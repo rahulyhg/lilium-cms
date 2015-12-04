@@ -1,5 +1,5 @@
 {
-  "name": "Lilium CMS",
+  "name": "LiliumCMS",
   "version": "0.0.1",
   "description": "Lightning-fast online CMS built with NodeJS, without express",
   "main": "lilium.js",
