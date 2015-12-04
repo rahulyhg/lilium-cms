@@ -1,0 +1,23 @@
+{
+  "name": "ryk",
+  "version": "0.0.1",
+  "description": "Lightning-fast online CMS built with NodeJS, without express",
+  "main": "lilium.js",
+  "scripts": {
+    "test": "liliumtest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://RykDesjardins@bitbucket.org/RykDesjardins/lilium-cms.git"
+  },
+  "keywords": [
+    "cms",
+    "nodejs",
+    "wordpress",
+    "javascript",
+    "blog"
+  ],
+  "author": "Erik Desjardins",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/RykDesjardins/lilium-cms#readme"
+}
