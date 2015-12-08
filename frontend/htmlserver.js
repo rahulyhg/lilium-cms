@@ -1,5 +1,6 @@
 var HTMLServer = function() {
 	this.serveClient = function(cli) {
+		cli.touch('htmlserver.serveClient');
 		cli.debug();
 	};
 

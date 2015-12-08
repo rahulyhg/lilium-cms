@@ -4,6 +4,9 @@ var ClientObject = function(req, resp) {
 	this.session = req.session;
 	this.sessiondata = req.session.data;
 	this.method = req.method;
+	this.createdon = new Date();
+
+	var nodes = ['clientobject.new'];
 
 	this.throwHTTP = function(code, message) {
 		this.response.writeHead(code, {
@@ -30,6 +33,7 @@ var ClientObject = function(req, resp) {
 
 	this.routeinfo = {
 		admin : false,
+		login : false,
 		root : false,
 		params : [],
 		path : []
@@ -41,9 +45,18 @@ var ClientObject = function(req, resp) {
 			routeinfo : this.routeinfo,
 			userinfo : this.userinfo,
 			method : this.method,
-			postdata : this.postdata
+			postdata : this.postdata,
+			nodes : nodes,
+			time : {
+				created : this.createdon,
+				served : new Date()
+			}
 		}));
 		this.response.end();
+	};
+
+	this.touch = function(str) {
+		nodes.push(str);
 	};
 
 	this.redirect = function(path, perm) {

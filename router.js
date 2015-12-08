@@ -3,6 +3,8 @@ var _c = require('./config.js');
 
 var Router = function() {
 	this.parseClientObject = function(cli) {
+		cli.touch('router.parseClientObject');
+
 		pObj = url.parse(cli.request.url, true);
 		
 		cli.routeinfo.path = pObj.pathname.replace(/^\/?|\/?$/g, "").split('/');

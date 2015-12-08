@@ -4,12 +4,15 @@ var Dispatcher = require('./dispatcher.js');
 
 var Handler = function() {
 	var GET = function(cli) {
+		cli.touch('handler.GET');
+
 		Router.parseClientObject(cli);
 		Dispatcher.dispatch(cli);
 	};
 
 	var POST = function(cli) {
-		
+		cli.touch('handler.POST');
+		cli.debug();
 	};
 
 	var notSupported = function(cli) {
@@ -17,6 +20,8 @@ var Handler = function() {
 	};
 
 	var parseMethod = function(cli) {
+		cli.touch('handler.parseMethod');
+
 		switch (cli.method) {
 			case 'GET': 
 				GET(cli);
@@ -30,7 +35,8 @@ var Handler = function() {
 		}
 	};
 	
-	this.handle = function(cli) {	
+	this.handle = function(cli) {
+		cli.touch('handler.handle');	
 		parseMethod(cli);
 	};
 
