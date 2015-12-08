@@ -1,5 +1,6 @@
-var _c = require('./config.js'),
-    _http = require('http');
+var _c = require('./config.js').default,
+    _http = require('http'),
+    _sesh = require('sesh/lib/core.js').magicSession(),
     __inbound = new (function() {
 	var server;
 	var callbacks = {
@@ -11,7 +12,7 @@ var _c = require('./config.js'),
 		for (var i = 0; i < callbacks.onRequest.length; i++) {
 			callbacks.onRequest[i](req, resp);
 		}
-	}
+	};
 
 	var handleConn = function() {
 		for (var i = 0; i < callbacks.onConn.length; i++) {
@@ -25,11 +26,11 @@ var _c = require('./config.js'),
 
 	this.start = function() {
 		server.listen(_c.server.port, handleConn);
-	}
+	};
 	
 	var init = function() {
 		server = _http.createServer(handleReq);
-	}
+	};
 
 	init();
 })();
