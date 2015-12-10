@@ -1,0 +1,256 @@
+var LMLContext = require('./lmlcontext.js');
+var fileserver = require('./fileserver.js');
+var _c = require('./config.js');
+
+var LML = function() {
+	// Reference to self
+	var that = this, lml = this;
+
+	// Print, execute, live, include, context
+	var markSymbolOpen  = '{';
+	var markSymbolClose = '}';
+
+	/*
+		Tag identifier - 
+			= Variable
+			@ Code
+			* Live
+			% File
+			# Context 
+	*/
+	var symbols = ['=', '@', '*', '%', '#'];
+	var symbolLen = symbols.length;
+
+	var execVariableTag = function(context, code, callback) {
+		// Browse the context library for corresponding obhect;
+		var lib = context.lib;
+		var levels = code.split('.');
+		var firstLevelLib = undefined;
+		var endVal = undefined;
+
+		if (levels.length != 0) {
+			firstLevelLib = lib[levels[0]];
+
+			if (typeof firstLevelLib === 'undefined') {
+				throw "LMLParseException - Undefined root level context library : " + levels[0];
+			} 
+
+			// Go through all levels
+			endVal = firstLevelLib;
+			for (var i = 1, len = levels.length; i < len; i++) {
+				endVal = endVal[levels[i]];
+
+				if (typeof endVal === 'undefined') {
+                                	throw "LMLParseException - Undefined branch " + levels[i] " in context library : " + levels[0];
+                       	 	}	 
+			}
+		} else {
+			throw "LMLParseException - Cannot print root level of library : " + levels[0];
+		}
+
+		context.newLine = endVal;
+		callback();
+		return true;
+	};
+
+	// WARNING : NOT SECURE
+	var execCodeTag = function(context, code, callback) {
+		// Execute code, not secure
+		code = "(function(context) {" + code + "})(context);";
+		try {
+			eval(code);
+			return true;
+		} catch (ex) {
+			throw "LMLParseException - Code Tag exception : " + ex;
+		}
+
+		callback();
+
+		return false;
+	};
+
+	// Not implemented yet
+	var execLiveTag = function(context, code, callback) {
+		execVariableTag(context, code, callback);
+	};
+
+	var execIncludeTag = function(context, code, callback) {
+		that.executeToContext(code, context, function(pContent) {
+			if (typeof pContent !== 'undefined') {
+				context.newLine += pContent;
+			} else {
+				callback();
+			}
+		});
+
+		return true;
+	};
+
+	var execContextTag = function(context, code, callback) {
+		context.newLine = "";
+		context.loadLibrary(code);
+
+		callback();
+		return true;
+	};
+	
+	var execTagContent = function(context, callback) {
+		var code = context.cachedCommand;
+		var tag = content.currentInTag;
+
+		switch (tag) {
+			case "=" : 
+				return execVariableTag(context, code, callback);
+				break;
+			
+			case "@" :
+				return execCodeTag(context, code, callback);
+				break;
+			
+			case "*" : 
+				return execLiveTag(context, code, callback);
+				break;
+		
+			case "%" :
+				return execIncludeTag(context, code, function() {
+					callback();
+				});
+				break;
+			
+			case "#" :
+				return execContextTag(context, code, callback);
+				break;
+
+			default :
+				throw "LMLParseException - Error fetching current tag. Cached character is : " + tag;
+		}
+
+		return false;
+	};
+
+	var parseLine = function(line, context, lineCallback) {
+		var i = 0, len = line.length;
+
+		var cont = function() {
+			var c = line[i];
+			var blockCont = false;
+
+			if (context.tagProspect) {
+				context.tagProspect = false;
+				for (var j = 0; j < symbolLen; j++) {
+					if (c == symbols[j]) {
+						context.isInTag = true;
+						context.currentInTag = symbols[j];
+
+						context.isExecTag = c == '@';
+						break;
+					}
+				}
+			} else if (c == markSymbolOpen) {
+				context.tagProspect = true;
+			} else if (context.isInTag) {
+				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose)) {
+					if (context.isExecTag) {
+						i++;
+					}
+
+					context.cachedCommand = context.cachedCommand.trim();
+					execTagContent(context, function() {
+						context.compiled = context.newLine;
+
+						context.isInTag = false;
+						context.cachedCommand = '';
+						context.isExecTag = false;
+						context.newLine = '';
+
+						cont();
+					});
+
+					blockCont = true;
+				} else {
+					context.cachedCommand += c;
+				}
+			} else {
+				context.compiled += c;	
+			}
+
+			i++;
+
+			if (i == len) {
+				lineCallback();
+			} else if (!blockCont) {
+				cont();
+			}
+		};
+
+		cont();
+	};
+
+	// Parses content, and returns partial strings through a callback
+	// The value returned is undefined when everything is done
+	this.parseContent = function(content, callback, ctx) {
+		// Per line execution, slow for minified files
+		var lines = content.split('\\n');
+		var i = 0, len = lines.length, context = undefined;
+
+		if (typeof ctx === 'undefined') {
+			context = new LMLContext();
+		} else {
+			context = ctx;
+		}
+
+		delete content;
+
+		if (len != 0) {
+			var cont = function() {
+				parseLine(lines[i], context, function(feedback) {
+					callback(context.compiled.toString());
+					context.compiled = "";
+					i++;
+
+					if (i == len) {
+						callback(undefined);
+					} else {
+						cont();
+					}
+				});
+			};
+			cont();
+		}
+	});
+
+	this.executeToContext = function(rootpath, context, callback) {
+		fileserver.readFile(rootpath, function(content) {
+			this.parseContent(content, function(pContent) {
+				if (typeof pContent !== 'undefined') {
+					callback(pContent.toString());
+				} else {
+					callback(undefined);
+				}
+			});
+		});
+	};
+
+	this.executeToFile = function(rootpath, compilepath, callback) {
+		fileserver.readFile(rootpath, function(content) {
+			var fileHandle = fileserver.getOutputFileHandle(compilepath);
+			that.parseContent(content, function(pContent) {
+				// Write pContent to file @compilepath
+				if (typeof pContent !== 'undefined') {
+					fileserver.closeFileHandle(fileHandle);
+					callback();
+				} else {
+					fileserver.writeToFile(fileHandle, pContent);
+				}
+			});
+		});
+	}
+
+	var init = function() {
+
+	};
+
+	init();
+};
+
+module.exports = new LML();
