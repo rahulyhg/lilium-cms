@@ -1,5 +1,5 @@
 // LML Context Object Namespace
-
+// Those will be loaded runtime instead of on boot
 var registeredLibraries = {
 	config : function(context) {
 		return require('./config.js');
@@ -22,6 +22,8 @@ var LMLContext = function(info) {
 	this.compiled = '';
 	this.newLine = '';
 
+	this.touched = ["LMLContext.init"];
+
 	this.lib = {
 		_public : new Object()
 	};
@@ -32,11 +34,15 @@ var LMLContext = function(info) {
 			throw "LMLParseException - Unable to add unregistered library '"+libName+"' to current context";
 		}
 
-		if (typeof lib[libNam] !== "undefined") {
+		if (typeof this.lib[libName] !== "undefined") {
 			throw "LMLParseException - Attempted to add already registered library '"+libName+"' to context";
 		}
 
-		lib[libName] = registeredLibraries[libName](this);
+		this.lib[libName] = registeredLibraries[libName](this);
+	};
+
+	this.touch = function(str) {
+		this.touched.push(str);
 	};
 
 	var init = function(info) {

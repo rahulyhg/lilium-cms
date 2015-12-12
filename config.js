@@ -18,6 +18,7 @@ module.exports = {
 		},
 		"server" : {
 			base : "/usr/share/ryk/",
+			html : "/usr/share/ryk/html",
 			url : "http://localhost:8080",
 			port : "8080"
 		},
@@ -33,6 +34,18 @@ module.exports = {
 			"admin" : {
 				loginIfNotAuth : true
 			}
+		},
+		"website" : {
+			"sitetitle" : "A Lilium Website",
+			"language" : "en"
+		},
+		"login" : {
+			"csspath" : "",
+			"jspath" : ""
+		},
+		"vendor" : {
+			"productname" : "Lilium CMS",
+			"version" : "0.1 DEV"
 		}
 	}
 };

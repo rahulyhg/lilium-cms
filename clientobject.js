@@ -35,8 +35,16 @@ var ClientObject = function(req, resp) {
 		admin : false,
 		login : false,
 		root : false,
+		isStatic : false,
 		params : [],
-		path : []
+		path : [],
+		fullpath : "",
+		fileExt : ""
+	};
+
+	this.responseinfo = {
+		filecreated : false,
+		cachedfile : false
 	};
 
 	this.debug = function() {
@@ -44,6 +52,7 @@ var ClientObject = function(req, resp) {
 		this.response.write(JSON.stringify({
 			routeinfo : this.routeinfo,
 			userinfo : this.userinfo,
+			responseinfo : this.responseinfo,
 			method : this.method,
 			postdata : this.postdata,
 			nodes : nodes,

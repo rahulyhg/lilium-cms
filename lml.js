@@ -41,7 +41,7 @@ var LML = function() {
 				endVal = endVal[levels[i]];
 
 				if (typeof endVal === 'undefined') {
-                                	throw "LMLParseException - Undefined branch " + levels[i] " in context library : " + levels[0];
+                                	throw "LMLParseException - Undefined branch " + levels[i] + " in context library : " + levels[0];
                        	 	}	 
 			}
 		} else {
@@ -88,7 +88,12 @@ var LML = function() {
 
 	var execContextTag = function(context, code, callback) {
 		context.newLine = "";
-		context.loadLibrary(code);
+
+		var codeArr = code.split(';');
+
+		for (var i = 0, len = codeArr.length; i < len; i++) {
+			context.loadLibrary(codeArr[i]);
+		}
 
 		callback();
 		return true;
@@ -96,7 +101,7 @@ var LML = function() {
 	
 	var execTagContent = function(context, callback) {
 		var code = context.cachedCommand;
-		var tag = content.currentInTag;
+		var tag = context.currentInTag;
 
 		switch (tag) {
 			case "=" : 
@@ -131,9 +136,13 @@ var LML = function() {
 	var parseLine = function(line, context, lineCallback) {
 		var i = 0, len = line.length;
 
+		if (len == 0) {
+			lineCallback();
+			return;
+		}
+
 		var cont = function() {
 			var c = line[i];
-			var blockCont = false;
 
 			if (context.tagProspect) {
 				context.tagProspect = false;
@@ -152,11 +161,13 @@ var LML = function() {
 				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose)) {
 					if (context.isExecTag) {
 						i++;
-					}
+					} 
 
 					context.cachedCommand = context.cachedCommand.trim();
+					context.skipNextChar = true;
+
 					execTagContent(context, function() {
-						context.compiled = context.newLine;
+						context.compiled += context.newLine;
 
 						context.isInTag = false;
 						context.cachedCommand = '';
@@ -166,10 +177,12 @@ var LML = function() {
 						cont();
 					});
 
-					blockCont = true;
+					return;
 				} else {
 					context.cachedCommand += c;
 				}
+			} else if (context.skipNextChar) {
+				context.skipNextChar = false;
 			} else {
 				context.compiled += c;	
 			}
@@ -178,8 +191,8 @@ var LML = function() {
 
 			if (i == len) {
 				lineCallback();
-			} else if (!blockCont) {
-				cont();
+			} else {
+				setTimeout(cont, 0);
 			}
 		};
 
@@ -190,8 +203,8 @@ var LML = function() {
 	// The value returned is undefined when everything is done
 	this.parseContent = function(content, callback, ctx) {
 		// Per line execution, slow for minified files
-		var lines = content.split('\\n');
-		var i = 0, len = lines.length, context = undefined;
+		var lines = content.split('\n');
+		var cLine = 0, lineTotal = lines.length, context = undefined;
 
 		if (typeof ctx === 'undefined') {
 			context = new LMLContext();
@@ -201,23 +214,25 @@ var LML = function() {
 
 		delete content;
 
-		if (len != 0) {
+		if (lineTotal != 0) {
 			var cont = function() {
-				parseLine(lines[i], context, function(feedback) {
-					callback(context.compiled.toString());
-					context.compiled = "";
-					i++;
+				setTimeout(function() {
+					parseLine(lines[cLine], context, function(feedback) {
+						callback(context.compiled.toString());
+						context.compiled = "";
+						cLine++;
 
-					if (i == len) {
-						callback(undefined);
-					} else {
-						cont();
-					}
-				});
+						if (cLine == lineTotal) {
+							callback(undefined);
+						} else {
+							cont();
+						}
+					});
+				}, 0);
 			};
 			cont();
 		}
-	});
+	};
 
 	this.executeToContext = function(rootpath, context, callback) {
 		fileserver.readFile(rootpath, function(content) {
@@ -232,16 +247,38 @@ var LML = function() {
 	};
 
 	this.executeToFile = function(rootpath, compilepath, callback) {
-		fileserver.readFile(rootpath, function(content) {
-			var fileHandle = fileserver.getOutputFileHandle(compilepath);
-			that.parseContent(content, function(pContent) {
-				// Write pContent to file @compilepath
-				if (typeof pContent !== 'undefined') {
-					fileserver.closeFileHandle(fileHandle);
-					callback();
-				} else {
-					fileserver.writeToFile(fileHandle, pContent);
+		fileserver.createDirIfNotExists(compilepath, function(dirExists) {
+			if (!dirExists) throw "LML.AccessException - Could not create directory for " + compilepath;
+
+			fileserver.readFile(rootpath, function(content) {
+				var fileHandle = fileserver.getOutputFileHandle(compilepath);
+				var linesToWrite = 0;
+				var linesWritten = 0;
+				var readyToFlush = false;
+				var flushing = false;
+
+				var verifyEnd = function() {
+					if (readyToFlush && linesToWrite == linesWritten && !flushing) {
+						flushing = true;
+						fileserver.closeFileHandle(fileHandle);
+						callback();
+					}
 				}
+
+				that.parseContent(content, function(pContent) {
+					// Write pContent to file @compilepath
+					if (typeof pContent === 'undefined') {
+						readyToFlush = true;
+						verifyEnd();
+					} else {
+						linesToWrite++;
+
+						fileserver.writeToFile(fileHandle, pContent, function() {
+							linesWritten++;
+							verifyEnd();
+						});
+					}
+				});
 			});
 		});
 	}

@@ -1,3 +1,5 @@
+var filelogic = require('../filelogic.js');
+
 var Admin = function() {
 	this.serveDashboard = function(cli) {
 		cli.touch('admin.serverDashboard');
@@ -6,7 +8,7 @@ var Admin = function() {
 
 	this.serveLogin = function(cli) {
 		cli.touch('admin.serverLogin');
-		cli.debug();	
+		filelogic.runLogic(cli);
 	};
 
 	var init = function() {
