@@ -1,5 +1,4 @@
 {#config;session;vocab}
-
 <!DOCTYPE html>
 <html>
 	<head>
@@ -9,6 +8,5 @@
 	</head>
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
-		{%loginform}
 	</body>
 </html>

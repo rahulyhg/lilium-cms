@@ -8,6 +8,7 @@ var FileServer = function() {
 		fs.lstat(fullpath, function(err, stats) {
 			if (err) {
 				cb(false);
+				return;
 			}
 
 			if (stats.isDirectory()) {
@@ -18,6 +19,10 @@ var FileServer = function() {
 				cb(!err);
 			});
 		});
+	};
+
+	this.dirname = function(fullpath) {
+		return path.dirname(fullpath);
 	};
 
 	this.createDirIfNotExists = function(fullpath, callback) {

@@ -75,7 +75,7 @@ var ClientObject = function(req, resp) {
 		this.response.end();
 	};
 
-	this.postdata = {};
+	this.postdata = undefined;
 };
 
 module.exports = ClientObject;

@@ -1,3 +1,6 @@
 module.exports = {
-	"logintitle" : "Login"
-}
+	"logintitle" : "Login",
+	"username" : "Username",
+	"password" : "Password",
+	"loginaction" : "Login"
+};

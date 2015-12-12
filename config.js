@@ -20,7 +20,8 @@ module.exports = {
 			base : "/usr/share/ryk/",
 			html : "/usr/share/ryk/html",
 			url : "http://localhost:8080",
-			port : "8080"
+			port : "8080",
+			postMaxLength : 1024
 		},
 		"signature" : {
 			publichash : "300da60969c40d4491da8cb9341b9bce9aa29da88d457de8aa3ce24576bd899e", // Lilium
@@ -37,7 +38,8 @@ module.exports = {
 		},
 		"website" : {
 			"sitetitle" : "A Lilium Website",
-			"language" : "en"
+			"language" : "en",
+			"flower" : "garden"
 		},
 		"login" : {
 			"csspath" : "",

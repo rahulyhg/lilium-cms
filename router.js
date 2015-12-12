@@ -19,6 +19,26 @@ var Router = function() {
 		cli.routeinfo.admin = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.admin;
 		cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.login;
 		cli.routeinfo.root = pObj.pathname == "/";
+
+		if (cli.method == "POST") {
+			this.parsePostData(cli);
+		}
+	};
+
+	this.parsePostData = function(cli) {
+		cli.touch("router.parsePostData");
+
+		var str = cli.postdata.data;
+		var arr = str.split("&");
+		cli.postdata.data = {};
+
+		delete str;	
+		for (var i = 0, len = arr.length; i < len; i++) {
+			var dat = arr[i].split('=');
+			cli.postdata.data[dat[0]] = dat.length > 1 ?
+				decodeURIComponent(dat[1].replace(/\+/g, ' ')) :
+				undefined;
+		}
 	};	
 	
 	var init = function() {

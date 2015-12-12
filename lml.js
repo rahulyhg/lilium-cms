@@ -28,24 +28,30 @@ var LML = function() {
 		var firstLevelLib = undefined;
 		var endVal = undefined;
 
-		if (levels.length != 0) {
-			firstLevelLib = lib[levels[0]];
+		try {
+			if (levels.length != 0) {
+				firstLevelLib = lib[levels[0]];
+	
+				if (typeof firstLevelLib === 'undefined') {
+					throw "LMLParseException - Undefined root level context library : " + levels[0];
+				} 
 
-			if (typeof firstLevelLib === 'undefined') {
-				throw "LMLParseException - Undefined root level context library : " + levels[0];
-			} 
-
-			// Go through all levels
-			endVal = firstLevelLib;
-			for (var i = 1, len = levels.length; i < len; i++) {
-				endVal = endVal[levels[i]];
-
-				if (typeof endVal === 'undefined') {
-                                	throw "LMLParseException - Undefined branch " + levels[i] + " in context library : " + levels[0];
-                       	 	}	 
+				// Go through all levels
+				endVal = firstLevelLib;
+				for (var i = 1, len = levels.length; i < len; i++) {
+					endVal = endVal[levels[i]];
+	
+					if (typeof endVal === 'undefined') {
+                	                	throw "LMLParseException - Undefined branch " + 
+							levels[i] + " in context library : " + 
+							levels[0];
+                       		 	}	 
+				}
+			} else {
+				throw "LMLParseException - Cannot print root level of library : " + levels[0];
 			}
-		} else {
-			throw "LMLParseException - Cannot print root level of library : " + levels[0];
+		} catch (ex) {
+			endVal = "[" + ex + "]";
 		}
 
 		context.newLine = endVal;
@@ -75,10 +81,12 @@ var LML = function() {
 	};
 
 	var execIncludeTag = function(context, code, callback) {
-		that.executeToContext(code, context, function(pContent) {
+		var fullpath = context.rootDir + "/" + code + ".petal";
+		that.executeToContext(fullpath, context, function(pContent) {
 			if (typeof pContent !== 'undefined') {
 				context.newLine += pContent;
 			} else {
+				context = context.parent;
 				callback();
 			}
 		});
@@ -117,9 +125,7 @@ var LML = function() {
 				break;
 		
 			case "%" :
-				return execIncludeTag(context, code, function() {
-					callback();
-				});
+				return execIncludeTag(context, code, callback);
 				break;
 			
 			case "#" :
@@ -201,16 +207,21 @@ var LML = function() {
 
 	// Parses content, and returns partial strings through a callback
 	// The value returned is undefined when everything is done
-	this.parseContent = function(content, callback, ctx) {
+	this.parseContent = function(rootpath, content, callback, context) {
 		// Per line execution, slow for minified files
 		var lines = content.split('\n');
-		var cLine = 0, lineTotal = lines.length, context = undefined;
+		var cLine = 0, lineTotal = lines.length;
 
-		if (typeof ctx === 'undefined') {
+		if (typeof context === 'undefined') {
 			context = new LMLContext();
+			context.rootDir = fileserver.dirname(rootpath);
 		} else {
-			context = ctx;
-		}
+			var parentContext = context;
+			context = new LMLContext();
+			context.parent = parentContext;
+			context.rootDir = fileserver.dirname(rootpath);
+			context.lib = context.parent.lib;
+		} 
 
 		delete content;
 
@@ -235,14 +246,21 @@ var LML = function() {
 	};
 
 	this.executeToContext = function(rootpath, context, callback) {
-		fileserver.readFile(rootpath, function(content) {
-			this.parseContent(content, function(pContent) {
-				if (typeof pContent !== 'undefined') {
-					callback(pContent.toString());
-				} else {
-					callback(undefined);
-				}
-			});
+		fileserver.fileExists(rootpath, function(exists) {
+			if (exists) {
+				fileserver.readFile(rootpath, function(content) {
+					that.parseContent(rootpath, content, function(pContent) {
+						if (typeof pContent !== 'undefined') {
+							callback(pContent.toString());
+						} else {
+							callback(undefined);
+						}
+					}, context);
+				});
+			} else {
+				callback("[LMLIncludeNotFound : "+rootpath+"]");
+				callback(undefined);
+			}
 		});
 	};
 
@@ -265,7 +283,7 @@ var LML = function() {
 					}
 				}
 
-				that.parseContent(content, function(pContent) {
+				that.parseContent(rootpath, content, function(pContent) {
 					// Write pContent to file @compilepath
 					if (typeof pContent === 'undefined') {
 						readyToFlush = true;

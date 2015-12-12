@@ -12,7 +12,19 @@ var Handler = function() {
 
 	var POST = function(cli) {
 		cli.touch('handler.POST');
-		cli.debug();
+		cli.postdata = new Object();
+
+		cli.postdata.length = cli.request.headers["content-length"];
+		cli.postdata.data = "";
+
+		cli.request.on('data', function(chunk) {
+			cli.postdata.data += chunk;
+		});
+
+		cli.request.on('end', function() {
+			Router.parseClientObject(cli);
+			cli.debug();
+		});
 	};
 
 	var notSupported = function(cli) {
