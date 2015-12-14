@@ -19,5 +19,8 @@
   ],
   "author": "Erik Desjardins",
   "license": "ISC",
-  "homepage": "https://bitbucket.org/RykDesjardins/lilium-cms#readme"
+  "homepage": "https://bitbucket.org/RykDesjardins/lilium-cms#readme",
+  "dependencies": {
+    "mongodb": "^2.1.0"
+  }
 }

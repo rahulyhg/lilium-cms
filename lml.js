@@ -1,6 +1,7 @@
 var LMLContext = require('./lmlcontext.js');
 var fileserver = require('./fileserver.js');
 var _c = require('./config.js');
+var log = require('./log.js');
 
 var LML = function() {
 	// Reference to self
@@ -265,6 +266,7 @@ var LML = function() {
 	};
 
 	this.executeToFile = function(rootpath, compilepath, callback) {
+		var timeStamp = new Date();
 		fileserver.createDirIfNotExists(compilepath, function(dirExists) {
 			if (!dirExists) throw "LML.AccessException - Could not create directory for " + compilepath;
 
@@ -279,6 +281,8 @@ var LML = function() {
 					if (readyToFlush && linesToWrite == linesWritten && !flushing) {
 						flushing = true;
 						fileserver.closeFileHandle(fileHandle);
+
+						log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms');
 						callback();
 					}
 				}

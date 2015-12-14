@@ -2,6 +2,7 @@ var fs = require('fs');
 var mkdirp = require('mkdirp');
 var path = require('path');
 var _c = require('./config.js');
+var log = require('./log.js');
 
 var FileServer = function() {
 	this.fileExists = function(fullpath, cb) {
@@ -21,12 +22,27 @@ var FileServer = function() {
 		});
 	};
 
+	this.dirExists = function(fullpath, cb) {
+		fs.lstat(fullpath, function(err, stats) {
+			if (err || !stats.isDirectory() && !stats.isSymbolicLink()) {
+				cb(false);
+			} else {
+				cb(true);
+			}
+		});
+	};
+
+	this.createSymlink = function(src, dest, cb) {
+		fs.symlink(src, dest, cb);
+	};
+
 	this.dirname = function(fullpath) {
 		return path.dirname(fullpath);
 	};
 
-	this.createDirIfNotExists = function(fullpath, callback) {
-		var dirname = path.dirname(fullpath);
+	this.createDirIfNotExists = function(fullpath, callback, abs) {
+		abs = typeof abs === 'undefined' ? false : abs;
+		var dirname = abs ? fullpath : path.dirname(fullpath);
 		mkdirp(dirname, function(err) {
 			callback(!err);
 		});
@@ -97,7 +113,7 @@ var FileServer = function() {
 	};
 
 	var init = function() {
-
+		
 	};
 
 	init();

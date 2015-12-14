@@ -23,7 +23,7 @@ var Handler = function() {
 
 		cli.request.on('end', function() {
 			Router.parseClientObject(cli);
-			cli.debug();
+			Dispatcher.dispost(cli);
 		});
 	};
 

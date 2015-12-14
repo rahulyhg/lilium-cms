@@ -1,4 +1,4 @@
-module.exports = {
+var _config = {
 	"default" : {
 		"info" : {
 			project : "Lilium CMS",
@@ -6,11 +6,12 @@ module.exports = {
 			author : "Erik Desjardins"
 		},
 		"data" : {
-			engine : "mongo",
+			engine : "mongodb",
 			host : "localhost",
-			port : "default",
+			port : 27017,
 			user : "lilium",
-			pass : ""
+			pass : "lilium",
+			use : "liliumdev"
 		},
 		"paths" : {
 			admin : "admin",
@@ -42,12 +43,15 @@ module.exports = {
 			"flower" : "garden"
 		},
 		"login" : {
-			"csspath" : "",
-			"jspath" : ""
+			"csspath" : "static/admin.css",
+			"jspath" : "static/admin.js"
 		},
 		"vendor" : {
 			"productname" : "Lilium CMS",
-			"version" : "0.1 DEV"
+			"version" : "0.1 DEV",
+			"infourl" : "http://liliumcms.com/info"
 		}
 	}
 };
+
+module.exports = _config;

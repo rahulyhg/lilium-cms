@@ -1,5 +1,6 @@
 var _c = require('./config.js').default,
     _http = require('http'),
+    log = require('./log.js'),
     _sesh = require('sesh/lib/core.js').magicSession(),
     __inbound = new (function() {
 	var server;
@@ -21,10 +22,12 @@ var _c = require('./config.js').default,
 	};
 	
 	this.bind = function(hook, cb) {
+		log('Inbound', 'Binding ' + hook + ' to connection');
 		callbacks[hook].push(cb);
 	};
 
 	this.start = function() {
+		log('Inbound', 'Ready to receive requests');
 		server.listen(_c.server.port, handleConn);
 	};
 	
