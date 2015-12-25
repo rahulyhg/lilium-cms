@@ -9,6 +9,8 @@ var Login = function() {
 
 	this.authUser = function(cli) {
 		cli.touch('login.authUser');
+		
+
 		cli.debug();
 	};
 	

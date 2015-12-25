@@ -102,6 +102,29 @@ var Core = function() {
 		});
 	};
 
+	var loadStandardInput = function() {
+		var stdin = process.openStdin();
+		stdin.liliumBuffer = "";
+		stdin.on('data', function(chunk) { 
+			setTimeout(function() {
+				chunk = chunk.toString().trim();
+				stdin.liliumBuffer += chunk;
+
+				if (chunk === '') {
+					eval(
+						'try{'+
+						stdin.liliumBuffer+
+						'}catch(ex){log'+
+						'("STDin", "Error : " + ex)}'
+					);
+					stdin.liliumBuffer = "";
+				}
+			}, 0);
+		});
+
+		log("STDin", 'Listening to standard input');
+	};
+
 	var loadHTMLStructure = function(callback) {
 		fileserver.createDirIfNotExists(_c.default.server.html + '/uploads/', function(valid) {
 			if (valid) {
@@ -122,6 +145,7 @@ var Core = function() {
 		loadHooks(readyToRock);
 		loadEndpoints();
 		loadPlugins();
+		loadStandardInput();
 
 		loadHTMLStructure(function() {
 			testDatabase(function() {	
