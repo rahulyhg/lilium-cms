@@ -23,13 +23,20 @@ var ClientObject = function(req, resp) {
 	this.userinfo = {
 		loggedin : req.session.data.user != 'Guest',
 		role : req.session.data.role,
-		userid : req.session.data.id,
+		userid : req.session.data.userid,
 		logintime : req.session.data.logintime,
 		level : req.session.data.level,
 		displayname : req.session.data.displayname,
 		avatar : req.session.data.avatar,
-		dashaccess : false
+		admin : req.session.data.admin,
+		god : req.session.data.god,
+		user : req.session.data.user,
 	};
+	this.userinfo.dashaccess = 
+		this.userinfo.loggedin &&
+		this.userinfo.admin || 
+		this.userinfo.god || 
+		(this.userinfo.role && this.userinfo.role.indexOf('dash') !== -1);
 
 	this.routeinfo = {
 		admin : false,

@@ -1,0 +1,13 @@
+{#config;session;vocab}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+		<link rel="stylesheet" type="text/css" href="{=config.default.admin.csspath}" />
+		<script src="{=config.default.admin.jspath}"></script>
+	</head>
+	<body>
+		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
+		<h2>{=vocab.admintitle}</h2>
+	</body>
+</html>

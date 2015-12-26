@@ -35,6 +35,9 @@ var _config = {
 		"usability" : {
 			"admin" : {
 				loginIfNotAuth : true
+			},
+			"home" : {
+				keepInRAM : false
 			}
 		},
 		"website" : {

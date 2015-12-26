@@ -74,7 +74,7 @@ var DB = function() {
 		cb : End callback with format function(err, cursor)
 	*/
 	this.find = this.query = function(coln, conds, stack, cb) {
-		db.collection(coln, {"strict":true}, function(err, col) {	
+		_conn.collection(coln, {"strict":true}, function(err, col) {	
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -101,7 +101,7 @@ var DB = function() {
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
 	this.modify = this.update = function(coln, conds, newVal, cb, upsert, one) {	
-		db.collection(coln, {"strict":true}, function(err, col) {	
+		_conn.collection(coln, {"strict":true}, function(err, col) {	
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -127,7 +127,7 @@ var DB = function() {
 	};
 
 	this.insert = function(coln, docs, cb) {
-		db.collection(coln, {"strict":true}, function(err, col) {
+		_conn.collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof docs !== "object") {
@@ -143,7 +143,7 @@ var DB = function() {
 	};
 
 	this.remove = this.delete = function(coln, conds, cb, one) {	
-		db.collection(coln, {"strict":true}, function(err, col) {	
+		_conn.collection(coln, {"strict":true}, function(err, col) {	
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -164,15 +164,21 @@ var DB = function() {
 
 	// Will callback cb with a boolean representing the existance of a document
 	this.match = this.exists = function(coln, conds, cb) {
-		db.collection(coln, {"strict":true}, function(err, col) {
-			
+		this.find(coln, conds, {limit:[1]}, function(err, r) {
+			if (err) {
+				cb(false);
+			} else {
+				r.hasNext(function(err, res) {
+					cb(err ? false : res);
+				});
+			};
 		});
 	};
 		
 	// USE CAREFULLY
 	// Will callback cb with a raw mongodb collection object
 	this.rawCollection = function(coln, opt, cb) {
-		db.collection(coln, opt, cb);
+		_conn.collection(coln, opt, cb);
 	};
 };
 

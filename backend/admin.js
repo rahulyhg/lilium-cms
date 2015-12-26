@@ -3,7 +3,7 @@ var filelogic = require('../filelogic.js');
 var Admin = function() {
 	this.serveDashboard = function(cli) {
 		cli.touch('admin.serverDashboard');
-		cli.debug();
+		filelogic.runLogic(cli);
 	};
 
 	this.serveLogin = function(cli) {
