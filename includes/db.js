@@ -97,6 +97,39 @@ var DB = function() {
 		});	
 	};
 
+	this.multiLevelFind = function(topLevel, levels, conds, stack, callback) {
+		var firstNodeCond = levels.shift();
+		this.find(topLevel, conds, stack, function(err, cur) {
+			cur.hasNext(function(err, hasNext) {
+				if (hasNext) {
+					cur.next(function(err, r) {
+						for (var i = 0, len = levels.length; i < len; i++) {
+							if (typeof r !== 'undefined') {
+								r = r[levels.shift()];
+							} else {
+								r = new Object();
+							}
+						}
+	
+						callback(r);
+					});
+				} else {
+					callback(undefined);		
+				}
+			});
+		});
+	};
+
+	this.singleLevelFind = function(topLevel, callback) {
+		this.find(topLevel, {}, {}, function(err, cur) {
+			cur.toArray(function(err, docs) {
+				callback(docs);
+			});
+		});
+	};
+
+
+
 	// Will find documents from collection coln according to conds, 
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)

@@ -41,6 +41,7 @@ var ClientObject = function(req, resp) {
 	this.routeinfo = {
 		admin : false,
 		login : false,
+		livevars : false,
 		root : false,
 		isStatic : false,
 		params : [],
@@ -71,12 +72,23 @@ var ClientObject = function(req, resp) {
 		this.response.end();
 	};
 
+	this.sendJSON = function(json) {
+		if (typeof json === 'object') {
+			json = JSON.stringify(json);
+		}
+		this.response.writeHead(200, {
+			"Content-Type": "application/json",
+			"Lilium-Proto": "livevars"
+		});
+		this.response.end(json);	
+	};
+
 	this.touch = function(str) {
 		nodes.push(str);
 	};
 
 	this.redirect = function(path, perm) {
-		this.response.writeHead(perm?302:301, {
+		this.response.writeHead(perm?301:302, {
 			'Location' : path
 		});
 		this.response.end();

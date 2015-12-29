@@ -1,6 +1,7 @@
 var Admin = require('./backend/admin.js');
 var HTMLServer = require('./frontend/htmlserver.js'); 
 var Endpoints = require('./endpoints.js');
+var LiveVars = require('./livevars.js');
 var _c = require('./config.js');
 
 var Dispatcher = function() {
@@ -19,6 +20,8 @@ var Dispatcher = function() {
 			}
 		} else if (cli.routeinfo.login) {
 			Admin.serveLogin(cli);
+		} else if (cli.routeinfo.livevars) {
+			LiveVars.handleRequest(cli);
 		} else {
 			HTMLServer.serveClient(cli);
 		}

@@ -78,7 +78,10 @@ var LML = function() {
 
 	// Not implemented yet
 	var execLiveTag = function(context, code, callback) {
-		execVariableTag(context, code, callback);
+		context.newLine = '<span class="liliumLiveVar" data-varname="'+code+'"></span>';
+		callback();
+
+		return true;
 	};
 
 	var execIncludeTag = function(context, code, callback) {

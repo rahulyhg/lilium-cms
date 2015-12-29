@@ -9,5 +9,6 @@
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>{=vocab.admintitle}</h2>
+		<h3>Welcome, {*session.displayname}</h3>
 	</body>
 </html>

@@ -2,6 +2,7 @@ var fileserver = require('../fileserver.js');
 var LML = require('../lml.js');
 var db = require('../includes/db.js');
 var CryptoJS = require('crypto-js');
+var _c = require('../config.js');
 
 var Login = function() {
 	var loginSuccess = function(cli, userObj) {
@@ -23,7 +24,7 @@ var Login = function() {
 		dat.dashaccess = dat.admin || dat.god || dat.role.indexOf('dash') !== -1;
 
 		cli.userinfo = dat;
-		cli.debug();
+		cli.redirect(_c.default.server.url + "/" + _c.default.paths.admin, false);
 	};
 
 	this.authUser = function(cli) {
@@ -49,7 +50,7 @@ var Login = function() {
 						});
 					});
 				} else {
-					cli.debug();
+					cli.redirect(_c.default.server.url + "/" + _c.default.paths.login + "?failed", false);
 				}
 			});
 		}

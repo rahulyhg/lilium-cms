@@ -15,7 +15,8 @@ var _config = {
 		},
 		"paths" : {
 			admin : "admin",
-			login : "login"
+			login : "login",
+			livevars : "livevars"
 		},
 		"server" : {
 			base : "/usr/share/ryk/",

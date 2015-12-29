@@ -36,6 +36,21 @@ var adminEntity = {
 	}
 };
 
+var defaultTheme = {
+	id : 0,
+	uName : 'flowerg',
+	dName : 'Flower Garden', 
+	active : true, 
+	creators : [{
+		fullname : 'Erik Desjardins',
+		website : "http://erikdesjardins.com",
+		license : 'MIT',
+		role : 'Developer'
+	}],
+	website : 'http://liliumcsm.com/themes/flowerg',
+	requiredModule : []
+};
+
 var rootEntity = {
 	id : -1, username : "root", shhh : '', roles : ["lilium"],
 }
@@ -45,7 +60,7 @@ var log = require('../log.js');
 
 var initMongo = function(db, cb) {
 	log('Database', 'Init script was executed');
-	var totalTasks = 3;
+	var totalTasks = 4;
 	var completedTasks = 0;
 	
 	// Boot Script
@@ -112,6 +127,19 @@ var initMongo = function(db, cb) {
 				});
 			} else {
 				throw "[DatabaseInit - entities collection does not exist]";
+			}
+		});
+
+
+		log('Database', 'Creating default theme entry');
+		db.collection('themes', {strict:true}, function(err, col) {
+			if (!err) {
+				col.insertOne(defaultTheme, function(err, r) {
+					completedTasks++;
+					checkForCompletion();
+				});
+			} else {
+				throw "[DatabaseInit - themes collection does not exist]";
 			}
 		});
 	};

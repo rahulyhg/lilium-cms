@@ -18,6 +18,7 @@ var Router = function() {
 		cli.routeinfo.params = pObj.query;
 		cli.routeinfo.admin = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.admin;
 		cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.login;
+		cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.livevars;
 		cli.routeinfo.root = pObj.pathname == "/";
 
 		if (cli.method == "POST") {

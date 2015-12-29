@@ -22,7 +22,6 @@ var LMLContext = function(info) {
 	this.compiled = '';
 	this.newLine = '';
 	this.skipNextChar = false;
-
 	this.rootDir = '';
 
 	this.touched = ["LMLContext.init"];
