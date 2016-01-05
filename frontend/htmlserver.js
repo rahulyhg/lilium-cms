@@ -1,4 +1,5 @@
 var fileserver = require('../fileserver.js');
+var _conf = require('../config.js');
 
 var MIMES = {
 	"" : "text/html",
@@ -20,7 +21,20 @@ var HTMLServer = function() {
 		cli.touch('htmlserver.serveClient');
 
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
-		cli.debug();
+
+		var filename = _conf.default.server.html + cli.routeinfo.fullpath;
+
+		fileserver.fileExists(filename, function (fileExists){
+
+			if (fileExists) {
+				fileserver.pipeFileToClient(cli, filename, function (){
+					cli.touch('htmlserver.serveClient.callback');
+				});
+			}
+
+		});
+
+
 	};
 
 	this.registerMime = function(ext, present) {
@@ -37,7 +51,7 @@ var HTMLServer = function() {
 
 	this.mimeOrRefused = function(ext) {
 		return this.mimeRegistered(ext) ? MIMES[ext] : "application/x-lilium-nope";
-	};		
+	};
 
 	var init = function() {
 
