@@ -66,7 +66,7 @@ var FileServer = function() {
 
 		var stream = fs.createReadStream(filename)
 		stream.pipe(cli.response);
-		
+
 		stream.on('close', function() {
 			cli.response.end();
 			callback();
@@ -85,7 +85,7 @@ var FileServer = function() {
 		return fs.createWriteStream(filename, {
 			flags : 'a+',
 			defaultEncoding : 'utf8',
-			mode : 0o644
+			mode : '0644'
 		});
 	};
 
@@ -113,7 +113,7 @@ var FileServer = function() {
 	};
 
 	var init = function() {
-		
+
 	};
 
 	init();
