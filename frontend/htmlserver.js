@@ -30,10 +30,11 @@ var HTMLServer = function() {
 				fileserver.pipeFileToClient(cli, filename, function (){
 					cli.touch('htmlserver.serveClient.callback');
 				});
+			}else{
+				cli.throwHTTP(404, 'Not Found');
 			}
 
 		});
-
 
 	};
 
