@@ -50,6 +50,10 @@ var _config = {
 			"csspath" : "static/admin.css",
 			"jspath" : "static/admin.js"
 		},
+		"admin" : {
+			"csspath" : "static/admin.css",
+			"jspath" : "static/admin.js"
+		},
 		"vendor" : {
 			"productname" : "Lilium CMS",
 			"version" : "0.1 DEV",
