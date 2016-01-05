@@ -35,10 +35,14 @@ var LiliumCMS = function() {
 			init(domElems);
 		};
 
-		this.storeDOMelements = function() {
+		this.storeDOMElements = function() {
 			domElems = _v('.liliumLiveVar');
-			var req = new VarRequest(domElems);
+		};
 
+		this.exec = function() {
+			this.storeDOMElements();
+	
+			var req = new VarRequest(domElems);
 			req.get();
 		};
 	};
@@ -48,7 +52,9 @@ var LiliumCMS = function() {
 	};
 
 	var Rykstrapper = function() {
-		
+		var livevars = new LiveVars();
+
+		livevars.exec();
 	};
 
 	this.rykstrapper = new RykStrapper();	
