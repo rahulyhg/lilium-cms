@@ -9,6 +9,9 @@ var registeredLibraries = {
 	},
 	session : function(context) {
 		return "";
+	},
+	forms : function(context) {
+
 	}
 };
 
@@ -28,6 +31,7 @@ var LMLContext = function(info) {
 	// Contains : {condTag:"if|while|for", values:[val1, val2], operator:"==|<=|>=|!="}
 	this.condStack = [];
 	this.currentBlock = "lml";
+	this.skipUntilClosure = false;
 
 	this.touched = ["LMLContext.init"];
 	
@@ -35,6 +39,7 @@ var LMLContext = function(info) {
 		_public : new Object()
 	};
 	this.pub = this.lib.pub = this.lib._public; // Alias for public, local context variables
+	this.slangContext = new Object();
 
 	this.loadLibrary = function(libName) {
 		if (typeof registeredLibraries[libName] === 'undefined') {
