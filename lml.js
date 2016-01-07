@@ -39,8 +39,9 @@ var LML = function() {
 		var endVal = undefined;
 
 		try {
-			if (useSlang = typeof context.slangContext[levels[0]] !== 'undefined' || levels.length > 1) {
-				firstLevelLib = uneSlang ?
+			var useSlang = typeof context.slangContext[levels[0]] !== 'undefined';
+			if (useSlang || levels.length > 1) {
+				firstLevelLib = useSlang ?
 					context.slangContext[levels[0]] :
 					context.lib[levels[0]];
 	
@@ -60,7 +61,7 @@ var LML = function() {
                        		 	}	 
 				}	
 			} else if (code.trim() == "" || levels.length == 0) {
-				throw "LMLParseException - Variable cannot be empty. Tried to read : '" + code = "'";
+				throw "LMLParseException - Variable cannot be empty. Tried to read : '" + code + "'";
 			} else {
 				throw "LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found";
 			}
