@@ -10,6 +10,7 @@ var LML = function() {
 	// Print, execute, live, include, context
 	var markSymbolOpen  = '{';
 	var markSymbolClose = '}';
+	var slangOpening = 'lml';
 
 	/*
 		Tag identifier - 
@@ -18,9 +19,17 @@ var LML = function() {
 			* Live
 			% File
 			# Context 
+		
+		LML slang -
+			{$ if (condition) $}
+				Included text
+			{$ endif $}
+
 	*/
-	var symbols = ['=', '@', '*', '%', '#'];
+
+	var symbols = ['=', '@', '*', '%', '#', '$'];
 	var symbolLen = symbols.length;
+	var condIdentifiers = ["if", "else", "while", "for"];
 
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
@@ -76,7 +85,6 @@ var LML = function() {
 		return false;
 	};
 
-	// Not implemented yet
 	var execLiveTag = function(context, code, callback) {
 		context.newLine = '<span class="liliumLiveVar" data-varname="'+code+'"></span>';
 		callback();
@@ -110,6 +118,14 @@ var LML = function() {
 		callback();
 		return true;
 	};
+
+	var execLMLTag = function(context, code, callback) {
+		// LML parsing 
+		// Big Regex : (if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\s]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endif|endfor|endwhile)
+		
+
+		return true;
+	};
 	
 	var execTagContent = function(context, callback) {
 		var code = context.cachedCommand;
@@ -134,6 +150,10 @@ var LML = function() {
 			
 			case "#" :
 				return execContextTag(context, code, callback);
+				break;
+
+			case "$" :
+				return execLMLTag(context, code, callback);
 				break;
 
 			default :
@@ -162,13 +182,14 @@ var LML = function() {
 						context.currentInTag = symbols[j];
 
 						context.isExecTag = c == '@';
+						context.isLMLTag = c == '$';
 						break;
 					}
 				}
 			} else if (c == markSymbolOpen) {
 				context.tagProspect = true;
 			} else if (context.isInTag) {
-				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose)) {
+				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose) || (context.isLMLTag && c == '$' && line[i+1] == markSymbolClose)) {
 					if (context.isExecTag) {
 						i++;
 					} 

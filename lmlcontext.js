@@ -16,6 +16,7 @@ var LMLContext = function(info) {
 	this.tagProspect = false;
 	this.isInTag = false;
 	this.isExecTag = false;
+	this.isLMLTag = false;
 	
 	this.currentInTag = '';
 	this.cachedCommand = '';
