@@ -1,3 +1,8 @@
+/**
+ * TODO document me!
+ * @return {[FormBuilder]} [The FormBuilder as a node module]
+ */
+
 var htmlParser = require('./htmlParser');
 
 var forms = {};
@@ -26,7 +31,8 @@ var Field = function(name, type){
   this.type = type || 'text';
 
   this.attr = {
-    classes : ['v-validate']
+    classes : [],
+    value : ''
   };
 
   /**
@@ -43,7 +49,7 @@ var Field = function(name, type){
 var FormBuilder = function() {
   this.currentForm;
 
-  this.createFormBuilder = function(name, attr, cb) {
+  this.createForm = function(name, attr, cb) {
     if (typeof name == 'undefined') {
       throw "[FormBuilderException - No name provided to form";
     }
@@ -69,7 +75,7 @@ var FormBuilder = function() {
   this.add = function(name, type, attr, requirements) {
 
     if (typeof currentForm == 'undefined') {
-      throw "[FormBuilderException - Form not created. Please call createFormBuilder() first.";
+      throw "[FormBuilderException - Form not created. Please call createForm() first.";
     }
 
     if (typeof name == 'undefined') {
