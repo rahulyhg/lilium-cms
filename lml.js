@@ -29,7 +29,8 @@ var LML = function() {
 
 	var symbols = ['=', '@', '*', '%', '#', '$'];
 	var symbolLen = symbols.length;
-	var condIdentifiers = ["if", "else", "while", "for"];
+	var condIdentifiers = ["if", "while", "for"];
+	var condClosures = ["endif", "else", "endwhile", "for"];
 
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
@@ -121,8 +122,35 @@ var LML = function() {
 
 	var execLMLTag = function(context, code, callback) {
 		// LML parsing 
-		// Big Regex : (if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\s]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endif|endfor|endwhile)
+		var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\s]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)/g;
 		
+		// Split in lines array, all commands have 
+		var lines = code.split(/\n|;/g);
+		for (var i = 0, max = lines.length; i < max; i++) {
+			var line = lines[i].trim();
+			if (line == "") continue;
+			
+			var match = line.match(selector);
+			
+			// Check for block opening or closure 
+			if (match.length > 0) {
+				var split = match.split(selector).filter(function(str) {
+					return str != undefined && str != "";
+				});
+	
+				if (condClosures.indexOf(split[0]) != -1) {
+				
+				} else if (condIdentifiers.indexOf(split[0]) != -1) {
+					context.condStack.push({
+						condTag : split[0],
+						values : [split[1], split[3]],
+						operator : split[2]
+					});
+				}
+			} else {
+
+			} 
+		}
 
 		return true;
 	};

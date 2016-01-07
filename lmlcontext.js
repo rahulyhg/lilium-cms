@@ -25,8 +25,12 @@ var LMLContext = function(info) {
 	this.skipNextChar = false;
 	this.rootDir = '';
 
-	this.touched = ["LMLContext.init"];
+	// Contains : {condTag:"if|while|for", values:[val1, val2], operator:"==|<=|>=|!="}
+	this.condStack = [];
+	this.currentBlock = "lml";
 
+	this.touched = ["LMLContext.init"];
+	
 	this.lib = {
 		_public : new Object()
 	};
