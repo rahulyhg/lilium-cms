@@ -1,12 +1,18 @@
-// var htmlParser = require('./htmlParser');
+var htmlParser = require('./htmlParser');
 
-var form;
+var forms = {};
 
 var Form = function(name, cb){
   this.name = name;
   this.valid = false;
   this.callback = cb;
   this.fields = {};
+
+  this.attr = {
+    method: 'post',
+    action: '',
+    placeholder: false
+  };
 };
 
 var Field = function(name, type){
@@ -19,32 +25,50 @@ var Field = function(name, type){
    */
   this.type = type || 'text';
 
+  this.attr = {
+    classes : ['v-validate']
+  };
+
   /**
    * Requirements for the field to be valid
    * @type {Object}
    */
   this.requirements = {
-    minLenght: "20",
-    maxLenght: "100",
-    required: true
+    minLenght: "0",
+    maxLenght: "-1",
+    required: false
   };
 }
 
 var FormBuilder = function() {
+  this.currentForm;
 
-  this.createFormBuilder = function(name, cb) {
+  this.createFormBuilder = function(name, attr, cb) {
     if (typeof name == 'undefined') {
       throw "[FormBuilderException - No name provided to form";
     }
 
-    form = new Form(name, cb);
+    if (typeof forms[name] !== 'undefined') {
+      throw "[FormBuilderException - Form already created : " + name;
+    }
+
+    // Instanciate a new form
+    currentForm = new Form(name, cb);
+
+    // Update attributes of the form
+    for (var key in attr) {
+      currentForm.attr[key] = attr[key];
+    }
+
+    // Add it to the form list
+    forms[name] = currentForm;
 
     return this;
   }
 
-  this.add = function(name, type, requirements) {
+  this.add = function(name, type, attr, requirements) {
 
-    if (typeof form == 'undefined') {
+    if (typeof currentForm == 'undefined') {
       throw "[FormBuilderException - Form not created. Please call createFormBuilder() first.";
     }
 
@@ -52,21 +76,32 @@ var FormBuilder = function() {
       throw "[FormBuilderException - No name provided to field";
     }
 
-    if (typeof form.fields[name] !== 'undefined') {
+    if (typeof currentForm.fields[name] !== 'undefined') {
       throw "[FormBuilderException - Field already added : " + name;
     }
 
+    // Instanciate a new field
     var field = new Field(name, type);
 
+    // Update attributes
+    for (var key in attr) {
+      field.attr[key] = attr[key];
+    }
+    // Update requirements
     for (var key in requirements) {
       field.requirements[key] = requirements[key];
     }
 
+    currentForm.fields[name] = field;
     return this;
   };
 
-  this.getForm = function(cb) {
-    return htmlParser.parse(form);
+  this.render = function(formName) {
+    if (typeof forms[formName] == 'undefined') {
+      throw "[FormBuilderException - Form to render doesn't exists : " + formName;
+    }
+
+    return htmlParser.parseForm(forms[formName]);
   }
 
   this.validate = function(requirements) {
@@ -81,23 +116,30 @@ var FormBuilder = function() {
 
       // Required verification
       if ((typeof field.content !== 'undefined' || field.content == '') && field.requirements.required) {
-
+        err[field.name] = 'This field is required';
       }
 
       // Minimum lenght verification
       if (field.content.length < requirements['minLenght']) {
-
+        err[field.name] = 'This field is to short';
       }
 
       // Maximum lenght verification
-      if (field.content.length > requirements['maxLenght']) {
-
+      if (requirements['maxLenght'] > 0 && field.content.length > requirements['maxLenght']) {
+        err[field.name] = 'This field is to long';
       }
 
       // Email verification
-      if (field.type == 'email' && !validateEmail(field.content)) {}
+      if (field.type == 'email' && !validateEmail(field.content)) {
+        err[field.name] = 'This field is not an email';
+      }
+
     }
     return callback(err);
+  }
+  this.debug = function(){
+    console.log(forms);
+
   }
 };
 
