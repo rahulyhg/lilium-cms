@@ -8,6 +8,7 @@ var LoginLib = require('./backend/login.js');
 var db = require('./includes/db.js');
 var fs = require('fs');
 var fileserver = require('./fileserver.js');
+var cli = require('./cli.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -68,7 +69,7 @@ var Core = function() {
 			log('Database', 'Received Database connection signal');
 			callback();
 		});
-		
+
 		db.testConnection(function(err) {
 			hooks.fire('dbtest', err);
 		});
@@ -83,7 +84,7 @@ var Core = function() {
 
 			callback();
 		});
-		
+
 		var staticHTMLPath = _c.default.server.html + '/static';
 		fileserver.dirExists(staticHTMLPath, function(exists) {
 			if (!exists) {
@@ -105,7 +106,7 @@ var Core = function() {
 	var loadStandardInput = function() {
 		var stdin = process.openStdin();
 		stdin.liliumBuffer = "";
-		stdin.on('data', function(chunk) { 
+		stdin.on('data', function(chunk) {
 			setTimeout(function() {
 				chunk = chunk.toString().trim();
 				stdin.liliumBuffer += chunk;
@@ -128,8 +129,8 @@ var Core = function() {
 	var loadHTMLStructure = function(callback) {
 		fileserver.createDirIfNotExists(_c.default.server.html + '/uploads/', function(valid) {
 			if (valid) {
-				log('FileServer', 
-					'Upload Directory was validated at : ' + 
+				log('FileServer',
+					'Upload Directory was validated at : ' +
 					_c.default.server.html + "/uploads/"
 				);
 			} else {
@@ -139,7 +140,7 @@ var Core = function() {
 			loadStaticSymlink(callback);
 		}, true);
 	};
-	
+
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
 		loadHooks(readyToRock);
@@ -148,7 +149,7 @@ var Core = function() {
 		loadStandardInput();
 
 		loadHTMLStructure(function() {
-			testDatabase(function() {	
+			testDatabase(function() {
 				log('Core', 'Firing initialized signal');
 				hooks.fire('init', {
 					loaded : [
