@@ -7,11 +7,11 @@ var _config = {
 		},
 		"data" : {
 			engine : "mongodb",
-			host : "localhost",
-			port : 27017,
-			user : "lilium",
-			pass : "lilium",
-			use : "liliumdev"
+			host : "HOST",
+			port : PORT_NUMBER,
+			user : "USER",
+			pass : "PASS",
+			use : "USER"
 		},
 		"paths" : {
 			admin : "admin",
@@ -19,10 +19,10 @@ var _config = {
 			livevars : "livevars"
 		},
 		"server" : {
-			base : "/usr/share/ryk/",
-			html : "/usr/share/ryk/html",
-			url : "http://localhost:8080",
-			port : "8080",
+			base : "YOUR_COMPLETE_PATH_TO_LILIUM/",
+			html : "YOUR_COMPLETE_PATH_TO_LILIUM/html",
+			url : "http://URL:PORT_NUMBER",
+			port : "PORT_NUMBER",
 			postMaxLength : 1024
 		},
 		"signature" : {
