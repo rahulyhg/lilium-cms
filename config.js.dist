@@ -11,7 +11,7 @@ var _config = {
 			port : PORT_NUMBER,
 			user : "USER",
 			pass : "PASS",
-			use : "USER"
+			use : "DATABASE"
 		},
 		"paths" : {
 			admin : "admin",

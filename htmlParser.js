@@ -91,7 +91,7 @@ var HtmlParser = function() {
   var parseButtonType = function(field) {
     var input = '<button ';
     input += parseBasicFieldAttributes(field);
-    input += ''
+    input += '></button>';
     return input;
   }
 
