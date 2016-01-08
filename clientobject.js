@@ -9,6 +9,10 @@ var ClientObject = function(req, resp) {
 	var nodes = ['clientobject.new'];
 
 	this.throwHTTP = function(code, message) {
+		this.responseinfo.httpcode = code;
+		this.responseinfo.httpmessage = message;
+		this.debug();		
+/*
 		this.response.writeHead(code, {
 			'content-type': 'text/plain'
 		});
@@ -18,6 +22,7 @@ var ClientObject = function(req, resp) {
 		}	
 
 		this.response.end();
+*/
 	};
 
 	this.userinfo = {

@@ -27,6 +27,33 @@ var RegisteredLiveVariables = {
 		} else {	
 			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 		}
+	},
+	content : function(cli, levels, callback) {
+		var allContent = levels.length === 0;
+
+		if (allContent) {
+			db.singleLevelFind('content', callback);
+		} else {
+			db.multiLevelFind('content', levels, {contentid:levels[0]}, {limit:[1]}, callback);
+		}
+	},
+	sites : function(cli, levels, callback) {
+		var allContent = levels.length === 0;
+
+		if (allContent) {
+			db.singleLevelFind('sites', callback); 
+		} else {
+			db.multiLevelFind('content', levels, {siteid:levels[0]}, {limit:[1]}, callback);
+		}
+	},
+	vocab : function(cli, levels, callback) {
+		var wholeDico = levels.length === 0;
+
+		if (wholeDico) {
+			db.singleLevelFind('vocab', callback);
+		} else {
+			db.multiLevelFind('vocab', levels, {langcode:levels[0]}, {limit:[1]}, callback);
+		}
 	}
 };
 

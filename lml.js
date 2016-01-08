@@ -10,6 +10,7 @@ var LML = function() {
 	// Print, execute, live, include, context
 	var markSymbolOpen  = '{';
 	var markSymbolClose = '}';
+	var slangOpening = 'lml';
 
 	/*
 		Tag identifier - 
@@ -18,38 +19,70 @@ var LML = function() {
 			* Live
 			% File
 			# Context 
+		
+		LML slang -
+			{$ if (condition) $}
+				Included text
+			{$ endif $}
+
 	*/
-	var symbols = ['=', '@', '*', '%', '#'];
+
+	var symbols = ['=', '@', '*', '%', '#', '$'];
 	var symbolLen = symbols.length;
+	var condIdentifiers = ["if", "while", "for"];
+	var condClosures = ["endif", "else", "endwhile", "for"];
 
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
-		var lib = context.lib;
 		var levels = code.split('.');
 		var firstLevelLib = undefined;
 		var endVal = undefined;
 
 		try {
-			if (levels.length != 0) {
-				firstLevelLib = lib[levels[0]];
+			var useSlang = typeof context.slangContext[levels[0]] !== 'undefined';
+			if (useSlang || levels.length > 1) {
+				firstLevelLib = useSlang ?
+					context.slangContext[levels[0]] :
+					context.lib[levels[0]];
 	
-				if (typeof firstLevelLib === 'undefined') {
-					throw "LMLParseException - Undefined root level context library : " + levels[0];
+				if (!useSlang && typeof firstLevelLib === 'undefined') {
+					throw "LMLParseException - Undefined root level context library or LML slang : " + levels[0];
 				} 
 
 				// Go through all levels
 				endVal = firstLevelLib;
-				for (var i = 1, len = levels.length; i < len; i++) {
-					endVal = endVal[levels[i]];
-	
+				for (var i = 1, len = levels.length; i < len; i++) {	
+					if (pos = levels[i].indexOf('(') !== -1) {
+						var curLevel = levels[i];
+						ftcName = curLevel.substr(0, pos);
+						
+						if (typeof endVal[ftcName] === 'function') {
+							var params = substr(
+								curLevel.indexOf('(')+1, 
+								curLevel.indexOf(')') - curLevel.indexOf('(') -1
+							).split(',').map(function(str) {
+								str = str.trim();
+								return (!isNaN(str)) ? parseInt(str) : str.replace(/'|"/g, '');
+							});
+
+							endVal = endVal[ftcName].apply(firstLevelLib, params);
+						} else {
+							throw "LMLParseException - Call to undefined funtion : " + ftcName;
+						}
+					} else {
+						endVal = endVal[levels[i]];
+					}
+
 					if (typeof endVal === 'undefined') {
                 	                	throw "LMLParseException - Undefined branch " + 
-							levels[i] + " in context library : " + 
+							levels[i] + " in " + (useSlang?"LML Slang":"context library") + " : " + 
 							levels[0];
                        		 	}	 
-				}
+				}	
+			} else if (code.trim() == "" || levels.length == 0) {
+				throw "LMLParseException - Variable cannot be empty. Tried to read : '" + code + "'";
 			} else {
-				throw "LMLParseException - Cannot print root level of library : " + levels[0];
+				throw "LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found";
 			}
 		} catch (ex) {
 			endVal = "[" + ex + "]";
@@ -76,7 +109,6 @@ var LML = function() {
 		return false;
 	};
 
-	// Not implemented yet
 	var execLiveTag = function(context, code, callback) {
 		context.newLine = '<span class="liliumLiveVar" data-varname="'+code+'"></span>';
 		callback();
@@ -110,6 +142,125 @@ var LML = function() {
 		callback();
 		return true;
 	};
+
+	var LMLSlang = new (function() {
+		this.validateClosure = function(condTag, closureTag) {
+			var validClosure = (condTag == 'if' && closureTag == 'else' || closureTag == 'endif') ||
+				(condTag == 'while' && closureTag == 'endwhile') ||
+				(condTag == 'for' && closureTag == 'endfor');
+
+			if (!validClosure) {
+				throw "[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " + 
+					condTag + " block";
+			}
+
+			return validClosure;
+		};
+
+		this.pushToCondStack = function(context, split) {
+			var condObj = {	
+				condTag : split[0],
+				values : [split[1], split[3]],
+				operator : split[2],
+				seekingElse : false,
+				requiredSkip : 0,
+				content : [],
+				subContext : new Object()
+			};
+
+			context.condStack.push(condObj);
+			return condObj;
+		};
+
+		this.pulloutVar = function(context, str) {
+			var endVal = str.trim();
+			var isNumber = !isNaN(str);
+			var isString = str.match(/^"(.*)"$/g);
+	
+			if (!isNumber) {
+				
+			} else {
+				endVal = parseInt(str);
+			}
+
+			return endVal;
+		};
+
+		this.processCondition = function(context, condObj) {
+			var firstVal = this.pulloutVar(condObj.values[0]);
+			var compVal = this.pulloutVar(condObj.values[1]);
+			var op = condObj.operator;			
+
+			
+
+			// var truthfulness = op == "==";
+		};
+
+		this.processLoop = function(context, condObj) {
+
+		};
+
+		this.processEach = function(context, condObj) {
+
+		};
+
+		this.processOperation = function(context, opObj) {
+
+		};
+	})();
+
+	var execLMLTag = function(context, code, callback) {
+		// LML parsing 
+		var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\s]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+|["|'][^\n]+["|'])|\/\/([^\n]+)/g;
+		var closureSelector = /(else|endif|endfor|endwhile)/g;		
+
+		// Split in lines array, all commands have 
+		var lines = code.split(/\n|;/g);
+		for (var i = 0, max = lines.length; i < max; i++) {
+			var line = lines[i].trim();
+			if (line == "") continue;
+			
+			var match = line.match(selector);
+			
+			// Check for block opening or closure 
+			if (match.length > 0) {
+				var split = match.split(selector).filter(function(str) {
+					return str != undefined && str != "";
+				});
+
+				// If closure detected	
+				if (condClosures.indexOf(split[0]) != -1) {
+					var curCond = context.condStack.pop();
+					var closureTag = split[0];
+
+					LMLSlang.validateClosure(curCond.condTag, closureTag);	
+				} else if (condIdentifiers.indexOf(split[0]) != -1) {
+					var condObj = LMLSlang.pushToCondStack(context, split);
+					
+					// Process conditions 
+					switch (condObj.condTag) {
+						case 'if' :
+							LMLSlang.processCondition(context, condObj);
+							break;
+					
+						case 'while':
+							LMLSlang.processLoop(context, condObj);
+							break;
+
+						case 'for':
+							LMLSland.processEach(context, condObj);
+							break;	
+					}
+				} else {
+
+				}
+			} else {
+				// Nothing was found that matches LML Slang
+			} 
+		}
+
+		return true;
+	};
 	
 	var execTagContent = function(context, callback) {
 		var code = context.cachedCommand;
@@ -134,6 +285,10 @@ var LML = function() {
 			
 			case "#" :
 				return execContextTag(context, code, callback);
+				break;
+
+			case "$" :
+				return execLMLTag(context, code, callback);
 				break;
 
 			default :
@@ -162,13 +317,14 @@ var LML = function() {
 						context.currentInTag = symbols[j];
 
 						context.isExecTag = c == '@';
+						context.isLMLTag = c == '$';
 						break;
 					}
 				}
 			} else if (c == markSymbolOpen) {
 				context.tagProspect = true;
 			} else if (context.isInTag) {
-				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose)) {
+				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose) || (context.isLMLTag && c == '$' && line[i+1] == markSymbolClose)) {
 					if (context.isExecTag) {
 						i++;
 					} 

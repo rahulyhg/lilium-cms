@@ -64,6 +64,10 @@ var FileServer = function() {
 		cli.touch('fileserver.pipeFileToClient');
 		filename = this.validateIndexPath(cli, filename);
 
+		cli.response.writeHead(200, {
+			"Content-Type" : cli.routeinfo.mimetype || 'text/html'
+		});
+
 		var stream = fs.createReadStream(filename)
 		stream.pipe(cli.response);
 
