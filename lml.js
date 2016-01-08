@@ -13,13 +13,13 @@ var LML = function() {
 	var slangOpening = 'lml';
 
 	/*
-		Tag identifier - 
+		Tag identifier -
 			= Variable
 			@ Code
 			* Live
 			% File
-			# Context 
-		
+			# Context
+
 		LML slang -
 			{$ if (condition) $}
 				Included text
@@ -44,21 +44,22 @@ var LML = function() {
 				firstLevelLib = useSlang ?
 					context.slangContext[levels[0]] :
 					context.lib[levels[0]];
-	
+
 				if (!useSlang && typeof firstLevelLib === 'undefined') {
 					throw "LMLParseException - Undefined root level context library or LML slang : " + levels[0];
-				} 
+				}
 
 				// Go through all levels
 				endVal = firstLevelLib;
-				for (var i = 1, len = levels.length; i < len; i++) {	
-					if (pos = levels[i].indexOf('(') !== -1) {
+				for (var i = 1, len = levels.length; i < len; i++) {
+					if (levels[i].indexOf('(') !== -1) {
+						pos = levels[i].indexOf('(');
 						var curLevel = levels[i];
 						ftcName = curLevel.substr(0, pos);
-						
+
 						if (typeof endVal[ftcName] === 'function') {
-							var params = substr(
-								curLevel.indexOf('(')+1, 
+							var params = curLevel.substr(
+								curLevel.indexOf('(')+1,
 								curLevel.indexOf(')') - curLevel.indexOf('(') -1
 							).split(',').map(function(str) {
 								str = str.trim();
@@ -74,11 +75,11 @@ var LML = function() {
 					}
 
 					if (typeof endVal === 'undefined') {
-                	                	throw "LMLParseException - Undefined branch " + 
-							levels[i] + " in " + (useSlang?"LML Slang":"context library") + " : " + 
+                	                	throw "LMLParseException - Undefined branch " +
+							levels[i] + " in " + (useSlang?"LML Slang":"context library") + " : " +
 							levels[0];
-                       		 	}	 
-				}	
+                       		 	}
+				}
 			} else if (code.trim() == "" || levels.length == 0) {
 				throw "LMLParseException - Variable cannot be empty. Tried to read : '" + code + "'";
 			} else {
@@ -150,7 +151,7 @@ var LML = function() {
 				(condTag == 'for' && closureTag == 'endfor');
 
 			if (!validClosure) {
-				throw "[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " + 
+				throw "[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " +
 					condTag + " block";
 			}
 
@@ -158,7 +159,7 @@ var LML = function() {
 		};
 
 		this.pushToCondStack = function(context, split) {
-			var condObj = {	
+			var condObj = {
 				condTag : split[0],
 				values : [split[1], split[3]],
 				operator : split[2],
@@ -176,9 +177,9 @@ var LML = function() {
 			var endVal = str.trim();
 			var isNumber = !isNaN(str);
 			var isString = str.match(/^"(.*)"$/g);
-	
+
 			if (!isNumber) {
-				
+
 			} else {
 				endVal = parseInt(str);
 			}
@@ -189,9 +190,9 @@ var LML = function() {
 		this.processCondition = function(context, condObj) {
 			var firstVal = this.pulloutVar(condObj.values[0]);
 			var compVal = this.pulloutVar(condObj.values[1]);
-			var op = condObj.operator;			
+			var op = condObj.operator;
 
-			
+
 
 			// var truthfulness = op == "==";
 		};
@@ -210,79 +211,79 @@ var LML = function() {
 	})();
 
 	var execLMLTag = function(context, code, callback) {
-		// LML parsing 
+		// LML parsing
 		var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\s]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+|["|'][^\n]+["|'])|\/\/([^\n]+)/g;
-		var closureSelector = /(else|endif|endfor|endwhile)/g;		
+		var closureSelector = /(else|endif|endfor|endwhile)/g;
 
-		// Split in lines array, all commands have 
+		// Split in lines array, all commands have
 		var lines = code.split(/\n|;/g);
 		for (var i = 0, max = lines.length; i < max; i++) {
 			var line = lines[i].trim();
 			if (line == "") continue;
-			
+
 			var match = line.match(selector);
-			
-			// Check for block opening or closure 
+
+			// Check for block opening or closure
 			if (match.length > 0) {
 				var split = match.split(selector).filter(function(str) {
 					return str != undefined && str != "";
 				});
 
-				// If closure detected	
+				// If closure detected
 				if (condClosures.indexOf(split[0]) != -1) {
 					var curCond = context.condStack.pop();
 					var closureTag = split[0];
 
-					LMLSlang.validateClosure(curCond.condTag, closureTag);	
+					LMLSlang.validateClosure(curCond.condTag, closureTag);
 				} else if (condIdentifiers.indexOf(split[0]) != -1) {
 					var condObj = LMLSlang.pushToCondStack(context, split);
-					
-					// Process conditions 
+
+					// Process conditions
 					switch (condObj.condTag) {
 						case 'if' :
 							LMLSlang.processCondition(context, condObj);
 							break;
-					
+
 						case 'while':
 							LMLSlang.processLoop(context, condObj);
 							break;
 
 						case 'for':
 							LMLSland.processEach(context, condObj);
-							break;	
+							break;
 					}
 				} else {
 
 				}
 			} else {
 				// Nothing was found that matches LML Slang
-			} 
+			}
 		}
 
 		return true;
 	};
-	
+
 	var execTagContent = function(context, callback) {
 		var code = context.cachedCommand;
 		var tag = context.currentInTag;
 
 		switch (tag) {
-			case "=" : 
+			case "=" :
 				return execVariableTag(context, code, callback);
 				break;
-			
+
 			case "@" :
 				return execCodeTag(context, code, callback);
 				break;
-			
-			case "*" : 
+
+			case "*" :
 				return execLiveTag(context, code, callback);
 				break;
-		
+
 			case "%" :
 				return execIncludeTag(context, code, callback);
 				break;
-			
+
 			case "#" :
 				return execContextTag(context, code, callback);
 				break;
@@ -327,7 +328,7 @@ var LML = function() {
 				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose) || (context.isLMLTag && c == '$' && line[i+1] == markSymbolClose)) {
 					if (context.isExecTag) {
 						i++;
-					} 
+					}
 
 					context.cachedCommand = context.cachedCommand.trim();
 					context.skipNextChar = true;
@@ -350,7 +351,7 @@ var LML = function() {
 			} else if (context.skipNextChar) {
 				context.skipNextChar = false;
 			} else {
-				context.compiled += c;	
+				context.compiled += c;
 			}
 
 			i++;
@@ -381,7 +382,7 @@ var LML = function() {
 			context.parent = parentContext;
 			context.rootDir = fileserver.dirname(rootpath);
 			context.lib = context.parent.lib;
-		} 
+		}
 
 		delete content;
 

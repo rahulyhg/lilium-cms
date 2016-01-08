@@ -1,4 +1,4 @@
-// var FormBuilder = require('./formBuilder.js');
+var FormBuilder = require('./formBuilder.js');
 
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot
@@ -22,7 +22,7 @@ var LMLContext = function(info) {
 	this.isInTag = false;
 	this.isExecTag = false;
 	this.isLMLTag = false;
-	
+
 	this.currentInTag = '';
 	this.cachedCommand = '';
 	this.compiled = '';
@@ -36,7 +36,7 @@ var LMLContext = function(info) {
 	this.skipUntilClosure = false;
 
 	this.touched = ["LMLContext.init"];
-	
+
 	this.lib = {
 		_public : new Object()
 	};
