@@ -1,3 +1,5 @@
+// var FormBuilder = require('./formBuilder.js');
+
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot
 var registeredLibraries = {
@@ -11,7 +13,7 @@ var registeredLibraries = {
 		return "";
 	},
 	forms : function(context) {
-
+		return FormBuilder;
 	}
 };
 

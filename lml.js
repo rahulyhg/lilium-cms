@@ -51,9 +51,28 @@ var LML = function() {
 
 				// Go through all levels
 				endVal = firstLevelLib;
-				for (var i = 1, len = levels.length; i < len; i++) {
-					endVal = endVal[levels[i]];
-	
+				for (var i = 1, len = levels.length; i < len; i++) {	
+					if (pos = levels[i].indexOf('(') !== -1) {
+						var curLevel = levels[i];
+						ftcName = curLevel.substr(0, pos);
+						
+						if (typeof endVal[ftcName] === 'function') {
+							var params = substr(
+								curLevel.indexOf('(')+1, 
+								curLevel.indexOf(')') - curLevel.indexOf('(') -1
+							).split(',').map(function(str) {
+								str = str.trim();
+								return (!isNaN(str)) ? parseInt(str) : str.replace(/'|"/g, '');
+							});
+
+							endVal = endVal[ftcName].apply(firstLevelLib, params);
+						} else {
+							throw "LMLParseException - Call to undefined funtion : " + ftcName;
+						}
+					} else {
+						endVal = endVal[levels[i]];
+					}
+
 					if (typeof endVal === 'undefined') {
                 	                	throw "LMLParseException - Undefined branch " + 
 							levels[i] + " in " + (useSlang?"LML Slang":"context library") + " : " + 
@@ -153,8 +172,28 @@ var LML = function() {
 			return condObj;
 		};
 
+		this.pulloutVar = function(context, str) {
+			var endVal = str.trim();
+			var isNumber = !isNaN(str);
+			var isString = str.match(/^"(.*)"$/g);
+	
+			if (!isNumber) {
+				
+			} else {
+				endVal = parseInt(str);
+			}
+
+			return endVal;
+		};
+
 		this.processCondition = function(context, condObj) {
+			var firstVal = this.pulloutVar(condObj.values[0]);
+			var compVal = this.pulloutVar(condObj.values[1]);
+			var op = condObj.operator;			
+
 			
+
+			// var truthfulness = op == "==";
 		};
 
 		this.processLoop = function(context, condObj) {
