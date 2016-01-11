@@ -13,11 +13,15 @@ var HtmlParser = function() {
     // Form tag generation
     htmlForm = '<form ';
 
+    if (form.attr.validate) {
+      htmlForm += 'class="v_form_validate" ';
+    }
+
     // Name
     htmlForm += form.name ? "name='" + form.name + "' " : "";
 
     // Method
-    htmlForm += form.attr.method ? "method='" + form.attr.method + "' " : "";
+    htmlForm += form.attr.method ? "method='" + form.attr.method + "' " : "post";
 
     // Action
     htmlForm += form.attr.action ? "action='" + form.attr.action + "' " : "";
@@ -53,6 +57,13 @@ var HtmlParser = function() {
             break;
           case 'textarea':
             htmlForm += parseTextAreaType(field);
+            break;
+          case 'number' :
+            htmlForm += parseNumberType(field);
+            break;
+          case 'hidden' :
+          htmlForm += parseHiddenType(field);
+          break;
         }
       }
 
@@ -76,10 +87,10 @@ var HtmlParser = function() {
     input += (hasPlaceholder && field.name) ? 'placeholder="' + field.name + '"' : '';
 
     // MinLenght
-    input += field.requirements.minLenght ? 'data-minLength="' + field.requirements.minLenght + '"' : '';
+    input += field.requirements.minLenght ? 'minlength="' + field.requirements.minLenght + '"' : '';
 
     // MaxLenght
-    input += field.requirements.maxLenght ? 'data-maxLength="' + field.requirements.maxLenght + '"' : '';
+    input += field.requirements.maxLenght ? 'maxlength="' + field.requirements.maxLenght + '"' : '';
 
     // That's all folks!
     input += ' />'
@@ -102,6 +113,24 @@ var HtmlParser = function() {
     return input;
   }
 
+  var parseHiddenType = function(field) {
+    var input = '<input type="hidden" ';
+    input += parseBasicFieldAttributes(field);
+    input += ' />';
+    return input;
+  }
+
+
+  var parseNumberType = function(field) {
+    var input = '<input type="number" ';
+    input += parseBasicFieldAttributes(field);
+    input += field.requirements.min ? 'min="' + field.requirements.min + '"' : '';
+    input += field.requirements.max ? 'max="' + field.requirements.max + '"' : '';
+    input += ' />';
+
+    return input;
+  }
+
   var parseTextAreaType = function(field) {
     var input = '<textarea ';
     input += parseBasicFieldAttributes(field);
@@ -110,6 +139,11 @@ var HtmlParser = function() {
     // Cols
     input += field.attr.cols ? 'cols="'+ field.attr.cols +'"' : '';
 
+    // MinLenght
+    input += field.requirements.minLenght ? 'minlength="' + field.requirements.minLenght + '"' : '';
+
+    // MaxLenght
+    input += field.requirements.maxLenght ? 'maxlength="' + field.requirements.maxLenght + '"' : '';
     input += ' >';
     input += field.attr.value ? field.attr.value : '';
     input += '</textarea>'
