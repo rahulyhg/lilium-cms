@@ -31,6 +31,7 @@ var LML = function() {
 	var symbolLen = symbols.length;
 	var condIdentifiers = ["if", "while", "for"];
 	var condClosures = ["endif", "else", "endwhile", "for"];
+	var lmlOperators = ["+=", "-=", "*=", "/=", "="];
 
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
@@ -105,7 +106,7 @@ var LML = function() {
 			throw "LMLParseException - Code Tag exception : " + ex;
 		}
 
-		callback();
+		callback("");
 
 		return false;
 	};
@@ -173,13 +174,46 @@ var LML = function() {
 			return condObj;
 		};
 
+		this.createOpObject = function(context, split) {
+			var opObj = {
+				op : split[1],
+				values : [split[0],split[2]],
+				subContext : new Object()
+			};
+
+			return opObj;
+		};
+
 		this.pulloutVar = function(context, str) {
 			var endVal = str.trim();
 			var isNumber = !isNaN(str);
 			var isString = str.match(/^"(.*)"$/g);
 
 			if (!isNumber) {
+				var levels = str.toString().split('.');
+				var firstLevel = levels[0];
 
+				if (typeof context.lib[firstLevel] !== "undefined") {
+					endVal = context.lib;
+					for (var i = 0; i < levels.length; i++) {
+						endVal = endVal[levels[i]];
+						if (typeof endVal !== 'undefined') {
+							endVal = "[LMLContextException] Undefined level " + levels[i] + " in var " + str;
+							break;
+						}
+					}
+				} else if (typeof context.slangContext[firstLevel] !== "undefined") {
+					endVal = context.slangContext;
+					for (var i = 0; i < levels.length; i++) {
+						endVal = endVal[levels[i]];
+						if (typeof endVal !== 'undefined') {
+							endVal = "[LMLSlangException] Undefined level " + levels[i] + " in var " + str;
+							break;
+						}
+					}
+				} else {
+					endVal = "[LMLSlangException] No context variable defined or invalid value for : " + str;
+				}
 			} else {
 				endVal = parseInt(str);
 			}
@@ -187,32 +221,68 @@ var LML = function() {
 			return endVal;
 		};
 
+		this.compare = function(val1, val2, op) {
+			switch (op) {
+				case "==": return val1 == val2;
+				case ">" : return val1 >  val2;
+				case "<" : return val1 <  val2;
+				case ">=": return val1 >= val2;
+				case "<=": return val1 <= val2;
+				case "!=": return val1 != val2;
+			};
+		};
+
+		this.affect = function(context, varName, value) {
+			var levels = varName.split('.');
+			var currentLvl = context.slangContext;
+
+			for (var i = 0; i < levels.length-1; i++) {
+				if (typeof currentLvl[levels[i]] !== 'object') {
+					currentLvl[levels[i]] = new Object();
+				} 
+				currentLvl = currentLvl[levels[i]];
+			}
+
+			currentLvl[levels[levels.length-1]] = value;
+			return value;
+		};
+
 		this.processCondition = function(context, condObj) {
-			var firstVal = this.pulloutVar(condObj.values[0]);
-			var compVal = this.pulloutVar(condObj.values[1]);
+			var firstVal = this.pulloutVar(context, condObj.values[0]);
+			var compVal = this.pulloutVar(context, condObj.values[1]);
 			var op = condObj.operator;
 
+			var truthfulness = this.compare(firstVal, compVal, op);
+			context.skipUntilClosure = !truthfulness;
 
-
-			// var truthfulness = op == "==";
+			return truthfulness;
 		};
 
-		this.processLoop = function(context, condObj) {
+		this.processLoop = function(context, condObj) {	
+			var truthfulness = this.processCondition(context, condObj);
+			this.storeUntilClosure = truthfulness;			
 
-		};
-
-		this.processEach = function(context, condObj) {
-
+			return truthfulness;
 		};
 
 		this.processOperation = function(context, opObj) {
+			var affectedName = opObj.values[0];
+			var affectedValue = this.pulloutVar(context, affectedName);
+			var effect = this.pulloutVar(context, opObj.values[1]);
 
+			switch (opObj.op) {
+				case "=" :  return this.affect(context, affectedName, effect);
+				case "+=" : return this.affect(context, affectedName, affectedValue + effect);
+				case "-=" : return this.affect(context, affectedName, affectedValue - effect);
+				case "*=" : return this.affect(context, affectedName, affectedValue * effect);
+				case "/=" : return this.affect(context, affectedName, affectedValue / effect);
+			}
 		};
 	})();
 
 	var execLMLTag = function(context, code, callback) {
 		// LML parsing
-		var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\s]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+|["|'][^\n]+["|'])|\/\/([^\n]+)/g;
+		var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\s]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+|["|'][^\n]+["|'])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
 		var closureSelector = /(else|endif|endfor|endwhile)/g;
 
 		// Split in lines array, all commands have
@@ -225,10 +295,11 @@ var LML = function() {
 
 			// Check for block opening or closure
 			if (match.length > 0) {
+				match = match[0];
 				var split = match.split(selector).filter(function(str) {
 					return str != undefined && str != "";
 				});
-
+				
 				// If closure detected
 				if (condClosures.indexOf(split[0]) != -1) {
 					var curCond = context.condStack.pop();
@@ -237,6 +308,7 @@ var LML = function() {
 					LMLSlang.validateClosure(curCond.condTag, closureTag);
 				} else if (condIdentifiers.indexOf(split[0]) != -1) {
 					var condObj = LMLSlang.pushToCondStack(context, split);
+					context.currentBlock = condObj.condTag;
 
 					// Process conditions
 					switch (condObj.condTag) {
@@ -245,21 +317,19 @@ var LML = function() {
 							break;
 
 						case 'while':
+						case 'for' :
 							LMLSlang.processLoop(context, condObj);
-							break;
-
-						case 'for':
-							LMLSland.processEach(context, condObj);
-							break;
 					}
-				} else {
-
+				} else if (lmlOperators.indexOf(split[1]) != -1) {
+					var opObj = LMLSlang.createOpObject(context, split);
+					LMLSlang.processOperation(context, opObj);
 				}
 			} else {
 				// Nothing was found that matches LML Slang
 			}
 		}
 
+		callback("");
 		return true;
 	};
 
@@ -326,7 +396,7 @@ var LML = function() {
 				context.tagProspect = true;
 			} else if (context.isInTag) {
 				if (c == markSymbolClose && !context.isExecTag || (context.isExecTag && c == '@' && line[i+1] == markSymbolClose) || (context.isLMLTag && c == '$' && line[i+1] == markSymbolClose)) {
-					if (context.isExecTag) {
+					if (context.isExecTag || context.isLMLTag) {
 						i++;
 					}
 

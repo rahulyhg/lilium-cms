@@ -34,6 +34,7 @@ var LMLContext = function(info) {
 	this.condStack = [];
 	this.currentBlock = "lml";
 	this.skipUntilClosure = false;
+	this.storeUntilClosure = false;
 
 	this.touched = ["LMLContext.init"];
 

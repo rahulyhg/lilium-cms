@@ -1,4 +1,9 @@
 {#config;session;vocab}
+{$
+	otherVar = 50;
+	someDynamicVar = 20;
+	otherVar += 20;
+$}
 <!DOCTYPE html>
 <html>
 	<head>
@@ -10,5 +15,7 @@
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>{=vocab.admintitle}</h2>
 		<h3>Welcome, {*session.displayname}</h3>
+		<h4>someDynamicVar = {=someDynamicVar}</h4>
+		<h4>otherVar = {=otherVar}</h4>
 	</body>
 </html>
