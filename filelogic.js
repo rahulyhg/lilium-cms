@@ -18,23 +18,15 @@ var FileLogic = function() {
 	var serveSpecialPage = function(cli, fullpath) {
 		cli.touch('filelogic.serveSpecialPage');
 
-		var specialName = 
-			cli.routeinfo.login ? "login" : 
-			cli.routeinfo.admin ? "admin" : 
+		var specialName =
+			cli.routeinfo.login ? "login" :
+			cli.routeinfo.admin ? "admin" :
 			"";
 
 		var readPath = _c.default.server.base + "backend/dynamic/"+specialName+".lml";
 		var savePath = _c.default.server.html + '/' + _c.default.paths[specialName] + '/index.html';
 
-		LML.executeToFile(
-			readPath,
-			savePath,
-			function() {
-				cli.touch('filelogic.serveSpecialPage.callback');
-				cli.responseinfo.filecreated = true;
-				serveCachedFile(cli, savePath);
-			}
-		);
+		saveLmlPage(cli, readPath, savePath);
 	};
 
 	var serveStaticFile = function(cli, fullpath) {
@@ -58,6 +50,27 @@ var FileLogic = function() {
 		return false;
 	};
 
+	this.serveLmlPage = function (cli) {
+		var name = cli.routeinfo.fullpath;
+		var readPath = _c.default.server.base + "backend/dynamic/"+ name +".lml";
+		var savePath = _c.default.server.html + '/' + name + '/index.html';
+
+		saveLmlPage(cli, readPath, savePath);
+	};
+
+	var saveLmlPage = function (cli, readPath, savePath) {
+		LML.executeToFile(
+			readPath,
+			savePath,
+			function() {
+				cli.touch('filelogic.serveSpecialPage.callback');
+				cli.responseinfo.filecreated = true;
+				serveCachedFile(cli, savePath);
+			}
+		);
+	}
+
+
 	this.runLogic = function(cli) {
 		cli.touch('filelogic.runlogic');
 		var fullpath = _c.default.server.html + cli.routeinfo.fullpath;
@@ -74,14 +87,15 @@ var FileLogic = function() {
 			} else if (checkForRedirection(cli)) {
 				redirectUserTo(cli);
 			} else {
-				throw 404;
 				cli.debug();
+				throw 404;
+
 			}
 		});
 	};
-	
+
 	var init = function() {
-		
+
 	};
 
 	init();
