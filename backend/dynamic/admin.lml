@@ -10,5 +10,9 @@
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>{=vocab.admintitle}</h2>
 		<h3>Welcome, {*session.displayname}</h3>
+		Currently running in {=config.default.env}
+
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src="/static/formValidation.js"></script>
 	</body>
 </html>
