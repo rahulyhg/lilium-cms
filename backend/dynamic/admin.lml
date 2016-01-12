@@ -27,5 +27,9 @@ $}
 		<h4>otherVar = {=otherVar}</h4>
 		<h4>str = {=str}</h4>
 		<h4>3rd variable = {=thirdVar}</h4>
+
+		Currently running in {=config.default.env}
+
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 	</body>
 </html>
