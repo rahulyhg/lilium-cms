@@ -296,10 +296,14 @@ var LML = function() {
 
 			if (context.skipUntilClosure) {
 				// Skip until flat else
-				
+				var cond = context.condStack[context.condStack.length-1];
+				var tagName = cond.condTag;
 			} else if (context.storeUntilClosure) {
 				// Store execution until closure
+				var cond = context.condStack[context.condStack.length-1];
+				var tagName = cond.condTag;
 				
+				cond.content.push(line);
 			} else {
 				var match = line.match(selector);
 
