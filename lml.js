@@ -187,9 +187,11 @@ var LML = function() {
 		this.pulloutVar = function(context, str) {
 			var endVal = str.trim();
 			var isNumber = !isNaN(str);
-			var isString = str.match(/^"(.*)"$/g);
+			var isStringMatch = str.match(/^"(.*)"$|^'(.*)'$/g);
 
-			if (!isNumber) {
+			if (isStringMatch) {
+				endVal = str.trim().slice(1, -1);
+			} else if (!isNumber) {
 				var levels = str.toString().split('.');
 				var firstLevel = levels[0];
 
@@ -197,7 +199,7 @@ var LML = function() {
 					endVal = context.lib;
 					for (var i = 0; i < levels.length; i++) {
 						endVal = endVal[levels[i]];
-						if (typeof endVal !== 'undefined') {
+						if (typeof endVal === 'undefined') {
 							endVal = "[LMLContextException] Undefined level " + levels[i] + " in var " + str;
 							break;
 						}
@@ -206,7 +208,7 @@ var LML = function() {
 					endVal = context.slangContext;
 					for (var i = 0; i < levels.length; i++) {
 						endVal = endVal[levels[i]];
-						if (typeof endVal !== 'undefined') {
+						if (typeof endVal === 'undefined') {
 							endVal = "[LMLSlangException] Undefined level " + levels[i] + " in var " + str;
 							break;
 						}
@@ -287,45 +289,54 @@ var LML = function() {
 
 		// Split in lines array, all commands have
 		var lines = code.split(/\n|;/g);
+		
 		for (var i = 0, max = lines.length; i < max; i++) {
 			var line = lines[i].trim();
 			if (line == "") continue;
 
-			var match = line.match(selector);
-
-			// Check for block opening or closure
-			if (match.length > 0) {
-				match = match[0];
-				var split = match.split(selector).filter(function(str) {
-					return str != undefined && str != "";
-				});
+			if (context.skipUntilClosure) {
+				// Skip until flat else
 				
-				// If closure detected
-				if (condClosures.indexOf(split[0]) != -1) {
-					var curCond = context.condStack.pop();
-					var closureTag = split[0];
-
-					LMLSlang.validateClosure(curCond.condTag, closureTag);
-				} else if (condIdentifiers.indexOf(split[0]) != -1) {
-					var condObj = LMLSlang.pushToCondStack(context, split);
-					context.currentBlock = condObj.condTag;
-
-					// Process conditions
-					switch (condObj.condTag) {
-						case 'if' :
-							LMLSlang.processCondition(context, condObj);
-							break;
-
-						case 'while':
-						case 'for' :
-							LMLSlang.processLoop(context, condObj);
-					}
-				} else if (lmlOperators.indexOf(split[1]) != -1) {
-					var opObj = LMLSlang.createOpObject(context, split);
-					LMLSlang.processOperation(context, opObj);
-				}
+			} else if (context.storeUntilClosure) {
+				// Store execution until closure
+				
 			} else {
-				// Nothing was found that matches LML Slang
+				var match = line.match(selector);
+
+				// Check for block opening or closure
+				if (match.length > 0) {
+					match = match[0];
+					var split = match.split(selector).filter(function(str) {
+						return str != undefined && str != "";
+					});
+					
+					// If closure detected
+					if (condClosures.indexOf(split[0]) != -1) {
+						var curCond = context.condStack.pop();
+						var closureTag = split[0];
+
+						LMLSlang.validateClosure(curCond.condTag, closureTag);
+					} else if (condIdentifiers.indexOf(split[0]) != -1) {
+						var condObj = LMLSlang.pushToCondStack(context, split);
+						context.currentBlock = condObj.condTag;
+	
+						// Process conditions
+						switch (condObj.condTag) {
+							case 'if' :
+								LMLSlang.processCondition(context, condObj);
+								break;
+
+							case 'while':
+							case 'for' :
+								LMLSlang.processLoop(context, condObj);
+						}
+					} else if (lmlOperators.indexOf(split[1]) != -1) {
+						var opObj = LMLSlang.createOpObject(context, split);
+						LMLSlang.processOperation(context, opObj);
+					}
+				} else {
+					// Nothing was found that matches LML Slang
+				}
 			}
 		}
 

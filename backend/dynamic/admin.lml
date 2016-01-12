@@ -1,8 +1,16 @@
 {#config;session;vocab}
 {$
 	otherVar = 50;
+	otherVar += 10;
 	someDynamicVar = 20;
-	otherVar += 20;
+
+	str = "Hello";
+	str += " World";
+	thirdVar = otherVar;
+
+	if (someDynamicVar == 20)
+		someDynamicVar += 30;
+	endif
 $}
 <!DOCTYPE html>
 <html>
@@ -17,5 +25,7 @@ $}
 		<h3>Welcome, {*session.displayname}</h3>
 		<h4>someDynamicVar = {=someDynamicVar}</h4>
 		<h4>otherVar = {=otherVar}</h4>
+		<h4>str = {=str}</h4>
+		<h4>3rd variable = {=thirdVar}</h4>
 	</body>
 </html>
