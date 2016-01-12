@@ -1,0 +1,14 @@
+{#config;session;vocab;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+	</head>
+	<body>
+		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
+		<h2>Create a new post</h2>
+    {=forms.render('post_create')}
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src="/static/formValidation.js"></script>
+	</body>
+</html>
