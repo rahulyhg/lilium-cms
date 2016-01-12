@@ -30,9 +30,19 @@ var Cli = function() {
                 _c.default.server.base + 'backend/static/',
                 staticHTMLPath,
                 function(err) {
-                  log('CLI', 'Cache Cleared');
+                  // Symlink for bower modules
+                  fs.createSymlink(
+                    _c.default.server.base + 'bower_components/',
+                    _c.default.server.html + '/bower/',
+                    function(err) {
+                      log('CLI', 'Cache Cleared.');
+                    }
+                  );
                 }
               );
+
+
+
             }
           }, true);
 
