@@ -3,13 +3,13 @@
  *
  * This is the entry point. Lilium is built for running with Forever using
  * a simple "forever start lilium" command. Since it has its own process,
- * it is possible to monitor the said process async. 
+ * it is possible to monitor the said process async.
  *
  */
 var startupTime = new Date();
 
 // Inclusions
-var _config = require('./config.js'); 
+var _config = require('./config.js');
 var core = require('./core.js');
 var ClientObject = require('./clientobject.js');
 var Inbound = require('./inbound.js');
@@ -27,7 +27,7 @@ var Lilium = function() {
 				Handler.handle(clientObject);
 			});
 
-			log('Lilium', 'Starting inbound server');	
+			log('Lilium', 'Starting inbound server');
 			Inbound.start();
 			log('Config', 'App is located at ' + _config.default.server.base);
 			log('Config', 'Root PATH is at ' + _config.default.server.html);
@@ -40,7 +40,7 @@ var Lilium = function() {
 			log('Developer', 'Documentation : http://liliumcms.com/docs');
 			log('Developer', 'Hit me up at : http://erikdesjardins.com !');
 			log();
-			log('Developer', 'With love; enjoy. <3');	
+			log('Developer', 'With love; enjoy. <3');
 		});
 	};
 
@@ -49,4 +49,4 @@ var Lilium = function() {
 	};
 };
 
-(new Lilium()).cms();
+module.exports = (new Lilium()).cms();

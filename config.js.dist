@@ -1,5 +1,6 @@
 var _config = {
 	"default" : {
+		"env" : 'prod',
 		"info" : {
 			project : "Lilium CMS",
 			version : "dev 0.1",
