@@ -31,46 +31,35 @@ var HtmlParser = function() {
     for (var index in form.fields) {
       field = form.fields[index];
 
-      // Generate the field label if it's not a checkbox, a radio, button, submit
-      if (field.type != 'checkbox' &&
-        field.type != 'radio' &&
-        field.type != 'button' &&
-        field.type != 'submit') {
-
-        htmlForm += (!form.attr.placeholder && field.name) ? '\n<label for="' + field.name + '">' + field.name + '</label>' : '\n';
-      }
-
       // Check whether it's a "Simple" input type or a  more "Complex" one
       if (field.type == 'text' ||
         field.type == 'password' ||
-        field.type == 'email' ||
-        field.type == 'checkbox') {
+        field.type == 'email') {
 
         htmlForm += parseSimpleFormType(field, form.attr.placeholder);
       } else {
         switch (field.type) {
           case 'button':
-            htmlForm += parseButtonType(field);
+            htmlForm += parseButtonType(field, form.attr.placeholder);
             break;
           case 'submit':
             htmlForm += parseSubmitType(field);
             break;
           case 'textarea':
-            htmlForm += parseTextAreaType(field);
+            htmlForm += parseTextAreaType(field, form.attr.placeholder);
             break;
           case 'number' :
-            htmlForm += parseNumberType(field);
+            htmlForm += parseNumberType(field, form.attr.placeholder);
             break;
           case 'hidden' :
           htmlForm += parseHiddenType(field);
           break;
+          case 'checkbox' :
+            htmlForm += parseCheckBoxType(field, form.attr.placeholder);
+            break;
         }
       }
 
-      // Generate the field label if it's a checkbox nor a radio
-      if (field.type == 'checkbox' || field.type == 'radio') {
-        htmlForm += (!form.attr.placeholder && field.name) ? '<label for="' + field.name + '">' + field.name + '</label>' : '';
-      }
       htmlForm += '<br>'
     }
 
@@ -79,8 +68,29 @@ var HtmlParser = function() {
     return htmlForm;
   }
 
+  var generateLabel = function(field, placeholder) {
+    var label = '<label ';
+
+    // Never generate label for those
+    if (field.type == 'button' || field.type == 'submit' || field.type == 'hidden') {
+      return '';
+    } else if ((field.type != 'text' && field.type != 'email' && field.type != 'password')) {
+      //Generate label even if it is placeholder
+      label += 'for="'+ field.name +'">' + field.name;
+      return label + '</label>';
+
+    } else if (!placeholder){
+      // generate label only if no placeholder
+      label += 'for="'+ field.name +'">' + field.name;
+      return label + '</label>';
+
+    }
+    return '';
+  }
+
   var parseSimpleFormType = function(field, hasPlaceholder) {
-    var input = '<input type="' + field.type + '" ';
+    var input = generateLabel(field, hasPlaceholder);
+    input += '<input type="' + field.type + '" ';
     input += parseBasicFieldAttributes(field);
 
     // Placeholder
@@ -106,10 +116,11 @@ var HtmlParser = function() {
     return input;
   }
 
-  var parseCheckBoxType = function(field) {
+  var parseCheckBoxType = function(field, hasPlaceholder) {
     var input = '<input type="checkbox" ';
     input += parseBasicFieldAttributes(field);
     input += ' />';
+    input += generateLabel(field, hasPlaceholder);
     return input;
   }
 
@@ -121,8 +132,9 @@ var HtmlParser = function() {
   }
 
 
-  var parseNumberType = function(field) {
-    var input = '<input type="number" ';
+  var parseNumberType = function(field, hasPlaceholder) {
+    var input = generateLabel(field, hasPlaceholder);
+    input += '<input type="number" ';
     input += parseBasicFieldAttributes(field);
     input += field.requirements.min ? 'min="' + field.requirements.min + '"' : '';
     input += field.requirements.max ? 'max="' + field.requirements.max + '"' : '';
@@ -131,8 +143,9 @@ var HtmlParser = function() {
     return input;
   }
 
-  var parseTextAreaType = function(field) {
-    var input = '<textarea ';
+  var parseTextAreaType = function(field, hasPlaceholder) {
+    var input = generateLabel(field, hasPlaceholder);
+    input += '<textarea ';
     input += parseBasicFieldAttributes(field);
     // Rows
     input += field.attr.rows ? 'rows="'+ field.attr.rows +'"' : '';

@@ -133,20 +133,25 @@ var FormBuilder = function() {
     }
 
     if (typeof form == 'undefined') {
-      throw "[FormBuilderException - No form provided for validation";
+      return false;
     }
 
     var err = {};
 
     for (var field in form.fields) {
+      var field = form.fields[field];
       var requirements = field.requirements;
+      // Required verification
+      if (requirements.required) {
+        if (typeof field.attr !== 'undefined' && field.attr == '') {
+          err[field.name] = '001';
+        } else if (typeof field.attr == 'undefined') {
+          err[field.name] = '001';
+        }
+      }
 
       // If it is a text based field e.g. text, password, email etc..
       if (isTextBasedField(field)) {
-        // Required verification
-        if ((typeof field.attr.value !== 'undefined' || field.attr.value == '') && field.requirements.required) {
-          err[field.name] = '001';
-        }
 
         // Minimum lenght verification
         if (field.attr.value.length < requirements['minLenght']) {
@@ -172,21 +177,26 @@ var FormBuilder = function() {
 
       // Number verification
       if (field.type == 'number') {
-        if (field.attr.value > requirements['max']) {
-          err[field.name] = '006';
-        } else if (field.attr.value < requirements['min']) {
-          err[field.name] = '007';
+        if (validator.isNumeric(field.attr.value)) {
+          if (field.attr.value > requirements['max']) {
+            err[field.name] = '006';
+          } else if (field.attr.value < requirements['min']) {
+            err[field.name] = '007';
+          }
+        } else {
+          err[field.name] = '008';
         }
+
       }
 
       // Checkbox verification
       if (field.type == 'checkbox' && requirements['required'] && field.attr.value != 'on') {
-        err[field.name] = '008';
+        err[field.name] = '009';
       }
 
     }
 
-    valid = Object.keys(err).length == 0 ? true : false;
+    form.valid = valid = Object.keys(err).length == 0 ? true : false;
 
     // Return
     if (callStack) {
@@ -210,7 +220,6 @@ var FormBuilder = function() {
    */
   this.handleRequest = function(cli) {
     if (typeof cli.postdata !== 'undefined') {
-
       if (typeof cli.postdata.data !== 'undefined' &&
         typeof cli.postdata.data.form_name !== 'undefined' &&
         typeof forms[cli.postdata.data.form_name] !== 'undefined'
