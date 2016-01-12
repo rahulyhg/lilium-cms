@@ -9,6 +9,7 @@ var db = require('./includes/db.js');
 var fs = require('fs');
 var fileserver = require('./fileserver.js');
 var cli = require('./cli.js');
+var post = require('./backend/post.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -26,9 +27,36 @@ var Core = function() {
 			LoginLib.authUser(cli);
 		});
 
+		endpoints.register('post', 'GET', function(cli){
+			cli.touch("endpoints.GET.post");
+			if (typeof post[cli.routeinfo.path[1]] == 'function') {
+				callFunction(cli, post);
+			}else {
+				cli.throwHTTP(404, 'Page not found.');
+			}
+		});
+
+		endpoints.register('post', 'POST', function(cli){
+			cli.touch("endpoints.POST.post");
+			callFunction(cli, post);
+		});
+
 		hooks.fire('endpoints');
 		log('Endpoints', 'Loaded endpoints');
 	};
+
+	/**
+	 * Calls a function based on the path of the cli
+	 * @param  {ClientObject} cli    the ClientObject
+	 * @param  {class} _class the class where you want to call the function
+	 */
+	var callFunction = function(cli, _class) {
+		if (typeof _class[cli.routeinfo.path[1]] == 'function') {
+			_class[cli.routeinfo.path[1]](cli);
+		}else {
+			cli.throwHTTP(404, 'Page not found.');
+		}
+	}
 
 	var loadPlugins = function() {
 		log('Plugins', 'Loading plugins');
