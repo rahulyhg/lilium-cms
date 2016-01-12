@@ -122,14 +122,21 @@ var FormBuilder = function() {
   /**
    * Validates a form.
    * @param  {Form} form The form object
+   * @param  {boolean} withErrStack Whether to return a json error stack or a simple boolean
    * @return {Array}err A stack of all the errors.
    */
-  this.validate = function(form) {
-    if (typeof form == 'undefined') {
-      throw "[FormBuilderException - Form not created. Please call createFormBuilder() first.";
+  this.validate = function(form, withErrStack) {
+    var valid = false;
+    // Return an error stack by default
+    if (typeof callStack == 'undefined') {
+        callStack = true;
     }
 
-    var err = [];
+    if (typeof form == 'undefined') {
+      throw "[FormBuilderException - No form provided for validation";
+    }
+
+    var err = {};
 
     for (var field in form.fields) {
       var requirements = field.requirements;
@@ -178,7 +185,15 @@ var FormBuilder = function() {
       }
 
     }
-    return err;
+
+    valid = Object.keys(err).length == 0 ? true : false;
+
+    // Return
+    if (callStack) {
+      return valid ? {success : true} : err;
+    }else {
+      return valid;
+    }
   }
 
   var isTextBasedField = function (field) {
