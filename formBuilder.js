@@ -244,6 +244,18 @@ var FormBuilder = function() {
     }
   }
 
+  this.serializeForm = function(form) {
+    var data = {};
+    for (var field in form.fields) {
+      var field = form.fields[field];
+      if (field.name != 'form_name') {
+        data[field.name] = field.attr.value;
+      }
+    }
+
+    return data;
+  }
+
   this.isAlreadyCreated = function(name) {
     if (typeof forms[name] == 'undefined') {
       return false;
