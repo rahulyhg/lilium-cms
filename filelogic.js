@@ -2,6 +2,7 @@ var FileServer = require('./fileserver.js');
 var LML = require('./lml.js');
 var _c = require('./config.js');
 var fs = require('fs');
+var slugify = require('slugify');
 
 var FileLogic = function() {
   /*
@@ -65,7 +66,23 @@ var FileLogic = function() {
 
   };
 
-  var saveLmlPage = function(cli, readPath, savePath) {
+  this.renderLmlPostPage = function(cli, postType, extra, cb) {
+    // Check for the post type
+    var title = slugify(extra.title);
+    var readPath = _c.default.server.base + "flowers/" + _c.default.website.flower + "/" + postType + ".lml";
+    var savePath = _c.default.server.html + "/" + title + ".html";
+    LML.executeToFile(
+      readPath,
+      savePath,
+      function() {
+        cli.responseinfo.filecreated = true;
+        cb(_c.default.server.url + "/" + title + ".html");
+      },
+      extra
+    );
+  }
+
+  var saveLmlPage = function(cli, readPath, savePath, extra) {
     LML.executeToFile(
       readPath,
       savePath,
@@ -73,7 +90,8 @@ var FileLogic = function() {
         cli.touch('filelogic.serveSpecialPage.callback');
         cli.responseinfo.filecreated = true;
         serveCachedFile(cli, savePath);
-      }
+      },
+      extra
     );
 
   }

@@ -1,0 +1,3 @@
+{# extra}
+<h1>{= extra.title}</h1>
+<div>{= extra.content}</div>
