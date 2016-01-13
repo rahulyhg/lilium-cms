@@ -14,6 +14,9 @@ var registeredLibraries = {
 	},
 	forms : function(context) {
 		return FormBuilder;
+	},
+	article : function(context) {
+		return require('./article.js');
 	}
 };
 
@@ -42,6 +45,7 @@ var LMLContext = function(info) {
 		_public : new Object()
 	};
 	this.pub = this.lib.pub = this.lib._public; // Alias for public, local context variables
+	this.extra = new Object();
 	this.slangContext = new Object();
 
 	this.loadLibrary = function(libName) {

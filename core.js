@@ -10,6 +10,8 @@ var fs = require('fs');
 var fileserver = require('./fileserver.js');
 var cli = require('./cli.js');
 var post = require('./backend/post.js');
+var admin = require('./backend/admin.js');
+var Article = require('./article.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -27,17 +29,13 @@ var Core = function() {
 			LoginLib.authUser(cli);
 		});
 
-		endpoints.register('post', 'GET', function(cli){
-			cli.touch("endpoints.GET.post");
-			if (typeof post[cli.routeinfo.path[1]] == 'function') {
-				callFunction(cli, post);
-			}else {
-				cli.throwHTTP(404, 'Page not found.');
-			}
+		admin.registerAdminEndpoint('article', 'GET', function(cli){
+			cli.touch("admin.GET.post");
+			Article.handleGET(cli);
 		});
 
-		endpoints.register('post', 'POST', function(cli){
-			cli.touch("endpoints.POST.post");
+		admin.registerAdminEndpoint('article', 'POST', function(cli){
+			cli.touch("admin.POST.post");
 			callFunction(cli, post);
 		});
 
