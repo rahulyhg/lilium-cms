@@ -1,0 +1,29 @@
+{
+  "name": "LiliumCMS",
+  "description": "Lightning-fast online CMS built with NodeJS, without express",
+  "main": "lilium.js",
+  "authors": [
+    "Erik Desjardins"
+  ],
+  "license": "ISC",
+  "keywords": [
+    "cms",
+    "nodejs",
+    "wordpress",
+    "javascript",
+    "blog"
+  ],
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "ckeditor": "~4.5.6"
+  }
+}

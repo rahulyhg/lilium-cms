@@ -57,6 +57,9 @@ var HtmlParser = function() {
           case 'checkbox' :
             htmlForm += parseCheckBoxType(field, form.attr.placeholder);
             break;
+          case 'ckeditor' :
+            htmlForm += parseTextAreaType(field,form.attr.placeholder);
+            break;
         }
       }
 
@@ -108,7 +111,6 @@ var HtmlParser = function() {
     return input;
   }
 
-
   var parseButtonType = function(field) {
     var input = '<button ';
     input += parseBasicFieldAttributes(field);
@@ -147,6 +149,8 @@ var HtmlParser = function() {
     var input = generateLabel(field, hasPlaceholder);
     input += '<textarea ';
     input += parseBasicFieldAttributes(field);
+    input += field.type == "ckeditor" ? ' ckeditor ' : '';
+
     // Rows
     input += field.attr.rows ? 'rows="'+ field.attr.rows +'"' : '';
     // Cols
@@ -185,17 +189,20 @@ var HtmlParser = function() {
     attributes += field.requirements.required ? ' required ' : '';
 
     // Classes
-    attributes += 'class="v_validate ' + parseClasses(field) + '" ';
+    attributes += 'class="v_validate, ' + parseClasses(field) + '" ';
     return attributes;
   }
 
   var parseClasses = function(field) {
     var classHtml = '';
+
     if (typeof field.attr.classes !== 'undefined') {
       for (var index in field.attr.classes) {
-        classHtml += '' + field.attr.classes[index] + ', ';
+        classHtml += ',' + field.attr.classes[index];
       }
     }
+
+
     return classHtml;
   }
 }

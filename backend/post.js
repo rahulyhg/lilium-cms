@@ -12,7 +12,7 @@ var PostController = function() {
     if (!formBuilder.isAlreadyCreated('post_create')) {
       formBuilder.createForm('post_create')
         .add('title', 'text', {}, {minLenght : 10, maxLenght : 23})
-        .add('content', 'textarea', {}, {minLenght : 10, maxLenght : 20})
+        .add('content', 'ckeditor')
         .add('active', 'checkbox')
         .add('onpage', 'number', {}, { min: 10, max:15 })
         .add('publish', 'submit')

@@ -73,10 +73,11 @@ $( document ).ready(function(){
 
   var processForm = function(form) {
     var serialized_form = form.serialize();
-
+    console.log(serialized_form);
     $.post(form.attr('action'),serialized_form, function(data){
+      console.log(data);
       if (data.redirect) {
-        window.location.href = data.redirect;
+        // window.location.href = data.redirect;
 
       }
     });

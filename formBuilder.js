@@ -27,7 +27,7 @@ var Field = function(name, type) {
   this.name = name;
   /**
    * Type of the field :
-   * text, textarea, button, checkbox, radio, select, option, email, date, number
+   * text, textarea, button, checkbox, radio, select, option, email, date, number, ckeditor
    * @type {String}
    */
   this.type = type || 'text';
@@ -209,7 +209,13 @@ var FormBuilder = function() {
   var isTextBasedField = function (field) {
     var isTextBased = false;
     var type = field.type;
-    if (type == 'text' || type == 'email' || type == 'password' || type == 'textarea') isTextBased = true;
+
+    if (type == 'text' ||
+     type == 'email' ||
+     type == 'password' ||
+     type == 'textarea' ||
+     type == 'ckeditor') isTextBased = true;
+
     return isTextBased;
   }
 
