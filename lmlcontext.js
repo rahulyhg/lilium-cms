@@ -17,6 +17,9 @@ var registeredLibraries = {
 	},
 	article : function(context) {
 		return require('./article.js');
+	},
+	extra : function(context) {
+		return context.extra;
 	}
 };
 
