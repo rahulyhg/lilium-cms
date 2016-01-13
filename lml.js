@@ -296,10 +296,14 @@ var LML = function() {
 
 			if (context.skipUntilClosure) {
 				// Skip until flat else
-				
+				var cond = context.condStack[context.condStack.length-1];
+				var tagName = cond.condTag;
 			} else if (context.storeUntilClosure) {
 				// Store execution until closure
+				var cond = context.condStack[context.condStack.length-1];
+				var tagName = cond.condTag;
 				
+				cond.content.push(line);
 			} else {
 				var match = line.match(selector);
 
@@ -449,7 +453,7 @@ var LML = function() {
 
 	// Parses content, and returns partial strings through a callback
 	// The value returned is undefined when everything is done
-	this.parseContent = function(rootpath, content, callback, context) {
+	this.parseContent = function(rootpath, content, callback, context, extra) {
 		// Per line execution, slow for minified files
 		var lines = content.split('\n');
 		var cLine = 0, lineTotal = lines.length;
@@ -466,6 +470,10 @@ var LML = function() {
 		}
 
 		delete content;
+
+		if (typeof extra !== 'undefined') {
+			context.extra = extra;
+		}
 
 		if (lineTotal != 0) {
 			var cont = function() {
@@ -506,7 +514,7 @@ var LML = function() {
 		});
 	};
 
-	this.executeToFile = function(rootpath, compilepath, callback) {
+	this.executeToFile = function(rootpath, compilepath, callback, extra) {
 		var timeStamp = new Date();
 		fileserver.createDirIfNotExists(compilepath, function(dirExists) {
 			if (!dirExists) throw "LML.AccessException - Could not create directory for " + compilepath;
@@ -541,7 +549,7 @@ var LML = function() {
 							verifyEnd();
 						});
 					}
-				});
+				}, undefined, extra);
 			});
 		});
 	}
