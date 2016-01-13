@@ -30,6 +30,11 @@ var Core = function() {
 			LoginLib.authUser(cli);
 		});
 
+		endpoints.register('admin', 'POST', function(cli) {
+			cli.touch("endpoints.POST.admin");
+			admin.handleAdminEndpoint(cli);
+		});
+
 		admin.registerAdminEndpoint('article', 'GET', function(cli){
 			cli.touch("admin.GET.post");
 			Article.handleGET(cli);
@@ -37,7 +42,7 @@ var Core = function() {
 
 		admin.registerAdminEndpoint('article', 'POST', function(cli){
 			cli.touch("admin.POST.post");
-			callFunction(cli, post);
+			Article.handlePOST(cli);
 		});
 
 		hooks.fire('endpoints');
@@ -124,8 +129,15 @@ var Core = function() {
 					_c.default.server.base + 'backend/static/',
 					staticHTMLPath,
 					function(err) {
-						log('Core', 'Firing static symlink signal');
-						hooks.fire('staticsymlink', err);
+						            // Symlink for bower modules
+            fileserver.createSymlink(
+              _c.default.server.base + 'bower_components/',
+              _c.default.server.html + '/bower',
+              function(err) {
+                log('Core', 'Firing static symlink signal');
+                hooks.fire('staticsymlink', err);
+              }
+            );
 					}
 				);
 			} else {
