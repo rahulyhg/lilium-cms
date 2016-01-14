@@ -1,8 +1,8 @@
 var mongoDocuments = {
 	names : [
-		"entities", "roles", "plugins", "themes", "config", 
+		"entities", "roles", "plugins", "themes", "config",
 		"sites", "discussions", "types", "vocab", "content",
-		"lilium"
+		"lilium", "uploads"
 	]
 };
 
@@ -39,8 +39,8 @@ var adminEntity = {
 var defaultTheme = {
 	id : 0,
 	uName : 'flowerg',
-	dName : 'Flower Garden', 
-	active : true, 
+	dName : 'Flower Garden',
+	active : true,
 	creators : [{
 		fullname : 'Erik Desjardins',
 		website : "http://erikdesjardins.com",
@@ -62,7 +62,7 @@ var initMongo = function(db, cb) {
 	log('Database', 'Init script was executed');
 	var totalTasks = 4;
 	var completedTasks = 0;
-	
+
 	// Boot Script
 	var _run = function() {
 		createCol(0);
@@ -105,7 +105,7 @@ var initMongo = function(db, cb) {
 				throw "[DatabaseInit - config collection does not exist]";
 			}
 		});
-	
+
 		log('Database', 'Inserting default content type');
 		db.collection('types', {strict:true}, function(err, col) {
 			if (!err) {
