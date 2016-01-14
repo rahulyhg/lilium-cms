@@ -27,7 +27,7 @@ var Field = function(name, type) {
   this.name = name;
   /**
    * Type of the field :
-   * text, textarea, button, checkbox, radio, select, option, email, date, number, ckeditor
+   * text, textarea, button, checkbox, radio, select, option, email, date, number, ckeditor, file
    * @type {String}
    */
   this.type = type || 'text';
