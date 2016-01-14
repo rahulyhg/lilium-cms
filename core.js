@@ -9,7 +9,6 @@ var db = require('./includes/db.js');
 var fs = require('fs');
 var fileserver = require('./fileserver.js');
 var cli = require('./cli.js');
-var post = require('./backend/post.js');
 var admin = require('./backend/admin.js');
 var Article = require('./article.js');
 
