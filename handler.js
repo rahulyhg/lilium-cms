@@ -29,13 +29,12 @@ var Handler = function() {
 
 		busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
 			if (mimeTypeIsSupported(mimetype)) {
-
 				var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
 				filename = crypto.createHash('md5').update(filename).digest('hex');
 				var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ getMimeByMimeType(mimetype);
 
 				// Save it in database
-				db.insert('uploads', {path : saveTo}, function (err, result){
+				db.insert('uploads', {path : saveTo, url : filename + getMimeByMimeType(mimetype)}, function (err, result){
 					cli.postdata.uploads = [];
 					cli.postdata.uploads.push(result.ops[0]);
 				});
