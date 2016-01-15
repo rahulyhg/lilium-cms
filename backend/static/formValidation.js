@@ -72,15 +72,40 @@ $( document ).ready(function(){
   });
 
   var processForm = function(form) {
-    var serialized_form = form.serialize();
-    console.log(serialized_form);
-    $.post(form.attr('action'),serialized_form, function(data){
-      console.log(data);
-      if (data.redirect) {
-        window.location.href = data.redirect;
 
+    var serialized_form = form.serialize();
+
+    // Process files
+    processFiles(form, function(){
+      $.post(form.attr('action'),serialized_form, function(data){
+        
+        if (data.redirect) {
+          window.location.href = data.redirect;
+        }
+      });
+    });
+
+
+  }
+
+  var processFiles = function(form, cb) {
+    var data = new FormData();
+    jQuery.each(form.find('input[type=file]')[0].files, function(i, file) {
+        data.append('file-'+i, file);
+    });
+
+    jQuery.ajax({
+      url: form.attr('action'),
+      data: data,
+      cache: false,
+      contentType: false,
+      processData: false,
+      type: 'POST',
+      success: function(data){
+          return cb;
       }
     });
   }
+
 
 });

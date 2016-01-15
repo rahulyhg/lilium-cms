@@ -39,18 +39,22 @@ var Article = function() {
         var form = formBuilder.handleRequest(cli);
         var response = formBuilder.validate(form, true);
         var redirect = '';
+
         if (response.success) {
           // Create post
           db.insert('content', formBuilder.serializeForm(form), function(err, result) {
-						console.log(result);
+
 						// Generate LML page
 						filelogic.renderLmlPostPage(cli, "article", result.ops[0], function(name){
+
 							cli.sendJSON({
 								redirect: name,
 								form: {success : true}
 							});
+
 						});
           });
+
         } else {
 					cli.sendJSON({
 						form: response
@@ -58,7 +62,6 @@ var Article = function() {
 				}
 
       } else {
-
         filelogic.serveLmlPage(cli);
       }
 
