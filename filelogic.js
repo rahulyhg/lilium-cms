@@ -51,8 +51,20 @@ var FileLogic = function() {
     return false;
   };
 
-  this.serveLmlPage = function(cli) {
-    var name = cli.routeinfo.fullpath;
+  /**
+   * Serves an lml page, if lastIsParam is true,
+   * it will not check for last path[] as the folder name.
+   */
+  this.serveLmlPage = function(cli, lastIsParam) {
+    lastIsParam = typeof lastIsParam == 'undefined' ? false : true;
+    var name = "";
+
+    if (lastIsParam) {
+      name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+    } else {
+      name = cli.routeinfo.fullpath;
+    }
+
     var readPath = _c.default.server.base + "backend/dynamic/" + name + ".lml";
     var savePath = _c.default.server.html + name +'/index.html';
 		FileServer.fileExists(savePath, function(isPresent) {

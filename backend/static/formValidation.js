@@ -77,8 +77,9 @@ $( document ).ready(function(){
 
     // Process files
     processFiles(form, function(){
+      console.log('AH YEAH');
       $.post(form.attr('action'),serialized_form, function(data){
-        
+
         if (data.redirect) {
           window.location.href = data.redirect;
         }
@@ -89,22 +90,28 @@ $( document ).ready(function(){
   }
 
   var processFiles = function(form, cb) {
-    var data = new FormData();
-    jQuery.each(form.find('input[type=file]')[0].files, function(i, file) {
-        data.append('file-'+i, file);
-    });
+    if (form.find('input[type=file]').length > 0) {
+      console.log('longer');
+      var data = new FormData();
+      jQuery.each(form.find('input[type=file]')[0].files, function(i, file) {
+          data.append('file-'+i, file);
+      });
 
-    jQuery.ajax({
-      url: form.attr('action'),
-      data: data,
-      cache: false,
-      contentType: false,
-      processData: false,
-      type: 'POST',
-      success: function(data){
-          return cb;
-      }
-    });
+      jQuery.ajax({
+        url: form.attr('action'),
+        data: data,
+        cache: false,
+        contentType: false,
+        processData: false,
+        type: 'POST',
+        success: function(data){
+            return cb();
+        }
+      });
+    }
+    console.log('NOPE');
+    return cb();
+
   }
 
 

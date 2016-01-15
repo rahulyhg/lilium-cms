@@ -2,7 +2,7 @@ var filelogic = require('./filelogic.js');
 var formBuilder = require('./formBuilder.js');
 var conf = require('./config.js');
 var db = require('./includes/db.js');
-
+var mongo = require('mongodb');
 var Article = function() {
 	this.handlePOST = function(cli) {
 		cli.touch('article.handlePOST');
@@ -21,6 +21,11 @@ var Article = function() {
 			case 'new':
 				this.new(cli);
 				break;
+			case 'edit' :
+				this.edit(cli);
+				break;
+			case 'getArticle' :
+				this.getArticle(cli);
 			default:
 
 		}
@@ -67,12 +72,47 @@ var Article = function() {
 
 	};
 
-	this.getArticle = function(postID) {
-		if (isNaN(postID)) {
-			// postID is a postname
+	this.edit = function(cli) {
+		if (cli.routeinfo.path[3]) {
+			if (!formBuilder.isAlreadyCreated('post_create')) {
+				createPostForm();
+			}
+			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+			db.exists('content', {_id : id}, function(exists) {
+				if (exists) {
+					filelogic.serveLmlPage(cli, true);
+				} else {
+					cli.throwHTTP(404, 'Article Not Found');
+				}
+			});
+
 		} else {
-			// postID is an ID (int)
+			cli.throwHTTP(404, 'Article Not Found');
 		}
+	}
+
+	this.getArticle = function(cli) {
+		// if (isNaN(postID)) {
+		// 	// postID is a postname
+		// } else {
+		// 	// postID is an ID (int)
+		// }
+
+		var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+		db.find('content', {'_id' : id},{limit:[1]}, function(err, cursor) {
+			cursor.next(function(err, article) {
+				if (article) {
+					cli.sendJSON({
+						form: article
+					});
+				} else {
+					cli.throwHTTP(404, 'Article Not Found');
+				}
+				cursor.close();
+			});
+		});
+
+
 
 		// Return article object from DB
 	};
