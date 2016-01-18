@@ -31,45 +31,55 @@ var Handler = function() {
 
 		// File upload
 		busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-			if (mimeTypeIsSupported(mimetype)) {
-				var mime = getMimeByMimeType(mimetype);
-				var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
-				filename = crypto.createHash('md5').update(filename).digest('hex');
-				var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
-				var url =  filename + mime;
 
-				file.on('end', function() {
-					if (config.default.supported_pictures.indexOf(mime) != -1) {
-						console.log('Image!');
-
-						imageResizer.resize(saveTo, mime.substring(1), function(images){
-							// Save it in database
-							db.insert('uploads', {path : saveTo, url : url, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
-								cli.postdata.uploads = [];
-								cli.postdata.uploads.push(result.ops[0]);
-							});
-
-							console.log('Image processed');
-						});
-					} else {
-						console.log('File!!');
-
-						// Save it in database
-						db.insert('uploads', {path : saveTo, url : url, type : 'file'}, function (err, result){
-							cli.postdata.uploads = [];
-							cli.postdata.uploads.push(result.ops[0]);
-							console.log('File processed');
-
-						});
-					}
-				});
-
-				file.pipe(fs.createWriteStream(saveTo));
-			} else {
+			if (cli.request.headers['content-length'] > config.default.server.fileMaxSize) {
 				file.resume();
 				isSupported = false;
-				return notSupported(cli);
+				return cli.throwHTTP(413, 'File is too large');
+
+			} else {
+
+				if (mimeTypeIsSupported(mimetype)) {
+
+					var mime = getMimeByMimeType(mimetype);
+					var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
+					filename = crypto.createHash('md5').update(filename).digest('hex');
+					var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
+					var url =  filename + mime;
+
+					file.on('end', function() {
+
+						if (config.default.supported_pictures.indexOf(mime) != -1) {
+
+							imageResizer.resize(saveTo, mime.substring(1), function(images){
+								// Save it in database
+								db.insert('uploads', {path : saveTo, url : url, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
+									cli.postdata.uploads = [];
+									cli.postdata.uploads.push(result.ops[0]);
+								});
+
+							});
+						} else {
+
+							// Save it in database
+							db.insert('uploads', {path : saveTo, url : url, type : 'file'}, function (err, result){
+								cli.postdata.uploads = [];
+								cli.postdata.uploads.push(result.ops[0]);
+
+							});
+						}
+					});
+
+					file.pipe(fs.createWriteStream(saveTo));
+
+				} else {
+
+					file.resume();
+					isSupported = false;
+					return notSupported(cli);
+				}
 			}
+
     });
 
 		busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated) {
