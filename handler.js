@@ -9,6 +9,8 @@ var crypto = require('crypto');
 var htmlserver = require('./frontend/htmlserver.js');
 var dateFormat = require('dateformat');
 var db = require('./includes/db.js');
+var imageResizer = require('./imageResizer.js');
+var imageSize = require('image-size');
 
 var Handler = function() {
 	var GET = function(cli) {
@@ -27,16 +29,39 @@ var Handler = function() {
 		var isSupported = true
 		var busboy = new Busboy({ headers: req.headers });
 
+		// File upload
 		busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
 			if (mimeTypeIsSupported(mimetype)) {
+				var mime = getMimeByMimeType(mimetype);
 				var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
 				filename = crypto.createHash('md5').update(filename).digest('hex');
-				var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ getMimeByMimeType(mimetype);
+				var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
+				var url =  filename + mime;
 
-				// Save it in database
-				db.insert('uploads', {path : saveTo, url : filename + getMimeByMimeType(mimetype)}, function (err, result){
-					cli.postdata.uploads = [];
-					cli.postdata.uploads.push(result.ops[0]);
+				file.on('end', function() {
+					if (config.default.supported_pictures.indexOf(mime) != -1) {
+						console.log('Image!');
+
+						imageResizer.resize(saveTo, mime.substring(1), function(images){
+							// Save it in database
+							db.insert('uploads', {path : saveTo, url : url, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
+								cli.postdata.uploads = [];
+								cli.postdata.uploads.push(result.ops[0]);
+							});
+
+							console.log('Image processed');
+						});
+					} else {
+						console.log('File!!');
+
+						// Save it in database
+						db.insert('uploads', {path : saveTo, url : url, type : 'file'}, function (err, result){
+							cli.postdata.uploads = [];
+							cli.postdata.uploads.push(result.ops[0]);
+							console.log('File processed');
+
+						});
+					}
 				});
 
 				file.pipe(fs.createWriteStream(saveTo));

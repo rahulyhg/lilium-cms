@@ -56,6 +56,13 @@ var _config = {
 			".swf" : "application/x-shockwave-flash",
 			".lml" : "application/x-lilium-markup"
 		},
+		"supported_pictures" : {
+			".jpg",
+			".jpeg",
+			".bmp",
+			".png",
+			".gif"
+		}
 		"website" : {
 			"sitetitle" : "A Lilium Website",
 			"language" : "en",

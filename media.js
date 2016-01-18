@@ -42,10 +42,10 @@ var Media = function() {
         var response = formBuilder.validate(form, true);
 
         if (response.success) {
-          var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
+          // var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
           // Create post
 							cli.sendJSON({
-								form: {redirect : url ,success : true}
+								form: {redirect : '' ,success : true}
 							});
         } else {
 					cli.sendJSON({

@@ -12,6 +12,8 @@ var cli = require('./cli.js');
 var admin = require('./backend/admin.js');
 var Article = require('./article.js');
 var Media = require('./media.js');
+var imageSize = require('./imageSize.js');
+
 var Core = function() {
 
 	var loadHooks = function(readyToRock) {
@@ -74,6 +76,12 @@ var Core = function() {
 		}else {
 			cli.throwHTTP(404, 'Page not found.');
 		}
+	}
+
+	var loadImageSizes = function() {
+		imageSize.add("thumbnail", 150, '*');
+		imageSize.add("medium", 300, '*');
+		imageSize.add("Archive-thumbnail", 400, 400);
 	}
 
 	var loadPlugins = function() {
@@ -190,7 +198,7 @@ var Core = function() {
 		loadEndpoints();
 		loadPlugins();
 		loadStandardInput();
-
+		loadImageSizes();
 		loadHTMLStructure(function() {
 			testDatabase(function() {
 				log('Core', 'Firing initialized signal');
