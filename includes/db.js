@@ -97,6 +97,22 @@ var DB = function() {
 		});	
 	};
 
+	this.findToArray = function(coln, conds, cb) {
+		_conn.collection(coln, {"strict":true}, function(err, col) {	
+			if (err) {
+				cb("[Database - Error : "+err+"]");
+			} else if (typeof conds != "object") {
+				cb("[Database - Invalid document]");
+			} else {
+				conds = typeof conds === 'undefined' ? {} : conds;
+
+				col.find(conds).toArray(function(err, arr) {
+					cb(undefined, arr);
+				});
+			} 
+		});	
+	};
+
 	this.multiLevelFind = function(topLevel, levels, conds, stack, callback) {
 		var firstNodeCond = levels.shift();
 		this.find(topLevel, conds, stack, function(err, cur) {

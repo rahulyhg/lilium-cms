@@ -64,8 +64,38 @@ var Core = function() {
 	var loadPlugins = function() {
 		log('Plugins', 'Loading plugins');
 
-		hooks.fire('plugins');
-		log('Plugins', 'Loaded plugins');
+		var fireEvent = function() {
+			log('Plugins', 'Loaded plugins');
+			hooks.fire('plugins');
+		};
+
+		db.findToArray('plugins', {"active":true}, function(err, results) {
+			if (err) {
+				log('Plugins', 'Failed to find entries in database; ' + err);
+				fireEvent();
+
+				return;
+			}
+
+			log('Plugins', 'Read plugins collection in database');
+			var i = -1;
+			var nextObject = function() {
+				i++
+				if (i != results.length) {
+					plugins.registerPlugin(results[i].identifier, nextObject);
+				} else {
+					fireEvent();
+				}
+			};
+
+			if (results.length > 0) {
+				nextObject();
+			} else {
+				log('Plugins', 'Nothing to register');
+				fireEvent();
+			}
+		});
+
 	};
 
 	var testDatabase = function(callback) {
@@ -176,17 +206,20 @@ var Core = function() {
 		log('Core', 'Initializing Lilium');
 		loadHooks(readyToRock);
 		loadEndpoints();
-		loadPlugins();
 		loadStandardInput();
+
+		hooks.bind('plugins', function() {
+			log('Core', 'Firing initialized signal');
+			hooks.fire('init', {
+				loaded : [
+					"hooks", "endpoints", "plugins"
+				]
+			});
+		});
 
 		loadHTMLStructure(function() {
 			testDatabase(function() {
-				log('Core', 'Firing initialized signal');
-				hooks.fire('init', {
-					loaded : [
-						"hooks", "endpoints", "plugins"
-					]
-				});
+				loadPlugins();
 			});
 		});
 	};

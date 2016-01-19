@@ -9,17 +9,17 @@ var registeredLibraries = {
 	vocab : function(context) {
 		return require('./vocab.js');
 	},
-	session : function(context) {
-		return "";
-	},
 	forms : function(context) {
 		return FormBuilder;
 	},
 	article : function(context) {
 		return require('./article.js');
 	},
+	plugins : function(context) {
+		return require('./plugins.js');
+	},
 	testarray : function(context) {
-		return ["Hi", ", ", "this ", "is ", "a ", " sentence", "."];
+		return {array : [{"text":"Hello"}, {"text":" "}, {"text":"world"}, {"text":"!"}]};
 	}
 };
 

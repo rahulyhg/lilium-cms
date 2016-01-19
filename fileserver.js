@@ -48,6 +48,12 @@ var FileServer = function() {
 		});
 	};
 
+	this.readJSON = function(abspath, callback) {
+		this.readFile(abspath, function(content) {
+			callback(JSON.parse(content||{}));
+		});
+	}
+
 	this.readFile = function(filename, callback) {
 		this.fileExists(filename, function(exists) {
 			if (exists) {

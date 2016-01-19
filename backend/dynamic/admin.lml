@@ -1,4 +1,4 @@
-{#config;session;vocab;testarray}
+{#config;vocab;testarray}
 {$
 	otherVar = 50;
 	otherVar += 10;
@@ -29,6 +29,7 @@
 	endif;
 
 	loopVar = 0;
+	loopMax = 5;
 
 	var1 = 100;
 	var2 = 100;
@@ -43,10 +44,6 @@
 		someDynamicVar /= 10;
 	endif;
 
-	forloop.sentence = "(forlooped string) ";
-	for (word in testarray);
-		forloop.sentence += word;
-	endfor;
 $}
 <!DOCTYPE html>
 <html>
@@ -63,11 +60,21 @@ $}
 		<h4>otherVar = {=otherVar}</h4>
 		<h4>str = {=str}</h4>
 		<h4>3rd variable = {=thirdVar}</h4>
-		<h4>For-loop sentence = {=forloop.sentence}</h4>
+
+		<h4>
+			Some for-loop sentence : 
+			{$ 
+				for (lmlobj in testarray.array);
+			$}
+				{=lmlobj.text}
+			{$
+				endfor;
+			$}
+		</h4>
 	
 		<h4>loopVar before while = {=loopVar}</h4>
 		{$ 
-			while (loopVar != 10); 
+			while (loopVar != loopMax); 
 				loopVar += 1; 
 		$}
 				<h5>loopVar Iteration : {=loopVar}</h5>
@@ -77,7 +84,7 @@ $}
 
 		<h4>loopVar after while = {=loopVar}</h4>
 		{$ 
-			if (loopVar != 10); 
+			if (loopVar != loopMax); 
 		$}
 			<h5>While loop did NOT work :(</h5>
 		{$ 

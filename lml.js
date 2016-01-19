@@ -19,6 +19,7 @@ var LML = function() {
 			* Live
 			% File
 			# Context
+			$ Slang
 
 		LML slang -
 			{$ if (condition) $}
@@ -35,7 +36,7 @@ var LML = function() {
 
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
-		var levels = code.split('.');
+		var levels = code.trim().split('.');
 		var firstLevelLib = undefined;
 		var endVal = undefined;
 
