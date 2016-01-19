@@ -79,12 +79,11 @@ var Media = function() {
 				cursor.next(function(err, media) {
 					if (media) {
 						for (size in media.sizes){
-							console.log(media.sizes[size]);
 							fs.deleteFile(media.sizes[size], function(err){
 								log("file : " + media.sizes[size] + " removed.");
 							});
 						}
-						
+
 						//Delete original
 						fs.deleteFile(media.path, function(err){
 							log("file : " + media.path + " removed.");
