@@ -1,4 +1,4 @@
-{#config;session;vocab}
+{#config;session;vocab;testarray}
 {$
 	otherVar = 50;
 	otherVar += 10;
@@ -8,9 +8,45 @@
 	str += " World";
 	thirdVar = otherVar;
 
-	if (someDynamicVar == 20)
+	if (someDynamicVar == 20);
 		someDynamicVar += 30;
-	endif
+	endif;
+
+	if (str == "Some Random String");
+		str = "THIS IS A LML ERROR";
+	else;
+		str += "!";
+	endif;
+
+	if (someDynamicVar == 100);
+		someDynamicVar = 0;
+	endif;
+
+	if (someDynamicVar == someDynamicVar);
+		someDynamicVar *= 2;
+	else 
+		someDynamicVar = -1000;
+	endif;
+
+	loopVar = 0;
+
+	var1 = 100;
+	var2 = 100;
+
+	if (var1 == var2);
+		someDynamicVar /= 10;
+	endif;
+
+	var2 -= 10;
+
+	if (var1 != var2);
+		someDynamicVar /= 10;
+	endif;
+
+	forloop.sentence = "(forlooped string) ";
+	for (word in testarray);
+		forloop.sentence += word;
+	endfor;
 $}
 <!DOCTYPE html>
 <html>
@@ -27,7 +63,33 @@ $}
 		<h4>otherVar = {=otherVar}</h4>
 		<h4>str = {=str}</h4>
 		<h4>3rd variable = {=thirdVar}</h4>
+		<h4>For-loop sentence = {=forloop.sentence}</h4>
+	
+		<h4>loopVar before while = {=loopVar}</h4>
+		{$ 
+			while (loopVar != 10); 
+				loopVar += 1; 
+		$}
+				<h5>loopVar Iteration : {=loopVar}</h5>
+		{$ 
+			endwhile; 
+		$}
 
+		<h4>loopVar after while = {=loopVar}</h4>
+		{$ 
+			if (loopVar != 10); 
+		$}
+			<h5>While loop did NOT work :(</h5>
+		{$ 
+			else; 
+				loopVar = "Now a string"; 
+		$}
+			<h5>While loop WORKED! :D</h5>
+			<h4>loopVar after if = {=loopVar}</h4>
+		{$ 
+			endif; 
+		$}	
+		
 		Currently running in {=config.default.env}
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
