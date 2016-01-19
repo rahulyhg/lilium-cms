@@ -8,11 +8,28 @@
 	</head>
 	<body>
 		<header><h1>About this media</h1></header>
-		<h2 data-name="title"></h2>
-    <img data-name="url" src="">
+		Name : <h2 data-name="name"></h2>
+		Media Type : <h4 data-name="type"></h4>
+		<button onclick="deleteMedia()">Delete Media</button><br>
+		Url : <span data-name="url"></span><br>
+		<img data-name="url" src="">
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="{=config.default.server.url}/static/textParser.js"></script>
+
+		<script>
+			var mediaId = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
+			var baseUrl = "{=config.default.server.url}";
+			$.get(baseUrl + "/admin/media/getMedia/" + mediaId, function(data) {
+				parser.parseTextToView(data.data);
+			});
+
+			function deleteMedia() {
+				$.post(baseUrl + "/admin/media/delete/" + mediaId, function(data) {
+					alert(data);
+				});
+			}
+		</script>
 
 	</body>
 </html>

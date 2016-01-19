@@ -1,0 +1,24 @@
+{#config;session;vocab;forms;extra}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+	</head>
+	<body>
+		<header><h1>List of medias</h1></header>
+		<a href="{=config.default.server.url}/admin/media/upload">Upload a media</a>
+    {$
+			for (media in extra);
+    $}
+			<div>
+				{=media._id}
+				<img src="{=media.sizes.thumbnail.url}">
+				<a href="{=config.default.server.url}/admin/media/view/{=media._id}">Edit</a>
+			</div>
+		{$
+			endfor;
+		$}
+
+	</body>
+</html>

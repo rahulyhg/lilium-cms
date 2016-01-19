@@ -33,12 +33,28 @@ var Media = function() {
 			case 'getMedia' :
 				this.getMedia(cli);
 				break;
+			case 'list' :
+				this.list(cli);
+				break;
 			default:
-
+				return cli.throwHTTP(404, 'Not Found');
+				break;
 		}
 	};
 
 	this.list = function(cli) {
+		//Find the 25 first for now
+		//TODO find a way to load more
+		db.find('uploads', {},{limit:[25]}, function(err, cursor) {
+			var medias = [];
+			cursor.each(function(err, media) {
+				if (media != null) {
+					medias.push(media);
+				} else {
+					filelogic.serveLmlPage(cli, false, medias);
+				}
+			});
+		});
 
 	}
 
@@ -79,8 +95,8 @@ var Media = function() {
 				cursor.next(function(err, media) {
 					if (media) {
 						for (size in media.sizes){
-							fs.deleteFile(media.sizes[size], function(err){
-								log("file : " + media.sizes[size] + " removed.");
+							fs.deleteFile(media.sizes[size].path, function(err){
+								log("file : " + media.sizes[size].path + " removed.");
 							});
 						}
 

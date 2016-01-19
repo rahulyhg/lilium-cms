@@ -1,18 +1,20 @@
 var textParser = function() {
-    this.parseGet = function() {
-      url = "http://localhost:8080/admin/media/getMedia/569d4e3ea38c12a1184bbb33";
-      $.get(url, function(data) {
-        data.data.each(function(index, element) {
-          var target = $('*[data-name="' + index + '"]');
-          if (target.is('img')) {
-            target.attr('src', element);
-          } else {
-            target.text(element);
-          }
+    this.parseTextToView = function(data) {
+        for (key in data) {
+          console.log(key);
 
-        });
-      });
+          var target = $('*[data-name="' + key + '"]');
+      
+          target.each(function() {
+            if ($(this).is('img')) {
+              $(this).attr('src', data[key]);
+            } else {
+              $(this).text(data[key]);
+            }
+          });
+
+        }
+
     }
   }
 var parser = new textParser();
-parser.parseGet();
