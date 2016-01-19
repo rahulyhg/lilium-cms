@@ -11,6 +11,8 @@ var Article = function() {
 				this.new(cli);
 				break;
 			default:
+				return cli.throwHTTP(404, 'Not Found');
+				break;
 
 		}
 	};
@@ -26,13 +28,29 @@ var Article = function() {
 				break;
 			case 'getArticle' :
 				this.getArticle(cli);
+				case 'list' :
+					this.list(cli);
+					break;
 			default:
+				return cli.throwHTTP(404, 'Not Found');
+				break;
 
 		}
 	};
 
 	this.list = function(cli) {
-
+		//Find the 25 first for now
+		//TODO find a way to load more
+		db.find('content', {},{limit:[25]}, function(err, cursor) {
+			var contents = [];
+			cursor.each(function(err, content) {
+				if (content != null) {
+					contents.push(content);
+				} else {
+					filelogic.serveLmlPage(cli, false, contents);
+				}
+			});
+		});
 	}
 
 	this.new = function(cli) {

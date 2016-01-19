@@ -1,1 +1,24 @@
-Listing all the posts
+{#config;session;vocab;forms;extra}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+	</head>
+	<body>
+		<header><h1>List of articles</h1></header>
+		<a href="{=config.default.server.url}/admin/article/new">Create a new article</a>
+    {$
+			for (content in extra);
+    $}
+			<div>
+				{=content.title}
+				<img src="{=content.picture}">
+				<a href="{=config.default.server.url}/admin/article/edit/{=content._id}">Edit</a>
+			</div>
+		{$
+			endfor;
+		$}
+
+	</body>
+</html>
