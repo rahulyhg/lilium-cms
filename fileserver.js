@@ -40,6 +40,10 @@ var FileServer = function() {
 		return path.dirname(fullpath);
 	};
 
+	this.deleteFile = function(path, cb) {
+		fs.unlink(path, cb);
+	}
+
 	this.createDirIfNotExists = function(fullpath, callback, abs) {
 		abs = typeof abs === 'undefined' ? false : abs;
 		var dirname = abs ? fullpath : path.dirname(fullpath);

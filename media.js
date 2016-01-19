@@ -3,6 +3,8 @@ var formBuilder = require('./formBuilder.js');
 var conf = require('./config.js');
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
+var fs = require('./fileserver.js');
+var log = require('./log.js');
 
 var Media = function() {
 	this.handlePOST = function(cli) {
@@ -10,6 +12,9 @@ var Media = function() {
 		switch (cli.routeinfo.path[2]) {
 			case 'upload':
 				this.upload(cli);
+				break;
+			case 'delete' :
+				this.delete(cli);
 				break;
 			default:
 
@@ -67,11 +72,45 @@ var Media = function() {
 	};
 
 	this.delete = function(cli) {
+		if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
+			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
+			db.find('uploads', {'_id' : id},{limit:[1]}, function(err, cursor) {
+				cursor.next(function(err, media) {
+					if (media) {
+						for (size in media.sizes){
+							console.log(media.sizes[size]);
+							fs.deleteFile(media.sizes[size], function(err){
+								log("file : " + media.sizes[size] + " removed.");
+							});
+						}
+						
+						//Delete original
+						fs.deleteFile(media.path, function(err){
+							log("file : " + media.path + " removed.");
+						});
+
+						db.remove('uploads', {_id : id},function(err, r){
+							return cli.sendJSON({
+								redirect: '/admin/media/list'
+							});
+						});
+
+					} else {
+						cli.throwHTTP(404, 'Media Not Found');
+					}
+					cursor.close();
+				});
+			});
+
+
+		} else {
+			return cli.throwHTTP(404, 'Media Not Found');
+		}
 	}
 
 	this.view = function(cli) {
-		if (cli.routeinfo.path[3]) {
+		if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
 
 			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 			db.exists('uploads', {_id : id}, function(exists) {
