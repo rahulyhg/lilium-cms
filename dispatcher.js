@@ -31,8 +31,17 @@ var Dispatcher = function() {
 
 	this.dispost = function(cli) {
 		cli.touch("dispatcher.dispost");
+
 		if (Endpoints.isRegistered(cli.routeinfo.path[0], 'POST')) {
-			Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
+			if (cli.routeinfo.admin) {
+				if (cli.userinfo.loggedin && cli.userinfo.dashaccess) {
+					Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
+				} else {
+						cli.throwHTTP(401, "Unauthorized");
+				}
+			} else {
+				Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
+			}
 		} else {
 			console.log("Endpoint not registered : " + cli.routeinfo.path[0]);
 			cli.debug();

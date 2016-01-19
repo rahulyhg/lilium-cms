@@ -22,6 +22,7 @@ var Handler = function() {
 
 	var POST = function(cli) {
 		cli.touch('handler.POST');
+		Router.parseClientObject(cli);
 		cli.postdata = new Object();
 		cli.postdata.length = cli.request.headers["content-length"];
 		cli.postdata.data = {};
@@ -88,7 +89,6 @@ var Handler = function() {
 
     busboy.on('finish', function() {
 			if (isSupported){
-				Router.parseClientObject(cli);
 				Dispatcher.dispost(cli);
 			}
 
