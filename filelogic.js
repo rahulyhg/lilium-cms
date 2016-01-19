@@ -2,6 +2,7 @@ var FileServer = require('./fileserver.js');
 var LML = require('./lml.js');
 var _c = require('./config.js');
 var fs = require('fs');
+var slugify = require('slugify');
 
 var FileLogic = function() {
   /*
@@ -50,8 +51,20 @@ var FileLogic = function() {
     return false;
   };
 
-  this.serveLmlPage = function(cli) {
-    var name = cli.routeinfo.fullpath;
+  /**
+   * Serves an lml page, if lastIsParam is true,
+   * it will not check for last path[] as the folder name.
+   */
+  this.serveLmlPage = function(cli, lastIsParam) {
+    lastIsParam = typeof lastIsParam == 'undefined' ? false : true;
+    var name = "";
+
+    if (lastIsParam) {
+      name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+    } else {
+      name = cli.routeinfo.fullpath;
+    }
+
     var readPath = _c.default.server.base + "backend/dynamic/" + name + ".lml";
     var savePath = _c.default.server.html + name +'/index.html';
 		FileServer.fileExists(savePath, function(isPresent) {
@@ -65,7 +78,23 @@ var FileLogic = function() {
 
   };
 
-  var saveLmlPage = function(cli, readPath, savePath) {
+  this.renderLmlPostPage = function(cli, postType, extra, cb) {
+    // Check for the post type
+    var title = slugify(extra.title);
+    var readPath = _c.default.server.base + "flowers/" + _c.default.website.flower + "/" + postType + ".lml";
+    var savePath = _c.default.server.html + "/" + title + ".html";
+    LML.executeToFile(
+      readPath,
+      savePath,
+      function() {
+        cli.responseinfo.filecreated = true;
+        cb(_c.default.server.url + "/" + title + ".html");
+      },
+      extra
+    );
+  }
+
+  var saveLmlPage = function(cli, readPath, savePath, extra) {
     LML.executeToFile(
       readPath,
       savePath,
@@ -73,7 +102,8 @@ var FileLogic = function() {
         cli.touch('filelogic.serveSpecialPage.callback');
         cli.responseinfo.filecreated = true;
         serveCachedFile(cli, savePath);
-      }
+      },
+      extra
     );
 
   }

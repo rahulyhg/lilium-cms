@@ -12,9 +12,6 @@
 		<div id="editor"></div>
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 		<script src="/static/formValidation.js"></script>
-		<textarea name="ckeditor" id="asd" rows="10" cols="80">
-                This is my textarea to be replaced with CKEditor.
-    </textarea>
 		<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
 		<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
 		<script src="{=config.default.server.url}/static/ckeditor_lilium.js"></script>

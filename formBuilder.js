@@ -27,7 +27,7 @@ var Field = function(name, type) {
   this.name = name;
   /**
    * Type of the field :
-   * text, textarea, button, checkbox, radio, select, option, email, date, number, ckeditor
+   * text, textarea, button, checkbox, radio, select, option, email, date, number, ckeditor, file
    * @type {String}
    */
   this.type = type || 'text';
@@ -53,11 +53,11 @@ var FormBuilder = function() {
 
   this.createForm = function(name, attr, cb) {
     if (typeof name == 'undefined') {
-      throw "[FormBuilderException - No name provided to form";
+      throw "[FormBuilderException] - No name provided to form";
     }
 
     if (typeof forms[name] !== 'undefined') {
-      throw "[FormBuilderException - Form already created : " + name;
+      throw "[FormBuilderException] - Form already created : " + name;
     }
 
     // Instanciate a new form
@@ -77,11 +77,11 @@ var FormBuilder = function() {
   this.add = function(name, type, attr, requirements) {
 
     if (typeof currentForm == 'undefined') {
-      throw "[FormBuilderException - Form not created. Please call createForm() first.";
+      throw "[FormBuilderException] - Form not created. Please call createForm() first.";
     }
 
     if (typeof name == 'undefined') {
-      throw "[FormBuilderException - No name provided to field";
+      throw "[FormBuilderException] - No name provided to field";
     }
 
     if (typeof currentForm.fields[name] !== 'undefined') {
@@ -106,7 +106,7 @@ var FormBuilder = function() {
 
   this.render = function(formName) {
     if (typeof forms[formName] == 'undefined') {
-      throw "[FormBuilderException - Form to render doesn't exists : " + formName;
+      throw "[FormBuilderException] - Form to render doesn't exists : " + formName;
     }
     if (typeof forms[formName]['form_name'] == 'undefined') {
       this.add('form_name', 'hidden', {
@@ -135,7 +135,6 @@ var FormBuilder = function() {
     if (typeof form == 'undefined') {
       return false;
     }
-
     var err = {};
 
     for (var field in form.fields) {
@@ -226,6 +225,15 @@ var FormBuilder = function() {
    */
   this.handleRequest = function(cli) {
     if (typeof cli.postdata !== 'undefined') {
+
+      // Check if it is a file upload
+      if (typeof cli.postdata.data !== 'undefined' &&
+          typeof cli.postdata.data.form_name == 'undefined' &&
+          typeof cli.postdata.uploads !== 'undefined'
+          ) {
+            return new Form();
+      }
+
       if (typeof cli.postdata.data !== 'undefined' &&
         typeof cli.postdata.data.form_name !== 'undefined' &&
         typeof forms[cli.postdata.data.form_name] !== 'undefined'
@@ -242,6 +250,18 @@ var FormBuilder = function() {
         return form;
       }
     }
+  }
+
+  this.serializeForm = function(form) {
+    var data = {};
+    for (var field in form.fields) {
+      var field = form.fields[field];
+      if (field.name != 'form_name') {
+        data[field.name] = field.attr.value;
+      }
+    }
+
+    return data;
   }
 
   this.isAlreadyCreated = function(name) {

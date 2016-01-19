@@ -9,9 +9,10 @@ var db = require('./includes/db.js');
 var fs = require('fs');
 var fileserver = require('./fileserver.js');
 var cli = require('./cli.js');
-var post = require('./backend/post.js');
 var admin = require('./backend/admin.js');
 var Article = require('./article.js');
+var Media = require('./media.js');
+var imageSize = require('./imageSize.js');
 
 var Core = function() {
 
@@ -30,14 +31,29 @@ var Core = function() {
 			LoginLib.authUser(cli);
 		});
 
+		endpoints.register('admin', 'POST', function(cli) {
+			cli.touch("endpoints.POST.admin");
+			admin.handleAdminEndpoint(cli);
+		});
+
 		admin.registerAdminEndpoint('article', 'GET', function(cli){
-			cli.touch("admin.GET.post");
+			cli.touch("admin.GET.article");
 			Article.handleGET(cli);
 		});
 
 		admin.registerAdminEndpoint('article', 'POST', function(cli){
-			cli.touch("admin.POST.post");
-			callFunction(cli, post);
+			cli.touch("admin.POST.article");
+			Article.handlePOST(cli);
+		});
+
+		admin.registerAdminEndpoint('media', 'GET', function(cli){
+			cli.touch("admin.GET.media");
+			Media.handleGET(cli);
+		});
+
+		admin.registerAdminEndpoint('media', 'POST', function(cli){
+			cli.touch("admin.POST.media");
+			Media.handlePOST(cli);
 		});
 
 		hooks.fire('endpoints');
@@ -60,6 +76,12 @@ var Core = function() {
 		}else {
 			cli.throwHTTP(404, 'Page not found.');
 		}
+	}
+
+	var loadImageSizes = function() {
+		imageSize.add("thumbnail", 150, '*');
+		imageSize.add("medium", 300, '*');
+		imageSize.add("Archive-thumbnail", 400, 400);
 	}
 
 	var loadPlugins = function() {
@@ -117,22 +139,19 @@ var Core = function() {
 			callback();
 		});
 
-		var staticHTMLPath = _c.default.server.html + '/static';
-		fileserver.dirExists(staticHTMLPath, function(exists) {
-			if (!exists) {
-				fileserver.createSymlink(
-					_c.default.server.base + 'backend/static/',
-					staticHTMLPath,
-					function(err) {
-						log('Core', 'Firing static symlink signal');
-						hooks.fire('staticsymlink', err);
-					}
-				);
-			} else {
-				log('FileServer', 'Symlink already exists; Firing signal');
-				hooks.fire('staticsymlink', undefined);
-			}
-		});
+		var to = _c.default.server.html + '/static';
+		var rootDir = _c.default.server.base + 'backend/static/';
+		cli.createSymlink(rootDir, to);
+
+		to =   _c.default.server.html + '/bower';
+		rootDir = _c.default.server.base + 'bower_components/';
+		cli.createSymlink(rootDir, to);
+
+		to =   _c.default.server.html + '/uploads';
+		rootDir = _c.default.server.base + 'backend/static/uploads/';
+		cli.createSymlink(rootDir, to);
+		hooks.fire('staticsymlink', undefined);
+
 	};
 
 	var loadStandardInput = function() {
@@ -159,18 +178,18 @@ var Core = function() {
 	};
 
 	var loadHTMLStructure = function(callback) {
-		fileserver.createDirIfNotExists(_c.default.server.html + '/uploads/', function(valid) {
+		fileserver.createDirIfNotExists(_c.default.server.html, function(valid) {
 			if (valid) {
 				log('FileServer',
-					'Upload Directory was validated at : ' +
-					_c.default.server.html + "/uploads/"
+					'HTML Directory was validated at : ' +
+					_c.default.server.html
 				);
 			} else {
-				log('FileServer', 'Error validated upload directory');
+				log('FileServer', 'Error validated html directory');
 			}
 
-			loadStaticSymlink(callback);
 		}, true);
+		loadStaticSymlink(callback);
 	};
 
 	this.makeEverythingSuperAwesome = function(readyToRock) {
@@ -179,7 +198,7 @@ var Core = function() {
 		loadEndpoints();
 		loadPlugins();
 		loadStandardInput();
-
+		loadImageSizes();
 		loadHTMLStructure(function() {
 			testDatabase(function() {
 				log('Core', 'Firing initialized signal');

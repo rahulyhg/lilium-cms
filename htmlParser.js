@@ -21,10 +21,13 @@ var HtmlParser = function() {
     htmlForm += form.name ? "name='" + form.name + "' " : "";
 
     // Method
-    htmlForm += form.attr.method ? "method='" + form.attr.method + "' " : "post";
+    htmlForm += form.attr.method ? "method='" + form.attr.method.toUpperCase() + "' " : "POST";
 
     // Action
     htmlForm += form.attr.action ? "action='" + form.attr.action + "' " : "";
+    if (form.attr.method == 'post') {
+      htmlForm += ' enctype="multipart/form-data" ';
+    }
     htmlForm += '/>';
 
     //Generate fields
@@ -60,6 +63,8 @@ var HtmlParser = function() {
           case 'ckeditor' :
             htmlForm += parseTextAreaType(field,form.attr.placeholder);
             break;
+          case 'file' :
+            htmlForm += parseFileType(field);
         }
       }
 
@@ -115,6 +120,14 @@ var HtmlParser = function() {
     var input = '<button ';
     input += parseBasicFieldAttributes(field);
     input += '></button>';
+    return input;
+  }
+
+  var parseFileType = function(field) {
+    var input = generateLabel(field, false);
+    input += '<input type="file" ';
+    input += parseBasicFieldAttributes(field);
+    input += '/>';
     return input;
   }
 

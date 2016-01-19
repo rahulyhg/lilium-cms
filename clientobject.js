@@ -11,15 +11,15 @@ var ClientObject = function(req, resp) {
 	this.throwHTTP = function(code, message) {
 		this.responseinfo.httpcode = code;
 		this.responseinfo.httpmessage = message;
-		this.debug();		
+		this.debug();
 /*
 		this.response.writeHead(code, {
 			'content-type': 'text/plain'
 		});
-		
+
 		if (typeof message !== "undefined") {
 			this.response.write(message);
-		}	
+		}
 
 		this.response.end();
 */
@@ -37,10 +37,10 @@ var ClientObject = function(req, resp) {
 		god : req.session.data.god,
 		user : req.session.data.user,
 	};
-	this.userinfo.dashaccess = 
+	this.userinfo.dashaccess =
 		this.userinfo.loggedin &&
-		this.userinfo.admin || 
-		this.userinfo.god || 
+		this.userinfo.admin ||
+		this.userinfo.god ||
 		(this.userinfo.role && this.userinfo.role.indexOf('dash') !== -1);
 
 	this.routeinfo = {
@@ -85,12 +85,25 @@ var ClientObject = function(req, resp) {
 			"Content-Type": "application/json",
 			"Lilium-Proto": "livevars"
 		});
-		this.response.end(json);	
+		this.response.end(json);
 	};
 
 	this.touch = function(str) {
 		nodes.push(str);
 	};
+
+	this.isGranted = function (role) {
+		var isGranted = false
+			if (typeof this.userinfo.role !== 'undefined' &&
+				this.userinfo.role.indexOf(role) != -1){
+					isGranted = true;
+			}
+			return isGranted;
+	}
+
+	this.isLoggedIn = function () {
+		return this.userinfo.loggedin;
+	}
 
 	this.redirect = function(path, perm) {
 		this.response.writeHead(perm?301:302, {

@@ -1,0 +1,22 @@
+{#config;session;vocab;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+	</head>
+	<body>
+		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
+		<h2>Edit the post</h2>
+    {=forms.render('post_create')}
+		<div id="editor"></div>
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src="/static/formValidation.js"></script>
+		<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
+		<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
+		<script src="{=config.default.server.url}/static/ckeditor_lilium.js"></script>
+    <script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
+
+    <script src="/static/formParser.js"></script>
+	</body>
+</html>

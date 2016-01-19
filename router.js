@@ -10,7 +10,7 @@ var Router = function() {
 		cli.routeinfo.fileExt = pathlib.extname(pObj.pathname);
 		cli.routeinfo.isStatic = cli.routeinfo.fileExt !== '';
 
-		cli.routeinfo.fullpath = pObj.pathname[pObj.pathname.length-1] == '/' ? 
+		cli.routeinfo.fullpath = pObj.pathname[pObj.pathname.length-1] == '/' ?
 			pObj.pathname.substr(0, pObj.pathname.length-1) :
 			pObj.pathname;
 
@@ -20,28 +20,8 @@ var Router = function() {
 		cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.login;
 		cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.livevars;
 		cli.routeinfo.root = pObj.pathname == "/";
-
-		if (cli.method == "POST") {
-			this.parsePostData(cli);
-		}
 	};
 
-	this.parsePostData = function(cli) {
-		cli.touch("router.parsePostData");
-
-		var str = cli.postdata.data;
-		var arr = str.split("&");
-		cli.postdata.data = {};
-
-		delete str;	
-		for (var i = 0, len = arr.length; i < len; i++) {
-			var dat = arr[i].split('=');
-			cli.postdata.data[dat[0]] = dat.length > 1 ?
-				decodeURIComponent(dat[1].replace(/\+/g, ' ')) :
-				undefined;
-		}
-	};	
-	
 	var init = function() {
 
 	};

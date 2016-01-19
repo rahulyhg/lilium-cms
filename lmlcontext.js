@@ -20,6 +20,9 @@ var registeredLibraries = {
 	},
 	testarray : function(context) {
 		return ["Hi", ", ", "this ", "is ", "a ", " sentence", "."];
+	},
+	extra : function(context) {
+		return context.extra;
 	}
 };
 
@@ -108,7 +111,7 @@ var LMLContext = function(info) {
 		this.currentBlock = "lml";
 		this.skipUntilClosure = false;
 		this.storeUntilClosure = false;
-		
+
 		// Carried between stashes
 		this.compiled = '';
 		this.newLine = '';

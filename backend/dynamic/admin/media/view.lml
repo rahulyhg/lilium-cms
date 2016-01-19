@@ -1,0 +1,18 @@
+{#config;session;vocab;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+
+	</head>
+	<body>
+		<header><h1>About this media</h1></header>
+		<h2 data-name="title"></h2>
+    <img data-name="url" src="">
+
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="{=config.default.server.url}/static/textParser.js"></script>
+
+	</body>
+</html>

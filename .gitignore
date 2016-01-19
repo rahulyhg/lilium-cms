@@ -39,5 +39,8 @@ bower_components
 # Optional npm cache directory
 .npm
 
+# Uploads
+backend/static/uploads/*
+
 # Optional REPL history
 .node_repl_history
