@@ -2,6 +2,7 @@ var filelogic = require('./filelogic.js');
 var formBuilder = require('./formBuilder.js');
 var conf = require('./config.js');
 var db = require('./includes/db.js');
+var mongo = require('mongodb');
 
 var Media = function() {
 	this.handlePOST = function(cli) {
@@ -20,6 +21,12 @@ var Media = function() {
 		switch (cli.routeinfo.path[2]) {
 			case 'upload':
 				this.upload(cli);
+				break;
+			case 'view' :
+				this.view(cli);
+				break;
+			case 'getMedia' :
+				this.getMedia(cli);
 				break;
 			default:
 
@@ -59,15 +66,43 @@ var Media = function() {
 
 	};
 
-	this.getArticle = function(postID) {
-		if (isNaN(postID)) {
-			// postID is a postname
-		} else {
-			// postID is an ID (int)
-		}
+	this.delete = function(cli) {
 
-		// Return article object from DB
-	};
+	}
+
+	this.view = function(cli) {
+		if (cli.routeinfo.path[3]) {
+
+			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+			db.exists('uploads', {_id : id}, function(exists) {
+				if (exists) {
+					filelogic.serveLmlPage(cli, true);
+				} else {
+					cli.throwHTTP(404, 'Media Not Found');
+				}
+			});
+
+		} else {
+			cli.throwHTTP(404, 'Media Not Found');
+		}
+	}
+
+	this.getMedia = function(cli){
+		var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+		db.find('uploads', {'_id' : id},{limit:[1]}, function(err, cursor) {
+			cursor.next(function(err, media) {
+				if (media) {
+					cli.sendJSON({
+						data: media
+					});
+				} else {
+					cli.throwHTTP(404, 'Media Not Found');
+				}
+				cursor.close();
+			});
+		});
+
+	}
 
 	var init = function() {
 
