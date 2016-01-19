@@ -22,17 +22,20 @@ var Handler = function() {
 
 	var POST = function(cli) {
 		cli.touch('handler.POST');
+
 		Router.parseClientObject(cli);
+
 		cli.postdata = new Object();
 		cli.postdata.length = cli.request.headers["content-length"];
 		cli.postdata.data = {};
+
+		var finishedCalled = false;
 		var req = cli.request;
 		var isSupported = true
 		var busboy = new Busboy({ headers: req.headers });
 
 		// File upload
 		busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-
 			if (cli.request.headers['content-length'] > config.default.server.fileMaxSize) {
 				file.resume();
 				isSupported = false;
@@ -88,8 +91,11 @@ var Handler = function() {
     });
 
     busboy.on('finish', function() {
-			if (isSupported){
-				Dispatcher.dispost(cli);
+			if (!finishedCalled) {
+				finishedCalled = true;
+				if (isSupported){
+					Dispatcher.dispost(cli);
+				}
 			}
 
     });
