@@ -31,7 +31,9 @@ var Handler = function() {
 
 		var finishedCalled = false;
 		var req = cli.request;
-		var isSupported = true
+		var isSupported = true;
+		console.log(req.headers);
+		req.headers["content-type"] = typeof req.headers["content-type"] == "undefined" ? "application/x-www-form-urlencoded": req.headers["content-type"];
 		var busboy = new Busboy({ headers: req.headers });
 
 		// File upload
@@ -49,13 +51,13 @@ var Handler = function() {
 					var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
 					filename = crypto.createHash('md5').update(filename).digest('hex');
 					var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
-					var url =  filename + mime;
+					var url =  config.default.server.url + "/uploads/" + filename + mime;
 
 					file.on('end', function() {
 
 						if (config.default.supported_pictures.indexOf(mime) != -1) {
 
-							imageResizer.resize(saveTo, mime.substring(1), function(images){
+							imageResizer.resize(saveTo,filename+ mime, mime.substring(1), function(images){
 								// Save it in database
 								db.insert('uploads', {path : saveTo, url : url, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
 									cli.postdata.uploads = [];

@@ -55,8 +55,8 @@ var FileLogic = function() {
    * Serves an lml page, if lastIsParam is true,
    * it will not check for last path[] as the folder name.
    */
-  this.serveLmlPage = function(cli, lastIsParam) {
-    lastIsParam = typeof lastIsParam == 'undefined' ? false : true;
+  this.serveLmlPage = function(cli, lastIsParam, extra) {
+    lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
     var name = "";
 
     if (lastIsParam) {
@@ -65,11 +65,12 @@ var FileLogic = function() {
       name = cli.routeinfo.fullpath;
     }
 
-    var readPath = _c.default.server.base + "backend/dynamic/" + name + ".lml";
+    var readPath = _c.default.server.base + "backend/dynamic" + name + ".lml";
     var savePath = _c.default.server.html + name +'/index.html';
+    console.log(readPath);
 		FileServer.fileExists(savePath, function(isPresent) {
 			if (!isPresent) {
-				saveLmlPage(cli, readPath, savePath);
+				saveLmlPage(cli, readPath, savePath, extra);
 			} else {
 				serveCachedFile(cli, savePath);
 			}
@@ -77,6 +78,13 @@ var FileLogic = function() {
 		});
 
   };
+
+  /**
+   * Remove the cached file
+   */
+  this.invalidateCachedFile = function(cli) {
+
+  }
 
   this.renderLmlPostPage = function(cli, postType, extra, cb) {
     // Check for the post type

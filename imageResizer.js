@@ -2,6 +2,7 @@ var lwip = require('lwip');
 var fs = require('fs');
 var log = require('./log.js');
 var sizes = require('./imageSize.js');
+var config = require('./config.js');
 
 var ImageResizer = function() {
   var extension;
@@ -9,14 +10,16 @@ var ImageResizer = function() {
   var imageSizes;
   var images = {};
   var currentFilename;
+  var fileName;
 
-	this.resize = function(filename, mime, cb) {
+	this.resize = function(path, filename, mime, cb) {
+    fileName = filename;
     sizeKeys = Object.keys(sizes.getSizes());
     imageSizes = sizes.getSizes();
-    currentFilename = filename;
+    currentFilename = path;
 		log("[ImageResizer] Resizing Image...");
     extension = mime;
-		fs.readFile(filename, function(err, buffer) {
+		fs.readFile(path, function(err, buffer) {
       //For all sizes;
       execute(buffer, mime, sizeKeys.length -1 ,function(){
         return cb(images);
@@ -53,8 +56,8 @@ var ImageResizer = function() {
          width = Math.floor(width);
          height = Math.floor(height);
 
-
-        var resizedFilename = currentFilename + "_" + width + "x" + height + "." + extension;
+        var resizedEndName =  "_" + width + "x" + height + "." + extension
+        var resizedFilename = currentFilename + resizedEndName;
 
         // Resize file
         image.batch()
@@ -65,7 +68,9 @@ var ImageResizer = function() {
             extension,
             {},
             function(err) {
-              images[sizeKeys[i]] = resizedFilename;
+              images[sizeKeys[i]] = {};
+              images[sizeKeys[i]].path = resizedFilename;
+              images[sizeKeys[i]].url = config.default.server.url + '/uploads/' + fileName + resizedEndName;
               execute(buffer,mime, i-1, cb);
             }
           );

@@ -24,7 +24,7 @@
 
 	if (someDynamicVar == someDynamicVar);
 		someDynamicVar *= 2;
-	else 
+	else
 		someDynamicVar = -1000;
 	endif;
 
@@ -64,32 +64,32 @@ $}
 		<h4>str = {=str}</h4>
 		<h4>3rd variable = {=thirdVar}</h4>
 		<h4>For-loop sentence = {=forloop.sentence}</h4>
-	
+
 		<h4>loopVar before while = {=loopVar}</h4>
-		{$ 
-			while (loopVar != 10); 
-				loopVar += 1; 
+		{$
+			while (loopVar != 10);
+				loopVar += 1;
 		$}
 				<h5>loopVar Iteration : {=loopVar}</h5>
-		{$ 
-			endwhile; 
+		{$
+			endwhile;
 		$}
 
 		<h4>loopVar after while = {=loopVar}</h4>
-		{$ 
-			if (loopVar != 10); 
+		{$
+			if (loopVar != 10);
 		$}
 			<h5>While loop did NOT work :(</h5>
-		{$ 
-			else; 
-				loopVar = "Now a string"; 
+		{$
+			else;
+				loopVar = "Now a string";
 		$}
 			<h5>While loop WORKED! :D</h5>
 			<h4>loopVar after if = {=loopVar}</h4>
-		{$ 
-			endif; 
-		$}	
-		
+		{$
+			endif;
+		$}
+
 		Currently running in {=config.default.env}
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
