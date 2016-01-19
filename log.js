@@ -1,4 +1,4 @@
-var nameMaxLength = 16;
+var nameMaxLength = 18;
 
 var separator = "";
 for (var i = 0; i < nameMaxLength; i++) {

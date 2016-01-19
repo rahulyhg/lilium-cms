@@ -30,7 +30,7 @@ var LML = function() {
 	var symbols = ['=', '@', '*', '%', '#', '$'];
 	var symbolLen = symbols.length;
 	var condIdentifiers = ["if", "while", "for"];
-	var condClosures = ["endif", "else", "endwhile", "for"];
+	var condClosures = ["endif", "else", "endwhile", "endfor"];
 	var lmlOperators = ["+=", "-=", "*=", "/=", "="];
 
 	var execVariableTag = function(context, code, callback) {
@@ -172,7 +172,8 @@ var LML = function() {
 				content : [],
 				subContext : new Object(),
 				buffer : "",
-				lineIndex : context.currentLineIndex
+				lineIndex : context.currentLineIndex,
+				forIndex : -1
 			};
 
 			context.condStack.push(condObj);
@@ -293,6 +294,18 @@ var LML = function() {
 				case "/=" : return this.affect(context, affectedName, affectedValue / effect);
 			}
 		};
+		
+		this.processForLoop = function(context, condObj) {
+			var affectedName = condObj.values[0];
+			var _arr = this.pulloutVar(context, condObj.values[1]);
+
+			condObj.forIndex++;
+			if (_arr.length == 0 || condObj.forIndex >= _arr.length) {
+				context.skipUntilClosure = true;
+			} else {
+				this.affect(context, affectedName, _arr[condObj.forIndex]);
+			}
+		};
 	})();
 
 	var execLMLTag = function(context, code, callback) {
@@ -335,13 +348,14 @@ var LML = function() {
 								context.skipUntilClosure = !context.skipUntilClosure;
 								context.condStack.push(curCond);
 							} else {
-								if (curCond.condTag == 'while') {
+								if (curCond.condTag == 'while' || curCond.condTag == 'for') {
 									if (!context.skipUntilClosure) {
-										context.lineFeedback.jumpTo = curCond.lineIndex-1;
+										context.lineFeedback.jumpTo = curCond.lineIndex;
 										context.condStack.push(curCond);
+										context.temp.looping = true;
+									} else {
+										context.temp.looping = false;
 									}
-								} else if (curCond.condTag == 'for') {
-									// loop in for
 								}
 
 								context.storeUntilClosure = false;
@@ -358,22 +372,26 @@ var LML = function() {
 						if (context.skipUntilClosure) {
 							context.condStack[context.condStack.length-1].requiredSkip++;
 						} else {
-							var condObj = LMLSlang.pushToCondStack(context, split);
+							var condObj = undefined;
+ 							if (context.temp.looping) {
+								condObj = context.condStack[context.condStack.length-1];
+								context.temp.looping = false;
+							} else {
+								condObj = LMLSlang.pushToCondStack(context, split);
+							}
+
 							context.currentBlock = condObj.condTag;
 		
 							// Process conditions
 							switch (condObj.condTag) {
 								case 'if' :
-									LMLSlang.processCondition(context, condObj);
-									break;
-	
 								case 'while':
 									LMLSlang.processCondition(context, condObj);
 									break;
 
 								case 'for' :
-									
-									break;									
+									LMLSlang.processForLoop(context, condObj);
+									break;		
 							}
 						}
 					} else if (lmlOperators.indexOf(split[1]) != -1) {
@@ -397,8 +415,16 @@ var LML = function() {
 		};
 
 		if (maxLine != 0) {
-			handleLMLLine();
-		}
+			try {
+				handleLMLLine();
+			} catch (ex) {
+				log("LMLParserException", ex + 
+					" in " + (context.rootPath||"LML file") + 
+					" @ line " + context.currentLineIndex);
+				log("Stacktrace", ex.stack);
+				throw "[Fatal] [LMLParserException] Could not recover from fatal error";
+			}
+		}		
 
 		return true;
 	};

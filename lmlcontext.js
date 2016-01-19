@@ -17,6 +17,9 @@ var registeredLibraries = {
 	},
 	article : function(context) {
 		return require('./article.js');
+	},
+	testarray : function(context) {
+		return ["Hi", ", ", "this ", "is ", "a ", " sentence", "."];
 	}
 };
 
@@ -62,7 +65,8 @@ var LMLContext = function(info) {
 			condStack :         this.condStack,
 			currentBlock :      this.currentBlock,
 			skipUntilClosure :  this.skipUntilClosure,
-			storeUntilClosure : this.storeUntilClosure
+			storeUntilClosure : this.storeUntilClosure,
+			temp :		    this.temp
 		});
 
 		this.init();
@@ -108,6 +112,8 @@ var LMLContext = function(info) {
 		// Carried between stashes
 		this.compiled = '';
 		this.newLine = '';
+
+		this.temp = new Object();
 	};
 
 	this.init();
