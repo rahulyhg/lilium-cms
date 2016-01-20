@@ -256,12 +256,29 @@ var FormBuilder = function() {
     var data = {};
     for (var field in form.fields) {
       var field = form.fields[field];
+      
+      var pattern = /(%5Cr)|(%5Cn)/ig;
+
+      field.attr.value = field.attr.value.replace(pattern, '');
       if (field.name != 'form_name') {
         data[field.name] = field.attr.value;
       }
     }
 
     return data;
+  }
+
+  this.deserializeForm = function(serializedForm) {
+    // TODO
+  }
+
+  this.unescapeForm = function(escapedForm) {
+    for (var field in escapedForm) {
+      if (typeof escapedForm[field] === 'string') {
+        escapedForm[field] = unescape(escapedForm[field]);
+      }
+    }
+    return escapedForm;
   }
 
   this.isAlreadyCreated = function(name) {

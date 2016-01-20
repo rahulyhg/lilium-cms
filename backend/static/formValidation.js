@@ -41,6 +41,7 @@ $( document ).ready(function(){
           validField = false;
         }
       }
+      $('[ckeditor]').val($.trim($('[ckeditor]').val()));
       // If a number verify number
 
       if (!validField) {
@@ -66,7 +67,6 @@ $( document ).ready(function(){
   });
 
   var processForm = function(form) {
-
     var serialized_form = form.serialize();
 
     // Process files

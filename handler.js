@@ -32,7 +32,6 @@ var Handler = function() {
 		var finishedCalled = false;
 		var req = cli.request;
 		var isSupported = true;
-		console.log(req.headers);
 		req.headers["content-type"] = typeof req.headers["content-type"] == "undefined" ? "application/x-www-form-urlencoded": req.headers["content-type"];
 		var busboy = new Busboy({ headers: req.headers });
 
