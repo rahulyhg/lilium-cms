@@ -14,6 +14,9 @@ var Article = function() {
       case 'edit':
         this.edit(cli);
         break;
+      case 'delete':
+        this.delete(cli);
+        break;
       default:
         return cli.throwHTTP(404, 'Not Found');
         break;
@@ -142,6 +145,21 @@ var Article = function() {
 
     } else {
       cli.throwHTTP(404, 'Article Not Found');
+    }
+  }
+
+  this.delete = function(cli) {
+    if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
+      var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+
+      db.remove('content', {_id : id},function(err, r){
+        return cli.sendJSON({
+          redirect: '/admin/article/list'
+        });
+      });
+
+    } else {
+      return cli.throwHTTP(404, 'Article Not Found');
     }
   }
 

@@ -256,8 +256,8 @@ var FormBuilder = function() {
     var data = {};
     for (var field in form.fields) {
       var field = form.fields[field];
-      
-      var pattern = /(%5Cr)|(%5Cn)/ig;
+
+      var pattern = /(%5C.)/ig;
 
       field.attr.value = field.attr.value.replace(pattern, '');
       if (field.name != 'form_name') {
