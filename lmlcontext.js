@@ -20,6 +20,14 @@ var registeredLibraries = {
 	},
 	testarray : function(context) {
 		return {array : [{"text":"Hello"}, {"text":" "}, {"text":"world"}, {"text":"!"}]};
+	},
+	debug : function(context) {
+		return {
+			printContext : function() {
+				return JSON.stringify(context);
+			},
+			format : "json"
+		};
 	}
 };
 
@@ -29,7 +37,6 @@ var LMLContext = function(info) {
 	this.lib = {
 		_public : new Object()
 	};
-	this.pub = this.lib.pub = this.lib._public; // Alias for public, local context variables
 	this.extra = new Object();
 	this.slangContext = new Object();
 

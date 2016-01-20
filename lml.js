@@ -36,60 +36,7 @@ var LML = function() {
 
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
-		var levels = code.trim().split('.');
-		var firstLevelLib = undefined;
-		var endVal = undefined;
-
-		try {
-			var useSlang = typeof context.slangContext[levels[0]] !== 'undefined';
-			if (useSlang || levels.length > 1) {
-				firstLevelLib = useSlang ?
-					context.slangContext[levels[0]] :
-					context.lib[levels[0]];
-
-				if (!useSlang && typeof firstLevelLib === 'undefined') {
-					throw "LMLParseException - Undefined root level context library or LML slang : " + levels[0];
-				}
-
-				// Go through all levels
-				endVal = firstLevelLib;
-				for (var i = 1, len = levels.length; i < len; i++) {
-					if (levels[i].indexOf('(') !== -1) {
-						pos = levels[i].indexOf('(');
-						var curLevel = levels[i];
-						ftcName = curLevel.substr(0, pos);
-
-						if (typeof endVal[ftcName] === 'function') {
-							var params = curLevel.substr(
-								curLevel.indexOf('(')+1,
-								curLevel.indexOf(')') - curLevel.indexOf('(') -1
-							).split(',').map(function(str) {
-								str = str.trim();
-								return (!isNaN(str)) ? parseInt(str) : str.replace(/'|"/g, '');
-							});
-
-							endVal = endVal[ftcName].apply(firstLevelLib, params);
-						} else {
-							throw "LMLParseException - Call to undefined funtion : " + ftcName;
-						}
-					} else {
-						endVal = endVal[levels[i]];
-					}
-
-					if (typeof endVal === 'undefined') {
-                	                	throw "LMLParseException - Undefined branch " +
-							levels[i] + " in " + (useSlang?"LML Slang":"context library") + " : " +
-							levels[0];
-                       		 	}
-				}
-			} else if (code.trim() == "" || levels.length == 0) {
-				throw "LMLParseException - Variable cannot be empty. Tried to read : '" + code + "'";
-			} else {
-				throw "LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found";
-			}
-		} catch (ex) {
-			endVal = "[" + ex + "]";
-		}
+		var endVal = LMLSlang.pulloutVar(context, code);
 
 		context.newLine = endVal;
 		callback();
@@ -199,29 +146,56 @@ var LML = function() {
 			if (isStringMatch) {
 				endVal = str.trim().slice(1, -1);
 			} else if (!isNumber) {
-				var levels = str.toString().split('.');
-				var firstLevel = levels[0];
+				try {
+					var levels = endVal.split('.');
+					var useSlang = typeof context.slangContext[levels[0]] !== 'undefined';
+					if (useSlang || levels.length > 1) {
+						firstLevelLib = useSlang ?
+							context.slangContext[levels[0]] :
+							context.lib[levels[0]];
 
-				if (typeof context.lib[firstLevel] !== "undefined") {
-					endVal = context.lib;
-					for (var i = 0; i < levels.length; i++) {
-						endVal = endVal[levels[i]];
-						if (typeof endVal === 'undefined') {
-							endVal = "[LMLContextException] Undefined level " + levels[i] + " in var " + str;
-							break;
+						if (!useSlang && typeof firstLevelLib === 'undefined') {
+							throw "LMLParseException - Undefined root level context library or LML slang : " + levels[0];
 						}
-					}
-				} else if (typeof context.slangContext[firstLevel] !== "undefined") {
-					endVal = context.slangContext;
-					for (var i = 0; i < levels.length; i++) {
-						endVal = endVal[levels[i]];
-						if (typeof endVal === 'undefined') {
-							endVal = "[LMLSlangException] Undefined level " + levels[i] + " in var " + str;
-							break;
+
+						// Go through all levels
+						endVal = firstLevelLib;
+						for (var i = 1, len = levels.length; i < len; i++) {
+							if (levels[i].indexOf('(') !== -1) {
+								pos = levels[i].indexOf('(');
+								var curLevel = levels[i];
+								ftcName = curLevel.substr(0, pos);
+		
+								if (typeof endVal[ftcName] === 'function') {
+									var params = curLevel.substr(
+										curLevel.indexOf('(')+1,
+										curLevel.indexOf(')') - curLevel.indexOf('(') -1
+									).split(',').map(function(str) {
+										str = str.trim();
+										return (!isNaN(str)) ? parseInt(str) : str.replace(/'|"/g, '');
+									});
+
+									endVal = endVal[ftcName].apply(firstLevelLib, params);
+								} else {
+									throw "LMLParseException - Call to undefined funtion : " + ftcName;
+								}
+							} else {
+								endVal = endVal[levels[i]];
+							}
+
+							if (typeof endVal === 'undefined') {
+                			                	throw "LMLParseException - Undefined branch " +
+									levels[i] + " in " + (useSlang?"LML Slang":"context library") + " : " +
+									levels[0];
+                       		 			}
 						}
+					} else if (code.trim() == "" || levels.length == 0) {
+						throw "LMLParseException - Variable cannot be empty. Tried to read : '" + code + "'";
+					} else {
+						throw "LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found";
 					}
-				} else {
-					endVal = "[LMLSlangException] No context variable defined or invalid value for : " + str;
+				} catch (ex) {
+					endVal = "[" + ex + "]";
 				}
 			} else {
 				endVal = parseInt(str);
@@ -311,7 +285,7 @@ var LML = function() {
 
 	var execLMLTag = function(context, code, callback) {
 		// LML parsing
-		var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+|["|'][^\n]+["|'])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
+		var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'][^\n]+["|'])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
 		var closureSelector = /(else|endif|endfor|endwhile)/g;
 
 		// Split in lines array, all commands have

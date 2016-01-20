@@ -1,0 +1,22 @@
+{#plugins;vocab;debug}
+{$
+	somevar = 0;
+	pluginlist = plugins.getCachedPlugins();
+$}
+<!DOCTYPE html>
+<html>
+	<head>
+	
+	</head>
+
+	<body>
+		<h1>{=vocab.plugins}</h1>
+		{$
+			for (plug in pluginlist);
+		$}
+			<h2>{=plug.identifier}</h2>
+		{$
+			endfor;
+		$}
+	</body>
+</html>

@@ -64,6 +64,8 @@ var Core = function() {
 	var loadPlugins = function() {
 		log('Plugins', 'Loading plugins');
 
+		plugins.bindEndpoints();
+	
 		var fireEvent = function() {
 			log('Plugins', 'Loaded plugins');
 			hooks.fire('plugins');

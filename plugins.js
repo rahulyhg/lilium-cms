@@ -1,11 +1,24 @@
 var fs = require('fs');
 var _c = require('./config.js');
 var fileserver = require('./fileserver.js');
+var filelogic = require('./filelogic.js');
 var log = require('./log.js');
+var Admin = require('./backend/admin.js');
 
 var RegisteredPlugins = new Object(); 
+var CachedPlugins = new Array();
 
 var Plugins = function() {
+	this.serveAdminList = function(cli) {
+		cli.touch("plugins.serveAdminList");
+	
+		filelogic.serveLmlPage(cli);	
+	};
+
+	this.getCachedPlugins = function(lmlContext) {
+		return CachedPlugins;
+	};
+
 	this.searchDirForPlugin = function(identifier, callback) {
 		this.getPluginsDirList(function(list) {
 			var pluginInfo = undefined;
@@ -35,6 +48,7 @@ var Plugins = function() {
 			nextDir = function() {
 				i++;
 				if (i >= dirs.length) {
+					CachedPlugins = allPlugins;
 					callback(allPlugins);
 				} else {
 					var infoPath = plugindir + dirs[i] + "/" + _c.default.paths.pluginsInfo;
@@ -101,6 +115,10 @@ var Plugins = function() {
 		} else {
 			throw "[PluginException] Could not get public iface of unregistered plugin with identifier " + identifier;
 		}
+	};
+
+	this.bindEndpoints = function() {
+		Admin.registerAdminEndpoint('plugins', 'GET', this.serveAdminList);
 	};
 
 	var init = function() {
