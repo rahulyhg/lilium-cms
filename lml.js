@@ -337,12 +337,6 @@ var LML = function() {
 								context.skipUntilClosure = false;
 							}
 						}
-					} else if (context.storeUntilClosure) {
-						context.condStack[context.condStack.length-1].content.push(line);
-
-						if (condIdentifiers.indexOf(split[0]) != -1) {	
-							context.condStack[context.condStack.length-1].requiredSkip++;
-						}
 					} else if (condIdentifiers.indexOf(split[0]) != -1) {
 						if (context.skipUntilClosure) {
 							context.condStack[context.condStack.length-1].requiredSkip++;
@@ -352,6 +346,7 @@ var LML = function() {
 								condObj = context.condStack[context.condStack.length-1];
 								context.temp.looping = false;
 							} else {
+								log('LML', 'Pushed to cond stack ' + split[0]);
 								condObj = LMLSlang.pushToCondStack(context, split);
 							}
 
@@ -517,7 +512,7 @@ var LML = function() {
 					setTimeout(seekLML, 0);
 				}
 			} else {
-				context.compiled += line.substring(nextWorkPos);
+				context.compiled += line.substring(nextWorkPos) + "\n";
 				lineCallback(context.lineFeedback);
 			}
 		};
@@ -612,7 +607,7 @@ var LML = function() {
 						fileserver.closeFileHandle(fileHandle);
 
 						log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms');
-						callback();
+						fileserver.minifyHTML(compilepath, callback);
 					}
 				}
 

@@ -31,6 +31,11 @@ var registeredLibraries = {
 	}
 };
 
+var LMLConstants = {
+	"false" : false,
+	"true" : true
+}
+
 var LMLContext = function(info) {
 	this.touched = ["LMLContext.init"];
 

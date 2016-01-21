@@ -6,7 +6,11 @@ $}
 <!DOCTYPE html>
 <html>
 	<head>
-	
+		<title>{=vocab.plugins}</title>
+		<script>
+			var i = 1000; // iterator
+			var j = 2000; // NOT THE I HEUHUHE
+		</script>
 	</head>
 
 	<body>
@@ -15,6 +19,8 @@ $}
 			for (plug in pluginlist);
 		$}
 			<h2>{=plug.identifier}</h2>
+			<div class="plugin-actions">
+			</div>
 		{$
 			endfor;
 		$}

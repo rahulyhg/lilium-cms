@@ -3,6 +3,7 @@ var mkdirp = require('mkdirp');
 var path = require('path');
 var _c = require('./config.js');
 var log = require('./log.js');
+var minify = require('html-minifier').minify;
 
 var FileServer = function() {
 	this.fileExists = function(fullpath, cb) {
@@ -18,6 +19,25 @@ var FileServer = function() {
 
 			fs.access(fullpath, fs.F_OK, function(err) {
 				cb(!err);
+			});
+		});
+	};
+
+	this.minifyHTML = function(fullpath, cb) {
+		var that = this;
+		var timeStamp = new Date();
+		this.readFile(fullpath, function(content) {
+			var handle = that.getOutputFileHandle(fullpath, 'w+');
+			that.writeToFile(handle, minify(content, {
+				removeComments : true,
+				removeScriptTypeAttributes : true,
+				minifyJS : true,
+				minifyCSS : true
+			}), function() {
+				that.closeFileHandle(handle);
+				log('FileServer', 'Minified file ' + fullpath + ' in ' + (new Date() - timeStamp) + 'ms');
+
+				cb();
 			});
 		});
 	};
@@ -91,9 +111,9 @@ var FileServer = function() {
 		return filename;
 	};
 
-	this.getOutputFileHandle = function(filename) {
+	this.getOutputFileHandle = function(filename, flag) {
 		return fs.createWriteStream(filename, {
-			flags : 'a+',
+			flags : flag?flag:'a+',
 			defaultEncoding : 'utf8',
 			mode : '0644'
 		});
@@ -103,7 +123,7 @@ var FileServer = function() {
 		handle.write(content, 'utf8', callback);
 	};
 
-	this.closeFileHandle = function(handle, callback) {
+	this.closeFileHandle = function(handle) {
 		handle.end();
 	};
 
