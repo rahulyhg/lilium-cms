@@ -111,20 +111,6 @@ var Themes = function() {
 		}
 	};
 
-	var activateNewTheme = function () {
-
-	}
-
-	this.unregisterPlugin = function(identifier) {
-		if (this.isRegistered(identifier)) {
-			this.getIface(identifier).unregister();
-
-			RegisteredPlugins[identifier] = undefined;
-			delete RegisteredPlugins[identifier];
-		} else {
-			throw "[ThemeException] Cannot unregister unregistered plugin with uName " + uName;
-		}
-	};
 
 	this.bindEndpoints = function() {
 		Admin.registerAdminEndpoint('themes', 'GET', this.serveAdminList);
