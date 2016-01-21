@@ -3,5 +3,6 @@ module.exports = {
 	"username" : "Username",
 	"password" : "Password",
 	"loginaction" : "Login",
-	"admintitle" : "Admin"
+	"admintitle" : "Admin",
+	"plugins" : "Plugins"
 };

@@ -9,22 +9,35 @@ var registeredLibraries = {
 	vocab : function(context) {
 		return require('./vocab.js');
 	},
-	session : function(context) {
-		return "";
-	},
 	forms : function(context) {
 		return FormBuilder;
 	},
 	article : function(context) {
 		return require('./article.js');
 	},
+	plugins : function(context) {
+		return require('./plugins.js');
+	},
 	testarray : function(context) {
 		return ["Hi", ", ", "this ", "is ", "a ", " sentence", "."];
 	},
 	extra : function(context) {
 		return context.extra;
+	},
+	debug : function(context) {
+		return {
+			printContext : function() {
+				return JSON.stringify(context);
+			},
+			format : "json"
+		};
 	}
 };
+
+var LMLConstants = {
+	"false" : false,
+	"true" : true
+}
 
 var LMLContext = function(info) {
 	this.touched = ["LMLContext.init"];
@@ -32,7 +45,6 @@ var LMLContext = function(info) {
 	this.lib = {
 		_public : new Object()
 	};
-	this.pub = this.lib.pub = this.lib._public; // Alias for public, local context variables
 	this.extra = new Object();
 	this.slangContext = new Object();
 
