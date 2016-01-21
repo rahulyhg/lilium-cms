@@ -44,6 +44,7 @@
 		someDynamicVar /= 10;
 	endif;
 
+	textString = "text";
 $}
 <!DOCTYPE html>
 <html>
@@ -66,7 +67,7 @@ $}
 			{$
 				for (lmlobj in testarray.array);
 			$}
-				{=lmlobj.text}
+				{=lmlobj.{={={=textString}String}String}}
 			{$
 				endfor;
 			$}
