@@ -36,10 +36,14 @@ var LML = function() {
 
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
-		var endVal = LMLSlang.pulloutVar(context, code);
+		parseStringForRecursiveVarTags(context, code, function(code) {
+			console.log('Pulling final variable : ' + code);
+			var endVal = LMLSlang.pulloutVar(context, code);
 
-		context.newLine = endVal;
-		callback();
+			context.newLine = endVal;
+			callback();
+		});
+
 		return true;
 	};
 
@@ -60,8 +64,10 @@ var LML = function() {
 	};
 
 	var execLiveTag = function(context, code, callback) {
-		context.newLine = '<span class="liliumLiveVar" data-varname="'+code+'"></span>';
-		callback();
+		parseStringForRecursiveVarTags(context, code, function(code) {
+			context.newLine = '<span class="liliumLiveVar" data-varname="'+code+'"></span>';
+			callback();
+		});
 
 		return true;
 	};
@@ -94,6 +100,40 @@ var LML = function() {
 
 		callback();
 		return true;
+	};
+
+	var parseStringForRecursiveVarTags = function(context, code, callback) {	
+		var openingPos = code.indexOf('{=');	
+		var closingPos = code.lastIndexOf('}');
+		var contentLength = closingPos - openingPos - 2;
+
+		if (openingPos !== -1) {
+			recursiveVariableTag(context, code.substring((openingPos+2), closingPos), function(replacedText) {
+				callback(code.substring(0, openingPos) + replacedText + code.substring(closingPos + 1));
+			});
+		} else {
+			callback(code);
+		}
+	};
+
+	var recursiveVariableTag = function(context, code, callback) {
+		var openingPos = code.indexOf('{=');	
+		var closingPos = code.lastIndexOf('}');	
+		var contentLength = closingPos - openingPos;
+
+		console.log('stacked ' + code);
+
+		if (openingPos !== -1) {
+			recursiveVariableTag(context, code.substring(openingPos+2, closingPos), function(replacedText) {
+				var newStr = code.substring(0, openingPos) + replacedText + code.substring(openingPos + contentLength + 1);
+				var endVal = LMLSlang.pulloutVar(context, newStr);
+
+				callback(endVal);
+			});
+		} else {
+			var endVal = LMLSlang.pulloutVar(context, code);
+			callback(endVal);
+		}
 	};
 
 	var LMLSlang = new (function() {
@@ -189,8 +229,8 @@ var LML = function() {
 									levels[0];
                        		 			}
 						}
-					} else if (code.trim() == "" || levels.length == 0) {
-						throw "LMLParseException - Variable cannot be empty. Tried to read : '" + code + "'";
+					} else if (str.trim() == "" || levels.length == 0) {
+						throw "LMLParseException - Variable cannot be empty. Tried to read : '" + str + "'";
 					} else {
 						throw "LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found";
 					}
@@ -346,7 +386,6 @@ var LML = function() {
 								condObj = context.condStack[context.condStack.length-1];
 								context.temp.looping = false;
 							} else {
-								log('LML', 'Pushed to cond stack ' + split[0]);
 								condObj = LMLSlang.pushToCondStack(context, split);
 							}
 
@@ -454,7 +493,7 @@ var LML = function() {
 		var nextWorkPos = 0;
 
 		// Needs to be precompiled every line
-		var lmlDetectRegex = /{(#|\*|%|=)([^\n|^}]*)}|({[\$|@]|[\$|@]})/g;
+		var lmlDetectRegex = /{(#|\*|%|=)([^\n\s]*)}|({[\$|@]|[\$|@]})/g;
 		var seekLML = function() {
 			if (nextWorkPos >= line.length) {
 				lineCallback(context.lineFeedback);

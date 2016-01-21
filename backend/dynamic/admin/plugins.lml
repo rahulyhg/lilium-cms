@@ -1,12 +1,13 @@
 {#plugins;vocab;debug}
 {$
 	somevar = 0;
+	strPlugin = "plugins";
 	pluginlist = plugins.getCachedPlugins();
 $}
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>{=vocab.plugins}</title>
+		<title>{=vocab.{=strPlugin}}</title>
 		<script>
 			var i = 1000; // iterator
 			var j = 2000; // NOT THE I HEUHUHE
@@ -14,7 +15,7 @@ $}
 	</head>
 
 	<body>
-		<h1>{=vocab.plugins}</h1>
+		<h1>{=vocab.{=strPlugin}}</h1>
 		{$
 			for (plug in pluginlist);
 		$}
