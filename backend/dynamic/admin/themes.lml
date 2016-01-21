@@ -1,0 +1,22 @@
+{#themes;vocab;debug} {$ themes = themes.getCachedThemes(); $}
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>{=vocab.themes}</title>
+</head>
+
+<body>
+	<h1>{=vocab.themes}</h1>
+	{$ for (theme in themes); $}
+	<h2>{=theme.dName}</h2>
+	<div class="plugin-actions">
+		<button>Enable</button>
+
+		<button>Disable</button>
+
+	</div>
+	{$ endfor; $}
+</body>
+
+</html>

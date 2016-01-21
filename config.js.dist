@@ -17,7 +17,9 @@ var _config = {
 		"paths" : {
 			admin : "admin",
 			login : "login",
-			livevars : "livevars"
+			livevars : "livevars",
+			themes : "flowers",
+			themesInfo : "info.json"
 		},
 		"server" : {
 			base : "YOUR_COMPLETE_PATH_TO_LILIUM/",

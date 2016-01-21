@@ -15,8 +15,15 @@ var registeredLibraries = {
 	article : function(context) {
 		return require('./article.js');
 	},
+	session : function(context) {
+		return {};
+		// return require('./sessions.js');
+	},
 	plugins : function(context) {
 		return require('./plugins.js');
+	},
+	themes : function(context) {
+		return require('./themes.js');
 	},
 	testarray : function(context) {
 		return ["Hi", ", ", "this ", "is ", "a ", " sentence", "."];

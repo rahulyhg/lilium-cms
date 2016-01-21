@@ -13,6 +13,7 @@ var admin = require('./backend/admin.js');
 var Article = require('./article.js');
 var Media = require('./media.js');
 var imageSize = require('./imageSize.js');
+var themes = require('./themes.js');
 
 var Core = function() {
 
@@ -84,14 +85,14 @@ var Core = function() {
 		imageSize.add("Archive-thumbnail", 400, 400);
 	}
 
-	var loadPlugins = function() {
+	var loadPlugins = function(cb) {
 		log('Plugins', 'Loading plugins');
 
 		plugins.bindEndpoints();
 
 		var fireEvent = function() {
 			log('Plugins', 'Loaded plugins');
-			hooks.fire('plugins');
+			return cb();
 		};
 
 		db.findToArray('plugins', {"active":true}, function(err, results) {
@@ -122,6 +123,44 @@ var Core = function() {
 		});
 
 	};
+
+	var loadTheme = function() {
+		log('Themes', 'Loading Theme');
+		themes.bindEndpoints();
+
+		var fireEvent = function() {
+			log('Themes', 'Loaded Themes');
+			hooks.fire('themes');
+		};
+
+		db.find('themes', {"active":true}, {limit:[1]}, function(err, cursor) {
+			if (err) {
+				log('Themes', 'Failed to find entries in database; ' + err);
+				fireEvent();
+
+				return;
+			}
+
+			log('Themes', 'Read themes collection in database');
+			var i = -1;
+
+
+			if (cursor.next != null) {
+				cursor.next(function(err, theme) {
+					if (theme) {
+						themes.enableTheme(theme.uName, function() {
+							fireEvent();
+
+						});
+					}
+					cursor.close();
+				});
+			} else {
+				throw '[ThemeException]: There is no default Theme to load.'
+			}
+		});
+
+	}
 
 	var testDatabase = function(callback) {
 		log('Database', 'Testing database');
@@ -229,20 +268,22 @@ var Core = function() {
 		loadHooks(readyToRock);
 		loadEndpoints();
 		loadStandardInput();
-		loadImageSizes();
+		// loadImageSizes();
 
-		hooks.bind('plugins', function() {
+		hooks.bind('themes', function() {
 			log('Core', 'Firing initialized signal');
 			hooks.fire('init', {
 				loaded : [
-					"hooks", "endpoints", "plugins"
+					"hooks", "endpoints","plugins", "themes"
 				]
 			});
 		});
 
 		loadHTMLStructure(function() {
 			testDatabase(function() {
-				loadPlugins();
+				loadPlugins(function(){
+					loadTheme();
+				});
 			});
 		});
 	};

@@ -1,4 +1,4 @@
-{#config;session;vocab;forms}
+{#config;session;vocab;forms;extra}
 <!DOCTYPE html>
 <html>
 	<head>
@@ -8,20 +8,19 @@
 	</head>
 	<body>
 		<header><h1>About this media</h1></header>
-		Name : <h2 data-name="name"></h2>
-		Media Type : <h4 data-name="type"></h4>
+		Name : <h2>{*uploads.56a0eb5761e908bb2ab4c988.type}</h2>
+		Media Type : <h4 data-name="type" livevars data-var="uploads.56a0eb5761e908bb2ab4c988.type"></h4>
 		<button onclick="deleteMedia()">Delete Media</button><br>
-		Url : <span data-name="url"></span><br>
-		<img data-name="url" src="">
+		Url : <span livevars data-var="uploads.56a0eb5761e908bb2ab4c988.url"></span><br>
+		<img src="{*uploads.{=extra.id}.type}">
+		<span livevars data-var="uploads.56a0eb5761e908bb2ab4c988.title"></span>
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="{=config.default.server.url}/static/textParser.js"></script>
 
 		<script>
-			var mediaId = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
-			var baseUrl = "{=config.default.server.url}";
-			$.get(baseUrl + "/admin/media/getMedia/" + mediaId, function(data) {
-				parser.parseTextToView(data.data);
+			parser.getLiveVars(function() {
+				parser.parseTextToView();
 			});
 
 			function deleteMedia() {

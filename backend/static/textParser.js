@@ -1,20 +1,39 @@
 var textParser = function() {
-    this.parseTextToView = function(data) {
-        for (key in data) {
-          console.log(key);
+  var endpoints = [];
+  var paramString = "?";
+  var livevars;
 
-          var target = $('*[data-name="' + key + '"]');
-      
-          target.each(function() {
-            if ($(this).is('img')) {
-              $(this).attr('src', data[key]);
-            } else {
-              $(this).text(data[key]);
-            }
-          });
+  this.getLiveVars = function(cb) {
+    $(".liliumLiveVar").each(function() {
+      if (endpoints.indexOf($(this).data('varname')) == -1) {
+        endpoints.push($(this).data('varname'));
+      }
+    });
 
-        }
-
+    for (var livevar in endpoints) {
+      paramString += "vars=" + endpoints[livevar] + "&";
     }
+
+    $.get("/livevars" + paramString, function(data) {
+      livevars = data;
+      return cb();
+    });
+  };
+
+  this.parseTextToView = function() {
+    $(".liliumLiveVar").each(function() {
+      if (typeof livevars[$(this).data('varname')] == "object") {
+        $(this).text(JSON.stringify(livevars[$(this).data('varname')]));
+      } else {
+        if ($(this).is('img')) {
+          $(this).attr('src', unescape(livevars[$(this).data('varname')]));
+        } else {
+          $(this).text(unescape(livevars[$(this).data('varname')]));
+        }
+      }
+
+    });
+
   }
+}
 var parser = new textParser();

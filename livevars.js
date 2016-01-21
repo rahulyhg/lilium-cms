@@ -1,15 +1,18 @@
 var db = require('./includes/db.js');
+var mongo = require('mongodb');
 
 var RegisteredLiveVariables = {
+
 	session : function(cli, levels, callback) {
 		var dat = cli.request.session.data;
-	
+
 		for (var i = 0; i < levels.length; i++) {
 			dat = dat[levels[i]];
 		}
 
 		callback(dat);
 	},
+
 	types : function(cli, levels, callback) {
 		var allTypes = levels.length === 0;
 
@@ -19,12 +22,13 @@ var RegisteredLiveVariables = {
 			db.multiLevelFind('types', levels, {name:levels[0]}, {}, callback);
 		}
 	},
+
 	entities : function(cli, levels, callback) {
 		var allEntities = levels.length === 0;
 
 		if (allEntities) {
 			db.singleLevelFind('entities', callback);
-		} else {	
+		} else {
 			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 		}
 	},
@@ -34,14 +38,14 @@ var RegisteredLiveVariables = {
 		if (allContent) {
 			db.singleLevelFind('content', callback);
 		} else {
-			db.multiLevelFind('content', levels, {contentid:levels[0]}, {limit:[1]}, callback);
+			db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 		}
 	},
 	sites : function(cli, levels, callback) {
 		var allContent = levels.length === 0;
 
 		if (allContent) {
-			db.singleLevelFind('sites', callback); 
+			db.singleLevelFind('sites', callback);
 		} else {
 			db.multiLevelFind('content', levels, {siteid:levels[0]}, {limit:[1]}, callback);
 		}
@@ -53,6 +57,16 @@ var RegisteredLiveVariables = {
 			db.singleLevelFind('vocab', callback);
 		} else {
 			db.multiLevelFind('vocab', levels, {langcode:levels[0]}, {limit:[1]}, callback);
+		}
+	},
+
+	uploads : function(cli, levels, callback) {
+		var allMedia = levels.length === 0;
+
+		if (allMedia) {
+			db.singleLevelFind('uploads', callback);
+		} else {
+			db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 		}
 	}
 };
@@ -136,5 +150,3 @@ var LiveVariables = function() {
 };
 
 module.exports = new LiveVariables();
-
-

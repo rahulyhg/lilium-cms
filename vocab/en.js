@@ -4,5 +4,6 @@ module.exports = {
 	"password" : "Password",
 	"loginaction" : "Login",
 	"admintitle" : "Admin",
-	"plugins" : "Plugins"
+	"plugins" : "Plugins",
+	"themes" : "Themes"
 };
