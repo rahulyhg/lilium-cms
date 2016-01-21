@@ -268,7 +268,7 @@ var Core = function() {
 		loadHooks(readyToRock);
 		loadEndpoints();
 		loadStandardInput();
-		// loadImageSizes();
+		loadImageSizes();
 
 		hooks.bind('themes', function() {
 			log('Core', 'Firing initialized signal');
