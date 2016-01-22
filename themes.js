@@ -97,7 +97,6 @@ var Themes = function() {
 				var ThemeInstance = require(themedir + info.dirName + "/" + info.entry);
 
 				if (typeof ActiveTheme !== 'undefined') {
-					console.log(ActiveTheme);
 					db.update('themes', {uName : ActiveTheme.uName}, {active: false});
 				}
 

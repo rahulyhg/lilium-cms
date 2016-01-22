@@ -117,8 +117,11 @@ var Core = function() {
 			if (results.length > 0) {
 				nextObject();
 			} else {
-				log('Plugins', 'Nothing to register');
-				fireEvent();
+				plugins.getPluginsDirList(function(){
+					log('Plugins', 'Nothing to register');
+					fireEvent();
+				});
+
 			}
 		});
 
@@ -148,7 +151,6 @@ var Core = function() {
 				if (theme != null) {
 					i++;
 					themes.enableTheme(theme.uName, function() {
-						console.log(i);
 						fireEvent();
 					});
 				} else {

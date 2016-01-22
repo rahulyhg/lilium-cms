@@ -1,6 +1,5 @@
 var Potager = function() {
   this.enable = function(_c, info, callback) {
-    console.log('Potager is enabled');
     return callback();
   }
 

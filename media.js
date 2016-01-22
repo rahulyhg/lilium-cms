@@ -47,11 +47,13 @@ var Media = function() {
 		//TODO find a way to load more
 		db.find('uploads', {},{limit:[25]}, function(err, cursor) {
 			var medias = [];
+			var extra = {};
+			extra.medias = medias
 			cursor.each(function(err, media) {
 				if (media != null) {
 					medias.push(media);
 				} else {
-					filelogic.serveLmlPage(cli, false, medias);
+					filelogic.serveLmlPage(cli, false, extra);
 				}
 			});
 		});

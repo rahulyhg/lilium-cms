@@ -10,9 +10,7 @@
 		<a href="{=config.default.server.url}/admin/media/upload">Upload a media</a>
 		{=debug.printContext()}
     {$
-			cpt = 1;
-			for (media in extra);
-			cpt += 1;
+			for (media in extra.medias);
     $}
 			{=cpt}
 		{$

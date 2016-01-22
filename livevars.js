@@ -1,8 +1,7 @@
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
 
-var RegisteredLiveVariables = {
-
+var RegisteredLiveVariables = {	
 	session : function(cli, levels, callback) {
 		var dat = cli.request.session.data;
 
@@ -77,6 +76,15 @@ var RegisteredLiveVariables = {
 			db.singleLevelFind('themes', callback);
 		} else {
 			db.multiLevelFind('themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
+		}
+	},
+	plugin : function(cli, levels, callback) {
+		var allPlugins = levels.length === 0;
+
+		if (allPlugins) {
+			db.singleLevelFind('plugins', callback);
+		} else {
+			db.multiLevelFind('plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
 		}
 	}
 };

@@ -67,7 +67,6 @@ var FileLogic = function() {
 
     var readPath = _c.default.server.base + "backend/dynamic" + name + ".lml";
     var savePath = _c.default.server.html + name +'/index.html';
-    console.log(readPath);
 		FileServer.fileExists(savePath, function(isPresent) {
 			if (!isPresent) {
 				saveLmlPage(cli, readPath, savePath, extra);
