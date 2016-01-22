@@ -34,6 +34,10 @@ var textParser = function() {
 
     });
 
+  };
+
+  this.livevars = function() {
+    return livevars;
   }
 }
 var parser = new textParser();

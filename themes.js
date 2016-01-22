@@ -10,12 +10,14 @@ var ActiveTheme = new Object();
 var CachedThemes = new Array();
 
 var Themes = function() {
+	var that = this;
+
 	this.serveAdminList = function(cli) {
 		cli.touch("themes.serveAdminList");
 		if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
-			this.enableTheme(function() {
+			that.enableTheme(cli.postdata.data.uName, function() {
 				cli.sendJSON({
-					activeTheme: ActiveTheme
+					success: true
 				});
 			});
 		} else {
@@ -82,7 +84,6 @@ var Themes = function() {
 	};
 
 	this.enableTheme = function(uName, callback) {
-		var that = this;
 		if (this.isActive(uName)) {
 			throw "[ThemeException] Cannot register already registered theme with uName " + uName;
 		} else {
@@ -96,11 +97,14 @@ var Themes = function() {
 				var ThemeInstance = require(themedir + info.dirName + "/" + info.entry);
 
 				if (typeof ActiveTheme !== 'undefined') {
-					db.update('themes', {uName : uName}, {active: false});
+					console.log(ActiveTheme);
+					db.update('themes', {uName : ActiveTheme.uName}, {active: false});
 				}
 
 				ActiveTheme = ThemeInstance;
+
 				ActiveTheme.active = true;
+				ActiveTheme.uName = uName;
 
 				db.update('themes', {uName : uName}, ActiveTheme, function() {
 
@@ -114,6 +118,7 @@ var Themes = function() {
 
 	this.bindEndpoints = function() {
 		Admin.registerAdminEndpoint('themes', 'GET', this.serveAdminList);
+		Admin.registerAdminEndpoint('themes', 'POST', this.serveAdminList);
 	};
 
 	var init = function() {
@@ -121,6 +126,7 @@ var Themes = function() {
 	};
 
 	init();
+
 };
 
 module.exports = new Themes();
