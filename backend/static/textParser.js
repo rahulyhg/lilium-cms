@@ -6,15 +6,15 @@ var textParser = function() {
   this.getLiveVars = function(cb) {
     $(".liliumLiveVar").each(function() {
       if (endpoints.indexOf($(this).data('varname')) == -1) {
-        endpoints.push($(this).data('varname'));
+        var params = $(this).data('varparam');
+        endpoints.push({
+	  'varname' : $(this).data('varname'),
+          'params' : typeof params === "string" ? JSON.parse(params.replace(/&lmlquote;/g, '"')) : {}
+        });
       }
     });
 
-    for (var livevar in endpoints) {
-      paramString += "vars=" + endpoints[livevar] + "&";
-    }
-
-    $.get("/livevars" + paramString, function(data) {
+    $.get("/livevars", {vars:JSON.stringify(endpoints)}, function(data) {
       livevars = data;
       return cb();
     });

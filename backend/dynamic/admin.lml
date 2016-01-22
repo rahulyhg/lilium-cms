@@ -52,11 +52,13 @@ $}
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 		<link rel="stylesheet" type="text/css" href="{=config.default.admin.csspath}" />
 		<script src="{=config.default.admin.jspath}"></script>
+		<script src="{=config.default.server.url}/static/textParser.js"></script>
 	</head>
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>{=vocab.admintitle}</h2>
 		<h3>Welcome, {*session.displayname}</h3>
+		{*endpoint.somevar.val(key:value,secondKey:"second value",thirdKey:15)}
 		<h4>someDynamicVar = {=someDynamicVar}</h4>
 		<h4>otherVar = {=otherVar}</h4>
 		<h4>str = {=str}</h4>

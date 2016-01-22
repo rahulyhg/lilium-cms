@@ -37,7 +37,6 @@ var LML = function() {
 	var execVariableTag = function(context, code, callback) {
 		// Browse the context library for corresponding obhect;
 		parseStringForRecursiveVarTags(context, code, function(code) {
-			console.log('Pulling final variable : ' + code);
 			var endVal = LMLSlang.pulloutVar(context, code);
 
 			context.newLine = endVal;
@@ -63,9 +62,29 @@ var LML = function() {
 		return false;
 	};
 
+	var fetchLiveParams = function(paramsString) { 
+		var json = {};
+
+		if (paramsString) {
+			var reg = /([^:]*:[^,]*),?/g;
+			var matches = null;
+
+			while((matches = reg.exec(paramsString)) != null) {
+				var str = matches[1];
+				var key = str.substring(0, str.indexOf(':'));
+				var val = str.substring(str.indexOf(':')+1).replace(/^\"|\"$/g, "");
+					json[key] = val;
+			}
+		} 
+
+		return JSON.stringify(json).replace(/"/g, '&lmlquote;');
+	};
+
 	var execLiveTag = function(context, code, callback) {
+		var params = fetchLiveParams(context.extra.livevarsParams);
+
 		parseStringForRecursiveVarTags(context, code, function(code) {
-			context.newLine = '<span class="liliumLiveVar" data-varname="'+code+'"></span>';
+			context.newLine = '<span class="liliumLiveVar" data-varname="'+code+'" data-varparam="'+params+'"></span>';
 			callback();
 		});
 
@@ -120,8 +139,6 @@ var LML = function() {
 		var openingPos = code.indexOf('{=');
 		var closingPos = code.lastIndexOf('}');
 		var contentLength = closingPos - openingPos;
-
-		console.log('stacked ' + code);
 
 		if (openingPos !== -1) {
 			recursiveVariableTag(context, code.substring(openingPos+2, closingPos), function(replacedText) {
@@ -493,7 +510,7 @@ var LML = function() {
 		var nextWorkPos = 0;
 
 		// Needs to be precompiled every line
-		var lmlDetectRegex = /{(#|\*|%|=)([^\n\s]*)}|({[\$|@]|[\$|@]})/g;
+		var lmlDetectRegex = /{(#|%|=)([^\n\s]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\s]*"?,?\s*)*)\)?}/g;
 		var seekLML = function() {
 			if (nextWorkPos >= line.length) {
 				lineCallback(context.lineFeedback);
@@ -529,13 +546,14 @@ var LML = function() {
 				detectPos = lmlMatch.index;
 				detectLength = lmlMatch[0].length;
 
-				if (typeof lmlMatch[1] !== 'undefined') {
+				if (typeof lmlMatch[1] !== 'undefined' || typeof lmlMatch[4] !== "undefined") {
 					var cropLength = detectPos - nextWorkPos;
 					var comp = line.substring(nextWorkPos).substring(0, cropLength);
 
 					context.compiled += comp;
-					context.currentInTag = lmlMatch[1];
-					context.cachedCommand = lmlMatch[2];
+					context.currentInTag = lmlMatch[1] || lmlMatch[4];
+					context.cachedCommand = lmlMatch[2] || lmlMatch[5];
+					context.extra.livevarsParams = lmlMatch[6];
 
 					nextWorkPos = detectPos + detectLength;
 					execTagContent(context, function() {

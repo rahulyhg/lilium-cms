@@ -28,12 +28,12 @@ var FileServer = function() {
 		var timeStamp = new Date();
 		this.readFile(fullpath, function(content) {
 			var handle = that.getOutputFileHandle(fullpath, 'w+');
-			that.writeToFile(handle, minify(content, {
+			that.writeToFile(handle, content/*minify(content, {
 				removeComments : true,
 				removeScriptTypeAttributes : true,
 				minifyJS : true,
 				minifyCSS : true
-			}), function() {
+			})*/, function() {
 				that.closeFileHandle(handle);
 				log('FileServer', 'Minified file ' + fullpath + ' in ' + (new Date() - timeStamp) + 'ms');
 

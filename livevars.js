@@ -3,7 +3,7 @@ var mongo = require('mongodb');
 
 var RegisteredLiveVariables = {
 
-	session : function(cli, levels, callback) {
+	session : function(cli, levels, params, callback) {
 		var dat = cli.request.session.data;
 
 		for (var i = 0; i < levels.length; i++) {
@@ -13,7 +13,7 @@ var RegisteredLiveVariables = {
 		callback(dat);
 	},
 
-	types : function(cli, levels, callback) {
+	types : function(cli, levels, params, callback) {
 		var allTypes = levels.length === 0;
 
 		if (allTypes) {
@@ -23,7 +23,7 @@ var RegisteredLiveVariables = {
 		}
 	},
 
-	entities : function(cli, levels, callback) {
+	entities : function(cli, levels, params, callback) {
 		var allEntities = levels.length === 0;
 
 		if (allEntities) {
@@ -32,7 +32,7 @@ var RegisteredLiveVariables = {
 			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 		}
 	},
-	content : function(cli, levels, callback) {
+	content : function(cli, levels, params, callback) {
 		var allContent = levels.length === 0;
 
 		if (allContent) {
@@ -41,7 +41,7 @@ var RegisteredLiveVariables = {
 			db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 		}
 	},
-	sites : function(cli, levels, callback) {
+	sites : function(cli, levels, params, callback) {
 		var allContent = levels.length === 0;
 
 		if (allContent) {
@@ -50,7 +50,7 @@ var RegisteredLiveVariables = {
 			db.multiLevelFind('content', levels, {siteid:levels[0]}, {limit:[1]}, callback);
 		}
 	},
-	vocab : function(cli, levels, callback) {
+	vocab : function(cli, levels, params, callback) {
 		var wholeDico = levels.length === 0;
 
 		if (wholeDico) {
@@ -60,7 +60,7 @@ var RegisteredLiveVariables = {
 		}
 	},
 
-	uploads : function(cli, levels, callback) {
+	uploads : function(cli, levels, params, callback) {
 		var allMedia = levels.length === 0;
 
 		if (allMedia) {
@@ -70,7 +70,7 @@ var RegisteredLiveVariables = {
 		}
 	},
 
-	theme : function(cli, levels, callback) {
+	theme : function(cli, levels, params, callback) {
 		var allThemes = levels.length === 0;
 
 		if (allThemes) {
@@ -86,17 +86,19 @@ var LiveVariables = function() {
 		return {livevars : cli.livevars};
 	};
 
-	var handleOneVar = function(cli, varName, assoc, next) {
+	var handleOneVar = function(cli, varObj, assoc, next) {
+		var varName = varObj.varname;
+		var params = varObj.params;
 		var levels = varName.split('.');
 		var topLevel = levels.shift();
 
 		if (typeof RegisteredLiveVariables[topLevel] !== 'undefined') {
-			RegisteredLiveVariables[topLevel](cli, levels, function(val) {
+			RegisteredLiveVariables[topLevel](cli, levels, params, function(val) {
 				assoc[varName] = val;
 				next(true);
 			});
 		} else {
-			assoc[varName] = '[UNREGISTERED TOP LEVEL LIVE VARIABLE '+toplevel+']';
+			assoc[varName] = '[UNREGISTERED TOP LEVEL LIVE VARIABLE '+topLevel+']';
 			next(false);
 		}
 	};
@@ -126,7 +128,7 @@ var LiveVariables = function() {
 	};
 
 	this.handleRequest = function(cli) {
-		var liveVars = cli.routeinfo.params.vars;
+		var liveVars = JSON.parse(cli.routeinfo.params.vars);
 		cli.livevars = {};
 
 		var callback = function() {
@@ -135,8 +137,6 @@ var LiveVariables = function() {
 
 		if (typeof liveVars === 'object') {
 			startLoop(cli, liveVars, cli.livevars, callback);
-		} else if (typeof liveVars === 'string') {
-			startLoop(cli, [liveVars], cli.livevars, callback);
 		} else {
 			callback();
 		}
