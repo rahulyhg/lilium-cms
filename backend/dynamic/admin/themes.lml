@@ -1,4 +1,7 @@
-{#themes;vocab;debug} {$ themes = themes.getCachedThemes(); $}
+{#themes;vocab;debug}
+{$
+	themeList = themes.getCachedThemes();
+$}
 <!DOCTYPE html>
 <html>
 
@@ -8,15 +11,26 @@
 
 <body>
 	<h1>{=vocab.themes}</h1>
-	{$ for (theme in themes); $}
+
+	{$
+		for (theme in themeList);
+	 $}
+	 	{*theme.{=theme.uName}.active}
 	<h2>{=theme.dName}</h2>
-	<div class="plugin-actions">
+	<div class="themes-actions">
 		<button>Enable</button>
 
 		<button>Disable</button>
 
 	</div>
-	{$ endfor; $}
+	{$
+		endfor;
+	$}
 </body>
 
 </html>
+<script src="{=config.default.server.url}/static/textParser.js"></script>
+
+<script>
+
+</script>

@@ -142,22 +142,20 @@ var Core = function() {
 			}
 
 			log('Themes', 'Read themes collection in database');
-			var i = -1;
+			var i = 0;
 
-
-			if (cursor.next != null) {
-				cursor.next(function(err, theme) {
-					if (theme) {
-						themes.enableTheme(theme.uName, function() {
-							fireEvent();
-
-						});
-					}
+			cursor.each(function(err, theme) {
+				if (theme != null) {
+					i++;
+					themes.enableTheme(theme.uName, function() {
+						console.log(i);
+						fireEvent();
+					});
+				} else {
+					if (i == 0) throw '[ThemeException]: There is no default Theme to load.';
 					cursor.close();
-				});
-			} else {
-				throw '[ThemeException]: There is no default Theme to load.'
-			}
+				}
+			});
 		});
 
 	}

@@ -24,7 +24,7 @@ var Themes = function() {
 
 	};
 
-	this.getCachedThemes = function(lmlContext) {
+	this.getCachedThemes = function() {
 		return CachedThemes;
 	};
 
@@ -56,10 +56,9 @@ var Themes = function() {
 				i++;
 				if (i >= dirs.length) {
 					CachedThemes = allThemes;
-					callback(allThemes);
+					callback(allThemes)
 				} else {
 					var infoPath = themedir + dirs[i] + "/" + _c.default.paths.themesInfo;
-          console.log(infoPath);
 					fileserver.fileExists(infoPath, function(exists) {
 						if (exists) {
 							fileserver.readJSON(infoPath, function(json) {
@@ -104,6 +103,7 @@ var Themes = function() {
 				ActiveTheme.active = true;
 
 				db.update('themes', {uName : uName}, ActiveTheme, function() {
+
 					ThemeInstance.enable(_c, info, callback);
 				}, true, true);
 

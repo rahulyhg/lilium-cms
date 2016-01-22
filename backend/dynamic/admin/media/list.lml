@@ -1,4 +1,4 @@
-{#config;session;vocab;forms;extra}
+{#config;session;vocab;forms;extra;debug}
 <!DOCTYPE html>
 <html>
 	<head>
@@ -8,14 +8,13 @@
 	<body>
 		<header><h1>List of medias</h1></header>
 		<a href="{=config.default.server.url}/admin/media/upload">Upload a media</a>
+		{=debug.printContext()}
     {$
+			cpt = 1;
 			for (media in extra);
+			cpt += 1;
     $}
-			<div>
-				{=media._id}
-				<img src="{=media.sizes.thumbnail.url}">
-				<a href="">Edit</a>
-			</div>
+			{=cpt}
 		{$
 			endfor;
 		$}

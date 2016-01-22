@@ -102,8 +102,8 @@ var LML = function() {
 		return true;
 	};
 
-	var parseStringForRecursiveVarTags = function(context, code, callback) {	
-		var openingPos = code.indexOf('{=');	
+	var parseStringForRecursiveVarTags = function(context, code, callback) {
+		var openingPos = code.indexOf('{=');
 		var closingPos = code.lastIndexOf('}');
 		var contentLength = closingPos - openingPos - 2;
 
@@ -117,8 +117,8 @@ var LML = function() {
 	};
 
 	var recursiveVariableTag = function(context, code, callback) {
-		var openingPos = code.indexOf('{=');	
-		var closingPos = code.lastIndexOf('}');	
+		var openingPos = code.indexOf('{=');
+		var closingPos = code.lastIndexOf('}');
 		var contentLength = closingPos - openingPos;
 
 		console.log('stacked ' + code);
@@ -205,7 +205,7 @@ var LML = function() {
 								pos = levels[i].indexOf('(');
 								var curLevel = levels[i];
 								ftcName = curLevel.substr(0, pos);
-		
+
 								if (typeof endVal[ftcName] === 'function') {
 									var params = curLevel.substr(
 										curLevel.indexOf('(')+1,
@@ -272,7 +272,7 @@ var LML = function() {
 			for (var i = 0; i < levels.length-1; i++) {
 				if (typeof currentLvl[levels[i]] !== 'object') {
 					currentLvl[levels[i]] = new Object();
-				} 
+				}
 				currentLvl = currentLvl[levels[i]];
 			}
 
@@ -291,8 +291,8 @@ var LML = function() {
 			return truthfulness;
 		}
 
-		this.processLoop = function(context, condObj) {	
-			context.storeUntilClosure = true;			
+		this.processLoop = function(context, condObj) {
+			context.storeUntilClosure = true;
 			return true;
 		};
 
@@ -309,7 +309,7 @@ var LML = function() {
 				case "/=" : return this.affect(context, affectedName, affectedValue / effect);
 			}
 		};
-		
+
 		this.processForLoop = function(context, condObj) {
 			var affectedName = condObj.values[0];
 			var _arr = this.pulloutVar(context, condObj.values[1]);
@@ -332,7 +332,7 @@ var LML = function() {
 		var lines = typeof code === 'string' ? code.split(/\n|;/g) : code;
 		var lineNumber = 0;
 		var maxLine = lines.length;
-	
+
 		var handleLMLLine = function() {
 			var line = lines[lineNumber].trim();
 
@@ -345,7 +345,7 @@ var LML = function() {
 					var split = match.split(selector).filter(function(str) {
 						return str != undefined && str != "";
 					});
-					
+
 					// If closure detected
 					if (condClosures.indexOf(split[0]) != -1) {
 						var curCond = context.condStack.pop();
@@ -355,10 +355,10 @@ var LML = function() {
 						if (curCond.requiredSkip > 0) {
 							curCond.requiredSkip--;
 						} else {
-							context.currentBlock = (context.condStack.length == 0) ? 
-								"lml" : 
+							context.currentBlock = (context.condStack.length == 0) ?
+								"lml" :
 								context.condStack[context.condStack.length-1].condTag;
-							
+
 							if (split[0] == 'else') {
 								context.skipUntilClosure = !context.skipUntilClosure;
 								context.condStack.push(curCond);
@@ -390,7 +390,7 @@ var LML = function() {
 							}
 
 							context.currentBlock = condObj.condTag;
-		
+
 							// Process conditions
 							switch (condObj.condTag) {
 								case 'if' :
@@ -400,7 +400,7 @@ var LML = function() {
 
 								case 'for' :
 									LMLSlang.processForLoop(context, condObj);
-									break;		
+									break;
 							}
 						}
 					} else if (lmlOperators.indexOf(split[1]) != -1) {
@@ -427,13 +427,13 @@ var LML = function() {
 			try {
 				handleLMLLine();
 			} catch (ex) {
-				log("LMLParserException", ex + 
-					" in " + (context.rootPath||"LML file") + 
+				log("LMLParserException", ex +
+					" in " + (context.rootPath||"LML file") +
 					" @ line " + context.currentLineIndex);
 				log("Stacktrace", ex.stack);
 				throw "[Fatal] [LMLParserException] Could not recover from fatal error";
 			}
-		}		
+		}
 
 		return true;
 	};
@@ -474,7 +474,7 @@ var LML = function() {
 		return false;
 	};
 
-	// Content of line should be trimmedd 
+	// Content of line should be trimmedd
 	var parseLine = function(line, context, lineCallback) {
 		line = line.trim();
 		if (line.length == 0) {
@@ -486,7 +486,7 @@ var LML = function() {
 		// lineCallback() is called at the end of line
 		// context.cachedCommand contains content of {}
 		// context.storedBuffer contains content of block (while and for)
-		// Normal HTML is just added to context.compiled 
+		// Normal HTML is just added to context.compiled
 		// context.currentInTag contains current tag context, eg. = or %
 		var detectPos = line.length;
 		var detectLength = line.length;
@@ -508,7 +508,7 @@ var LML = function() {
 				}
 
 				context.cachedCommand = crop;
-		
+
 				execTagContent(context, function() {
 					context.compiled += context.newLine;
 					context.newLine = "";
@@ -527,16 +527,16 @@ var LML = function() {
 				setTimeout(seekLML, 0);
 			} else if ((lmlMatch = lmlDetectRegex.exec(line)) != null) {
 				detectPos = lmlMatch.index;
-				detectLength = lmlMatch[0].length;	
+				detectLength = lmlMatch[0].length;
 
 				if (typeof lmlMatch[1] !== 'undefined') {
 					var cropLength = detectPos - nextWorkPos;
 					var comp = line.substring(nextWorkPos).substring(0, cropLength);
-					
-					context.compiled += comp; 
+
+					context.compiled += comp;
 					context.currentInTag = lmlMatch[1];
 					context.cachedCommand = lmlMatch[2];
-				
+
 					nextWorkPos = detectPos + detectLength;
 					execTagContent(context, function() {
 						context.compiled += context.newLine;
@@ -576,7 +576,7 @@ var LML = function() {
 		if (typeof extra !== 'undefined') {
 			context.extra = extra;
 		}
-		
+
 		delete content;
 
 		if (lineTotal != 0) {

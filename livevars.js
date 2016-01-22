@@ -68,6 +68,16 @@ var RegisteredLiveVariables = {
 		} else {
 			db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 		}
+	},
+
+	theme : function(cli, levels, callback) {
+		var allThemes = levels.length === 0;
+
+		if (allThemes) {
+			db.singleLevelFind('themes', callback);
+		} else {
+			db.multiLevelFind('themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
+		}
 	}
 };
 

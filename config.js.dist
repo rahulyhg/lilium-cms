@@ -19,7 +19,9 @@ var _config = {
 			login : "login",
 			livevars : "livevars",
 			themes : "flowers",
-			themesInfo : "info.json"
+			themesInfo : "info.json",
+			plugins : "plugins",
+			pluginsInfo: "info.json"
 		},
 		"server" : {
 			base : "YOUR_COMPLETE_PATH_TO_LILIUM/",
