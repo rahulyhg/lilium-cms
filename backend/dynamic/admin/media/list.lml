@@ -14,7 +14,7 @@
 			<div>
 				{=media._id}
 				<img src="{=media.sizes.thumbnail.url}">
-				<a href="{=config.default.server.url}/admin/media/view/{=media._id}">Edit</a>
+				<a href="">Edit</a>
 			</div>
 		{$
 			endfor;
