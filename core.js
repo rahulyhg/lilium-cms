@@ -14,6 +14,7 @@ var Article = require('./article.js');
 var Media = require('./media.js');
 var imageSize = require('./imageSize.js');
 var themes = require('./themes.js');
+var entities = require('./entities.js');
 
 var Core = function() {
 
@@ -124,6 +125,10 @@ var Core = function() {
 
 	};
 
+	var loadRoles = function(cb) {
+		entities.cacheRoles(cb);
+	};
+	
 	var loadTheme = function() {
 		log('Themes', 'Loading Theme');
 		themes.bindEndpoints();
@@ -280,7 +285,9 @@ var Core = function() {
 		loadHTMLStructure(function() {
 			testDatabase(function() {
 				loadPlugins(function(){
-					loadTheme();
+					loadRoles(function() {
+						loadTheme();
+					});
 				});
 			});
 		});

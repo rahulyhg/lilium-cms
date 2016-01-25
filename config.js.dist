@@ -21,7 +21,8 @@ var _config = {
 			themes : "flowers",
 			themesInfo : "info.json",
 			plugins : "plugins",
-			pluginsInfo: "info.json"
+			pluginsInfo: "info.json",
+			uploads : "uploads"
 		},
 		"server" : {
 			base : "YOUR_COMPLETE_PATH_TO_LILIUM/",

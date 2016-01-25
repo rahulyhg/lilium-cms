@@ -50,7 +50,7 @@ var Handler = function() {
 					var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
 					filename = crypto.createHash('md5').update(filename).digest('hex');
 					var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
-					var url =  config.default.server.url + "/uploads/" + filename + mime;
+					var url = filename + mime;
 
 					file.on('end', function() {
 

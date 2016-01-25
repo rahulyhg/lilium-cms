@@ -1,6 +1,7 @@
 var _c = require('../config.js');
 var log = require('../log.js');
 var MongoClient = require('mongodb').MongoClient
+var mongoObjectID = require('mongodb').ObjectID;
 
 var _conn = undefined;
 
@@ -95,6 +96,10 @@ var DB = function() {
 				cb(undefined, cursor);
 			} 
 		});	
+	};
+
+	this.mongoID = function(str) {
+		return new mongoObjectID(str);
 	};
 
 	this.findToArray = function(coln, conds, cb) {
@@ -214,7 +219,7 @@ var DB = function() {
 	// Will callback cb with a boolean representing the existance of a document
 	this.match = this.exists = function(coln, conds, cb) {
 		this.find(coln, conds, {limit:[1]}, function(err, r) {
-			if (err) {
+				if (err) {
 				cb(false);
 			} else {
 				r.hasNext(function(err, res) {
