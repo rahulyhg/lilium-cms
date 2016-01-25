@@ -7,6 +7,11 @@ $}
 <html>
 	<head>
 		<title>{=vocab.{=strPlugin}}</title>
+		<style>
+			.liliumLiveVar{
+				display: none;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -49,19 +54,18 @@ $}
 			$.post("{=config.default.server.url}/admin/plugins/registerPlugin", {identifier : $(this).closest(".plugin-actions").attr('id')}, function(data) {
 
 				if (data.success) {
-					$(that).replaceWith("<button class='disable-theme'>Disable</button>");
+					$(that).replaceWith("<button class='disable-plugin'>Disable</button>");
 				}
 			});
 		});
 
 		$('.plugin').on('click','.disable-plugin',function() {
-			console.log('DISABLE');
-
+			console.log('disable');
 			var that = this;
 			$.post("{=config.default.server.url}/admin/plugins/unregisterPlugin", {identifier : $(this).closest(".plugin-actions").attr('id')}, function(data) {
 
 				if (data.success) {
-					$(that).replaceWith("<button class='enable-theme'>Enable</button>");
+					$(that).replaceWith("<button class='enable-plugin'>Enable</button>");
 				}
 			});
 		});

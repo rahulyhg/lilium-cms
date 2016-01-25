@@ -125,9 +125,12 @@ var Plugins = function() {
 				var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
 
 				RegisteredPlugins[identifier] = pluginInstance;
-
 				db.update('plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
-					pluginInstance.register(_c, info, callback);
+					pluginInstance.register(_c, info, function(){
+						console.log('What are does');
+
+						return callback();
+					});
 				}, true, true);
 			});
 		}
@@ -138,10 +141,15 @@ var Plugins = function() {
 
 
 			db.update('plugins', {identifier : identifier}, {identifier : identifier, active : false}, function() {
-				RegisteredPlugins[identifier].unregister(callback);
+				console.log('unregister');
+				RegisteredPlugins[identifier].unregister(function(){
+					console.log('unregister');
+					RegisteredPlugins[identifier] = undefined;
+					delete RegisteredPlugins[identifier];
+					return callback();
+				});
 
-				RegisteredPlugins[identifier] = undefined;
-				delete RegisteredPlugins[identifier];
+
 
 			}, true, true);
 

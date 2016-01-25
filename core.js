@@ -154,7 +154,13 @@ var Core = function() {
 						fireEvent();
 					});
 				} else {
-					if (i == 0) throw '[ThemeException]: There is no default Theme to load.';
+
+					if (i == 0){
+						// Enable with default theme
+						themes.enableTheme(undefined, function() {
+							fireEvent();
+						});
+					};
 					cursor.close();
 				}
 			});

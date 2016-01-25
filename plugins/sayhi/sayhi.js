@@ -11,25 +11,20 @@ var SayHi = function() {
 
 	var registerEndpoint = function() {
 		endpoints.register('sayhi', 'GET', function(cli) {
-			cli.sendJSON({
-				"message" : "Hi!",
-				"sentFrom" : "SayHi"
-			});
+
 		});
 	};
 
 	this.unregister = function(callback) {
 		log("SayHi", "Goodbye!");
-
+		endpoints.unregister('sayhi', 'GET');
 		callback();
 	};
 
 	this.register = function(_c, info, callback) {
 		initRequires(_c.default.server.base);
-
 		log("SayHi", "Hi there!");
 		registerEndpoint();
-
 		callback();
 	};
 };

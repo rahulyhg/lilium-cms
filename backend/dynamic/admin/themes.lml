@@ -7,6 +7,11 @@ $}
 
 <head>
 	<title>{=vocab.themes}</title>
+	<style>
+		.liliumLiveVar{
+			display: none;
+		}
+	</style>
 </head>
 
 <body>
