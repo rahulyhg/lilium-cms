@@ -110,7 +110,8 @@ var Media = function() {
 
 						db.remove('uploads', {_id : id},function(err, r){
 							return cli.sendJSON({
-								redirect: '/admin/media/list'
+								redirect: '/admin/media/list',
+								success: true
 							});
 						});
 

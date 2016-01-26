@@ -31,15 +31,6 @@ var RegisteredLiveVariables = {
 			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 		}
 	},
-	content : function(cli, levels, callback) {
-		var allContent = levels.length === 0;
-
-		if (allContent) {
-			db.singleLevelFind('content', callback);
-		} else {
-			db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
-		}
-	},
 	sites : function(cli, levels, callback) {
 		var allContent = levels.length === 0;
 
