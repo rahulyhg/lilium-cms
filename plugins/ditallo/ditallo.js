@@ -10,22 +10,23 @@ var SayHi = function() {
 	};
 
 	var registerEndpoint = function() {
-		endpoints.register('sayhi', 'GET', function(cli) {
-
+		endpoints.register('ditallo', 'GET', function(cli) {
 		});
 	};
 
 	this.unregister = function(callback) {
-		log("SayHi", "Goodbye!");
-		endpoints.unregister('sayhi', 'GET');
+		log("DitAllo", "Au revoir!");
+		endpoints.unregister('ditallo', 'GET');
+
 		callback();
 	};
 
 	this.register = function(_c, info, callback) {
 		initRequires(_c.default.server.base);
-		log("SayHi", "Hi there!");
+
+		log("DitAllo", "Allo ici!");
 		registerEndpoint();
-		callback();
+		return callback();
 	};
 };
 

@@ -13,7 +13,7 @@ var textParser = function() {
         });
       }
     });
-
+    console.log({vars:JSON.stringify(endpoints)});
     $.get("/livevars", {vars:JSON.stringify(endpoints)}, function(data) {
       livevars = data;
       return cb(livevars);
@@ -34,6 +34,10 @@ var textParser = function() {
 
     });
 
+  };
+
+  this.livevars = function() {
+    return livevars;
   }
 }
 var parser = new textParser();

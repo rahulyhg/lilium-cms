@@ -47,6 +47,7 @@ var defaultTheme = {
 		license : 'MIT',
 		role : 'Developer'
 	}],
+	path: 'garden',
 	website : 'http://liliumcsm.com/themes/flowerg',
 	requiredModule : []
 };

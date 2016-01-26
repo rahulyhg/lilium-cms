@@ -3,6 +3,7 @@ var HTMLServer = require('./frontend/htmlserver.js');
 var Endpoints = require('./endpoints.js');
 var LiveVars = require('./livevars.js');
 var _c = require('./config.js');
+var log = require('./log.js');
 
 var Dispatcher = function() {
 	this.dispatch = function(cli) {
@@ -43,7 +44,7 @@ var Dispatcher = function() {
 				Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
 			}
 		} else {
-			console.log("Endpoint not registered : " + cli.routeinfo.path[0]);
+			log("Dispatcher","Endpoint not registered : " + cli.routeinfo.path[0]);
 			cli.debug();
 		}
 	};

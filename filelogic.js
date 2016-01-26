@@ -67,7 +67,6 @@ var FileLogic = function() {
 
     var readPath = _c.default.server.base + "backend/dynamic" + name + ".lml";
     var savePath = _c.default.server.html + name +'/index.html';
-    console.log(readPath);
 		FileServer.fileExists(savePath, function(isPresent) {
 			if (!isPresent) {
 				saveLmlPage(cli, readPath, savePath, extra);
@@ -87,9 +86,11 @@ var FileLogic = function() {
   }
 
   this.renderLmlPostPage = function(cli, postType, extra, cb) {
+    var theme = require('./themes.js');
+
     // Check for the post type
     var title = slugify(extra.title);
-    var readPath = _c.default.server.base + "flowers/" + _c.default.website.flower + "/" + postType + ".lml";
+    var readPath = _c.default.server.base + "flowers/" + theme.getEnabledTheme().info.path + "/" + postType + ".lml";
     var savePath = _c.default.server.html + "/" + title + ".html";
     LML.executeToFile(
       readPath,

@@ -1,3 +1,4 @@
-{# extra}
-<h1>{= extra.title}</h1>
-<div>{= extra.content}</div>
+{#extra}
+GARDEN
+<h1>{=extra.title}</h1>
+<div>{=extra.content}</div>

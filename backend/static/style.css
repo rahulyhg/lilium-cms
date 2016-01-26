@@ -1,0 +1,21 @@
+.selectedPicture{
+  border: 2px solid #000;
+  margin: 0px !important;
+}
+
+#picture-list img{
+  margin: 2px;
+  float: left;
+}
+
+.hidden{
+  display: none;
+}
+
+.cke_button__imgbrowser_icon{
+  background: url(/bower/ckeditor/skins/moono/icons.png) no-repeat 0 -1008px!important;
+}
+
+lml\:livevars{
+  display: none;
+}

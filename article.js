@@ -3,6 +3,7 @@ var formBuilder = require('./formBuilder.js');
 var conf = require('./config.js');
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
+var livevars = require('./livevars.js');
 
 var Article = function() {
   this.handlePOST = function(cli) {
@@ -78,7 +79,7 @@ var Article = function() {
         db.insert('content', formBuilder.serializeForm(form), function(err, result) {
 
           // Generate LML page
-          filelogic.renderLmlPostPage(cli, "article", result.ops[0], function(name) {
+          filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
 
             cli.sendJSON({
               redirect: name,
@@ -154,7 +155,8 @@ var Article = function() {
 
       db.remove('content', {_id : id},function(err, r){
         return cli.sendJSON({
-          redirect: '/admin/article/list'
+          redirect: '/admin/article/list',
+          success: true
         });
       });
 
@@ -194,7 +196,15 @@ var Article = function() {
   };
 
   var init = function() {
+    livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
+      var allContent = levels.length === 0;
 
+      if (allContent) {
+        db.singleLevelFind('content', callback);
+      } else {
+        db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+      }
+    });
   }
 
   var createPostForm = function() {

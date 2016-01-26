@@ -1,24 +1,80 @@
-{#config;session;vocab;forms;extra}
+{#config;session;vocab;forms;extra;debug}
 <!DOCTYPE html>
 <html>
 	<head>
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+
+		</style>
 	</head>
 	<body>
-		<header><h1>List of articles</h1></header>
-		<a href="{=config.default.server.url}/admin/article/new">Create a new article</a>
-    {$
-			for (content in extra);
-    $}
-			<div>
-				{=content.title}
-				<img src="{=content.picture}">
-				<a href="{=config.default.server.url}/admin/article/edit/{=content._id}">Edit</a>
-			</div>
 		{$
-			endfor;
+			var baseurl = config.default.server.url;
+			baseurl += "/";
+			baseurl += config.default.paths.admin;
 		$}
+		<header><h1>List of posts</h1></header>
+		<a href="{=baseurl}/article/new">Create an article</a>
 
+		<div class="article_list">
+
+		</div>
+		<div id="template" class="hidden">
+			<div class="article_element">
+				<div class="article_title"></div>
+				<div class="article_id"></div>
+				<div class="article_picture">
+					<img src=""></img>
+				</div>
+				<div class="article_actions">
+					<a class="view" href="">Edit</a>
+					<a id="remove" href="#">Remove</a>
+				</div>
+
+			</div>
+		</div>
+
+		{*content}
+
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+
+		<script src="{=config.default.server.url}/static/textParser.js"></script>
+
+		<script>
+
+
+		parser.getLiveVars(function() {
+			parser.parseTextToView();
+			parser.livevars().content.forEach(function (article, index) {
+				var element = $('#template .article_element').clone();
+
+				$(element).attr('id', article._id);
+				$(element).find('.article_title').text(unescape(article.title));
+				$(element).find('.article_id').text(article._id);
+				$(element).find('.article_picture img').attr('src', article.picture);
+				$(element).find('.article_actions .view').attr('href', '{=baseurl}/article/edit/' + article._id);
+
+				$('.article_list').append(element);
+			});
+
+		});
+
+		$('.article_list').on('click','#remove',function(event) {
+			event.preventDefault();
+
+			var media_element = $(event.target).closest('.article_element')
+			var id = $(media_element).attr('id');
+
+			$.post('{=baseurl}/article/delete/' + id, function(data) {
+				console.log(data);
+				if (data.success) {
+					$(media_element).remove();
+				}
+			});
+		});
+
+
+		</script>
 	</body>
 </html>
