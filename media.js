@@ -5,6 +5,7 @@ var db = require('./includes/db.js');
 var mongo = require('mongodb');
 var fs = require('./fileserver.js');
 var log = require('./log.js');
+var livevars = require('./livevars.js');
 
 var Media = function() {
 	this.handlePOST = function(cli) {
@@ -161,7 +162,15 @@ var Media = function() {
 	}
 
 	var init = function() {
+		livevars.registerLiveVariable('media', function(cli, levels, callback) {
+			var wholeDico = levels.length === 0;
 
+			if (wholeDico) {
+				db.singleLevelFind('uploads', callback);
+			} else {
+				db.multiLevelFind('uploads', levels, {langcode:levels[0]}, {limit:[1]}, callback);
+			}
+		});
 	}
 
 	var createMediaForm = function() {

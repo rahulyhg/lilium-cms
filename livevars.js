@@ -1,7 +1,7 @@
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
 
-var RegisteredLiveVariables = {	
+var RegisteredLiveVariables = {
 	session : function(cli, levels, callback) {
 		var dat = cli.request.session.data;
 
@@ -154,7 +154,7 @@ var LiveVariables = function() {
 	// Callback must contain the good value
 	this.registerLiveVariable = function(endpoint, func) {
 		if (typeof RegisteredLiveVariables[endpoint] === 'undefined') {
-			RegisteredLiveVariables[endpoint] = func();
+			RegisteredLiveVariables[endpoint] = func;
 		} else {
 			throw "[LiveVariables] Tried to register an already defined endpoint : " + endpoint;
 		}

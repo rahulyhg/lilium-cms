@@ -7,15 +7,52 @@
 	</head>
 	<body>
 		<header><h1>List of medias</h1></header>
-		<a href="{=config.default.server.url}/admin/media/upload">Upload a media</a>
-		{=debug.printContext()}
-    {$
-			for (media in extra.medias);
-    $}
-			{=cpt}
-		{$
-			endfor;
-		$}
+		<div class="media_list">
 
+		</div>
+		<div id="template">
+			<div class="media_element">
+				<div class="media_id">
+
+				</div>
+				<div class="media_picture">
+					<img src=""></img>
+				</div>
+				<div class="media_actions">
+					<a class="view" href="">Edit</a>
+					<a class="remove" href="">Remove</a>
+				</div>
+
+			</div>
+		</div>
+
+		{*media}
+		<a href="{=config.default.server.url}/admin/media/upload">Upload a media</a>
+
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+
+		<script src="{=config.default.server.url}/static/textParser.js"></script>
+
+		<script>
+		var time = new Date();
+		parser.getLiveVars(function() {
+			parser.parseTextToView();
+			parser.livevars().media.forEach(function (media, index) {
+				var element = $('#template .media_element').clone();
+
+				$(element).attr('id', media._id);
+				$(element).find('.media_id').text(media._id);
+				$(element).find('.media_picture img').attr('src', media.sizes.thumbnail.url);
+				$(element).find('.media_picture .media_actions .view').attr('src', media.sizes.thumbnail.url);
+
+				$('.media_list').append(element);
+			});
+			var endTime = new Date();
+			console.log(time-endTime);
+
+		});
+
+
+		</script>
 	</body>
 </html>
