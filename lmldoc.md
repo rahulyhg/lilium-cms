@@ -13,5 +13,7 @@ LML syntax is a bit similar to PHP, but has its own pros and cons. The activatio
 {*var}  Will print a live, context variable. (Will update in real-time)
 {%file} Will include an interpreted LML or HTML file at this position. In a theme, those are called "petals".
 
-{@ var a = 1000;  @}
-Everything between {@ and @} will be interepreted as normal server-side Javascript. You can make equations and declare new variables to be printed in your logic.
+{$
+   var a = 1000;  
+$}
+Everything between {$ and $} will be interepreted as normal server-side Javascript. You can make equations and declare new variables to be printed in your logic.
