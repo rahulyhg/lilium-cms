@@ -86,21 +86,48 @@ var LiveVariables = function() {
 		return {livevars : cli.livevars};
 	};
 
+	var secondLevelVars = function(cli, params, next) {
+		var keys = Object.keys(params);
+		var keyIndex = 0;
+
+		var nextVar = function() {
+			if (keys.length < keyIndex) {
+				var key = keys[keyIndex];
+				var levels = params[key].toString().split('.');
+				keyIndex++;
+
+				if (typeof RegisteredLiveVariables[levels[0]] !== 'undefined') {
+					RegisteredLiveVariables[levels[0]](cli, levels, params, function(val) {
+						params[key] = val;
+						nextVar();
+					});
+				} else {
+					nextVar();
+				}	
+			} else {
+				next(params);
+			}
+		};
+		nextVar();
+	};
+
 	var handleOneVar = function(cli, varObj, assoc, next) {
 		var varName = varObj.varname;
 		var params = varObj.params;
 		var levels = varName.split('.');
 		var topLevel = levels.shift();
 
-		if (typeof RegisteredLiveVariables[topLevel] !== 'undefined') {
-			RegisteredLiveVariables[topLevel](cli, levels, params, function(val) {
-				assoc[varName] = val;
-				next(true);
-			});
-		} else {
-			assoc[varName] = '[UNREGISTERED TOP LEVEL LIVE VARIABLE '+topLevel+']';
-			next(false);
-		}
+		secondLevelVars(cli, params, function(params) {
+			if (typeof RegisteredLiveVariables[topLevel] !== 'undefined') {
+				RegisteredLiveVariables[topLevel](cli, levels, params, function(val) {
+					assoc[varName] = val;
+					next(true);
+				});
+			} else {
+				assoc[varName] = '[UNREGISTERED TOP LEVEL LIVE VARIABLE '+topLevel+']';
+				next(false);
+			}
+		});
 	};
 
 	var startLoop = function(cli, varNames, assoc, callback) {

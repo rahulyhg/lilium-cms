@@ -17,7 +17,6 @@ var themes = require('./themes.js');
 var entities = require('./entities.js');
 
 var Core = function() {
-
 	var loadHooks = function(readyToRock) {
 		log('Hooks', 'Loading hooks');
 		hooks.bind('init', readyToRock);

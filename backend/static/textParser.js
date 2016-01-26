@@ -4,7 +4,7 @@ var textParser = function() {
   var livevars;
 
   this.getLiveVars = function(cb) {
-    $(".liliumLiveVar").each(function() {
+    $("lml\\:livevars").each(function() {
       if (endpoints.indexOf($(this).data('varname')) == -1) {
         var params = $(this).data('varparam');
         endpoints.push({
@@ -16,12 +16,12 @@ var textParser = function() {
 
     $.get("/livevars", {vars:JSON.stringify(endpoints)}, function(data) {
       livevars = data;
-      return cb();
+      return cb(livevars);
     });
   };
 
   this.parseTextToView = function() {
-    $(".liliumLiveVar").each(function() {
+    $("lml\\:livevars").each(function() {
       if (typeof livevars[$(this).data('varname')] == "object") {
         $(this).text(JSON.stringify(livevars[$(this).data('varname')]));
       } else {

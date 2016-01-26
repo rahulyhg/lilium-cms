@@ -27,12 +27,10 @@ var ClientObject = function(req, resp) {
 
 	this.userinfo = {
 		loggedin : req.session.data.user != 'Guest',
-		role : req.session.data.role,
+		role : req.session.data.roles,
 		userid : req.session.data.userid,
 		logintime : req.session.data.logintime,
-		level : req.session.data.level,
 		displayname : req.session.data.displayname,
-		avatar : req.session.data.avatar,
 		admin : req.session.data.admin,
 		god : req.session.data.god,
 		user : req.session.data.user,

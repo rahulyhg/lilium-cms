@@ -1,49 +1,5 @@
 {#config;vocab;testarray}
 {$
-	otherVar = 50;
-	otherVar += 10;
-	someDynamicVar = 20;
-
-	str = "Hello";
-	str += " World";
-	thirdVar = otherVar;
-
-	if (someDynamicVar == 20);
-		someDynamicVar += 30;
-	endif;
-
-	if (str == "Some Random String");
-		str = "THIS IS A LML ERROR";
-	else;
-		str += "!";
-	endif;
-
-	if (someDynamicVar == 100);
-		someDynamicVar = 0;
-	endif;
-
-	if (someDynamicVar == someDynamicVar);
-		someDynamicVar *= 2;
-	else
-		someDynamicVar = -1000;
-	endif;
-
-	loopVar = 0;
-	loopMax = 5;
-
-	var1 = 100;
-	var2 = 100;
-
-	if (var1 == var2);
-		someDynamicVar /= 10;
-	endif;
-
-	var2 -= 10;
-
-	if (var1 != var2);
-		someDynamicVar /= 10;
-	endif;
-
 	textString = "text";
 $}
 <!DOCTYPE html>
@@ -57,51 +13,10 @@ $}
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>{=vocab.admintitle}</h2>
-		<h3>Welcome, {*session.displayname}</h3>
-		{*endpoint.somevar.val(key:value,secondKey:"second value",thirdKey:15)}
-		<h4>someDynamicVar = {=someDynamicVar}</h4>
-		<h4>otherVar = {=otherVar}</h4>
-		<h4>str = {=str}</h4>
-		<h4>3rd variable = {=thirdVar}</h4>
+		Currently running in {=config.default.env} env.
 
-		<h4>
-			Some for-loop sentence :
-			{$
-				for (lmlobj in testarray.array);
-			$}
-				{=lmlobj.{={={=textString}String}String}}
-			{$
-				endfor;
-			$}
-		</h4>
-
-		<h4>loopVar before while = {=loopVar}</h4>
-		{$
-			while (loopVar != loopMax);
-				loopVar += 1;
-		$}
-				<h5>loopVar Iteration : {=loopVar}</h5>
-		{$
-			endwhile;
-		$}
-
-		<h4>loopVar after while = {=loopVar}</h4>
-		{$
-			if (loopVar != loopMax);
-		$}
-			<h5>While loop did NOT work :(</h5>
-		{$
-			else;
-				loopVar = "Now a string";
-		$}
-			<h5>While loop WORKED! :D</h5>
-			<h4>loopVar after if = {=loopVar}</h4>
-		{$
-			endif;
-		$}
-
-		Currently running in {=config.default.env}
-
+		{*entities.lilium(postType:types.post)}
+	
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 	</body>
 </html>

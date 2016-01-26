@@ -112,7 +112,7 @@ var DB = function() {
 				conds = typeof conds === 'undefined' ? {} : conds;
 
 				col.find(conds).toArray(function(err, arr) {
-					cb(undefined, arr);
+					cb(err, arr);
 				});
 			} 
 		});	

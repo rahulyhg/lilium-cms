@@ -34,12 +34,17 @@ var Entities = function() {
 	};
 
 	this.fetchFromDB = function(idOrUsername, callback) {
-		var condition = new Array();
-		condition[(isNaN(idOrUsername) ? "_id" : "username")] = (isNaN(idOrUsername) ? db.mongoID(idOrUsername) : idOrUsername);
+		var condition = new Object();
+	
+		if (typeof idOrUsername === "object") { 
+			condition["_id"] = db.mongoID(idOrUsername);
+		} else {
+			condition.username = idOrUsername;
+		}
 		
 		db.findToArray('entities', condition, function(err, user) {
 			if (!err && user.length == 1) {
-				entityWithData(user, callback);
+				entityWithData(user[0], callback);
 			} else {
 				callback(undefined);
 			}

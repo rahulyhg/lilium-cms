@@ -51,8 +51,17 @@ var LiliumCMS = function() {
 		
 	};
 
+	var LMLHTML5 = function() {
+		var init = function() {
+		
+		};
+
+		init();
+	};
+
 	var Rykstrapper = function() {
 		var livevars = new LiveVars();
+		var lmlhtml5 = new LMLHTML5();
 
 		livevars.exec();
 	};
