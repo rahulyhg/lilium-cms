@@ -7,13 +7,15 @@
 
 	</head>
 	<body>
+		{*media.{?1}}
+
 		<header><h1>About this media</h1></header>
-		Name : <h2>{*media.{=extra}.type}</h2>
-		Media Type : <h4 data-name="type" livevars data-var="uploads.56a0eb5761e908bb2ab4c988.type"></h4>
+		Name : <h2></h2>
+		Media Type : <h4 data-name="type"></h4>
 		<button onclick="deleteMedia()">Delete Media</button><br>
-		Url : <span livevars data-var="media.56a0eb5761e908bb2ab4c988.url"></span><br>
-		<img src="{*uploads.{=extra.id}.type}">
-		<span livevars data-var="media.56a0eb5761e908bb2ab4c988.title"></span>
+		Url : <span></span><br>
+		<img src="">
+		<span></span>
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="{=config.default.server.url}/static/textParser.js"></script>
@@ -21,31 +23,11 @@
 		<script>
 		parser.getLiveVars(function() {
 			parser.parseTextToView();
-			parser.livevars().media.forEach(function (media, index) {
-				var element = $('#template .media_element').clone();
 
-				$(element).attr('id', media._id);
-				$(element).find('.media_id').text(media._id);
-				$(element).find('.media_picture img').attr('src', media.sizes.thumbnail.url);
-				$(element).find('.media_actions .view').attr('href', '{=baseurl}/media/view/' + media._id);
-
-				$('.media_list').append(element);
-			});
 
 		});
 
-			function deleteMedia() {
-				$.post(baseUrl + "/admin/media/delete/" + mediaId, function(data) {
-					alert(data);
-				});
-			}
 		</script>
 
 	</body>
 </html>
-
-<span livevars data-var="media.__id__.url">
-	<span data-var="__id__">
-		123012370hjifoqfioef
-	</span>
-</span>

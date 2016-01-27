@@ -165,11 +165,10 @@ var Media = function() {
 	var init = function() {
 		livevars.registerLiveVariable('media', function(cli, levels, params, callback) {
 			var wholeDico = levels.length === 0;
-
 			if (wholeDico) {
 				db.singleLevelFind('uploads', callback);
 			} else {
-				db.multiLevelFind('uploads', levels, {langcode:levels[0]}, {limit:[1]}, callback);
+				db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 			}
 		});
 	}
