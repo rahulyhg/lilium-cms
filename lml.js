@@ -510,7 +510,7 @@ var LML = function() {
 		var nextWorkPos = 0;
 
 		// Needs to be precompiled every line
-		var lmlDetectRegex = /{(#|%|=)([^\n\s]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ.\s]*"?,?\s*)*)\)?}/g;
+		var lmlDetectRegex = /{(#|%|=)([^\n\s]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\-.\s]*"?,?\s*)*)\)?}/g;
 		var seekLML = function() {
 			if (nextWorkPos >= line.length) {
 				lineCallback(context.lineFeedback);

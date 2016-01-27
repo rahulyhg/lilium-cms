@@ -41,6 +41,11 @@ var Core = function() {
 			cli.touch("admin.GET.article");
 			Article.handleGET(cli);
 		});
+	
+		admin.registerAdminEndpoint('entities', 'GET', function(cli){
+			cli.touch("admin.GET.entities");
+			entities.handleGET(cli);
+		});
 
 		admin.registerAdminEndpoint('article', 'POST', function(cli){
 			cli.touch("admin.POST.article");

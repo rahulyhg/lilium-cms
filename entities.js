@@ -1,5 +1,6 @@
 var log = require('./log.js');
 var db = require('./includes/db.js');
+var filelogic = require('./filelogic.js');
 
 var Roles = new Object();
 
@@ -49,6 +50,12 @@ var Entities = function() {
 				callback(undefined);
 			}
 		});
+	};
+
+	this.handleGET = function(cli) {
+		cli.touch('entities.handleGET');
+		
+		filelogic.serveLmlPage(cli);	
 	};
 
 	this.createEmptyEntity = function() {
