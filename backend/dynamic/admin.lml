@@ -16,7 +16,12 @@ $}
 		Currently running in {=config.default.env} env.
 
 		{*entities.lilium(postType:types.post)}
-	
+
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script>
+		parser.getLiveVars(function() {
+			parser.parseTextToView();
+			});
+		</script>
 	</body>
 </html>

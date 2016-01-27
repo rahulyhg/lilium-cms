@@ -5,6 +5,7 @@ var db = require('./includes/db.js');
 var mongo = require('mongodb');
 var fs = require('./fileserver.js');
 var log = require('./log.js');
+var livevars = require('./livevars.js');
 
 var Media = function() {
 	this.handlePOST = function(cli) {
@@ -47,11 +48,13 @@ var Media = function() {
 		//TODO find a way to load more
 		db.find('uploads', {},{limit:[25]}, function(err, cursor) {
 			var medias = [];
+			var extra = {};
+			extra.medias = medias
 			cursor.each(function(err, media) {
 				if (media != null) {
 					medias.push(media);
 				} else {
-					filelogic.serveLmlPage(cli, false, medias);
+					filelogic.serveLmlPage(cli, false, extra);
 				}
 			});
 		});
@@ -107,7 +110,8 @@ var Media = function() {
 
 						db.remove('uploads', {_id : id},function(err, r){
 							return cli.sendJSON({
-								redirect: '/admin/media/list'
+								redirect: '/admin/media/list',
+								success: true
 							});
 						});
 
@@ -159,7 +163,14 @@ var Media = function() {
 	}
 
 	var init = function() {
-
+		livevars.registerLiveVariable('media', function(cli, levels, params, callback) {
+			var wholeDico = levels.length === 0;
+			if (wholeDico) {
+				db.singleLevelFind('uploads', callback);
+			} else {
+				db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+			}
+		});
 	}
 
 	var createMediaForm = function() {

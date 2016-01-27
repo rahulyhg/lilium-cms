@@ -4,6 +4,8 @@
 	<head>
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+
 	</head>
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>

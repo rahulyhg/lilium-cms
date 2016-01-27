@@ -1,6 +1,5 @@
-{#plugins;vocab;debug}
+{#plugins;vocab;debug;config}
 {$
-	somevar = 0;
 	strPlugin = "plugins";
 	pluginlist = plugins.getCachedPlugins();
 $}
@@ -8,10 +7,8 @@ $}
 <html>
 	<head>
 		<title>{=vocab.{=strPlugin}}</title>
-		<script>
-			var i = 1000; // iterator
-			var j = 2000; // NOT THE I HEUHUHE
-		</script>
+		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+
 	</head>
 
 	<body>
@@ -19,11 +16,58 @@ $}
 		{$
 			for (plug in pluginlist);
 		$}
-			<h2>{=plug.identifier}</h2>
-			<div class="plugin-actions">
+			{*plugin.{=plug.identifier}.active}
+			<div class="plugin" id="plugin.{=plug.identifier}.active">
+				<h2>{=plug.identifier}</h2>
+				<div class="plugin-actions" id="{=plug.identifier}">
+					<button class='enable-plugin'>Enable</button>
+				</div>
 			</div>
 		{$
 			endfor;
 		$}
+
+		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+
+		<script src="{=config.default.server.url}/static/textParser.js"></script>
+
+		<script>
+		parser.getLiveVars(function() {
+			parser.parseTextToView();
+
+			$('.plugin').each(function() {
+				var id = $(this).attr('id');
+				if (parser.livevars()[id]) {
+					//Make a disable button for all enabled plugins
+					$(this).find('.plugin-actions').html("<button class='disable-plugin'>Disable</button>");
+				}
+			});
+
+		});
+
+		$('.plugin').on('click','.enable-plugin',function() {
+			console.log('ENABLE');
+			var that = this;
+			$.post("{=config.default.server.url}/admin/plugins/registerPlugin", {identifier : $(this).closest(".plugin-actions").attr('id')}, function(data) {
+
+				if (data.success) {
+					$(that).replaceWith("<button class='disable-plugin'>Disable</button>");
+				}
+			});
+		});
+
+		$('.plugin').on('click','.disable-plugin',function() {
+			console.log('disable');
+			var that = this;
+			$.post("{=config.default.server.url}/admin/plugins/unregisterPlugin", {identifier : $(this).closest(".plugin-actions").attr('id')}, function(data) {
+
+				if (data.success) {
+					$(that).replaceWith("<button class='enable-plugin'>Enable</button>");
+				}
+			});
+		});
+
+		</script>
+
 	</body>
 </html>

@@ -1,4 +1,4 @@
-{#themes;vocab;debug}
+{#themes;vocab;debug;config}
 {$
 	themeList = themes.getCachedThemes();
 $}
@@ -7,6 +7,8 @@ $}
 
 <head>
 	<title>{=vocab.themes}</title>
+	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+
 </head>
 
 <body>
@@ -16,12 +18,11 @@ $}
 		for (theme in themeList);
 	 $}
 	 	{*theme.{=theme.uName}.active}
-	<h2>{=theme.dName}</h2>
-	<div class="themes-actions">
-		<button>Enable</button>
-
-		<button>Disable</button>
-
+	<div class="theme" id="theme.{=theme.uName}.active">
+		<h2>{=theme.dName}</h2>
+		<div class="themes-actions" id="{=theme.uName}">
+			<button class='enable-theme'>Enable</button>
+		</div>
 	</div>
 	{$
 		endfor;
@@ -29,8 +30,36 @@ $}
 </body>
 
 </html>
+<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+
 <script src="{=config.default.server.url}/static/textParser.js"></script>
 
 <script>
+parser.getLiveVars(function() {
+	parser.parseTextToView();
+
+	$('.theme').each(function() {
+		var id = $(this).attr('id');
+		console.log(parser.livevars()[id]);
+		if (parser.livevars()[id]) {
+			//Make a disable button
+			$(this).find('.themes-actions').html("<span id='theme_enabled'>This theme is installed</span>");
+		}
+	});
+
+});
+
+$('.theme').on('click','.enable-theme',function() {
+
+	var that = this;
+	$.post("{=config.default.server.url}/admin/themes/enableTheme", {uName : $(this).closest(".themes-actions").attr('id')}, function(data) {
+
+		if (data.success) {
+			$('#theme_enabled').replaceWith("<button class='enable-theme'>Enable</button>");
+			$(that).replaceWith("<span id='theme_enabled'>This theme is installed</span>");
+
+		}
+	});
+});
 
 </script>

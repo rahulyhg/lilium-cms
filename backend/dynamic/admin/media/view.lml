@@ -7,27 +7,26 @@
 
 	</head>
 	<body>
+		{*media.{?1}}
+
 		<header><h1>About this media</h1></header>
-		Name : <h2>{*uploads.56a0eb5761e908bb2ab4c988.type}</h2>
-		Media Type : <h4 data-name="type" livevars data-var="uploads.56a0eb5761e908bb2ab4c988.type"></h4>
+		Name : <h2></h2>
+		Media Type : <h4 data-name="type"></h4>
 		<button onclick="deleteMedia()">Delete Media</button><br>
-		Url : <span livevars data-var="uploads.56a0eb5761e908bb2ab4c988.url"></span><br>
-		<img src="{*uploads.{=extra.id}.type}">
-		<span livevars data-var="uploads.56a0eb5761e908bb2ab4c988.title"></span>
+		Url : <span></span><br>
+		<img src="">
+		<span></span>
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="{=config.default.server.url}/static/textParser.js"></script>
 
 		<script>
-			parser.getLiveVars(function() {
-				parser.parseTextToView();
-			});
+		parser.getLiveVars(function() {
+			parser.parseTextToView();
 
-			function deleteMedia() {
-				$.post(baseUrl + "/admin/media/delete/" + mediaId, function(data) {
-					alert(data);
-				});
-			}
+
+		});
+
 		</script>
 
 	</body>

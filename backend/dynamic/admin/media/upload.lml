@@ -1,14 +1,31 @@
 {#config;session;vocab;forms}
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-	</head>
-	<body>
-		<header><h1>Upload a media</h1></header>
-    {=forms.render('media_create')}
-		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-		<script src="/static/formValidation.js"></script>
-	</body>
+
+<head>
+	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+</head>
+
+<body>
+	<header>
+		<h1>Upload a media</h1>
+	</header>
+	{=forms.render('media_create')}
+	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+	<script src="/static/formValidation.js"></script>
+
+	<script>
+		document.addEventListener('formSubmited', function(e) {
+			data = e.detail;
+			if (data.form.success) {
+				var fileInput = $("[name='media_create'] > [name='File']");
+				$(fileInput).replaceWith(fileInput = fileInput.clone(true));
+				alert('Media Uploaded!');
+			}
+		});
+	</script>
+	
+</body>
+
 </html>

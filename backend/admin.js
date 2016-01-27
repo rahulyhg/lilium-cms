@@ -9,7 +9,7 @@ var formBuilder = require('../formBuilder');
 var Admin = function() {
 	this.serveDashboard = function(cli) {
 		cli.touch('admin.serverDashboard');
-	
+
 		if (cli.routeinfo.path.length == 1) {
 			filelogic.runLogic(cli);
 		} else {
@@ -46,7 +46,7 @@ var Admin = function() {
 			AdminEndpoints[method][endpoint] = func;
 		} else {
 			throw "[AdminEndpointException] Endpoint is already registered : " + method + "@" + endpoint;
-		}	
+		}
 	};
 
 	var init = function() {
