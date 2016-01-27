@@ -48,6 +48,7 @@ var Article = function() {
   };
 
   this.list = function(cli) {
+    cli.debug();
     //Find the 25 first for now
     //TODO find a way to load more
     db.find('content', {}, {
@@ -210,15 +211,10 @@ var Article = function() {
   var createPostForm = function() {
     formBuilder.createForm('post_create')
       .add('title', 'text', {}, {
-        minLenght: 10,
-        maxLenght: 23
+        minLenght: 3,
+        maxLenght: 100
       })
       .add('content', 'ckeditor')
-      .add('active', 'checkbox')
-      .add('onpage', 'number', {}, {
-        min: 10,
-        max: 15
-      })
       .add('publish', 'submit');
   }
 
