@@ -1,22 +1,23 @@
-$( document ).ready(function(){
-  $('.v_form_validate').submit(function(e){
+
+$( document ).ready(function() {
+  $('.v_form_validate').submit(function(e) {
     e.preventDefault();
     var validForm = true;
 
-    $('.v_validate ').each(function(){
+    $('.v_validate ').each(function() {
 
       var validField = true;
 
 
       // If a field : text, textarea
       if ($(this).attr('type') == 'text' ||
-       $(this).attr('type') == 'textarea' ||
-       $(this).attr('type') == 'email' ||
-       $(this).attr('type') == 'password') {
+        $(this).attr('type') == 'textarea' ||
+        $(this).attr('type') == 'email' ||
+        $(this).attr('type') == 'password') {
 
-         if ($(this).attr('required') && $(this).val().length == 0) {
-           validField = false;
-         }
+        if ($(this).attr('required') && $(this).val().length == 0) {
+          validField = false;
+        }
 
         // Min and maxlength verification
         if ($(this).attr('minlength') && $(this).val().length < $(this).attr('minlength')) {
@@ -67,26 +68,27 @@ $( document ).ready(function(){
   });
 
   var processForm = function(form) {
+    var that = this;
     var serialized_form = form.serialize();
 
     // Process files
-    processFiles(form, function(){
-      $.post(form.attr('action'),serialized_form, function(data){
+    processFiles(form, function() {
+      $.post(form.attr('action'), serialized_form, function(data) {
 
-        if (data.redirect) {
-          window.location.href = data.redirect;
-        }
+        var event = new CustomEvent('formSubmited', {
+          'detail': data
+        });
+        document.dispatchEvent(event);
+        return false;
       });
     });
-
-
-  }
+  };
 
   var processFiles = function(form, cb) {
     if (form.find('input[type=file]').length > 0) {
       var data = new FormData();
       jQuery.each(form.find('input[type=file]')[0].files, function(i, file) {
-          data.append('file-'+i, file);
+        data.append('file-' + i, file);
       });
 
       jQuery.ajax({
@@ -96,14 +98,12 @@ $( document ).ready(function(){
         contentType: false,
         processData: false,
         type: 'POST',
-        success: function(data){
-            return cb();
+        success: function(data) {
+          return cb();
         }
       });
+    } else {
+      return cb();
     }
-    return cb();
-
-  }
-
-
+  };
 });
