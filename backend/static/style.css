@@ -16,6 +16,6 @@
   background: url(/bower/ckeditor/skins/moono/icons.png) no-repeat 0 -1008px!important;
 }
 
-lml\:livevars, lml/:template {
+lml\:livevars, lml\:template {
   display: none;
 }

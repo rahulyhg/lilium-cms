@@ -77,14 +77,23 @@ var LML = function() {
 			}
 		} 
 
+		return json;
+	};
+
+	var stringifyLiveParams = function(json) {
 		return JSON.stringify(json).replace(/"/g, '&lmlquote;');
 	};
 
 	var execLiveTag = function(context, code, callback) {
 		var params = fetchLiveParams(context.extra.livevarsParams);
+		var templatename = params.template || "";
 
 		parseStringForRecursiveVarTags(context, code, function(code) {
-			context.newLine = '<lml:livevars data-varname="'+code+'" data-varparam="'+params+'" ></lml:livevars>';
+			context.newLine = '<lml:livevars data-varname="'+
+				code+'" data-template="'+
+				templatename+'" data-varparam="'+
+				stringifyLiveParams(params)+'" ></lml:livevars>';
+
 			callback();
 		});
 

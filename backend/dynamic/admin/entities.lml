@@ -8,13 +8,13 @@
 
 		<main class="entities-main"> 
 			<ul class="entity-list">
-				{*entities(templatename:"entity-list-item")}
+				{*entities(template:"entity-list-item")}
 			</ul>
 		</main>
 
-		<lml:template data-templatename="entity-list-item">
+		<lml:template id="entity-list-item">
 			<li class="entity-item-list">
-				<h2 class="entity-item"></h2>
+				<lml:tobject data-nodetype="h2" data-key="displayname"></lml:tobject>
 				<div class="entity-actions">
 					<button>delete</button>
 				</div>

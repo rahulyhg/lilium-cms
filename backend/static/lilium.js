@@ -42,18 +42,44 @@ var LiliumCMS = function() {
       			});
   		};
 
+		var generateTemplateFromObject = function(domTemplate, domTarget, data) {
+			var templateItems = domTemplate.children().clone();
+			templateItems.find('lml\\:tobject').each(function(index, obj) {
+				obj = $(obj);
+				var nodeType = obj.data('nodetype');
+				var key = obj.data('key');
+
+				$(obj).replaceWith($("<"+nodeType+">").html(data[key]));
+			});
+
+			$(domTarget).before(templateItems);
+
+			return true;
+		};
+
   		this.parseTextToView = function() {
     			$("lml\\:livevars").each(function() {
-      				if (typeof livevars[$(this).data('varname')] == "object") {
-        				$(this).text(JSON.stringify(livevars[$(this).data('varname')]));
-      				} else {
-        				if ($(this).is('img')) {
-          					$(this).attr('src', unescape(livevars[$(this).data('varname')]));
-        				} else {
-          					$(this).text(unescape(livevars[$(this).data('varname')]));
-        				}
-      				}
+				var lmlTag = $(this);
 
+      				if (typeof livevars[$(this).data('varname')] === "object") {
+					var templateName = $(this).data('template');
+					var varValue = livevars[$(this).data('varname')];
+
+					if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
+						var templateObj = $('#' + $(this).data('template'));
+
+						if (templateObj.length != 0) {
+							if (varValue.length > 0) {
+								varValue.forEach(function(val, index) {
+									generateTemplateFromObject(templateObj, lmlTag, val);
+								});
+							}
+						}
+					} else {
+						$(this).text(JSON.stringify(livevars[$(this).data('varname')]));
+						$(this).text(unescape(livevars[$(this).data('varname')]));
+					}
+      				}
    			});
 
   		};
@@ -392,14 +418,17 @@ var LiliumCMS = function() {
 		init();
 	};
 
-	var Rykstrapper = function() {
-		var livevars = new LiveVars();
-		var lmlhtml5 = new LMLHTML5();
+	var AwesomeStrapper = function() {
+		this.strap = function() {
+			var livevars = new LiveVars();
+			var lmlhtml5 = new LMLHTML5();
 
-		livevars.exec();
+			livevars.exec();
+		};
 	};
 
-	this.rykstrapper = new RykStrapper();	
+	this.awesomestrapper = new AwesomeStrapper();	
 };
 
 var liliumcms = new LiliumCMS();
+$(function() {liliumcms.awesomestrapper.strap();});
