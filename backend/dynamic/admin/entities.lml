@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html>
 	<head>
-
+		{%globalhead}
 	</head>
 	<body>
 		<h1>All entities</h1>
 
-		
+		<main class="entities-main"> 
+			<ul class="entity-list">
+				{*entities(templatename:"entity-list-item")}
+			</ul>
+		</main>
+
+		<lml:template data-templatename="entity-list-item">
+			<li class="entity-item-list">
+				<h2 class="entity-item"></h2>
+				<div class="entity-actions">
+					<button>delete</button>
+				</div>
+			</li>
+		</lml:template>
 	</body>
 </html>

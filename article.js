@@ -196,7 +196,7 @@ var Article = function() {
     // Return article object from DB
   };
 
-  var init = function() {
+  this.registerContentLiveVar = function() {
     livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
       var allContent = levels.length === 0;
 
@@ -218,6 +218,8 @@ var Article = function() {
       .add('publish', 'submit');
   }
 
+
+  var init = function() {};
 
   init();
 }

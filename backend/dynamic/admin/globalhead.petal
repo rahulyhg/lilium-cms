@@ -1,0 +1,3 @@
+{#config}
+<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/static/style.css" />
+<script src="{=config.default.server.url}/static/lilium.js"></script>

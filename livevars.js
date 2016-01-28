@@ -1,9 +1,10 @@
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
+var log = require('./log.js');
 
 var RegisteredLiveVariables = {
-	session : function(cli, levels, params, callback) {
 
+	session : function(cli, levels, params, callback) {
 		var dat = cli.request.session.data;
 
 		for (var i = 0; i < levels.length; i++) {
@@ -30,6 +31,15 @@ var RegisteredLiveVariables = {
 			db.singleLevelFind('entities', callback);
 		} else {
 			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
+		}
+	},
+	content : function(cli, levels, params, callback) {
+		var allContent = levels.length === 0;
+
+		if (allContent) {
+			db.singleLevelFind('content', callback);
+		} else {
+			db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 		}
 	},
 	sites : function(cli, levels, params, callback) {
@@ -69,15 +79,6 @@ var RegisteredLiveVariables = {
 		} else {
 			db.multiLevelFind('themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
 		}
-	},
-	plugin : function(cli, levels, params, callback) {
-		var allPlugins = levels.length === 0;
-
-		if (allPlugins) {
-			db.singleLevelFind('plugins', callback);
-		} else {
-			db.multiLevelFind('plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
-		}
 	}
 };
 
@@ -103,7 +104,7 @@ var LiveVariables = function() {
 					});
 				} else {
 					nextVar();
-				}
+				}	
 			} else {
 				next(params);
 			}
@@ -173,7 +174,7 @@ var LiveVariables = function() {
 	// Callback must contain the good value
 	this.registerLiveVariable = function(endpoint, func) {
 		if (typeof RegisteredLiveVariables[endpoint] === 'undefined') {
-			RegisteredLiveVariables[endpoint] = func;
+			RegisteredLiveVariables[endpoint] = func();
 		} else {
 			throw "[LiveVariables] Tried to register an already defined endpoint : " + endpoint;
 		}

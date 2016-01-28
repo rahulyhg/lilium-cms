@@ -278,6 +278,11 @@ var Core = function() {
 		loadStaticSymlink(callback);
 	};
 
+	var loadLiveVars = function() {
+		Articles.registerContentLiveVar();
+		Media.registerMediaLiveVar();
+	};
+
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
 		loadHooks(readyToRock);

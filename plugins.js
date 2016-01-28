@@ -4,45 +4,16 @@ var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');
 var log = require('./log.js');
 var Admin = require('./backend/admin.js');
-var db = require('./includes/db.js');
 
-var RegisteredPlugins = new Object();
+var RegisteredPlugins = new Object(); 
 var CachedPlugins = new Array();
 
 var Plugins = function() {
-	var that = this;
-
 	this.serveAdminList = function(cli) {
 		cli.touch("plugins.serveAdminList");
-		filelogic.serveLmlPage(cli)
+	
+		filelogic.serveLmlPage(cli);	
 	};
-
-	this.handlePOST = function(cli) {
-		cli.touch("plugins.handlePOST");
-
-		if (cli.routeinfo.path.length > 2) {
-			switch (cli.routeinfo.path[2]) {
-				case "registerPlugin":
-					that.registerPlugin(cli.postdata.data.identifier, function() {
-						cli.sendJSON({
-							success: true
-						});
-					});
-					break;
-				case "unregisterPlugin":
-					that.unregisterPlugin(cli.postdata.data.identifier, function() {
-						cli.sendJSON({
-							success: true
-						});
-					});
-					break;
-				default:
-
-			}
-		} else {
-			filelogic.serveLmlPage(cli)
-		}
-	}
 
 	this.getCachedPlugins = function(lmlContext) {
 		return CachedPlugins;
@@ -63,14 +34,14 @@ var Plugins = function() {
 		});
 	};
 
-	this.getPluginsDirList = function(callback) {
+	this.getPluginsDirList = function(callback) {	
 		var plugindir = _c.default.server.base + _c.default.paths.plugins + "/";
 
 		fs.readdir(plugindir, function(err, dirs) {
 			if (err) {
 				throw "[PluginException] Could not access plugin directory : " + err;
 			}
-
+			
 			var allPlugins = new Array();
 
 			var i = -1;
@@ -94,22 +65,15 @@ var Plugins = function() {
 					});
 				}
 			};
-
+	
 			nextDir();
 		});
 	};
 
-	this.getCachedPlugin = function (identifier) {
-    for(var i = 0, len = CachedPlugins.length; i < len; i++) {
-        if (CachedPlugins[i]['identifier'] === identifier) return CachedPlugins[i];
-    }
-    return null;
-	}
-
 	this.isRegistered = function(identifier) {
 		return typeof RegisteredPlugins[identifier] !== 'undefined';
 	};
-
+	
 	this.registerPlugin = function(identifier, callback) {
 		var that = this;
 		if (this.isRegistered(identifier)) {
@@ -125,34 +89,17 @@ var Plugins = function() {
 				var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
 
 				RegisteredPlugins[identifier] = pluginInstance;
-				db.update('plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
-					pluginInstance.register(_c, info, function(){
-						console.log('What are does');
-
-						return callback();
-					});
-				}, true, true);
+				pluginInstance.register(_c, info, callback);
 			});
 		}
 	};
 
-	this.unregisterPlugin = function(identifier, callback) {
+	this.unregisterPlugin = function(identifier) {
 		if (this.isRegistered(identifier)) {
+			this.getIface(identifier).unregister();
 
-
-			db.update('plugins', {identifier : identifier}, {identifier : identifier, active : false}, function() {
-				console.log('unregister');
-				RegisteredPlugins[identifier].unregister(function(){
-					console.log('unregister');
-					RegisteredPlugins[identifier] = undefined;
-					delete RegisteredPlugins[identifier];
-					return callback();
-				});
-
-
-
-			}, true, true);
-
+			RegisteredPlugins[identifier] = undefined;	
+			delete RegisteredPlugins[identifier];	
 		} else {
 			throw "[PluginException] Cannot unregister unregistered plugin with identifier " + identifier;
 		}
@@ -172,7 +119,6 @@ var Plugins = function() {
 
 	this.bindEndpoints = function() {
 		Admin.registerAdminEndpoint('plugins', 'GET', this.serveAdminList);
-		Admin.registerAdminEndpoint('plugins', 'POST', this.handlePOST);
 	};
 
 	var init = function() {

@@ -162,7 +162,7 @@ var Media = function() {
 
 	}
 
-	var init = function() {
+	this.registerMediaLiveVar = function() {
 		livevars.registerLiveVariable('media', function(cli, levels, params, callback) {
 			var wholeDico = levels.length === 0;
 			if (wholeDico) {
@@ -178,7 +178,7 @@ var Media = function() {
       .add('File', 'file')
       .add('publish', 'submit');
   }
-
+	var init = function() {};
 
 	init();
 }
