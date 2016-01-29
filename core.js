@@ -15,6 +15,7 @@ var Media = require('./media.js');
 var imageSize = require('./imageSize.js');
 var themes = require('./themes.js');
 var entities = require('./entities.js');
+var cacheInvalidator = require('./cacheInvalidator.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -258,6 +259,18 @@ var Core = function() {
 		log("STDin", 'Listening to standard input');
 	};
 
+	var loadCacheInvalidator = function() {
+		if (_c.default.env == 'dev') {
+			log("CacheInvalidator", 'Clearing old cached files in db');
+
+			db.remove('cachedFiles', {}, function() {}, false);
+		}
+		log("CacheInvalidator", 'Initializing cacheInvalidator');
+		cacheInvalidator.init(function () {
+			log("CacheInvalidator", 'Ready to invalidate cached files!');
+		});
+	}
+
 	var loadHTMLStructure = function(callback) {
 		fileserver.createDirIfNotExists(_c.default.server.html, function(valid) {
 			if (valid) {
@@ -293,6 +306,7 @@ var Core = function() {
 			testDatabase(function() {
 				loadPlugins(function(){
 					loadRoles(function() {
+						loadCacheInvalidator();
 						loadTheme();
 					});
 				});
