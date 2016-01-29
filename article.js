@@ -4,6 +4,7 @@ var conf = require('./config.js');
 var db = require('./includes/db.js');
 var mongo = require('mongodb');
 var livevars = require('./livevars.js');
+var cacheInvalidator = require('./cacheInvalidator.js');
 
 var Article = function() {
   this.handlePOST = function(cli) {
@@ -81,9 +82,9 @@ var Article = function() {
 
           // Generate LML page
           filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
-
+            cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id);
             cli.sendJSON({
-              redirect: name,
+              redirect: conf.default.server.url + "/" + name,
               form: {
                 success: true
               }
@@ -113,7 +114,6 @@ var Article = function() {
       if (cli.method == 'POST') {
 
         var form = formBuilder.handleRequest(cli);
-				console.log(form.fields.content.attr);
         var response = formBuilder.validate(form, true);
 
         if (response.success) {
@@ -217,6 +217,10 @@ var Article = function() {
       .add('content', 'ckeditor')
       .add('publish', 'submit');
   }
+
+  cacheInvalidator.emitter.on('articleInvalidated',function(id) {
+    console.log('Article id is : '+ id);
+  });
 
 
   init();
