@@ -2,6 +2,7 @@ var fs = require('fs');
 var conf = require('./config.js');
 var EventEmitter = require('events');
 var util = require('util');
+var db = require('./includes/db.js');
 
 /**
  * Contains all the functions to call when a
@@ -42,11 +43,29 @@ var CacheInvalidator = function() {
   }
 
   this.addFileToWatch = function(path, eventName, value) {
-
     cachedFileEvents[path] = [eventName, value];
+    db.insert('cachedFiles',{file: path, extra : [eventName, value]} , function(err){
+      console.log(err);
+    });
   }
 
-  this.addFolderToWatch(conf.default.server.html);
+  this.removeFileToWatch = function(path) {
+    if (typeof cachedFileEvents[path] !== 'undefined') {
+      db.remove('cachedFiles', {file:path}, function(err) {
+        delete cachedFileEvents.path;
+      }, true);
+    }
+  }
+
+  this.init = function(cb) {
+    this.addFolderToWatch(conf.default.server.html);
+    db.findToArray('cachedFiles', {}, function(err, arr){
+      arr.forEach(function(elem){
+        cachedFileEvents[elem.file] = elem.extra;
+      });
+      cb();
+    });
+  }
 
 }
 
