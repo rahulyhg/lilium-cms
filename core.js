@@ -130,7 +130,7 @@ var Core = function() {
 	var loadRoles = function(cb) {
 		entities.cacheRoles(cb);
 	};
-	
+
 	var loadTheme = function() {
 		log('Themes', 'Loading Theme');
 		themes.bindEndpoints();
@@ -161,7 +161,7 @@ var Core = function() {
 
 					if (i == 0){
 						// Enable with default theme
-						themes.enableTheme(undefined, function() {
+						themes.enableTheme(_c.default.website.flower, function() {
 							fireEvent();
 						});
 					};
