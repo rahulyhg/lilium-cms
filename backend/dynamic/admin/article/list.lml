@@ -67,7 +67,6 @@
 			var id = $(media_element).attr('id');
 
 			$.post('{=baseurl}/article/delete/' + id, function(data) {
-				console.log(data);
 				if (data.success) {
 					$(media_element).remove();
 				}

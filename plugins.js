@@ -127,7 +127,6 @@ var Plugins = function() {
 				RegisteredPlugins[identifier] = pluginInstance;
 				db.update('plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
 					pluginInstance.register(_c, info, function(){
-						console.log('What are does');
 
 						return callback();
 					});
@@ -141,9 +140,7 @@ var Plugins = function() {
 
 
 			db.update('plugins', {identifier : identifier}, {identifier : identifier, active : false}, function() {
-				console.log('unregister');
 				RegisteredPlugins[identifier].unregister(function(){
-					console.log('unregister');
 					RegisteredPlugins[identifier] = undefined;
 					delete RegisteredPlugins[identifier];
 					return callback();

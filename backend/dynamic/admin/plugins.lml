@@ -46,7 +46,6 @@ $}
 		});
 
 		$('.plugin').on('click','.enable-plugin',function() {
-			console.log('ENABLE');
 			var that = this;
 			$.post("{=config.default.server.url}/admin/plugins/registerPlugin", {identifier : $(this).closest(".plugin-actions").attr('id')}, function(data) {
 
@@ -57,7 +56,6 @@ $}
 		});
 
 		$('.plugin').on('click','.disable-plugin',function() {
-			console.log('disable');
 			var that = this;
 			$.post("{=config.default.server.url}/admin/plugins/unregisterPlugin", {identifier : $(this).closest(".plugin-actions").attr('id')}, function(data) {
 
