@@ -5,6 +5,7 @@ var db = require('./includes/db.js');
 var mongo = require('mongodb');
 var livevars = require('./livevars.js');
 var cacheInvalidator = require('./cacheInvalidator.js');
+var fs = require('./fileserver.js');
 
 var Article = function() {
   this.handlePOST = function(cli) {
@@ -49,21 +50,7 @@ var Article = function() {
   };
 
   this.list = function(cli) {
-    cli.debug();
-    //Find the 25 first for now
-    //TODO find a way to load more
-    db.find('content', {}, {
-      limit: [25]
-    }, function(err, cursor) {
-      var contents = [];
-      cursor.each(function(err, content) {
-        if (content != null) {
-          contents.push(formBuilder.unescapeForm(content));
-        } else {
-          filelogic.serveLmlPage(cli, false, contents);
-        }
-      });
-    });
+    filelogic.serveLmlPage(cli, false, contents);
   }
 
   this.new = function(cli) {
@@ -155,10 +142,15 @@ var Article = function() {
       var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
       db.remove('content', {_id : id},function(err, r){
-        return cli.sendJSON({
-          redirect: '/admin/article/list',
-          success: true
+        var filename = r.title + '.html';
+        fs.deleteFile(filename, function() {
+          cacheInvalidator.removeFileToWatch(filename);
+          return cli.sendJSON({
+            redirect: '/admin/article/list',
+            success: true
+          });
         });
+
       });
 
     } else {
@@ -167,12 +159,6 @@ var Article = function() {
   }
 
   this.getArticle = function(cli) {
-    // if (isNaN(postID)) {
-    // 	// postID is a postname
-    // } else {
-    // 	// postID is an ID (int)
-    // }
-
     var id = new mongo.ObjectID(cli.routeinfo.path[3]);
     db.find('content', {
       '_id': id
