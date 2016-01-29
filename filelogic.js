@@ -97,7 +97,7 @@ var FileLogic = function() {
       savePath,
       function() {
         cli.responseinfo.filecreated = true;
-        cb(_c.default.server.url + "/" + title + ".html");
+        cb(title + ".html");
       },
       extra
     );
