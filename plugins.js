@@ -4,7 +4,7 @@ var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');
 var log = require('./log.js');
 var Admin = require('./backend/admin.js');
-
+var db = require('./includes/db.js');
 var RegisteredPlugins = new Object();
 var CachedPlugins = new Array();
 
