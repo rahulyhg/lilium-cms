@@ -35,6 +35,11 @@ var LiliumCMS = function() {
  	       				});
       				}
     			});
+	
+			endpoints.push({
+				'varname' : 'session',
+				'params' : {}
+			});
       
 			$.get("/livevars", {vars:JSON.stringify(endpoints)}, function(data) {
         			livevars = data;
@@ -70,19 +75,29 @@ var LiliumCMS = function() {
 				obj = $(obj);
 				var nodeType = obj.data('nodetype');
 				var action = obj.data('action');
-	
-				var node = $(document.createElement(nodeType));
-				node.html(fetchTemplateObjectContent(obj, data));
+				var filter = obj.data('filter');
+				var passed = true;
 				
-				if (action && typeof window[action] === 'function') {
-					var paramkey = obj.data('actionparamkey');
-					var bindName = obj.data('bind');
-					node.bind(bindName, function() {
-						window[action].apply(data, [data[paramkey]]);
-					});
+				if (typeof window[filter] === 'function') {
+					passed = window[filter].apply(data, [data]);
 				}
 
-				obj = $(obj).replaceWith(node);
+				if (passed) {
+					var node = $(document.createElement(nodeType));
+					node.html(fetchTemplateObjectContent(obj, data));
+					
+					if (action && typeof window[action] === 'function') {
+						var paramkey = obj.data('actionparamkey');
+						var bindName = obj.data('bind');
+						node.bind(bindName, function() {
+							window[action].apply(data, [data[paramkey]]);
+						});
+					}
+
+					obj = $(obj).replaceWith(node);
+				} else {
+					$(obj).remove();
+				}
 			});
 
 			$(domTarget).before(templateItems);

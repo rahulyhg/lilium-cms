@@ -8,4 +8,8 @@
 			liliumcms.refresh();
 		});
 	};
+	
+	var canDelete = function(item) {
+		return typeof item.id === 'undefined' || item.id > 1;
+	};
 </script>
