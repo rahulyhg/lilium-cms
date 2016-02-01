@@ -1,0 +1,36 @@
+{#config;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		{%globalhead;entityscript}
+	</head>
+	<body>
+		<h1>All entities</h1>
+
+		<main class="entities-main"> 
+			<ul class="entity-list">
+				{*entities(template:"entity-list-item")}
+			</ul>
+
+			<h2>Add new user</h2>
+    			{=forms.render('entity_create')}
+		</main>
+
+		<lml:template id="entity-list-item">
+			<li class="entity-item-list">
+				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
+				<h6>
+					Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
+				</h6>
+				<div class="entity-actions">
+					<lml:tobject data-nodetype="button"
+						     data-bind="click" 
+						     data-action="deleteUser" 
+						     data-actionparamkey="_id">
+							Delete
+					</lml:tobject>
+				</div>
+			</li>
+		</lml:template>
+	</body>
+</html>

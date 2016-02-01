@@ -1,5 +1,9 @@
+var _c = require('./config.js');
 var log = require('./log.js');
 var db = require('./includes/db.js');
+var filelogic = require('./filelogic.js');
+var formbuilder = require('./formBuilder.js');
+var CryptoJS = require('crypto-js');
 
 var Roles = new Object();
 
@@ -48,6 +52,82 @@ var Entities = function() {
 			} else {
 				callback(undefined);
 			}
+		});
+	};
+
+	this.handleGET = function(cli) {
+		cli.touch('entities.handleGET');
+		
+		if (cli.routeinfo.path.length == 2) {
+			filelogic.serveLmlPage(cli);	
+		} else {
+			var action = cli.routeinfo.path[2];
+	
+			switch (action) {
+				case "edit":
+					this.serveEdit(cli);	
+					break;
+
+				default: 
+        				return cli.throwHTTP(404, 'Not Found');
+        				break;
+			}
+		}
+	};
+
+	this.handlePOST = function(cli) {
+		cli.touch('entities.handlePOST');
+		var action = cli.postdata.data.form_name;		
+
+		switch (action) {
+			case "entity_create":
+				this.createFromCli(cli);
+				break;
+
+			case "entity_delete":
+				this.deleteFromCli(cli);
+				break;
+
+			default: 
+				cli.debug();
+		}
+	};
+
+	this.serveEdit = function(cli) {
+		cli.touch('entities.serveEdit');
+
+		cli.debug();
+	};
+
+	this.createFromCli = function(cli) {
+		cli.touch('entities.createFromCli');
+		var entData = cli.postdata.data;
+		var newEnt = this.createEmptyEntity();
+		
+		newEnt.username = entData.username;
+		newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
+		newEnt.email = entData.email;
+		newEnt.roles.push(entData.roles);
+		newEnt.displayname = entData.displayname;
+		newEnt.createdOn = new Date();
+
+		if (typeof newEnt.meta === "object") {
+			for (var key in newEnt.meta) {
+				newEnt.data[key] = newEnt.meta[key];
+			}
+		}
+
+		this.registerEntity(newEnt, function() {
+			cli.touch('entities.registerEntity.callback');
+			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath);
+		});
+	};
+
+	this.deleteFromCli = function(cli) {
+		var id = cli.postdata.data.uid;
+		
+		db.remove('entities', {_id:db.mongoID(id)}, function(err, result) {
+			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath);
 		});
 	};
 
@@ -130,6 +210,28 @@ var Entities = function() {
 		}
 
 		return allowed;
+	};
+
+	this.registerCreationForm = function() {
+		formbuilder.createForm('entity_create')
+			.add('username', 'text', {displayname:"Username"})
+			.add('password', 'password', {displayname:"Password"})
+			.add('meta[firstname]', 'text', {displayname:"First name"})
+			.add('meta[lastname]', 'text', {displayname:"Last name"})
+			.add('email', 'text', {displayname:"Email"})
+			.add('displayname', 'text', {displayname:"Display name"})
+			.add('roles', 'livevar', {
+				endpoint : 'roles',
+				tag : 'select',
+				template : 'option',
+				title : 'role',
+				props : {
+					'value' : 'name',
+					'html' : 'displayname'
+				},
+				displayname: "Initial role"
+			})
+			.add('create', 'submit');
 	};
 	
 	var init = function() {

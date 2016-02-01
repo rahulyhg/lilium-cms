@@ -1,4 +1,4 @@
-var FormBuilder = require('./formBuilder.js');
+var log = require('./log.js');
 
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot
@@ -10,7 +10,7 @@ var registeredLibraries = {
 		return require('./vocab.js');
 	},
 	forms : function(context) {
-		return FormBuilder;
+		return require('./formBuilder.js'); 
 	},
 	article : function(context) {
 		return require('./article.js');
@@ -56,11 +56,13 @@ var LMLContext = function(info) {
 
 	this.loadLibrary = function(libName) {
 		if (typeof registeredLibraries[libName] === 'undefined') {
-			throw "LMLParseException - Unable to add unregistered library '"+libName+"' to current context";
+			log("LMLParseException", "Unable to add unregistered library '"+libName+"' to current context");
+			return;
 		}
 
 		if (typeof this.lib[libName] !== "undefined") {
-			throw "LMLParseException - Attempted to add already registered library '"+libName+"' to context";
+			log("LMLParseException", "Attempted to add already registered library '"+libName+"' to context");
+			return;
 		}
 
 		this.lib[libName] = registeredLibraries[libName](this);

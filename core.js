@@ -42,6 +42,16 @@ var Core = function() {
 			cli.touch("admin.GET.article");
 			Article.handleGET(cli);
 		});
+	
+		admin.registerAdminEndpoint('entities', 'GET', function(cli){
+			cli.touch("admin.GET.entities");
+			entities.handleGET(cli);
+		});
+
+		admin.registerAdminEndpoint('entities', 'POST', function(cli){
+			cli.touch("admin.POST.entities");
+			entities.handlePOST(cli);
+		});
 
 		admin.registerAdminEndpoint('article', 'POST', function(cli){
 			cli.touch("admin.POST.article");
@@ -286,12 +296,22 @@ var Core = function() {
 		loadStaticSymlink(callback);
 	};
 
+	var loadLiveVars = function() {
+		Articles.registerContentLiveVar();
+		Media.registerMediaLiveVar();
+	};
+
+	var loadForms = function() {
+		entities.registerCreationForm();
+	};
+
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
 		loadHooks(readyToRock);
 		loadEndpoints();
 		loadStandardInput();
 		loadImageSizes();
+		loadForms();
 
 		hooks.bind('themes', function() {
 			log('Core', 'Firing initialized signal');

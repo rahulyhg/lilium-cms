@@ -85,11 +85,11 @@ var Handler = function() {
 				}
 			}
 
-    });
+    		});
 
 		busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated) {
-			cli.postdata.data[fieldname] = inspect(val).slice(1,-1);
-    });
+			parsePOSTField(cli, fieldname, val);
+   		});
 
     busboy.on('finish', function() {
 			if (!finishedCalled) {
@@ -115,6 +115,34 @@ var Handler = function() {
         }
     }
 	}
+
+	var parsePOSTField = function(cli, fieldname, val) {
+		if (fieldname.indexOf('[') == -1) {
+			cli.postdata.data[fieldname] = inspect(val).slice(1,-1);
+		} else {
+			var reg = /\[([a-zA-ZÀ-ÿ0-9]*)\]/g;
+			var firstLevel = fieldname.substring(0, fieldname.indexOf('['));
+			
+			if (typeof cli.postdata.data[firstLevel] === 'undefined') {
+				cli.postdata.data[firstLevel] = new Object();
+			}
+
+			var currentLevel = cli.postdata.data[firstLevel];
+			var levelsTotal = (fieldname.match(/\[/g)||[]).length;
+			var levelIndex = 0;
+			var match = null;
+
+			while ((match = reg.exec(fieldname)) != null) {
+				var nIndex = match[1];
+				levelIndex++;
+				if (typeof currentLevel[nIndex] === 'undefined') {
+					currentLevel[nIndex] = levelIndex == levelsTotal ? inspect(val).slice(1,-1) : new Object();
+				}
+
+				currentLevel = currentLevel[nIndex];
+			}	
+		}
+	};
 
 	var notSupported = function(cli) {
 		cli.throwHTTP(405, 'Method Not Allowed');

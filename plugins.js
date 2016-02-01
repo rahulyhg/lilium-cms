@@ -4,45 +4,16 @@ var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');
 var log = require('./log.js');
 var Admin = require('./backend/admin.js');
-var db = require('./includes/db.js');
 
 var RegisteredPlugins = new Object();
 var CachedPlugins = new Array();
 
 var Plugins = function() {
-	var that = this;
-
 	this.serveAdminList = function(cli) {
 		cli.touch("plugins.serveAdminList");
-		filelogic.serveLmlPage(cli)
+
+		filelogic.serveLmlPage(cli);
 	};
-
-	this.handlePOST = function(cli) {
-		cli.touch("plugins.handlePOST");
-
-		if (cli.routeinfo.path.length > 2) {
-			switch (cli.routeinfo.path[2]) {
-				case "registerPlugin":
-					that.registerPlugin(cli.postdata.data.identifier, function() {
-						cli.sendJSON({
-							success: true
-						});
-					});
-					break;
-				case "unregisterPlugin":
-					that.unregisterPlugin(cli.postdata.data.identifier, function() {
-						cli.sendJSON({
-							success: true
-						});
-					});
-					break;
-				default:
-
-			}
-		} else {
-			filelogic.serveLmlPage(cli)
-		}
-	}
 
 	this.getCachedPlugins = function(lmlContext) {
 		return CachedPlugins;
@@ -99,13 +70,6 @@ var Plugins = function() {
 		});
 	};
 
-	this.getCachedPlugin = function (identifier) {
-    for(var i = 0, len = CachedPlugins.length; i < len; i++) {
-        if (CachedPlugins[i]['identifier'] === identifier) return CachedPlugins[i];
-    }
-    return null;
-	}
-
 	this.isRegistered = function(identifier) {
 		return typeof RegisteredPlugins[identifier] !== 'undefined';
 	};
@@ -135,9 +99,9 @@ var Plugins = function() {
 		}
 	};
 
-	this.unregisterPlugin = function(identifier, callback) {
+	this.unregisterPlugin = function(identifier) {
 		if (this.isRegistered(identifier)) {
-
+			this.getIface(identifier).unregister();
 
 			db.update('plugins', {identifier : identifier}, {identifier : identifier, active : false}, function() {
 				RegisteredPlugins[identifier].unregister(function(){
@@ -149,7 +113,6 @@ var Plugins = function() {
 
 
 			}, true, true);
-
 		} else {
 			throw "[PluginException] Cannot unregister unregistered plugin with identifier " + identifier;
 		}
@@ -169,7 +132,6 @@ var Plugins = function() {
 
 	this.bindEndpoints = function() {
 		Admin.registerAdminEndpoint('plugins', 'GET', this.serveAdminList);
-		Admin.registerAdminEndpoint('plugins', 'POST', this.handlePOST);
 	};
 
 	var init = function() {

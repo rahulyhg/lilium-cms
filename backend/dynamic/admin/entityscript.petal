@@ -1,0 +1,11 @@
+{#config}
+<script>
+	var deleteUser = function(id) {
+		$.post('{=config.default.server.url}/admin/entities', {
+			"uid" : id,
+			"form_name" : "entity_delete"
+		}, function(data) {
+			liliumcms.refresh();
+		});
+	};
+</script>
