@@ -47,6 +47,11 @@ var Core = function() {
 			entities.handleGET(cli);
 		});
 
+		admin.registerAdminEndpoint('entities', 'POST', function(cli){
+			cli.touch("admin.POST.entities");
+			entities.handlePOST(cli);
+		});
+
 		admin.registerAdminEndpoint('article', 'POST', function(cli){
 			cli.touch("admin.POST.article");
 			Article.handlePOST(cli);
@@ -283,12 +288,17 @@ var Core = function() {
 		Media.registerMediaLiveVar();
 	};
 
+	var loadForms = function() {
+		entities.registerCreationForm();
+	};
+
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
 		loadHooks(readyToRock);
 		loadEndpoints();
 		loadStandardInput();
 		loadImageSizes();
+		loadForms();
 
 		hooks.bind('themes', function() {
 			log('Core', 'Firing initialized signal');

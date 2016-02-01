@@ -203,7 +203,7 @@ var DB = function() {
 			} else if (typeof conds != "object") {
 				cb("[Database - Invalid document]");
 			} else {
-				if (typeof conds === 'undefined') {
+				if (typeof conds === 'undefined' || Object.keys(conds).length == 0) {
 					cb("[Database - Deleting requires a filter. Use the empty function to clear an entire collection]");
 				} else {
 					col[one ? 'deleteOne' : 'deleteMany'](

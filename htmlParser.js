@@ -65,6 +65,10 @@ var HtmlParser = function() {
             break;
           case 'file' :
             htmlForm += parseFileType(field);
+            break;
+          case 'livevar' :
+            htmlForm += parseLiveVar(field);
+            break;
         }
       }
 
@@ -78,18 +82,19 @@ var HtmlParser = function() {
 
   var generateLabel = function(field, placeholder) {
     var label = '<label ';
+    var text = field.attr.displayname || field.name;
 
     // Never generate label for those
     if (field.type == 'button' || field.type == 'submit' || field.type == 'hidden') {
       return '';
     } else if ((field.type != 'text' && field.type != 'email' && field.type != 'password')) {
       //Generate label even if it is placeholder
-      label += 'for="'+ field.name +'">' + field.name;
+      label += 'for="'+ field.name +'">' + text;
       return label + '</label>';
 
     } else if (!placeholder){
       // generate label only if no placeholder
-      label += 'for="'+ field.name +'">' + field.name;
+      label += 'for="'+ field.name +'">' + text;
       return label + '</label>';
 
     }
@@ -186,6 +191,16 @@ var HtmlParser = function() {
     input += '/>'
     return input;
   }
+
+  var parseLiveVar = function(field) {
+    return generateLabel(field, false) + 
+      '<lml:livevars data-filler="' + field.attr.tag +
+      '" data-fieldname="' + field.name +
+      '" data-filling="' + field.attr.template +
+      '" data-varname="' + field.attr.endpoint +
+      '" data-varprops="' + JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') +
+      '"></lml:livevars>';
+  };
 
   var parseBasicFieldAttributes = function(field) {
     var attributes = '';

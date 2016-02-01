@@ -20,7 +20,7 @@ var LiliumCMS = function() {
         				// Check for {$1} to extract params from the url
         				var urls = variableName.match(reg);
         				if (urls !== null) {
-      	    				urls.forEach(function(elem) {
+      	    					urls.forEach(function(elem) {
             						var urlPos = elem.match(/[0-9]/);
             						var param = urlParams[urlParams.length - (urlPos)];
             						var urlposReg = new RegExp("({\\?\\s*[" + urlPos + "]\\s*})", "g");
@@ -42,19 +42,67 @@ var LiliumCMS = function() {
       			});
   		};
 
+		var fetchTemplateObjectContent = function(obj, data) {
+			var key = obj.data('key');
+			var sep = obj.data('arrayseparator');
+			var content = "";
+
+			if (typeof data[key] !== 'undefined') {
+				var arr = data[key];
+			
+				if (typeof arr === 'object' && arr.length != 0) {
+					for (var i = 0; i < arr.length; i++) {
+						content += arr[i] + (i == arr.length-1 ? "" : sep);
+					}
+				} else {
+					content = arr;
+				}
+			} else {
+				content = obj.html();
+			}
+
+			return content;
+		};
+
 		var generateTemplateFromObject = function(domTemplate, domTarget, data) {
 			var templateItems = domTemplate.children().clone();
 			templateItems.find('lml\\:tobject').each(function(index, obj) {
 				obj = $(obj);
 				var nodeType = obj.data('nodetype');
-				var key = obj.data('key');
+				var action = obj.data('action');
+	
+				var node = $(document.createElement(nodeType));
+				node.html(fetchTemplateObjectContent(obj, data));
+				
+				if (action && typeof window[action] === 'function') {
+					var paramkey = obj.data('actionparamkey');
+					var bindName = obj.data('bind');
+					node.bind(bindName, function() {
+						window[action].apply(data, [data[paramkey]]);
+					});
+				}
 
-				$(obj).replaceWith($("<"+nodeType+">").html(data[key]));
+				obj = $(obj).replaceWith(node);
 			});
 
 			$(domTarget).before(templateItems);
 
 			return true;
+		};
+
+		var generateFillingFromObject = function(filler, fillingData, data) {
+			var props = JSON.parse(fillingData.varprops.replace(/&lmlquote;/g, '"'));
+			var filling = $(document.createElement(fillingData.filling));
+			
+			for (var key in props) {
+				if (key === 'html') {
+					filling.html(data[props[key]]);
+				} else {
+					filling.attr(key, data[props[key]]);
+				}
+			}
+
+			filler.append(filling);
 		};
 
   		this.parseTextToView = function() {
@@ -64,6 +112,7 @@ var LiliumCMS = function() {
       				if (typeof livevars[$(this).data('varname')] === "object") {
 					var templateName = $(this).data('template');
 					var varValue = livevars[$(this).data('varname')];
+					var fillerName = $(this).data('filler');
 
 					if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
 						var templateObj = $('#' + $(this).data('template'));
@@ -75,6 +124,17 @@ var LiliumCMS = function() {
 								});
 							}
 						}
+
+						$(lmlTag).remove();
+					} else if (fillerName != "") {
+						var filler = $(document.createElement(fillerName));
+						filler.attr('name', lmlTag.data('fieldname'));
+	
+						varValue.forEach(function(val, index) {
+							generateFillingFromObject(filler, lmlTag.data(), val);
+						});
+
+						$(lmlTag).after(filler);
 					} else {
 						$(this).text(JSON.stringify(livevars[$(this).data('varname')]));
 						$(this).text(unescape(livevars[$(this).data('varname')]));
@@ -104,9 +164,7 @@ var LiliumCMS = function() {
 					var validForm = true;
 
 					$('.v_validate ').each(function() {
-
 						var validField = true;
-
 
 						// If a field : text, textarea
 						if ($(this).attr('type') == 'text' ||
@@ -115,14 +173,14 @@ var LiliumCMS = function() {
 							$(this).attr('type') == 'password') {
 
 						if ($(this).attr('required') && $(this).val().length == 0) {
-						validField = false;
+							validField = false;
 						}
 
 						// Min and maxlength verification
 						if ($(this).attr('minlength') && $(this).val().length < $(this).attr('minlength')) {
-						validField = false;
+							validField = false;
 						} else if ($(this).attr('maxlength') && $(this).val().length > $(this).attr('maxlength')) {
-						validField = false;
+							validField = false;
 						}
 						}
 
@@ -428,6 +486,11 @@ var LiliumCMS = function() {
 	};
 
 	this.awesomestrapper = new AwesomeStrapper();	
+
+	// API
+	this.refresh = function() {
+		window.location.reload();
+	};
 };
 
 var liliumcms = new LiliumCMS();

@@ -1,4 +1,4 @@
-var log = require('./log.js');
+var FormBuilder = require('./formBuilder.js');
 
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot
@@ -10,7 +10,7 @@ var registeredLibraries = {
 		return require('./vocab.js');
 	},
 	forms : function(context) {
-		return require('./formBuilder.js'); 
+		return FormBuilder;
 	},
 	article : function(context) {
 		return require('./article.js');

@@ -101,18 +101,30 @@ var LML = function() {
 	};
 
 	var execIncludeTag = function(context, code, callback) {
-		var fullpath = context.rootDir + "/" + code + ".petal";
-		var includeBuffer = "";
-
-		that.executeToContext(fullpath, context, function(pContent) {
-			if (typeof pContent !== 'undefined') {
-				includeBuffer += pContent;
-			} else {
-				context.merge();
-				context.newLine = includeBuffer;
+		var split = code.split(';');
+		var currentIndex = 0;
+	
+		var next = function() {
+			if (currentIndex == split.length) {
 				callback();
+			} else {
+				var fullpath = context.rootDir + "/" + split[currentIndex] + ".petal";
+				var includeBuffer = "";
+
+				that.executeToContext(fullpath, context, function(pContent) {
+					if (typeof pContent !== 'undefined') {
+						includeBuffer += pContent;
+					} else {
+						context.merge();
+						context.newLine += includeBuffer;
+						currentIndex++;
+
+						next();
+					}
+				});
 			}
-		});
+		};
+		next();
 
 		return true;
 	};

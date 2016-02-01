@@ -91,7 +91,7 @@ var ClientObject = function(req, resp) {
 	};
 
 	this.isGranted = function (role) {
-		var isGranted = false
+		var isGranted = false;
 			if (typeof this.userinfo.role !== 'undefined' &&
 				this.userinfo.role.indexOf(role) != -1){
 					isGranted = true;
