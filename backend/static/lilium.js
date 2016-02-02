@@ -35,38 +35,62 @@ var LiliumCMS = function() {
  	       				});
       				}
     			});
-	
+
 			endpoints.push({
 				'varname' : 'session',
 				'params' : {}
 			});
-      
+
 			$.get("/livevars", {vars:JSON.stringify(endpoints)}, function(data) {
         			livevars = data;
         			return cb(livevars);
       			});
   		};
 
+			this.livevars = function () {
+				return livevars;
+			}
+
 		var fetchTemplateObjectContent = function(obj, data) {
+			console.log(obj);
 			var key = obj.data('key');
 			var sep = obj.data('arrayseparator');
 			var content = "";
 
-			if (typeof data[key] !== 'undefined') {
-				var arr = data[key];
-			
-				if (typeof arr === 'object' && arr.length != 0) {
-					for (var i = 0; i < arr.length; i++) {
-						content += arr[i] + (i == arr.length-1 ? "" : sep);
+			if (typeof key !== 'undefined') {
+				// Split for keys like : endpoint.variable.id
+				var keys = key.split('.');
+				var currentData = data;
+
+				keys.forEach(function(elem, i){
+					//Check if data[key] exists
+					if (typeof currentData[elem] !== 'undefined') {
+						currentData = currentData[elem];
+
+						//Check if it is the last key
+						if (keys.length == i + 1) {
+
+								if (typeof currentData === 'object' && currentData.length != 0) {
+									for (var i = 0; i < currentData.length; i++) {
+										content += currentData[i] + (i == currentData.length-1 ? "" : sep);
+									}
+								} else {
+									content = currentData;
+								}
+						}
+
+					} else {
+						content = obj.html();
 					}
-				} else {
-					content = arr;
-				}
+
+				});
+
+
 			} else {
 				content = obj.html();
 			}
-
 			return content;
+
 		};
 
 		var generateTemplateFromObject = function(domTemplate, domTarget, data) {
@@ -77,15 +101,19 @@ var LiliumCMS = function() {
 				var action = obj.data('action');
 				var filter = obj.data('filter');
 				var passed = true;
-				
+
 				if (typeof window[filter] === 'function') {
 					passed = window[filter].apply(data, [data]);
 				}
 
 				if (passed) {
 					var node = $(document.createElement(nodeType));
-					node.html(fetchTemplateObjectContent(obj, data));
-					
+					if (nodeType == 'img') {
+						node.attr('src', fetchTemplateObjectContent(obj, data));
+					} else {
+						node.html(fetchTemplateObjectContent(obj, data));
+					}
+
 					if (action && typeof window[action] === 'function') {
 						var paramkey = obj.data('actionparamkey');
 						var bindName = obj.data('bind');
@@ -108,7 +136,7 @@ var LiliumCMS = function() {
 		var generateFillingFromObject = function(filler, fillingData, data) {
 			var props = JSON.parse(fillingData.varprops.replace(/&lmlquote;/g, '"'));
 			var filling = $(document.createElement(fillingData.filling));
-			
+
 			for (var key in props) {
 				if (key === 'html') {
 					filling.html(data[props[key]]);
@@ -144,7 +172,7 @@ var LiliumCMS = function() {
 					} else if (fillerName != "") {
 						var filler = $(document.createElement(fillerName));
 						filler.attr('name', lmlTag.data('fieldname'));
-	
+
 						varValue.forEach(function(val, index) {
 							generateFillingFromObject(filler, lmlTag.data(), val);
 						});
@@ -268,7 +296,7 @@ var LiliumCMS = function() {
 							data: data,
 							cache: false,
 							contentType: false,
-							processData: false,	
+							processData: false,
 							type: 'POST',
 							success: function(data) {
 								return cb();
@@ -480,12 +508,12 @@ var LiliumCMS = function() {
 	};
 
 	var Hooks = function() {
-		
+
 	};
 
 	var LMLHTML5 = function() {
 		var init = function() {
-		
+
 		};
 
 		init();
@@ -500,8 +528,10 @@ var LiliumCMS = function() {
 		};
 	};
 
-	this.awesomestrapper = new AwesomeStrapper();	
-
+	this.awesomestrapper = new AwesomeStrapper();
+	this.formParser = new FormParser();
+	this.livevars = new LiveVars();
+	this.ckeditor = new CKEditor();
 	// API
 	this.refresh = function() {
 		window.location.reload();
