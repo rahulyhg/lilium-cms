@@ -23,10 +23,12 @@ var Hooks = function() {
 
 	this.trigger = this.fire = function(eventName, params) {
 		if (typeof events[eventName] !== 'undefined') {
-			for (var i = 0, len = events[eventName].length; i < len; i++) {
-				events[eventName][i](
+			for (var i = events[eventName].length - 1; i >= 0; i--) {
+				if (events[eventName][i](
 					typeof params === 'undefined' ? undefined : params
-				);
+				)) {
+					break;
+				}
 			}
 		}
 	};

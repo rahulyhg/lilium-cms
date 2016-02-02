@@ -19,9 +19,7 @@ var Login = function() {
 
 		cli.request.session.data = userObj;
 		cli.userinfo = userObj;
-		hooks.fire('user_loggedin', userObj);
-
-		cli.redirect(_c.default.server.url + "/" + _c.default.paths.admin, false);
+		hooks.fire('user_loggedin', cli);
 	};
 
 	this.authUser = function(cli) {

@@ -21,7 +21,10 @@ var Core = function() {
 	var loadHooks = function(readyToRock) {
 		log('Hooks', 'Loading hooks');
 		hooks.bind('init', readyToRock);
-
+		hooks.bind('user_loggedin', function(cli) {
+			cli.redirect(_c.default.server.url + "/" + _c.default.paths.admin, false);
+			return true;
+		});
 		hooks.fire('hooks');
 		log('Hooks', 'Loaded hooks');
 	};
@@ -42,7 +45,7 @@ var Core = function() {
 			cli.touch("admin.GET.article");
 			Article.handleGET(cli);
 		});
-	
+
 		admin.registerAdminEndpoint('entities', 'GET', function(cli){
 			cli.touch("admin.GET.entities");
 			entities.handleGET(cli);
