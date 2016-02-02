@@ -89,7 +89,7 @@ var LiliumCMS = function() {
 			} else {
 				content = obj.html();
 			}
-			return content;
+			return unescape(content);
 
 		};
 
