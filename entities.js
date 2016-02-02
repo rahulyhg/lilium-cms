@@ -18,7 +18,7 @@ var Entity = function() {
 	this.avatarID = -1;
 	this.avatarURL = "";
 	this.createdOn = undefined;
-	
+
 	// Various data; should always be checked for undefined
 	this.data = new Object();
 };
@@ -39,13 +39,13 @@ var Entities = function() {
 
 	this.fetchFromDB = function(idOrUsername, callback) {
 		var condition = new Object();
-	
-		if (typeof idOrUsername === "object") { 
+
+		if (typeof idOrUsername === "object") {
 			condition["_id"] = db.mongoID(idOrUsername);
 		} else {
 			condition.username = idOrUsername;
 		}
-		
+
 		db.findToArray('entities', condition, function(err, user) {
 			if (!err && user.length == 1) {
 				entityWithData(user[0], callback);
@@ -57,18 +57,18 @@ var Entities = function() {
 
 	this.handleGET = function(cli) {
 		cli.touch('entities.handleGET');
-		
+
 		if (cli.routeinfo.path.length == 2) {
-			filelogic.serveLmlPage(cli);	
+			filelogic.serveLmlPage(cli);
 		} else {
 			var action = cli.routeinfo.path[2];
-	
+
 			switch (action) {
 				case "edit":
-					this.serveEdit(cli);	
+					this.serveEdit(cli);
 					break;
 
-				default: 
+				default:
         				return cli.throwHTTP(404, 'Not Found');
         				break;
 			}
@@ -77,7 +77,7 @@ var Entities = function() {
 
 	this.handlePOST = function(cli) {
 		cli.touch('entities.handlePOST');
-		var action = cli.postdata.data.form_name;		
+		var action = cli.postdata.data.form_name;
 
 		switch (action) {
 			case "entity_create":
@@ -88,7 +88,7 @@ var Entities = function() {
 				this.deleteFromCli(cli);
 				break;
 
-			default: 
+			default:
 				cli.debug();
 		}
 	};
@@ -103,7 +103,7 @@ var Entities = function() {
 		cli.touch('entities.createFromCli');
 		var entData = cli.postdata.data;
 		var newEnt = this.createEmptyEntity();
-		
+
 		newEnt.username = entData.username;
 		newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
 		newEnt.email = entData.email;
@@ -125,7 +125,7 @@ var Entities = function() {
 
 	this.deleteFromCli = function(cli) {
 		var id = cli.postdata.data.uid;
-		
+
 		db.remove('entities', {_id:db.mongoID(id)}, function(err, result) {
 			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath);
 		});
@@ -148,7 +148,7 @@ var Entities = function() {
 	};
 
 	this.updateEntity = function(valObject) {
-		
+
 	};
 
 	this.cacheRoles = function(callback) {
@@ -162,7 +162,7 @@ var Entities = function() {
 				log('Roles', 'Cached ' + roles.length + ' roles');
 			} else {
 				log('Roles', 'Could not cache roles from database');
-			} 
+			}
 
 			callback();
 		});
@@ -177,39 +177,43 @@ var Entities = function() {
 		}
 	};
 
-	this.registerRole = function(rObj, rights, callback) {
+	this.registerRole = function(rObj, rights, callback, updateIfExists) {
 		if (typeof Roles[rObj.name] !== 'undefined') {
 			throw "[RolesException] Tried to register already registered role " + rObj.name;
 		} else {
 			rObj.rights = rights;
-			db.insert('roles', rObj, function(err, result) {
+			db.update('roles', {name: rObj.name} ,rObj, function(err, result) {
 				Roles[rObj.name] = rObj;
 				callback(rObj);
-			});
+			}, updateIfExists);
 		}
 	};
 
 	this.isAllowed = function(entity, right) {
-		var allowed = entity.roles.indexOf('lilium') !== -1;
+		var allowed = false;
+		if (typeof entity.roles !== 'undefined') {
+			allowed = entity.roles.indexOf('lilium') !== -1;
 
-		if (!allowed) {
-			for (var i = 0, len = entity.roles.length; i < len; i++) {
-				var rights = Roles[entity.roles[i]];
-	
-				if (typeof rights !== 'undefined') {
-					for (var j = 0, jLen = rights.length; j < jLen; j++) {
-						if (rights[j] == right) {
-							allowed = true;
-							break;
-						};
+			if (!allowed) {
+				for (var i = 0, len = entity.roles.length; i < len; i++) {
+					var rights = Roles[entity.roles[i]].rights;
+					if (typeof rights !== 'undefined') {
+						for (var j = 0, jLen = rights.length; j < jLen; j++) {
+							if (rights[j] == right) {
+								allowed = true;
+								break;
+							};
+						}
+
 					}
+					if (allowed) break;
 				}
-	
-				if (allowed) break;
-			}
-		}
 
+			}
+
+		}
 		return allowed;
+
 	};
 
 	this.registerCreationForm = function() {
@@ -227,13 +231,14 @@ var Entities = function() {
 				title : 'role',
 				props : {
 					'value' : 'name',
-					'html' : 'displayname'
+					'html' : 'displayname',
+					'header' : 'Select One',
 				},
 				displayname: "Initial role"
 			})
 			.add('create', 'submit');
 	};
-	
+
 	var init = function() {
 
 	};
