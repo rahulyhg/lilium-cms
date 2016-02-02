@@ -1,0 +1,8 @@
+{#config}
+<script>
+	var deleteArticle = function(id) {
+		$.post('{=config.default.server.url}/admin/article/delete/' + id, function(data) {
+			liliumcms.refresh();
+		});
+	}
+</script>

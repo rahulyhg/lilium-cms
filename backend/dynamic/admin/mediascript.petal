@@ -1,0 +1,8 @@
+{#config}
+<script>
+	var deleteMedia = function(id) {
+		$.post('{=config.default.server.url}/admin/media/delete/' + id, function(data) {
+			liliumcms.refresh();
+		});
+	}
+</script>

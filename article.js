@@ -50,7 +50,7 @@ var Article = function() {
   };
 
   this.list = function(cli) {
-    filelogic.serveLmlPage(cli, false, contents);
+    filelogic.serveLmlPage(cli, false);
   }
 
   this.new = function(cli) {

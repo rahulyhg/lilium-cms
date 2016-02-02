@@ -54,7 +54,6 @@ var LiliumCMS = function() {
     }
 
     var fetchTemplateObjectContent = function(obj, data) {
-      console.log(obj);
       var key = obj.data('key');
       var sep = obj.data('arrayseparator');
       var content = "";
@@ -328,7 +327,6 @@ var LiliumCMS = function() {
       var pictures = [];
       var picture_id_url = {};
       var selectedPicture;
-
       $('[ckeditor]').ckeditor();
       CKEDITOR.on('instanceReady', function(ev) {
         this.document.appendStyleSheet('/static/style.css');
@@ -462,16 +460,20 @@ var LiliumCMS = function() {
               //Load pictures
               $.get("/livevars", {
                 vars: JSON.stringify([{
-                  varname: "media",
+                  varname: "uploads",
                   "params": {}
                 }])
               }, function(data) {
-                pictures = data.media;
-                pictures.forEach(function(picture, index) {
-                  picture_id_url[picture._id] = picture.url;
+                if (typeof data.uploads !== 'undefined') {
+                  pictures = data.uploads;
+                  pictures.forEach(function(picture, index) {
+                    picture_id_url[picture._id] = '/uploads/' + picture.url;
 
-                  $('#picture-list').append('<img id="' + picture._id + '" src="' + picture.sizes.thumbnail.url + '">');
-                });
+                    $('#picture-list').append('<img id="' + picture._id + '" src="' + picture.sizes.thumbnail.url + '">');
+                  });
+                } else {
+                  $('#picture-list').html('<h2>No pictures</h2>');
+                }
               });
             }
 
@@ -488,16 +490,6 @@ var LiliumCMS = function() {
           }
         }
       })
-      CKEDITOR.plugins.add("image-explorer", {
-        init: function(editor) {
-          editor.addCommand('imagebrowser', new CKEDITOR.dialogCommand('imagebrowserDialog'));
-          editor.ui.addButton('imgbrowser', {
-            label: 'Insert Image',
-            command: 'imagebrowser',
-            toolbar: 'insert'
-          });
-        }
-      });
 
       $('body').on('click', '#picture-list img', function(event) {
         var elem = event.target;

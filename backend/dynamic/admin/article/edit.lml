@@ -2,34 +2,23 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		{%../globalhead;../entityscript}
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-
 	</head>
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
-		<h2>Edit the post</h2>
+		<h2>Edit a post</h2>
     {=forms.render('post_create')}
-		<button onclick="deletePost()">Delete Post</button>
 		<div id="editor"></div>
-		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-		<script src="/static/formValidation.js"></script>
 		<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
 		<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
-		<script src="{=config.default.server.url}/static/ckeditor_lilium.js"></script>
-    <script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
+		<script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
 
-    <script src="/static/formParser.js"></script>
 		<script>
-			var postId = window.location.href.substr(window.location.href.lastIndexOf('/') + 1);
-			var baseUrl = "{=config.default.server.url}";
-
-			function deletePost() {
-				$.post(baseUrl + "/admin/article/delete/" + postId, function(data) {
-					alert(data);
-				});
-			}
+		liliumcms.formParser.parse();
+		liliumcms.ckeditor.initEditor();
 		</script>
 	</body>
 </html>
