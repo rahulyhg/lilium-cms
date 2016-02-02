@@ -112,7 +112,10 @@ var LiliumCMS = function() {
           var node = $(document.createElement(nodeType));
           if (nodeType == 'img') {
             node.attr('src', fetchTemplateObjectContent(obj, data));
-          } else {
+          } else if (nodeType == 'a') {
+						node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data));
+						node.html(obj.html());
+					} else {
             node.html(fetchTemplateObjectContent(obj, data));
           }
 
