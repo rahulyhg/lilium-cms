@@ -48,6 +48,9 @@ var _config = {
 				keepInRAM : false
 			}
 		},
+		"stripe" : {
+			apikey : YOUR_STRIPE_API_KEY
+		},
 		"MIMES" : {
 			"" : "text/html",
 			".html" : "text/html",

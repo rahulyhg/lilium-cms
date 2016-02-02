@@ -21,7 +21,7 @@ var Core = function() {
 	var loadHooks = function(readyToRock) {
 		log('Hooks', 'Loading hooks');
 		hooks.bind('init', 100, readyToRock);
-		hooks.bind('user_loggedin', 300, function(cli) {
+		hooks.bind('user_loggedin', 100, function(cli) {
 			cli.redirect(_c.default.server.url + "/" + _c.default.paths.admin, false);
 			return true;
 		});
