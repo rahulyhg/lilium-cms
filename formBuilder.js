@@ -6,6 +6,7 @@
 var htmlParser = require('./htmlParser');
 var validator = require('validator');
 
+var templates = {};
 var forms = {};
 
 var Form = function(name, cb) {
@@ -52,6 +53,15 @@ var FormBuilder = function() {
   this.currentForm;
 
   this.createForm = function(name, attr, cb) {
+
+    instanciateForm(name, attr);
+    // Add it to the form list
+    forms[name] = currentForm;
+
+    return this;
+  }
+
+  var instanciateForm = function(name, attr) {
     if (typeof name == 'undefined') {
       throw "[FormBuilderException] - No name provided to form";
     }
@@ -61,31 +71,45 @@ var FormBuilder = function() {
     }
 
     // Instanciate a new form
-    currentForm = new Form(name, cb);
+    currentForm = new Form(name);
 
     // Update attributes of the form
     for (var key in attr) {
       currentForm.attr[key] = attr[key];
     }
+  }
 
-    // Add it to the form list
-    forms[name] = currentForm;
-
-    return this;
+  this.addTemplate = function(name) {
+    if (typeof templates[name] == 'undefined') throw "[FormBuilderException] - Template not created. Please call createFormTemplate() first.";
+    for (var key in templates[name].fields) {
+      console.log(templates[name][key]);
+      var field = templates[name].fields[key]
+      this.add(field.name, field.type, field.attr, field.requirements);
+    }
   }
 
   this.add = function(name, type, attr, requirements) {
+    // Check if it is a tempalte
 
     if (typeof currentForm == 'undefined') {
       throw "[FormBuilderException] - Form not created. Please call createForm() first.";
     }
+    if (typeof currentForm.fields == 'undefined') {
+      currentForm.fields = {};
+    }
+    if (typeof currentForm.fields[name] !== 'undefined') {
+      throw "[FormBuilderException - Field already added : " + name;
+    }
+
+    currentForm.fields[name] = createField(name, type, attr, requirements);
+    return this;
+
+  };
+
+  var createField = function(name, type, attr, requirements) {
 
     if (typeof name == 'undefined') {
       throw "[FormBuilderException] - No name provided to field";
-    }
-
-    if (typeof currentForm.fields[name] !== 'undefined') {
-      throw "[FormBuilderException - Field already added : " + name;
     }
 
     // Instanciate a new field
@@ -100,9 +124,23 @@ var FormBuilder = function() {
       field.requirements[key] = requirements[key];
     }
 
-    currentForm.fields[name] = field;
+    return field;
+  }
+
+  this.registerFormTemplate = function(name) {
+    if (typeof templates[name] !== 'undefined') throw "[FormBuilderException] - Template already created: " + name;
+    currentForm = new Object();
+    templates[name] = currentForm;
+
     return this;
-  };
+  }
+
+  this.unregisterFormTemplate = function(name) {
+    if (typeof templates[name] !== 'undefined') {
+      templates[name] = undefined;
+      delete templates[name];
+    }
+  }
 
   this.render = function(formName) {
     if (typeof forms[formName] == 'undefined') {
@@ -129,7 +167,7 @@ var FormBuilder = function() {
     var valid = false;
     // Return an error stack by default
     if (typeof callStack == 'undefined') {
-        callStack = true;
+      callStack = true;
     }
 
     if (typeof form == 'undefined') {
@@ -199,21 +237,23 @@ var FormBuilder = function() {
 
     // Return
     if (callStack) {
-      return valid ? {success : true} : err;
-    }else {
+      return valid ? {
+        success: true
+      } : err;
+    } else {
       return valid;
     }
   }
 
-  var isTextBasedField = function (field) {
+  var isTextBasedField = function(field) {
     var isTextBased = false;
     var type = field.type;
 
     if (type == 'text' ||
-     type == 'email' ||
-     type == 'password' ||
-     type == 'textarea' ||
-     type == 'ckeditor') isTextBased = true;
+      type == 'email' ||
+      type == 'password' ||
+      type == 'textarea' ||
+      type == 'ckeditor') isTextBased = true;
 
     return isTextBased;
   }
@@ -228,10 +268,10 @@ var FormBuilder = function() {
 
       // Check if it is a file upload
       if (typeof cli.postdata.data !== 'undefined' &&
-          typeof cli.postdata.data.form_name == 'undefined' &&
-          typeof cli.postdata.uploads !== 'undefined'
-          ) {
-            return new Form();
+        typeof cli.postdata.data.form_name == 'undefined' &&
+        typeof cli.postdata.uploads !== 'undefined'
+      ) {
+        return new Form();
       }
 
       if (typeof cli.postdata.data !== 'undefined' &&
