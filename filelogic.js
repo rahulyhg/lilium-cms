@@ -78,6 +78,30 @@ var FileLogic = function() {
 
   };
 
+  this.serveLmlPluginPage = function(pluginName, cli, lastIsParam, extra) {
+    lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
+    var name;
+
+    if (lastIsParam) {
+      name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+    } else {
+      name = cli.routeinfo.fullpath;
+    }
+
+    var readPath = _c.default.server.base + "plugins/" + pluginName + "/dynamic" + name + ".lml";
+    console.log(readPath);
+    var savePath = _c.default.server.html + name +'/index.html';
+
+    FileServer.fileExists(savePath, function(isPresent) {
+      if (!isPresent) {
+        saveLmlPage(cli, readPath, savePath, extra);
+      } else {
+        serveCachedFile(cli, savePath);
+      }
+
+    });
+  }
+
   /**
    * Remove the cached file
    */
