@@ -120,15 +120,7 @@ var Article = function() {
         }
 
       } else {
-        db.exists('content', {
-          _id: id
-        }, function(exists) {
-          if (exists) {
-            filelogic.serveLmlPage(cli, true);
-          } else {
-            cli.throwHTTP(404, 'Article Not Found');
-          }
-        });
+        filelogic.serveLmlPage(cli, true);
       }
 
 

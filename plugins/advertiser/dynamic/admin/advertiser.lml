@@ -3,6 +3,12 @@
 <html>
 	<head>
 		{%globalhead;script}
+		{$
+			var baseurl = config.default.server.url;
+			baseurl += "/";
+			baseurl += config.default.paths.admin;
+			baseurl += "/";
+		$}
 	</head>
 	<body>
   <h1>All Advertisers</h1>
@@ -23,6 +29,11 @@
         Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
       </h6>
       <div class="entity-actions">
+			<lml:tobject data-nodetype="a"
+						 data-href="{=baseurl}advertiser/edit/"
+						 data-key="_id">
+					Edit
+			</lml:tobject>
         <lml:tobject data-nodetype="button"
                data-bind="click"
                data-action="deleteUser"

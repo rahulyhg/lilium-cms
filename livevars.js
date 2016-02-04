@@ -34,7 +34,7 @@ var RegisteredLiveVariables = {
 				db.singleLevelFind('entities', callback);
 			}
 		} else {
-			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
+			db.multiLevelFind('entities', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 		}
 	},
 	roles : function(cli, levels, params, callback) {

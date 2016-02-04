@@ -504,6 +504,7 @@ var LiliumCMS = function() {
       });
     }
   };
+  
   var deepUnescape = function(json){
     for (var index in json) {
       switch (typeof json[index]) {
@@ -517,7 +518,8 @@ var LiliumCMS = function() {
       }
     }
     return json;
-  }
+  };
+
   var Hooks = function() {
 
   };

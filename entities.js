@@ -225,8 +225,8 @@ var Entities = function() {
 		formbuilder.registerFormTemplate('entity_create')
 			.add('username', 'text', {displayname:"Username"})
 			.add('password', 'password', {displayname:"Password"})
-			.add('meta[firstname]', 'text', {displayname:"First name"})
-			.add('meta[lastname]', 'text', {displayname:"Last name"})
+			.add('firstname', 'text', {displayname:"First name"})
+			.add('lastname', 'text', {displayname:"Last name"})
 			.add('email', 'text', {displayname:"Email"})
 			.add('displayname', 'text', {displayname:"Display name"})
 			.add('roles', 'livevar', {

@@ -1,0 +1,26 @@
+{#config;session;vocab;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		{%../globalhead;../script}
+		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+	</head>
+	<body>
+		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
+		<h2>Edit an advertiser</h2>
+		{*entities.{?1}}
+    {=forms.render('advertiser_create')}
+		<script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
+
+		<script>
+		$(document).ready(function() {
+			document.addEventListener('livevarsReady', function(){
+				liliumcms.formParser.parse($("lml\\:livevars:first").attr('data-varname'));
+			})
+		});
+
+		</script>
+	</body>
+</html>
