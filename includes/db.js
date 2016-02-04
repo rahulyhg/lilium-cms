@@ -10,7 +10,7 @@ var DB = function() {
 	this.testConnection = function(callback) {
 		log('Database', 'Testing connection to mongo database');
 		MongoClient.connect(formatMongoString(), function(err, db) {
-			log('Database', 'Test at ' + _c.default.data.host + ":" + _c.default.data.port); 
+			log('Database', 'Test at ' + _c.default.data.host + ":" + _c.default.data.port);
 			if (!err) {
 				log('Database', 'Firing successful test signal');
 				db.close(false, function() {
@@ -23,7 +23,7 @@ var DB = function() {
 
 			return;
 		});
-	};	
+	};
 
 	this.createDatabase = function(callback) {
 		log('Database', 'Initializing database');
@@ -68,14 +68,14 @@ var DB = function() {
 	/*
 		coln : Collection name
 		conds : Query object for matching with format : {key:value}
-		stack : An array of query functions to call with format : 
+		stack : An array of query functions to call with format :
 		[
 			"functionName" : [params]
 		]
 		cb : End callback with format function(err, cursor)
 	*/
 	this.find = this.query = function(coln, conds, stack, cb) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {	
+		_conn.collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -94,8 +94,8 @@ var DB = function() {
 				}
 
 				cb(undefined, cursor);
-			} 
-		});	
+			}
+		});
 	};
 
 	this.mongoID = function(str) {
@@ -103,7 +103,7 @@ var DB = function() {
 	};
 
 	this.findToArray = function(coln, conds, cb) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {	
+		_conn.collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -114,8 +114,8 @@ var DB = function() {
 				col.find(conds).toArray(function(err, arr) {
 					cb(err, arr);
 				});
-			} 
-		});	
+			}
+		});
 	};
 
 	this.multiLevelFind = function(topLevel, levels, conds, stack, callback) {
@@ -131,11 +131,11 @@ var DB = function() {
 								r = new Object();
 							}
 						}
-	
-						callback(r);
+
+						callback([r]);
 					});
 				} else {
-					callback(undefined);		
+					callback(undefined);
 				}
 			});
 		});
@@ -151,11 +151,11 @@ var DB = function() {
 
 
 
-	// Will find documents from collection coln according to conds, 
+	// Will find documents from collection coln according to conds,
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
-	this.modify = this.update = function(coln, conds, newVal, cb, upsert, one) {	
-		_conn.collection(coln, {"strict":true}, function(err, col) {	
+	this.modify = this.update = function(coln, conds, newVal, cb, upsert, one) {
+		_conn.collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -175,9 +175,9 @@ var DB = function() {
 						cb(undefined, r);
 					});
 				}
-			} 
-		});	
-		
+			}
+		});
+
 	};
 
 	this.insert = function(coln, docs, cb) {
@@ -191,13 +191,13 @@ var DB = function() {
 					docs, function(err, r) {
 						cb(err, r);
 					}
-					); 
+					);
 			}
 		});
 	};
 
-	this.remove = this.delete = function(coln, conds, cb, one) {	
-		_conn.collection(coln, {"strict":true}, function(err, col) {	
+	this.remove = this.delete = function(coln, conds, cb, one) {
+		_conn.collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -212,8 +212,8 @@ var DB = function() {
 						cb(undefined, r);
 					});
 				}
-			} 
-		});	
+			}
+		});
 	};
 
 	// Will callback cb with a boolean representing the existance of a document
@@ -228,7 +228,7 @@ var DB = function() {
 			};
 		});
 	};
-		
+
 	// USE CAREFULLY
 	// Will callback cb with a raw mongodb collection object
 	this.rawCollection = function(coln, opt, cb) {
