@@ -99,9 +99,7 @@ var Entities = function() {
 		cli.debug();
 	};
 
-	this.createFromCli = function(cli) {
-		cli.touch('entities.createFromCli');
-		var entData = cli.postdata.data;
+	this.initialiseBaseEntity = function(data) {
 		var newEnt = this.createEmptyEntity();
 
 		newEnt.username = entData.username;
@@ -116,6 +114,13 @@ var Entities = function() {
 				newEnt.data[key] = newEnt.meta[key];
 			}
 		}
+		return newEnt;
+	}
+
+	this.createFromCli = function(cli) {
+		cli.touch('entities.createFromCli');
+		var entData = cli.postdata.data;
+		var newEnt = initialiseBaseEntity(entData);
 
 		this.registerEntity(newEnt, function() {
 			cli.touch('entities.registerEntity.callback');
@@ -217,7 +222,7 @@ var Entities = function() {
 	};
 
 	this.registerCreationForm = function() {
-		formbuilder.createForm('entity_create')
+		formbuilder.registerFormTemplate('entity_create')
 			.add('username', 'text', {displayname:"Username"})
 			.add('password', 'password', {displayname:"Password"})
 			.add('meta[firstname]', 'text', {displayname:"First name"})
@@ -237,6 +242,9 @@ var Entities = function() {
 				displayname: "Initial role"
 			})
 			.add('create', 'submit');
+
+			formbuilder.createForm('entity_create')
+				.addTemplate('entity_create');
 	};
 
 	var init = function() {

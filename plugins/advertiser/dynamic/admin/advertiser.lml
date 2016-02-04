@@ -1,0 +1,38 @@
+{#config;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		{%globalhead;script}
+	</head>
+	<body>
+  <h1>All Advertisers</h1>
+
+  <main class="entities-main">
+    <ul class="entity-list">
+      {*entities(template:"entity-list-item",role:"advertiser")}
+    </ul>
+
+    <h2>Add new advertiser</h2>
+        {=forms.render('advertiser_create')}
+  </main>
+
+  <lml:template id="entity-list-item">
+    <li class="entity-item-list">
+      <lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
+      <h6>
+        Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
+      </h6>
+      <div class="entity-actions">
+        <lml:tobject data-nodetype="button"
+               data-bind="click"
+               data-action="deleteUser"
+               data-actionparamkey="_id"
+               data-filter="canDelete" >
+            Delete
+        </lml:tobject>
+      </div>
+    </li>
+  </lml:template>
+
+	</body>
+</html>
