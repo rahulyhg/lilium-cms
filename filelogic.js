@@ -89,7 +89,6 @@ var FileLogic = function() {
     }
 
     var readPath = _c.default.server.base + "plugins/" + pluginName + "/dynamic" + name + ".lml";
-    console.log(readPath);
     var savePath = _c.default.server.html + name +'/index.html';
 
     FileServer.fileExists(savePath, function(isPresent) {
