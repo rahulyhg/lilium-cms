@@ -5,7 +5,7 @@
 var HtmlParser = function() {
   this.parseForm = function(form) {
     var htmlForm = '';
-
+    var submitButton = '';
     if (typeof form == 'undefined') {
       throw "[HtmlParser - No form provided to parse";
     }
@@ -40,13 +40,14 @@ var HtmlParser = function() {
         field.type == 'email') {
 
         htmlForm += parseSimpleFormType(field, form.attr.placeholder);
+        htmlForm += '<br>'
+
+      } else if (field.type == 'submit') {
+        submitButton = parseSubmitType(field);
       } else {
         switch (field.type) {
           case 'button':
             htmlForm += parseButtonType(field, form.attr.placeholder);
-            break;
-          case 'submit':
-            htmlForm += parseSubmitType(field);
             break;
           case 'textarea':
             htmlForm += parseTextAreaType(field, form.attr.placeholder);
@@ -70,10 +71,15 @@ var HtmlParser = function() {
             htmlForm += parseLiveVar(field);
             break;
         }
+        htmlForm += '<br>'
+
       }
 
-      htmlForm += '<br>'
     }
+
+    //Insert submit form
+    htmlForm += submitButton;
+    htmlForm += '<br>'
 
     // Close form tag
     htmlForm += "\n</form>";
@@ -193,7 +199,7 @@ var HtmlParser = function() {
   }
 
   var parseLiveVar = function(field) {
-    return generateLabel(field, false) + 
+    return generateLabel(field, false) +
       '<lml:livevars data-filler="' + field.attr.tag +
       '" data-fieldname="' + field.name +
       '" data-filling="' + field.attr.template +
