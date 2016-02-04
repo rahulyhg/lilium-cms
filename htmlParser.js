@@ -20,6 +20,9 @@ var HtmlParser = function() {
     // Name
     htmlForm += form.name ? "name='" + form.name + "' " : "";
 
+    //id
+    htmlForm += form.attr.id ? "id='" + form.attr.id  + "' " : "";
+
     // Method
     htmlForm += form.attr.method ? "method='" + form.attr.method.toUpperCase() + "' " : "POST";
 
@@ -224,6 +227,11 @@ var HtmlParser = function() {
 
     // Classes
     attributes += 'class="v_validate, ' + parseClasses(field) + '" ';
+
+    // Data-...
+    for (var key in field.attr.data ) {
+      attributes += 'data-'+ key +'="'+ field.attr.data[key] +'" ';
+    }
     return attributes;
   }
 
