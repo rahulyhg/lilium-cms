@@ -6,7 +6,7 @@
 	 var Admin = undefined;
 	 var filelogic = undefined;
 	 var formBuilder = undefined;
-	 var adminAdvertiser = undefined;
+	 var adminAdvertiser = require('./adminAdvertiser.js');
 
 	 var Advertiser = function() {
 	   this.iface = new Object();
@@ -19,7 +19,7 @@
 	     Admin = require(abspath + 'backend/admin.js');
 	     filelogic = require(abspath + 'filelogic.js');
 	     formBuilder = require(abspath + 'formBuilder.js');
-			 adminAdvertiser = require('./adminAdvertiser.js').init(abspath);
+			 adminAdvertiser.init(abspath);
 	   };
 
 	   var registerEndpoint = function() {

@@ -49,7 +49,8 @@ var _config = {
 			}
 		},
 		"stripe" : {
-			apikey : YOUR_STRIPE_API_KEY
+			secretkey : YOUR_SECRET_STRIPE_API_KEY,
+			publickey : YOUR_PUBLIC_STRIPE_API_KEY
 		},
 		"MIMES" : {
 			"" : "text/html",

@@ -1,14 +1,42 @@
 {#config}
 <script>
 
-  Stripe.setPublishableKey('pk_test_oNJjSq28FtDSAS5pEMb1RfC6');
+  Stripe.setPublishableKey('{=config.default.stripe.publickey}');
 
   var deleteUser = function(id) {
-    $.post('{=config.default.server.url}/admin/entities', {
+    $.post('{=config.default.server.url}/admin/advertiser/delete', {
       "uid" : id,
       "form_name" : "entity_delete"
     }, function(data) {
       liliumcms.refresh();
     });
   };
+  $( document ).ready(function() {
+    $('#stripe_form').submit(function(event) {
+      event.preventDefault();
+        var $form = $(this);
+
+        // Disable the submit button to prevent repeated clicks
+        $form.find('button').prop('disabled', true);
+
+        Stripe.card.createToken($form, function(status, response){
+          if (response.error) {
+            // Show the errors on the form
+            $form.find('.payment-errors').text(response.error.message);
+            $form.find('button').prop('disabled', false);
+          } else {
+            // response contains id and card, which contains additional card details
+            var token = response.id;
+            // Insert the token into the form so it gets submitted to the server
+            $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+            // and submit
+            $form.get(0).submit();
+          }
+        });
+
+        // Prevent the form from submitting with the default action
+        return false;
+      });
+  });
+
 </script>

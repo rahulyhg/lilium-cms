@@ -99,7 +99,7 @@ var Entities = function() {
 		cli.debug();
 	};
 
-	this.initialiseBaseEntity = function(data) {
+	this.initialiseBaseEntity = function(entData) {
 		var newEnt = this.createEmptyEntity();
 
 		newEnt.username = entData.username;
