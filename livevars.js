@@ -28,7 +28,11 @@ var RegisteredLiveVariables = {
 		var allEntities = levels.length === 0;
 
 		if (allEntities) {
-			db.singleLevelFind('entities', callback);
+			if (params.role) {
+				db.multiLevelFind('entities', levels, {'roles' : {$in :[params.role]}}, {}, callback);
+			} else {
+				db.singleLevelFind('entities', callback);
+			}
 		} else {
 			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 		}
