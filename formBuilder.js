@@ -82,10 +82,11 @@ var FormBuilder = function() {
   this.addTemplate = function(name) {
     if (typeof templates[name] == 'undefined') throw "[FormBuilderException] - Template not created. Please call createFormTemplate() first.";
     for (var key in templates[name].fields) {
-      console.log(templates[name][key]);
       var field = templates[name].fields[key]
       this.add(field.name, field.type, field.attr, field.requirements);
     }
+
+    return this;
   }
 
   this.add = function(name, type, attr, requirements) {
