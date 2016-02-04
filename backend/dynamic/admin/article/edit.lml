@@ -10,6 +10,7 @@
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>Edit a post</h2>
+		{*content.{?1}}
     {=forms.render('post_create')}
 		<div id="editor"></div>
 		<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
@@ -17,8 +18,13 @@
 		<script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
 
 		<script>
-		liliumcms.formParser.parse();
-		liliumcms.ckeditor.initEditor();
+		$(document).ready(function() {
+			document.addEventListener('livevarsReady', function(){
+				liliumcms.formParser.parse($("lml\\:livevars:first").attr('data-varname'));
+				liliumcms.ckeditor.initEditor();
+			})
+		});
+
 		</script>
 	</body>
 </html>
