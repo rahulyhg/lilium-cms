@@ -107,6 +107,31 @@ var FormBuilder = function() {
 
   };
 
+  this.edit = function(name, type, attr, requirements) {
+    if (typeof currentForm.fields[name] !== 'undefined') {
+      var field = currentForm.fields[name];
+      if (typeof type !== 'undefined' && type != '') {
+        field.type = type;
+      }
+
+      // Update attributes
+      for (var key in attr) {
+        field.attr[key] = attr[key];
+      }
+      // Update requirements
+      for (var key in requirements) {
+        field.requirements[key] = requirements[key];
+      }
+    }
+  }
+
+  this.remove = function(name) {
+    if (typeof currentForm.fields[name] !== 'undefined') {
+      currentForm.fields[name] = undefined;
+      delete currentForm.fields[name];
+    }
+  }
+
   var createField = function(name, type, attr, requirements) {
 
     if (typeof name == 'undefined') {
@@ -146,13 +171,6 @@ var FormBuilder = function() {
   this.render = function(formName) {
     if (typeof forms[formName] == 'undefined') {
       throw "[FormBuilderException] - Form to render doesn't exists : " + formName;
-    }
-    if (typeof forms[formName]['form_name'] == 'undefined') {
-      this.add('form_name', 'hidden', {
-        value: formName
-      }, {
-        required: false
-      });
     }
 
     return htmlParser.parseForm(forms[formName]);
