@@ -165,6 +165,7 @@ var AdminAdvertiser = function() {
         db.findToArray('entities', {
           _id: db.mongoID(id)
         }, function(err, arr) {
+          console.log(arr[0]);
           if (typeof arr[0].stripeid !== 'undefined') {
             transaction.deleteCustomer(arr[0].stripeid, function() {
               db.remove('entities', {

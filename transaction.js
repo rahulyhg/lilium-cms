@@ -29,6 +29,7 @@ var transaction = function() {
 
   this.createNewCustomer = function(entity, cb) {
     stripe.customers.create({
+        card: entity.stripeToken,
         email: entity.email,
         description: 'Created with lilium'
       },
