@@ -151,13 +151,13 @@ var AdminAdvertiser = function() {
       form.stripeToken = undefined;
       delete form.stripeToken;
       form.creaditCard = undefined;
-      delete form.creaditCard = undefined;
+      delete form.creaditCard;
       form.cvc = undefined;
-      delete form.cvc = undefined;
+      delete form.cvc;
       form.month = undefined;
-      delete form.month = undefined;
+      delete form.month;
       form.year = undefined;
-      delete form.year = undefined;
+      delete form.year;
     }
 
     db.update('entities', {

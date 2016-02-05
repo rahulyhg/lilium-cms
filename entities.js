@@ -122,7 +122,7 @@ var Entities = function() {
 	this.createFromCli = function(cli) {
 		cli.touch('entities.createFromCli');
 		var entData = cli.postdata.data;
-		var newEnt = initialiseBaseEntity(entData);
+		var newEnt = this.initialiseBaseEntity(entData);
 
 		this.registerEntity(newEnt, function() {
 			cli.touch('entities.registerEntity.callback');

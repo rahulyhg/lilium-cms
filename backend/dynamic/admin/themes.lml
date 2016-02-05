@@ -30,8 +30,6 @@ $}
 </html>
 <script>
 liliumcms.livevars.getLiveVars(function() {
-	liliumcms.livevars.parseTextToView();
-
 	$('.theme').each(function() {
 		var id = $(this).attr('id');
 		if (liliumcms.livevars.livevars()[id]) {
