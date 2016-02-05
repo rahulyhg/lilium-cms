@@ -6,6 +6,7 @@
 	 var Admin = undefined;
 	 var filelogic = undefined;
 	 var formBuilder = undefined;
+	 var sponsoredarticle = require('./sponsoredarticle.js');
 
 	 var Production = function() {
 	   this.iface = new Object();
@@ -18,6 +19,7 @@
 	     Admin = require(abspath + 'backend/admin.js');
 	     filelogic = require(abspath + 'filelogic.js');
 	     formBuilder = require(abspath + 'formBuilder.js');
+			 sponsoredarticle.init(abspath);
 	   };
 
 	   var registerEndpoint = function() {
@@ -29,14 +31,44 @@
 
 	   var registerHooks = function() {
 	     Admin.registerAdminEndpoint('production', 'GET', function(cli){
-	 			cli.touch("admin.GET.advertiser");
-	 			adminAdvertiser.handleGET(cli);
+	 			cli.touch("admin.GET.production");
+	 			handleGET(cli);
 	 		});
 	     Admin.registerAdminEndpoint('production', 'POST', function(cli){
-	 			cli.touch("admin.POST.advertiser");
-	 			adminAdvertiser.handlePOST(cli);
+	 			cli.touch("admin.POST.production");
+	 			handlePOST(cli);
 	 		});
-	   }
+		};
+
+		var handleGET = function(cli) {
+			switch (cli.routeinfo.path[2]) {
+				case undefined:
+					filelogic.serveLmlPluginPage('production', cli, false);
+					break;
+				case 'listchangerequest':
+					filelogic.serveLmlPluginPage('production', cli, false);
+					break;
+				case 'editchangerequest':
+					filelogic.serveLmlPluginPage('production', cli, true);
+					break;
+				case 'sponsoredcontent':
+					filelogic.serveLmlPluginPage('production', cli, false);
+				default:
+					cli.throwHTTP(404, 'Page not found');
+
+			}
+		}
+
+		var handlePOST = function(cli) {
+			switch (cli.routeinfo.path[2]) {
+				case 'sponsoredcontent':
+					sponsoredarticle.createSponsoredContent(cli);
+					break;
+				default:
+				cli.throwHTTP(404, 'Page not found');
+
+			}
+		}
 
 	   var registerRoles = function() {
 	     entities.registerRole({
@@ -45,7 +77,7 @@
 	     }, ['dash', 'production', 'sponsoredcontent'], function() {
 	       return;
 	     }, true);
-	   }
+	   };
 
 	   this.unregister = function(callback) {
 	     log("Production", "Plugin disabled");
