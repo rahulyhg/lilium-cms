@@ -173,6 +173,14 @@ var FormBuilder = function() {
       throw "[FormBuilderException] - Form to render doesn't exists : " + formName;
     }
 
+    if (typeof forms[formName].fields['form_name'] == 'undefined') {
+      this.add('form_name', 'hidden', {
+        value: formName
+      }, {
+        required: false
+      });
+    }
+
     return htmlParser.parseForm(forms[formName]);
   }
 
@@ -182,7 +190,7 @@ var FormBuilder = function() {
    * @param  {boolean} withErrStack Whether to return a json error stack or a simple boolean
    * @return {Array}err A stack of all the errors.
    */
-  this.validate = function(form, withErrStack) {
+  this.validate = function(form, callStack) {
     var valid = false;
     // Return an error stack by default
     if (typeof callStack == 'undefined') {
