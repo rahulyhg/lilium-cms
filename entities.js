@@ -107,6 +107,8 @@ var Entities = function() {
 		newEnt.email = entData.email;
 		newEnt.roles.push(entData.roles);
 		newEnt.displayname = entData.displayname;
+		newEnt.firstname = entData.firstname;
+		newEnt.lastname = entData.lastname;
 		newEnt.createdOn = new Date();
 
 		if (typeof newEnt.meta === "object") {
