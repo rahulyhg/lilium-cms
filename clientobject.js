@@ -1,3 +1,5 @@
+var entities = require('./entities.js');
+
 var ClientObject = function(req, resp) {
 	this.request = req;
 	this.response = resp;
@@ -35,11 +37,8 @@ var ClientObject = function(req, resp) {
 		god : req.session.data.god,
 		user : req.session.data.user,
 	};
-	this.userinfo.dashaccess =
-		this.userinfo.loggedin &&
-		this.userinfo.admin ||
-		this.userinfo.god ||
-		(this.userinfo.role && this.userinfo.role.indexOf('dash') !== -1);
+
+
 
 	this.routeinfo = {
 		admin : false,
@@ -52,6 +51,11 @@ var ClientObject = function(req, resp) {
 		fullpath : "",
 		fileExt : ""
 	};
+	this.userinfo.dashaccess =
+		this.userinfo.loggedin &&
+		this.userinfo.admin ||
+		this.userinfo.god ||
+		entities.isAllowed(this.userinfo, 'dash');
 
 	this.responseinfo = {
 		filecreated : false,

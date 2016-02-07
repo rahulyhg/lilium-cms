@@ -1,10 +1,11 @@
 // Lilium Frontend core framework
 // Requires vaniryk
 var LiliumCMS = function() {
+  var livevars;
+
   var LiveVars = function() {
     var endpoints = [];
     var paramString = "?";
-    var livevars;
 
     this.getLiveVars = function(cb) {
       var urlParams = window.location.pathname.split('/');
@@ -13,6 +14,7 @@ var LiliumCMS = function() {
       var reg = /({\?\s*[0-9]\s*})/g;
 
       $("lml\\:livevars").each(function() {
+        var elem = this;
         if (endpoints.indexOf($(this).data('varname')) == -1) {
           var params = $(this).data('varparam');
 
@@ -26,7 +28,7 @@ var LiliumCMS = function() {
               var urlposReg = new RegExp("({\\?\\s*[" + urlPos + "]\\s*})", "g");
               variableName = variableName.replace(urlposReg, param);
             });
-            $(this).data('varname', variableName);
+            elem.setAttribute('data-varname', variableName);
           }
 
           endpoints.push({
@@ -44,7 +46,7 @@ var LiliumCMS = function() {
       $.get("/livevars", {
         vars: JSON.stringify(endpoints)
       }, function(data) {
-        livevars = data;
+        livevars = deepUnescape(data);
         return cb(livevars);
       });
     };
@@ -90,7 +92,7 @@ var LiliumCMS = function() {
       } else {
         content = obj.html();
       }
-      return unescape(content);
+      return content;
 
     };
 
@@ -188,6 +190,7 @@ var LiliumCMS = function() {
           }
         }
       });
+      document.dispatchEvent(livevarsReadyEvent);
 
     };
 
@@ -315,10 +318,8 @@ var LiliumCMS = function() {
   }
 
   var FormParser = function() {
-    this.parse = function() {
-      $.get('/admin/article/getArticle/' + window.location.pathname.split('/').pop(), function(data) {
-        $("form").deserialize(data.form);
-      });
+    this.parse = function(selector) {
+      $("form").deserialize(livevars[selector][0]);
     };
   };
 
@@ -503,6 +504,21 @@ var LiliumCMS = function() {
       });
     }
   };
+  
+  var deepUnescape = function(json){
+    for (var index in json) {
+      switch (typeof json[index]) {
+        case 'string':
+          json[index] = unescape(json[index])
+          break;
+        case 'object':
+          json[index] = deepUnescape(json[index]);
+          break;
+
+      }
+    }
+    return json;
+  };
 
   var Hooks = function() {
 
@@ -539,3 +555,4 @@ var liliumcms = new LiliumCMS();
 $(function() {
   liliumcms.awesomestrapper.strap();
 });
+var livevarsReadyEvent = new Event('livevarsReady');

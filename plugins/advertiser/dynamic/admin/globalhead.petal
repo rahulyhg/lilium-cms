@@ -1,0 +1,5 @@
+{#config}
+<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/static/style.css" />
+<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+<script src="{=config.default.server.url}/static/lilium.js"></script>
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>

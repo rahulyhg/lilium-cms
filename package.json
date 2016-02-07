@@ -48,6 +48,7 @@
     "session": "^0.1.0",
     "slugify": "^0.1.1",
     "stream-browserify": "^2.0.1",
+    "stripe": "^4.3.0",
     "util": "^0.10.3",
     "validator": "^4.5.0"
   }

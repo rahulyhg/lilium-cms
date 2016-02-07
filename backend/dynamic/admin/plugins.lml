@@ -27,7 +27,6 @@ $}
 
 		<script>
 		liliumcms.livevars.getLiveVars(function() {
-			liliumcms.livevars.parseTextToView();
 
 			$('.plugin').each(function() {
 				var id = $(this).attr('id');

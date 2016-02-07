@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{%../globalhead;../entityscript}
+		{%../globalhead;../articlescript}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";

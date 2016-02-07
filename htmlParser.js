@@ -5,7 +5,7 @@
 var HtmlParser = function() {
   this.parseForm = function(form) {
     var htmlForm = '';
-
+    var submitButton = '';
     if (typeof form == 'undefined') {
       throw "[HtmlParser - No form provided to parse";
     }
@@ -19,6 +19,9 @@ var HtmlParser = function() {
 
     // Name
     htmlForm += form.name ? "name='" + form.name + "' " : "";
+
+    //id
+    htmlForm += form.attr.id ? "id='" + form.attr.id  + "' " : "";
 
     // Method
     htmlForm += form.attr.method ? "method='" + form.attr.method.toUpperCase() + "' " : "POST";
@@ -47,15 +50,13 @@ var HtmlParser = function() {
       if (field.type == 'text' ||
         field.type == 'password' ||
         field.type == 'email') {
-
         htmlForm += parseSimpleFormType(field, field.attr.placeholder || form.attr.placeholder);
+      } else if (field.type == 'submit') {
+        submitButton = parseSubmitType(field);
       } else {
         switch (field.type) {
           case 'button':
             htmlForm += parseButtonType(field, form.attr.placeholder);
-            break;
-          case 'submit':
-            htmlForm += parseSubmitType(field);
             break;
           case 'textarea':
             htmlForm += parseTextAreaType(field, form.attr.placeholder);
@@ -79,6 +80,8 @@ var HtmlParser = function() {
             htmlForm += parseLiveVar(field);
             break;
         }
+        htmlForm += '<br>'
+
       }
       
       if (hasFieldWrapper) {
@@ -87,6 +90,10 @@ var HtmlParser = function() {
 
       htmlForm += form.attr.afterField || "";
     }
+
+    //Insert submit form
+    htmlForm += submitButton;
+    htmlForm += '<br>'
 
     // Close form tag
     htmlForm += "\n</form>";
@@ -207,7 +214,7 @@ var HtmlParser = function() {
   }
 
   var parseLiveVar = function(field) {
-    return generateLabel(field, false) + 
+    return generateLabel(field, false) +
       '<lml:livevars data-filler="' + field.attr.tag +
       '" data-fieldname="' + field.name +
       '" data-filling="' + field.attr.template +
@@ -232,6 +239,11 @@ var HtmlParser = function() {
 
     // Classes
     attributes += 'class="v_validate, ' + parseClasses(field) + '" ';
+
+    // Data-...
+    for (var key in field.attr.data ) {
+      attributes += 'data-'+ key +'="'+ field.attr.data[key] +'" ';
+    }
     return attributes;
   }
 

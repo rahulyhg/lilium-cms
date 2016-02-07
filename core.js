@@ -25,8 +25,11 @@ var Frontend = require('./frontend.js');
 var Core = function() {
 	var loadHooks = function(readyToRock) {
 		log('Hooks', 'Loading hooks');
-		hooks.bind('init', readyToRock);
-
+		hooks.bind('init', 100, readyToRock);
+		hooks.bind('user_loggedin', 100, function(cli) {
+			cli.redirect(_c.default.server.url + "/" + _c.default.paths.admin, false);
+			return true;
+		});
 		hooks.fire('hooks');
 		log('Hooks', 'Loaded hooks');
 	};
@@ -47,7 +50,7 @@ var Core = function() {
 			cli.touch("admin.GET.article");
 			Article.handleGET(cli);
 		});
-	
+
 		admin.registerAdminEndpoint('entities', 'GET', function(cli){
 			cli.touch("admin.GET.entities");
 			entities.handleGET(cli);
@@ -234,17 +237,17 @@ var Core = function() {
 			});
 		};
 
-		hooks.bind('dbtest', function(err) {
+		hooks.bind('dbtest', 100, function(err) {
 			log('Database', 'Received Database test signal : ' + (err?'failed':'success'));
 			dbinit();
 		});
 
-		hooks.bind('dbinit', function(err) {
+		hooks.bind('dbinit', 100, function(err) {
 			log('Database', 'Received Database init signal');
 			dbconn();
 		});
 
-		hooks.bind('dbconn', function(err) {
+		hooks.bind('dbconn', 100, function(err) {
 			log('Database', 'Received Database connection signal');
 			callback();
 		});
@@ -256,7 +259,7 @@ var Core = function() {
 
 	var loadStaticSymlink = function(callback) {
 		log('FileServer', 'Creating symlink for static files.');
-		hooks.bind('staticsymlink', function(err) {
+		hooks.bind('staticsymlink', 100, function(err) {
 			if (err) {
 				log('Core', 'Could not create symlink : ' + err);
 			}
@@ -372,7 +375,7 @@ var Core = function() {
 		loadDFP();
 		loadFrontend();
 
-		hooks.bind('themes', function() {
+		hooks.bind('themes', 100, function() {
 			log('Core', 'Firing initialized signal');
 			hooks.fire('init', {
 				loaded : [
