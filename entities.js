@@ -4,6 +4,7 @@ var db = require('./includes/db.js');
 var filelogic = require('./filelogic.js');
 var formbuilder = require('./formBuilder.js');
 var CryptoJS = require('crypto-js');
+var livevars = require('./livevars.js');
 
 var Roles = new Object();
 
@@ -232,6 +233,41 @@ var Entities = function() {
 				displayname: "Initial role"
 			})
 			.add('create', 'submit');
+	};
+
+	this.registerLiveVars = function() {
+		livevars.registerLiveVariable('entities', function(cli, levels, params, callback) {
+			var allEntities = levels.length === 0;
+
+			if (allEntities) {
+				db.singleLevelFind('entities', callback);
+			} else if (levels[0] == 'query') {
+				var queryInfo = params.query || new Object();
+				var qObj = new Object();
+				
+				qObj._id = queryInfo._id;
+				qObj.displayname = queryInfo.displayname;
+				qObj.email = queryInfo.email;
+				qObj.roles = queryInfo.roles ? {$in : queryInfo.roles} : undefined;
+				qObj.username = queryInfo.username;
+
+				db.findToArray('entities', queryInfo, function(err, arr) {
+					callback(err || arr);
+				});
+			} else {
+				db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
+			}
+		});
+	
+		livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {	
+			var allRoles = levels.length === 0;
+
+			if (allRoles) {
+				db.singleLevelFind('roles', callback);
+			} else {
+				db.multiLevelFind('roles', levels, {name:levels[0]}, {limit:[1]}, callback);
+			}
+		});
 	};
 	
 	var init = function() {

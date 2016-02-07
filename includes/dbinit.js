@@ -2,7 +2,8 @@ var mongoDocuments = {
 	names : [
 		"entities", "roles", "plugins", "themes", "config",
 		"sites", "discussions", "types", "vocab", "content",
-		"lilium", "uploads", "cachedFiles"
+		"lilium", "uploads", "cachedFiles", "campaigns", "products",
+		"producttypes", "productpricebases"
 	]
 };
 
@@ -36,6 +37,48 @@ var adminEntity = {
 	}
 };
 
+var defaultProductTypes = [
+	{name:"bannerads",displayName:"Banner Ads"},
+	{name:"email",displayName:"Email"},
+	{name:"sponsedit",displayName:"Sponsored Editorial"},
+	{name:"twitter",displayName:"Twitter"},
+	{name:"instagram",displayName:"Instagram"},
+	{name:"facebook",displayName:"Facebook"},
+	{name:"snapchat",displayName:"Snapchat"},
+	{name:"video",displayName:"Video"},
+	{name:"other",displayName:"Other"}
+];
+
+var defaultPriceBases = [
+	{name:"unit",displayName:"Unit",divider:1},
+	{name:"cpm",displayName:"CPM",divider:1000},
+	{name:"cpc",displayName:"CPC",divider:1},
+	{name:"cpv",displayName:"CPV",divider:1}
+];
+
+var defaultProducts = [
+	{name:"banbigbox",displayName:"Banner Ads - Big Box",productType:"bannerads",priceBase:"cpm",price:10,active:true},
+	{name:"banbigboxm",displayName:"Banner Ads - Big Box (Mobile)",productType:"bannerads",priceBase:"cpm",price:10,active:true},
+	{name:"banbillboard",displayName:"Banner Ads - Billboard",productType:"bannerads",priceBase:"cpm",price:10,active:true},
+	{name:"bancompto",displayName:"Banner Ads - Companion Takeover",productType:"bannerads",priceBase:"unit",price:500,active:true},
+	{name:"banlskysc",displayName:"Banner Ads - Large Skyscraper",productType:"bannerads",priceBase:"cpm",price:10,active:true},
+	{name:"banlb",displayName:"Banner Ads - Leaderboard",productType:"bannerads",priceBase:"cpm",price:10,active:true},
+	{name:"banskysc",displayName:"Banner Ads - Skyscraper",productType:"bannerads",priceBase:"cpm",price:10,active:true},
+	{name:"bantakeover",displayName:"Banner Ads - Takeover",productType:"bannerads",priceBase:"cpm",price:30,active:true},
+	{name:"email",displayName:"Email Discovery",productType:"email",priceBase:"unit",price: 500,active:true},
+	{name:"fbdisc",displayName:"Facebook Discovery",productType:"facebook",priceBase:"unit",price: 15,active:true},
+	{name:"twdisc",displayName:"Twitter Discovery",productType:"twitter",priceBase:"unit",price: 0,active:true},
+	{name:"igdisc",displayName:"Instagram Discovery",productType:"instagram",priceBase:"unit",price: 15,active:true},
+	{name:"igpush",displayName:"Instagram Push",productType:"instagram",priceBase:"unit",price: 750,active:true},
+	{name:"snapstory",displayName:"Snapchat Story",productType:"snapchat",priceBase:"unit",price: 300,active:true},
+	{name:"seditbasic",displayName:"Sponsored Editorial - Basic",productType:"sponsedit",priceBase:"unit",price: 725,active:true},
+	{name:"seditstand",displayName:"Sponsored Editorial - Standard",productType:"sponsedit",priceBase:"unit",price: 1500,active:true},
+	{name:"seditprem",displayName:"Sponsored Editorial - Premium",productType:"sponsedit",priceBase:"unit",price: 2000,active:true},
+	{name:"seditrev",displayName:"Revision (Sponsored Editorial)",productType:"other",priceBase:"unit",price: 120,active:true},
+	{name:"svideo",displayName:"Sponsored Video",productType:"video",priceBase:"unit",price: 3000,active:true},
+	{name:"other",displayName:"Other",productType:"other",priceBase:"unit",price: 0,active:true}
+];
+
 var defaultTheme = {
 	id : 0,
 	uName : 'flowerg',
@@ -58,7 +101,7 @@ var defaultPlugin = {
 };
 
 var rootEntity = {
-	id : -1, username : "root", shhh : '', roles : ["lilium"],
+	id : -1, displayname:"[Root]", username : "root", shhh : '', roles : ["lilium"],
 }
 
 var defaultServerConfiguration = require('../config.js');
@@ -66,7 +109,7 @@ var log = require('../log.js');
 
 var initMongo = function(db, cb) {
 	log('Database', 'Init script was executed');
-	var totalTasks = 5;
+	var totalTasks = 8;
 	var completedTasks = 0;
 
 	// Boot Script
@@ -157,6 +200,42 @@ var initMongo = function(db, cb) {
 				});
 			} else {
 				throw "[DatabaseInit - themes collection does not exist]";
+			}
+		});
+
+		log('Database', 'Creating default product types entries');
+		db.collection('producttypes', {strict:true}, function(err, col) {
+			if (!err) {
+				col.insertMany(defaultProductTypes, function(err, r) {
+					completedTasks++;
+					checkForCompletion();
+				});
+			} else {
+				throw "[DatabaseInit - plugins collection does not exist]";
+			}
+		});
+
+		log('Database', 'Creating default product price bases entries');
+		db.collection('productpricebases', {strict:true}, function(err, col) {
+			if (!err) {
+				col.insertMany(defaultPriceBases, function(err, r) {
+					completedTasks++;
+					checkForCompletion();
+				});
+			} else {
+				throw "[DatabaseInit - plugins collection does not exist]";
+			}
+		});
+
+		log('Database', 'Creating default products entries');
+		db.collection('products', {strict:true}, function(err, col) {
+			if (!err) {
+				col.insertMany(defaultProducts, function(err, r) {
+					completedTasks++;
+					checkForCompletion();
+				});
+			} else {
+				throw "[DatabaseInit - plugins collection does not exist]";
 			}
 		});
 	};

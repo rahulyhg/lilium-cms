@@ -1,0 +1,18 @@
+{#config;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		{%globalhead}
+	</head>
+	<body>
+		<h1>All Campaigns</h1>
+		{*campaigns.all(template:"single-campaign")}
+
+		<h2>Create Campaign</h2>
+		{=forms.render('campaign_create')}
+
+		<lml:template id="single-campaign">
+
+		</lml:template>
+	</body>
+</html>

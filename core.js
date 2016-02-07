@@ -16,6 +16,11 @@ var imageSize = require('./imageSize.js');
 var themes = require('./themes.js');
 var entities = require('./entities.js');
 var cacheInvalidator = require('./cacheInvalidator.js');
+var dfp = require('./dfp.js');
+var postman = require('./postman.js');
+var Products = require('./products');
+var Campaigns = require('./campaigns.js');
+var Frontend = require('./frontend.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -66,6 +71,11 @@ var Core = function() {
 		admin.registerAdminEndpoint('media', 'POST', function(cli){
 			cli.touch("admin.POST.media");
 			Media.handlePOST(cli);
+		});
+
+		admin.registerAdminEndpoint('campaigns', 'GET', function(cli) {
+			cli.touch('admin.GET.campaigns');
+			Campaigns.handleGET(cli);
 		});
 
 		hooks.fire('endpoints');
@@ -140,6 +150,29 @@ var Core = function() {
 
 	var loadRoles = function(cb) {
 		entities.cacheRoles(cb);
+	};
+
+	var loadProducts = function(cb) {
+		db.findToArray('products', {}, function(err, arr) {
+			for (var i = 0; i < arr.length; i++) {
+				Products.registerProduct(arr[i]);
+			}
+
+			db.findToArray('producttypes', {}, function(err, arr) {	
+				for (var i = 0; i < arr.length; i++) {
+					Products.registerProductType(arr[i].name, arr[i].displayName);
+				}
+
+				db.findToArray('productpricebases', {}, function(err, arr) {
+					for (var i = 0; i < arr.length; i++) {
+						Products.registerPriceBase(arr[i].name, arr[i].displayName, arr[i].divider);
+					}
+
+					log('Products', 'Loaded products info from database');
+					cb();
+				});
+			});
+		});
 	};
 
 	var loadTheme = function() {
@@ -297,12 +330,34 @@ var Core = function() {
 	};
 
 	var loadLiveVars = function() {
-		Articles.registerContentLiveVar();
+		// Article.registerContentLiveVar();
 		Media.registerMediaLiveVar();
+		dfp.registerLiveVar();
+		Campaigns.registerLiveVar();
+		entities.registerLiveVars();
+	};
+
+	var loadPostman = function() {
+		postman.createTransporter();
+	};
+
+	var loadDFP = function(cb) {
+		log("DFP", "Loading core user");
+		dfp.createUser();
+
+		if (_c.default.env == 'dev') {
+			dfp.createDevEnv();
+		}
 	};
 
 	var loadForms = function() {
+		Campaigns.registerCreationForm();
 		entities.registerCreationForm();
+		LoginLib.registerLoginForm();
+	};
+
+	var loadFrontend = function() {
+		Frontend.registerFromCore();
 	};
 
 	this.makeEverythingSuperAwesome = function(readyToRock) {
@@ -312,6 +367,10 @@ var Core = function() {
 		loadStandardInput();
 		loadImageSizes();
 		loadForms();
+		loadPostman();
+		loadLiveVars();
+		loadDFP();
+		loadFrontend();
 
 		hooks.bind('themes', function() {
 			log('Core', 'Firing initialized signal');
@@ -326,8 +385,10 @@ var Core = function() {
 			testDatabase(function() {
 				loadPlugins(function(){
 					loadRoles(function() {
-						loadCacheInvalidator();
-						loadTheme();
+						loadProducts(function() {
+							loadCacheInvalidator();
+							loadTheme();
+						});
 					});
 				});
 			});

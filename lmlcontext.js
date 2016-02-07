@@ -6,6 +6,9 @@ var registeredLibraries = {
 	config : function(context) {
 		return require('./config.js');
 	},
+	frontend : function(context) {
+		return require('./frontend.js');
+	},
 	vocab : function(context) {
 		return require('./vocab.js');
 	},
@@ -22,7 +25,7 @@ var registeredLibraries = {
 		return require('./plugins.js');
 	},
 	themes : function(context) {
-   	return require('./themes.js');
+   		return require('./themes.js');
 	},
 	testarray : function(context) {
 		return {array : [{"text":"Hello"}, {"text":" "}, {"text":"world"}, {"text":"!"}]};

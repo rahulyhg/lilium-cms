@@ -1,0 +1,4 @@
+<link rel="stylesheet" href="{=config.default.server.url}/static/lilium.css">
+<script src="{=config.default.server.url}/static/jq.js"></script>
+<script src="{=config.default.server.url}/static/lilium.js"></script>
+

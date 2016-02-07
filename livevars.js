@@ -24,24 +24,6 @@ var RegisteredLiveVariables = {
 		}
 	},
 
-	entities : function(cli, levels, params, callback) {
-		var allEntities = levels.length === 0;
-
-		if (allEntities) {
-			db.singleLevelFind('entities', callback);
-		} else {
-			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
-		}
-	},
-	roles : function(cli, levels, params, callback) {	
-		var allRoles = levels.length === 0;
-
-		if (allRoles) {
-			db.singleLevelFind('roles', callback);
-		} else {
-			db.multiLevelFind('roles', levels, {name:levels[0]}, {limit:[1]}, callback);
-		}
-	},
 	content : function(cli, levels, params, callback) {
 		var allContent = levels.length === 0;
 
@@ -179,11 +161,11 @@ var LiveVariables = function() {
 		}
 	};
 
-	// Function must follow format : function(client, endpoint, callback)
-	// Callback must contain the good value
+	// Function must follow format : function(client, levels, params, callback)
+	// Callback must be called, and must contain an array
 	this.registerLiveVariable = function(endpoint, func) {
 		if (typeof RegisteredLiveVariables[endpoint] === 'undefined') {
-			RegisteredLiveVariables[endpoint] = func();
+			RegisteredLiveVariables[endpoint] = func;
 		} else {
 			throw "[LiveVariables] Tried to register an already defined endpoint : " + endpoint;
 		}

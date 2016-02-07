@@ -14,7 +14,7 @@ var HtmlParser = function() {
     htmlForm = '<form ';
 
     if (form.attr.validate) {
-      htmlForm += 'class="v_form_validate" ';
+      htmlForm += 'class="v_form_validate '+(form.attr.cssClass || "")+'" ';
     }
 
     // Name
@@ -30,16 +30,25 @@ var HtmlParser = function() {
     }
     htmlForm += '/>';
 
+    var hasFieldWrapper = typeof form.attr.fieldWrapper !== "undefined";
+
     //Generate fields
     for (var index in form.fields) {
       field = form.fields[index];
+
+      if (hasFieldWrapper) {
+        htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') + 
+          ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || "field-") + 
+          (field.attr.wrapperCssSuffix || field.type) + 
+          '">';
+      }
 
       // Check whether it's a "Simple" input type or a  more "Complex" one
       if (field.type == 'text' ||
         field.type == 'password' ||
         field.type == 'email') {
 
-        htmlForm += parseSimpleFormType(field, form.attr.placeholder);
+        htmlForm += parseSimpleFormType(field, field.attr.placeholder || form.attr.placeholder);
       } else {
         switch (field.type) {
           case 'button':
@@ -71,8 +80,12 @@ var HtmlParser = function() {
             break;
         }
       }
+      
+      if (hasFieldWrapper) {
+        htmlForm += "</" + (form.attr.fieldWrapper.tag || "div") + ">";
+      }
 
-      htmlForm += '<br>'
+      htmlForm += form.attr.afterField || "";
     }
 
     // Close form tag
@@ -102,12 +115,13 @@ var HtmlParser = function() {
   }
 
   var parseSimpleFormType = function(field, hasPlaceholder) {
-    var input = generateLabel(field, hasPlaceholder);
+    var input = hasPlaceholder ? "" : generateLabel(field, hasPlaceholder);
+    var displayName = field.attr.displayname || field.name || undefined;
     input += '<input type="' + field.type + '" ';
     input += parseBasicFieldAttributes(field);
 
     // Placeholder
-    input += (hasPlaceholder && field.name) ? 'placeholder="' + field.name + '"' : '';
+    input += (hasPlaceholder && displayName) ? 'placeholder="' + displayName + '"' : '';
 
     // MinLenght
     input += field.requirements.minLenght ? 'minlength="' + field.requirements.minLenght + '"' : '';
@@ -198,7 +212,7 @@ var HtmlParser = function() {
       '" data-fieldname="' + field.name +
       '" data-filling="' + field.attr.template +
       '" data-varname="' + field.attr.endpoint +
-      '" data-varprops="' + JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') +
+      '" data-varparam="' + JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') +
       '"></lml:livevars>';
   };
 

@@ -1,5 +1,0 @@
-<form id="lilium-login-form" class="lilium-login-form" method="POST" action="{=config.default.server.url}/login" enctype="x-www-form-urlencoded">
-	<input type="text" placeholder="{=vocab.username}" name="username" />
-	<input type="password" placeholder="{=vocab.password}" name="password" />
-	<input type="submit" value="{=vocab.loginaction}" name="login" />
-</form>

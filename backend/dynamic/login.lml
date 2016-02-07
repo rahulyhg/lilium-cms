@@ -1,13 +1,15 @@
-{#config;vocab}
+{#config;vocab;frontend;forms}
 <!DOCTYPE html>
 <html>
 	<head>
 		<title>{=config.default.website.sitetitle} - {=vocab.logintitle}</title>
-		<link rel="stylesheet" type="text/css" href="{=config.default.login.csspath}" />
-		<script src="{=config.default.login.jspath}"></script>
+		{%loginhead}
 	</head>
-	<body>
-		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
-		{%loginform}
+	<body class="{=frontend.getBodyClasses("login")}" id="{=frontend.getBodyID("login")}">
+		<main class="lmllogin-wrapper">		
+			<header><h1>{=config.default.vendor.productname}</h1></header>
+			{=forms.render("login_form")}
+			<footer>v{=config.default.vendor.version}</footer>
+		</main>
 	</body>
 </html>
