@@ -24,6 +24,24 @@ var RegisteredLiveVariables = {
 		}
 	},
 
+	entities : function(cli, levels, params, callback) {
+		var allEntities = levels.length === 0;
+
+		if (allEntities) {
+			db.singleLevelFind('entities', callback);
+		} else {
+			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
+		}
+	},
+	roles : function(cli, levels, params, callback) {
+		var allRoles = levels.length === 0;
+
+		if (allRoles) {
+			db.singleLevelFind('roles', callback);
+		} else {
+			db.multiLevelFind('roles', levels, {name:levels[0]}, {limit:[1]}, callback);
+		}
+	},
 	content : function(cli, levels, params, callback) {
 		var allContent = levels.length === 0;
 
@@ -70,6 +88,16 @@ var RegisteredLiveVariables = {
 		} else {
 			db.multiLevelFind('themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
 		}
+	},
+
+	plugin : function(cli, levels, params, callback) {
+		var allPlugins = levels.length === 0;
+
+		if (allPlugins) {
+			db.singleLevelFind('plugins', callback);
+		} else {
+			db.multiLevelFind('plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
+		}
 	}
 };
 
@@ -95,7 +123,7 @@ var LiveVariables = function() {
 					});
 				} else {
 					nextVar();
-				}	
+				}
 			} else {
 				next(params);
 			}

@@ -6,9 +6,7 @@ $}
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>{=vocab.{=strPlugin}}</title>
-		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-
+		{%globalhead;entityscript}
 	</head>
 
 	<body>
@@ -27,17 +25,13 @@ $}
 			endfor;
 		$}
 
-		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-
-		<script src="{=config.default.server.url}/static/textParser.js"></script>
-
 		<script>
-		parser.getLiveVars(function() {
-			parser.parseTextToView();
+		liliumcms.livevars.getLiveVars(function() {
+			liliumcms.livevars.parseTextToView();
 
 			$('.plugin').each(function() {
 				var id = $(this).attr('id');
-				if (parser.livevars()[id]) {
+				if (liliumcms.livevars.livevars()[id]) {
 					//Make a disable button for all enabled plugins
 					$(this).find('.plugin-actions').html("<button class='disable-plugin'>Disable</button>");
 				}

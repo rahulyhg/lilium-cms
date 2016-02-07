@@ -5,6 +5,7 @@ var CryptoJS = require('crypto-js');
 var _c = require('../config.js');
 var entities = require('../entities.js');
 var formbuilder = require('../formBuilder.js');
+var hooks = require('../hooks.js');
 
 var Login = function() {
 	var loginSuccess = function(cli, userObj) {
@@ -16,9 +17,12 @@ var Login = function() {
 		userObj.god = entities.isAllowed(userObj, 'lilium');
 		userObj.dashaccess = entities.isAllowed(userObj, 'dash');
 		userObj.user = userObj.username;
-	
+
 		cli.request.session.data = userObj;
 		cli.userinfo = userObj;
+
+		hooks.fire('user_loggedin');
+
 		cli.redirect(_c.default.server.url + "/" + _c.default.paths.admin, false);
 	};
 

@@ -6,9 +6,7 @@ $}
 <html>
 
 <head>
-	<title>{=vocab.themes}</title>
-	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-
+	{%globalhead;entityscript}
 </head>
 
 <body>
@@ -30,17 +28,13 @@ $}
 </body>
 
 </html>
-<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-
-<script src="{=config.default.server.url}/static/textParser.js"></script>
-
 <script>
-parser.getLiveVars(function() {
-	parser.parseTextToView();
+liliumcms.livevars.getLiveVars(function() {
+	liliumcms.livevars.parseTextToView();
 
 	$('.theme').each(function() {
 		var id = $(this).attr('id');
-		if (parser.livevars()[id]) {
+		if (liliumcms.livevars.livevars()[id]) {
 			//Make a disable button
 			$(this).find('.themes-actions').html("<span id='theme_enabled'>This theme is installed</span>");
 		}

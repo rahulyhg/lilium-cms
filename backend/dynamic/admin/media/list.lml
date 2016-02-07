@@ -1,78 +1,36 @@
-{#config;session;vocab;forms;extra;debug}
+{#config;forms}
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-
-	</head>
-	<body>
-		<header><h1>List of medias</h1></header>
-		<a href="{=config.default.server.url}/admin/media/upload">Upload a media</a>
-
-		<div class="media_list">
-
-		</div>
-		<div id="template" class="hidden">
-
-				<div class="media_element">
-				<div class="media_id">
-
-				</div>
-				<div class="media_picture">
-					<img src=""></img>
-				</div>
-				<div class="media_actions">
-					<a class="view" href="">Edit</a>
-					<a id="remove" href="#">Remove</a>
-				</div>
-
-			</div>
-		</div>
-
-		{*media}
-
-		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-
-		<script src="{=config.default.server.url}/static/textParser.js"></script>
-
-		<script>
+		{%../globalhead;../mediascript}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";
 			baseurl += config.default.paths.admin;
+			baseurl += "/";
 		$}
+	</head>
+	<body>
+		<h1>List of medias</h1>
+		<a href="{=baseurl}media/upload">Add a media</a>
+		<main class="medias-main">
+			<ul class="medias-list">
+				{*uploads(template:"medias-list-item")}
+			</ul>
+		</main>
 
-		parser.getLiveVars(function() {
-			parser.parseTextToView();
-			parser.livevars().media.forEach(function (media, index) {
-				var element = $('#template .media_element').clone();
-
-				$(element).attr('id', media._id);
-				$(element).find('.media_id').text(media._id);
-				$(element).find('.media_picture img').attr('src', media.sizes.thumbnail.url);
-				$(element).find('.media_actions .view').attr('href', '{=baseurl}/media/view/' + media._id);
-
-				$('.media_list').append(element);
-			});
-
-		});
-
-		$('.media_list').on('click','#remove',function(event) {
-			event.preventDefault();
-
-			var media_element = $(event.target).closest('.media_element')
-			var id = $(media_element).attr('id');
-
-			$.post('{=baseurl}/media/delete/' + id, function(data) {
-				if (data.success) {
-					$(media_element).remove();
-				}
-			});
-		});
-
-
-		</script>
+		<lml:template id="medias-list-item">
+			<li class="medias-item-list">
+				<lml:tobject data-nodetype="img" data-key="sizes.thumbnail.url"></lml:tobject>
+				<div class="medias-actions">
+					<lml:tobject data-nodetype="button"
+						     data-bind="click"
+						     data-action="deleteMedia"
+						     data-actionparamkey="_id">
+							Delete
+					</lml:tobject>
+				</div>
+			</li>
+		</lml:template>
 	</body>
 </html>
