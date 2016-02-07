@@ -80,7 +80,6 @@ var HtmlParser = function() {
             htmlForm += parseLiveVar(field);
             break;
         }
-        htmlForm += '<br>'
 
       }
       
