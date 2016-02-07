@@ -23,25 +23,6 @@ var RegisteredLiveVariables = {
 			db.multiLevelFind('types', levels, {name:levels[0]}, {}, callback);
 		}
 	},
-
-	entities : function(cli, levels, params, callback) {
-		var allEntities = levels.length === 0;
-
-		if (allEntities) {
-			db.singleLevelFind('entities', callback);
-		} else {
-			db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
-		}
-	},
-	roles : function(cli, levels, params, callback) {
-		var allRoles = levels.length === 0;
-
-		if (allRoles) {
-			db.singleLevelFind('roles', callback);
-		} else {
-			db.multiLevelFind('roles', levels, {name:levels[0]}, {limit:[1]}, callback);
-		}
-	},
 	content : function(cli, levels, params, callback) {
 		var allContent = levels.length === 0;
 
