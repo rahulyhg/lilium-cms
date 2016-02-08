@@ -81,6 +81,11 @@ var Core = function() {
 			Campaigns.handleGET(cli);
 		});
 
+		admin.registerAdminEndpoint('campaigns', 'POST', function(cli) {
+			cli.touch('admin.GET.campaigns');
+			Campaigns.handlePOST(cli);
+		});
+
 		hooks.fire('endpoints');
 		log('Endpoints', 'Loaded endpoints');
 	};
@@ -172,7 +177,7 @@ var Core = function() {
 					}
 
 					log('Products', 'Loaded products info from database');
-					cb();
+					Campaigns.loadCampaignsStatuses(cb);
 				});
 			});
 		});

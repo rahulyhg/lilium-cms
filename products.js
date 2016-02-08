@@ -108,7 +108,7 @@ var Products = function() {
 			if (ftc) {
 				switch (ftc) {
 					case "all":
-						callback(keyValToArray(RegisteredProducts));
+						callback(RegisteredProducts);
 						break;
 					case "tyoes":
 						callback(keyValToArray(RegisteredProductTypes));

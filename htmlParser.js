@@ -14,7 +14,7 @@ var HtmlParser = function() {
     htmlForm = '<form ';
 
     if (form.attr.validate) {
-      htmlForm += 'class="v_form_validate '+(form.attr.cssClass || "")+'" ';
+      htmlForm += 'class="v_form_validate lmlform '+(form.attr.cssClass || "")+'" ';
     }
 
     // Name
@@ -43,7 +43,7 @@ var HtmlParser = function() {
         htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') + 
           ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || "field-") + 
           (field.attr.wrapperCssSuffix || field.type) + 
-          '">';
+          ' lmlform-fieldwrapper">';
       }
 
       // Check whether it's a "Simple" input type or a  more "Complex" one
@@ -75,6 +75,9 @@ var HtmlParser = function() {
             break;
           case 'file' :
             htmlForm += parseFileType(field);
+            break;
+          case 'select' :
+            htmlForm += parseSelectType(field);
             break;
           case 'multiple' :
             htmlForm += parseMultipleType(field);
@@ -163,12 +166,25 @@ var HtmlParser = function() {
   }
 
   var parseCheckBoxType = function(field, hasPlaceholder) {
-    var input = '<input type="checkbox" ';
+    var input = generateLabel(field, hasPlaceholder);
+    input += '<input type="checkbox" ';
     input += parseBasicFieldAttributes(field);
     input += ' />';
-    input += generateLabel(field, hasPlaceholder);
     return input;
   }
+
+  var parseSelectType = function(field) {
+    var input = generateLabel(field) + '<select ' + parseBasicFieldAttributes(field) + ' >';
+
+    if (field.attr.datasource) {
+      for (var i = 0; i < field.attr.datasource.length; i++) {
+        var item = field.attr.datasource[i];
+        input += '<option value="'+item.name+'">' + item.displayName + '</option>';
+      }
+    }
+
+    return input + "</select>";
+  };
 
   var parseHiddenType = function(field) {
     var input = '<input type="hidden" ';
@@ -229,6 +245,7 @@ var HtmlParser = function() {
       '" data-fieldname="' + field.name +
       '" data-filling="' + field.attr.template +
       '" data-varname="' + field.attr.endpoint +
+      '" data-scheme="' + (field.attr.datascheme ? JSON.stringify(field.attr.datascheme).replace(/"/g, '&lmlquote;') : "{}") +
       '" data-varparam="' + (field.attr.props ? JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') : "{}") +
       '"></lml:livevars>';
   };

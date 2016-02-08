@@ -2,6 +2,18 @@
 // Requires vaniryk
 var LiliumCMS = function() {
   var livevars;
+  var pushtables = new Array();
+
+  var LiliumEvents = {
+    livevarsRendered : {
+      event : new CustomEvent('livevarsRendered'),
+      name : "livevarsRendered"
+    },
+    livevarsFetched : {
+      event : new CustomEvent('livevarsFetched'),
+      name : "livevarsFetched"
+    }
+  };
 
   var LiveVars = function() {
     var endpoints = [];
@@ -163,7 +175,13 @@ var LiliumCMS = function() {
           var varValue = livevars[$(this).data('varname')];
           var fillerName = $(this).data('filler');
 
-          if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
+          if (fillerName == "pushtable") {            
+            var datascheme = $(this).data('scheme');
+            var pushTable = new PushTable($(this).data('fieldname'), datascheme, varValue);
+            pushtables.push(pushTable);           
+ 
+            $(lmlTag).after(pushTable.render()).remove();
+          } else if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
             var templateObj = $('#' + $(this).data('template'));
 
             if (templateObj.length != 0) {
@@ -190,8 +208,7 @@ var LiliumCMS = function() {
           }
         }
       });
-      document.dispatchEvent(livevarsReadyEvent);
-
+      document.dispatchEvent(LiliumEvents.livevarsRendered.event);
     };
 
     this.livevars = function() {
@@ -321,6 +338,165 @@ var LiliumCMS = function() {
     this.parse = function(selector) {
       $("form").deserialize(livevars[selector][0]);
     };
+  };
+
+  var PushTable = function(tableid, dataScheme, dataSource) {
+    var datasrc = dataSource;
+    var html = "";
+    var scheme = JSON.parse(dataScheme.replace(/&lmlquote;/g, '"'));
+    var htmlIdentifier = tableid;
+    var that = this;
+    var rows = new Object();
+
+    this.rendered = false;
+
+    this.bindEvents = function() {
+      if (this.rendered) {
+        $('#' + htmlIdentifier).find('.lmlpushtablekeyer').bind('change', function() { return that.selectChanged(this); });
+        $('#' + htmlIdentifier).find('.lmlpushtablecolumnaddaction').bind('click', function() { return that.appendRow(this) });
+      } else {
+        throw "Tried to apply bindings on a PushTable that was not yet rendered. Identifier : " + this.htmlIdentifier;
+      }
+
+      this.selectChanged();
+    };
+
+    this.rowToHTML = function(row) {
+      var _h = '<tr class="lmlpushtableaddedrow" id="'+row._rowID+'" data-value="'+row['_lmlid']+'"><td>'+
+        '<b>'+row['_title']+'</b><input type="hidden" name="'+tableid+'['+row._rowID+'][prodid]" value="'+row['_lmlid']+'" /></td>';
+
+      for (var key in row) {
+        if (key[0] != "_") {
+          _h += '<td><span>'+row[key].toString()+'</span><input type="hidden" name="'+
+            tableid+'['+row._rowID+']['+key+']" value="'+row[key]+'" /></td>';
+        }
+      }
+
+      return _h + '<td><button class="lmlpushtableremovebutton">Remove</button></td></tr>'; 
+    };
+
+    this.removeDeleteRow = function(rowID) {
+      $('#' + rowID).remove();
+      delete rows[rowID];
+      that.updateFooter();
+
+      return false;
+    };
+
+    this.appendRow = function() {
+      var row = new Object();
+      row._rowID = "row" + Math.random().toString(36).slice(-12);
+    
+      row['_lmlid'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer').val();
+      row['_title'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer option:selected').html();
+ 
+      $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield').each(function(index, val) {
+        var fieldname = $(this).data('fieldname');
+        row[fieldname] = $(this).val();
+      }); 
+
+      rows[row._rowID] = row;
+      (function(rowID) {
+        $('#' + htmlIdentifier).find('tbody').append(that.rowToHTML(row))
+          .find('tr').last().find('.lmlpushtableremovebutton').bind('click', function() {
+            that.removeDeleteRow(rowID);
+          }
+        );
+      })(row._rowID);
+
+      that.updateFooter(); 
+      return false;
+    };
+
+    this.selectChanged = function(select) {
+      var key = $(select || ("#" + htmlIdentifier + " .lmlpushtablekeyer option:selected")).val();
+      var src = datasrc[key];
+
+      $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield').each(function(index, val) {
+        var dataKeyName = $(this).data('keyname');
+        var defaultValue = $(this).data('defaultvalue');
+        $(this).val(dataKeyName ? src[dataKeyName] : defaultValue); 
+      });
+
+      return false;
+    };
+
+    this.render = function() {
+      this.rendered = true;
+      return html;
+    };
+
+    this.updateFooter = function() {
+      if (scheme.footer) {
+        var table = $('#' + htmlIdentifier);
+        table.find('tfoot tr td:gt(0)').each(function(index, col) {
+          if (scheme.footer.sumIndexes.indexOf(index) !== -1) {
+             var colScheme = scheme.columns[index];
+             var total = 0;
+ 
+             for (var rowID in rows) {
+               total += parseInt(rows[rowID][colScheme.fieldName]);
+             }
+
+             $(col).html(total + (colScheme.prepend || ""))
+          }
+        });
+      }
+
+      return false;
+    };
+  
+    this.init = function() {
+      html += '<table id="'+tableid+'" class="lmlpushtable lmldatasourcetable"><thead><tr><th>' + 
+        scheme.key.displayName + '</th>'
+
+      for (var i = 0; i < scheme.columns.length; i++) {
+        html += "<th>" + scheme.columns[i].displayName + "</th>";
+      }
+
+      html += '<th></th></tr><tr><th><select class="lmlpushtablekeyer">';
+
+      for (var key in dataSource) {
+        var dat = dataSource[key];
+        html += '<option class="lmlpushtableoptionkey" value="'+dat[scheme.key.keyValue]+'">'+dat[scheme.key.keyName]+'</option>';
+      }
+
+      html += '</select></th>';
+      
+      for (var i = 0; i < scheme.columns.length; i++) {
+        var col = scheme.columns[i];
+        html += '<th><input class="lmlpushtablecolumnfield" type="'+(col.dataType || "text")+
+         '" data-fieldname="'+col.fieldName+
+         (col.keyName ? '" data-keyname="'+col.keyName : "") +
+         (col.defaultValue ? '" data-defaultvalue="'+col.defaultValue : "") +
+         '" /></th>';
+      }
+     
+      html += '<th><button class="lmlpushtablecolumnaddaction">Add</button></th>' +
+       '</tr></thead><tbody></tbody>';
+
+      if (scheme.footer) {
+        html += '<tfoot><tr><td>' + scheme.footer.title + '</td>';
+	
+        for (var i = 0; i < scheme.columns.length; i++) {
+          if (scheme.footer.sumIndexes.indexOf(i) !== -1) {
+            html += '<td>0'+(scheme.columns[i].prepend||"")+'</td>'
+          } else {
+            html += '<td></td>';
+          }
+        }
+
+        html += '<td></td></tr></tfoot>';
+      }
+
+      html += '</table>'; 
+
+      document.addEventListener(LiliumEvents.livevarsRendered.name, function() {
+        that.bindEvents();        
+      });
+    };
+
+    this.init();
   };
 
   var CKEditor = function() {
@@ -573,4 +749,3 @@ var liliumcms = new LiliumCMS();
 $(function() {
   liliumcms.awesomestrapper.strap();
 });
-var livevarsReadyEvent = new Event('livevarsReady');

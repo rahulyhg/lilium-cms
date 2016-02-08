@@ -7,6 +7,7 @@ var filelogic = require('./filelogic.js');
 var formbuilder = require('./formBuilder.js');
 
 var cachedCampaigns = new Object();
+var registeredStatuses = new Array();
 
 var Campaigns = function() {
 	var that = this;
@@ -14,6 +15,16 @@ var Campaigns = function() {
 	this.getCampaignsFromDatabase = function(conds, cb) {
 		db.findToArray('campaigns', conds, function(err, data) {
 			cb(err || data);
+		});
+	}
+
+	this.loadCampaignsStatuses = function(cb) {
+		db.findToArray('campaignStatuses', new Object(), function(err, data) {
+			for (var i = 0; i < data.length; i++) {
+				registeredStatuses.push(data[i]);
+			}
+
+			cb();
 		});
 	}
 
@@ -49,11 +60,22 @@ var Campaigns = function() {
 		}
 	};
 
+	this.handlePOST = function(cli) {
+		cli.touch('campaigns.handlePOST');
+		cli.debug();
+	};
+
 	this.registerCreationForm = function() {
 		formbuilder.createForm('campaign_create', {
-
+				fieldWrapper : {
+					'tag' : 'div',
+					'cssPrefix' : 'campaigncreatefield-'
+				},
+				cssClass : "form-campaign-creation"
 			})
+			.add('projectid', 'text', {displayname:"Project ID"})
 			.add('campname', 'text', {displayname:"Campaign name"})
+			.add('campstatus', 'select', {displayname:"Status", datasource: registeredStatuses})
 			.add('clientid', 'livevar', {
 				endpoint : "entities.query",
 				tag : "select",
@@ -68,12 +90,25 @@ var Campaigns = function() {
 					value : "_id"
 				}
 			})
-			.add('products', 'livevar', {
+			.add('paymentreq', 'checkbox', {displayname:"Payment required prior to production"})
+			.add('productstable', 'livevar', {
 				endpoint : "products.all",
 				tag : "pushtable",
 				title : "products",
 				displayname : "Products",
-				template : "tmpl_productrow"
+				template : "tmpl_productrow",
+				datascheme : {
+					key : {displayName: "Product", keyName: "displayName", keyValue: "name"},
+					columns : [
+						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1},
+						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
+						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"}	
+					],
+					footer : {
+						title : "Total",
+						sumIndexes : [1]
+					}
+				}
 			})
 			.add('create', 'submit');
 	};

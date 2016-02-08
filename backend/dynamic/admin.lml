@@ -5,10 +5,8 @@ $}
 <!DOCTYPE html>
 <html>
 	<head>
+		{%adminhead}
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-		<link rel="stylesheet" type="text/css" href="{=config.default.admin.csspath}" />
-		<script src="{=config.default.admin.jspath}"></script>
-		<script src="{=config.default.server.url}/static/textParser.js"></script>
 	</head>
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
