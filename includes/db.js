@@ -99,7 +99,11 @@ var DB = function() {
 	};
 
 	this.mongoID = function(str) {
-		return new mongoObjectID(str);
+		try{
+			return new mongoObjectID(str);
+		} catch (err) {
+			return;
+		}
 	};
 
 	this.findToArray = function(coln, conds, cb) {

@@ -3,7 +3,7 @@ var mongoDocuments = {
 		"entities", "roles", "plugins", "themes", "config",
 		"sites", "discussions", "types", "vocab", "content",
 		"lilium", "uploads", "cachedFiles", "campaigns", "products",
-		"producttypes", "productpricebases"
+		"producttypes", "productpricebases", "changerequests"
 	]
 };
 
