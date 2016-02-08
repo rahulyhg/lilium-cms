@@ -62,7 +62,7 @@ var LML = function() {
 		return false;
 	};
 
-	var fetchLiveParams = function(paramsString) { 
+	var fetchLiveParams = function(paramsString) {
 		var json = {};
 
 		if (paramsString) {
@@ -75,7 +75,7 @@ var LML = function() {
 				var val = str.substring(str.indexOf(':')+1).replace(/^\"|\"$/g, "");
 					json[key] = val;
 			}
-		} 
+		}
 
 		return json;
 	};
@@ -103,7 +103,7 @@ var LML = function() {
 	var execIncludeTag = function(context, code, callback) {
 		var split = code.split(';');
 		var currentIndex = 0;
-	
+
 		var next = function() {
 			if (currentIndex == split.length) {
 				callback();
@@ -685,7 +685,11 @@ var LML = function() {
 						fileserver.closeFileHandle(fileHandle);
 
 						log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms');
-						fileserver.minifyHTML(compilepath, callback);
+						if (_c.default.env == 'prod') {
+							fileserver.minifyHTML(compilepath, callback);
+						} else {
+							callback();
+						}
 					}
 				}
 
