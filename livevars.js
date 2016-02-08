@@ -23,15 +23,6 @@ var RegisteredLiveVariables = {
 			db.multiLevelFind('types', levels, {name:levels[0]}, {}, callback);
 		}
 	},
-	content : function(cli, levels, params, callback) {
-		var allContent = levels.length === 0;
-
-		if (allContent) {
-			db.singleLevelFind('content', callback);
-		} else {
-			db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
-		}
-	},
 	sites : function(cli, levels, params, callback) {
 		var allContent = levels.length === 0;
 
@@ -156,18 +147,23 @@ var LiveVariables = function() {
 	};
 
 	this.handleRequest = function(cli) {
-		var liveVars = JSON.parse(cli.routeinfo.params.vars);
-		cli.livevars = {};
+		try{
+			var liveVars = JSON.parse(cli.routeinfo.params.vars);
+			cli.livevars = {};
 
-		var callback = function() {
-			cli.sendJSON(cli.livevars);
-		};
+			var callback = function() {
+				cli.sendJSON(cli.livevars);
+			};
 
-		if (typeof liveVars === 'object') {
-			startLoop(cli, liveVars, cli.livevars, callback);
-		} else {
-			callback();
+			if (typeof liveVars === 'object') {
+				startLoop(cli, liveVars, cli.livevars, callback);
+			} else {
+				callback();
+			}
+		} catch(e) {
+			cli.throwHTTP(400, 'Bad request');
 		}
+
 	};
 
 	// Function must follow format : function(client, levels, params, callback)

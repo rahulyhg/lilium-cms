@@ -38,7 +38,7 @@ var Article = function() {
         break;
       case 'getArticle':
         this.getArticle(cli);
-				break;
+        break;
       case 'list':
         this.list(cli);
         break;
@@ -133,7 +133,9 @@ var Article = function() {
     if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
       var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
-      db.remove('content', {_id : id},function(err, r){
+      db.remove('content', {
+        _id: id
+      }, function(err, r) {
         var filename = r.title + '.html';
         fs.deleteFile(filename, function() {
           cacheInvalidator.removeFileToWatch(filename);
@@ -174,14 +176,24 @@ var Article = function() {
     // Return article object from DB
   };
 
-  this.registerContentLiveVar = function() {
+  var registerContentLiveVar = function() {
     livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
+      console.log('livevars');
+
       var allContent = levels.length === 0;
+      console.log(params);
 
       if (allContent) {
         db.singleLevelFind('content', callback);
       } else {
-        db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+
+        db.multiLevelFind('content', levels, {
+          _id: new mongo.ObjectID(levels[0])
+        }, {
+          limit: [1]
+        }, callback);
+
+
       }
     });
   }
@@ -196,12 +208,14 @@ var Article = function() {
       .add('publish', 'submit');
   }
 
-  cacheInvalidator.emitter.on('articleInvalidated',function(id) {
-    console.log('Article id is : '+ id);
+  cacheInvalidator.emitter.on('articleInvalidated', function(id) {
+    console.log('Article id is : ' + id);
   });
 
 
-  var init = function() {};
+  var init = function() {
+    registerContentLiveVar();
+  };
 
   init();
 }

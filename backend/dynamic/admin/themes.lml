@@ -33,7 +33,6 @@ liliumcms.livevars.getLiveVars(function() {
 	$('.theme').each(function() {
 		var id = $(this).attr('id');
 		if (liliumcms.livevars.livevars()[id]) {
-			//Make a disable button
 			$(this).find('.themes-actions').html("<span id='theme_enabled'>This theme is installed</span>");
 		}
 	});

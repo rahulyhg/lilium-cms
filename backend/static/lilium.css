@@ -1,4 +1,4 @@
-/* Lilium CMS - Flat style 
+/* Lilium CMS - Flat style
  *
  *
  *
@@ -22,7 +22,6 @@ input, textarea, button {
 button, input[type="submit"] {
 	cursor: pointer;
 
-	
 }
 
 lml\:template, lml\:tobject, lml {
@@ -30,13 +29,17 @@ lml\:template, lml\:tobject, lml {
 }
 
 h1, h2, h3, h4, h5, h6 {
-	margin:0; 
+	margin:0;
 	padding:0;
 	font-weight: 100;
 }
 
+form input, form label{
+	display: block;
+}
+
 .lilium {
-	padding:0; 
+	padding:0;
 	margin:0;
 }
 
@@ -117,4 +120,3 @@ h1, h2, h3, h4, h5, h6 {
 
 	margin-top: 3px;
 }
-

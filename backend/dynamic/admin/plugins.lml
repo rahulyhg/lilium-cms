@@ -31,7 +31,6 @@ $}
 			$('.plugin').each(function() {
 				var id = $(this).attr('id');
 				if (liliumcms.livevars.livevars()[id]) {
-					//Make a disable button for all enabled plugins
 					$(this).find('.plugin-actions').html("<button class='disable-plugin'>Disable</button>");
 				}
 			});

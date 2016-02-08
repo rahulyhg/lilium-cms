@@ -504,7 +504,7 @@ var LiliumCMS = function() {
       });
     }
   };
-  
+
   var deepUnescape = function(json){
     for (var index in json) {
       switch (typeof json[index]) {
@@ -534,7 +534,7 @@ var LiliumCMS = function() {
 
   var AwesomeStrapper = function() {
     this.strap = function() {
-      
+
       var livevars = new LiveVars();
       var lmlhtml5 = new LMLHTML5();
 
@@ -563,7 +563,7 @@ var LiliumCMS = function() {
         window.location.params[keyVal[0]] = keyVal[1];
       }
     }
-    
+
   };
 
   init();

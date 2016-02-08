@@ -1,21 +1,29 @@
 {#config;session;vocab;forms}
 <!DOCTYPE html>
 <html>
-	<head>
-		{%../globalhead;../entityscript}
-		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-	</head>
-	<body>
-		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
-		<h2>Create a new post</h2>
-    {=forms.render('post_create')}
-		<div id="editor"></div>
-		<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
-		<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
-		<script>
+
+<head>
+	{%../globalhead;../entityscript}
+	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+</head>
+
+<body>
+	<header>
+		<h1>{=config.default.vendor.productname}
+			<small>v{=config.default.vendor.version}</small>
+		</h1>
+	</header>
+	<h2>Create a new post</h2>
+	{=forms.render('post_create')}
+	<div id="editor"></div>
+	<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
+	<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
+	<script>
 		liliumcms.ckeditor.initEditor();
-		</script>
-	</body>
+	</script>
+
+</body>
+
 </html>

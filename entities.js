@@ -259,7 +259,7 @@ var Entities = function() {
 			} else if (levels[0] == 'query') {
 				var queryInfo = params.query || new Object();
 				var qObj = new Object();
-				
+
 				qObj._id = queryInfo._id;
 				qObj.displayname = queryInfo.displayname;
 				qObj.email = queryInfo.email;
@@ -273,8 +273,8 @@ var Entities = function() {
 				db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 			}
 		});
-	
-		livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {	
+
+		livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {
 			var allRoles = levels.length === 0;
 
 			if (allRoles) {
@@ -284,7 +284,7 @@ var Entities = function() {
 			}
 		});
 	};
-	
+
 	var init = function() {
 
 	};
