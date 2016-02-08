@@ -140,7 +140,7 @@ var LiliumCMS = function() {
     };
 
     var generateFillingFromObject = function(filler, fillingData, data) {
-      var props = JSON.parse(fillingData.varprops.replace(/&lmlquote;/g, '"'));
+      var props = typeof fillingData.varparam == "object" ? fillingData.varparam : JSON.parse(fillingData.varparam.replace(/&lmlquote;/g, '"'));
       var filling = $(document.createElement(fillingData.filling));
 
       for (var key in props) {
@@ -534,6 +534,7 @@ var LiliumCMS = function() {
 
   var AwesomeStrapper = function() {
     this.strap = function() {
+      
       var livevars = new LiveVars();
       var lmlhtml5 = new LMLHTML5();
 
@@ -549,6 +550,23 @@ var LiliumCMS = function() {
   this.refresh = function() {
     window.location.reload();
   };
+
+  var init = function() {
+    var pathname = window.location.pathname;
+    var split = pathname.split('?')[1];
+    window.location.params = new Object();
+
+    if (split) {
+      split = split.split('&');
+      for (var i = 0; i < split.length; i++) {
+        var keyVal = split[i].split('=');
+        window.location.params[keyVal[0]] = keyVal[1];
+      }
+    }
+    
+  };
+
+  init();
 };
 
 var liliumcms = new LiliumCMS();

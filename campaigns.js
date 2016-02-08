@@ -50,8 +50,10 @@ var Campaigns = function() {
 	};
 
 	this.registerCreationForm = function() {
-		formbuilder.createForm('campaign_create')
-			.add('name', 'text', {displayname:"Campaign name"})
+		formbuilder.createForm('campaign_create', {
+
+			})
+			.add('campname', 'text', {displayname:"Campaign name"})
 			.add('clientid', 'livevar', {
 				endpoint : "entities.query",
 				tag : "select",
@@ -65,6 +67,13 @@ var Campaigns = function() {
 					html : "displayname",
 					value : "_id"
 				}
+			})
+			.add('products', 'livevar', {
+				endpoint : "products.all",
+				tag : "pushtable",
+				title : "products",
+				displayname : "Products",
+				template : "tmpl_productrow"
 			})
 			.add('create', 'submit');
 	};

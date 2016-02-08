@@ -89,8 +89,9 @@ var FormBuilder = function() {
     return this;
   }
 
-  this.add = function(name, type, attr, requirements) {
+  this.add = function(name, type, attr, requirements, contextForm) {
     // Check if it is a tempalte
+    currentForm = contextForm || currentForm;
 
     if (typeof currentForm == 'undefined') {
       throw "[FormBuilderException] - Form not created. Please call createForm() first.";
@@ -99,7 +100,7 @@ var FormBuilder = function() {
       currentForm.fields = {};
     }
     if (typeof currentForm.fields[name] !== 'undefined') {
-      throw "[FormBuilderException - Field already added : " + name;
+      throw "[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]);
     }
 
     currentForm.fields[name] = createField(name, type, attr, requirements);
@@ -178,7 +179,7 @@ var FormBuilder = function() {
         value: formName
       }, {
         required: false
-      });
+      }, forms[formName]);
     }
 
     return htmlParser.parseForm(forms[formName]);

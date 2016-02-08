@@ -1,5 +1,6 @@
 var log = require('./log.js');
 var _c = require('./config.js');
+var livevars = require('./livevars.js');
 
 var RegisteredProducts = new Object();
 var RegisteredProductTypes = new Object();
@@ -89,6 +90,40 @@ var Products = function() {
 				divider : divider
 			};
 		}
+	};
+
+	var keyValToArray = function(obj) {
+		var arr = new Array();
+		for (key in obj) {
+			arr.push(obj[key]);
+		}
+
+		return arr;
+	};
+
+	this.registerLiveVar = function() {
+		livevars.registerLiveVariable('products', function(cli, levels, params, callback) {
+			var ftc = levels[0];
+
+			if (ftc) {
+				switch (ftc) {
+					case "all":
+						callback(keyValToArray(RegisteredProducts));
+						break;
+					case "tyoes":
+						callback(keyValToArray(RegisteredProductTypes));
+						break;
+					case "pricebases":
+						callback(keyValToArray(RegisteredPriceBases));
+						break;
+					default:
+						callback("[ProductException] Undefined action : " + ftc);
+						break;
+				}
+			} else {
+				callback("[ProductException] Root level if forbidden. A first level must be defined");
+			}
+		});
 	};
 };
 
