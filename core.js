@@ -338,6 +338,7 @@ var Core = function() {
 		dfp.registerLiveVar();
 		Campaigns.registerLiveVar();
 		entities.registerLiveVars();
+		Products.registerLiveVar();
 	};
 
 	var loadPostman = function() {

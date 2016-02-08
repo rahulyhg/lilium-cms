@@ -76,6 +76,12 @@ var HtmlParser = function() {
           case 'file' :
             htmlForm += parseFileType(field);
             break;
+          case 'multiple' :
+            htmlForm += parseMultipleType(field);
+            break;
+          case 'stack' :
+            htmlForm += parseStackType(field);
+            break;
           case 'livevar' :
             htmlForm += parseLiveVar(field);
             break;
@@ -184,6 +190,11 @@ var HtmlParser = function() {
     return input;
   }
 
+  var parseMultipleType = function(field) {
+    var input = generateLabel(field);
+  
+  }
+
   var parseTextAreaType = function(field, hasPlaceholder) {
     var input = generateLabel(field, hasPlaceholder);
     input += '<textarea ';
@@ -219,7 +230,7 @@ var HtmlParser = function() {
       '" data-fieldname="' + field.name +
       '" data-filling="' + field.attr.template +
       '" data-varname="' + field.attr.endpoint +
-      '" data-varparam="' + JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') +
+      '" data-varparam="' + (field.attr.props ? JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') : "{}") +
       '"></lml:livevars>';
   };
 
