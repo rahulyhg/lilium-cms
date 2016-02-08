@@ -178,10 +178,8 @@ var Article = function() {
 
   var registerContentLiveVar = function() {
     livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
-      console.log('livevars');
 
       var allContent = levels.length === 0;
-      console.log(params);
 
       if (allContent) {
         db.singleLevelFind('content', callback);

@@ -1,7 +1,6 @@
 var conf = require('./config.js');
 var stripe = require('stripe')(conf.default.stripe.secretkey);
 var transaction = function() {
-  console.log('in here');
 
   this.ini = function() {
 
@@ -39,7 +38,7 @@ var transaction = function() {
       }
     );
   };
-  
+
 
   this.createNewCustomer = function(entity, cb) {
     stripe.customers.create({
