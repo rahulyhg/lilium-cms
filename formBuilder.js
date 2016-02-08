@@ -6,8 +6,7 @@
 var htmlParser = require('./htmlParser');
 var validator = require('validator');
 
-var templates = {};
-var forms = {};
+
 
 var Form = function(name, cb) {
   this.name = name;
@@ -50,7 +49,9 @@ var Field = function(name, type) {
 }
 
 var FormBuilder = function() {
-  this.currentForm;
+  var templates = {};
+  var forms = {};
+  var currentForm = undefined;
 
   this.createForm = function(name, attr, cb) {
 
@@ -173,6 +174,8 @@ var FormBuilder = function() {
     if (typeof forms[formName] == 'undefined') {
       throw "[FormBuilderException] - Form to render doesn't exists : " + formName;
     }
+
+    currentForm = forms[formName];
 
     if (typeof forms[formName].fields['form_name'] == 'undefined') {
       this.add('form_name', 'hidden', {
