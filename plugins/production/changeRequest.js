@@ -2,7 +2,7 @@ var fileLogic = undefined;
 var config = undefined;
 var livevars = undefined;
 var db = undefined;
-var formbuilder= undefined;
+var formBuilder= undefined;
 
 var ChangeRequest = function() {
   this.handleGET = function(cli) {
@@ -22,10 +22,7 @@ var ChangeRequest = function() {
   this.handlePOST = function(cli) {
     switch (cli.routeinfo.path[3]) {
       case 'edit':
-        this.edit(cli);
-        break;
-      case 'changerequest':
-        changeRequest.handleGET(cli);
+        this.updateChange(cli);
         break;
       default:
         cli.throwHTTP(404, 'Page not found');
@@ -33,9 +30,38 @@ var ChangeRequest = function() {
     }
   };
 
+  this.updateChange = function(cli) {
+    var form = formBuilder.handleRequest(cli);
+    var response = formBuilder.validate(form, true);
+    if (response.success) {
+      //Change status to client approval
+      db.findAndModify('changerequests', {_id : db.mongoID(cli.routeinfo.path[4])}, {status: "Pending Approval"}, function(err, doc) {
+        if (err) {
+          cli.sendJSON({
+            success: false
+          });
+
+        } else {
+          //Update article content
+          db.update('content', {
+            _id: db.mongoID(doc.value.articleId)
+          }, {content : formBuilder.serializeForm(form).original}, function(err, r) {
+            cli.sendJSON({
+              success: true
+            });
+          });
+
+        }
+
+      });
+    }
+
+
+  };
+
   this.edit = function(cli) {
     fileLogic.serveLmlPluginPage('production', cli, true);
-  }
+  };
 
   this.genLivevars = function() {
 
@@ -73,13 +99,12 @@ var ChangeRequest = function() {
     livevars = require(abspath + 'livevars.js');
     db = require(abspath + 'includes/db.js');
 
-    formbuilder = require(abspath + 'formBuilder.js');
+    formBuilder = require(abspath + 'formBuilder.js');
 
     this.genLivevars();
 
-    formbuilder.createForm('changerequest_edit')
-    .add('original[0].content', 'ckeditor', {})
-    .add('diff', 'ckeditor', {readOnly : true})
+    formBuilder.createForm('changerequest_edit')
+    .add('original', 'ckeditor', {displayname: 'Original Content'})
     .add('Change', 'submit')
 
   };

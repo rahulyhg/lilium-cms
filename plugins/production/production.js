@@ -54,7 +54,7 @@
 	         sponsoredarticle.createSponsoredContent(cli);
 	         break;
 	       case 'changerequest':
-	         changerequest.handleGET(cli);
+	         changerequest.handlePOST(cli);
 	         break;
 	       default:
 	         cli.throwHTTP(404, 'Page not found');

@@ -7,36 +7,80 @@
 	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+	<style>
+	.__removed__ {
+		color : red;
+		text-decoration: line-through;
+	}
+
+	.__added__ {
+		color: green;
+	}
+	</style>
 </head>
 
 <body>
-	<h2>Change Request</h2>
-	{*changerequests.{?1}(diffview:true)} {=forms.render('changerequest_edit')}
-	<div id="editor"></div>
+	<div class="row">
+		<div class="col-md-12">
+			<h2>Change Request</h2>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			{=forms.render('changerequest_edit')}
+		</div>
+		<div class="col-md-6">
+			<label>Change Requested</label>
+			<div id="editor_diff"></div>
+		</div>
+	</div>
+	{*changerequests.{?1}(diffview:true)}
+
 	<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
 	<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
 	<script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
 
 	<script>
 		$(document).ready(function() {
+			var loaded = false;
 			document.addEventListener('livevarsReady', function() {
-				genDiffView();
+				if(!loaded) genDiffView();
+				loaded = true;
+				liliumcms.ckeditor.initEditor();
+
 			})
 
 			var genDiffView = function() {
 				var lastUrlParam = liliumcms.getUrlParams()[liliumcms.getUrlParams().length - (1)];
 				var changerequest_livevar = liliumcms.livevars.livevars()['changerequests.' + lastUrlParam][0];
-				console.log(changerequest_livevar);
 				var original = changerequest_livevar.original[0].content;
 				var request = changerequest_livevar.diff;
-				var diff = JsDiff.diffChars(original, request);
-				var textarea = $('#editor');
 
-				diff.forEach(function(part) {
-					console.log(part);
-					var elem = part.added ?'<span class="__added__">' + part.value + '</span>': part.removed ? '<span class="__removed__">' + part.value + '</span>': part.value;
-					$(textarea).append(elem);
+
+				// Add new lines for each html elements for line diff
+				var neworiginal = "";
+				//Loop trough each elements
+				$(original).each(function(index,elem) {
+					neworiginal += $(elem).prop('outerHTML') + "\n";
 				});
+				original = neworiginal;
+
+				var newdiff = "";
+				//Loop trough each elements
+				$(request).each(function(index,elem) {
+					newdiff += $(elem).prop('outerHTML') + "\n";
+				});
+				request = newdiff;
+				var diff = JsDiff.diffLines(original, request, {newlineIsToken: true});
+
+				var textarea = $('textarea[name=diff]');
+				var text = "";
+				diff.forEach(function(part) {
+					var elem = part.added ?'<span class="__added__">' + part.value + '</span>': part.removed ? '<span class="__removed__">' + part.value + '</span>': part.value;
+						text += elem;
+				});
+					$('#editor_diff').append(text);
+					$('textarea[name=original]').val(original);
 			}
 		});
 
