@@ -5,6 +5,7 @@ var filelogic = require('./filelogic.js');
 var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
+var livevars = require('./livevars.js');
 
 var RegisteredPlugins = new Object();
 var CachedPlugins = new Array();
@@ -170,6 +171,18 @@ var Plugins = function() {
 	this.bindEndpoints = function() {
 		Admin.registerAdminEndpoint('plugins', 'GET', this.serveAdminList);
 		Admin.registerAdminEndpoint('plugins', 'POST', this.handlePOST);
+	};
+
+	this.registerLiveVar = function() {
+		livevars.registerLiveVariable("plugins", function(cli, levels, params, callback) {
+			var allPlugins = levels.length === 0;
+
+			if (allPlugins) {
+				db.singleLevelFind('plugins', callback);
+			} else {
+				db.multiLevelFind('plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
+			}
+		}, ['plugins']);
 	};
 
 	var init = function() {

@@ -199,7 +199,18 @@ var Entities = function() {
 
 	this.isAllowed = function(entity, right) {
 		var allowed = false;
-		if (typeof entity.roles !== 'undefined') {
+		var that = this;
+
+		if (!entity.loggedin && (right === "" || right.length === 0)) {
+			allowed = true;
+		} else if (typeof right === "object" && typeof right.length !== 'undefined') { 
+			var rights = right;
+			for (var i = 0; i < rights.length; i++) {
+				allowed = that.isAllowed(entity, rights[i]);
+
+				if (!allowed) break;
+			}
+		} else if (typeof right === "string" && typeof entity.roles !== 'undefined') {
 			allowed = entity.roles.indexOf('lilium') !== -1;
 
 			if (!allowed) {
@@ -221,7 +232,6 @@ var Entities = function() {
 
 		}
 		return allowed;
-
 	};
 
 	this.registerCreationForm = function() {
@@ -272,7 +282,7 @@ var Entities = function() {
 			} else {
 				db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 			}
-		});
+		}, ["entities"]);
 	
 		livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {	
 			var allRoles = levels.length === 0;
@@ -282,7 +292,17 @@ var Entities = function() {
 			} else {
 				db.multiLevelFind('roles', levels, {name:levels[0]}, {limit:[1]}, callback);
 			}
-		});
+		}, ["roles"]);
+
+		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
+			var dat = cli.request.session.data;
+
+			for (var i = 0; i < levels.length; i++) {
+				dat = dat[levels[i]];
+			}
+	
+			callback(dat);
+		}, []);		
 	};
 	
 	var init = function() {

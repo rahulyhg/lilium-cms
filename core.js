@@ -338,12 +338,14 @@ var Core = function() {
 	};
 
 	var loadLiveVars = function() {
-		// Article.registerContentLiveVar();
+		Article.registerContentLiveVar();
 		Media.registerMediaLiveVar();
 		dfp.registerLiveVar();
 		Campaigns.registerLiveVar();
 		entities.registerLiveVars();
 		Products.registerLiveVar();
+		plugins.registerLiveVar();
+		themes.registerLiveVar();
 	};
 
 	var loadPostman = function() {
