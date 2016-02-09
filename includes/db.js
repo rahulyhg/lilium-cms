@@ -184,6 +184,33 @@ var DB = function() {
 
 	};
 
+	this.findAndModify = function(coln, conds, newVal, cb, upsert, one) {
+		_conn.collection(coln, {"strict":true}, function(err, col) {
+			if (err) {
+				cb("[Database - Error : "+err+"]");
+			} else if (typeof conds != "object") {
+				cb("[Database - Invalid document]");
+			} else {
+				conds = typeof conds === 'undefined' ? {} : conds;
+				if (typeof newVal !== 'object') {
+					cb('[Database - Invalid mod values]');
+				} else {
+					col.findAndModify(
+						conds,
+						[['_id','asc']],
+						{$set:newVal},
+						{
+							'upsert' : upsert ? upsert : false,
+							$limit : 1
+						}
+					).then(function(doc) {
+						cb(undefined, doc);
+					});
+				}
+			}
+		});
+	}
+
 	this.insert = function(coln, docs, cb) {
 		_conn.collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
