@@ -1,0 +1,20 @@
+Welcome advertiser
+
+<lml:template id="articles-list-item">
+  <li class="articles-item-list">
+    <lml:tobject data-nodetype="h3" data-key="title"></lml:tobject>
+    <div class="articles-actions">
+      <lml:tobject data-nodetype="a"
+             data-href="{=baseurl}article/edit/"
+             data-key="_id">
+          Edit
+      </lml:tobject>
+      <lml:tobject data-nodetype="button"
+             data-bind="click"
+             data-action="deleteArticle"
+             data-actionparamkey="_id">
+          Delete
+      </lml:tobject>
+    </div>
+  </li>
+</lml:template>

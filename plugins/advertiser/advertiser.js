@@ -25,7 +25,11 @@
 	   var registerEndpoint = function() {
 
 	     endpoints.register('advertiser', 'GET', function(cli) {
-	       cli.debug();
+				 if (cli.isGranted('advertiser')) {
+					 filelogic.serveLmlPluginPage('advertiser', cli, false);
+				 } else {
+					 cli.redirect(conf.default.server.url +'/'+ conf.default.paths.login ,false);
+				 }
 	     });
 	   };
 
