@@ -1,0 +1,47 @@
+{#config;session;vocab;forms}
+<!DOCTYPE html>
+<html>
+
+<head>
+	{%../../globalhead;../../script}
+	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+</head>
+
+<body>
+	<h2>Change Request</h2>
+	{*changerequests.{?1}(diffview:true)} {=forms.render('changerequest_edit')}
+	<div id="editor"></div>
+	<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
+	<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
+	<script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
+
+	<script>
+		$(document).ready(function() {
+			document.addEventListener('livevarsReady', function() {
+				genDiffView();
+			})
+
+			var genDiffView = function() {
+				var lastUrlParam = liliumcms.getUrlParams()[liliumcms.getUrlParams().length - (1)];
+				var changerequest_livevar = liliumcms.livevars.livevars()['changerequests.' + lastUrlParam][0];
+				console.log(changerequest_livevar);
+				var original = changerequest_livevar.original[0].content;
+				var request = changerequest_livevar.diff;
+				var diff = JsDiff.diffChars(original, request);
+				var textarea = $('#editor');
+
+				diff.forEach(function(part) {
+					console.log(part);
+					var elem = part.added ?'<span class="__added__">' + part.value + '</span>': part.removed ? '<span class="__removed__">' + part.value + '</span>': part.value;
+					$(textarea).append(elem);
+				});
+			}
+		});
+
+
+	</script>
+</body>
+
+</html>

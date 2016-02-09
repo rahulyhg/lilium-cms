@@ -2,13 +2,14 @@
 // Requires vaniryk
 var LiliumCMS = function() {
   var livevars;
+  var urlParams;
 
   var LiveVars = function() {
     var endpoints = [];
     var paramString = "?";
 
     this.getLiveVars = function(cb) {
-      var urlParams = window.location.pathname.split('/');
+      urlParams = window.location.pathname.split('/');
 
       // regex to match {$1}
       var reg = /({\?\s*[0-9]\s*})/g;
@@ -205,6 +206,10 @@ var LiliumCMS = function() {
       });
     };
   };
+
+  this.getUrlParams = function() {
+    return urlParams;
+  }
 
   var FormValidator = function() {
     this.prepareValidation = function() {

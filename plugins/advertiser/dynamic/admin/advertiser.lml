@@ -15,7 +15,7 @@
 
   <main class="entities-main">
     <ul class="entity-list">
-      {*entities(template:"entity-list-item",role:"advertiser")}
+      {*entities(template:"entity-list-item",query : {role:"advertiser"})}
     </ul>
 
     <h2>Add new advertiser</h2>
