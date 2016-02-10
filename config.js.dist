@@ -52,6 +52,9 @@ var _config = {
 			secretkey : YOUR_SECRET_STRIPE_API_KEY,
 			publickey : YOUR_PUBLIC_STRIPE_API_KEY
 		},
+		"sendgrid" : {
+			apikey : YOUR_API_KEY
+		},
 		"MIMES" : {
 			"" : "text/html",
 			".html" : "text/html",

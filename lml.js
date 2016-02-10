@@ -667,6 +667,41 @@ var LML = function() {
 		});
 	};
 
+	this.executeToHtml = function(rootpath, callback, extra) {
+		var timeStamp = new Date();
+		var html = "";
+
+		fileserver.readFile(rootpath, function(content) {
+			var linesToWrite = 0;
+			var linesWritten = 0;
+			var readyToFlush = false;
+			var flushing = false;
+
+			var verifyEnd = function() {
+				if (readyToFlush && linesToWrite == linesWritten && !flushing) {
+					flushing = true;
+
+					log('LML', 'Compiled File : ' + rootpath + ' in ' + (new Date() - timeStamp) + 'ms');
+
+					callback(html);
+				}
+			}
+
+			that.parseContent(rootpath, content, function(pContent) {
+				// Write pContent to file @compilepath
+				if (typeof pContent === 'undefined') {
+					readyToFlush = true;
+					verifyEnd();
+				} else {
+					linesToWrite++;
+					html += pContent;
+					linesWritten++;
+					verifyEnd();
+				}
+			}, undefined, extra);
+		});
+	}
+
 	this.executeToFile = function(rootpath, compilepath, callback, extra) {
 		var timeStamp = new Date();
 		fileserver.createDirIfNotExists(compilepath, function(dirExists) {

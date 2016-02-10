@@ -1,27 +1,53 @@
 var _c = require('./config.js');
+var sendgrid = require('sendgrid')(_c.default.sendgrid.apikey);
+var hooks = require('./hooks.js');
 var log = require('./log.js');
-var nodemailer = require('nodemailer');
+
+var hooks = {};
 
 var transporter = undefined;
 var messagesQueue = new Array();
 
 var Postman = function() {
-	var sendNextMessage = function() {
-        	transporter.send(messagesQueue.shift());
-	};
+  this.register = function(eventName, mail, cb) {
+    var that = this;
 
-	this.createTransporter = function() {
-		log('Postman', 'Creating nodemailer transport');
-		
-		// TODO : Replace host by config host name (will not work with localhost unless using a local mail server)
-		transporter = nodemailer.createTransport('direct:?name=http://www.mtlblog.com');
+    hooks[eventName].push(mail);
+    // Register to the hook event
+    hooks.bind(eventName, 999, function(params, eventName) {
+      //Get email template
+      hooks[eventName].forEach(function(mail) {
+        that.sendEmail(mail, cb);
+      });
+    })
+  };
 
-		transporter.on('idle', function(){
-    			while(transporter.isIdle() && messagesQueue.length){
-    				sendNextMessage();
-			}
-		});
-	};	
+  this.createEmail = function(params, isHtml, callback) {
+    if (isHtml) {
+      var email = new sendgrid.Email(params);
+      email.setHtml(filelogic.createHtmlMail(lmlPath, params, function(html) {
+        params.html = undefined;
+        delete params.html;
+        console.log(html);
+        email.setHtml = html;
+        callback(email);
+      }));
+
+
+    } else {
+      var email = new sendgrid.Email(params);
+      callback(email);
+    }
+  };
+
+  this.sendEmail(email, cb) {
+    sendgrid.send(email, function(err, json) {
+      if (err) log(err);
+      cb(json);
+    });
+  };
+
 };
+
 
 module.exports = new Postman();

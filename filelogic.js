@@ -17,6 +17,14 @@ var FileLogic = function() {
     FileServer.serveAbsFile(cli, fullpath);
   };
 
+  var createHtmlMail = function(path, params, callback) {
+    LML.executeToHtml(
+      path,
+      callback,
+      params
+    );
+  }
+
   var serveSpecialPage = function(cli, fullpath) {
     cli.touch('filelogic.serveSpecialPage');
     var specialName =

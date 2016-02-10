@@ -37,7 +37,8 @@ var Hooks = function() {
 			var keys = Object.keys(events[eventName]);
 			for (var i = keys.length - 1; i >= 0; i--) {
 				if (events[eventName][keys[i]](
-					typeof params === 'undefined' ? undefined : params
+					typeof params === 'undefined' ? undefined : params,
+					eventName
 				)) {
 					break;
 				}
