@@ -104,6 +104,7 @@ var ChangeRequest = function() {
     this.genLivevars();
 
     formBuilder.createForm('changerequest_edit')
+    .add('title', 'text', {displayname: 'Title'})
     .add('original', 'ckeditor', {displayname: 'Original Content'})
     .add('Change', 'submit')
 

@@ -31,6 +31,7 @@
 		</div>
 		<div class="col-md-6">
 			<label>Change Requested</label>
+			<h1 id="title_diff"></h1>
 			<div id="editor_diff"></div>
 		</div>
 	</div>
@@ -47,13 +48,14 @@
 				if(!loaded) genDiffView();
 				loaded = true;
 				liliumcms.ckeditor.initEditor();
-
 			})
 
 			var genDiffView = function() {
 				var lastUrlParam = liliumcms.getUrlParams()[liliumcms.getUrlParams().length - (1)];
 				var changerequest_livevar = liliumcms.livevars.livevars()['changerequests.' + lastUrlParam][0];
 				var original = changerequest_livevar.original[0].content;
+				var title = changerequest_livevar.original[0].title;
+				var diff_title = changerequest_livevar.title;
 				var request = changerequest_livevar.diff;
 
 
@@ -80,7 +82,9 @@
 						text += elem;
 				});
 					$('#editor_diff').append(text);
+					$('#title_diff').append(diff_title);
 					$('textarea[name=original]').val(original);
+					$('input[name=title]').val(title);
 			}
 		});
 
