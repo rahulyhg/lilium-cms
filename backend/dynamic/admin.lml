@@ -9,6 +9,7 @@ $}
 		<link rel="stylesheet" type="text/css" href="{=config.default.admin.csspath}" />
 		<script src="{=config.default.admin.jspath}"></script>
 		<script src="{=config.default.server.url}/static/textParser.js"></script>
+		<script src="{=config.default.server.url}/bower/socket.io//textParser.js"></script>
 	</head>
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
@@ -18,10 +19,10 @@ $}
 		{*entities.lilium(postType:types.post)}
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+		<script src="{=config.default.server.base_url}:8080/socket.io/socket.io.js"></script>
 		<script>
-		parser.getLiveVars(function() {
-			parser.parseTextToView();
-			});
+			var socket = io();
+			socket.emit('join', 'Harry Potter');
 		</script>
 	</body>
 </html>

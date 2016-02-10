@@ -3,6 +3,7 @@ var _c = require('./config.js').default,
     log = require('./log.js'),
     _sesh = require('sesh/lib/core.js').magicSession(),
     __inbound = new (function() {
+  var io;
 	var server;
 	var callbacks = {
 		'onRequest' : [],
@@ -20,7 +21,7 @@ var _c = require('./config.js').default,
 			callbacks.onConn[i](req, resp);
 		}
 	};
-	
+
 	this.bind = function(hook, cb) {
 		log('Inbound', 'Binding ' + hook + ' to connection');
 		callbacks[hook].push(cb);
@@ -30,9 +31,15 @@ var _c = require('./config.js').default,
 		log('Inbound', 'Ready to receive requests');
 		server.listen(_c.server.port, handleConn);
 	};
-	
+
+  this.io = function() {
+    return io;
+  }
+
 	var init = function() {
 		server = _http.createServer(handleReq);
+    io = require('socket.io')(server);
+
 	};
 
 	init();

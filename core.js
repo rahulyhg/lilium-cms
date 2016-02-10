@@ -21,6 +21,7 @@ var postman = require('./postman.js');
 var Products = require('./products');
 var Campaigns = require('./campaigns.js');
 var Frontend = require('./frontend.js');
+var notification = require('./notifications.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -356,6 +357,11 @@ var Core = function() {
 		LoginLib.registerLoginForm();
 	};
 
+	var loadNotifications = function() {
+		notification.init();
+		log('Notifications', 'Sockets ready');
+	}
+
 	var loadFrontend = function() {
 		Frontend.registerFromCore();
 	};
@@ -367,6 +373,7 @@ var Core = function() {
 		loadStandardInput();
 		loadImageSizes();
 		loadForms();
+		loadNotifications();
 		loadLiveVars();
 		loadDFP();
 		loadFrontend();
