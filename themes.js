@@ -124,6 +124,10 @@ var Themes = function() {
     return ActiveTheme;
   };
 
+  this.getEnabledThemePath = function() {
+    return _c.default.server.base + _c.default.paths.themes + '/' +ActiveTheme.info.dirName;
+  }
+
 
   this.bindEndpoints = function() {
     Admin.registerAdminEndpoint('themes', 'GET', this.serveAdminList);

@@ -133,7 +133,7 @@ var Entities = function() {
 				to: [newEnt.email],
 				from: _c.default.emails.default,
 				subject: "Your account has been Created",
-				html: conf.default.server.base + conf.default.paths.mail + '/welcome.lml'
+				html: 'welcome.lml'
 			},true, function() {
 
 			}, {name:newEnt.firstname + " " + newEnt.lastname});

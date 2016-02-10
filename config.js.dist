@@ -6,6 +6,9 @@ var _config = {
 			version : "dev 0.1",
 			author : "Erik Desjardins"
 		},
+		"emails" : {
+			default : "DEFAULT_CONTACT_MAIL"
+		},
 		"data" : {
 			engine : "mongodb",
 			host : "HOST",

@@ -3,6 +3,7 @@ var sendgrid = require('sendgrid')(_c.default.sendgrid.apikey);
 var hooks = require('./hooks.js');
 var log = require('./log.js');
 var filelogic = require('./filelogic.js');
+var themes = require('./themes.js');
 
 var hooks = {};
 
@@ -26,7 +27,7 @@ var Postman = function() {
   this.createEmail = function(params, isHtml, callback, extra) {
     if (isHtml) {
       var email = new sendgrid.Email(params);
-      email.setHtml(filelogic.createHtmlMail(params.html, extra, function(html) {
+      email.setHtml(filelogic.createHtmlMail(themes.getEnabledThemePath() + '/mail/' + params.html, extra, function(html) {
         params.html = undefined;
         delete params.html;
 
