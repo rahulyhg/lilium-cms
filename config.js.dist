@@ -19,6 +19,7 @@ var _config = {
 			login : "login",
 			livevars : "livevars",
 			themes : "flowers",
+			mail : "mail",
 			themesInfo : "info.json",
 			plugins : "plugins",
 			pluginsInfo: "info.json",

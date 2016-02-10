@@ -17,7 +17,7 @@ var FileLogic = function() {
     FileServer.serveAbsFile(cli, fullpath);
   };
 
-  var createHtmlMail = function(path, params, callback) {
+  this.createHtmlMail = function(path, params, callback) {
     LML.executeToHtml(
       path,
       callback,

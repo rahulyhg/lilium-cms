@@ -5,6 +5,7 @@ var filelogic = require('./filelogic.js');
 var formbuilder = require('./formBuilder.js');
 var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
+var mailer = require('./postman.js');
 
 var Roles = new Object();
 
@@ -55,6 +56,7 @@ var Entities = function() {
 			}
 		});
 	};
+
 
 	this.handleGET = function(cli) {
 		cli.touch('entities.handleGET');
@@ -127,6 +129,14 @@ var Entities = function() {
 
 		this.registerEntity(newEnt, function() {
 			cli.touch('entities.registerEntity.callback');
+			mailer.createEmail({
+				to: [newEnt.email],
+				from: _c.default.emails.default,
+				subject: "Your account has been Created",
+				html: conf.default.server.base + conf.default.paths.mail + '/welcome.lml'
+			},true, function() {
+
+			}, {name:newEnt.firstname + " " + newEnt.lastname});
 			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath);
 		});
 	};

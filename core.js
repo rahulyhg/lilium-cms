@@ -161,7 +161,7 @@ var Core = function() {
 				Products.registerProduct(arr[i]);
 			}
 
-			db.findToArray('producttypes', {}, function(err, arr) {	
+			db.findToArray('producttypes', {}, function(err, arr) {
 				for (var i = 0; i < arr.length; i++) {
 					Products.registerProductType(arr[i].name, arr[i].displayName);
 				}
@@ -341,10 +341,6 @@ var Core = function() {
 		Products.registerLiveVar();
 	};
 
-	var loadPostman = function() {
-		postman.createTransporter();
-	};
-
 	var loadDFP = function(cb) {
 		log("DFP", "Loading core user");
 		dfp.createUser();
@@ -371,7 +367,6 @@ var Core = function() {
 		loadStandardInput();
 		loadImageSizes();
 		loadForms();
-		loadPostman();
 		loadLiveVars();
 		loadDFP();
 		loadFrontend();
