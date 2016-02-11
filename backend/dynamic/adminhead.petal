@@ -2,4 +2,4 @@
 <link type="text/css" rel="stylesheet" href="{=config.default.server.url}/static/lilium.css" />
 <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 <script src="{=config.default.server.url}/static/lilium.js"></script>
-<script src="{=config.default.server.url}/bower/socket.io//textParser.js"></script>
+<script src="{=config.default.server.base_url}:8080/socket.io/socket.io.js"></script>

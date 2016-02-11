@@ -215,7 +215,6 @@ var Article = function() {
 
 
   var init = function() {
-    registerContentLiveVar();
   };
 
   init();

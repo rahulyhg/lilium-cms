@@ -20,10 +20,11 @@ var Campaigns = function() {
 
 	this.loadCampaignsStatuses = function(cb) {
 		db.findToArray('campaignStatuses', new Object(), function(err, data) {
-			for (var i = 0; i < data.length; i++) {
-				registeredStatuses.push(data[i]);
-			}
-
+            if  (typeof data !== 'undefined') {
+                for (var i = 0; i < data.length; i++) {
+    				registeredStatuses.push(data[i]);
+    			}
+            }
 			cb();
 		});
 	}
