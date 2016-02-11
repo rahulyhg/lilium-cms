@@ -117,8 +117,9 @@ var Plugins = function() {
 			throw "[PluginException] Cannot register already registered plugin with identifier " + identifier;
 		} else {
 			log('Plugins', 'Registering plugin with identifier ' + identifier);
-			this.searchDirForPlugin(identifier, function(info) {
-				if (!info) {
+			that.searchDirForPlugin(identifier, function(info) {
+				if (!info) {	
+					log("PluginException", "Could not find any info on plugin with identifier " + identifier);
 					throw "[PluginException] Could not find any info on plugin with identifier " + identifier;
 				}
 
@@ -126,11 +127,16 @@ var Plugins = function() {
 				var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
 
 				RegisteredPlugins[identifier] = pluginInstance;
-				db.update('plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
-					pluginInstance.register(_c, info, function(){
 
-						return callback();
-					});
+				db.update('plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
+					if (typeof pluginInstance.register !== 'function') {
+						log("Plugins", 'Plugin has no method "register"');
+						callback();
+					} else {
+						pluginInstance.register(_c, info, function(){
+							return callback();
+						});
+					}
 				}, true, true);
 			});
 		}
@@ -174,7 +180,7 @@ var Plugins = function() {
 	};
 
 	this.registerLiveVar = function() {
-		livevars.registerLiveVariable("plugins", function(cli, levels, params, callback) {
+		livevars.registerLiveVariable("plugin", function(cli, levels, params, callback) {
 			var allPlugins = levels.length === 0;
 
 			if (allPlugins) {

@@ -205,10 +205,14 @@ var Entities = function() {
 			allowed = true;
 		} else if (typeof right === "object" && typeof right.length !== 'undefined') { 
 			var rights = right;
-			for (var i = 0; i < rights.length; i++) {
-				allowed = that.isAllowed(entity, rights[i]);
-
-				if (!allowed) break;
+			if (right.length === 0) {
+				allowed = true;
+			} else {
+				for (var i = 0; i < rights.length; i++) {
+					allowed = that.isAllowed(entity, rights[i]);
+	
+					if (!allowed) break;
+				}
 			}
 		} else if (typeof right === "string" && typeof entity.roles !== 'undefined') {
 			allowed = entity.roles.indexOf('lilium') !== -1;
@@ -285,13 +289,12 @@ var Entities = function() {
 		}, ["entities"]);
 	
 		livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {	
-			var allRoles = levels.length === 0;
-
-			if (allRoles) {
-				db.singleLevelFind('roles', callback);
-			} else {
-				db.multiLevelFind('roles', levels, {name:levels[0]}, {limit:[1]}, callback);
+			var roleArr = new Array();
+			for (var key in Roles) {
+				roleArr.push(Roles[key]);
 			}
+
+			callback(roleArr);
 		}, ["roles"]);
 
 		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {

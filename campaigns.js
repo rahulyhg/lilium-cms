@@ -45,7 +45,7 @@ var Campaigns = function() {
 					that.getAllMyCampaigns({clientid:cli.userinfo.userid}, callback);
 					break;
 			};
-		});
+		}, ["campaigns"]);
 	};
 
 	this.handleGET = function(cli) {
@@ -90,7 +90,7 @@ var Campaigns = function() {
 					value : "_id"
 				}
 			})
-			.add('paymentreq', 'checkbox', {displayname:"Payment required prior to production"})
+			.add('paymentreq', 'checkbox', {displayname:"Payment required prior to production"}, {required:false})
 			.add('productstable', 'livevar', {
 				endpoint : "products.all",
 				tag : "pushtable",

@@ -123,7 +123,7 @@ var Products = function() {
 			} else {
 				callback("[ProductException] Root level if forbidden. A first level must be defined");
 			}
-		});
+		}, ["products"]);
 	};
 };
 
