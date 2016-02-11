@@ -355,10 +355,53 @@ var LiliumCMS = function() {
 
     this.rendered = false;
 
+    var findColByFieldName = function(fieldName) {
+      var col = undefined;
+      for (var i = 0; i < scheme.columns.length && !col; i++) {
+        if (scheme.columns[i].fiendName == fieldName) {
+          col = scheme.columns[i];
+        }
+      }
+
+      return col;
+    };
+
     this.bindEvents = function() {
       if (this.rendered) {
         $('#' + htmlIdentifier).find('.lmlpushtablekeyer').bind('change', function() { return that.selectChanged(this); });
         $('#' + htmlIdentifier).find('.lmlpushtablecolumnaddaction').bind('click', function() { return that.appendRow(this) });
+      
+        for (var i = 0; i < scheme.columns.length; i++) {
+          var col = scheme.columns[i];
+          if (typeof col.influence !== 'undefined') {
+
+            (function(col) {
+              $('.lmlpushtablecolumnfield-' + col.fieldName).bind('change', function() {
+                var affectedField = $('.lmlpushtablecolumnfield-' + col.influence.fieldName);
+                var newValue = parseInt(affectedField.data("initvalue"));
+                switch (col.influence.eq) {
+                  case "+":
+                    newValue += parseInt($(this).val());
+                    break;
+                  case "-":
+                    newValue -= parseInt($(this).val());
+                    break;
+                  case "*":
+                    newValue *= parseInt($(this).val());
+                    break;
+                  case "/":
+                    newValue /= parseInt($(this).val());
+                    break;
+                  case "=":
+                    newValue = $(this).val();
+                    break;
+                }
+
+                affectedField.val(newValue);
+              });
+            })(col);
+          }
+        }
       } else {
         throw "Tried to apply bindings on a PushTable that was not yet rendered. Identifier : " + this.htmlIdentifier;
       }
@@ -420,7 +463,7 @@ var LiliumCMS = function() {
       $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield').each(function(index, val) {
         var dataKeyName = $(this).data('keyname');
         var defaultValue = $(this).data('defaultvalue');
-        $(this).val(dataKeyName ? src[dataKeyName] : defaultValue);
+        $(this).val(dataKeyName ? src[dataKeyName] : defaultValue).data("initvalue", $(this).val());
       });
 
       return false;
@@ -470,7 +513,7 @@ var LiliumCMS = function() {
 
       for (var i = 0; i < scheme.columns.length; i++) {
         var col = scheme.columns[i];
-        html += '<th><input class="lmlpushtablecolumnfield" type="'+(col.dataType || "text")+
+        html += '<th><input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-'+col.fieldName+'" type="'+(col.dataType || "text")+
          '" data-fieldname="'+col.fieldName+
          (col.keyName ? '" data-keyname="'+col.keyName : "") +
          (col.defaultValue ? '" data-defaultvalue="'+col.defaultValue : "") +
