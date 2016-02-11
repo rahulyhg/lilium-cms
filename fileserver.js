@@ -28,7 +28,7 @@ var FileServer = function() {
 		var timeStamp = new Date();
 		this.readFile(fullpath, function(content) {
 			var handle = that.getOutputFileHandle(fullpath, 'w+');
-			that.writeToFile(handle, content.replace(/\n/g, "")/*minify(content, {
+			that.writeToFile(handle, content/*.replace(/\n/g, "")/*minify(content, {
 				removeComments : true,
 				removeScriptTypeAttributes : true,
 				minifyJS : true,

@@ -1,81 +1,18 @@
 var db = require('./includes/db.js');
-var mongo = require('mongodb');
 var log = require('./log.js');
 
-var RegisteredLiveVariables = {
-
-	session : function(cli, levels, params, callback) {
-		var dat = cli.request.session.data;
-
-		for (var i = 0; i < levels.length; i++) {
-			dat = dat[levels[i]];
-		}
-
-		callback(dat);
-	},
-
-	types : function(cli, levels, params, callback) {
-		var allTypes = levels.length === 0;
-
-		if (allTypes) {
-			db.singleLevelFind('types', callback);
-		} else {
-			db.multiLevelFind('types', levels, {name:levels[0]}, {}, callback);
-		}
-	},
-	sites : function(cli, levels, params, callback) {
-		var allContent = levels.length === 0;
-
-		if (allContent) {
-			db.singleLevelFind('sites', callback);
-		} else {
-			db.multiLevelFind('content', levels, {siteid:levels[0]}, {limit:[1]}, callback);
-		}
-	},
-	vocab : function(cli, levels, params, callback) {
-		var wholeDico = levels.length === 0;
-
-		if (wholeDico) {
-			db.singleLevelFind('vocab', callback);
-		} else {
-			db.multiLevelFind('vocab', levels, {langcode:levels[0]}, {limit:[1]}, callback);
-		}
-	},
-
-	uploads : function(cli, levels, params, callback) {
-		var allMedia = levels.length === 0;
-
-		if (allMedia) {
-			db.singleLevelFind('uploads', callback);
-		} else {
-			db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
-		}
-	},
-
-	theme : function(cli, levels, params, callback) {
-		var allThemes = levels.length === 0;
-
-		if (allThemes) {
-			db.singleLevelFind('themes', callback);
-		} else {
-			db.multiLevelFind('themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
-		}
-	},
-
-	plugin : function(cli, levels, params, callback) {
-		var allPlugins = levels.length === 0;
-
-		if (allPlugins) {
-			db.singleLevelFind('plugins', callback);
-		} else {
-			db.multiLevelFind('plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
-		}
-	}
-};
+var RegisteredLiveVariables = new Object();;
 
 var LiveVariables = function() {
 	var preparePackage = function(cli) {
 		return {livevars : cli.livevars};
+	};
+
+	var createEndpoint = function(callback, rights) {
+		return {
+			callback : callback,
+			rights : rights || new Array()
+		};
 	};
 
 	var secondLevelVars = function(cli, params, next) {
@@ -89,7 +26,7 @@ var LiveVariables = function() {
 				keyIndex++;
 
 				if (typeof RegisteredLiveVariables[levels[0]] !== 'undefined') {
-					RegisteredLiveVariables[levels[0]](cli, levels, params, function(val) {
+					RegisteredLiveVariables[levels[0]].callback(cli, levels, params, function(val) {
 						params[key] = val;
 						nextVar();
 					});
@@ -111,10 +48,18 @@ var LiveVariables = function() {
 
 		secondLevelVars(cli, params, function(params) {
 			if (typeof RegisteredLiveVariables[topLevel] !== 'undefined') {
-				RegisteredLiveVariables[topLevel](cli, levels, params, function(val) {
-					assoc[varName] = val;
-					next(true);
-				});
+				var entityLib = require('./entities.js');
+				var entity = cli.userinfo;
+
+				if (entityLib.isAllowed(entity, RegisteredLiveVariables[topLevel].rights)) {
+					RegisteredLiveVariables[topLevel].callback(cli, levels, params, function(val) {
+						assoc[varName] = val;
+						next(true);
+					});
+				} else {
+					assoc[varName] = "[ACCESS DENIED FOR TOP LEVEL VARIABLE "+topLevel+"]";
+					next(false);
+				}
 			} else {
 				assoc[varName] = '[UNREGISTERED TOP LEVEL LIVE VARIABLE '+topLevel+']';
 				next(false);
@@ -168,9 +113,11 @@ var LiveVariables = function() {
 
 	// Function must follow format : function(client, levels, params, callback)
 	// Callback must be called, and must contain an array
-	this.registerLiveVariable = function(endpoint, func) {
+	this.registerLiveVariable = function(endpoint, func, rights) {
+		rights = rights || new Array();
+
 		if (typeof RegisteredLiveVariables[endpoint] === 'undefined') {
-			RegisteredLiveVariables[endpoint] = func;
+			RegisteredLiveVariables[endpoint] = createEndpoint(func, rights);
 		} else {
 			throw "[LiveVariables] Tried to register an already defined endpoint : " + endpoint;
 		}

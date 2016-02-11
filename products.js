@@ -36,7 +36,7 @@ var Products = function() {
 	this.getProductType = function(key) {
 		if (this.productTypeIsRegistered(key)) {
 			return Object.assign({}, RegisteredProductTypes[key]);
-		} else {	
+		} else {
 			throw "[ProductException] Product type with key " + key + " does not exist";
 		}
 	}
@@ -44,7 +44,7 @@ var Products = function() {
 	this.getPriceBase = function(key) {
 		if (this.productPriceBaseIsRegistered(key)) {
 			return Object.assign({}, RegisteredPriceBases[key]);
-		} else {	
+		} else {
 			throw "[ProductException] Price base with key " + key + " does not exist";
 		}
 	}
@@ -60,7 +60,7 @@ var Products = function() {
 	this.productPriceBaseIsRegistered = function(key) {
 		return typeof RegisteredPriceBases[key] !== 'undefined';
 	};
-		
+
 	this.registerProduct = function(productObject) {
 		if (this.productIsRegistered(productObject.name)) {
 			throw "[ProductException] Product with key " + productObject.name + " is already registered";
@@ -80,7 +80,7 @@ var Products = function() {
 		}
 	};
 
-	this.registerPriceBase = function(keyName, displayName, divider) {	
+	this.registerPriceBase = function(keyName, displayName, divider) {
 		if (this.productPriceBaseIsRegistered(keyName)) {
 			throw "[ProductException] Product price base with key " + keyName + " is already registered";
 		} else {
@@ -108,7 +108,7 @@ var Products = function() {
 			if (ftc) {
 				switch (ftc) {
 					case "all":
-						callback(keyValToArray(RegisteredProducts));
+						callback(RegisteredProducts);
 						break;
 					case "tyoes":
 						callback(keyValToArray(RegisteredProductTypes));
@@ -123,7 +123,8 @@ var Products = function() {
 			} else {
 				callback("[ProductException] Root level if forbidden. A first level must be defined");
 			}
-		});
+
+		}, ["products"]);
 	};
 };
 

@@ -176,24 +176,27 @@ var Article = function() {
     // Return article object from DB
   };
 
-  var registerContentLiveVar = function() {
+
+  this.registerContentLiveVar = function() {
     livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
+	var allContent = levels.length === 0;
 
-      var allContent = levels.length === 0;
+	if (allContent) {
+		db.singleLevelFind('content', callback);
+	} else {
+		db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+	}
+    }, ["content"]);
 
-      if (allContent) {
-        db.singleLevelFind('content', callback);
-      } else {
+    livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
+		var allTypes = levels.length === 0;
 
-        db.multiLevelFind('content', levels, {
-          _id: new mongo.ObjectID(levels[0])
-        }, {
-          limit: [1]
-        }, callback);
-
-
-      }
-    });
+		if (allTypes) {
+			db.singleLevelFind('types', callback);
+		} else {
+			db.multiLevelFind('types', levels, {name:levels[0]}, {}, callback);
+		}
+     }, ["types"]);
   }
 
   var createPostForm = function() {

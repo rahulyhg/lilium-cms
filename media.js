@@ -170,7 +170,17 @@ var Media = function() {
 			} else {
 				db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 			}
-		});
+		}, ["media"]);
+
+		livevars.registerLiveVariable('uploads', function(cli, levels, params, callback) {
+			var allMedia = levels.length === 0;
+
+			if (allMedia) {
+				db.singleLevelFind('uploads', callback);
+			} else {
+				db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+			}
+		}, ["uploads"]);
 	}
 
 	var createMediaForm = function() {

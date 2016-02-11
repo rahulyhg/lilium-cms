@@ -3,7 +3,7 @@ var mongoDocuments = {
 		"entities", "roles", "plugins", "themes", "config",
 		"sites", "discussions", "types", "vocab", "content",
 		"lilium", "uploads", "cachedFiles", "campaigns", "products",
-		"producttypes", "productpricebases", "changerequests"
+		"producttypes", "productpricebases", "changerequests", "campaignStatuses"
 	]
 };
 
@@ -18,6 +18,17 @@ var typesDefaultStructure = {
 	content : ["title", "subtitle", "snippet", "body", "social", "cover", "date"],
 	status : ["draft", "live", "trashed", "deleted"]
 };
+
+var defaultCampaignStatuses = [
+	{name:"new", displayName:"New"},
+	{name:"preprod", displayName:"Preproduction"},
+	{name:"clipending", displayName:"Pending Client Action"},
+	{name:"prod", displayName:"Production"},
+	{name:"review", displayName:"Reviewed"},
+	{name:"ready", displayName:"Ready"},
+	{name:"ongoing", displayName:"Ongoing"},
+	{name:"finished", displayName:"Finished"}
+];
 
 var adminEntity = {
 	id : 0,
@@ -109,7 +120,7 @@ var log = require('../log.js');
 
 var initMongo = function(db, cb) {
 	log('Database', 'Init script was executed');
-	var totalTasks = 8;
+	var totalTasks = 9;
 	var completedTasks = 0;
 
 	// Boot Script
@@ -236,6 +247,18 @@ var initMongo = function(db, cb) {
 				});
 			} else {
 				throw "[DatabaseInit - plugins collection does not exist]";
+			}
+		});
+
+		log('Database', 'Creating default Campaigns Statuses');
+		db.collection('campaignStatuses', {strict:true}, function(err, col) {
+			if (!err) {
+				col.insertMany(defaultCampaignStatuses, function(err, r) {
+					completedTasks++;
+					checkForCompletion();
+				});
+			} else {
+				throw "[DatabaseInit - campaignStatuses collection does not exist]";
 			}
 		});
 	};

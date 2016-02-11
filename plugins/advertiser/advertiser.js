@@ -19,7 +19,8 @@
 	     Admin = require(abspath + 'backend/admin.js');
 	     filelogic = require(abspath + 'filelogic.js');
 	     formBuilder = require(abspath + 'formBuilder.js');
-			 adminAdvertiser.init(abspath);
+
+             adminAdvertiser.init(abspath);
 	   };
 
 	   var registerEndpoint = function() {
@@ -77,10 +78,13 @@
 	     initRequires(_c.default.server.base);
 	     log("Advertiser", "Initalizing plugin");
 
+             log('Advertiser', 'Registering Endpoints');
 	     registerEndpoint();
 
+             log('Advertiser', 'Hooking on events');
 	     registerHooks();
 
+             log('Advertiser', 'Adding advertiser role');
 	     registerRoles();
 
 	     return callback();

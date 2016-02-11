@@ -5,6 +5,7 @@ var filelogic = require('./filelogic.js');
 var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
+var livevars = require('./livevars.js');
 
 var ActiveTheme = new Object();
 var CachedThemes = new Array();
@@ -132,6 +133,17 @@ var Themes = function() {
   this.bindEndpoints = function() {
     Admin.registerAdminEndpoint('themes', 'GET', this.serveAdminList);
     Admin.registerAdminEndpoint('themes', 'POST', this.serveAdminList);
+  };
+
+  this.registerLiveVar = function() {
+    livevars.registerLiveVariable('theme', function(cli, levels, params, callback) {
+		var allThemes = levels.length === 0;
+		if (allThemes) {
+			db.singleLevelFind('themes', callback);
+		} else {
+			db.multiLevelFind('themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
+		}
+	}, ["themes"]);
   };
 
   var init = function() {

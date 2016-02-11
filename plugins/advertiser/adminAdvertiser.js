@@ -250,10 +250,9 @@ var AdminAdvertiser = function() {
     formBuilder = require(abspath + 'formBuilder.js');
     fileLogic = require(abspath + 'filelogic.js');
     entites = require(abspath + 'entities.js');
-    transaction = require(abspath + 'transaction.js');
+    // transaction = require(abspath + 'transaction.js');
     config = require(abspath + 'config.js');
     db = require(abspath + 'includes/db.js');
-
   };
 
 }

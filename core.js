@@ -82,6 +82,11 @@ var Core = function() {
 			Campaigns.handleGET(cli);
 		});
 
+		admin.registerAdminEndpoint('campaigns', 'POST', function(cli) {
+			cli.touch('admin.GET.campaigns');
+			Campaigns.handlePOST(cli);
+		});
+
 		hooks.fire('endpoints');
 		log('Endpoints', 'Loaded endpoints');
 	};
@@ -173,7 +178,7 @@ var Core = function() {
 					}
 
 					log('Products', 'Loaded products info from database');
-					cb();
+					Campaigns.loadCampaignsStatuses(cb);
 				});
 			});
 		});
@@ -334,12 +339,18 @@ var Core = function() {
 	};
 
 	var loadLiveVars = function() {
-		// Article.registerContentLiveVar();
+		Article.registerContentLiveVar();
 		Media.registerMediaLiveVar();
 		dfp.registerLiveVar();
 		Campaigns.registerLiveVar();
 		entities.registerLiveVars();
 		Products.registerLiveVar();
+		plugins.registerLiveVar();
+		themes.registerLiveVar();
+	};
+
+	var loadPostman = function() {
+		postman.createTransporter();
 	};
 
 	var loadDFP = function(cb) {
