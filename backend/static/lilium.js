@@ -60,6 +60,7 @@ var LiliumCMS = function() {
         vars: JSON.stringify(endpoints)
       }, function(data) {
         livevars = deepUnescape(data);
+        document.dispatchEvent(LiliumEvents.livevarsFetched.event);
         return cb(livevars);
       });
     };
