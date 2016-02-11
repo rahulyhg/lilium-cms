@@ -90,6 +90,11 @@ var FormBuilder = function() {
     return this;
   }
 
+  this.form = function(name) {
+      currentForm = forms[name];
+      return this;
+  }
+
   this.add = function(name, type, attr, requirements, contextForm) {
     // Check if it is a tempalte
     currentForm = contextForm || currentForm;
@@ -194,7 +199,7 @@ var FormBuilder = function() {
    * @param  {boolean} withErrStack Whether to return a json error stack or a simple boolean
    * @return {Array}err A stack of all the errors.
    */
-  this.validate = function(form, callStack) {
+  this.validate = function(form, callStack, cli) {
     var valid = false;
     // Return an error stack by default
     if (typeof callStack == 'undefined') {
@@ -216,6 +221,13 @@ var FormBuilder = function() {
         } else if (typeof field.attr == 'undefined') {
           err[field.name] = '001';
         }
+      }
+
+      // Check for roles
+      if (typeof field.attr.data !== 'undefined' && field.attr.data.right && typeof cli !== 'undefined') {
+          if (!cli.isGranted(field.attr.data.right)){
+              err[field.name] = '010';
+          }
       }
 
       // If it is a text based field e.g. text, password, email etc..

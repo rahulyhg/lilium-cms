@@ -225,6 +225,18 @@ var LiliumCMS = function() {
         that.parseTextToView();
       });
     };
+
+    document.addEventListener('livevarsFetched', function() {
+        $('form input[data-rights]').each(function() {
+            if(livevars.session.roles.indexOf('lilium') == -1 &&
+                livevars.session.roles.indexOf('admin') == -1 &&
+                livevars.session.roles.indexOf($(this).data('rights')) == -1) {
+
+                $(this).closest('label[for='+ $(this).attr(name) +']').remove();
+                $(this).remove();
+            };
+        });
+    })
   };
 
   this.getUrlParams = function() {
