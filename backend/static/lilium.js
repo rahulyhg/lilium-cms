@@ -110,7 +110,7 @@ var LiliumCMS = function() {
     };
 
     var generateTemplateFromObject = function(domTemplate, domTarget, data) {
-      var templateItems = domTemplate.children().clone();
+      var templateItems = domTemplate.clone();
       templateItems.find('lml\\:tobject').each(function(index, obj) {
         obj = $(obj);
         var nodeType = obj.data('nodetype');
@@ -142,12 +142,22 @@ var LiliumCMS = function() {
           }
 
           obj = $(obj).replaceWith(node);
+
         } else {
           $(obj).remove();
         }
       });
 
-      $(domTarget).before(templateItems);
+      var wrap = domTemplate.data('wrapper');
+      if (wrap) {
+        templateItems.html('<' + wrap + '>'+ templateItems.html()  +'</' + wrap + '>');
+      }
+      
+      if (domTarget.data('target')) {
+        $('#' + domTarget.data('target')).append(templateItems.children());
+      } else { 
+        $(domTarget).before(templateItems.children());
+      }
 
       return true;
     };
