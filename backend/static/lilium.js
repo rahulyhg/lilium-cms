@@ -191,7 +191,9 @@ var LiliumCMS = function() {
                 varValue.forEach(function(val, index) {
                   generateTemplateFromObject(templateObj, lmlTag, val);
                 });
-              }
+            } else {
+                $(templateObj).html($(templateObj).find('lml\:empty').html());
+            }
             }
 
             $(lmlTag).remove();
