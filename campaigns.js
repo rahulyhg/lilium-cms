@@ -61,9 +61,38 @@ var Campaigns = function() {
 		}
 	};
 
+	var cliToDatabaseCampaign = function(cli) {
+		cli.touch('campaigns.clitodatabasecampaign');
+
+		var postdata = cli.postdata.data;
+		var products = new Array();
+
+		for (var key in postdata.productstable) {
+			products.push(postdata.productstable[key]);
+		}
+
+		return {
+			"projectid": postdata.projectid,
+			"campname":  postdata.campname,
+			"campstatus": postdata.campstatus,
+			"clientid": postdata.clientid,		
+			"paymentreq": postdata.paymentreq && postdata.paymentreq == "on", 
+			"products" : products
+		};
+	};
+
 	this.handlePOST = function(cli) {
 		cli.touch('campaigns.handlePOST');
-		cli.debug();
+		
+		var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
+
+		if (true || stack.valid) {
+			db.insert('campaigns', cliToDatabaseCampaign(cli), function(res) {
+				cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
+			});
+		} else {
+			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "?invalidform", false);
+		}
 	};
 
 	this.registerCreationForm = function() {
@@ -101,7 +130,12 @@ var Campaigns = function() {
 				datascheme : {
 					key : {displayName: "Product", keyName: "displayName", keyValue: "name"},
 					columns : [
-						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1},
+						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1, 
+							influence : {
+								fieldName : "price",
+								eq : "*"
+							}
+						},
 						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
 						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"}
 					],
