@@ -2,20 +2,22 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{%globalhead;script}
+        <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+		{%../../../../backend/dynamic/admin/globalhead;script}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";
 			baseurl += config.default.paths.admin;
 			baseurl += "/";
 		$}
+
 	</head>
 	<body>
   <h1>All Advertisers</h1>
 
   <main class="entities-main">
     <ul class="entity-list">
-      {*entities(template:"entity-list-item",query : {role:"advertiser"})}
+      {*advertiser(template:"entity-list-item")}
     </ul>
 
     <h2>Add new advertiser</h2>

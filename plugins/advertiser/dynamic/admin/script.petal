@@ -1,16 +1,16 @@
 {#config}
 <script>
-  Stripe.setPublishableKey('{=config.default.stripe.publickey}');
-
-  var deleteUser = function(id) {
-    $.post('{=config.default.server.url}/admin/advertiser/delete', {
-      "uid": id,
-      "form_name": "entity_delete"
-    }, function(data) {
-      liliumcms.refresh();
-    });
-  };
   $(document).ready(function() {
+      Stripe.setPublishableKey('{=config.default.stripe.publickey}');
+
+      var deleteUser = function(id) {
+        $.post('{=config.default.server.url}/admin/advertiser/delete', {
+          "uid": id,
+          "form_name": "entity_delete"
+        }, function(data) {
+          liliumcms.refresh();
+        });
+      };
 
     // Check if credit card info are added
     $('#stripe_form').submit(function(event) {
