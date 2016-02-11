@@ -96,10 +96,11 @@ var ClientObject = function(req, resp) {
 
 	this.isGranted = function (role) {
 		var isGranted = false;
-			if (typeof this.userinfo.role !== 'undefined' && (
-				this.userinfo.role.indexOf('lilium') != -1 ||
-				this.userinfo.role.indexOf('admin') != -1 ||
-				this.userinfo.role.indexOf(role) != -1)){
+        console.log(this.userinfo.roles);
+			if (typeof this.userinfo.roles !== 'undefined' && (
+				this.userinfo.roles.indexOf('lilium') != -1 ||
+				this.userinfo.roles.indexOf('admin') != -1 ||
+				this.userinfo.roles.indexOf(role) != -1)){
 					isGranted = true;
 			}
 			return isGranted;

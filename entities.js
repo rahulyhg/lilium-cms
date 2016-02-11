@@ -229,17 +229,20 @@ var Entities = function() {
 
 			if (!allowed) {
 				for (var i = 0, len = entity.roles.length; i < len; i++) {
-					var rights = Roles[entity.roles[i]].rights;
-					if (typeof rights !== 'undefined') {
-						for (var j = 0, jLen = rights.length; j < jLen; j++) {
-							if (rights[j] == right) {
-								allowed = true;
-								break;
-							};
-						}
+                    if (typeof Roles[entity.roles[i]] !== 'undefined') {
+                        var rights = Roles[entity.roles[i]].rights;
+    					if (typeof rights !== 'undefined') {
+    						for (var j = 0, jLen = rights.length; j < jLen; j++) {
+    							if (rights[j] == right) {
+    								allowed = true;
+    								break;
+    							};
+    						}
 
-					}
-					if (allowed) break;
+    					}
+    					if (allowed) break;
+                    }
+
 				}
 
 			}
