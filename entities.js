@@ -129,6 +129,7 @@ var Entities = function() {
 
 		this.registerEntity(newEnt, function() {
 			cli.touch('entities.registerEntity.callback');
+			/*
 			mailer.createEmail({
 				to: [newEnt.email],
 				from: _c.default.emails.default,
@@ -137,6 +138,7 @@ var Entities = function() {
 			},true, function() {
 
 			}, {name:newEnt.firstname + " " + newEnt.lastname});
+			*/
 			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath);
 		});
 	};

@@ -22,11 +22,13 @@ var typesDefaultStructure = {
 var defaultCampaignStatuses = [
 	{name:"new", displayName:"New"},
 	{name:"preprod", displayName:"Preproduction"},
-	{name:"clipending", displayName:"Pending Client Action"},
+	{name:"clisig", displayName:"Pending Client Signature"},
+	{name:"cliprepay", displayName:"Pending Client Payment"},
 	{name:"prod", displayName:"Production"},
 	{name:"review", displayName:"Reviewed"},
 	{name:"ready", displayName:"Ready"},
 	{name:"ongoing", displayName:"Ongoing"},
+	{name:"cliendpay", displayName:"Pending Client Closure"},
 	{name:"finished", displayName:"Finished"}
 ];
 

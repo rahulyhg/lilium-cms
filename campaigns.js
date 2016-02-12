@@ -35,6 +35,17 @@ var Campaigns = function() {
 		});
 	}
 
+	var statusByName = function(statusname) {
+		var status = undefined;
+		for (var i = 0; i < registeredStatuses.length && !status; i++) {
+			if (registeredStatuses[i].name == statusname) {
+				status = registeredStatuses[i];
+			}
+		};
+
+		return status;
+	};
+
 	var formatEntriesForList = function(entries, callback) {
 		var arr = new Array();
 		var max = entries.length;
@@ -49,7 +60,7 @@ var Campaigns = function() {
 			var listObj = {
 				projectid : entry.projectid,
 				name : entry.campname,
-				status : entry.campstatus,
+				status : statusByName(entry.campstatus).displayName,
 				clientid : entry.clientid,
 				url : _c.default.server.url + "/admin/campaigns/" + entry.projectid
 			}
@@ -108,7 +119,7 @@ var Campaigns = function() {
 		if (root) {
 			filelogic.serveLmlPage(cli);
 		} else {
-			var actionName = cli.routeinfo.path[2];
+			var projectid = cli.routeinfo.path[2];
 			cli.debug();
 		}
 	};
@@ -139,8 +150,9 @@ var Campaigns = function() {
 		var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
 
 		if (true || stack.valid) {
-			db.insert('campaigns', cliToDatabaseCampaign(cli), function(res) {
-				cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
+			dbCamp = cliToDatabaseCampaign(cli);
+			db.insert('campaigns', dbCamp, function(res) {
+				cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "/" + dbCamp.projectid, false);
 			});
 		} else {
 			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "?invalidform", false);

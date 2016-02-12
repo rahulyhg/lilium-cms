@@ -112,7 +112,7 @@ var LiliumCMS = function() {
 
     var generateTemplateFromObject = function(domTemplate, domTarget, data) {
       var templateItems = domTemplate.clone();
-      templateItems.find('lml\\:tobject').each(function(index, obj) {
+      while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
         obj = $(obj);
         var nodeType = obj.data('nodetype');
         var action = obj.data('action');
@@ -131,7 +131,7 @@ var LiliumCMS = function() {
             if (obj.data('href')) {
 	      node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data));
 	    } else if (obj.data('hrefsource')) {
-              note.attr('href', data[obj.data('hrefsource')]);
+              node.attr('href', data[obj.data('hrefsource')]);
             }
 
             node.html(obj.html());
