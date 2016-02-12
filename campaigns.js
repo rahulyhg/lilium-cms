@@ -18,6 +18,12 @@ var Campaigns = function() {
 		});
 	}
 
+    this.getAllMyCampaigns = function(conds, cb) {
+        db.findToArray('campaigns', conds, function(err, data) {
+			cb(err || data);
+		});
+    }
+
 	this.loadCampaignsStatuses = function(cb) {
 		db.findToArray('campaignStatuses', new Object(), function(err, data) {
             if  (typeof data !== 'undefined') {
@@ -30,6 +36,7 @@ var Campaigns = function() {
 	}
 
 	this.registerLiveVar = function() {
+        var that = this;
 		// levels : field to query
 		// params : {
 		//	query : value to query
@@ -40,13 +47,22 @@ var Campaigns = function() {
 
 			switch (firstLevel) {
 				case "all":
-					that.getCampaignsFromDatabase(new Object(), callback);
+                    if (cli.isGranted['campaigns']) {
+                        that.getCampaignsFromDatabase(new Object(), callback);
+                    } else {
+                        callback();
+                    }
 					break;
 				case "mine":
-					that.getAllMyCampaigns({clientid:cli.userinfo.userid}, callback);
+                    if (cli.isGranted('advertiser')) {
+                        console.log(isNaN(cli.userinfo.userid));
+                        that.getAllMyCampaigns({clientid: cli.userinfo.userid.toString()}, callback);
+                    } else {
+                        callback();
+                    }
 					break;
 			};
-		}, ["campaigns"]);
+		});
 	};
 
 	this.handleGET = function(cli) {
@@ -75,15 +91,15 @@ var Campaigns = function() {
 			"projectid": postdata.projectid,
 			"campname":  postdata.campname,
 			"campstatus": postdata.campstatus,
-			"clientid": postdata.clientid,		
-			"paymentreq": postdata.paymentreq && postdata.paymentreq == "on", 
+			"clientid": postdata.clientid,
+			"paymentreq": postdata.paymentreq && postdata.paymentreq == "on",
 			"products" : products
 		};
 	};
 
 	this.handlePOST = function(cli) {
 		cli.touch('campaigns.handlePOST');
-		
+
 		var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
 
 		if (true || stack.valid) {
@@ -130,7 +146,7 @@ var Campaigns = function() {
 				datascheme : {
 					key : {displayName: "Product", keyName: "displayName", keyValue: "name"},
 					columns : [
-						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1, 
+						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1,
 							influence : {
 								fieldName : "price",
 								eq : "*"
