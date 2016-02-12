@@ -366,6 +366,7 @@ var Core = function() {
 		Campaigns.registerCreationForm();
 		entities.registerCreationForm();
 		LoginLib.registerLoginForm();
+        Article.registerForms();
 	};
 
 	var loadNotifications = function() {
