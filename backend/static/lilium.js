@@ -69,8 +69,9 @@ var LiliumCMS = function() {
             return livevars;
         }
 
-        var fetchTemplateObjectContent = function(obj, data) {
+        var fetchTemplateObjectContent = function(obj, data, domTarget) {
             var key = obj.data('key');
+            var template = $('#' + obj.data('template'));
             var sep = obj.data('arrayseparator');
             var content = "";
 
@@ -87,9 +88,15 @@ var LiliumCMS = function() {
                         //Check if it is the last key
                         if (keys.length == i + 1) {
 
-                            if (typeof currentData === 'object' && currentData.length != 0) {
+                            // Append data
+                            // Check if array or object
+                            if (typeof currentData === 'object' && Object.prototype.toString.call( currentData ) === '[object Array]' && currentData.length != 0) {
                                 for (var i = 0; i < currentData.length; i++) {
-                                    content += currentData[i] + (i == currentData.length - 1 ? "" : sep);
+                                    if (typeof currentData === 'object') {
+                                        generateTemplateFromObject(template, obj ,currentData[i]);
+                                    } else {
+                                        content += currentData[i] + (i == currentData.length - 1 ? "" : sep);
+                                    }
                                 }
                             } else {
                                 content = currentData;
@@ -126,17 +133,17 @@ var LiliumCMS = function() {
                 if (passed) {
                     var node = $(document.createElement(nodeType));
                     if (nodeType == 'img') {
-                        node.attr('src', fetchTemplateObjectContent(obj, data));
+                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget));
                     } else if (nodeType == 'a') {
                         if (obj.data('href')) {
-                            node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data));
+                            node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget));
                         } else if (obj.data('hrefsource')) {
                             note.attr('href', data[obj.data('hrefsource')]);
                         }
 
                         node.html(obj.html());
                     } else {
-                        node.html(fetchTemplateObjectContent(obj, data));
+                        node.html(fetchTemplateObjectContent(obj, data, domTarget, templateItems));
                     }
 
                     if (action && typeof window[action] === 'function') {
