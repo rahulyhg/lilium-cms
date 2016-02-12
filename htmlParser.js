@@ -101,7 +101,6 @@ var HtmlParser = function() {
 
     //Insert submit form
     htmlForm += submitButton;
-    htmlForm += '<br>'
 
     // Close form tag
     htmlForm += "\n</form>";
