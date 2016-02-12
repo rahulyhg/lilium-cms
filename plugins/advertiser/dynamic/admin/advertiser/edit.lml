@@ -2,7 +2,9 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{%../globalhead;../script}
+        <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+
+        {%../../../../../backend/dynamic/admin/globalhead;../../script}
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
@@ -10,7 +12,7 @@
 	<body>
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>Edit an advertiser</h2>
-		{*entities.{?1}}
+		{*advertiser.{?1}}
 		<div class="payment-errors">
 
 		</div>
@@ -19,7 +21,8 @@
 
 		<script>
 		$(document).ready(function() {
-			document.addEventListener('livevarsReady', function(){
+			document.addEventListener('livevarsFetched', function(){
+                console.log($("lml\\:livevars:first").attr('data-varname'));
 				liliumcms.formParser.parse($("lml\\:livevars:first").attr('data-varname'));
 			})
 		});

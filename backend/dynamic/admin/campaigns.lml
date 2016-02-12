@@ -12,7 +12,9 @@
 		{=forms.render('campaign_create')}
 
 		<lml:template id="single-campaign">
-
+            <li class="entity-item-list">
+                <lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
+            </li>
 		</lml:template>
 	</body>
 </html>
