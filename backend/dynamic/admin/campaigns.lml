@@ -6,15 +6,32 @@
 	</head>
 	<body>
 		<h1>All Campaigns</h1>
-		{*campaigns.all(template:"single-campaign")}
+		<table>
+			<thead>
+				<tr>
+					<th>Project ID</th>
+					<th>Name</th>
+					<th>Status</th>
+					<th>Client</th>
+				</tr>
+			</thead>
+			<tbody id="camptbody">
+				{*campaigns.list(template:"single-campaign",target:"camptbody")}
+			</tbody>
+		</table>
 
 		<h2>Create Campaign</h2>
 		{=forms.render('campaign_create')}
 
-		<lml:template id="single-campaign">
-            <li class="entity-item-list">
-                <lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
-            </li>
+		<lml:template id="single-campaign" data-wrapper="tr">
+			<lml:tobject data-nodetype="td"  >
+				<lml:tobject data-nodetype="a" data-hrefsource="url">
+					<lml:tobject data-nodetype="span" data-key="projectid" >
+				</lml:tobject>
+			</lml:tobject>
+			<lml:tobject data-nodetype="td" data-key="name"   ></lml:tobject>
+			<lml:tobject data-nodetype="td" data-key="status" ></lml:tobject>
+			<lml:tobject data-nodetype="td" data-key="clientname" ></lml:tobject>
 		</lml:template>
 	</body>
 </html>

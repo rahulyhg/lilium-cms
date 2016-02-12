@@ -111,7 +111,7 @@ var LiliumCMS = function() {
     };
 
     var generateTemplateFromObject = function(domTemplate, domTarget, data) {
-      var templateItems = domTemplate.children().clone();
+      var templateItems = domTemplate.clone();
       templateItems.find('lml\\:tobject').each(function(index, obj) {
         obj = $(obj);
         var nodeType = obj.data('nodetype');
@@ -128,9 +128,14 @@ var LiliumCMS = function() {
           if (nodeType == 'img') {
             node.attr('src', fetchTemplateObjectContent(obj, data));
           } else if (nodeType == 'a') {
-						node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data));
-						node.html(obj.html());
-					} else {
+            if (obj.data('href')) {
+	      node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data));
+	    } else if (obj.data('hrefsource')) {
+              note.attr('href', data[obj.data('hrefsource')]);
+            }
+
+            node.html(obj.html());
+	  } else {
             node.html(fetchTemplateObjectContent(obj, data));
           }
 
@@ -148,7 +153,16 @@ var LiliumCMS = function() {
         }
       });
 
-      $(domTarget).before(templateItems);
+      var wrap = domTemplate.data('wrapper');
+      if (wrap) {
+        templateItems.html('<' + wrap + '>'+ templateItems.html()  +'</' + wrap + '>');
+      }
+      
+      if (domTarget.data('target')) {
+        $('#' + domTarget.data('target')).append(templateItems.children());
+      } else { 
+        $(domTarget).before(templateItems.children());
+      }
 
       return true;
     };

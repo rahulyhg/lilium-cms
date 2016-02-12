@@ -35,6 +35,37 @@ var Campaigns = function() {
 		});
 	}
 
+	var formatEntriesForList = function(entries, callback) {
+		var arr = new Array();
+		var max = entries.length;
+		var index = 0;
+
+		var nextEntry = function() {
+			if (index == max) {
+				return callback(arr);
+			}
+
+			var entry = entries[index];
+			var listObj = {
+				projectid : entry.projectid,
+				name : entry.campname,
+				status : entry.campstatus,
+				clientid : entry.clientid,
+				url : _c.default.server.url + "/admin/campaigns/" + entry.projectid
+			}
+
+			db.findToArray('entities', {_id:db.mongoID(listObj.clientid)}, function(err, res) {
+				listObj.clientname = res[0].displayname;
+				arr.push(listObj);
+
+				index++;
+				nextEntry();
+			});
+		};
+
+		nextEntry();
+	};
+
 	this.registerLiveVar = function() {
         var that = this;
 		// levels : field to query
@@ -52,6 +83,11 @@ var Campaigns = function() {
                     } else {
                         callback();
                     }
+					break;
+				case "list":
+					that.getCampaignsFromDatabase(new Object(), function(arr) {
+						formatEntriesForList(arr, callback);
+					});
 					break;
 				case "mine":
                     if (cli.isGranted('advertiser')) {
@@ -146,7 +182,7 @@ var Campaigns = function() {
 				datascheme : {
 					key : {displayName: "Product", keyName: "displayName", keyValue: "name"},
 					columns : [
-						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1,
+						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1, 
 							influence : {
 								fieldName : "price",
 								eq : "*"
