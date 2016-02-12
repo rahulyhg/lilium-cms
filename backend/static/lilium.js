@@ -127,9 +127,14 @@ var LiliumCMS = function() {
           if (nodeType == 'img') {
             node.attr('src', fetchTemplateObjectContent(obj, data));
           } else if (nodeType == 'a') {
-						node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data));
-						node.html(obj.html());
-					} else {
+            if (obj.data('href')) {
+	      node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data));
+	    } else if (obj.data('hrefsource')) {
+              note.attr('href', data[obj.data('hrefsource')]);
+            }
+
+            node.html(obj.html());
+	  } else {
             node.html(fetchTemplateObjectContent(obj, data));
           }
 
@@ -142,7 +147,6 @@ var LiliumCMS = function() {
           }
 
           obj = $(obj).replaceWith(node);
-
         } else {
           $(obj).remove();
         }

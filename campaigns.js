@@ -44,7 +44,8 @@ var Campaigns = function() {
 				projectid : entry.projectid,
 				name : entry.campname,
 				status : entry.campstatus,
-				clientid : entry.clientid
+				clientid : entry.clientid,
+				url : _c.default.server.url + "/admin/campaigns/" + entry.projectid
 			}
 			
 			db.findToArray('entities', {_id:db.mongoID(listObj.clientid)}, function(err, res) {

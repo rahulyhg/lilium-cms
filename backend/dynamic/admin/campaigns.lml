@@ -24,7 +24,11 @@
 		{=forms.render('campaign_create')}
 
 		<lml:template id="single-campaign" data-wrapper="tr">
-			<lml:tobject data-nodetype="td" data-key="projectid"  ></lml:tobject>
+			<lml:tobject data-nodetype="td"  >
+				<lml:tobject data-nodetype="a" data-hrefsource="url">
+					<lml:tobject data-nodetype="span" data-key="projectid" >
+				</lml:tobject>
+			</lml:tobject>
 			<lml:tobject data-nodetype="td" data-key="name"   ></lml:tobject>
 			<lml:tobject data-nodetype="td" data-key="status" ></lml:tobject>
 			<lml:tobject data-nodetype="td" data-key="clientname" ></lml:tobject>
