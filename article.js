@@ -55,9 +55,7 @@ var Article = function() {
 
   this.new = function(cli) {
     cli.touch('article.new');
-    if (!formBuilder.isAlreadyCreated('post_create')) {
-      createPostForm();
-    }
+
     if (cli.method == 'POST') {
       var form = formBuilder.handleRequest(cli);
       var response = formBuilder.validate(form, true);
@@ -94,9 +92,7 @@ var Article = function() {
 
   this.edit = function(cli) {
     if (cli.routeinfo.path[3]) {
-      if (!formBuilder.isAlreadyCreated('post_create')) {
-        createPostForm();
-      }
+
       var id = new mongo.ObjectID(cli.routeinfo.path[3]);
       if (cli.method == 'POST') {
 
@@ -199,7 +195,7 @@ var Article = function() {
      }, ["types"]);
   }
 
-  var createPostForm = function() {
+  this.registerForms = function() {
     formBuilder.createForm('post_create')
       .add('title', 'text', {}, {
         minLenght: 3,

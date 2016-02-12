@@ -71,6 +71,10 @@
 	     }, true);
 	   };
 
+       var registerForms = function() {
+           formBuilder.form('post_create').add('isSponsored', 'checkbox', {displayname : 'Sponsored Content', data : {right: 'production'}});
+       }
+
 	   this.unregister = function(callback) {
 	     log("Production", "Plugin disabled");
 
@@ -87,6 +91,7 @@
 
 	     registerRoles();
 
+         registerForms();
 	     return callback();
 	   };
 	 };
