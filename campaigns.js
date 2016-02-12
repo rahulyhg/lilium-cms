@@ -91,7 +91,6 @@ var Campaigns = function() {
 					break;
 				case "mine":
                     if (cli.isGranted('advertiser')) {
-                        console.log(isNaN(cli.userinfo.userid));
                         that.getAllMyCampaigns({clientid: cli.userinfo.userid.toString()}, callback);
                     } else {
                         callback();
@@ -182,7 +181,7 @@ var Campaigns = function() {
 				datascheme : {
 					key : {displayName: "Product", keyName: "displayName", keyValue: "name"},
 					columns : [
-						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1, 
+						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1,
 							influence : {
 								fieldName : "price",
 								eq : "*"

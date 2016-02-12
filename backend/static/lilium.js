@@ -138,7 +138,7 @@ var LiliumCMS = function() {
                         if (obj.data('href')) {
                             node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget));
                         } else if (obj.data('hrefsource')) {
-                            note.attr('href', data[obj.data('hrefsource')]);
+                            node.attr('href', data[obj.data('hrefsource')]);
                         }
 
                         node.html(obj.html());

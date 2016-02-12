@@ -7,7 +7,8 @@ var ClientObject = function(req, resp) {
 	this.sessiondata = req.session.data;
 	this.method = req.method;
 	this.createdon = new Date();
-
+	this.uploads = req.session.data.uploads;
+	console.log(this.uploads);
 	var nodes = ['clientobject.new'];
 
 	this.throwHTTP = function(code, message) {
@@ -74,7 +75,9 @@ var ClientObject = function(req, resp) {
 			time : {
 				created : this.createdon,
 				served : new Date()
-			}
+			},
+			nallo: 'allo',
+			uploads: this.uploads
 		}));
 		this.response.end();
 	};
@@ -96,7 +99,6 @@ var ClientObject = function(req, resp) {
 
 	this.isGranted = function (role) {
 		var isGranted = false;
-        console.log(this.userinfo.roles);
 			if (typeof this.userinfo.roles !== 'undefined' && (
 				this.userinfo.roles.indexOf('lilium') != -1 ||
 				this.userinfo.roles.indexOf('admin') != -1 ||

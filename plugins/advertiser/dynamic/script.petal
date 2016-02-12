@@ -1,7 +1,6 @@
 {#config}
 <script>
   var deleteUser = function(id) {
-    console.log('hello');
     $.post('{=config.default.server.url}/admin/advertiser/delete', {
       "uid": id,
       "form_name": "entity_delete"
@@ -52,4 +51,14 @@
 
     });
   });
+
+  var payementNeeded = function(item) {
+    return item.campstatus == 'clipayement';
+  }
+
+  var signNeeded = function(item) {
+    return item.campstatus == 'clisign';
+  }
+
+
 </script>

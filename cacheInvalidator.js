@@ -3,7 +3,7 @@ var conf = require('./config.js');
 var EventEmitter = require('events');
 var util = require('util');
 var db = require('./includes/db.js');
-
+var log = require('./log.js');
 /**
  * Contains all the functions to call when a
  * cachedFileInvalidated is fired
@@ -45,7 +45,7 @@ var CacheInvalidator = function() {
   this.addFileToWatch = function(path, eventName, value) {
     cachedFileEvents[path] = [eventName, value];
     db.insert('cachedFiles',{file: path, extra : [eventName, value]} , function(err){
-      console.log(err);
+      log('Cache Invalidator', err);
     });
   }
 

@@ -174,7 +174,6 @@ var AdminAdvertiser = function() {
     db.findToArray('entities', {
       _id: db.mongoID(id)
     }, function(err, arr) {
-        console.log('ab yea');
       if (typeof arr[0].stripeid !== 'undefined') {
         transaction.deleteCustomer(arr[0].stripeid, function() {
           db.remove('entities', {
@@ -185,7 +184,6 @@ var AdminAdvertiser = function() {
           });
         });
     } else {
-        console.log('removing');
         db.remove('entities', {
           _id: db.mongoID(id)
         }, function(err, result) {

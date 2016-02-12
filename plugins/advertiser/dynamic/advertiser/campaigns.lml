@@ -1,31 +1,44 @@
 {#config;forms}
+{$
+	var baseurl = config.default.server.url;
+	baseurl += "/";
+	baseurl += "advertiser";
+	baseurl += "/";
+$}
 <!DOCTYPE html>
 <html>
-	<head>
-        <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-		{%../../../../backend/dynamic/admin/globalhead;../script}
 
-	</head>
-	<body>
+<head>
+	<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+	{%../../../../backend/dynamic/admin/globalhead;../script}
+
+</head>
+
+<body>
 </body>
 {*campaigns.mine(template:"campaigns-list-item")}
 <lml:template id="campaigns-list-item">
-    <li class="campaign-item-list">
-        <lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
-        <h6>
-            Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
-        </h6>
-        <div class="entity-actions">
-            <lml:tobject data-nodetype="button"
-                     data-bind="click"
-                     data-action="deleteUser"
-                     data-actionparamkey="_id"
-                     data-filter="canDelete" >
-                    Delete
-            </lml:tobject>
-        </div>
-    </li>
-    <lml:empty>
-        No campaigns found.
-    </lml:empty>
+	<li class="campaign-item-list">
+		<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
+		<lml:tobject data-nodetype="h5" data-key="campstatus"></lml:tobject>
+		<div id="#products">
+			<lml:tobject data-nodetype="div" data-key="products" data-template="product-list"></lml:tobject>
+		</div>
+		<div class="entity-actions">
+			<lml:tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id"  data-filter="signNeeded">
+				Sign to start
+			</lml:tobject>
+			<lml:tobject data-nodetype="a" data-href="{=baseurl}article/pay/" data-key="_id" data-filter="payementNeeded">
+				Pay to start
+			</lml:tobject>
+		</div>
+	</li>
+	<lml:empty>
+		No campaigns found.
+	</lml:empty>
+</lml:template>
+
+<lml:template id="product-list">
+	<lml:tobject data-nodetype="h3" data-key="prodid"></lml:tobject>
+	<lml:tobject data-nodetype="h2" data-key="price"></lml:tobject>
 </lml:template>

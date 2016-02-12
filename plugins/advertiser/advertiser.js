@@ -7,8 +7,9 @@
 	 var filelogic = undefined;
 	 var formBuilder = undefined;
 	 var adminAdvertiser = require('./adminAdvertiser.js');
-     var livevars = undefined;
-     var db = undefined;
+	 var campaigns = require('./campaigns.js');
+	 var livevars = undefined;
+	 var db = undefined;
 
 	 var Advertiser = function() {
 	     this.iface = new Object();
@@ -21,22 +22,56 @@
 	         Admin = require(abspath + 'backend/admin.js');
 	         filelogic = require(abspath + 'filelogic.js');
 	         formBuilder = require(abspath + 'formBuilder.js');
-             livevars = require(abspath + 'livevars.js');
-             db = require(abspath + 'includes/db.js');
+	         livevars = require(abspath + 'livevars.js');
+	         db = require(abspath + 'includes/db.js');
 
+	         campaigns.init(abspath);
 	         adminAdvertiser.init(abspath);
 	     };
 
 	     var registerEndpoint = function() {
 
 	         endpoints.register('advertiser', 'GET', function(cli) {
-                 console.log('checking granted');
 	             if (cli.isGranted('advertiser')) {
-	                 filelogic.serveLmlPluginPage('advertiser', cli, false);
+
+	                 switch (cli.routeinfo.path[1]) {
+	                     case undefined:
+	                         filelogic.serveLmlPluginPage('advertiser', cli, false);
+	                         break;
+	                     case 'campaigns':
+	                         campaigns.handleGET(cli);
+	                         break;
+	                     default:
+	                         cli.throwHTTP(404, 'Not found');
+
+
+	                 }
+
 	             } else {
 	                 cli.redirect(conf.default.server.url + '/' + conf.default.paths.login, false);
 	             }
 	         });
+
+			 endpoints.register('advertiser', 'POST', function(cli) {
+				 if (cli.isGranted('advertiser')) {
+
+					 switch (cli.routeinfo.path[1]) {
+						 case undefined:
+							 filelogic.serveLmlPluginPage('advertiser', cli, false);
+							 break;
+						 case 'campaigns':
+							 campaigns.handlePOST(cli);
+							 break;
+						 default:
+							 cli.throwHTTP(404, 'Not found');
+
+
+					 }
+
+				 } else {
+					 cli.redirect(conf.default.server.url + '/' + conf.default.paths.login, false);
+				 }
+			 });
 	     };
 
 	     var registerHooks = function() {
@@ -65,7 +100,11 @@
 	         livevars.registerLiveVariable('advertiser', function(cli, levels, params, callback) {
 	             var allEntities = levels.length === 0;
 	             if (allEntities) {
-	                 db.findToArray('entities', {roles : {$in:['advertiser']}} ,function(err, arr) {
+	                 db.findToArray('entities', {
+	                     roles: {
+	                         $in: ['advertiser']
+	                     }
+	                 }, function(err, arr) {
 	                     callback(err || arr);
 	                 });
 	             } else if (levels[0] == 'query') {
@@ -86,11 +125,13 @@
 	             } else {
 	                 db.multiLevelFind('entities', levels, {
 	                     _id: db.mongoID(levels[0]),
-                         roles : {$in:['advertiser']}
+	                     roles: {
+	                         $in: ['advertiser']
+	                     }
 	                 }, {
 	                     limit: [1]
 	                 }, function(err, arr) {
-                         console.log(err);
+	                     log('Advertiser Plugin', err);
 	                     callback(err || arr);
 	                 });
 	             }
@@ -128,7 +169,7 @@
 
 	         log('Advertiser', 'Adding advertiser role');
 	         registerRoles();
-             registerLiveVars();
+	         registerLiveVars();
 	         return callback();
 	     };
 	 };

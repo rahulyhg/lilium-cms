@@ -59,8 +59,9 @@ var Handler = function() {
 								imageResizer.resize(saveTo,filename+ mime, mime.substring(1), function(images){
 									// Save it in database
 									db.insert('uploads', {path : saveTo, url : url, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
-										cli.postdata.uploads = [];
-										cli.postdata.uploads.push(result.ops[0]);
+										cli.request.session.data.uploads = [];
+										cli.request.session.data.uploads.push(result.ops[0]);
+
 									});
 
 								});
@@ -68,8 +69,9 @@ var Handler = function() {
 
 								// Save it in database
 								db.insert('uploads', {path : saveTo, url : url, type : 'file'}, function (err, result){
-									cli.postdata.uploads = [];
-									cli.postdata.uploads.push(result.ops[0]);
+
+									cli.request.session.data.uploads = [];
+									cli.request.session.data.uploads.push(result.ops[0]);
 
 								});
 							}
