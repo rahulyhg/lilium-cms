@@ -6,7 +6,7 @@ var log = undefined;
 var config = undefined;
 var db = undefined;
 
-var AdminAdvertiser = function() {
+var CampaignAdvertiser = function() {
   this.handlePOST = function(cli) {
     cli.touch('advertiser.admin.handlePOST');
     switch (cli.routeinfo.path[2]) {
@@ -197,63 +197,6 @@ var AdminAdvertiser = function() {
     });
   };
 
-  var createForm = function() {
-    if (!formBuilder.isAlreadyCreated('advertiser_create')) {
-      formBuilder.registerFormTemplate('avertiser')
-        .add('creaditCard', 'text', {
-          displayname: "Card Number",
-          data: {
-            stripe: "number"
-          }
-        },
-        {
-          required: false
-        })
-        .add('cvc', 'text', {
-          displayname: "CVC",
-          data: {
-            stripe: "cvc"
-          }
-        },
-        {
-          required: false
-        })
-        .add('month', 'text', {
-          displayname: "Expiration month (MM)",
-          data: {
-            stripe: "exp-month"
-          }
-        },
-        {
-          required: false
-        })
-        .add('year', 'text', {
-          displayname: "Expiration year (YYYY)",
-          data: {
-            stripe: "exp-year"
-          }
-        },
-        {
-          required: false
-        });
-      formBuilder.createForm('advertiser_create', {
-          id: 'stripe_form'
-        })
-        .addTemplate('entity_create')
-        .addTemplate('avertiser');
-    }
-    if (!formBuilder.isAlreadyCreated('advertiser_edit')) {
-      formBuilder.createForm('advertiser_edit', {
-          id: 'stripe_form'
-        })
-        .addTemplate('entity_create')
-        .addTemplate('avertiser')
-        .edit('password', '', {}, {
-          required: false
-        });
-    }
-  };
-
   this.init = function(abspath) {
     log = require(abspath + 'log.js');
     log("AdvertiserPlugin", "Initializing admin class");
@@ -267,4 +210,4 @@ var AdminAdvertiser = function() {
 
 }
 
-module.exports = new AdminAdvertiser();
+module.exports = new CampaignAdvertiser();

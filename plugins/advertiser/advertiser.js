@@ -30,6 +30,7 @@
 	     var registerEndpoint = function() {
 
 	         endpoints.register('advertiser', 'GET', function(cli) {
+                 console.log('checking granted');
 	             if (cli.isGranted('advertiser')) {
 	                 filelogic.serveLmlPluginPage('advertiser', cli, false);
 	             } else {
@@ -84,11 +85,14 @@
 	                 });
 	             } else {
 	                 db.multiLevelFind('entities', levels, {
-	                     username: levels[0],
+	                     _id: db.mongoID(levels[0]),
                          roles : {$in:['advertiser']}
 	                 }, {
 	                     limit: [1]
-	                 }, callback);
+	                 }, function(err, arr) {
+                         console.log(err);
+	                     callback(err || arr);
+	                 });
 	             }
 	         }, ["entities"]);
 

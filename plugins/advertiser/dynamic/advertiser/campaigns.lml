@@ -1,0 +1,31 @@
+{#config;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+        <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+		{%../../../../backend/dynamic/admin/globalhead;../script}
+
+	</head>
+	<body>
+</body>
+{*campaigns.mine(template:"campaigns-list-item")}
+<lml:template id="campaigns-list-item">
+    <li class="campaign-item-list">
+        <lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
+        <h6>
+            Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
+        </h6>
+        <div class="entity-actions">
+            <lml:tobject data-nodetype="button"
+                     data-bind="click"
+                     data-action="deleteUser"
+                     data-actionparamkey="_id"
+                     data-filter="canDelete" >
+                    Delete
+            </lml:tobject>
+        </div>
+    </li>
+    <lml:empty>
+        No campaigns found.
+    </lml:empty>
+</lml:template>
