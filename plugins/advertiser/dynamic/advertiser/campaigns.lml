@@ -28,7 +28,7 @@ $}
 			<lml:tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id"  data-filter="signNeeded">
 				Sign to start
 			</lml:tobject>
-			<lml:tobject data-nodetype="a" data-href="{=baseurl}article/pay/" data-key="_id" data-filter="payementNeeded">
+			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
 				Pay to start
 			</lml:tobject>
 		</div>

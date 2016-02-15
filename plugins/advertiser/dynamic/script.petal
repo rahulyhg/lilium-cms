@@ -53,7 +53,7 @@
   });
 
   var payementNeeded = function(item) {
-    return item.campstatus == 'clipayement';
+    return item.campstatus == 'clipayment';
   }
 
   var signNeeded = function(item) {

@@ -28,7 +28,6 @@ var AdminAdvertiser = function() {
 
 
   this.handleGET = function(cli) {
-    createForm();
 
     cli.touch('advertiser.admin.handleGET');
 
@@ -196,60 +195,21 @@ var AdminAdvertiser = function() {
   };
 
   var createForm = function() {
-    if (!formBuilder.isAlreadyCreated('advertiser_create')) {
-      formBuilder.registerFormTemplate('avertiser')
-        .add('creaditCard', 'text', {
-          displayname: "Card Number",
-          data: {
-            stripe: "number"
-          }
-        },
-        {
-          required: false
-        })
-        .add('cvc', 'text', {
-          displayname: "CVC",
-          data: {
-            stripe: "cvc"
-          }
-        },
-        {
-          required: false
-        })
-        .add('month', 'text', {
-          displayname: "Expiration month (MM)",
-          data: {
-            stripe: "exp-month"
-          }
-        },
-        {
-          required: false
-        })
-        .add('year', 'text', {
-          displayname: "Expiration year (YYYY)",
-          data: {
-            stripe: "exp-year"
-          }
-        },
-        {
-          required: false
-        });
+
       formBuilder.createForm('advertiser_create', {
           id: 'stripe_form'
         })
         .addTemplate('entity_create')
-        .addTemplate('avertiser');
-    }
-    if (!formBuilder.isAlreadyCreated('advertiser_edit')) {
+        .addTemplate('payment');
+
       formBuilder.createForm('advertiser_edit', {
           id: 'stripe_form'
         })
         .addTemplate('entity_create')
-        .addTemplate('avertiser')
+        .addTemplate('payment')
         .edit('password', '', {}, {
           required: false
         });
-    }
   };
 
   this.init = function(abspath) {
@@ -258,9 +218,14 @@ var AdminAdvertiser = function() {
     formBuilder = require(abspath + 'formBuilder.js');
     fileLogic = require(abspath + 'filelogic.js');
     entites = require(abspath + 'entities.js');
-    // transaction = require(abspath + 'transaction.js');
+    transaction = require(abspath + 'transaction.js');
     config = require(abspath + 'config.js');
     db = require(abspath + 'includes/db.js');
+
+    createForm();
+    log("AdvertiserPlugin", "Create Form");
+
+
   };
 
 }
