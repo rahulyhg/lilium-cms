@@ -111,6 +111,10 @@ var ClientObject = function(req, resp) {
 		return this.userinfo.loggedin;
 	}
 
+    this.refresh = function() {
+        this.redirect(this.routeinfo.fullpath);
+    }
+
 	this.redirect = function(path, perm) {
 		this.response.writeHead(perm?301:302, {
 			'Location' : path
