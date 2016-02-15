@@ -53,23 +53,65 @@ var CampaignAdvertiser = function() {
     };
 
     var uploadSignature = function(cli) {
-        console.log('DEBUGING');
 
-        cli.debug();
-        var form = formBuilder.handleRequest(cli);
-        var validation = formBuilder.validate(form, false, cli);
+        if (cli.routeinfo.path[3]) {
 
-        if (validation.success) {
+            // Find campaing
+            db.findToArray('campaigns', {
+                _id: db.mongoID(cli.routeinfo.path[3])
+            }, function(err, array) {
+                if (err) log('Advertiser Plugin', err);
+                //
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clisign') {
 
+                    var form = formBuilder.handleRequest(cli);
+                    var validation = formBuilder.validate(form, false, cli);
+
+
+                    if (validation) {
+
+                        var image = formBuilder.serializeForm(form);
+                        var extensions = image.signature.split('.');
+                        var mime = extensions[extensions.length - 1];
+
+                        var nextStatus = array[0].paymentreq ? 'clipayment' : 'prod';
+
+                        if (config.default.supported_pictures.indexOf('.' + mime) != -1) {
+                            // Save it in database
+                            db.update('campaigns', {_id: array[0]._id}, { clientsignature: image.signature, campstatus: nextStatus}, function(err, result) {
+                                cli.sendJSON({
+                                    form: {
+                                        redirect: '',
+                                        success: true
+                                    }
+                                });
+                            });
+                        } else {
+                            cli.sendJSON({
+                                form: response
+                            });
+                        }
+                    } else {
+                        cli.refresh();
+                    }
+
+                } else {
+                    cli.throwHTTP(400, 'Bad Request');
+                }
+            });
+        } else {
+            cli.throwHTTP(404, 'Not found');
         }
     }
 
     var serveSignPage = function(cli) {
 
         if (cli.routeinfo.path[3]) {
-            db.findToArray('campaigns', {_id: db.mongoID(cli.routeinfo.path[3])}, function(err, array) {
-                if(err) log('Advertiser Plugin', err);
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid) {
+            db.findToArray('campaigns', {
+                _id: db.mongoID(cli.routeinfo.path[3])
+            }, function(err, array) {
+                if (err) log('Advertiser Plugin', err);
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clisign') {
                     fileLogic.serveLmlPluginPage('advertiser', cli, true);
                 } else {
                     cli.throwHTTP(400, 'Bad Request');
@@ -234,8 +276,16 @@ var CampaignAdvertiser = function() {
         db = require(abspath + 'includes/db.js');
 
         formBuilder.createForm('advertiser_sign')
-            .add('signature', 'file', {'displayname' : 'Upload a picture of your signature'}, {required : true})
-            .add('term', 'checkbox', {displayname : 'I aggree with the terms'}, {required: true})
+            .add('signature', 'file', {
+                'displayname': 'Upload a picture of your signature'
+            }, {
+                required: true
+            })
+            .add('term', 'checkbox', {
+                displayname: 'I aggree with the terms'
+            }, {
+                required: true
+            })
             .add('submit', 'submit');
     };
 
