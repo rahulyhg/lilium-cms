@@ -8,7 +8,6 @@ var ClientObject = function(req, resp) {
 	this.method = req.method;
 	this.createdon = new Date();
 	this.uploads = req.session.data.uploads;
-	console.log(this.uploads);
 	var nodes = ['clientobject.new'];
 
 	this.throwHTTP = function(code, message) {

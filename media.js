@@ -6,6 +6,8 @@ var mongo = require('mongodb');
 var fs = require('./fileserver.js');
 var log = require('./log.js');
 var livevars = require('./livevars.js');
+var imageResizer = require('./imageResizer.js');
+var imageSize = require('image-size');
 
 var Media = function() {
 	this.handlePOST = function(cli) {
@@ -73,11 +75,33 @@ var Media = function() {
         var response = formBuilder.validate(form, true);
 
         if (response.success) {
+
+            var image = formBuilder.serializeForm(form);
+            var extensions = image.File.split('.');
+            var mime = extensions[extensions.length-1];
+            var saveTo = conf.default.server.base + "backend/static/uploads/" +image.File;
+
+            if (conf.default.supported_pictures.indexOf('.' + mime) != -1) {
+                imageResizer.resize(saveTo, image.File, mime, function(images){
+
+                    // Save it in database
+                    db.insert('uploads', {path : saveTo, url : image.File, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
+
+                        cli.sendJSON({
+                            form: {redirect : '' ,success : true}
+                        });
+
+                    });
+
+                });
+        } else {
+            cli.sendJSON({
+                form: response
+            });
+        }
           // var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
           // Create post
-							cli.sendJSON({
-								form: {redirect : '' ,success : true}
-							});
+
         } else {
 					cli.sendJSON({
 						form: response

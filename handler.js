@@ -11,6 +11,8 @@ var dateFormat = require('dateformat');
 var db = require('./includes/db.js');
 var imageResizer = require('./imageResizer.js');
 var imageSize = require('image-size');
+var events = require('events');
+var eventEmitter = new events.EventEmitter();
 
 var Handler = function() {
 	var GET = function(cli) {
@@ -31,7 +33,8 @@ var Handler = function() {
 
 		var finishedCalled = false;
 		var req = cli.request;
-		var isSupported = true;
+		var hasFile = false;
+
 		req.headers["content-type"] = typeof req.headers["content-type"] == "undefined" ? "application/x-www-form-urlencoded": req.headers["content-type"];
 		try {
 			var busboy = new Busboy({ headers: req.headers });
@@ -39,50 +42,29 @@ var Handler = function() {
 			busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
 				if (cli.request.headers['content-length'] > config.default.server.fileMaxSize) {
 					file.resume();
-					isSupported = false;
+					hasFile = false;
 					return cli.throwHTTP(413, 'File is too large');
 
 				} else {
-
 					if (mimeTypeIsSupported(mimetype)) {
+                        hasFile = true;
 
 						var mime = getMimeByMimeType(mimetype);
 						var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
 						filename = crypto.createHash('md5').update(filename).digest('hex');
 						var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
-						var url = filename + mime;
+						var name = filename + mime;
+                        
+                        file.pipe(fs.createWriteStream(saveTo));
 
 						file.on('end', function() {
-
-							if (config.default.supported_pictures.indexOf(mime) != -1) {
-
-								imageResizer.resize(saveTo,filename+ mime, mime.substring(1), function(images){
-									// Save it in database
-									db.insert('uploads', {path : saveTo, url : url, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
-										cli.request.session.data.uploads = [];
-										cli.request.session.data.uploads.push(result.ops[0]);
-
-									});
-
-								});
-							} else {
-
-								// Save it in database
-								db.insert('uploads', {path : saveTo, url : url, type : 'file'}, function (err, result){
-
-									cli.request.session.data.uploads = [];
-									cli.request.session.data.uploads.push(result.ops[0]);
-
-								});
-							}
+                            cli.postdata.data[fieldname] = name;
 						});
 
-						file.pipe(fs.createWriteStream(saveTo));
 
 					} else {
 
 						file.resume();
-						isSupported = false;
 						return notSupported(cli);
 					}
 				}
@@ -96,9 +78,7 @@ var Handler = function() {
 			busboy.on('finish', function() {
 				if (!finishedCalled) {
 					finishedCalled = true;
-					if (isSupported){
-						Dispatcher.dispost(cli);
-					}
+                    Dispatcher.dispost(cli);
 				}
 
 			});

@@ -308,15 +308,6 @@ var FormBuilder = function() {
    */
   this.handleRequest = function(cli) {
     if (typeof cli.postdata !== 'undefined') {
-
-      // Check if it is a file upload
-      if (typeof cli.postdata.data !== 'undefined' &&
-        typeof cli.postdata.data.form_name == 'undefined' &&
-        typeof cli.postdata.uploads !== 'undefined'
-      ) {
-        return new Form();
-      }
-
       if (typeof cli.postdata.data !== 'undefined' &&
         typeof cli.postdata.data.form_name !== 'undefined' &&
         typeof forms[cli.postdata.data.form_name] !== 'undefined'
@@ -325,8 +316,14 @@ var FormBuilder = function() {
 
         for (var key in cli.postdata.data) {
           if (typeof form.fields[key] !== 'undefined') {
-            var escapedData = escape(cli.postdata.data[key]);
-            form.fields[key].attr.value = escapedData;
+              //Keep object for files type
+              if (form.fields[key].type == 'form') {
+                  form.fields[key].attr.value = cli.postdata.data[key];
+              } else {
+                  var escapedData = escape(cli.postdata.data[key]);
+                  form.fields[key].attr.value = escapedData;
+              }
+
           }
 
         }
