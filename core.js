@@ -22,6 +22,7 @@ var Products = require('./products');
 var Campaigns = require('./campaigns.js');
 var Frontend = require('./frontend.js');
 var notification = require('./notifications.js');
+var Forms = require('./forms');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -363,6 +364,7 @@ var Core = function() {
 	};
 
 	var loadForms = function() {
+        Forms.init();
 		Campaigns.registerCreationForm();
 		entities.registerCreationForm();
 		LoginLib.registerLoginForm();
