@@ -39,7 +39,7 @@ var LiliumCMS = function() {
                             var urlposReg = new RegExp("({\\?\\s*[" + urlPos + "]\\s*})", "g");
                             variableName = variableName.replace(urlposReg, param);
                         });
-                        elem.setAttribute('data-varname', variableName);
+                        elem.dataset.varname = variableName;
                     }
 
                     endpoints.push({
@@ -231,6 +231,8 @@ var LiliumCMS = function() {
                     }
                 }
             });
+            //remove lml:template
+            $('lml\\:template').remove();
             document.dispatchEvent(new CustomEvent('livevarsRendered', {'detail': {'livevars' : livevars}}));
         };
 
