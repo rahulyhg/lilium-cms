@@ -96,6 +96,13 @@ var Campaigns = function() {
                         callback();
                     }
 					break;
+				default :
+					if (cli.isGranted('advertiser')) {
+						that.getAllMyCampaigns({_id: db.mongoID(firstLevel)}, callback);
+					} else {
+						callback();
+					}
+
 			};
 		});
 	};
