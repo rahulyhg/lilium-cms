@@ -7,11 +7,9 @@ var LiliumCMS = function() {
 
     var LiliumEvents = {
         livevarsRendered: {
-            event: new CustomEvent('livevarsRendered'),
             name: "livevarsRendered"
         },
         livevarsFetched: {
-            event: new CustomEvent('livevarsFetched'),
             name: "livevarsFetched"
         }
     };
@@ -60,7 +58,7 @@ var LiliumCMS = function() {
                 vars: JSON.stringify(endpoints)
             }, function(data) {
                 livevars = deepUnescape(data);
-                document.dispatchEvent(LiliumEvents.livevarsFetched.event);
+                document.dispatchEvent(new CustomEvent('livevarsFetched', {'detail': {'livevars' : livevars}}));
                 return cb(livevars);
             });
         };
@@ -193,9 +191,9 @@ var LiliumCMS = function() {
             $("lml\\:livevars").each(function() {
                 var lmlTag = $(this);
 
-                if (typeof livevars[$(this).data('varname')] === "object") {
+                if (typeof livevars[this.dataset.varname] === "object") {
                     var templateName = $(this).data('template');
-                    var varValue = livevars[$(this).data('varname')];
+                    var varValue = livevars[this.dataset.varname];
                     var fillerName = $(this).data('filler');
 
                     if (fillerName == "pushtable") {
@@ -233,7 +231,7 @@ var LiliumCMS = function() {
                     }
                 }
             });
-            document.dispatchEvent(LiliumEvents.livevarsRendered.event);
+            document.dispatchEvent(new CustomEvent('livevarsRendered', {'detail': {'livevars' : livevars}}));
         };
 
         this.livevars = function() {
