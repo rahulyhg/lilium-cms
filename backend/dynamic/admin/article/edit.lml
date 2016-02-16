@@ -24,7 +24,7 @@
 
 	<script>
 		$(document).ready(function() {
-			document.addEventListener('livevarsReady', function() {
+			document.addEventListener('livevarsFetched', function() {
 				liliumcms.formParser.parse($("lml\\:livevars:first").attr('data-varname'));
 				liliumcms.ckeditor.initEditor();
 			})
