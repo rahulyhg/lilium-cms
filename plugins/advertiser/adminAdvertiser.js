@@ -89,6 +89,7 @@ var AdminAdvertiser = function() {
   };
 
   var editAdvertiser = function(cli) {
+    var that = this;
     cli.touch('advertiser.editAdvertiser');
 
     if (cli.routeinfo.path[3]) {
@@ -105,27 +106,13 @@ var AdminAdvertiser = function() {
           serializedForm.stripeToken = entData.stripeToken;
 
           if (entData.stripeToken) {
-            //Check if there is already a stripe client for this advertiser
-            db.findToArray('entities', {
-              _id: db.mongoID(id)
-            }, function(err, arr) {
-              if (typeof arr[0] !== 'undefined' && typeof arr[0].stripeid !== 'undefined') {
-                // Update stripe user
-                transaction.updateCustomer(arr[0].stripeid, serializedForm, function(stripeid) {
-                  serializedForm.stripeid = stripeid;
-                  updateAdvertiser(serializedForm, id);
-                });
-              } else {
-                // Create stripe user
-                transaction.createCustomer(newEnt, function(stripeid) {
-                  serializedForm.stripeid = stripeid;
-                  updateAdvertiser(serializedForm, id);
-                });
-              }
-            });
+            that.addAdvertiserStripeCostumer(serializedForm.stripeToken, serializedForm, id, function() {
+            })
 
           } else {
-            updateAdvertiser(serializedForm, id);
+            updateAdvertiser(serializedForm, id, function() {
+                fileLogic.serveLmlPluginPage('advertiser', cli, true);
+            });
           }
 
         } else {
@@ -144,7 +131,32 @@ var AdminAdvertiser = function() {
 
   };
 
-  var updateAdvertiser = function(form, id) {
+  this.addAdvertiserStripeCostumer = function(stripeToken, serializedPaymentForm, entity_id, cb) {
+      if (stripeToken) {
+        //Check if there is already a stripe client for this advertiser
+        db.findToArray('entities', {
+          _id: db.mongoID(entity_id)
+        }, function(err, arr) {
+          if (typeof arr[0] !== 'undefined' && typeof arr[0].stripeid !== 'undefined') {
+            // Update stripe user
+            transaction.updateCustomer(arr[0].stripeid, serializedPaymentForm, function(stripeid) {
+              serializedPaymentForm.stripeid = stripeid;
+              updateAdvertiser(serializedPaymentForm, entity_id, cb);
+            });
+          } else {
+            // Create stripe user
+            transaction.createNewCustomer(arr[0], function(stripeid) {
+              serializedPaymentForm.stripeid = stripeid;
+              updateAdvertiser(serializedPaymentForm, entity_id, cb);
+            });
+          }
+        });
+    } else {
+        cb(false);
+    }
+  }
+
+  var updateAdvertiser = function(form, id, cb) {
     if (typeof form.stripeToken !== 'undefined') {
       //Remove unneeded data.
       form.stripeToken = undefined;
@@ -157,13 +169,17 @@ var AdminAdvertiser = function() {
       delete form.month;
       form.year = undefined;
       delete form.year;
-    }
 
-    db.update('entities', {
-      _id: id
-    }, form, function(err, r) {
-      fileLogic.serveLmlPluginPage('advertiser', cli, true);
-    });
+      db.update('entities', {
+        _id: id
+      }, form, function(err, r) {
+          cb(true);
+      });
+  } else {
+      cb(false);
+  }
+
+
 
   }
 

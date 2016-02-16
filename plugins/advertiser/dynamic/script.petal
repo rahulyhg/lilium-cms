@@ -10,46 +10,46 @@
   };
   $(document).ready(function() {
     Stripe.setPublishableKey('{=config.default.stripe.publickey}');
+    document.addEventListener('livevarsRendered', function(e) {
+        // Check if credit card info are added
+        $('#stripe_form').on('submit', function(event) {
+          if ($('[data-stripe=number]').val() != '') {
+            event.preventDefault();
+            var $form = $(this);
 
+            // Disable the submit button to prevent repeated clicks
+            $form.find('button').prop('disabled', true);
 
+            var obj = {
+              number: $('[data-stripe=number]').val(),
+              cvc: $('[data-stripe=cvc]').val(),
+              exp_month: $('[data-stripe=exp-month]').val(),
+              exp_year: $('[data-stripe=exp-year]').val()
+            };
+            Stripe.card.createToken(obj, function(status, response) {
+              if (response.error) {
+                // Show the errors on the form
+                $('.payment-errors').text(response.error.message);
+                $('#stripe_form').find('button').prop('disabled', false);
+              } else {
+                // response contains id and card, which contains additional card details
+                var token = response.id;
+                // Insert the token into the form so it gets submitted to the server
+                $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+                // and submit
+                $form.get(0).submit();
+              }
+            });
 
-    // Check if credit card info are added
-    $('#stripe_form').submit(function(event) {
-      if ($('[data-stripe=number]').val() != '') {
-        event.preventDefault();
-        var $form = $(this);
-
-        // Disable the submit button to prevent repeated clicks
-        $form.find('button').prop('disabled', true);
-
-        var obj = {
-          number: $('[data-stripe=number]').val(),
-          cvc: $('[data-stripe=cvc]').val(),
-          exp_month: $('[data-stripe=exp-month]').val(),
-          exp_year: $('[data-stripe=exp-year]').val()
-        };
-        Stripe.card.createToken(obj, function(status, response) {
-          if (response.error) {
-            // Show the errors on the form
-            $('.payment-errors').text(response.error.message);
-            $('#stripe_form').find('button').prop('disabled', false);
+            // Prevent the form from submitting with the default action
+            return false;
           } else {
-            // response contains id and card, which contains additional card details
-            var token = response.id;
-            // Insert the token into the form so it gets submitted to the server
-            $form.append($('<input type="hidden" name="stripeToken" />').val(token));
-            // and submit
-            $form.get(0).submit();
+            return true;
           }
+
         });
-
-        // Prevent the form from submitting with the default action
-        return false;
-      } else {
-        return true;
-      }
-
     });
+
   });
 
   var payementNeeded = function(item) {

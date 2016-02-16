@@ -10,6 +10,7 @@
 	 var campaigns = require('./campaigns.js');
 	 var livevars = undefined;
 	 var db = undefined;
+	 var transaction = undefined;
 
 	 var Advertiser = function() {
 	     this.iface = new Object();
@@ -24,6 +25,7 @@
 	         formBuilder = require(abspath + 'formBuilder.js');
 	         livevars = require(abspath + 'livevars.js');
 	         db = require(abspath + 'includes/db.js');
+			 transaction = require(abspath + 'transaction.js');
 
 	         campaigns.init(abspath);
 	         adminAdvertiser.init(abspath);
@@ -97,6 +99,10 @@
 	     }
 
 	     var registerLiveVars = function() {
+			 livevars.registerLiveVariable('isStripeClient', function(cli, levels, params, callback) {
+				 campaigns.findStripeCostumer(cli, callback);
+			 }, ["advertisement"]);
+
 	         livevars.registerLiveVariable('advertiser', function(cli, levels, params, callback) {
 	             var allEntities = levels.length === 0;
 	             if (allEntities) {
