@@ -26,6 +26,10 @@ var transaction = function() {
     stripe.customers.del(id, cb);
   };
 
+  this.getCustomer = function(stripeId, cb) {
+      stripe.customers.retrieve(stripeId, cb);
+  }
+
   this.updateCustomer = function(stripeId, entity, cb) {
     stripe.customers.update(stripeId, {
         card: entity.stripeToken,
