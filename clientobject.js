@@ -3,23 +3,13 @@ var entities = require('./entities.js');
 var ClientObject = function(req, resp) {
 	this.request = req;
 	this.response = resp;
-	this.session = req.session;
-	this.sessiondata = req.session.data;
 	this.method = req.method;
 	this.createdon = new Date();
 	this.postdata = undefined;
 	this.nodes = ['clientobject.new'];
-
-	this.userinfo = {
-		loggedin : req.session.data.user != 'Guest',
-		roles : req.session.data.roles,
-		userid : req.session.data._id,
-		logintime : req.session.data.logintime,
-		displayname : req.session.data.displayname,
-		admin : req.session.data.admin,
-		god : req.session.data.god,
-		user : req.session.data.user,
-	};
+	this.cookies = new Object();
+	this.session = new Object();
+	this.userinfo = new Object();
 
 	this.routeinfo = {
 		admin : false,
@@ -42,6 +32,8 @@ var ClientObject = function(req, resp) {
 		filecreated : false,
 		cachedfile : false
 	};
+
+	this.parseCookie();
 };
 ClientObject.prototype.throwHTTP = function(code, message) {
 	this.responseinfo.httpcode = code;
@@ -101,6 +93,18 @@ ClientObject.prototype.redirect = function(path, perm) {
 		'Location' : path
 	});
 	this.response.end();
+};
+
+ClientObject.prototype.parseCookie = function() {
+	var cookieString = this.request.headers.cookie;
+	var that = this;
+
+	if (cookieString) {
+		cookieString.split(';').forEach(function(cookie) {
+			var keyVal = cookie.split('=');
+			that.cookies[keyVal.shift().trim()] = decodeURI(keyVal.join('=').trim());
+		});		
+	}
 };
 
 module.exports = ClientObject;

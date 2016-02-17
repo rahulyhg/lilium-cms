@@ -1,7 +1,6 @@
 var _c = require('./config.js').default,
     _http = require('http'),
     log = require('./log.js'),
-    _sesh = require('sesh/lib/core.js').magicSession(),
     __inbound = new (function() {
   var io;
 	var server;

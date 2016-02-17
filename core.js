@@ -22,6 +22,7 @@ var Products = require('./products');
 var Campaigns = require('./campaigns.js');
 var Frontend = require('./frontend.js');
 var notification = require('./notifications.js');
+var sessions = require('./session.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -378,6 +379,10 @@ var Core = function() {
 		Frontend.registerFromCore();
 	};
 
+	var loadSessions = function(cb) {
+		sessions.initSessionsFromDatabase(cb);
+	};
+
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
 		loadHooks(readyToRock);
@@ -404,8 +409,10 @@ var Core = function() {
 				loadPlugins(function(){
 					loadRoles(function() {
 						loadProducts(function() {
-							loadCacheInvalidator();
-							loadTheme();
+							loadSessions(function() {
+								loadCacheInvalidator();
+								loadTheme();
+							});
 						});
 					});
 				});

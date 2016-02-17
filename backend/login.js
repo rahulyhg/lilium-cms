@@ -6,20 +6,13 @@ var _c = require('../config.js');
 var entities = require('../entities.js');
 var formbuilder = require('../formBuilder.js');
 var hooks = require('../hooks.js');
+var sessions = require('../session.js');
 
 var Login = function() {
 	var loginSuccess = function(cli, userObj) {
 		cli.touch('login.loginsuccess('+userObj.id+')');
+		sessions.createSessionInCli(cli, userObj);
 
-		userObj.loggedin = true;
-		userObj.logintime = new Date();
-		userObj.admin = entities.isAllowed(userObj, 'admin');
-		userObj.god = entities.isAllowed(userObj, 'lilium');
-		userObj.dashaccess = entities.isAllowed(userObj, 'dash');
-		userObj.user = userObj.username;
-
-		cli.request.session.data = userObj;
-		cli.userinfo = userObj;
 		hooks.fire('user_loggedin', cli);
 	};
 

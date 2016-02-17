@@ -182,6 +182,14 @@ var Campaigns = function() {
 								"old" : err || old[0],
 								"new" : dbCamp
 							});
+
+							if (!err && old[0] && old[0].campstatus != dbCamp.cmapstatus) {
+								hooks.trigger('campaignStatusChanged', {
+									"old" : old[0],
+									"new" : dbCamp
+								});
+							}
+
 							cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
 						}, false, true);
 					});
@@ -236,7 +244,15 @@ var Campaigns = function() {
 							}
 						},
 						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
-						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"}
+						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"},	
+						{fieldName: "enddate", dataType:"date", displayName: "End Date", keyName : "enddate"},
+						{fieldName: "website", displayName: "Website", keyName: "website", 
+							autocomplete : {
+								datasource: "sites.all",
+								keyName : "displayName",
+								keyValue : "name"
+							}
+						}
 					],
 					footer : {
 						title : "Total",

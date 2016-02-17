@@ -4,13 +4,14 @@ var Endpoints = require('./endpoints.js');
 var LiveVars = require('./livevars.js');
 var _c = require('./config.js');
 var log = require('./log.js');
+var entities = require('./entities.js');
 
 var Dispatcher = function() {
 	this.dispatch = function(cli) {
 		cli.touch('dispatcher.dispatch');
 
 		if (cli.routeinfo.admin) {
-			if (cli.userinfo.loggedin && cli.userinfo.dashaccess) {
+			if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
 				Admin.serveDashboard(cli);
 			} else {
 				if (_c.default.usability.admin.loginIfNotAuth) {
@@ -23,7 +24,7 @@ var Dispatcher = function() {
 			Admin.serveLogin(cli);
 		} else if (cli.routeinfo.livevars) {
 			LiveVars.handleRequest(cli);
-		}else if (Endpoints.isRegistered(cli.routeinfo.path[0], 'GET')) {
+		} else if (Endpoints.isRegistered(cli.routeinfo.path[0], 'GET')) {
 			Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
 		} else {
 			HTMLServer.serveClient(cli);
@@ -35,7 +36,7 @@ var Dispatcher = function() {
 
 		if (Endpoints.isRegistered(cli.routeinfo.path[0], 'POST')) {
 			if (cli.routeinfo.admin) {
-				if (cli.userinfo.loggedin && cli.userinfo.dashaccess) {
+				if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
 					Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
 				} else {
 						cli.throwHTTP(401, "Unauthorized");

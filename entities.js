@@ -312,7 +312,7 @@ var Entities = function() {
 		}, ["roles"]);
 
 		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
-			var dat = cli.request.session.data;
+			var dat = cli.session.data;
 
 			for (var i = 0; i < levels.length; i++) {
 				dat = dat[levels[i]];

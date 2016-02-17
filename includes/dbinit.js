@@ -1,7 +1,7 @@
 var mongoDocuments = {
 	names : [
 		"entities", "roles", "plugins", "themes", "config",
-		"sites", "discussions", "types", "vocab", "content",
+		"sites", "discussions", "types", "vocab", "content", "sessions", 
 		"lilium", "uploads", "cachedFiles", "campaigns", "products",
 		"producttypes", "productpricebases", "changerequests", "campaignStatuses"
 	]
