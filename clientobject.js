@@ -7,25 +7,8 @@ var ClientObject = function(req, resp) {
 	this.sessiondata = req.session.data;
 	this.method = req.method;
 	this.createdon = new Date();
-
-	var nodes = ['clientobject.new'];
-
-	this.throwHTTP = function(code, message) {
-		this.responseinfo.httpcode = code;
-		this.responseinfo.httpmessage = message;
-		this.debug();
-/*
-		this.response.writeHead(code, {
-			'content-type': 'text/plain'
-		});
-
-		if (typeof message !== "undefined") {
-			this.response.write(message);
-		}
-
-		this.response.end();
-*/
-	};
+	this.postdata = undefined;
+	this.nodes = ['clientobject.new'];
 
 	this.userinfo = {
 		loggedin : req.session.data.user != 'Guest',
@@ -37,8 +20,6 @@ var ClientObject = function(req, resp) {
 		god : req.session.data.god,
 		user : req.session.data.user,
 	};
-
-
 
 	this.routeinfo = {
 		admin : false,
@@ -61,63 +42,65 @@ var ClientObject = function(req, resp) {
 		filecreated : false,
 		cachedfile : false
 	};
+};
+ClientObject.prototype.throwHTTP = function(code, message) {
+	this.responseinfo.httpcode = code;
+	this.responseinfo.httpmessage = message;
+	this.debug();
+};
 
-	this.debug = function() {
-		this.response.writeHead(200);
-		this.response.write(JSON.stringify({
-			routeinfo : this.routeinfo,
-			userinfo : this.userinfo,
-			responseinfo : this.responseinfo,
-			method : this.method,
-			postdata : this.postdata,
-			nodes : nodes,
-			time : {
-				created : this.createdon,
-				served : new Date()
-			}
-		}));
-		this.response.end();
-	};
-
-	this.sendJSON = function(json) {
-		if (typeof json === 'object') {
-			json = JSON.stringify(json);
+ClientObject.prototype.debug = function() {
+	this.response.writeHead(200);
+	this.response.write(JSON.stringify({
+		routeinfo : this.routeinfo,
+		userinfo : this.userinfo,
+		responseinfo : this.responseinfo,
+		method : this.method,
+		postdata : this.postdata,
+		nodes : this.nodes,
+		time : {
+			created : this.createdon,
+			served : new Date()
 		}
-		this.response.writeHead(200, {
-			"Content-Type": "application/json",
-			"Lilium-Proto": "livevars"
-		});
-		this.response.end(json);
-	};
+	}));
+	this.response.end();
+};
 
-	this.touch = function(str) {
-		nodes.push(str);
-	};
-
-	this.isGranted = function (role) {
-		var isGranted = false;
-        console.log(this.userinfo.roles);
-			if (typeof this.userinfo.roles !== 'undefined' && (
-				this.userinfo.roles.indexOf('lilium') != -1 ||
-				this.userinfo.roles.indexOf('admin') != -1 ||
-				this.userinfo.roles.indexOf(role) != -1)){
-					isGranted = true;
-			}
-			return isGranted;
+ClientObject.prototype.sendJSON = function(json) {
+	if (typeof json === 'object') {
+		json = JSON.stringify(json);
 	}
+	this.response.writeHead(200, {
+		"Content-Type": "application/json",
+		"Lilium-Proto": "livevars"
+	});
+	this.response.end(json);
+};
 
-	this.isLoggedIn = function () {
-		return this.userinfo.loggedin;
-	}
+ClientObject.prototype.touch = function(str) {
+	this.nodes.push(str);
+};
 
-	this.redirect = function(path, perm) {
-		this.response.writeHead(perm?301:302, {
-			'Location' : path
-		});
-		this.response.end();
-	};
+ClientObject.prototype.isGranted = function (role) {
+	var isGranted = false;
+		if (typeof this.userinfo.roles !== 'undefined' && (
+			this.userinfo.roles.indexOf('lilium') != -1 ||
+			this.userinfo.roles.indexOf('admin') != -1 ||
+			this.userinfo.roles.indexOf(role) != -1)){
+				isGranted = true;
+		}
+		return isGranted;
+}
 
-	this.postdata = undefined;
+ClientObject.prototype.isLoggedIn = function () {
+	return this.userinfo.loggedin;
+}
+
+ClientObject.prototype.redirect = function(path, perm) {
+	this.response.writeHead(perm?301:302, {
+		'Location' : path
+	});
+	this.response.end();
 };
 
 module.exports = ClientObject;

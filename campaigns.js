@@ -5,6 +5,7 @@ var LiveVars = require('./livevars.js');
 var db = require('./includes/db.js');
 var filelogic = require('./filelogic.js');
 var formbuilder = require('./formBuilder.js');
+var hooks = require('./hooks.js');
 
 var cachedCampaigns = new Object();
 var registeredStatuses = new Array();
@@ -170,13 +171,20 @@ var Campaigns = function() {
 			switch (action) {
 				case 'new':
 					db.insert('campaigns', dbCamp, function(res) {
+						hooks.trigger('campaignCreated', dbCamp);
 						cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "/edit/" + dbCamp.projectid, false);
 					});
 					break;
 				case 'edit':
-					db.update('campaigns', {projectid : dbCamp.projectid}, dbCamp, function(res) {
-						cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
-					}, false, true);
+					db.findToArray('campaigns', {projectid : dbCamp.projectid}, function(err, old) {
+						db.update('campaigns', {projectid : dbCamp.projectid}, dbCamp, function(res) {
+							hooks.trigger('campaignUpdated', {
+								"old" : err || old[0],
+								"new" : dbCamp
+							});
+							cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
+						}, false, true);
+					});
 					break;
 				default: 
 					cli.debug();
