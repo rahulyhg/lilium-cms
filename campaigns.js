@@ -18,11 +18,21 @@ var Campaigns = function() {
 		});
 	}
 
-    this.getAllMyCampaigns = function(conds, cb) {
-        db.findToArray('campaigns', conds, function(err, data) {
+	this.getCampaignByProjectID = function(id, cb) {
+		db.findToArray('campaigns', {"projectid" : id}, function(err, data) {
+			if (!err && data.length > 0) {
+				data[0].tablekey = id;
+			}
+
+			cb(err || data[0]);
+		});
+	};
+
+    	this.getAllMyCampaigns = function(conds, cb) {
+     		db.findToArray('campaigns', conds, function(err, data) {
 			cb(err || data);
 		});
-    }
+    	};
 
 	this.loadCampaignsStatuses = function(cb) {
 		db.findToArray('campaignStatuses', new Object(), function(err, data) {
@@ -62,7 +72,7 @@ var Campaigns = function() {
 				name : entry.campname,
 				status : statusByName(entry.campstatus).displayName,
 				clientid : entry.clientid,
-				url : _c.default.server.url + "/admin/campaigns/" + entry.projectid
+				url : _c.default.server.url + "/admin/campaigns/edit/" + entry.projectid
 			}
 
 			db.findToArray('entities', {_id:db.mongoID(listObj.clientid)}, function(err, res) {
@@ -89,11 +99,11 @@ var Campaigns = function() {
 
 			switch (firstLevel) {
 				case "all":
-                    if (cli.isGranted['campaigns']) {
-                        that.getCampaignsFromDatabase(new Object(), callback);
-                    } else {
-                        callback();
-                    }
+					if (cli.isGranted['campaigns']) {
+						that.getCampaignsFromDatabase(new Object(), callback);
+					} else {
+						callback();
+					}
 					break;
 				case "list":
 					that.getCampaignsFromDatabase(new Object(), function(arr) {
@@ -101,12 +111,21 @@ var Campaigns = function() {
 					});
 					break;
 				case "mine":
-                    if (cli.isGranted('advertiser')) {
-                        console.log(isNaN(cli.userinfo.userid));
-                        that.getAllMyCampaigns({clientid: cli.userinfo.userid.toString()}, callback);
-                    } else {
-                        callback();
-                    }
+					if (cli.isGranted('advertiser')) {
+						console.log(isNaN(cli.userinfo.userid));
+						that.getAllMyCampaigns({clientid: cli.userinfo.userid.toString()}, callback);
+					} else {
+						callback();
+					}
+					break;
+				case "get":
+					var projectid = levels[1];
+
+					if (projectid) {
+						that.getCampaignByProjectID(projectid, callback);
+					} else {
+						callback("[CampaignException] ProjectID must be specified as a third level");
+					}
 					break;
 			};
 		});
@@ -114,14 +133,9 @@ var Campaigns = function() {
 
 	this.handleGET = function(cli) {
 		cli.touch('campaigns.handleGET');
-		var root = cli.routeinfo.path.length == 2;
+		var hasParam = cli.routeinfo.path.length > 2;
 
-		if (root) {
-			filelogic.serveLmlPage(cli);
-		} else {
-			var projectid = cli.routeinfo.path[2];
-			cli.debug();
-		}
+		filelogic.serveLmlPage(cli, hasParam);
 	};
 
 	var cliToDatabaseCampaign = function(cli) {
@@ -148,12 +162,25 @@ var Campaigns = function() {
 		cli.touch('campaigns.handlePOST');
 
 		var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
+		var action = cli.routeinfo.path[2] || 'new';
 
 		if (true || stack.valid) {
 			dbCamp = cliToDatabaseCampaign(cli);
-			db.insert('campaigns', dbCamp, function(res) {
-				cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "/" + dbCamp.projectid, false);
-			});
+
+			switch (action) {
+				case 'new':
+					db.insert('campaigns', dbCamp, function(res) {
+						cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "/edit/" + dbCamp.projectid, false);
+					});
+					break;
+				case 'edit':
+					db.update('campaigns', {projectid : dbCamp.projectid}, dbCamp, function(res) {
+						cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
+					}, false, true);
+					break;
+				default: 
+					cli.debug();
+			}
 		} else {
 			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "?invalidform", false);
 		}
@@ -167,7 +194,7 @@ var Campaigns = function() {
 				},
 				cssClass : "form-campaign-creation"
 			})
-			.add('projectid', 'text', {displayname:"Project ID"})
+			.add('projectid', 'text', {displayname:"Project ID", editonce: true})
 			.add('campname', 'text', {displayname:"Campaign name"})
 			.add('campstatus', 'select', {displayname:"Status", datasource: registeredStatuses})
 			.add('clientid', 'livevar', {
@@ -192,7 +219,7 @@ var Campaigns = function() {
 				displayname : "Products",
 				template : "tmpl_productrow",
 				datascheme : {
-					key : {displayName: "Product", keyName: "displayName", keyValue: "name"},
+					key : {displayName: "Product", keyName: "displayName", keyValue: "name", readKey: "prodid"},
 					columns : [
 						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1, 
 							influence : {
@@ -209,7 +236,7 @@ var Campaigns = function() {
 					}
 				}
 			})
-			.add('create', 'submit');
+			.add('save', 'submit', {onlyWhen:"new", displayName:'Save'});
 	};
 
 	var init = function() {};

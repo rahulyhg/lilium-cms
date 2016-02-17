@@ -244,6 +244,7 @@ var HtmlParser = function() {
       '" data-fieldname="' + field.name +
       '" data-filling="' + field.attr.template +
       '" data-varname="' + field.attr.endpoint +
+      '" data-title="' + (field.attr.title || "") +
       '" data-scheme="' + (field.attr.datascheme ? JSON.stringify(field.attr.datascheme).replace(/"/g, '&lmlquote;') : "{}") +
       '" data-varparam="' + (field.attr.props ? JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') : "{}") +
       '"></lml:livevars>';
