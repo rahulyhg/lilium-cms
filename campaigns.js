@@ -96,6 +96,47 @@ var Campaigns = function() {
                         callback();
                     }
 					break;
+                case "articlereview": //returns articles of the campaign in need of advertiser review
+                    if (cli.isGranted('advertiser')) {
+                        db.findToArray('campaigns', {
+                            _id: db.mongoID(levels[1])
+                        }, function(err, array) {
+                            if (err) log('Campaigns livevars', err);
+                            if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {
+                                var campaign = array[0];
+
+                                //Get article in need of article a review
+                                var campaign = array[0];
+                                var productsID = [];
+
+                                for (var key in campaign.products) {
+                                    productsID.push[campaign.products[key].prodid];
+                                }
+
+                                db.findToArray('products', {$and : [{name : {$in: productsID}}, {productType: "sponsedit"}]}, function(err, arr) {
+                                    callback(arr);
+                                });
+
+                            } else {
+                                callback();
+                            }
+                        });
+                    } else {
+                        callback();
+                    }
+                case "query":
+                    if (cli.isGranted('advertiser')) {
+                        var queryInfo = params.query || new Object();
+        				var qObj = new Object();
+
+        				qObj._id = queryInfo._id;
+        				qObj.campstatus = queryInfo.campstatus ? {$or : queryInfo.campstatus} : undefined;
+
+                        that.getAllMyCampaigns(qObj, callback);
+                    } else {
+                        callback();
+                    }
+                break;
 				default :
 					if (cli.isGranted('advertiser')) {
 						that.getAllMyCampaigns({_id: db.mongoID(firstLevel)}, callback);
