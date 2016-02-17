@@ -104,6 +104,14 @@ var HtmlParser = function() {
 
     // Close form tag
     htmlForm += "\n</form>";
+
+    var deps = form.attr.dependencies;
+    if (deps) {
+      for (var i = 0; i < deps.length; i++) {
+        htmlForm += '<lml:livevars data-varname="'+deps[i]+'" data-cacheonly="true" data-fromform="'+form.name+'"></lml:livevars>';
+      }
+    }
+
     return htmlForm;
   }
 

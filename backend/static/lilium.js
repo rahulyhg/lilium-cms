@@ -191,6 +191,7 @@ var LiliumCMS = function() {
           var varValue = livevars[this.dataset.varname];
           var fillerName = $(this).data('filler');
           var sourceof = $(this).data('sourceof');
+          var cacheonly = $(this).data('cacheonly');
 
           if (sourceof && sourceof != "") {
             (function(src, data) {
@@ -200,7 +201,9 @@ var LiliumCMS = function() {
             })(sourceof, varValue);
           }
 
-          if (fillerName == "pushtable") {
+          if (cacheonly) {
+            $(lmlTag).remove();
+          } else if (fillerName == "pushtable") {
             var datascheme = $(this).data('scheme');
             var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);
             pushtables.push(pushTable);
@@ -617,8 +620,29 @@ var LiliumCMS = function() {
         html += '<th><input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-'+col.fieldName+'" type="'+(col.dataType || "text")+
          '" data-fieldname="'+col.fieldName+
          (col.keyName ? '" data-keyname="'+col.keyName : "") +
-         (col.defaultValue ? '" data-defaultvalue="'+col.defaultValue : "") +
-         '" /></th>';
+         (col.defaultValue ? '" data-defaultvalue="'+col.defaultValue : "");
+
+        if (col.autocomplete) {
+          html +='" list="'+tableid+col.fieldName+'list" autocomplete data-acsource="'+col.autocomplete.datasource+'"';
+        }
+
+        html += '" />';
+
+        if (col.autocomplete && col.autocomplete.datasource) {
+          var datVar = livevars[col.autocomplete.datasource];
+
+          if (datVar && datVar.length) {
+            html += '<datalist id="'+tableid+col.fieldName+'list">';
+
+            for (var j = 0; j < datVar.length; j++) {
+              html += '<option value="'+datVar[j][col.autocomplete.keyValue]+'">' + datVar[j][col.autocomplete.keyName] + '</option>';
+            }
+
+            html += '</datalist>';
+          }
+        }
+
+        html += '</th>';
       }
 
       html += '<th><button class="lmlpushtablecolumnaddaction">Add</button></th>' +

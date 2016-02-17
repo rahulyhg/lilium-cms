@@ -208,7 +208,8 @@ var Campaigns = function() {
 					'tag' : 'div',
 					'cssPrefix' : 'campaigncreatefield-'
 				},
-				cssClass : "form-campaign-creation"
+				cssClass : "form-campaign-creation",
+				dependencies : ["sites.all", "products.all"]
 			})
 			.add('projectid', 'text', {displayname:"Project ID", editonce: true})
 			.add('campname', 'text', {displayname:"Campaign name"})
@@ -244,7 +245,7 @@ var Campaigns = function() {
 							}
 						},
 						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
-						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"},	
+						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"},
 						{fieldName: "enddate", dataType:"date", displayName: "End Date", keyName : "enddate"},
 						{fieldName: "website", displayName: "Website", keyName: "website", 
 							autocomplete : {
