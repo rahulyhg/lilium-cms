@@ -44,7 +44,9 @@ $}
 			<div class="entity-actions">
 
 				<lml:tobject data-nodetype="div" data-filter="hasStripeAccount">
-					Pay to start
+					<form method="post">
+                        <input type="submit"/>
+                    </form>
 				</lml:tobject>
 				<lml:tobject data-nodetype="div" data-filter="needStripeAccount">
 					<h3>Please provide the following informations for payment</h3>
@@ -65,15 +67,19 @@ $}
 
 
 	<script>
+    function hasStripeAccount(campaign) {
+            console.log('Stripe Account? ' + liliumcms.livevars.livevars().isStripeClient[0].isStripeClient);
+
+            return liliumcms.livevars.livevars().isStripeClient[0].isStripeClient;
+    };
+
+    function needStripeAccount(campaign) {
+    console.log('Need Account? ' + !liliumcms.livevars.livevars().isStripeClient[0].isStripeClient);
+
+        return !liliumcms.livevars.livevars().isStripeClient[0].isStripeClient;
+    };
+
 	$(document).ready(function() {
-
-		function hasStripeAccount(campaign) {
-				return liliumcms.livevars.livevars().isStripeClient[0].isStripeClient;
-		};
-
-		function needStripeAccount(campaign) {
-			return !liliumcms.livevars.livevars().isStripeClient[0].isStripeClient;
-		};
 
 		document.addEventListener('livevarsFetched', function(e) {
 

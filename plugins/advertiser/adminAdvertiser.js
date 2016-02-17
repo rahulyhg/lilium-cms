@@ -145,6 +145,7 @@ var AdminAdvertiser = function() {
             });
           } else {
             // Create stripe user
+            arr[0].stripeToken = stripeToken;
             transaction.createNewCustomer(arr[0], function(stripeid) {
               serializedPaymentForm.stripeid = stripeid;
               updateAdvertiser(serializedPaymentForm, entity_id, cb);
@@ -173,7 +174,7 @@ var AdminAdvertiser = function() {
       db.update('entities', {
         _id: id
       }, form, function(err, r) {
-          cb(true);
+          cb(true, form);
       });
   } else {
       cb(false);

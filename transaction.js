@@ -1,24 +1,9 @@
 var conf = require('./config.js');
+var log = require('./log.js');
 var stripe = require('stripe')(conf.default.stripe.secretkey);
 var transaction = function() {
 
-  this.ini = function() {
-
-  };
-
-  this.createTransaction = function() {
-
-  };
-
-  this.balance = function() {
-
-  };
-
-  this.listAccounts = function() {
-
-  };
-
-  this.listCharges = function() {
+  this.init = function() {
 
   };
 
@@ -37,10 +22,18 @@ var transaction = function() {
         description: 'Created with lilium'
       },
       function(err, customer) {
-        if (err) console.log(err);
+        if (err) log('Transaction', err);
         return cb(customer.id);
       }
     );
+  };
+
+  this.charge = function(charge, cb) {
+      stripe.charges.create(charge, cb);
+  };
+
+  this.processCharge = function(charge, cb) {
+      stripe.charges.capture(charge.id, cb)
   };
 
 
@@ -51,7 +44,7 @@ var transaction = function() {
         description: 'Created with lilium'
       },
       function(err, customer) {
-        if (err) console.log(err);
+        if (err) log('Transaction', err);
         return cb(customer.id);
       }
     );

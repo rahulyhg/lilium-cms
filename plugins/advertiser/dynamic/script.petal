@@ -22,6 +22,7 @@
 
             var obj = {
               number: $('[data-stripe=number]').val(),
+              name: $('[data-stripe=name]').val(),
               cvc: $('[data-stripe=cvc]').val(),
               exp_month: $('[data-stripe=exp-month]').val(),
               exp_year: $('[data-stripe=exp-year]').val()

@@ -3,6 +3,15 @@ var formBuilder = require('./formBuilder.js');
 var Forms = function() {
     this.init = function() {
         formBuilder.registerFormTemplate('payment')
+            .add('nameoncard', 'text', {
+              displayname: "Name on card",
+              data: {
+                stripe: "name"
+              }
+            },
+            {
+              required: false
+            })
           .add('creaditCard', 'text', {
             displayname: "Card Number",
             data: {

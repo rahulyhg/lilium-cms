@@ -71,50 +71,45 @@ var CampaignAdvertiser = function() {
                 // Make sure the campaingn is at the payment status
                 if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipayment') {
                     var campaign = array[0];
-                    console.log('Campaign is at payment status');
 
                     // Check if we have a stripe customer for the current Advertiser
                     findStripeCostumer(cli, function(result) {
 
                         if (typeof result == 'object' && result.length > 0 && result[0].isStripeClient) {
-                            console.log('Found Stripe Costumer');
 
                             // Stripe payement
                             stripeOrder(result[0].stripeID, campaign, function(order) {
-                                if (typeof order.status !== 'undefined' && order.status == 'paid') {
+                                if (order.paid) {
                                     cli.sendJSON({
                                         sucess : true
                                     });
                                 } else {
                                     cli.refresh();
                                 }
-                            }, true);
+                            });
                         } else {
-                            console.log('Didnt Stripe Costumer');
-
                             // Create stripe client
                             var form = formBuilder.handleRequest(cli);
                             var response = formBuilder.validate(form, true);
 
                             if (response.success) {
-                                console.log('Form is valid');
 
                                 var entData = cli.postdata.data;
                                 var serializedForm = formBuilder.serializeForm(form);
                                 serializedForm.stripeToken = entData.stripeToken;
-                                console.log('Form serialized');
 
-                                adminAdvertiser.addAdvertiserStripeCostumer(entData.stripeToken, serializedForm, cli.userinfo.userid, function(success) {
+                                adminAdvertiser.addAdvertiserStripeCostumer(entData.stripeToken, serializedForm, cli.userinfo.userid, function(success, advertiser) {
                                     if (success) {
-                                        console.log('Advertiser updated');
-
                                         // Create order and pay it
-                                        stripeOrder(result[0].stripeID, campaign, function(order) {
-                                            console.log('Stripe Ordered');
-                                            cli.sendJSON({
-                                                sucess : true
-                                            });
-                                        }, true);
+                                        stripeOrder(advertiser.stripeid, campaign, function(order) {
+                                            if (order.paid) {
+                                                cli.sendJSON({
+                                                    sucess : true
+                                                });
+                                            } else {
+                                                cli.refresh();
+                                            }
+                                        });
                                     } else {
                                         cli.throwHTTP(400, 'Advertiser failed to update');
                                     }
@@ -136,32 +131,25 @@ var CampaignAdvertiser = function() {
         }
     }
 
-    var stripeOrder = function(stripeId, campaign, cb, paynow) {
-        var order = {
+    var stripeOrder = function(stripeId, campaign, cb) {
+        var charge = {
             currency: 'CAD',
-            items: [],
+            amount: 0,
             customer: stripeId
         }
 
         for (var key in campaign.products) {
-            var prod = campaign.products[key];
-            var product = {
-                amount: prod.price,
-                currency: 'CAD',
-                description: prodid
-            }
-            order.items.push(product);
+            charge.amount += campaign.products[key].price * 100;
         }
-        // TODO implement createOrder and PayOrder in transaction
-        transaction.createOrder(order, function(err, order) {
-            if (paynow) {
-                //Pay the order
-                transaction.payOrder(order, function(err, order) {
-                    cb(order);
-                });
 
+        transaction.charge(charge, function(err, charge) {
+            if (charge.paid) {
+                // Update campaign status
+                db.update('campaigns', {_id: campaign._id},{campstatus:"prod"}, function(err) {
+                    cb(charge);
+                });
             } else {
-                cb(order);
+                cb(charge);
             }
 
         });
@@ -172,7 +160,7 @@ var CampaignAdvertiser = function() {
         db.findToArray('entities', {
             _id: cli.userinfo.userid
         }, function(err, arr) {
-            if (typeof arr[0] == 'defined' && typeof arr[0].stripeid !== 'undefined' && arr[0].stripeid !== '') {
+            if (typeof arr[0] !== 'undefined' && typeof arr[0].stripeid !== 'undefined' && arr[0].stripeid !== '') {
                 // Get stripe client for last credit card numbers
                 transaction.getCustomer(arr[0].stripeid, function(err, client) {
                     if (typeof client !== 'undefined' && client.sources.data[0]) {
@@ -305,7 +293,7 @@ var CampaignAdvertiser = function() {
         formBuilder = require(abspath + 'formBuilder.js');
         fileLogic = require(abspath + 'filelogic.js');
         entites = require(abspath + 'entities.js');
-        // transaction = require(abspath + 'transaction.js');
+        transaction = require(abspath + 'transaction.js');
         config = require(abspath + 'config.js');
         db = require(abspath + 'includes/db.js');
 
