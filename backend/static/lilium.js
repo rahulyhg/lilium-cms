@@ -589,6 +589,20 @@ var LiliumCMS = function() {
             $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield').each(function(index, val) {
                 var dataKeyName = $(this).data('keyname');
                 var defaultValue = $(this).data('defaultvalue');
+
+                var displayif = $(this).data('displayif');
+
+                if (typeof displayif !== 'undefined' && typeof window[displayif] == 'function') {
+                    if (window[displayif].apply(key, [key])) {
+                        //Hide the selection
+                        $(this).show();
+                    } else {
+                        //Hide the selection
+                        $(this).hide();
+                    }
+
+                }
+
                 $(this).val(dataKeyName ? src[dataKeyName] : defaultValue).data("initvalue", $(this).val());
             });
 
@@ -643,10 +657,12 @@ var LiliumCMS = function() {
                 html += '<th><input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-' + col.fieldName + '" type="' + (col.dataType || "text") +
                     '" data-fieldname="' + col.fieldName +
                     (col.keyName ? '" data-keyname="' + col.keyName : "") +
-                    (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
+                    (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "") +
+                    (typeof col.influence !== 'undefined' && col.influence.displayif ? '" data-displayif="' + col.influence.displayif : "");
+
                     if (col.autocomplete) {
-                    html += '" list="' + tableid + col.fieldName + 'list" autocomplete data-acsource="' + col.autocomplete.datasource + '"';
-                }
+                        html += '" list="' + tableid + col.fieldName + 'list" autocomplete data-acsource="' + col.autocomplete.datasource + '"';
+                    }
 
                 html += '" />';
 
