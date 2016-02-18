@@ -1,5 +1,6 @@
 var url = require('url');
 var pathlib = require('path');
+var session = require('./session.js');
 var _c = require('./config.js');
 
 var Router = function() {
@@ -20,6 +21,10 @@ var Router = function() {
 		cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.login;
 		cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === _c.default.paths.livevars;
 		cli.routeinfo.root = pObj.pathname == "/";
+
+		if (!cli.routeinfo.isStatic) {
+			session.injectSessionInCli(cli);
+		};
 	};
 
 	var init = function() {

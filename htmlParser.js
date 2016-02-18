@@ -104,6 +104,14 @@ var HtmlParser = function() {
 
     // Close form tag
     htmlForm += "\n</form>";
+
+    var deps = form.attr.dependencies;
+    if (deps) {
+      for (var i = 0; i < deps.length; i++) {
+        htmlForm += '<lml:livevars data-varname="'+deps[i]+'" data-cacheonly="true" data-fromform="'+form.name+'"></lml:livevars>';
+      }
+    }
+
     return htmlForm;
   }
 
@@ -244,6 +252,7 @@ var HtmlParser = function() {
       '" data-fieldname="' + field.name +
       '" data-filling="' + field.attr.template +
       '" data-varname="' + field.attr.endpoint +
+      '" data-title="' + (field.attr.title || "") +
       '" data-scheme="' + (field.attr.datascheme ? JSON.stringify(field.attr.datascheme).replace(/"/g, '&lmlquote;') : "{}") +
       '" data-varparam="' + (field.attr.props ? JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') : "{}") +
       '"></lml:livevars>';

@@ -1,0 +1,17 @@
+{#config;forms}
+<!DOCTYPE html>
+<html>
+	<head>
+		{%globalhead}
+	</head>
+	<body>
+		<div id="campwrapper">
+			{*campaigns.get.{?1}(template:"camptemp",sourceof:"campaign_create")}
+			{=forms.render("campaign_create")}
+		</div>
+
+		<lml:template id="camptemp" data-wrapper="div">
+			<lml:tobject data-nodetype="h1" data-key="campname"></lml:tobject>
+		</lml:template>
+	</body>
+</html>

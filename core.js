@@ -23,6 +23,8 @@ var Campaigns = require('./campaigns.js');
 var Frontend = require('./frontend.js');
 var notification = require('./notifications.js');
 var Forms = require('./forms');
+var sessions = require('./session.js');
+var sites = require('./sites.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -348,6 +350,7 @@ var Core = function() {
 		Products.registerLiveVar();
 		plugins.registerLiveVar();
 		themes.registerLiveVar();
+		sites.registerLiveVar();
 	};
 
 	var loadPostman = function() {
@@ -368,7 +371,7 @@ var Core = function() {
 		Campaigns.registerCreationForm();
 		entities.registerCreationForm();
 		LoginLib.registerLoginForm();
-        Article.registerForms();
+	        Article.registerForms();
 	};
 
 	var loadNotifications = function() {
@@ -378,6 +381,14 @@ var Core = function() {
 
 	var loadFrontend = function() {
 		Frontend.registerFromCore();
+	};
+
+	var loadSessions = function(cb) {
+		sessions.initSessionsFromDatabase(cb);
+	};
+
+	var loadSites = function(cb) {
+		sites.cacheSitesFromDatabase(cb);
 	};
 
 	this.makeEverythingSuperAwesome = function(readyToRock) {
@@ -403,11 +414,15 @@ var Core = function() {
 
 		loadHTMLStructure(function() {
 			testDatabase(function() {
-				loadPlugins(function(){
-					loadRoles(function() {
-						loadProducts(function() {
-							loadCacheInvalidator();
-							loadTheme();
+				loadSites(function() {
+					loadPlugins(function(){
+						loadRoles(function() {
+							loadProducts(function() {
+								loadSessions(function() {
+									loadCacheInvalidator();
+									loadTheme();
+								});
+							});
 						});
 					});
 				});

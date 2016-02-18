@@ -1,7 +1,7 @@
 var mongoDocuments = {
 	names : [
 		"entities", "roles", "plugins", "themes", "config",
-		"sites", "discussions", "types", "vocab", "content",
+		"sites", "discussions", "types", "vocab", "content", "sessions",
 		"lilium", "uploads", "cachedFiles", "campaigns", "products",
 		"producttypes", "productpricebases", "changerequests", "campaignStatuses"
 	]
@@ -29,6 +29,7 @@ var defaultCampaignStatuses = [
 	{name:"review", displayName:"Reviewed"},
 	{name:"ready", displayName:"Ready"},
 	{name:"ongoing", displayName:"Ongoing"},
+	{name:"cliendpay", displayName:"Pending Client Closure"},
 	{name:"finished", displayName:"Finished"}
 ];
 
