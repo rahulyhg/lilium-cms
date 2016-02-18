@@ -1,2 +1,14 @@
-<h1>Welcome advertiser</h2>
-<a href="/advertiser/campaigns">View your campaigns</a>
+<html>
+<head>
+    {%../../../backend/dynamic/admin/globalhead;script}
+
+    <title></title>
+</head>
+<body>
+    <h1>Welcome advertiser</h2>
+        <a href="/advertiser/campaigns">View your campaigns</a>
+        <h1>Campaigns needing your attention</h1>
+
+        {*campaign.query(campstatus:[campstatus:'clisign', campstatus:'clipayment', campstatus:'clipending'])}
+</body>
+</html>

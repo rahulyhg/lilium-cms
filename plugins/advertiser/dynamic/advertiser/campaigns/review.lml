@@ -1,0 +1,83 @@
+{#config;forms}
+{$
+	var baseurl = config.default.server.url;
+	baseurl += "/";
+	baseurl += "advertiser";
+	baseurl += "/";
+$}
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+	{%../../../../../backend/dynamic/admin/globalhead;../../script}
+
+</head>
+
+<body>
+	{*isStripeClient}
+
+	<h1>Payment</h1>
+	<div id="order">
+		{*campaigns.articlereview.{?1}(template:"review-article")}
+	</div>
+
+	<lml:template id="review-article">
+
+		<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
+		<div>
+            {#forms.render(reviewArticle)}
+            <lml:tobject data-nodetype="button"
+                     data-bind="click"
+                     data-action="looksGood"
+                     data-actionparamkey="_id">
+                    Looks Good
+            </lml:tobject>
+            <lml:tobject data-nodetype="button"
+                     data-bind="click"
+                     data-action="changeRequest"
+                     data-actionparamkey="_id">
+                    Change Request
+            </lml:tobject>
+        </div>
+
+	</lml>
+
+
+    <button id="confirm-review">Confirm</button>
+	<script>
+
+	$(document).ready(function() {
+        var articles;
+        var changeRequest = [];
+		document.addEventListener('livevarsFetched', function(e) {
+
+			 articles = e.detail.livevars[$($("lml\\:livevars")[1]).attr('data-varname')];
+
+            products = livevars[key][0].products;
+
+			$("#campaign_total_price").html(totalPrice + '$');
+
+			var submit_button = $("form[name=advertiser_pay] input[type=submit]");
+			$(submit_button).val($(submit_button).val() + " " + totalPrice + '$');
+		});
+
+        $('#confirm-review').click(function(e) {
+            $.post("", changeRequest, function(data) {
+
+            })
+        })
+
+
+
+	});
+
+    var changeRequest = function(id) {
+        changeRequest.push(id);
+    }
+
+    var looksGood = function(id) {
+
+    }
+	</script>
+</body>

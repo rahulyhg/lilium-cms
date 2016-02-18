@@ -45,6 +45,8 @@ var CampaignAdvertiser = function() {
             case 'pay':
                 servePayPage(cli);
                 break;
+            case 'review':
+                reviewArticle(cli);
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -80,9 +82,7 @@ var CampaignAdvertiser = function() {
                             // Stripe payement
                             stripeOrder(result[0].stripeID, campaign, function(order) {
                                 if (order.paid) {
-                                    cli.sendJSON({
-                                        sucess : true
-                                    });
+                                    cli.redirect(conf.default.server.url + "/advertiser?alert=Order Successfull!");
                                 } else {
                                     cli.refresh();
                                 }
@@ -103,9 +103,7 @@ var CampaignAdvertiser = function() {
                                         // Create order and pay it
                                         stripeOrder(advertiser.stripeid, campaign, function(order) {
                                             if (order.paid) {
-                                                cli.sendJSON({
-                                                    sucess : true
-                                                });
+                                                cli.redirect(conf.default.server.url + "/advertiser?alert=Order Successfull!");
                                             } else {
                                                 cli.refresh();
                                             }
@@ -198,11 +196,11 @@ var CampaignAdvertiser = function() {
             // Find campaing
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
-            }, function(err, array) {
+            }, function(err, camp) {
                 if (err) log('Advertiser Plugin', err);
                 //
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clisign') {
-
+                if (camp.length > 0 && cli.userinfo.userid == camp[0].clientid && camp[0].campstatus == 'clisign') {
+                    var campaign = camp[0];
                     var form = formBuilder.handleRequest(cli);
                     var validation = formBuilder.validate(form, false, cli);
 
@@ -213,16 +211,21 @@ var CampaignAdvertiser = function() {
                         var extensions = image.signature.split('.');
                         var mime = extensions[extensions.length - 1];
 
-                        var nextStatus = array[0].paymentreq ? 'clipayment' : 'prod';
+                        var nextStatus = campaign.paymentreq ? 'clipayment' : 'prod';
 
                         if (config.default.supported_pictures.indexOf('.' + mime) != -1) {
                             // Save it in database
                             db.update('campaigns', {
-                                _id: array[0]._id
+                                _id: campaign._id
                             }, {
                                 clientsignature: image.signature,
                                 campstatus: nextStatus
                             }, function(err, result) {
+                                if (campaign.paymentreq) {
+                                    cli.redirect(conf.default.server.url + "/advertiser/campaigns/pay/" + campaign._id);
+                                } else {
+                                    cli.redirect(conf.default.server.url + "/advertiser?alert=Signature Successfull!");
+                                }
                                 cli.sendJSON({
                                     form: {
                                         redirect: '',
@@ -239,6 +242,27 @@ var CampaignAdvertiser = function() {
                         cli.refresh();
                     }
 
+                } else {
+                    cli.throwHTTP(400, 'Bad Request');
+                }
+            });
+        } else {
+            cli.throwHTTP(404, 'Not found');
+        }
+    };
+
+    var reviewArticle = function(cli) {
+        fileLogic.serveLmlPluginPage('advertiser', cli, true);
+    };
+
+    var changeRequest = function(cli) {
+        if (cli.routeinfo.path[3]) {
+
+            db.findToArray('campaigns', {
+                _id: db.mongoID(cli.routeinfo.path[3])
+            }, function(err, array) {
+                if (err) log('Advertiser Plugin', err);
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {
                 } else {
                     cli.throwHTTP(400, 'Bad Request');
                 }

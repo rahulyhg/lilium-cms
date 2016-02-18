@@ -15,8 +15,9 @@ $}
 </head>
 
 <body>
-</body>
 {*campaigns.mine(template:"campaigns-list-item")}
+</body>
+
 <lml:template id="campaigns-list-item">
 	<li class="campaign-item-list">
 		<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
@@ -31,6 +32,9 @@ $}
 			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
 				Pay to start
 			</lml:tobject>
+            <lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="reviewNeeded">
+                Ready for review
+            </lml:tobject>
 		</div>
 	</li>
 	<lml:empty>

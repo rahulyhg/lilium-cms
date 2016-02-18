@@ -61,5 +61,8 @@
     return item.campstatus == 'clisign';
   }
 
+  var reviewNeeded = function(item) {
+    return item.campstatus == 'clipending';
+  }
 
 </script>
