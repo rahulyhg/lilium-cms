@@ -54,7 +54,7 @@ var Handler = function() {
 						filename = crypto.createHash('md5').update(filename).digest('hex');
 						var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
 						var name = filename + mime;
-                        
+
                         file.pipe(fs.createWriteStream(saveTo));
 
 						file.on('end', function() {

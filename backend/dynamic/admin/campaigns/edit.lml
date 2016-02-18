@@ -3,6 +3,8 @@
 <html>
 	<head>
 		{%globalhead}
+        {%../campaignscript}
+
 	</head>
 	<body>
 		<div id="campwrapper">

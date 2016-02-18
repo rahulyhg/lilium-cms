@@ -113,7 +113,6 @@ var Campaigns = function() {
 					break;
 				case "mine":
 					if (cli.isGranted('advertiser')) {
-						console.log(isNaN(cli.userinfo.userid));
 						that.getAllMyCampaigns({clientid: cli.userinfo.userid.toString()}, callback);
 					} else {
 						callback();
@@ -257,7 +256,7 @@ var Campaigns = function() {
 					'cssPrefix' : 'campaigncreatefield-'
 				},
 				cssClass : "form-campaign-creation",
-				dependencies : ["sites.all", "products.all"]
+				dependencies : ["sites.all", "products.all", "content"]
 			})
 			.add('projectid', 'text', {displayname:"Project ID", editonce: true})
 			.add('campname', 'text', {displayname:"Campaign name"})
@@ -300,6 +299,16 @@ var Campaigns = function() {
 								datasource: "sites.all",
 								keyName : "displayName",
 								keyValue : "name"
+							}
+						},
+                        {fieldName: "article", displayName: "Article", keyName: "article",
+							autocomplete : {
+								datasource: "content",
+								keyName : "title",
+								keyValue : "_id"
+							},
+                            influence : {
+								displayif : "isArticle"
 							}
 						}
 					],

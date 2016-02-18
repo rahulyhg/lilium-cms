@@ -3,6 +3,7 @@
 <html>
 	<head>
 		{%globalhead}
+        {%campaignscript}
 	</head>
 	<body>
 		<h1>All Campaigns</h1>
@@ -33,5 +34,6 @@
 			<lml:tobject data-nodetype="td" data-key="status" ></lml:tobject>
 			<lml:tobject data-nodetype="td" data-key="clientname" ></lml:tobject>
 		</lml:template>
+
 	</body>
 </html>

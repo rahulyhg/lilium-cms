@@ -3,7 +3,7 @@ var fileLogic = undefined;
 var entites = undefined;
 var transaction = undefined;
 var log = undefined;
-var config = undefined;
+var _c = undefined;
 var db = undefined;
 var adminAdvertiser = require('./adminAdvertiser.js');
 
@@ -68,6 +68,7 @@ var CampaignAdvertiser = function() {
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function(err, array) {
+
                 if (err) log('Advertiser Plugin', err);
 
                 // Make sure the campaingn is at the payment status
@@ -81,9 +82,11 @@ var CampaignAdvertiser = function() {
 
                             // Stripe payement
                             stripeOrder(result[0].stripeID, campaign, function(order) {
+
                                 if (order.paid) {
-                                    cli.redirect(conf.default.server.url + "/advertiser?alert=Order Successfull!");
+                                cli.redirect(_c.default.server.url + "/advertiser?alert=OrderSuccessfull!");
                                 } else {
+
                                     cli.refresh();
                                 }
                             });
@@ -97,13 +100,13 @@ var CampaignAdvertiser = function() {
                                 var entData = cli.postdata.data;
                                 var serializedForm = formBuilder.serializeForm(form);
                                 serializedForm.stripeToken = entData.stripeToken;
-
                                 adminAdvertiser.addAdvertiserStripeCostumer(entData.stripeToken, serializedForm, cli.userinfo.userid, function(success, advertiser) {
                                     if (success) {
                                         // Create order and pay it
                                         stripeOrder(advertiser.stripeid, campaign, function(order) {
                                             if (order.paid) {
-                                                cli.redirect(conf.default.server.url + "/advertiser?alert=Order Successfull!");
+
+                                                cli.redirect(_c.default.server.url + "/advertiser");
                                             } else {
                                                 cli.refresh();
                                             }
@@ -213,7 +216,7 @@ var CampaignAdvertiser = function() {
 
                         var nextStatus = campaign.paymentreq ? 'clipayment' : 'prod';
 
-                        if (config.default.supported_pictures.indexOf('.' + mime) != -1) {
+                        if (_c.default.supported_pictures.indexOf('.' + mime) != -1) {
                             // Save it in database
                             db.update('campaigns', {
                                 _id: campaign._id
@@ -222,16 +225,10 @@ var CampaignAdvertiser = function() {
                                 campstatus: nextStatus
                             }, function(err, result) {
                                 if (campaign.paymentreq) {
-                                    cli.redirect(conf.default.server.url + "/advertiser/campaigns/pay/" + campaign._id);
+                                    cli.redirect(_c.default.server.url + "/advertiser/campaigns/pay/" + campaign._id);
                                 } else {
-                                    cli.redirect(conf.default.server.url + "/advertiser?alert=Signature Successfull!");
+                                    cli.redirect(_c.default.server.url + "/advertiser?alert=Signature Successfull!");
                                 }
-                                cli.sendJSON({
-                                    form: {
-                                        redirect: '',
-                                        success: true
-                                    }
-                                });
                             });
                         } else {
                             cli.sendJSON({
@@ -318,7 +315,7 @@ var CampaignAdvertiser = function() {
         fileLogic = require(abspath + 'filelogic.js');
         entites = require(abspath + 'entities.js');
         transaction = require(abspath + 'transaction.js');
-        config = require(abspath + 'config.js');
+        _c = require(abspath + 'config.js');
         db = require(abspath + 'includes/db.js');
 
         formBuilder.createForm('advertiser_sign')

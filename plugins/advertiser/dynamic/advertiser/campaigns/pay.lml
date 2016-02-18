@@ -68,14 +68,10 @@ $}
 
 	<script>
     function hasStripeAccount(campaign) {
-            console.log('Stripe Account? ' + liliumcms.livevars.livevars().isStripeClient[0].isStripeClient);
-
             return liliumcms.livevars.livevars().isStripeClient[0].isStripeClient;
     };
 
     function needStripeAccount(campaign) {
-    console.log('Need Account? ' + !liliumcms.livevars.livevars().isStripeClient[0].isStripeClient);
-
         return !liliumcms.livevars.livevars().isStripeClient[0].isStripeClient;
     };
 
