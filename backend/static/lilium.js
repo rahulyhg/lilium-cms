@@ -10,7 +10,7 @@ var LiliumCMS = function() {
             name: "livevarsRendered"
         },
         livevarsFetched: {
-            name: "livevarsFetched"
+            name: "livevarsRendered"
         }
     };
 
@@ -63,6 +63,7 @@ var LiliumCMS = function() {
                         'livevars': livevars
                     }
                 }));
+
                 return cb(livevars);
             });
         };
@@ -74,6 +75,7 @@ var LiliumCMS = function() {
         var fetchTemplateObjectContent = function(obj, data, domTarget) {
             var key = obj.data('key');
             var template = $('#' + obj.data('template'));
+
             var sep = obj.data('arrayseparator');
             var content = "";
 
@@ -121,7 +123,7 @@ var LiliumCMS = function() {
 
         var generateTemplateFromObject = function(domTemplate, domTarget, data) {
             var templateItems = domTemplate.clone();
-            templateItems.find('lml\\:tobject').each(function(index, obj) {
+            while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
                 obj = $(obj);
                 var nodeType = obj.data('nodetype');
                 var action = obj.data('action');
@@ -190,6 +192,7 @@ var LiliumCMS = function() {
 
             filler.append(filling);
         };
+<<<<<<< HEAD
 
         this.parseTextToView = function() {
             $("lml\\:livevars").each(function() {
@@ -199,11 +202,21 @@ var LiliumCMS = function() {
                     var templateName = $(this).data('template');
                     var varValue = livevars[this.dataset.varname];
                     var fillerName = $(this).data('filler');
+                    var sourceof = $(this).data('sourceof');
+                    var cacheonly = $(this).data('cacheonly');
 
-                    if (fillerName == "pushtable") {
+                     if (sourceof && sourceof != "") {
+                        (function(src, data) {
+                            document.addEventListener(LiliumEvents.livevarsRendered.name, function() {
+                                fillFormFromSource(src, data);
+                            });
+                        })(sourceof, varValue);
+                    }
+                    if (cacheonly) {
+                        $(lmlTag).remove();
+                    } else if (fillerName == "pushtable") {
                         var datascheme = $(this).data('scheme');
-                        var pushTable = new PushTable($(this).data('fieldname'), datascheme, varValue);
-                        pushtables.push(pushTable);
+                        var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);                        pushtables.push(pushTable);
 
                         $(lmlTag).after(pushTable.render()).remove();
                     } else if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
@@ -214,6 +227,8 @@ var LiliumCMS = function() {
                                 varValue.forEach(function(val, index) {
                                     generateTemplateFromObject(templateObj, lmlTag, val);
                                 });
+                            } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
+                                generateTemplateFromObject(templateObj, lmlTag, varValue);
                             } else {
                                 $(templateObj).html($(templateObj).find('lml\:empty').html());
                             }
@@ -337,7 +352,6 @@ var LiliumCMS = function() {
                         // Send via ajax
                         processForm($(this));
                     }
-
                 });
 
                 var processForm = function(form) {
@@ -383,19 +397,61 @@ var LiliumCMS = function() {
         };
     }
 
+
+    var findPushTableFromTitle = function(title) {
+        var pt = undefined;
+        for (var i = 0; i < pushtables.length; i++) {
+            if (pushtables[i].title == title) {
+                pt = pushtables[i];
+                break;
+            }
+        }
+
+        return pt;
+    }
+
+    var fillFormFromSource = function(src, data) {
+        var form = $('form[name="' + src + '"]');
+
+        if (form.length != 0) {
+            for (var key in data) {
+                var val = data[key];
+                var pt = undefined;
+
+                var field = form.find('*[name="' + key + '"]');
+                if (field.length > 0) {
+                    if (field.attr('type') == 'checkbox') {
+                        field.get(0).checked = val === true;
+                    } else {
+                        field.val(val);
+                    }
+                } else if ((pt = findPushTableFromTitle(key))) {
+                    pt.fillFromSource(val);
+                } else {
+                    console.log("No Field for key : " + key);
+                }
+            }
+        }
+    };
+
     var FormParser = function() {
         this.parse = function(selector) {
             $("form").deserialize(livevars[selector][0]);
         };
     };
 
-    var PushTable = function(tableid, dataScheme, dataSource) {
+
+    var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
         var datasrc = dataSource;
         var html = "";
         var scheme = JSON.parse(dataScheme.replace(/&lmlquote;/g, '"'));
         var htmlIdentifier = tableid;
         var that = this;
         var rows = new Object();
+
+        var selectkeys = new Object();
+        this.id = tableid;
+        this.title = objTitle;
 
         this.rendered = false;
 
@@ -416,7 +472,7 @@ var LiliumCMS = function() {
                     return that.selectChanged(this);
                 });
                 $('#' + htmlIdentifier).find('.lmlpushtablecolumnaddaction').bind('click', function() {
-                    return that.appendRow(this)
+                    return that.appendRow()
                 });
 
                 for (var i = 0; i < scheme.columns.length; i++) {
@@ -479,17 +535,41 @@ var LiliumCMS = function() {
             return false;
         };
 
-        this.appendRow = function() {
+        this.fillFromSource = function(sourceObj) {
+            for (var i = 0; i < sourceObj.length; i++) {
+                this.appendRow(sourceObj[i]);
+            }
+        }
+
+        this.appendRow = function(sourceObj) {
             var row = new Object();
             row._rowID = "row" + Math.random().toString(36).slice(-12);
 
-            row['_lmlid'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer').val();
-            row['_title'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer option:selected').html();
+            if (sourceObj) {
+                var readKey = scheme.key.readKey || scheme.key.keyValue;
+                var keyIndex = sourceObj[readKey];
+                var keyObject = datasrc[keyIndex];
 
-            $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield').each(function(index, val) {
-                var fieldname = $(this).data('fieldname');
-                row[fieldname] = $(this).val();
-            });
+                row._lmlid = keyObject[scheme.key.keyValue];
+                row._title = keyObject[scheme.key.keyName];
+
+                row._lmlid = keyObject[scheme.key.keyValue];
+                row._title = keyObject[scheme.key.keyName];
+
+                for (var k in sourceObj) {
+                    if (k != readKey) {
+                        row[k] = sourceObj[k];
+                    }
+                }
+            } else {
+                row['_lmlid'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer').val();
+                row['_title'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer option:selected').html();
+
+                $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield').each(function(index, val) {
+                    var fieldname = $(this).data('fieldname');
+                    row[fieldname] = $(this).val();
+                });
+            }
 
             rows[row._rowID] = row;
             (function(rowID) {
@@ -554,6 +634,7 @@ var LiliumCMS = function() {
             for (var key in dataSource) {
                 var dat = dataSource[key];
                 html += '<option class="lmlpushtableoptionkey" value="' + dat[scheme.key.keyValue] + '">' + dat[scheme.key.keyName] + '</option>';
+                selectkeys[dat[scheme.key.keyValue]] = dat[scheme.key.keyName];
             }
 
             html += '</select></th>';
@@ -563,9 +644,29 @@ var LiliumCMS = function() {
                 html += '<th><input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-' + col.fieldName + '" type="' + (col.dataType || "text") +
                     '" data-fieldname="' + col.fieldName +
                     (col.keyName ? '" data-keyname="' + col.keyName : "") +
-                    (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "") +
-                    '" /></th>';
-            }
+                    (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
+                    if (col.autocomplete) {
+                    html += '" list="' + tableid + col.fieldName + 'list" autocomplete data-acsource="' + col.autocomplete.datasource + '"';
+                }
+
+                html += '" />';
+
+                if (col.autocomplete && col.autocomplete.datasource) {
+                    var datVar = livevars[col.autocomplete.datasource];
+
+                    if (datVar && datVar.length) {
+                        html += '<datalist id="' + tableid + col.fieldName + 'list">';
+
+                        for (var j = 0; j < datVar.length; j++) {
+                            html += '<option value="' + datVar[j][col.autocomplete.keyValue] + '">' + datVar[j][col.autocomplete.keyName] + '</option>';
+                        }
+
+                        html += '</datalist>';
+                    }
+                }
+
+                html += '</th>';
+                }
 
             html += '<th><button class="lmlpushtablecolumnaddaction">Add</button></th>' +
                 '</tr></thead><tbody></tbody>';
