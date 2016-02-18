@@ -58,7 +58,11 @@ var LiliumCMS = function() {
                 vars: JSON.stringify(endpoints)
             }, function(data) {
                 livevars = deepUnescape(data);
-                document.dispatchEvent(new CustomEvent('livevarsFetched', {'detail': {'livevars' : livevars}}));
+                document.dispatchEvent(new CustomEvent('livevarsFetched', {
+                    'detail': {
+                        'livevars': livevars
+                    }
+                }));
                 return cb(livevars);
             });
         };
@@ -88,10 +92,10 @@ var LiliumCMS = function() {
 
                             // Append data
                             // Check if array or object
-                            if (typeof currentData === 'object' && Object.prototype.toString.call( currentData ) === '[object Array]' && currentData.length != 0) {
+                            if (typeof currentData === 'object' && Object.prototype.toString.call(currentData) === '[object Array]' && currentData.length != 0) {
                                 for (var i = 0; i < currentData.length; i++) {
                                     if (typeof currentData === 'object') {
-                                        generateTemplateFromObject(template, obj ,currentData[i]);
+                                        generateTemplateFromObject(template, obj, currentData[i]);
                                     } else {
                                         content += currentData[i] + (i == currentData.length - 1 ? "" : sep);
                                     }
@@ -233,7 +237,11 @@ var LiliumCMS = function() {
             });
             //remove lml:template
             $('lml\\:template').remove();
-            document.dispatchEvent(new CustomEvent('livevarsRendered', {'detail': {'livevars' : livevars}}));
+            document.dispatchEvent(new CustomEvent('livevarsRendered', {
+                'detail': {
+                    'livevars': livevars
+                }
+            }));
         };
 
         this.livevars = function() {
