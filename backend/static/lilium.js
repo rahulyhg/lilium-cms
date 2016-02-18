@@ -192,7 +192,6 @@ var LiliumCMS = function() {
 
             filler.append(filling);
         };
-<<<<<<< HEAD
 
         this.parseTextToView = function() {
             $("lml\\:livevars").each(function() {
