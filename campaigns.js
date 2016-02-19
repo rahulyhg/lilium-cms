@@ -292,8 +292,8 @@ var Campaigns = function() {
 								eq : "*"
 							}
 						},
-						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
 						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"},
+						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
 						{fieldName: "enddate", dataType:"date", displayName: "End Date", keyName : "enddate"},
 						{fieldName: "website", displayName: "Website", keyName: "website",
 							autocomplete : {
@@ -301,11 +301,23 @@ var Campaigns = function() {
 								keyName : "displayName",
 								keyValue : "name"
 							}
-						}
+						},
+						{fieldName: "productapilink", dataType:"template", templateid: "productapilink"}
 					],
+					columnTemplates : {
+						"productapilink" : {
+							fields: [
+								{fieldName: "articleid", dataType: "text", displayName: "Article", keyName: "articleid", displayCase : "sponsedit"},
+								{fieldName: "dfpprojid", dataType: "text", displayName: "DPF Project ID", keyName: "dfpprodid", displayCase : "bannerads"},
+								{fieldName: "fbcampid", dataType: "text", displayName: "Facebook camp. ID", keyName: "fbcampid", displayCase : "facebook"},
+								{fieldName: "apilink", dataType: "text", displayName: "More details", keyName: "details", displayCase : "*"}
+							],
+							dependsOn : "productType"
+						}
+					},
 					footer : {
 						title : "Total",
-						sumIndexes : [1]
+						sumIndexes : [2]
 					}
 				}
 			})

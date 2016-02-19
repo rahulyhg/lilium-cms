@@ -94,6 +94,10 @@ form input, form label{
 	padding: 6px;
 }
 
+.lmlpushtable .lmlpushtablecasenotmet {
+	display: none;
+}
+
 /* @/login */
 .lmllogin {
 	background-color: #333;

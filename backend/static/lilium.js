@@ -552,9 +552,6 @@ var LiliumCMS = function() {
                 row._lmlid = keyObject[scheme.key.keyValue];
                 row._title = keyObject[scheme.key.keyName];
 
-                row._lmlid = keyObject[scheme.key.keyValue];
-                row._title = keyObject[scheme.key.keyName];
-
                 for (var k in sourceObj) {
                     if (k != readKey) {
                         row[k] = sourceObj[k];
@@ -564,7 +561,7 @@ var LiliumCMS = function() {
                 row['_lmlid'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer').val();
                 row['_title'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer option:selected').html();
 
-                $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield').each(function(index, val) {
+                $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield:not(.lmlpushtablecasenotmet)').each(function(index, val) {
                     var fieldname = $(this).data('fieldname');
                     row[fieldname] = $(this).val();
                 });
@@ -582,6 +579,31 @@ var LiliumCMS = function() {
             return false;
         };
 
+        var findTemplateFieldFromDisplayCase = function(templateid, src) {
+              var colTemp = scheme.columnTemplates[templateid];
+              var dependsOn = colTemp.dependsOn;
+              var valToVerify = src[dependsOn];
+              var possibleFields = colTemp.fields;
+              var fieldFound = undefined;
+              var defaultField = undefined;
+
+              for (var ctn = 0; ctn < possibleFields.length; ctn++) {
+                var posFld = possibleFields[ctn];
+
+                if (posFld.displayCase == valToVerify) {
+                  fieldFound = posFld;
+                } else if (posFld.displayCase == "*") {
+                  defaultField = posFld;
+                }
+              }
+
+              if (!fieldFound && defaultField) {
+                fieldFound = defaultField;
+              }
+
+              return fieldFound;
+        };
+
         this.selectChanged = function(select) {
             var key = $(select || ("#" + htmlIdentifier + " .lmlpushtablekeyer option:selected")).val();
             var src = datasrc[key];
@@ -590,6 +612,17 @@ var LiliumCMS = function() {
                 var dataKeyName = $(this).data('keyname');
                 var defaultValue = $(this).data('defaultvalue');
                 $(this).val(dataKeyName ? src[dataKeyName] : defaultValue).data("initvalue", $(this).val());
+            });
+
+            $('#' + htmlIdentifier).find('.lmlpushtableheadertitlesrow .pushtablecolumntemplatereactive').each(function(index, th) {
+              var foundField = findTemplateFieldFromDisplayCase($(th).data('templateid'), src);
+              $(th).html(foundField ? (foundField.displayName || foundField.fieldName) : "-");
+            });
+
+            $('#' + htmlIdentifier).find('.lmlpushtableheaderfieldsrow .lmlpushtabletemplatereactiverow').each(function(index, th) {
+              var foundField = findTemplateFieldFromDisplayCase($(th).data('templateid'), src);
+              $(th).children().addClass('lmlpushtablecasenotmet');
+              $('.lmlpushtablecolumnfield-' + foundField.fieldName).removeClass('lmlpushtablecasenotmet');
             });
 
             return false;
@@ -621,14 +654,17 @@ var LiliumCMS = function() {
         };
 
         this.init = function() {
-            html += '<table id="' + tableid + '" class="lmlpushtable lmldatasourcetable"><thead><tr><th>' +
+            html += '<table id="' + tableid + '" class="lmlpushtable lmldatasourcetable"><thead><tr class="lmlpushtableheadertitlesrow"><th>' +
                 scheme.key.displayName + '</th>'
 
             for (var i = 0; i < scheme.columns.length; i++) {
-                html += "<th>" + scheme.columns[i].displayName + "</th>";
+                html += '<th class="pushtablecolumnheader'+
+                 (scheme.columns[i].dataType == "template" ? " pushtablecolumntemplatereactive" : "") +
+                 '" '+ (scheme.columns[i].templateid ? 'data-templateid="'+scheme.columns[i].templateid+'"' : "")+
+                 '>' + (scheme.columns[i].displayName || "") + "</th>";
             }
 
-            html += '<th></th></tr><tr><th><select class="lmlpushtablekeyer">';
+            html += '<th></th></tr><tr class="lmlpushtableheaderfieldsrow"><th><select class="lmlpushtablekeyer">';
 
             for (var key in dataSource) {
                 var dat = dataSource[key];
@@ -638,34 +674,49 @@ var LiliumCMS = function() {
 
             html += '</select></th>';
 
+            var addHeaderField = function(col) {
+              html += '<input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-' + col.fieldName + (col.displayCase ? " lmlpushtablecasenotmet lmlpushtabletemplatereactive" : "") + '" type="' + (col.dataType || "text") +
+                      '" data-fieldname="' + col.fieldName +
+                      (col.keyName ? '" data-keyname="' + col.keyName : "") +
+                      (col.displayCase ? '" data-displaycase="' + col.displayCase : "") +
+                      (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
+                  
+                  if (col.autocomplete) {
+                    html += '" list="' + tableid + col.fieldName + 'list" autocomplete data-acsource="' + col.autocomplete.datasource + '"';
+                  }
+  
+                  html += '" />';
+  
+                  if (col.autocomplete && col.autocomplete.datasource) {
+                      var datVar = livevars[col.autocomplete.datasource];
+  
+                      if (datVar && datVar.length) {
+                          html += '<datalist id="' + tableid + col.fieldName + 'list">';
+  
+                          for (var j = 0; j < datVar.length; j++) {
+                              html += '<option value="' + datVar[j][col.autocomplete.keyValue] + '">' + datVar[j][col.autocomplete.keyName] + '</option>';
+                          }
+  
+                          html += '</datalist>';
+                      }
+                  }
+            }
+
             for (var i = 0; i < scheme.columns.length; i++) {
                 var col = scheme.columns[i];
-                html += '<th><input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-' + col.fieldName + '" type="' + (col.dataType || "text") +
-                    '" data-fieldname="' + col.fieldName +
-                    (col.keyName ? '" data-keyname="' + col.keyName : "") +
-                    (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
-                    if (col.autocomplete) {
-                    html += '" list="' + tableid + col.fieldName + 'list" autocomplete data-acsource="' + col.autocomplete.datasource + '"';
+                if (col.dataType == "template") {
+                  html += '<th class="lmlpushtabletemplatereactiverow" data-templateid="'+col.templateid+'">';
+                  
+                  var colTemplate = scheme.columnTemplates[col.templateid];
+                  colTemplate.fields.forEach(function(tempField) {
+                    addHeaderField(tempField);
+                  });
+                } else {
+                  html += "<th>";
+                  addHeaderField(col);
                 }
-
-                html += '" />';
-
-                if (col.autocomplete && col.autocomplete.datasource) {
-                    var datVar = livevars[col.autocomplete.datasource];
-
-                    if (datVar && datVar.length) {
-                        html += '<datalist id="' + tableid + col.fieldName + 'list">';
-
-                        for (var j = 0; j < datVar.length; j++) {
-                            html += '<option value="' + datVar[j][col.autocomplete.keyValue] + '">' + datVar[j][col.autocomplete.keyName] + '</option>';
-                        }
-
-                        html += '</datalist>';
-                    }
-                }
-
-                html += '</th>';
-                }
+                html += "</th>"
+              }
 
             html += '<th><button class="lmlpushtablecolumnaddaction">Add</button></th>' +
                 '</tr></thead><tbody></tbody>';
