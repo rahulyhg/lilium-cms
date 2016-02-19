@@ -17,7 +17,18 @@
     "javascript",
     "blog"
   ],
-  "author": "Erik Desjardins",
+  "author": {
+    "name": "Erik Desjardins",
+    "email": "me@erikdesjardins.com",
+    "url": "http://erikdesjardins.com"
+  },
+  "contributor": [
+    {
+      "name": "Samuel Rondeau-Millaire",
+      "email": "contact@samrm.io"
+      "url": "http://samrm.io"
+    }
+  ], 
   "license": "ISC",
   "homepage": "https://bitbucket.org/RykDesjardins/lilium-cms#readme",
   "dependencies": {
