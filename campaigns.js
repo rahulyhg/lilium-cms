@@ -89,7 +89,8 @@ var Campaigns = function() {
 	};
 
 	this.registerLiveVar = function() {
-        var that = this;
+        	var that = this;
+
 		// levels : field to query
 		// params : {
 		//	query : value to query
@@ -182,7 +183,8 @@ var Campaigns = function() {
 
 	this.handleGET = function(cli) {
 		cli.touch('campaigns.handleGET');
-		var hasParam = cli.routeinfo.path.length > 2;
+		var params = cli.routeinfo.path;
+		var hasParam = params.length > 2 && params[2] != "new";
 
 		filelogic.serveLmlPage(cli, hasParam);
 	};

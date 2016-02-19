@@ -1,3 +1,24 @@
+/*********************************************************************************************************
+ *                                                                                                       *
+ *  Live Variables | Non-cached data fetched from server async                                           *
+ *                                                                                                       *
+ *  Author : Erik Desjardins                                                                             *
+ *  Contributors : Samuel Rondeau-Millaire                                                               *
+ *  Description : Interprets LML and renders ready to be served HTML files                               *
+ *  Documentation : http://liliumcms.com/docs                                                            *
+ *                                                                                                       *
+ *********************************************************************************************************
+ *                                                                                                       *
+ *-- Livevars Syntax ------------------------------------------------------------------------------------*
+ *                                                                                                       *
+ *      Tags start with an asterisk followed by the endpoint, then levels.                               *
+ *      Labelled parameters can be added afterwards using JSON syntax, wrapped by parenthesis.           *
+ *                                                                                                       *
+ *      Example :                                                                                        *
+ *        {*endpoint.secondlevel.thirdlevel(sontparam:"someValue",otherparam:"otherValue")}              * 
+ *                                                                                                       *
+ *********************************************************************************************************/
+
 var db = require('./includes/db.js');
 var log = require('./log.js');
 

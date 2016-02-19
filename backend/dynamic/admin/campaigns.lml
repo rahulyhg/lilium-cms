@@ -20,8 +20,7 @@
 			</tbody>
 		</table>
 
-		<h2>Create Campaign</h2>
-		{=forms.render('campaign_create')}
+		<a href="{=config.default.server.url}/admin/campaigns/new">Create Campaign</a>
 
 		<lml:template id="single-campaign" data-wrapper="tr">
 			<lml:tobject data-nodetype="td"  >

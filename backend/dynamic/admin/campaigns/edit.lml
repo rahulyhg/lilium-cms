@@ -1,5 +1,5 @@
-{#config;forms}
 <!DOCTYPE html>
+{#config;forms}
 <html>
 	<head>
 		{%globalhead}

@@ -1,3 +1,24 @@
+/*********************************************************************************************************
+ *                                                                                                       *
+ *  LML INTERPRETER | LILIUM MARKUP LANGUAGE INTERPRETER                                                 *
+ *                                                                                                       *
+ *  Author : Erik Desjardins                                                                             *
+ *  Contributors : Samuel Rondeau-Millaire                                                               *
+ *  Description : Interprets LML and renders ready to be served HTML files                               *
+ *  Documentation : http://liliumcms.com/docs                                                            *
+ *                                                                                                       *
+ *********************************************************************************************************
+ *                                                                                                       *
+ *-- LML Tag Identifiers --------------------------------------------------------------------------------*
+ *                                                                                                       *
+ *       = Variable                                                                                      *
+ *       * Live Variable                                                                                 *
+ *       % Petal File Inclusion                                                                          *
+ *       # Library Inclusion                                                                             *
+ *       $ LML Slang wrapper                                                                             *
+ *                                                                                                       *
+ *********************************************************************************************************/
+
 var LMLContext = require('./lmlcontext.js');
 var fileserver = require('./fileserver.js');
 var _c = require('./config.js');
@@ -12,23 +33,7 @@ var LML = function() {
 	var markSymbolClose = '}';
 	var slangOpening = 'lml';
 
-	/*
-		Tag identifier -
-			= Variable
-			@ Code
-			* Live
-			% File
-			# Context
-			$ Slang
-
-		LML slang -
-			{$ if (condition) $}
-				Included text
-			{$ endif $}
-
-	*/
-
-	var symbols = ['=', '@', '*', '%', '#', '$'];
+	var symbols = ['=', '*', '%', '#', '$'];
 	var symbolLen = symbols.length;
 	var condIdentifiers = ["if", "while", "for"];
 	var condClosures = ["endif", "else", "endwhile", "endfor"];
@@ -44,22 +49,6 @@ var LML = function() {
 		});
 
 		return true;
-	};
-
-	// WARNING : NOT SECURE
-	var execCodeTag = function(context, code, callback) {
-		// Execute code, not secure
-		code = "(function(context) {" + code + "})(context);";
-		try {
-			eval(code);
-			return true;
-		} catch (ex) {
-			throw "LMLParseException - Code Tag exception : " + ex;
-		}
-
-		callback("");
-
-		return false;
 	};
 
 	var fetchLiveParams = function(paramsString) {

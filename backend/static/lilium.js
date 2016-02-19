@@ -1,5 +1,23 @@
-// Lilium Frontend core framework
-// Requires vaniryk
+/*********************************************************************************************************
+ *                                                                                                       *
+ *  88          88 88 88                                     ,ad8888ba,  88b           d88  ad88888ba    *
+ *  88          "" 88 ""                                    d8"'    `"8b 888b         d888 d8"     "8b   *
+ *  88             88                                      d8'           88`8b       d8'88 Y8,           *
+ *  88          88 88 88 88       88 88,dPYba,,adPYba,     88            88 `8b     d8' 88 `Y8aaaaa,     *
+ *  88          88 88 88 88       88 88P'   "88"    "8a    88            88  `8b   d8'  88   `"""""8b,   *
+ *  88          88 88 88 88       88 88      88      88    Y8,           88   `8b d8'   88         `8b   *
+ *  88          88 88 88 "8a,   ,a88 88      88      88     Y8a.    .a8P 88    `888'    88 Y8a     a8P   *
+ *  88888888888 88 88 88  `"YbbdP'Y8 88      88      88      `"Y8888Y"'  88     `8'     88  "Y88888P"    *
+ *                                                                                                       *
+ *********************************************************************************************************
+ * LILIUM CMS | GLOBAL FRONTEND JAVASCRIPT                                                               *
+ *                                                                                                       *
+ * Author : Erik Desjardins                                                                              *
+ * Contributors : Samuel Rondeau-Millaire                                                                *
+ * Description : Global styling for admin section of Lilium.                                             *
+ * Documentation : http://liliumcms.com/docs                                                             *
+ *********************************************************************************************************/
+
 var LiliumCMS = function() {
     var livevars;
     var urlParams;
