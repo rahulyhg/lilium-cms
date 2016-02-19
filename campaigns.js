@@ -136,15 +136,15 @@ var Campaigns = function() {
                             if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {
                                 var campaign = array[0];
 
-                                //Get article in need of article a review
+                                //Get article in need of a review
                                 var campaign = array[0];
-                                var productsID = [];
+                                var articlesID = [];
 
                                 for (var key in campaign.products) {
-                                    productsID.push[campaign.products[key].prodid];
+                                    articlesID.push(db.mongoID(campaign.products[key].article));
                                 }
 
-                                db.findToArray('products', {$and : [{name : {$in: productsID}}, {productType: "sponsedit"}]}, function(err, arr) {
+                                db.findToArray('content', {_id : {$in: articlesID}}, function(err, arr) {
                                     callback(arr);
                                 });
 
@@ -155,6 +155,7 @@ var Campaigns = function() {
                     } else {
                         callback();
                     }
+                break;
                 case "query":
                     if (cli.isGranted('advertiser')) {
                         var queryInfo = params.query || new Object();

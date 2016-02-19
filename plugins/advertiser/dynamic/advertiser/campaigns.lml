@@ -32,7 +32,7 @@ $}
 			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
 				Pay to start
 			</lml:tobject>
-            <lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="reviewNeeded">
+            <lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-filter="reviewNeeded">
                 Ready for review
             </lml:tobject>
 		</div>

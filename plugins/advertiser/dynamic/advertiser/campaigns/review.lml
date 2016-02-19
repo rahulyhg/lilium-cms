@@ -15,17 +15,20 @@ $}
 </head>
 
 <body>
-	{*isStripeClient}
 
-	<h1>Payment</h1>
+	<h1>Review the following posts</h1>
 	<div id="order">
 		{*campaigns.articlereview.{?1}(template:"review-article")}
 	</div>
 
 	<lml:template id="review-article">
 
-		<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
-		<div>
+		<lml:tobject data-nodetype="h3" data-key="title"></lml:tobject>
+		<lml:tobject data-nodetype="p" data-key="content"></lml:tobject>
+        <div>
+
+        </div>
+        <div>
             {#forms.render(reviewArticle)}
             <lml:tobject data-nodetype="button"
                      data-bind="click"

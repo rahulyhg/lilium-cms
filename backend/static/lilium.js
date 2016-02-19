@@ -767,7 +767,7 @@ var LiliumCMS = function() {
                         if (typeof selectedPicture !== 'undefined') {
                             var id = $(selectedPicture).attr('id');
                             var img = editor.document.createElement('img');
-                            img.setAttribute('src', picture_id_url[id]);
+                            img.setAttribute('src', '/uploads/' + picture_id_url[id]);
                             img.setStyle('width', '300px');
                             editor.insertElement(img);
                         }
@@ -804,7 +804,7 @@ var LiliumCMS = function() {
         for (var index in json) {
             switch (typeof json[index]) {
                 case 'string':
-                    json[index] = unescape(json[index])
+                    json[index] = unescape(json[index]);
                     break;
                 case 'object':
                     json[index] = deepUnescape(json[index]);

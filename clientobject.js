@@ -63,9 +63,10 @@ ClientObject.prototype.sendJSON = function(json) {
 		json = JSON.stringify(json);
 	}
 	this.response.writeHead(200, {
-		"Content-Type": "application/json",
+		"Content-Type": "application/json; charset=utf-8",
 		"Lilium-Proto": "livevars"
 	});
+
 	this.response.end(json);
 };
 

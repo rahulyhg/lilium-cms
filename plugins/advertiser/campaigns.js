@@ -47,6 +47,7 @@ var CampaignAdvertiser = function() {
                 break;
             case 'review':
                 reviewArticle(cli);
+                break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
