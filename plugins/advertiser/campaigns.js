@@ -23,6 +23,9 @@ var CampaignAdvertiser = function() {
             case 'pay':
                 return payCampaign(cli);
                 break;
+            case 'review':
+                return postChangeRequest(cli);
+                break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -59,6 +62,58 @@ var CampaignAdvertiser = function() {
 
     };
 
+    var postChangeRequest = function(cli) {
+        if (cli.routeinfo.path[3]) {
+            db.findToArray('campaigns', {
+                _id: db.mongoID(cli.routeinfo.path[3])
+            }, function(err, array) {
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {
+                    var campaign = array[0];
+
+                    var updatecamp = function(status) {
+                        db.update('campaigns', {_id: campaign._id}, {campstatus : status}, function() {
+                            cli.sendJSON({
+                                success: true,
+                                redirect: _c.default.server.url + '/advertiser/campaigns'
+                            });
+                        })
+                    }
+                    console.log(cli.postdata);
+                    // Check if there is some post data
+                    if (typeof cli.postdata.data !== 'undefined' && typeof cli.postdata.data.changerequests !== 'undefined') {
+                        var changerequests = cli.postdata.data.changerequests
+                        var changeobj = [];
+                        //Create changerequests
+                        for (var key in changerequests) {
+                            var request = {};
+                            request.content = escape(changerequests[key].content);
+                            request.title = escape(changerequests[key].title);
+                            request.articleId = key;
+                            changeobj.push(request);
+                        }
+
+                        db.insert('changerequests', changeobj, function(err, r) {
+                            // Update status
+                            updatecamp('review');
+
+                        });
+
+                    } else {
+                        // Update status
+                        updatecamp('ready');
+                    }
+
+
+
+                } else {
+                    cli.throwHTTP(400, 'Bad request');
+                }
+            });
+        } else {
+            cli.throwHTTP(404, 'Not found');
+        }
+    }
+
     var payCampaign = function(cli) {
         var that = this;
 
@@ -85,7 +140,7 @@ var CampaignAdvertiser = function() {
                             stripeOrder(result[0].stripeID, campaign, function(order) {
 
                                 if (order.paid) {
-                                cli.redirect(_c.default.server.url + "/advertiser?alert=OrderSuccessfull!");
+                                    cli.redirect(_c.default.server.url + "/advertiser?alert=OrderSuccessfull!");
                                 } else {
 
                                     cli.refresh();
@@ -147,7 +202,11 @@ var CampaignAdvertiser = function() {
         transaction.charge(charge, function(err, charge) {
             if (charge.paid) {
                 // Update campaign status
-                db.update('campaigns', {_id: campaign._id},{campstatus:"prod"}, function(err) {
+                db.update('campaigns', {
+                    _id: campaign._id
+                }, {
+                    campstatus: "prod"
+                }, function(err) {
                     cb(charge);
                 });
             } else {
@@ -260,8 +319,7 @@ var CampaignAdvertiser = function() {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function(err, array) {
                 if (err) log('Advertiser Plugin', err);
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {
-                } else {
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {} else {
                     cli.throwHTTP(400, 'Bad Request');
                 }
             });
@@ -337,6 +395,10 @@ var CampaignAdvertiser = function() {
             })
             .addTemplate('payment')
             .add('Pay', 'submit');
+
+        formBuilder.createForm('advertiser_article_review')
+            .addTemplate('article_base')
+            .add('_id', 'hidden')
     };
 
 }

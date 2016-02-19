@@ -72,7 +72,7 @@ var LiliumCMS = function() {
             return livevars;
         }
 
-        var fetchTemplateObjectContent = function(obj, data, domTarget) {
+        var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey) {
             var key = obj.data('key');
             var template = $('#' + obj.data('template'));
 
@@ -97,7 +97,7 @@ var LiliumCMS = function() {
                             if (typeof currentData === 'object' && Object.prototype.toString.call(currentData) === '[object Array]' && currentData.length != 0) {
                                 for (var i = 0; i < currentData.length; i++) {
                                     if (typeof currentData === 'object') {
-                                        generateTemplateFromObject(template, obj, currentData[i]);
+                                        generateTemplateFromObject(template, obj, currentData[i], livevarkey);
                                     } else {
                                         content += currentData[i] + (i == currentData.length - 1 ? "" : sep);
                                     }
@@ -121,8 +121,9 @@ var LiliumCMS = function() {
 
         };
 
-        var generateTemplateFromObject = function(domTemplate, domTarget, data) {
+        var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey) {
             var templateItems = domTemplate.clone();
+
             while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
                 obj = $(obj);
                 var nodeType = obj.data('nodetype');
@@ -136,18 +137,23 @@ var LiliumCMS = function() {
 
                 if (passed) {
                     var node = $(document.createElement(nodeType));
+                    console.log(livevarkey);
+                    if (typeof livevarkey !== 'undefined') {
+                        node.context.dataset.livevarkey = livevarkey;
+                    }
+
                     if (nodeType == 'img') {
-                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget));
+                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
                     } else if (nodeType == 'a') {
                         if (obj.data('href')) {
-                            node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget));
+                            node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
                         } else if (obj.data('hrefsource')) {
                             node.attr('href', data[obj.data('hrefsource')]);
                         }
 
                         node.html(obj.html());
                     } else {
-                        node.html(fetchTemplateObjectContent(obj, data, domTarget, templateItems));
+                        node.html(fetchTemplateObjectContent(obj, data, domTarget, templateItems, livevarkey));
                     }
 
                     if (action && typeof window[action] === 'function') {
@@ -203,6 +209,7 @@ var LiliumCMS = function() {
                     var fillerName = $(this).data('filler');
                     var sourceof = $(this).data('sourceof');
                     var cacheonly = $(this).data('cacheonly');
+                    var livevarkey = this.dataset.varname;
 
                      if (sourceof && sourceof != "") {
                         (function(src, data) {
@@ -218,28 +225,28 @@ var LiliumCMS = function() {
                         })(sourceof, varValue);
                     }
                     if (cacheonly) {
-                        $(lmlTag).remove();
+                        // $(lmlTag).remove();
                     } else if (fillerName == "pushtable") {
                         var datascheme = $(this).data('scheme');
                         var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);                        pushtables.push(pushTable);
 
-                        $(lmlTag).after(pushTable.render()).remove();
+                        $(lmlTag).after(pushTable.render());
                     } else if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
                         var templateObj = $('#' + $(this).data('template'));
 
                         if (templateObj.length != 0) {
                             if (varValue.length > 0) {
                                 varValue.forEach(function(val, index) {
-                                    generateTemplateFromObject(templateObj, lmlTag, val);
+                                    generateTemplateFromObject(templateObj, lmlTag, val, livevarkey);
                                 });
                             } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
-                                generateTemplateFromObject(templateObj, lmlTag, varValue);
+                                generateTemplateFromObject(templateObj, lmlTag, varValue, livevarkey);
                             } else {
                                 $(templateObj).html($(templateObj).find('lml\:empty').html());
                             }
                         }
 
-                        $(lmlTag).remove();
+                        // $(lmlTag).remove();
                     } else if (fillerName != "") {
                         var filler = $(document.createElement(fillerName));
                         filler.attr('name', lmlTag.data('fieldname'));

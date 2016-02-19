@@ -10,26 +10,25 @@ $}
 
 <head>
 	<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 	{%../../../../../backend/dynamic/admin/globalhead;../../script}
-
+	<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
+	<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
 </head>
 
 <body>
 
 	<h1>Review the following posts</h1>
-	<div id="order">
-		{*campaigns.articlereview.{?1}(template:"review-article")}
+	<div>
+		{*campaigns.articlereview.{?1}(template:"review-article",sourceof:"advertiser_article_review")}
 	</div>
 
 	<lml:template id="review-article">
 
-		<lml:tobject data-nodetype="h3" data-key="title"></lml:tobject>
-		<lml:tobject data-nodetype="p" data-key="content"></lml:tobject>
         <div>
-
+			{=forms.render(advertiser_article_review)}
         </div>
         <div>
-            {#forms.render(reviewArticle)}
             <lml:tobject data-nodetype="button"
                      data-bind="click"
                      data-action="looksGood"
@@ -49,37 +48,60 @@ $}
 
     <button id="confirm-review">Confirm</button>
 	<script>
-
+	/**
+	 * all articles that we want to change
+	 * {id:,title:, content:}
+	 * @type {Object}
+	 */
+	var changeRequests = {};
 	$(document).ready(function() {
         var articles;
-        var changeRequest = [];
-		document.addEventListener('livevarsFetched', function(e) {
 
-			 articles = e.detail.livevars[$($("lml\\:livevars")[1]).attr('data-varname')];
+		document.addEventListener('livevarsRendered', function(e) {
 
-            products = livevars[key][0].products;
+			        $('#confirm-review').click(function(e) {
+						//Check if everything is confirmed
+						if ($('button.selected').length == liliumcms.livevars.livevars()[$("lml\\:livevars:first").attr('data-varname')].length) {
+							$.post($(location).attr("href"), {changerequests : changeRequests}, function(data) {
+								if (data.sucess) {
+									window.location.replace(data.redirect);
+								}
+							})
+						} else {
+							alert('Please review every Articles');
+						}
 
-			$("#campaign_total_price").html(totalPrice + '$');
+			        })
 
-			var submit_button = $("form[name=advertiser_pay] input[type=submit]");
-			$(submit_button).val($(submit_button).val() + " " + totalPrice + '$');
 		});
 
-        $('#confirm-review').click(function(e) {
-            $.post("", changeRequest, function(data) {
-
-            })
-        })
 
 
 
 	});
 
-    var changeRequest = function(id) {
-        changeRequest.push(id);
+    var changeRequest = function(id, button) {
+		$(button).parent().find('.selected').removeClass('selected');
+		console.log(button);
+		$(button).addClass('selected');
+
+		//find corresponding form
+		var form = $('form[name=advertiser_article_review] input[name=_id][value="'+ id +'"]').parent();
+		var title = $(form).find('input[name=title]').val();
+		var content = $.trim($(form).find('[ckeditor]').val());
+
+        changeRequests[id]= {id: id, title: title, content: content};
     }
 
-    var looksGood = function(id) {
+    var looksGood = function(id, button) {
+		//Remove selection
+		if (changeRequests[id]) {
+			changeRequests[id] = undefined;
+			delete changeRequests[id];
+		}
+
+		$(button).parent().find('.selected').removeClass('selected');
+		$(button).addClass('selected');
 
     }
 	</script>

@@ -1,0 +1,42 @@
+{#config;session;vocab;forms}
+<!DOCTYPE html>
+<html>
+
+<head>
+	{%../globalhead;../script}
+	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+	<style>
+
+	</style>
+</head>
+
+<body>
+	{*changerequests}
+
+	<lml:template id="review-article">
+
+
+        <div>
+		<lml:tobject data-nodetype="h3" data-key="title"></lml:tobject>
+		<lml:tobject data-nodetype="h3" data-key="campaign.campname"></lml:tobject>
+
+            <lml:tobject data-nodetype="button"
+                     data-bind="click"
+                     data-action="looksGood"
+                     data-actionparamkey="_id">
+                    Looks Good
+            </lml:tobject>
+            <lml:tobject data-nodetype="button"
+                     data-bind="click"
+                     data-action="changeRequest"
+                     data-actionparamkey="_id">
+                    Change Request
+            </lml:tobject>
+        </div>
+
+	</lml>
+</body>
+
+</html>

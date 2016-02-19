@@ -43,6 +43,7 @@ var Handler = function() {
 				if (cli.request.headers['content-length'] > config.default.server.fileMaxSize) {
 					file.resume();
 					hasFile = false;
+					finishedCalled = true;
 					return cli.throwHTTP(413, 'File is too large');
 
 				} else {

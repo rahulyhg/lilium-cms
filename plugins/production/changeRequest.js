@@ -10,8 +10,8 @@ var ChangeRequest = function() {
       case 'edit':
         this.edit(cli);
         break;
-      case 'changerequest':
-        changeRequest.handleGET(cli);
+      case undefined:
+        fileLogic.serveLmlPluginPage('production',cli);
         break;
       default:
         cli.throwHTTP(404, 'Page not found');
@@ -69,7 +69,23 @@ var ChangeRequest = function() {
           var allRoles = levels.length === 0;
 
           if (allRoles) {
-            db.singleLevelFind('changerequests', callback);
+            db.join('changerequests', [
+                {$lookup:{from: "campaigns", localField: "articleId", foreignField: "products._id", as: "product"}},
+                {
+            $project: {
+                "content" : 1,
+                "title" : 1,
+                "articleId" : 1,
+                "product.products" : {
+                    $cond: {
+                        if: {$eq : ["product.products.article", '56c742c06094640103ba3843']}, then: 1, else :0
+                    }
+                }
+
+            }
+
+      }
+        ], callback);
           } else {
             if (params.diffview) {
       				db.multiLevelFind('changerequests', levels, {_id : db.mongoID(levels[0])}, {limit:[1]}, function(changeRequest) {
