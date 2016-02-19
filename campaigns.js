@@ -257,7 +257,7 @@ var Campaigns = function() {
 					'cssPrefix' : 'campaigncreatefield-'
 				},
 				cssClass : "form-campaign-creation",
-				dependencies : ["sites.all", "products.all"]
+				dependencies : ["sites.all.simple", "products.all", "content.all.simple", "dfp.recent.simple"]
 			})
 			.add('projectid', 'text', {displayname:"Project ID", editonce: true})
 			.add('campname', 'text', {displayname:"Campaign name"})
@@ -297,7 +297,7 @@ var Campaigns = function() {
 						{fieldName: "enddate", dataType:"date", displayName: "End Date", keyName : "enddate"},
 						{fieldName: "website", displayName: "Website", keyName: "website",
 							autocomplete : {
-								datasource: "sites.all",
+								datasource: "sites.all.simple",
 								keyName : "displayName",
 								keyValue : "name"
 							}
@@ -307,7 +307,11 @@ var Campaigns = function() {
 					columnTemplates : {
 						"productapilink" : {
 							fields: [
-								{fieldName: "articleid", dataType: "text", displayName: "Article", keyName: "articleid", displayCase : "sponsedit"},
+								{fieldName: "articleid", displayName: "Article", keyName: "articleid", displayCase : "sponsedit", autocomplete : {
+									datasource: "content.all.simple",
+									keyName : "articleid",
+									keyValue : "title"
+								}},
 								{fieldName: "dfpprojid", dataType: "text", displayName: "DPF Project ID", keyName: "dfpprodid", displayCase : "bannerads"},
 								{fieldName: "fbcampid", dataType: "text", displayName: "Facebook camp. ID", keyName: "fbcampid", displayCase : "facebook"},
 								{fieldName: "apilink", dataType: "text", displayName: "More details", keyName: "details", displayCase : "*"}

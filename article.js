@@ -179,7 +179,19 @@ var Article = function() {
 
 	if (allContent) {
 		db.singleLevelFind('content', callback);
-	} else {
+	} else if (levels[0] == "all") {
+		var sentArr = new Array();
+                db.findToArray('content', {}, function(err, arr) {
+			for (var i = 0; i < arr.length; i++) {
+				sentArr.push({
+					articleid : arr[i]._id,
+					title : arr[i].title
+				});
+			};
+
+			callback(sentArr);
+                });
+        } else {
 		db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 	}
     }, ["content"]);

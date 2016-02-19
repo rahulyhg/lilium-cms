@@ -682,7 +682,7 @@ var LiliumCMS = function() {
                       (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
                   
                   if (col.autocomplete) {
-                    html += '" list="' + tableid + col.fieldName + 'list" autocomplete data-acsource="' + col.autocomplete.datasource + '"';
+                    html += '" list="' + tableid + col.fieldName + 'list" autocomplete="on" data-acsource="' + col.autocomplete.datasource + '"';
                   }
   
                   html += '" />';
