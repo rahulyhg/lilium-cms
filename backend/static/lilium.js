@@ -207,7 +207,13 @@ var LiliumCMS = function() {
                      if (sourceof && sourceof != "") {
                         (function(src, data) {
                             document.addEventListener(LiliumEvents.livevarsRendered.name, function() {
-                                fillFormFromSource(src, data);
+                                if ($.isArray(data)) {
+                                    for (var key in data) {
+                                        fillFormFromSource(src, data[key], key);
+                                    }
+                                }else {
+                                    fillFormFromSource(src, data);
+                                }
                             });
                         })(sourceof, varValue);
                     }
@@ -409,10 +415,13 @@ var LiliumCMS = function() {
         return pt;
     }
 
-    var fillFormFromSource = function(src, data) {
-        var form = $('form[name="' + src + '"]');
+    var fillFormFromSource = function(src, data, index) {
+
+        index = typeof index == 'undefined' ? 0: index;
+        var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
 
         if (form.length != 0) {
+
             for (var key in data) {
                 var val = data[key];
                 var pt = undefined;
