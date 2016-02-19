@@ -154,7 +154,7 @@ var LiliumCMS = function() {
                         var paramkey = obj.data('actionparamkey');
                         var bindName = obj.data('bind');
                         node.bind(bindName, function() {
-                            window[action].apply(data, [data[paramkey]]);
+                            window[action].apply(data, [data[paramkey], node]);
                         });
                     }
 
@@ -849,6 +849,12 @@ var LiliumCMS = function() {
     this.formParser = new FormParser();
     this.livevars = new LiveVars();
     this.ckeditor = new CKEditor();
+
+    document.addEventListener('livevarsRendered', function(e) {
+        liliumcms.ckeditor.initEditor();
+
+    });
+
     // API
     this.refresh = function() {
         window.location.reload();
