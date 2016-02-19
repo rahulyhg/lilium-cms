@@ -22,10 +22,10 @@
     "email": "me@erikdesjardins.com",
     "url": "http://erikdesjardins.com"
   },
-  "contributor": [
+  "contributors": [
     {
       "name": "Samuel Rondeau-Millaire",
-      "email": "contact@samrm.io"
+      "email": "contact@samrm.io",
       "url": "http://samrm.io"
     }
   ], 
