@@ -247,6 +247,24 @@ var DB = function() {
 		});
 	};
 
+	this.aggregate = this.join = function(coln, aggregation, cb) {
+		_conn.collection(coln, {"strict":true}, function(err, col) {
+			if (err) {
+				cb("[Database - Error : "+err+"]");
+			} else {
+				if (typeof aggregation === 'undefined') {
+					cb("[Database - Aggregate requires an aggregation.]");
+				} else {
+					col.aggregate(
+						aggregation
+					).toArray(function(err, result) {
+				       cb(err || result);
+				   });
+				}
+			}
+		});
+	}
+
 	// Will callback cb with a boolean representing the existance of a document
 	this.match = this.exists = function(coln, conds, cb) {
 		this.find(coln, conds, {limit:[1]}, function(err, r) {
