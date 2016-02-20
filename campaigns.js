@@ -89,7 +89,8 @@ var Campaigns = function() {
 	};
 
 	this.registerLiveVar = function() {
-        var that = this;
+        	var that = this;
+
 		// levels : field to query
 		// params : {
 		//	query : value to query
@@ -182,7 +183,8 @@ var Campaigns = function() {
 
 	this.handleGET = function(cli) {
 		cli.touch('campaigns.handleGET');
-		var hasParam = cli.routeinfo.path.length > 2;
+		var params = cli.routeinfo.path;
+		var hasParam = params.length > 2 && params[2] != "new";
 
 		filelogic.serveLmlPage(cli, hasParam);
 	};
@@ -257,7 +259,7 @@ var Campaigns = function() {
 					'cssPrefix' : 'campaigncreatefield-'
 				},
 				cssClass : "form-campaign-creation",
-				dependencies : ["sites.all", "products.all", "content"]
+				dependencies : ["sites.all.simple", "products.all", "content.all.simple", "dfp.recent.simple"]
 			})
 			.add('projectid', 'text', {displayname:"Project ID", editonce: true})
 			.add('campname', 'text', {displayname:"Campaign name"})
@@ -292,30 +294,36 @@ var Campaigns = function() {
 								eq : "*"
 							}
 						},
-						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
 						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"},
+						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
 						{fieldName: "enddate", dataType:"date", displayName: "End Date", keyName : "enddate"},
 						{fieldName: "website", displayName: "Website", keyName: "website",
 							autocomplete : {
-								datasource: "sites.all",
+								datasource: "sites.all.simple",
 								keyName : "displayName",
 								keyValue : "name"
 							}
 						},
-                        {fieldName: "article", displayName: "Article", keyName: "article",
-							autocomplete : {
-								datasource: "content",
-								keyName : "title",
-								keyValue : "_id"
-							},
-                            influence : {
-								displayif : "isArticle"
-							}
-						}
+						{fieldName: "productapilink", dataType:"template", templateid: "productapilink"}
 					],
+					columnTemplates : {
+						"productapilink" : {
+							fields: [
+								{fieldName: "articleid", displayName: "Article", keyName: "articleid", displayCase : "sponsedit", autocomplete : {
+									datasource: "content.all.simple",
+									keyName : "articleid",
+									keyValue : "title"
+								}},
+								{fieldName: "dfpprojid", dataType: "text", displayName: "DPF Project ID", keyName: "dfpprodid", displayCase : "bannerads"},
+								{fieldName: "fbcampid", dataType: "text", displayName: "Facebook camp. ID", keyName: "fbcampid", displayCase : "facebook"},
+								{fieldName: "apilink", dataType: "text", displayName: "More details", keyName: "details", displayCase : "*"}
+							],
+							dependsOn : "productType"
+						}
+					},
 					footer : {
 						title : "Total",
-						sumIndexes : [1]
+						sumIndexes : [2]
 					}
 				}
 			})

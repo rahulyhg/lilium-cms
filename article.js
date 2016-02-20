@@ -176,17 +176,24 @@ var Article = function() {
     this.registerContentLiveVar = function() {
         livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
+	if (allContent) {
+		db.singleLevelFind('content', callback);
+	} else if (levels[0] == "all") {
+		var sentArr = new Array();
+                db.findToArray('content', {}, function(err, arr) {
+			for (var i = 0; i < arr.length; i++) {
+				sentArr.push({
+					articleid : arr[i]._id,
+					title : arr[i].title
+				});
+			};
 
-            if (allContent) {
-                db.singleLevelFind('content', callback);
-            } else {
-                db.multiLevelFind('content', levels, {
-                    _id: new mongo.ObjectID(levels[0])
-                }, {
-                    limit: [1]
-                }, callback);
-            }
-        }, ["content"]);
+			callback(sentArr);
+                });
+        } else {
+		db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+	}
+    }, ["content"]);
 
         livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
             var allTypes = levels.length === 0;

@@ -1,0 +1,10 @@
+{#config;forms}
+<!DOCTYPE html>
+	<head>
+		{%globalhead}
+	</head>
+	<body>
+		<h2>Create Campaign</h2>
+		{=forms.render('campaign_create')}
+	</body>
+</html>
