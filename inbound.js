@@ -2,7 +2,7 @@ var _c = require('./config.js').default,
     _http = require('http'),
     log = require('./log.js'),
     __inbound = new (function() {
-  var io;
+    	var io = require('socket.io')(server);
 	var server;
 	var callbacks = {
 		'onRequest' : [],
@@ -31,14 +31,16 @@ var _c = require('./config.js').default,
 		server.listen(_c.server.port, handleConn);
 	};
 
-  this.io = function() {
-    return io;
-  }
+  	this.io = function() {
+    		return io;
+  	};
+
+	this.createServer = function() {
+		server = _http.createServer(handleReq);
+	}
 
 	var init = function() {
-		server = _http.createServer(handleReq);
-    io = require('socket.io')(server);
-
+	
 	};
 
 	init();

@@ -28,6 +28,7 @@ var Lilium = function() {
 			});
 
 			log('Lilium', 'Starting inbound server');
+			Inbound.createServer();
 			Inbound.start();
 			log('Config', 'App is located at ' + _config.default.server.base);
 			log('Config', 'Root PATH is at ' + _config.default.server.html);
