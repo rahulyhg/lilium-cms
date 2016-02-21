@@ -173,8 +173,8 @@ var LML = function() {
 				(condTag == 'for' && closureTag == 'endfor');
 
 			if (!validClosure) {
-				throw "[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " +
-					condTag + " block";
+				throw new Error("[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " +
+					condTag + " block");
 			}
 
 			return validClosure;
@@ -225,7 +225,7 @@ var LML = function() {
 							context.lib[levels[0]];
 
 						if (!useSlang && typeof firstLevelLib === 'undefined') {
-							throw "LMLParseException - Undefined root level context library or LML slang : " + levels[0];
+							throw new Error("LMLParseException - Undefined root level context library or LML slang : " + levels[0]);
 						}
 
 						// Go through all levels
@@ -247,22 +247,22 @@ var LML = function() {
 
 									endVal = endVal[ftcName].apply(firstLevelLib, params);
 								} else {
-									throw "LMLParseException - Call to undefined funtion : " + ftcName;
+									throw new Error("LMLParseException - Call to undefined funtion : " + ftcName);
 								}
 							} else {
 								endVal = endVal[levels[i]];
 							}
 
 							if (typeof endVal === 'undefined') {
-                			                	throw "LMLParseException - Undefined branch " +
+                			                	throw new Error("LMLParseException - Undefined branch " +
 									levels[i] + " in " + (useSlang?"LML Slang":"context library") + " : " +
-									levels[0];
+									levels[0]);
                        		 			}
 						}
 					} else if (str.trim() == "" || levels.length == 0) {
-						throw "LMLParseException - Variable cannot be empty. Tried to read : '" + str + "'";
+						throw new Error("LMLParseException - Variable cannot be empty. Tried to read : '" + str + "'");
 					} else {
-						throw "LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found";
+						throw new Error("LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found");
 					}
 				} catch (ex) {
 					endVal = "[" + ex + "]";
@@ -461,7 +461,7 @@ var LML = function() {
 					" in " + (context.rootPath||"LML file") +
 					" @ line " + context.currentLineIndex);
 				log("Stacktrace", ex.stack);
-				throw "[Fatal] [LMLParserException] Could not recover from fatal error";
+				throw new Error("[Fatal] [LMLParserException] Could not recover from fatal error");
 			}
 		}
 
@@ -498,7 +498,7 @@ var LML = function() {
 				break;
 
 			default :
-				throw "LMLParseException - Error fetching current tag. Cached character is : " + tag;
+				throw new Error("LMLParseException - Error fetching current tag. Cached character is : " + tag);
 		}
 
 		return false;
@@ -697,7 +697,7 @@ var LML = function() {
 	this.executeToFile = function(rootpath, compilepath, callback, extra) {
 		var timeStamp = new Date();
 		fileserver.createDirIfNotExists(compilepath, function(dirExists) {
-			if (!dirExists) throw "LML.AccessException - Could not create directory for " + compilepath;
+			if (!dirExists) throw new Error("LML.AccessException - Could not create directory for " + compilepath);
 
 			fileserver.readFile(rootpath, function(content) {
 				var fileHandle = fileserver.getOutputFileHandle(compilepath);

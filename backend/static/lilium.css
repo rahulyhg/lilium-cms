@@ -199,3 +199,25 @@ form input, form label{
 
 	margin-top: 3px;
 }
+
+/* Error Reports */
+.errorbody {
+	background-color: #222222;
+	color: #CCC;
+	
+	font-family: "Raleway", Arial, sans-serif;
+}
+
+.lmlcrash header {
+	padding: 10px;
+	background-color: #555;
+}
+
+.lmlcrash header h1 {
+	color: #EEE;
+	font-weight: 100;
+}
+
+.lmlcrash main {
+	padding: 20px;
+}

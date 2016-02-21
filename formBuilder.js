@@ -64,11 +64,11 @@ var FormBuilder = function() {
 
   var instanciateForm = function(name, attr) {
     if (typeof name == 'undefined') {
-      throw "[FormBuilderException] - No name provided to form";
+      throw new Error("[FormBuilderException] - No name provided to form");
     }
 
     if (typeof forms[name] !== 'undefined') {
-      throw "[FormBuilderException] - Form already created : " + name;
+      throw new Error("[FormBuilderException] - Form already created : " + name);
     }
 
     // Instanciate a new form
@@ -100,13 +100,13 @@ var FormBuilder = function() {
     currentForm = contextForm || currentForm;
 
     if (typeof currentForm == 'undefined') {
-      throw "[FormBuilderException] - Form not created. Please call createForm() first.";
+      throw new Error("[FormBuilderException] - Form not created. Please call createForm() first.");
     }
     if (typeof currentForm.fields == 'undefined') {
       currentForm.fields = {};
     }
     if (typeof currentForm.fields[name] !== 'undefined') {
-      throw "[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]);
+      throw new Error("[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]));
     }
 
     currentForm.fields[name] = createField(name, type, attr, requirements);
@@ -142,7 +142,7 @@ var FormBuilder = function() {
   var createField = function(name, type, attr, requirements) {
 
     if (typeof name == 'undefined') {
-      throw "[FormBuilderException] - No name provided to field";
+      throw new Error("[FormBuilderException] - No name provided to field");
     }
 
     // Instanciate a new field
@@ -177,7 +177,7 @@ var FormBuilder = function() {
 
   this.render = function(formName) {
     if (typeof forms[formName] == 'undefined') {
-      throw "[FormBuilderException] - Form to render doesn't exists : " + formName;
+      throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
     }
 
     currentForm = forms[formName];

@@ -1,0 +1,29 @@
+{%head}
+{$
+	filenames = docscontent.listDir();
+$}
+	<body class="lmldocsbody lmldocumentation lmlbody">
+		<header>
+			<h1>
+				<img src="{=config.default.server.url}/plugins/docs/html/lmllogo.png" />
+				<span>Lilium CMS | Documentation</span>
+			</h1>
+		</header>
+		<main>
+			<div class="docs-sidebar">
+				<ul>
+				{$  
+					for (file in filenames);
+				$}
+					<li><a href="{=file.url}" >{=file.displayname}</a></li>
+				{$
+					endfor;
+				$}
+				</ul>
+			</div>
+			<article>
+				{=docscontent.render()}
+			</article>
+		</main>
+	</body>
+</html>

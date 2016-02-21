@@ -69,7 +69,7 @@ var Plugins = function() {
 
 		fs.readdir(plugindir, function(err, dirs) {
 			if (err) {
-				throw "[PluginException] Could not access plugin directory : " + err;
+				throw new Error("[PluginException] Could not access plugin directory : " + err);
 			}
 
 			var allPlugins = new Array();
@@ -114,13 +114,13 @@ var Plugins = function() {
 	this.registerPlugin = function(identifier, callback) {
 		var that = this;
 		if (this.isRegistered(identifier)) {
-			throw "[PluginException] Cannot register already registered plugin with identifier " + identifier;
+			throw new Error("[PluginException] Cannot register already registered plugin with identifier " + identifier);
 		} else {
 			log('Plugins', 'Registering plugin with identifier ' + identifier);
 			that.searchDirForPlugin(identifier, function(info) {
 				if (!info) {	
 					log("PluginException", "Could not find any info on plugin with identifier " + identifier);
-					throw "[PluginException] Could not find any info on plugin with identifier " + identifier;
+					throw new Error("[PluginException] Could not find any info on plugin with identifier " + identifier);
 				}
 
 				var plugindir = _c.default.server.base + _c.default.paths.plugins + "/";
@@ -158,7 +158,7 @@ var Plugins = function() {
 			}, true, true);
 
 		} else {
-			throw "[PluginException] Cannot unregister unregistered plugin with identifier " + identifier;
+			throw new Error("[PluginException] Cannot unregister unregistered plugin with identifier " + identifier);
 		}
 	};
 
@@ -167,10 +167,10 @@ var Plugins = function() {
 			if (typeof RegisteredPlugins[identifier].iface === 'object') {
 				return RegisteredPlugins[identifier].iface;
 			} else {
-				throw "[PluginException] Plugin with identifier " + identifier + " has no public iface";
+				throw new Error("[PluginException] Plugin with identifier " + identifier + " has no public iface");
 			}
 		} else {
-			throw "[PluginException] Could not get public iface of unregistered plugin with identifier " + identifier;
+			throw new Error("[PluginException] Could not get public iface of unregistered plugin with identifier " + identifier);
 		}
 	};
 

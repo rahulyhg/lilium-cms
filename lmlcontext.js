@@ -1,48 +1,8 @@
 var log = require('./log.js');
+var lmllib = require('./lmllib.js');
 
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot
-var registeredLibraries = {
-	config : function(context) {
-		return require('./config.js');
-	},
-	frontend : function(context) {
-		return require('./frontend.js');
-	},
-	vocab : function(context) {
-		return require('./vocab.js');
-	},
-	forms : function(context) {
-		return require('./formBuilder.js'); 
-	},
-	article : function(context) {
-		return require('./article.js');
-	},
-	session : function() {
-		return "";
-	},
-	plugins : function(context) {
-		return require('./plugins.js');
-	},
-	themes : function(context) {
-   		return require('./themes.js');
-	},
-	testarray : function(context) {
-		return {array : [{"text":"Hello"}, {"text":" "}, {"text":"world"}, {"text":"!"}]};
-	},
-	extra : function(context) {
-		return context.extra;
-	},
-	debug : function(context) {
-		return {
-			printContext : function() {
-				return JSON.stringify(context);
-			},
-			format : "json"
-		};
-	}
-};
-
 var LMLConstants = {
 	"false" : false,
 	"true" : true
@@ -58,7 +18,7 @@ var LMLContext = function(info) {
 	this.slangContext = new Object();
 
 	this.loadLibrary = function(libName) {
-		if (typeof registeredLibraries[libName] === 'undefined') {
+		if (!lmllib.isRegistered(libName)) {
 			log("LMLParseException", "Unable to add unregistered library '"+libName+"' to current context");
 			return;
 		}
@@ -68,7 +28,7 @@ var LMLContext = function(info) {
 			return;
 		}
 
-		this.lib[libName] = registeredLibraries[libName](this);
+		this.lib[libName] = lmllib.pulloutLib(libName, this);
 	};
 
 	this.states = [];

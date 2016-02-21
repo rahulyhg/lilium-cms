@@ -155,7 +155,12 @@ var Handler = function() {
 
 	this.handle = function(cli) {
 		cli.touch('handler.handle');
-		parseMethod(cli);
+
+		try {
+			parseMethod(cli);
+		} catch (ex) {
+			cli.crash(ex);
+		}
 	};
 
 	var init = function() {

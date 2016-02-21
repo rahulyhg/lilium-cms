@@ -140,7 +140,7 @@ var LiveVariables = function() {
 		if (typeof RegisteredLiveVariables[endpoint] === 'undefined') {
 			RegisteredLiveVariables[endpoint] = createEndpoint(func, rights);
 		} else {
-			throw "[LiveVariables] Tried to register an already defined endpoint : " + endpoint;
+			throw new Error("[LiveVariables] Tried to register an already defined endpoint : " + endpoint);
 		}
 	};
 

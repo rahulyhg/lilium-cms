@@ -6,7 +6,7 @@ var registeredEndpoints = {
 var EndPoints = function() {
 	this.register = function(endpoint, method, callback) {
 		if (typeof registeredEndpoints[method][endpoint] !== 'undefined') {
-			throw "[EndPointException - Already registered : "+method+"/"+endpoint+"]";
+			throw new Error("[EndPointException - Already registered : "+method+"/"+endpoint+"]");
 		}
 
 		registeredEndpoints[method][endpoint] = callback;
@@ -26,7 +26,7 @@ var EndPoints = function() {
 		if (typeof registeredEndpoints[method][endpoint] !== 'undefined') {
 			registeredEndpoints[method][endpoint](cli);
 		} else {
-			throw "[EndPointException - Not Found : "+method+"/"+endpoint+"]";
+			throw new Error("[EndPointException - Not Found : "+method+"/"+endpoint+"]");
 		}
 	};
 };

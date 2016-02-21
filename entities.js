@@ -190,7 +190,7 @@ var Entities = function() {
 
 	this.promoteRole = function(roleName, right, cb) {
 		if (typeof Roles[roleName] === 'undefined') {
-			throw "[RolesException] Could not promote unexisting role " + roleName;
+			throw new Error("[RolesException] Could not promote unexisting role " + roleName);
 		} else {
 			Roles[roleName].rights.push(right);
 			db.update('roles', {rights: Roles[roleName].rights }, cb);
@@ -199,7 +199,7 @@ var Entities = function() {
 
 	this.registerRole = function(rObj, rights, callback, updateIfExists) {
 		if (typeof Roles[rObj.name] !== 'undefined') {
-			throw "[RolesException] Tried to register already registered role " + rObj.name;
+			throw new Error("[RolesException] Tried to register already registered role " + rObj.name);
 		} else {
 			rObj.rights = rights;
 			db.update('roles', {name: rObj.name} ,rObj, function(err, result) {

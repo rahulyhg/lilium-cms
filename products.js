@@ -29,7 +29,7 @@ var Products = function() {
 
 			return product;
 		} else {
-			throw "[ProductException] Product with key " + key + " does not exist";
+			throw new Error("[ProductException] Product with key " + key + " does not exist");
 		};
 	};
 
@@ -37,7 +37,7 @@ var Products = function() {
 		if (this.productTypeIsRegistered(key)) {
 			return Object.assign({}, RegisteredProductTypes[key]);
 		} else {
-			throw "[ProductException] Product type with key " + key + " does not exist";
+			throw new Error("[ProductException] Product type with key " + key + " does not exist");
 		}
 	}
 
@@ -45,7 +45,7 @@ var Products = function() {
 		if (this.productPriceBaseIsRegistered(key)) {
 			return Object.assign({}, RegisteredPriceBases[key]);
 		} else {
-			throw "[ProductException] Price base with key " + key + " does not exist";
+			throw new Error("[ProductException] Price base with key " + key + " does not exist");
 		}
 	}
 
@@ -63,7 +63,7 @@ var Products = function() {
 
 	this.registerProduct = function(productObject) {
 		if (this.productIsRegistered(productObject.name)) {
-			throw "[ProductException] Product with key " + productObject.name + " is already registered";
+			throw new Error("[ProductException] Product with key " + productObject.name + " is already registered");
 		} else {
 			RegisteredProducts[productObject.name] = productObject;
 		}
@@ -71,7 +71,7 @@ var Products = function() {
 
 	this.registerProductType = function(keyName, displayName) {
 		if (this.productTypeIsRegistered(keyName)) {
-			throw "[ProductException] Product type with key " + keyName + " is already registered";
+			throw new Error("[ProductException] Product type with key " + keyName + " is already registered");
 		} else {
 			RegisteredProductTypes[keyName] = {
 				name : keyName,
@@ -82,7 +82,7 @@ var Products = function() {
 
 	this.registerPriceBase = function(keyName, displayName, divider) {
 		if (this.productPriceBaseIsRegistered(keyName)) {
-			throw "[ProductException] Product price base with key " + keyName + " is already registered";
+			throw new Error("[ProductException] Product price base with key " + keyName + " is already registered");
 		} else {
 			RegisteredPriceBases[keyName] = {
 				name : keyName,

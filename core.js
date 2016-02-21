@@ -287,6 +287,10 @@ var Core = function() {
 		to =   _c.default.server.html + '/uploads';
 		rootDir = _c.default.server.base + 'backend/static/uploads/';
 		cli.createSymlink(rootDir, to);
+	
+		to =   _c.default.server.html + '/plugins';
+		rootDir = _c.default.server.base + 'plugins/';
+		cli.createSymlink(rootDir, to);
 		hooks.fire('staticsymlink', undefined);
 
 	};

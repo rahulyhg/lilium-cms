@@ -90,6 +90,20 @@ var FileServer = function() {
 		});
 	};
 
+	this.readFileSync = function(filename) {
+		return fs.readFileSync(filename, 'utf8');
+	};
+
+	this.listDirContent = function(dirname, callback) {
+		fs.readdir(dirname, function(err, content) {
+			callback(err || content);
+		});
+	};
+
+	this.listDirContentSync = function(dirname) {
+		return fs.readdirSync(dirname);
+	};
+
 	this.pipeFileToClient = function(cli, filename, callback) {
 		cli.touch('fileserver.pipeFileToClient');
 		filename = this.validateIndexPath(cli, filename);

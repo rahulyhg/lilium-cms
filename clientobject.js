@@ -1,4 +1,6 @@
 var entities = require('./entities.js');
+var log = require('./log.js');
+var _c = require('./config.js');
 
 var ClientObject = function(req, resp) {
 	this.request = req;
@@ -94,6 +96,19 @@ ClientObject.prototype.redirect = function(path, perm) {
 		'Location' : path
 	});
 	this.response.end();
+};
+
+ClientObject.prototype.crash = function(ex) {
+	log('ClientObject', 'Crash handled with exception : ' + ex);
+
+	try {
+		var errFilePath = _c.default.server.base + "/backend/dynamic/error.lml";
+
+		this.routeinfo.isStatic = true;
+		require('./filelogic.js').executeLMLNoCache(this, errFilePath, ex);
+	} catch (ex) {
+		log('ClientObject', 'Could not handle crash : ' + ex);
+	}
 };
 
 ClientObject.prototype.parseCookie = function() {

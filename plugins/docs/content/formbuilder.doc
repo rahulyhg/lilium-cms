@@ -1,0 +1,234 @@
+<h2>Form Builder</h2>
+<h3>Logic</h3>
+
+<p>
+	The Form Builder can register and render different kind of interactive forms. The module makes it a lot easier and faster to create complete forms, including posting data, filling the form back with data coming from Live Variables, and complete validation.
+</p>
+
+<p>
+	Forms can be added from plugins, and default ones are registered during <i>Core</i> execution. The module is located inside the formBuilder.js file and can be used with <code>var formbuilder = require(abspath + 'formBuilder.js');</code>
+</p>
+
+<h3>Basic registration</h3>
+
+<p>
+	The registration of a form is done using the required object directly. 
+</p>
+
+<pre>
+	// Example of a form creation
+	formbuilder.createForm('myForm', {
+		fieldWrapper : {
+			tag : 'div',
+			cssPrefix : 'myFormField-'
+		},
+		cssClass : "myFormCssClass"
+	})
+	.add('username', 'text', {displayname:"Username"})
+	.add('password', 'password', {displayname:"Password"})
+	.add('login', 'submit', {displayname:"Login"});
+</pre>
+
+<h3>Rendering the Form</h3>
+<p>
+	The <i>forms</i> LML library must be included first before rendering a form. The correct way of rendering a form is :
+</p>
+<pre>
+	{#forms}
+	{=forms.render("myForm")}
+</pre>
+<p>
+	This will render the previously registered form with the identifier <i>myForm</i>.
+</p>
+
+<h3>API Documentation</h3>
+
+<h4>formbuilder.createForm( formName, [params] )</h4>
+<p>
+	Creates and return a form object. Can be directly queried with multiple <code>add</code> calls.
+</p>
+
+<b>formName</b>
+<p>
+	Represents the form identifier. This id will be used when rendering the form
+</p>
+<b>params</b>
+<p>	
+	A Javascript Object containing various information about the form. 
+	<pre>
+	{
+		// Each field will be wrapper with
+		fieldWrapper : {
+			tag : 'An HTML tag to wrap each field with',
+			cssPrefix : 'The begining of a css class applied to each wrapper'
+		},
+		cssClass : 'The css class of the form',
+		dependencies : ["an array of livevars with levels", "endpoint.all.simple", "otherlivevar.some"]
+	}
+	</pre>
+
+	The dependencies are requested before the form is built so that all information is present upon displaying the form.
+</p>
+
+<h4>form.add( fieldName, fieldType, [[props], validations] )</h4>
+<p>
+	Adds a field to a form object. The field name is also the name that will be affected to the input, and the key sent to the server on POST request. 
+</p>
+
+<b>fieldName</b>
+<p>
+	The <code>name</code> attribute given to the field. 
+</p>
+
+<b>fieldType</b>
+<p>
+	Most likely the <code>type</code> attribute of an <code>input</code> HTML node. There are some exceptions. The accepted field types are the followings.
+</p>
+<ul>
+	<li>button</li>
+	<li>textarea</li>
+	<li>number</li>
+	<li>hidden</li>
+	<li>checkbox</li>
+	<li>ckeditor</li>
+	<li>file</li>
+	<li>select</li>
+	<li>multiple (not yet supported)</li>
+	<li>stack (not yet supported)</li>
+	<li>livevar</li>
+</ul>
+<p>
+	Some of the previous fields receive specific parameters and props. 
+</p>
+
+<b>props</b>
+<p>
+	The properties are what defined the field, and it includes frontend display and data source.
+</p>
+
+<pre>
+	// Global properties
+	{
+		displayname : "The words before the field, or inside as a placeholder",
+		editonce : true | false, // decides if the field is editable only on insertion
+		placeholder : true | false, // wether the displayname is shown inside or beside the field
+		onlywhen : "new | edit" // not yet supported, decides in which context the field should be displayed
+	}
+</pre>
+
+<p>
+	Select boxes have a special property for providing all the options.
+</p>
+
+<pre>
+	// Select box properties
+	{
+		... 
+		datasource : [] // an array of {displayname:"",value:""} objects
+	}
+</pre>
+
+<h4>Working with Live Variables</h4>
+<p>
+	The form builder can work with livevars, meaning data can be fetched async before the table is fully built. The <code>formbuilder.createForm</code> function accepts a <code>dependencies</code> property which represents an array of live variable endpoints necessary for the form to be built.  
+</p>
+<pre>
+	// Properties for livevars
+	{
+		// The endpoint must be included in the dependencies field of the form on creation
+		endpoint : "livevarendpoint.all.simple", // The livevar enpoint to query
+		tag : "select", // An HTML tag for the field
+		template : "option", // An HTML tag created on each returned value of the livevar
+		title : "myselectbox", // The title of the HTML field
+		props : {
+			html : "displayvalue", // The key for innerHTML content of the looped template
+			value : "id", // The key for value of the looped template
+
+			// Everything else contained here will be passed as a param to the livevar
+			query : {
+				fullname : "lilium"
+			},
+		}
+	}
+</pre>
+
+<h4>Working with Push Tables</h4>
+<p>
+	The Live Variables field type can also be represented as tabular data, customizable and interactive. 
+</p>
+<pre>
+	// Properties for a push table. All livevars properties are also accepted
+	{
+		...
+		tag : "pushtable", // specify we're working with push tables
+		template : "htmlid", // An LML template to be displayed on top of the table 
+		
+		// The data scheme is a representation of what data to display in the table
+		datascheme : {
+			// The key is the row identifier of each row
+			key {
+				displayName : "User", // Title of the key column
+				keyName : "username", // JSON key of the innerHTML 
+				keyValue : "userid", // JSON key of the select value
+				readKey : "userid" // JSON key of the edit context value
+			},	
+			// An array of columns
+			columns : [
+				{
+					fieldName : "fullname", // JSON key of field
+					displayName : "Full Name", // Displayed column title
+					dataType : "text", // type attribute of input field
+					defaultValue : "John Doe", // Default value of field
+					prepend : " is my name", // Text displayed after the value. Commonly "$"
+
+					// Influences another field
+					influence : {
+						fieldName : "displayname", // The influenced field
+						eq : "=" // An operator. Accepted are : +, -, *, /, =
+					},
+
+					// Autocompletion using a livevar
+					// The livevar must be declared in the form dependencies
+					autocomplete : {
+						datasource : "users.all.simple", // The livevar endpoint
+						keyName : "fullname", // JSON key of the displayed text
+						keyValue : "userid", // JSON key of the field's value
+					}
+				},
+				{
+					...
+					// A template of multiple column can be provided.
+					// A condition must be met for one of the fields to appear.
+					dataType : "template", // Special datatype for looping inside a template declared below
+					templateid : "myTemplateID" // HTML identifier of the template declared inside columnTemplates
+				}
+			],
+			// Predefined column templates
+			columnTemplates : {
+				myTemplateID : {
+					// The JSON field to verify
+					dependsOn : "userrole", 
+					fields : [
+						{
+							... // Same properties as columns
+								
+							// The userrole JSON field must be equal to this for the field to appear
+							// For an "else" clause, the asterisk must be used (*)
+							displayCase : "administrator" 
+						}
+					]
+				}
+			},
+			footer : {
+				title : "Total", // The footer display title
+				
+				// Will make a sum of all rows for the columns with index 3 and 4.
+				// Index 0 is rejected as it's the title column
+				sumIndexes : [3, 4]
+			}
+		}
+	}
+</pre>
+<p>
+	It is possible to build fully interactive tables using Push Tables. 
+</p>

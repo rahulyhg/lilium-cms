@@ -7,7 +7,7 @@ var HtmlParser = function() {
     var htmlForm = '';
     var submitButton = '';
     if (typeof form == 'undefined') {
-      throw "[HtmlParser - No form provided to parse";
+      throw new Error("[HtmlParser - No form provided to parse");
     }
 
     // Form tag generation

@@ -49,7 +49,7 @@ var Themes = function() {
     var themedir = _c.default.server.base + _c.default.paths.themes + "/";
     fs.readdir(themedir, function(err, dirs) {
       if (err) {
-        throw "[ThemeException] Could not access theme directory : " + err;
+        throw new Error("[ThemeException] Could not access theme directory : " + err);
       }
 
       var allThemes = new Array();
@@ -86,12 +86,12 @@ var Themes = function() {
 
   this.enableTheme = function(uName, callback) {
     if (this.isActive(uName)) {
-      throw "[ThemeException] Cannot register already registered theme with uName " + uName;
+      throw new Error("[ThemeException] Cannot register already registered theme with uName " + uName);
     } else {
       log('Themes', 'Registering theme with uName ' + uName);
       this.searchDirForThemes(uName, function(info) {
         if (!info) {
-          throw "[ThemeException] Could not find any info on theme with uName " + uName;
+          throw new Error("[ThemeException] Could not find any info on theme with uName " + uName);
         }
 
         var themedir = _c.default.server.base + _c.default.paths.themes + "/";

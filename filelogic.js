@@ -134,6 +134,20 @@ var FileLogic = function() {
     );
   }
 
+  this.serveAbsoluteLml = function(readPath, savePath, cli, extra) {
+    FileServer.fileExists(savePath, function(isPresent) {
+      if (isPresent) {
+        serveCachedFile(cli, savePath);
+      } else {
+        log("FileLogic", "Interpreting LML from absolute path : " + readPath);
+        LML.executeToFile(readPath, savePath, function() {
+          cli.responseinfo.filecreated = true;
+          serveCachedFile(cli, savePath);
+        }, extra);
+      }
+    });
+  };
+
   var saveLmlPage = function(cli, readPath, savePath, extra) {
     LML.executeToFile(
       readPath,
@@ -148,6 +162,10 @@ var FileLogic = function() {
 
   }
 
+  this.executeLMLNoCache = function(cli, readPath, extra) {
+    var tmpname = _c.default.server.html + "/static/tmp/" + Math.random().toString(36).slice(-12) + ".html";
+    saveLmlPage(cli, readPath, tmpname, extra);
+  };
 
   this.runLogic = function(cli) {
     cli.touch('filelogic.runlogic');
