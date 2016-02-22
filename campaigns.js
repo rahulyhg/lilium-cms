@@ -301,7 +301,8 @@ var Campaigns = function() {
 							autocomplete : {
 								datasource: "sites.all.simple",
 								keyName : "displayName",
-								keyValue : "name"
+								keyValue : "name",
+								cantAdd : true
 							}
 						},
 						{fieldName: "productapilink", dataType:"template", templateid: "productapilink"}
@@ -311,8 +312,9 @@ var Campaigns = function() {
 							fields: [
 								{fieldName: "articleid", displayName: "Article", keyName: "articleid", displayCase : "sponsedit", autocomplete : {
 									datasource: "content.all.simple",
-									keyName : "articleid",
-									keyValue : "title"
+									keyValue : "articleid",
+									keyName : "title",
+									cantAdd : true
 								}},
 								{fieldName: "dfpprojid", dataType: "text", displayName: "DPF Project ID", keyName: "dfpprodid", displayCase : "bannerads"},
 								{fieldName: "fbcampid", dataType: "text", displayName: "Facebook camp. ID", keyName: "fbcampid", displayCase : "facebook"},
