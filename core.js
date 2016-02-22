@@ -25,6 +25,10 @@ var notification = require('./notifications.js');
 var Forms = require('./forms');
 var sessions = require('./session.js');
 var sites = require('./sites.js');
+var Handler = require('./handler.js');
+var ClientObject = require('./clientobject.js');
+var Inbound = require('./inbound.js');
+var Livevars = require('./livevars.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -187,13 +191,15 @@ var Core = function() {
 		});
 	};
 
-	var loadTheme = function() {
+	var loadTheme = function(cb) {
 		log('Themes', 'Loading Theme');
 		themes.bindEndpoints();
 
 		var fireEvent = function() {
 			log('Themes', 'Loaded Themes');
 			hooks.fire('themes');
+
+			cb();
 		};
 
 		db.find('themes', {"active":true}, {limit:[1]}, function(err, cursor) {
@@ -355,6 +361,8 @@ var Core = function() {
 		plugins.registerLiveVar();
 		themes.registerLiveVar();
 		sites.registerLiveVar();
+
+		Livevars.registerDebugEndpoint();
 	};
 
 	var loadPostman = function() {
@@ -371,7 +379,8 @@ var Core = function() {
 	};
 
 	var loadForms = function() {
-        Forms.init();
+        	Forms.init();
+
 		Campaigns.registerCreationForm();
 		entities.registerCreationForm();
 		LoginLib.registerLoginForm();
@@ -395,6 +404,15 @@ var Core = function() {
 		sites.cacheSitesFromDatabase(cb);
 	};
 
+	var loadRequestHandler = function() {	
+		hooks.bind('request', 1000, function(params) {
+			// Run main modules
+			var clientObject = new ClientObject(params.req, params.resp);
+			Handler.handle(clientObject);
+		});
+
+	};
+
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
 		loadHooks(readyToRock);
@@ -406,32 +424,25 @@ var Core = function() {
 		loadLiveVars();
 		loadDFP();
 		loadFrontend();
-
-		hooks.bind('themes', 100, function() {
-			log('Core', 'Firing initialized signal');
-			hooks.fire('init', {
-				loaded : [
-					"hooks", "endpoints","plugins", "themes"
-				]
-			});
-		});
+		loadRequestHandler();
 
 		loadHTMLStructure(function() {
-			testDatabase(function() {
-				loadSites(function() {
-					loadPlugins(function(){
-						loadRoles(function() {
-							loadProducts(function() {
-								loadSessions(function() {
-									loadCacheInvalidator();
-									loadTheme();
-								});
-							});
-						});
-					});
-				});
-			});
-		});
+		testDatabase(function() {
+		loadSites(function() {
+		loadPlugins(function(){
+		loadRoles(function() {
+		loadProducts(function() {
+		loadSessions(function() {
+		loadTheme(function() {
+			loadCacheInvalidator();
+
+			log('Lilium', 'Starting inbound server');
+			Inbound.createServer();
+			Inbound.start();
+			
+			log('Core', 'Firing initialized signal');
+			hooks.fire('init');
+		});});});});});});});});
 	};
 
 	var init = function() {

@@ -132,6 +132,14 @@ var LiveVariables = function() {
 
 	};
 
+	this.registerDebugEndpoint = function() {
+		log("Livevars", "Registering admin endpoint for debug");
+		require('./backend/admin.js').registerAdminEndpoint('livevars', 'GET', function(cli) {
+			cli.touch('livevars.GET');
+			cli.debug();
+		});
+	};
+
 	// Function must follow format : function(client, levels, params, callback)
 	// Callback must be called, and must contain an array
 	this.registerLiveVariable = function(endpoint, func, rights) {

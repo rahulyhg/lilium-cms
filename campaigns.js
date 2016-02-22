@@ -222,7 +222,7 @@ var Campaigns = function() {
 				case 'new':
 					db.insert('campaigns', dbCamp, function(res) {
 						hooks.trigger('campaignCreated', dbCamp);
-						cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "/edit/" + dbCamp.projectid, false);
+						cli.redirect(_c.default.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
 					});
 					break;
 				case 'edit':

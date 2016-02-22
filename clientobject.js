@@ -99,15 +99,16 @@ ClientObject.prototype.redirect = function(path, perm) {
 };
 
 ClientObject.prototype.crash = function(ex) {
-	log('ClientObject', 'Crash handled with exception : ' + ex);
+	log('ClientObject', 'Crash handled with error : ' + ex);
 
 	try {
 		var errFilePath = _c.default.server.base + "/backend/dynamic/error.lml";
-
 		this.routeinfo.isStatic = true;
+
 		require('./filelogic.js').executeLMLNoCache(this, errFilePath, ex);
 	} catch (ex) {
 		log('ClientObject', 'Could not handle crash : ' + ex);
+		this.response.end();
 	}
 };
 

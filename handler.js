@@ -11,8 +11,7 @@ var dateFormat = require('dateformat');
 var db = require('./includes/db.js');
 var imageResizer = require('./imageResizer.js');
 var imageSize = require('image-size');
-var events = require('events');
-var eventEmitter = new events.EventEmitter();
+var eventEmitter = new require('events').EventEmitter();
 
 var Handler = function() {
 	var GET = function(cli) {
@@ -153,7 +152,7 @@ var Handler = function() {
 		}
 	};
 
-	this.handle = function(cli) {
+	this.handle = config.default.env == "dev" ? function(cli) {
 		cli.touch('handler.handle');
 
 		try {
@@ -161,6 +160,9 @@ var Handler = function() {
 		} catch (ex) {
 			cli.crash(ex);
 		}
+	} : function(cli) {
+		cli.touch('handler.handle');
+		parseMethod(cli);
 	};
 
 	var init = function() {

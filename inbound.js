@@ -1,24 +1,23 @@
 var _c = require('./config.js').default,
     _http = require('http'),
+    hooks = require('./hooks.js'),
     log = require('./log.js'),
+    reqCount = 0,
+    totalReqCount = 0,
     __inbound = new (function() {
     	var io = require('socket.io')(server);
 	var server;
-	var callbacks = {
-		'onRequest' : [],
-		'onConn' : []
-	};
 
 	var handleReq = function(req, resp) {
-		for (var i = 0; i < callbacks.onRequest.length; i++) {
-			callbacks.onRequest[i](req, resp);
-		}
+		reqCount++;
+		totalReqCount++;
+		resp.on('finish', function() {reqCount--;});
+
+		hooks.trigger('request', {req:req,resp:resp});
 	};
 
-	var handleConn = function() {
-		for (var i = 0; i < callbacks.onConn.length; i++) {
-			callbacks.onConn[i](req, resp);
-		}
+	var handleConn = function(req, resp) {
+		hooks.trigger('conn', {req:req,resp:resp});
 	};
 
 	this.bind = function(hook, cb) {
@@ -37,7 +36,15 @@ var _c = require('./config.js').default,
 
 	this.createServer = function() {
 		server = _http.createServer(handleReq);
-	}
+	};
+
+	this.getRequestHandlesCount = function() {
+		return reqCount;
+	};
+
+	this.getTotalRequestHandlesCount = function() {
+		return totalReqCount;
+	};
 
 	var init = function() {
 	
