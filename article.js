@@ -29,7 +29,10 @@ var Article = function() {
 
     this.handleGET = function(cli) {
         cli.touch('article.handleGET');
-        switch (cli.routeinfo.path[2]) {
+        if (cli.routeinfo.path.length == 2) {
+          cli.redirect(conf.default.server.url + cli.routeinfo.fullpath + "/list", true);
+        } else {
+          switch (cli.routeinfo.path[2]) {
             case 'new':
                 this.new(cli);
                 break;
@@ -46,6 +49,7 @@ var Article = function() {
                 return cli.throwHTTP(404, 'Not Found');
                 break;
 
+          }
         }
     };
 

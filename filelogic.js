@@ -120,7 +120,7 @@ var FileLogic = function() {
     var theme = require('./themes.js');
 
     // Check for the post type
-    var title = slugify(extra.title);
+    var title = slugify(extra.title).toLowerCase();
     var readPath = _c.default.server.base + "flowers/" + theme.getEnabledTheme().info.path + "/" + postType + ".lml";
     var savePath = _c.default.server.html + "/" + title + ".html";
     LML.executeToFile(

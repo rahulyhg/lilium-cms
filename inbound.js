@@ -1,12 +1,15 @@
 var _c = require('./config.js').default,
     _http = require('http'),
+    _https = require('https'),
     hooks = require('./hooks.js'),
     log = require('./log.js'),
+    fs = require('fs'),
     reqCount = 0,
     totalReqCount = 0,
     __inbound = new (function() {
     	var io = require('socket.io')(server);
 	var server;
+	var secureServer;
 
 	var handleReq = function(req, resp) {
 		reqCount++;
@@ -28,6 +31,7 @@ var _c = require('./config.js').default,
 	this.start = function() {
 		log('Inbound', 'Ready to receive requests');
 		server.listen(_c.server.port, handleConn);
+		// secureServer.listen(8000, handleConn);
 	};
 
   	this.io = function() {
@@ -36,6 +40,13 @@ var _c = require('./config.js').default,
 
 	this.createServer = function() {
 		server = _http.createServer(handleReq);
+
+		/*
+		secureServer = _https.createServer({
+			key : fs.readFileSync("/Users/ryk/Desktop/server-key.pem"),
+			cert : fs.readFileSync("/Users/ryk/Desktop/server-crt.pem")
+		}, handleReq);
+		*/
 	};
 
 	this.getRequestHandlesCount = function() {

@@ -8,17 +8,30 @@ var HTMLServer = function() {
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
 		var filename = _conf.default.server.html + cli.routeinfo.fullpath;
+		var htmlFile = filename + ".html";
 
-		fileserver.fileExists(filename, function (fileExists){
-
+		fileserver.fileExists(htmlFile, function (fileExists){
 			if (fileExists) {
-				fileserver.pipeFileToClient(cli, filename, function (){
+				cli.routeinfo.isStatic = true;
+				fileserver.pipeFileToClient(cli, htmlFile, function() {
 					cli.touch('htmlserver.serveClient.callback');
 				});
-			}else{
-				cli.throwHTTP(404, 'Not Found');
+			} else {
+				fileserver.fileExists(filename, function (fileExists){
+					if (fileExists) {
+						// If html page requested from root
+						if (cli.routeinfo.path.length == 1 && cli.routeinfo.fullpath.indexOf('.html') !== -1) {
+							cli.redirect(_conf.default.server.url + cli.routeinfo.fullpath.slice(-5), true);
+						} else {
+							fileserver.pipeFileToClient(cli, filename, function (){
+								cli.touch('htmlserver.serveClient.callback');
+							});
+						}
+					} else {
+						cli.throwHTTP(404, 'Not Found');
+					}
+				});
 			}
-
 		});
 
 	};
