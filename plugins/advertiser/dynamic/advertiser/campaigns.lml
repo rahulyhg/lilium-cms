@@ -15,16 +15,24 @@ $}
 </head>
 
 <body>
-{*campaigns.mine(template:"campaigns-list-item")}
-</body>
+<table>
+	<thead>
+		<tr>
+			<th>Campaign Name</th>
+			<th>Status</th>
+			<th>Action(s)</th>
 
-<lml:template id="campaigns-list-item">
-	<li class="campaign-item-list">
-		<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
-		<lml:tobject data-nodetype="h5" data-key="campstatus"></lml:tobject>
-		<div id="#products">
-			<lml:tobject data-nodetype="div" data-key="products" data-template="product-list"></lml:tobject>
-		</div>
+		</tr>
+	</thead>
+	<tbody id="campaignstbody">
+		{*campaigns.mine(template:"campaigns-list-item",target:"campaignstbody")}
+	</tbody>
+</table>
+
+<lml:template id="campaigns-list-item" data-wrapper="tr">
+	<lml:tobject data-nodetype="td" data-key="campname"  ></lml:tobject>
+	<lml:tobject data-nodetype="td" data-key="campstatus" ></lml:tobject>
+	<lml:tobject data-nodetype="td">
 		<div class="entity-actions">
 			<lml:tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id"  data-filter="signNeeded">
 				Sign to start
@@ -32,17 +40,16 @@ $}
 			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
 				Pay to start
 			</lml:tobject>
-            <lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-filter="reviewNeeded">
-                Ready for review
-            </lml:tobject>
+			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-filter="reviewNeeded">
+				Ready for review
+			</lml:tobject>
+			<lml:tobject class="btn btn-default" data-nodetype="a"
+						 data-href="{=baseurl}advertiser/campaigns/show/"
+					 data-key="_id">
+					 View
+			</lml:tobject>
 		</div>
-	</li>
-	<lml:empty>
-		No campaigns found.
-	</lml:empty>
+	</lml:tobject>
 </lml:template>
-
-<lml:template id="product-list">
-	<lml:tobject data-nodetype="h3" data-key="prodid"></lml:tobject>
-	<lml:tobject data-nodetype="h2" data-key="price"></lml:tobject>
-</lml:template>
+</body>
+</html>

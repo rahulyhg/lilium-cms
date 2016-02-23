@@ -11,139 +11,147 @@ var cachedCampaigns = new Object();
 var registeredStatuses = new Array();
 
 var Campaigns = function() {
-	var that = this;
+    var that = this;
 
-	this.getCampaignsFromDatabase = function(conds, cb) {
-		db.findToArray('campaigns', conds, function(err, data) {
-			cb(err || data);
-		});
-	}
+    this.getCampaignsFromDatabase = function(conds, cb) {
+        db.findToArray('campaigns', conds, function(err, data) {
+            cb(err || data);
+        });
+    }
 
-	this.getCampaignByProjectID = function(id, cb) {
-		db.findToArray('campaigns', {"projectid" : id}, function(err, data) {
-			if (!err && data.length > 0) {
-				data[0].tablekey = id;
-			}
-
-			cb(err || data[0]);
-		});
-	};
-
-    	this.getAllMyCampaigns = function(conds, cb) {
-     		db.findToArray('campaigns', conds, function(err, data) {
-			cb(err || data);
-		});
-    	};
-
-	this.loadCampaignsStatuses = function(cb) {
-		db.findToArray('campaignStatuses', new Object(), function(err, data) {
-            if  (typeof data !== 'undefined') {
-                for (var i = 0; i < data.length; i++) {
-    				registeredStatuses.push(data[i]);
-    			}
+    this.getCampaignByProjectID = function(id, cb) {
+        db.findToArray('campaigns', {
+            "projectid": id
+        }, function(err, data) {
+            if (!err && data.length > 0) {
+                data[0].tablekey = id;
             }
-			cb();
-		});
-	}
 
-	var statusByName = function(statusname) {
-		var status = undefined;
-		for (var i = 0; i < registeredStatuses.length && !status; i++) {
-			if (registeredStatuses[i].name == statusname) {
-				status = registeredStatuses[i];
-			}
-		};
+            cb(err || data[0]);
+        });
+    };
 
-		return status;
-	};
+    this.getAllMyCampaigns = function(conds, cb) {
+        db.findToArray('campaigns', conds, function(err, data) {
+            cb(err || data);
+        });
+    };
 
-	var formatEntriesForList = function(entries, callback) {
-		var arr = new Array();
-		var max = entries.length;
-		var index = 0;
+    this.loadCampaignsStatuses = function(cb) {
+        db.findToArray('campaignStatuses', new Object(), function(err, data) {
+            if (typeof data !== 'undefined') {
+                for (var i = 0; i < data.length; i++) {
+                    registeredStatuses.push(data[i]);
+                }
+            }
+            cb();
+        });
+    }
 
-		var nextEntry = function() {
-			if (index == max) {
-				return callback(arr);
-			}
+    var statusByName = function(statusname) {
+        var status = undefined;
+        for (var i = 0; i < registeredStatuses.length && !status; i++) {
+            if (registeredStatuses[i].name == statusname) {
+                status = registeredStatuses[i];
+            }
+        };
 
-			var entry = entries[index];
-			var listObj = {
-				projectid : entry.projectid,
-				name : entry.campname,
-				status : statusByName(entry.campstatus).displayName,
-				clientid : entry.clientid,
-				url : _c.default.server.url + "/admin/campaigns/edit/" + entry.projectid
-			}
+        return status;
+    };
 
-			db.findToArray('entities', {_id:db.mongoID(listObj.clientid)}, function(err, res) {
-				listObj.clientname = res[0].displayname;
-				arr.push(listObj);
+    var formatEntriesForList = function(entries, callback) {
+        var arr = new Array();
+        var max = entries.length;
+        var index = 0;
 
-				index++;
-				nextEntry();
-			});
-		};
+        var nextEntry = function() {
+            if (index == max) {
+                return callback(arr);
+            }
 
-		nextEntry();
-	};
+            var entry = entries[index];
+            var listObj = {
+                projectid: entry.projectid,
+                name: entry.campname,
+                status: statusByName(entry.campstatus).displayName,
+                clientid: entry.clientid,
+                url: _c.default.server.url + "/admin/campaigns/edit/" + entry.projectid
+            }
 
-	this.registerLiveVar = function() {
-        	var that = this;
+            db.findToArray('entities', {
+                _id: db.mongoID(listObj.clientid)
+            }, function(err, res) {
+                listObj.clientname = res[0].displayname;
+                arr.push(listObj);
 
-		// levels : field to query
-		// params : {
-		//	query : value to query
-		//	operator : operator to query with, '=' is none specified
-		// };
-		LiveVars.registerLiveVariable('campaigns', function(cli, levels, params, callback) {
-			var firstLevel = levels[0];
+                index++;
+                nextEntry();
+            });
+        };
 
-			switch (firstLevel) {
-				case "all":
-					if (cli.isGranted['campaigns']) {
-						that.getCampaignsFromDatabase(new Object(), callback);
-					} else {
-						callback();
-					}
-					break;
-				case "list":
-					that.getCampaignsFromDatabase(new Object(), function(arr) {
-						formatEntriesForList(arr, callback);
-					});
-					break;
-				case "mine":
-					if (cli.isGranted('advertiser')) {
-						that.getAllMyCampaigns({clientid: db.mongoID(cli.userinfo.userid.toString())}, callback);
-					} else {
-						callback();
-					}
-					break;
-				case "get":
-					var projectid = levels[1];
+        nextEntry();
+    };
 
-					if (projectid) {
-						that.getCampaignByProjectID(projectid, callback);
-					} else {
-						callback("[CampaignException] ProjectID must be specified as a third level");
-					}
-					break;
+    this.registerLiveVar = function() {
+        var that = this;
+
+        // levels : field to query
+        // params : {
+        //	query : value to query
+        //	operator : operator to query with, '=' is none specified
+        // };
+        LiveVars.registerLiveVariable('campaigns', function(cli, levels, params, callback) {
+            var firstLevel = levels[0];
+
+            switch (firstLevel) {
+                case "all":
+                    if (cli.isGranted['campaigns']) {
+                        that.getCampaignsFromDatabase(new Object(), callback);
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "list":
+                    that.getCampaignsFromDatabase(new Object(), function(arr) {
+                        formatEntriesForList(arr, callback);
+                    });
+                    break;
+                case "mine":
+                    if (cli.isGranted('advertiser')) {
+                        that.getAllMyCampaigns({
+                            clientid: db.mongoID(cli.userinfo.userid.toString())
+                        }, callback);
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "get":
+                    var projectid = levels[1];
+
+                    if (projectid) {
+                        that.getCampaignByProjectID(projectid, callback);
+                    } else {
+                        callback("[CampaignException] ProjectID must be specified as a third level");
+                    }
+                    break;
                 case "query":
                     var queryInfo;
-                    try{
+                    try {
                         queryInfo = JSON.parse(params.query) || new Object();
-                    }catch(err) {
+                    } catch (err) {
                         cli.crash(new Error(err));
                         return;
                     }
                     var qObj = new Object();
 
-                    queryInfo._id ? qObj._id = queryInfo._id:false;
-                    queryInfo.projectid ? qObj.projectid =queryInfo.projectid:false;
-                    queryInfo.campname  ? qObj.campname = queryInfo.campname:false;
-                    queryInfo.clientid  ? qObj.clientid = queryInfo.clientid:false;
-                    queryInfo.paymentreq  ? qObj.paymentreq = queryInfo.paymentreq:false;
-                    queryInfo.campstatus ? qObj.campstatus = {$in : queryInfo.campstatus}:false;
+                    queryInfo._id ? qObj._id = queryInfo._id : false;
+                    queryInfo.projectid ? qObj.projectid = queryInfo.projectid : false;
+                    queryInfo.campname ? qObj.campname = queryInfo.campname : false;
+                    queryInfo.clientid ? qObj.clientid = queryInfo.clientid : false;
+                    queryInfo.paymentreq ? qObj.paymentreq = queryInfo.paymentreq : false;
+                    queryInfo.campstatus ? qObj.campstatus = {
+                        $in: queryInfo.campstatus
+                    } : false;
 
                     db.findToArray('campaigns', qObj, function(err, arr) {
                         callback(err || arr);
@@ -166,7 +174,11 @@ var Campaigns = function() {
                                     articlesID.push(db.mongoID(campaign.products[key].articleid));
                                 }
 
-                                db.findToArray('content', {_id : {$in: articlesID}}, function(err, arr) {
+                                db.findToArray('content', {
+                                    _id: {
+                                        $in: articlesID
+                                    }
+                                }, function(err, arr) {
                                     callback(arr);
                                 });
 
@@ -177,185 +189,252 @@ var Campaigns = function() {
                     } else {
                         callback();
                     }
-                break;
+                    break;
                 case "query":
                     if (cli.isGranted('advertiser')) {
                         var queryInfo = params.query || new Object();
-        				var qObj = new Object();
+                        var qObj = new Object();
 
-        				qObj._id = queryInfo._id;
-        				qObj.campstatus = queryInfo.campstatus ? {$or : queryInfo.campstatus} : undefined;
+                        qObj._id = queryInfo._id;
+                        qObj.campstatus = queryInfo.campstatus ? {
+                            $or: queryInfo.campstatus
+                        } : undefined;
 
                         that.getAllMyCampaigns(qObj, callback);
                     } else {
                         callback();
                     }
-                break;
-				default :
-					if (cli.isGranted('advertiser')) {
-						that.getAllMyCampaigns({_id: db.mongoID(firstLevel)}, callback);
-					} else {
-						callback();
-					}
+                    break;
+                default:
+                    if (cli.isGranted('advertiser')) {
+                        that.getAllMyCampaigns({
+                            _id: db.mongoID(firstLevel)
+                        }, callback);
+                    } else {
+                        callback();
+                    }
 
-			};
-		});
-	};
+            };
+        });
+    };
 
-	this.handleGET = function(cli) {
-		cli.touch('campaigns.handleGET');
-		var params = cli.routeinfo.path;
-		var hasParam = params.length > 2 && params[2] != "new";
+    this.handleGET = function(cli) {
+        cli.touch('campaigns.handleGET');
+        var params = cli.routeinfo.path;
+        var hasParam = params.length > 2 && params[2] != "new";
 
-		filelogic.serveLmlPage(cli, hasParam);
-	};
+        filelogic.serveLmlPage(cli, hasParam);
+    };
 
-	var cliToDatabaseCampaign = function(cli) {
-		cli.touch('campaigns.clitodatabasecampaign');
+    var cliToDatabaseCampaign = function(cli) {
+        cli.touch('campaigns.clitodatabasecampaign');
 
-		var postdata = cli.postdata.data;
-		var products = new Array();
+        var postdata = cli.postdata.data;
+        var products = new Array();
 
-		for (var key in postdata.productstable) {
-			products.push(postdata.productstable[key]);
-		}
+        for (var key in postdata.productstable) {
+            products.push(postdata.productstable[key]);
+        }
 
-		return {
-			"projectid": postdata.projectid,
-			"campname":  postdata.campname,
-			"campstatus": postdata.campstatus,
-			"clientid": postdata.clientid,
-			"paymentreq": postdata.paymentreq && postdata.paymentreq == "on",
-			"products" : products
-		};
-	};
+        return {
+            "projectid": postdata.projectid,
+            "campname": postdata.campname,
+            "campstatus": postdata.campstatus,
+            "clientid": postdata.clientid,
+            "paymentreq": postdata.paymentreq && postdata.paymentreq == "on",
+            "products": products
+        };
+    };
 
-	this.handlePOST = function(cli) {
-		cli.touch('campaigns.handlePOST');
+    this.handlePOST = function(cli) {
+        cli.touch('campaigns.handlePOST');
 
-		var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
-		var action = cli.routeinfo.path[2] || 'new';
+        var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
+        var action = cli.routeinfo.path[2] || 'new';
 
-		if (true || stack.valid) {
-			dbCamp = cliToDatabaseCampaign(cli);
-			dbCamp.clientid = db.mongoID(dbCamp.clientid);
+        if (true || stack.valid) {
+            dbCamp = cliToDatabaseCampaign(cli);
+            dbCamp.clientid = db.mongoID(dbCamp.clientid);
 
-			switch (action) {
-				case 'new':
-					db.insert('campaigns', dbCamp, function(res) {
-						hooks.trigger('campaignCreated', dbCamp);
-						cli.redirect(_c.default.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
-					});
-					break;
-				case 'edit':
-					db.findToArray('campaigns', {projectid : dbCamp.projectid}, function(err, old) {
-						db.update('campaigns', {projectid : dbCamp.projectid}, dbCamp, function(res) {
-							hooks.trigger('campaignUpdated', {
-								"old" : err || old[0],
-								"new" : dbCamp
-							});
+            switch (action) {
+                case 'new':
+                    db.insert('campaigns', dbCamp, function(res) {
+                        hooks.trigger('campaignCreated', dbCamp);
+                        cli.redirect(_c.default.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
+                    });
+                    break;
+                case 'edit':
+                    db.findToArray('campaigns', {
+                        projectid: dbCamp.projectid
+                    }, function(err, old) {
+                        db.update('campaigns', {
+                            projectid: dbCamp.projectid
+                        }, dbCamp, function(res) {
+                            hooks.trigger('campaignUpdated', {
+                                "old": err || old[0],
+                                "new": dbCamp
+                            });
 
-							if (!err && old[0] && old[0].campstatus != dbCamp.cmapstatus) {
-								hooks.trigger('campaignStatusChanged', {
-									"old" : old[0],
-									"new" : dbCamp
-								});
-							}
+                            if (!err && old[0] && old[0].campstatus != dbCamp.cmapstatus) {
+                                hooks.trigger('campaignStatusChanged', {
+                                    "old": old[0],
+                                    "new": dbCamp
+                                });
+                            }
 
-							cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
-						}, false, true);
-					});
-					break;
-				default:
-					cli.debug();
-			}
-		} else {
-			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "?invalidform", false);
-		}
-	};
+                            cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
+                        }, false, true);
+                    });
+                    break;
+                default:
+                    cli.debug();
+            }
+        } else {
+            cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "?invalidform", false);
+        }
+    };
 
-	this.registerCreationForm = function() {
-		formbuilder.createForm('campaign_create', {
-				fieldWrapper : {
-					'tag' : 'div',
-					'cssPrefix' : 'campaigncreatefield-'
-				},
-				cssClass : "form-campaign-creation",
-				dependencies : ["sites.all.simple", "products.all", "content.all.simple", "dfp.recent.simple"]
-			})
-			.add('projectid', 'text', {displayname:"Project ID", editonce: true})
-			.add('campname', 'text', {displayname:"Campaign name"})
-			.add('campstatus', 'select', {displayname:"Status", datasource: registeredStatuses})
-			.add('clientid', 'livevar', {
-				endpoint : "entities.query",
-				tag : "select",
-				template : "option",
-				title : "client",
-				displayname : "Client",
-				props : {
-					query : {
-						roles : ["advertiser"]
-					},
-					html : "displayname",
-					value : "_id"
-				}
-			})
-			.add('paymentreq', 'checkbox', {displayname:"Payment required prior to production"}, {required:false})
-			.add('productstable', 'livevar', {
-				endpoint : "products.all",
-				tag : "pushtable",
-				title : "products",
-				displayname : "Products",
-				template : "tmpl_productrow",
-				datascheme : {
-					key : {displayName: "Product", keyName: "displayName", keyValue: "name", readKey: "prodid"},
-					columns : [
-						{fieldName: "qte", dataType:"number", displayName : "Quantity", defaultValue: 1,
-							influence : {
-								fieldName : "price",
-								eq : "*"
-							}
-						},
-						{fieldName: "pricebase", displayName: "Based on", keyName : "priceBase", defaultValue:"unit"},
-						{fieldName: "price", dataType:"number", displayName: "Price", keyName : "price", prepend:"$"},
-						{fieldName: "enddate", dataType:"date", displayName: "End Date", keyName : "enddate"},
-						{fieldName: "website", displayName: "Website", keyName: "website",
-							autocomplete : {
-								datasource: "sites.all.simple",
-								keyName : "displayName",
-								keyValue : "name",
-								cantAdd : true
-							}
-						},
-						{fieldName: "productapilink", dataType:"template", templateid: "productapilink"}
-					],
-					columnTemplates : {
-						"productapilink" : {
-							fields: [
-								{fieldName: "articleid", displayName: "Article", keyName: "articleid", displayCase : "sponsedit", autocomplete : {
-									datasource: "content.all.simple",
-									keyValue : "articleid",
-									keyName : "title",
-									cantAdd : true
-								}},
-								{fieldName: "dfpprojid", dataType: "text", displayName: "DPF Project ID", keyName: "dfpprodid", displayCase : "bannerads"},
-								{fieldName: "fbcampid", dataType: "text", displayName: "Facebook camp. ID", keyName: "fbcampid", displayCase : "facebook"},
-								{fieldName: "apilink", dataType: "text", displayName: "More details", keyName: "details", displayCase : "*"}
-							],
-							dependsOn : "productType"
-						}
-					},
-					footer : {
-						title : "Total",
-						sumIndexes : [2]
-					}
-				}
-			})
-			.add('save', 'submit', {onlyWhen:"new", displayName:'Save'});
-	};
+    this.registerCreationForm = function() {
+        formbuilder.createForm('campaign_create', {
+                fieldWrapper: {
+                    'tag': 'div',
+                    'cssPrefix': 'campaigncreatefield-'
+                },
+                cssClass: "form-campaign-creation",
+                dependencies: ["sites.all.simple", "products.all", "content.all.simple", "dfp.recent.simple"]
+            })
+            .add('projectid', 'text', {
+                displayname: "Project ID",
+                editonce: true
+            })
+            .add('campname', 'text', {
+                displayname: "Campaign name"
+            })
+            .add('campstatus', 'select', {
+                displayname: "Status",
+                datasource: registeredStatuses
+            })
+            .add('clientid', 'livevar', {
+                endpoint: "entities.query",
+                tag: "select",
+                template: "option",
+                title: "client",
+                displayname: "Client",
+                props: {
+                    query: {
+                        roles: ["advertiser"]
+                    },
+                    html: "displayname",
+                    value: "_id"
+                }
+            })
+            .add('paymentreq', 'checkbox', {
+                displayname: "Payment required prior to production"
+            }, {
+                required: false
+            })
+            .add('productstable', 'livevar', {
+                endpoint: "products.all",
+                tag: "pushtable",
+                title: "products",
+                displayname: "Products",
+                template: "tmpl_productrow",
+                datascheme: {
+                    key: {
+                        displayName: "Product",
+                        keyName: "displayName",
+                        keyValue: "name",
+                        readKey: "prodid"
+                    },
+                    columns: [{
+                        fieldName: "qte",
+                        dataType: "number",
+                        displayName: "Quantity",
+                        defaultValue: 1,
+                        influence: {
+                            fieldName: "price",
+                            eq: "*"
+                        }
+                    }, {
+                        fieldName: "pricebase",
+                        displayName: "Based on",
+                        keyName: "priceBase",
+                        defaultValue: "unit"
+                    }, {
+                        fieldName: "price",
+                        dataType: "number",
+                        displayName: "Price",
+                        keyName: "price",
+                        prepend: "$"
+                    }, {
+                        fieldName: "enddate",
+                        dataType: "date",
+                        displayName: "End Date",
+                        keyName: "enddate"
+                    }, {
+                        fieldName: "website",
+                        displayName: "Website",
+                        keyName: "website",
+                        autocomplete: {
+                            datasource: "sites.all.simple",
+                            keyName: "displayName",
+                            keyValue: "name",
+                            cantAdd: true
+                        }
+                    }, {
+                        fieldName: "productapilink",
+                        dataType: "template",
+                        templateid: "productapilink"
+                    }],
+                    columnTemplates: {
+                        "productapilink": {
+                            fields: [{
+                                fieldName: "articleid",
+                                displayName: "Article",
+                                keyName: "articleid",
+                                displayCase: "sponsedit",
+                                autocomplete: {
+                                    datasource: "content.all.simple",
+                                    keyValue: "articleid",
+                                    keyName: "title",
+                                    cantAdd: true
+                                }
+                            }, {
+                                fieldName: "dfpprojid",
+                                dataType: "text",
+                                displayName: "DPF Project ID",
+                                keyName: "dfpprodid",
+                                displayCase: "bannerads"
+                            }, {
+                                fieldName: "fbcampid",
+                                dataType: "text",
+                                displayName: "Facebook camp. ID",
+                                keyName: "fbcampid",
+                                displayCase: "facebook"
+                            }, {
+                                fieldName: "apilink",
+                                dataType: "text",
+                                displayName: "More details",
+                                keyName: "details",
+                                displayCase: "*"
+                            }],
+                            dependsOn: "productType"
+                        }
+                    },
+                    footer: {
+                        title: "Total",
+                        sumIndexes: [2]
+                    }
+                }
+            })
+            .add('save', 'submit', {
+                onlyWhen: "new",
+                displayName: 'Save'
+            });
+    };
 
-	var init = function() {};
-	init();
+    var init = function() {};
+    init();
 };
 
 module.exports = new Campaigns();

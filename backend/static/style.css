@@ -12,10 +12,14 @@
   display: none;
 }
 
-.cke_button__imgbrowser_icon{
-  background: url(/bower/ckeditor/skins/moono/icons.png) no-repeat 0 -1008px!important;
-}
-
 lml\:livevars, lml\:template {
   display: none;
+}
+.__removed__ {
+    color : red;
+    text-decoration: line-through;
+}
+
+.__added__ {
+    color: green;
 }
