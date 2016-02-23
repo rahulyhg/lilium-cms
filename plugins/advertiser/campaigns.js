@@ -67,7 +67,7 @@ var CampaignAdvertiser = function() {
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function(err, array) {
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipending') {
                     var campaign = array[0];
 
                     var updatecamp = function(status) {
@@ -90,7 +90,7 @@ var CampaignAdvertiser = function() {
                             request.content = escape(changerequests[key].content);
                             request.campId = campaign._id;
                             request.title = escape(changerequests[key].title);
-                            request.articleId = key;
+                            request.articleId = db.mongoID(key);
                             changeobj.push(request);
                         }
 

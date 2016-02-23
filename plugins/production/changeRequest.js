@@ -38,34 +38,43 @@ var ChangeRequest = function() {
             db.findToArray('changerequests', {
                 _id: db.mongoID(cli.routeinfo.path[4])
             }, function(err, arr) {
-                if (err) throw new Error("[ChangeRequest] - Error fetching changerequests : " + err);
-                if (arr && arr.length > 0) {
-                    var changeRequest = arr[0];
-                    formBuilder.serializeForm(form)
 
+                if (err) cli.crash(new Error("[ChangeRequest] - Error fetching changerequests : " + err));
+                if (arr && arr.length > 0) {
+
+                    var changeRequest = arr[0];
+                    var updatedContent = formBuilder.serializeForm(form);
                     // Update article
                     db.findAndModify('content', {
                         _id: db.mongoID(changeRequest.articleId)
                     }, {
-                        title: changeRequest.title,
-                        content: changeRequest.original
+                        title: updatedContent.title,
+                        content: updatedContent.original
                     }, function(err, doc) {
-                        if (err) throw new Error("[ChangeRequest] - Error while modifying content : " + err);
+                        if (err) cli.crash(new Error("[ChangeRequest] - Error while modifying content : " + err));
                         // Update campaign status
                         db.update('campaigns', {
                             _id: db.mongoID(changeRequest.campId)
                         }, {
                             campstatus: "clipending"
                         }, function(err, result) {
-                            cli.crash(new Error("[ChangeRequest] - Error while updateing campaign status : " + err));
-                            return;
+                            if (err)cli.crash(new Error("[ChangeRequest] - Error while updateing campaign status : " + err));
+
                             cli.sendJSON({
                                 success: true
                             });
                         });
                     });
 
+                } else {
+                    cli.sendJSON({
+                        success: false
+                    });
                 }
+            });
+        } else {
+            cli.sendJSON({
+                success: false
             });
         }
 
@@ -85,27 +94,37 @@ var ChangeRequest = function() {
                 db.join('changerequests', [{
                     $lookup: {
                         from: "campaigns",
-                        localField: "articleId",
-                        foreignField: "products._id",
-                        as: "product"
+                        localField: "campId",
+                        foreignField: "_id",
+                        as: "campaign"
                     }
                 }, {
-                    $project: {
-                        "content": 1,
-                        "title": 1,
-                        "articleId": 1,
-                        "product.products": {
-                            $cond: {
-                                if: {
-                                    $eq: ["product.products.article", '56c742c06094640103ba3843']
-                                },
-                                then: 1,
-                                else: 0
-                            }
-                        }
-
+                    $unwind: "$campaign"
+                }, {
+                    $lookup: {
+                        from: "entities",
+                        localField: "campaign.clientid",
+                        foreignField: "_id",
+                        as: "campaign.client"
                     }
-
+                }, {
+                    $lookup: {
+                        from: "content",
+                        localField: "articleId",
+                        foreignField: "_id",
+                        as: "article"
+                    }
+                }, {
+                    $unwind: "$campaign.client"
+                }, {
+                    $unwind: "$article"
+                }, {
+                    $project: {
+                        "campaign.campname": 1,
+                        "campaign.campstatus": 1,
+                        "campaign.client.displayname": 1,
+                        "article.title": 1
+                    }
                 }], callback);
             } else {
                 if (params.diffview) {
@@ -159,7 +178,17 @@ var ChangeRequest = function() {
             .add('original', 'ckeditor', {
                 displayname: 'Original Content'
             })
-            .add('Change', 'submit')
+            .add('Change', 'submit');
+
+        formBuilder.createForm('changerequest_edit_diff')
+            .add('requested_title', 'text', {
+                displayname: 'Title'
+            })
+            .add('requested_content', 'ckeditor', {
+                displayname: 'Content',
+                data : {readonly : true}
+            })
+
 
     };
 };

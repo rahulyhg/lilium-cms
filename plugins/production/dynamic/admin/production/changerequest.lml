@@ -7,36 +7,49 @@
 	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+	{$
+		var baseurl = config.default.server.url;
+		baseurl += "/";
+		baseurl += config.default.paths.admin;
+		baseurl += "/";
+	$}
 	<style>
 
 	</style>
 </head>
 
 <body>
-	{*changerequests}
-    
-	<lml:template id="review-article">
 
+	<table>
+		<thead>
+			<tr>
+				<th>Change Request ID</th>
+				<th>Campaign Name</th>
+				<th>Title</th>
+				<th>Client</th>
+				<th>Status</th>
 
-        <div>
-		<lml:tobject data-nodetype="h3" data-key="title"></lml:tobject>
-		<lml:tobject data-nodetype="h3" data-key="campaign.campname"></lml:tobject>
+			</tr>
+		</thead>
+		<tbody id="changetbody">
+			{*changerequests(template:"single-changerequest",target:"changetbody")}
+		</tbody>
+	</table>
 
-            <lml:tobject data-nodetype="button"
-                     data-bind="click"
-                     data-action="looksGood"
-                     data-actionparamkey="_id">
-                    Looks Good
-            </lml:tobject>
-            <lml:tobject data-nodetype="button"
-                     data-bind="click"
-                     data-action="changeRequest"
-                     data-actionparamkey="_id">
-                    Change Request
-            </lml:tobject>
-        </div>
+	<lml:template id="single-changerequest" data-wrapper="tr">
+		<lml:tobject data-nodetype="td"  >
+			<lml:tobject data-nodetype="a"
+						 data-href="{=baseurl}production/changerequest/edit/"
+					 data-key="_id">
+				<lml:tobject data-nodetype="span" data-key="_id" >
+			</lml:tobject>
+		</lml:tobject>
+		<lml:tobject data-nodetype="td" data-key="campaign.campname"  ></lml:tobject>
+		<lml:tobject data-nodetype="td" data-key="article.title" ></lml:tobject>
+		<lml:tobject data-nodetype="td" data-key="campaign.client.displayname"  ></lml:tobject>
+		<lml:tobject data-nodetype="td" data-key="campaign.campstatus" ></lml:tobject>
+	</lml:template>
 
-	</lml>
 </body>
 
 </html>

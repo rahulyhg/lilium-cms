@@ -7,16 +7,7 @@
 	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-	<style>
-	.__removed__ {
-		color : red;
-		text-decoration: line-through;
-	}
-
-	.__added__ {
-		color: green;
-	}
-	</style>
+	
 </head>
 
 <body>
@@ -27,12 +18,13 @@
 	</div>
 	<div class="row">
 		<div class="col-md-6">
+			<label>Original Article</label>
+
 			{=forms.render('changerequest_edit')}
 		</div>
 		<div class="col-md-6">
 			<label>Change Requested</label>
-			<h1 id="title_diff"></h1>
-			<div id="editor_diff"></div>
+			{=forms.render('changerequest_edit_diff')}
 		</div>
 	</div>
 	{*changerequests.{?1}(diffview:true)}
@@ -44,7 +36,7 @@
 	<script>
 		$(document).ready(function() {
 			var loaded = false;
-			document.addEventListener('livevarsReady', function() {
+			document.addEventListener('livevarsFetched', function() {
 				if(!loaded) genDiffView();
 				loaded = true;
 				liliumcms.ckeditor.initEditor();
@@ -56,21 +48,24 @@
 				var original = changerequest_livevar.original[0].content;
 				var title = changerequest_livevar.original[0].title;
 				var diff_title = changerequest_livevar.title;
-				var request = changerequest_livevar.diff;
+				var request = changerequest_livevar.content;
 
 
 				// Add new lines for each html elements for line diff
 				var neworiginal = "";
 				//Loop trough each elements
 				$(original).each(function(index,elem) {
-					neworiginal += $(elem).prop('outerHTML') + "\n";
+					line = $(elem).prop('outerHTML');
+					if (typeof line !== 'undefined') neworiginal += line + "\n";
 				});
 				original = neworiginal;
 
 				var newdiff = "";
+
 				//Loop trough each elements
 				$(request).each(function(index,elem) {
-					newdiff += $(elem).prop('outerHTML') + "\n";
+					line = $(elem).prop('outerHTML');
+					if (typeof line !== 'undefined') newdiff += line + "\n";
 				});
 				request = newdiff;
 				var diff = JsDiff.diffLines(original, request, {newlineIsToken: true});
@@ -78,11 +73,13 @@
 				var textarea = $('textarea[name=diff]');
 				var text = "";
 				diff.forEach(function(part) {
+				console.log(part);
 					var elem = part.added ?'<span class="__added__">' + part.value + '</span>': part.removed ? '<span class="__removed__">' + part.value + '</span>': part.value;
 						text += elem;
 				});
-					$('#editor_diff').append(text);
-					$('#title_diff').append(diff_title);
+					console.log(text);
+					$('textarea[name=requested_content]').val(text);
+					$('input[name=requested_title]').val(diff_title);
 					$('textarea[name=original]').val(original);
 					$('input[name=title]').val(title);
 			}
