@@ -128,6 +128,27 @@ var Campaigns = function() {
 						callback("[CampaignException] ProjectID must be specified as a third level");
 					}
 					break;
+                case "query":
+                    var queryInfo;
+                    try{
+                        queryInfo = JSON.parse(params.query) || new Object();
+                    }catch(err) {
+                        cli.crash(new Error(err));
+                        return;
+                    }
+                    var qObj = new Object();
+
+                    queryInfo._id ? qObj._id = queryInfo._id:false;
+                    queryInfo.projectid ? qObj.projectid =queryInfo.projectid:false;
+                    queryInfo.campname  ? qObj.campname = queryInfo.campname:false;
+                    queryInfo.clientid  ? qObj.clientid = queryInfo.clientid:false;
+                    queryInfo.paymentreq  ? qObj.paymentreq = queryInfo.paymentreq:false;
+                    queryInfo.campstatus ? qObj.campstatus = {$in : queryInfo.campstatus}:false;
+
+                    db.findToArray('campaigns', qObj, function(err, arr) {
+                        callback(err || arr);
+                    });
+                    break;
                 case "articlereview": //returns articles of the campaign in need of advertiser review
                     if (cli.isGranted('advertiser')) {
                         db.findToArray('campaigns', {
