@@ -15,56 +15,60 @@ $}
 </head>
 
 <body>
-	{*isStripeClient}
+{*isStripeClient}
+<h1>Payment</h1>
+<table>
 
-	<h1>Payment</h1>
-	<div id="order">
-		{*campaigns.{?1}(template:"campaigns-list-item")}
+	<thead>
+		<tr>
+			<th>Product Name</th>
+			<th>End date</th>
+			<th>Quantity</th>
+			<th>Price</th>
+		</tr>
+	</thead>
+	<tbody id="ordertbody">
+	</tbody>
+</table>
+TPS :
+TVQ :
+<div>Total : <span id="campaign_total_price"></span></div>
+{*campaigns.{?1}(template:"order_details")}
+
+<lml:template id="order_details">
+	<h1>Campaign details</h1>
+	<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
+	<div>
+		<lml:tobject data-nodetype="div" data-key="products" data-template="product-list" data-target="ordertbody"></lml:tobject>
+		<div class="entity-actions">
+
+			<lml:tobject data-nodetype="div" data-filter="hasStripeAccount">
+				<form method="post">
+					<input type="submit"/>
+				</form>
+			</lml:tobject>
+			<lml:tobject data-nodetype="div" data-filter="needStripeAccount">
+				<h3>Please provide the following informations for payment</h3>
+				<div class="payment-errors">
+
+				</div>
+				{=forms.render(advertiser_pay)}
+			</lml:tobject>
+		</div>
 	</div>
 
-	<lml:template id="order_template">
-		<h1>Campaign details</h1>
-		<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
-		<div>
-			<lml:tobject data-nodetype="div" data-key="products" data-template="product-list"></lml:tobject>
-		</div>
+</lml>
 
-	</lml>
-	<lml:template id="campaigns-list-item">
-		<li class="campaign-item-list">
-			<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
-			<lml:tobject data-nodetype="h5" data-key="campstatus"></lml:tobject>
-			<div id="#products">
-				<lml:tobject data-nodetype="div" data-key="products" data-template="product-list"></lml:tobject>
-			</div>
-			TPS :
-			TVQ :
-			<div>Total : <span id="campaign_total_price"></span></div>
+<lml:template id="product-list" data-wrapper="tr">
+	<lml:tobject data-nodetype="td" data-key="prodid"  ></lml:tobject>
+	<lml:tobject data-nodetype="td" data-key="enddate" ></lml:tobject>
+	<lml:tobject data-nodetype="td">
+		<lml:tobject data-nodetype="span" data-key="qte"></lml:tobject>
+		<lml:tobject data-nodetype="span" data-key="pricebase"></lml:tobject>
+	</lml:tobject>
+	<lml:tobject data-nodetype="td" data-key="price" ></lml:tobject>
 
-			<div class="entity-actions">
-
-				<lml:tobject data-nodetype="div" data-filter="hasStripeAccount">
-					<form method="post">
-                        <input type="submit"/>
-                    </form>
-				</lml:tobject>
-				<lml:tobject data-nodetype="div" data-filter="needStripeAccount">
-					<h3>Please provide the following informations for payment</h3>
-					<div class="payment-errors">
-
-					</div>
-					{=forms.render(advertiser_pay)}
-				</lml:tobject>
-			</div>
-		</li>
-	</lml:template>
-
-	<lml:template id="product-list">
-		Product: <lml:tobject data-nodetype="h3" data-key="prodid"></lml:tobject>
-		Quantity: <lml:tobject data-nodetype="h2" data-key="qte"></lml:tobject>
-		Price: <lml:tobject data-nodetype="h2" data-key="price"></lml:tobject>
-	</lml:template>
-
+</lml:template>
 
 	<script>
     function hasStripeAccount(campaign) {

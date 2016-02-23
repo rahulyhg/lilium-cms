@@ -130,7 +130,7 @@ var CampaignAdvertiser = function() {
                 if (err) log('Advertiser Plugin', err);
 
                 // Make sure the campaingn is at the payment status
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipayment') {
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipayment') {
                     var campaign = array[0];
 
                     // Check if we have a stripe customer for the current Advertiser
@@ -337,7 +337,7 @@ var CampaignAdvertiser = function() {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function(err, array) {
                 if (err) log('Advertiser Plugin', err);
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipayment') {
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipayment') {
                     fileLogic.serveLmlPluginPage('advertiser', cli, true);
                 } else {
                     cli.throwHTTP(400, 'Bad Request');
