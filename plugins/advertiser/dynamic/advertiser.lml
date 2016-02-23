@@ -9,6 +9,6 @@
         <a href="/advertiser/campaigns">View your campaigns</a>
         <h1>Campaigns needing your attention</h1>
 
-        {*campaign.query(campstatus:[campstatus:'clisign', campstatus:'clipayment', campstatus:'clipending'])}
+        {*campaigns.query(query:{"campstatus":["clipending","clipay","clisign"]},template:"campaigns-list-item",index:0)}
 </body>
 </html>

@@ -71,6 +71,7 @@ var CampaignAdvertiser = function() {
                     var campaign = array[0];
 
                     var updatecamp = function(status) {
+                        //Update camp status
                         db.update('campaigns', {_id: campaign._id}, {campstatus : status}, function() {
                             cli.sendJSON({
                                 success: true,
@@ -87,6 +88,7 @@ var CampaignAdvertiser = function() {
                         for (var key in changerequests) {
                             var request = {};
                             request.content = escape(changerequests[key].content);
+                            request.campId = campaign._id;
                             request.title = escape(changerequests[key].title);
                             request.articleId = key;
                             changeobj.push(request);
