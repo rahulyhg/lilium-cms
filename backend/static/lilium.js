@@ -246,7 +246,8 @@ var LiliumCMS = function() {
                         // $(lmlTag).remove();
                     } else if (fillerName == "pushtable") {
                         var datascheme = $(this).data('scheme');
-                        var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);                        pushtables.push(pushTable);
+                        var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);
+                        pushtables.push(pushTable);
 
                         $(lmlTag).after(pushTable.render());
                     } else if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
@@ -324,7 +325,7 @@ var LiliumCMS = function() {
                     e.preventDefault();
                     var validForm = true;
 
-                    $('.v_validate ').each(function() {
+                    $(this).find('.v_validate ').each(function() {
                         var validField = true;
 
                         // If a field : text, textarea
@@ -478,6 +479,7 @@ var LiliumCMS = function() {
         var datasrc = dataSource;
         var html = "";
         var scheme = JSON.parse(dataScheme.replace(/&lmlquote;/g, '"'));
+        var schemeCol = new Object();
         var htmlIdentifier = tableid;
         var that = this;
         var rows = new Object();
@@ -497,6 +499,10 @@ var LiliumCMS = function() {
             }
 
             return col;
+        };
+
+        this.getSchemeCol = function() {
+            return schemeCol;
         };
 
         this.bindEvents = function() {
@@ -549,15 +555,47 @@ var LiliumCMS = function() {
         this.rowToHTML = function(row) {
             var _h = '<tr class="lmlpushtableaddedrow" id="' + row._rowID + '" data-value="' + row['_lmlid'] + '"><td>' +
                 '<b>' + row['_title'] + '</b><input type="hidden" name="' + tableid + '[' + row._rowID + '][prodid]" value="' + row['_lmlid'] + '" /></td>';
+            var validRow = true;
+            var er = undefined;
 
             for (var key in row) {
                 if (key[0] != "_") {
+                  if (schemeCol[key].autocomplete) {
+                    // Check for column in templates
+                    var livevarValue = livevars[schemeCol[key].autocomplete.datasource];
+                    var required = schemeCol[key].required;
+                    var isEmpty = row[key].trim() == "";
+                    var foundObject = undefined;
+
+                    if (isEmpty && !required) {
+                      foundObject = new Object();
+                      foundObject[schemeCol[key].autocomplete.keyName] = "-";
+                    } else {
+                      for (var i = 0; i < livevarValue.length; i++) {
+                        if (livevarValue[i][schemeCol[key].autocomplete.keyValue] == row[key]) {
+                          foundObject = livevarValue[i];
+                          break;
+                        }
+                      }
+                    }
+
+                    if (foundObject) {
+                      _h += '<td><span>' + foundObject[schemeCol[key].autocomplete.keyName] + '</span><input type="hidden" name="' +
+                        tableid + '[' + row._rowID + '][' + key + ']" value="' + row[key] + '" /></td>';
+                    } else {
+                       validRow = false;
+                       er = new Error("Invalid Row");
+                       er.invalidRow = key;
+                       break;
+                    } 
+                  } else {
                     _h += '<td><span>' + row[key].toString() + '</span><input type="hidden" name="' +
                         tableid + '[' + row._rowID + '][' + key + ']" value="' + row[key] + '" /></td>';
-                }
+                  }
+	        }
             }
 
-            return _h + '<td><button class="lmlpushtableremovebutton">Remove</button></td></tr>';
+            return validRow ? _h + '<td><button class="lmlpushtableremovebutton">Remove</button></td></tr>' : er;
         };
 
         this.removeDeleteRow = function(rowID) {
@@ -597,16 +635,27 @@ var LiliumCMS = function() {
 
                 $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield:not(.lmlpushtablecasenotmet)').each(function(index, val) {
                     var fieldname = $(this).data('fieldname');
-                    row[fieldname] = $(this).val();
+                    
+                    if ($(this).prop('autocomplete') == 'on') {
+                      row[fieldname] = $('#' + $(this).attr('list')).find('option[value="' + $(this).val() + '"]').html() || $(this).val();
+                    } else {
+                      row[fieldname] = $(this).val();
+                    }
                 });
             }
 
             rows[row._rowID] = row;
             (function(rowID) {
-                $('#' + htmlIdentifier).find('tbody').append(that.rowToHTML(row))
-                    .find('tr').last().find('.lmlpushtableremovebutton').bind('click', function() {
-                        that.removeDeleteRow(rowID);
-                    });
+                if (htmlRow instanceof Error) {
+                    var rowKey = htmlRow.invalidRow;
+                    // TODO : show error message
+                } else {
+                    var htmlRow = that.rowToHTML(row);
+                    $('#' + htmlIdentifier).find('tbody').append(htmlRow)
+                        .find('tr').last().find('.lmlpushtableremovebutton').bind('click', function() {
+                            that.removeDeleteRow(rowID);
+                        });
+                }
             })(row._rowID);
 
             that.updateFooter();
@@ -702,7 +751,7 @@ var LiliumCMS = function() {
         };
 
         this.init = function() {
-            html += '<table id="' + tableid + '" class="lmlpushtable lmldatasourcetable"><thead><tr class="lmlpushtableheadertitlesrow"><th>' +
+            html += '<table id="' + tableid + '" class="lmlpushtable lmldatasourcetable" data-title="'+this.title+'"><thead><tr class="lmlpushtableheadertitlesrow"><th>' +
                 scheme.key.displayName + '</th>'
 
             for (var i = 0; i < scheme.columns.length; i++) {
@@ -742,7 +791,7 @@ var LiliumCMS = function() {
                           html += '<datalist id="' + tableid + col.fieldName + 'list">';
   
                           for (var j = 0; j < datVar.length; j++) {
-                              html += '<option value="' + datVar[j][col.autocomplete.keyValue] + '">' + datVar[j][col.autocomplete.keyName] + '</option>';
+                              html += '<option  value="' + datVar[j][col.autocomplete.keyName] + '">' + datVar[j][col.autocomplete.keyValue] + '</option>';
                           }
   
                           html += '</datalist>';
@@ -752,6 +801,8 @@ var LiliumCMS = function() {
 
             for (var i = 0; i < scheme.columns.length; i++) {
                 var col = scheme.columns[i];
+                schemeCol[col.fieldName] = col;
+
                 if (col.dataType == "template") {
                   html += '<th class="lmlpushtabletemplatereactiverow" data-templateid="'+col.templateid+'">';
                   
@@ -765,6 +816,13 @@ var LiliumCMS = function() {
                 }
                 html += "</th>"
               }
+
+            for (var tempKey in scheme.columnTemplates) {
+              var tempCols = scheme.columnTemplates[tempKey];
+              for (var j = 0; j < tempCols.fields.length; j++) {
+                schemeCol[tempCols.fields[j].fieldName] = tempCols.fields[j];
+              }
+            }
 
             html += '<th><button class="lmlpushtablecolumnaddaction">Add</button></th>' +
                 '</tr></thead><tbody></tbody>';

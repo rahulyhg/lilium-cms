@@ -193,6 +193,7 @@
 						datasource : "users.all.simple", // The livevar endpoint
 						keyName : "fullname", // JSON key of the displayed text
 						keyValue : "userid", // JSON key of the field's value
+						cantAdd : true | false // If true, field must contain a value that matches the datasource
 					}
 				},
 				{
