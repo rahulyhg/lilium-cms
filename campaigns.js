@@ -114,7 +114,7 @@ var Campaigns = function() {
 					break;
 				case "mine":
 					if (cli.isGranted('advertiser')) {
-						that.getAllMyCampaigns({clientid: cli.userinfo.userid.toString()}, callback);
+						that.getAllMyCampaigns({clientid: db.mongoID(cli.userinfo.userid.toString())}, callback);
 					} else {
 						callback();
 					}
@@ -155,7 +155,7 @@ var Campaigns = function() {
                             _id: db.mongoID(levels[1])
                         }, function(err, array) {
                             if (err) log('Campaigns livevars', err);
-                            if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {
+                            if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipending') {
                                 var campaign = array[0];
 
                                 //Get article in need of a review
@@ -163,7 +163,7 @@ var Campaigns = function() {
                                 var articlesID = [];
 
                                 for (var key in campaign.products) {
-                                    articlesID.push(db.mongoID(campaign.products[key].article));
+                                    articlesID.push(db.mongoID(campaign.products[key].articleid));
                                 }
 
                                 db.findToArray('content', {_id : {$in: articlesID}}, function(err, arr) {
@@ -238,6 +238,7 @@ var Campaigns = function() {
 
 		if (true || stack.valid) {
 			dbCamp = cliToDatabaseCampaign(cli);
+			dbCamp.clientid = db.mongoID(dbCamp.clientid);
 
 			switch (action) {
 				case 'new':
