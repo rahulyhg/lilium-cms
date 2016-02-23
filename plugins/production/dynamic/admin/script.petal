@@ -1,4 +1,12 @@
 {#config}
 <script>
+var changeRequested = function(item) {
+  return item.campstatus == 'prod';
+}
+
+var preprod = function(item) {
+  return item.campstatus == 'preprod';
+}
+
 
 </script>

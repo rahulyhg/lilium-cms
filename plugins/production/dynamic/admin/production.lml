@@ -1,1 +1,47 @@
-Production page
+{#config;session;vocab;forms}
+<!DOCTYPE html>
+<html>
+
+<head>
+	{%globalhead;script}
+    {$
+        var baseurl = config.default.server.url;
+        baseurl += "/";
+        baseurl += config.default.paths.admin;
+        baseurl += "/";
+    $}
+</head>
+
+<body>
+<h1>Production page</h1>
+<h2>Articles needing your attention</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Campaign Name</th>
+            <th>Status</th>
+            <th>Action(s)</th>
+        </tr>
+    </thead>
+    <tbody id="campaignstbody">
+        {*campaigns.needsattention_prod(template:"campaigns-list-item",target:"campaignstbody")}
+    </tbody>
+</table>
+
+<lml:template id="campaigns-list-item" data-wrapper="tr">
+    <lml:tobject data-nodetype="td" data-key="campname"  ></lml:tobject>
+    <lml:tobject data-nodetype="td" data-key="campstatus" ></lml:tobject>
+    <lml:tobject data-nodetype="td">
+        <div class="entity-actions">
+            <lml:tobject data-nodetype="a"  data-href="{=baseurl}production/changerequest/edit/" data-key="_id"  data-filter="changeRequested">
+                Change Request
+            </lml:tobject>
+            <lml:tobject data-nodetype="a" data-href="{=baseurl}article/new" data-filter="preprod">
+                Pre-Production
+            </lml:tobject>
+        </div>
+    </lml:tobject>
+</lml:template>
+</body>
+
+</html>

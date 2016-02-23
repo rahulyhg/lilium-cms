@@ -125,6 +125,24 @@ var Campaigns = function() {
                         callback();
                     }
                     break;
+                case "needsattention_advertiser":
+                    if(cli.isGranted('advertiser')) {
+                        db.findToArray('campaigns', {campstatus: {$in :['clipending', 'clipayment', 'clisign']}}, function(err, res) {
+                            callback(err||res);
+                        });
+                    } else {
+                        callback();
+                    }
+                    break;
+                    case "needsattention_prod":
+                        if(cli.isGranted('production')) {
+                            db.findToArray('campaigns', {campstatus: {$in :['prod', 'preprod']}}, function(err, res) {
+                                callback(err||res)
+                            });
+                        } else {
+                            callback();
+                        }
+                        break;
                 case "get":
                     var projectid = levels[1];
 

@@ -1,7 +1,12 @@
 <html>
 <head>
     {%../../../backend/dynamic/admin/globalhead;script}
-
+    {$
+    	var baseurl = config.default.server.url;
+    	baseurl += "/";
+    	baseurl += "advertiser";
+    	baseurl += "/";
+    $}
     <title></title>
 </head>
 <body>
@@ -9,6 +14,36 @@
         <a href="/advertiser/campaigns">View your campaigns</a>
         <h1>Campaigns needing your attention</h1>
 
-        {*campaigns.query(query:{"campstatus":["clipending","clipay","clisign"]},template:"campaigns-list-item",index:0)}
-</body>
+        <table>
+        	<thead>
+        		<tr>
+        			<th>Campaign Name</th>
+        			<th>Status</th>
+        			<th>Action(s)</th>
+
+        		</tr>
+        	</thead>
+        	<tbody id="campaignstbody">
+        		{*campaigns.needsattention_advertiser(template:"campaigns-list-item",target:"campaignstbody")}
+        	</tbody>
+        </table>
+
+        <lml:template id="campaigns-list-item" data-wrapper="tr">
+        	<lml:tobject data-nodetype="td" data-key="campname"  ></lml:tobject>
+        	<lml:tobject data-nodetype="td" data-key="campstatus" ></lml:tobject>
+        	<lml:tobject data-nodetype="td">
+        		<div class="entity-actions">
+        			<lml:tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id"  data-filter="signNeeded">
+        				Signature needed
+        			</lml:tobject>
+        			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
+        				Payment needed
+        			</lml:tobject>
+        			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-filter="reviewNeeded">
+        				Ready for review
+        			</lml:tobject>
+        		</div>
+        	</lml:tobject>
+        </lml:template>
+    </body>
 </html>
