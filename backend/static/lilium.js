@@ -587,7 +587,7 @@ var LiliumCMS = function() {
                        er = new Error("Invalid Row");
                        er.invalidRow = key;
                        break;
-                    } 
+                    }
                   } else {
                     _h += '<td><span>' + row[key].toString() + '</span><input type="hidden" name="' +
                         tableid + '[' + row._rowID + '][' + key + ']" value="' + row[key] + '" /></td>';
@@ -635,7 +635,7 @@ var LiliumCMS = function() {
 
                 $('#' + htmlIdentifier).find('.lmlpushtablecolumnfield:not(.lmlpushtablecasenotmet)').each(function(index, val) {
                     var fieldname = $(this).data('fieldname');
-                    
+
                     if ($(this).prop('autocomplete') == 'on') {
                       row[fieldname] = $('#' + $(this).attr('list')).find('option[value="' + $(this).val() + '"]').html() || $(this).val();
                     } else {
@@ -777,23 +777,23 @@ var LiliumCMS = function() {
                       (col.keyName ? '" data-keyname="' + col.keyName : "") +
                       (col.displayCase ? '" data-displaycase="' + col.displayCase : "") +
                       (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
-                  
+
                   if (col.autocomplete) {
                     html += '" list="' + tableid + col.fieldName + 'list" autocomplete="on" data-acsource="' + col.autocomplete.datasource + '"';
                   }
-  
+
                   html += '" />';
-  
+
                   if (col.autocomplete && col.autocomplete.datasource) {
                       var datVar = livevars[col.autocomplete.datasource];
-  
+
                       if (datVar && datVar.length) {
                           html += '<datalist id="' + tableid + col.fieldName + 'list">';
-  
+
                           for (var j = 0; j < datVar.length; j++) {
                               html += '<option  value="' + datVar[j][col.autocomplete.keyName] + '">' + datVar[j][col.autocomplete.keyValue] + '</option>';
                           }
-  
+
                           html += '</datalist>';
                       }
                   }
@@ -805,7 +805,7 @@ var LiliumCMS = function() {
 
                 if (col.dataType == "template") {
                   html += '<th class="lmlpushtabletemplatereactiverow" data-templateid="'+col.templateid+'">';
-                  
+
                   var colTemplate = scheme.columnTemplates[col.templateid];
                   colTemplate.fields.forEach(function(tempField) {
                     addHeaderField(tempField);
@@ -856,16 +856,25 @@ var LiliumCMS = function() {
             var pictures = [];
             var picture_id_url = {};
             var selectedPicture;
+            $('[ckeditor][data-readonly=true]').ckeditor(function(){
+
+            }, {
+                readOnly : true
+            })
             $('[ckeditor]').ckeditor();
+
             CKEDITOR.on('instanceReady', function(ev) {
-                this.document.appendStyleSheet('/static/style.css');
+
+                this.document.appendStyleSheet('/static/ckeditorstyle.css');
             });
             CKEDITOR.config.entities = false;
             CKEDITOR.config.extraPlugins = 'image-explorer';
-            CKEDITOR.config.basicEntities = false;
             CKEDITOR.config.entities_greek = false;
             CKEDITOR.config.entities_latin = false;
             CKEDITOR.config.removeButtons = 'Image';
+            CKEDITOR.config.allowedContent = true;
+            CKEDITOR.config.contentsCss = '/static/style.css';
+            CKEDITOR.config.skin = "../../../bower/BootstrapCK4-Skin/skins/bootstrapck"
 
             //CKEDITOR plugin to choose picture
             CKEDITOR.dialog.add("imagebrowserDialog", function(editor) {
