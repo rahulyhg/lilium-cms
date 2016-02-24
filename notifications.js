@@ -3,6 +3,7 @@ var _c = require('./config.js');
 var log = require('./log.js');
 var cli = require('./clientobject.js');
 var session = require('./session.js');
+var log = require('./log.js');
 
 var sockets = {};
 
@@ -18,13 +19,22 @@ var Notification = function() {
                 // Get session and get client id
                 var clientId = session.getSessionFromSID(sessionId).data._id;
 
-                sockets[clientId] = socket;
+                if (!sockets[clientId]) {
+                    sockets[clientId] = {};
+                }
+                sockets[clientId][socket.id] = socket;
 
       			socket.on('join', function(id, name){
       			});
 
       			socket.on('disconnect', function(){
+                    //Remove it from list
+                    var sessionId = that.getSessionIDFromCookie(this.handshake.headers.cookie);
+                    var clientId = session.getSessionFromSID(sessionId).data._id;
 
+                    sockets[clientId][socket.id] = undefined;
+
+                    delete sockets[clientId][socket.id];
       			});
 
       			socket.on('alert', function() {
@@ -36,14 +46,18 @@ var Notification = function() {
   	}
 
     this.emitToUser = function(userID, message) {
-        var socket = sockets[userID];
-        if (socket) {
-            console.log('emisssion');
-            socket.emit('message', message);
-        } else {
-            console.log('Socket with id : ' + userId + ' not found!');
+        // Send to every sockets connected by the user (for multi-tab)
+        for (var index in sockets[userID]) {
+            var socket = sockets[userID][index];
+            if (socket) {
+                socket.emit('message', message);
+            }
         }
-    }
+    };
+
+    this.emit = function() {
+
+    };
 
     this.getSessionIDFromCookie = function(cookieString) {
         var cookies = {};
