@@ -21,13 +21,13 @@ var Sessions = function() {
 		}
 
 		return (prefix || "") + s4() + s4() + s4() + s4() +
-				s4() + s4() + s4() + s4();		
+				s4() + s4() + s4() + s4();
 	};
 
 	this.createSession = function() {
 		var token = this.createToken(new Date().getTime());
 		var newSesh = new UserSesh(token);
-	
+
 		return newSesh;
 	};
 
@@ -53,7 +53,7 @@ var Sessions = function() {
 			};
 		} else {
 			cli.session = new UserSesh();
-		}  
+		}
 	};
 
 	this.createSessionInCli = function(cli, userObj) {
@@ -83,6 +83,10 @@ var Sessions = function() {
 		db.update('sessions', {token:cli.session.token}, cli.session, callback);
 	};
 
+    this.getSessionFromSID = function(sid) {
+        return _sesh[sid];
+    }
+
 	this.initSessionsFromDatabase = function(cb) {
 		var seshCount = 0;
 		db.find('sessions', {}, {}, function(err, data) {
@@ -105,7 +109,7 @@ var Sessions = function() {
 			} else {
 				cb();
 			}
-		}); 
+		});
 	};
 };
 

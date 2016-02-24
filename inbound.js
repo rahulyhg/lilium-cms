@@ -7,9 +7,9 @@ var _c = require('./config.js').default,
     reqCount = 0,
     totalReqCount = 0,
     __inbound = new (function() {
-    	var io = require('socket.io')(server);
 	var server;
 	var secureServer;
+    var io;
 
 	var handleReq = function(req, resp) {
 		reqCount++;
@@ -40,7 +40,7 @@ var _c = require('./config.js').default,
 
 	this.createServer = function() {
 		server = _http.createServer(handleReq);
-
+        io = require('socket.io')(server);
 		/*
 		secureServer = _https.createServer({
 			key : fs.readFileSync("/Users/ryk/Desktop/server-key.pem"),
@@ -58,7 +58,7 @@ var _c = require('./config.js').default,
 	};
 
 	var init = function() {
-	
+
 	};
 
 	init();
