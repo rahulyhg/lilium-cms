@@ -17,6 +17,8 @@
  * Description : Global styling for admin section of Lilium.                                             *
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
+var debugMode = 'true';
+var socket = io();
 
 var LiliumCMS = function() {
     var livevars;
@@ -222,6 +224,7 @@ var LiliumCMS = function() {
                 var lmlTag = $(this);
 
                 if (typeof livevars[this.dataset.varname] === "object") {
+
                     var templateName = $(this).data('template');
                     var varValue = livevars[this.dataset.varname];
                     var fillerName = $(this).data('filler');
@@ -229,6 +232,10 @@ var LiliumCMS = function() {
                     var cacheonly = $(this).data('cacheonly');
                     var livevarkey = this.dataset.varname;
 
+                    if (livevars[this.dataset.varname].length == 0) {
+                        var template = $('#'+templateName);
+                        $(this).after($(template).find('lml\\:empty').html());
+                    }
                      if (sourceof && sourceof != "") {
                         (function(src, data) {
                             document.addEventListener(LiliumEvents.livevarsRendered.name, function() {
@@ -260,8 +267,6 @@ var LiliumCMS = function() {
                                 });
                             } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
                                 generateTemplateFromObject(templateObj, lmlTag, varValue, livevarkey);
-                            } else {
-                                $(templateObj).html($(templateObj).find('lml\:empty').html());
                             }
                         }
 
@@ -850,6 +855,64 @@ var LiliumCMS = function() {
 
         this.init();
     };
+
+
+
+
+    io.Socket.prototype.join = function(groupName) {
+        this.emit('join', groupName);
+    }
+
+    io.Socket.prototype.emitToGroup = function(groupName, data) {
+        this.emit('emittogroup', {group: groupName, data: data});
+    }
+
+    socket.on('join', function(data){
+        if (!data.success) {
+            console.error('[Notifications] ' + data.group + ' : ' + data.msg);
+        } else {
+            console.log('Join success : ' + data.group);
+        }
+
+    });
+
+    socket.on('group', function(data) {
+        if (debugMode){
+            console.log('[Notification] Message from group "' + data.group + '" : ' + data.msg);
+        }
+    });
+
+    socket.on('debug', function(data){
+        if (debugMode){
+        console.log('[Notification] ' + data.msg);
+        }
+    })
+
+    socket.on('err', function(data) {
+        console.error('[Notification] ' + data.msg);
+    });
+
+    socket.on('notification', function(notification) {
+        notification.type = typeof notification.type !== 'undefined'? notification.type : 'info';
+        notification.message = notification.msg ? notification.msg : 'Notification without a message :(';
+
+        $.notify(notification, {
+            type: notification.type,
+            newest_on_top: true,
+            delay: 10000,
+            template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+                '<button type="button" aria-hidden="true" class="close" data-notify="dismiss">x</button>' +
+                '<span data-notify="icon"></span> ' +
+                '<span data-notify="title"><b>{1}: </b></span> ' +
+                '<span data-notify="message">{2}</span>' +
+                '<div class="progress" data-notify="progressbar">' +
+                    '<div class="progress-bar progress-bar-{0}" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div>' +
+                '</div>' +
+                '<a href="{3}" target="{4}" data-notify="url"></a>' +
+            '</div>'
+        });
+    })
+
 
     var CKEditor = function() {
         this.initEditor = function() {

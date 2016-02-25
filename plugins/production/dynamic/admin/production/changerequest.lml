@@ -48,6 +48,11 @@
 		<lml:tobject data-nodetype="td" data-key="article.title" ></lml:tobject>
 		<lml:tobject data-nodetype="td" data-key="campaign.client.displayname"  ></lml:tobject>
 		<lml:tobject data-nodetype="td" data-key="campaign.campstatus" ></lml:tobject>
+
+
+            <lml:empty>
+                No Change Requests
+            </lml:empty>
 	</lml:template>
 
 </body>

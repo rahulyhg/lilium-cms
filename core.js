@@ -165,6 +165,13 @@ var Core = function() {
 	};
 
 	var loadRoles = function(cb) {
+        entities.registerRole({
+          name: 'admin',
+          displayname: 'admin'
+      }, ['dash', 'admin'], function() {
+          return;
+        }, true);
+
 		entities.cacheRoles(cb);
 	};
 
@@ -293,7 +300,7 @@ var Core = function() {
 		to =   _c.default.server.html + '/uploads';
 		rootDir = _c.default.server.base + 'backend/static/uploads/';
 		cli.createSymlink(rootDir, to);
-	
+
 		to =   _c.default.server.html + '/plugins';
 		rootDir = _c.default.server.base + 'plugins/';
 		cli.createSymlink(rootDir, to);
@@ -404,7 +411,7 @@ var Core = function() {
 		sites.cacheSitesFromDatabase(cb);
 	};
 
-	var loadRequestHandler = function() {	
+	var loadRequestHandler = function() {
 		hooks.bind('request', 1000, function(params) {
 			// Run main modules
 			var clientObject = new ClientObject(params.req, params.resp);
@@ -420,7 +427,6 @@ var Core = function() {
 		loadStandardInput();
 		loadImageSizes();
 		loadForms();
-		loadNotifications();
 		loadLiveVars();
 		loadDFP();
 		loadFrontend();
@@ -438,8 +444,10 @@ var Core = function() {
 
 			log('Lilium', 'Starting inbound server');
 			Inbound.createServer();
+            loadNotifications();
+
 			Inbound.start();
-			
+
 			log('Core', 'Firing initialized signal');
 			hooks.fire('init');
 		});});});});});});});});

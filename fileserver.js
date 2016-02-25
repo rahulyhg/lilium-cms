@@ -109,7 +109,7 @@ var FileServer = function() {
 		filename = this.validateIndexPath(cli, filename);
 
 		cli.response.writeHead(200, {
-			"Content-Type" : cli.routeinfo.mimetype || 'text/html'
+			"Content-Type" : cli.routeinfo.mimetype || 'text/html; charset=utf-8'
 		});
 
 		var stream = fs.createReadStream(filename)

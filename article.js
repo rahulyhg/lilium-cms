@@ -6,6 +6,7 @@ var mongo = require('mongodb');
 var livevars = require('./livevars.js');
 var cacheInvalidator = require('./cacheInvalidator.js');
 var fs = require('./fileserver.js');
+var notifications = require('./notifications.js');
 
 var Article = function() {
     this.handlePOST = function(cli) {
@@ -19,6 +20,21 @@ var Article = function() {
                 break;
             case 'delete':
                 this.delete(cli);
+                break;
+            case 'broadcast':
+                notifications.broadcastNotification({title: "Critical!", url: "/admin/article/list", msg: "Server shutdown in 5 minutes.", type: 'danger'});
+                return cli.throwHTTP(200, 'ok');
+
+                break;
+            case 'role':
+                notifications.notifyGroup('admin', {title: "Don't forget", url: "/admin/article/list", msg: "Maintenance tonight!", type: 'warning'});
+                return cli.throwHTTP(200, 'ok');
+                break;
+            case 'user':
+                var random = Math.floor(Math.random() * 4) + 0;
+                var types = ['danger', 'success', 'warning', 'info'];
+                notifications.notifyUser(cli.userinfo.userid, {title: "Article", url: "/admin/article/list", msg: "View Article List", type: types[random]});
+                return cli.throwHTTP(200, 'ok');
                 break;
             default:
                 return cli.throwHTTP(404, 'Not Found');

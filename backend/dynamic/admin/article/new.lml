@@ -7,6 +7,8 @@
 	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+    <script src="{=config.default.server.base_url}:8080/socket.io/socket.io.js"></script>
+
 </head>
 
 <body>
@@ -23,7 +25,13 @@
 	<script>
 		liliumcms.ckeditor.initEditor();
 	</script>
-
+    <script>
+        var socket = io();
+        socket.emit('join', 'Harry Potter');
+        socket.on('message', function(data){
+            console.log(data);
+        });
+    </script>
 </body>
 
 </html>

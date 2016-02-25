@@ -39,7 +39,7 @@ button, input[type="submit"] {
 
 }
 
-lml\:template, lml\:tobject, lml, 
+lml\:template, lml\:tobject, lml,
 .lmlloading, .lmlhidden {
 	display: none;
 }
@@ -105,7 +105,7 @@ form input, form label{
 	text-align: left;
 }
 
-.lmlpushtable thead th input, 
+.lmlpushtable thead th input,
 .lmlpushtable thead th select {
 	padding: 6px;
 }
@@ -204,7 +204,7 @@ form input, form label{
 .errorbody {
 	background-color: #222222;
 	color: #CCC;
-	
+
 	font-family: "Raleway", Arial, sans-serif;
 }
 
@@ -220,4 +220,48 @@ form input, form label{
 
 .lmlcrash main {
 	padding: 20px;
+}
+.alert-info {
+    border-color: #2980b9;
+    color: #2980b9;
+}
+.alert-danger {
+    border-color: #c0392b;
+    color: #c0392b;
+}
+.alert-warning {
+    border-color: #f1c40f;
+    color: #f1c40f;
+}
+.alert-success {
+    border-color: #27af61;
+    color: #27af61;
+}
+.alert {
+    background: #333;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 5px solid;
+    border-radius: 0px;
+}
+.close {
+    text-shadow: none;
+}
+.alert-info .close{
+    color: #2980b9;
+    opacity: 1;
+}
+.alert-success .close{
+    color: #27af61;
+    opacity: 1;
+}
+
+.alert-warning .close{
+    color: #f1c40f;
+    opacity: 1;
+}
+
+.alert-danger .close{
+    color: #c0392b;
+    opacity: 1;
 }
