@@ -80,7 +80,7 @@ var LiliumCMS = function() {
             $.get("/livevars", {
                 vars: JSON.stringify(endpoints)
             }, function(data) {
-                livevars = deepUnescape(data);
+                livevars = data;
                 document.dispatchEvent(new CustomEvent('livevarsFetched', {
                     'detail': {
                         'livevars': livevars
@@ -285,7 +285,7 @@ var LiliumCMS = function() {
                         $(lmlTag).after(filler);
                     } else {
                         $(this).text(JSON.stringify(livevars[$(this).data('varname')]));
-                        $(this).text(unescape(livevars[$(this).data('varname')]));
+                        $(this).text(livevars[$(this).data('varname')]);
                     }
                 }
             });
@@ -406,7 +406,7 @@ var LiliumCMS = function() {
                                 validField = false;
                             }
                         }
-                        $('[ckeditor]').val($.trim($('[ckeditor]').val()));
+                        $('[ckeditor]').val($('[ckeditor]').ckeditor().getData());
                         // If a number verify number
 
                         if (!validField) {
@@ -979,7 +979,7 @@ var LiliumCMS = function() {
                 this.document.appendStyleSheet('/static/ckeditorstyle.css');
             });
             CKEDITOR.config.entities = false;
-            CKEDITOR.config.extraPlugins = 'image-explorer';
+            CKEDITOR.config.extraPlugins = 'image-finder';
             CKEDITOR.config.entities_greek = false;
             CKEDITOR.config.entities_latin = false;
             CKEDITOR.config.removeButtons = 'Image';
@@ -1036,7 +1036,7 @@ var LiliumCMS = function() {
                     }
                 }
             })
-            CKEDITOR.plugins.add("image-explorer", {
+            CKEDITOR.plugins.add("image-finder", {
                 init: function(editor) {
                     editor.addCommand('imagebrowser', new CKEDITOR.dialogCommand('imagebrowserDialog'));
                     editor.ui.addButton('imgbrowser', {
@@ -1059,21 +1059,6 @@ var LiliumCMS = function() {
             });
 
         }
-    };
-
-    var deepUnescape = function(json) {
-        for (var index in json) {
-            switch (typeof json[index]) {
-                case 'string':
-                    json[index] = unescape(json[index]);
-                    break;
-                case 'object':
-                    json[index] = deepUnescape(json[index]);
-                    break;
-
-            }
-        }
-        return json;
     };
 
     var Hooks = function() {

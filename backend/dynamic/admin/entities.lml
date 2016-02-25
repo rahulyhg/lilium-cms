@@ -33,5 +33,6 @@
 				</div>
 			</li>
 		</lml:template>
+        <script src="{=config.default.server.base_url}:8080/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
 	</body>
 </html>

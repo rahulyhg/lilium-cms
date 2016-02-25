@@ -320,8 +320,7 @@ var FormBuilder = function() {
               if (form.fields[key].type == 'form') {
                   form.fields[key].attr.value = cli.postdata.data[key];
               } else {
-                  var escapedData = escape(cli.postdata.data[key]);
-                  form.fields[key].attr.value = escapedData;
+                  form.fields[key].attr.value =  cli.postdata.data[key];
               }
 
           }

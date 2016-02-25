@@ -3,33 +3,39 @@
 <html>
 
 <head>
-	{%../globalhead;../entityscript}
-	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
+    {%../globalhead;../entityscript}
+    <title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
+    <link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
+    <link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
     <script src="{=config.default.server.base_url}:8080/socket.io/socket.io.js"></script>
 
 </head>
 
 <body>
-	<header>
-		<h1>{=config.default.vendor.productname}
-			<small>v{=config.default.vendor.version}</small>
-		</h1>
-	</header>
-	<h2>Create a new post</h2>
-	{=forms.render('post_create')}
-	<div id="editor"></div>
-	<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
-	<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
-	<script>
-		liliumcms.ckeditor.initEditor();
-	</script>
+    <header>
+        <h1>{=config.default.vendor.productname}
+            <small>v{=config.default.vendor.version}</small>
+        </h1>
+    </header>
+    <h2>Create a new post</h2>
+    {=forms.render('post_create')}
+    <div id="editor"></div>
+    <script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
+    <script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
+
     <script>
         var socket = io();
         socket.emit('join', 'Harry Potter');
-        socket.on('message', function(data){
+        socket.on('message', function(data) {
             console.log(data);
+        });
+
+        window.addEventListener("beforeunload", function(e) {
+            var confirmationMessage = 'It looks like you have been editing something. ' +
+             'If you leave before saving, your changes will be lost.';
+
+            (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+            return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
         });
     </script>
 </body>

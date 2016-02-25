@@ -14,9 +14,15 @@ $}
 		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
 		<h2>{=vocab.admintitle}</h2>
 		Currently running in {=config.default.env} env.
-        <button id="broadcast">Broadcast a "critical" notification</button>
-        <button id="roles">Send a "warning" notification to admin group</button>
-        <button id="myself">Send a "random" notification to yourself</button>
+        <div>
+            <button id="broadcast">Broadcast a "critical" notification</button>
+        </div>
+        <div>
+            <button id="roles">Send a "warning" notification to admin group</button>
+        </div>
+        <div>
+            <button id="myself">Send a "random" notification to yourself</button>
+        </div>
 		{*entities.lilium(postType:types.post)}
 
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
