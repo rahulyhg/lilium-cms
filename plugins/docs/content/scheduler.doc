@@ -1,0 +1,18 @@
+<h2>Scheduler</h2>
+<p>
+	The scheduler let developers run tasks at a certain moment in time, and handles iterations over certain periods in time.
+</p>
+
+<h3>Scheduler.schedule( id, intervals, ftc )</h3>
+<b>id</b>
+<p>
+	A unique identifier
+</p>
+<b>intervals</b>
+<p>
+TO DOCUMENT
+</p>
+<b>ftc</b>
+<p>
+	The function to be called
+</p>

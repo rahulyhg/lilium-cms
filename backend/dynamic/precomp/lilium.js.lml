@@ -24,11 +24,14 @@ var LiliumCMS = function() {
     var pushtables = new Array();
 
     var LiliumEvents = {
+        livevarsPrerendered: {
+            name: "livevarsPrerendered"
+        },
         livevarsRendered: {
             name: "livevarsRendered"
         },
         livevarsFetched: {
-            name: "livevarsRendered"
+            name: "livevarsFetched"
         }
     };
 
@@ -39,7 +42,7 @@ var LiliumCMS = function() {
         this.getLiveVars = function(cb) {
             urlParams = window.location.pathname.split('/');
 
-            // regex to match {$1}
+            // regex to match { $1 }
             var reg = /({\?\s*[0-9]\s*})/g;
 
             $("lml\\:livevars").each(function() {
@@ -48,7 +51,7 @@ var LiliumCMS = function() {
                     var params = $(this).data('varparam');
 
                     var variableName = $(this).data('varname');
-                    // Check for {$1} to extract params from the url
+                    // Check for { $1 } to extract params from the url
                     var urls = variableName.match(reg);
                     if (urls !== null) {
                         urls.forEach(function(elem) {
@@ -231,7 +234,7 @@ var LiliumCMS = function() {
 
                      if (sourceof && sourceof != "") {
                         (function(src, data) {
-                            document.addEventListener(LiliumEvents.livevarsRendered.name, function() {
+                            document.addEventListener(LiliumEvents.livevarsPrerendered.name, function() {
                                 if ($.isArray(data)) {
                                     for (var key in data) {
                                         fillFormFromSource(src, data[key], key);
@@ -281,8 +284,15 @@ var LiliumCMS = function() {
                     }
                 }
             });
-            //remove lml:template
+            // Lilium Templates
             $('lml\\:template').remove();
+
+            // Fire ready event
+            document.dispatchEvent(new CustomEvent('livevarsPrerendered', {
+                'detail': {
+                    'livevars': livevars
+                }
+            }));
             document.dispatchEvent(new CustomEvent('livevarsRendered', {
                 'detail': {
                     'livevars': livevars
@@ -317,6 +327,36 @@ var LiliumCMS = function() {
     this.getUrlParams = function() {
         return urlParams;
     }
+
+    var FormBeautifier = function() {
+        var createCheckboxWrapper = function(oObj) {
+            var obj = document.createElement('div');
+            obj.setAttribute('name', oObj.getAttribute('name'));
+            obj.classList.add('lmlbeautifiedcheckbox');
+            if (oObj.checked) {
+                obj.classList.add("checked");
+            }
+
+            return obj;
+        };
+
+        this.beautify = function() {
+            $('input[type="checkbox"]:not(.systeminput)').each(function(index, cbox) {
+                var beautifulCheckbox = $(createCheckboxWrapper(cbox));
+                
+                $(beautifulCheckbox).bind('click', function() {
+                    $(this).toggleClass('checked');
+                    cbox.checked = $(this).hasClass('checked');
+                });
+
+                $(cbox).bind('change', function() {
+                    $(beautifulCheckbox)[cbox.checked ? "addClass" : "removeClass"]('checked');
+                });
+
+                $(cbox).after(beautifulCheckbox);
+            });
+        };
+    };
 
     var FormValidator = function() {
         this.prepareValidation = function() {
@@ -853,10 +893,17 @@ var LiliumCMS = function() {
 
     var CKEditor = function() {
         this.initEditor = function() {
+            if (typeof CKEDITOR === 'undefined') {
+                return;
+            }
+
             var pictures = [];
             var picture_id_url = {};
             var selectedPicture;
-            $('[ckeditor]').ckeditor();
+
+            if ($('[ckeditor]').ckeditor) {
+                $('[ckeditor]').ckeditor();
+            }
             CKEDITOR.on('instanceReady', function(ev) {
                 this.document.appendStyleSheet('/static/style.css');
             });
@@ -981,10 +1028,11 @@ var LiliumCMS = function() {
     this.formParser = new FormParser();
     this.livevars = new LiveVars();
     this.ckeditor = new CKEditor();
+    this.formbeautifier = new FormBeautifier();
 
     document.addEventListener('livevarsRendered', function(e) {
         liliumcms.ckeditor.initEditor();
-
+        liliumcms.formbeautifier.beautify();
     });
 
     // API

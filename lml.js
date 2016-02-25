@@ -700,7 +700,7 @@ var LML = function() {
 			if (!dirExists) throw new Error("LML.AccessException - Could not create directory for " + compilepath);
 
 			fileserver.readFile(rootpath, function(content) {
-				var fileHandle = fileserver.getOutputFileHandle(compilepath);
+				var fileHandle = fileserver.getOutputFileHandle(compilepath, 'w+');
 				var linesToWrite = 0;
 				var linesWritten = 0;
 				var readyToFlush = false;

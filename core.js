@@ -29,6 +29,7 @@ var Handler = require('./handler.js');
 var ClientObject = require('./clientobject.js');
 var Inbound = require('./inbound.js');
 var Livevars = require('./livevars.js');
+var Precompiler = require('./precomp.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -410,7 +411,10 @@ var Core = function() {
 			var clientObject = new ClientObject(params.req, params.resp);
 			Handler.handle(clientObject);
 		});
+	};
 
+	var loadPrecompiledStaticFiles = function(callback) {
+		Precompiler.precompile(callback);
 	};
 
 	this.makeEverythingSuperAwesome = function(readyToRock) {
@@ -432,6 +436,7 @@ var Core = function() {
 		loadPlugins(function(){
 		loadRoles(function() {
 		loadProducts(function() {
+		loadPrecompiledStaticFiles(function() {
 		loadSessions(function() {
 		loadTheme(function() {
 			loadCacheInvalidator();
@@ -442,7 +447,7 @@ var Core = function() {
 			
 			log('Core', 'Firing initialized signal');
 			hooks.fire('init');
-		});});});});});});});});
+		});});});});});});});});});
 	};
 
 	var init = function() {

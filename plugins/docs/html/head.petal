@@ -2,11 +2,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/static/lilium.css" />
+		<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/compiled/lilium.css" />
 		<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/plugins/docs/html/docs.css" />
 		<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/plugins/docs/html/tomorrow-night.css" />
 		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-		<script src="{=config.default.server.url}/static/lilium.js"></script>
+		<script src="{=config.default.server.url}/compiled/lilium.js"></script>
 		<script src="{=config.default.server.url}/plugins/docs/html/highlight.pack.js" ></script>
 		<script>
 			$(function() {
