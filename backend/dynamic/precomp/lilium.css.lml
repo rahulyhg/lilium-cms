@@ -18,8 +18,8 @@
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
 
+{#config}
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,300,500,600,700,100); /* 'Raleway', sans-serif */
-@import url(https://fonts.googleapis.com/css?family=Architects+Daughter); /* 'Architects Daughter', cursive */
 
 html, body {
 	padding:0;
@@ -36,7 +36,31 @@ input, textarea, button {
 
 button, input[type="submit"] {
 	cursor: pointer;
+}
 
+input[type="checkbox"], .lmlcheckbox {
+	display: none;
+}
+
+.lmlbeautifiedcheckbox {
+	display: inline-block;
+	width: 32px;
+	height:32px;
+	vertical-align: middle;
+
+	margin-right: 10px;
+
+	background-image: url('{=config.default.server.url}/static/media/lmlcontrols.png');
+	background-position: 96px 0px;
+	cursor: pointer;
+} 
+
+.lmlbeautifiedcheckbox.checked {
+	background-position: 0px 0px;
+}
+
+form .campaigncreatefield-checkbox label {
+	display: inline-block;
 }
 
 lml\:template, lml\:tobject, lml,
