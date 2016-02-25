@@ -24,83 +24,86 @@ var Notification = function() {
                 var sessionId = that.getSessionIDFromCookie(socket.handshake.headers.cookie);
                 // Get session and get client id
                 var session = sessionManager.getSessionFromSID(sessionId);
-                var clientId = session.data._id;
+                if (session) {
+                    var clientId = session.data._id;
 
-                if (!sockets[clientId]) {
-                    sockets[clientId] = {};
-                }
-                sockets[clientId][socket.id] = socket;
-
-
-                socket.on('join', function(groupName) {
-                    // Group exists
-                    if (groups[groupName]) {
-
-                        // Check for needed roles
-                        if (session.data.roles.indexOf(groups[groupName]) !== -1) {
-                            socket.join(groupName);
-                            socket.emit('debug', {success: true, msg: 'Joined ' + groupName + ' group.'});
-                        } else {
-                            socket.emit('err', {success: false, msg: 'Permission denied for group: ' + groupName});
-                        }
-
-                    } else {
-                        socket.emit('err', {success: false, msg: 'Group "' + groupName + '" not found.'});
+                    if (!sockets[clientId]) {
+                        sockets[clientId] = {};
                     }
+                    sockets[clientId][socket.id] = socket;
 
-                });
 
-                socket.on('emittogroup', function(emission) {
-                    if (emission.group) {
-                        if (groups[emission.group]) {
-                            if(socket.rooms[emission.group]) {
-                                socket.broadcast.to(emission.group).emit('group', emission.data);
+                    socket.on('join', function(groupName) {
+                        // Group exists
+                        if (groups[groupName]) {
+
+                            // Check for needed roles
+                            if (session.data.roles.indexOf(groups[groupName]) !== -1) {
+                                socket.join(groupName);
+                                socket.emit('debug', {success: true, msg: 'Joined ' + groupName + ' group.'});
                             } else {
-                                socket.emit('err', {msg:'Notification failed : not in group "' + emission.group +'"'});
+                                socket.emit('err', {success: false, msg: 'Permission denied for group: ' + groupName});
                             }
 
                         } else {
-                            socket.emit('err', 'Group ' + emission.group + ' not found');
+                            socket.emit('err', {success: false, msg: 'Group "' + groupName + '" not found.'});
                         }
-                    }
 
-                });
+                    });
 
-                socket.on('private', function(emission){
-                    // Check if target exists
-                    if (sockets[emission.id]) {
+                    socket.on('emittogroup', function(emission) {
+                        if (emission.group) {
+                            if (groups[emission.group]) {
+                                if(socket.rooms[emission.group]) {
+                                    socket.broadcast.to(emission.group).emit('group', emission.data);
+                                } else {
+                                    socket.emit('err', {msg:'Notification failed : not in group "' + emission.group +'"'});
+                                }
 
-                        for (var index in sockets[emission.id]) {
-                            if (io.sockets.connected[sockets[emission.id][index]]) {
-                                io.sockets.connected[sockets[emission.id]].emit('private', emission.data);
+                            } else {
+                                socket.emit('err', 'Group ' + emission.group + ' not found');
                             }
                         }
-                    }
-                });
 
-                socket.on('broadcast', function(emission) {
+                    });
 
-                    // Only admin or lilium can
-                    if (session.data.roles.indexOf('admin') !== -1) {
-                        // Broadcast to its site only
-                    }
+                    socket.on('private', function(emission){
+                        // Check if target exists
+                        if (sockets[emission.id]) {
 
-                    if (session.data.roles.indexOf('lilium') !== -1) {
-                        // Broadcast to all site?
-                    }
-                });
+                            for (var index in sockets[emission.id]) {
+                                if (io.sockets.connected[sockets[emission.id][index]]) {
+                                    io.sockets.connected[sockets[emission.id]].emit('private', emission.data);
+                                }
+                            }
+                        }
+                    });
 
-      			socket.on('disconnect', function(){
-                    sockets[clientId][socket.id] = undefined;
+                    socket.on('broadcast', function(emission) {
 
-                    delete sockets[clientId][socket.id];
-      			});
+                        // Only admin or lilium can
+                        if (session.data.roles.indexOf('admin') !== -1) {
+                            // Broadcast to its site only
+                        }
 
-      			socket.on('alert', function() {
-        			socket.broadcast.emit('message', {
-          				username: socket.username
-    	    			});
-      			});
+                        if (session.data.roles.indexOf('lilium') !== -1) {
+                            // Broadcast to all site?
+                        }
+                    });
+
+          			socket.on('disconnect', function(){
+                        sockets[clientId][socket.id] = undefined;
+
+                        delete sockets[clientId][socket.id];
+          			});
+
+          			socket.on('alert', function() {
+            			socket.broadcast.emit('message', {
+              				username: socket.username
+        	    			});
+          			});
+                }
+
     		});
   	};
 
