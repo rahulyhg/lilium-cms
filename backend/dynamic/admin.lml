@@ -42,7 +42,8 @@ $}
 
             socket.join('admin')
 		</script>
-        <script src="{=config.default.server.base_url}:8080/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
+        <script src="{=config.default.server.url}/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
+		<script src="{=config.default.server.url}/bower/jquery-timeago/jquery.timeago.js"></script>
 
 	</body>
 </html>

@@ -4,6 +4,7 @@ var log = require('./log.js');
 var cli = require('./clientobject.js');
 var sessionManager = require('./session.js');
 var log = require('./log.js');
+var db = require('./includes/db.js');
 
 var sockets = {};
 var groups = {};
@@ -12,6 +13,7 @@ var Notification = function() {
     var that = this;
     var io;
 	this.init = function() {
+            registerLivevars();
             io = inbound.io();
 
             //Create default groups
@@ -38,8 +40,9 @@ var Notification = function() {
                         if (groups[groupName]) {
 
                             // Check for needed roles
-                            if (session.data.roles.indexOf(groups[groupName]) !== -1) {
+                            if (session.data.roles.indexOf(groups[groupName].role) !== -1) {
                                 socket.join(groupName);
+                                groups[groupName].users.push(clientId);
                                 socket.emit('debug', {success: true, msg: 'Joined ' + groupName + ' group.'});
                             } else {
                                 socket.emit('err', {success: false, msg: 'Permission denied for group: ' + groupName});
@@ -49,6 +52,41 @@ var Notification = function() {
                             socket.emit('err', {success: false, msg: 'Group "' + groupName + '" not found.'});
                         }
 
+                    });
+
+                    socket.on('notification-interaction', function(notifId) {
+                        var id = db.mongoID(notifId);
+                        var userId = db.mongoID(clientId);
+                        // Update notification as interacted
+                        db.update('notifications', {_id : id, userID : userId}, {interacted : true}, function(err, res) {
+                            // No need for confirmation client side
+                        });
+
+                        // Find notification in session
+                        for (var index in session.data.notifications) {
+                            if(session.data.notifications[index]._id == notifId) {
+                                session.data.notifications[index].interacted = true;
+                                break;
+                            }
+                        }
+
+                        // Bypass session manager taking only a cli
+                        var cli = {};
+                        cli.session = session;
+
+                        // Save it
+                        sessionManager.saveSession(cli, function(){});
+
+                    });
+
+                    socket.on('notification-view', function() {
+                        session.data.newNotifications = 0;
+                        // Bypass session manager taking only a cli
+                        var cli = {};
+                        cli.session = session;
+
+                        // Save it
+                        sessionManager.saveSession(cli, function(){});
                     });
 
                     socket.on('emittogroup', function(emission) {
@@ -118,6 +156,47 @@ var Notification = function() {
     };
 
     this.notifyUser = function(userID, notification) {
+        //Check if user will receive notification
+        notification.interacted = false;
+        notification.userID = db.mongoID(userID);
+        notification.date = new Date();
+
+
+        // Add it in the user session if it exsists
+        db.findToArray('sessions', {"data._id": notification.userID}, function(err, arr) {
+            if(arr && arr[0]) {
+                var session = sessionManager.getSessionFromSID(arr[0].token);
+
+                if (!session.data.newNotifications) {
+                    session.data.newNotifications = 0;
+                }
+
+                session.data.newNotifications += 1;
+
+                if (!session.data.notifications) {
+                    session.data.notifications = [];
+                }
+
+                // Only keep last 5 notifs in session
+                if (session.data.notifications.length >= 5) {
+                    //Remove last notification (oldest)
+                    session.data.notifications.shift();
+                }
+                //Remove last notification (oldest)
+                session.data.notifications.push(notification);
+
+                // Bypass session manager taking only a cli
+                var cli = {};
+                cli.session = session;
+                // Save it
+                sessionManager.saveSession(cli, function(){});
+
+            }
+        })
+
+        // Add notification to db
+        db.insert('notifications', notification, function() {});
+
         // Send to every sockets connected by the user (for multi-tab)
         for (var index in sockets[userID]) {
             var socket = sockets[userID][index];
@@ -155,7 +234,9 @@ var Notification = function() {
     };
 
     this.createGroup = function(groupName, role) {
-        groups[groupName] = role;
+        groups[groupName] = {};
+        groups[groupName].role = role;
+        groups[groupName].users = [];
     };
 
     this.getSessionIDFromCookie = function(cookieString) {
@@ -167,6 +248,12 @@ var Notification = function() {
 
     return cookies['lmlsid'];
     };
+
+    var registerLivevars = function() {
+        //Get last 5 of user
+        //Get last x of user
+        //Get x to y of user
+    }
 }
 
 module.exports = new Notification();
