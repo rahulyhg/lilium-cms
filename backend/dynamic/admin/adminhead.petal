@@ -1,6 +1,7 @@
 {#config}
 <!-- Metas -->
 <meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 
 <!-- Links -->
 <link type="text/css" rel="stylesheet" href="{=config.default.server.url}/bower/bootstrap/dist/css/bootstrap.min.css"/>

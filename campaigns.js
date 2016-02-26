@@ -319,7 +319,7 @@ var Campaigns = function() {
                     'cssPrefix': 'campaigncreatefield-'
                 },
                 cssClass: "form-campaign-creation",
-                dependencies: ["sites.all.simple", "products.all", "content.all.simple", "dfp.recent.simple"]
+                dependencies: ["sites.all.simple", "products.all", "content.all.simple", "dfpcache.all.simple"]
             })
             .add('projectid', 'text', {
                 displayname: "Project ID",
@@ -419,10 +419,15 @@ var Campaigns = function() {
                                 }
                             }, {
                                 fieldName: "dfpprojid",
-                                dataType: "text",
                                 displayName: "DPF Project ID",
                                 keyName: "dfpprodid",
-                                displayCase: "bannerads"
+                                displayCase: "bannerads",
+                                autocomplete : {
+                                     datasource : "dfpcache.all.simple",
+                                     keyValue : "id",
+                                     keyName : "name",
+                                     cantAdd : false
+                                }
                             }, {
                                 fieldName: "fbcampid",
                                 dataType: "text",

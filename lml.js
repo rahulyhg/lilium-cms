@@ -102,7 +102,6 @@ var LML = function() {
 				callback();
 			} else {
 				var fullpath = "";
-				log('LML', 'Including petal file : ' + split[currentIndex]);
 				if (Petals.isRegistered(split[currentIndex])) {
 					fullpath = Petals.get(split[currentIndex]).filepath;
 				} else {

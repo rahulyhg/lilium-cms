@@ -31,6 +31,8 @@ var Inbound = require('./inbound.js');
 var Livevars = require('./livevars.js');
 var Precompiler = require('./precomp.js');
 var Petals = require('./petal.js');
+var GC = require('./gc.js');
+var scheduler = require('./scheduler.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -347,7 +349,20 @@ var Core = function() {
 		cacheInvalidator.init(function () {
 			log("CacheInvalidator", 'Ready to invalidate cached files!');
 		});
-	}
+	};
+
+	var scheduleGC = function() {
+		log('GC', 'Scheduling temporary file collection');
+		scheduler.schedule('GCcollecttmp', {
+			every : {
+				secondCount : 1000 * 60 * 60
+			}
+		}, function() {
+			GC.clearTempFiles(function() {
+				log("GC", "Scheduled temporary files collection done");
+			});
+		});
+	};
 
 	var loadHTMLStructure = function(callback) {
 		fileserver.createDirIfNotExists(_c.default.server.html, function(valid) {
@@ -385,6 +400,7 @@ var Core = function() {
 	var loadDFP = function(cb) {
 		log("DFP", "Loading core user");
 		dfp.createUser();
+		dfp.scheduleDeepCopy();
 
 		if (_c.default.env == 'dev') {
 			dfp.createDevEnv();
@@ -452,11 +468,11 @@ var Core = function() {
 		loadSessions(function() {
 		loadTheme(function() {
 			loadCacheInvalidator();
+			scheduleGC();
 
 			log('Lilium', 'Starting inbound server');
 			Inbound.createServer();
             		loadNotifications();
-
 			Inbound.start();
 
 			log('Core', 'Firing initialized signal');

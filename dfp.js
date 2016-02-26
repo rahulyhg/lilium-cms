@@ -6,6 +6,8 @@ var DFP = require('node-google-dfp');
 var endpoints = require('./endpoints.js');
 var Admin = require('./backend/admin.js');
 var livevars = require('./livevars.js');
+var db = require('./includes/db.js');
+var scheduler = require('./scheduler.js');
 
 var _priv = {
 	client_id : "906088923998-mlch13qpsds3cg92kd2ue6prhdhle84n.apps.googleusercontent.com",
@@ -98,6 +100,85 @@ var LiliumDFP = function() {
 		});
 	};
 
+	this.cachedLivevarCallback = function(cli, levels, params, cb) {
+		var actionName = levels[0];
+		var complexity = levels[1] || "complete";
+		if (!actionName) {
+			cb("[DFPCachedLiveVarException] No root actions are defined for this live variable");
+		} else {
+			if (actionName == "all") {
+				if (complexity == 'simple') {
+					db.find('dfpcache', {}, {}, function(err, cur) {
+						var bigArr = new Array();
+						var nextObject = function() {
+							cur.hasNext(function(err, hasNext) {
+								if (!err && hasNext) {
+									cur.next(function(err, obj) {
+										bigArr.push({
+											id : obj.id,
+											name : obj.name
+										});
+										nextObject();
+									});
+								} else {
+									cb(bigArr);
+								}
+							});
+						};
+						nextObject();
+					});
+				} else if (complexity == 'complete') {
+					db.findToArray('dfpcache', {}, function(err, arr) {
+						cb(err || arr);
+					});
+				} else {
+					cb("[DFPCachedLiveVarException] Complexity '" + complexity + "' does not exist for action 'all'");
+				}
+			} else if (actionName == "some") {
+				var limit = params.limit;
+				if (!limit) {
+					
+				} else {
+					cb("[DFPCachedLiveVarException] Action 'some' requires a number as the 'limit' parameter");
+				}
+			} else {
+				cb("[DFPCachedLiveVarException] No live variable action called " + actionName);
+			}
+		}
+	};
+
+	this.deepServerFetch = function(callback) {
+		log('DFP', 'Preparing for deep orders copy');
+		dfpUser.getService('LineItemService', function(err, ser) {
+			ser.getLineItemsByStatement(new DFP.Statement('WHERE 1 = 1'), function(err, results) {
+				var arr = results.rval.results;
+
+				log('DFP', 'Running database queries');
+				db.remove('dfpcache', {}, function() {
+					db.insert('dfpcache', arr, function() {
+						log('DFP', 'Stored deep copy of '+arr.length+' DFP Orders');
+						if (callback) {
+							callback();
+						}
+					});
+				});
+			});
+		});
+	};
+
+	this.scheduleDeepCopy = function() {
+		var that = this;
+		log('DFP', "Scheduled Deep Copy");
+		scheduler.schedule('dfpDeepCopy', {
+			runat : "3:00:00"
+		}, function() {
+			log('DFP', "Starting scheduled deep fetch");
+			that.deepServerFetch(function() {
+				log('DFP', "Ended scheduled deep fetch");
+			});
+		});
+	};
+
 	this.createUser = function() {
 		dfpUser = new DFP.User(_priv.network_code, _priv.app_name, _priv.version);
 		dfpUser.setSettings(_priv);
@@ -105,6 +186,7 @@ var LiliumDFP = function() {
 
 	this.registerLiveVar = function() {
 		livevars.registerLiveVariable('dfp', this.livevarCallback);
+		livevars.registerLiveVariable('dfpcache', this.cachedLivevarCallback);
 		log('DFP', 'Registered DFP live variable endpoint as "dfp.service.action"');
 	};
 

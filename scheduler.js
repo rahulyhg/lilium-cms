@@ -150,8 +150,6 @@ var Scheduler = function() {
 
 		if (typeof _jobs[id] !== 'undefined') {
 			err = new Error("Job with ID " + id + " already scheduled");
-		} else if (validateTimeStr(intervals)) {
-			err = new Error("Invalid time string : " + intervals);
 		} else {
 			_jobs[id] = job;
 		}
