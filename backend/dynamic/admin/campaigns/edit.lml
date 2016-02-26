@@ -2,11 +2,11 @@
 {#config;forms}
 <html>
 	<head>
-		{%globalhead}
-        {%../campaignscript}
-
+		{%adminhead}
+        	{%../campaignscript}
 	</head>
 	<body>
+		{%adminbar}
 		<div id="campwrapper">
 			{*campaigns.get.{?1}(template:"camptemp",sourceof:"campaign_create")}
 			{=forms.render("campaign_create")}

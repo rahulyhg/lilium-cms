@@ -18,7 +18,7 @@
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
 var debugMode = 'true';
-var socket = io();
+var socket = typeof io !== 'undefined' ? io() : undefined;
 
 var LiliumCMS = function() {
     var livevars;
@@ -898,7 +898,7 @@ var LiliumCMS = function() {
 
 
 
-
+    if (typeof io !== "undefined") {
     io.Socket.prototype.join = function(groupName) {
         this.emit('join', groupName);
     }
@@ -951,7 +951,8 @@ var LiliumCMS = function() {
                 '<a href="{3}" target="{4}" data-notify="url"></a>' +
             '</div>'
         });
-    })
+    });
+    }
 
 
     var CKEditor = function() {

@@ -3,8 +3,7 @@
 <html>
 	<head>
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-
+		{%adminhead}
 	</head>
 	<body>
 		{*media.{?1}}

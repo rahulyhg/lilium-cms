@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{%../globalhead;../mediascript}
+		{%adminhead;../mediascript}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";

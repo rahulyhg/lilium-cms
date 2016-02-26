@@ -5,13 +5,12 @@ $}
 <!DOCTYPE html>
 <html>
 	<head>
-        <meta charset="utf-8" />
-
 		{%adminhead}
 		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 	</head>
 	<body>
-		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
+		{%adminbar}
+		<h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1>
 		<h2>{=vocab.admintitle}</h2>
 		Currently running in {=config.default.env} env.
         <div>

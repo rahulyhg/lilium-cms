@@ -23,6 +23,7 @@ var LMLContext = require('./lmlcontext.js');
 var fileserver = require('./fileserver.js');
 var _c = require('./config.js');
 var log = require('./log.js');
+var Petals = require('./petal.js');
 
 var LML = function() {
 	// Reference to self
@@ -100,7 +101,14 @@ var LML = function() {
 			if (currentIndex == split.length) {
 				callback();
 			} else {
-				var fullpath = context.rootDir + "/" + split[currentIndex] + ".petal";
+				var fullpath = "";
+				log('LML', 'Including petal file : ' + split[currentIndex]);
+				if (Petals.isRegistered(split[currentIndex])) {
+					fullpath = Petals.get(split[currentIndex]).filepath;
+				} else {
+					fullpath = context.rootDir + "/" + split[currentIndex] + ".petal";
+				}
+
 				var includeBuffer = "";
 
 				that.executeToContext(fullpath, context, function(pContent) {
@@ -111,7 +119,7 @@ var LML = function() {
 						context.newLine += includeBuffer;
 						currentIndex++;
 
-						next();
+						next();	
 					}
 				});
 			}

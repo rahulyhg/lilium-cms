@@ -2,9 +2,10 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{%globalhead;entityscript}
+		{%adminhead;entityscript}
 	</head>
 	<body>
+		{%adminbar}
 		<h1>All entities</h1>
 
 		<main class="entities-main">

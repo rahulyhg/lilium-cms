@@ -21,6 +21,12 @@
 {#config}
 @import url(https://fonts.googleapis.com/css?family=Raleway:400,300,500,600,700,100); /* 'Raleway', sans-serif */
 
+{$
+	actioncolor = "#9B59B6";
+	hovercolor =  "#A869C6";
+	activecolor = "#8B49A6";
+$}
+
 html, body {
 	padding:0;
 	margin:0;
@@ -136,6 +142,85 @@ form input, form label{
 
 .lmlpushtable .lmlpushtablecasenotmet {
 	display: none;
+}
+
+/* Admin Bar */
+header.admin-bar {
+	display: block;
+	background-color: #555;
+
+	height: 50px;
+	border-bottom: 1px solid #DDD;
+}
+
+header.admin-bar a {
+	text-decoration: none;
+}
+
+header.admin-bar > * {
+	vertical-align: middle;
+}
+
+header.admin-bar .lilium-logo-link {
+	width: 50px;
+	height: 100%;
+	overflow: hidden;
+
+	display: inline-block;
+}
+
+header.admin-bar .lilium-logo-link img {
+	height: 64px;
+    	width: auto;
+    	position: relative;
+    	bottom: 8px;
+    	right: 15px;	
+}
+
+header.admin-bar .admin-publish-button {
+	-webkit-border-radius: 3px;
+   	   -moz-border-radius: 3px;
+	    -ms-border-radius: 3px;
+	     -o-border-radius: 3px;
+		border-radius: 3px;
+
+	background-color: {=actioncolor};
+	color: #FFF;
+	font-size: 18px;
+	text-transform: uppercase;
+	padding: 5px 30px;
+	font-weight: 300;
+
+	display: inline-block;
+	cursor: pointer;
+
+	margin-left: 20px;
+}
+
+header.admin-bar .admin-publish-button:hover {
+	background-color: {=hovercolor};
+}
+
+header.admin-bar .admin-publish-button:active {
+	background-color: {=activecolor};
+}
+
+header.admin-bar .loggedin-user-box {
+	float: right;
+	height: 100%;
+	color: #CCC;
+
+	text-transform: uppercase;
+	
+	padding: 13px 20px;
+    	border-left: 1px solid #777;
+	cursor : pointer;
+
+	font-size: 14px;
+}
+
+header.admin-bar .loggedin-user-box:hover {
+	background-color: rgba(255, 255, 255, 0.1);
 }
 
 /* @/login */

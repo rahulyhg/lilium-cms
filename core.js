@@ -30,6 +30,7 @@ var ClientObject = require('./clientobject.js');
 var Inbound = require('./inbound.js');
 var Livevars = require('./livevars.js');
 var Precompiler = require('./precomp.js');
+var Petals = require('./petal.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -116,6 +117,11 @@ var Core = function() {
 			cli.throwHTTP(404, 'Page not found.');
 		}
 	}
+
+	var loadGlobalPetals = function() {
+		Petals.register('adminbar',  _c.default.server.base + 'backend/dynamic/admin/adminbar.petal');
+		Petals.register('adminhead', _c.default.server.base + 'backend/dynamic/admin/adminhead.petal');
+	};
 
 	var loadImageSizes = function() {
 		imageSize.add("thumbnail", 150, '150');
@@ -306,7 +312,6 @@ var Core = function() {
 		rootDir = _c.default.server.base + 'plugins/';
 		cli.createSymlink(rootDir, to);
 		hooks.fire('staticsymlink', undefined);
-
 	};
 
 	var loadStandardInput = function() {
@@ -435,6 +440,7 @@ var Core = function() {
 		loadDFP();
 		loadFrontend();
 		loadRequestHandler();
+		loadGlobalPetals();
 
 		loadHTMLStructure(function() {
 		testDatabase(function() {
@@ -449,7 +455,7 @@ var Core = function() {
 
 			log('Lilium', 'Starting inbound server');
 			Inbound.createServer();
-            loadNotifications();
+            		loadNotifications();
 
 			Inbound.start();
 

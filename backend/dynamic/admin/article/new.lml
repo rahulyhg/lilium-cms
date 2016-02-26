@@ -3,15 +3,12 @@
 <html>
 
 <head>
-    {%../globalhead;../entityscript}
+    {%adminhead;../entityscript}
     <title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-    <link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-    <link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-    <script src="{=config.default.server.base_url}:8080/socket.io/socket.io.js"></script>
-
 </head>
 
 <body>
+    {%adminbar}
     <header>
         <h1>{=config.default.vendor.productname}
             <small>v{=config.default.vendor.version}</small>
@@ -20,8 +17,6 @@
     <h2>Create a new post</h2>
     {=forms.render('post_create')}
     <div id="editor"></div>
-    <script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
-    <script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
 
     <script>
         var socket = io();

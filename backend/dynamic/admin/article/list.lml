@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{%../globalhead;../articlescript}
+		{%adminhead;../articlescript}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";
@@ -11,6 +11,7 @@
 		$}
 	</head>
 	<body>
+		{%adminbar}
 		<h1>List of articles</h1>
 		<a href="{=baseurl}article/new">Add an article</a>
 		<main class="entities-main">

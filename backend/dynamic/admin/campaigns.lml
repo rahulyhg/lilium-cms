@@ -2,10 +2,11 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		{%globalhead}
-        {%campaignscript}
+		{%adminhead}
+        	{%campaignscript}
 	</head>
 	<body>
+		{%adminbar}
 		<h1>All Campaigns</h1>
 		<table>
 			<thead>

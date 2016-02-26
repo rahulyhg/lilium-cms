@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>	
-		{%globalhead}
+		{%adminhead}
 	</head>
 	<body>
 		<h1>DFP Orders</h1>
