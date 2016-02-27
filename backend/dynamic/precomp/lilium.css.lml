@@ -24,6 +24,11 @@
 	hovercolor =  "#A869C6";
 	activecolor = "#8B49A6";
 	siteurl = config.default.server.url;
+	fontcolor = "#111";
+	infocolor = "#2980b9";
+	dangercolor = "#c0392b";
+	warningcolor = "#f1c40f";
+	successcolor = "#27af61";
 $}
 
 @font-face {
@@ -172,7 +177,7 @@ html, body {
 	margin:0;
 
 	font-family: 'Raleway', sans-serif;
-	color: #111;
+	color: {=font-color};
 }
 
 input, textarea, button {
@@ -199,7 +204,7 @@ input[type="checkbox"], .lmlcheckbox {
 	background-image: url('{=siteurl}/static/media/lmlcontrols.png');
 	background-position: 96px 0px;
 	cursor: pointer;
-} 
+}
 
 .lmlbeautifiedcheckbox.checked {
 	background-position: 0px 0px;
@@ -285,12 +290,25 @@ form input, form label{
 }
 
 /* Admin Bar */
-header.admin-bar {
+.navbar-default {
 	display: block;
 	background-color: #555;
-
 	height: 50px;
 	border-bottom: 1px solid #DDD;
+}
+
+.navbar{
+	border-radius: 0px;
+	border: none;
+	color: #FFF;
+
+}
+.navbar .dropdown-menu {
+	color: {=fontcolor};
+}
+.container-fluid {
+	padding-left: 0px;
+	padding-right: 0px;
 }
 
 header.admin-bar a {
@@ -314,10 +332,83 @@ header.admin-bar .lilium-logo-link img {
     	width: auto;
     	position: relative;
     	bottom: 8px;
-    	right: 15px;	
+    	right: 15px;
+}
+header.admin-bar .navbar-default .navbar-header {
+	height: 50px;
 }
 
-header.admin-bar .admin-publish-button {
+.glyphicon > .badge{
+	position: relative;
+	top: -10px;
+	background-color: {=actioncolor};
+	border-radius: 2px;
+	line-height: 15px;
+}
+
+/* Notifications */
+#notification-dropdown{
+	padding: 0px;
+	max-height: 300px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+#notification-dropdown li{
+	padding: 10px;
+	background-color: #F6F6F6;
+	width: 300px;
+	border-left: 5px;
+	border-color: {=infocolor};
+	border-left-style: solid;
+}
+#notification-dropdown li.danger{
+	border-color: {=dangercolor};
+}
+#notification-dropdown li.warning{
+	border-color: {=warningcolor};
+}
+#notification-dropdown li.success{
+	border-color: {=successcolor};
+}
+
+#notification-dropdown li > a{
+	width: 300px;
+	white-space: initial;
+}
+#notification-dropdown li > a .notif-title {
+	font-size: 14px;
+	font-weight: bold;
+	color: #333;
+}
+
+#notification-dropdown li:hover{
+	background-color: #ccc;
+}
+#notification-dropdown li.new:hover{
+	background-color: #ccc;
+}
+#notification-dropdown li:hover .date{
+	color: #fff;
+}
+#notification-dropdown li:hover a{
+	background-color: inherit;
+}
+#notification-dropdown li .date{
+	color: #ccc;
+	margin-left: 10px;
+	font-size: 12px;
+}
+#notification-dropdown li.new{
+	background-color: #FFF;
+}
+#notification-dropdown > .title{
+	font-size: 16px;
+	padding: 10px;
+
+}
+
+
+header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
 	-webkit-border-radius: 3px;
    	   -moz-border-radius: 3px;
 	    -ms-border-radius: 3px;
@@ -333,28 +424,36 @@ header.admin-bar .admin-publish-button {
 
 	display: inline-block;
 	cursor: pointer;
-
+	margin-top: 8px;
 	margin-left: 20px;
 }
+header.admin-bar .navbar-default .navbar-nav>li>* {
+	padding: 12px 20px;
+    line-height: 25px;
+}
 
-header.admin-bar .admin-publish-button:hover {
+.link {
+	cursor : pointer;
+}
+
+header.admin-bar .link:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+
+}
+
+header.admin-bar .navbar-default .navbar-nav .admin-publish-button:hover {
 	background-color: {=hovercolor};
 }
 
-header.admin-bar .admin-publish-button:active {
+header.admin-bar .navbar-default .navbar-nav .admin-publish-button:active {
 	background-color: {=activecolor};
 }
 
-header.admin-bar .loggedin-user-box {
-	float: right;
-	height: 100%;
-	color: #CCC;
+header.admin-bar .navbar-default .navbar-nav  .loggedin-user-box {
 
 	text-transform: uppercase;
-	
-	padding: 13px 20px;
-    	border-left: 1px solid #777;
-	cursor : pointer;
+
+    border-left: 1px solid #777;
 
 	font-size: 14px;
 }
@@ -362,6 +461,19 @@ header.admin-bar .loggedin-user-box {
 header.admin-bar .loggedin-user-box:hover {
 	background-color: rgba(255, 255, 255, 0.1);
 	color: #EEE;
+}
+
+header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
+	color: #CCC;
+	height: 100%;
+	display: inline;
+}
+
+header.admin-bar .navbar-default .navbar-nav  .notifications {
+}
+
+.glyphicon{
+	top:inherit;
 }
 
 /* @/login */
@@ -472,27 +584,30 @@ header.admin-bar .loggedin-user-box:hover {
 	padding: 20px;
 }
 .alert-info {
-    border-color: #2980b9;
+    border-left-color: #2980b9;
     color: #2980b9;
 }
 .alert-danger {
-    border-color: #c0392b;
+    border-left-color: #c0392b;
     color: #c0392b;
 }
 .alert-warning {
-    border-color: #f1c40f;
+    border-left-color: #f1c40f;
     color: #f1c40f;
 }
 .alert-success {
-    border-color: #27af61;
+    border-left-color: #27af61;
     color: #27af61;
 }
 .alert {
-    background: #333;
+    background: #fff;
     padding: 15px;
     margin-bottom: 20px;
-    border: 5px solid;
+	border : 1px solid #999;
+    border-left: 5px solid;
     border-radius: 0px;
+	-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175)
 }
 .close {
     text-shadow: none;

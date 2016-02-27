@@ -160,7 +160,6 @@ var LiliumCMS = function() {
 
                 if (passed) {
                     var node = $(document.createElement(nodeType));
-                    console.log(livevarkey);
                     if (typeof livevarkey !== 'undefined') {
                         node.context.dataset.livevarkey = livevarkey;
                     }
@@ -896,7 +895,70 @@ var LiliumCMS = function() {
         this.init();
     };
 
+    // Notifications
+    document.addEventListener(LiliumEvents.livevarsFetched.name, function(e) {
+        var session = e.detail.livevars.session
+        if (session && session.notifications) {
+            var notifs = session.notifications;
+            var notificationList = $('#notification_list');
+            var nbUnviewed = session.newNotifications ? session.newNotifications : 0;
+            for (var index in notifs) {
+                // Update small counter
+                var notifHtml = generateNotification(notifs[index]);
 
+                $(notificationList).prepend(notifHtml);
+            }
+            // Update notification badge
+            if (nbUnviewed == 0) {
+                $('.dropdown .dropdown-toggle .badge').hide();
+            } else {
+                $('.dropdown .dropdown-toggle .badge').html(nbUnviewed);
+            }
+            // Update time for notifications
+            $("time.timeago").timeago();
+
+            $('body').on('click', '#notification_list li', function(e) {
+                e.preventDefault();
+
+                if ($(this).hasClass('new')) {
+                    $(this).removeClass('new');
+                    socket.emit('notification-interaction', $(this).attr('id'));
+                }
+
+                if ($(this).data('href')) {
+                    window.location.href = $(this).data('href');
+                } else {
+                    $('.dropdown.open .dropdown-toggle').dropdown('toggle');
+                }
+
+            });
+
+            $('#dropdown-notification').on('click', function () {
+                var badge = $('.dropdown .glyphicon .badge');
+                if ($(badge).is(":visible")) {
+
+                }
+                socket.emit('notification-view', {});
+                // Hide badge
+                badge.html(0);
+                badge.hide();
+            });
+        }
+    });
+
+    var generateNotification = function(notif) {
+
+        var isNew = typeof notif.interacted !== 'undefined' && !notif.interacted? "new" : "";
+        var type = notif.type ? notif.type : "info";
+        var link = notif.url? "data-href='" + notif.url + "'": "";
+        var title = notif.title ? "<div class='notif-title'>"+ notif.title +"</div>" : "";
+        var msg = notif.msg ? notif.msg : "Empty Notification :(";
+        var date = notif.date? '<time class="date timeago" datetime="'+ notif.date.toString() +'">' + notif.date +'</time>' : '';
+
+        var html = "<li id='" + notif._id + "' class='" + isNew + ' ' + type + " link' " + link +"><div>"+ title + '<div class="notif-msg">' + msg + '</div>' + date +"</div></li>";
+
+        return html;
+    };
 
     if (typeof io !== "undefined") {
     io.Socket.prototype.join = function(groupName) {
@@ -933,13 +995,31 @@ var LiliumCMS = function() {
     });
 
     socket.on('notification', function(notification) {
+        var notif = generateNotification(notification);
+        var badge = $('.dropdown .dropdown-toggle .badge');
+        $('#notification_list').prepend(notif);
+        $(badge).html(parseInt(badge.html()) + 1);
+        $(badge).show();
+
+
+        // Update time for notifications
+        $("time.timeago").timeago();
+
         notification.type = typeof notification.type !== 'undefined'? notification.type : 'info';
         notification.message = notification.msg ? notification.msg : 'Notification without a message :(';
 
         $.notify(notification, {
             type: notification.type,
             newest_on_top: true,
-            delay: 10000,
+            delay: -1,
+            animate: {
+                enter: 'animated fadeInUp',
+                exit: 'animated fadeOutDown'
+            },
+            placement: {
+                from: "bottom",
+                align: "right"
+            },
             template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
                 '<button type="button" aria-hidden="true" class="close" data-notify="dismiss">x</button>' +
                 '<span data-notify="icon"></span> ' +

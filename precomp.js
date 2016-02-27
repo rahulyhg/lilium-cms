@@ -14,8 +14,9 @@ var Precomp = function() {
 		log('Precompiler', 'Precompiling static files');
 		fileserver.listDirContent(absReadPath, function(fileArr) {
 			db.findToArray('compiledfiles', {}, function(err, histo) {
+				
 				var histoObj = new Object();
-		
+
 				for (var i = 0; i < histo.length; i++) {
 					histoObj[histo[i].filename] = histo[i].sum;
 				}
@@ -25,7 +26,7 @@ var Precomp = function() {
 						var curFile = fileArr[fileIndex];
 						var mustRewrite = false;
 						fileIndex++;
-		
+
 						if (curFile.indexOf('.lml') !== -1) {
 							checksum.file(absReadPath + curFile, function(err, sum) {
 								if (histoObj[curFile] == sum) {
