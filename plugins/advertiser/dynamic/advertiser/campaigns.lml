@@ -1,6 +1,6 @@
 {#config;forms}
 {$
-	var baseurl = config.default.server.url;
+	baseurl = config.default.server.url;
 	baseurl += "/";
 	baseurl += "advertiser";
 	baseurl += "/";
@@ -44,7 +44,7 @@ $}
 				Ready for review
 			</lml:tobject>
 			<lml:tobject class="btn btn-default" data-nodetype="a"
-						 data-href="{=baseurl}advertiser/campaigns/show/"
+						 data-href="{=baseurl}campaigns/show/"
 					 data-key="_id">
 					 View
 			</lml:tobject>

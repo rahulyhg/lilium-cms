@@ -136,6 +136,40 @@ var HtmlParser = function() {
     return '';
   }
 
+  var parseStackField = function(field) {
+    return '<input type="'+(field.dataType || 'text')+
+      '" class="lmlstacktableheaderfield lmlstacktableheaderfield-'+field.fieldName+
+      '" data-fieldname="'+field.fieldName+
+      '" value="" />';
+  }
+ 
+  var parseStackType = function(field, hasPlaceholder) {
+    var scheme = field.attr.scheme;
+    var columns = scheme.columns;
+    var html = "";
+    var displayName = field.attr.displayname || field.name || undefined;
+    
+    html += '<label for="'+field.name+'">'+displayName+'</label>';
+    html += '<div class="lmlstacktablewrapper" data-fieldname="'+field.name+'" >';
+    html += '<table class="lmlstacktable" data-fieldname="'+field.name+
+            '" id="lmlstacktable-' + field.name +
+            '" data-title="' + displayName +
+            '" data-scheme="'+JSON.stringify(scheme).replace(/\"/g, '&lmlquote;')+'"><thead><tr>';
+
+    for (var i = 0; i < columns.length; i++) {
+      html += '<th>'+columns[i].displayname+'</th>';
+    }
+    
+    html += '<th></th></tr>';
+    
+    for (var i = 0; i < columns.length; i++) {
+      html += '<th>'+parseStackField(columns[i])+'</th>';
+    }
+
+    html += '<th><button class="lmlstacktableappendbutton">Append</button></th></tr></thead></tbody></tbody></table>';
+    return html;
+  };
+
   var parseSimpleFormType = function(field, hasPlaceholder) {
     var input = hasPlaceholder ? "" : generateLabel(field, hasPlaceholder);
     var displayName = field.attr.displayname || field.name || undefined;

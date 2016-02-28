@@ -26,14 +26,16 @@ var FileServer = function() {
 	this.minifyHTML = function(fullpath, cb) {
 		var that = this;
 		var timeStamp = new Date();
+
 		this.readFile(fullpath, function(content) {
 			var handle = that.getOutputFileHandle(fullpath, 'w+');
-			that.writeToFile(handle, content/*.replace(/\n/g, "")/*minify(content, {
+			that.writeToFile(handle, minify(content, {
 				removeComments : true,
 				removeScriptTypeAttributes : true,
+				collapseWhitespace: true,
 				minifyJS : true,
 				minifyCSS : true
-			})*/, function() {
+			}), function() {
 				that.closeFileHandle(handle);
 				log('FileServer', 'Minified file ' + fullpath + ' in ' + (new Date() - timeStamp) + 'ms');
 
@@ -102,6 +104,14 @@ var FileServer = function() {
 
 	this.listDirContentSync = function(dirname) {
 		return fs.readdirSync(dirname);
+	};
+
+	this.copyFile = function(source, dest, callback) {
+		var rs = fs.createReadStream(source);
+		var ws = fs.createWriteStream(dest);
+
+		rs.on('close', callback);
+		rs.pipe(ws);
 	};
 
 	this.pipeFileToClient = function(cli, filename, callback) {

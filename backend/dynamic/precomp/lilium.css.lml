@@ -180,6 +180,19 @@ html, body {
 	color: {=font-color};
 }
 
+body {
+	opacity:0;
+	-webkit-transition: opacity 0.2s;
+   	   -moz-transition: opacity 0.2s;
+	    -ms-transition: opacity 0.2s;
+	     -o-transition: opacity 0.2s;
+		transition: opacity 0.2s;
+}
+
+body.lmlrendered {
+	opacity: 1;
+}
+ 
 input, textarea, button {
 	outline: none;
 	border: none;
@@ -295,6 +308,8 @@ form input, form label{
 	background-color: #555;
 	height: 50px;
 	border-bottom: 1px solid #DDD;
+
+	margin-bottom: 0px;
 }
 
 .navbar{

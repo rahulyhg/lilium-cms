@@ -136,7 +136,32 @@ var LiveVariables = function() {
 		log("Livevars", "Registering admin endpoint for debug");
 		require('./backend/admin.js').registerAdminEndpoint('livevars', 'GET', function(cli) {
 			cli.touch('livevars.GET');
-			cli.debug();
+			require('./filelogic.js').serveLmlPage(cli);
+		});
+
+		require('./formBuilder.js').createForm('debug_livevars', {
+			fieldWrapper : {
+				tag : 'div',
+				cssPrefix : 'livevar-debug-field-'
+			},
+			cssClass : 'livevar-debug-form',
+			dependencies : [],
+			async : true
+		})
+		.add('endpoint', 'text', {
+			displayname : "Endpoint",
+		})
+		.add('params', 'stack', {
+			displayname : "Parameters",
+			scheme : {
+				columns : [
+					{fieldName:'paramname', dataType:'text', displayname:"Name"},	
+					{fieldName:'paramvalue', dataType:'text', displayname:"Value"}
+				]
+			}
+		})
+		.add('submit', 'submit', {
+			displayname : "Test"
 		});
 	};
 

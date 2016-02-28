@@ -24,6 +24,7 @@ var LiliumCMS = function() {
     var livevars;
     var urlParams;
     var pushtables = new Array();
+    var stacktables = new Array();
 
     var LiliumEvents = {
         livevarsPrerendered: {
@@ -513,11 +514,42 @@ var LiliumCMS = function() {
     };
 
     var FormParser = function() {
+        var makeSingleStackTable = function(index, osTable) {
+            sTable = $(osTable);
+            var stackTable = new StackTable(
+                sTable.attr('id'), 
+                sTable.data('title'),
+                JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+            );  
+
+            osTable.dataset.stacktableindex = index;
+            stacktables.push(stackTable);
+        };
+
+        var makeStackTables = function() {
+            $('.lmlstacktable').each(makeSingleStackTable);
+        };
+
         this.parse = function(selector) {
             $("form").deserialize(livevars[selector][0]);
         };
+
+        this.init = function() {
+            makeStackTables();
+        };
     };
 
+    var StackTable = function(tableid, objTitle, dataScheme) {
+        var htmlIdentifier = tableid;
+        var scheme = dataScheme;
+        var title = objTitle;
+ 
+        var init = function() {
+
+        };
+   
+        init();
+    };
 
     var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
         var datasrc = dataSource;
@@ -1154,6 +1186,10 @@ var LiliumCMS = function() {
         init();
     };
 
+    this.everythingIsAwesome = function() {
+        $('body').addClass('lmlrendered');
+    };
+
     var AwesomeStrapper = function() {
         this.strap = function() {
             var livevars = new LiveVars();
@@ -1172,6 +1208,8 @@ var LiliumCMS = function() {
     document.addEventListener('livevarsRendered', function(e) {
         liliumcms.ckeditor.initEditor();
         liliumcms.formbeautifier.beautify();
+        liliumcms.formParser.init();
+        liliumcms.everythingIsAwesome();
     });
 
     // API

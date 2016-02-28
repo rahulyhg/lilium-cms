@@ -313,9 +313,25 @@ var Entities = function() {
 
 		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
 			var dat = cli.session.data;
-
-			for (var i = 0; i < levels.length; i++) {
-				dat = dat[levels[i]];
+			
+			if (levels.length) {
+				for (var i = 0; i < levels.length; i++) {
+					if (levels[i] == "shhh") {
+						dat = "[SessionLiveVarException] Tried to fetch entity's secret";
+						break;
+					} else {
+						dat = dat[levels[i]];
+					}
+				}
+			} else {
+				dat = {
+					_id : dat._id,
+					admin : dat.admin,
+					avatarURL : dat.avatarURL,
+					displayname : dat.displayname,
+					roles : dat.roles,
+					username : dat.username
+				}
 			}
 
 			callback(dat);

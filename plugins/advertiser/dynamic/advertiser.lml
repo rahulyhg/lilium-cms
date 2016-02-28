@@ -1,3 +1,5 @@
+{#config}
+<!DOCTYPE html>
 <html>
 <head>
     {%../../../backend/dynamic/admin/globalhead;script}
@@ -10,9 +12,10 @@
     <title></title>
 </head>
 <body>
-    <h1>Welcome advertiser</h2>
-        <a href="/advertiser/campaigns">View your campaigns</a>
-        <h1>Campaigns needing your attention</h1>
+    
+    <h2>Welcome advertiser</h2>
+        <a href="{=config.default.server.url}/advertiser/campaigns">View your campaigns</a>
+        <h3>Campaigns needing your attention</h3>
 
         <table>
         	<thead>
