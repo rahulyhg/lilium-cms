@@ -518,10 +518,10 @@ var LiliumCMS = function() {
         var makeSingleStackTable = function(index, osTable) {
             sTable = $(osTable);
             var stackTable = new StackTable(
-                sTable.attr('id'), 
+                sTable.attr('id'),
                 sTable.data('title'),
                 JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
-            );  
+            );
 
             osTable.dataset.stacktableindex = index;
             stacktables.push(stackTable);
@@ -544,11 +544,11 @@ var LiliumCMS = function() {
         var htmlIdentifier = tableid;
         var scheme = dataScheme;
         var title = objTitle;
- 
+
         var init = function() {
 
         };
-   
+
         init();
     };
 
@@ -1078,6 +1078,7 @@ var LiliumCMS = function() {
             var picture_id_url = {};
             var selectedPicture;
 
+            CKEDITOR.basePath = '/bower/ckeditor/';
 
 
             if ($('[ckeditor]').ckeditor) {
@@ -1092,6 +1093,7 @@ var LiliumCMS = function() {
 
                 this.document.appendStyleSheet('/static/ckeditorstyle.css');
             });
+
             CKEDITOR.config.entities = false;
             CKEDITOR.config.extraPlugins = 'image-finder';
             CKEDITOR.config.entities_greek = false;
@@ -1099,7 +1101,8 @@ var LiliumCMS = function() {
             CKEDITOR.config.removeButtons = 'Image';
             CKEDITOR.config.allowedContent = true;
             CKEDITOR.config.contentsCss = '/static/style.css';
-            CKEDITOR.config.skin = "../../../bower/BootstrapCK4-Skin/skins/bootstrapck"
+            CKEDITOR.config.skin = "BootstrapCK4,/bower/BootstrapCK4-Skin/skins/bootstrapck/";
+
 
             //CKEDITOR plugin to choose picture
             CKEDITOR.dialog.add("imagebrowserDialog", function(editor) {
