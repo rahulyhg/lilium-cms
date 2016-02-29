@@ -81,8 +81,14 @@ var Campaigns = function() {
             db.findToArray('entities', {
                 _id: db.mongoID(listObj.clientid)
             }, function(err, res) {
-                listObj.clientname = res[0].displayname;
+                if (typeof res[0] === 'undefined') {
+                    listObj.clientname = "[CLIENT NOT FOUND]";
+                } else {
+                    listObj.clientname = err || res[0].displayname;
+                }
+
                 arr.push(listObj);
+
 
                 index++;
                 nextEntry();
