@@ -423,11 +423,11 @@ var LiliumCMS = function() {
 
 
                     });
-
                     if (validForm) {
                         // Send via ajax
                         processForm($(this));
                     }
+                    return false;
                 });
 
                 var processForm = function(form) {
@@ -437,7 +437,6 @@ var LiliumCMS = function() {
                     // Process files
                     processFiles(form, function() {
                         $.post(form.attr('action'), serialized_form, function(data) {
-
                             var event = new CustomEvent('formSubmited', {
                                 'detail': data
                             });
@@ -445,6 +444,8 @@ var LiliumCMS = function() {
                             return false;
                         });
                     });
+                    return false;
+
                 };
 
                 var processFiles = function(form, cb) {
@@ -1198,7 +1199,8 @@ var LiliumCMS = function() {
             livevars.exec();
         };
     };
-
+    this.formvalidator = new FormValidator();
+    // this.formvalidator.prepareValidation();
     this.awesomestrapper = new AwesomeStrapper();
     this.formParser = new FormParser();
     this.livevars = new LiveVars();
