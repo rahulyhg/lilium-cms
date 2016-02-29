@@ -336,14 +336,12 @@ var FormBuilder = function() {
     for (var field in form.fields) {
       var field = form.fields[field];
 
-      var pattern = /(%5C.)/ig;
 
-      field.attr.value = field.attr.value.replace(pattern, '');
       if (field.name != 'form_name') {
         data[field.name] = field.attr.value;
       }
     }
-
+    console.log(data);
     return data;
   }
 

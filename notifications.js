@@ -165,8 +165,7 @@ var Notification = function() {
         // Add it in the user session if it exsists
         db.findToArray('sessions', {"data._id": notification.userID}, function(err, arr) {
             if(arr && arr[0]) {
-
-                insertNotificationInSession(arr[0].token);
+                insertNotificationInSession(arr[0].token, notification);
             }
         })
 
@@ -183,31 +182,35 @@ var Notification = function() {
     }
 
     var insertNotificationInSession = function(sessionId, notification) {
-        var session = sessionManager.getSessionFromSID();
+        var session = sessionManager.getSessionFromSID(sessionId);
+        if (session) {
+            if (!session.data.newNotifications) {
+                session.data.newNotifications = 0;
+            }
 
-        if (!session.data.newNotifications) {
-            session.data.newNotifications = 0;
-        }
+            session.data.newNotifications += 1;
 
-        session.data.newNotifications += 1;
+            if (!session.data.notifications) {
+                session.data.notifications = [];
+            }
 
-        if (!session.data.notifications) {
-            session.data.notifications = [];
-        }
-
-        // Only keep last 5 notifs in session
-        if (session.data.notifications.length >= 5) {
+            // Only keep last 5 notifs in session
+            if (session.data.notifications.length >= 5) {
+                //Remove last notification (oldest)
+                session.data.notifications.shift();
+            }
             //Remove last notification (oldest)
-            session.data.notifications.shift();
+            session.data.notifications.push(notification);
+            console.log(session.data);
+            // Bypass session manager taking only a cli
+            var cli = {};
+            cli.session = session;
+            // Save it
+            sessionManager.saveSession(cli, function(){
+                console.log('saved');
+            });
         }
-        //Remove last notification (oldest)
-        session.data.notifications.push(notification);
 
-        // Bypass session manager taking only a cli
-        var cli = {};
-        cli.session = session;
-        // Save it
-        sessionManager.saveSession(cli, function(){});
     }
 
     this.notifyGroup = function(groupName, notification) {
