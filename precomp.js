@@ -5,6 +5,7 @@ var db = require('./includes/db.js');
 var fileserver = require('./fileserver.js');
 var checksum = require('checksum');
 var compressor = require('node-minify');
+var frontend = require('./frontend.js');
 
 var Precomp = function() {
 	var absReadPath = _c.default.server.base + "backend/dynamic/precomp/";
@@ -55,7 +56,7 @@ var Precomp = function() {
 								if (histoObj[curFile] == sum) {
 									nextFile();
 								} else {
-									log('Precompile', 'Precompiling static file : ' + curFile);
+									log('Precompiler', 'Precompiling static file : ' + curFile);
 									var rPath = absReadPath + curFile;
 									var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
 									var wPath = absWritePath + curFile.slice(0, -4);
@@ -74,7 +75,7 @@ var Precomp = function() {
 												});
 											});
 										},
-										{}
+										{minify:false}
 									);
 								}
 							});
@@ -91,9 +92,35 @@ var Precomp = function() {
 		});
 	};
 
+	var mergeJS = function(readycb) {
+		var files = frontend.getJSQueue('admin');
+		var compiledPath = _c.default.server.html + "/compiled/admin.js";
+		var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
+		var fileIndex = 0;
+		var fileTotal = files.length;
+
+		log('Precompiler', 'Merging ' + fileTotal +' Javascript files of admin context');
+		var nextFile = function() {
+			if (fileIndex != fileTotal) {
+				fileserver.pipeFileToHandle(fHandle, files[fileIndex], function() {
+					log('Precompiler', 'Appended ' + files[fileIndex]);
+					fileIndex++;
+					nextFile();
+				});
+			} else {
+				fileserver.closeFileHandle(fHandle);
+				log('Precompiled', 'Merged ' + fileIndex + ' JS files');
+				readycb();
+			}
+		};
+		nextFile();
+	};
+
 	this.precompile = function(readycb) {
 		fileserver.createDirIfNotExists(absWritePath, function() {
-			runLoop(readycb);
+			runLoop(function() {
+				mergeJS(readycb);
+			});
 		}, true);
 	};
 };

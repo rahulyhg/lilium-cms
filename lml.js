@@ -719,7 +719,9 @@ var LML = function() {
 						fileserver.closeFileHandle(fileHandle);
 
 						log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms');
-						if (true || _c.default.env == 'prod') {
+						
+						var willMinify = !extra || extra.minify;
+						if (willMinify) {
 							fileserver.minifyHTML(compilepath, callback);
 						} else {
 							callback();

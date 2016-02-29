@@ -2,6 +2,7 @@ var log = require('./log.js');
 var _c = require('./config.js');
 
 var BodyClasses = new Object();
+var JavaScriptFiles = new Object();
 
 var Frontend = function() {
 	var bodyPrefix = "liliumbody-";
@@ -37,6 +38,36 @@ var Frontend = function() {
 
 	this.getBodyID = function(contextName) {
 		return bodyPrefix + (contextName ? contextName : defaultBodySuffix); 
+	};
+
+	this.registerJSFile = function(absPath, priority, context) {
+		context = context || "all";
+
+		var arr = JavaScriptFiles[context];
+		
+		if (!arr) {
+			arr = new Array();
+			JavaScriptFiles[context] = arr;
+		}
+	
+		if (arr.indexOf(absPath) === -1 && (context != "all" || BodyClasses["all"].indexOf(absPath) !== -1)) {
+			while (typeof arr[priority] !== 'undefined') {
+				priority++;
+			} 
+			
+			arr[priority] = absPath;
+		};
+	};
+
+	this.getJSQueue = function(contextName) {
+		var arr = JavaScriptFiles[contextName || "all"];
+		var returnedArr = new Array();
+
+		if (arr) for (var index in arr) {
+			returnedArr.push(arr[index]);
+		}
+
+		return returnedArr;
 	};
 
 	this.registerFromCore = function() {

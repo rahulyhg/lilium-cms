@@ -24,7 +24,6 @@ $}
         </div>
 		{*entities.lilium(postType:types.post)}
 
-		<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
 		<script>
         $('#broadcast').click(function() {
             $.post('http://localhost:8080/admin/article/broadcast', {}, function(data){
@@ -40,7 +39,7 @@ $}
             $.post('http://localhost:8080/admin/article/user');
         });
 
-            socket.join('admin')
+            // socket.join('admin')
 		</script>
         <script src="{=config.default.server.url}/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
 		<script src="{=config.default.server.url}/bower/jquery-timeago/jquery.timeago.js"></script>

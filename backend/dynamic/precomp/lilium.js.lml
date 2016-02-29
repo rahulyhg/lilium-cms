@@ -1212,6 +1212,7 @@ var LiliumCMS = function() {
         liliumcms.everythingIsAwesome();
     });
 
+
     // API
     this.refresh = function() {
         window.location.reload();

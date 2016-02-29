@@ -133,7 +133,7 @@ var FileServer = function() {
 
 	this.validateIndexPath = function(cli, filename) {
 		if (!cli.routeinfo.isStatic && filename.indexOf("index.html") == -1) {
-			filename += "/index.html"
+			filename += "/index.html";
 		}
 
 		return filename;
@@ -145,6 +145,12 @@ var FileServer = function() {
 			defaultEncoding : 'utf8',
 			mode : '0644'
 		});
+	};
+
+	this.pipeFileToHandle = function(handle, filename, callback) {
+		var rs = fs.createReadStream(filename);
+		rs.on('close', callback);
+		rs.pipe(handle, {end: false});
 	};
 
 	this.writeToFile = function(handle, content, callback) {

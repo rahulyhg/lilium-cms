@@ -442,6 +442,17 @@ var Core = function() {
 	};
 
 	var loadPrecompiledStaticFiles = function(callback) {
+		var base = _c.default.server.base;
+		var htmlbase = _c.default.server.html;
+
+		Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin");
+		Frontend.registerJSFile(base + "bower_components/bootstrap/dist/js/bootstrap.min.js", 200, "admin");
+		Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin");
+		Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin");
+		Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin");
+		Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin");
+		Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin');
+
 		Precompiler.precompile(callback);
 	};
 
