@@ -313,7 +313,7 @@ var Entities = function() {
 
 		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
 			var dat = cli.session.data;
-			
+
 			if (levels.length) {
 				for (var i = 0; i < levels.length; i++) {
 					if (levels[i] == "shhh") {
@@ -330,7 +330,9 @@ var Entities = function() {
 					avatarURL : dat.avatarURL,
 					displayname : dat.displayname,
 					roles : dat.roles,
-					username : dat.username
+					username : dat.username,
+					notifications : dat.notifications,
+					newNotifications : dat.newNotifications
 				}
 			}
 

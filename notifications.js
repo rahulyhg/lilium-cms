@@ -183,6 +183,9 @@ var Notification = function() {
 
     var insertNotificationInSession = function(sessionId, notification) {
         var session = sessionManager.getSessionFromSID(sessionId);
+        console.log(sessionId);
+        console.log(session);
+        
         if (session) {
             if (!session.data.newNotifications) {
                 session.data.newNotifications = 0;
