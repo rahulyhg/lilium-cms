@@ -320,7 +320,13 @@ var FormBuilder = function() {
               if (form.fields[key].type == 'form') {
                   form.fields[key].attr.value = cli.postdata.data[key];
               } else {
-                  var escapedData = cli.postdata.data[key].replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\/g, "");
+                   var escapedData
+                  if (typeof cli.postdata.data[key] == 'string') {
+                      escapedData = cli.postdata.data[key].replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\/g, "");
+                  } else {
+                    escapedData = cli.postdata.data[key];
+                  }
+
                   form.fields[key].attr.value = escapedData
               }
 

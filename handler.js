@@ -5,9 +5,8 @@ var inspect = require('util').inspect;
 var Busboy = require('busboy');
 var config = require('./config.js');
 var fs = require('fs');
-var crypto = require('crypto');
+var fileserver = require('./fileserver.js');
 var htmlserver = require('./frontend/htmlserver.js');
-var dateFormat = require('dateformat');
 var db = require('./includes/db.js');
 var imageResizer = require('./imageResizer.js');
 var imageSize = require('image-size');
@@ -50,8 +49,8 @@ var Handler = function() {
                         hasFile = true;
 
 						var mime = getMimeByMimeType(mimetype);
-						var filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
-						filename = crypto.createHash('md5').update(filename).digest('hex');
+						//Gen random name
+						filename = fileserver.genRandomNameFile(filename);
 						var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
 						var name = filename + mime;
 
