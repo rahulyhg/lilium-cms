@@ -20,7 +20,6 @@
 
     <script>
         var socket = io();
-        socket.emit('join', 'Harry Potter');
         socket.on('message', function(data) {
             console.log(data);
         });

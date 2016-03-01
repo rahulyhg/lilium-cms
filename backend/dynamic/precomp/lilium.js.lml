@@ -81,7 +81,7 @@ var LiliumCMS = function() {
             $.get("/livevars", {
                 vars: JSON.stringify(endpoints)
             }, function(data) {
-                livevars = data;
+                livevars = deepUnescape(data);
                 document.dispatchEvent(new CustomEvent('livevarsFetched', {
                     'detail': {
                         'livevars': livevars
@@ -285,7 +285,7 @@ var LiliumCMS = function() {
                         $(lmlTag).after(filler);
                     } else {
                         $(this).text(JSON.stringify(livevars[$(this).data('varname')]));
-                        $(this).text(livevars[$(this).data('varname')]);
+                        $(this).text(unescape(livevars[$(this).data('varname')]));
                     }
                 }
             });
@@ -432,11 +432,14 @@ var LiliumCMS = function() {
 
                 var processForm = function(form) {
                     var that = this;
-                    var serialized_form = form.serialize();
-
+                    var serialized_form = escape(form.serialize());
                     // Process files
                     processFiles(form, function() {
+
                         $.post(form.attr('action'), serialized_form, function(data) {
+                            if (data.success) {
+                                window.location.replace(data.redirect);
+                            }
                             var event = new CustomEvent('formSubmited', {
                                 'detail': data
                             });
@@ -1067,6 +1070,20 @@ var LiliumCMS = function() {
     });
     }
 
+         var deepUnescape = function(json) {
+             for (var index in json) {
+                 switch (typeof json[index]) {
+                     case 'string':
+                         json[index] = unescape(json[index]);
+                         break;
+                     case 'object':
+                         json[index] = deepUnescape(json[index]);
+                         break;
+
+                 }
+             }
+             return json;
+         };
 
     var CKEditor = function() {
         this.initEditor = function() {
@@ -1090,10 +1107,9 @@ var LiliumCMS = function() {
                 $('[ckeditor]').ckeditor();
             }
             CKEDITOR.on('instanceReady', function(ev) {
-
+                // Output paragraphs as <p>Text</p>.
                 this.document.appendStyleSheet('/static/ckeditorstyle.css');
             });
-
             CKEDITOR.config.entities = false;
             CKEDITOR.config.extraPlugins = 'image-finder';
             CKEDITOR.config.entities_greek = false;
@@ -1203,7 +1219,6 @@ var LiliumCMS = function() {
         };
     };
     this.formvalidator = new FormValidator();
-    // this.formvalidator.prepareValidation();
     this.awesomestrapper = new AwesomeStrapper();
     this.formParser = new FormParser();
     this.livevars = new LiveVars();
