@@ -256,20 +256,75 @@ var Notification = function() {
     }
 
     this.notifyGroup = function(groupName, notification) {
-        var notifications = [];
+        notification.date = new Date();
+        notification.interacted = false;
 
         if (groups[groupName]) {
-            for (var key in groups[groupName].users) {
-                var tempnotif = extend({}, notification);
-                var user = groups[groupName].users[key];
+            // Find users in db that has the group role
+            db.aggregate('entities', [{
+                "$unwind": "$roles"
+            }, {
+                "$lookup": {
+                    from: "roles",
+                    localField: "roles",
+                    "foreignField": "name",
+                    as: "rights"
+                }
+            }, {
+                "$match": {
+                    "rights.name": groups[groupName].role
+                }
+            }, {
+                "$project": {
+                    "_id": 0,
+                    "userID": "$_id",
+                    "type": {
+                        "$literal": notification.type
+                    },
+                    "msg": {
+                        "$literal": notification.msg
+                    },
+                    "title": {
+                        "$literal": notification.title
+                    },
+                    "url": {
+                        "$literal": notification.url
+                    },
+                    "interacted": {
+                        "$literal": false
+                    },
+                    "date": {
+                        "$literal": notification.date
+                    }
+                }
+            }], function(result) {
+                // Insert Notifications
+                db.insert('notifications', result, function(err, r) {});
+            });
 
-                tempnotif.interacted = false;
-                tempnotif.userID = db.mongoID(user.clientId);
-                tempnotif.date = new Date();
 
-                notifications.push(tempnotif);
-            }
-            db.insert('notification', notifications, function() {});
+            // Insert notification in all the sessions
+            // Find sessions that have dash access
+            db.aggregate('sessions', [{
+                "$unwind": "$data.roles"
+            }, {
+                $lookup: {
+                    from: "roles",
+                    localField: "data.roles",
+                    foreignField: "name",
+                    as: "roles"
+                }
+            }, {
+                $match: {
+                    "roles.name": groups[groupName].role
+                }
+            }, {
+                $group: {
+                    _id: "$token"
+                }
+            }], function(result) {
+                insertBatchNotificationInSessions(result, notification);
+            });
 
             io.sockets.in(groupName).emit('notification', notification);
         }
@@ -290,6 +345,7 @@ var Notification = function() {
 
     this.broadcastNotification = function(notification) {
         notification.date = new Date();
+        notification.interacted = false;
 
         // Create notification for users that have dash access
         db.aggregate('entities', [{
