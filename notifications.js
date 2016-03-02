@@ -229,7 +229,7 @@ var Notification = function() {
             }
         }
 
-    	db.update('sessions', {'token' : {'$in': tokens}}, {'$push':{'data.notifications': notification}} , function(err, result) {}, true, false);
+    	db.update('sessions', {'token' : {'$in': tokens}}, {'$push':{'data.notifications': notification}, $inc : {'data.newNotifications' : 1}} , function(err, result) {}, true, false, true);
     }
 
     var insertNotif = function(session, notification) {
