@@ -114,7 +114,6 @@ var DB = function() {
 				cb("[Database - Invalid document]");
 			} else {
 				conds = typeof conds === 'undefined' ? {} : conds;
-
 				col.find(conds).toArray(function(err, arr) {
 					cb(err, arr);
 				});

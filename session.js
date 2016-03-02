@@ -27,7 +27,6 @@ var Sessions = function() {
 	this.createSession = function() {
 		var token = this.createToken(new Date().getTime());
 		var newSesh = new UserSesh(token);
-
 		return newSesh;
 	};
 
@@ -71,6 +70,12 @@ var Sessions = function() {
 
 		cli.userinfo = cli.session.data;
 
+		// Load notifications in db
+		db.findToArray('notifications', {userID : db.mongoID(cli.session.data._id)},function(err, arr) {
+			cli.session.data.notifications = arr.slice(0,4);
+		});
+		cli.session.data.notifications = [];
+
 		this.setCookieToCli(cli);
 
 		// No need for callback
@@ -79,13 +84,19 @@ var Sessions = function() {
 		});
 	};
 
+
+
 	this.saveSession = function(cli, callback) {
 		db.update('sessions', {token:cli.session.token}, cli.session, callback);
 	};
 
     this.getSessionFromSID = function(sid) {
         return _sesh[sid];
-    }
+    };
+
+	this.getSessions = function() {
+		return _sesh;
+	};
 
 	this.initSessionsFromDatabase = function(cb) {
 		var seshCount = 0;
