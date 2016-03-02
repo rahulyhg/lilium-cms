@@ -934,6 +934,14 @@ var LiliumCMS = function() {
     // Notifications
     document.addEventListener(LiliumEvents.livevarsFetched.name, function(e) {
         var session = e.detail.livevars.session
+
+        // Subscribe to channels based on user roles
+        if (session) {
+            for (var index in session.roles) {
+                // Join socket channel
+                socket.join(session.roles[index]);
+            }
+        }
         if (session && session.notifications) {
             var notifs = session.notifications;
             var notificationList = $('#notification_list');
