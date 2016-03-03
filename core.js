@@ -446,7 +446,7 @@ var Core = function() {
 		var htmlbase = _c.default.server.html;
 
 		Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin");
-		Frontend.registerJSFile(base + "bower_components/bootstrap/dist/js/bootstrap.min.js", 200, "admin");
+		Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin");
 		Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin");
 		Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin");
 		Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin");
