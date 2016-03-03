@@ -17,7 +17,7 @@
  * Description : Global styling for admin section of Lilium.                                             *
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
- 
+
 {#config}
 {$
 	actioncolor = "#9B59B6";
@@ -323,7 +323,7 @@ header.admin-bar {
 	left:0;
 	right:0;
 	top:0;
-	
+
 	z-index: 10000;
 	height: {=topbarheight};
 }
@@ -408,7 +408,7 @@ header.admin-bar .navbar-default .navbar-header {
 	padding:0;
 	margin: 0;
 
-	color: #BBB;	
+	color: #BBB;
 }
 
 .lmladminsidebar .lmladminsidebaritems li {
@@ -451,7 +451,7 @@ header.admin-bar .navbar-default .navbar-header {
 	width: 22px;
 }
 
-.glyphicon > .badge{
+.fa > .badge{
 	position: relative;
 	top: -10px;
 	background-color: {=actioncolor};
@@ -586,9 +586,6 @@ header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
 header.admin-bar .navbar-default .navbar-nav  .notifications {
 }
 
-.glyphicon{
-	top:inherit;
-}
 
 /* @/login */
 .lmllogin {
@@ -744,4 +741,3 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
     color: #c0392b;
     opacity: 1;
 }
-
