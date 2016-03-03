@@ -519,6 +519,7 @@ var LiliumCMS = function() {
 
     var FormParser = function() {
         var makeSingleStackTable = function(index, osTable) {
+            console.log(osTable);
             sTable = $(osTable);
             var stackTable = new StackTable(
                 sTable.attr('id'),
@@ -547,6 +548,35 @@ var LiliumCMS = function() {
         var htmlIdentifier = tableid;
         var scheme = dataScheme;
         var title = objTitle;
+
+        var render = function() {
+
+        }
+
+        $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
+            var row = "<tr>";
+
+            $('.lmlstacktable th input').each(function() {
+                row += "<td>" + $(this).val() + "</td>";
+            });
+            row += "<td class='hello'><button>Remove</button></td>";
+            row += "</tr>";
+            console.log(row);
+            console.log('EHYYYY');
+            $('#' + htmlIdentifier).find('tr').last().after(row);
+            console.log('nalu');
+            return false;
+        });
+
+        $('#' + htmlIdentifier).find('.lmlstacktableremovebutton').bind('click', function() {
+            $(this).parent().remove();
+        }
+
+
+
+        this.appendRow = function() {
+
+        }
 
         var init = function() {
 
@@ -577,6 +607,7 @@ var LiliumCMS = function() {
                     col = scheme.columns[i];
                 }
             }
+            
 
             return col;
         };
