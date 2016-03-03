@@ -113,7 +113,6 @@ var LiveVariables = function() {
 	};
 
 	this.handleRequest = function(cli) {
-        cli.debug();
 		try{
 			var liveVars = JSON.parse(cli.routeinfo.params.vars);
 			cli.livevars = {};
