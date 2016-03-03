@@ -14,20 +14,24 @@ var Precomp = function() {
 
 	var minifyFile = function(inFile, outFile, filetype, callback) {
 		log('Precompiler', 'Minifying ' + filetype + ' file');
-		if (filetype == 'css') {
-			new compressor.minify({
-  				type: 'yui-css',
-  				fileIn: inFile,
-  				fileOut: outFile,
-  				callback: callback
-			});
-		} else if (filetype == 'js') {
-			new compressor.minify({
-  				type: 'yui-js',
-  				fileIn: inFile,
-  				fileOut: outFile,
-  				callback: callback
-			});
+		if (_c.default.env !== 'dev') {
+			if (filetype == 'css') {
+				new compressor.minify({
+	  				type: 'yui-css',
+  					fileIn: inFile,
+  					fileOut: outFile,
+  					callback: callback
+				});
+			} else if (filetype == 'js') {
+				new compressor.minify({
+  					type: 'yui-js',
+  					fileIn: inFile,
+	  				fileOut: outFile,
+  					callback: callback
+				});
+			} else {
+				fileserver.copyFile(inFile, outFile, callback);
+			}
 		} else {
 			fileserver.copyFile(inFile, outFile, callback);
 		}
@@ -116,10 +120,36 @@ var Precomp = function() {
 		nextFile();
 	};
 
+	var mergeCSS = function(readycb) {
+		var files = frontend.getCSSQueue('admin');
+		var compiledPath = _c.default.server.html + "/compiled/admin.css";
+		var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
+		var fileIndex = 0;
+		var fileTotal = files.length;
+
+		log('Precompiler', 'Merging ' + fileTotal +' CSS files of admin context');
+		var nextFile = function() {
+			if (fileIndex != fileTotal) {
+				fileserver.pipeFileToHandle(fHandle, files[fileIndex], function() {
+					log('Precompiler', 'Appended ' + files[fileIndex]);
+					fileIndex++;
+					nextFile();
+				});
+			} else {
+				fileserver.closeFileHandle(fHandle);
+				log('Precompiled', 'Merged ' + fileIndex + ' CSS files');
+				readycb();
+			}
+		};
+		nextFile();
+	};
+
 	this.precompile = function(readycb) {
 		fileserver.createDirIfNotExists(absWritePath, function() {
 			runLoop(function() {
-				mergeJS(readycb);
+				mergeJS(function() {
+					mergeCSS(readycb);
+				});
 			});
 		}, true);
 	};

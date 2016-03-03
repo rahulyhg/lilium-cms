@@ -17,7 +17,7 @@
  * Description : Global styling for admin section of Lilium.                                             *
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
-
+ 
 {#config}
 {$
 	actioncolor = "#9B59B6";
@@ -25,10 +25,17 @@
 	activecolor = "#8B49A6";
 	siteurl = config.default.server.url;
 	fontcolor = "#111";
+	barcolor = "#555";
+	barcolorhover = "#777";
 	infocolor = "#2980b9";
 	dangercolor = "#c0392b";
 	warningcolor = "#f1c40f";
 	successcolor = "#27af61";
+	topbarheight = "50px";
+	sidebarwidth = "200px";
+
+	fontdir = config.default.server.url;
+	fontdir += "/static/fonts/font-awesome";
 $}
 
 @font-face {
@@ -172,6 +179,14 @@ $}
        url('{=siteurl}/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.svg#CrimsonText') format('svg');
 }
 
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('{=fontdir}/fontawesome-webfont.eot?v=4.5.0');
+  src: url('{=fontdir}/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), url('{=fontdir}/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('{=fontdir}/fontawesome-webfont.woff?v=4.5.0') format('woff'), url('{=fontdir}/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('{=fontdir}/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
 html, body {
 	padding:0;
 	margin:0;
@@ -303,13 +318,30 @@ form input, form label{
 }
 
 /* Admin Bar */
+header.admin-bar {
+	position:fixed;
+	left:0;
+	right:0;
+	top:0;
+	
+	z-index: 10000;
+	height: {=topbarheight};
+}
+
 .navbar-default {
 	display: block;
-	background-color: #555;
-	height: 50px;
+	background-color: {=barcolor};
+	height: {=topbarheight};
 	border-bottom: 1px solid #DDD;
 
 	margin-bottom: 0px;
+
+	position:fixed;
+	left:0;
+	right:0;
+	top:0;
+
+	z-index: 10000;
 }
 
 .navbar{
@@ -350,7 +382,63 @@ header.admin-bar .lilium-logo-link img {
     	right: 15px;
 }
 header.admin-bar .navbar-default .navbar-header {
-	height: 50px;
+	position: absolute;
+}
+
+#navbar.navbar-collapse {
+	padding-left: 50px;
+}
+
+.lmladmincontentwrapper {
+	padding-left: {=sidebarwidth};
+	padding-top: {=topbarheight};
+}
+
+.lmladminsidebar {
+	position: fixed;
+	left: 0;
+	bottom: 0;
+	top: {=topbarheight};
+
+	width: {=sidebarwidth};
+	background-color: {=barcolor};
+}
+
+.lmladminsidebar .lmladminsidebaritems {
+	padding:0;
+	margin: 0;
+
+	color: #BBB;	
+}
+
+.lmladminsidebar .lmladminsidebaritems li {
+	cursor: pointer;
+	font-size: 16px;
+}
+
+.lmladminsidebar .lmladminsidebaritems li:hover {
+	background-color: {=barcolorhover};
+	color: #EEE;
+}
+
+.lmladminsidebar .lmladminsidebaritems li a {
+	display: block;
+	padding: 5px 10px;
+	color: #BBB;
+
+	text-decoration: none;
+}
+
+.lmladminsidebar .lmladminsidebaritems li:hover a {
+	color: #EEE;
+}
+
+.lmladminsidebar .lmladminsidebaritems .fa {
+	font-size: 18px;
+	margin-right: 5px;
+
+	text-decoration: none;
+	width: 22px;
 }
 
 .glyphicon > .badge{
@@ -587,7 +675,7 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 
 .lmlcrash header {
 	padding: 10px;
-	background-color: #555;
+	background-color: {=barcolor};
 }
 
 .lmlcrash header h1 {
@@ -645,3 +733,4 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
     color: #c0392b;
     opacity: 1;
 }
+

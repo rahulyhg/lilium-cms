@@ -15,7 +15,7 @@ var Plugins = function() {
 
 	this.serveAdminList = function(cli) {
 		cli.touch("plugins.serveAdminList");
-		filelogic.serveLmlPage(cli)
+		filelogic.serveAdminLML(cli)
 	};
 
 	this.handlePOST = function(cli) {
@@ -41,7 +41,7 @@ var Plugins = function() {
 
 			}
 		} else {
-			filelogic.serveLmlPage(cli)
+			filelogic.serveAdminLML(cli)
 		}
 	}
 

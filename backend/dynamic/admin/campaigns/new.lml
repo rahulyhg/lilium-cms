@@ -1,11 +1,3 @@
 {#config;forms}
-<!DOCTYPE html>
-	<head>
-		{%adminhead}
-	</head>
-	<body>
-		{%adminbar}
 		<h2>Create Campaign</h2>
 		{=forms.render('campaign_create')}
-	</body>
-</html>

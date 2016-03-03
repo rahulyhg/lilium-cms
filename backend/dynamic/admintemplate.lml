@@ -1,0 +1,14 @@
+{#config;extra}
+<!DOCTYPE html>
+<html>
+	<head>
+		{%adminhead}
+	</head>
+	<body class="lmladminbody lmladmin">
+		{%adminbar}
+		{%adminsidebar}
+		<main class="lmladminmain lmladmincontentwrapper">
+			{%%extra.templatefile}
+		</main>
+	</body>
+</html>

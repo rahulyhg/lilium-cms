@@ -88,6 +88,9 @@ var HtmlParser = function() {
           case 'livevar' :
             htmlForm += parseLiveVar(field);
             break;
+          case "title":
+            htmlForm += parseTitleType(field);
+            break;
         }
 
       }
@@ -141,6 +144,15 @@ var HtmlParser = function() {
       '" class="lmlstacktableheaderfield lmlstacktableheaderfield-'+field.fieldName+
       '" data-fieldname="'+field.fieldName+
       '" value="" />';
+  }
+
+  var parseTitleType = function(field) {
+    var tag = field.attr.type || "h3";
+    var content = field.attr.displayname || field.name || "";    
+
+    return field.attr.html || (
+      "<" + tag + ">" + content + "</" + tag + ">"
+    );
   }
  
   var parseStackType = function(field, hasPlaceholder) {

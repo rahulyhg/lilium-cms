@@ -19,7 +19,7 @@
  *********************************************************************************************************/
 var debugMode = 'true';
 var socket = typeof io !== 'undefined' ? io() : undefined;
-
+  
 var LiliumCMS = function() {
     var livevars;
     var urlParams;
@@ -37,7 +37,7 @@ var LiliumCMS = function() {
             name: "livevarsFetched"
         }
     };
-
+ 
     var LiveVars = function() {
         var endpoints = [];
         var paramString = "?";
@@ -75,7 +75,7 @@ var LiliumCMS = function() {
 
             endpoints.push({
                 'varname': 'session',
-                'params': {}
+                'params': new Object()
             });
 
             $.get("/livevars", {
@@ -179,6 +179,24 @@ var LiliumCMS = function() {
                         node.html(fetchTemplateObjectContent(obj, data, domTarget, templateItems, livevarkey));
                     }
 
+                    if (obj.data('class')) {
+                        var classes = obj.data('class').split(' ');
+
+                        for (var ci = 0; ci < classes.length; ci++) {
+                            node.addClass(classes[ci]);
+                        }
+                    }
+
+                    if (obj.data('classsource')) {
+                        var classSrc = obj.data('classsource');
+                        var classes = data[classSrc];
+                        classes = classes ? classes.split(' ') : [];
+
+                        for (var ci = 0; ci < classes.length; ci++) {
+                            node.addClass(classes[ci]);
+                        }
+                    }
+
                     if (action && typeof window[action] === 'function') {
                         var paramkey = obj.data('actionparamkey');
                         var bindName = obj.data('bind');
@@ -278,9 +296,13 @@ var LiliumCMS = function() {
                         var filler = $(document.createElement(fillerName));
                         filler.attr('name', lmlTag.data('fieldname'));
 
-                        varValue.forEach(function(val, index) {
-                            generateFillingFromObject(filler, lmlTag.data(), val);
-                        });
+                        if (typeof varValue.length !== 'undefined' && varValue.forEach) {
+                            varValue.forEach(function(val, index) {
+                                generateFillingFromObject(filler, lmlTag.data(), val);
+                            });
+                        } else {
+                            generateFillingFromObject(filler, lmlTag.data(), varValue);
+                        }
 
                         $(lmlTag).after(filler);
                     } else {
@@ -492,25 +514,32 @@ var LiliumCMS = function() {
         index = typeof index == 'undefined' ? 0: index;
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
 
-        if (form.length != 0) {
-
-            for (var key in data) {
+        var foreachloop = function(data, kString) {
+             for (var key in data) {
+                var kkString = kString + (kString == "" ? "" : ".") + key;
                 var val = data[key];
                 var pt = undefined;
 
-                var field = form.find('*[name="' + key + '"]');
-                if (field.length > 0) {
-                    if (field.attr('type') == 'checkbox') {
-                        field.get(0).checked = val === true;
-                    } else {
-                        field.val(val);
-                    }
-                } else if ((pt = findPushTableFromTitle(key))) {
-                    pt.fillFromSource(val);
+                if (typeof val === "object") {
+                    foreachloop(val, kkString);
                 } else {
-                    console.log("No Field for key : " + key);
+                    var field = form.find('*[name="' + kkString + '"]');
+                    if (field.length > 0) {
+                        if (field.attr('type') == 'checkbox') {
+                            field.get(0).checked = val === true;
+                        } else {
+                            field.val(val);
+                        }
+                    } else if ((pt = findPushTableFromTitle(kkString))) {
+                        pt.fillFromSource(val);
+                    } 
                 }
             }
+
+        }
+
+        if (form.length != 0) {
+            foreachloop(data, "");
         }
     };
 

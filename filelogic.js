@@ -1,6 +1,7 @@
 var FileServer = require('./fileserver.js');
 var LML = require('./lml.js');
 var _c = require('./config.js');
+var log = require('./log.js');
 var fs = require('fs');
 var slugify = require('slugify');
 
@@ -83,7 +84,46 @@ var FileLogic = function() {
 			}
 
 		});
+  };
 
+  this.serveAdminLML = function(cli, lastIsParam, extra) {
+    	lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
+    	var name = "";
+
+    	if (lastIsParam) {
+      		name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+    	} else {
+      		name = cli.routeinfo.fullpath;
+    	}
+
+    	var readPath = _c.default.server.base + "backend/dynamic" + name + ".lml";
+    	var savePath = _c.default.server.html + name +'/index.html';
+	var tmpPath = _c.default.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+	var adminPath = _c.default.server.base + "backend/dynamic/admintemplate.lml";     
+
+    	FileServer.fileExists(savePath, function(isPresent) {
+		if (!isPresent) {
+			LML.executeToFile(
+				readPath,
+				tmpPath, 
+				function() {
+					LML.executeToFile(
+						adminPath,
+						savePath,
+						function() {
+							FileServer.pipeFileToClient(cli, savePath, function() {
+								log('FileLogic', 'Admin page generated and served');
+							});
+						},
+						{templatefile:tmpPath}
+					);
+				},
+				new Object()
+			);
+		} else {
+			serveCachedFile(cli, savePath);
+		}
+	});
   };
 
   this.serveLmlPluginPage = function(pluginName, cli, lastIsParam, extra) {

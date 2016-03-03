@@ -35,7 +35,7 @@ var Article = function() {
         } else {
           switch (cli.routeinfo.path[2]) {
             case 'undefined':
-                  this.serveLmlPage(cli);
+                  this.serveAdminLML(cli);
             case 'new':
                 this.new(cli);
                 break;
@@ -54,7 +54,7 @@ var Article = function() {
     };
 
     this.list = function(cli) {
-        filelogic.serveLmlPage(cli, false);
+        filelogic.serveAdminLML(cli, false);
     }
 
     this.new = function(cli) {
@@ -89,7 +89,7 @@ var Article = function() {
             }
 
         } else {
-            filelogic.serveLmlPage(cli);
+            filelogic.serveAdminLML(cli);
         }
 
     };
@@ -120,7 +120,7 @@ var Article = function() {
                 }
 
             } else {
-                filelogic.serveLmlPage(cli, true);
+                filelogic.serveAdminLML(cli, true);
             }
 
 

@@ -1,0 +1,17 @@
+{#config}
+<div class="lmladminsidebar">
+	<div class="lmladminsidebarlistwrapper">
+		<ul class="lmladminsidebaritems">
+			{*adminmenus(template:"lmladminsidebaritemtemplate")}
+		</ul>
+	</div>
+</div>
+
+<lml:template id="lmladminsidebaritemtemplate">
+	<li>
+		<lml:tobject data-nodetype="a" data-hrefsource="absURL">
+			<lml:tobject data-nodetype="i" data-classsource="faicon" data-class="fa"></lml:tobject>
+			<lml:tobject data-nodetype="span" data-key="displayname"></lml:tobject>
+		</lml:tobject> 
+	</li>
+</lml:template>

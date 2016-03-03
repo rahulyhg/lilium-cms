@@ -1,9 +1,3 @@
-<!DOCTYPE html>
-<html>
-	<head>	
-		{%adminhead}
-	</head>
-	<body>
 		<h1>DFP Orders</h1>
 		<ul>
 			{*dfp.OrderService.getOrdersByStatement(statement:"WHERE status = 'DRAFT' OR status = 'APPROVED'",template:"orderItem")}
@@ -18,5 +12,3 @@
 				<div>Status : <lml:tobject data-nodetype="span" data-key="status"></lml:tobject></div>
 			</li>
 		</lml:template>
-	</body>
-</html>

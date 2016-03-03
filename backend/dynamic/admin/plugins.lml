@@ -3,14 +3,7 @@
 	strPlugin = "plugins";
 	pluginlist = plugins.getCachedPlugins();
 $}
-<!DOCTYPE html>
-<html>
-	<head>
-		{%adminhead;entityscript}
-	</head>
-
-	<body>
-		{%adminbar}
+	{%entityscript}
 		<h1>{=vocab.{=strPlugin}}</h1>
 		{$
 			for (plug in pluginlist);
@@ -59,6 +52,3 @@ $}
 		});
 
 		</script>
-
-	</body>
-</html>

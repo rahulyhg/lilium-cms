@@ -1,13 +1,4 @@
 {#config;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-		{%adminhead}
-	</head>
-	<body>
-		{%adminbar}
 		<h2>Live Variables Playground</h2>
 
 		{=forms.render("debug_livevars")}
-	</body>
-</html>

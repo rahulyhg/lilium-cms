@@ -62,7 +62,7 @@ var Entities = function() {
 		cli.touch('entities.handleGET');
 
 		if (cli.routeinfo.path.length == 2) {
-			filelogic.serveLmlPage(cli);
+			filelogic.serveAdminLML(cli);
 		} else {
 			var action = cli.routeinfo.path[2];
 

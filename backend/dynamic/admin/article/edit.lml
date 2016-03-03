@@ -1,14 +1,4 @@
 {#config;session;vocab;forms}
-<!DOCTYPE html>
-<html>
-
-<head>
-	{%adminhead;../entityscript}
-	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-</head>
-
-<body>
-	{%adminbar}
 	<header>
 		<h1>{=config.default.vendor.productname}
 			<small>v{=config.default.vendor.version}</small>
@@ -26,6 +16,3 @@
 		});
 
 	</script>
-</body>
-
-</html>

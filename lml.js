@@ -102,25 +102,41 @@ var LML = function() {
 				callback();
 			} else {
 				var fullpath = "";
+				var executeLML = true;
+
 				if (Petals.isRegistered(split[currentIndex])) {
 					fullpath = Petals.get(split[currentIndex]).filepath;
+				} else if (0 == split[currentIndex].indexOf('%')) {
+					fullpath = split[currentIndex];
+					executeLML = false;
 				} else {
 					fullpath = context.rootDir + "/" + split[currentIndex] + ".petal";
 				}
 
 				var includeBuffer = "";
 
-				that.executeToContext(fullpath, context, function(pContent) {
-					if (typeof pContent !== 'undefined') {
-						includeBuffer += pContent;
-					} else {
-						context.merge();
-						context.newLine += includeBuffer;
-						currentIndex++;
+				if (executeLML) {
+					that.executeToContext(fullpath, context, function(pContent) {
+						if (typeof pContent !== 'undefined') {
+							includeBuffer += pContent;
+						} else {
+							context.merge();
+							context.newLine += includeBuffer;
+							currentIndex++;
 
-						next();	
-					}
-				});
+							next();	
+						}
+					});
+				} else {
+					var fullpath = LMLSlang.pulloutVar(context, fullpath.substring(1));
+
+					fileserver.readFile(fullpath, function(fContent) {
+						context.merge();
+						context.newLine += fContent || ("[LMLIncludeException] File not found : " + fullpath);
+						currentIndex++;
+						next();
+					});
+				}
 			}
 		};
 		next();
