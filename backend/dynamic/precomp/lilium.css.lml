@@ -375,18 +375,18 @@ header.admin-bar .lilium-logo-link {
 }
 
 header.admin-bar .lilium-logo-link img {
-	height: 64px;
+	height: 55px;
     	width: auto;
     	position: relative;
     	bottom: 8px;
-    	right: 15px;
+    	right: 10px;
 }
 header.admin-bar .navbar-default .navbar-header {
 	position: absolute;
 }
 
 #navbar.navbar-collapse {
-	padding-left: 50px;
+	padding-left: 40px;
 }
 
 .lmladmincontentwrapper {
@@ -414,6 +414,16 @@ header.admin-bar .navbar-default .navbar-header {
 .lmladminsidebar .lmladminsidebaritems li {
 	cursor: pointer;
 	font-size: 16px;
+}
+
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected,
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected:hover {
+	background-color: {=actioncolor};
+}
+
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected a,
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected:hover a {
+	color: #FFF;
 }
 
 .lmladminsidebar .lmladminsidebaritems li:hover {

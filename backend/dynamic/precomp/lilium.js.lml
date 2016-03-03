@@ -1207,6 +1207,24 @@ var LiliumCMS = function() {
         }
     };
 
+    var AdminMenu = function() {
+        this.init = function() {
+            var currentHref = window.location.href;
+            var looping = true;
+
+            $('.lmladminsidebaritems li').each(function(index, li) {
+                if (looping) {
+                    li = $(li);
+                    var href = li.find('a').attr('href');
+                    if (currentHref.indexOf(href) !== -1) {
+                        li.addClass('lmladminsidebarselected');
+                        looping = false;
+                    }
+                }
+            });
+        };
+    };
+
     var Hooks = function() {
 
     };
@@ -1237,12 +1255,14 @@ var LiliumCMS = function() {
     this.formParser = new FormParser();
     this.livevars = new LiveVars();
     this.ckeditor = new CKEditor();
+    this.adminmenu = new AdminMenu();
     this.formbeautifier = new FormBeautifier();
 
     document.addEventListener('livevarsRendered', function(e) {
         liliumcms.ckeditor.initEditor();
         liliumcms.formbeautifier.beautify();
         liliumcms.formParser.init();
+        liliumcms.adminmenu.init();
         liliumcms.everythingIsAwesome();
     });
 

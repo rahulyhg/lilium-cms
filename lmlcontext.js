@@ -24,7 +24,7 @@ var LMLContext = function(info) {
 		}
 
 		if (typeof this.lib[libName] !== "undefined") {
-			log("LMLParseWarning", "Attempted to add already registered library '"+libName+"' to context");
+			// log("LMLParseWarning", "Attempted to add already registered library '"+libName+"' to context");
 			return;
 		}
 

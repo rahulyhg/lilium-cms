@@ -59,6 +59,11 @@ var Core = function() {
 			admin.handleAdminEndpoint(cli);
 		});
 
+		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
+			cli.touch("admin.GET.dashboard");
+			admin.handleGETDashboard(cli);
+		});
+
 		admin.registerAdminEndpoint('article', 'GET', function(cli){
 			cli.touch("admin.GET.article");
 			Article.handleGET(cli);
@@ -143,19 +148,19 @@ var Core = function() {
 
 		admin.registerAdminMenu({
 			id : "sites", faicon : "fa-sitemap", displayname : "Sites", priority : 50,
-			rights : ["manage-sites"], absURL : aurl + "sites/", children : []
+			rights : ["manage-sites"], absURL : aurl + "sites", children : []
 		});
 		admin.registerAdminMenu({
 			id : "dashboard", faicon : "fa-tachometer", displayname : "Dashboard", priority : 100,
-			rights : ["dash"], absURL : aurl, children : []
+			rights : ["dash"], absURL : aurl + "dashboard", children : []
 		});
 		admin.registerAdminMenu({
 			id : "articles", faicon : "fa-pencil", displayname : "Articles", priority : 200,
-			rights : ["view-content"], absURL : aurl + "article/", children : []
+			rights : ["view-content"], absURL : aurl + "article", children : []
 		});
 		admin.registerAdminMenu({
 			id : "campaigns", faicon : "fa-line-chart", displayname : "Campaigns", priority : 300,
-			rights : ["view-campaigns"], absURL : aurl + "campaigns/", children : []
+			rights : ["view-campaigns"], absURL : aurl + "campaigns", children : []
 		});
 		admin.registerAdminMenu({
 			id : "media", faicon : "fa-picture-o", displayname : "Media", priority : 400,
@@ -163,15 +168,15 @@ var Core = function() {
 		});
 		admin.registerAdminMenu({
 			id : "entities", faicon : "fa-users", displayname : "Entities", priority : 500,
-			rights : ["view-entities"], absURL : aurl + "entities/", children : []
+			rights : ["view-entities"], absURL : aurl + "entities", children : []
 		});
 		admin.registerAdminMenu({
 			id : "themes", faicon : "fa-paint-brush", displayname : "Themes", priority : 600,
-			rights : ["manage-themes"], absURL : aurl + "themes/", children : []
+			rights : ["manage-themes"], absURL : aurl + "themes", children : []
 		});
 		admin.registerAdminMenu({
 			id : "plugins", faicon : "fa-plug", displayname : "Plugins", priority : 700,
-			rights : ["manage-plugins"], absURL : aurl + "plugins/", children : []
+			rights : ["manage-plugins"], absURL : aurl + "plugins", children : []
 		});
 		admin.registerAdminMenu({
 			id : "settings", faicon : "fa-cogs", displayname : "Settings", priority : 1000,
