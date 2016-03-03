@@ -15,7 +15,7 @@
  *      Labelled parameters can be added afterwards using JSON syntax, wrapped by parenthesis.           *
  *                                                                                                       *
  *      Example :                                                                                        *
- *        {*endpoint.secondlevel.thirdlevel(sontparam:"someValue",otherparam:"otherValue")}              * 
+ *        {*endpoint.secondlevel.thirdlevel(sontparam:"someValue",otherparam:"otherValue")}              *
  *                                                                                                       *
  *********************************************************************************************************/
 
@@ -113,6 +113,7 @@ var LiveVariables = function() {
 	};
 
 	this.handleRequest = function(cli) {
+        cli.debug();
 		try{
 			var liveVars = JSON.parse(cli.routeinfo.params.vars);
 			cli.livevars = {};
@@ -155,7 +156,7 @@ var LiveVariables = function() {
 			displayname : "Parameters",
 			scheme : {
 				columns : [
-					{fieldName:'paramname', dataType:'text', displayname:"Name"},	
+					{fieldName:'paramname', dataType:'text', displayname:"Name"},
 					{fieldName:'paramvalue', dataType:'text', displayname:"Value"}
 				]
 			}

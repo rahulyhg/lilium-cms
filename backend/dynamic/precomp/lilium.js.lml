@@ -544,38 +544,44 @@ var LiliumCMS = function() {
         };
     };
 
-    var StackTable = function(tableid, objTitle, dataScheme) {
+    var StackTable = function(tableid, objTitle, dataScheme, dataSource) {
         var htmlIdentifier = tableid;
         var scheme = dataScheme;
         var title = objTitle;
-
+        var linenumber = 0;
+        var that = this;
         var render = function() {
 
         }
 
         $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
-            var row = "<tr>";
-
-            $('.lmlstacktable th input').each(function() {
-                row += "<td>" + $(this).val() + "</td>";
-            });
-            row += "<td class='hello'><button>Remove</button></td>";
-            row += "</tr>";
-            console.log(row);
-            console.log('EHYYYY');
-            $('#' + htmlIdentifier).find('tr').last().after(row);
-            console.log('nalu');
-            return false;
+            that.appendRow();
         });
 
-        $('#' + htmlIdentifier).find('.lmlstacktableremovebutton').bind('click', function() {
-            $(this).parent().remove();
-        }
 
 
 
-        this.appendRow = function() {
 
+        this.appendRow = function(data, index) {
+            var row = "<tr>";
+            if (data && index) {
+
+            }
+            $('.lmlstacktable th input').each(function(index) {
+                row += "<td>" + $(this).val() + "</td>";
+                row += "<input type='hidden' name='"+ $('#' + htmlIdentifier).data('fieldname') +"["+linenumber+"]["+ scheme.columns[index].fieldName +"]' value='"+  $(this).val() +"'></input>";
+                $(this).val('');
+            });
+            row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";
+            row += "</tr>";
+            $('#' + htmlIdentifier).find('tr').last().after(row);
+            $('#' + htmlIdentifier).find('.lmlstacktableremovebutton').bind('click', function() {
+                $(this).parent().parent().remove();
+            });
+
+            linenumber ++;
+
+            return false;
         }
 
         var init = function() {
@@ -607,7 +613,7 @@ var LiliumCMS = function() {
                     col = scheme.columns[i];
                 }
             }
-            
+
 
             return col;
         };

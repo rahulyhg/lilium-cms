@@ -33,6 +33,7 @@ var Precompiler = require('./precomp.js');
 var Petals = require('./petal.js');
 var GC = require('./gc.js');
 var scheduler = require('./scheduler.js');
+var Role = require('./role.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -94,9 +95,19 @@ var Core = function() {
 		});
 
 		admin.registerAdminEndpoint('campaigns', 'POST', function(cli) {
-			cli.touch('admin.GET.campaigns');
+			cli.touch('admin.POST.campaigns');
 			Campaigns.handlePOST(cli);
 		});
+
+        admin.registerAdminEndpoint('role', 'GET', function(cli) {
+            cli.touch('admin.GET.role');
+            Role.handleGET(cli);
+        });
+
+        admin.registerAdminEndpoint('role', 'POST', function(cli) {
+            cli.touch('admin.POST.role');
+            Role.handlePOST(cli);
+        });
 
 		hooks.fire('endpoints');
 		log('Endpoints', 'Loaded endpoints');
