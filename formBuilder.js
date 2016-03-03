@@ -320,7 +320,14 @@ var FormBuilder = function() {
               if (form.fields[key].type == 'form') {
                   form.fields[key].attr.value = cli.postdata.data[key];
               } else {
-                  form.fields[key].attr.value =  cli.postdata.data[key];
+                   var escapedData
+                  if (typeof cli.postdata.data[key] == 'string') {
+                      escapedData = cli.postdata.data[key].replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\/g, "");
+                  } else {
+                    escapedData = cli.postdata.data[key];
+                  }
+
+                  form.fields[key].attr.value = escapedData
               }
 
           }
@@ -341,7 +348,6 @@ var FormBuilder = function() {
         data[field.name] = field.attr.value;
       }
     }
-    console.log(data);
     return data;
   }
 

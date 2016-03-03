@@ -207,7 +207,7 @@ body {
 body.lmlrendered {
 	opacity: 1;
 }
- 
+
 input, textarea, button {
 	outline: none;
 	border: none;
@@ -463,7 +463,8 @@ header.admin-bar .navbar-default .navbar-header {
 #notification-dropdown{
 	padding: 0px;
 	max-height: 300px;
-	overflow-y: scroll;
+	width: 300px;
+
 	overflow-x: hidden;
 }
 #notification-dropdown li{

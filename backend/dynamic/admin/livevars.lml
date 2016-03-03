@@ -1,4 +1,3 @@
 {#config;forms}
 		<h2>Live Variables Playground</h2>
-
 		{=forms.render("debug_livevars")}

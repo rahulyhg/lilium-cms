@@ -6,6 +6,7 @@ var fileserver = require('./fileserver.js');
 var checksum = require('checksum');
 var compressor = require('node-minify');
 var frontend = require('./frontend.js');
+var log = require('./log.js');
 
 var Precomp = function() {
 	var absReadPath = _c.default.server.base + "backend/dynamic/precomp/";
@@ -14,27 +15,37 @@ var Precomp = function() {
 
 	var minifyFile = function(inFile, outFile, filetype, callback) {
 		log('Precompiler', 'Minifying ' + filetype + ' file');
-		if (_c.default.env !== 'dev') {
-			if (filetype == 'css') {
-				new compressor.minify({
-	  				type: 'yui-css',
-  					fileIn: inFile,
-  					fileOut: outFile,
-  					callback: callback
-				});
-			} else if (filetype == 'js') {
-				new compressor.minify({
-  					type: 'yui-js',
-  					fileIn: inFile,
-	  				fileOut: outFile,
-  					callback: callback
-				});
-			} else {
-				fileserver.copyFile(inFile, outFile, callback);
-			}
-		} else {
-			fileserver.copyFile(inFile, outFile, callback);
-		}
+
+            if (filetype == 'css') {
+                new compressor.minify({
+                    type: 'yui-css',
+                    fileIn: inFile,
+                    fileOut: outFile,
+                    callback: function(err, min) {
+                        if (err) {
+                            console.error(err);
+                        } else {
+                            callback(err, min)
+                        };
+                    }
+                });
+            } else if (filetype == 'js') {
+                new compressor.minify({
+                    type: 'yui-js',
+                    fileIn: inFile,
+                    fileOut: outFile,
+                    callback: function(err, min) {
+                        if (err) {
+                            console.error(err);
+                        } else {
+                            callback(err, min)
+                        };
+                    }
+                });
+            } else {
+                fileserver.copyFile(inFile, outFile, callback);
+            }
+
 	};
 
 	var runLoop = function(readycb) {
@@ -42,7 +53,7 @@ var Precomp = function() {
 		log('Precompiler', 'Precompiling static files');
 		fileserver.listDirContent(absReadPath, function(fileArr) {
 			db.findToArray('compiledfiles', {}, function(err, histo) {
-				
+
 				var histoObj = new Object();
 
 				for (var i = 0; i < histo.length; i++) {

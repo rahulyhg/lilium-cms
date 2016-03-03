@@ -6,6 +6,7 @@ var log = undefined;
 var _c = undefined;
 var db = undefined;
 var adminAdvertiser = require('./adminAdvertiser.js');
+var fileserver = undefined;
 
 var CampaignAdvertiser = function() {
     this.handlePOST = function(cli) {
@@ -264,7 +265,7 @@ var CampaignAdvertiser = function() {
             }, function(err, camp) {
                 if (err) log('Advertiser Plugin', err);
                 //
-                if (camp.length > 0 && cli.userinfo.userid == camp[0].clientid && camp[0].campstatus == 'clisign') {
+                if (camp.length > 0 && cli.userinfo.userid == camp[0].clientid.toString() && camp[0].campstatus == 'clisign') {
                     var campaign = camp[0];
                     var form = formBuilder.handleRequest(cli);
                     var validation = formBuilder.validate(form, false, cli);
@@ -273,30 +274,32 @@ var CampaignAdvertiser = function() {
                     if (validation) {
 
                         var image = formBuilder.serializeForm(form);
-                        var extensions = image.signature.split('.');
-                        var mime = extensions[extensions.length - 1];
+                        var signature = image.signature;
 
-                        var nextStatus = campaign.paymentreq ? 'clipayment' : 'prod';
+                        var filename = fileserver.genRandomNameFile(signature);
+                        var path =  _c.default.server.base + "backend/static/uploads/" +filename + ".png";
 
-                        if (_c.default.supported_pictures.indexOf('.' + mime) != -1) {
-                            // Save it in database
-                            db.update('campaigns', {
-                                _id: campaign._id
-                            }, {
-                                clientsignature: image.signature,
-                                campstatus: nextStatus
-                            }, function(err, result) {
-                                if (campaign.paymentreq) {
-                                    cli.redirect(_c.default.server.url + "/advertiser/campaigns/pay/" + campaign._id);
-                                } else {
-                                    cli.redirect(_c.default.server.url + "/advertiser?alert=Signature Successfull!");
-                                }
-                            });
-                        } else {
-                            cli.sendJSON({
-                                form: response
-                            });
-                        }
+                        // Create signature image from text
+                        fileserver.genImageFromText(signature, path, "Arty Signature", 30, function() {
+                            //Save
+
+                            var nextStatus = campaign.paymentreq ? 'clipayment' : 'prod';
+
+                                // Save it in database
+                                db.update('campaigns', {
+                                    _id: campaign._id
+                                }, {
+                                    clientsignature: filename + ".png",
+                                    campstatus: nextStatus
+                                }, function(err, result) {
+                                    if (campaign.paymentreq) {
+                                        cli.redirect(_c.default.server.url + "/advertiser/campaigns/pay/" + campaign._id);
+                                    } else {
+                                        cli.redirect(_c.default.server.url + "/advertiser?alert=Signature Successfull!");
+                                    }
+                                });
+                        });
+
                     } else {
                         cli.refresh();
                     }
@@ -356,7 +359,7 @@ var CampaignAdvertiser = function() {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function(err, array) {
                 if (err) log('Advertiser Plugin', err);
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clisign') {
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clisign') {
                     fileLogic.serveLmlPluginPage('advertiser', cli, true);
                 } else {
                     cli.throwHTTP(400, 'Bad Request');
@@ -367,8 +370,6 @@ var CampaignAdvertiser = function() {
         }
     };
 
-
-
     this.init = function(abspath) {
         log = require(abspath + 'log.js');
         log("AdvertiserPlugin", "Initializing campaigns class");
@@ -378,10 +379,11 @@ var CampaignAdvertiser = function() {
         transaction = require(abspath + 'transaction.js');
         _c = require(abspath + 'config.js');
         db = require(abspath + 'includes/db.js');
+        fileserver = require(abspath + 'fileserver.js');
 
         formBuilder.createForm('advertiser_sign')
-            .add('signature', 'file', {
-                'displayname': 'Upload a picture of your signature'
+            .add('signature', 'text', {
+                'displayname': 'Sign by typing your complete name'
             }, {
                 required: true
             })

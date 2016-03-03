@@ -34,6 +34,7 @@ var Precompiler = require('./precomp.js');
 var Petals = require('./petal.js');
 var GC = require('./gc.js');
 var scheduler = require('./scheduler.js');
+var Role = require('./role.js');
 
 var Core = function() {
 	var loadHooks = function(readyToRock) {
@@ -100,7 +101,7 @@ var Core = function() {
 		});
 
 		admin.registerAdminEndpoint('campaigns', 'POST', function(cli) {
-			cli.touch('admin.GET.campaigns');
+			cli.touch('admin.POST.campaigns');
 			Campaigns.handlePOST(cli);
 		});
 		
@@ -108,6 +109,16 @@ var Core = function() {
 			cli.touch('admin.GET.settings');
 			settings.handleGET(cli);
 		});
+
+        admin.registerAdminEndpoint('role', 'GET', function(cli) {
+            cli.touch('admin.GET.role');
+            Role.handleGET(cli);
+        });
+
+        admin.registerAdminEndpoint('role', 'POST', function(cli) {
+            cli.touch('admin.POST.role');
+            Role.handlePOST(cli);
+        });
 
 		hooks.fire('endpoints');
 		log('Endpoints', 'Loaded endpoints');
@@ -501,7 +512,7 @@ var Core = function() {
 		var htmlbase = _c.default.server.html;
 
 		Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin");
-		Frontend.registerJSFile(base + "bower_components/bootstrap/dist/js/bootstrap.min.js", 200, "admin");
+		Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin");
 		Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin");
 		Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin");
 		Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin");

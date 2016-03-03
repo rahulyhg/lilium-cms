@@ -81,7 +81,7 @@ var LiliumCMS = function() {
             $.get("/livevars", {
                 vars: JSON.stringify(endpoints)
             }, function(data) {
-                livevars = data;
+                livevars = deepUnescape(data);
                 document.dispatchEvent(new CustomEvent('livevarsFetched', {
                     'detail': {
                         'livevars': livevars
@@ -307,7 +307,7 @@ var LiliumCMS = function() {
                         $(lmlTag).after(filler);
                     } else {
                         $(this).text(JSON.stringify(livevars[$(this).data('varname')]));
-                        $(this).text(livevars[$(this).data('varname')]);
+                        $(this).text(unescape(livevars[$(this).data('varname')]));
                     }
                 }
             });
@@ -454,11 +454,14 @@ var LiliumCMS = function() {
 
                 var processForm = function(form) {
                     var that = this;
-                    var serialized_form = form.serialize();
-
+                    var serialized_form = escape(form.serialize());
                     // Process files
                     processFiles(form, function() {
+
                         $.post(form.attr('action'), serialized_form, function(data) {
+                            if (data.success) {
+                                window.location.replace(data.redirect);
+                            }
                             var event = new CustomEvent('formSubmited', {
                                 'detail': data
                             });
@@ -545,6 +548,7 @@ var LiliumCMS = function() {
 
     var FormParser = function() {
         var makeSingleStackTable = function(index, osTable) {
+            console.log(osTable);
             sTable = $(osTable);
             var stackTable = new StackTable(
                 sTable.attr('id'),
@@ -569,10 +573,45 @@ var LiliumCMS = function() {
         };
     };
 
-    var StackTable = function(tableid, objTitle, dataScheme) {
+    var StackTable = function(tableid, objTitle, dataScheme, dataSource) {
         var htmlIdentifier = tableid;
         var scheme = dataScheme;
         var title = objTitle;
+        var linenumber = 0;
+        var that = this;
+        var render = function() {
+
+        }
+
+        $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
+            that.appendRow();
+        });
+
+
+
+
+
+        this.appendRow = function(data, index) {
+            var row = "<tr>";
+            if (data && index) {
+
+            }
+            $('.lmlstacktable th input').each(function(index) {
+                row += "<td>" + $(this).val() + "</td>";
+                row += "<input type='hidden' name='"+ $('#' + htmlIdentifier).data('fieldname') +"["+linenumber+"]["+ scheme.columns[index].fieldName +"]' value='"+  $(this).val() +"'></input>";
+                $(this).val('');
+            });
+            row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";
+            row += "</tr>";
+            $('#' + htmlIdentifier).find('tr').last().after(row);
+            $('#' + htmlIdentifier).find('.lmlstacktableremovebutton').bind('click', function() {
+                $(this).parent().parent().remove();
+            });
+
+            linenumber ++;
+
+            return false;
+        }
 
         var init = function() {
 
@@ -603,6 +642,7 @@ var LiliumCMS = function() {
                     col = scheme.columns[i];
                 }
             }
+
 
             return col;
         };
@@ -960,6 +1000,14 @@ var LiliumCMS = function() {
     // Notifications
     document.addEventListener(LiliumEvents.livevarsFetched.name, function(e) {
         var session = e.detail.livevars.session
+
+        // Subscribe to channels based on user roles
+        if (session) {
+            for (var index in session.roles) {
+                // Join socket channel
+                socket.join(session.roles[index]);
+            }
+        }
         if (session && session.notifications) {
             var notifs = session.notifications;
             var notificationList = $('#notification_list');
@@ -1096,6 +1144,20 @@ var LiliumCMS = function() {
     });
     }
 
+         var deepUnescape = function(json) {
+             for (var index in json) {
+                 switch (typeof json[index]) {
+                     case 'string':
+                         json[index] = unescape(json[index]);
+                         break;
+                     case 'object':
+                         json[index] = deepUnescape(json[index]);
+                         break;
+
+                 }
+             }
+             return json;
+         };
 
     var CKEditor = function() {
         this.initEditor = function() {
@@ -1119,10 +1181,9 @@ var LiliumCMS = function() {
                 $('[ckeditor]').ckeditor();
             }
             CKEDITOR.on('instanceReady', function(ev) {
-
+                // Output paragraphs as <p>Text</p>.
                 this.document.appendStyleSheet('/static/ckeditorstyle.css');
             });
-
             CKEDITOR.config.entities = false;
             CKEDITOR.config.extraPlugins = 'image-finder';
             CKEDITOR.config.entities_greek = false;
@@ -1250,7 +1311,6 @@ var LiliumCMS = function() {
         };
     };
     this.formvalidator = new FormValidator();
-    // this.formvalidator.prepareValidation();
     this.awesomestrapper = new AwesomeStrapper();
     this.formParser = new FormParser();
     this.livevars = new LiveVars();
