@@ -157,7 +157,7 @@ var DB = function() {
 	// Will find documents from collection coln according to conds,
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
-	this.modify = this.update = function(coln, conds, newVal, cb, upsert, one) {
+	this.modify = this.update = function(coln, conds, newVal, cb, upsert, one, operators) {
 		_conn.collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -170,7 +170,7 @@ var DB = function() {
 				} else {
 					col[one ? 'updateOne' : 'updateMany'](
 						conds,
-						{$set:newVal},
+						operators ? newVal : {$set:newVal},
 						{
 							'upsert' : upsert ? upsert : false
 						}
