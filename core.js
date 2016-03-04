@@ -1,4 +1,5 @@
 var _c = require('./config.js');
+var settings = require('./settings.js');
 var hooks = require('./hooks.js');
 var endpoints = require('./endpoints.js');
 var plugins = require('./plugins.js');
@@ -59,6 +60,11 @@ var Core = function() {
 			admin.handleAdminEndpoint(cli);
 		});
 
+		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
+			cli.touch("admin.GET.dashboard");
+			admin.handleGETDashboard(cli);
+		});
+
 		admin.registerAdminEndpoint('article', 'GET', function(cli){
 			cli.touch("admin.GET.article");
 			Article.handleGET(cli);
@@ -98,6 +104,11 @@ var Core = function() {
 			cli.touch('admin.POST.campaigns');
 			Campaigns.handlePOST(cli);
 		});
+		
+		admin.registerAdminEndpoint('settings', 'GET', function(cli) {
+			cli.touch('admin.GET.settings');
+			settings.handleGET(cli);
+		});
 
         admin.registerAdminEndpoint('role', 'GET', function(cli) {
             cli.touch('admin.GET.role');
@@ -134,6 +145,7 @@ var Core = function() {
 	var loadGlobalPetals = function() {
 		Petals.register('adminbar',  _c.default.server.base + 'backend/dynamic/admin/adminbar.petal');
 		Petals.register('adminhead', _c.default.server.base + 'backend/dynamic/admin/adminhead.petal');
+		Petals.register('adminsidebar', _c.default.server.base + 'backend/dynamic/admin/adminsidebar.petal');
 	};
 
 	var loadImageSizes = function() {
@@ -141,6 +153,47 @@ var Core = function() {
 		imageSize.add("medium", 300, '*');
 		imageSize.add("Archive-thumbnail", 400, 400);
 	}
+
+	var loadAdminMenus = function() {
+		var aurl = _c.default.server.url + "/admin/";
+
+		admin.registerAdminMenu({
+			id : "sites", faicon : "fa-sitemap", displayname : "Sites", priority : 50,
+			rights : ["manage-sites"], absURL : aurl + "sites", children : []
+		});
+		admin.registerAdminMenu({
+			id : "dashboard", faicon : "fa-tachometer", displayname : "Dashboard", priority : 100,
+			rights : ["dash"], absURL : aurl + "dashboard", children : []
+		});
+		admin.registerAdminMenu({
+			id : "articles", faicon : "fa-pencil", displayname : "Articles", priority : 200,
+			rights : ["view-content"], absURL : aurl + "article", children : []
+		});
+		admin.registerAdminMenu({
+			id : "campaigns", faicon : "fa-line-chart", displayname : "Campaigns", priority : 300,
+			rights : ["view-campaigns"], absURL : aurl + "campaigns", children : []
+		});
+		admin.registerAdminMenu({
+			id : "media", faicon : "fa-picture-o", displayname : "Media", priority : 400,
+			rights : ["view-media"], absURL : aurl + "media/list", children : []
+		});
+		admin.registerAdminMenu({
+			id : "entities", faicon : "fa-users", displayname : "Entities", priority : 500,
+			rights : ["view-entities"], absURL : aurl + "entities", children : []
+		});
+		admin.registerAdminMenu({
+			id : "themes", faicon : "fa-paint-brush", displayname : "Themes", priority : 600,
+			rights : ["manage-themes"], absURL : aurl + "themes", children : []
+		});
+		admin.registerAdminMenu({
+			id : "plugins", faicon : "fa-plug", displayname : "Plugins", priority : 700,
+			rights : ["manage-plugins"], absURL : aurl + "plugins", children : []
+		});
+		admin.registerAdminMenu({
+			id : "settings", faicon : "fa-cogs", displayname : "Settings", priority : 1000,
+			rights : ["manage-settings"], absURL : aurl + "settings/", children : []
+		});
+	};
 
 	var loadPlugins = function(cb) {
 		log('Plugins', 'Loading plugins');
@@ -391,6 +444,7 @@ var Core = function() {
 	};
 
 	var loadLiveVars = function() {
+		admin.registerLiveVar();
 		Article.registerContentLiveVar();
 		Media.registerMediaLiveVar();
 		dfp.registerLiveVar();
@@ -400,7 +454,7 @@ var Core = function() {
 		plugins.registerLiveVar();
 		themes.registerLiveVar();
 		sites.registerLiveVar();
-
+		settings.registerLiveVar();
 		Livevars.registerDebugEndpoint();
 	};
 
@@ -425,6 +479,7 @@ var Core = function() {
 		entities.registerCreationForm();
 		LoginLib.registerLoginForm();
 	        Article.registerForms();
+		settings.registerForm();
 	};
 
 	var loadNotifications = function() {
@@ -464,6 +519,11 @@ var Core = function() {
 		Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin");
 		Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin');
 
+		Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin');
+		Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin');
+		Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin');
+		Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin');
+
 		Precompiler.precompile(callback);
 	};
 
@@ -479,6 +539,7 @@ var Core = function() {
 		loadFrontend();
 		loadRequestHandler();
 		loadGlobalPetals();
+		loadAdminMenus();
 
 		loadHTMLStructure(function() {
 		testDatabase(function() {

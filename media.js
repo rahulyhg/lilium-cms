@@ -56,7 +56,7 @@ var Media = function() {
 				if (media != null) {
 					medias.push(media);
 				} else {
-					filelogic.serveLmlPage(cli, false, extra);
+					filelogic.serveAdminLML(cli, false, extra);
 				}
 			});
 		});
@@ -109,7 +109,7 @@ var Media = function() {
 				}
 
       } else {
-        filelogic.serveLmlPage(cli);
+        filelogic.serveAdminLML(cli);
       }
 
 	};
@@ -158,7 +158,7 @@ var Media = function() {
 			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 			db.exists('uploads', {_id : id}, function(exists) {
 				if (exists) {
-					filelogic.serveLmlPage(cli, true, {id : id});
+					filelogic.serveAdminLML(cli, true, {id : id});
 				} else {
 					cli.throwHTTP(404, 'Media Not Found');
 				}

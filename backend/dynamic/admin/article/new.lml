@@ -1,14 +1,5 @@
 {#config;session;vocab;forms}
-<!DOCTYPE html>
-<html>
-
-<head>
-    {%adminhead;../entityscript}
-    <title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-</head>
-
-<body>
-    {%adminbar}
+    {%../entityscript}
     <header>
         <h1>{=config.default.vendor.productname}
             <small>v{=config.default.vendor.version}</small>
@@ -32,6 +23,3 @@
             return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
         });
     </script>
-</body>
-
-</html>

@@ -26,7 +26,7 @@
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li id="dropdown-notification" class="dropdown">
-						<span class="glyphicon glyphicon-bell link dropdown-toggle"  data-toggle="dropdown" aria-hidden="true"><span class="badge">0</span></span>
+						<span class="fa fa-bell link dropdown-toggle"  data-toggle="dropdown" aria-hidden="true"><span class="badge">0</span></span>
 						<ul id="notification-dropdown" class="dropdown-menu" id="notification-dropdown">
 							<div class="title">Notifications</div>
 							<div id="notification_list">

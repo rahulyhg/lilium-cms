@@ -1,12 +1,4 @@
-{#config;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-		{%adminhead}
-        	{%campaignscript}
-	</head>
-	<body>
-		{%adminbar}
+{#config}
 		<h1>All Campaigns</h1>
 		<table>
 			<thead>
@@ -38,6 +30,3 @@
                 No Campaigns
             </lml:empty>
 		</lml:template>
-
-	</body>
-</html>

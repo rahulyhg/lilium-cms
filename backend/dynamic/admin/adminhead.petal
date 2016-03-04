@@ -3,13 +3,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 
-<!-- Links -->
-<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/bower/bootstrap/dist/css/bootstrap.min.css"/>
-<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-
 <!-- Scripts -->
 <script src="{=config.default.server.url}/compiled/admin.js"></script>
 
 <!-- Lilium Admin Styles and Scripts  -->
-<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/compiled/lilium.css"/>
+<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/compiled/admin.css"/>

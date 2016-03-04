@@ -247,7 +247,7 @@ var Campaigns = function() {
         var params = cli.routeinfo.path;
         var hasParam = params.length > 2 && params[2] != "new";
 
-        filelogic.serveLmlPage(cli, hasParam);
+        filelogic.serveAdminLML(cli, hasParam);
     };
 
     var cliToDatabaseCampaign = function(cli) {

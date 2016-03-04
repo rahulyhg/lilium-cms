@@ -22,7 +22,7 @@ var Themes = function() {
         });
       });
     } else {
-      filelogic.serveLmlPage(cli);
+      filelogic.serveAdminLML(cli);
     }
 
   };

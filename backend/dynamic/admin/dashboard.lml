@@ -1,0 +1,35 @@
+{#config;vocab;testarray}
+<h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1>
+<h2>{=vocab.admintitle}</h2>
+Currently running in {=config.default.env} env.
+        
+<div>
+	<button id="broadcast">Broadcast a "critical" notification</button>
+</div>
+<div>
+	<button id="roles">Send a "warning" notification to admin group</button>
+</div>
+<div>
+	<button id="myself">Send a "random" notification to yourself</button>
+</div>
+
+{*entities.lilium(postType:types.post)}
+
+<script>
+        $('#broadcast').click(function() {
+            $.post('http://localhost:8080/admin/article/broadcast', {}, function(data){
+
+            });
+        });
+        $('#roles').click(function() {
+            $.post('http://localhost:8080/admin/article/role', {}, function(data){
+
+            });
+        });
+        $('#myself').click(function() {
+            $.post('http://localhost:8080/admin/article/user');
+        });
+</script>
+<script src="{=config.default.server.url}/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
+<script src="{=config.default.server.url}/bower/jquery-timeago/jquery.timeago.js"></script>
+

@@ -1,14 +1,7 @@
 {#config;session;vocab;forms;extra}
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-		{%adminhead}
-	</head>
-	<body>
 		{*media.{?1}}
 
-		<header><h1>About this media</h1></header>
+		<h1>About this media</h1>
 		Name : <h2></h2>
 		Media Type : <h4 data-name="type"></h4>
 		<button onclick="deleteMedia()">Delete Media</button><br>
@@ -28,5 +21,3 @@
 
 		</script>
 
-	</body>
-</html>

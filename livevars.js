@@ -113,7 +113,6 @@ var LiveVariables = function() {
 	};
 
 	this.handleRequest = function(cli) {
-        cli.debug();
 		try{
 			var liveVars = JSON.parse(cli.routeinfo.params.vars);
 			cli.livevars = {};
@@ -137,7 +136,7 @@ var LiveVariables = function() {
 		log("Livevars", "Registering admin endpoint for debug");
 		require('./backend/admin.js').registerAdminEndpoint('livevars', 'GET', function(cli) {
 			cli.touch('livevars.GET');
-			require('./filelogic.js').serveLmlPage(cli);
+			require('./filelogic.js').serveAdminLML(cli);
 		});
 
 		require('./formBuilder.js').createForm('debug_livevars', {

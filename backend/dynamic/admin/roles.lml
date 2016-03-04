@@ -1,11 +1,5 @@
 {#config;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-		{%adminhead;entityscript}
-	</head>
-	<body>
-		{%adminbar}
+		{%entityscript}
 		<h1>All roles</h1>
 
 		<main class="entities-main">
@@ -35,5 +29,3 @@
 			</li>
 		</lml:template>
         <script src="{=config.default.server.base_url}:8080/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
-	</body>
-</html>

@@ -3,6 +3,7 @@ var _c = require('./config.js');
 
 var BodyClasses = new Object();
 var JavaScriptFiles = new Object();
+var CSSFiles = new Object();
 
 var Frontend = function() {
 	var bodyPrefix = "liliumbody-";
@@ -50,7 +51,7 @@ var Frontend = function() {
 			JavaScriptFiles[context] = arr;
 		}
 	
-		if (arr.indexOf(absPath) === -1 && (context != "all" || BodyClasses["all"].indexOf(absPath) !== -1)) {
+		if (arr.indexOf(absPath) === -1 && (context != "all" || JavaScriptFiles["all"].indexOf(absPath) !== -1)) {
 			while (typeof arr[priority] !== 'undefined') {
 				priority++;
 			} 
@@ -61,6 +62,36 @@ var Frontend = function() {
 
 	this.getJSQueue = function(contextName) {
 		var arr = JavaScriptFiles[contextName || "all"];
+		var returnedArr = new Array();
+
+		if (arr) for (var index in arr) {
+			returnedArr.push(arr[index]);
+		}
+
+		return returnedArr;
+	};
+	
+	this.registerCSSFile = function(absPath, priority, context) {
+		context = context || "all";
+
+		var arr = CSSFiles[context];
+		
+		if (!arr) {
+			arr = new Array();
+			CSSFiles[context] = arr;
+		}
+	
+		if (arr.indexOf(absPath) === -1 && (context != "all" || CSSFiles["all"].indexOf(absPath) !== -1)) {
+			while (typeof arr[priority] !== 'undefined') {
+				priority++;
+			} 
+			
+			arr[priority] = absPath;
+		};
+	};
+
+	this.getCSSQueue = function(contextName) {
+		var arr = CSSFiles[contextName || "all"];
 		var returnedArr = new Array();
 
 		if (arr) for (var index in arr) {

@@ -1,16 +1,11 @@
 {#config;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-		{%adminhead;../mediascript}
+		{%../mediascript}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";
 			baseurl += config.default.paths.admin;
 			baseurl += "/";
 		$}
-	</head>
-	<body>
 		<h1>List of medias</h1>
 		<a href="{=baseurl}media/upload">Add a media</a>
 		<main class="medias-main">
@@ -32,5 +27,3 @@
 				</div>
 			</li>
 		</lml:template>
-	</body>
-</html>

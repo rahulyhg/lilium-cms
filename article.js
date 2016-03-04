@@ -70,7 +70,7 @@ var Article = function() {
     };
 
     this.list = function(cli) {
-        filelogic.serveLmlPage(cli, false);
+        filelogic.serveAdminLML(cli, false);
     }
 
     this.new = function(cli) {
@@ -105,7 +105,7 @@ var Article = function() {
             }
 
         } else {
-            filelogic.serveLmlPage(cli);
+            filelogic.serveAdminLML(cli);
         }
 
     };
@@ -136,7 +136,7 @@ var Article = function() {
                 }
 
             } else {
-                filelogic.serveLmlPage(cli, true);
+                filelogic.serveAdminLML(cli, true);
             }
 
 

@@ -1,17 +1,11 @@
 {#config;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-		{%adminhead;../articlescript}
+		{%../articlescript}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";
 			baseurl += config.default.paths.admin;
 			baseurl += "/";
 		$}
-	</head>
-	<body>
-		{%adminbar}
 		<h1>List of articles</h1>
 		<a href="{=baseurl}article/new">Add an article</a>
 		<main class="entities-main">
@@ -38,5 +32,3 @@
 				</div>
 			</li>
 		</lml:template>
-	</body>
-</html>

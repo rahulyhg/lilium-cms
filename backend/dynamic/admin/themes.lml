@@ -2,15 +2,7 @@
 {$
 	themeList = themes.getCachedThemes();
 $}
-<!DOCTYPE html>
-<html>
-
-<head>
-	{%adminhead;entityscript}
-</head>
-
-<body>
-	{%adminbar}
+	{%entityscript}
 	<h1>{=vocab.themes}</h1>
 
 	{$
@@ -26,9 +18,7 @@ $}
 	{$
 		endfor;
 	$}
-</body>
 
-</html>
 <script>
 liliumcms.livevars.getLiveVars(function() {
 	$('.theme').each(function() {
