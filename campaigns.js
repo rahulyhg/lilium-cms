@@ -272,7 +272,6 @@ var Campaigns = function() {
 
     this.handlePOST = function(cli) {
         cli.touch('campaigns.handlePOST');
-        cli.debug();
         var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
         var action = cli.routeinfo.path[2] || 'new';
 

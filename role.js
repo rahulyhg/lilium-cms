@@ -10,7 +10,7 @@ var Role = function() {
     this.handlePOST = function(cli) {
         cli.touch('role.handlePOST');
         switch (cli.routeinfo.path[2]) {
-            case 'new':
+            case 'list':
                 this.new(cli);
                 break;
             case 'edit':
@@ -38,9 +38,6 @@ var Role = function() {
                 case 'edit':
                     this.edit(cli);
                     break;
-                case 'getArticle':
-                    this.getArticle(cli);
-                    break;
                 case 'list':
                     this.list(cli);
                     break;
@@ -53,7 +50,7 @@ var Role = function() {
     };
 
     this.list = function(cli) {
-        filelogic.serveLmlPage(cli, false);
+        filelogic.serveAdminLML(cli, false);
     }
 
     this.new = function(cli) {
@@ -64,13 +61,12 @@ var Role = function() {
 
             // Create post
             db.insert('roles', prepareRoleForDB(cli), function(err, result) {
-                console.log(result);
                 // Generate LML page
                 cli.redirect('/admin/roles/edit/');
             });
 
         } else {
-            filelogic.serveLmlPage(cli);
+            filelogic.serveAdminLML(cli);
         }
 
     };
@@ -101,7 +97,7 @@ var Role = function() {
                 }
 
             } else {
-                filelogic.serveLmlPage(cli, true);
+                filelogic.serveAdminLML(cli, true);
             }
 
 
@@ -111,34 +107,30 @@ var Role = function() {
     }
 
     this.delete = function(cli) {
-        if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
-            var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+        if (cli.postdata.data._id) {
+            var id = new mongo.ObjectID(cli.postdata.data._id);
 
-            db.remove('content', {
+            db.remove('roles', {
                 _id: id
             }, function(err, r) {
-                var filename = r.title + '.html';
-                fs.deleteFile(filename, function() {
-                    cacheInvalidator.removeFileToWatch(filename);
-                    return cli.sendJSON({
-                        redirect: '/admin/article/list',
-                        success: true
-                    });
+                return cli.sendJSON({
+                    success: true
                 });
-
             });
 
         } else {
-            return cli.throwHTTP(404, 'Article Not Found');
+            return cli.sendJSON({
+                success: false
+            });
         }
     }
 
-    this.prepareRoleForDB = function(cli) {
+    var prepareRoleForDB = function(cli) {
         var postdata = cli.postdata.data;
         var rights = new Array();
 
         for (var key in postdata.rights) {
-            rights.push(postdata.rights[key]);
+            rights.push(postdata.rights[key].rightname);
         }
 
         return {
@@ -150,18 +142,19 @@ var Role = function() {
 
 
 
-    this.registerContentLiveVar = function() {
+    var registerContentLiveVar = function() {
         livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
-                db.singleLevelFind('role', callback);
+                db.singleLevelFind('roles', callback);
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
-                db.findToArray('content', {}, function(err, arr) {
+                db.findToArray('roles', {}, function(err, arr) {
                     for (var i = 0; i < arr.length; i++) {
                         sentArr.push({
-                            articleid: arr[i]._id,
-                            title: arr[i].title
+                            id: arr[i]._id,
+                            displayname: arr[i]._id,
+                            right: arr[i].rights
                         });
                     };
 
@@ -198,7 +191,7 @@ var Role = function() {
 			displayname : "User Rights",
 			scheme : {
 				columns : [
-					{fieldName:'rightname', dataType:'text', displayname:"Name"},
+					{fieldName:'rights', dataType:'text', displayname:"Name"},
 				]
 			}
 		})
@@ -208,7 +201,10 @@ var Role = function() {
     }
 
 
-    var init = function() {registerForms()};
+    var init = function() {
+        registerContentLiveVar();
+        registerForms()
+    };
 
     init();
 };

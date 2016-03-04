@@ -19,7 +19,7 @@
  *********************************************************************************************************/
 var debugMode = 'true';
 var socket = typeof io !== 'undefined' ? io() : undefined;
-  
+
 var LiliumCMS = function() {
     var livevars;
     var urlParams;
@@ -37,7 +37,7 @@ var LiliumCMS = function() {
             name: "livevarsFetched"
         }
     };
- 
+
     var LiveVars = function() {
         var endpoints = [];
         var paramString = "?";
@@ -517,6 +517,19 @@ var LiliumCMS = function() {
         index = typeof index == 'undefined' ? 0: index;
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
 
+        // Check for stacktable
+        $(form).find('table.lmlstacktable').each(function(index, osTable) {
+            sTable = $(osTable);
+            var stackTable = new StackTable(
+                sTable.attr('id'),
+                sTable.data('title'),
+                JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+            );
+
+            stackTable.appendRow(data);
+
+        });
+
         var foreachloop = function(data, kString) {
              for (var key in data) {
                 var kkString = kString + (kString == "" ? "" : ".") + key;
@@ -535,7 +548,7 @@ var LiliumCMS = function() {
                         }
                     } else if ((pt = findPushTableFromTitle(kkString))) {
                         pt.fillFromSource(val);
-                    } 
+                    }
                 }
             }
 
@@ -547,8 +560,7 @@ var LiliumCMS = function() {
     };
 
     var FormParser = function() {
-        var makeSingleStackTable = function(index, osTable) {
-            console.log(osTable);
+        var makeSingleStackTable = this.makeSingleStackTable = function(index, osTable) {
             sTable = $(osTable);
             var stackTable = new StackTable(
                 sTable.attr('id'),
@@ -573,34 +585,29 @@ var LiliumCMS = function() {
         };
     };
 
-    var StackTable = function(tableid, objTitle, dataScheme, dataSource) {
+    var StackTable = function(tableid, objTitle, dataScheme) {
         var htmlIdentifier = tableid;
         var scheme = dataScheme;
+        var fieldName = dataScheme.fieldName;
         var title = objTitle;
         var linenumber = 0;
         var that = this;
-        var render = function() {
+        console.log(scheme);
 
+        var render = function() {
+            // Check for livevars
         }
 
         $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
             that.appendRow();
+            return false;
         });
 
 
-
-
-
-        this.appendRow = function(data, index) {
+        var append = function(val, index) {
             var row = "<tr>";
-            if (data && index) {
-
-            }
-            $('.lmlstacktable th input').each(function(index) {
-                row += "<td>" + $(this).val() + "</td>";
-                row += "<input type='hidden' name='"+ $('#' + htmlIdentifier).data('fieldname') +"["+linenumber+"]["+ scheme.columns[index].fieldName +"]' value='"+  $(this).val() +"'></input>";
-                $(this).val('');
-            });
+            row += "<td>" + val + "</td>";
+            row += "<input type='hidden' name='"+ $('#' + htmlIdentifier).data('fieldname') +"["+linenumber+"]["+ scheme.columns[index].fieldName +"]' value='"+  val +"'></input>";
             row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";
             row += "</tr>";
             $('#' + htmlIdentifier).find('tr').last().after(row);
@@ -613,8 +620,26 @@ var LiliumCMS = function() {
             return false;
         }
 
-        var init = function() {
 
+        this.appendRow = function(livevar) {
+                $('.lmlstacktable th input').each(function(index) {
+                    if (livevar) {
+                        var data = livevar[$(this).data('fieldname')];
+                        append();
+                    } else {
+                        append($(this).val(), index);
+                        $(this).val('');
+                    }
+
+                });
+
+
+
+            return false;
+        }
+
+        var init = function() {
+            render();
         };
 
         init();

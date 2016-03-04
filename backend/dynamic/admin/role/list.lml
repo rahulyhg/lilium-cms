@@ -1,11 +1,10 @@
 {#config;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-		{%../adminhead}
-	</head>
-	<body>
-		{%adminbar}
+{$
+	var baseurl = config.default.server.url;
+	baseurl += "/";
+	baseurl += config.default.paths.admin;
+	baseurl += "/";
+$}
 		<h1>All roles</h1>
 
 		<main class="entities-main">
@@ -21,19 +20,32 @@
 			<li class="entity-item-list">
 				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
 				<h6>
-					Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
+					Rights : <lml:tobject data-nodetype="span" data-key="rights" data-arrayseparator=", "></lml:tobject>
 				</h6>
 				<div class="entity-actions">
+					<lml:tobject data-nodetype="a"
+								 data-href="{=baseurl}role/edit/"
+						     data-key="_id">
+							Edit
+					</lml:tobject>
 					<lml:tobject data-nodetype="button"
 						     data-bind="click"
 						     data-action="deleteUser"
-						     data-actionparamkey="_id"
-						     data-filter="canDelete" >
+						     data-actionparamkey="_id">
 							Delete
 					</lml:tobject>
+
 				</div>
 			</li>
 		</lml:template>
-        <script src="{=config.default.server.base_url}:8080/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
-	</body>
-</html>
+
+		<script>
+		var deleteUser = function(id) {
+			$.post('/{=config.default.paths.admin}/role/delete', {_id: id}, function(data){
+				if (data.success) {
+					document.location.reload();
+
+				}
+			});
+		};
+		</script>
