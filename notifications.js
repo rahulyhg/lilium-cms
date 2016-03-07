@@ -19,6 +19,7 @@ var Notification = function() {
         //Create default groups
         that.createGroup('admin', 'admin');
         that.createGroup('lilium', 'lilium');
+        that.createGroup('spy');
 
         io.on('connection', function(socket) {
 
@@ -40,7 +41,7 @@ var Notification = function() {
                     if (groups[groupName]) {
 
                         // Check for needed roles
-                        if (session.data.roles.indexOf(groups[groupName].role) !== -1) {
+                        if (typeof groups[groupName].role == 'undefined' || session.data.roles.indexOf(groups[groupName].role) !== -1) {
                             socket.join(groupName);
                             groups[groupName].users.push({
                                 session: sessionId,
@@ -134,6 +135,40 @@ var Notification = function() {
                             }
                         }
                     }
+                });
+
+                socket.on('spy', function(data) {
+                    // Only admins or lilium can access this feature
+                    if (session.data.roles.indexOf('admin') !== -1 || session.data.roles.indexOf('lilium') !== -1) {
+                        // Make a list of all currently loggedin users
+                        var loggedInUsers = {};
+                        for (var clientId in sockets) {
+                            loggedInUsers[clientId] = [];
+                            // Each sockets, get the id
+                            for (var socketid in sockets[clientId]) {
+                                var info = {};
+                                info.url = sockets[clientId][socketid].url;
+                                info.time = sockets[clientId][socketid].time;
+
+                                loggedInUsers[clientId].push(info);
+                            }
+                        }
+
+                        socket.emit('spy', loggedInUsers);
+                    }
+                });
+
+                socket.on('urlChanged', function(url){
+                    sockets[clientId][socket.id].url = url;
+                    sockets[clientId][socket.id].time = new Date();
+
+                    clientUrls = [];
+
+                    for (var index in sockets[clientId]) {
+                        clientUrls.push(sockets[clientId][index].url);
+                    };
+
+                    io.sockets.in('spy').emit('spy-update', {clientId: clientUrls});
                 });
 
                 socket.on('broadcast', function(emission) {

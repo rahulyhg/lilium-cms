@@ -1107,11 +1107,17 @@ var LiliumCMS = function() {
     if (typeof io !== "undefined") {
     io.Socket.prototype.join = function(groupName) {
         this.emit('join', groupName);
-    }
+    };
 
     io.Socket.prototype.emitToGroup = function(groupName, data) {
         this.emit('emittogroup', {group: groupName, data: data});
-    }
+    };
+
+    io.Socket.prototype.notifyURL = function(groupName, data) {
+        this.emit('urlChanged', window.location.href);
+    };
+
+    socket.notifyURL();
 
     socket.on('join', function(data){
         if (!data.success) {

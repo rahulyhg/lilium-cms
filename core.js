@@ -34,6 +34,7 @@ var Petals = undefined;
 var GC = undefined;
 var scheduler = undefined;
 var Role = undefined;
+var filelogic = undefined;
 
 var log = require('./log.js');
 
@@ -74,6 +75,7 @@ var Core = function() {
 		GC = require('./gc.js');
 		scheduler = require('./scheduler.js');
 		Role = require('./role.js');
+        filelogic = require('./filelogic');
 	};
 
 	var loadHooks = function(readyToRock) {
@@ -103,7 +105,7 @@ var Core = function() {
 			cli.touch('admin.GET.sites');
 			sites.handleGET(cli);
 		});
-		
+
 		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
 			cli.touch("admin.GET.dashboard");
 			admin.handleGETDashboard(cli);
@@ -148,7 +150,7 @@ var Core = function() {
 			cli.touch('admin.POST.campaigns');
 			Campaigns.handlePOST(cli);
 		});
-		
+
 		admin.registerAdminEndpoint('settings', 'GET', function(cli) {
 			cli.touch('admin.GET.settings');
 			settings.handleGET(cli);
@@ -162,6 +164,11 @@ var Core = function() {
         admin.registerAdminEndpoint('role', 'POST', function(cli) {
             cli.touch('admin.POST.role');
             Role.handlePOST(cli);
+        });
+
+        admin.registerAdminEndpoint('activities', 'GET', function(cli) {
+            cli.touch('admin.GET.activities');
+            filelogic.serveAdminLML(cli, false);
         });
 
 		hooks.fire('endpoints');
@@ -237,6 +244,10 @@ var Core = function() {
 			id : "settings", faicon : "fa-cogs", displayname : "Settings", priority : 1000,
 			rights : ["manage-settings"], absURL : aurl + "settings/", children : []
 		});
+        admin.registerAdminMenu({
+            id : "activities", faicon : "fa-eye", displayname : "User Activities", priority : 800,
+            rights : ["view-user-activities"], absURL : aurl + "activities/", children : []
+        });
 	};
 
 	var loadPlugins = function(cb) {
@@ -474,7 +485,7 @@ var Core = function() {
 				} else {
 					log('FileServer', 'Error validated html directory');
 				}
-	
+
 			}, true);
 		});
 
@@ -615,7 +626,7 @@ var Core = function() {
 
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
-		loadWebsites(function(resp) { 
+		loadWebsites(function(resp) {
 			loadSites(function() {
 				loadRequires();
 				loadHooks(readyToRock);
@@ -646,7 +657,7 @@ var Core = function() {
 					Inbound.createServer();
 		     	     		loadNotifications();
 					Inbound.start();
-			
+
 					log('Core', 'Firing initialized signal');
 					hooks.fire('init');
 				});});});});});});});});});

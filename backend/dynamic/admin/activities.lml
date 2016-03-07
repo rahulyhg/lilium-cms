@@ -1,0 +1,56 @@
+<h1>User Activities</h1>
+<p>Use this page to monitor what users are working on.</p>
+<table id="user-list">
+    <thead>
+        <tr>
+            <th>User</th><th>Current page(s)</th><th>Time opened</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+<script>
+socket.join('spy');
+socket.emit('spy');
+
+socket.on('spy', function(users) {
+    var table = '';
+    console.log(users);
+    for(var id in users) {
+         table += createUserRow(users[id], id);
+    }
+
+    $('#user-list tbody').append(table);
+    $("time.timeago").timeago();
+});
+
+socket.on('spy-update', function(user){
+
+});
+
+var createUserRow = function(user, id) {
+    var row = '<tr id="'+ id +'">';
+    row += '<td>' + id + '</td>';
+
+    var timeCol = '<ul>';
+    var urlCol = '<ul>';
+
+    for (var index in user) {
+        timeCol += '<li><time class="date timeago" datetime="'+ user[index].time +'"></time></li>';
+        urlCol += '<li>' + user[index].url + '</li>';
+    }
+
+    timeCol += '</ul>';
+    urlCol += '</ul>';
+    row += '<td>' + urlCol + '</td>';
+    row += '<td>' + timeCol + '</td>';
+    row += '</tr>';
+    return row;
+};
+
+var updateUserRow = function(user) {
+
+};
+
+</script>

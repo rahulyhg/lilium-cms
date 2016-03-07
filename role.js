@@ -187,6 +187,9 @@ var Role = function() {
 		.add('displayname', 'text', {
 			displayname : "Display Name",
 		})
+        .add('level', 'number', {
+            displayname : "Level (Smaller is stronger)"
+        })
 		.add('rights', 'stack', {
 			displayname : "User Rights",
 			scheme : {
