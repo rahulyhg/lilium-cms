@@ -105,7 +105,7 @@ var LiliumCMS = function() {
 		}
 
 		return pullout;
-	};		
+	};
 
         var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey) {
             var key = obj.data('key');
@@ -158,7 +158,6 @@ var LiliumCMS = function() {
 
         var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey) {
             var templateItems = domTemplate.clone();
-
             while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
                 obj = $(obj);
                 var nodeType = obj.data('nodetype');
@@ -1034,7 +1033,7 @@ var LiliumCMS = function() {
     };
 
     // Notifications
-    document.addEventListener(LiliumEvents.livevarsFetched.name, function(e) {
+    document.addEventListener(LiliumEvents.livevarsRendered.name, function(e) {
         var session = e.detail.livevars.session
 
         // Subscribe to channels based on user roles
@@ -1046,13 +1045,12 @@ var LiliumCMS = function() {
         }
         if (session && session.notifications) {
             var notifs = session.notifications;
-            var notificationList = $('#notification_list');
+            var notificationList = $('.nav > .dropdown #notification-dropdown #notification_list');
             var nbUnviewed = session.newNotifications ? session.newNotifications : 0;
             for (var index in notifs) {
                 // Update small counter
                 var notifHtml = generateNotification(notifs[index]);
-
-                $(notificationList).prepend(notifHtml);
+                notificationList.prepend(notifHtml);
             }
             // Update notification badge
             if (nbUnviewed == 0) {
@@ -1099,9 +1097,9 @@ var LiliumCMS = function() {
         var link = notif.url? "data-href='" + notif.url + "'": "";
         var title = notif.title ? "<div class='notif-title'>"+ notif.title +"</div>" : "";
         var msg = notif.msg ? notif.msg : "Empty Notification :(";
-        var date = notif.date? '<time class="date timeago" datetime="'+ notif.date.toString() +'">' + notif.date +'</time>' : '';
+        var date = notif.date? "<time class='date timeago' datetime='"+ notif.date.toString() +"'>" + notif.date +"</time>" : '';
 
-        var html = "<li id='" + notif._id + "' class='" + isNew + ' ' + type + " link' " + link +"><div>"+ title + '<div class="notif-msg">' + msg + '</div>' + date +"</div></li>";
+        var html = "<li id='" + notif._id + "' class='" + isNew + ' ' + type + " link' " + link +"><div>"+ title + "<div class='notif-msg'>" + msg + '</div>' + date +"</div></li>";
 
         return html;
     };

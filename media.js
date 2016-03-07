@@ -119,7 +119,7 @@ var Media = function() {
 		if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
 			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
-			db.find('uploads', {'_id' : id},{limit:[1]}, function(err, cursor) {
+			db.find(cli._c, 'uploads', {'_id' : id},{limit:[1]}, function(err, cursor) {
 				cursor.next(function(err, media) {
 					if (media) {
 						for (size in media.sizes){
@@ -133,7 +133,7 @@ var Media = function() {
 							log("file : " + media.path + " removed.");
 						});
 
-						db.remove('uploads', {_id : id},function(err, r){
+						db.remove(cli._c, 'uploads', {_id : id},function(err, r){
 							return cli.sendJSON({
 								redirect: '/admin/media/list',
 								success: true
@@ -157,7 +157,7 @@ var Media = function() {
 		if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
 
 			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
-			db.exists('uploads', {_id : id}, function(exists) {
+			db.exists(cli._c, 'uploads', {_id : id}, function(exists) {
 				if (exists) {
 					filelogic.serveAdminLML(cli, true, {id : id});
 				} else {
@@ -172,7 +172,7 @@ var Media = function() {
 
 	this.getMedia = function(cli){
 		var id = new mongo.ObjectID(cli.routeinfo.path[3]);
-		db.find('uploads', {'_id' : id},{limit:[1]}, function(err, cursor) {
+		db.find(cli._c, 'uploads', {'_id' : id},{limit:[1]}, function(err, cursor) {
 			cursor.next(function(err, media) {
 				if (media) {
 					cli.sendJSON({
@@ -191,9 +191,9 @@ var Media = function() {
 		livevars.registerLiveVariable('media', function(cli, levels, params, callback) {
 			var wholeDico = levels.length === 0;
 			if (wholeDico) {
-				db.singleLevelFind(cli, 'uploads', callback);
+				db.singleLevelFind(cli._c, 'uploads', callback);
 			} else {
-				db.multiLevelFind(cli, 'uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+				db.multiLevelFind(cli._c, 'uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 			}
 		}, ["media"]);
 
@@ -201,9 +201,9 @@ var Media = function() {
 			var allMedia = levels.length === 0;
 
 			if (allMedia) {
-				db.singleLevelFind(cli, 'uploads', callback);
+				db.singleLevelFind(cli._c, 'uploads', callback);
 			} else {
-				db.multiLevelFind(cli, 'uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+				db.multiLevelFind(cli._c, 'uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 			}
 		}, ["uploads"]);
 	}
