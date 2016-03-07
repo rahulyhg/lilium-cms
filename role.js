@@ -60,7 +60,7 @@ var Role = function() {
             var redirect = '';
 
             // Create post
-            db.insert('roles', prepareRoleForDB(cli), function(err, result) {
+            db.insert(cli._c, 'roles', prepareRoleForDB(cli), function(err, result) {
                 // Generate LML page
                 cli.redirect('/admin/roles/edit/');
             });
@@ -82,7 +82,7 @@ var Role = function() {
 
                 if (response.success) {
 
-                    db.update('content', {
+                    db.update(cli._c, 'content', {
                         _id: id
                     }, formBuilder.serializeForm(form), function(err, r) {
                         cli.sendJSON({
@@ -110,7 +110,7 @@ var Role = function() {
         if (cli.postdata.data._id) {
             var id = new mongo.ObjectID(cli.postdata.data._id);
 
-            db.remove('roles', {
+            db.remove(cli._c, 'roles', {
                 _id: id
             }, function(err, r) {
                 return cli.sendJSON({
@@ -146,10 +146,10 @@ var Role = function() {
         livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
-                db.singleLevelFind('roles', callback);
+                db.singleLevelFind(cli._c, 'roles', callback);
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
-                db.findToArray('roles', {}, function(err, arr) {
+                db.findToArray(cli._c, 'roles', {}, function(err, arr) {
                     for (var i = 0; i < arr.length; i++) {
                         sentArr.push({
                             id: arr[i]._id,
@@ -161,7 +161,7 @@ var Role = function() {
                     callback(sentArr);
                 });
             } else {
-                db.multiLevelFind('roles', levels, {
+                db.multiLevelFind(cli._c, 'roles', levels, {
                     _id: new mongo.ObjectID(levels[0])
                 }, {
                     limit: [1]
