@@ -303,14 +303,6 @@ var Entities = function() {
 			}
 		}, ["entities"]);
 
-		livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {
-			var roleArr = new Array();
-			for (var key in Roles) {
-				roleArr.push(Roles[key]);
-			}
-			callback(roleArr);
-		}, ["roles"]);
-
 		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
 			var dat = cli.session.data;
 			if (levels.length) {

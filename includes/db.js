@@ -73,7 +73,7 @@ var DB = function() {
 	};
 
 	var formatMongoString = function(conf) {
-		return 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" + 
+		return 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" +
 			conf.data.host + ":" + conf.data.port + "/" + conf.data.use;
 	}
 
@@ -173,8 +173,8 @@ var DB = function() {
 	// Will find documents from collection coln according to conds,
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
-	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one) {
-		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one, operators) {
+        _conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -186,7 +186,7 @@ var DB = function() {
 				} else {
 					col[one ? 'updateOne' : 'updateMany'](
 						conds,
-						{$set:newVal},
+						operators ? newVal : {$set:newVal},
 						{
 							'upsert' : upsert ? upsert : false
 						}

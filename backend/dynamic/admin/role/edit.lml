@@ -1,0 +1,29 @@
+{#config;forms}
+{$
+	var baseurl = config.default.server.url;
+	baseurl += "/";
+	baseurl += config.default.paths.admin;
+	baseurl += "/";
+$}
+		<main class="entities-main">
+			<ul class="entity-list">
+				{*roles.{?1}(template:"entity-list-item",sourceof:"role_create")}
+			</ul>
+
+    			{=forms.render('role_create')}
+		</main>
+
+		<lml:template id="entity-list-item">
+				<lml:tobject data-nodetype="h1" data-key="displayname"></lml:tobject>
+				</div>
+		</lml:template>
+
+		<script>
+		var deleteUser = function(id) {
+			$.post('/{=config.default.paths.admin}/role/delete', {_id: id}, function(data){
+				if (data.success) {
+					document.location.href = '{=baseurl}role';
+				}
+			});
+		};
+		</script>
