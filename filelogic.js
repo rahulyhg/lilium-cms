@@ -33,8 +33,8 @@ var FileLogic = function() {
       cli.routeinfo.admin ? "admin" :
       "";
 
-    var readPath = _c.default.server.base + "backend/dynamic/" + specialName + ".lml";
-    var savePath = _c.default.server.html + '/' + _c.default.paths[specialName] + '/index.html';
+    var readPath = cli._c.server.base + "backend/dynamic/" + specialName + ".lml";
+    var savePath = cli._c.server.html + '/' + cli._c.paths[specialName] + '/index.html';
 
     saveLmlPage(cli, readPath, savePath);
   };
@@ -74,8 +74,8 @@ var FileLogic = function() {
       name = cli.routeinfo.fullpath;
     }
 
-    var readPath = _c.default.server.base + "backend/dynamic" + name + ".lml";
-    var savePath = _c.default.server.html + name +'/index.html';
+    var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
+    var savePath = cli._c.server.html + name +'/index.html';
 		FileServer.fileExists(savePath, function(isPresent) {
 			if (!isPresent) {
 				saveLmlPage(cli, readPath, savePath, extra);
@@ -96,10 +96,10 @@ var FileLogic = function() {
       		name = cli.routeinfo.fullpath;
     	}
 
-    	var readPath = _c.default.server.base + "backend/dynamic" + name + ".lml";
-    	var savePath = _c.default.server.html + name +'/index.html';
-	var tmpPath = _c.default.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
-	var adminPath = _c.default.server.base + "backend/dynamic/admintemplate.lml";     
+    	var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
+    	var savePath = cli._c.server.html + name +'/index.html';
+	var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+	var adminPath = cli._c.server.base + "backend/dynamic/admintemplate.lml";     
 
     	FileServer.fileExists(savePath, function(isPresent) {
 		if (!isPresent) {
@@ -115,10 +115,10 @@ var FileLogic = function() {
 								log('FileLogic', 'Admin page generated and served');
 							});
 						},
-						{templatefile:tmpPath}
+						{templatefile:tmpPath,config:cli._c}
 					);
 				},
-				new Object()
+				{config:cli._c}
 			);
 		} else {
 			serveCachedFile(cli, savePath);
@@ -136,8 +136,8 @@ var FileLogic = function() {
       name = cli.routeinfo.fullpath;
     }
 
-    var readPath = _c.default.server.base + "plugins/" + pluginName + "/dynamic" + name + ".lml";
-    var savePath = _c.default.server.html + name +'/index.html';
+    var readPath = cli._c.server.base + "plugins/" + pluginName + "/dynamic" + name + ".lml";
+    var savePath = cli._c.server.html + name +'/index.html';
 
     FileServer.fileExists(savePath, function(isPresent) {
       if (!isPresent) {
@@ -158,11 +158,13 @@ var FileLogic = function() {
 
   this.renderLmlPostPage = function(cli, postType, extra, cb) {
     var theme = require('./themes.js');
+    extra = extra || new Object();
+    extra.config = cli._c;
 
     // Check for the post type
     var title = slugify(extra.title).toLowerCase();
-    var readPath = _c.default.server.base + "flowers/" + theme.getEnabledTheme().info.path + "/" + postType + ".lml";
-    var savePath = _c.default.server.html + "/" + title + ".html";
+    var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme().info.path + "/" + postType + ".lml";
+    var savePath = cli._c.server.html + "/" + title + ".html";
     LML.executeToFile(
       readPath,
       savePath,
@@ -180,6 +182,9 @@ var FileLogic = function() {
         serveCachedFile(cli, savePath);
       } else {
         log("FileLogic", "Interpreting LML from absolute path : " + readPath);
+        extra = extra || new Object();
+        extra.config = cli._c;
+
         LML.executeToFile(readPath, savePath, function() {
           cli.responseinfo.filecreated = true;
           serveCachedFile(cli, savePath);
@@ -189,6 +194,9 @@ var FileLogic = function() {
   };
 
   var saveLmlPage = function(cli, readPath, savePath, extra) {
+    extra = extra || new Object();
+    extra.config = cli._c;
+    
     LML.executeToFile(
       readPath,
       savePath,
@@ -203,13 +211,13 @@ var FileLogic = function() {
   }
 
   this.executeLMLNoCache = function(cli, readPath, extra) {
-    var tmpname = _c.default.server.html + "/static/tmp/" + Math.random().toString(36).slice(-12) + ".html";
+    var tmpname = cli._c.server.html + "/static/tmp/" + Math.random().toString(36).slice(-12) + ".html";
     saveLmlPage(cli, readPath, tmpname, extra);
   };
 
   this.runLogic = function(cli) {
     cli.touch('filelogic.runlogic');
-    var fullpath = _c.default.server.html + cli.routeinfo.fullpath;
+    var fullpath = cli._c.server.html + cli.routeinfo.fullpath;
 
     // Check for static file
     FileServer.fileExists(fullpath, function(isPresent) {

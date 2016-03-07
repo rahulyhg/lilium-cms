@@ -70,7 +70,7 @@ var Notification = function() {
                     var id = db.mongoID(notifId);
                     var userId = db.mongoID(clientId);
                     // Update notification as interacted
-                    db.update('notifications', {
+                    db.update(_c.default(), 'notifications', {
                         _id: id,
                         userID: userId
                     }, {
@@ -182,7 +182,7 @@ var Notification = function() {
 
 
         // Add it in the user session if it exsists
-        db.findToArray('sessions', {
+        db.findToArray(_c.default(), 'sessions', {
             "data._id": notification.userID
         }, function(err, arr) {
             if (arr && arr[0]) {
@@ -191,7 +191,7 @@ var Notification = function() {
         })
 
         // Add notification to db
-        db.insert('notifications', notification, function() {});
+        db.insert(_c.default(), 'notifications', notification, function() {});
 
         // Send to every sockets connected by the user (for multi-tab)
         for (var index in sockets[userID]) {
@@ -229,7 +229,7 @@ var Notification = function() {
             }
         }
 
-    	db.update('sessions', {'token' : {'$in': tokens}}, {'$push':{'data.notifications': notification}, $inc : {'data.newNotifications' : 1}} , function(err, result) {}, true, false, true);
+    	db.update(_c.default(), 'sessions', {'token' : {'$in': tokens}}, {'$push':{'data.notifications': notification}, $inc : {'data.newNotifications' : 1}} , function(err, result) {}, true, false, true);
     }
 
     var insertNotif = function(session, notification) {
@@ -261,7 +261,7 @@ var Notification = function() {
 
         if (groups[groupName]) {
             // Find users in db that has the group role
-            db.aggregate('entities', [{
+            db.aggregate(_c.default(), 'entities', [{
                 "$unwind": "$roles"
             }, {
                 "$lookup": {
@@ -299,13 +299,13 @@ var Notification = function() {
                 }
             }], function(result) {
                 // Insert Notifications
-                db.insert('notifications', result, function(err, r) {});
+                db.insert(_c.default(), 'notifications', result, function(err, r) {});
             });
 
 
             // Insert notification in all the sessions
             // Find sessions that have dash access
-            db.aggregate('sessions', [{
+            db.aggregate(_c.default(), 'sessions', [{
                 "$unwind": "$data.roles"
             }, {
                 $lookup: {
@@ -348,7 +348,7 @@ var Notification = function() {
         notification.interacted = false;
 
         // Create notification for users that have dash access
-        db.aggregate('entities', [{
+        db.aggregate(_c.default(), 'entities', [{
             "$unwind": "$roles"
         }, {
             "$lookup": {
@@ -388,12 +388,12 @@ var Notification = function() {
             }
         }], function(result) {
             // Insert Notifications
-            db.insert('notifications', result, function(err, r) {});
+            db.insert(_c.default(), 'notifications', result, function(err, r) {});
         });
 
         // Insert notification in all the sessions
         // Find sessions that have dash access
-        db.aggregate('sessions', [{
+        db.aggregate(_c.default(), 'sessions', [{
             "$unwind": "$data.roles"
         }, {
             $lookup: {

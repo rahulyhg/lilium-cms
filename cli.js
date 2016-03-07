@@ -18,11 +18,11 @@ var Cli = function() {
         if (err) {
           log('CLI', err);
         } else {
-          fs.createDirIfNotExists(_c.default.server.html, function(valid) {
+          fs.createDirIfNotExists(_c.default().server.html, function(valid) {
             if (valid) {
               log('FileServer',
                 'HTML Directory was validated at : ' +
-                _c.default.server.html
+                _c.default().server.html
               );
             } else {
               log('FileServer', 'Error validated html directory');

@@ -9,6 +9,10 @@ var crypto = require('crypto');
 var dateFormat = require('dateformat');
 
 var FileServer = function() {
+    this.workDir = function() {
+        return __dirname;
+    }; 
+
     this.fileExists = function(fullpath, cb) {
         fs.lstat(fullpath, function(err, stats) {
             if (err) {

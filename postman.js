@@ -1,5 +1,5 @@
 var _c = require('./config.js');
-var sendgrid = require('sendgrid')(_c.default.sendgrid.apikey);
+var sendgrid = require('sendgrid')(_c.default.sendgrid ? _c.default.sendgrid.apikey : "");
 var hooks = require('./hooks.js');
 var log = require('./log.js');
 var filelogic = require('./filelogic.js');

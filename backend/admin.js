@@ -5,7 +5,6 @@ var AdminEndpoints = {
 
 var AdminMenus = new Array();
 
-var _c = require('../config.js');
 var filelogic = require('../filelogic.js');
 var formBuilder = require('../formBuilder');
 
@@ -24,7 +23,7 @@ var Admin = function() {
 		cli.touch('admin.serverDashboard');
 
 		if (cli.routeinfo.path.length == 1) {
-			cli.redirect(_c.default.server.url + "/admin/dashboard", false);
+			cli.redirect(cli._c.server.url + "/admin/dashboard", false);
 		} else {
 			this.handleAdminEndpoint(cli);
 		}

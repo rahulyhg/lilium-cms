@@ -4,13 +4,14 @@ var MongoClient = require('mongodb').MongoClient
 var mongoObjectID = require('mongodb').ObjectID;
 
 var _conn = undefined;
+var _conns = new Object();
 
 var DB = function() {
 	// Will return undefined if everything went well, or an err if it crashes
-	this.testConnection = function(callback) {
+	this.testConnection = function(conf, callback) {
 		log('Database', 'Testing connection to mongo database');
-		MongoClient.connect(formatMongoString(), function(err, db) {
-			log('Database', 'Test at ' + _c.default.data.host + ":" + _c.default.data.port);
+		MongoClient.connect(formatMongoString(conf), function(err, db) {
+			log('Database', 'Test at ' + conf.data.host + ":" + conf.data.port);
 			if (!err) {
 				log('Database', 'Firing successful test signal');
 				db.close(false, function() {
@@ -25,9 +26,23 @@ var DB = function() {
 		});
 	};
 
-	this.createDatabase = function(callback) {
+	this.testConnectionFromParams = function(host, port, user, pass, name, cb) {
+		var mongoString = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/" + name;
+		log('Database', 'Testing : ' + mongoString);
+		MongoClient.connect(mongoString, function(err, tempConn) {
+			if (err) {
+				cb(false, err);
+			} else {
+				tempConn.close(false, function() {
+					cb(true);
+				});
+			}
+		});
+	};
+
+	this.createDatabase = function(conf, callback) {
 		log('Database', 'Initializing database');
-		MongoClient.connect(formatMongoString(), function(err, db) {
+		MongoClient.connect(formatMongoString(conf), function(err, db) {
 			if (err) {
 				log('Database', 'Error accessing database : ' + err);
 				callback(false);
@@ -37,11 +52,11 @@ var DB = function() {
 		});
 	};
 
-	this.initDatabase = function(callback) {
-		MongoClient.connect(formatMongoString(), function(err, db) {
+	this.initDatabase = function(conf, callback) {
+		MongoClient.connect(formatMongoString(conf), function(err, db) {
 			db.collection('lilium', {strict:true}, function(err, c) {
 				if (err) {
-					require('./dbinit.js')(_c.default.data.engine, db, callback);
+					require('./dbinit.js')(conf, db, callback);
 				} else {
 					callback(false);
 				}
@@ -49,16 +64,17 @@ var DB = function() {
 		});
 	};
 
-	this.createPool = function(callback) {
+	this.createPool = function(conf, callback) {
 		log('Database', 'Creating database global connection object');
-		MongoClient.connect(formatMongoString(), function(err, conn) {
-			_conn = conn;
+		MongoClient.connect(formatMongoString(conf), function(err, conn) {
+			_conns[conf.id] = conn;
 			callback(!err);
 		});
 	};
 
-	var formatMongoString = function() {
-		return 'mongodb://' + _c.default.data.host + ":" + _c.default.data.port + "/" + _c.default.data.use;
+	var formatMongoString = function(conf) {
+		return 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" + 
+			conf.data.host + ":" + conf.data.port + "/" + conf.data.use;
 	}
 
 	var init = function() {
@@ -74,8 +90,8 @@ var DB = function() {
 		]
 		cb : End callback with format function(err, cursor)
 	*/
-	this.find = this.query = function(coln, conds, stack, cb) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {
+	this.find = this.query = function(conf, coln, conds, stack, cb) {
+		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -106,8 +122,8 @@ var DB = function() {
 		}
 	};
 
-	this.findToArray = function(coln, conds, cb) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {
+	this.findToArray = function(conf, coln, conds, cb) {
+		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -121,9 +137,9 @@ var DB = function() {
 		});
 	};
 
-	this.multiLevelFind = function(topLevel, levels, conds, stack, callback) {
+	this.multiLevelFind = function(conf, topLevel, levels, conds, stack, callback) {
 		var firstNodeCond = levels.shift();
-		this.find(topLevel, conds, stack, function(err, cur) {
+		this.find(conf, topLevel, conds, stack, function(err, cur) {
 			cur.hasNext(function(err, hasNext) {
 				if (hasNext) {
 					cur.next(function(err, r) {
@@ -144,8 +160,8 @@ var DB = function() {
 		});
 	};
 
-	this.singleLevelFind = function(topLevel, callback) {
-		this.find(topLevel, {}, {}, function(err, cur) {
+	this.singleLevelFind = function(conf, topLevel, callback) {
+		this.find(conf, topLevel, {}, {}, function(err, cur) {
 			cur.toArray(function(err, docs) {
 				callback(docs);
 			});
@@ -157,8 +173,8 @@ var DB = function() {
 	// Will find documents from collection coln according to conds,
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
-	this.modify = this.update = function(coln, conds, newVal, cb, upsert, one) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {
+	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one) {
+		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -183,8 +199,8 @@ var DB = function() {
 
 	};
 
-	this.findAndModify = function(coln, conds, newVal, cb, upsert, one) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {
+	this.findAndModify = function(conf, coln, conds, newVal, cb, upsert, one) {
+		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -210,8 +226,8 @@ var DB = function() {
 		});
 	}
 
-	this.insert = function(coln, docs, cb) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {
+	this.insert = function(conf, coln, docs, cb) {
+		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof docs !== "object") {
@@ -226,8 +242,8 @@ var DB = function() {
 		});
 	};
 
-	this.remove = this.delete = function(coln, conds, cb, one) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {
+	this.remove = this.delete = function(conf, coln, conds, cb, one) {
+		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -246,8 +262,8 @@ var DB = function() {
 		});
 	};
 
-	this.aggregate = this.join = function(coln, aggregation, cb) {
-		_conn.collection(coln, {"strict":true}, function(err, col) {
+	this.aggregate = this.join = function(conf, coln, aggregation, cb) {
+		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else {
@@ -265,8 +281,8 @@ var DB = function() {
 	}
 
 	// Will callback cb with a boolean representing the existance of a document
-	this.match = this.exists = function(coln, conds, cb) {
-		this.find(coln, conds, {limit:[1]}, function(err, r) {
+	this.match = this.exists = function(conf, coln, conds, cb) {
+		this.find(conf, coln, conds, {limit:[1]}, function(err, r) {
 				if (err) {
 				cb(false);
 			} else {
@@ -279,8 +295,8 @@ var DB = function() {
 
 	// USE CAREFULLY
 	// Will callback cb with a raw mongodb collection object
-	this.rawCollection = function(coln, opt, cb) {
-		_conn.collection(coln, opt, cb);
+	this.rawCollection = function(conf, coln, opt, cb) {
+		_conns[conf.id].collection(coln, opt, cb);
 	};
 };
 

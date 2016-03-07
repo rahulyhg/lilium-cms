@@ -35,7 +35,7 @@ var ChangeRequest = function() {
         var response = formBuilder.validate(form, true);
         if (response.success) {
             // Retrieve changerequest
-            db.findToArray('changerequests', {
+            db.findToArray(config.default(), 'changerequests', {
                 _id: db.mongoID(cli.routeinfo.path[4])
             }, function(err, arr) {
 
@@ -45,7 +45,7 @@ var ChangeRequest = function() {
                     var changeRequest = arr[0];
                     var updatedContent = formBuilder.serializeForm(form);
                     // Update article
-                    db.findAndModify('content', {
+                    db.findAndModify(config.default(), 'content', {
                         _id: db.mongoID(changeRequest.articleId)
                     }, {
                         title: updatedContent.title,
@@ -53,7 +53,7 @@ var ChangeRequest = function() {
                     }, function(err, doc) {
                         if (err) cli.crash(new Error("[ChangeRequest] - Error while modifying content : " + err));
                         // Update campaign status
-                        db.update('campaigns', {
+                        db.update(config.default(), 'campaigns', {
                             _id: db.mongoID(changeRequest.campId)
                         }, {
                             campstatus: "clipending"
@@ -91,7 +91,7 @@ var ChangeRequest = function() {
             var allRoles = levels.length === 0;
 
             if (allRoles) {
-                db.join('changerequests', [{
+                db.join(config.default(), 'changerequests', [{
                     $lookup: {
                         from: "campaigns",
                         localField: "campId",
@@ -128,13 +128,13 @@ var ChangeRequest = function() {
                 }], callback);
             } else {
                 if (params.diffview) {
-                    db.multiLevelFind('changerequests', levels, {
+                    db.multiLevelFind(config.default(), 'changerequests', levels, {
                         _id: db.mongoID(levels[0])
                     }, {
                         limit: [1]
                     }, function(changeRequest) {
                         if (typeof changeRequest !== 'undefined' && changeRequest.length > 0) {
-                            db.multiLevelFind('content', levels, {
+                            db.multiLevelFind(config.default(), 'content', levels, {
                                 _id: changeRequest[0].articleId
                             }, {
                                 limit: [1]
@@ -148,7 +148,7 @@ var ChangeRequest = function() {
 
                     });
                 } else {
-                    db.multiLevelFind('changerequests', levels, {
+                    db.multiLevelFind(config.default(), 'changerequests', levels, {
                         _id: db.mongoID(levels[0])
                     }, {
                         limit: [1]

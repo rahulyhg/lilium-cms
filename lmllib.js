@@ -1,6 +1,7 @@
 var registeredLibraries = {
 	config : function(context) {
-		return require('./config.js');
+		var conf = context.config || require('./config.js').default();
+		return {default:conf};
 	},
 	frontend : function(context) {
 		return require('./frontend.js');
@@ -32,7 +33,7 @@ var registeredLibraries = {
 	debug : function(context) {
 		return {
 			printcontext : function() {
-				return json.stringify(context);
+				return JSON.stringify(context);
 			},
 			format : "json"
 		};

@@ -50,7 +50,7 @@
 	                 }
 
 	             } else {
-	                 cli.redirect(conf.default.server.url + '/' + conf.default.paths.login, false);
+	                 cli.redirect(conf.default().server.url + '/' + conf.default().paths.login, false);
 	             }
 	         });
 
@@ -71,7 +71,7 @@
 					 }
 
 				 } else {
-					 cli.redirect(conf.default.server.url + '/' + conf.default.paths.login, false);
+					 cli.redirect(conf.default().server.url + '/' + conf.default().paths.login, false);
 				 }
 			 });
 	     };
@@ -89,7 +89,7 @@
 	         hooks.bind('user_loggedin', 200, function(cli) {
 	             // Check if user is a publisher
 	             if (cli.userinfo.roles.indexOf('advertiser') != -1) {
-	                 cli.redirect(conf.default.server.url + "/advertiser", false);
+	                 cli.redirect(conf.default().server.url + "/advertiser", false);
 	                 return true;
 	             } else {
 	                 return false;
@@ -164,7 +164,7 @@
 
 	     this.register = function(_c, info, callback) {
 	         conf = _c;
-	         initRequires(_c.default.server.base);
+	         initRequires(_c.default().server.base);
 	         log("Advertiser", "Initalizing plugin");
 
 	         log('Advertiser', 'Registering Endpoints');

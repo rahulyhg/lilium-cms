@@ -1,0 +1,31 @@
+{#config;forms;extra}
+<h2>Network Sites</h2>
+
+<table>
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>URL</th>
+			<th>Links</th>
+			<th>Actions</th>
+		</tr>
+	</thead>
+	<tbody id="sites_tbody">
+
+	</tbody
+</table>
+
+<lml:template id="site_template">
+	<lml:tobject data-nodetype="tr">
+		<lml:tobject data-nodetype="td" data-key="website.sitetitle"></lml:tobject>
+		<lml:tobject data-nodetype="td">
+			<lml:tobject data-nodetype="a" data-hrefsource="server.url">
+				<lml:tobject data-nodetype="span" data-key="server.url" >
+			</lml:tobject>
+		</lml:tobject>
+		<lml:tobject data-nodetype="td"></lml:tobject>
+		<lml:tobject data-nodetype="td"></lml:tobject>
+	</lml:tobject>
+</lml:template>
+
+{*sites.complex(template:"site_template",target:"sites_tbody")}

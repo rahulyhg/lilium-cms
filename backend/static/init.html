@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Lilium Initialization Process</title>
+		<style>
+			html, body {
+				padding:0; margin:0;
+			}
+		</style>
+	</head>
+
+	<body class="lmlinit lmlinstall">
+		<main>
+			<div>
+				<form method="POST">
+					<h1>Lilium Server Configuration</h1>
+					<p>
+						Welcome to Lilium! The first and most important step is to properly configure your server.
+					</p>
+
+					<fieldset>
+						<legend>Server Information</legend>
+
+						<label>Base URL</label>
+						<input type="text" id="baseurl" name="baseurl" />
+	
+						<label>Listening Port</label>
+						<input type="text" id="portnumber" name="portnumber" />
+	
+						<label>HTML Folder path</label>
+						<input type="text" id="htmlpath" name="htmlpath" />
+					</fieldset>
+
+					<fieldset>
+						<legend>Database Connection</legend>
+			
+						<label>Host</label>
+						<input type="text" id="dbhost" name="dbhost" />
+						<label>Port</label>
+						<input type="text" id="dbport" name="dbport" value="27017" />
+						<label>Username</label>
+						<input type="text" id="dbuser" name="dbuser" />
+						<label>Password</label>
+						<input type="text" id="dbpass" name="dbpass" />
+						<label>Database Name</label>
+						<input type="text" id="dbname" name="dbname" />
+					</fieldset>
+
+					<fieldset>
+						<legend>Admin Information</legend>
+						
+						<label>Server Name</label>
+						<input type="text" id="servername" name="servername" />
+						
+						<label>Admin Email</label>
+						<input type="email" id="adminemail" name="adminemail" />
+					</fieldset>
+
+					<input type="submit" value="Create Server" />
+				</form>
+			</div>
+		</main>
+		
+		<script>
+			var portFromURL = 80;
+			var portRE = /\:([0-9]+)/;			
+			var match = portRE.exec(window.location.href);
+
+			if (match && match[1]) {
+				portFromURL = match[1];
+			}
+
+			document.getElementById('baseurl').value = window.location.href.replace(/https?\:/, '').replace(/\/$/, '');
+			document.getElementById('portnumber').value = portFromURL;
+			
+		</script>
+	</body>
+</html>

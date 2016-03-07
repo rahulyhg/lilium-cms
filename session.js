@@ -71,7 +71,7 @@ var Sessions = function() {
 		cli.userinfo = cli.session.data;
 
 		// Load notifications in db
-		db.findToArray('notifications', {userID : db.mongoID(cli.session.data._id)},function(err, arr) {
+		db.findToArray(_c.default(), 'notifications', {userID : db.mongoID(cli.session.data._id)},function(err, arr) {
 			cli.session.data.notifications = arr.slice(0,4);
 		});
 		cli.session.data.notifications = [];
@@ -79,7 +79,7 @@ var Sessions = function() {
 		this.setCookieToCli(cli);
 
 		// No need for callback
-		db.insert('sessions', cli.session, function() {
+		db.insert(_c.default(), 'sessions', cli.session, function() {
 
 		});
 	};
@@ -87,7 +87,7 @@ var Sessions = function() {
 
 
 	this.saveSession = function(cli, callback) {
-		db.update('sessions', {token:cli.session.token}, cli.session, callback);
+		db.update(_c.default(), 'sessions', {token:cli.session.token}, cli.session, callback);
 	};
 
     this.getSessionFromSID = function(sid) {
@@ -100,7 +100,7 @@ var Sessions = function() {
 
 	this.initSessionsFromDatabase = function(cb) {
 		var seshCount = 0;
-		db.find('sessions', {}, {}, function(err, data) {
+		db.find(_c.default(), 'sessions', {}, {}, function(err, data) {
 			if (!err) {
 				var fetchNext = function() {
 					data.hasNext(function(err, hasNext) {

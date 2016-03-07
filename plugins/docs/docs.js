@@ -24,9 +24,9 @@ var Docs = function() {
 			cli.touch('docs.GET.docs');
 			var paths = cli.routeinfo.path;
 			var isRoot = paths.length == 2;
-			var rootLMLDir = _c.default.server.base + "plugins/docs/";		
+			var rootLMLDir = _c.default().server.base + "plugins/docs/";		
 			var rootLMLFile = rootLMLDir + "html/index.lml";
-			var savePath = _c.default.server.html + "/admin/docs/";
+			var savePath = _c.default().server.html + "/admin/docs/";
 			var contentName = isRoot ? "" : paths[2];
 
 			if (isRoot) {
@@ -47,19 +47,19 @@ var Docs = function() {
 			return {
 				render : function() {
 					var libname = context.extra.libname;
-					var docFilePath = _c.default.server.base + "plugins/docs/content/" + libname + ".doc";
+					var docFilePath = _c.default().server.base + "plugins/docs/content/" + libname + ".doc";
 
 					return fileserver.readFileSync(docFilePath);
 				},
 				listDir : function() {
-					var docFilePath = _c.default.server.base + "plugins/docs/content/";
+					var docFilePath = _c.default().server.base + "plugins/docs/content/";
 					var files = fileserver.listDirContentSync(docFilePath);
 
 					for (var i = 0; i < files.length; i++) {
 						var endpoint = files[i].replace('.doc', '');
 						files[i] = {
 							displayname : (endpoint == 'index' ? 'Lilium Docs' : endpoint),
-							url : _c.default.server.url + "/admin/docs/" + (endpoint == "index" ? "" : endpoint)
+							url : _c.default().server.url + "/admin/docs/" + (endpoint == "index" ? "" : endpoint)
 						};
 					}
 		
@@ -75,7 +75,7 @@ var Docs = function() {
 	};
 
 	this.register = function(_c, info, callback) {
-		initRequires(_c.default.server.base);
+		initRequires(_c.default().server.base);
 		log("Docs", "Documentation was initiated");
 		registerEndpoint();
 		registerLMLContextLib();

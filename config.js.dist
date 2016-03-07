@@ -12,7 +12,7 @@ var _config = {
 		"data" : {
 			engine : "mongodb",
 			host : "HOST",
-			port : PORT_NUMBER,
+			port : -1,
 			user : "USER",
 			pass : "PASS",
 			use : "DATABASE"
@@ -53,11 +53,11 @@ var _config = {
 			}
 		},
 		"stripe" : {
-			secretkey : YOUR_SECRET_STRIPE_API_KEY,
-			publickey : YOUR_PUBLIC_STRIPE_API_KEY
+			secretkey : "",
+			publickey : ""
 		},
 		"sendgrid" : {
-			apikey : YOUR_API_KEY
+			apikey : ""
 		},
 		"MIMES" : {
 			"" : "text/html",

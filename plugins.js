@@ -65,7 +65,7 @@ var Plugins = function() {
 	};
 
 	this.getPluginsDirList = function(callback) {
-		var plugindir = _c.default.server.base + _c.default.paths.plugins + "/";
+		var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
 
 		fs.readdir(plugindir, function(err, dirs) {
 			if (err) {
@@ -81,7 +81,7 @@ var Plugins = function() {
 					CachedPlugins = allPlugins;
 					callback(allPlugins);
 				} else {
-					var infoPath = plugindir + dirs[i] + "/" + _c.default.paths.pluginsInfo;
+					var infoPath = plugindir + dirs[i] + "/" + _c.default().paths.pluginsInfo;
 					fileserver.fileExists(infoPath, function(exists) {
 						if (exists) {
 							fileserver.readJSON(infoPath, function(json) {
@@ -123,12 +123,12 @@ var Plugins = function() {
 					throw new Error("[PluginException] Could not find any info on plugin with identifier " + identifier);
 				}
 
-				var plugindir = _c.default.server.base + _c.default.paths.plugins + "/";
+				var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
 				var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
 
 				RegisteredPlugins[identifier] = pluginInstance;
 
-				db.update('plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
+				db.update(_c.default(), 'plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
 					if (typeof pluginInstance.register !== 'function') {
 						log("Plugins", 'Plugin has no method "register"');
 						callback();
@@ -146,7 +146,7 @@ var Plugins = function() {
 		if (this.isRegistered(identifier)) {
 
 
-			db.update('plugins', {identifier : identifier}, {identifier : identifier, active : false}, function() {
+			db.update(_c.default(), 'plugins', {identifier : identifier}, {identifier : identifier, active : false}, function() {
 				RegisteredPlugins[identifier].unregister(function(){
 					RegisteredPlugins[identifier] = undefined;
 					delete RegisteredPlugins[identifier];
@@ -184,9 +184,9 @@ var Plugins = function() {
 			var allPlugins = levels.length === 0;
 
 			if (allPlugins) {
-				db.singleLevelFind('plugins', callback);
+				db.singleLevelFind(_c.default(), 'plugins', callback);
 			} else {
-				db.multiLevelFind('plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
+				db.multiLevelFind(_c.default(), 'plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
 			}
 		}, ['plugins']);
 	};

@@ -25,7 +25,7 @@ var Login = function() {
 			typeof usr !== 'undefined' && typeof psw !== 'undefined'
 			&& usr !== '' && psw !== ''
 		) {
-			db.match("entities", {
+			db.match(cli._c, "entities", {
 				'username' : usr,
 				'shhh' : CryptoJS.SHA256(psw).toString(CryptoJS.enc.Hex)
 			}, function(found) {
@@ -36,7 +36,7 @@ var Login = function() {
 						loginSuccess(cli, userObj);
 					});
 				} else {
-					cli.redirect(_c.default.server.url + "/" + _c.default.paths.login + "?failed", false);
+					cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
 				}
 			});
 		}

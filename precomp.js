@@ -9,10 +9,6 @@ var frontend = require('./frontend.js');
 var log = require('./log.js');
 
 var Precomp = function() {
-	var absReadPath = _c.default.server.base + "backend/dynamic/precomp/";
-	var absWritePath = _c.default.server.html + "/compiled/";
-	var tempPath = _c.default.server.html + "/static/tmp/";
-
 	var minifyFile = function(inFile, outFile, filetype, callback) {
 		log('Precompiler', 'Minifying ' + filetype + ' file');
 
@@ -48,11 +44,15 @@ var Precomp = function() {
 
 	};
 
-	var runLoop = function(readycb) {
+	var runLoop = function(conf, readycb) {
+		var absReadPath = conf.server.base + "backend/dynamic/precomp/";
+		var absWritePath = conf.server.html + "/compiled/";
+		var tempPath = conf.server.html + "/static/tmp/";
+		
 		var fileIndex = 0;
 		log('Precompiler', 'Precompiling static files');
 		fileserver.listDirContent(absReadPath, function(fileArr) {
-			db.findToArray('compiledfiles', {}, function(err, histo) {
+			db.findToArray(conf, 'compiledfiles', {}, function(err, histo) {
 
 				var histoObj = new Object();
 
@@ -82,7 +82,7 @@ var Precomp = function() {
 											var beforeMinify = new Date();
 											minifyFile(tPath, wPath, wPath.substring(wPath.lastIndexOf('.')+1), function() {
 												log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms");
-												db.insert('compiledfiles', {
+												db.insert(conf, 'compiledfiles', {
 													filename : curFile,
 													sum : sum
 												}, function() {
@@ -107,9 +107,9 @@ var Precomp = function() {
 		});
 	};
 
-	var mergeJS = function(readycb) {
+	var mergeJS = function(conf, readycb) {
 		var files = frontend.getJSQueue('admin');
-		var compiledPath = _c.default.server.html + "/compiled/admin.js";
+		var compiledPath = conf.server.html + "/compiled/admin.js";
 		var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
 		var fileIndex = 0;
 		var fileTotal = files.length;
@@ -131,9 +131,9 @@ var Precomp = function() {
 		nextFile();
 	};
 
-	var mergeCSS = function(readycb) {
+	var mergeCSS = function(conf, readycb) {
 		var files = frontend.getCSSQueue('admin');
-		var compiledPath = _c.default.server.html + "/compiled/admin.css";
+		var compiledPath = conf.server.html + "/compiled/admin.css";
 		var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
 		var fileIndex = 0;
 		var fileTotal = files.length;
@@ -155,11 +155,11 @@ var Precomp = function() {
 		nextFile();
 	};
 
-	this.precompile = function(readycb) {
-		fileserver.createDirIfNotExists(absWritePath, function() {
-			runLoop(function() {
-				mergeJS(function() {
-					mergeCSS(readycb);
+	this.precompile = function(conf, readycb) {
+		fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function() {
+			runLoop(conf, function() {
+				mergeJS(conf, function() {
+					mergeCSS(conf, readycb);
 				});
 			});
 		}, true);

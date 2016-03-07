@@ -2,7 +2,6 @@ var Admin = require('./backend/admin.js');
 var HTMLServer = require('./frontend/htmlserver.js');
 var Endpoints = require('./endpoints.js');
 var LiveVars = require('./livevars.js');
-var _c = require('./config.js');
 var log = require('./log.js');
 var entities = require('./entities.js');
 
@@ -14,8 +13,8 @@ var Dispatcher = function() {
 			if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
 				Admin.serveDashboard(cli);
 			} else {
-				if (_c.default.usability.admin.loginIfNotAuth) {
-					cli.redirect(_c.default.server.url + "/login?cause=401", false);
+				if (cli._c.usability.admin.loginIfNotAuth) {
+					cli.redirect(cli._c.server.url + "/login?cause=401", false);
 				} else {
 					cli.throwHTTP(401, "Unauthorized");
 				}

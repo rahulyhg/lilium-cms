@@ -108,7 +108,7 @@ var LiliumDFP = function() {
 		} else {
 			if (actionName == "all") {
 				if (complexity == 'simple') {
-					db.find('dfpcache', {}, {}, function(err, cur) {
+					db.find(cli._c, 'dfpcache', {}, {}, function(err, cur) {
 						var bigArr = new Array();
 						var nextObject = function() {
 							cur.hasNext(function(err, hasNext) {
@@ -128,7 +128,7 @@ var LiliumDFP = function() {
 						nextObject();
 					});
 				} else if (complexity == 'complete') {
-					db.findToArray('dfpcache', {}, function(err, arr) {
+					db.findToArray(cli._c, 'dfpcache', {}, function(err, arr) {
 						cb(err || arr);
 					});
 				} else {
@@ -154,8 +154,8 @@ var LiliumDFP = function() {
 				var arr = results.rval.results;
 
 				log('DFP', 'Running database queries');
-				db.remove('dfpcache', {}, function() {
-					db.insert('dfpcache', arr, function() {
+				db.remove(_c.default(), 'dfpcache', {}, function() {
+					db.insert(_c.default(), 'dfpcache', arr, function() {
 						log('DFP', 'Stored deep copy of '+arr.length+' DFP Orders');
 						if (callback) {
 							callback();

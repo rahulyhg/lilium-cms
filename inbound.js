@@ -1,4 +1,4 @@
-var _c = require('./config.js').default,
+var _c = require('./config.js').default(),
     _http = require('http'),
     _https = require('https'),
     hooks = require('./hooks.js'),

@@ -44,22 +44,22 @@ var CacheInvalidator = function() {
 
   this.addFileToWatch = function(path, eventName, value) {
     cachedFileEvents[path] = [eventName, value];
-    db.insert('cachedFiles',{file: path, extra : [eventName, value]} , function(err){
+    db.insert(conf.default(), 'cachedFiles',{file: path, extra : [eventName, value]} , function(err){
       log('Cache Invalidator', err);
     });
   }
 
   this.removeFileToWatch = function(path) {
     if (typeof cachedFileEvents[path] !== 'undefined') {
-      db.remove('cachedFiles', {file:path}, function(err) {
+      db.remove(conf.default(), 'cachedFiles', {file:path}, function(err) {
         delete cachedFileEvents.path;
       }, true);
     }
   }
 
   this.init = function(cb) {
-    this.addFolderToWatch(conf.default.server.html);
-    db.findToArray('cachedFiles', {}, function(err, arr){
+    this.addFolderToWatch(conf.default().server.html);
+    db.findToArray(conf.default(), 'cachedFiles', {}, function(err, arr){
       arr.forEach(function(elem){
         cachedFileEvents[elem.file] = elem.extra;
       });

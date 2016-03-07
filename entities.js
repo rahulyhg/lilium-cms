@@ -33,7 +33,7 @@ var Entities = function() {
 			entity[key] = oData[key];
 		}
 
-		db.findToArray('uploads', {"id_" : entity.avatarID}, function(err, avatar) {
+		db.findToArray(_c.default(), 'uploads', {"id_" : entity.avatarID}, function(err, avatar) {
 			entity.avatarURL = err || avatar.length == 0 ? "" : avatar[0].url;
 			callback(entity);
 		});
@@ -48,7 +48,7 @@ var Entities = function() {
 			condition.username = idOrUsername;
 		}
 
-		db.findToArray('entities', condition, function(err, user) {
+		db.findToArray(_c.default(), 'entities', condition, function(err, user) {
 			if (!err && user.length == 1) {
 				entityWithData(user[0], callback);
 			} else {
@@ -127,7 +127,7 @@ var Entities = function() {
 		var entData = cli.postdata.data;
 		var newEnt = this.initialiseBaseEntity(entData);
 
-		this.registerEntity(newEnt, function() {
+		this.registerEntity(cli, newEnt, function() {
 			cli.touch('entities.registerEntity.callback');
 			/*
 			mailer.createEmail({
@@ -139,15 +139,15 @@ var Entities = function() {
 
 			}, {name:newEnt.firstname + " " + newEnt.lastname});
 			*/
-			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath);
+			cli.redirect(cli._c.server.url + cli.routeinfo.fullpath);
 		});
 	};
 
 	this.deleteFromCli = function(cli) {
 		var id = cli.postdata.data.uid;
 
-		db.remove('entities', {_id:db.mongoID(id)}, function(err, result) {
-			cli.redirect(_c.default.server.url + cli.routeinfo.fullpath);
+		db.remove(cli._c, 'entities', {_id:db.mongoID(id)}, function(err, result) {
+			cli.redirect(cli._c.server.url + cli.routeinfo.fullpath);
 		});
 	};
 
@@ -159,9 +159,9 @@ var Entities = function() {
 		return e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "";
 	};
 
-	this.registerEntity = function(entity, callback) {
+	this.registerEntity = function(cli, entity, callback) {
 		if (this.validateEntityObject(entity)) {
-			db.insert('entities', entity, callback, true);
+			db.insert(cli._c, 'entities', entity, callback, true);
 		} else {
 			callback("[EntityValidationException] Entity object misses required fields.", undefined);
 		}
@@ -173,7 +173,7 @@ var Entities = function() {
 
 	this.cacheRoles = function(callback) {
 		log('Roles', 'Caching roles from Database');
-		db.findToArray('roles', {}, function(err, roles) {
+		db.findToArray(_c.default(), 'roles', {}, function(err, roles) {
 			if (!err) {
 				for (var i = 0, len = roles.length; i < len; i++) {
 					Roles[roles[i].name] = roles[i];
@@ -193,7 +193,7 @@ var Entities = function() {
 			throw new Error("[RolesException] Could not promote unexisting role " + roleName);
 		} else {
 			Roles[roleName].rights.push(right);
-			db.update('roles', {rights: Roles[roleName].rights }, cb);
+			db.update(_c.default(), 'roles', {rights: Roles[roleName].rights }, cb);
 		}
 	};
 
@@ -202,7 +202,7 @@ var Entities = function() {
 			throw new Error("[RolesException] Tried to register already registered role " + rObj.name);
 		} else {
 			rObj.rights = rights;
-			db.update('roles', {name: rObj.name} ,rObj, function(err, result) {
+			db.update(_c.default(), 'roles', {name: rObj.name} ,rObj, function(err, result) {
 				Roles[rObj.name] = rObj;
 				callback(rObj);
 			}, updateIfExists);
@@ -284,7 +284,7 @@ var Entities = function() {
 			var allEntities = levels.length === 0;
 
 			if (allEntities) {
-				db.singleLevelFind('entities', callback);
+				db.singleLevelFind(cli._c, 'entities', callback);
 			} else if (levels[0] == 'query') {
 				var queryInfo = params.query || new Object();
 				var qObj = new Object();
@@ -295,11 +295,11 @@ var Entities = function() {
 				qObj.roles = queryInfo.roles ? {$in : queryInfo.roles} : undefined;
 				qObj.username = queryInfo.username;
 
-				db.findToArray('entities', queryInfo, function(err, arr) {
+				db.findToArray(cli._c,'entities', queryInfo, function(err, arr) {
 					callback(err || arr);
 				});
 			} else {
-				db.multiLevelFind('entities', levels, {username:levels[0]}, {limit:[1]}, callback);
+				db.multiLevelFind(cli._c, 'entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 			}
 		}, ["entities"]);
 

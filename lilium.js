@@ -45,12 +45,12 @@ var Lilium = function() {
 		log('Lilium', 'Starting up...');
 		core.makeEverythingSuperAwesome(function() {
 			log('Lilium', 'Initialization signal received');
-			log('Config', 'App is located at ' + _config.default.server.base);
-			log('Config', 'Root PATH is at ' + _config.default.server.html);
-			log('Config', 'Root URL is at ' + _config.default.server.url);
-			log('Config', 'Public signature ' + _config.default.signature.publichash);
+			log('Config', 'App is located at ' + _config.default().server.base);
+			log('Config', 'Root PATH is at ' + _config.default().server.html);
+			log('Config', 'Root URL is at ' + _config.default().server.url);
+			log('Config', 'Public signature ' + _config.default().signature.publichash);
 			log();
-			log('Lilium', ' *** Running ' + _config.default.vendor.productname + ' v' + _config.default.vendor.version + ' ***');
+			log('Lilium', ' *** Running ' + _config.default().vendor.productname + ' v' + _config.default().vendor.version + ' ***');
 			log();
 			log('Benchmark', 'Init time : ' + (new Date() - startupTime) + "ms");
 			log('Developer', 'Documentation : http://liliumcms.com/docs');

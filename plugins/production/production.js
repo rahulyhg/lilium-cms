@@ -83,9 +83,9 @@
 
 	   this.register = function(_c, info, callback) {
 	     conf = _c;
-	     initRequires(_c.default.server.base);
+	     initRequires(_c.default().server.base);
 	     log("Production", "Initalizing plugin");
-			 changerequest.init(_c.default.server.base);
+			 changerequest.init(_c.default().server.base);
 
 	     registerHooks();
 

@@ -62,7 +62,7 @@ var Settings = function() {
 
 	this.registerLiveVar = function() {
 		require('./livevars.js').registerLiveVariable('settings', function(cli, levels, params, callback) {
-			callback(_c);
+			callback(cli._c);
 		}, ["admin"]);
 	};
 };

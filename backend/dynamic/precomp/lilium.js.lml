@@ -94,7 +94,18 @@ var LiliumCMS = function() {
 
         this.livevars = function() {
             return livevars;
-        }
+        };
+
+	var pullOutVarFromString = function(object, str) {
+		var levels = str.split('.');
+		var pullout = object;
+
+		for (var i = 0; i < levels.length; i++) {
+			pullout = pullout[levels[i]];
+		}
+
+		return pullout;
+	};		
 
         var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey) {
             var key = obj.data('key');
@@ -171,7 +182,7 @@ var LiliumCMS = function() {
                         if (obj.data('href')) {
                             node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
                         } else if (obj.data('hrefsource')) {
-                            node.attr('href', data[obj.data('hrefsource')]);
+                            node.attr('href', pullOutVarFromString(data, obj.data('hrefsource')));
                         }
 
                         node.html(obj.html());

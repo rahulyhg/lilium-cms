@@ -1,47 +1,86 @@
-var _c = require('./config.js');
-var settings = require('./settings.js');
-var hooks = require('./hooks.js');
-var endpoints = require('./endpoints.js');
-var plugins = require('./plugins.js');
-var LML = require('./lml.js');
+var _c = undefined;
+var settings = undefined;
+var hooks = undefined;
+var endpoints = undefined;
+var plugins = undefined;
+var LML = undefined;
+var LoginLib = undefined;
+var db = undefined;
+var fs = undefined;
+var fileserver = undefined;
+var cli = undefined;
+var admin = undefined;
+var Article = undefined;
+var Media = undefined;
+var imageSize = undefined;
+var themes = undefined;
+var entities = undefined;
+var cacheInvalidator = undefined;
+var dfp = undefined;
+var postman = undefined;
+var Products = undefined;
+var Campaigns = undefined;
+var Frontend = undefined;
+var notification = undefined;
+var Forms = undefined;
+var sessions = undefined;
+var sites = undefined;
+var Handler = undefined;
+var ClientObject = undefined;
+var Inbound = undefined;
+var Livevars = undefined;
+var Precompiler = undefined;
+var Petals = undefined;
+var GC = undefined;
+var scheduler = undefined;
+var Role = undefined;
+
 var log = require('./log.js');
-var LoginLib = require('./backend/login.js');
-var db = require('./includes/db.js');
-var fs = require('fs');
-var fileserver = require('./fileserver.js');
-var cli = require('./cli.js');
-var admin = require('./backend/admin.js');
-var Article = require('./article.js');
-var Media = require('./media.js');
-var imageSize = require('./imageSize.js');
-var themes = require('./themes.js');
-var entities = require('./entities.js');
-var cacheInvalidator = require('./cacheInvalidator.js');
-var dfp = require('./dfp.js');
-var postman = require('./postman.js');
-var Products = require('./products');
-var Campaigns = require('./campaigns.js');
-var Frontend = require('./frontend.js');
-var notification = require('./notifications.js');
-var Forms = require('./forms');
-var sessions = require('./session.js');
-var sites = require('./sites.js');
-var Handler = require('./handler.js');
-var ClientObject = require('./clientobject.js');
-var Inbound = require('./inbound.js');
-var Livevars = require('./livevars.js');
-var Precompiler = require('./precomp.js');
-var Petals = require('./petal.js');
-var GC = require('./gc.js');
-var scheduler = require('./scheduler.js');
-var Role = require('./role.js');
 
 var Core = function() {
+	var loadRequires = function() {
+		_c = require('./config.js');
+		settings = require('./settings.js');
+		hooks = require('./hooks.js');
+		endpoints = require('./endpoints.js');
+		plugins = require('./plugins.js');
+		LML = require('./lml.js');
+		LoginLib = require('./backend/login.js');
+		db = require('./includes/db.js');
+		fs = require('fs');
+		fileserver = require('./fileserver.js');
+		cli = require('./cli.js');
+		admin = require('./backend/admin.js');
+		Article = require('./article.js');
+		Media = require('./media.js');
+		imageSize = require('./imageSize.js');
+		themes = require('./themes.js');
+		entities = require('./entities.js');
+		cacheInvalidator = require('./cacheInvalidator.js');
+		dfp = require('./dfp.js');
+		postman = require('./postman.js');
+		Products = require('./products');
+		Campaigns = require('./campaigns.js');
+		Frontend = require('./frontend.js');
+		notification = require('./notifications.js');
+		Forms = require('./forms');
+		sessions = require('./session.js');
+		Handler = require('./handler.js');
+		ClientObject = require('./clientobject.js');
+		Inbound = require('./inbound.js');
+		Livevars = require('./livevars.js');
+		Precompiler = require('./precomp.js');
+		Petals = require('./petal.js');
+		GC = require('./gc.js');
+		scheduler = require('./scheduler.js');
+		Role = require('./role.js');
+	};
+
 	var loadHooks = function(readyToRock) {
 		log('Hooks', 'Loading hooks');
 		hooks.bind('init', 100, readyToRock);
 		hooks.bind('user_loggedin', 100, function(cli) {
-			cli.redirect(_c.default.server.url + "/" + _c.default.paths.admin, false);
+			cli.redirect(cli._c.server.url + "/" + cli._c.paths.admin, false);
 			return true;
 		});
 		hooks.fire('hooks');
@@ -60,6 +99,11 @@ var Core = function() {
 			admin.handleAdminEndpoint(cli);
 		});
 
+		admin.registerAdminEndpoint('sites', 'GET', function(cli) {
+			cli.touch('admin.GET.sites');
+			sites.handleGET(cli);
+		});
+		
 		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
 			cli.touch("admin.GET.dashboard");
 			admin.handleGETDashboard(cli);
@@ -143,9 +187,9 @@ var Core = function() {
 	}
 
 	var loadGlobalPetals = function() {
-		Petals.register('adminbar',  _c.default.server.base + 'backend/dynamic/admin/adminbar.petal');
-		Petals.register('adminhead', _c.default.server.base + 'backend/dynamic/admin/adminhead.petal');
-		Petals.register('adminsidebar', _c.default.server.base + 'backend/dynamic/admin/adminsidebar.petal');
+		Petals.register('adminbar',  _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
+		Petals.register('adminhead', _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
+		Petals.register('adminsidebar', _c.default().server.base + 'backend/dynamic/admin/adminsidebar.petal');
 	};
 
 	var loadImageSizes = function() {
@@ -155,7 +199,7 @@ var Core = function() {
 	}
 
 	var loadAdminMenus = function() {
-		var aurl = _c.default.server.url + "/admin/";
+		var aurl = _c.default().server.url + "/admin/";
 
 		admin.registerAdminMenu({
 			id : "sites", faicon : "fa-sitemap", displayname : "Sites", priority : 50,
@@ -205,7 +249,7 @@ var Core = function() {
 			return cb();
 		};
 
-		db.findToArray('plugins', {"active":true}, function(err, results) {
+		db.findToArray(_c.default(), 'plugins', {"active":true}, function(err, results) {
 			if (err) {
 				log('Plugins', 'Failed to find entries in database; ' + err);
 				fireEvent();
@@ -249,17 +293,17 @@ var Core = function() {
 	};
 
 	var loadProducts = function(cb) {
-		db.findToArray('products', {}, function(err, arr) {
+		db.findToArray(_c.default(), 'products', {}, function(err, arr) {
 			for (var i = 0; i < arr.length; i++) {
 				Products.registerProduct(arr[i]);
 			}
 
-			db.findToArray('producttypes', {}, function(err, arr) {
+			db.findToArray(_c.default(), 'producttypes', {}, function(err, arr) {
 				for (var i = 0; i < arr.length; i++) {
 					Products.registerProductType(arr[i].name, arr[i].displayName);
 				}
 
-				db.findToArray('productpricebases', {}, function(err, arr) {
+				db.findToArray(_c.default(), 'productpricebases', {}, function(err, arr) {
 					for (var i = 0; i < arr.length; i++) {
 						Products.registerPriceBase(arr[i].name, arr[i].displayName, arr[i].divider);
 					}
@@ -282,7 +326,7 @@ var Core = function() {
 			cb();
 		};
 
-		db.find('themes', {"active":true}, {limit:[1]}, function(err, cursor) {
+		db.find(_c.default(), 'themes', {"active":true}, {limit:[1]}, function(err, cursor) {
 			if (err) {
 				log('Themes', 'Failed to find entries in database; ' + err);
 				fireEvent();
@@ -303,7 +347,7 @@ var Core = function() {
 
 					if (i == 0){
 						// Enable with default theme
-						themes.enableTheme(_c.default.website.flower, function() {
+						themes.enableTheme(_c.default().website.flower, function() {
 							fireEvent();
 						});
 					};
@@ -315,41 +359,30 @@ var Core = function() {
 	}
 
 	var testDatabase = function(callback) {
-		log('Database', 'Testing database');
-		var dbinit = function() {
-			log('Database', 'Initializing database if not initialized');
-			db.initDatabase(function(err) {
-				log('Database', 'Firing Database init signal');
-				hooks.fire('dbinit', err);
+		log('Database', 'Testing databases');
+
+		_c.each(function(conf, next) {
+			var dbinit = function() {
+				log('Database', 'Initializing database if not initialized');
+				db.initDatabase(conf, function(err) {
+					log('Database', 'Firing Database init signal');
+					dbconn();
+				});
+			};
+
+			var dbconn = function() {
+				log ('Database', 'Requesting dynamic connection object');
+				db.createPool(conf, function() {
+					log('Database', 'Firing Database connection signal');
+					next();
+				});
+			};
+
+			db.testConnection(conf, function(err) {
+				hooks.fire('dbtest', err);
+				dbinit();
 			});
-		};
-
-		var dbconn = function() {
-			log ('Database', 'Requesting dynamic connection object');
-			db.createPool(function() {
-				log('Database', 'Firing Database connection signal');
-				hooks.fire('dbconn');
-			});
-		};
-
-		hooks.bind('dbtest', 100, function(err) {
-			log('Database', 'Received Database test signal : ' + (err?'failed':'success'));
-			dbinit();
-		});
-
-		hooks.bind('dbinit', 100, function(err) {
-			log('Database', 'Received Database init signal');
-			dbconn();
-		});
-
-		hooks.bind('dbconn', 100, function(err) {
-			log('Database', 'Received Database connection signal');
-			callback();
-		});
-
-		db.testConnection(function(err) {
-			hooks.fire('dbtest', err);
-		});
+		}, callback);
 	};
 
 	var loadStaticSymlink = function(callback) {
@@ -362,21 +395,23 @@ var Core = function() {
 			callback();
 		});
 
-		var to = _c.default.server.html + '/static';
-		var rootDir = _c.default.server.base + 'backend/static/';
-		cli.createSymlink(rootDir, to);
+		_c.eachSync(function(conf) {
+			var to = conf.server.html + '/static';
+			var rootDir = conf.server.base + 'backend/static/';
+			cli.createSymlink(rootDir, to);
 
-		to =   _c.default.server.html + '/bower';
-		rootDir = _c.default.server.base + 'bower_components/';
-		cli.createSymlink(rootDir, to);
+			to =   conf.server.html + '/bower';
+			rootDir = conf.server.base + 'bower_components/';
+			cli.createSymlink(rootDir, to);
 
-		to =   _c.default.server.html + '/uploads';
-		rootDir = _c.default.server.base + 'backend/static/uploads/';
-		cli.createSymlink(rootDir, to);
+			to =   conf.server.html + '/uploads';
+			rootDir = conf.server.base + 'backend/static/uploads/';
+			cli.createSymlink(rootDir, to);
 
-		to =   _c.default.server.html + '/plugins';
-		rootDir = _c.default.server.base + 'plugins/';
-		cli.createSymlink(rootDir, to);
+			to =   conf.server.html + '/plugins';
+			rootDir = conf.server.base + 'plugins/';
+			cli.createSymlink(rootDir, to);
+		});
 		hooks.fire('staticsymlink', undefined);
 	};
 
@@ -404,10 +439,10 @@ var Core = function() {
 	};
 
 	var loadCacheInvalidator = function() {
-		if (_c.default.env == 'dev') {
+		if (_c.default().env == 'dev') {
 			log("CacheInvalidator", 'Clearing old cached files in db');
 
-			db.remove('cachedFiles', {}, function() {}, false);
+			db.remove(_c.default(), 'cachedFiles', {}, function() {}, false);
 		}
 		log("CacheInvalidator", 'Initializing cacheInvalidator');
 		cacheInvalidator.init(function () {
@@ -429,17 +464,20 @@ var Core = function() {
 	};
 
 	var loadHTMLStructure = function(callback) {
-		fileserver.createDirIfNotExists(_c.default.server.html, function(valid) {
-			if (valid) {
-				log('FileServer',
-					'HTML Directory was validated at : ' +
-					_c.default.server.html
-				);
-			} else {
-				log('FileServer', 'Error validated html directory');
-			}
+		_c.each(function(conf) {
+			fileserver.createDirIfNotExists(conf.server.html, function(valid) {
+				if (valid) {
+					log('FileServer',
+						'HTML Directory was validated at : ' +
+						conf.server.html
+					);
+				} else {
+					log('FileServer', 'Error validated html directory');
+				}
+	
+			}, true);
+		});
 
-		}, true);
 		loadStaticSymlink(callback);
 	};
 
@@ -496,7 +534,10 @@ var Core = function() {
 	};
 
 	var loadSites = function(cb) {
-		sites.cacheSitesFromDatabase(cb);
+		sites = require('./sites.js');
+		sites.cacheSitesFromDatabase(function() {
+			sites.loadSites(cb);
+		});
 	};
 
 	var loadRequestHandler = function() {
@@ -508,59 +549,109 @@ var Core = function() {
 	};
 
 	var loadPrecompiledStaticFiles = function(callback) {
-		var base = _c.default.server.base;
-		var htmlbase = _c.default.server.html;
+		_c.each(function(conf, next) {
+			var base = conf.server.base;
+			var htmlbase = conf.server.html;
 
-		Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin");
-		Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin");
-		Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin");
-		Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin");
-		Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin");
-		Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin");
-		Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin');
+			Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin");
+			Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin");
+			Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin");
+			Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin");
+			Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin");
+			Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin");
+			Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin");
+			Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin');
 
-		Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin');
-		Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin');
-		Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin');
-		Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin');
+			Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin');
+			Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin');
+			Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin');
+			Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin');
 
-		Precompiler.precompile(callback);
+			Precompiler.precompile(conf, next);
+		}, callback);
+	};
+
+	var prepareDefaultSiteCreation = function(cb) {
+		require('./init.js')(cb);
+	};
+
+	var loadWebsites = function(loadEverything) {
+		var currentRoot = __dirname;
+		var fss = require('./fileserver.js');
+
+		fss.dirExists(currentRoot + "/sites", function(exists) {
+			if (exists) {
+				fss.fileExists(currentRoot + "/sites/default.json", function(exists) {
+					if (exists) {
+						loadEverything();
+					} else {
+						prepareDefaultSiteCreation(loadEverything);
+					}
+				});
+			} else {
+				prepareDefaultSiteCreation(loadEverything);
+			}
+		});
+	};
+
+	var redirectIfInit = function(resp, cb) {
+		if (resp) {
+			resp.writeHead(200,
+  				{ "Content-Type" : "text/html" }
+			);
+			resp.end(
+				'<i>Please wait a moment...</i><script>setTimeout(function() {window.location = "'+resp.redirectTo+'"}, 1000);</script>',
+				'utf8',
+				function() {
+					resp.req.connection.unref();
+					resp.req.connection.destroy();
+					resp.server.close(cb);
+				}
+			);
+		} else {
+			cb();
+		}
 	};
 
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
-		loadHooks(readyToRock);
-		loadEndpoints();
-		loadStandardInput();
-		loadImageSizes();
-		loadForms();
-		loadLiveVars();
-		loadDFP();
-		loadFrontend();
-		loadRequestHandler();
-		loadGlobalPetals();
-		loadAdminMenus();
+		loadWebsites(function(resp) { 
+			loadSites(function() {
+				loadRequires();
+				loadHooks(readyToRock);
+				loadEndpoints();
+				loadStandardInput();
+				loadImageSizes();
+				loadForms();
+				loadLiveVars();
+				loadDFP();
+				loadFrontend();
+				loadRequestHandler();
+				loadGlobalPetals();
+				loadAdminMenus();
 
-		loadHTMLStructure(function() {
-		testDatabase(function() {
-		loadSites(function() {
-		loadPlugins(function(){
-		loadRoles(function() {
-		loadProducts(function() {
-		loadPrecompiledStaticFiles(function() {
-		loadSessions(function() {
-		loadTheme(function() {
-			loadCacheInvalidator();
-			scheduleGC();
+				loadHTMLStructure(function() {
+				testDatabase(function() {
+				loadPlugins(function(){
+				loadRoles(function() {
+				loadProducts(function() {
+				loadPrecompiledStaticFiles(function() {
+				loadSessions(function() {
+				loadTheme(function() {
+				redirectIfInit(resp, function() {
+					loadCacheInvalidator();
+					scheduleGC();
 
-			log('Lilium', 'Starting inbound server');
-			Inbound.createServer();
-            		loadNotifications();
-			Inbound.start();
-
-			log('Core', 'Firing initialized signal');
-			hooks.fire('init');
-		});});});});});});});});});
+					log('Lilium', 'Starting inbound server');
+					Inbound.createServer();
+		     	     		loadNotifications();
+					Inbound.start();
+			
+					log('Core', 'Firing initialized signal');
+					hooks.fire('init');
+				});});});});});});});});});
+			});
+		});
 	};
 
 	var init = function() {

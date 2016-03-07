@@ -22,7 +22,7 @@ var SayHi = function() {
 	};
 
 	this.register = function(_c, info, callback) {
-		initRequires(_c.default.server.base);
+		initRequires(_c.default().server.base);
 		log("SayHi", "Hi there!");
 		registerEndpoint();
 		callback();

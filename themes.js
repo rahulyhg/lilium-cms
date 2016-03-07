@@ -46,7 +46,7 @@ var Themes = function() {
   };
 
   this.getThemesDirList = function(callback) {
-    var themedir = _c.default.server.base + _c.default.paths.themes + "/";
+    var themedir = _c.default().server.base + _c.default().paths.themes + "/";
     fs.readdir(themedir, function(err, dirs) {
       if (err) {
         throw new Error("[ThemeException] Could not access theme directory : " + err);
@@ -61,7 +61,7 @@ var Themes = function() {
           CachedThemes = allThemes;
           callback(allThemes)
         } else {
-          var infoPath = themedir + dirs[i] + "/" + _c.default.paths.themesInfo;
+          var infoPath = themedir + dirs[i] + "/" + _c.default().paths.themesInfo;
           fileserver.fileExists(infoPath, function(exists) {
             if (exists) {
               fileserver.readJSON(infoPath, function(json) {
@@ -94,10 +94,10 @@ var Themes = function() {
           throw new Error("[ThemeException] Could not find any info on theme with uName " + uName);
         }
 
-        var themedir = _c.default.server.base + _c.default.paths.themes + "/";
+        var themedir = _c.default().server.base + _c.default().paths.themes + "/";
         var ThemeInstance = require(themedir + info.dirName + "/" + info.entry);
         if (typeof ActiveTheme !== 'undefined') {
-          db.update('themes', {
+          db.update(_c.default(), 'themes', {
             uName: ActiveTheme.uName
           }, {
             active: false
@@ -110,7 +110,7 @@ var Themes = function() {
         info.path = info.dirName;
 				ActiveTheme.uName = info.uName;
         ActiveTheme.info = info;
-        db.update('themes', {
+        db.update(_c.default(), 'themes', {
           uName: uName
         }, info, function() {
 
@@ -126,7 +126,7 @@ var Themes = function() {
   };
 
   this.getEnabledThemePath = function() {
-    return _c.default.server.base + _c.default.paths.themes + '/' +ActiveTheme.info.dirName;
+    return _c.default().server.base + _c.default().paths.themes + '/' +ActiveTheme.info.dirName;
   }
 
 
@@ -139,9 +139,9 @@ var Themes = function() {
     livevars.registerLiveVariable('theme', function(cli, levels, params, callback) {
 		var allThemes = levels.length === 0;
 		if (allThemes) {
-			db.singleLevelFind('themes', callback);
+			db.singleLevelFind(cli._c, 'themes', callback);
 		} else {
-			db.multiLevelFind('themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
+			db.multiLevelFind(cli._c, 'themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
 		}
 	}, ["themes"]);
   };

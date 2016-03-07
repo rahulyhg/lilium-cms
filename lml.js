@@ -623,6 +623,9 @@ var LML = function() {
 		if (typeof context === 'undefined') {
 			context = new LMLContext();
 			context.rootDir = fileserver.dirname(rootpath);
+			context.config = extra.config;
+
+			delete extra.config;
 		} else {
 			context.stash();
 		}

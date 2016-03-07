@@ -14,13 +14,13 @@ var Campaigns = function() {
     var that = this;
 
     this.getCampaignsFromDatabase = function(conds, cb) {
-        db.findToArray('campaigns', conds, function(err, data) {
+        db.findToArray(_c.default(), 'campaigns', conds, function(err, data) {
             cb(err || data);
         });
     }
 
     this.getCampaignByProjectID = function(id, cb) {
-        db.findToArray('campaigns', {
+        db.findToArray(_c.default(), 'campaigns', {
             "projectid": id
         }, function(err, data) {
             if (!err && data.length > 0) {
@@ -32,13 +32,13 @@ var Campaigns = function() {
     };
 
     this.getAllMyCampaigns = function(conds, cb) {
-        db.findToArray('campaigns', conds, function(err, data) {
+        db.findToArray(_c.default(), 'campaigns', conds, function(err, data) {
             cb(err || data);
         });
     };
 
     this.loadCampaignsStatuses = function(cb) {
-        db.findToArray('campaignStatuses', new Object(), function(err, data) {
+        db.findToArray(_c.default(), 'campaignStatuses', new Object(), function(err, data) {
             if (typeof data !== 'undefined') {
                 for (var i = 0; i < data.length; i++) {
                     registeredStatuses.push(data[i]);
@@ -75,10 +75,10 @@ var Campaigns = function() {
                 name: entry.campname,
                 status: statusByName(entry.campstatus).displayName,
                 clientid: entry.clientid,
-                url: _c.default.server.url + "/admin/campaigns/edit/" + entry.projectid
+                url: _c.default().server.url + "/admin/campaigns/edit/" + entry.projectid
             }
 
-            db.findToArray('entities', {
+            db.findToArray(_c.default(), 'entities', {
                 _id: db.mongoID(listObj.clientid)
             }, function(err, res) {
                 if (typeof res[0] === 'undefined') {
@@ -133,7 +133,7 @@ var Campaigns = function() {
                     break;
                 case "needsattention_advertiser":
                     if(cli.isGranted('advertiser')) {
-                        db.findToArray('campaigns', {campstatus: {$in :['clipending', 'clipayment', 'clisign']}}, function(err, res) {
+                        db.findToArray(_c.default(), 'campaigns', {campstatus: {$in :['clipending', 'clipayment', 'clisign']}}, function(err, res) {
                             callback(err||res);
                         });
                     } else {
@@ -142,7 +142,7 @@ var Campaigns = function() {
                     break;
                     case "needsattention_prod":
                         if(cli.isGranted('production')) {
-                            db.findToArray('campaigns', {campstatus: {$in :['prod', 'preprod']}}, function(err, res) {
+                            db.findToArray(_c.default(), 'campaigns', {campstatus: {$in :['prod', 'preprod']}}, function(err, res) {
                                 callback(err||res)
                             });
                         } else {
@@ -177,13 +177,13 @@ var Campaigns = function() {
                         $in: queryInfo.campstatus
                     } : false;
 
-                    db.findToArray('campaigns', qObj, function(err, arr) {
+                    db.findToArray(_c.default(), 'campaigns', qObj, function(err, arr) {
                         callback(err || arr);
                     });
                     break;
                 case "articlereview": //returns articles of the campaign in need of advertiser review
                     if (cli.isGranted('advertiser')) {
-                        db.findToArray('campaigns', {
+                        db.findToArray(_c.default(), 'campaigns', {
                             _id: db.mongoID(levels[1])
                         }, function(err, array) {
                             if (err) log('Campaigns livevars', err);
@@ -198,7 +198,7 @@ var Campaigns = function() {
                                     articlesID.push(db.mongoID(campaign.products[key].articleid));
                                 }
 
-                                db.findToArray('content', {
+                                db.findToArray(_c.default(), 'content', {
                                     _id: {
                                         $in: articlesID
                                     }
@@ -282,16 +282,16 @@ var Campaigns = function() {
 
             switch (action) {
                 case 'new':
-                    db.insert('campaigns', dbCamp, function(res) {
+                    db.insert(cli._c, 'campaigns', dbCamp, function(res) {
                         hooks.trigger('campaignCreated', dbCamp);
-                        cli.redirect(_c.default.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
+                        cli.redirect(cli._c.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
                     });
                     break;
                 case 'edit':
-                    db.findToArray('campaigns', {
+                    db.findToArray(cli._c, 'campaigns', {
                         projectid: dbCamp.projectid
                     }, function(err, old) {
-                        db.update('campaigns', {
+                        db.update(cli._c, 'campaigns', {
                             projectid: dbCamp.projectid
                         }, dbCamp, function(res) {
                             hooks.trigger('campaignUpdated', {
@@ -306,7 +306,7 @@ var Campaigns = function() {
                                 });
                             }
 
-                            cli.redirect(_c.default.server.url + cli.routeinfo.fullpath, false);
+                            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath, false);
                         }, false, true);
                     });
                     break;
@@ -314,7 +314,7 @@ var Campaigns = function() {
                     cli.debug();
             }
         } else {
-            cli.redirect(_c.default.server.url + cli.routeinfo.fullpath + "?invalidform", false);
+            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath + "?invalidform", false);
         }
     };
 

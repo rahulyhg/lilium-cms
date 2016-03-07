@@ -46,7 +46,7 @@ var Article = function() {
     this.handleGET = function(cli) {
         cli.touch('article.handleGET');
         if (cli.routeinfo.path.length == 2) {
-          cli.redirect(conf.default.server.url + cli.routeinfo.fullpath + "/list", true);
+          cli.redirect(cli._c.server.url + cli.routeinfo.fullpath + "/list", true);
         } else {
           switch (cli.routeinfo.path[2]) {
             case 'new':
@@ -83,13 +83,13 @@ var Article = function() {
 
             if (response.success) {
                 // Create post
-                db.insert('content', formBuilder.serializeForm(form), function(err, result) {
+                db.insert(cli._c, 'content', formBuilder.serializeForm(form), function(err, result) {
 
                     // Generate LML page
                     filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id);
                         cli.sendJSON({
-                            redirect: conf.default.server.url + "/" + name,
+                            redirect: cli._c.server.url + "/" + name,
                             form: {
                                 success: true
                             }
@@ -170,7 +170,7 @@ var Article = function() {
 
     this.getArticle = function(cli) {
         var id = new mongo.ObjectID(cli.routeinfo.path[3]);
-        db.find('content', {
+        db.find(cli._c, 'content', {
             '_id': id
         }, {
             limit: [1]
@@ -197,10 +197,10 @@ var Article = function() {
         livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
 	if (allContent) {
-		db.singleLevelFind('content', callback);
+		db.singleLevelFind(cli._c, 'content', callback);
 	} else if (levels[0] == "all") {
 		var sentArr = new Array();
-                db.findToArray('content', {}, function(err, arr) {
+                db.findToArray(cli._c, 'content', {}, function(err, arr) {
 			for (var i = 0; i < arr.length; i++) {
 				sentArr.push({
 					articleid : arr[i]._id,
@@ -211,7 +211,7 @@ var Article = function() {
 			callback(sentArr);
                 });
         } else {
-		db.multiLevelFind('content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+		db.multiLevelFind(cli._c, 'content', levels, {_id : new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 	}
     }, ["content"]);
 
@@ -219,9 +219,9 @@ var Article = function() {
             var allTypes = levels.length === 0;
 
             if (allTypes) {
-                db.singleLevelFind('types', callback);
+                db.singleLevelFind(cli._c, 'types', callback);
             } else {
-                db.multiLevelFind('types', levels, {
+                db.multiLevelFind(cli._c, 'types', levels, {
                     name: levels[0]
                 }, {}, callback);
             }

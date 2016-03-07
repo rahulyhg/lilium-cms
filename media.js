@@ -48,10 +48,11 @@ var Media = function() {
 	this.list = function(cli) {
 		//Find the 25 first for now
 		//TODO find a way to load more
-		db.find('uploads', {},{limit:[25]}, function(err, cursor) {
-			var medias = [];
-			var extra = {};
-			extra.medias = medias
+		db.find(cli._c, 'uploads', {},{limit:[25]}, function(err, cursor) {
+			var medias = new Array();
+			var extra = new Object();
+			extra.medias = medias;
+
 			cursor.each(function(err, media) {
 				if (media != null) {
 					medias.push(media);
@@ -79,13 +80,13 @@ var Media = function() {
             var image = formBuilder.serializeForm(form);
             var extensions = image.File.split('.');
             var mime = extensions[extensions.length-1];
-            var saveTo = conf.default.server.base + "backend/static/uploads/" +image.File;
+            var saveTo = cli._c.server.base + "backend/static/uploads/" +image.File;
 
-            if (conf.default.supported_pictures.indexOf('.' + mime) != -1) {
+            if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
                 imageResizer.resize(saveTo, image.File, mime, function(images){
 
                     // Save it in database
-                    db.insert('uploads', {path : saveTo, url : image.File, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
+                    db.insert(cli._c, 'uploads', {path : saveTo, url : image.File, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
 
                         cli.sendJSON({
                             form: {redirect : '' ,success : true}
@@ -190,9 +191,9 @@ var Media = function() {
 		livevars.registerLiveVariable('media', function(cli, levels, params, callback) {
 			var wholeDico = levels.length === 0;
 			if (wholeDico) {
-				db.singleLevelFind('uploads', callback);
+				db.singleLevelFind(cli, 'uploads', callback);
 			} else {
-				db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+				db.multiLevelFind(cli, 'uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 			}
 		}, ["media"]);
 
@@ -200,9 +201,9 @@ var Media = function() {
 			var allMedia = levels.length === 0;
 
 			if (allMedia) {
-				db.singleLevelFind('uploads', callback);
+				db.singleLevelFind(cli, 'uploads', callback);
 			} else {
-				db.multiLevelFind('uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
+				db.multiLevelFind(cli, 'uploads', levels, {_id:new mongo.ObjectID(levels[0])}, {limit:[1]}, callback);
 			}
 		}, ["uploads"]);
 	}

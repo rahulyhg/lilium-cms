@@ -7,7 +7,7 @@ var HTMLServer = function() {
 
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
-		var filename = _conf.default.server.html + cli.routeinfo.fullpath;
+		var filename = _conf.default().server.html + cli.routeinfo.fullpath;
 		var htmlFile = filename + ".html";
 
 		fileserver.fileExists(htmlFile, function (fileExists){
@@ -21,7 +21,7 @@ var HTMLServer = function() {
 					if (fileExists) {
 						// If html page requested from root
 						if (cli.routeinfo.path.length == 1 && cli.routeinfo.fullpath.indexOf('.html') !== -1) {
-							cli.redirect(_conf.default.server.url + cli.routeinfo.fullpath.slice(-5), true);
+							cli.redirect(_conf.default().server.url + cli.routeinfo.fullpath.slice(-5), true);
 						} else {
 							fileserver.pipeFileToClient(cli, filename, function (){
 								cli.touch('htmlserver.serveClient.callback');
@@ -38,18 +38,18 @@ var HTMLServer = function() {
 
 	this.registerMime = function(ext, present) {
 		if (!this.mimeRegistered(ext)) {
-			_conf.default.MIMES[ext] = present;
+			_conf.default().MIMES[ext] = present;
 		} else {
 			throw "[HTMLServer - MimeException] MIMETYPE already registered.";
 		}
 	};
 
 	this.mimeRegistered = function(ext) {
-		return typeof _conf.default.MIMES[ext] !== 'undefined';
+		return typeof _conf.default().MIMES[ext] !== 'undefined';
 	};
 
 	this.mimeOrRefused = function(ext) {
-		return this.mimeRegistered(ext) ? _conf.default.MIMES[ext] : "application/x-lilium-nope";
+		return this.mimeRegistered(ext) ? _conf.default().MIMES[ext] : "application/x-lilium-nope";
 	};
 
 	var init = function() {

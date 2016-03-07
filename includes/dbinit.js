@@ -118,10 +118,9 @@ var rootEntity = {
 	id : -1, displayname:"[Root]", username : "root", shhh : '', roles : ["lilium"],
 }
 
-var defaultServerConfiguration = require('../config.js');
 var log = require('../log.js');
 
-var initMongo = function(db, cb) {
+var initMongo = function(conf, db, cb) {
 	log('Database', 'Init script was executed');
 	var totalTasks = 9;
 	var completedTasks = 0;
@@ -160,7 +159,7 @@ var initMongo = function(db, cb) {
 		log('Database', 'Inserting default configuration');
 		db.collection('config', {strict:true}, function(err, col) {
 			if (!err) {
-				col.insertOne(defaultServerConfiguration, function(err, r) {
+				col.insertOne(conf, function(err, r) {
 					completedTasks++;
 					checkForCompletion();
 				});
@@ -278,8 +277,6 @@ var initMongo = function(db, cb) {
 	_run();
 };
 
-module.exports = function(dbtype, db, cb) {
-	if (dbtype == 'mongodb') {
-		initMongo(db, cb);
-	};
+module.exports = function(conf, db, cb) {
+	initMongo(conf, db, cb);
 };

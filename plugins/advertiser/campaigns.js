@@ -76,7 +76,7 @@ var CampaignAdvertiser = function() {
                         db.update('campaigns', {_id: campaign._id}, {campstatus : status}, function() {
                             cli.sendJSON({
                                 success: true,
-                                redirect: _c.default.server.url + '/advertiser/campaigns'
+                                redirect: _c.default().server.url + '/advertiser/campaigns'
                             });
                         })
                     }
@@ -143,7 +143,7 @@ var CampaignAdvertiser = function() {
                             stripeOrder(result[0].stripeID, campaign, function(order) {
 
                                 if (order.paid) {
-                                    cli.redirect(_c.default.server.url + "/advertiser?alert=OrderSuccessfull!");
+                                    cli.redirect(_c.default().server.url + "/advertiser?alert=OrderSuccessfull!");
                                 } else {
 
                                     cli.refresh();
@@ -165,7 +165,7 @@ var CampaignAdvertiser = function() {
                                         stripeOrder(advertiser.stripeid, campaign, function(order) {
                                             if (order.paid) {
 
-                                                cli.redirect(_c.default.server.url + "/advertiser");
+                                                cli.redirect(_c.default().server.url + "/advertiser");
                                             } else {
                                                 cli.refresh();
                                             }
@@ -277,7 +277,7 @@ var CampaignAdvertiser = function() {
                         var signature = image.signature;
 
                         var filename = fileserver.genRandomNameFile(signature);
-                        var path =  _c.default.server.base + "backend/static/uploads/" +filename + ".png";
+                        var path =  _c.default().server.base + "backend/static/uploads/" +filename + ".png";
 
                         // Create signature image from text
                         fileserver.genImageFromText(signature, path, "Arty Signature", 30, function() {
@@ -293,9 +293,9 @@ var CampaignAdvertiser = function() {
                                     campstatus: nextStatus
                                 }, function(err, result) {
                                     if (campaign.paymentreq) {
-                                        cli.redirect(_c.default.server.url + "/advertiser/campaigns/pay/" + campaign._id);
+                                        cli.redirect(_c.default().server.url + "/advertiser/campaigns/pay/" + campaign._id);
                                     } else {
-                                        cli.redirect(_c.default.server.url + "/advertiser?alert=Signature Successfull!");
+                                        cli.redirect(_c.default().server.url + "/advertiser?alert=Signature Successfull!");
                                     }
                                 });
                         });
