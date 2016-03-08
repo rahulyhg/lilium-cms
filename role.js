@@ -29,7 +29,7 @@ var Role = function() {
     this.handleGET = function(cli) {
         cli.touch('role.handleGET');
         if (cli.routeinfo.path.length == 2) {
-            cli.redirect(conf.default.server.url + cli.routeinfo.fullpath + "/list", true);
+            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath + "/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
                 case 'new':
@@ -62,7 +62,7 @@ var Role = function() {
             // Create post
             db.insert(cli._c, 'roles', prepareRoleForDB(cli), function(err, result) {
                 // Generate LML page
-                cli.redirect('/admin/roles/edit/');
+                cli.redirect('/admin/role/edit/');
             });
 
         } else {
