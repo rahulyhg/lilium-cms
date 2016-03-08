@@ -87,6 +87,10 @@ ClientObject.prototype.isGranted = function (role) {
 		return isGranted;
 }
 
+ClientObject.prototype.hasEnoughPermission = function (minimumRole) {
+	// Check minimumRole power and check client maximumRole
+}
+
 ClientObject.prototype.isLoggedIn = function () {
 	return this.userinfo.loggedin;
 }

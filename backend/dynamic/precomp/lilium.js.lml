@@ -587,6 +587,7 @@ var LiliumCMS = function() {
         };
 
         this.parse = function(selector) {
+            console.log(selector);
             $("form").deserialize(livevars[selector][0]);
         };
 
@@ -635,7 +636,7 @@ var LiliumCMS = function() {
                 $('.lmlstacktable th input').each(function(index) {
                     if (livevar) {
                         var data = livevar[$(this).data('fieldname')];
-                        append();
+                        append(data);
                     } else {
                         append($(this).val(), index);
                         $(this).val('');
