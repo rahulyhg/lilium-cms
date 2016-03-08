@@ -83,7 +83,7 @@ var Media = function() {
             var saveTo = cli._c.server.base + "backend/static/uploads/" +image.File;
 
             if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
-                imageResizer.resize(saveTo, image.File, mime, function(images){
+                imageResizer.resize(saveTo, image.File, mime, cli, function(images){
 
                     // Save it in database
                     db.insert(cli._c, 'uploads', {path : saveTo, url : image.File, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
