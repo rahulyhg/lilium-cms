@@ -1,18 +1,10 @@
 {#config;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-        <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-		{%../../../../backend/dynamic/admin/globalhead;../script}
-		{$
-			var baseurl = config.default.server.url;
-			baseurl += "/";
-			baseurl += config.default.paths.admin;
-			baseurl += "/";
-		$}
-
-	</head>
-	<body>
+{$
+    var baseurl = config.default.server.url;
+    baseurl += "/";
+    baseurl += config.default.paths.admin;
+    baseurl += "/";
+$}
   <h1>All Advertisers</h1>
 
   <main class="entities-main">
@@ -45,6 +37,3 @@
       </div>
     </li>
   </lml:template>
-
-	</body>
-</html>
