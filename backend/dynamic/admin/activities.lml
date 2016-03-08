@@ -15,10 +15,11 @@ socket.join('spy');
 socket.emit('spy');
 
 socket.on('spy', function(users) {
+    console.log(users);
     var table = '';
     for(var id in users) {
-        if (users[id].length > 0) {
-            table += createUserRow(users[id], id);
+        if (users[id].pages.length > 0) {
+            table += createUserRow(users[id].pages, id, users[id].displayname);
         }
     }
 
@@ -31,7 +32,7 @@ socket.on('spy-update', function(user){
     if (user.data.length == 0) {
         row.remove();
     } else {
-        var html = createUserRow(user.data, user.id);
+        var html = createUserRow(user.data, user.id, user.displayname);
         // Check if user exists
         if (row.length) {
             row.replaceWith(html);
@@ -41,23 +42,19 @@ socket.on('spy-update', function(user){
 
         $('#user-list tr#' + user.id + " time.timeago").timeago();
     }
-
-
-
-
 });
 
-var createUserRow = function(user, id) {
+var createUserRow = function(pages, id, displayname) {
     var row = '<tr id="'+ id +'">';
-    row += '<td>' + id + '</td>';
+    row += '<td>' + displayname + '</td>';
 
     var timeCol = '<ul>';
     var urlCol = '<ul>';
 
-    for (var index in user) {
-        if (typeof user[index].url !== 'undefined') {
-            timeCol += '<li><time class="date timeago" datetime="'+ user[index].time +'"></time></li>';
-            urlCol += '<li>' + user[index].url + '</li>';
+    for (var index in pages) {
+        if (typeof pages[index].url !== 'undefined') {
+            timeCol += '<li><time class="date timeago" datetime="'+ pages[index].time +'"></time></li>';
+            urlCol += '<li>' + pages[index].url + '</li>';
         }
     }
 
@@ -68,9 +65,4 @@ var createUserRow = function(user, id) {
     row += '</tr>';
     return row;
 };
-
-var updateUserRow = function(user) {
-
-};
-
 </script>

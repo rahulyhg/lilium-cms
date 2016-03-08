@@ -35,6 +35,7 @@ var Notification = function() {
                     sockets[clientId] = {};
                 }
                 sockets[clientId][socket.id] = socket;
+                sockets[clientId].displayname = session.data.displayname;
 
 
                 socket.on('join', function(groupName) {
@@ -144,14 +145,16 @@ var Notification = function() {
                         // Make a list of all currently loggedin users
                         var loggedInUsers = {};
                         for (var clientId in sockets) {
-                            loggedInUsers[clientId] = [];
+                            loggedInUsers[clientId] = {};
+                            loggedInUsers[clientId].pages = [];
+                            loggedInUsers[clientId].displayname = sockets[clientId].displayname;
                             // Each sockets, get the id
                             for (var socketid in sockets[clientId]) {
                                 var info = {};
                                 info.url = sockets[clientId][socketid].url;
                                 info.time = sockets[clientId][socketid].time;
 
-                                loggedInUsers[clientId].push(info);
+                                loggedInUsers[clientId].pages.push(info);
                             }
                         }
 
@@ -164,7 +167,7 @@ var Notification = function() {
                     sockets[clientId][socket.id].time = new Date();
 
                     var clientUrls = createCurrentUserPages();
-                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls});
+                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
                 });
 
                 socket.on('broadcast', function(emission) {
@@ -189,10 +192,10 @@ var Notification = function() {
                         sockets[clientId] = undefined;
                         delete sockets[clientId];
                     }
-                    
+
                     // Notify users currently spying
                     var clientUrls = createCurrentUserPages();
-                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls});
+                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
 
                 });
 
