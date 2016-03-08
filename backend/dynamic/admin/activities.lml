@@ -16,9 +16,10 @@ socket.emit('spy');
 
 socket.on('spy', function(users) {
     var table = '';
-    console.log(users);
     for(var id in users) {
-         table += createUserRow(users[id], id);
+        if (users[id].length > 0) {
+            table += createUserRow(users[id], id);
+        }
     }
 
     $('#user-list tbody').append(table);
@@ -26,6 +27,23 @@ socket.on('spy', function(users) {
 });
 
 socket.on('spy-update', function(user){
+    var row = $('#user-list tr#' + user.id);
+    if (user.data.length == 0) {
+        row.remove();
+    } else {
+        var html = createUserRow(user.data, user.id);
+        // Check if user exists
+        if (row.length) {
+            row.replaceWith(html);
+        } else {
+            $('#user-list tbody').append(html);
+        }
+
+        $('#user-list tr#' + user.id + " time.timeago").timeago();
+    }
+
+
+
 
 });
 
@@ -37,8 +55,10 @@ var createUserRow = function(user, id) {
     var urlCol = '<ul>';
 
     for (var index in user) {
-        timeCol += '<li><time class="date timeago" datetime="'+ user[index].time +'"></time></li>';
-        urlCol += '<li>' + user[index].url + '</li>';
+        if (typeof user[index].url !== 'undefined') {
+            timeCol += '<li><time class="date timeago" datetime="'+ user[index].time +'"></time></li>';
+            urlCol += '<li>' + user[index].url + '</li>';
+        }
     }
 
     timeCol += '</ul>';

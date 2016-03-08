@@ -12,6 +12,7 @@ var groups = {};
 var Notification = function() {
     var that = this;
     var io;
+
     this.init = function() {
         registerLivevars();
         io = inbound.io();
@@ -162,13 +163,8 @@ var Notification = function() {
                     sockets[clientId][socket.id].url = url;
                     sockets[clientId][socket.id].time = new Date();
 
-                    clientUrls = [];
-
-                    for (var index in sockets[clientId]) {
-                        clientUrls.push(sockets[clientId][index].url);
-                    };
-
-                    io.sockets.in('spy').emit('spy-update', {clientId: clientUrls});
+                    var clientUrls = createCurrentUserPages();
+                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls});
                 });
 
                 socket.on('broadcast', function(emission) {
@@ -184,9 +180,20 @@ var Notification = function() {
                 });
 
                 socket.on('disconnect', function() {
+                    createCurrentUserPages();
                     sockets[clientId][socket.id] = undefined;
 
                     delete sockets[clientId][socket.id];
+
+                    if (sockets[clientId].length == 0) {
+                        sockets[clientId] = undefined;
+                        delete sockets[clientId];
+                    }
+                    
+                    // Notify users currently spying
+                    var clientUrls = createCurrentUserPages();
+                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls});
+
                 });
 
                 socket.on('alert', function() {
@@ -196,6 +203,19 @@ var Notification = function() {
                 });
             }
 
+            var createCurrentUserPages = function() {
+                clientUrls = [];
+
+                for (var index in sockets[clientId]) {
+                    var info = {};
+
+                    info.url = sockets[clientId][index].url;
+                    info.time = sockets[clientId][index].time;
+                    clientUrls.push(info);
+                };
+
+                return clientUrls;
+            }
         });
     };
 
@@ -235,7 +255,7 @@ var Notification = function() {
                 socket.emit('notification', notification);
             }
         }
-    }
+    };
 
     var insertNotificationInSession = function(sessionId, notification) {
         var session = sessionManager.getSessionFromSID(sessionId);
@@ -251,7 +271,7 @@ var Notification = function() {
             });
         }
 
-    }
+    };
 
     var insertBatchNotificationInSessions = function(sessionsIDs, notification) {
         var sessions = sessionManager.getSessions();
@@ -265,7 +285,7 @@ var Notification = function() {
         }
 
     	db.update(_c.default(), 'sessions', {'token' : {'$in': tokens}}, {'$push':{'data.notifications': notification}, $inc : {'data.newNotifications' : 1}} , function(err, result) {}, true, false, true);
-    }
+    };
 
     var insertNotif = function(session, notification) {
         if (session) {
@@ -288,7 +308,7 @@ var Notification = function() {
             session.data.notifications.push(notification);
             return session;
         }
-    }
+    };
 
     this.notifyGroup = function(groupName, notification) {
         notification.date = new Date();
@@ -363,7 +383,7 @@ var Notification = function() {
 
             io.sockets.in(groupName).emit('notification', notification);
         }
-    }
+    };
 
     this.emitToGroup = function(groupName, data) {
         if (groups[groupName]) {
@@ -452,7 +472,7 @@ var Notification = function() {
         });
         // Broadcast for user connected
         io.sockets.emit('notification', notification);
-    }
+    };
 
     this.broadcast = function(data) {
         io.sockets.emit('message', data);
@@ -478,7 +498,7 @@ var Notification = function() {
         //Get last 5 of user
         //Get last x of user
         //Get x to y of user
-    }
+    };
 }
 
 module.exports = new Notification();
