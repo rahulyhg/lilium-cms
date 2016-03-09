@@ -99,13 +99,13 @@ var FileLogic = function() {
     	var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
     	var savePath = cli._c.server.html + name +'/index.html';
 	var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
-	var adminPath = cli._c.server.base + "backend/dynamic/admintemplate.lml";     
+	var adminPath = cli._c.server.base + "backend/dynamic/admintemplate.lml";
 
     	FileServer.fileExists(savePath, function(isPresent) {
 		if (!isPresent) {
 			LML.executeToFile(
 				readPath,
-				tmpPath, 
+				tmpPath,
 				function() {
 					LML.executeToFile(
 						adminPath,
@@ -125,6 +125,47 @@ var FileLogic = function() {
 		}
 	});
   };
+
+  this.serveLmlPluginAdminPage = function(pluginName, cli, lastIsParam, extra) {
+      lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
+      var name;
+
+      if (lastIsParam) {
+        name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+      } else {
+        name = cli.routeinfo.fullpath;
+      }
+
+      var readPath = cli._c.server.base + "plugins/" + pluginName + "/dynamic" + name + ".lml";
+      var savePath = cli._c.server.html + name +'/index.html';
+      var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+  	  var adminPath = cli._c.server.base + "backend/dynamic/admintemplate.lml";
+
+      FileServer.fileExists(savePath, function(isPresent) {
+        if (!isPresent) {
+            LML.executeToFile(
+				readPath,
+				tmpPath,
+				function() {
+					LML.executeToFile(
+						adminPath,
+						savePath,
+						function() {
+							FileServer.pipeFileToClient(cli, savePath, function() {
+								log('FileLogic', 'Admin page generated and served');
+							});
+						},
+						{templatefile:tmpPath,config:cli._c}
+					);
+				},
+				{config:cli._c}
+			);
+        } else {
+          serveCachedFile(cli, savePath);
+        }
+
+      });
+  }
 
   this.serveLmlPluginPage = function(pluginName, cli, lastIsParam, extra) {
     lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
@@ -196,7 +237,7 @@ var FileLogic = function() {
   var saveLmlPage = function(cli, readPath, savePath, extra) {
     extra = extra || new Object();
     extra.config = cli._c;
-    
+
     LML.executeToFile(
       readPath,
       savePath,

@@ -7,6 +7,7 @@ var livevars = require('./livevars.js');
 var cacheInvalidator = require('./cacheInvalidator.js');
 var fs = require('./fileserver.js');
 var notifications = require('./notifications.js');
+var slugify = require('slugify');
 
 var Article = function() {
     this.handlePOST = function(cli) {
@@ -20,21 +21,6 @@ var Article = function() {
                 break;
             case 'delete':
                 this.delete(cli);
-                break;
-            case 'broadcast':
-                notifications.broadcastNotification({title: "Critical!", url: "/admin/article/list", msg: "Server shutdown in 5 minutes.", type: 'danger'});
-                return cli.throwHTTP(200, 'ok');
-
-                break;
-            case 'role':
-                notifications.notifyGroup('admin', {title: "Don't forget", url: "/admin/article/list", msg: "Maintenance tonight!", type: 'warning'});
-                return cli.throwHTTP(200, 'ok');
-                break;
-            case 'user':
-                var random = Math.floor(Math.random() * 4) + 0;
-                var types = ['danger', 'success', 'warning', 'info'];
-                notifications.notifyUser(cli.userinfo.userid, {title: "Article", url: "/admin/article/list", msg: "View Article List", type: types[random]});
-                return cli.throwHTTP(200, 'ok');
                 break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
@@ -78,16 +64,21 @@ var Article = function() {
 
         if (cli.method == 'POST') {
             var form = formBuilder.handleRequest(cli);
+
             var response = formBuilder.validate(form, true);
+
             var redirect = '';
 
             if (response.success) {
-                // Create post
-                db.insert(cli._c, 'content', formBuilder.serializeForm(form), function(err, result) {
+                var formData = formBuilder.serializeForm(form);
+                formData.name = slugify(formData.title).toLowerCase();
 
+                // Create post
+                db.insert(cli._c, 'content', formData, function(err, result) {
                     // Generate LML page
-                    filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
+                    filelogic.renderLmlPostPage(cli, "article",formBuilder.unescapeForm(result.ops[0]) , function(name) {
                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id);
+                        notifications.notifyUser(cli.userinfo.userid, {title: "Article is Live!", url: cli._c.server.url + '/' + formData.name, msg: "Your article is published. Click to see it live.", type: 'success'});
                         cli.sendJSON({
                             redirect: cli._c.server.url + "/" + name,
                             form: {
@@ -121,9 +112,11 @@ var Article = function() {
 
                 if (response.success) {
 
-                    db.update('content', {
+                    db.findAndModify(cli._c, 'content', {
                         _id: id
                     }, formBuilder.serializeForm(form), function(err, r) {
+                        notifications.notifyUser(cli.userinfo.userid, {title: "Article is updated!", url: cli._c.server.url + '/' +  r.value.name , msg: "Your changes are live. Click to see the live article.", type: 'success'});
+
                         cli.sendJSON({
                             success: true
                         });
@@ -149,7 +142,7 @@ var Article = function() {
         if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
-            db.remove('content', {
+            db.remove(cli._c, 'content', {
                 _id: id
             }, function(err, r) {
                 var filename = r.title + '.html';
@@ -236,6 +229,7 @@ var Article = function() {
     }
 
     cacheInvalidator.emitter.on('articleInvalidated', function(id) {
+        // Invalidate article
         console.log('Article id is : ' + id);
     });
 

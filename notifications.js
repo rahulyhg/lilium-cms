@@ -12,6 +12,7 @@ var groups = {};
 var Notification = function() {
     var that = this;
     var io;
+
     this.init = function() {
         registerLivevars();
         io = inbound.io();
@@ -19,6 +20,7 @@ var Notification = function() {
         //Create default groups
         that.createGroup('admin', 'admin');
         that.createGroup('lilium', 'lilium');
+        that.createGroup('spy');
 
         io.on('connection', function(socket) {
 
@@ -31,8 +33,10 @@ var Notification = function() {
 
                 if (!sockets[clientId]) {
                     sockets[clientId] = {};
+                    sockets[clientId].sockets = {};
                 }
-                sockets[clientId][socket.id] = socket;
+                sockets[clientId].sockets[socket.id] = socket;
+                sockets[clientId].displayname = session.data.displayname;
 
 
                 socket.on('join', function(groupName) {
@@ -40,7 +44,7 @@ var Notification = function() {
                     if (groups[groupName]) {
 
                         // Check for needed roles
-                        if (session.data.roles.indexOf(groups[groupName].role) !== -1) {
+                        if (typeof groups[groupName].role == 'undefined' || session.data.roles.indexOf(groups[groupName].role) !== -1) {
                             socket.join(groupName);
                             groups[groupName].users.push({
                                 session: sessionId,
@@ -128,12 +132,43 @@ var Notification = function() {
                     // Check if target exists
                     if (sockets[emission.id]) {
 
-                        for (var index in sockets[emission.id]) {
-                            if (io.sockets.connected[sockets[emission.id][index]]) {
-                                io.sockets.connected[sockets[emission.id]].emit('private', emission.data);
+                        for (var index in sockets[emission.id].sockets) {
+                            if (io.sockets.connected[sockets[emission.id].sockets[index]]) {
+                                io.sockets.connected[sockets[emission.id].sockets].emit('private', emission.data);
                             }
                         }
                     }
+                });
+
+                socket.on('spy', function(data) {
+                    // Only admins or lilium can access this feature
+                    if (session.data.roles.indexOf('admin') !== -1 || session.data.roles.indexOf('lilium') !== -1) {
+                        // Make a list of all currently loggedin users
+                        var loggedInUsers = {};
+                        for (var clientId in sockets) {
+                            loggedInUsers[clientId] = {};
+                            loggedInUsers[clientId].pages = [];
+                            loggedInUsers[clientId].displayname = sockets[clientId].displayname;
+                            // Each sockets, get the id
+                            for (var socketid in sockets[clientId].sockets) {
+                                var info = {};
+                                info.url = sockets[clientId].sockets[socketid].url;
+                                info.time = sockets[clientId].sockets[socketid].time;
+
+                                loggedInUsers[clientId].pages.push(info);
+                            }
+                        }
+
+                        socket.emit('spy', loggedInUsers);
+                    }
+                });
+
+                socket.on('urlChanged', function(url){
+                    sockets[clientId].sockets[socket.id].url = url;
+                    sockets[clientId].sockets[socket.id].time = new Date();
+
+                    var clientUrls = createCurrentUserPages();
+                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
                 });
 
                 socket.on('broadcast', function(emission) {
@@ -149,9 +184,20 @@ var Notification = function() {
                 });
 
                 socket.on('disconnect', function() {
-                    sockets[clientId][socket.id] = undefined;
+                    createCurrentUserPages();
+                    sockets[clientId].sockets[socket.id] = undefined;
 
-                    delete sockets[clientId][socket.id];
+                    delete sockets[clientId].sockets[socket.id];
+
+                    if (sockets[clientId].sockets.length == 0) {
+                        sockets[clientId] = undefined;
+                        delete sockets[clientId];
+                    }
+
+                    // Notify users currently spying
+                    var clientUrls = createCurrentUserPages();
+                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
+
                 });
 
                 socket.on('alert', function() {
@@ -161,13 +207,26 @@ var Notification = function() {
                 });
             }
 
+            var createCurrentUserPages = function() {
+                clientUrls = [];
+
+                for (var index in sockets[clientId].sockets) {
+                    var info = {};
+
+                    info.url = sockets[clientId].sockets[index].url;
+                    info.time = sockets[clientId].sockets[index].time;
+                    clientUrls.push(info);
+                };
+
+                return clientUrls;
+            }
         });
     };
 
     this.emitToUser = function(userID, message) {
         // Send to every sockets connected by the user (for multi-tab)
-        for (var index in sockets[userID]) {
-            var socket = sockets[userID][index];
+        for (var index in sockets[userID].sockets) {
+            var socket = sockets[userID].sockets[index];
             if (socket) {
                 socket.emit('message', message);
             }
@@ -194,13 +253,13 @@ var Notification = function() {
         db.insert(_c.default(), 'notifications', notification, function() {});
 
         // Send to every sockets connected by the user (for multi-tab)
-        for (var index in sockets[userID]) {
-            var socket = sockets[userID][index];
+        for (var index in sockets[userID].sockets) {
+            var socket = sockets[userID].sockets[index];
             if (socket) {
                 socket.emit('notification', notification);
             }
         }
-    }
+    };
 
     var insertNotificationInSession = function(sessionId, notification) {
         var session = sessionManager.getSessionFromSID(sessionId);
@@ -216,7 +275,7 @@ var Notification = function() {
             });
         }
 
-    }
+    };
 
     var insertBatchNotificationInSessions = function(sessionsIDs, notification) {
         var sessions = sessionManager.getSessions();
@@ -230,7 +289,7 @@ var Notification = function() {
         }
 
     	db.update(_c.default(), 'sessions', {'token' : {'$in': tokens}}, {'$push':{'data.notifications': notification}, $inc : {'data.newNotifications' : 1}} , function(err, result) {}, true, false, true);
-    }
+    };
 
     var insertNotif = function(session, notification) {
         if (session) {
@@ -253,7 +312,7 @@ var Notification = function() {
             session.data.notifications.push(notification);
             return session;
         }
-    }
+    };
 
     this.notifyGroup = function(groupName, notification) {
         notification.date = new Date();
@@ -328,7 +387,7 @@ var Notification = function() {
 
             io.sockets.in(groupName).emit('notification', notification);
         }
-    }
+    };
 
     this.emitToGroup = function(groupName, data) {
         if (groups[groupName]) {
@@ -417,7 +476,7 @@ var Notification = function() {
         });
         // Broadcast for user connected
         io.sockets.emit('notification', notification);
-    }
+    };
 
     this.broadcast = function(data) {
         io.sockets.emit('message', data);
@@ -443,7 +502,7 @@ var Notification = function() {
         //Get last 5 of user
         //Get last x of user
         //Get x to y of user
-    }
+    };
 }
 
 module.exports = new Notification();

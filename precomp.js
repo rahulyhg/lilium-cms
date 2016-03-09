@@ -7,41 +7,46 @@ var checksum = require('checksum');
 var compressor = require('node-minify');
 var frontend = require('./frontend.js');
 var log = require('./log.js');
+var _c = require('./config.js');
 
 var Precomp = function() {
 	var minifyFile = function(inFile, outFile, filetype, callback) {
-	    log('Precompiler', 'Minifying ' + filetype + ' file');
+		log('Precompiler', 'Minifying ' + filetype + ' file');
+			// Only minify in prod
+			if (_c.default.env == 'prod') {
+				if (filetype == 'css') {
+					new compressor.minify({
+						type: 'yui-css',
+						fileIn: inFile,
+						fileOut: outFile,
+						callback: function(err, min) {
+							if (err) {
+								console.error(err);
+							} else {
+								callback(err, min)
+							};
+						}
+					});
+				} else if (filetype == 'js') {
+					new compressor.minify({
+						type: 'yui-js',
+						fileIn: inFile,
+						fileOut: outFile,
+						callback: function(err, min) {
+							if (err) {
+								console.error(err);
+							} else {
+								callback(err, min)
+							};
+						}
+					});
+				} else {
+					fileserver.copyFile(inFile, outFile, callback);
+				}
+			} else {
+				fileserver.copyFile(inFile, outFile, callback);
 
-            if (filetype == 'css') {
-                new compressor.minify({
-                    type: 'yui-css',
-                    fileIn: inFile,
-                    fileOut: outFile,
-                    callback: function(err, min) {
-                        if (err) {
-                            console.error(err);
-                        } else {
-                            callback(err, min)
-                        };
-                    }
-                });
-            } else if (filetype == 'js') {
-                new compressor.minify({
-                    type: 'yui-js',
-                    fileIn: inFile,
-                    fileOut: outFile,
-                    callback: function(err, min) {
-                        if (err) {
-                            console.error(err);
-                        } else {
-                            callback(err, min)
-                        };
-                    }
-                });
-            } else {
-                fileserver.copyFile(inFile, outFile, callback);
-            }
-
+			}
 	};
 
 	var runLoop = function(conf, readycb) {

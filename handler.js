@@ -8,7 +8,6 @@ var fs = require('fs');
 var fileserver = require('./fileserver.js');
 var htmlserver = require('./frontend/htmlserver.js');
 var db = require('./includes/db.js');
-var imageResizer = require('./imageResizer.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
 
@@ -39,20 +38,20 @@ var Handler = function() {
 			var busboy = new Busboy({ headers: req.headers });
 			// File upload
 			busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
-				if (cli.request.headers['content-length'] > config.default.server.fileMaxSize) {
+				if (cli.request.headers['content-length'] > cli._c.server.fileMaxSize) {
 					file.resume();
 					hasFile = false;
 					finishedCalled = true;
 					return cli.throwHTTP(413, 'File is too large');
 
 				} else {
-					if (mimeTypeIsSupported(mimetype)) {
+					if (mimeTypeIsSupported(mimetype, cli)) {
                         hasFile = true;
 
-						var mime = getMimeByMimeType(mimetype);
+						var mime = getMimeByMimeType(mimetype, cli);
 						//Gen random name
 						filename = fileserver.genRandomNameFile(filename);
-						var saveTo = config.default.server.base + "backend/static/uploads/" +filename+ mime;
+						var saveTo = cli._c.server.base + "backend/static/uploads/" +filename+ mime;
 						var name = filename + mime;
 
                         file.pipe(fs.createWriteStream(saveTo));
@@ -90,12 +89,12 @@ var Handler = function() {
 
 
 	};
-	var mimeTypeIsSupported = function(mimetype) {
-		return  getMimeByMimeType(mimetype) ? true : false;
+	var mimeTypeIsSupported = function(mimetype, cli) {
+		return  getMimeByMimeType(mimetype, cli) ? true : false;
 	}
 
-	var getMimeByMimeType = function(mimeType) {
-		var mimes = config.default.MIMES;
+	var getMimeByMimeType = function(mimeType, cli) {
+		var mimes = cli._c.MIMES;
     for( var prop in mimes ) {
         if( mimes.hasOwnProperty( prop ) ) {
              if( mimes[ prop ] === mimeType )
@@ -152,7 +151,7 @@ var Handler = function() {
 		}
 	};
 
-	this.handle = config.default.env == "dev" ? function(cli) {
+	this.handle = config.default().env == "dev" ? function(cli) {
 		cli.touch('handler.handle');
 
 		try {

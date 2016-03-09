@@ -1,5 +1,4 @@
 {#config;forms}
-		{%../articlescript}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";

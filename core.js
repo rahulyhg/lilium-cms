@@ -34,6 +34,7 @@ var Petals = undefined;
 var GC = undefined;
 var scheduler = undefined;
 var Role = undefined;
+var filelogic = undefined;
 
 var log = require('./log.js');
 
@@ -75,7 +76,6 @@ var Core = function() {
 		GC = require('./gc.js');
 		scheduler = require('./scheduler.js');
 		Role = require('./role.js');
-
 		log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
 	};
 
@@ -156,7 +156,7 @@ var Core = function() {
 			cli.touch('admin.POST.campaigns');
 			Campaigns.handlePOST(cli);
 		});
-		
+
 		admin.registerAdminEndpoint('settings', 'GET', function(cli) {
 			cli.touch('admin.GET.settings');
 			settings.handleGET(cli);
@@ -170,6 +170,11 @@ var Core = function() {
         admin.registerAdminEndpoint('role', 'POST', function(cli) {
             cli.touch('admin.POST.role');
             Role.handlePOST(cli);
+        });
+
+        admin.registerAdminEndpoint('activities', 'GET', function(cli) {
+            cli.touch('admin.GET.activities');
+            filelogic.serveAdminLML(cli, false);
         });
 
 		hooks.fire('endpoints');
@@ -249,6 +254,10 @@ var Core = function() {
 			id : "devtools", faicon : "fa-hashtag", displayname : "Dev Tools", priority : 2000,
 			rights : ["develop"], absURL : aurl + "devtools", children : []
 		});
+        admin.registerAdminMenu({
+            id : "activities", faicon : "fa-eye", displayname : "User Activities", priority : 800,
+            rights : ["view-user-activities"], absURL : aurl + "activities/", children : []
+        });
 	};
 
 	var loadPlugins = function(cb) {

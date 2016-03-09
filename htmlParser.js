@@ -153,19 +153,19 @@ var HtmlParser = function() {
 
   var parseTitleType = function(field) {
     var tag = field.attr.type || "h3";
-    var content = field.attr.displayname || field.name || "";    
+    var content = field.attr.displayname || field.name || "";
 
     return field.attr.html || (
       "<" + tag + ">" + content + "</" + tag + ">"
     );
   }
- 
+
   var parseStackType = function(field, hasPlaceholder) {
     var scheme = field.attr.scheme;
     var columns = scheme.columns;
     var html = "";
     var displayName = field.attr.displayname || field.name || undefined;
-    
+
     html += '<label for="'+field.name+'">'+displayName+'</label>';
     html += '<div class="lmlstacktablewrapper" data-fieldname="'+field.name+'" >';
     html += '<table class="lmlstacktable" data-fieldname="'+field.name+
@@ -176,9 +176,9 @@ var HtmlParser = function() {
     for (var i = 0; i < columns.length; i++) {
       html += '<th>'+columns[i].displayname+'</th>';
     }
-    
+
     html += '<th></th></tr>';
-    
+
     for (var i = 0; i < columns.length; i++) {
       html += '<th>'+parseStackField(columns[i])+'</th>';
     }

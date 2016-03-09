@@ -22,7 +22,7 @@ var debugMode = 'true';
 var socket = typeof io !== 'undefined' ? io() : undefined;
  
 window.location.urlBase = "{=config.default.server.url}/";
-    
+
 var LiliumCMS = function() {
     var livevars;
     var livevarsResponse;
@@ -30,6 +30,7 @@ var LiliumCMS = function() {
     var pushtables = new Array();
     var stacktables = new Array();
     var queryParams = new Object();
+    var that = this;
 
     var LiliumEvents = {
         livevarsPrerendered: {
@@ -42,7 +43,7 @@ var LiliumCMS = function() {
             name: "livevarsFetched"
         }
     };
- 
+
     var LiveVars = function() {
         var endpoints = [];
         var paramString = "?";
@@ -111,7 +112,7 @@ var LiliumCMS = function() {
 		}
 
 		return pullout;
-	};		
+	};
 
         var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey) {
             var key = obj.data('key');
@@ -164,7 +165,6 @@ var LiliumCMS = function() {
 
         var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey) {
             var templateItems = domTemplate.clone();
-
             while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
                 obj = $(obj);
                 var nodeType = obj.data('nodetype');
@@ -405,7 +405,7 @@ var LiliumCMS = function() {
     };
 
     var FormValidator = function() {
-        this.prepareValidation = function() {
+        this.prepareValidation = function(cb) {
             $(document).ready(function() {
                 $('.v_form_validate').submit(function(e) {
                     e.preventDefault();
@@ -448,7 +448,6 @@ var LiliumCMS = function() {
                             }
                         }
                         $('[ckeditor]').val($('[ckeditor]').ckeditor().getData());
-                        // If a number verify number
 
                         if (!validField) {
                             validForm = validField;
@@ -473,12 +472,11 @@ var LiliumCMS = function() {
 
                 var processForm = function(form) {
                     var that = this;
-                    var serialized_form = escape(form.serialize());
+                    var serialized_form = form.serialize();
                     // Process files
                     processFiles(form, function() {
-
-                        $.post(form.attr('action'), serialized_form, function(data) {
-                            if (data.success) {
+                        $.post(form.attr('action') || window.location.href.toString(), serialized_form, function(data) {
+                            if (data.success && data.redirect) {
                                 window.location.replace(data.redirect);
                             }
                             var event = new CustomEvent('formSubmited', {
@@ -487,6 +485,7 @@ var LiliumCMS = function() {
                             document.dispatchEvent(event);
                             return false;
                         });
+                        if (cb) cb();
                     });
                     return false;
 
@@ -559,6 +558,19 @@ var LiliumCMS = function() {
         index = typeof index == 'undefined' ? 0: index;
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
 
+        // Check for stacktable
+        $(form).find('table.lmlstacktable').each(function(index, osTable) {
+            sTable = $(osTable);
+            var stackTable = new StackTable(
+                sTable.attr('id'),
+                sTable.data('title'),
+                JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+            );
+
+            stackTable.appendRow(data);
+
+        });
+
         var foreachloop = function(data, kString) {
              for (var key in data) {
                 var kkString = kString + (kString == "" ? "" : ".") + key;
@@ -577,7 +589,7 @@ var LiliumCMS = function() {
                         }
                     } else if ((pt = findPushTableFromTitle(kkString))) {
                         pt.fillFromSource(val);
-                    } 
+                    }
                 }
             }
 
@@ -589,8 +601,7 @@ var LiliumCMS = function() {
     };
 
     var FormParser = function() {
-        var makeSingleStackTable = function(index, osTable) {
-            console.log(osTable);
+        var makeSingleStackTable = this.makeSingleStackTable = function(index, osTable) {
             sTable = $(osTable);
             var stackTable = new StackTable(
                 sTable.attr('id'),
@@ -615,34 +626,28 @@ var LiliumCMS = function() {
         };
     };
 
-    var StackTable = function(tableid, objTitle, dataScheme, dataSource) {
+    var StackTable = function(tableid, objTitle, dataScheme) {
         var htmlIdentifier = tableid;
         var scheme = dataScheme;
+        var fieldName = dataScheme.fieldName;
         var title = objTitle;
         var linenumber = 0;
         var that = this;
-        var render = function() {
 
+        var render = function() {
+            // Check for livevars
         }
 
         $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
             that.appendRow();
+            return false;
         });
 
 
-
-
-
-        this.appendRow = function(data, index) {
+        var append = function(val, index) {
             var row = "<tr>";
-            if (data && index) {
-
-            }
-            $('.lmlstacktable th input').each(function(index) {
-                row += "<td>" + $(this).val() + "</td>";
-                row += "<input type='hidden' name='"+ $('#' + htmlIdentifier).data('fieldname') +"["+linenumber+"]["+ scheme.columns[index].fieldName +"]' value='"+  $(this).val() +"'></input>";
-                $(this).val('');
-            });
+            row += "<td>" + val + "</td>";
+            row += "<input type='hidden' name='"+ $('#' + htmlIdentifier).data('fieldname') +"["+linenumber+"]["+ scheme.columns[index].fieldName +"]' value='"+  val +"'></input>";
             row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";
             row += "</tr>";
             $('#' + htmlIdentifier).find('tr').last().after(row);
@@ -655,8 +660,26 @@ var LiliumCMS = function() {
             return false;
         }
 
-        var init = function() {
 
+        this.appendRow = function(livevar) {
+                $('.lmlstacktable th input').each(function(index) {
+                    if (livevar) {
+                        var data = livevar[$(this).data('fieldname')];
+                        append(data);
+                    } else {
+                        append($(this).val(), index);
+                        $(this).val('');
+                    }
+
+                });
+
+
+
+            return false;
+        }
+
+        var init = function() {
+            render();
         };
 
         init();
@@ -1040,7 +1063,7 @@ var LiliumCMS = function() {
     };
 
     // Notifications
-    document.addEventListener(LiliumEvents.livevarsFetched.name, function(e) {
+    document.addEventListener(LiliumEvents.livevarsRendered.name, function(e) {
         var session = e.detail.livevars.session
 
         // Subscribe to channels based on user roles
@@ -1052,13 +1075,12 @@ var LiliumCMS = function() {
         }
         if (session && session.notifications) {
             var notifs = session.notifications;
-            var notificationList = $('#notification_list');
+            var notificationList = $('.nav > .dropdown #notification-dropdown #notification_list');
             var nbUnviewed = session.newNotifications ? session.newNotifications : 0;
             for (var index in notifs) {
                 // Update small counter
                 var notifHtml = generateNotification(notifs[index]);
-
-                $(notificationList).prepend(notifHtml);
+                notificationList.prepend(notifHtml);
             }
             // Update notification badge
             if (nbUnviewed == 0) {
@@ -1105,9 +1127,9 @@ var LiliumCMS = function() {
         var link = notif.url? "data-href='" + notif.url + "'": "";
         var title = notif.title ? "<div class='notif-title'>"+ notif.title +"</div>" : "";
         var msg = notif.msg ? notif.msg : "Empty Notification :(";
-        var date = notif.date? '<time class="date timeago" datetime="'+ notif.date.toString() +'">' + notif.date +'</time>' : '';
+        var date = notif.date? "<time class='date timeago' datetime='"+ notif.date.toString() +"'>" + notif.date +"</time>" : '';
 
-        var html = "<li id='" + notif._id + "' class='" + isNew + ' ' + type + " link' " + link +"><div>"+ title + '<div class="notif-msg">' + msg + '</div>' + date +"</div></li>";
+        var html = "<li id='" + notif._id + "' class='" + isNew + ' ' + type + " link' " + link +"><div>"+ title + "<div class='notif-msg'>" + msg + '</div>' + date +"</div></li>";
 
         return html;
     };
@@ -1115,11 +1137,17 @@ var LiliumCMS = function() {
     if (typeof io !== "undefined") {
     io.Socket.prototype.join = function(groupName) {
         this.emit('join', groupName);
-    }
+    };
 
     io.Socket.prototype.emitToGroup = function(groupName, data) {
         this.emit('emittogroup', {group: groupName, data: data});
-    }
+    };
+
+    io.Socket.prototype.notifyURL = function(groupName, data) {
+        this.emit('urlChanged', window.location.href);
+    };
+
+    socket.notifyURL();
 
     socket.on('join', function(data){
         if (!data.success) {
@@ -1159,7 +1187,26 @@ var LiliumCMS = function() {
 
         notification.type = typeof notification.type !== 'undefined'? notification.type : 'info';
         notification.message = notification.msg ? notification.msg : 'Notification without a message :(';
+        that.notify(notification);
+    });
+    }
 
+         var deepUnescape = function(json) {
+             for (var index in json) {
+                 switch (typeof json[index]) {
+                     case 'string':
+                         json[index] = unescape(json[index]);
+                         break;
+                     case 'object':
+                         json[index] = deepUnescape(json[index]);
+                         break;
+
+                 }
+             }
+             return json;
+         };
+
+    this.notify = function (notification) {
         $.notify(notification, {
             type: notification.type,
             newest_on_top: true,
@@ -1183,23 +1230,7 @@ var LiliumCMS = function() {
                 '<a href="{3}" target="{4}" data-notify="url"></a>' +
             '</div>'
         });
-    });
     }
-
-         var deepUnescape = function(json) {
-             for (var index in json) {
-                 switch (typeof json[index]) {
-                     case 'string':
-                         json[index] = unescape(json[index]);
-                         break;
-                     case 'object':
-                         json[index] = deepUnescape(json[index]);
-                         break;
-
-                 }
-             }
-             return json;
-         };
 
     var CKEditor = function() {
         this.initEditor = function() {

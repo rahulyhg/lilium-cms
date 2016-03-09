@@ -33,10 +33,10 @@ var AdminAdvertiser = function() {
 
     switch (cli.routeinfo.path[2]) {
       case undefined:
-        fileLogic.serveLmlPluginPage('advertiser', cli, false);
+        fileLogic.serveLmlPluginAdminPage('advertiser', cli, false);
         break;
       case 'edit':
-        fileLogic.serveLmlPluginPage('advertiser', cli, true);
+        fileLogic.serveLmlPluginAdminPage('advertiser', cli, true);
         break;
       default:
         return cli.throwHTTP(404, 'Not Found');
@@ -70,13 +70,13 @@ var AdminAdvertiser = function() {
 
           newEnt.stripeid = stripeid;
 
-          entites.registerEntity(newEnt, function() {
+          entites.registerEntity(cli, newEnt, function() {
             cli.touch('advertiser.registerEntity.callback');
             cli.redirect(config.default().server.url + cli.routeinfo.relsitepath);
           });
         });
       } else {
-        entites.registerEntity(newEnt, function() {
+        entites.registerEntity(cli, newEnt, function() {
           cli.touch('advertiser.registerEntity.callback');
           cli.redirect(config.default().server.url + cli.routeinfo.relsitepath);
         });
@@ -106,12 +106,12 @@ var AdminAdvertiser = function() {
           serializedForm.stripeToken = entData.stripeToken;
 
           if (entData.stripeToken) {
-            that.addAdvertiserStripeCostumer(serializedForm.stripeToken, serializedForm, id, function() {
+            that.addAdvertiserStripeCostumer(serializedForm.stripeToken, serializedForm, id, cli, function() {
             })
 
           } else {
-            updateAdvertiser(serializedForm, id, function() {
-                fileLogic.serveLmlPluginPage('advertiser', cli, true);
+            updateAdvertiser(serializedForm, id, cli, function() {
+                fileLogic.serveLmlPluginAdminPage('advertiser', cli, true);
             });
           }
 
@@ -122,7 +122,7 @@ var AdminAdvertiser = function() {
         }
 
       } else {
-        fileLogic.serveLmlPluginPage('advertiser', cli, true);
+        fileLogic.serveLmlPluginAdminPage('advertiser', cli, true);
       }
 
     } else {
@@ -131,24 +131,24 @@ var AdminAdvertiser = function() {
 
   };
 
-  this.addAdvertiserStripeCostumer = function(stripeToken, serializedPaymentForm, entity_id, cb) {
+  this.addAdvertiserStripeCostumer = function(stripeToken, serializedPaymentForm, entity_id, cli, cb) {
       if (stripeToken) {
         //Check if there is already a stripe client for this advertiser
-        db.findToArray('entities', {
+        db.findToArray(cli._c, 'entities', {
           _id: db.mongoID(entity_id)
         }, function(err, arr) {
           if (typeof arr[0] !== 'undefined' && typeof arr[0].stripeid !== 'undefined') {
             // Update stripe user
             transaction.updateCustomer(arr[0].stripeid, serializedPaymentForm, function(stripeid) {
               serializedPaymentForm.stripeid = stripeid;
-              updateAdvertiser(serializedPaymentForm, entity_id, cb);
+              updateAdvertiser(serializedPaymentForm, entity_id, cli, cb);
             });
           } else {
             // Create stripe user
             arr[0].stripeToken = stripeToken;
             transaction.createNewCustomer(arr[0], function(stripeid) {
               serializedPaymentForm.stripeid = stripeid;
-              updateAdvertiser(serializedPaymentForm, entity_id, cb);
+              updateAdvertiser(serializedPaymentForm, entity_id, cli, cb);
             });
           }
         });
@@ -157,7 +157,7 @@ var AdminAdvertiser = function() {
     }
   }
 
-  var updateAdvertiser = function(form, id, cb) {
+  var updateAdvertiser = function(form, id, cli, cb) {
     if (typeof form.stripeToken !== 'undefined') {
       //Remove unneeded data.
       form.stripeToken = undefined;
@@ -171,7 +171,7 @@ var AdminAdvertiser = function() {
       form.year = undefined;
       delete form.year;
 
-      db.update('entities', {
+      db.update(cli._c, 'entities', {
         _id: id
       }, form, function(err, r) {
           cb(true, form);
@@ -187,12 +187,12 @@ var AdminAdvertiser = function() {
   var deleteAdvertiser = function(cli) {
     cli.touch('advertiser.deleteAdvertiser');
     var id = cli.postdata.data.uid;
-    db.findToArray('entities', {
+    db.findToArray(cli._c, 'entities', {
       _id: db.mongoID(id)
     }, function(err, arr) {
       if (typeof arr[0].stripeid !== 'undefined') {
         transaction.deleteCustomer(arr[0].stripeid, function() {
-          db.remove('entities', {
+          db.remove(cli._c, 'entities', {
             _id: db.mongoID(id)
           }, function(err, result) {
               cli.sendJSON({
@@ -200,7 +200,7 @@ var AdminAdvertiser = function() {
           });
         });
     } else {
-        db.remove('entities', {
+        db.remove(cli._c, 'entities', {
           _id: db.mongoID(id)
         }, function(err, result) {
             cli.sendJSON({

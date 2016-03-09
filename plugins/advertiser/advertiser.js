@@ -106,7 +106,7 @@
 	         livevars.registerLiveVariable('advertiser', function(cli, levels, params, callback) {
 	             var allEntities = levels.length === 0;
 	             if (allEntities) {
-	                 db.findToArray('entities', {
+	                 db.findToArray(cli._c, 'entities', {
 	                     roles: {
 	                         $in: ['advertiser']
 	                     }
@@ -125,11 +125,11 @@
 	                 }
 	                 qObj.username = queryInfo.username;
 
-	                 db.findToArray('entities', queryInfo, function(err, arr) {
+	                 db.findToArray(cli._c, 'entities', queryInfo, function(err, arr) {
 	                     callback(err || arr);
 	                 });
 	             } else {
-	                 db.multiLevelFind('entities', levels, {
+	                 db.multiLevelFind(cli._c, 'entities', levels, {
 	                     _id: db.mongoID(levels[0]),
 	                     roles: {
 	                         $in: ['advertiser']

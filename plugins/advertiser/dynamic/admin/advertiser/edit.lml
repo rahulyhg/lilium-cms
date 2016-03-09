@@ -1,31 +1,21 @@
 {#config;session;vocab;forms}
-<!DOCTYPE html>
-<html>
-	<head>
-        <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+<header>
+	<h1>{=config.default.vendor.productname}
+		<small>v{=config.default.vendor.version}</small>
+	</h1>
+</header>
+<h2>Edit an advertiser</h2>
+{*advertiser.{?1}}
+<div class="payment-errors">
 
-        {%../../../../../backend/dynamic/admin/globalhead;../../script}
-		<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
-		<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-		<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-	</head>
-	<body>
-		<header><h1>{=config.default.vendor.productname} <small>v{=config.default.vendor.version}</small></h1></header>
-		<h2>Edit an advertiser</h2>
-		{*advertiser.{?1}}
-		<div class="payment-errors">
+</div>
+{=forms.render('advertiser_edit')}
+<script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
 
-		</div>
-    {=forms.render('advertiser_edit')}
-		<script src="{=config.default.server.url}/bower/jquery-deserialize/dist/jquery.deserialize.min.js"></script>
-
-		<script>
-		$(document).ready(function() {
-			document.addEventListener('livevarsFetched', function(){
-				liliumcms.formParser.parse($("lml\\:livevars:first").attr('data-varname'));
-			})
-		});
-
-		</script>
-	</body>
-</html>
+<script>
+	$(document).ready(function() {
+		document.addEventListener('livevarsFetched', function() {
+			liliumcms.formParser.parse($("lml\\:livevars:first").attr('data-varname'));
+		})
+	});
+</script>

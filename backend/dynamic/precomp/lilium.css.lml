@@ -17,7 +17,6 @@
  * Description : Global styling for admin section of Lilium.                                             *
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
-    
 {#config;debug}
 {$
 	actioncolor = "#9B59B6";
