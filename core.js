@@ -76,6 +76,7 @@ var Core = function() {
 		GC = require('./gc.js');
 		scheduler = require('./scheduler.js');
 		Role = require('./role.js');
+		filelogic = require('./filelogic.js');
 		log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
 	};
 
