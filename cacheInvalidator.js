@@ -36,15 +36,16 @@ var CacheInvalidator = function() {
     fs.watch(path, function(event, filename){
       var fileInvalidated = cachedFileEvents[filename];
       if (typeof cachedFileEvents[filename] !== 'undefined') {
-        that.emitter.emit(fileInvalidated[0],fileInvalidated[1]);
+        that.emitter.emit(fileInvalidated);
       }
 
     });
   }
 
-  this.addFileToWatch = function(path, eventName, value) {
-    cachedFileEvents[path] = [eventName, value];
-    db.insert(conf.default(), 'cachedFiles',{file: path, extra : [eventName, value]} , function(err){
+  this.addFileToWatch = function(path, eventName, value, conf) {
+    cachedFileEvents[path] = {};
+    cachedFileEvents[path] = {name : eventName, value : value, db : conf.id};
+    db.insert(conf.id, 'cachedFiles',{file: path, extra : cachedFileEvents[path]}, function(err){
       log('Cache Invalidator', err);
     });
   }

@@ -3,7 +3,7 @@ var LML = require('./lml.js');
 var _c = require('./config.js');
 var log = require('./log.js');
 var fs = require('fs');
-var slugify = require('slugify');
+var slugify = require('slug');
 
 var FileLogic = function() {
   /*
