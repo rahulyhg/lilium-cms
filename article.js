@@ -46,7 +46,7 @@ var Article = function() {
     this.handleGET = function(cli) {
         cli.touch('article.handleGET');
         if (cli.routeinfo.path.length == 2) {
-          cli.redirect(cli._c.server.url + cli.routeinfo.fullpath + "/list", true);
+          cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
         } else {
           switch (cli.routeinfo.path[2]) {
             case 'new':

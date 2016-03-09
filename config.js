@@ -1,4 +1,5 @@
 var _configs = new Object();
+var log = require('./log.js');
 
 var Config = function() {
 	this.httpRegex = /https?\:\/\//;
@@ -33,6 +34,7 @@ Config.prototype.fetchConfig = function(site) {
 
 Config.prototype.fetchConfigFromCli = function(cli) {
 	var rootdomain = cli.request.headers.host.replace(this.httpRegex, "") + cli.request.url;
+
 	while (rootdomain && !_configs.hasOwnProperty(rootdomain)) {
 		var index = rootdomain.lastIndexOf('/');
 		rootdomain = index == -1 ? undefined : rootdomain.substring(0, index);
@@ -76,6 +78,7 @@ Config.prototype.each = function(loopFtc, end) {
 Config.prototype.registerConfigs = function(key, object) {
 	_configs[key] = object;
 
+	log('Config', 'Registered config with key ' + key);
 	if (key == "default") {
 		object.default = true;
 	}

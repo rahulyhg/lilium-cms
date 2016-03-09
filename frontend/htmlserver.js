@@ -7,7 +7,7 @@ var HTMLServer = function() {
 
 		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
 
-		var filename = cli._c.server.html + cli.routeinfo.fullpath;
+		var filename = cli._c.server.html + cli.routeinfo.relsitepath;
 		var htmlFile = filename + ".html";
 
 		fileserver.fileExists(htmlFile, function (fileExists){
@@ -20,7 +20,7 @@ var HTMLServer = function() {
 				fileserver.fileExists(filename, function (fileExists){
 					if (fileExists) {
 						// If html page requested from root
-						if (cli.routeinfo.path.length == 1 && cli.routeinfo.fullpath.indexOf('.html') !== -1) {
+						if (cli.routeinfo.path.length == 1 && cli.routeinfo.relsitepath.indexOf('.html') !== -1) {
 							cli.redirect(cli._c.server.url + cli.routeinfo.fullpath.slice(-5), true);
 						} else {
 							fileserver.pipeFileToClient(cli, filename, function (){

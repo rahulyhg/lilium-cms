@@ -22,6 +22,11 @@ var Router = function() {
 		}
 
 		cli.routeinfo.path = pObj.pathname.replace(/^\/?|\/?$/g, "").split('/');
+		for (var i = 0; i < (cli.routeinfo.rootdomain.match(/\//g) || []).length; i++) {
+			cli.routeinfo.path.shift();
+		}
+
+		cli.routeinfo.relsitepath = "/" + cli.routeinfo.path.join('/');
 		cli.routeinfo.params = pObj.query;
 		cli.routeinfo.admin = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.admin;
 		cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.login;

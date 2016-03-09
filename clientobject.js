@@ -119,7 +119,17 @@ ClientObject.prototype.parseCookie = function() {
 	if (cookieString) {
 		cookieString.split(';').forEach(function(cookie) {
 			var keyVal = cookie.split('=');
-			that.cookies[keyVal.shift().trim()] = decodeURI(keyVal.join('=').trim());
+			var keyName = keyVal.shift().trim();
+			keyVal = decodeURI(keyVal.join('=').trim());
+
+			if (!that.cookies[keyName]) {
+				that.cookies[keyName] = keyVal;
+			} else if (that.cookies[keyName] === 'object') {
+				that.cookies[keyName].push(keyVal);
+			} else {
+				var str = that.cookies[keyName];
+				that.cookies[keyName] = [str, keyVal];
+			}
 		});
 	}
 };

@@ -35,23 +35,36 @@ var Sessions = function() {
 	};
 
 	this.injectSessionInCli = function(cli) {
-		var curSesh = _sesh[cli.cookies.lmlsid];
+		var ids = cli.cookies.lmlsid;
+		var injected = false;
+		if (typeof ids !== 'object') {
+			ids = [ids || ""];
+		}
 
-		if (cli.cookies.lmlsid && curSesh && cli.routeinfo.configname == curSesh.data.site) {
-			cli.session = curSesh;
+		for (var i = 0; i < ids.length; i++) {
+			var curSesh = _sesh[ids[i]];
 
-			cli.userinfo = {
-				loggedin : cli.session.loggedin,
-				roles : cli.session.data.roles,
-				userid : cli.session.data._id,
-				logintime : cli.session.data.logintime,
-				displayname : cli.session.data.displayname,
-				admin : cli.session.data.admin,
-				god : cli.session.data.god,
-				user : cli.session.data.user,
-				site : cli.routeinfo.configname
-			};
-		} else {
+			if (curSesh && cli.routeinfo.configname == curSesh.data.site) {
+				cli.session = curSesh;
+	
+				cli.userinfo = {
+					loggedin : cli.session.loggedin,
+					roles : cli.session.data.roles,
+					userid : cli.session.data._id,
+					logintime : cli.session.data.logintime,
+					displayname : cli.session.data.displayname,
+					admin : cli.session.data.admin,
+					god : cli.session.data.god,
+					user : cli.session.data.user,
+					site : cli.routeinfo.configname
+				};
+
+				injected = true;
+				break;
+			} 
+		}
+
+		if (!injected) {
 			cli.session = new UserSesh();
 		}
 	};

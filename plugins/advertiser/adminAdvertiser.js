@@ -72,13 +72,13 @@ var AdminAdvertiser = function() {
 
           entites.registerEntity(newEnt, function() {
             cli.touch('advertiser.registerEntity.callback');
-            cli.redirect(config.default().server.url + cli.routeinfo.fullpath);
+            cli.redirect(config.default().server.url + cli.routeinfo.relsitepath);
           });
         });
       } else {
         entites.registerEntity(newEnt, function() {
           cli.touch('advertiser.registerEntity.callback');
-          cli.redirect(config.default().server.url + cli.routeinfo.fullpath);
+          cli.redirect(config.default().server.url + cli.routeinfo.relsitepath);
         });
       }
     } else {

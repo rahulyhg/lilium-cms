@@ -218,7 +218,7 @@ var Core = function() {
 			rights : ["dash"], absURL : aurl + "dashboard", children : []
 		});
 		admin.registerAdminMenu({
-			id : "articles", faicon : "fa-pencil", displayname : "Articles", priority : 200,
+			id : "articles", faicon : "fa-pencil", displayname : "Posts", priority : 200,
 			rights : ["view-content"], absURL : aurl + "article", children : []
 		});
 		admin.registerAdminMenu({
@@ -370,58 +370,6 @@ var Core = function() {
 
 	}
 
-	var testDatabase = function(callback) {
-		log('Database', 'Testing databases');
-
-		_c.each(function(conf, next) {
-			var dbinit = function() {
-				log('Database', 'Initializing database if not initialized');
-				db.initDatabase(conf, function(err) {
-					log('Database', 'Firing Database init signal');
-					dbconn();
-				});
-			};
-
-			var dbconn = function() {
-				log ('Database', 'Requesting dynamic connection object');
-				db.createPool(conf, function() {
-					log('Database', 'Firing Database connection signal');
-					next();
-				});
-			};
-
-			db.testConnection(conf, function(err) {
-				hooks.fire('dbtest', err);
-				dbinit();
-			});
-		}, callback);
-	};
-
-	var loadStaticSymlink = function(callback) {
-		log('FileServer', 'Creating symlink for static files.');
-
-		_c.eachSync(function(conf) {
-			var to = conf.server.html + '/static';
-			var rootDir = conf.server.base + 'backend/static/';
-			fileserver.createSymlinkSync(rootDir, to);
-
-			to =   conf.server.html + '/bower';
-			rootDir = conf.server.base + 'bower_components/';
-			fileserver.createSymlinkSync(rootDir, to);
-
-			to =   conf.server.html + '/uploads';
-			rootDir = conf.server.base + 'backend/static/uploads/';
-			fileserver.createSymlinkSync(rootDir, to);
-
-			to =   conf.server.html + '/plugins';
-			rootDir = conf.server.base + 'plugins/';
-			fileserver.createSymlinkSync(rootDir, to);
-		});
-
-		hooks.fire('staticsymlink', undefined);
-		callback();
-	};
-
 	var loadStandardInput = function() {
 		var stdin = process.openStdin();
 		stdin.liliumBuffer = "";
@@ -467,25 +415,6 @@ var Core = function() {
 			GC.clearTempFiles(function() {
 				log("GC", "Scheduled temporary files collection done");
 			});
-		});
-	};
-
-	var loadHTMLStructure = function(callback) {
-		_c.each(function(conf, next) {
-			fileserver.createDirIfNotExists(conf.server.html, function(valid) {
-				if (valid) {
-					log('FileServer',
-						'HTML Directory was validated at : ' +
-						conf.server.html
-					);
-				} else {
-					log('FileServer', 'Error validated html directory');
-				}
-	
-				next();
-			}, true);
-		}, function() {
-			loadStaticSymlink(callback);
 		});
 	};
 
@@ -542,13 +471,6 @@ var Core = function() {
 		sessions.initSessionsFromDatabase(cb);
 	};
 
-	var loadSites = function(cb) {
-		sites = require('./sites.js');
-		sites.cacheSitesFromDatabase(function() {
-			sites.loadSites(cb);
-		});
-	};
-
 	var loadRequestHandler = function() {
 		hooks.bind('request', 1000, function(params) {
 			// Run main modules
@@ -557,34 +479,13 @@ var Core = function() {
 		});
 	};
 
-	var loadPrecompiledStaticFiles = function(callback) {
-		_c.each(function(conf, next) {
-			var base = conf.server.base;
-			var htmlbase = conf.server.html;
-
-			Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
-			Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
-			Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
-			Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin", conf.id);
-			Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
-			Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
-			Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
-			Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin', conf.id);
-
-			Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
-			Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin', conf.id);
-			Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
-			Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin', conf.id);
-
-			Precompiler.precompile(conf, next);
-		}, callback);
-	};
-
 	var prepareDefaultSiteCreation = function(cb) {
 		require('./init.js')(cb);
 	};
 
 	var loadWebsites = function(loadEverything) {
+		sites = require('./sites.js');
+		
 		var currentRoot = __dirname;
 		var fss = require('./fileserver.js');
 
@@ -592,7 +493,7 @@ var Core = function() {
 			if (exists) {
 				fss.fileExists(currentRoot + "/sites/default.json", function(exists) {
 					if (exists) {
-						loadEverything();
+						sites.loadSites(loadEverything);
 					} else {
 						prepareDefaultSiteCreation(loadEverything);
 					}
@@ -625,41 +526,36 @@ var Core = function() {
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
 		loadWebsites(function(resp) { 
-			loadSites(function() {
-				loadRequires();
-				loadHooks(readyToRock);
-				loadEndpoints();
-				loadStandardInput();
-				loadImageSizes();
-				loadForms();
-				loadLiveVars();
-				loadDFP();
-				loadGlobalPetals();
-				loadRequestHandler();
-				loadAdminMenus();
-				loadFrontend();
+			loadRequires();
+			loadHooks(readyToRock);
+			loadEndpoints();
+			loadStandardInput();
+			loadImageSizes();
+			loadForms();
+			loadLiveVars();
+			loadDFP();
+			loadGlobalPetals();
+			loadRequestHandler();
+			loadAdminMenus();
+			loadFrontend();
 
-				loadHTMLStructure(function() {
-				testDatabase(function() {
-				loadPlugins(function(){
-				loadRoles(function() {
-				loadProducts(function() {
-				loadPrecompiledStaticFiles(function() {
-				loadSessions(function() {
-				loadTheme(function() {
-				redirectIfInit(resp, function() {
-					loadCacheInvalidator();
-					scheduleGC();
+			loadPlugins(function(){
+			loadRoles(function() {
+			loadProducts(function() {
+			loadSessions(function() {
+			loadTheme(function() {
+			redirectIfInit(resp, function() {
+				loadCacheInvalidator();
+				scheduleGC();
 
-					log('Lilium', 'Starting inbound server');
-					Inbound.createServer();
-		     	     		loadNotifications();
-					Inbound.start();
-			
-					log('Core', 'Firing initialized signal');
-					hooks.fire('init');
-				});});});});});});});});});
-			});
+				log('Lilium', 'Starting inbound server');
+				Inbound.createServer();
+	     	     		loadNotifications();
+				Inbound.start();
+		
+				log('Core', 'Firing initialized signal');
+				hooks.fire('init');
+			});});});});});});
 		});
 	};
 

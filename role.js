@@ -29,7 +29,7 @@ var Role = function() {
     this.handleGET = function(cli) {
         cli.touch('role.handleGET');
         if (cli.routeinfo.path.length == 2) {
-            cli.redirect(conf.default.server.url + cli.routeinfo.fullpath + "/list", true);
+            cli.redirect(conf.default.server.url + cli.routeinfo.relsitepath + "/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
                 case 'new':

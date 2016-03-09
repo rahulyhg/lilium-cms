@@ -69,9 +69,9 @@ var FileLogic = function() {
     var name = "";
 
     if (lastIsParam) {
-      name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+      name = cli.routeinfo.relsitepath.replace('/' + cli.routeinfo.path.pop(),'');
     } else {
-      name = cli.routeinfo.fullpath;
+      name = cli.routeinfo.relsitepath;
     }
 
     var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
@@ -91,9 +91,9 @@ var FileLogic = function() {
     	var name = "";
 
     	if (lastIsParam) {
-      		name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+      		name = cli.routeinfo.relsitepath.replace('/' + cli.routeinfo.path.pop(),'');
     	} else {
-      		name = cli.routeinfo.fullpath;
+      		name = cli.routeinfo.relsitepath;
     	}
 
     	var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
@@ -131,9 +131,9 @@ var FileLogic = function() {
     var name;
 
     if (lastIsParam) {
-      name = cli.routeinfo.fullpath.replace('/' + cli.routeinfo.path.pop(),'');
+      name = cli.routeinfo.relsitepath.replace('/' + cli.routeinfo.path.pop(),'');
     } else {
-      name = cli.routeinfo.fullpath;
+      name = cli.routeinfo.relsitepath;
     }
 
     var readPath = cli._c.server.base + "plugins/" + pluginName + "/dynamic" + name + ".lml";
@@ -217,7 +217,7 @@ var FileLogic = function() {
 
   this.runLogic = function(cli) {
     cli.touch('filelogic.runlogic');
-    var fullpath = cli._c.server.html + cli.routeinfo.fullpath;
+    var fullpath = cli._c.server.html + cli.routeinfo.relsitepath;
 
     // Check for static file
     FileServer.fileExists(fullpath, function(isPresent) {

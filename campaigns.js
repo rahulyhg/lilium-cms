@@ -306,7 +306,7 @@ var Campaigns = function() {
                                 });
                             }
 
-                            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath, false);
+                            cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath, false);
                         }, false, true);
                     });
                     break;
@@ -314,7 +314,7 @@ var Campaigns = function() {
                     cli.debug();
             }
         } else {
-            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath + "?invalidform", false);
+            cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?invalidform", false);
         }
     };
 

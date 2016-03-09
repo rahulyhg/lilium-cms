@@ -139,7 +139,7 @@ var Entities = function() {
 
 			}, {name:newEnt.firstname + " " + newEnt.lastname});
 			*/
-			cli.redirect(cli._c.server.url + cli.routeinfo.fullpath);
+			cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath);
 		});
 	};
 
@@ -147,7 +147,7 @@ var Entities = function() {
 		var id = cli.postdata.data.uid;
 
 		db.remove(cli._c, 'entities', {_id:db.mongoID(id)}, function(err, result) {
-			cli.redirect(cli._c.server.url + cli.routeinfo.fullpath);
+			cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath);
 		});
 	};
 

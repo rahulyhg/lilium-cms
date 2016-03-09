@@ -53,56 +53,60 @@ var Precomp = function() {
 		log('Precompiler', 'Precompiling static files');
 		fileserver.listDirContent(absReadPath, function(fileArr) {
 			db.findToArray(conf, 'compiledfiles', {}, function(err, histo) {
-
-				var histoObj = new Object();
-
-				for (var i = 0; i < histo.length; i++) {
-					histoObj[histo[i].filename] = histo[i].sum;
-				}
-
-				var nextFile = function() {
-					if (fileIndex < fileArr.length) {
-						var curFile = fileArr[fileIndex];
-						var mustRewrite = false;
-						fileIndex++;
-
-						if (curFile.indexOf('.lml') !== -1) {
-							checksum.file(absReadPath + curFile, function(err, sum) {
-								if (histoObj[curFile] == sum) {
-									nextFile();
-								} else {
-									log('Precompiler', 'Precompiling static file : ' + curFile);
+				db.remove(conf, 'compiledfiles', {}, function(remErr, res) {;
+					var histoObj = new Object();
+	
+					for (var i = 0; i < histo.length; i++) {
+						histoObj[histo[i].filename] = histo[i].sum;
+					}
+	
+					var nextFile = function() {
+						if (fileIndex < fileArr.length) {
+							var curFile = fileArr[fileIndex];
+							var mustRewrite = false;
+							fileIndex++;
+	
+							if (curFile.indexOf('.lml') !== -1) {
+								checksum.file(absReadPath + curFile, function(err, sum) {
 									var rPath = absReadPath + curFile;
 									var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
 									var wPath = absWritePath + curFile.slice(0, -4);
-									LML.executeToFile(
-										rPath,
-										tPath,
-										function() {
-											var beforeMinify = new Date();
-											minifyFile(tPath, wPath, wPath.substring(wPath.lastIndexOf('.')+1), function() {
-												log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms");
-												db.insert(conf, 'compiledfiles', {
-													filename : curFile,
-													sum : sum
-												}, function() {
-													nextFile();
-												});
-											});
-										},
-										{minify:false,config:conf}
-									);
-								}
-							});
+	
+									fileserver.fileExists(wPath, function(exists) {
+										if (exists && histoObj[curFile] == sum) {
+											nextFile();
+										} else {
+											log('Precompiler', 'Precompiling static file : ' + curFile);
+											LML.executeToFile(
+												rPath,
+												tPath,
+												function() {
+													var beforeMinify = new Date();
+													minifyFile(tPath, wPath, wPath.substring(wPath.lastIndexOf('.')+1), function() {
+														log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms");
+														db.insert(conf, 'compiledfiles', {
+															filename : curFile,
+															sum : sum
+														}, function() {
+															nextFile();
+														});
+													});
+												},
+												{minify:false,config:conf}
+											);
+										}
+									});
+								});
+							} else {
+								nextFile();
+							}
 						} else {
-							nextFile();
+							readycb();
 						}
-					} else {
-						readycb();
-					}
-				};
-
-				nextFile();
+					};
+	
+					nextFile();
+				});
 			});
 		});
 	};
