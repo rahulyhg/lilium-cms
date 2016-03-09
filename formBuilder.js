@@ -5,7 +5,7 @@
 
 var htmlParser = require('./htmlParser');
 var validator = require('validator');
-
+var hooks = require('./hooks.js');
 
 
 var Form = function(name, cb) {
@@ -112,6 +112,11 @@ var FormBuilder = function() {
     currentForm.fields[name] = createField(name, type, attr, requirements);
     return this;
 
+  };
+
+  this.trigger = this.trg = function(sectionname) {
+    hooks.trigger(this.name + "-" + sectionname, {form : this});
+    return this;
   };
 
   this.edit = function(name, type, attr, requirements) {

@@ -61,7 +61,7 @@ var LiveVariables = function() {
 		nextVar();
 	};
 
-	var handleOneVar = function(cli, varObj, assoc, next) {
+	var handleOneVar = function(cli, varObj, assoc, response, next) {
 		var varName = varObj.varname;
 		var params = varObj.params;
 		var levels = varName.split('.');
@@ -78,10 +78,18 @@ var LiveVariables = function() {
 						next(true);
 					});
 				} else {
+					response.code = 403;
+					response.valid = false;
+					response.message = "Unauthorized";
+
 					assoc[varName] = "[ACCESS DENIED FOR TOP LEVEL VARIABLE "+topLevel+"]";
 					next(false);
 				}
 			} else {
+				response.code = 403;
+				response.valid = false;
+				response.message = "Unauthorized";
+
 				assoc[varName] = '[UNREGISTERED TOP LEVEL LIVE VARIABLE '+topLevel+']';
 				next(false);
 			}
@@ -91,13 +99,18 @@ var LiveVariables = function() {
 	var startLoop = function(cli, varNames, assoc, callback) {
 		var index = 0;
 		var max = varNames.length;
+		var response = {
+			code : 200,
+			valid : true,
+			message : "OK"
+		};
 
 		var checkLoop = function() {
 			if (index >= max) {
-				callback();
+				callback(response);
 			} else {
 				setTimeout(function() {
-					handleOneVar(cli, varNames[index], assoc, function() {
+					handleOneVar(cli, varNames[index], assoc, response, function(valid) {
 						index++;
 						checkLoop();
 					});
@@ -108,17 +121,20 @@ var LiveVariables = function() {
 		if (max > 0) {
 			checkLoop();
 		} else {
-			callback();
+			callback(response);
 		}
 	};
 
 	this.handleRequest = function(cli) {
-		try{
+		try {
 			var liveVars = JSON.parse(cli.routeinfo.params.vars);
 			cli.livevars = {};
 
-			var callback = function() {
-				cli.sendJSON(cli.livevars);
+			var callback = function(response) {
+				cli.sendJSON({
+					livevars : cli.livevars,
+					response : response
+				});
 			};
 
 			if (typeof liveVars === 'object') {

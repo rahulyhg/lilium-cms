@@ -1,7 +1,7 @@
 {#config;forms;extra}
-<h2>Network Sites</h2>
+<h1>Network Sites</h1>
 
-<table>
+<table class="lmlfullwidthtable">
 	<thead>
 		<tr>
 			<th>Name</th>
@@ -12,12 +12,19 @@
 	</thead>
 	<tbody id="sites_tbody">
 
-	</tbody
+	</tbody>
 </table>
+
+<a class="button-link" href="{=config.default.server.url}/admin/sites/launch">Launch new website</a>
 
 <lml:template id="site_template">
 	<lml:tobject data-nodetype="tr">
-		<lml:tobject data-nodetype="td" data-key="website.sitetitle"></lml:tobject>
+		<lml:tobject data-nodetype="td">
+			<lml:tobject data-key="website.sitetitle"></lml:tobject>
+			<lml:tobject data-filter="isDefaultSite">
+				<span class="siteDefaultTag">default</span>
+			</lml:tobject>
+		</lml:tobject>
 		<lml:tobject data-nodetype="td">
 			<lml:tobject data-nodetype="a" data-hrefsource="server.url">
 				<lml:tobject data-nodetype="span" data-key="server.url" >
@@ -27,5 +34,11 @@
 		<lml:tobject data-nodetype="td"></lml:tobject>
 	</lml:tobject>
 </lml:template>
+
+<script>
+	window.isDefaultSite = function(dat) {
+		return dat.default;
+	};
+</script>
 
 {*sites.complex(template:"site_template",target:"sites_tbody")}

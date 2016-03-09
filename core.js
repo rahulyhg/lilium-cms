@@ -39,6 +39,7 @@ var log = require('./log.js');
 
 var Core = function() {
 	var loadRequires = function() {
+		var nn = new Date();
 		_c = require('./config.js');
 		settings = require('./settings.js');
 		hooks = require('./hooks.js');
@@ -74,6 +75,8 @@ var Core = function() {
 		GC = require('./gc.js');
 		scheduler = require('./scheduler.js');
 		Role = require('./role.js');
+
+		log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
 	};
 
 	var loadHooks = function(readyToRock) {
@@ -102,6 +105,11 @@ var Core = function() {
 		admin.registerAdminEndpoint('sites', 'GET', function(cli) {
 			cli.touch('admin.GET.sites');
 			sites.handleGET(cli);
+		});
+		
+		admin.registerAdminEndpoint('sites', 'POST', function(cli) {
+			cli.touch('admin.GET.sites');
+			sites.handlePOST(cli);
 		});
 		
 		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
@@ -199,7 +207,7 @@ var Core = function() {
 	}
 
 	var loadAdminMenus = function() {
-		var aurl = _c.default().server.url + "/admin/";
+		var aurl = "admin/"; //_c.default().server.url + "/admin/";
 
 		admin.registerAdminMenu({
 			id : "sites", faicon : "fa-sitemap", displayname : "Sites", priority : 50,
@@ -235,7 +243,11 @@ var Core = function() {
 		});
 		admin.registerAdminMenu({
 			id : "settings", faicon : "fa-cogs", displayname : "Settings", priority : 1000,
-			rights : ["manage-settings"], absURL : aurl + "settings/", children : []
+			rights : ["manage-settings"], absURL : aurl + "settings", children : []
+		});
+		admin.registerAdminMenu({
+			id : "devtools", faicon : "fa-hashtag", displayname : "Dev Tools", priority : 2000,
+			rights : ["develop"], absURL : aurl + "devtools", children : []
 		});
 	};
 
@@ -387,32 +399,27 @@ var Core = function() {
 
 	var loadStaticSymlink = function(callback) {
 		log('FileServer', 'Creating symlink for static files.');
-		hooks.bind('staticsymlink', 100, function(err) {
-			if (err) {
-				log('Core', 'Could not create symlink : ' + err);
-			}
-
-			callback();
-		});
 
 		_c.eachSync(function(conf) {
 			var to = conf.server.html + '/static';
 			var rootDir = conf.server.base + 'backend/static/';
-			cli.createSymlink(rootDir, to);
+			fileserver.createSymlinkSync(rootDir, to);
 
 			to =   conf.server.html + '/bower';
 			rootDir = conf.server.base + 'bower_components/';
-			cli.createSymlink(rootDir, to);
+			fileserver.createSymlinkSync(rootDir, to);
 
 			to =   conf.server.html + '/uploads';
 			rootDir = conf.server.base + 'backend/static/uploads/';
-			cli.createSymlink(rootDir, to);
+			fileserver.createSymlinkSync(rootDir, to);
 
 			to =   conf.server.html + '/plugins';
 			rootDir = conf.server.base + 'plugins/';
-			cli.createSymlink(rootDir, to);
+			fileserver.createSymlinkSync(rootDir, to);
 		});
+
 		hooks.fire('staticsymlink', undefined);
+		callback();
 	};
 
 	var loadStandardInput = function() {
@@ -464,7 +471,7 @@ var Core = function() {
 	};
 
 	var loadHTMLStructure = function(callback) {
-		_c.each(function(conf) {
+		_c.each(function(conf, next) {
 			fileserver.createDirIfNotExists(conf.server.html, function(valid) {
 				if (valid) {
 					log('FileServer',
@@ -475,10 +482,11 @@ var Core = function() {
 					log('FileServer', 'Error validated html directory');
 				}
 	
+				next();
 			}, true);
+		}, function() {
+			loadStaticSymlink(callback);
 		});
-
-		loadStaticSymlink(callback);
 	};
 
 	var loadLiveVars = function() {
@@ -518,6 +526,7 @@ var Core = function() {
 		LoginLib.registerLoginForm();
 	        Article.registerForms();
 		settings.registerForm();
+		sites.registerForms();
 	};
 
 	var loadNotifications = function() {
@@ -553,19 +562,19 @@ var Core = function() {
 			var base = conf.server.base;
 			var htmlbase = conf.server.html;
 
-			Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin");
-			Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin");
-			Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin");
-			Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin");
-			Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin");
-			Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin");
-			Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin");
-			Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin');
+			Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
+			Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
+			Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
+			Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin", conf.id);
+			Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
+			Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
+			Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
+			Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin', conf.id);
 
-			Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin');
-			Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin');
-			Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin');
-			Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin');
+			Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
+			Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin', conf.id);
+			Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
+			Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin', conf.id);
 
 			Precompiler.precompile(conf, next);
 		}, callback);
@@ -625,10 +634,10 @@ var Core = function() {
 				loadForms();
 				loadLiveVars();
 				loadDFP();
-				loadFrontend();
-				loadRequestHandler();
 				loadGlobalPetals();
+				loadRequestHandler();
 				loadAdminMenus();
+				loadFrontend();
 
 				loadHTMLStructure(function() {
 				testDatabase(function() {

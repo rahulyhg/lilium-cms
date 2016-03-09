@@ -37,7 +37,7 @@ var Sessions = function() {
 	this.injectSessionInCli = function(cli) {
 		var curSesh = _sesh[cli.cookies.lmlsid];
 
-		if (cli.cookies.lmlsid && curSesh) {
+		if (cli.cookies.lmlsid && curSesh && cli.routeinfo.configname == curSesh.data.site) {
 			cli.session = curSesh;
 
 			cli.userinfo = {
@@ -49,6 +49,7 @@ var Sessions = function() {
 				admin : cli.session.data.admin,
 				god : cli.session.data.god,
 				user : cli.session.data.user,
+				site : cli.routeinfo.configname
 			};
 		} else {
 			cli.session = new UserSesh();
@@ -67,11 +68,12 @@ var Sessions = function() {
 		cli.session.data.admin = entities.isAllowed(userObj, 'admin');
 		cli.session.data.god = entities.isAllowed(userObj, 'lilium');
 		cli.session.data.user = userObj.username;
+		cli.session.data.site = cli.routeinfo.configname;
 
 		cli.userinfo = cli.session.data;
 
 		// Load notifications in db
-		db.findToArray(_c.default(), 'notifications', {userID : db.mongoID(cli.session.data._id)},function(err, arr) {
+		db.findToArray(cli._c, 'notifications', {userID : db.mongoID(cli.session.data._id)},function(err, arr) {
 			cli.session.data.notifications = arr.slice(0,4);
 		});
 		cli.session.data.notifications = [];
@@ -79,15 +81,13 @@ var Sessions = function() {
 		this.setCookieToCli(cli);
 
 		// No need for callback
-		db.insert(_c.default(), 'sessions', cli.session, function() {
-
-		});
+		db.insert(cli._c, 'sessions', cli.session, function() {});
 	};
 
 
 
 	this.saveSession = function(cli, callback) {
-		db.update(_c.default(), 'sessions', {token:cli.session.token}, cli.session, callback);
+		db.update(cli._c, 'sessions', {token:cli.session.token}, cli.session, callback);
 	};
 
     this.getSessionFromSID = function(sid) {

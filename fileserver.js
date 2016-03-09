@@ -65,6 +65,18 @@ var FileServer = function() {
         fs.symlink(src, dest, cb);
     };
 
+    this.createSymlinkSync = function(src, dest) {
+	try {
+            var stat = fs.statSync(dest);
+        
+            if (!stat.isDirectory()) {
+                fs.symlinkSync(src, dest);
+            }
+        } catch (ex) {
+            fs.symlinkSync(src, dest);
+        }
+    };
+
     this.dirname = function(fullpath) {
         return path.dirname(fullpath);
     };

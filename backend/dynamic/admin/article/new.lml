@@ -1,11 +1,6 @@
 {#config;session;vocab;forms}
     {%../entityscript}
-    <header>
-        <h1>{=config.default.vendor.productname}
-            <small>v{=config.default.vendor.version}</small>
-        </h1>
-    </header>
-    <h2>Create a new post</h2>
+    <h1>Publish a new post</h1>
     {=forms.render('post_create')}
     <div id="editor"></div>
 

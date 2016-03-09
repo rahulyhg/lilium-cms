@@ -39,7 +39,7 @@ var Entities = function() {
 		});
 	};
 
-	this.fetchFromDB = function(idOrUsername, callback) {
+	this.fetchFromDB = function(conf, idOrUsername, callback) {
 		var condition = new Object();
 
 		if (typeof idOrUsername === "object") {
@@ -48,7 +48,7 @@ var Entities = function() {
 			condition.username = idOrUsername;
 		}
 
-		db.findToArray(_c.default(), 'entities', condition, function(err, user) {
+		db.findToArray(conf, 'entities', condition, function(err, user) {
 			if (!err && user.length == 1) {
 				entityWithData(user[0], callback);
 			} else {

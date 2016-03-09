@@ -43,6 +43,7 @@ var HtmlParser = function() {
         htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') +
           ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || "field-") +
           (field.attr.wrapperCssSuffix || field.type) +
+          (' lmlform-fieldwrapper-' + field.type) + 
           ' lmlform-fieldwrapper">';
       }
 
@@ -119,6 +120,10 @@ var HtmlParser = function() {
   }
 
   var generateLabel = function(field, placeholder) {
+    if (field.nolabel) {
+      return "";
+    }
+
     var label = '<label ';
     var text = field.attr.displayname || field.name;
 

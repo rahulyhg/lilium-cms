@@ -41,17 +41,25 @@ var Frontend = function() {
 		return bodyPrefix + (contextName ? contextName : defaultBodySuffix); 
 	};
 
-	this.registerJSFile = function(absPath, priority, context) {
+	this.registerJSFile = function(absPath, priority, context, siteid) {
 		context = context || "all";
 
-		var arr = JavaScriptFiles[context];
+		// TODO Handle Site ID
+		var site = JavaScriptFiles[siteid];
+
+		if (!site) {
+			site = new Object();
+			JavaScriptFiles[siteid] = site;
+		}
+
+		var arr = site[context];
 		
 		if (!arr) {
 			arr = new Array();
-			JavaScriptFiles[context] = arr;
+			site[context] = arr;
 		}
 	
-		if (arr.indexOf(absPath) === -1 && (context != "all" || JavaScriptFiles["all"].indexOf(absPath) !== -1)) {
+		if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
 			while (typeof arr[priority] !== 'undefined') {
 				priority++;
 			} 
@@ -60,8 +68,8 @@ var Frontend = function() {
 		};
 	};
 
-	this.getJSQueue = function(contextName) {
-		var arr = JavaScriptFiles[contextName || "all"];
+	this.getJSQueue = function(contextName, siteid) {
+		var arr = JavaScriptFiles[siteid][contextName || "all"];
 		var returnedArr = new Array();
 
 		if (arr) for (var index in arr) {
@@ -71,17 +79,24 @@ var Frontend = function() {
 		return returnedArr;
 	};
 	
-	this.registerCSSFile = function(absPath, priority, context) {
+	this.registerCSSFile = function(absPath, priority, context, siteid) {
 		context = context || "all";
 
-		var arr = CSSFiles[context];
+		var site = CSSFiles[siteid];
+
+		if (!site) {
+			site = new Object();
+			CSSFiles[siteid] = site;
+		}
+
+		var arr = site[context];
 		
 		if (!arr) {
 			arr = new Array();
-			CSSFiles[context] = arr;
+			site[context] = arr;
 		}
 	
-		if (arr.indexOf(absPath) === -1 && (context != "all" || CSSFiles["all"].indexOf(absPath) !== -1)) {
+		if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
 			while (typeof arr[priority] !== 'undefined') {
 				priority++;
 			} 
@@ -90,8 +105,8 @@ var Frontend = function() {
 		};
 	};
 
-	this.getCSSQueue = function(contextName) {
-		var arr = CSSFiles[contextName || "all"];
+	this.getCSSQueue = function(contextName, siteid) {
+		var arr = CSSFiles[siteid][contextName || "all"];
 		var returnedArr = new Array();
 
 		if (arr) for (var index in arr) {

@@ -45,11 +45,16 @@ var Forms = function() {
             });
 
         formBuilder.registerFormTemplate('article_base')
-            .add('title', 'text', {}, {
+            .add('title', 'text', {
+                placeholder : true,
+                displayname : 'Title'
+            }, {
                 minLenght: 3,
                 maxLenght: 100
             })
-            .add('content', 'ckeditor')
+            .add('content', 'ckeditor', {
+                nolabel : true
+            })
     }
 };
 

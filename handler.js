@@ -16,14 +16,15 @@ var Handler = function() {
 	var GET = function(cli) {
 		cli.touch('handler.GET');
 
-		Router.parseClientObject(cli);
-		Dispatcher.dispatch(cli);
+		if (Router.parseClientObject(cli)) {
+			Dispatcher.dispatch(cli);
+		}
 	};
 
 	var POST = function(cli) {
 		cli.touch('handler.POST');
 
-		Router.parseClientObject(cli);
+		if (!Router.parseClientObject(cli)) return;
 
 		cli.postdata = new Object();
 		cli.postdata.length = cli.request.headers["content-length"];

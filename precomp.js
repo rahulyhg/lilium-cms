@@ -10,7 +10,7 @@ var log = require('./log.js');
 
 var Precomp = function() {
 	var minifyFile = function(inFile, outFile, filetype, callback) {
-		log('Precompiler', 'Minifying ' + filetype + ' file');
+	    log('Precompiler', 'Minifying ' + filetype + ' file');
 
             if (filetype == 'css') {
                 new compressor.minify({
@@ -90,7 +90,7 @@ var Precomp = function() {
 												});
 											});
 										},
-										{minify:false}
+										{minify:false,config:conf}
 									);
 								}
 							});
@@ -108,7 +108,7 @@ var Precomp = function() {
 	};
 
 	var mergeJS = function(conf, readycb) {
-		var files = frontend.getJSQueue('admin');
+		var files = frontend.getJSQueue('admin', conf.id);
 		var compiledPath = conf.server.html + "/compiled/admin.js";
 		var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
 		var fileIndex = 0;
@@ -132,7 +132,7 @@ var Precomp = function() {
 	};
 
 	var mergeCSS = function(conf, readycb) {
-		var files = frontend.getCSSQueue('admin');
+		var files = frontend.getCSSQueue('admin', conf.id);
 		var compiledPath = conf.server.html + "/compiled/admin.css";
 		var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
 		var fileIndex = 0;

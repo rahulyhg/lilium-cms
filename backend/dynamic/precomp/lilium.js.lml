@@ -17,14 +17,19 @@
  * Description : Global styling for admin section of Lilium.                                             *
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
+{#config}
 var debugMode = 'true';
 var socket = typeof io !== 'undefined' ? io() : undefined;
-  
+ 
+window.location.urlBase = "{=config.default.server.url}/";
+    
 var LiliumCMS = function() {
     var livevars;
+    var livevarsResponse;
     var urlParams;
     var pushtables = new Array();
     var stacktables = new Array();
+    var queryParams = new Object();
 
     var LiliumEvents = {
         livevarsPrerendered: {
@@ -81,7 +86,8 @@ var LiliumCMS = function() {
             $.get("/livevars", {
                 vars: JSON.stringify(endpoints)
             }, function(data) {
-                livevars = deepUnescape(data);
+                livevars = deepUnescape(data.livevars);
+                livevarsResponse = data.response;
                 document.dispatchEvent(new CustomEvent('livevarsFetched', {
                     'detail': {
                         'livevars': livevars
@@ -182,7 +188,9 @@ var LiliumCMS = function() {
                         if (obj.data('href')) {
                             node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
                         } else if (obj.data('hrefsource')) {
-                            node.attr('href', pullOutVarFromString(data, obj.data('hrefsource')));
+                            var prepend = obj.data('prependroot') ? window.location.urlBase : "";
+
+                            node.attr('href', prepend + pullOutVarFromString(data, obj.data('hrefsource')));
                         }
 
                         node.html(obj.html());
@@ -510,6 +518,29 @@ var LiliumCMS = function() {
         };
     }
 
+    var LocalCache = function() {
+        var cache = window.localStorage;
+
+        this.cacheForm = function() {
+            
+        };
+  
+        this.fillFormFromCache = function(formName) {
+
+        };
+
+        this.setVar = function(key, value) {
+            window.localStorage.setItem(key, value);
+        };
+
+        this.getVar = function(key) {
+            var item = window.localStorage.getItem(key);
+            return item == null ? undefined : item;
+        };
+
+        cache.forms = cache.forms || new Object();
+        cache.adminmenus = cache.adminmenus || new Object();
+    };
 
     var findPushTableFromTitle = function(title) {
         var pt = undefined;
@@ -1297,6 +1328,39 @@ var LiliumCMS = function() {
         };
     };
 
+    var QueryParams = function() {
+        this.parseURL = function() {
+            var querystring = window.location.href.split("?");
+            if (querystring.length > 1) {
+                var unescapedParams = querystring[1].split('&');
+
+                for (var i = 0; i < unescapedParams.length; i++) {
+                    var split = unescapedParams[i].split('=');
+                    queryParams[split.shift()] = unescape(split.join('='));
+                }
+
+                liliumcms.queryparams.parseHTML();
+            }
+        };
+
+        this.parseHTML = function() {
+            $('lml\\:queryparam').each(function(index, qTag) {
+                var urlval = queryParams[$(qTag).data('param')];
+
+                if (urlval) {
+                    $(qTag).find('lml\\:tobject').each(function(index, tobj) {
+                        $(tobj).after(queryParams[$(tobj).data("querystring")]);
+                        $(tobj).remove();
+                    });
+
+                    $(qTag).after(qTag.innerHTML);
+                }
+
+                $(qTag).remove();
+            });
+        };
+    }
+
     var Hooks = function() {
 
     };
@@ -1321,6 +1385,8 @@ var LiliumCMS = function() {
             livevars.exec();
         };
     };
+
+    this.queryparams = new QueryParams();
     this.formvalidator = new FormValidator();
     this.awesomestrapper = new AwesomeStrapper();
     this.formParser = new FormParser();
@@ -1330,6 +1396,7 @@ var LiliumCMS = function() {
     this.formbeautifier = new FormBeautifier();
 
     document.addEventListener('livevarsRendered', function(e) {
+        liliumcms.queryparams.parseURL();
         liliumcms.ckeditor.initEditor();
         liliumcms.formbeautifier.beautify();
         liliumcms.formParser.init();

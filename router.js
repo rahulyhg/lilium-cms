@@ -16,6 +16,11 @@ var Router = function() {
 			pObj.pathname;
 
 		_c.fetchConfigFromCli(cli);
+		if (!cli._c) {
+			cli.throwHTTP(404, "Not Found");
+			return false;
+		}
+
 		cli.routeinfo.path = pObj.pathname.replace(/^\/?|\/?$/g, "").split('/');
 		cli.routeinfo.params = pObj.query;
 		cli.routeinfo.admin = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.admin;
@@ -26,6 +31,8 @@ var Router = function() {
 		if (!cli.routeinfo.isStatic) {
 			session.injectSessionInCli(cli);
 		};
+
+		return true;
 	};
 
 	var init = function() {

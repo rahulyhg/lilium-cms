@@ -5,5 +5,5 @@
 		</div>
 
 		<lml:template id="title_template">
-			<h2>Lilium settings and configurations</h2>
+			<h1>Lilium settings and configurations</h1>
 		</lml:template>

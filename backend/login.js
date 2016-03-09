@@ -32,7 +32,7 @@ var Login = function() {
 				cli.touch('db.match('+found+')');
 
 				if (found) {
-					entities.fetchFromDB(usr, function(userObj) {
+					entities.fetchFromDB(cli._c, usr, function(userObj) {
 						loginSuccess(cli, userObj);
 					});
 				} else {

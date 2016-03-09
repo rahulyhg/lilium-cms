@@ -39,6 +39,7 @@ Config.prototype.fetchConfigFromCli = function(cli) {
 	}
 	
 	cli.routeinfo.configname = rootdomain;
+	cli.routeinfo.rootdomain = rootdomain;
 	cli._c = _configs[rootdomain];
 };
 

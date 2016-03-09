@@ -17,8 +17,8 @@
  * Description : Global styling for admin section of Lilium.                                             *
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
-
-{#config}
+   
+{#config;debug}
 {$
 	actioncolor = "#9B59B6";
 	hovercolor =  "#A869C6";
@@ -37,7 +37,7 @@
 	fontdir = config.default.server.url;
 	fontdir += "/static/fonts/font-awesome";
 $}
-
+ 
 @font-face {
   font-family: 'Raleway';
   font-weight: 100;
@@ -213,6 +213,14 @@ input, textarea, button {
 	border: none;
 }
 
+a {
+	color: {=actioncolor};
+}
+
+a:hover {
+	color: {=activecolor};
+}
+
 button, input[type="submit"] {
 	cursor: pointer;
 }
@@ -243,7 +251,7 @@ form .campaigncreatefield-checkbox label {
 }
 
 lml\:template, lml\:tobject, lml,
-.lmlloading, .lmlhidden {
+lml\:queryparam, .lmlloading, .lmlhidden {
 	display: none;
 }
 
@@ -265,6 +273,8 @@ form input, form label{
 /* Normalized Forms */
 .lmlform {
 	background-color: #F6F6F6;
+	border-top: 1px solid #DDD;
+	border-bottom: 1px solid #DDD;
 }
 
 .lmlform-fieldwrapper {
@@ -275,9 +285,67 @@ form input, form label{
 	margin-right: 10px;
 }
 
-.lmlform input, .lmlform select, .lmlform textarea {
+.lmlform-fieldwrapper label.inline, .lmlform input.inline, 
+.lmlform select.inline, .lmlform textarea.inline {
+	display: inline-block;
+}
+
+.lmlform input:not([type="file"]), .lmlform select, .lmlform textarea {
 	padding: 10px;
 	font-size: 14px;
+	border: 1px solid #DFDFDF;
+	width: 100%;
+}
+
+.lmlform input[type="submit"], .lmlform button {
+	background-color: {=actioncolor};
+	color: #EEE;
+	font-size: 18px;
+
+	border: none;
+}
+
+.lmlform input[type="submit"]:hover, .lmlform button:hover {
+	background-color: {=hovercolor}
+}
+
+.lmlform input[type="submit"]:active, .lmlform button:active {
+	background-color: {=activecolor}
+}
+
+.lmlform input:focus, .lmlform select:focus, 
+.lmlform textarea:focus {
+	border: 1px solid {=actioncolor};
+}
+
+.lmlform .lmlform-fieldwrapper-title {
+	background-color: #EEE;
+}
+
+.lmlform .lmlform-fieldwrapper-title:not(:first-child) {	
+	border-top: 1px solid #DDD;
+}
+
+.lmlform .lmlform-fieldwrapper-title:not(:last-child) {	
+	border-bottom: 1px solid #DDD;
+}
+
+.lmlform .lmlform-fieldwrapper-title h3 {
+	text-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+
+/* Lilium Table Styles */
+table.lmlfullwidthtable {
+	width: 100%;
+}
+
+table.lmlfullwidthtable thead {
+	background-color: #E3E3E3;
+}
+
+table.lmlfullwidthtable thead tr th,
+table.lmlfullwidthtable tbody tr td {
+	padding: 4px 15px
 }
 
 /* PushTables */
@@ -317,83 +385,31 @@ form input, form label{
 	display: none;
 }
 
-/* Admin Bar */
-header.admin-bar {
-	position:fixed;
-	left:0;
-	right:0;
-	top:0;
-
-	z-index: 10000;
-	height: {=topbarheight};
-}
-
-.navbar-default {
-	display: block;
-	background-color: {=barcolor};
-	height: {=topbarheight};
-	border-bottom: 1px solid #DDD;
-
-	margin-bottom: 0px;
-
-	position:fixed;
-	left:0;
-	right:0;
-	top:0;
-
-	z-index: 10000;
-}
-
-.navbar{
-	border-radius: 0px;
-	border: none;
-	color: #FFF;
-
-}
-.navbar .dropdown-menu {
-	color: {=fontcolor};
-}
-.container-fluid {
-	padding-left: 0px;
-	padding-right: 0px;
-}
-
-header.admin-bar a {
-	text-decoration: none;
-}
-
-header.admin-bar > * {
-	vertical-align: middle;
-}
-
-header.admin-bar .lilium-logo-link {
-	width: 50px;
-	height: 100%;
-	overflow: hidden;
-
-	display: inline-block;
-}
-
-header.admin-bar .lilium-logo-link img {
-	height: 55px;
-    	width: auto;
-    	position: relative;
-    	bottom: 8px;
-    	right: 10px;
-}
-header.admin-bar .navbar-default .navbar-header {
-	position: absolute;
-}
-
-#navbar.navbar-collapse {
-	padding-left: 40px;
-}
-
 .lmladmincontentwrapper {
 	padding-left: {=sidebarwidth};
 	padding-top: {=topbarheight};
 }
 
+/* Admin Body */
+main.lmladminmain {
+
+}
+
+main.lmladminmain h1 {
+    	padding: 10px 15px;
+    	background-color: #EEE;
+    	color: #777;
+    	font-size: 36px;
+    	border-bottom: 1px solid #DDD;
+    	text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1);
+}
+
+main.lmladminmain .pad10 {
+	padding: 10px 15px;
+	display: block;
+}
+
+/* Admin Sidebar */
 .lmladminsidebar {
 	position: fixed;
 	left: 0;
@@ -520,6 +536,79 @@ header.admin-bar .navbar-default .navbar-header {
 	padding: 10px;
 
 }
+
+/* Admin Bar */
+header.admin-bar {
+	position:fixed;
+	left:0;
+	right:0;
+	top:0;
+
+	z-index: 10000;
+	height: {=topbarheight};
+}
+
+.navbar-default {
+	display: block;
+	background-color: {=barcolor};
+	height: {=topbarheight};
+	border-bottom: 1px solid #DDD;
+
+	margin-bottom: 0px;
+
+	position:fixed;
+	left:0;
+	right:0;
+	top:0;
+
+	z-index: 10000;
+}
+
+.navbar{
+	border-radius: 0px;
+	border: none;
+	color: #FFF;
+
+}
+.navbar .dropdown-menu {
+	color: {=fontcolor};
+}
+.container-fluid {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+header.admin-bar a {
+	text-decoration: none;
+}
+
+header.admin-bar > * {
+	vertical-align: middle;
+}
+
+header.admin-bar .lilium-logo-link {
+	width: 50px;
+	height: 100%;
+	overflow: hidden;
+
+	display: inline-block;
+}
+
+header.admin-bar .lilium-logo-link img {
+	height: 55px;
+    	width: auto;
+    	position: relative;
+    	bottom: 8px;
+    	right: 10px;
+}
+header.admin-bar .navbar-default .navbar-header {
+	position: absolute;
+}
+
+#navbar.navbar-collapse {
+	padding-left: 40px;
+}
+
 
 
 header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
@@ -740,4 +829,45 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 .alert-danger .close{
     color: #c0392b;
     opacity: 1;
+}
+
+/* Strips and widgets */
+.messagestrip {
+	padding: 2px 15px;
+    	margin: 0px;
+    	display: block;
+    	color: #FFF;
+}
+
+.messagestrip .fa {
+	margin-right: 4px;
+	font-size: 18px;
+
+	vertical-align: middle;
+	display: inline-block;
+}
+
+.messagestrip span {
+	vertical-align: middle;
+	display: inline-block;
+    	font-size: 14px;	
+}
+
+.messagestrip.error {
+	background-color: #F77;
+}
+
+.siteDefaultTag {
+	font-size: 10px;
+   	background-color: {=activecolor};
+	font-weight: 600;    
+	
+	color: #FFF;
+    	padding: 0px 5px;
+    	display: inline-block;
+    	
+	border-radius: 4px;
+    	text-transform: uppercase;
+    	margin-left: 5px;
+    	vertical-align: middle;
 }

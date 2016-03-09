@@ -231,6 +231,7 @@ var Article = function() {
     this.registerForms = function() {
         formBuilder.createForm('post_create')
         .addTemplate('article_base')
+        .trigger('bottom')
         .add('publish', 'submit');
     }
 

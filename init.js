@@ -51,6 +51,7 @@ var generateConfigObject = function(postdata, cb) {
 
 	// Admin info
 	conf.default.info.project = postdata.servername || "A Lilium Website";
+	conf.default.website.sitetitle = conf.default.info.project;
 	conf.default.emails.default = postdata.adminemail || "";
 	conf.default.id = postdata.baseurl.replace('//', '');
 

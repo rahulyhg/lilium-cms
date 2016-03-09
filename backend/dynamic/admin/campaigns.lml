@@ -1,6 +1,6 @@
 {#config}
 		<h1>All Campaigns</h1>
-		<table>
+		<table class="lmlfullwidthtable">
 			<thead>
 				<tr>
 					<th>Project ID</th>
