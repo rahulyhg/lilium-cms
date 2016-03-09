@@ -23,7 +23,7 @@ $}
 liliumcms.livevars.getLiveVars(function() {
 	$('.theme').each(function() {
 		var id = $(this).attr('id');
-		if (liliumcms.livevars.livevars()[id]) {
+		if (liliumcms.livevars.livevars()[id] && liliumcms.livevars.livevars()[id][0]) {
 			$(this).find('.themes-actions').html("<span id='theme_enabled'>This theme is installed</span>");
 		}
 	});
