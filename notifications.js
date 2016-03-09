@@ -33,8 +33,9 @@ var Notification = function() {
 
                 if (!sockets[clientId]) {
                     sockets[clientId] = {};
+                    sockets[clientId].sockets = {};
                 }
-                sockets[clientId][socket.id] = socket;
+                sockets[clientId].sockets[socket.id] = socket;
                 sockets[clientId].displayname = session.data.displayname;
 
 
@@ -131,9 +132,9 @@ var Notification = function() {
                     // Check if target exists
                     if (sockets[emission.id]) {
 
-                        for (var index in sockets[emission.id]) {
-                            if (io.sockets.connected[sockets[emission.id][index]]) {
-                                io.sockets.connected[sockets[emission.id]].emit('private', emission.data);
+                        for (var index in sockets[emission.id].sockets) {
+                            if (io.sockets.connected[sockets[emission.id].sockets[index]]) {
+                                io.sockets.connected[sockets[emission.id].sockets].emit('private', emission.data);
                             }
                         }
                     }
@@ -149,10 +150,10 @@ var Notification = function() {
                             loggedInUsers[clientId].pages = [];
                             loggedInUsers[clientId].displayname = sockets[clientId].displayname;
                             // Each sockets, get the id
-                            for (var socketid in sockets[clientId]) {
+                            for (var socketid in sockets[clientId].sockets) {
                                 var info = {};
-                                info.url = sockets[clientId][socketid].url;
-                                info.time = sockets[clientId][socketid].time;
+                                info.url = sockets[clientId].sockets[socketid].url;
+                                info.time = sockets[clientId].sockets[socketid].time;
 
                                 loggedInUsers[clientId].pages.push(info);
                             }
@@ -163,8 +164,8 @@ var Notification = function() {
                 });
 
                 socket.on('urlChanged', function(url){
-                    sockets[clientId][socket.id].url = url;
-                    sockets[clientId][socket.id].time = new Date();
+                    sockets[clientId].sockets[socket.id].url = url;
+                    sockets[clientId].sockets[socket.id].time = new Date();
 
                     var clientUrls = createCurrentUserPages();
                     io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
@@ -184,11 +185,11 @@ var Notification = function() {
 
                 socket.on('disconnect', function() {
                     createCurrentUserPages();
-                    sockets[clientId][socket.id] = undefined;
+                    sockets[clientId].sockets[socket.id] = undefined;
 
-                    delete sockets[clientId][socket.id];
+                    delete sockets[clientId].sockets[socket.id];
 
-                    if (sockets[clientId].length == 0) {
+                    if (sockets[clientId].sockets.length == 0) {
                         sockets[clientId] = undefined;
                         delete sockets[clientId];
                     }
@@ -209,11 +210,11 @@ var Notification = function() {
             var createCurrentUserPages = function() {
                 clientUrls = [];
 
-                for (var index in sockets[clientId]) {
+                for (var index in sockets[clientId].sockets) {
                     var info = {};
 
-                    info.url = sockets[clientId][index].url;
-                    info.time = sockets[clientId][index].time;
+                    info.url = sockets[clientId].sockets[index].url;
+                    info.time = sockets[clientId].sockets[index].time;
                     clientUrls.push(info);
                 };
 
@@ -224,8 +225,8 @@ var Notification = function() {
 
     this.emitToUser = function(userID, message) {
         // Send to every sockets connected by the user (for multi-tab)
-        for (var index in sockets[userID]) {
-            var socket = sockets[userID][index];
+        for (var index in sockets[userID].sockets) {
+            var socket = sockets[userID].sockets[index];
             if (socket) {
                 socket.emit('message', message);
             }
@@ -252,8 +253,8 @@ var Notification = function() {
         db.insert(_c.default(), 'notifications', notification, function() {});
 
         // Send to every sockets connected by the user (for multi-tab)
-        for (var index in sockets[userID]) {
-            var socket = sockets[userID][index];
+        for (var index in sockets[userID].sockets) {
+            var socket = sockets[userID].sockets[index];
             if (socket) {
                 socket.emit('notification', notification);
             }

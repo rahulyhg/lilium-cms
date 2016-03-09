@@ -277,7 +277,6 @@ var FormBuilder = function() {
     }
 
     form.valid = valid = Object.keys(err).length == 0 ? true : false;
-
     // Return
     if (callStack) {
       return valid ? {

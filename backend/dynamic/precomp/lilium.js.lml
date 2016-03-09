@@ -25,6 +25,7 @@ var LiliumCMS = function() {
     var urlParams;
     var pushtables = new Array();
     var stacktables = new Array();
+    var that = this;
 
     var LiliumEvents = {
         livevarsPrerendered: {
@@ -396,7 +397,7 @@ var LiliumCMS = function() {
     };
 
     var FormValidator = function() {
-        this.prepareValidation = function() {
+        this.prepareValidation = function(cb) {
             $(document).ready(function() {
                 $('.v_form_validate').submit(function(e) {
                     e.preventDefault();
@@ -439,7 +440,6 @@ var LiliumCMS = function() {
                             }
                         }
                         $('[ckeditor]').val($('[ckeditor]').ckeditor().getData());
-                        // If a number verify number
 
                         if (!validField) {
                             validForm = validField;
@@ -464,12 +464,11 @@ var LiliumCMS = function() {
 
                 var processForm = function(form) {
                     var that = this;
-                    var serialized_form = escape(form.serialize());
+                    var serialized_form = form.serialize();
                     // Process files
                     processFiles(form, function() {
-
-                        $.post(form.attr('action'), serialized_form, function(data) {
-                            if (data.success) {
+                        $.post(form.attr('action') || window.location.href.toString(), serialized_form, function(data) {
+                            if (data.success && data.redirect) {
                                 window.location.replace(data.redirect);
                             }
                             var event = new CustomEvent('formSubmited', {
@@ -478,6 +477,7 @@ var LiliumCMS = function() {
                             document.dispatchEvent(event);
                             return false;
                         });
+                        if (cb) cb();
                     });
                     return false;
 
@@ -587,7 +587,6 @@ var LiliumCMS = function() {
         };
 
         this.parse = function(selector) {
-            console.log(selector);
             $("form").deserialize(livevars[selector][0]);
         };
 
@@ -603,7 +602,6 @@ var LiliumCMS = function() {
         var title = objTitle;
         var linenumber = 0;
         var that = this;
-        console.log(scheme);
 
         var render = function() {
             // Check for livevars
@@ -1158,7 +1156,26 @@ var LiliumCMS = function() {
 
         notification.type = typeof notification.type !== 'undefined'? notification.type : 'info';
         notification.message = notification.msg ? notification.msg : 'Notification without a message :(';
+        that.notify(notification);
+    });
+    }
 
+         var deepUnescape = function(json) {
+             for (var index in json) {
+                 switch (typeof json[index]) {
+                     case 'string':
+                         json[index] = unescape(json[index]);
+                         break;
+                     case 'object':
+                         json[index] = deepUnescape(json[index]);
+                         break;
+
+                 }
+             }
+             return json;
+         };
+
+    this.notify = function (notification) {
         $.notify(notification, {
             type: notification.type,
             newest_on_top: true,
@@ -1182,23 +1199,7 @@ var LiliumCMS = function() {
                 '<a href="{3}" target="{4}" data-notify="url"></a>' +
             '</div>'
         });
-    });
     }
-
-         var deepUnescape = function(json) {
-             for (var index in json) {
-                 switch (typeof json[index]) {
-                     case 'string':
-                         json[index] = unescape(json[index]);
-                         break;
-                     case 'object':
-                         json[index] = deepUnescape(json[index]);
-                         break;
-
-                 }
-             }
-             return json;
-         };
 
     var CKEditor = function() {
         this.initEditor = function() {

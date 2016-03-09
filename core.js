@@ -572,6 +572,8 @@ var Core = function() {
 			Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin");
 			Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin");
 			Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin');
+            Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin");
+
 
 			Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin');
 			Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin');
