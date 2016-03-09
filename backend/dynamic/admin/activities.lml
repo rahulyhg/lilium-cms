@@ -1,6 +1,6 @@
 <h1>User Activities</h1>
 <p>Use this page to monitor what users are working on.</p>
-<table id="user-list">
+<table id="user-list" class="lmlfullwidthtable">
     <thead>
         <tr>
             <th>User</th><th>Current page(s)</th><th>Time opened</th>
