@@ -7,6 +7,7 @@ var livevars = require('./livevars.js');
 var cacheInvalidator = require('./cacheInvalidator.js');
 var fs = require('./fileserver.js');
 var notifications = require('./notifications.js');
+var slugify = require('slugify');
 
 var Article = function() {
     this.handlePOST = function(cli) {
@@ -69,14 +70,15 @@ var Article = function() {
             var redirect = '';
 
             if (response.success) {
+                var formData = formBuilder.serializeForm(form);
+                formData.name = slugify(formData.title).toLowerCase();
 
                 // Create post
-                db.insert(cli._c, 'content', formBuilder.serializeForm(form), function(err, result) {
-
+                db.insert(cli._c, 'content', formData, function(err, result) {
                     // Generate LML page
-                    filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
+                    filelogic.renderLmlPostPage(cli, "article",formBuilder.unescapeForm(result.ops[0]) , function(name) {
                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id);
-                        notifications.notifyUser(cli.userinfo.userid, {title: "Article is Live!", url: cli._c.server.url + '/' + name.substring(0, name.lastIndexOf('.')) , msg: "Your article is published. Click to see it live.", type: 'success'});
+                        notifications.notifyUser(cli.userinfo.userid, {title: "Article is Live!", url: cli._c.server.url + '/' + formData.name, msg: "Your article is published. Click to see it live.", type: 'success'});
                         cli.sendJSON({
                             redirect: cli._c.server.url + "/" + name,
                             form: {
@@ -110,9 +112,11 @@ var Article = function() {
 
                 if (response.success) {
 
-                    db.update(cli._c, 'content', {
+                    db.findAndModify(cli._c, 'content', {
                         _id: id
                     }, formBuilder.serializeForm(form), function(err, r) {
+                        notifications.notifyUser(cli.userinfo.userid, {title: "Article is updated!", url: cli._c.server.url + '/' +  r.value.name , msg: "Your changes are live. Click to see the live article.", type: 'success'});
+
                         cli.sendJSON({
                             success: true
                         });
@@ -224,6 +228,7 @@ var Article = function() {
     }
 
     cacheInvalidator.emitter.on('articleInvalidated', function(id) {
+        // Invalidate article
         console.log('Article id is : ' + id);
     });
 

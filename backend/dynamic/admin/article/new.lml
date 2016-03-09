@@ -1,26 +1,5 @@
 {#config;session;vocab;forms}
-    {%../articlescript}
-    <header>
-        <h1>{=config.default.vendor.productname}
-            <small>v{=config.default.vendor.version}</small>
-        </h1>
-    </header>
-    <h2>Create a new post</h2>
-    {=forms.render('post_create')}
-    <div id="editor"></div>
-
-    <script>
-        window.addEventListener("beforeunload", function(e) {
-            var confirmationMessage = 'It looks like you have been editing something. ' +
-             'If you leave before saving, your changes will be lost.';
-
-            (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-            return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-        });
-        document.addEventListener('livevarsRendered', function(e) {
-            liliumcms.formvalidator.prepareValidation(function(data) {
-                // Create notification
-                liliumcms.notify({title: 'Article' ,message : 'Your article is beeing processed', type : 'info'})
-            });
-        });
-    </script>
+{%../articlescript}
+<h2>Create a new post</h2>
+{=forms.render('post_create')}
+<div id="editor"></div>
