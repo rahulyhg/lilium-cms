@@ -26,7 +26,7 @@ Config.prototype.getSimpleSites = function() {
 	}
 
 	return arr;
-};	
+};
 
 Config.prototype.fetchConfig = function(site) {
 	return _configs[site];
@@ -39,7 +39,7 @@ Config.prototype.fetchConfigFromCli = function(cli) {
 		var index = rootdomain.lastIndexOf('/');
 		rootdomain = index == -1 ? undefined : rootdomain.substring(0, index);
 	}
-	
+
 	cli.routeinfo.configname = rootdomain;
 	cli.routeinfo.rootdomain = rootdomain;
 	cli._c = _configs[rootdomain];
@@ -65,7 +65,7 @@ Config.prototype.each = function(loopFtc, end) {
 		} else if (sites[siteIndex] == 'default') {
 			siteIndex++;
 			nextItem();
-		} else {	
+		} else {
 			loopFtc(_configs[sites[siteIndex]], function() {
 				siteIndex++;
 				nextItem();
