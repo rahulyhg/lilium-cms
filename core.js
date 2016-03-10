@@ -106,8 +106,6 @@ var Core = function() {
             sessions.logout(cli);
         });
 
-
-
 		admin.registerAdminEndpoint('sites', 'GET', function(cli) {
 			cli.touch('admin.GET.sites');
 			sites.handleGET(cli);
@@ -180,7 +178,7 @@ var Core = function() {
 
         admin.registerAdminEndpoint('me', 'POST', function(cli) {
             cli.touch('admin.POST.me');
-            Role.handlePOST(cli);
+            entities.handlePOST(cli);
         });
 
         admin.registerAdminEndpoint('me', 'GET', function(cli) {

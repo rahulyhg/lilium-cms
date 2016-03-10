@@ -521,6 +521,10 @@ header.admin-bar .navbar-default .navbar-header {
 	padding: 10px;
 }
 
+.navbar-right #notification-dropdown.dropdown-menu {
+    right: -1px;
+}
+
 /* Profile dropdown */
 #profile-dropdown {
     width: 100%;

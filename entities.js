@@ -6,6 +6,7 @@ var formbuilder = require('./formBuilder.js');
 var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var mailer = require('./postman.js');
+var imageResizer = require('./imageResizer.js');
 
 var Roles = new Object();
 
@@ -80,8 +81,17 @@ var Entities = function() {
 
 	this.handlePOST = function(cli) {
 		cli.touch('entities.handlePOST');
-        if (cli.routeinfo.path.length == 2 && cli.routeinfo.path[1] == 'me') {
-            this.updateProfile(cli);
+        if (cli.routeinfo.path[1] == 'me') {
+            switch (cli.routeinfo.path[2]) {
+                case undefined :
+                    this.updateProfile(cli);
+                case "update_profile_picture":
+                    this.updateProfilePicture(cli);
+                    break;
+                case "change_password":
+                    this.changePassword(cli);
+                    break;
+            }
         } else {
             var action = cli.postdata.data.form_name;
 
@@ -109,6 +119,63 @@ var Entities = function() {
         this.updateProfile(cli);
 
     };
+
+    this.updateProfilePicture = function(cli) {
+        var form = formbuilder.handleRequest(cli);
+        var response = formbuilder.validate(form, true);
+
+        if (response.success) {
+
+            var image = formbuilder.serializeForm(form);
+            var extensions = image.picture.split('.');
+            var mime = extensions[extensions.length-1];
+            var saveTo = cli._c.server.base + "backend/static/uploads/" + image.picture;
+
+            if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
+                imageResizer.resize(saveTo, image.picture, mime, cli, function(images){
+
+                    // Save it in database
+                    db.update(cli._c, 'entities', {_id : cli.userinfo.userid}, {avatarURL : cli._c.server.url + '/uploads/' + image.picture, avatarID : image.picture.substring(0, image.picture.lastIndexOf('.'))}, function (err, result){
+
+                        cli.sendJSON({
+                            redirect : '',
+                            success : true
+                        });
+
+                    });
+
+                });
+        } else {
+            cli.sendJSON({
+                form: response
+            });
+        }
+          // var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
+          // Create post
+
+        } else {
+            cli.sendJSON({
+                msg : 'Invalid file type'
+            });
+        }
+    };
+
+    this.changePassword = function(cli) {
+        var form = formbuilder.handleRequest(cli);
+        var response = formbuilder.validate(form, true);
+
+        if (response.success) {
+            form = formbuilder.serializeForm(form);
+            var shhh = CryptoJS.SHA256(form.password).toString(CryptoJS.enc.Hex);
+            db.update(cli._c, 'entities', {_id : cli.userinfo.userid}, {shhh : shhh}, function (err, result){
+                cli.refresh();
+            });
+        } else {
+            cli.sendJSON({
+                msg : response
+            });
+        }
+    }
 
     this.update = function(cli) {
 
@@ -310,6 +377,22 @@ var Entities = function() {
 
 			formbuilder.createForm('entity_create')
 				.addTemplate('entity_create');
+
+
+            formbuilder.createForm('update_entitiy')
+                .addTemplate('entity_create')
+                .remove('password')
+                .edit('create', '', {value : 'Update Profile'});
+
+            formbuilder.createForm('update_password', {action: '/admin/me/change_password'})
+                .add('editpasswd', 'title', {displayname : 'Edit Password'})
+                .add('password', 'password')
+                .add('update', 'submit');
+
+            formbuilder.createForm('upload_profile_picture', {action: '/admin/me/update_profile_picture'})
+                .add('uppicutre', 'title', {displayname : 'Upload a profile picture'})
+                .add('picture', 'file', {displayname : 'Profile Picture'})
+                .add('upload', 'submit', {value : 'Upload'});
 	};
 
 	this.registerLiveVars = function() {
