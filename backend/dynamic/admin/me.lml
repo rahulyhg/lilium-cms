@@ -1,0 +1,4 @@
+{#config;session;vocab;forms}
+<h1>Your Profile</h1>
+{*me(sourceof:"entity_create")}
+{=forms.render('entity_create')}

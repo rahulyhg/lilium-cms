@@ -62,7 +62,7 @@ var Entities = function() {
 		cli.touch('entities.handleGET');
 
 		if (cli.routeinfo.path.length == 2) {
-			filelogic.serveAdminLML(cli);
+            filelogic.serveAdminLML(cli);
 		} else {
 			var action = cli.routeinfo.path[2];
 
@@ -80,21 +80,54 @@ var Entities = function() {
 
 	this.handlePOST = function(cli) {
 		cli.touch('entities.handlePOST');
-		var action = cli.postdata.data.form_name;
+        if (cli.routeinfo.path.length == 2 && cli.routeinfo.path[1] == 'me') {
+            this.updateProfile(cli);
+        } else {
+            var action = cli.postdata.data.form_name;
 
-		switch (action) {
-			case "entity_create":
-				this.createFromCli(cli);
-				break;
+            switch (action) {
+                case "entity_create":
+                    this.createFromCli(cli);
+                    break;
 
-			case "entity_delete":
-				this.deleteFromCli(cli);
-				break;
+                case "entity_delete":
+                    this.deleteFromCli(cli);
+                    break;
 
-			default:
-				cli.debug();
-		}
+                default:
+                    cli.debug();
+            }
+        }
+
 	};
+
+    this.updateProfile = function(cli) {
+        cli.touch('entities.updateProfile');
+        var entData = cli.postdata.data;
+        var entitie = this.initialiseBaseEntity(entData);
+        entitie._id = cli.
+        this.updateProfile(cli);
+
+    };
+
+    this.update = function(cli) {
+
+
+        this.registerEntity(cli, newEnt, function() {
+            cli.touch('entities.registerEntity.callback');
+            /*
+            mailer.createEmail({
+                to: [newEnt.email],
+                from: _c.default.emails.default,
+                subject: "Your account has been Created",
+                html: 'welcome.lml'
+            },true, function() {
+
+            }, {name:newEnt.firstname + " " + newEnt.lastname});
+            */
+            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath);
+        });
+    }
 
 	this.serveEdit = function(cli) {
 		cli.touch('entities.serveEdit');
@@ -298,10 +331,16 @@ var Entities = function() {
 				db.findToArray(cli._c,'entities', queryInfo, function(err, arr) {
 					callback(err || arr);
 				});
-			} else {
+            } else {
 				db.multiLevelFind(cli._c, 'entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 			}
 		}, ["entities"]);
+
+        livevars.registerLiveVariable('me', function(cli, levels, params, callback) {
+            db.findToArray(cli._c, 'entities', {_id: db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+                callback(err || arr);
+            });
+        }, []);
 
 		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
 			var dat = cli.session.data;

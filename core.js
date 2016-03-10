@@ -101,6 +101,13 @@ var Core = function() {
 			admin.handleAdminEndpoint(cli);
 		});
 
+        endpoints.register('logout', 'GET', function(cli) {
+            cli.touch("endpoints.POST.logout");
+            sessions.logout(cli);
+        });
+
+
+
 		admin.registerAdminEndpoint('sites', 'GET', function(cli) {
 			cli.touch('admin.GET.sites');
 			sites.handleGET(cli);
@@ -168,6 +175,16 @@ var Core = function() {
 
         admin.registerAdminEndpoint('activities', 'GET', function(cli) {
             cli.touch('admin.GET.activities');
+            filelogic.serveAdminLML(cli, false);
+        });
+
+        admin.registerAdminEndpoint('me', 'POST', function(cli) {
+            cli.touch('admin.POST.me');
+            Role.handlePOST(cli);
+        });
+
+        admin.registerAdminEndpoint('me', 'GET', function(cli) {
+            cli.touch('admin.GET.me');
             filelogic.serveAdminLML(cli, false);
         });
 

@@ -519,9 +519,13 @@ header.admin-bar .navbar-default .navbar-header {
 #notification-dropdown > .title{
 	font-size: 16px;
 	padding: 10px;
-
 }
 
+/* Profile dropdown */
+#profile-dropdown {
+    width: 100%;
+    padding: 0px;
+}
 
 header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
 	-webkit-border-radius: 3px;

@@ -30,6 +30,13 @@ var Sessions = function() {
 		return newSesh;
 	};
 
+    this.logout = function(cli) {
+        this.removeSession(cli, function() {
+            cli.response.setHeader('Set-Cookie', 'lmlsid=""');
+            cli.redirect(cli._c.server.url + '/admin');
+        })
+    }
+
 	this.setCookieToCli = function(cli) {
 		cli.response.setHeader('Set-Cookie', 'lmlsid=' + cli.session.token);
 	};
@@ -84,7 +91,16 @@ var Sessions = function() {
 		});
 	};
 
+    this.removeSession = function(cli, callback) {
+        // Remove session from db
+        db.remove(_c.default(), 'sessions', {token: cli.session.token}, function() {
+            // Remove from memory
+            _sesh[cli.session.token] = undefined;
+            delete _sesh[cli.session.token];
 
+            callback();
+        });
+    }
 
 	this.saveSession = function(cli, callback) {
 		db.update(_c.default(), 'sessions', {token:cli.session.token}, cli.session, callback);
