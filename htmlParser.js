@@ -21,7 +21,7 @@ var HtmlParser = function() {
     htmlForm += form.name ? "name='" + form.name + "' " : "";
 
     //id
-    htmlForm += form.attr.id ? "id='" + form.attr.id  + "' " : "";
+    htmlForm += 'id="' + (form.attr.id ? form.attr.id  : form.name) + '" ';
 
     // Method
     htmlForm += form.attr.method ? "method='" + form.attr.method.toUpperCase() + "' " : "POST";

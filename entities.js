@@ -253,7 +253,7 @@ var Entities = function() {
 		return allowed;
 	};
 
-	this.registerCreationForm = function() {
+	this.registerFormTemplates = function() {
 		formbuilder.registerFormTemplate('entity_create')
 			.add('username', 'text', {displayname:"Username"})
 			.add('password', 'password', {displayname:"Password"})
@@ -274,9 +274,11 @@ var Entities = function() {
 				displayname: "Initial role"
 			})
 			.add('create', 'submit');
+	};
 
-			formbuilder.createForm('entity_create')
-				.addTemplate('entity_create');
+	this.registerCreationForm = function() {
+		formbuilder.createForm('entity_create')
+		.addTemplate('entity_create');
 	};
 
 	this.registerLiveVars = function() {

@@ -72,7 +72,9 @@
 	   };
 
        var registerForms = function() {
-           formBuilder.form('post_create').add('isSponsored', 'checkbox', {displayname : 'Sponsored Content', data : {right: 'production'}});
+           hooks.bind('post_create_bottom', 200, function(pkg) {
+               pkg.form.add('isSponsored', 'checkbox', {displayname : 'Sponsored Content', data : {right: 'production'}});
+           });
        }
 
 	   this.unregister = function(callback) {
@@ -85,13 +87,17 @@
 	     conf = _c;
 	     initRequires(_c.default().server.base);
 	     log("Production", "Initalizing plugin");
-			 changerequest.init(_c.default().server.base);
+             changerequest.init(_c.default().server.base);
 
+             log('Production', 'Registering hooks');
 	     registerHooks();
 
+             log('Production', 'Registering Roles');
 	     registerRoles();
 
-         registerForms();
+             log('Production', 'Registering forms');
+             registerForms();
+ 
 	     return callback();
 	   };
 	 };

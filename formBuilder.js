@@ -115,7 +115,8 @@ var FormBuilder = function() {
   };
 
   this.trigger = this.trg = function(sectionname) {
-    hooks.trigger(this.name + "-" + sectionname, {form : this});
+    var that = this;
+    hooks.trigger(currentForm.name + "_" + sectionname, {form : that});
     return this;
   };
 

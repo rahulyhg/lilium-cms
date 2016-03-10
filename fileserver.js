@@ -97,7 +97,16 @@ var FileServer = function() {
         this.readFile(abspath, function(content) {
             callback(JSON.parse(content || {}));
         });
-    }
+    };
+
+    this.saveJSON = function(abspath, object, callback) {
+        var that = this;
+        var handle = this.getOutputFileHandle(abspath, 'w+');
+        this.writeToFile(handle, JSON.stringify(object), function() {
+            that.closeFileHandle(handle);
+            callback();
+        });
+    };
 
     this.readFile = function(filename, callback) {
         this.fileExists(filename, function(exists) {

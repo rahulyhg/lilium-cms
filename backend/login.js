@@ -36,6 +36,7 @@ var Login = function() {
 						loginSuccess(cli, userObj);
 					});
 				} else {
+					hooks.fire('user_login_failed', cli);
 					cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
 				}
 			});
@@ -52,6 +53,7 @@ var Login = function() {
 			})
 			.add('usr', 'text', {displayname:"Username", placeholder:true,wrapperCssSuffix:"username"})
 			.add('psw', 'password', {displayname:"Password", placeholder:true,wrapperCssSuffix:"password"})
+			.trg('userpass')
 			.add('login', 'submit', {displayname:"Login",wrapperCssSuffix:"loginbutton"});
 	};
 	

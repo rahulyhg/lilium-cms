@@ -163,6 +163,11 @@ var Core = function() {
 			settings.handleGET(cli);
 		});
 
+		admin.registerAdminEndpoint('settings', 'POST', function(cli) {
+			cli.touch('admin.POST.settings');
+			settings.handlePOST(cli);
+		});
+
         admin.registerAdminEndpoint('role', 'GET', function(cli) {
             cli.touch('admin.GET.role');
             Role.handleGET(cli);
@@ -255,10 +260,13 @@ var Core = function() {
 			id : "devtools", faicon : "fa-hashtag", displayname : "Dev Tools", priority : 2000,
 			rights : ["develop"], absURL : aurl + "devtools", children : []
 		});
-        admin.registerAdminMenu({
-            id : "activities", faicon : "fa-eye", displayname : "User Activities", priority : 800,
-            rights : ["view-user-activities"], absURL : aurl + "activities/", children : []
-        });
+        	admin.registerAdminMenu({
+            		id : "activities", faicon : "fa-eye", displayname : "User Activities", priority : 800,
+           		rights : ["view-user-activities"], absURL : aurl + "activities/", children : []
+        	});
+
+		hooks.fire('adminmenus_created');
+		log('Core', 'Registered Default Admin menus');
 	};
 
 	var loadPlugins = function(cb) {
@@ -342,8 +350,9 @@ var Core = function() {
 		themes.bindEndpoints();
 
 		var fireEvent = function() {
-			log('Themes', 'Loaded Themes');
+			log('Themes', 'Firing Theme event');
 			hooks.fire('themes');
+			log('Themes', 'Loaded themes');
 
 			cb();
 		};
@@ -457,8 +466,13 @@ var Core = function() {
 		}
 	};
 
-	var loadForms = function() {
+	var initForms = function() {
         	Forms.init();
+		entities.registerFormTemplates();
+	};
+
+	var loadForms = function() {
+		log('Core', 'Loading multiple forms');
 
 		Campaigns.registerCreationForm();
 		entities.registerCreationForm();
@@ -466,6 +480,9 @@ var Core = function() {
 	        Article.registerForms();
 		settings.registerForm();
 		sites.registerForms();
+
+		hooks.fire('forms_init');
+		log('Core', 'Forms were loaded');
 	};
 
 	var loadNotifications = function() {
@@ -474,7 +491,9 @@ var Core = function() {
 	}
 
 	var loadFrontend = function() {
+		log('Frontend', 'Registering default values from core');
 		Frontend.registerFromCore();
+		hooks.fire('frontend_registered');
 	};
 
 	var loadSessions = function(cb) {
@@ -541,13 +560,11 @@ var Core = function() {
 			loadEndpoints();
 			loadStandardInput();
 			loadImageSizes();
-			loadForms();
 			loadLiveVars();
 			loadDFP();
 			loadGlobalPetals();
 			loadRequestHandler();
-			loadAdminMenus();
-			loadFrontend();
+			initForms();
 
 			loadPlugins(function(){
 			loadRoles(function() {
@@ -555,6 +572,10 @@ var Core = function() {
 			loadSessions(function() {
 			loadTheme(function() {
 			redirectIfInit(resp, function() {
+				loadAdminMenus();
+				loadFrontend();
+				loadForms();
+			
 				loadCacheInvalidator();
 				scheduleGC();
 

@@ -239,10 +239,8 @@ var AdminAdvertiser = function() {
     config = require(abspath + 'config.js');
     db = require(abspath + 'includes/db.js');
 
-    createForm();
     log("AdvertiserPlugin", "Create Form");
-
-
+    createForm();
   };
 
 }

@@ -161,7 +161,7 @@ var ChangeRequest = function() {
 
     this.init = function(abspath) {
         log = require(abspath + 'log.js');
-        log("AdvertiserPlugin", "Initializing changeRequest class");
+        log("Production", "Initializing changeRequest class");
         fileLogic = require(abspath + 'filelogic.js');
         config = require(abspath + 'config.js');
         livevars = require(abspath + 'livevars.js');
@@ -169,8 +169,10 @@ var ChangeRequest = function() {
 
         formBuilder = require(abspath + 'formBuilder.js');
 
+	log ('Production', 'Registering Live Variables');
         this.genLivevars();
 
+	log('Production', 'Creating forms');
         formBuilder.createForm('changerequest_edit')
             .add('title', 'text', {
                 displayname: 'Title'
@@ -188,7 +190,6 @@ var ChangeRequest = function() {
                 displayname: 'Content',
                 data : {readonly : true}
             })
-
 
     };
 };

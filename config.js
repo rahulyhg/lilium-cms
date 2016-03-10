@@ -74,6 +74,10 @@ Config.prototype.each = function(loopFtc, end) {
 	nextItem();
 };
 
+Config.prototype.saveConfigs = function(config, callback) {
+	require('./fileserver.js').saveJSON(config.server.base + "/sites/" + config.jsonfile, config, callback);
+}
+
 Config.prototype.registerConfigs = function(key, object) {
 	_configs[key] = object;
 

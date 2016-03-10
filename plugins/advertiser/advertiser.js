@@ -86,6 +86,13 @@
 	             adminAdvertiser.handlePOST(cli);
 	         });
 
+		hooks.bind('settings_form_bottom', 200, function(pkg) {
+			log('Advertiser', 'Adding fields to settings form');
+			pkg.form.add('ad-server-sep', 'title', {displayname:"Ad Server"})
+			.add('adserver.publicaddr', 'text', {displayname:"Public Address with port (client requests)"},{required:false})
+			.add('adserver.privateaddr', 'text', {displayname:"Private Address with port (lilium requests)"},{required:false})
+		});
+
 	         hooks.bind('user_loggedin', 200, function(cli) {
 	             // Check if user is a publisher
 	             if (cli.userinfo.roles.indexOf('advertiser') != -1) {

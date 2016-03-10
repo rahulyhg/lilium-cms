@@ -228,6 +228,7 @@ var Sites = function() {
 
 					fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function(siteInfo) {
 						var keyname = sitename.replace('//', '').replace(/\s/g, '/');
+						siteInfo.jsonfile = files[fileIndex];					
 
 						config.registerConfigs(keyname, siteInfo);
 						if (sitename == 'default') {

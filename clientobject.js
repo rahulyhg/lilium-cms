@@ -76,6 +76,10 @@ ClientObject.prototype.touch = function(str) {
 	this.nodes.push(str);
 };
 
+ClientObject.prototype.hasRight = function(right) {
+	return this.userinfo.loggedin && entities.isAllowed(this.userinfo, right);
+}
+
 ClientObject.prototype.isGranted = function (role) {
 	var isGranted = false;
 		if (typeof this.userinfo.roles !== 'undefined' && (
