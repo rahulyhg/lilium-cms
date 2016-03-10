@@ -1,17 +1,71 @@
 {#config;session;vocab;forms}
 		<h1>Upload a media</h1>
 	{=forms.render('media_create')}
-	<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
-	<script src="/static/formValidation.js"></script>
-
+    <div class="bar">
+        <div class="progress">
+          <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+            <span class="sr-only">60% Complete</span>
+          </div>
+        </div>
+    </div>
 	<script>
-		document.addEventListener('formSubmited', function(e) {
-			data = e.detail;
-			if (data.form.success) {
-				var fileInput = $("[name='media_create'] > [name='File']");
-				$(fileInput).replaceWith(fileInput = fileInput.clone(true));
-				alert('Media Uploaded!');
-			}
-		});
+        $(document).ready(function() {
+            $('form').on('submit', function(e) {
+                var bar = $('.progress .progress-bar');
+                bar.removeClass('progress-bar-danger');
+                bar.removeClass('progress-bar-success');
+
+                e.preventDefault();
+
+                $('.progress').show();
+
+                var file = $("[name='media_create'] > [name='File']")[0].files[0];
+                var form_name = $("[name='media_create'] > [name='form_name']").val();
+                var formData = new FormData();
+
+                formData.append('File', file);
+                formData.append('form_name', form_name);
+
+                var req = new XMLHttpRequest();
+                req.open('post', $(this).attr('action')|| '', true);
+
+                req.upload.onprogress = function(e) {
+                    if (e.lengthComputable) {
+                        var uploadPerc = (e.loaded / e.total) * 100 > 40 ? 40 :(e.loaded / e.total) * 100 ;
+                        bar.css('width', uploadPerc + '%');
+                        if (uploadPerc >= 40) {
+                            bar.text('Resizing pictures...');
+
+                        } else {
+                            bar.text('Uploading...');
+
+                        }
+
+                    }
+                };
+
+                req.onerror = function(e) {
+                    console.log(e);
+                };
+
+                req.onload = function(e) {
+                    var res = JSON.parse(e.target.response);
+                    if (res.success) {
+                        bar.css('width', '100%');
+                        bar.addClass('progress-bar-success');
+                        bar.text('Upload Success!');
+
+                        liliumcms.notify({message: 'Upload Success', type: 'success', title: 'Media'});
+
+                    } else {
+                        bar.addClass('progress-bar-danger');
+                        liliumcms.notify({message: 'There was a problem uploading you Media', type: 'danger', title: 'Media'})
+                    }
+
+                };
+
+                req.send(formData);
+
+            });
+        });
 	</script>
-	

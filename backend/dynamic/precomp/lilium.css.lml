@@ -742,3 +742,11 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
     color: #c0392b;
     opacity: 1;
 }
+
+/* Progress bar */
+.bar {
+    padding : 10px;
+}
+.progress {
+    display: none;
+}

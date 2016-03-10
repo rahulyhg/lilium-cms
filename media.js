@@ -89,7 +89,8 @@ var Media = function() {
                     db.insert(cli._c, 'uploads', {path : saveTo, url : image.File, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
 
                         cli.sendJSON({
-                            form: {redirect : '' ,success : true}
+                            redirect : '' ,
+                            success : true
                         });
 
                     });
@@ -105,7 +106,7 @@ var Media = function() {
 
         } else {
 					cli.sendJSON({
-						form: response
+						msg : 'Invalid file type'
 					});
 				}
 
