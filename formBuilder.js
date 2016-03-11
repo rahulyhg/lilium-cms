@@ -143,6 +143,7 @@ var FormBuilder = function() {
       currentForm.fields[name] = undefined;
       delete currentForm.fields[name];
     }
+    return this;
   }
 
   var createField = function(name, type, attr, requirements) {

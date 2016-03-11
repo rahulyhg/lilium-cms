@@ -1062,6 +1062,9 @@ var LiliumCMS = function() {
         this.init();
     };
 
+    document.addEventListener(LiliumEvents.livevarsFetched.name, function(e) {
+        $('.dropdown-menu #avatar').attr('src', liliumcms.livevars.livevars().session.avatarURL);
+    });
     // Notifications
     document.addEventListener(LiliumEvents.livevarsRendered.name, function(e) {
         var session = e.detail.livevars.session

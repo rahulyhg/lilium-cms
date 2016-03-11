@@ -36,7 +36,7 @@
 	fontdir = config.default.server.url;
 	fontdir += "/static/fonts/font-awesome";
 $}
- 
+
 @font-face {
   font-family: 'Raleway';
   font-weight: 100;
@@ -284,7 +284,7 @@ form input, form label{
 	margin-right: 10px;
 }
 
-.lmlform-fieldwrapper label.inline, .lmlform input.inline, 
+.lmlform-fieldwrapper label.inline, .lmlform input.inline,
 .lmlform select.inline, .lmlform textarea.inline {
 	display: inline-block;
 }
@@ -312,7 +312,7 @@ form input, form label{
 	background-color: {=activecolor}
 }
 
-.lmlform input:focus, .lmlform select:focus, 
+.lmlform input:focus, .lmlform select:focus,
 .lmlform textarea:focus {
 	border: 1px solid {=actioncolor};
 }
@@ -321,11 +321,11 @@ form input, form label{
 	background-color: #EEE;
 }
 
-.lmlform .lmlform-fieldwrapper-title:not(:first-child) {	
+.lmlform .lmlform-fieldwrapper-title:not(:first-child) {
 	border-top: 1px solid #DDD;
 }
 
-.lmlform .lmlform-fieldwrapper-title:not(:last-child) {	
+.lmlform .lmlform-fieldwrapper-title:not(:last-child) {
 	border-bottom: 1px solid #DDD;
 }
 
@@ -538,7 +538,10 @@ main.lmladminmain .pad10 {
 #notification-dropdown > .title{
 	font-size: 16px;
 	padding: 10px;
+}
 
+.navbar-right #notification-dropdown.dropdown-menu {
+    right: -1px;
 }
 
 /* Admin Bar */
@@ -614,6 +617,11 @@ header.admin-bar .navbar-default .navbar-header {
 }
 
 
+/* Profile dropdown */
+#profile-dropdown {
+    width: 100%;
+    padding: 0px;
+}
 
 header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
 	-webkit-border-radius: 3px;
@@ -854,7 +862,7 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 .messagestrip span {
 	vertical-align: middle;
 	display: inline-block;
-    	font-size: 14px;	
+    	font-size: 14px;
 }
 
 .messagestrip.error {
@@ -864,12 +872,12 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 .siteDefaultTag {
 	font-size: 10px;
    	background-color: {=activecolor};
-	font-weight: 600;    
-	
+	font-weight: 600;
+
 	color: #FFF;
     	padding: 0px 5px;
     	display: inline-block;
-    	
+
 	border-radius: 4px;
     	text-transform: uppercase;
     	margin-left: 5px;
@@ -891,8 +899,15 @@ a.button-link {
 a.button-link:hover {
 	text-decoration: none;
 	background-color: {=hovercolor};
-} 
+}
 
 a.button-link:active {
 	background-color: {=activecolor};
+}
+/* Progress bar */
+.bar {
+    padding : 10px;
+}
+.progress {
+    display: none;
 }

@@ -67,7 +67,7 @@ var DB = function() {
 	this.createPool = function(conf, callback) {
 		log('Database', 'Creating database global connection object');
 		MongoClient.connect(formatMongoString(conf), function(err, conn) {
-			_conns[conf.id] = conn;
+			_conns[conf.id || conf] = conn;
 			callback(!err);
 		});
 	};
@@ -91,7 +91,7 @@ var DB = function() {
 		cb : End callback with format function(err, cursor)
 	*/
 	this.find = this.query = function(conf, coln, conds, stack, cb) {
-		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -123,7 +123,7 @@ var DB = function() {
 	};
 
 	this.findToArray = function(conf, coln, conds, cb) {
-		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -174,7 +174,7 @@ var DB = function() {
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
 	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one, operators) {
-        _conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+        _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -200,7 +200,7 @@ var DB = function() {
 	};
 
 	this.findAndModify = function(conf, coln, conds, newVal, cb, upsert, one) {
-		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -227,7 +227,7 @@ var DB = function() {
 	}
 
 	this.insert = function(conf, coln, docs, cb) {
-		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof docs !== "object") {
@@ -243,7 +243,7 @@ var DB = function() {
 	};
 
 	this.remove = this.delete = function(conf, coln, conds, cb, one) {
-		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -263,7 +263,7 @@ var DB = function() {
 	};
 
 	this.aggregate = this.join = function(conf, coln, aggregation, cb) {
-		_conns[conf.id].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else {
@@ -296,7 +296,7 @@ var DB = function() {
 	// USE CAREFULLY
 	// Will callback cb with a raw mongodb collection object
 	this.rawCollection = function(conf, coln, opt, cb) {
-		_conns[conf.id].collection(coln, opt, cb);
+		_conns[conf.id || conf].collection(coln, opt, cb);
 	};
 };
 

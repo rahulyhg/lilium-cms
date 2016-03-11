@@ -6,6 +6,8 @@ var formbuilder = require('./formBuilder.js');
 var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var mailer = require('./postman.js');
+var imageResizer = require('./imageResizer.js');
+var sessionManager = require('./session.js');
 
 var Roles = new Object();
 
@@ -33,10 +35,7 @@ var Entities = function() {
 			entity[key] = oData[key];
 		}
 
-		db.findToArray(_c.default(), 'uploads', {"id_" : entity.avatarID}, function(err, avatar) {
-			entity.avatarURL = err || avatar.length == 0 ? "" : avatar[0].url;
-			callback(entity);
-		});
+        callback(entity);
 	};
 
 	this.fetchFromDB = function(conf, idOrUsername, callback) {
@@ -62,7 +61,7 @@ var Entities = function() {
 		cli.touch('entities.handleGET');
 
 		if (cli.routeinfo.path.length == 2) {
-			filelogic.serveAdminLML(cli);
+            filelogic.serveAdminLML(cli);
 		} else {
 			var action = cli.routeinfo.path[2];
 
@@ -80,21 +79,131 @@ var Entities = function() {
 
 	this.handlePOST = function(cli) {
 		cli.touch('entities.handlePOST');
-		var action = cli.postdata.data.form_name;
+        if (cli.routeinfo.path[1] == 'me') {
+            switch (cli.routeinfo.path[2]) {
+                case undefined :
+                    this.updateProfile(cli);
+                case "update_profile_picture":
+                    this.updateProfilePicture(cli);
+                    break;
+                case "change_password":
+                    this.changePassword(cli);
+                    break;
+            }
+        } else {
+            var action = cli.postdata.data.form_name;
 
-		switch (action) {
-			case "entity_create":
-				this.createFromCli(cli);
-				break;
+            switch (action) {
+                case "entity_create":
+                    this.createFromCli(cli);
+                    break;
 
-			case "entity_delete":
-				this.deleteFromCli(cli);
-				break;
+                case "entity_delete":
+                    this.deleteFromCli(cli);
+                    break;
 
-			default:
-				cli.debug();
-		}
+                default:
+                    cli.debug();
+            }
+        }
+
 	};
+
+    this.updateProfile = function(cli) {
+        cli.touch('entities.updateProfile');
+        var entData = cli.postdata.data;
+        var entitie = this.initialiseBaseEntity(entData);
+        entitie._id = cli.
+        this.updateProfile(cli);
+
+    };
+
+    this.updateProfilePicture = function(cli) {
+        var form = formbuilder.handleRequest(cli);
+        var response = formbuilder.validate(form, true);
+
+        if (response.success) {
+
+            var image = formbuilder.serializeForm(form);
+            var extensions = image.picture.split('.');
+            var mime = extensions[extensions.length-1];
+            var saveTo = cli._c.server.base + "backend/static/uploads/" + image.picture;
+
+            if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
+                imageResizer.resize(saveTo, image.picture, mime, cli, function(images){
+					var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
+					var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
+                    // Save it in database
+                    db.update(cli._c, 'entities', {_id : cli.userinfo.userid}, {avatarURL : avatarURL, avatarID : avatarID}, function (err, result){
+						// Update session
+						var sessToken = cli.session.token;
+						var session = sessionManager.getSessionFromSID(sessToken);
+
+						session.data.avatarID = avatarID;
+						session.data.avatarURL = avatarURL;
+
+						cli.session.data.avatarURL = avatarURL;
+						cli.session.data.avatarID = avatarID;
+
+						sessionManager.saveSession(cli, function() {
+							cli.sendJSON({
+	                            redirect : '',
+	                            success : true
+	                        });
+						});
+                    });
+
+                });
+        } else {
+            cli.sendJSON({
+                form: response
+            });
+        }
+          // var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
+          // Create post
+
+        } else {
+            cli.sendJSON({
+                msg : 'Invalid file type'
+            });
+        }
+    };
+
+    this.changePassword = function(cli) {
+        var form = formbuilder.handleRequest(cli);
+        var response = formbuilder.validate(form, true);
+
+        if (response.success) {
+            form = formbuilder.serializeForm(form);
+            var shhh = CryptoJS.SHA256(form.password).toString(CryptoJS.enc.Hex);
+            db.update(cli._c, 'entities', {_id : cli.userinfo.userid}, {shhh : shhh}, function (err, result){
+                cli.refresh();
+            });
+        } else {
+            cli.sendJSON({
+                msg : response
+            });
+        }
+    }
+
+    this.update = function(cli) {
+
+
+        this.registerEntity(cli, newEnt, function() {
+            cli.touch('entities.registerEntity.callback');
+            /*
+            mailer.createEmail({
+                to: [newEnt.email],
+                from: _c.default.emails.default,
+                subject: "Your account has been Created",
+                html: 'welcome.lml'
+            },true, function() {
+
+            }, {name:newEnt.firstname + " " + newEnt.lastname});
+            */
+            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath);
+        });
+    }
 
 	this.serveEdit = function(cli) {
 		cli.touch('entities.serveEdit');
@@ -277,8 +386,25 @@ var Entities = function() {
 	};
 
 	this.registerCreationForm = function() {
-		formbuilder.createForm('entity_create')
-		.addTemplate('entity_create');
+
+			formbuilder.createForm('entity_create')
+				.addTemplate('entity_create');
+
+
+            formbuilder.createForm('update_entitiy')
+                .addTemplate('entity_create')
+                .remove('password')
+                .edit('create', '', {value : 'Update Profile'});
+
+            formbuilder.createForm('update_password', {action: '/admin/me/change_password'})
+                .add('editpasswd', 'title', {displayname : 'Edit Password'})
+                .add('password', 'password')
+                .add('update', 'submit');
+
+            formbuilder.createForm('upload_profile_picture', {action: '/admin/me/update_profile_picture'})
+                .add('uppicutre', 'title', {displayname : 'Upload a profile picture'})
+                .add('picture', 'file', {displayname : 'Profile Picture'})
+                .add('upload', 'submit', {value : 'Upload'});
 	};
 
 	this.registerLiveVars = function() {
@@ -300,10 +426,16 @@ var Entities = function() {
 				db.findToArray(cli._c,'entities', queryInfo, function(err, arr) {
 					callback(err || arr);
 				});
-			} else {
+            } else {
 				db.multiLevelFind(cli._c, 'entities', levels, {username:levels[0]}, {limit:[1]}, callback);
 			}
 		}, ["entities"]);
+
+        livevars.registerLiveVariable('me', function(cli, levels, params, callback) {
+            db.findToArray(cli._c, 'entities', {_id: db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+                callback(err || arr);
+            });
+        }, []);
 
 		livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
 			var dat = cli.session.data;
