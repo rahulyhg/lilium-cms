@@ -112,12 +112,12 @@ var Core = function() {
 			cli.touch('admin.GET.sites');
 			sites.handleGET(cli);
 		});
-		
+
 		admin.registerAdminEndpoint('sites', 'POST', function(cli) {
 			cli.touch('admin.GET.sites');
 			sites.handlePOST(cli);
 		});
-		
+
 		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
 			cli.touch("admin.GET.dashboard");
 			admin.handleGETDashboard(cli);
@@ -329,10 +329,19 @@ var Core = function() {
 	var loadRoles = function(cb) {
         entities.registerRole({
           name: 'admin',
-          displayname: 'admin'
+          displayname: 'admin',
+		  power: 5
       }, ['dash', 'admin'], function() {
           return;
         }, true);
+
+		entities.registerRole({
+		  name: 'lilium',
+		  displayname: 'lilium',
+		  power: 1
+	  }, ['dash', 'admin'], function() {
+		  return;
+		}, true);
 
 		entities.cacheRoles(cb);
 	};
@@ -529,7 +538,7 @@ var Core = function() {
 
 	var loadWebsites = function(loadEverything) {
 		sites = require('./sites.js');
-		
+
 		var currentRoot = __dirname;
 		var fss = require('./fileserver.js');
 
@@ -569,7 +578,7 @@ var Core = function() {
 
 	this.makeEverythingSuperAwesome = function(readyToRock) {
 		log('Core', 'Initializing Lilium');
-		loadWebsites(function(resp) { 
+		loadWebsites(function(resp) {
 			loadRequires();
 			loadHooks(readyToRock);
 			loadEndpoints();
@@ -590,7 +599,7 @@ var Core = function() {
 				loadAdminMenus();
 				loadFrontend();
 				loadForms();
-			
+
 				loadCacheInvalidator();
 				scheduleGC();
 
@@ -598,7 +607,7 @@ var Core = function() {
 				Inbound.createServer();
 	     	     		loadNotifications();
 				Inbound.start();
-		
+
 				log('Core', 'Firing initialized signal');
 				hooks.fire('init');
 			});});});});});});

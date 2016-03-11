@@ -59,11 +59,17 @@ var Role = function() {
         if (cli.method == 'POST' && cli.postdata) {
             var redirect = '';
 
-            // Create post
-            db.insert(cli._c, 'roles', prepareRoleForDB(cli), function(err, result) {
-                // Generate LML page
-                cli.redirect('/admin/role/edit/');
-            });
+            // Check if current user has sufficient role power
+            if (cli.userinfo.power < cli.postdata.data.level) {
+                // Create post
+                db.insert(cli._c, 'roles', prepareRoleForDB(cli), function(err, result) {
+                    // Generate LML page
+                    cli.redirect('/admin/role/edit/');
+                });
+            } else {
+                cli.sendJSON({success : false, msg : 'Insufficient Power'});
+            }
+
 
         } else {
             filelogic.serveAdminLML(cli);
@@ -130,12 +136,15 @@ var Role = function() {
         var rights = new Array();
 
         for (var key in postdata.rights) {
+            console.log(postdata.rights);
+            
             rights.push(postdata.rights[key].rightname);
         }
 
         return {
             "name": postdata.name,
             "displayname": postdata.displayname,
+            "power": postdata.level,
             "rights": rights
         };
     }

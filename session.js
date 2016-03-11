@@ -63,6 +63,7 @@ var Sessions = function() {
 					admin : cli.session.data.admin,
 					god : cli.session.data.god,
 					user : cli.session.data.user,
+					power : cli.session.data.power,
 					site : cli.routeinfo.configname
 				};
 
@@ -91,10 +92,18 @@ var Sessions = function() {
 
 		cli.userinfo = cli.session.data;
 
+		// Find  highest power of user
+
 		// Load notifications in db
 		db.findToArray(cli._c, 'notifications', {userID : db.mongoID(cli.session.data._id)},function(err, arr) {
 			cli.session.data.notifications = arr.slice(0,4);
 		});
+
+		// Find the maximum power the user has
+		entities.maxPower(cli, function(maxUserPower) {
+			cli.session.data.power = maxUserPower;
+		});
+		cli.session.data.power = 999;
 		cli.session.data.notifications = [];
 
 		this.setCookieToCli(cli);
