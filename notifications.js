@@ -37,6 +37,7 @@ var Notification = function() {
                 }
                 sockets[clientId].sockets[socket.id] = socket;
                 sockets[clientId].displayname = session.data.displayname;
+                sockets[clientId].power = session.data.power;
 
 
                 socket.on('join', function(groupName) {
@@ -141,26 +142,26 @@ var Notification = function() {
                 });
 
                 socket.on('spy', function(data) {
-                    // Only admins or lilium can access this feature
-                    if (session.data.roles.indexOf('admin') !== -1 || session.data.roles.indexOf('lilium') !== -1) {
                         // Make a list of all currently loggedin users
                         var loggedInUsers = {};
                         for (var clientId in sockets) {
-                            loggedInUsers[clientId] = {};
-                            loggedInUsers[clientId].pages = [];
-                            loggedInUsers[clientId].displayname = sockets[clientId].displayname;
-                            // Each sockets, get the id
-                            for (var socketid in sockets[clientId].sockets) {
-                                var info = {};
-                                info.url = sockets[clientId].sockets[socketid].url;
-                                info.time = sockets[clientId].sockets[socketid].time;
+                            if (sockets[clientId].power > session.data.power) {
+                                loggedInUsers[clientId] = {};
+                                loggedInUsers[clientId].pages = [];
+                                loggedInUsers[clientId].displayname = sockets[clientId].displayname;
+                                // Each sockets, get the id
+                                for (var socketid in sockets[clientId].sockets) {
+                                    var info = {};
+                                    info.url = sockets[clientId].sockets[socketid].url;
+                                    info.time = sockets[clientId].sockets[socketid].time;
 
-                                loggedInUsers[clientId].pages.push(info);
+                                    loggedInUsers[clientId].pages.push(info);
+                                }
                             }
+
                         }
 
                         socket.emit('spy', loggedInUsers);
-                    }
                 });
 
                 socket.on('urlChanged', function(url){
@@ -168,7 +169,15 @@ var Notification = function() {
                     sockets[clientId].sockets[socket.id].time = new Date();
 
                     var clientUrls = createCurrentUserPages();
-                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
+
+                    for (var index in groups['spy'].users) {
+                        var spySession = sessionManager.getSessionFromSID(groups['spy'].users[index].session);
+
+                        // Check if user has required power
+                        if (session.data.power < spySession.data.power) {
+                            sockets[spySession.client].emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
+                        }
+                    }
                 });
 
                 socket.on('broadcast', function(emission) {
