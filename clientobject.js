@@ -1,5 +1,6 @@
 var entities = require('./entities.js');
 var log = require('./log.js');
+var db = require('./includes/db.js');
 
 var ClientObject = function(req, resp) {
 	this.request = req;
@@ -59,6 +60,36 @@ ClientObject.prototype.debug = function() {
 	}));
 	this.response.end();
 };
+
+ClientObject.prototype.hasEnoughPower = function(power, cb) {
+	var cli = this;
+	// Check if role or number given
+	if (typeof power === 'string') {
+		db.findToArray(this._c, 'roles', {name : power}, function(err, arr) {
+			if (arr[0] && this.userinfo.power <= arr[0].power) {
+				cb(true);
+			} else {
+				cb(false);
+			}
+		})
+	} else if (!isNaN(power)){
+		cb(cli.userinfo.power <= power);
+	} else {
+		db.findToArray(this._c, 'roles', {name : {'$in' : power}}, function(err, arr) {
+			if (err) {cli.crash(err);}
+			if (arr.length > 0) {
+				for (var index in arr) {
+					if (cli.userinfo.power > arr[index].power) {
+						cb(false);
+					}
+				}
+				cb(true);
+			} else {
+				cb(false);
+			}
+		});
+	}
+}
 
 ClientObject.prototype.sendJSON = function(json) {
 	if (typeof json === 'object') {

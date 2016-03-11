@@ -67,7 +67,10 @@ var Role = function() {
                     cli.redirect('/admin/role/edit/');
                 });
             } else {
-                cli.sendJSON({success : false, msg : 'Insufficient Power'});
+                cli.sendJSON({
+                    success: false,
+                    msg: 'Insufficient Power'
+                });
             }
 
 
@@ -85,20 +88,27 @@ var Role = function() {
 
                 var form = formBuilder.handleRequest(cli);
                 var response = formBuilder.validate(form, true);
+                if (cli.userinfo.power < cli.postdata.data.level) {
 
-                if (response.success) {
+                    if (response.success) {
 
-                    db.update(cli._c, 'content', {
-                        _id: id
-                    }, formBuilder.serializeForm(form), function(err, r) {
-                        cli.sendJSON({
-                            success: true
+                        db.update(cli._c, 'content', {
+                            _id: id
+                        }, formBuilder.serializeForm(form), function(err, r) {
+                            cli.sendJSON({
+                                success: true
+                            });
                         });
-                    });
 
+                    } else {
+                        cli.sendJSON({
+                            form: response
+                        });
+                    }
                 } else {
                     cli.sendJSON({
-                        form: response
+                        success: false,
+                        msg: 'Insufficient Power'
                     });
                 }
 
@@ -136,15 +146,13 @@ var Role = function() {
         var rights = new Array();
 
         for (var key in postdata.rights) {
-            console.log(postdata.rights);
-            
-            rights.push(postdata.rights[key].rightname);
+            rights.push(postdata.rights[key].rights);
         }
 
         return {
             "name": postdata.name,
             "displayname": postdata.displayname,
-            "power": postdata.level,
+            "power": parseInt(postdata.level),
             "rights": rights
         };
     }
@@ -155,7 +163,9 @@ var Role = function() {
         livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
-                db.singleLevelFind(cli._c, 'roles', callback);
+                db.findToArray(cli._c, 'roles', {power : {'$gt' : cli.userinfo.power}}, function(err, arr) {
+                    callback(err || arr);
+                });
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
                 db.findToArray(cli._c, 'roles', {}, function(err, arr) {
@@ -182,34 +192,36 @@ var Role = function() {
 
     var registerForms = function() {
         formBuilder.createForm('role_create', {
-			fieldWrapper : {
-				tag : 'div',
-				cssPrefix : 'role-field-'
-			},
-			cssClass : 'role-form',
-			dependencies : [],
-			async : true
-		})
-		.add('name', 'text', {
-			displayname : "Name",
-		})
-		.add('displayname', 'text', {
-			displayname : "Display Name",
-		})
-        .add('level', 'number', {
-            displayname : "Level (Smaller is stronger)"
-        })
-		.add('rights', 'stack', {
-			displayname : "User Rights",
-			scheme : {
-				columns : [
-					{fieldName:'rights', dataType:'text', displayname:"Name"},
-				]
-			}
-		})
-		.add('submit', 'submit', {
-			displayname : "Create Role"
-		});
+                fieldWrapper: {
+                    tag: 'div',
+                    cssPrefix: 'role-field-'
+                },
+                cssClass: 'role-form',
+                dependencies: [],
+                async: true
+            })
+            .add('name', 'text', {
+                displayname: "Name",
+            })
+            .add('displayname', 'text', {
+                displayname: "Display Name",
+            })
+            .add('level', 'number', {
+                displayname: "Level (Smaller is stronger)"
+            })
+            .add('rights', 'stack', {
+                displayname: "User Rights",
+                scheme: {
+                    columns: [{
+                        fieldName: 'rights',
+                        dataType: 'text',
+                        displayname: "Name"
+                    }, ]
+                }
+            })
+            .add('submit', 'submit', {
+                displayname: "Create Role"
+            });
     }
 
 

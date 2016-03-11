@@ -315,16 +315,25 @@ var Entities = module.exports = new function() {
         return new Entity();
     };
 
-    this.validateEntityObject = function(e) {
-        return e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "";
+    this.validateEntityObject = function(e, cli, cb) {
+		var valid = true;
+		valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.role;
+		 cli.hasEnoughPower(e.roles, function(hasEnoughPower) {
+             valid = hasEnoughPower;
+             cb(valid);
+         });
     };
 
     this.registerEntity = function(cli, entity, callback) {
-        if (this.validateEntityObject(entity)) {
-            db.insert(cli._c, 'entities', entity, callback, true);
-        } else {
-            callback("[EntityValidationException] Entity object misses required fields.", undefined);
-        }
+        this.validateEntityObject(entity, cli, function(valid) {
+            if (valid) {
+                db.insert(cli._c, 'entities', entity, callback, true);
+
+            } else {
+                callback("[EntityValidationException] Entity object misses required fields.", undefined);
+
+            }
+        });
     };
 
     this.updateEntity = function(valObject) {
