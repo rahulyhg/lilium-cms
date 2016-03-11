@@ -91,6 +91,8 @@
 			pkg.form.add('ad-server-sep', 'title', {displayname:"Ad Server"})
 			.add('adserver.publicaddr', 'text', {displayname:"Public Address with port (client requests)"},{required:false})
 			.add('adserver.privateaddr', 'text', {displayname:"Private Address with port (lilium requests)"},{required:false})
+			.add('adserver.keyone', 'text', {displayname:"First Private key"},{required:false})
+			.add('adserver.keytwo', 'text', {displayname:"Second Private key"},{required:false});
 		});
 
 	         hooks.bind('user_loggedin', 200, function(cli) {
