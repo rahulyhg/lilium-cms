@@ -34,10 +34,7 @@ var Entities = function() {
 			entity[key] = oData[key];
 		}
 
-		db.findToArray(_c.default(), 'uploads', {"id_" : entity.avatarID}, function(err, avatar) {
-			entity.avatarURL = err || avatar.length == 0 ? "" : avatar[0].url;
-			callback(entity);
-		});
+        callback(entity);
 	};
 
 	this.fetchFromDB = function(idOrUsername, callback) {
@@ -443,6 +440,7 @@ var Entities = function() {
 					avatarURL : dat.avatarURL,
 					displayname : dat.displayname,
 					roles : dat.roles,
+					avatarURL : dat.avatarURL,
 					username : dat.username,
 					notifications : dat.notifications === 'undefined' ? [] : dat.notifications,
 					newNotifications : dat.newNotifications === 'undefined' ? 0 : dat.newNotifications
