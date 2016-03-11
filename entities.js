@@ -7,7 +7,6 @@ var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var mailer = require('./postman.js');
 var imageResizer = require('./imageResizer.js');
-var sessionManager = require('./session.js');
 
 var Roles = new Object();
 
@@ -27,7 +26,7 @@ var Entity = function() {
 	this.data = new Object();
 };
 
-var Entities = function() {
+var Entities = module.exports = new function() {
 	var entityWithData = function(oData, callback) {
 		var entity = new Entity();
 
@@ -471,5 +470,3 @@ var Entities = function() {
 
 	init();
 };
-
-module.exports = new Entities();

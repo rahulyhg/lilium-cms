@@ -53,7 +53,7 @@ var Sessions = function() {
 
 			if (curSesh && cli.routeinfo.configname == curSesh.data.site) {
 				cli.session = curSesh;
-	
+
 				cli.userinfo = {
 					loggedin : cli.session.loggedin,
 					roles : cli.session.data.roles,
@@ -68,7 +68,7 @@ var Sessions = function() {
 
 				injected = true;
 				break;
-			} 
+			}
 		}
 
 		if (!injected) {
@@ -84,7 +84,6 @@ var Sessions = function() {
 		for (var k in userObj) {
 			cli.session.data[k] = userObj[k];
 		}
-
 		cli.session.data.admin = entities.isAllowed(userObj, 'admin');
 		cli.session.data.god = entities.isAllowed(userObj, 'lilium');
 		cli.session.data.user = userObj.username;
