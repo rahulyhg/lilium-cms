@@ -20,7 +20,7 @@
 {#config}
 var debugMode = 'true';
 var socket = typeof io !== 'undefined' ? io() : undefined;
- 
+
 window.location.urlBase = "{=config.default.server.url}/";
 
 var LiliumCMS = function() {
@@ -521,9 +521,9 @@ var LiliumCMS = function() {
         var cache = window.localStorage;
 
         this.cacheForm = function() {
-            
+
         };
-  
+
         this.fillFormFromCache = function(formName) {
 
         };
@@ -1063,7 +1063,7 @@ var LiliumCMS = function() {
     };
 
     document.addEventListener(LiliumEvents.livevarsFetched.name, function(e) {
-        $('.dropdown-menu #avatar').attr('src', liliumcms.livevars.livevars().session.avatarURL);
+        $('.dropdown-menu #avatar img').attr('src', liliumcms.livevars.livevars().session.avatarURL);
     });
     // Notifications
     document.addEventListener(LiliumEvents.livevarsRendered.name, function(e) {

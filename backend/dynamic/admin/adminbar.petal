@@ -42,15 +42,18 @@
                         </div>
 
                         <div id="profile-dropdown" class="dropdown-menu">
-                            <img id="avatar" src="">
-                            <div class="pull-right">
+                            <span class="links">
                                 <div>
                                     <a href="{=config.default.server.url}/admin/me">Profile</a>
                                 </div>
                                 <div>
                                     <a href="{=config.default.server.url}/logout">Logout</a>
                                 </div>
-                            </div>
+                            </span>
+                            <span id="avatar">
+                                <img src="">
+                            </span>
+
 
                         </div>
                     </li>

@@ -618,9 +618,44 @@ header.admin-bar .navbar-default .navbar-header {
 
 
 /* Profile dropdown */
+#loggedinuserbox {
+	width: 200px;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	text-align: center;
+}
+
 #profile-dropdown {
-    width: 100%;
+    width: 200px;
     padding: 0px;
+}
+
+#profile-dropdown #avatar{
+	display: inline-block;
+	float: right;
+}
+
+#profile-dropdown #avatar img {
+	max-height: 70px;
+	max-width: 70px;
+}
+
+#profile-dropdown .links {
+	width: 128px;
+	display: inline-block;
+
+}
+
+#profile-dropdown .links a {
+	padding-left: 10px;
+    display: block;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+#profile-dropdown .links a:hover {
+ background: {=hovercolor};
+ color: #fff;
 }
 
 header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
