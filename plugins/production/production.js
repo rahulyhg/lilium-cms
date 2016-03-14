@@ -8,6 +8,7 @@
 	 var formBuilder = undefined;
 	 var sponsoredarticle = require('./sponsoredarticle.js');
 	 var changerequest = require('./changeRequest.js');
+     var Campaigns = require('./campaigns.js');
 
 	 var Production = function() {
 	   this.iface = new Object();
@@ -33,6 +34,40 @@
 	       handlePOST(cli);
 	     });
 	   };
+
+       var initCampaigns = function(asbpath) {
+           Campaigns.init(asbpath);
+           console.log('init');
+
+           Admin.registerAdminEndpoint('campaigns', 'GET', function(cli) {
+               cli.touch('admin.GET.campaigns');
+               Campaigns.handleGET(cli);
+           });
+           console.log('get');
+           Admin.registerAdminEndpoint('campaigns', 'POST', function(cli) {
+               cli.touch('admin.POST.campaigns');
+               Campaigns.handlePOST(cli);
+           });
+           console.log('post');
+
+           Campaigns.registerLiveVar();
+           console.log('livevars');
+
+           var aurl = "admin/"; //_c.default().server.url + "/admin/";
+
+           Admin.registerAdminMenu({
+               id : "campaigns", faicon : "fa-line-chart", displayname : "Campaigns", priority : 300,
+               rights : ["view-campaigns"], absURL : aurl + "campaigns", children : []
+           });
+
+           Campaigns.registerCreationForm();
+           console.log('form');
+
+           Campaigns.loadCampaignsStatuses(function() {});
+           console.log('campagins status');
+
+
+       };
 
 	   var handleGET = function(cli) {
 	     switch (cli.routeinfo.path[2]) {
@@ -97,7 +132,9 @@
 
              log('Production', 'Registering forms');
              registerForms();
- 
+
+             initCampaigns(_c.default().server.base);
+
 	     return callback();
 	   };
 	 };

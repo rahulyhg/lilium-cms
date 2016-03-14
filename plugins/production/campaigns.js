@@ -1,11 +1,11 @@
-var log = require('./log.js');
-var _c = require('./config.js');
-var Products = require('./products.js');
-var LiveVars = require('./livevars.js');
-var db = require('./includes/db.js');
-var filelogic = require('./filelogic.js');
-var formbuilder = require('./formBuilder.js');
-var hooks = require('./hooks.js');
+var log = undefined;
+var _c = undefined;
+var Products = undefined;
+var LiveVars = undefined;
+var db = undefined;
+var filelogic = undefined;
+var formbuilder = undefined;
+var hooks = undefined;
 
 var cachedCampaigns = new Object();
 var registeredStatuses = new Array();
@@ -461,8 +461,16 @@ var Campaigns = function() {
             });
     };
 
-    var init = function() {};
-    init();
+    this.init = function(abspath) {
+        log = require(abspath + 'log.js');
+        _c = require( abspath + 'config.js');
+        Products = require(abspath + 'products.js');
+        LiveVars = require(abspath + 'livevars.js');
+        db = require(abspath + 'includes/db.js');
+        filelogic = require(abspath + 'filelogic.js');
+        formbuilder = require(abspath + 'formBuilder.js');
+        hooks = require(abspath + 'hooks.js');
+    };
 };
 
 module.exports = new Campaigns();

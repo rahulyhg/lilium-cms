@@ -19,7 +19,6 @@ var cacheInvalidator = undefined;
 var dfp = undefined;
 var postman = undefined;
 var Products = undefined;
-var Campaigns = undefined;
 var Frontend = undefined;
 var notification = undefined;
 var Forms = undefined;
@@ -62,7 +61,6 @@ var Core = function() {
 		dfp = require('./dfp.js');
 		postman = require('./postman.js');
 		Products = require('./products');
-		Campaigns = require('./campaigns.js');
 		Frontend = require('./frontend.js');
 		notification = require('./notifications.js');
 		Forms = require('./forms');
@@ -153,16 +151,6 @@ var Core = function() {
 			Media.handlePOST(cli);
 		});
 
-		admin.registerAdminEndpoint('campaigns', 'GET', function(cli) {
-			cli.touch('admin.GET.campaigns');
-			Campaigns.handleGET(cli);
-		});
-
-		admin.registerAdminEndpoint('campaigns', 'POST', function(cli) {
-			cli.touch('admin.POST.campaigns');
-			Campaigns.handlePOST(cli);
-		});
-
 		admin.registerAdminEndpoint('settings', 'GET', function(cli) {
 			cli.touch('admin.GET.settings');
 			settings.handleGET(cli);
@@ -246,10 +234,6 @@ var Core = function() {
 		admin.registerAdminMenu({
 			id : "articles", faicon : "fa-pencil", displayname : "Posts", priority : 200,
 			rights : ["view-content"], absURL : aurl + "article", children : []
-		});
-		admin.registerAdminMenu({
-			id : "campaigns", faicon : "fa-line-chart", displayname : "Campaigns", priority : 300,
-			rights : ["view-campaigns"], absURL : aurl + "campaigns", children : []
 		});
 		admin.registerAdminMenu({
 			id : "media", faicon : "fa-picture-o", displayname : "Media", priority : 400,
@@ -363,7 +347,7 @@ var Core = function() {
 					}
 
 					log('Products', 'Loaded products info from database');
-					Campaigns.loadCampaignsStatuses(cb);
+                    cb();
 				});
 			});
 		});
@@ -466,7 +450,6 @@ var Core = function() {
 		Article.registerContentLiveVar();
 		Media.registerMediaLiveVar();
 		dfp.registerLiveVar();
-		Campaigns.registerLiveVar();
 		entities.registerLiveVars();
 		Products.registerLiveVar();
 		plugins.registerLiveVar();
@@ -498,7 +481,6 @@ var Core = function() {
 	var loadForms = function() {
 		log('Core', 'Loading multiple forms');
 
-		Campaigns.registerCreationForm();
 		entities.registerCreationForm();
 		LoginLib.registerLoginForm();
 	        Article.registerForms();
