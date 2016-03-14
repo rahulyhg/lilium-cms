@@ -7,6 +7,7 @@ var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var mailer = require('./postman.js');
 var imageResizer = require('./imageResizer.js');
+var sessionManager = require('./session.js');
 
 var Roles = new Object();
 
@@ -129,32 +130,31 @@ var Entities = module.exports = new function() {
             var saveTo = cli._c.server.base + "backend/static/uploads/" + image.picture;
 
             if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
-                imageResizer.resize(saveTo, image.picture, mime, cli, function(images) {
-                    var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
-                    var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
+
+                imageResizer.resize(saveTo, image.picture, mime, cli, function(images){
+
+					var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
+					var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
                     // Save it in database
-                    db.update(cli._c, 'entities', {
-                        _id: cli.userinfo.userid
-                    }, {
-                        avatarURL: avatarURL,
-                        avatarID: avatarID
-                    }, function(err, result) {
+                    db.update(cli._c, 'entities', {_id : cli.userinfo.userid}, {avatarURL : avatarURL, avatarID : avatarID}, function (err, result){
+
                         // Update session
-                        var sessToken = cli.session.token;
-                        var session = sessionManager.getSessionFromSID(sessToken);
+						var sessToken = cli.session.token;
+						var session = sessionManager.getSessionFromSID(sessToken);
 
                         session.data.avatarID = avatarID;
-                        session.data.avatarURL = avatarURL;
+						session.data.avatarURL = avatarURL;
 
-                        cli.session.data.avatarURL = avatarURL;
-                        cli.session.data.avatarID = avatarID;
+						cli.session.data.avatarURL = avatarURL;
+						cli.session.data.avatarID = avatarID;
 
-                        sessionManager.saveSession(cli, function() {
-                            cli.sendJSON({
-                                redirect: '',
-                                success: true
-                            });
-                        });
+						sessionManager.saveSession(cli, function() {
+
+							cli.sendJSON({
+	                            redirect : '',
+	                            success : true
+	                        });
+						});
                     });
 
                 });
