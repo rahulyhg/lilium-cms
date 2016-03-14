@@ -10,7 +10,7 @@ var db = require('./includes/db.js');
 var scheduler = require('./scheduler.js');
 var hooks = require('./hooks');
 
-var _priv = {
+var _priv = _c.default().dfp || {
 	client_id : "906088923998-mlch13qpsds3cg92kd2ue6prhdhle84n.apps.googleusercontent.com",
 	client_secret : "nIuS1lRrl02_JIAtLAJ9EElM",
 	redirect_url : "http://localhost:8080",
@@ -22,8 +22,6 @@ var _priv = {
 	network_code : "1020360",
 	app_name : "Lilium CMS"
 };
-
-var _priv = _c.default().dfp || {};	
 
 /*
 var oauth2Client = new OAuth2(_priv.client_id, _priv.client_secret, _priv.redirect_url);

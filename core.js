@@ -35,6 +35,7 @@ var GC = undefined;
 var scheduler = undefined;
 var Role = undefined;
 var filelogic = undefined;
+var dashboard = undefined;
 
 var log = require('./log.js');
 
@@ -77,6 +78,7 @@ var Core = function() {
 		scheduler = require('./scheduler.js');
 		Role = require('./role.js');
 		filelogic = require('./filelogic.js');
+		dashboard = require('./dashboard.js');
 		log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
 	};
 
@@ -120,7 +122,7 @@ var Core = function() {
 		
 		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
 			cli.touch("admin.GET.dashboard");
-			admin.handleGETDashboard(cli);
+			dashboard.handleGET(cli);
 		});
 
 		admin.registerAdminEndpoint('article', 'GET', function(cli){
@@ -556,6 +558,12 @@ var Core = function() {
 		});
 	};
 
+	var loadLMLLibs = function() {
+		hooks.trigger('will_load_core_lml_libs');
+		dashboard.registerLMLLib();
+		hooks.trigger('loaded_core_lml_libs');
+	};	
+
 	var redirectIfInit = function(resp, cb) {
 		if (resp) {
 			resp.writeHead(200,
@@ -587,6 +595,7 @@ var Core = function() {
 			loadDFP();
 			loadGlobalPetals();
 			loadRequestHandler();
+			loadLMLLibs();
 			initForms();
 
 			loadPlugins(function(){

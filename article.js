@@ -184,8 +184,6 @@ var Article = function() {
             });
         });
 
-
-
         // Return article object from DB
     };
 

@@ -92,7 +92,8 @@
 			log('Advertiser', 'Adding fields to settings form');
 			pkg.form.add('ad-server-sep', 'title', {displayname:"Ad Server"})
 			.add('adserver.publicaddr', 'text', {displayname:"Public Address with port (client requests)"},{required:false})
-			.add('adserver.privateaddr', 'text', {displayname:"Private Address with port (lilium requests)"},{required:false})
+			.add('adserver.privateaddr', 'text', {displayname:"Private Address with port (handshake)"},{required:false})
+			.add('adserver.bridgeaddr', 'text', {displayname:"Bridge Address with port (Lilium requests)"},{required:false})
 			.add('adserver.keyone', 'text', {displayname:"First Private key"},{required:false})
 			.add('adserver.keytwo', 'text', {displayname:"Second Private key"},{required:false});
 		});
@@ -121,69 +122,87 @@
                  });
 
                  hooks.bind('settings_saved', 500, function(dat) {
-                     pingAdServer(function() {
-                         
+                     pingAdServer(function(valid) {
+                         log('Hooks', 'Setting saved event was caught with valid flag : ' + valid);
                      });
                  });
-	     }
+	     };
+
+             var createAdServerHandshake = function(cb) {
+                 var cconf = conf.default();
+                 var split = cconf.adserver.privateaddr.split(':');
+                 var privAddr = split[0].replace(/\/\//g, '');
+                 var privPort = split[1] || 5141;
+
+                 var req = http.request({
+                     host : privAddr,
+                     port : privPort,
+                     headers : {
+                         "x-lml-adkeyset" : cconf.adserver.keyone,
+                         "x-lml-addoublelock" : cconf.adserver.keytwo
+                     }
+                 }, function(response) {
+                     cb(response);
+                 });
+
+                 req.on('error', function(err) {
+                     log('Advertiser', "AdServer is unreachable : " + err);
+                     cb(undefined, err);
+                 });
+
+                 req.end('', 'utf8');
+             };
+
+             var makeAdServerRequest = function(method, data, cb) {
+                 log('Adversiter', 'Sending POST to AdServer using method : ' + method);
+                 var cconf = conf.default();
+                 var split = cconf.adserver.bridgeaddr.split(':');
+                 var privAddr = split[0].replace(/\/\//g, '');
+                 var privPort = split[1] || 5142;
+
+                 var confReq = http.request({
+                     host : privAddr,
+                     path : "/" + method,
+                     port : privPort,
+                     method : "POST"
+                 }, function(confResp, err) {
+                     if (!err && confResp.statusCode == 200) {
+                         log("Advertiser", "AdServer responded with OK flag");
+                     } else {
+                         log("Advertiser", "AdServer responded with status code " + confResp.statusCode);
+                     } 
+
+                     cb(confResp, err);
+                 });
+
+                 confReq.on('error', function(err) {
+                     log("Advertiser", "Error handled while executed method '" + method + "' : " + err);
+                     cb(undefined, err);
+                 });
+
+                 confReq.write(JSON.stringify(data));
+                 confReq.end();     
+             };
 
              var pingAdServer = function(cb) {
                  log("Advertiser", "Contacting AdServer");
                  var cconf = conf.default();
 
                  if (cconf.adserver && cconf.adserver.privateaddr) {
-                     var split = cconf.adserver.privateaddr.split(':');
-                     var privAddr = split[0].replace(/\/\//g, '');
-                     var privPort = split[1] || 5141;
-
-                     var req = http.request({
-                         host : privAddr,
-                         path : "/handshake",
-                         port : privPort,
-                         headers : {
-                             "x-lml-adkeyset" : cconf.adserver.keyone,
-                             "x-lml-addoublelock" : cconf.adserver.keytwo
-                         }
-                     }, function(response) {
-                         if (response.statusCode == 202) {
+                     createAdServerHandshake(function(response, err) {
+                         if (!err && response.statusCode == 202) {
                              log("Advertiser", "AdServer handshake was successfully created. Sending configs");
-                             var confReq = http.request({
-                                 host : privAddr,
-                                 path : "/setDatabaseConfig",
-                                 port : privPort,
-                                 method : "POST"
-                             }, function(confResp) {
-                                 if (confResp.statusCode == 200) {
-                                     log("Advertiser", "AdServer Database configs were set");
-                                 } else {
-                                     log("Advertiser", "AdServer responded with status code " + confResp.statusCode);
-                                 } 
-
-                                 cb();
+                             makeAdServerRequest('setDatabaseConfig', {dba:cconf.data}, function(response, err) {
+                                 cb(!err);
                              });
-
-                             confReq.on('error', function(err) {
-                                 log("Advertiser", "Error handled while sending configs : " + err);
-                                 cb();
-                             });
-
-                             confReq.write(JSON.stringify({dba:cconf.data}));
-                             confReq.end();
                          } else {
                              log("Advertiser", "Could not create handshake with AdServer");
-                             cb();
+                             cb(false);
                          }
                      });
-
-                     req.on('error', function(err) {
-                         log('Advertiser', "AdServer is unreachable : " + err);
-                         cb();
-                     });
-
-                     req.end('', 'utf8');
                  } else {
                      log("Adversiter", "AdServer is not configured yet.");
-                     cb();
+                     cb(false);
                  }
              };
 
