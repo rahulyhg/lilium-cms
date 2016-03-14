@@ -473,8 +473,16 @@ var Core = function() {
 
 	var loadDFP = function(cb) {
 		log("DFP", "Loading core user");
+		dfp.registerHooks();
 		dfp.createUser();
 		dfp.scheduleDeepCopy();
+
+		setTimeout(function() {
+			log('DFP', 'Running deep fetch async');
+			dfp.deepServerFetch(function() {
+				log('DFP', 'Deep fetch finished');
+			});
+		}, 1);
 
 		if (_c.default.env == 'dev') {
 			dfp.createDevEnv();

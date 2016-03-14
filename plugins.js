@@ -123,21 +123,27 @@ var Plugins = function() {
 					throw new Error("[PluginException] Could not find any info on plugin with identifier " + identifier);
 				}
 
-				var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
-				var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
-
-				RegisteredPlugins[identifier] = pluginInstance;
-
-				db.update(_c.default(), 'plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
-					if (typeof pluginInstance.register !== 'function') {
-						log("Plugins", 'Plugin has no method "register"');
-						callback();
-					} else {
-						pluginInstance.register(_c, info, function(){
-							return callback();
-						});
-					}
-				}, true, true);
+				try {
+					var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
+					var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
+	
+					RegisteredPlugins[identifier] = pluginInstance;
+	
+					db.update(_c.default(), 'plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
+						if (typeof pluginInstance.register !== 'function') {
+							log("Plugins", 'Plugin has no method "register"');
+							callback();
+						} else {
+							log('Plugins', "Calling register method on plugin with identifier " + identifier);
+							pluginInstance.register(_c, info, function(){
+								return callback();
+							});
+ 						}
+ 					}, true, true);
+				} catch (ex) {
+					log("Plugins", "Could not register plugin [" + identifier + "] because of an exception : " + ex);
+					console.log(ex.stack);
+				}
 			});
 		}
 	};

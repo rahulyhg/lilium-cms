@@ -2,6 +2,7 @@ var _c = require('./config.js');
 var filelogic = require('./filelogic.js');
 var fileserver = require('./fileserver.js');
 var forms = require('./formBuilder.js');
+var hooks = require('./hooks.js');
 
 var Settings = function() {
 	this.handleGET = function(cli) {
@@ -16,6 +17,7 @@ var Settings = function() {
 			var dat = cli.postdata.data;
 			delete dat.form_name;
 
+			hooks.fire('settings_will_save', dat);
 			for (var key in dat) {
 				var val = dat[key];
 				var keyLevel = key.split('.');
@@ -33,6 +35,7 @@ var Settings = function() {
 			}
 
 			_c.saveConfigs(cli._c, function() {
+				hooks.fire('settings_saved', dat);
 				cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?updated=true", false);
 			});
 		} else {
