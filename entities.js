@@ -7,7 +7,6 @@ var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var mailer = require('./postman.js');
 var imageResizer = require('./imageResizer.js');
-var sessionManager = require('./session.js');
 
 var Roles = new Object();
 
@@ -139,6 +138,7 @@ var Entities = module.exports = new function() {
                     db.update(cli._c, 'entities', {_id : cli.userinfo.userid}, {avatarURL : avatarURL, avatarID : avatarID}, function (err, result){
 
                         // Update session
+                        var sessionManager = require('./session.js');
 						var sessToken = cli.session.token;
 						var session = sessionManager.getSessionFromSID(sessToken);
 

@@ -95,7 +95,9 @@ var Notification = function() {
                     // Bypass session manager taking only a cli
                     var cli = {};
                     cli.session = session;
-
+                    cli._c = {};
+                    cli._c.id = session.data.site;
+                    
                     // Save it
                     sessionManager.saveSession(cli, function() {});
 
@@ -106,7 +108,8 @@ var Notification = function() {
                     // Bypass session manager taking only a cli
                     var cli = {};
                     cli.session = session;
-
+                    cli._c = {};
+                    cli._c.id = session.data.site;
                     // Save it
                     sessionManager.saveSession(cli, function() {});
                 });
@@ -242,7 +245,7 @@ var Notification = function() {
         }
     };
 
-    this.notifyUser = function(userID, notification) {
+    this.notifyUser = function(userID, dbId, notification) {
         //Check if user will receive notification
         notification.interacted = false;
         notification.userID = db.mongoID(userID);
@@ -254,7 +257,7 @@ var Notification = function() {
             "data._id": notification.userID
         }, function(err, arr) {
             if (arr && arr[0]) {
-                insertNotificationInSession(arr[0].token, notification);
+                insertNotificationInSession(arr[0].token, notification, dbId);
             }
         })
 
@@ -270,7 +273,7 @@ var Notification = function() {
         }
     };
 
-    var insertNotificationInSession = function(sessionId, notification) {
+    var insertNotificationInSession = function(sessionId, notification, dbId) {
         var session = sessionManager.getSessionFromSID(sessionId);
 
         if (session) {
@@ -279,6 +282,8 @@ var Notification = function() {
             // Bypass session manager taking only a cli
             var cli = {};
             cli.session = session;
+            cli._c = {};
+            cli._c.id = dbId;
             // Save it
             sessionManager.saveSession(cli, function() {
             });

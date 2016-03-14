@@ -15,7 +15,7 @@ var _cachedSites = new Array();
 var SiteInitializer = function(conf) {
 	var conf = conf;
 	var rootpath = __dirname;
-	
+
 	var loadHTMLStructure = function(done) {
 		fileserver.createDirIfNotExists(conf.server.html, function(valid) {
 			if (valid) {
@@ -26,7 +26,7 @@ var SiteInitializer = function(conf) {
 			} else {
 				log('FileServer', 'Error validated html directory');
 			}
-	
+
 			done();
 		}, true);
 	};
@@ -47,7 +47,7 @@ var SiteInitializer = function(conf) {
 		to =   conf.server.html + '/plugins';
 		rootDir = conf.server.base + 'plugins/';
 		fileserver.createSymlinkSync(rootDir, to);
-	
+
 		done();
 	};
 
@@ -86,6 +86,7 @@ var SiteInitializer = function(conf) {
 		Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
 		Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin', conf.id);
+        Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
 		Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin', conf.id);
@@ -128,9 +129,9 @@ var Sites = function() {
 			filelogic.serveAdminLML(cli);
 		} else {
 			switch (param) {
-				case "launch" : 
+				case "launch" :
 					filelogic.serveAdminLML(cli);
-					break;	
+					break;
 				default :
 					cli.debug();
 			}
@@ -171,7 +172,7 @@ var Sites = function() {
 		if (postdata.serverhtml[postdata.serverhtml.length - 1] == "/") {
 			postdata.serverhtml = postdata.serverhtml.slice(0, -1);
 		}
-	
+
 		if (postdata.serverurl[postdata.serverurl.length - 1] == "/") {
 			postdata.serverurl = postdata.serverurl.slice(0, -1);
 		}
@@ -195,17 +196,17 @@ var Sites = function() {
 		conf.default.website.sitetitle = conf.default.info.project;
 		conf.default.emails.default = postdata.websiteemail || "";
 		conf.default.id = postdata.baseurl.replace(/\/\//g, '');
-	
+
 		var filename = postdata.baseurl.replace(/\/\//g, '').replace(/\//g, ' ');
 		var ws = fs.createWriteStream(__dirname + "/sites/" + filename + ".json", {
 			flags: 'w+',
 			defaultEncoding: 'utf8'
 		});
-	
+
 		ws.write(JSON.stringify(conf.default), 'utf8', function() {
 			ws.end();
 			config.registerConfigs(conf.default.id, conf.default);
-			
+
 			that.initializeWebsite(conf.default, done);
 		});
 	};
@@ -228,7 +229,7 @@ var Sites = function() {
 
 					fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function(siteInfo) {
 						var keyname = sitename.replace('//', '').replace(/\s/g, '/');
-						siteInfo.jsonfile = files[fileIndex];					
+						siteInfo.jsonfile = files[fileIndex];
 
 						config.registerConfigs(keyname, siteInfo);
 						if (sitename == 'default') {

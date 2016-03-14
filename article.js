@@ -78,7 +78,7 @@ var Article = function() {
                     // Generate LML page
                     filelogic.renderLmlPostPage(cli, "article",formBuilder.unescapeForm(result.ops[0]) , function(name) {
                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
-                        notifications.notifyUser(cli.userinfo.userid, {title: "Article is Live!", url: cli._c.server.url + '/' + formData.name, msg: "Your article is published. Click to see it live.", type: 'success'});
+                        notifications.notifyUser(cli.userinfo.userid, cli._c.id, {title: "Article is Live!", url: cli._c.server.url + '/' + formData.name, msg: "Your article is published. Click to see it live.", type: 'success'});
                         cli.sendJSON({
                             redirect: cli._c.server.url + "/" + name,
                             form: {
@@ -118,7 +118,7 @@ var Article = function() {
                         _id: id
                     }, formData , function(err, r) {
                         filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
-                            notifications.notifyUser(cli.userinfo.userid, {title: "Article is updated!", url: cli._c.server.url + '/' +  formData.name , msg: "Your changes are live. Click to see the live article.", type: 'success'});
+                            notifications.notifyUser(cli.userinfo.userid, cli._c.id, {title: "Article is updated!", url: cli._c.server.url + '/' +  formData.name , msg: "Your changes are live. Click to see the live article.", type: 'success'});
                         });
 
                         cli.sendJSON({
