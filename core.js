@@ -34,6 +34,7 @@ var GC = undefined;
 var scheduler = undefined;
 var Role = undefined;
 var filelogic = undefined;
+var category = undefined;
 
 var log = require('./log.js');
 
@@ -74,6 +75,7 @@ var Core = function() {
 		scheduler = require('./scheduler.js');
 		Role = require('./role.js');
 		filelogic = require('./filelogic.js');
+		category = require('./category.js');
 		log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
 	};
 
@@ -184,6 +186,16 @@ var Core = function() {
             cli.touch('admin.GET.me');
             filelogic.serveAdminLML(cli, false);
         });
+
+		admin.registerAdminEndpoint('categories', 'POST', function(cli) {
+			cli.touch('admin.POST.me');
+			category.handlePOST(cli);
+		});
+
+		admin.registerAdminEndpoint('categories', 'GET', function(cli) {
+			cli.touch('admin.GET.me');
+			category.handleGET(cli, false);
+		});
 
 		hooks.fire('endpoints');
 		log('Endpoints', 'Loaded endpoints');

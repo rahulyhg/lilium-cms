@@ -5,8 +5,7 @@
 			baseurl += config.default.paths.admin;
 			baseurl += "/";
 		$}
-		<h1>List of articles</h1>
-		<a href="{=baseurl}article/new">Add an article</a>
+		<h1>List of articles<a class='fab' href="{=baseurl}article/new">+</a></h1>
 		<main class="entities-main">
 			<ul class="entity-list">
 				{*content(template:"articles-list-item")}

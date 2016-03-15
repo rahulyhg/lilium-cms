@@ -77,6 +77,25 @@ var Forms = function() {
             })
             .add('create', 'submit');
 
+        formBuilder.registerFormTemplate('category')
+            .add('name', 'text', {
+                displayname: "Name"
+            })
+            .add('displayname', 'text', {
+                displayname: "Display Name"
+            })
+            .add('description', 'text', {
+                displayname: "Description"
+            })
+
+        formBuilder.createForm('category_create')
+            .addTemplate('category')
+            .add('create', 'submit');
+
+        formBuilder.createForm('category_edit')
+            .addTemplate('category')
+            .add('create', 'submit');
+
         formBuilder.registerFormTemplate('article_base')
             .add('title', 'text', {
                 placeholder: true,
@@ -89,9 +108,13 @@ var Forms = function() {
                 nolabel: true
             });
 
-        formBuilder.createForm('media_create', {class : []})
+        formBuilder.createForm('media_create', {
+                class: []
+            })
             .add('File', 'file')
-            .add('publish', 'submit', {classes : ['lml-button']});
+            .add('publish', 'submit', {
+                classes: ['lml-button']
+            });
     }
 };
 

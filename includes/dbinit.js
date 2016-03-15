@@ -3,7 +3,8 @@ var mongoDocuments = {
 		"entities", "roles", "plugins", "themes", "config", "compiledfiles",
 		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache",
 		"lilium", "uploads", "cachedFiles", "campaigns", "products", "dfp",
-		"producttypes", "productpricebases", "changerequests", "campaignStatuses", "notifications"
+		"producttypes", "productpricebases", "changerequests", "campaignStatuses", "notifications",
+		"categories"
 	]
 };
 

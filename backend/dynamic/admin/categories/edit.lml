@@ -1,0 +1,10 @@
+{#config;forms}
+		<h1>Edit Category</h1>
+
+		<main class="entities-main">
+			<ul class="entity-list">
+				{*categories.{?1}(sourceof:"category_edit")}
+			</ul>
+
+    			{=forms.render('category_edit')}
+		</main>
