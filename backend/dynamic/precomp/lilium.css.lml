@@ -37,6 +37,7 @@
 	fontdir += "/static/fonts/font-awesome";
 $}
 
+
 @font-face {
   font-family: 'Raleway';
   font-weight: 100;
@@ -1015,6 +1016,8 @@ div#picture-list img {
 .medias-actions > button:nth-of-type(1) {
     border-bottom: 1px solid #fff;
 }
+
+/* Fab buttons */
 h1 > a.fab {
     float: right;
     background-color: {=actioncolor};
@@ -1032,4 +1035,9 @@ h1 > a.fab {
 
 h1 > a.fab:hover {
     background-color: {=hovercolor};
+}
+
+/* Modal */
+.modal-dialog {
+  padding-top: 30px;
 }

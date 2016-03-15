@@ -6,9 +6,18 @@
  $}
 <script>
     var deleteMedia = function(id) {
-        $.post('{=config.default.server.url}/admin/media/delete/' + id, function(data) {
-            liliumcms.refresh();
+        var url = '{=baseurl}' + this.url;
+
+        $('#confirm_media .modal-body img').attr('src', url);
+        $('#confirm_media').modal();
+
+        // Hide modal if "Okay" is pressed
+        $('#confirm_media .btn-ok').click(function() {
+            $.post('{=config.default.server.url}/admin/media/delete/' + id, function(data) {
+                liliumcms.refresh();
+            });
         });
+
     }
 
     var copyLink = function(id) {
@@ -28,6 +37,12 @@
                     // copy text
                     document.execCommand('copy');
                     element.blur();
+
+                    liliumcms.notify({
+                        message: 'Copied to clipboard!',
+                        type: 'success',
+                        title: 'Media'
+                    })
                 } catch (err) {
                     window.open(url, '_blank');
                 }

@@ -89,9 +89,9 @@ var SiteInitializer = function(conf) {
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
 		Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/bower/ckeditor/samples/css/samples.css", 500, 'admin', conf.id);
 		Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin', conf.id);
+
 
 		Precompiler.precompile(conf, done);
 	};
