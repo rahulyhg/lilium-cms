@@ -426,41 +426,6 @@ var Entities = module.exports = new function() {
         return allowed;
     };
 
-    this.registerFormTemplates = function() {
-        formbuilder.registerFormTemplate('entity_create')
-            .add('username', 'text', {
-                displayname: "Username"
-            })
-            .add('password', 'password', {
-                displayname: "Password"
-            })
-            .add('firstname', 'text', {
-                displayname: "First name"
-            })
-            .add('lastname', 'text', {
-                displayname: "Last name"
-            })
-            .add('email', 'text', {
-                displayname: "Email"
-            })
-            .add('displayname', 'text', {
-                displayname: "Display name"
-            })
-            .add('roles', 'livevar', {
-                endpoint: 'roles',
-                tag: 'select',
-                template: 'option',
-                title: 'role',
-                props: {
-                    'value': 'name',
-                    'html': 'displayname',
-                    'header': 'Select One',
-                },
-                displayname: "Initial role"
-            })
-            .add('create', 'submit');
-    };
-
     this.registerCreationForm = function() {
 
         formbuilder.createForm('entity_create')

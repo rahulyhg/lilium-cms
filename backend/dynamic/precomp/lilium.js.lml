@@ -1316,13 +1316,13 @@ var LiliumCMS = function() {
     this.awesomestrapper = new AwesomeStrapper();
     this.formParser = new FormParser();
     this.livevars = new LiveVars();
-    ckeditor = new CKEditor();
+    ckeditor = typeof CKEditor !== 'undefined' ? new CKEditor() : undefined;
     this.adminmenu = new AdminMenu();
     this.formbeautifier = new FormBeautifier();
 
     document.addEventListener('livevarsRendered', function(e) {
         liliumcms.queryparams.parseURL();
-        ckeditor.initEditor();
+        ckeditor ? ckeditor.initEditor() : false ;
         liliumcms.formbeautifier.beautify();
         liliumcms.formParser.init();
         liliumcms.adminmenu.init();

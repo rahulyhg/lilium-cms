@@ -11,7 +11,7 @@ var dateFormat = require('dateformat');
 var FileServer = function() {
     this.workDir = function() {
         return __dirname;
-    }; 
+    };
 
     this.fileExists = function(fullpath, cb) {
         fs.lstat(fullpath, function(err, stats) {
@@ -67,13 +67,17 @@ var FileServer = function() {
 
     this.createSymlinkSync = function(src, dest) {
 	try {
-            var stat = fs.statSync(dest);
-        
-            if (!stat.isDirectory()) {
-                fs.symlinkSync(src, dest);
-            }
+            this.dirExists(dest, function(exists) {
+                if (!exists) {
+                    var stat = fs.statSync(dest);
+
+                    if (!stat.isDirectory()) {
+                        fs.symlinkSync(src, dest);
+                    }
+                }
+            })
+
         } catch (ex) {
-            fs.symlinkSync(src, dest);
         }
     };
 

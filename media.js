@@ -67,10 +67,6 @@ var Media = function() {
 	this.upload = function(cli) {
 		cli.touch('media.new');
 
-      if (!formBuilder.isAlreadyCreated('media_create')) {
-        createMediaForm();
-      }
-
       if (cli.method == 'POST') {
         var form = formBuilder.handleRequest(cli);
         var response = formBuilder.validate(form, true);
@@ -87,10 +83,10 @@ var Media = function() {
 
                     // Save it in database
                     db.insert(cli._c, 'uploads', {path : saveTo, url : image.File, name : "Full Size", size : imageSize(saveTo), type : 'image', sizes: images}, function (err, result){
-
                         cli.sendJSON({
                             redirect : '' ,
-                            success : true
+                            success : true,
+							picture: result.ops[0]
                         });
 
                     });
@@ -209,12 +205,8 @@ var Media = function() {
 		}, ["uploads"]);
 	}
 
-	var createMediaForm = function() {
-    formBuilder.createForm('media_create')
-      .add('File', 'file')
-      .add('publish', 'submit');
-  }
-	var init = function() {};
+	var init = function() {
+	};
 
 	init();
 }

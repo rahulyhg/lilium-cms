@@ -352,6 +352,14 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	padding: 15px;
 }
 
+.lml-button {
+	background-color: {=actioncolor};
+	color: #EEE;
+	font-size: 18px;
+    padding: 10px;
+	border: none;
+}
+
 /* PushTables */
 .lmlpushtable {
 	-webkit-box-sizing: border-box;
@@ -945,4 +953,24 @@ a.button-link:active {
 }
 .progress {
     display: none;
+}
+
+/* CKEDITOR */
+.cke_top {}
+.cke_button__imgbrowser_icon {
+    background: url(/bower/ckeditor/skins/moono/icons.png) no-repeat 0 -1008px!important;
+}
+
+#picture-list {
+    width: 800px;
+    height: 400px;
+}
+
+div#picture-list img {
+    margin : 2px;
+    float: left;
+}
+.selectedPicture {
+  border: 2px solid #000;
+  margin: 0px !important;
 }

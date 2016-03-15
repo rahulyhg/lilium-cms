@@ -63,7 +63,6 @@ var Core = function() {
 		Products = require('./products');
 		Frontend = require('./frontend.js');
 		notification = require('./notifications.js');
-		Forms = require('./forms');
 		sessions = require('./session.js');
 		Handler = require('./handler.js');
 		ClientObject = require('./clientobject.js');
@@ -474,8 +473,9 @@ var Core = function() {
 	};
 
 	var initForms = function() {
+		Forms = require('./forms');
+
         	Forms.init();
-		entities.registerFormTemplates();
 	};
 
 	var loadForms = function() {
@@ -528,6 +528,7 @@ var Core = function() {
 			if (exists) {
 				fss.fileExists(currentRoot + "/sites/default.json", function(exists) {
 					if (exists) {
+						initForms();
 						sites.loadSites(loadEverything);
 					} else {
 						prepareDefaultSiteCreation(loadEverything);
@@ -570,7 +571,6 @@ var Core = function() {
 			loadDFP();
 			loadGlobalPetals();
 			loadRequestHandler();
-			initForms();
 
 			loadPlugins(function(){
 			loadRoles(function() {

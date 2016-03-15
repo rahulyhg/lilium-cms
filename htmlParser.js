@@ -18,13 +18,13 @@ var HtmlParser = function() {
     }
 
     // Name
-    htmlForm += form.name ? "name='" + form.name + "' " : "";
+    htmlForm += form.name ? 'name="' + form.name + '"' : "";
 
     //id
     htmlForm += 'id="' + (form.attr.id ? form.attr.id  : form.name) + '" ';
 
     // Method
-    htmlForm += form.attr.method ? "method='" + form.attr.method.toUpperCase() + "' " : "POST";
+    htmlForm += form.attr.method ? 'method="' + form.attr.method.toUpperCase() + '"' : 'method="POST"';
 
     // Action
     htmlForm += form.attr.action ? "action='" + form.attr.action + "' " : "";
@@ -43,7 +43,7 @@ var HtmlParser = function() {
         htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') +
           ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || "field-") +
           (field.attr.wrapperCssSuffix || field.type) +
-          (' lmlform-fieldwrapper-' + field.type) + 
+          (' lmlform-fieldwrapper-' + field.type) +
           ' lmlform-fieldwrapper">';
       }
 
@@ -107,7 +107,7 @@ var HtmlParser = function() {
     htmlForm += submitButton;
 
     // Close form tag
-    htmlForm += "\n</form>";
+    htmlForm += "</form>";
 
     var deps = form.attr.dependencies;
     if (deps) {
@@ -293,6 +293,7 @@ var HtmlParser = function() {
   var parseSubmitType = function(field) {
     var input = '<input type="submit" ';
     input += field.attr.value ? 'value="' + field.attr.value + '" ' : ' value="' + field.name + '" ';
+    input += 'class="v_validate ' + parseClasses(field) + '" ';
     input += '/>'
     return input;
   }
@@ -324,7 +325,7 @@ var HtmlParser = function() {
     attributes += field.requirements.required ? ' required ' : '';
 
     // Classes
-    attributes += 'class="v_validate, ' + parseClasses(field) + '" ';
+    attributes += 'class="v_validate ' + parseClasses(field) + '" ';
 
     // Data-...
     for (var key in field.attr.data ) {
@@ -338,7 +339,7 @@ var HtmlParser = function() {
 
     if (typeof field.attr.classes !== 'undefined') {
       for (var index in field.attr.classes) {
-        classHtml += ',' + field.attr.classes[index];
+        classHtml += ' ' + field.attr.classes[index];
       }
     }
 
