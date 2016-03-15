@@ -974,3 +974,62 @@ div#picture-list img {
   border: 2px solid #000;
   margin: 0px !important;
 }
+
+/* Media */
+.medias-item-list {
+    float: left;
+    list-style: none;
+}
+.medias-item-list {
+    width: 150px;
+    height: 150px;
+}
+.medias-item-list:hover .medias-actions{
+    display:block;
+}
+.medias-item-list .medias-actions {
+    display:none;
+    float: left;
+    position: relative;
+    left: 0px;
+    top: 0px;
+    width: 150px;
+    height: 150px;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 1000;
+    margin-bottom: -150px;
+    text-align: center;
+    border: 1px solid #fff;
+}
+.medias-actions > button {
+    background: initial;
+    color: #fff;
+    vertical-align: middle;
+    /* text-align: center; */
+    height: 50%;
+    width: 100%;
+}
+.medias-actions > button:hover {
+    background-color: rgba(0,0,0,0.5);
+}
+.medias-actions > button:nth-of-type(1) {
+    border-bottom: 1px solid #fff;
+}
+h1 > a.fab {
+    float: right;
+    background-color: {=actioncolor};
+    color: #fff;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    text-align: center;
+    line-height: 45px;
+    text-decoration: none;
+    top: 30px;
+    position: relative;
+    font-size: 50px;
+}
+
+h1 > a.fab:hover {
+    background-color: {=hovercolor};
+}

@@ -1,12 +1,55 @@
 {#config}
+{$ var baseurl = config.default.server.url;
+    baseurl += "/";
+    baseurl += config.default.paths.uploads;
+    baseurl += "/";
+ $}
 <script>
-	var deleteMedia = function(id) {
-		$.post('{=config.default.server.url}/admin/media/delete/' + id, function(data) {
-			liliumcms.refresh();
-		});
-	}
+    var deleteMedia = function(id) {
+        $.post('{=config.default.server.url}/admin/media/delete/' + id, function(data) {
+            liliumcms.refresh();
+        });
+    }
+
+    var copyLink = function(id) {
+        var url = 'http:{=baseurl}' + this.url;
+        if (document.queryCommandSupported('Copy')) {
+
+            var range = document.createRange();
+
+            var textarea = document.createElement('textarea');
+            var element = $('#copyLink').get(0);
+
+            element.value = url;
+
+            if (element.select) {
+                try {
+                    element.select();
+                    // copy text
+                    document.execCommand('copy');
+                    element.blur();
+                } catch (err) {
+                    window.open(url, '_blank');
+                }
+            } else {
+                window.open(url, '_blank');
+            }
+
+        } else {
+            window.open(url, '_blank');
+        }
+
+    }
 
     $(document).ready(function() {
+
+        document.addEventListener('livevarsRendered', function() {
+            // Change copy to view
+            if (!document.queryCommandSupported('Copy')) {
+                $('.medias-actions button:first-of-type').html('View Media');
+            }
+        })
+
         $('form').on('submit', function(e) {
             var bar = $('.progress .progress-bar');
             bar.removeClass('progress-bar-danger');
@@ -19,18 +62,18 @@
             var fileInput = $(this).find(":file")[0];
 
             var file = fileInput.files[0];
-            var form_name =  $(this).find("[name='form_name']").val();
+            var form_name = $(this).find("[name='form_name']").val();
             var formData = new FormData();
 
             formData.append($(fileInput).attr('name'), file);
             formData.append('form_name', form_name);
 
             var req = new XMLHttpRequest();
-            req.open('post', $(this).attr('action')|| '', true);
+            req.open('post', $(this).attr('action') || '', true);
 
             req.upload.onprogress = function(e) {
                 if (e.lengthComputable) {
-                    var uploadPerc = (e.loaded / e.total) * 100 > 40 ? 40 :(e.loaded / e.total) * 100 ;
+                    var uploadPerc = (e.loaded / e.total) * 100 > 40 ? 40 : (e.loaded / e.total) * 100;
                     bar.css('width', uploadPerc + '%');
                     if (uploadPerc >= 40) {
                         bar.text('Resizing pictures...');
@@ -52,11 +95,19 @@
                     bar.addClass('progress-bar-success');
                     bar.text('Upload Success!');
 
-                    liliumcms.notify({message: 'Upload Success', type: 'success', title: 'Media'});
+                    liliumcms.notify({
+                        message: 'Upload Success',
+                        type: 'success',
+                        title: 'Media'
+                    });
 
                 } else {
                     bar.addClass('progress-bar-danger');
-                    liliumcms.notify({message: 'There was a problem uploading your media', type: 'danger', title: 'Media'})
+                    liliumcms.notify({
+                        message: 'There was a problem uploading your media',
+                        type: 'danger',
+                        title: 'Media'
+                    })
                 }
 
             };
@@ -65,5 +116,4 @@
 
         });
     });
-
 </script>

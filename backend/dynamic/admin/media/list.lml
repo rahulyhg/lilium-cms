@@ -6,8 +6,7 @@
 			baseurl += config.default.paths.admin;
 			baseurl += "/";
 		$}
-		<h1>List of medias</h1>
-		<a href="{=baseurl}media/upload">Add a media</a>
+		<h1>List of medias <a class='fab' href='{=baseurl}media/upload'>+</a></h1>
 		<main class="medias-main">
 			<ul class="medias-list">
 				{*uploads(template:"medias-list-item")}
@@ -16,14 +15,22 @@
 
 		<lml:template id="medias-list-item">
 			<li class="medias-item-list">
-				<lml:tobject data-nodetype="img" data-key="sizes.thumbnail.url"></lml:tobject>
 				<div class="medias-actions">
 					<lml:tobject data-nodetype="button"
-						     data-bind="click"
-						     data-action="deleteMedia"
-						     data-actionparamkey="_id">
+							 data-bind="click"
+							 data-action="copyLink"
+							 data-actionparamkey="_id">
+							Copy Link
+					</lml:tobject>
+					<lml:tobject data-nodetype="button"
+							 data-bind="click"
+							 data-action="deleteMedia"
+							 data-actionparamkey="_id">
 							Delete
 					</lml:tobject>
 				</div>
+				<lml:tobject data-nodetype="img" data-key="sizes.thumbnail.url"></lml:tobject>
+
 			</li>
 		</lml:template>
+		<input type=text id='copyLink' style='position: fixed; top : 9999999px; left: 999999px'>
