@@ -81,7 +81,6 @@ var SiteInitializer = function(conf) {
 		Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
 		Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
 		Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
-		Frontend.registerJSFile(base + "bower_components/ckeditor/ckeditor.js", 600, "admin", conf.id);
 		Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
 		Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
 		Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
