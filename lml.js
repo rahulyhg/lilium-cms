@@ -110,10 +110,10 @@ var LML = function() {
 
 				if (Petals.isRegistered(split[currentIndex])) {
 					fullpath = Petals.get(split[currentIndex]).filepath;
-				} else if (0 == split[currentIndex].indexOf('%')) {
+				} else if (split[currentIndex][0] == '%') {
 					fullpath = split[currentIndex];
 					executeLML = false;
-				} else {
+				} else {	
 					fullpath = context.rootDir + "/" + split[currentIndex] + ".petal";
 				}
 

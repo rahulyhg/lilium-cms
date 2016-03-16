@@ -11,7 +11,7 @@ var Dashboard = function() {
 		pets = new Array();
 
 		for (var pos in _dashpetals) {
-			pets.push(Petal.get(_dashpetals[pos]));
+			pets.push(Petal.get(_dashpetals[pos]).id);
 		}
 
 		return pets;
