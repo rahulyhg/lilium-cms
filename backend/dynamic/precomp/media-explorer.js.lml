@@ -165,7 +165,7 @@ var mediaExplorer = function(closeUpload) {
                 if (closeOnUpload) {
                     $(modal).modal('hide');
                     // Add spinner
-                    $('.media_explorer_form').append('<i class="fa fa-spinner fa-spin"></i>');
+                    $('.media_explorer_form .fa-spinner').show();
                     $('.media_explorer_form .actions').hide();
 
                 }
@@ -225,11 +225,11 @@ var mediaExplorer = function(closeUpload) {
                             bar.addClass('progress-bar-success');
                             bar.text('Upload Success!');
                         } else {
-                            $('.media_explorer_form .fa').remove();
+                            $('.media_explorer_form .fa-spinner').hide();
                             $('.media_explorer_form .actions').show();
                             $('.media_explorer_form .actions .action-desc').text('Click to change image');
                             $('input#media-input').val(res.picture._id);
-                            $('.media_explorer_form').css('background-image', 'url(' + res.picture.sizes.thumbnail.url + ')');
+                            $('.media_explorer_form').css('background-image', 'url({=baseurl}uploads/' + res.picture.url + ')');
                         }
 
 

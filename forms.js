@@ -104,6 +104,7 @@ var Forms = function() {
             html += '<div>' + displayname + '</div>';
             html += '<div class="action-desc">Click to insert image</div>';
             html += '</div>';
+            html += '<i class="fa fa-spinner fa-spin" style="display:none"></i>';
             html += '</div>';
             return html;
         });
