@@ -35,6 +35,7 @@ var scheduler = undefined;
 var Role = undefined;
 var filelogic = undefined;
 var category = undefined;
+var dashboard = undefined;
 
 var log = require('./log.js');
 
@@ -76,6 +77,7 @@ var Core = function() {
 		Role = require('./role.js');
 		filelogic = require('./filelogic.js');
 		category = require('./category.js');
+		dashboard = require('./dashboard.js');
 		log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
 	};
 
@@ -119,7 +121,7 @@ var Core = function() {
 
 		admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
 			cli.touch("admin.GET.dashboard");
-			admin.handleGETDashboard(cli);
+			dashboard.handleGET(cli);
 		});
 
 		admin.registerAdminEndpoint('article', 'GET', function(cli){
@@ -476,8 +478,16 @@ var Core = function() {
 
 	var loadDFP = function(cb) {
 		log("DFP", "Loading core user");
+		dfp.registerHooks();
 		dfp.createUser();
 		dfp.scheduleDeepCopy();
+
+		setTimeout(function() {
+			log('DFP', 'Running deep fetch async');
+			dfp.deepServerFetch(function() {
+				log('DFP', 'Deep fetch finished');
+			});
+		}, 1);
 
 		if (_c.default.env == 'dev') {
 			dfp.createDevEnv();
@@ -552,6 +562,12 @@ var Core = function() {
 		});
 	};
 
+	var loadLMLLibs = function() {
+		hooks.trigger('will_load_core_lml_libs');
+		dashboard.registerLMLLib();
+		hooks.trigger('loaded_core_lml_libs');
+	};	
+
 	var redirectIfInit = function(resp, cb) {
 		if (resp) {
 			resp.writeHead(200,
@@ -583,6 +599,8 @@ var Core = function() {
 			loadDFP();
 			loadGlobalPetals();
 			loadRequestHandler();
+			loadLMLLibs();
+			initForms();
 
 			loadPlugins(function(){
 			loadRoles(function() {

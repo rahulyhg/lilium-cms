@@ -104,12 +104,16 @@ var LML = function() {
 				var fullpath = "";
 				var executeLML = true;
 
+				if (split[currentIndex][0] == "=") {
+					split[currentIndex] = LMLSlang.pulloutVar(context, split[currentIndex].substring(1));
+				}
+
 				if (Petals.isRegistered(split[currentIndex])) {
 					fullpath = Petals.get(split[currentIndex]).filepath;
-				} else if (0 == split[currentIndex].indexOf('%')) {
+				} else if (split[currentIndex][0] == '%') {
 					fullpath = split[currentIndex];
 					executeLML = false;
-				} else {
+				} else {	
 					fullpath = context.rootDir + "/" + split[currentIndex] + ".petal";
 				}
 

@@ -8,8 +8,9 @@ var Admin = require('./backend/admin.js');
 var livevars = require('./livevars.js');
 var db = require('./includes/db.js');
 var scheduler = require('./scheduler.js');
+var hooks = require('./hooks');
 
-var _priv = {
+var _priv = _c.default().dfp || {
 	client_id : "906088923998-mlch13qpsds3cg92kd2ue6prhdhle84n.apps.googleusercontent.com",
 	client_secret : "nIuS1lRrl02_JIAtLAJ9EElM",
 	redirect_url : "http://localhost:8080",
@@ -20,7 +21,7 @@ var _priv = {
 	version : "v201511",
 	network_code : "1020360",
 	app_name : "Lilium CMS"
-};	
+};
 
 /*
 var oauth2Client = new OAuth2(_priv.client_id, _priv.client_secret, _priv.redirect_url);
@@ -148,22 +149,24 @@ var LiliumDFP = function() {
 	};
 
 	this.deepServerFetch = function(callback) {
-		log('DFP', 'Preparing for deep orders copy');
-		dfpUser.getService('LineItemService', function(err, ser) {
-			ser.getLineItemsByStatement(new DFP.Statement('WHERE 1 = 1'), function(err, results) {
-				var arr = results.rval.results;
-
-				log('DFP', 'Running database queries');
-				db.remove(_c.default(), 'dfpcache', {}, function() {
-					db.insert(_c.default(), 'dfpcache', arr, function() {
-						log('DFP', 'Stored deep copy of '+arr.length+' DFP Orders');
-						if (callback) {
-							callback();
-						}
+		if (_priv.client_id) {
+			log('DFP', 'Preparing for deep orders copy');
+			dfpUser.getService('LineItemService', function(err, ser) {
+				ser.getLineItemsByStatement(new DFP.Statement('WHERE 1 = 1'), function(err, results) {
+					var arr = results.rval.results;
+	
+					log('DFP', 'Running database queries');
+					db.remove(_c.default(), 'dfpcache', {}, function() {
+						db.insert(_c.default(), 'dfpcache', arr, function() {
+							log('DFP', 'Stored deep copy of '+arr.length+' DFP Orders');
+							if (callback) {
+								callback();
+							}
+						});
 					});
 				});
 			});
-		});
+		}
 	};
 
 	this.scheduleDeepCopy = function() {
@@ -180,8 +183,30 @@ var LiliumDFP = function() {
 	};
 
 	this.createUser = function() {
-		dfpUser = new DFP.User(_priv.network_code, _priv.app_name, _priv.version);
-		dfpUser.setSettings(_priv);
+		if (_priv.client_id) {
+			dfpUser = new DFP.User(_priv.network_code, _priv.app_name, _priv.version);
+ 			dfpUser.setSettings(_priv);
+		}
+	};
+
+	this.registerHooks = function() {
+		log('DFP', 'Binding Setting form event');
+		hooks.bind('settings_form_bottom', 117, function(pkg) {
+			var form = pkg.form;
+			form.add('dfp_title', 'title', {displayname:"DFP"})
+			.add('dfp.client_id', 'text', {displayname:"Client ID"}, {required:false})
+			.add('dfp.client_secret', 'text', {displayname:"Client Secret"}, {required:false})
+			.add('dfp.redirect_url', 'text', {displayname:"Redirect URL"}, {required:false})
+			.add('dfp.scope', 'text', {displayname:"Scope"}, {required:false})
+			.add('dfp.code', 'text', {displayname:"Code"}, {required:false})
+			.add('dfp.access_token', 'text', {displayname:"Access Token"}, {required:false})
+			.add('dfp.refresh_token', 'text', {displayname:"Refresh Token"}, {required:false})
+			.add('dfp.version', 'text', {displayname:"API Version"}, {required:false})
+			.add('dfp.network_code', 'text', {displayname:"Network Code"}, {required:false})
+			.add('dfp.app_name', 'text', {displayname:"DFP App Name"}, {required:false})
+
+			log('DFP', 'Added fields to Settings form');
+		});
 	};
 
 	this.registerLiveVar = function() {

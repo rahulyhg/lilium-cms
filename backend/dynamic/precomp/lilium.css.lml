@@ -403,6 +403,52 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	padding-top: {=topbarheight};
 }
 
+.lmladminsidebardecowrapper {
+overflow: hidden;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.lmladminsidebardeco {
+	display: block;
+    	background-color: #000;
+    	position: absolute;
+    	bottom: 0;
+    	height: 600px;
+    	left: 0;
+    	right: 0;
+    	opacity: 0.05;
+}
+
+
+.lmladminsidebardeco:nth-child(1) {
+	-webkit-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+	-moz-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+	-ms-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+	-o-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+	transform: translateX(79px) translateY(86px) rotateZ(25deg);
+}
+
+.lmladminsidebardeco:nth-child(2) {
+    	-webkit-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+    	-moz-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+    	-ms-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+    	-o-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+    	transform: translateX(103px) translateY(126px) rotateZ(56deg);
+}
+
+.lmladminsidebardeco:nth-child(3) {
+    	-webkit-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+    	-moz-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+    	-ms-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+    	-o-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+    	transform: translateX(100px) translateY(172px) rotateZ(94deg);
+}
+
 /* Admin Body */
 main.lmladminmain {
 
@@ -431,6 +477,9 @@ main.lmladminmain .pad10 {
 
 	width: {=sidebarwidth};
 	background-color: {=barcolor};
+
+	overflow-x: hidden;
+	z-index: 20000;
 }
 
 .lmladminsidebar .lmladminsidebaritems {
@@ -486,6 +535,11 @@ main.lmladminmain .pad10 {
 	background-color: {=actioncolor};
 	border-radius: 2px;
 	line-height: 15px;
+}
+
+.lmladminsidebarlistwrapper {
+	position:relative;
+	z-index: 2000;
 }
 
 /* Notifications */
@@ -562,6 +616,8 @@ header.admin-bar {
 
 	z-index: 10000;
 	height: {=topbarheight};
+
+	box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
 }
 
 .navbar-default {

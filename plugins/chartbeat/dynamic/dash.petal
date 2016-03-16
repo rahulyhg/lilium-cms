@@ -1,0 +1,22 @@
+<div class="dash-cb-wrapper">
+	<div class="dash-cb-realtime-header">
+		<div class="col-xs-6 col-md-4"> 
+			counter
+		</div>
+		<div class="col-xs-12 col-md-8">
+			history
+		</div>
+	</div>
+
+	<div class="dash-cb-realtime-stats">
+		<div class="col-xs-6 col-md-4">
+
+		</div>
+		<div class="col-xs-6 col-md-4">
+
+		</div>
+		<div class="col-xs-6 col-md-4">
+
+		</div>
+	</div>
+</div>

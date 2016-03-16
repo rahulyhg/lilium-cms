@@ -5,6 +5,11 @@
 			{*adminmenus(template:"lmladminsidebaritemtemplate")}
 		</ul>
 	</div>
+	<div class="lmladminsidebardecowrapper">
+		<div class="lmladminsidebardeco"></div>
+		<div class="lmladminsidebardeco"></div>
+		<div class="lmladminsidebardeco"></div>
+	</div>
 </div>
 
 <lml:template id="lmladminsidebaritemtemplate">
