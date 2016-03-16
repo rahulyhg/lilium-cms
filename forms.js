@@ -1,7 +1,9 @@
 var formBuilder = require('./formBuilder.js');
+var log = require('./log.js');
 
 var Forms = function() {
     this.init = function() {
+        log('Forms', 'Initializing default forms');
         formBuilder.registerFormTemplate('payment')
             .add('nameoncard', 'text', {
                 displayname: "Name on card",

@@ -600,7 +600,6 @@ var Core = function() {
 			loadGlobalPetals();
 			loadRequestHandler();
 			loadLMLLibs();
-			initForms();
 
 			loadPlugins(function(){
 			loadRoles(function() {

@@ -37,21 +37,17 @@
 
        var initCampaigns = function(asbpath) {
            Campaigns.init(asbpath);
-           console.log('init');
 
            Admin.registerAdminEndpoint('campaigns', 'GET', function(cli) {
                cli.touch('admin.GET.campaigns');
                Campaigns.handleGET(cli);
            });
-           console.log('get');
            Admin.registerAdminEndpoint('campaigns', 'POST', function(cli) {
                cli.touch('admin.POST.campaigns');
                Campaigns.handlePOST(cli);
            });
-           console.log('post');
 
            Campaigns.registerLiveVar();
-           console.log('livevars');
 
            var aurl = "admin/"; //_c.default().server.url + "/admin/";
 
@@ -61,10 +57,8 @@
            });
 
            Campaigns.registerCreationForm();
-           console.log('form');
 
            Campaigns.loadCampaignsStatuses(function() {});
-           console.log('campagins status');
 
 
        };
