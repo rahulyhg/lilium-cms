@@ -95,6 +95,10 @@ var FormBuilder = function() {
       return this;
   }
 
+  this.registerFieldType = function(name, fct) {
+      htmlParser.registerType(name, fct);
+  }
+
   this.add = function(name, type, attr, requirements, contextForm) {
     // Check if it is a tempalte
     currentForm = contextForm || currentForm;

@@ -96,6 +96,21 @@ var Forms = function() {
             .addTemplate('category')
             .add('create', 'submit');
 
+        formBuilder.registerFieldType('media-explorer', function(field) {
+            var displayname = typeof field.attr.displayname !== 'undefined' ? field.attr.displayname : field.name;
+            var html = '<div class="media_explorer_form">';
+            html += '<input type="hidden" id="media-input" name="' + field.name + '">';
+            html += '<div class="actions">';
+            html += '<div>' + displayname + '</div>';
+            html += '<div class="action-desc">Click to insert image</div>';
+            html += '</div>';
+            html += '</div>';
+            return html;
+        });
+
+        formBuilder.registerFormTemplate('media-explorer')
+            .add('media', 'media-explorer', {displayname: 'Banner'});
+
         formBuilder.registerFormTemplate('article_base')
             .add('title', 'text', {
                 placeholder: true,
