@@ -248,6 +248,11 @@ var Core = function() {
 			id : "articles", faicon : "fa-pencil", displayname : "Posts", priority : 200,
 			rights : ["view-content"], absURL : aurl + "article", children : []
 		});
+
+        admin.registerAdminSubMenu('articles', {
+            id : "articles-category", faicon : "fa-cubes", displayname : "Categories", priority : 200,
+            rights : ["view-content"], absURL : aurl + "article", children : []
+        });
 		admin.registerAdminMenu({
 			id : "media", faicon : "fa-picture-o", displayname : "Media", priority : 400,
 			rights : ["view-media"], absURL : aurl + "media/list", children : []
@@ -505,7 +510,7 @@ var Core = function() {
 
 		entities.registerCreationForm();
 		LoginLib.registerLoginForm();
-	        Article.registerForms();
+	    Article.registerForms();
 		settings.registerForm();
 		sites.registerForms();
 

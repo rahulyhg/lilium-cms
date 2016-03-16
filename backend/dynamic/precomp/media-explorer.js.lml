@@ -1,0 +1,294 @@
+{#config;forms}
+{$
+    var baseurl = config.default.server.url;
+    baseurl += "/";
+$}
+var mediaExplorer;
+
+var mediaExplorer = function(closeUpload) {
+    var closeOnUpload = closeUpload;
+    var modal;
+    var selectedPicture;
+    var pictures = [];
+    var selectedId = 'media-list';
+    var picture_id_url = {};
+    var that = this;
+
+    this.init = function() {
+
+        getModal(function(html) {
+            $('body').append(html);
+            modal = $('#mediaExplorerModal');
+            $(modal).find('#upload-media').html('<h1>Upload a media</h1>{=forms.render('media_create')}<div class="bar"><div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div></div></div>');
+            $(modal).find(':submit').hide();
+            watchForSubmition();
+
+        });
+
+        $('body').on('click', '.media_explorer_form', function(e) {
+            that.open();
+        })
+
+    };
+
+    this.event = {
+        mediaExplorerOpened: "mediaExplorerOpened",
+        mediaExplorerClosed: "mediaExplorerClosed",
+        mediaExplorerUploaded: "mediaExplorerUploaded",
+        mediaExplorerImageSelected: "mediaExplorerImageSelected"
+    };
+
+    this.open = function(cb) {
+        loadImages();
+        modal.modal('show');
+
+
+
+        $('#mediaExplorerModal .menu span').click(function(e) {
+            if (typeof selectedPicture !== 'undefined') {
+                $(selectedPicture).removeClass('selectedPicture');
+                selectedPicture = undefined;
+            }
+
+            var tab = e.target;
+            var tabid = $(tab).data('tab');
+            $('#mediaExplorerModal .menu span.selected').removeClass('selected');
+            $('#mediaExplorerModal #' + selectedId).hide();
+
+            selectedId = tabid;
+
+            if ('#mediaExplorerModal') {
+
+            }
+            $(tab).addClass('selected');
+            $('#mediaExplorerModal #' + tabid).show();
+
+
+        });
+
+        $('body').on('click', '#media-list img', function(event) {
+            var elem = event.target;
+            if (typeof selectedPicture !== 'undefined') {
+                $(selectedPicture).removeClass('selectedPicture');
+            }
+
+            selectedPicture = elem;
+            $(selectedPicture).addClass('selectedPicture');
+
+        });
+
+
+        if (typeof cb == 'function') {
+            cb(this);
+        }
+
+        // Broadcast open event
+        document.dispatchEvent(new CustomEvent(this.event.mediaExplorerOpened, {
+            'detail': {
+                'mediaExplorer': this
+            }
+        }));
+    };
+
+    this.close = function(cb) {
+        modal.modal('close');
+
+        if (typeof cb == 'function') {
+            cb(this);
+        }
+
+        // Broadcast close event
+        document.dispatchEvent(new CustomEvent(this.event.mediaExplorerClosed, {
+            'detail': {
+                'mediaExplorer': this
+            }
+        }));
+    }
+
+    var loadImages = function() {
+        // Check if pictures are loaded first
+        if (pictures.length == 0) {
+
+            //Load pictures
+            $.get("/livevars", {
+                vars: JSON.stringify([{
+                    varname: "media",
+                    "params": {}
+                }])
+            }, function(data) {
+                pictures = data.livevars.media;
+                if (pictures) {
+                    pictures.forEach(function(picture, index) {
+                        picture_id_url[picture._id] = picture.url;
+                        $('#mediaExplorerModal #media-list').append('<img id="' + picture._id + '" src="' + picture.sizes.thumbnail.url + '">');
+                    });
+                }
+
+            });
+        }
+    }
+
+    var getModal = function(cb) {
+        if (typeof modal == 'undefined') {
+            $.get('/static/media-explorer.html', function(data) {
+                if (typeof cb == 'function') {
+                    cb(data);
+                }
+
+            });
+        } else {
+            return modal;
+        }
+    };
+
+    watchForSubmition = function() {
+        $('#mediaExplorerModal button#add').on('click', function(e) {
+            if (selectedId == 'media-list') {
+                if (typeof selectedPicture !== 'undefined') {
+                    var id = $(selectedPicture).attr('id');
+
+                    $('.media_explorer_form').css('background-image', 'url(' + '{=baseurl}uploads/' + picture_id_url[id] + ')');
+                    $('.media_explorer_form .actions .action-desc').text('Click to change image');
+                    $('input#media-input').val(id);
+
+                    document.dispatchEvent(new CustomEvent(that.event.mediaExplorerImageSelected, {
+                        'detail': {
+                            'picture': {url : picture_id_url[id], id : id}
+                        }
+                    }));
+                    $(modal).modal('hide');
+
+                }
+            } else {
+                e.preventDefault();
+
+                if (closeOnUpload) {
+                    $(modal).modal('hide');
+                    // Add spinner
+                    $('.media_explorer_form').append('<i class="fa fa-spinner fa-spin"></i>');
+                    $('.media_explorer_form .actions').hide();
+
+                }
+
+                if (typeof selectedPicture !== 'undefined') {
+                    $(selectedPicture).removeClass('selectedPicture');
+                    selectedPicture = undefined;
+                }
+
+                if (!closeOnUpload) {
+
+                var bar = $('.progress .progress-bar');
+                bar.removeClass('progress-bar-danger');
+                bar.removeClass('progress-bar-success');
+
+
+                $('.progress').show();
+
+                }
+                var fileInput = $('#mediaExplorerModal #upload-media > input:File')[0];
+
+                var file = fileInput.files[0];
+                var form_name = $("#mediaExplorerModal #upload-media > input[name='form_name']").val();
+                var formData = new FormData();
+
+                formData.append($(fileInput).attr('name'), file);
+                formData.append('form_name', form_name);
+
+                var req = new XMLHttpRequest();
+                req.open('post', '{=baseurl}admin/media/upload', true);
+
+                req.upload.onprogress = function(e) {
+                    if (!closeOnUpload) {
+
+                        if (e.lengthComputable) {
+                            var uploadPerc = (e.loaded / e.total) * 100 > 40 ? 40 : (e.loaded / e.total) * 100;
+                            bar.css('width', uploadPerc + '%');
+                            if (uploadPerc >= 40) {
+                                bar.text('Resizing pictures...');
+                            } else {
+                                bar.text('Uploading...');
+                            }
+
+                        }
+                    }
+                };
+
+                req.onerror = function(e) {
+                    console.log(e);
+                };
+
+                req.onload = function(e) {
+                    var res = JSON.parse(e.target.response);
+                    if (res.success) {
+                        if (!closeOnUpload) {
+                            bar.css('width', '100%');
+                            bar.addClass('progress-bar-success');
+                            bar.text('Upload Success!');
+                        } else {
+                            $('.media_explorer_form .fa').remove();
+                            $('.media_explorer_form .actions').show();
+                            $('.media_explorer_form .actions .action-desc').text('Click to change image');
+                            $('input#media-input').val(res.picture._id);
+                            $('.media_explorer_form').css('background-image', 'url(' + res.picture.sizes.thumbnail.url + ')');
+                        }
+
+
+                        liliumcms.notify({
+                            message: 'Upload Success',
+                            type: 'success',
+                            title: 'Media'
+                        });
+                        // Insert uploaded picture
+                        picture_id_url[res.picture._id] = res.picture.url;
+                        $('#mediaExplorerModal #media-list').append('<img id="' + res.picture._id + '" src="' + res.picture.sizes.thumbnail.url + '">');
+
+
+                        // Broadcast open event
+                        document.dispatchEvent(new CustomEvent(that.event.mediaExplorerUploaded, {
+                            'detail': {
+                                'picture': res.picture
+                            }
+                        }));
+
+                        document.dispatchEvent(new CustomEvent(that.event.mediaExplorerImageSelected, {
+                            'detail': {
+                                'picture': res.picture
+                            }
+                        }));
+
+
+                    } else {
+                        if (!closeOnUpload) {
+                            bar.addClass('progress-bar-danger');
+                        }
+                        liliumcms.notify({
+                            message: 'There was a problem uploading your media',
+                            type: 'danger',
+                            title: 'Media'
+                        })
+                    }
+
+                };
+
+                req.send(formData);
+            }
+            });
+
+
+
+    }
+};
+
+
+$(document).ready(function() {
+    document.addEventListener('livevarsRendered', function(e) {
+        if ($('.media_explorer_form').size() > 0) {
+
+            mediaExplorer = new mediaExplorer(true);
+
+            mediaExplorer.init();
+        }
+    });
+
+
+});

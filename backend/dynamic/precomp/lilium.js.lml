@@ -83,6 +83,7 @@ var LiliumCMS = function() {
                 'varname': 'session',
                 'params': new Object()
             });
+            
 
             $.get("/livevars", {
                 vars: JSON.stringify(endpoints)
@@ -113,7 +114,9 @@ var LiliumCMS = function() {
 
 		return pullout;
 	};
-
+        /**
+         * Gets the content in string of the object tempalte
+         */
         var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey) {
             var key = obj.data('key');
             var template = $('#' + obj.data('template'));
@@ -137,7 +140,10 @@ var LiliumCMS = function() {
                             // Append data
                             // Check if array or object
                             if (typeof currentData === 'object' && Object.prototype.toString.call(currentData) === '[object Array]' && currentData.length != 0) {
+                                console.log(template);
+
                                 for (var i = 0; i < currentData.length; i++) {
+                                    // Any array
                                     if (typeof currentData === 'object') {
                                         generateTemplateFromObject(template, obj, currentData[i], livevarkey);
                                     } else {
@@ -163,6 +169,9 @@ var LiliumCMS = function() {
 
         };
 
+        /**
+         * Transform the lml:template in html node
+         */
         var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey) {
             var templateItems = domTemplate.clone();
             while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
@@ -177,27 +186,33 @@ var LiliumCMS = function() {
                 }
 
                 if (passed) {
+                    // Create a node based on nodetype
                     var node = $(document.createElement(nodeType));
                     if (typeof livevarkey !== 'undefined') {
                         node.context.dataset.livevarkey = livevarkey;
                     }
 
                     if (nodeType == 'img') {
+                        // Add src to image node
                         node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
                     } else if (nodeType == 'a') {
+                        // Href for a link node
                         if (obj.data('href')) {
                             node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
                         } else if (obj.data('hrefsource')) {
+                            // hrefsource just appends itself to the already existing href
                             var prepend = obj.data('prependroot') ? window.location.urlBase : "";
 
                             node.attr('href', prepend + pullOutVarFromString(data, obj.data('hrefsource')));
                         }
-
+                        // Set html to node
                         node.html(obj.html());
                     } else {
+                        // Other node types, we'll generate the content for nodes
                         node.html(fetchTemplateObjectContent(obj, data, domTarget, templateItems, livevarkey));
                     }
 
+                    // Add class to the node object
                     if (obj.data('class')) {
                         var classes = obj.data('class').split(' ');
 
@@ -206,6 +221,7 @@ var LiliumCMS = function() {
                         }
                     }
 
+                    // ?
                     if (obj.data('classsource')) {
                         var classSrc = obj.data('classsource');
                         var classes = data[classSrc];
@@ -216,6 +232,7 @@ var LiliumCMS = function() {
                         }
                     }
 
+                    // Bind events to functions
                     if (action && typeof window[action] === 'function') {
                         var paramkey = obj.data('actionparamkey');
                         var bindName = obj.data('bind');
@@ -224,19 +241,30 @@ var LiliumCMS = function() {
                         });
                     }
 
+                    // Replace the actual tempalte with the node
                     obj = $(obj).replaceWith(node);
+
                 } else {
+                    // Ignore for now, validation stuff
                     $(obj).remove();
                 }
             });
 
+            // Wrapping the element with some html
             var wrap = domTemplate.data('wrapper');
             if (wrap) {
                 templateItems.html('<' + wrap + '>' + templateItems.html() + '</' + wrap + '>');
             }
 
+            // Appending element to some target
             if (domTarget.data('target')) {
-                $('#' + domTarget.data('target')).append(templateItems.children());
+                if (domTarget.data('target') == 'this') {
+                    console.log(templateItems.children());
+
+                    $(domTarget).append(templateItems);
+                } else {
+                    $('#' + domTarget.data('target')).append(templateItems.children());
+                }
             } else {
                 $(domTarget).before(templateItems.children());
             }
@@ -258,7 +286,9 @@ var LiliumCMS = function() {
 
             filler.append(filling);
         };
-
+        /**
+         * Generate view based on livevars and lml:templates
+         */
         this.parseTextToView = function() {
             $("lml\\:livevars").each(function() {
                 var lmlTag = $(this);
@@ -302,10 +332,12 @@ var LiliumCMS = function() {
 
                         if (templateObj.length != 0) {
                             if (varValue.length > 0) {
+                                // Generate template object for array
                                 varValue.forEach(function(val, index) {
                                     generateTemplateFromObject(templateObj, lmlTag, val, livevarkey);
                                 });
                             } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
+                                // Generate template for single data
                                 generateTemplateFromObject(templateObj, lmlTag, varValue, livevarkey);
                             }
                         }
@@ -1239,7 +1271,6 @@ var LiliumCMS = function() {
         this.init = function() {
             var currentHref = window.location.href;
             var looping = true;
-
             $('.lmladminsidebaritems li').each(function(index, li) {
                 if (looping) {
                     li = $(li);

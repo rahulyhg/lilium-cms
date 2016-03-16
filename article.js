@@ -226,6 +226,7 @@ var Article = function() {
     this.registerForms = function() {
         formBuilder.createForm('post_create')
         .addTemplate('article_base')
+        .addTemplate('media-explorer')
         .trigger('bottom')
         .add('publish', 'submit');
     }

@@ -1097,3 +1097,81 @@ h1 > a.fab:hover {
 .modal-dialog {
   padding-top: 30px;
 }
+
+/* Media Explorer */
+.media_explorer_form {
+    height: 200px;
+    text-align: center;
+    background-color: #ccc;
+    width: 33%;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+#mediaExplorerModal .modal-dialog {
+    width: 618px;
+}
+#mediaExplorerModal #media-list img {
+    margin: 2px;
+}
+#mediaExplorerModal .modal-body {
+    max-height: 400px;
+    overflow-x: scroll;
+}
+
+.media_explorer_form > div {
+    color: #F6F6F6;
+    font-weight: bold;
+    font-size: 20px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.media_explorer_form .actions {
+    text-shadow: 1px 1px #333;
+}
+.media_explorer_form .fa {
+    font-size: 37px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+}
+
+
+.media_explorer_form .action-desc {
+    font-size: 12px;
+    font-weight: 300;
+
+}
+#mediaExplorerModal .menu {
+    border-bottom:1px solid #e5e5e5;
+}
+
+#mediaExplorerModal .menu > span {
+    padding: 10px;
+    color: #333;
+    background-color: white;
+    float: left;
+    cursor: pointer;
+}
+
+#mediaExplorerModal .menu > span:hover {
+    background-color: #e6e6e6;
+}
+
+
+#mediaExplorerModal .menu > span.selected {
+    background-color: {=barcolorhover};
+    color : #fff;
+}
+
+#mediaExplorerModal .modal-body {
+    padding: 0px;
+}
+
+.clear-both{
+    clear: both;
+}
