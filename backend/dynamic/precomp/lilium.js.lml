@@ -83,7 +83,7 @@ var LiliumCMS = function() {
                 'varname': 'session',
                 'params': new Object()
             });
-            
+
 
             $.get("/livevars", {
                 vars: JSON.stringify(endpoints)
@@ -140,12 +140,11 @@ var LiliumCMS = function() {
                             // Append data
                             // Check if array or object
                             if (typeof currentData === 'object' && Object.prototype.toString.call(currentData) === '[object Array]' && currentData.length != 0) {
-                                console.log(template);
 
                                 for (var i = 0; i < currentData.length; i++) {
                                     // Any array
                                     if (typeof currentData === 'object') {
-                                        generateTemplateFromObject(template, obj, currentData[i], livevarkey);
+                                        content += generateTemplateFromObject(template, obj, currentData[i], livevarkey, true);
                                     } else {
                                         content += currentData[i] + (i == currentData.length - 1 ? "" : sep);
                                     }
@@ -172,7 +171,7 @@ var LiliumCMS = function() {
         /**
          * Transform the lml:template in html node
          */
-        var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey) {
+        var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey, isSubTemplate) {
             var templateItems = domTemplate.clone();
             while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
                 obj = $(obj);
@@ -241,7 +240,7 @@ var LiliumCMS = function() {
                         });
                     }
 
-                    // Replace the actual tempalte with the node
+                    // Replace the actual template with the node
                     obj = $(obj).replaceWith(node);
 
                 } else {
@@ -258,18 +257,15 @@ var LiliumCMS = function() {
 
             // Appending element to some target
             if (domTarget.data('target')) {
-                if (domTarget.data('target') == 'this') {
-                    console.log(templateItems.children());
-
-                    $(domTarget).append(templateItems);
-                } else {
-                    $('#' + domTarget.data('target')).append(templateItems.children());
-                }
+                $('#' + domTarget.data('target')).append(templateItems.children());
             } else {
                 $(domTarget).before(templateItems.children());
             }
-
-            return true;
+            if (typeof isSubTemplate !== 'undefined' && isSubTemplate) {
+                return templateItems.html();
+            } else {
+                return true;
+            }
         };
 
         var generateFillingFromObject = function(filler, fillingData, data) {
@@ -479,7 +475,7 @@ var LiliumCMS = function() {
                                 validField = false;
                             }
                         }
-                        $('[ckeditor]').val($('[ckeditor]').ckeditor().getData());
+                        $('[ckeditor]').val($('[ckeditor]').ckeditor().val());
 
                         if (!validField) {
                             validForm = validField;
@@ -1275,6 +1271,10 @@ var LiliumCMS = function() {
                 if (looping) {
                     li = $(li);
                     var href = li.find('a').attr('href');
+                    // Check if menu as submenus
+                    if (li.find('ul > li').size() > 0) {
+                        li.addClass('parent');
+                    }
                     if (currentHref.indexOf(href) !== -1) {
                         li.addClass('lmladminsidebarselected');
                         looping = false;
