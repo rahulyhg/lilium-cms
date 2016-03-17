@@ -143,11 +143,12 @@ var LiliumCMS = function() {
 
                                 for (var i = 0; i < currentData.length; i++) {
                                     // Any array
-                                    if (typeof currentData === 'object') {
-                                        content += generateTemplateFromObject(template, obj, currentData[i], livevarkey, true);
-                                    } else {
+                                    if (Object.prototype.toString.call( currentData ) === '[object Array]' && typeof currentData[i] !== 'object') {
                                         content += currentData[i] + (i == currentData.length - 1 ? "" : sep);
+                                    } else if (typeof currentData === 'object'){
+                                        content += generateTemplateFromObject(template, obj, currentData[i], livevarkey, true);
                                     }
+
                                 }
                             } else {
                                 content = currentData;
