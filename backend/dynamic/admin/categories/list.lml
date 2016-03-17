@@ -1,4 +1,10 @@
 {#config;forms}
+{$
+    var baseurl = config.default.server.url;
+    baseurl += "/";
+    baseurl += config.default.paths.admin;
+    baseurl += "/";
+$}
 		<h1>All Categories</h1>
 
 		<main class="entities-main">
@@ -13,10 +19,13 @@
 		<lml:template id="category-list-item">
 			<li class="entity-item-list">
 				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
-				<h6>
-					Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
-				</h6>
+                <lml:tobject data-nodetype="h6" data-key="description"></lml:tobject>
 				<div class="entity-actions">
+                    <lml:tobject data-nodetype="a"
+                                 data-href="{=baseurl}categories/edit/"
+                             data-key="_id">
+                            Edit
+                    </lml:tobject>
 					<lml:tobject data-nodetype="button"
 						     data-bind="click"
 						     data-action="deleteUser"

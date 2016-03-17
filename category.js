@@ -12,7 +12,7 @@ var Category = function() {
         } else {
             switch (cli.routeinfo.path[2]) {
                 case 'edit':
-                    filelogic.serveAdminLML(cli);
+                    filelogic.serveAdminLML(cli, true);
                     break;
                 case 'list':
                     filelogic.serveAdminLML(cli);
@@ -27,8 +27,8 @@ var Category = function() {
 
     this.handlePOST = function(cli) {
         switch (cli.routeinfo.path[2]) {
-            case 'new':
-                this.new(cli);
+            case 'list':
+                this.create(cli);
                 break;
             case 'edit':
                 this.edit(cli);
@@ -50,15 +50,12 @@ var Category = function() {
             var formData = formBuilder.serializeForm(form);
 
             // Create post
-            db.update(cli._c, 'categories', formData, function(err, result) {
+            db.update(cli._c, 'categories', {_id : db.mongoID(cli.routeinfo.path[3])},formData, function(err, result) {
+                console.log('stop');
                 // Generate LML page
                 cli.sendJSON({
-                    redirect: cli._c.server.url + "/" + name,
-                    form: {
-                        success: true
-                    }
+                    'success' : true
                 });
-
             });
 
         } else {
@@ -78,7 +75,7 @@ var Category = function() {
             db.insert(cli._c, 'categories', formData, function(err, result) {
                 // Generate LML page
                 cli.sendJSON({
-                    redirect: cli._c.server.url + "/" + name,
+                    redirect: cli._c.server.url + "/",
                     form: {
                         success: true
                     }

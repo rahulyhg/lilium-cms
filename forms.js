@@ -94,7 +94,7 @@ var Forms = function() {
 
         formBuilder.createForm('category_edit')
             .addTemplate('category')
-            .add('create', 'submit');
+            .add('update', 'submit');
 
         formBuilder.registerFieldType('media-explorer', function(field) {
             var displayname = typeof field.attr.displayname !== 'undefined' ? field.attr.displayname : field.name;
