@@ -1267,16 +1267,33 @@ var LiliumCMS = function() {
         this.init = function() {
             var currentHref = window.location.href;
             var looping = true;
+
             $('.lmladminsidebaritems li').each(function(index, li) {
+                li = $(li);
+                var href = li.find('a').attr('href');
+                // Check if menu as submenus
+                if (li.find('ul > li').size() > 0) {
+                    li.addClass('parent');
+                    li.find('> a').append('<i class="fa fa-angle-left"></i>');
+                    li.hover(function(){
+                        li.addClass('opened');
+                        li.find('ul').show(200);
+                    }, function() {
+                        li.removeClass('opened');
+                        li.find('ul').hide(200);
+                      });
+                }
                 if (looping) {
-                    li = $(li);
-                    var href = li.find('a').attr('href');
-                    // Check if menu as submenus
-                    if (li.find('ul > li').size() > 0) {
-                        li.addClass('parent');
-                    }
                     if (currentHref.indexOf(href) !== -1) {
+                        // Check if child
+                        if (li.parent().parent().hasClass('parent')) {
+                            li.parent().parent().addClass('opened');
+                            li.parent().show();
+
+                        }
                         li.addClass('lmladminsidebarselected');
+                        li.addClass('opened');
+                        li.find('ul').show();
                         looping = false;
                     }
                 }

@@ -80,7 +80,6 @@ var CampaignAdvertiser = function() {
                             });
                         })
                     }
-                    console.log(cli.postdata);
                     // Check if there is some post data
                     if (typeof cli.postdata.data !== 'undefined' && typeof cli.postdata.data.changerequests !== 'undefined') {
                         var changerequests = cli.postdata.data.changerequests

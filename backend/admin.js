@@ -59,11 +59,29 @@ var Admin = function() {
 			while (typeof AdminMenus[adminmenu.priority] !== 'undefined') {
 				adminmenu.priority++;
 			}
-			
+
 			AdminMenus[adminmenu.priority] = adminmenu;
 			return adminmenu;
 		}
 	};
+
+    this.registerAdminSubMenu = function(parentMenuId, adminmenu) {
+
+        for (var index in AdminMenus) {
+            if (AdminMenus[index].id && AdminMenus[index].id == parentMenuId) {
+                if (adminmenu.priority == -1) {
+                    return new Error("Admin Menu Priority not set");
+                } else {
+                    while (typeof AdminMenus[index].children[adminmenu.priority] !== 'undefined') {
+                        adminmenu.priority++;
+                    }
+                    AdminMenus[index].children[adminmenu.priority] = adminmenu;
+                    return adminmenu;
+                }
+                break;
+            }
+        }
+    }
 
 	this.getAdminMenus = function() {
 		return AdminMenus;
@@ -84,9 +102,24 @@ var Admin = function() {
 		require('../livevars.js').registerLiveVariable('adminmenus', function(cli, levels, params, callback) {
 			var sortedMenus = new Array();
 			var menus = that.getAdminMenus();
-			
+
 			for (var index in menus) {
-				sortedMenus.push(menus[index]);
+                var subMenu = [];
+
+                if (cli.hasRight(menus[index].rights)) {
+                    var submenus = [];
+
+                    for (var subindex in menus[index].children) {
+
+                        if (menus[index].children[subindex] && cli.hasRight(menus[index].children[subindex].rights)) {
+                            subMenu.push(menus[index].children[subindex]);
+                        }
+                    }
+                    menus[index].children = subMenu;
+                    sortedMenus.push(menus[index]);
+
+                }
+
 			}
 
 			callback(sortedMenus);

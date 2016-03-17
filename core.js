@@ -251,7 +251,11 @@ var Core = function() {
 
         admin.registerAdminSubMenu('articles', {
             id : "articles-category", faicon : "fa-cubes", displayname : "Categories", priority : 200,
-            rights : ["view-content"], absURL : aurl + "article", children : []
+            rights : ["view-content"], absURL : aurl + "categories", children : []
+        });
+        admin.registerAdminSubMenu('articles', {
+            id : "articles-category", faicon : "fa-clock", displayname : "Realtime Views", priority : 100,
+            rights : ["view-content"], absURL : aurl + "views", children : []
         });
 		admin.registerAdminMenu({
 			id : "media", faicon : "fa-picture-o", displayname : "Media", priority : 400,
@@ -277,6 +281,10 @@ var Core = function() {
 			id : "devtools", faicon : "fa-hashtag", displayname : "Dev Tools", priority : 2000,
 			rights : ["develop"], absURL : aurl + "devtools", children : []
 		});
+        admin.registerAdminSubMenu('entities', {
+            id : "entities-rights", faicon : "fa-minus-circle", displayname : "Roles", priority : 100,
+            rights : ["dash"], absURL : aurl + "role", children : []
+        });
         	admin.registerAdminMenu({
             		id : "activities", faicon : "fa-eye", displayname : "User Activities", priority : 800,
            		rights : ["view-user-activities"], absURL : aurl + "activities/", children : []
@@ -571,7 +579,7 @@ var Core = function() {
 		hooks.trigger('will_load_core_lml_libs');
 		dashboard.registerLMLLib();
 		hooks.trigger('loaded_core_lml_libs');
-	};	
+	};
 
 	var redirectIfInit = function(resp, cb) {
 		if (resp) {
@@ -605,7 +613,6 @@ var Core = function() {
 			loadGlobalPetals();
 			loadRequestHandler();
 			loadLMLLibs();
-			initForms();
 
 			loadPlugins(function(){
 			loadRoles(function() {
