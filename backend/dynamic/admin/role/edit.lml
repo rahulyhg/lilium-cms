@@ -6,16 +6,14 @@
 	baseurl += "/";
 $}
 		<main class="entities-main">
-			<ul class="entity-list">
-				{*roles.{?1}(template:"entity-list-item",sourceof:"role_create")}
-			</ul>
-
+        <div id="campwrapper">
+        {*roles.{?1}(sourceof:"role_create")}
+        </div>
     			{=forms.render('role_create')}
 		</main>
 
-		<lml:template id="entity-list-item">
-				<lml:tobject data-nodetype="h1" data-key="displayname"></lml:tobject>
-				</div>
+        <lml:template id="roletemp" data-wrapper="div">
+			<lml:tobject data-nodetype="h1" data-key="name"></lml:tobject>
 		</lml:template>
 
 		<script>

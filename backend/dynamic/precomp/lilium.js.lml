@@ -674,6 +674,8 @@ var LiliumCMS = function() {
 
 
         var append = function(val, index) {
+            console.log('Val ' + val);
+            console.log('INDEX ' + index);
             var row = "<tr>";
             row += "<td>" + val + "</td>";
             row += "<input type='hidden' name='"+ $('#' + htmlIdentifier).data('fieldname') +"["+linenumber+"]["+ scheme.columns[index].fieldName +"]' value='"+  val +"'></input>";
@@ -694,7 +696,9 @@ var LiliumCMS = function() {
                 $('.lmlstacktable th input').each(function(index) {
                     if (livevar) {
                         var data = livevar[$(this).data('fieldname')];
-                        append(data);
+                        for (var valueindex in data) {
+                            append(data[valueindex], index);
+                        }
                     } else {
                         append($(this).val(), index);
                         $(this).val('');

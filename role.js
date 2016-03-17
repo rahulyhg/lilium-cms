@@ -163,25 +163,15 @@ var Role = function() {
         livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
-                db.findToArray(cli._c, 'roles', {power : {'$gt' : cli.userinfo.power}}, function(err, arr) {
-                    callback(err || arr);
-                });
+                db.singleLevelFind(cli._c, 'roles', callback);
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
                 db.findToArray(cli._c, 'roles', {}, function(err, arr) {
-                    for (var i = 0; i < arr.length; i++) {
-                        sentArr.push({
-                            id: arr[i]._id,
-                            displayname: arr[i]._id,
-                            right: arr[i].rights
-                        });
-                    };
-
-                    callback(sentArr);
+                    callback(arr);
                 });
             } else {
                 db.multiLevelFind(cli._c, 'roles', levels, {
-                    _id: new mongo.ObjectID(levels[0])
+                    _id: db.mongoID(levels[0])
                 }, {
                     limit: [1]
                 }, callback);
