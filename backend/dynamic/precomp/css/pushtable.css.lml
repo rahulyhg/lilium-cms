@@ -26,6 +26,7 @@
 	text-align: left;
 }
 
+
 .lmlpushtable thead th input,
 .lmlpushtable thead th select {
 	padding: 6px;

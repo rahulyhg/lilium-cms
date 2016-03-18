@@ -62,7 +62,6 @@ var Precomp = function() {
 				files.push(file.replace(absReadPath, ''));
 			});
 			fileArr = files;
-			console.log(files);
 			db.findToArray(conf, 'compiledfiles', {}, function(err, histo) {
 				db.remove(conf, 'compiledfiles', {}, function(remErr, res) {;
 					var histoObj = new Object();
@@ -82,9 +81,6 @@ var Precomp = function() {
 									var rPath = absReadPath + curFile;
 									var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
 									var wPath = absWritePath + curFile.slice(0, -4);
-									console.log('read' + rPath);
-									console.log('temp' + tPath);
-									console.log('write' + wPath)
 									fileserver.fileExists(wPath, function(exists) {
 										if (exists && histoObj[curFile] == sum) {
 											nextFile();
