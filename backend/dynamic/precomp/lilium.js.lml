@@ -298,6 +298,10 @@ var LiliumCMS = function() {
                     var sourceof = $(this).data('sourceof');
                     var cacheonly = $(this).data('cacheonly');
                     var livevarkey = this.dataset.varname;
+                    if (typeof $(this).data('attribute') !== 'undefined') {
+                        var attributes = typeof $(this).data('attribute') == "object"? $(this).data('attribute') : JSON.parse($(this).data('attribute').replace(/&lmlquote;/g, '"'));
+
+                    }
 
                     if (livevars[this.dataset.varname].length == 0) {
                         var template = $('#'+templateName);
@@ -343,7 +347,10 @@ var LiliumCMS = function() {
                     } else if (fillerName != "") {
                         var filler = $(document.createElement(fillerName));
                         filler.attr('name', lmlTag.data('fieldname'));
-
+                        console.log(attributes);
+                        if (attributes && attributes.multiselect) {
+                            filler.attr("multiple", "multiple");
+                        }
                         if (typeof varValue.length !== 'undefined' && varValue.forEach) {
                             varValue.forEach(function(val, index) {
                                 generateFillingFromObject(filler, lmlTag.data(), val);

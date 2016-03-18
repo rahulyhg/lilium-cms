@@ -266,7 +266,11 @@ var Entities = module.exports = new function() {
         newEnt.username = entData.username;
         newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
         newEnt.email = entData.email;
-        newEnt.roles.push(entData.roles);
+        newEnt.roles = [];
+        console.log(entData.roles);
+        for (var index in entData.roles) {
+            newEnt.roles.push(entData.roles[index]);
+        }
         newEnt.displayname = entData.displayname;
         newEnt.firstname = entData.firstname;
         newEnt.lastname = entData.lastname;

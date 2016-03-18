@@ -1,4 +1,6 @@
 {#config;forms}
+{%entityscript}
+
 		<h1>All entities</h1>
 
 		<main class="entities-main">
@@ -27,4 +29,8 @@
 				</div>
 			</li>
 		</lml:template>
-        <script src="{=config.default.server.base_url}:8080/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
+<script>
+    $('form').on('submit', function() {
+        
+    });
+</script>

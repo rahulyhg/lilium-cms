@@ -98,6 +98,9 @@ var HtmlParser = function() {
                     case "title":
                         htmlForm += parseTitleType(field);
                         break;
+                    case "multiselect":
+                        htmlForm += parseSelectType(field, true);
+                        break;
                     default:
                         htmlForm += this.checkRegisteredTypes(field);
                 }
@@ -125,14 +128,14 @@ var HtmlParser = function() {
         }
 
         return htmlForm;
-    }
+    };
 
     this.checkRegisteredTypes = function(field) {
         if (typeof field.type !== 'undefined' && this.types[field.type]) {
             return this.types[field.type](field);
         }
         return '';
-    }
+    };
 
     var generateLabel = function(field, placeholder) {
         if (field.nolabel) {
@@ -157,14 +160,14 @@ var HtmlParser = function() {
 
         }
         return '';
-    }
+    };
 
     var parseStackField = function(field) {
         return '<input type="' + (field.dataType || 'text') +
             '" class="lmlstacktableheaderfield lmlstacktableheaderfield-' + field.fieldName +
             '" data-fieldname="' + field.fieldName +
             '" value="" />';
-    }
+    };
 
     var parseTitleType = function(field) {
         var tag = field.attr.type || "h3";
@@ -173,7 +176,7 @@ var HtmlParser = function() {
         return field.attr.html || (
             "<" + tag + ">" + content + "</" + tag + ">"
         );
-    }
+    };
 
     var parseStackType = function(field, hasPlaceholder) {
         var scheme = field.attr.scheme;
@@ -221,14 +224,14 @@ var HtmlParser = function() {
         input += ' />'
 
         return input;
-    }
+    };
 
     var parseButtonType = function(field) {
         var input = '<button ';
         input += parseBasicFieldAttributes(field);
         input += '></button>';
         return input;
-    }
+    };
 
     var parseFileType = function(field) {
         var input = generateLabel(field, false);
@@ -236,7 +239,7 @@ var HtmlParser = function() {
         input += parseBasicFieldAttributes(field);
         input += '/>';
         return input;
-    }
+    };
 
     var parseCheckBoxType = function(field, hasPlaceholder) {
         var input = generateLabel(field, hasPlaceholder);
@@ -244,10 +247,11 @@ var HtmlParser = function() {
         input += parseBasicFieldAttributes(field);
         input += ' />';
         return input;
-    }
+    };
 
-    var parseSelectType = function(field) {
-        var input = generateLabel(field) + '<select ' + parseBasicFieldAttributes(field) + ' >';
+    var parseSelectType = function(field, isMultiple) {
+        var multiple = isMultiple ? ' multiple ' : '';
+        var input = generateLabel(field) + '<select ' + parseBasicFieldAttributes(field) + multiple + ' >';
 
         if (field.attr.datasource) {
             for (var i = 0; i < field.attr.datasource.length; i++) {
@@ -264,7 +268,7 @@ var HtmlParser = function() {
         input += parseBasicFieldAttributes(field);
         input += ' />';
         return input;
-    }
+    };
 
 
     var parseNumberType = function(field, hasPlaceholder) {
@@ -276,12 +280,12 @@ var HtmlParser = function() {
         input += ' />';
 
         return input;
-    }
+    };
 
     var parseMultipleType = function(field) {
         var input = generateLabel(field);
 
-    }
+    };
 
     var parseTextAreaType = function(field, hasPlaceholder) {
         var input = generateLabel(field, hasPlaceholder);
@@ -303,7 +307,7 @@ var HtmlParser = function() {
         input += field.attr.value ? field.attr.value : '';
         input += '</textarea>'
         return input;
-    }
+    };
 
     var parseSubmitType = function(field) {
         var input = '<input type="submit" ';
@@ -311,11 +315,13 @@ var HtmlParser = function() {
         input += 'class="v_validate ' + parseClasses(field) + '" ';
         input += '/>'
         return input;
-    }
+    };
 
     var parseLiveVar = function(field) {
         return generateLabel(field, false) +
-            '<lml:livevars data-filler="' + field.attr.tag +
+            '<lml:livevars ' +
+            'data-attribute="' + (field.attr.attr ? JSON.stringify(field.attr.attr).replace(/"/g, '&lmlquote;') : "{}") +
+            '" data-filler="' + field.attr.tag +
             '" data-fieldname="' + field.name +
             '" data-filling="' + field.attr.template +
             '" data-varname="' + field.attr.endpoint +
@@ -347,7 +353,7 @@ var HtmlParser = function() {
             attributes += 'data-' + key + '="' + field.attr.data[key] + '" ';
         }
         return attributes;
-    }
+    };
 
     var parseClasses = function(field) {
         var classHtml = '';
@@ -360,7 +366,7 @@ var HtmlParser = function() {
 
 
         return classHtml;
-    }
+    };
 }
 
 module.exports = new HtmlParser();

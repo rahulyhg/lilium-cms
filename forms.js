@@ -68,6 +68,9 @@ var Forms = function() {
                 tag: 'select',
                 template: 'option',
                 title: 'role',
+                attr: {
+                    'multiselect' : true
+                },
                 props: {
                     'value': 'name',
                     'html': 'displayname',
