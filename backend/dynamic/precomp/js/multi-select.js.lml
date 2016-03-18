@@ -1,9 +1,31 @@
-var MultiSelect = function() {
-    this.init = function() {
-        $('select[multiple]').each(function(elem) {
-            generateMultiSelect(elem);
-        })
+var options;
+
+var MultiSelect = function(tableid, lmltag, selectElem, dataSource) {
+    var selectElem =  selectElem;
+    var lmltag = lmltag;
+    // selectElem.hide();
+    this.render = function() {
+        var html = '<div class="multiselect">';
+
+        $(selectElem).find('option').each(function(index, elem) {
+            var elem = $(elem);
+            html += '<span id="'+ elem.attr('value') +'">' + elem.html() + '</span>';
+        });
+        html += '</div>'
+        options = selectElem;
+        lmltag.after(html);
     }
+
+    $(document).on('click', '.multiselect span', function() {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected');
+            selectElem.find('option[value='+ $(this).attr('id') +']').removeAttr('selected');
+        } else {
+            $(this).addClass('selected');
+            selectElem.find('option[value='+ $(this).attr('id') +']').attr('selected', true);
+
+        }
+    });
 
     var generateMultiSelect = function (elem) {
         elem.hide();

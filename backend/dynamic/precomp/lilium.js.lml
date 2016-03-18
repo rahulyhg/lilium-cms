@@ -27,6 +27,7 @@ var LiliumCMS = function() {
     var livevarsResponse;
     var urlParams;
     this.pushtables = new Array();
+    this.multiselects = new Array();
     var stacktables = new Array();
     var queryParams = new Object();
 
@@ -403,11 +404,14 @@ var LiliumCMS = function() {
             that.queryparams = new QueryParams();
             that.formvalidator = new FormValidator();
             that.formParser = new FormParser();
-            that.livevars = new LiveVars();
+            if (typeof LiveVars !== 'undefined') {
+                that.livevars = new LiveVars();
+                that.livevars.exec();
+
+            }
             that.ckeditor = typeof CKEditor !== 'undefined' ? new CKEditor() : undefined;
             that.adminmenu = new AdminMenu();
             that.formbeautifier = new FormBeautifier();
-            that.livevars.exec();
         };
     };
 
@@ -446,6 +450,10 @@ $(document).ready(function(){
 });
 
 document.addEventListener('livevarsRendered', function(e) {
+    liliumcms.multiselects.forEach(function(select) {
+        select.render();
+
+    });
     liliumcms.queryparams.parseURL();
     liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false ;
     liliumcms.formbeautifier.beautify();

@@ -102,6 +102,7 @@ var SiteInitializer = function(conf) {
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/media.css", 2600, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/notifications.css", 2400, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2500, 'admin', conf.id);
+		Frontend.registerCSSFile(htmlbase + "/compiled/css/multiselect.css", 2600, 'admin', conf.id);
 
 
 		Precompiler.precompile(conf, done);

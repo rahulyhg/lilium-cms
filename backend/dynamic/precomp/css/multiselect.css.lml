@@ -1,0 +1,31 @@
+.multiselect span.selected {
+    background-color: #9B59B6;
+    color: #fff;
+
+}
+
+.multiselect span.selected:hover {
+    background-color: #A869C6;
+}
+
+.multiselect span:hover {
+    background-color: #777;
+    color: #fff;
+}
+
+.multiselect span {
+    display: block;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.multiselect {
+    width: 100%;
+    background-color: #fff;
+    max-height: 300px;
+    overflow-y : auto;
+    border: 1px solid #DFDFDF;
+}
+select[multiple] {
+    display: none;
+}
