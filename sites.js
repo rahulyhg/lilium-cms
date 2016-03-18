@@ -85,6 +85,11 @@ var SiteInitializer = function(conf) {
 		Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
 		Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin', conf.id);
+		Frontend.registerJSFile(htmlbase + "/compiled/livevars.js", 2100, 'admin', conf.id);
+		Frontend.registerJSFile(htmlbase + "/compiled/pushtable.js", 2200, 'admin', conf.id);
+		Frontend.registerJSFile(htmlbase + "/compiled/stacktable.js", 2300, 'admin', conf.id);
+		Frontend.registerJSFile(htmlbase + "/compiled/socket.js", 2400, 'admin', conf.id);
+		Frontend.registerJSFile(htmlbase + "/compiled/multi-select.js", 2500, 'admin', conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/ckeditor-lilium.js", 1300, 'admin', conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/media-explorer.js", 1300, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
