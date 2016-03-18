@@ -1287,25 +1287,14 @@ var LiliumCMS = function() {
                 if (li.find('ul > li').size() > 0) {
                     li.addClass('parent');
                     li.find('> a').append('<i class="fa fa-angle-left"></i>');
-                    li.hover(function(){
-                        li.addClass('opened');
-                        li.find('ul').show(200);
-                    }, function() {
-                        li.removeClass('opened');
-                        li.find('ul').hide(200);
-                      });
                 }
                 if (looping) {
                     if (currentHref.indexOf(href) !== -1) {
                         // Check if child
                         if (li.parent().parent().hasClass('parent')) {
-                            li.parent().parent().addClass('opened');
-                            li.parent().show();
-
+                            li.parent().parent().addClass('child-selected');
                         }
                         li.addClass('lmladminsidebarselected');
-                        li.addClass('opened');
-                        li.find('ul').show();
                         looping = false;
                     }
                 }
