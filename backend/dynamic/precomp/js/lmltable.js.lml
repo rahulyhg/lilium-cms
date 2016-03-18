@@ -1,0 +1,20 @@
+var LmlTable = function (table) {
+    var table = $(table);
+    var maxEntries = typeof table.data('maxentries') !=='undefined' ? table.data('maxentries') || 20;
+
+    this.init = function() {
+
+    };
+
+    this.filter = function() {
+
+    };
+
+    this.createNav = function (){
+
+    };
+
+    this.updateNav = function() {
+
+    };
+}
