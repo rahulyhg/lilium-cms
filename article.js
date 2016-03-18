@@ -227,6 +227,21 @@ var Article = function() {
         formBuilder.createForm('post_create')
         .addTemplate('article_base')
         .addTemplate('media-explorer')
+        .add('categories', 'livevar', {
+            endpoint: 'categories',
+            tag: 'select',
+            template: 'option',
+            title: 'role',
+            attr: {
+                'multiselect' : true
+            },
+            props: {
+                'value': 'name',
+                'html': 'displayname',
+                'header': 'Select One',
+            },
+            displayname: "Categories"
+        })
         .trigger('bottom')
         .add('publish', 'submit');
     }
