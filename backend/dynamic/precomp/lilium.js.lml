@@ -26,7 +26,7 @@ window.location.urlBase = "{=config.default.server.url}/";
 var LiliumCMS = function() {
     var livevarsResponse;
     var urlParams;
-    var pushtables = new Array();
+    this.pushtables = new Array();
     var stacktables = new Array();
     var queryParams = new Object();
 
@@ -37,6 +37,7 @@ var LiliumCMS = function() {
     this.ckeditor;
     this.adminmenu;
     this.formbeautifier;
+    this.multiselect;
 
     var that = this;
 
@@ -240,6 +241,14 @@ var LiliumCMS = function() {
 
         index = typeof index == 'undefined' ? 0: index;
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
+
+        $(form).find('select[multiple]').each(function(index, osSelect) {
+            var select = new MultiSelect(
+                sTable.attr('id'),
+                sTable.data('title'),
+                JSON.parse(osSelect.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+            );
+        });
 
         // Check for stacktable
         $(form).find('table.lmlstacktable').each(function(index, osTable) {

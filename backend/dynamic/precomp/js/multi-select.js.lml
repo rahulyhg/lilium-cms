@@ -1,0 +1,11 @@
+var MultiSelect = function() {
+    this.init = function() {
+        $('select[multiple]').each(function(elem) {
+            generateMultiSelect(elem);
+        })
+    }
+
+    var generateMultiSelect = function (elem) {
+        elem.hide();
+    }
+}

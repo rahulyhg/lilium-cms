@@ -86,7 +86,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             if (key[0] != "_") {
                 if (schemeCol[key].autocomplete) {
                     // Check for column in templates
-                    var livevarValue = livevars[schemeCol[key].autocomplete.datasource];
+                    var livevarValue = liliumcms.livevars.livevars[schemeCol[key].autocomplete.datasource];
                     var required = schemeCol[key].required;
                     var isEmpty = row[key].trim() == "";
                     var foundObject = undefined;
@@ -309,7 +309,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             html += '" />';
 
             if (col.autocomplete && col.autocomplete.datasource) {
-                var datVar = livevars[col.autocomplete.datasource];
+                var datVar = liliumcms.livevars.livevars[col.autocomplete.datasource];
 
                 if (datVar && datVar.length) {
                     html += '<datalist id="' + tableid + col.fieldName + 'list">';
@@ -367,7 +367,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
 
         html += '</table>';
 
-        document.addEventListener(LiliumEvents.livevarsRendered.name, function() {
+        document.addEventListener(liliumcms.LiliumEvents.livevarsRendered.name, function() {
             that.bindEvents();
         });
     };

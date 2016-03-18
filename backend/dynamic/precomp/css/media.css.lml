@@ -39,6 +39,7 @@
     border-bottom: 1px solid #fff;
 }
 
+
 /* Media Explorer */
 .media_explorer_form {
     height: 200px;

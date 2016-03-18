@@ -99,9 +99,9 @@ var SiteInitializer = function(conf) {
 		Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/ckeditor.css", 2100, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/login.css", 2200, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/media.css", 2300, 'admin', conf.id);
+		Frontend.registerCSSFile(htmlbase + "/compiled/css/media.css", 2600, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/notifications.css", 2400, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2400, 'admin', conf.id);
+		Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2500, 'admin', conf.id);
 
 
 		Precompiler.precompile(conf, done);
