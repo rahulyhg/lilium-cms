@@ -1,0 +1,19 @@
+/* CKEDITOR */
+.cke_top {}
+.cke_button__imgbrowser_icon {
+    background: url(/bower/ckeditor/skins/moono/icons.png) no-repeat 0 -1008px!important;
+}
+
+#picture-list {
+    width: 800px;
+    height: 400px;
+}
+
+div#picture-list img {
+    margin : 2px;
+    float: left;
+}
+.selectedPicture {
+  border: 2px solid #000;
+  margin: 0px !important;
+}

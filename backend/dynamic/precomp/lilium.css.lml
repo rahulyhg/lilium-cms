@@ -361,43 +361,6 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	border: none;
 }
 
-/* PushTables */
-.lmlpushtable {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-
-	width: 100%;
-
-	border-collapse: separate;
-	border-spacing: 0px;
-}
-
-.lmlpushtable thead tr,
-.lmlpushtable tfoot tr {
-	padding: 2px;
-	background-color: #EEE;
-
-	font-size: 18px;
-	font-weight: bold;
-}
-
-.lmlpushtable thead th,
-.lmlpushtable tfoot td,
-.lmlpushtable tbody td {
-	padding: 10px;
-	text-align: left;
-}
-
-.lmlpushtable thead th input,
-.lmlpushtable thead th select {
-	padding: 6px;
-}
-
-.lmlpushtable .lmlpushtablecasenotmet {
-	display: none;
-}
-
 .lmladmincontentwrapper {
 	padding-left: {=sidebarwidth};
 	padding-top: {=topbarheight};
@@ -852,93 +815,6 @@ header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
 header.admin-bar .navbar-default .navbar-nav  .notifications {
 }
 
-
-/* @/login */
-.lmllogin {
-	background-color: #333;
-	color: #EEE;
-}
-
-.dashboard-login-form {
-	background-color: transparent;
-}
-
-.lmllogin .lmlform-fieldwrapper {
-	padding: 0px;
-}
-
-.lmllogin-wrapper {
-	width: 320px;
-	height: auto;
-	margin: 200px auto 0px auto;
-
-	text-align: center;
-}
-
-.lmllogin-wrapper header {
-	padding: 10px;
-}
-
-.lmllogin-wrapper form {
-	overflow: hidden;
-	-webkit-border-radius: 5px;
-   	   -moz-border-radius: 5px;
-	    -ms-border-radius: 5px;
-	     -o-border-radius: 5px;
-		border-radius: 5px;
-
-	border: 6px solid rgba(255, 255, 255, 0.1);
-}
-
-.lmllogin-wrapper form input {
-	width: 100%;
-
- 	box-sizing: border-box;
- 	-moz-box-sizing: border-box;
- 	-webkit-box-sizing: border-box;
-
-	padding: 10px;
-	font-size: 16px;
-
-	color: #333;
-	background-color: #EEE;
-
-	-webkit-transition: all 0.2s;
-   	   -moz-transition: all 0.2s;
-	    -ms-transition: all 0.2s;
-	     -o-transition: all 0.2s;
-		transition: all 0.2s;
-}
-
-.lmllogin-wrapper form input:hover {
-	background-color: #F7F7F7;
-}
-
-.lmllogin-wrapper form input:focus {
-	background-color: #FFF;
-}
-
-.lmllogin-wrapper form input[type="submit"] {
-	background-color: #DDD;
-
-	color: #777;
-	text-transform: uppercase;
-}
-
-.lmllogin-wrapper form input[type="submit"]:hover,
-.lmllogin-wrapper form input[type="submit"]:focus {
-	background-color: #FFF;
-	color: #111;
-}
-
-.lmllogin-wrapper footer {
-	text-align: right;
-	font-size: 12px;
-	color: #999;
-
-	margin-top: 3px;
-}
-
 /* Error Reports */
 .errorbody {
 	background-color: #222222;
@@ -959,55 +835,6 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 
 .lmlcrash main {
 	padding: 20px;
-}
-
-/* Notifications */
-.alert-info {
-    border-left-color: #2980b9;
-    color: #2980b9;
-}
-.alert-danger {
-    border-left-color: #c0392b;
-    color: #c0392b;
-}
-.alert-warning {
-    border-left-color: #f1c40f;
-    color: #f1c40f;
-}
-.alert-success {
-    border-left-color: #27af61;
-    color: #27af61;
-}
-.alert {
-    background: #fff;
-    padding: 15px;
-    margin-bottom: 20px;
-	border : 1px solid #999;
-    border-left: 5px solid;
-    border-radius: 0px;
-	-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-    box-shadow: 0 6px 12px rgba(0,0,0,.175)
-}
-.close {
-    text-shadow: none;
-}
-.alert-info .close{
-    color: #2980b9;
-    opacity: 1;
-}
-.alert-success .close{
-    color: #27af61;
-    opacity: 1;
-}
-
-.alert-warning .close{
-    color: #f1c40f;
-    opacity: 1;
-}
-
-.alert-danger .close{
-    color: #c0392b;
-    opacity: 1;
 }
 
 /* Strips and widgets */
@@ -1079,67 +906,6 @@ a.button-link:active {
     display: none;
 }
 
-/* CKEDITOR */
-.cke_top {}
-.cke_button__imgbrowser_icon {
-    background: url(/bower/ckeditor/skins/moono/icons.png) no-repeat 0 -1008px!important;
-}
-
-#picture-list {
-    width: 800px;
-    height: 400px;
-}
-
-div#picture-list img {
-    margin : 2px;
-    float: left;
-}
-.selectedPicture {
-  border: 2px solid #000;
-  margin: 0px !important;
-}
-
-/* Media */
-.medias-item-list {
-    float: left;
-    list-style: none;
-}
-.medias-item-list {
-    width: 150px;
-    height: 150px;
-}
-.medias-item-list:hover .medias-actions{
-    display:block;
-}
-.medias-item-list .medias-actions {
-    display:none;
-    float: left;
-    position: relative;
-    left: 0px;
-    top: 0px;
-    width: 150px;
-    height: 150px;
-    background-color: rgba(0,0,0,0.2);
-    z-index: 1000;
-    margin-bottom: -150px;
-    text-align: center;
-    border: 1px solid #fff;
-}
-.medias-actions > button {
-    background: initial;
-    color: #fff;
-    vertical-align: middle;
-    /* text-align: center; */
-    height: 50%;
-    width: 100%;
-}
-.medias-actions > button:hover {
-    background-color: rgba(0,0,0,0.5);
-}
-.medias-actions > button:nth-of-type(1) {
-    border-bottom: 1px solid #fff;
-}
-
 /* Fab buttons */
 h1 > a.fab {
     float: right;
@@ -1163,80 +929,6 @@ h1 > a.fab:hover {
 /* Modal */
 .modal-dialog {
   padding-top: 30px;
-}
-
-/* Media Explorer */
-.media_explorer_form {
-    height: 200px;
-    text-align: center;
-    background-color: #ccc;
-    width: 33%;
-    cursor: pointer;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-}
-#mediaExplorerModal .modal-dialog {
-    width: 618px;
-}
-#mediaExplorerModal #media-list img {
-    margin: 2px;
-}
-#mediaExplorerModal .modal-body {
-    max-height: 400px;
-    overflow-x: scroll;
-}
-
-.media_explorer_form > div {
-    color: #F6F6F6;
-    font-weight: bold;
-    font-size: 20px;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.media_explorer_form .actions {
-    text-shadow: 1px 1px #333;
-}
-.media_explorer_form .fa {
-    font-size: 37px;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #fff;
-}
-
-
-.media_explorer_form .action-desc {
-    font-size: 12px;
-    font-weight: 300;
-
-}
-#mediaExplorerModal .menu {
-    border-bottom:1px solid #e5e5e5;
-}
-
-#mediaExplorerModal .menu > span {
-    padding: 10px;
-    color: #333;
-    background-color: white;
-    float: left;
-    cursor: pointer;
-}
-
-#mediaExplorerModal .menu > span:hover {
-    background-color: #e6e6e6;
-}
-
-
-#mediaExplorerModal .menu > span.selected {
-    background-color: {=barcolorhover};
-    color : #fff;
-}
-
-#mediaExplorerModal .modal-body {
-    padding: 0px;
 }
 
 .clear-both{

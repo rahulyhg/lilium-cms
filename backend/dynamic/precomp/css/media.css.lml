@@ -1,0 +1,114 @@
+/* Media */
+.medias-item-list {
+    float: left;
+    list-style: none;
+}
+.medias-item-list {
+    width: 150px;
+    height: 150px;
+}
+.medias-item-list:hover .medias-actions{
+    display:block;
+}
+.medias-item-list .medias-actions {
+    display:none;
+    float: left;
+    position: relative;
+    left: 0px;
+    top: 0px;
+    width: 150px;
+    height: 150px;
+    background-color: rgba(0,0,0,0.2);
+    z-index: 1000;
+    margin-bottom: -150px;
+    text-align: center;
+    border: 1px solid #fff;
+}
+.medias-actions > button {
+    background: initial;
+    color: #fff;
+    vertical-align: middle;
+    /* text-align: center; */
+    height: 50%;
+    width: 100%;
+}
+.medias-actions > button:hover {
+    background-color: rgba(0,0,0,0.5);
+}
+.medias-actions > button:nth-of-type(1) {
+    border-bottom: 1px solid #fff;
+}
+
+/* Media Explorer */
+.media_explorer_form {
+    height: 200px;
+    text-align: center;
+    background-color: #ccc;
+    width: 33%;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+#mediaExplorerModal .modal-dialog {
+    width: 618px;
+}
+#mediaExplorerModal #media-list img {
+    margin: 2px;
+}
+#mediaExplorerModal .modal-body {
+    max-height: 400px;
+    overflow-x: scroll;
+}
+
+.media_explorer_form > div {
+    color: #F6F6F6;
+    font-weight: bold;
+    font-size: 20px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.media_explorer_form .actions {
+    text-shadow: 1px 1px #333;
+}
+.media_explorer_form .fa {
+    font-size: 37px;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #fff;
+}
+
+
+.media_explorer_form .action-desc {
+    font-size: 12px;
+    font-weight: 300;
+
+}
+#mediaExplorerModal .menu {
+    border-bottom:1px solid #e5e5e5;
+}
+
+#mediaExplorerModal .menu > span {
+    padding: 10px;
+    color: #333;
+    background-color: white;
+    float: left;
+    cursor: pointer;
+}
+
+#mediaExplorerModal .menu > span:hover {
+    background-color: #e6e6e6;
+}
+
+
+#mediaExplorerModal .menu > span.selected {
+    background-color: {=barcolorhover};
+    color : #fff;
+}
+
+#mediaExplorerModal .modal-body {
+    padding: 0px;
+}

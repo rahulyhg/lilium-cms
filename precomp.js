@@ -53,30 +53,38 @@ var Precomp = function() {
 		var absReadPath = conf.server.base + "backend/dynamic/precomp/";
 		var absWritePath = conf.server.html + "/compiled/";
 		var tempPath = conf.server.html + "/static/tmp/";
-		
+
 		var fileIndex = 0;
 		log('Precompiler', 'Precompiling static files');
-		fileserver.listDirContent(absReadPath, function(fileArr) {
+		fileserver.listDirContentRecursive(absReadPath, function(fileArr) {
+			var files = [];
+			fileArr.forEach(function(file){
+				files.push(file.replace(absReadPath, ''));
+			});
+			fileArr = files;
+			console.log(files);
 			db.findToArray(conf, 'compiledfiles', {}, function(err, histo) {
 				db.remove(conf, 'compiledfiles', {}, function(remErr, res) {;
 					var histoObj = new Object();
-	
+
 					for (var i = 0; i < histo.length; i++) {
 						histoObj[histo[i].filename] = histo[i].sum;
 					}
-	
+
 					var nextFile = function() {
 						if (fileIndex < fileArr.length) {
 							var curFile = fileArr[fileIndex];
 							var mustRewrite = false;
 							fileIndex++;
-	
+
 							if (curFile.indexOf('.lml') !== -1) {
 								checksum.file(absReadPath + curFile, function(err, sum) {
 									var rPath = absReadPath + curFile;
 									var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
 									var wPath = absWritePath + curFile.slice(0, -4);
-	
+									console.log('read' + rPath);
+									console.log('temp' + tPath);
+									console.log('write' + wPath)
 									fileserver.fileExists(wPath, function(exists) {
 										if (exists && histoObj[curFile] == sum) {
 											nextFile();
@@ -109,7 +117,7 @@ var Precomp = function() {
 							readycb();
 						}
 					};
-	
+
 					nextFile();
 				});
 			});

@@ -7,6 +7,8 @@ var minify = require('html-minifier').minify;
 var Canvas = require('canvas');
 var crypto = require('crypto');
 var dateFormat = require('dateformat');
+var dir = require('node-dir');
+
 
 var FileServer = function() {
     this.workDir = function() {
@@ -66,7 +68,7 @@ var FileServer = function() {
     };
 
     this.createSymlinkSync = function(src, dest) {
-	try {
+        try {
             this.dirExists(dest, function(exists) {
                 if (!exists) {
                     fs.symlinkSync(src, dest);
@@ -138,16 +140,31 @@ var FileServer = function() {
         });
     };
 
+    this.listDirContentRecursive = function(dirname, callback) {
+        dir.files(dirname, function(err, files){
+            callback(err || files);
+        });
+    }
+
     this.listDirContentSync = function(dirname) {
         return fs.readdirSync(dirname);
     };
 
     this.copyFile = function(source, dest, callback) {
-        var rs = fs.createReadStream(source);
-        var ws = fs.createWriteStream(dest);
+        var folders = dest.split(path.sep);
+        folders.pop();
+        var pathToFile = folders.join('/');
 
-        rs.on('close', callback);
-        rs.pipe(ws);
+
+        mkdirp(pathToFile, function() {
+            var rs = fs.createReadStream(source);
+            var ws = fs.createWriteStream(dest);
+
+
+            rs.on('close', callback);
+            rs.pipe(ws);
+        });
+
     };
 
     this.pipeFileToClient = function(cli, filename, callback) {
@@ -240,8 +257,8 @@ var FileServer = function() {
         ctx.font = '100px ArtySign';
         ctx.fillText(text, 0, 29);
 
-		// Recreate a canvas with the appropriate width
-		var size = ctx.measureText(text);
+        // Recreate a canvas with the appropriate width
+        var size = ctx.measureText(text);
 
         canvas = new Canvas(size.width + 30, 150);
 

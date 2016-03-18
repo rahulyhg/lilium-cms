@@ -1,0 +1,36 @@
+/* PushTables */
+.lmlpushtable {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+
+	width: 100%;
+
+	border-collapse: separate;
+	border-spacing: 0px;
+}
+
+.lmlpushtable thead tr,
+.lmlpushtable tfoot tr {
+	padding: 2px;
+	background-color: #EEE;
+
+	font-size: 18px;
+	font-weight: bold;
+}
+
+.lmlpushtable thead th,
+.lmlpushtable tfoot td,
+.lmlpushtable tbody td {
+	padding: 10px;
+	text-align: left;
+}
+
+.lmlpushtable thead th input,
+.lmlpushtable thead th select {
+	padding: 6px;
+}
+
+.lmlpushtable .lmlpushtablecasenotmet {
+	display: none;
+}

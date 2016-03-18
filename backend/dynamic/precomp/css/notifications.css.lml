@@ -1,0 +1,48 @@
+/* Notifications */
+.alert-info {
+    border-left-color: #2980b9;
+    color: #2980b9;
+}
+.alert-danger {
+    border-left-color: #c0392b;
+    color: #c0392b;
+}
+.alert-warning {
+    border-left-color: #f1c40f;
+    color: #f1c40f;
+}
+.alert-success {
+    border-left-color: #27af61;
+    color: #27af61;
+}
+.alert {
+    background: #fff;
+    padding: 15px;
+    margin-bottom: 20px;
+	border : 1px solid #999;
+    border-left: 5px solid;
+    border-radius: 0px;
+	-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175)
+}
+.close {
+    text-shadow: none;
+}
+.alert-info .close{
+    color: #2980b9;
+    opacity: 1;
+}
+.alert-success .close{
+    color: #27af61;
+    opacity: 1;
+}
+
+.alert-warning .close{
+    color: #f1c40f;
+    opacity: 1;
+}
+
+.alert-danger .close{
+    color: #c0392b;
+    opacity: 1;
+}
