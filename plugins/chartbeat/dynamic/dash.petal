@@ -1,22 +1,62 @@
+{#config}
+{*chartbeat.dashboard.history(limit:100)}
+{*chartbeat.dashboard.top}
+{*chartbeat.dashboard.latest}
 <div class="dash-cb-wrapper">
+	{$
+		if (config.default.chartbeat.api_key != "");
+	$}
 	<div class="dash-cb-realtime-header">
-		<div class="col-xs-6 col-md-4"> 
-			counter
+		<div class="col-xs-6 col-md-3">
+			<span class="cb-header-title">Active visitors</span>
+
+			<canvas id="chartbeat-live-gauge" height=35 width=100></canvas>
+			<span id="chartbeat-live-count"></span>
 		</div>
-		<div class="col-xs-12 col-md-8">
-			history
+		<div class="col-xs-6 col-md-3">
+			<span class="cb-header-title">Retainment ratio</span>
+			<span id="chartbeat-retain-ratio">---</span>
 		</div>
+		<div class="col-xs-6 col-md-3">
+			<span class="cb-header-title">Average scroll</span>
+			<span id="chartbeat-average-scroll">---</span>
+		</div>
+		<div class="col-xs-6 col-md-3">
+			<span class="cb-header-title">Top referrer</span>
+			<span id="chartbeat-top-referrer"></span>
+		</div>
+	</div>
+	
+	<div class="dash-cb-histo-graph">
+		<canvas id="dash-cb-histo-canvas"></canvas>
+	</div>
+
+	<div>
+		<h2 class="subtitlestrip">Top pages</h2>
+		<ul class="cb-top-list">
+		</ul>
 	</div>
 
 	<div class="dash-cb-realtime-stats">
 		<div class="col-xs-6 col-md-4">
-
+			devices
 		</div>
 		<div class="col-xs-6 col-md-4">
-
+			geo
 		</div>
 		<div class="col-xs-6 col-md-4">
-
-		</div>
+			other stats
 	</div>
+	{$
+		else;
+	$}
+	<div>
+		<h3>Chartbeat needs to be configured <a href="{=config.default.server.url}/admin/settings">here</a>.</h3>
+	</div>
+	{$
+		endif;
+	$}
+
 </div>
+
+{%dashboardChartbeatJS}

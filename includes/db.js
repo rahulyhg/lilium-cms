@@ -52,6 +52,10 @@ var DB = function() {
 		});
 	};
 
+	this.createCollection = function(conf, col, callback) {
+		_conns[conf.id || conf].createCollection(col, {}, callback);
+	};
+
 	this.initDatabase = function(conf, callback) {
 		MongoClient.connect(formatMongoString(conf), function(err, db) {
 			db.collection('lilium', {strict:true}, function(err, c) {

@@ -3,6 +3,7 @@ var conf = require('./config.js');
 var EventEmitter = require('events');
 var util = require('util');
 var db = require('./includes/db.js');
+var hooks = require('./hooks.js');
 var log = require('./log.js');
 /**
  * Contains all the functions to call when a
@@ -40,7 +41,7 @@ var CacheInvalidator = function() {
       }
 
     });
-  }
+  };
 
   this.addFileToWatch = function(path, eventName, value, conf) {
     cachedFileEvents[path] = {};
@@ -48,7 +49,7 @@ var CacheInvalidator = function() {
     db.insert(conf.id, 'cachedFiles',{file: path, extra : cachedFileEvents[path]}, function(err){
       log('Cache Invalidator', err);
     });
-  }
+  };
 
   this.removeFileToWatch = function(path) {
     if (typeof cachedFileEvents[path] !== 'undefined') {
@@ -56,7 +57,17 @@ var CacheInvalidator = function() {
         delete cachedFileEvents.path;
       }, true);
     }
-  }
+  };
+
+  this.deleteCachedFile = function(cli, rel, cb) {
+    fs.unlink(cli._c.server.html + "/" + rel, cb||function(){});
+  };
+
+  this.registerDeletionOnHook = function(hook, filepath) {
+    hooks.bind(hook, 10, function() {
+      fs.unlink(filepath);
+    });
+  };
 
   this.init = function(cb) {
     this.addFolderToWatch(conf.default().server.html);
@@ -66,11 +77,8 @@ var CacheInvalidator = function() {
       });
       cb();
     });
-  }
+  };
 
-}
-
-
-
+};
 
 module.exports = new CacheInvalidator();

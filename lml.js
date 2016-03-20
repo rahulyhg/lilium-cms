@@ -239,6 +239,7 @@ var LML = function() {
 			var endVal = str.trim();
 			var isNumber = !isNaN(str);
 			var isStringMatch = str.match(/^"(.*)"$|^'(.*)'$/g);
+			var acceptUndefined = str[0] === '?';
 
 			if (isStringMatch) {
 				endVal = str.trim().slice(1, -1);
@@ -292,7 +293,7 @@ var LML = function() {
 						throw new Error("LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found");
 					}
 				} catch (ex) {
-					endVal = "[" + ex + "]";
+					endVal = acceptUndefined ? "" : ("[" + ex + "]");
 				}
 			} else {
 				endVal = parseInt(str);

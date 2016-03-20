@@ -568,6 +568,10 @@ var Core = function() {
 		hooks.trigger('loaded_core_lml_libs');
 	};	
 
+	var precompile = function(done) {
+		sites.loopPrecomp(done);
+	};
+
 	var redirectIfInit = function(resp, cb) {
 		if (resp) {
 			resp.writeHead(200,
@@ -606,6 +610,7 @@ var Core = function() {
 			loadProducts(function() {
 			loadSessions(function() {
 			loadTheme(function() {
+			precompile(function() {
 			redirectIfInit(resp, function() {
 				loadAdminMenus();
 				loadFrontend();
@@ -621,7 +626,7 @@ var Core = function() {
 
 				log('Core', 'Firing initialized signal');
 				hooks.fire('init');
-			});});});});});});
+			});});});});});});});
 		});
 	};
 

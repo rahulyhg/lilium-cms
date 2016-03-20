@@ -109,19 +109,20 @@
 
 	         });
 
-                 hooks.bind('settings_will_save', 350, function(dat) {
-                     var len = dat["adserver.privateaddr"].length;
-                     if (len != 0 && dat["adserver.privateaddr"][len-1] == '/') {
-                         dat["adserver.privateaddr"] = dat["adserver.privateaddr"].substring(0, len-1);
+                 hooks.bind('settings_will_save', 350, function(cli) {
+                     var dat = cli._c;
+                     var len = dat.adserver.privateaddr.length;
+                     if (len != 0 && dat.adserver.privateaddr[len-1] == '/') {
+                         dat.adserver.privateaddr = dat.adserver.privateaddr.substring(0, len-1);
                      }
 
-                     len = dat["adserver.publicaddr"].length;
-                     if (len != 0 && dat["adserver.publicaddr"][len-1] == '/') {
-                         dat["adserver.publicaddr"] = dat["adserver.publicaddr"].substring(0, len-1);
+                     len = dat.adserver.publicaddr.length;
+                     if (len != 0 && dat.adserver.publicaddr[len-1] == '/') {
+                         dat.adserver.publicaddr = dat.adserver.publicaddr.substring(0, len-1);
                      }
                  });
 
-                 hooks.bind('settings_saved', 500, function(dat) {
+                 hooks.bind('settings_saved', 500, function() {
                      pingAdServer(function(valid) {
                          log('Hooks', 'Setting saved event was caught with valid flag : ' + valid);
                      });
