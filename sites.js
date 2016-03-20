@@ -74,10 +74,11 @@ var SiteInitializer = function(conf) {
 		});
 	};
 
-	var precompile = function(done) {
+	this.precompile = function(done) {
 		var base = conf.server.base;
 		var htmlbase = conf.server.html;
 
+		log('SiteInitializer', "Registering admin default frontend JS and CSS");
 		Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
 		Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
 		Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
@@ -92,7 +93,7 @@ var SiteInitializer = function(conf) {
 		Frontend.registerJSFile(htmlbase + "/compiled/js/multi-select.js", 2500, 'admin', conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/js/ckeditor-lilium.js", 1300, 'admin', conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/js/media-explorer.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
+        	Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
 		Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
 		Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
@@ -104,19 +105,23 @@ var SiteInitializer = function(conf) {
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2500, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/multiselect.css", 2600, 'admin', conf.id);
 
-
-		Precompiler.precompile(conf, done);
+		hooks.fire('frontend_will_precompile', {config:conf,Frontend:Frontend});
+		Precompiler.precompile(conf, function() {
+			hooks.fire('frontend_precompiled', {config:conf,Frontend:Frontend});
+			done();
+		});
 	};
 
 	this.initialize = function(done) {
 		log('Sites', 'Initializing site with id ' + conf.id);
 
+		hooks.fire('site_will_initialize', conf);
 		loadHTMLStructure(function() {
 		loadStaticSymlinks(function() {
 		loadDatabase(function() {
-		precompile(function() {
+			hooks.fire('site_initialized', conf);
 			done();
-		});});});});
+		});});});
 	};
 };
 
@@ -129,7 +134,7 @@ var Sites = function() {
 			} else if (levels[0] == "complex") {
 				cb(config.getAllSites());
 			} else {
-				cb();
+				cb([]);
 			}
 		});
 	};
@@ -150,18 +155,6 @@ var Sites = function() {
 		}
 	};
 
-/*
-"websitename": "Public Name",
-"websiteemail": "email@email.com",
-"dbhost": "Host",
-"dbport": "Port",
-"dbuser": "Username",
-"dbpass": "Password",
-"dbname": "Database Name",
-"serverurl": "Base URL",
-"serverport": "27017",
-"serverhtml": "/usr/local/ryk/lilium-dev/"
-*/
 	this.handlePOST = function(cli) {
 		var dat = cli.postdata.data;
 		var that = this;
@@ -219,13 +212,34 @@ var Sites = function() {
 			ws.end();
 			config.registerConfigs(conf.default.id, conf.default);
 
-			that.initializeWebsite(conf.default, done);
+			that.initializeWebsite(conf.default, function() {
+				that.precompile(done);
+			});
 		});
 	};
 
 	this.initializeWebsite = function(conf, callback) {
 		new SiteInitializer(conf).initialize(callback);
-	}
+	};
+
+	this.loopPrecomp = function(done) {
+		var s = _cachedSites;
+		var len = s.length;
+		var index = 0;
+
+		log("Sites", "Precompiling static files");
+		var execPreComp = function() {
+			if (index === len) {
+				done();
+			} else {
+				(new SiteInitializer(s[index])).precompile(function() {
+					index++;
+					execPreComp();
+				});
+			}
+		};
+		execPreComp();
+	};
 
 	this.loadSites = function(cb) {
 		var that = this;
@@ -249,6 +263,7 @@ var Sites = function() {
 							config.registerConfigs(urlbase, siteInfo);
 						}
 
+						_cachedSites.push(siteInfo);
 						fileIndex++;
 						that.initializeWebsite(config.fetchConfig(keyname), nextFile);
 					});

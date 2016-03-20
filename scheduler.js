@@ -14,12 +14,15 @@ var BGJob = function(id, intervals, ftc) {
 };
 
 BGJob.prototype.start = function() {
-	var timeUntilRun = this.getTimeUntilRun;
+	var that = this;
+	var timeUntilRun = that.getTimeUntilRun();
 	if (timeUntilRun) {
-		this.timeout = setTimeout(this.applyFtc, timeUntilRun);
+		that.timeout = setTimeout(function() {
+			that.applyFtc(that);
+		}, timeUntilRun);
 	}
 
-	return this;
+	return that;
 };
 
 BGJob.prototype.abort = function() {
@@ -42,13 +45,13 @@ BGJob.prototype.getTimeUntilRun = function() {
 		day : now.getDate(), 
 		dayofweek : now.getDay()
 	};
-	var laterArr = this.timeToRun.split(':');
+	var laterArr = this.timeToRun ? this.timeToRun.split(':') : [0,0,0];
 	var laterArr = {
 		hours : laterArr[0],
 		minutes : laterArr[1],
 		seconds : laterArr[2]
 	};	
-
+			
 	// Verify nearest date
 	if (typeof this.dayToRun.weekday !== "undefined") {
 		var nextDay = -1;
@@ -97,9 +100,10 @@ BGJob.prototype.getTimeUntilRun = function() {
  	return later - now;
 };
 
-BGJob.prototype.applyFtc = function() {
-	this.start();
-	this.ftc.apply(this.ftc, []);
+BGJob.prototype.applyFtc = function(that) {
+	that = that || this;
+	that.start();
+	that.ftc.apply(this.ftc, []);
 };
 
 var Scheduler = function() {

@@ -71,13 +71,16 @@ var FileServer = function() {
         try {
             this.dirExists(dest, function(exists) {
                 if (!exists) {
-                    fs.symlinkSync(src, dest);
+                    try {
+                        var stat = fs.statSync(dest);
 
-                } else {
-                    var stat = fs.lstatSync(dest);
-
-                    if (!stat.isSymbolicLink()) {
-                        fs.symlinkSync(src, dest);
+                        if (!stat.isDirectory()) {
+                            fs.symlinkSync(src, dest);
+                        }
+                    } catch (ex) {
+                        try {
+                            fs.symlinkSync(src, dest);
+                        } catch (ex) {}
                     }
                 }
             })

@@ -418,7 +418,7 @@ main.lmladminmain {
 }
 
 main.lmladminmain h1 {
-    	padding: 10px 15px;
+    	padding: 10px;
     	background-color: #EEE;
     	color: #777;
     	font-size: 36px;
@@ -431,6 +431,14 @@ main.lmladminmain .pad10 {
 	display: block;
 }
 
+h2.subtitlestrip {
+	padding: 10px;
+    	border-bottom: 1px solid #EEE;
+    	border-top: 1px solid #eee;
+    	background-color: #fafafa;
+    	color: #999;
+}
+ 
 /* Admin Sidebar */
 .lmladminsidebar {
 	position: fixed;
@@ -454,7 +462,8 @@ main.lmladminmain .pad10 {
 
 .lmladminsidebar .lmladminsidebaritems li {
 	cursor: pointer;
-	font-size: 16px;
+	font-size: 14px;
+	padding: 4px 2px;
 }
 
 .lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected,
@@ -869,7 +878,7 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 	font-weight: 600;
 
 	color: #FFF;
-    	padding: 0px 5px;
+    	padding: 1px 5px 0px;
     	display: inline-block;
 
 	border-radius: 4px;

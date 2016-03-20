@@ -60,7 +60,6 @@
            Campaigns.registerCreationForm();
 
            Campaigns.loadCampaignsStatuses(function() {});
-
        };
 
 	   var handleGET = function(cli) {

@@ -1,0 +1,203 @@
+<script>
+// jQuery
+var LiliumChartbeat = function($) {
+	var socket = io ? io() : undefined;
+	var gauge;
+	var histo;
+	var latestHisto;
+	var topList = new Array();
+	var retainCountTo = new CountUp("chartbeat-retain-ratio", 0, 0, 0, 2, {
+		useEasing : true, 
+		useGrouping : true, 
+		separator : ',', 
+		suffix : ' %' 		
+	});
+	retainCountTo.start();
+	var avgScrollCountTo = new CountUp("chartbeat-average-scroll", 0, 0, 0, 2, {
+		useEasing : true, 
+		useGrouping : true, 
+		separator : ',', 
+		suffix : ' %' 		
+	});
+	avgScrollCountTo.start();
+
+	var historyChart = undefined;
+
+	var createGauge = function() {
+		gauge = new Donut(document.getElementById('chartbeat-live-gauge'), {
+  			lines: 12, // The number of lines to draw
+  			angle: 0.15, // The length of each line
+  			lineWidth: 0.44, // The line thickness
+  			pointer: {
+    				length: 0.9, // The radius of the inner circle
+    				strokeWidth: 0.035, // The rotation offset
+    				color: '#000000' // Fill color
+  			},
+  			limitMax: 'false',   // If true, the pointer will not go past the end of the gauge
+  			colorStart: '#9B59B6',   // Colors
+  			colorStop: '#8FC0DA',    // just experiment with them
+  			strokeColor: '#FAFAFA',   // to see which ones work best for you
+  			generateGradient: false			
+		});
+		gauge.setTextField(document.getElementById("chartbeat-live-count"));
+		gauge.maxValue = 3000; // set max gauge value
+		gauge.animationSpeed = 62; // set animation speed (32 is default value)
+		gauge.set(0);
+	};
+
+	var bindSocket = function() {
+		socket.on('chartbeat_histo', function(dat) {
+			var cbdat = JSON.parse(dat);
+			if (gauge && !cbdat.error) {
+				gauge.set(cbdat.data.stats.people);
+			}
+			latestHisto = cbdat;
+			updateHeader();
+		});
+
+		socket.on('chartbeat_top', function(dat) {
+			topList = dat;
+			makeTopList();
+		});
+
+		socket.on('chartbeat_histo_push', function(dat) {
+			var dat = typeof dat === 'object' ? dat : JSON.prase(dat);
+			historyChart.addData([dat.people], new Date(Date.parse(dat.at)).toLocaleTimeString());
+		});
+	};
+
+	var bindLivevars = function() {
+		document.addEventListener('livevarsPrerendered', function(pkg) {
+			var livevars = pkg.detail.livevars;
+			histo = livevars["chartbeat.dashboard.history"];
+			topList = livevars["chartbeat.dashboard.top"];
+			latestHisto = livevars["chartbeat.dashboard.latest"];
+			var historyData = new Array();	
+			var labelsData = new Array();
+
+			if (histo.length != 0) {
+				var avg = 0;
+				for (var i = histo.length - 1; i >= 0; i--) {
+					avg += histo[i].people;
+					historyData.push(histo[i].people);
+					labelsData.push(new Date(Date.parse(histo[i].at)).toLocaleTimeString());
+				};
+				avg /= histo.length;
+
+				gauge.maxValue = avg*2;
+				gauge.set(histo[0].people);
+			}
+
+			var canv = document.getElementById('dash-cb-histo-canvas');
+
+			var resizeCanvas = function() {		
+				var holder = $('.dash-cb-histo-graph');
+				canv.width = holder.outerWidth() + 10;
+				canv.height = holder.outerHeight() + 6;
+
+				if (historyChart) {
+					historyChart.resize().clear().draw();
+				}
+			};
+
+			['resize', 'focus'].forEach(function(ev) {
+				window.addEventListener(ev, function() {
+					resizeCanvas();
+				});
+			});
+			resizeCanvas();
+
+			historyChart = new Chart(canv.getContext('2d')).Line({
+				labels : labelsData,
+				datasets : [
+					{
+						fillColor: "rgba(155,89,182,0.5)",
+           					strokeColor: "rgba(155,89,182,1)",
+            					pointColor: "rgba(155,89,182,1)",
+            					pointStrokeColor: "#fff",
+            					pointHighlightFill: "#fff",
+            					pointHighlightStroke: "rgba(220,220,220,1)",
+						data : historyData
+					}
+				]
+			}, {
+				animation : true,
+				showScale : false, 
+				responsive : true,
+				maintainAspectRatio : false,
+				scaleShowGridLines : false,
+				pointHitDetectionRadius : 4
+			});
+
+			updateHeader();
+			makeTopList();
+		});
+	};
+
+	var updateHeader = function(dat) {
+		updateRetain();
+		updateAvgScroll();
+	};
+
+	var updateRetain = function() {
+		if (!latestHisto.error) {
+			retainCountTo.update(Math.ceil(latestHisto.data.stats.recirc / latestHisto.data.stats.people * 100));
+		}
+	};
+
+	var updateAvgScroll = function() {
+		if (!latestHisto.error) {
+			avgScrollCountTo.update(Math.ceil(latestHisto.data.stats.scroll.avg * 10));
+		}
+	};
+
+	var makeTopList = function() {
+		var l = $('.cb-top-list');
+		var refs = new Object();
+
+		l.empty();
+		for (var i = 0; i < topList.length; i++) {
+			l.append(generateTopListItem(topList[i]));
+			var tr = topList[i].refs;
+			
+			for (var j = 0; j < tr.length; j++) {
+				if (refs[tr[j].domain]) {
+					refs[tr[j].domain] += tr[j].visitors;
+				} else {
+					refs[tr[j].domain] = tr[j].visitors;
+				}
+			}
+		}
+
+		var topRefNum = 0;
+		var topRefDom = "None";
+		for (var refName in refs) {
+			if (refs[refName] > topRefNum) {
+				topRefNum = refs[refName];
+				topRefDom = refName;
+			}
+		};
+
+		$('#chartbeat-top-referrer').html(topRefDom);
+	};
+
+	var generateTopListItem = function(article) {
+		return '<li><a href="//'+article.url+'" target="_blank">' +
+			'<div class="cb-top-title-wrapper"><span class="cb-top-title">'+article.title+'</span>' +
+			'<span class="cb-top-author">'+article.author+'</span></div>' +
+			'<div class="cb-top-count-wrapper"><span class="cb-top-count">'+article.people+'</span></div>' +
+			'</a></li>';
+	};
+
+	this.start = function() {
+		bindSocket();
+		bindLivevars();
+		createGauge();
+	};
+};
+
+jQuery(function($) {
+	var _lmlcBeat = new LiliumChartbeat($);
+	_lmlcBeat.start();
+});
+</script>

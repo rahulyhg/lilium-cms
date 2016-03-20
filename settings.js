@@ -17,7 +17,6 @@ var Settings = function() {
 			var dat = cli.postdata.data;
 			delete dat.form_name;
 
-			hooks.fire('settings_will_save', dat);
 			for (var key in dat) {
 				var val = dat[key];
 				var keyLevel = key.split('.');
@@ -34,8 +33,9 @@ var Settings = function() {
 				nextLevel[keyLevel[keyLevel.length-1]] = val;
 			}
 
+			hooks.fire('settings_will_save', cli);
 			_c.saveConfigs(cli._c, function() {
-				hooks.fire('settings_saved', dat);
+				hooks.fire('settings_saved', cli);
 				cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?updated=true", false);
 			});
 		} else {

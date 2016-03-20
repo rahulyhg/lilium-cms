@@ -5,77 +5,87 @@ var cli = require('./clientobject.js');
 var sessionManager = require('./session.js');
 var log = require('./log.js');
 var db = require('./includes/db.js');
+var hooks = require('./hooks.js');
 
+var io;
 var sockets = {};
 var groups = {};
 
-var Notification = function() {
-    var that = this;
-    var io;
+var LiliumSocket = function(socket, session) {
+	this.socket = socket;
+	this.session = session;
+        this.clientId = session.data._id;
+	this.config = _c.fetchConfig(session.data.site);
 
-    this.init = function() {
-        registerLivevars();
-        io = inbound.io();
+	if (!sockets[this.clientId]) {
+		sockets[this.clientId] = new Object();
+		sockets[this.clientId].sockets = new Object();
+	}
 
-        //Create default groups
-        that.createGroup('admin', 'admin');
-        that.createGroup('lilium', 'lilium');
-        that.createGroup('spy');
+	sockets[this.clientId].sockets[this.socket.id] = this.socket;
+	sockets[this.clientId].displayname = this.session.data.displayname;
+	sockets[this.clientId].power = this.session.data.power;
 
-        io.on('connection', function(socket) {
+	this.socket.liliumsocket = this;
+};
 
-            // Parse cookie and get session id
-            var sessionId = that.getSessionIDFromCookie(socket.handshake.headers.cookie);
-            // Get session and get client id
-            var session = sessionManager.getSessionFromSID(sessionId);
-            if (session) {
-                var clientId = session.data._id;
+	LiliumSocket.prototype.joinGroup = function(grp) {
+		this.socket.join(grp);
+	};
 
-                if (!sockets[clientId]) {
-                    sockets[clientId] = {};
-                    sockets[clientId].sockets = {};
-                }
-                sockets[clientId].sockets[socket.id] = socket;
-                sockets[clientId].displayname = session.data.displayname;
-                sockets[clientId].power = session.data.power;
+	LiliumSocket.prototype.bind = function() {
+		this.socket.on('join', this.join);
+                this.socket.on('notification-interaction', this.notificationInteraction);
+                this.socket.on('notification-view', this.notificationView);
+                this.socket.on('emittogroup', this.emitToGroup);
+                this.socket.on('private', this.private);
+                this.socket.on('spy', this.spy);
+                this.socket.on('urlChanged', this.urlChanged);
+                this.socket.on('broadcast', this.broadcast);
+                this.socket.on('disconnect', this.disconnect);
+                this.socket.on('alert', this.alert);
+		this.socket.on('error', this.error);
 
+		return this; 
+	
+	};
 
-                socket.on('join', function(groupName) {
-                    // Group exists
+	LiliumSocket.prototype.join = function(groupName) {
+                    var ls = this.liliumsocket;
                     if (groups[groupName]) {
 
                         // Check for needed roles
-                        if (typeof groups[groupName].role == 'undefined' || session.data.roles.indexOf(groups[groupName].role) !== -1) {
-                            socket.join(groupName);
+                        if (typeof groups[groupName].role == 'undefined' || ls.session.data.roles.indexOf(groups[groupName].role) !== -1) {
+                            this.join(groupName);
                             groups[groupName].users.push({
-                                session: sessionId,
-                                client: clientId
+                                session: ls.session.sessionId,
+                                client: ls.clientId
                             });
-                            socket.emit('debug', {
+                            this.emit('debug', {
                                 success: true,
                                 msg: 'Joined ' + groupName + ' group.'
                             });
                         } else {
-                            socket.emit('err', {
+                            this.emit('err', {
                                 success: false,
                                 msg: 'Permission denied for group: ' + groupName
                             });
                         }
 
                     } else {
-                        socket.emit('err', {
+                        this.emit('err', {
                             success: false,
                             msg: 'Group "' + groupName + '" not found.'
                         });
                     }
+	};
 
-                });
-
-                socket.on('notification-interaction', function(notifId) {
+	LiliumSocket.prototype.notificationInteraction = function(notifId) {
+                    var ls = this.liliumsocket;
                     var id = db.mongoID(notifId);
-                    var userId = db.mongoID(clientId);
+                    var userId = db.mongoID(this.clientId);
                     // Update notification as interacted
-                    db.update(_c.default(), 'notifications', {
+                    db.update(ls.config, 'notifications', {
                         _id: id,
                         userID: userId
                     }, {
@@ -85,54 +95,51 @@ var Notification = function() {
                     });
 
                     // Find notification in session
-                    for (var index in session.data.notifications) {
-                        if (session.data.notifications[index]._id == notifId) {
-                            session.data.notifications[index].interacted = true;
+                    for (var index in this.session.data.notifications) {
+                        if (ls.session.data.notifications[index]._id == notifId) {
+                            ls.session.data.notifications[index].interacted = true;
                             break;
                         }
                     }
 
                     // Bypass session manager taking only a cli
                     var cli = {};
-                    cli.session = session;
+                    cli.session = ls.session;
                     cli._c = {};
-                    cli._c.id = session.data.site;
+                    cli._c.id = ls.session.data.site;
                     
                     // Save it
                     sessionManager.saveSession(cli, function() {});
-
-                });
-
-                socket.on('notification-view', function() {
-                    session.data.newNotifications = 0;
+	};
+	LiliumSocket.prototype.notificationView = function() {
+                    var ls = this.liliumsocket;
+                    ls.session.data.newNotifications = 0;
                     // Bypass session manager taking only a cli
                     var cli = {};
-                    cli.session = session;
+                    cli.session = ls.session;
                     cli._c = {};
-                    cli._c.id = session.data.site;
+                    cli._c.id = ls.session.data.site;
                     // Save it
                     sessionManager.saveSession(cli, function() {});
-                });
-
-                socket.on('emittogroup', function(emission) {
-                    if (emission.group) {
+ 
+	};
+	LiliumSocket.prototype.emitToGroup = function(emission) {
+            if (emission.group) {
                         if (groups[emission.group]) {
-                            if (socket.rooms[emission.group]) {
-                                socket.broadcast.to(emission.group).emit('group', emission.data);
+                            if (this.rooms[emission.group]) {
+                                this.broadcast.to(emission.group).emit('group', emission.data);
                             } else {
-                                socket.emit('err', {
+                                this.emit('err', {
                                     msg: 'Notification failed : not in group "' + emission.group + '"'
                                 });
                             }
 
                         } else {
-                            socket.emit('err', 'Group ' + emission.group + ' not found');
+                            this.emit('err', 'Group ' + emission.group + ' not found');
                         }
                     }
-
-                });
-
-                socket.on('private', function(emission) {
+	};
+	LiliumSocket.prototype.private = function(emission) {
                     // Check if target exists
                     if (sockets[emission.id]) {
 
@@ -142,13 +149,14 @@ var Notification = function() {
                             }
                         }
                     }
-                });
 
-                socket.on('spy', function(data) {
+	};
+	LiliumSocket.prototype.spy = function(data) {
+                    var ls = this.liliumsocket;
                         // Make a list of all currently loggedin users
                         var loggedInUsers = {};
                         for (var clientId in sockets) {
-                            if (sockets[clientId].power > session.data.power) {
+                            if (sockets[clientId].power > ls.session.data.power) {
                                 loggedInUsers[clientId] = {};
                                 loggedInUsers[clientId].pages = [];
                                 loggedInUsers[clientId].displayname = sockets[clientId].displayname;
@@ -164,75 +172,116 @@ var Notification = function() {
 
                         }
 
-                        socket.emit('spy', loggedInUsers);
-                });
+                        this.emit('spy', loggedInUsers);
+ 
+	};
+	LiliumSocket.prototype.urlChanged = function(url) {
+                    var ls = this.liliumsocket;
+                    sockets[ls.clientId].sockets[this.id].url = url;
+                    sockets[ls.clientId].sockets[this.id].time = new Date();
 
-                socket.on('urlChanged', function(url){
-                    sockets[clientId].sockets[socket.id].url = url;
-                    sockets[clientId].sockets[socket.id].time = new Date();
-
-                    var clientUrls = createCurrentUserPages();
+                    var clientUrls = ls.createCurrentUserPages();
 
                     for (var index in groups['spy'].users) {
                         var spySession = sessionManager.getSessionFromSID(groups['spy'].users[index].session);
 
                         // Check if user has required power
-                        if (session.data.power < spySession.data.power) {
-                            sockets[spySession.client].emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
+                        if (ls.session.data.power < spySession.data.power) {
+                            sockets[spySession.client].emit('spy-update', {
+                                id: ls.clientId, 
+                                data : clientUrls, 
+                                displayname: sockets[ls.clientId].displayname}
+                            );
                         }
                     }
-                });
-
-                socket.on('broadcast', function(emission) {
+ 
+	};
+	LiliumSocket.prototype.broadcast = function(emission) {
+                    var ls = this.liliumsocket;
 
                     // Only admin or lilium can
-                    if (session.data.roles.indexOf('admin') !== -1) {
+                    if (ls.session.data.roles.indexOf('admin') !== -1) {
                         // Broadcast to its site only
                     }
 
-                    if (session.data.roles.indexOf('lilium') !== -1) {
+                    if (ls.session.data.roles.indexOf('lilium') !== -1) {
                         // Broadcast to all site?
                     }
-                });
 
-                socket.on('disconnect', function() {
-                    createCurrentUserPages();
-                    sockets[clientId].sockets[socket.id] = undefined;
+	};
+	LiliumSocket.prototype.disconnect = function() {
+                    var ls = this.liliumsocket;
+                    sockets[ls.clientId].sockets[ls.socket.id] = undefined;
+                    delete sockets[ls.clientId].sockets[ls.socket.id];
 
-                    delete sockets[clientId].sockets[socket.id];
-
-                    if (sockets[clientId].sockets.length == 0) {
-                        sockets[clientId] = undefined;
-                        delete sockets[clientId];
+                    if (sockets[ls.clientId].sockets.length == 0) {
+                        sockets[ls.clientId] = undefined;
+                        delete sockets[ls.clientId];
                     }
 
                     // Notify users currently spying
-                    var clientUrls = createCurrentUserPages();
-                    io.sockets.in('spy').emit('spy-update', {id: clientId, data : clientUrls, displayname: sockets[clientId].displayname});
-
-                });
-
-                socket.on('alert', function() {
-                    socket.broadcast.emit('message', {
-                        username: socket.username
+                    var clientUrls = ls.createCurrentUserPages();
+                    io.sockets.in('spy').emit('spy-update', {
+                        id: ls.clientId, data : clientUrls, displayname: sockets[ls.clientId].displayname
                     });
-                });
-            }
+	};
+	LiliumSocket.prototype.alert = function() {
+                    this.broadcast.emit('message', {
+                        username: this.username
+                    });
+	};
 
-            var createCurrentUserPages = function() {
+        LiliumSocket.prototype.createCurrentUserPages = function() {
                 clientUrls = [];
 
-                for (var index in sockets[clientId].sockets) {
+                for (var index in sockets[this.clientId].sockets) {
                     var info = {};
 
-                    info.url = sockets[clientId].sockets[index].url;
-                    info.time = sockets[clientId].sockets[index].time;
+                    info.url = sockets[this.clientId].sockets[index].url;
+                    info.time = sockets[this.clientId].sockets[index].time;
                     clientUrls.push(info);
                 };
 
                 return clientUrls;
+        };
+
+	LiliumSocket.prototype.error = function(err) {
+		log('Socket', 'Error with socket : ' + err.message);
+		log('Stacktrace', err.stack);
+	};
+
+var Notification = function() {
+    var that = this;
+
+    var onSocketConnection = function(socket) {
+            // Parse cookie and get session id
+            var sessionId = that.getSessionIDFromCookie(socket.handshake.headers.cookie);
+            // Get session and get client id
+            var session = sessionManager.getSessionFromSID(sessionId);
+            session.sessionId = sessionId;
+            if (session) {
+        	new LiliumSocket(socket, session).bind().joinGroup('lmlsite_' + session.data.site);
             }
+    };
+
+    this.init = function() {
+        registerLivevars();
+        io = inbound.io();
+
+        //Create default groups
+        that.createGroup('admin', 'admin');
+        that.createGroup('lilium', 'lilium');
+        that.createGroup('spy');
+
+        _c.eachSync(function(conf) {
+            that.createGroup('lmlsite_' + conf.id);
         });
+
+        hooks.bind('site_initialized', 3000, function(conf) {
+            that.createGroup('lmlsite_' + conf.id);
+        });
+     
+        io.on('connection', onSocketConnection);
     };
 
     this.emitToUser = function(userID, message) {
@@ -403,10 +452,14 @@ var Notification = function() {
         }
     };
 
-    this.emitToGroup = function(groupName, data) {
+    this.emitToGroup = function(groupName, data, type) {
         if (groups[groupName]) {
-            io.sockets.in(groupName).emit('notification', notification);
+            io.sockets.in(groupName).emit(type || 'notification', data);
         }
+    };
+
+    this.emitToWebsite = function(siteid, data, type) {
+        this.emitToGroup('lmlsite_' + siteid, data, type);
     };
 
     this.removeGroup = function(groupName) {
@@ -492,8 +545,8 @@ var Notification = function() {
         io.sockets.emit('notification', notification);
     };
 
-    this.broadcast = function(data) {
-        io.sockets.emit('message', data);
+    this.broadcast = function(data, msgType) {
+        io.sockets.emit(msgType || 'message', data);
     };
 
     this.createGroup = function(groupName, role) {

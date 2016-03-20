@@ -1,0 +1,911 @@
+/*********************************************************************************************************
+*                                                                                                       *
+*  88          88 88 88                                     ,ad8888ba,  88b           d88  ad88888ba    *
+*  88          "" 88 ""                                    d8"'    `"8b 888b         d888 d8"     "8b   *
+*  88             88                                      d8'           88`8b       d8'88 Y8,           *
+*  88          88 88 88 88       88 88,dPYba,,adPYba,     88            88 `8b     d8' 88 `Y8aaaaa,     *
+*  88          88 88 88 88       88 88P'   "88"    "8a    88            88  `8b   d8'  88   `"""""8b,   *
+*  88          88 88 88 88       88 88      88      88    Y8,           88   `8b d8'   88         `8b   *
+*  88          88 88 88 "8a,   ,a88 88      88      88     Y8a.    .a8P 88    `888'    88 Y8a     a8P   *
+*  88888888888 88 88 88  `"YbbdP'Y8 88      88      88      `"Y8888Y"'  88     `8'     88  "Y88888P"    *
+*                                                                                                       *
+*********************************************************************************************************
+* LILIUM CMS | GLOBAL STYLESHEET                                                                        *
+*                                                                                                       *
+* Author : Erik Desjardins                                                                              *
+* Contributors : Samuel Rondeau-Millaire                                                                *
+* Description : Global styling for admin section of Lilium.                                             *
+* Documentation : http://liliumcms.com/docs                                                             *
+*********************************************************************************************************/
+@font-face {
+font-family: 'Raleway';
+font-weight: 100;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Raleway-100/Raleway-100.eot');
+src: url('//liliumdev.com:8080/static/fonts/Raleway-100/Raleway-100.eot?#iefix') format('embedded-opentype'),
+local('Raleway Thin'),
+local('Raleway-100'),
+url('//liliumdev.com:8080/static/fonts/Raleway-100/Raleway-100.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Raleway-100/Raleway-100.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Raleway-100/Raleway-100.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Raleway-100/Raleway-100.svg#Raleway') format('svg');
+}
+@font-face {
+font-family: 'Raleway';
+font-weight: 300;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Raleway-300/Raleway-300.eot');
+src: url('//liliumdev.com:8080/static/fonts/Raleway-300/Raleway-300.eot?#iefix') format('embedded-opentype'),
+local('Raleway Light'),
+local('Raleway-300'),
+url('//liliumdev.com:8080/static/fonts/Raleway-300/Raleway-300.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Raleway-300/Raleway-300.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Raleway-300/Raleway-300.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Raleway-300/Raleway-300.svg#Raleway') format('svg');
+}
+@font-face {
+font-family: 'Raleway';
+font-weight: 400;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Raleway-regular/Raleway-regular.eot');
+src: url('//liliumdev.com:8080/static/fonts/Raleway-regular/Raleway-regular.eot?#iefix') format('embedded-opentype'),
+local('Raleway'),
+local('Raleway-regular'),
+url('//liliumdev.com:8080/static/fonts/Raleway-regular/Raleway-regular.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Raleway-regular/Raleway-regular.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Raleway-regular/Raleway-regular.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Raleway-regular/Raleway-regular.svg#Raleway') format('svg');
+}
+@font-face {
+font-family: 'Raleway';
+font-weight: 500;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Raleway-500/Raleway-500.eot');
+src: url('//liliumdev.com:8080/static/fonts/Raleway-500/Raleway-500.eot?#iefix') format('embedded-opentype'),
+local('Raleway Medium'),
+local('Raleway-500'),
+url('//liliumdev.com:8080/static/fonts/Raleway-500/Raleway-500.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Raleway-500/Raleway-500.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Raleway-500/Raleway-500.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Raleway-500/Raleway-500.svg#Raleway') format('svg');
+}
+@font-face {
+font-family: 'Raleway';
+font-weight: 600;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Raleway-600/Raleway-600.eot');
+src: url('//liliumdev.com:8080/static/fonts/Raleway-600/Raleway-600.eot?#iefix') format('embedded-opentype'),
+local('Raleway SemiBold'),
+local('Raleway-600'),
+url('//liliumdev.com:8080/static/fonts/Raleway-600/Raleway-600.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Raleway-600/Raleway-600.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Raleway-600/Raleway-600.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Raleway-600/Raleway-600.svg#Raleway') format('svg');
+}
+@font-face {
+font-family: 'Raleway';
+font-weight: 700;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Raleway-700/Raleway-700.eot');
+src: url('//liliumdev.com:8080/static/fonts/Raleway-700/Raleway-700.eot?#iefix') format('embedded-opentype'),
+local('Raleway Bold'),
+local('Raleway-700'),
+url('//liliumdev.com:8080/static/fonts/Raleway-700/Raleway-700.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Raleway-700/Raleway-700.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Raleway-700/Raleway-700.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Raleway-700/Raleway-700.svg#Raleway') format('svg');
+}
+@font-face {
+font-family: 'Crimson Text';
+font-weight: 400;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-regular/Crimson-Text-regular.eot');
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-regular/Crimson-Text-regular.eot?#iefix') format('embedded-opentype'),
+local('Crimson Text'),
+local('Crimson-Text-regular'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-regular/Crimson-Text-regular.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-regular/Crimson-Text-regular.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-regular/Crimson-Text-regular.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-regular/Crimson-Text-regular.svg#CrimsonText') format('svg');
+}
+@font-face {
+font-family: 'Crimson Text';
+font-weight: 600;
+font-style: normal;
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-600/Crimson-Text-600.eot');
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-600/Crimson-Text-600.eot?#iefix') format('embedded-opentype'),
+local('Crimson Text Semibold'),
+local('Crimson-Text-600'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600/Crimson-Text-600.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600/Crimson-Text-600.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600/Crimson-Text-600.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600/Crimson-Text-600.svg#CrimsonText') format('svg');
+}
+@font-face {
+font-family: 'Crimson Text';
+font-weight: 400;
+font-style: italic;
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-italic/Crimson-Text-italic.eot');
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-italic/Crimson-Text-italic.eot?#iefix') format('embedded-opentype'),
+local('Crimson Text Italic'),
+local('Crimson-Text-italic'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-italic/Crimson-Text-italic.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-italic/Crimson-Text-italic.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-italic/Crimson-Text-italic.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-italic/Crimson-Text-italic.svg#CrimsonText') format('svg');
+}
+@font-face {
+font-family: 'Crimson Text';
+font-weight: 600;
+font-style: italic;
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.eot');
+src: url('//liliumdev.com:8080/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.eot?#iefix') format('embedded-opentype'),
+local('Crimson Text Semibold Italic'),
+local('Crimson-Text-600italic'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.woff2') format('woff2'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.woff') format('woff'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.ttf') format('truetype'),
+url('//liliumdev.com:8080/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.svg#CrimsonText') format('svg');
+}
+@font-face {
+font-family: 'FontAwesome';
+src: url('//liliumdev.com:8080/static/fonts/font-awesome/fontawesome-webfont.eot?v=4.5.0');
+src: url('//liliumdev.com:8080/static/fonts/font-awesome/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), url('//liliumdev.com:8080/static/fonts/font-awesome/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('//liliumdev.com:8080/static/fonts/font-awesome/fontawesome-webfont.woff?v=4.5.0') format('woff'), url('//liliumdev.com:8080/static/fonts/font-awesome/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('//liliumdev.com:8080/static/fonts/font-awesome/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
+font-weight: normal;
+font-style: normal;
+}
+html, body {
+padding:0;
+margin:0;
+font-family: 'Raleway', sans-serif;
+color: [Error: LMLParseException - Cannot print root level of library 'font-color', LML slang not found];
+}
+body {
+opacity:0;
+-webkit-transition: opacity 0.2s;
+-moz-transition: opacity 0.2s;
+-ms-transition: opacity 0.2s;
+-o-transition: opacity 0.2s;
+transition: opacity 0.2s;
+}
+body.lmlrendered {
+opacity: 1;
+}
+input, textarea, button {
+outline: none;
+border: none;
+}
+a {
+color: #9B59B6;
+}
+a:hover {
+color: #8B49A6;
+}
+button, input[type="submit"] {
+cursor: pointer;
+}
+input[type="checkbox"], .lmlcheckbox {
+display: none;
+}
+.lmlbeautifiedcheckbox {
+display: inline-block;
+width: 32px;
+height:32px;
+vertical-align: middle;
+margin-right: 10px;
+background-image: url('//liliumdev.com:8080/static/media/lmlcontrols.png');
+background-position: 96px 0px;
+cursor: pointer;
+}
+.lmlbeautifiedcheckbox.checked {
+background-position: 0px 0px;
+}
+form .campaigncreatefield-checkbox label {
+display: inline-block;
+}
+lml\:template, lml\:tobject, lml,
+lml\:queryparam, .lmlloading, .lmlhidden {
+display: none;
+}
+h1, h2, h3, h4, h5, h6 {
+margin:0;
+padding:0;
+font-weight: 100;
+}
+form input, form label{
+display: block;
+}
+.lilium {
+padding:0;
+margin:0;
+}
+/* Normalized Forms */
+.lmlform {
+background-color: #F6F6F6;
+border-top: 1px solid #DDD;
+border-bottom: 1px solid #DDD;
+}
+.lmlform-fieldwrapper {
+padding: 10px;
+}
+.lmlform-fieldwrapper label {
+margin-right: 10px;
+}
+.lmlform-fieldwrapper label.inline, .lmlform input.inline,
+.lmlform select.inline, .lmlform textarea.inline {
+display: inline-block;
+}
+.lmlform input:not([type="file"]), .lmlform select, .lmlform textarea {
+padding: 10px;
+font-size: 14px;
+border: 1px solid #DFDFDF;
+width: 100%;
+}
+.lmlform input[type="submit"], .lmlform button {
+background-color: #9B59B6;
+color: #EEE;
+font-size: 18px;
+border: none;
+}
+.lmlform input[type="submit"]:hover, .lmlform button:hover {
+background-color: #A869C6}
+.lmlform input[type="submit"]:active, .lmlform button:active {
+background-color: #8B49A6}
+.lmlform input:focus, .lmlform select:focus,
+.lmlform textarea:focus {
+border: 1px solid #9B59B6;
+}
+.lmlform .lmlform-fieldwrapper-title {
+background-color: #EEE;
+}
+.lmlform .lmlform-fieldwrapper-title:not(:first-child) {
+border-top: 1px solid #DDD;
+}
+.lmlform .lmlform-fieldwrapper-title:not(:last-child) {
+border-bottom: 1px solid #DDD;
+}
+.lmlform .lmlform-fieldwrapper-title h3 {
+text-shadow: 0 0 3px rgba(0,0,0,0.1);
+}
+/* Lilium Table Styles */
+table.lmlfullwidthtable {
+width: 100%;
+}
+table.lmlfullwidthtable thead {
+background-color: #E3E3E3;
+}
+table.lmlfullwidthtable thead tr th,
+table.lmlfullwidthtable tbody tr td {
+padding: 4px 15px
+}
+table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
+background-color: #FAFAFA;
+padding: 15px;
+}
+.lml-button {
+background-color: #9B59B6;
+color: #EEE;
+font-size: 18px;
+padding: 10px;
+border: none;
+}
+/* PushTables */
+.lmlpushtable {
+-webkit-box-sizing: border-box;
+-moz-box-sizing: border-box;
+box-sizing: border-box;
+width: 100%;
+border-collapse: separate;
+border-spacing: 0px;
+}
+.lmlpushtable thead tr,
+.lmlpushtable tfoot tr {
+padding: 2px;
+background-color: #EEE;
+font-size: 18px;
+font-weight: bold;
+}
+.lmlpushtable thead th,
+.lmlpushtable tfoot td,
+.lmlpushtable tbody td {
+padding: 10px;
+text-align: left;
+}
+.lmlpushtable thead th input,
+.lmlpushtable thead th select {
+padding: 6px;
+}
+.lmlpushtable .lmlpushtablecasenotmet {
+display: none;
+}
+.lmladmincontentwrapper {
+padding-left: 200px;
+padding-top: 50px;
+}
+.lmladminsidebardecowrapper {
+overflow: hidden;
+position: absolute;
+bottom: 0;
+left: 0;
+right: 0;
+top: 0;
+z-index: 1000;
+}
+.lmladminsidebardeco {
+display: block;
+background-color: #000;
+position: absolute;
+bottom: 0;
+height: 600px;
+left: 0;
+right: 0;
+opacity: 0.05;
+}
+.lmladminsidebardeco:nth-child(1) {
+-webkit-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+-moz-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+-ms-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+-o-transform: translateX(79px) translateY(86px) rotateZ(25deg);
+transform: translateX(79px) translateY(86px) rotateZ(25deg);
+}
+.lmladminsidebardeco:nth-child(2) {
+-webkit-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+-moz-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+-ms-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+-o-transform: translateX(103px) translateY(126px) rotateZ(56deg);
+transform: translateX(103px) translateY(126px) rotateZ(56deg);
+}
+.lmladminsidebardeco:nth-child(3) {
+-webkit-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+-moz-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+-ms-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+-o-transform: translateX(100px) translateY(172px) rotateZ(94deg);
+transform: translateX(100px) translateY(172px) rotateZ(94deg);
+}
+/* Admin Body */
+main.lmladminmain {
+}
+main.lmladminmain h1 {
+padding: 10px;
+background-color: #EEE;
+color: #777;
+font-size: 36px;
+border-bottom: 1px solid #DDD;
+text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.1);
+}
+main.lmladminmain .pad10 {
+padding: 10px 15px;
+display: block;
+}
+h2.subtitlestrip {
+padding: 10px;
+border-bottom: 1px solid #EEE;
+border-top: 1px solid #eee;
+background-color: #fafafa;
+color: #999;
+}
+/* Admin Sidebar */
+.lmladminsidebar {
+position: fixed;
+left: 0;
+bottom: 0;
+top: 50px;
+width: 200px;
+background-color: #555;
+overflow-x: hidden;
+z-index: 20000;
+}
+.lmladminsidebar .lmladminsidebaritems {
+padding:0;
+margin: 0;
+color: #BBB;
+}
+.lmladminsidebar .lmladminsidebaritems li {
+cursor: pointer;
+font-size: 14px;
+padding: 4px 2px;
+}
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected,
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected:hover {
+background-color: #9B59B6;
+}
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected a,
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected:hover a {
+color: #FFF;
+}
+.lmladminsidebar .lmladminsidebaritems li:hover {
+background-color: #777;
+color: #EEE;
+}
+.lmladminsidebar .lmladminsidebaritems li a {
+display: block;
+padding: 5px 10px;
+color: #BBB;
+text-decoration: none;
+}
+.lmladminsidebar .lmladminsidebaritems li:hover a {
+color: #EEE;
+}
+.lmladminsidebar .lmladminsidebaritems .fa {
+font-size: 18px;
+margin-right: 5px;
+text-decoration: none;
+width: 22px;
+}
+.fa > .badge{
+position: relative;
+top: -10px;
+background-color: #9B59B6;
+border-radius: 2px;
+line-height: 15px;
+}
+.lmladminsidebarlistwrapper {
+position:relative;
+z-index: 2000;
+}
+/* Notifications */
+#notification-dropdown{
+padding: 0px;
+max-height: 300px;
+width: 300px;
+overflow-x: hidden;
+}
+#notification-dropdown li{
+padding: 10px;
+background-color: #F6F6F6;
+width: 300px;
+border-left: 5px;
+border-color: #2980b9;
+border-left-style: solid;
+}
+#notification-dropdown li.danger{
+border-color: #c0392b;
+}
+#notification-dropdown li.warning{
+border-color: #f1c40f;
+}
+#notification-dropdown li.success{
+border-color: #27af61;
+}
+#notification-dropdown li > a{
+width: 300px;
+white-space: initial;
+}
+#notification-dropdown li > a .notif-title {
+font-size: 14px;
+font-weight: bold;
+color: #333;
+}
+#notification-dropdown li:hover{
+background-color: #ccc;
+}
+#notification-dropdown li.new:hover{
+background-color: #ccc;
+}
+#notification-dropdown li:hover .date{
+color: #fff;
+}
+#notification-dropdown li:hover a{
+background-color: inherit;
+}
+#notification-dropdown li .date{
+color: #ccc;
+margin-left: 10px;
+font-size: 12px;
+}
+#notification-dropdown li.new{
+background-color: #FFF;
+}
+#notification-dropdown > .title{
+font-size: 16px;
+padding: 10px;
+}
+.navbar-right #notification-dropdown.dropdown-menu {
+right: -1px;
+}
+/* Admin Bar */
+header.admin-bar {
+position:fixed;
+left:0;
+right:0;
+top:0;
+z-index: 10000;
+height: 50px;
+box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+}
+.navbar-default {
+display: block;
+background-color: #555;
+height: 50px;
+border-bottom: 1px solid #DDD;
+margin-bottom: 0px;
+position:fixed;
+left:0;
+right:0;
+top:0;
+z-index: 10000;
+}
+.navbar{
+border-radius: 0px;
+border: none;
+color: #FFF;
+}
+.navbar .dropdown-menu {
+color: #111;
+}
+.container-fluid {
+padding-left: 0px;
+padding-right: 0px;
+}
+header.admin-bar a {
+text-decoration: none;
+}
+header.admin-bar > * {
+vertical-align: middle;
+}
+header.admin-bar .lilium-logo-link {
+width: 50px;
+height: 100%;
+overflow: hidden;
+display: inline-block;
+}
+header.admin-bar .lilium-logo-link img {
+height: 55px;
+width: auto;
+position: relative;
+bottom: 8px;
+right: 10px;
+}
+header.admin-bar .navbar-default .navbar-header {
+position: absolute;
+}
+#navbar.navbar-collapse {
+padding-left: 40px;
+}
+/* Profile dropdown */
+#loggedinuserbox {
+width: 200px;
+text-overflow: ellipsis;
+white-space: nowrap;
+overflow: hidden;
+text-align: center;
+}
+#profile-dropdown {
+width: 200px;
+padding: 0px;
+}
+#profile-dropdown #avatar{
+display: inline-block;
+float: right;
+}
+#profile-dropdown #avatar img {
+max-height: 70px;
+max-width: 70px;
+}
+#profile-dropdown .links {
+width: 128px;
+display: inline-block;
+}
+#profile-dropdown .links a {
+padding-left: 10px;
+display: block;
+padding-top: 5px;
+padding-bottom: 5px;
+}
+#profile-dropdown .links a:hover {
+background: #A869C6;
+color: #fff;
+}
+header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
+-webkit-border-radius: 3px;
+-moz-border-radius: 3px;
+-ms-border-radius: 3px;
+-o-border-radius: 3px;
+border-radius: 3px;
+background-color: #9B59B6;
+color: #FFF;
+font-size: 18px;
+text-transform: uppercase;
+padding: 5px 30px;
+font-weight: 300;
+display: inline-block;
+cursor: pointer;
+margin-top: 8px;
+margin-left: 20px;
+}
+header.admin-bar .navbar-default .navbar-nav>li>* {
+padding: 12px 20px;
+line-height: 25px;
+}
+.link {
+cursor : pointer;
+}
+header.admin-bar .link:hover {
+background-color: rgba(255, 255, 255, 0.1);
+}
+header.admin-bar .navbar-default .navbar-nav .admin-publish-button:hover {
+background-color: #A869C6;
+}
+header.admin-bar .navbar-default .navbar-nav .admin-publish-button:active {
+background-color: #8B49A6;
+}
+header.admin-bar .navbar-default .navbar-nav  .loggedin-user-box {
+text-transform: uppercase;
+border-left: 1px solid #777;
+font-size: 14px;
+}
+header.admin-bar .loggedin-user-box:hover {
+background-color: rgba(255, 255, 255, 0.1);
+color: #EEE;
+}
+header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
+color: #CCC;
+height: 100%;
+display: inline;
+}
+header.admin-bar .navbar-default .navbar-nav  .notifications {
+}
+/* @/login */
+.lmllogin {
+background-color: #333;
+color: #EEE;
+}
+.dashboard-login-form {
+background-color: transparent;
+}
+.lmllogin .lmlform-fieldwrapper {
+padding: 0px;
+}
+.lmllogin-wrapper {
+width: 320px;
+height: auto;
+margin: 200px auto 0px auto;
+text-align: center;
+}
+.lmllogin-wrapper header {
+padding: 10px;
+}
+.lmllogin-wrapper form {
+overflow: hidden;
+-webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+-ms-border-radius: 5px;
+-o-border-radius: 5px;
+border-radius: 5px;
+border: 6px solid rgba(255, 255, 255, 0.1);
+}
+.lmllogin-wrapper form input {
+width: 100%;
+box-sizing: border-box;
+-moz-box-sizing: border-box;
+-webkit-box-sizing: border-box;
+padding: 10px;
+font-size: 16px;
+color: #333;
+background-color: #EEE;
+-webkit-transition: all 0.2s;
+-moz-transition: all 0.2s;
+-ms-transition: all 0.2s;
+-o-transition: all 0.2s;
+transition: all 0.2s;
+}
+.lmllogin-wrapper form input:hover {
+background-color: #F7F7F7;
+}
+.lmllogin-wrapper form input:focus {
+background-color: #FFF;
+}
+.lmllogin-wrapper form input[type="submit"] {
+background-color: #DDD;
+color: #777;
+text-transform: uppercase;
+}
+.lmllogin-wrapper form input[type="submit"]:hover,
+.lmllogin-wrapper form input[type="submit"]:focus {
+background-color: #FFF;
+color: #111;
+}
+.lmllogin-wrapper footer {
+text-align: right;
+font-size: 12px;
+color: #999;
+margin-top: 3px;
+}
+/* Error Reports */
+.errorbody {
+background-color: #222222;
+color: #CCC;
+font-family: "Raleway", Arial, sans-serif;
+}
+.lmlcrash header {
+padding: 10px;
+background-color: #555;
+}
+.lmlcrash header h1 {
+color: #EEE;
+font-weight: 100;
+}
+.lmlcrash main {
+padding: 20px;
+}
+.alert-info {
+border-left-color: #2980b9;
+color: #2980b9;
+}
+.alert-danger {
+border-left-color: #c0392b;
+color: #c0392b;
+}
+.alert-warning {
+border-left-color: #f1c40f;
+color: #f1c40f;
+}
+.alert-success {
+border-left-color: #27af61;
+color: #27af61;
+}
+.alert {
+background: #fff;
+padding: 15px;
+margin-bottom: 20px;
+border : 1px solid #999;
+border-left: 5px solid;
+border-radius: 0px;
+-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
+box-shadow: 0 6px 12px rgba(0,0,0,.175)
+}
+.close {
+text-shadow: none;
+}
+.alert-info .close{
+color: #2980b9;
+opacity: 1;
+}
+.alert-success .close{
+color: #27af61;
+opacity: 1;
+}
+.alert-warning .close{
+color: #f1c40f;
+opacity: 1;
+}
+.alert-danger .close{
+color: #c0392b;
+opacity: 1;
+}
+/* Strips and widgets */
+.messagestrip {
+padding: 2px 15px;
+margin: 0px;
+display: block;
+color: #FFF;
+}
+.messagestrip .fa {
+margin-right: 4px;
+font-size: 18px;
+vertical-align: middle;
+display: inline-block;
+}
+.messagestrip span {
+vertical-align: middle;
+display: inline-block;
+font-size: 14px;
+}
+.messagestrip.error {
+background-color: #F77;
+}
+.siteDefaultTag {
+font-size: 10px;
+background-color: #8B49A6;
+font-weight: 600;
+color: #FFF;
+padding: 1px 5px 0px;
+display: inline-block;
+border-radius: 4px;
+text-transform: uppercase;
+margin-left: 5px;
+vertical-align: middle;
+}
+a.button-link {
+background-color: #9B59B6;
+color: #FFF;
+border-radius: 10px;
+padding: 8px 13px;
+font-size: 13px;
+text-transform: uppercase;
+margin-right: 6px;
+cursor: pointer;
+}
+a.button-link:hover {
+text-decoration: none;
+background-color: #A869C6;
+}
+a.button-link:active {
+background-color: #8B49A6;
+}
+/* Progress bar */
+.bar {
+padding : 10px;
+}
+.progress {
+display: none;
+}
+/* CKEDITOR */
+.cke_top {}
+.cke_button__imgbrowser_icon {
+background: url(/bower/ckeditor/skins/moono/icons.png) no-repeat 0 -1008px!important;
+}
+#picture-list {
+width: 800px;
+height: 400px;
+}
+div#picture-list img {
+margin : 2px;
+float: left;
+}
+.selectedPicture {
+border: 2px solid #000;
+margin: 0px !important;
+}
+/* Media */
+.medias-item-list {
+float: left;
+list-style: none;
+}
+.medias-item-list {
+width: 150px;
+height: 150px;
+}
+.medias-item-list:hover .medias-actions{
+display:block;
+}
+.medias-item-list .medias-actions {
+display:none;
+float: left;
+position: relative;
+left: 0px;
+top: 0px;
+width: 150px;
+height: 150px;
+background-color: rgba(0,0,0,0.2);
+z-index: 1000;
+margin-bottom: -150px;
+text-align: center;
+border: 1px solid #fff;
+}
+.medias-actions > button {
+background: initial;
+color: #fff;
+vertical-align: middle;
+/* text-align: center; */
+height: 50%;
+width: 100%;
+}
+.medias-actions > button:hover {
+background-color: rgba(0,0,0,0.5);
+}
+.medias-actions > button:nth-of-type(1) {
+border-bottom: 1px solid #fff;
+}
+/* Fab buttons */
+h1 > a.fab {
+float: right;
+background-color: #9B59B6;
+color: #fff;
+border-radius: 50%;
+width: 45px;
+height: 45px;
+text-align: center;
+line-height: 45px;
+text-decoration: none;
+top: 30px;
+position: relative;
+font-size: 50px;
+}
+h1 > a.fab:hover {
+background-color: #A869C6;
+}
+/* Modal */
+.modal-dialog {
+padding-top: 30px;
+}
