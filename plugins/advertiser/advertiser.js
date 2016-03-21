@@ -127,6 +127,15 @@
                          log('Hooks', 'Setting saved event was caught with valid flag : ' + valid);
                      });
                  });
+
+                 hooks.bind('campaignCreated', 560, function(camp) {
+                     makeAdServerRequest('newCampaign', camp, function(resp, err) {
+                         log("Advertiser", err ? 
+                             "Error sending 'created' event : " + err : 
+                             "AdServer responded to 'created' with code " + resp.statusCode
+                         );
+                     }, camp.cli);
+                 });
 	     };
 
              var createAdServerHandshake = function(cb) {
@@ -154,9 +163,15 @@
                  req.end('', 'utf8');
              };
 
-             var makeAdServerRequest = function(method, data, cb) {
+             var makeAdServerRequest = function(method, data, cb, cli) {
                  log('Adversiter', 'Sending POST to AdServer using method : ' + method);
-                 var cconf = conf.default();
+                 var cconf = cli ? cli._c : conf.default();
+
+                 if (!cconf.adserver && !cconf.adserver.bridgeaddr) {
+                     cb(undefined, new Error("AdServer is not configured."));
+                     return;
+                 }
+                 
                  var split = cconf.adserver.bridgeaddr.split(':');
                  var privAddr = split[0].replace(/\/\//g, '');
                  var privPort = split[1] || 5142;

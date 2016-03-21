@@ -1,6 +1,6 @@
 $(document).ready(function() {
     document.addEventListener(liliumcms.LiliumEvents.livevarsRendered.name, function(e) {
-        var session = e.detail.livevars.session
+        var session = e.detail.livevars.session;
 
         // Subscribe to channels based on user roles
         if (session) {
@@ -128,7 +128,7 @@ $(document).ready(function() {
             notification.message = notification.msg ? notification.msg : 'Notification without a message :(';
             liliumcms.notify(notification);
         });
-    }
+    };
     liliumcms.notify = function(notification) {
         $.notify(notification, {
             type: notification.type,
@@ -153,5 +153,5 @@ $(document).ready(function() {
                 '<a href="{3}" target="{4}" data-notify="url"></a>' +
                 '</div>'
         });
-    }
+    };
 });

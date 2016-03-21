@@ -30,4 +30,4 @@ var MultiSelect = function(tableid, lmltag, selectElem, dataSource) {
     var generateMultiSelect = function (elem) {
         elem.hide();
     }
-}
+};

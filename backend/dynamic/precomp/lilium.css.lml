@@ -463,7 +463,6 @@ h2.subtitlestrip {
 .lmladminsidebar .lmladminsidebaritems li {
 	cursor: pointer;
 	font-size: 14px;
-	padding: 4px 2px;
 }
 
 .lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected,
@@ -483,7 +482,7 @@ h2.subtitlestrip {
 
 .lmladminsidebar .lmladminsidebaritems li a {
 	display: block;
-	padding: 5px 10px;
+	padding: 9px 12px;
 	color: #BBB;
 
 	text-decoration: none;
@@ -555,11 +554,10 @@ h2.subtitlestrip {
 	height: 0px;
 }
 .lmladminsidebar .lmladminsidebaritems .parent:hover ul li {
-	height: 30px;
-
+	height: 38px;
 }
 .lmladminsidebar .lmladminsidebaritems .parent.child-selected ul li {
-	height: 30px;
+	height: 38px;
 }
 .lmladminsidebar .lmladminsidebaritems .parent.child-selected > a > i:nth-of-type(2){
     -webkit-transform : rotate(-90deg);

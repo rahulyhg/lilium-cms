@@ -17,4 +17,4 @@ var LmlTable = function (table) {
     this.updateNav = function() {
 
     };
-}
+};

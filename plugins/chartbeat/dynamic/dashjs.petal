@@ -25,23 +25,23 @@ var LiliumChartbeat = function($) {
 
 	var createGauge = function() {
 		gauge = new Donut(document.getElementById('chartbeat-live-gauge'), {
-  			lines: 12, // The number of lines to draw
-  			angle: 0.15, // The length of each line
-  			lineWidth: 0.44, // The line thickness
+  			lines: 12, 
+  			angle: 0.15,
+  			lineWidth: 0.44,
   			pointer: {
-    				length: 0.9, // The radius of the inner circle
-    				strokeWidth: 0.035, // The rotation offset
-    				color: '#000000' // Fill color
+    				length: 0.9,
+    				strokeWidth: 0.035,
+    				color: '#000000'
   			},
-  			limitMax: 'false',   // If true, the pointer will not go past the end of the gauge
-  			colorStart: '#9B59B6',   // Colors
-  			colorStop: '#8FC0DA',    // just experiment with them
-  			strokeColor: '#FAFAFA',   // to see which ones work best for you
+  			limitMax: 'false',   
+  			colorStart: '#9B59B6',
+  			colorStop: '#8FC0DA', 
+  			strokeColor: '#FAFAFA',
   			generateGradient: false			
 		});
 		gauge.setTextField(document.getElementById("chartbeat-live-count"));
-		gauge.maxValue = 3000; // set max gauge value
-		gauge.animationSpeed = 62; // set animation speed (32 is default value)
+		gauge.maxValue = 3000; 
+		gauge.animationSpeed = 62;
 		gauge.set(0);
 	};
 
@@ -181,10 +181,40 @@ var LiliumChartbeat = function($) {
 		$('#chartbeat-top-referrer').html(topRefDom);
 	};
 
+	var generateTopListTags = function(article) {
+		var html = "";
+
+		switch (article.type) {
+			case "LandingPage" :
+				html += '<span class="cb-top-tag cb-top-tag-blue">Archive</span>';
+				break;
+			case "Article" :
+				html += '<span class="cb-top-tag cb-top-tag-gray">Content</span>';
+				break;
+		}
+
+		if (article.google > article.people / 2) {
+			html += '<span class="cb-top-tag cb-top-tag-dark">Google</span>';
+		}
+
+		if (latestHisto && !latestHisto.error && article.people > latestHisto.data.stats.people / 2) {
+			html += '<span class="cb-top-tag cb-top-tag-red">33% of traffic</span>';
+		} else if (latestHisto && !latestHisto.error && article.people > latestHisto.data.stats.people / 3) {
+			html += '<span class="cb-top-tag cb-top-tag-red">50% of traffic</span>';
+		}
+
+		if (article.recirc > article.people / 2) {
+			html += '<span class="cb-top-tag cb-top-tag-green">Retaining</span>';
+		}
+
+		return html;
+	};
+
 	var generateTopListItem = function(article) {
 		return '<li><a href="//'+article.url+'" target="_blank">' +
 			'<div class="cb-top-title-wrapper"><span class="cb-top-title">'+article.title+'</span>' +
-			'<span class="cb-top-author">'+article.author+'</span></div>' +
+			'<div class="cb-top-tags-wrapper">' + (article.author != "" ? '<span class="cb-top-author">'+article.author+'</span>' : '') + 
+			generateTopListTags(article) + '</div></div>' +
 			'<div class="cb-top-count-wrapper"><span class="cb-top-count">'+article.people+'</span></div>' +
 			'</a></li>';
 	};

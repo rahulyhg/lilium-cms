@@ -282,6 +282,7 @@ var Campaigns = function() {
             switch (action) {
                 case 'new':
                     db.insert(cli._c, 'campaigns', dbCamp, function(res) {
+                        dbCamp.cli = cli;
                         hooks.trigger('campaignCreated', dbCamp);
                         cli.redirect(cli._c.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
                     });
@@ -301,7 +302,8 @@ var Campaigns = function() {
                             if (!err && old[0] && old[0].campstatus != dbCamp.cmapstatus) {
                                 hooks.trigger('campaignStatusChanged', {
                                     "old": old[0],
-                                    "new": dbCamp
+                                    "new": dbCamp,
+                                    "cli": cli
                                 });
                             }
 

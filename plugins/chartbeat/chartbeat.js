@@ -17,7 +17,7 @@ var Chartbeat = function() {
 	this.iface = new Object();
 	var scheduleFetchID = "chartbeat_fetch_realtime";
 	var quickstatsURL = "http://api.chartbeat.com/live/quickstats/v4/?apikey={apikey}&host={host}&section={section}";
-	var toppagesURL = "http://api.chartbeat.com/live/toppages/v3/?apikey={apikey}&host={host}&section={section}";
+	var toppagesURL = "http://api.chartbeat.com/live/toppages/v3/?apikey={apikey}&host={host}&section={section}&types=1";
 
 	var initRequires = function(abspath) {
 		log = require(abspath + "log.js");
@@ -183,7 +183,9 @@ var Chartbeat = function() {
 						title : p.title,
 						google : p.stats.search,
 						social : p.stats.social,
-						refs : p.stats.toprefs
+						refs : p.stats.toprefs,
+						type : p.stats.type,
+						recirc : p.stats.recirc 
 					});
 				}
 				_toppages = arr;
