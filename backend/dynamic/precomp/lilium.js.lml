@@ -228,9 +228,9 @@ var LiliumCMS = function() {
 
     var findPushTableFromTitle = function(title) {
         var pt = undefined;
-        for (var i = 0; i < pushtables.length; i++) {
-            if (pushtables[i].title == title) {
-                pt = pushtables[i];
+        for (var i = 0; i < that.pushtables.length; i++) {
+            if (that.pushtables[i].title == title) {
+                pt = that.pushtables[i];
                 break;
             }
         }
