@@ -224,11 +224,21 @@ var Article = function() {
     }
 
     this.registerForms = function() {
-        formBuilder.createForm('post_create')
+        formBuilder.createForm('post_create', {
+            formWrapper: {
+                'tag': 'div',
+                'class' : 'row',
+                'id': 'article_new',
+                'inner': true
+            }
+        })
         .addTemplate('article_base')
         .addTemplate('media-explorer')
-        .add('categories', 'livevar', {
-            endpoint: 'categories',
+        .add('roles', 'livevar', {
+            fieldWrapper: {
+                'class': 'col-md-10'
+            },
+            endpoint: 'roles',
             tag: 'select',
             template: 'option',
             title: 'role',
@@ -240,7 +250,7 @@ var Article = function() {
                 'html': 'displayname',
                 'header': 'Select One',
             },
-            displayname: "Categories"
+            displayname: "Initial role"
         })
         .trigger('bottom')
         .add('publish', 'submit');

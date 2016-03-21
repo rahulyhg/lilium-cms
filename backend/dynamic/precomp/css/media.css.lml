@@ -106,7 +106,7 @@
 
 
 #mediaExplorerModal .menu > span.selected {
-    background-color: {=barcolorhover};
+    background-color: #777;
     color : #fff;
 }
 

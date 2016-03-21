@@ -270,6 +270,17 @@ form input, form label{
 	margin:0;
 }
 
+/* Bootstrap */
+.container {
+    padding-left: 200px;
+    width: 100%;
+    padding-right: 0px;
+}
+.row{
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
 /* Normalized Forms */
 .lmlform {
 	background-color: #F6F6F6;
@@ -438,7 +449,7 @@ h2.subtitlestrip {
     	background-color: #fafafa;
     	color: #999;
 }
- 
+
 /* Admin Sidebar */
 .lmladminsidebar {
 	position: fixed;

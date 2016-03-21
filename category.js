@@ -51,11 +51,8 @@ var Category = function() {
 
             // Create post
             db.update(cli._c, 'categories', {_id : db.mongoID(cli.routeinfo.path[3])},formData, function(err, result) {
-                console.log('stop');
                 // Generate LML page
-                cli.sendJSON({
-                    'success' : true
-                });
+                cli.refresh();
             });
 
         } else {
@@ -74,13 +71,7 @@ var Category = function() {
             // Create post
             db.insert(cli._c, 'categories', formData, function(err, result) {
                 // Generate LML page
-                cli.sendJSON({
-                    redirect: cli._c.server.url + "/",
-                    form: {
-                        success: true
-                    }
-                });
-
+                cli.refresh();
             });
 
         } else {
@@ -94,10 +85,7 @@ var Category = function() {
         if (cli.postdata.data.id) {
             db.remove(cli._c, 'categories', {_id : db.mongoID(cli.postdata.data.id)}, function() {
                 cli.sendJSON({
-                    redirect: cli._c.server.url + "/" + name,
-                    form: {
-                        success: true
-                    }
+                    success: true
                 });
             });
         } else {

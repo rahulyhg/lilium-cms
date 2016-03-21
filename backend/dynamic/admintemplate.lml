@@ -7,7 +7,7 @@
 	<body class="lmladminbody lmladmin">
 		{%adminbar}
 		{%adminsidebar}
-		<main class="lmladminmain lmladmincontentwrapper">
+		<main class="container lmladminmain lmladmincontentwrapper">
 			{%%extra.templatefile}
 		</main>
 	</body>

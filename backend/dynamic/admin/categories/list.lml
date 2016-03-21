@@ -28,11 +28,20 @@ $}
                     </lml:tobject>
 					<lml:tobject data-nodetype="button"
 						     data-bind="click"
-						     data-action="deleteUser"
-						     data-actionparamkey="_id"
-						     data-filter="canDelete" >
+						     data-action="deleteCampaign"
+						     data-actionparamkey="_id" >
 							Delete
 					</lml:tobject>
 				</div>
 			</li>
 		</lml:template>
+<script>
+ var deleteCampaign = function(id) {
+         $.post('{=config.default.server.url}/admin/categories/delete', {
+             "id" : id,
+             "form_name" : "category_delete"
+         }, function(data) {
+             liliumcms.refresh();
+         });
+ }
+</script>
