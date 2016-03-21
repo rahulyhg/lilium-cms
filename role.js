@@ -60,7 +60,7 @@ var Role = function() {
             var redirect = '';
 
             // Check if current user has sufficient role power
-            if (cli.userinfo.power < cli.postdata.data.level) {
+            if (cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
                 db.insert(cli._c, 'roles', prepareRoleForDB(cli), function(err, result) {
                     // Generate LML page
@@ -88,13 +88,14 @@ var Role = function() {
 
                 var form = formBuilder.handleRequest(cli);
                 var response = formBuilder.validate(form, true);
-                if (cli.userinfo.power < cli.postdata.data.level) {
+                if (cli.userinfo.power < cli.postdata.data.power) {
 
                     if (response.success) {
-
-                        db.update(cli._c, 'content', {
+                        var data = prepareRoleForDB(cli);
+                        db.update(cli._c, 'roles', {
                             _id: id
-                        }, formBuilder.serializeForm(form), function(err, r) {
+                        }, data, function(err, r) {
+                            if (err) console.log(err);
                             cli.sendJSON({
                                 success: true
                             });
@@ -152,7 +153,7 @@ var Role = function() {
         return {
             "name": postdata.name,
             "displayname": postdata.displayname,
-            "power": parseInt(postdata.level),
+            "power": parseInt(postdata.power),
             "rights": rights
         };
     }
@@ -196,7 +197,7 @@ var Role = function() {
             .add('displayname', 'text', {
                 displayname: "Display Name",
             })
-            .add('level', 'number', {
+            .add('power', 'number', {
                 displayname: "Level (Smaller is stronger)"
             })
             .add('rights', 'stack', {
