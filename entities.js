@@ -267,7 +267,6 @@ var Entities = module.exports = new function() {
         newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
         newEnt.email = entData.email;
         newEnt.roles = [];
-        console.log(entData.roles);
         for (var index in entData.roles) {
             newEnt.roles.push(entData.roles[index]);
         }
@@ -287,7 +286,6 @@ var Entities = module.exports = new function() {
     this.createFromCli = function(cli) {
         cli.touch('entities.createFromCli');
         var entData = cli.postdata.data;
-        console.log(entData);
         var newEnt = this.initialiseBaseEntity(entData);
 
         this.registerEntity(cli, newEnt, function() {

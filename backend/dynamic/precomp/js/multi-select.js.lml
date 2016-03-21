@@ -3,7 +3,6 @@ var options;
 var MultiSelect = function(tableid, lmltag, selectElem, dataSource) {
     var selectElem =  selectElem;
     var lmltag = lmltag;
-
     // selectElem.hide();
     this.render = function() {
         var html = '<div class="multiselect">';
@@ -18,20 +17,26 @@ var MultiSelect = function(tableid, lmltag, selectElem, dataSource) {
     }
 
     $(document).on('click', '.multiselect span', function() {
-    console.log('click');
-
         if ($(this).hasClass('selected')) {
-            $(this).find('input').remove();
-
             $(this).removeClass('selected');
-
+            selectElem.find('option[value='+ $(this).attr('id') +']').removeAttr('selected');
         } else {
-            $(this).append('<input type="hidden" name="'+ selectElem.attr('name') +'[]">').val($(this).attr('id'));
-
             $(this).addClass('selected');
-            console.log(selectElem.val());
+            selectElem.find('option[value='+ $(this).attr('id') +']').attr('selected', true);
 
         }
+    });
+
+    $('form').on('submit', function(e) {
+        var form = $(this);
+
+        $(this).find('select[multiple] option:selected').each(function() {
+            form.append('<input type="hidden" name="'+ $(this).parent().attr('name') +'[]" value="' + $(this).val() + '">');
+        });
+
+        form.append('<input type="hidden" name="nalu" value="hello">');
+
+        form.find('select[multiple]').remove();
     });
 
     var generateMultiSelect = function (elem) {
