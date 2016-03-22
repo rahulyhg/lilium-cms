@@ -1,7 +1,13 @@
 var LiveVars = function() {
-    var endpoints = [];
+    var endpoints = this.endpoints = [];
     var paramString = "?";
     var livevars;
+
+    this.getSingleLivevar = function(endpoint, cb) {
+        $.get("/livevars", {
+            vars: JSON.stringify(endpoint)
+        }, cb);
+    }
 
     this.getLiveVars = function(cb) {
         urlParams = window.location.pathname.split('/');
@@ -26,11 +32,12 @@ var LiveVars = function() {
                     });
                     elem.dataset.varname = variableName;
                 }
-
                 endpoints.push({
                     'varname': variableName,
                     'params': typeof params === "string" ? JSON.parse(params.replace(/&lmlquote;/g, '"')) : {}
                 });
+                console.log(endpoints);
+
             }
         });
 
@@ -38,7 +45,6 @@ var LiveVars = function() {
             'varname': 'session',
             'params': new Object()
         });
-
 
         $.get("/livevars", {
             vars: JSON.stringify(endpoints)

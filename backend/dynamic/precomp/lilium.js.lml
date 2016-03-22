@@ -40,7 +40,8 @@ var LiliumCMS = function() {
     this.adminmenu;
     this.formbeautifier;
     this.multiselect;
-
+    this.tables;
+    
     var that = this;
 
     this.LiliumEvents = {

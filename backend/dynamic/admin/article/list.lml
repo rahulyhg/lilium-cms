@@ -1,4 +1,4 @@
-{#config;forms}
+{#config;forms;tableBuilder}
 		{$
 			var baseurl = config.default.server.url;
 			baseurl += "/";
@@ -7,8 +7,9 @@
 		$}
 		<h1>List of articles<a class='fab' href="{=baseurl}article/new">+</a></h1>
 		<main class="entities-main">
+			{=tableBuilder.render('article')}
 			<ul class="entity-list">
-				{*content(template:"articles-list-item")}
+				{*content.table(template:"articles-list-item")}
 			</ul>
 		</main>
 

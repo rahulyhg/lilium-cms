@@ -1,9 +1,9 @@
 var LmlTable = function (table) {
     var table = $(table);
-    var maxEntries = typeof table.data('maxentries') !=='undefined' ? table.data('maxentries') || 20;
+    var maxEntries = table.data('max');
 
     this.init = function() {
-
+        this.getData();
     };
 
     this.filter = function() {
@@ -17,4 +17,32 @@ var LmlTable = function (table) {
     this.updateNav = function() {
 
     };
+
+    this.nextPage = function() {
+
+    };
+
+    this.previousPage = function() {
+
+    };
+
+    this.page = function() {
+
+    };
+
+    this.getData = function() {
+        liliumcms.livevars.getSingleLivevar({
+            varname: table.data('endpoint'),
+            params: {
+                sortby: table.data('sortby'),
+                max: table.data('max'),
+                skip: table.data('page') * table.data('max');
+            }
+        });
+    };
+
+    this.init();
 };
+$('.lmltablebuilder').each(function(index, elem) {
+    liliumcms.tables.push(new LmlTable(elem));
+});

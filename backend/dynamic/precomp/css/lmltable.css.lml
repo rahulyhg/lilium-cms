@@ -1,0 +1,18 @@
+/* Lilium Table Styles */
+table.lmlfullwidthtable {
+	width: 100%;
+}
+
+table.lmlfullwidthtable thead {
+	background-color: #E3E3E3;
+}
+
+table.lmlfullwidthtable thead tr th,
+table.lmlfullwidthtable tbody tr td {
+	padding: 4px 15px
+}
+
+table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
+	background-color: #FAFAFA;
+	padding: 15px;
+}
