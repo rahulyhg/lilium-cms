@@ -64,7 +64,7 @@ var Role = function() {
                 // Create post
                 db.insert(cli._c, 'roles', prepareRoleForDB(cli), function(err, result) {
                     // Generate LML page
-                    cli.redirect('/admin/role/edit/');
+                    cli.refresh();
                 });
             } else {
                 cli.sendJSON({
@@ -95,10 +95,7 @@ var Role = function() {
                         db.update(cli._c, 'roles', {
                             _id: id
                         }, data, function(err, r) {
-                            if (err) console.log(err);
-                            cli.sendJSON({
-                                success: true
-                            });
+                            cli.refresh();
                         });
 
                     } else {

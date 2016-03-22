@@ -15,7 +15,13 @@ var HtmlParser = function() {
         if (typeof form == 'undefined') {
             throw new Error("[HtmlParser - No form provided to parse");
         }
+        var hasFormWrapper =typeof form.attr.formWrapper !== "undefined";
 
+        if (hasFormWrapper && !form.attr.formWrapper.inner) {
+            htmlForm += '<' + (form.attr.formWrapper.tag || 'div') +
+                ' class="' + form.attr.formWrapper.class + '"' +
+                ' id="' + form.attr.formWrapper.id + '">';
+        }
         // Form tag generation
         htmlForm = '<form ';
 
@@ -37,9 +43,16 @@ var HtmlParser = function() {
         if (form.attr.method == 'post') {
             htmlForm += ' enctype="multipart/form-data" ';
         }
+
         htmlForm += '/>';
 
         var hasFieldWrapper = typeof form.attr.fieldWrapper !== "undefined";
+        if (hasFormWrapper && form.attr.formWrapper.inner) {
+            htmlForm += '<' + (form.attr.formWrapper.tag || 'div') +
+                ' class="' + form.attr.formWrapper.class + '"' +
+                ' id="' + form.attr.formWrapper.id + '">';
+        }
+
 
         //Generate fields
         for (var index in form.fields) {
@@ -47,8 +60,8 @@ var HtmlParser = function() {
 
             if (hasFieldWrapper) {
                 htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') +
-                    ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || "field-") +
-                    (field.attr.wrapperCssSuffix || field.type) +
+                    ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || form.attr.fieldWrapper.class || 'field-') +
+                    (field.attr.wrapperCssSuffix || form.attr.wrapperCssSuffix ||  field.type ) +
                     (' lmlform-fieldwrapper-' + field.type) +
                     ' lmlform-fieldwrapper">';
             }
@@ -114,11 +127,20 @@ var HtmlParser = function() {
             htmlForm += form.attr.afterField || "";
         }
 
+
+
         //Insert submit form
         htmlForm += submitButton;
 
+        if (hasFormWrapper && form.attr.formWrapper.inner) {
+            htmlForm += "</" + (form.attr.formWrapper.tag || "div") + ">";
+        }
         // Close form tag
         htmlForm += "</form>";
+
+        if (hasFormWrapper && !form.attr.formWrapper.inner) {
+            htmlForm += "</" + (form.attr.formWrapper.tag || "div") + ">";
+        }
 
         var deps = form.attr.dependencies;
         if (deps) {

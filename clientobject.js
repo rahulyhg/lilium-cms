@@ -91,6 +91,10 @@ ClientObject.prototype.hasEnoughPower = function(power, cb) {
 	}
 }
 
+ClientObject.prototype.refresh = function() {
+    this.redirect(this.routeinfo.fullpath);
+};
+
 ClientObject.prototype.sendJSON = function(json) {
 	if (typeof json === 'object') {
 		json = JSON.stringify(json);

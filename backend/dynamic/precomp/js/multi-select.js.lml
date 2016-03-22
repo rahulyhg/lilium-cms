@@ -34,6 +34,18 @@ var MultiSelect = function(tableid, lmltag, selectElem, dataSource) {
         }
     });
 
+    $('form').on('submit', function(e) {
+        var form = $(this);
+
+        $(this).find('select[multiple] option:selected').each(function() {
+            form.append('<input type="hidden" name="'+ $(this).parent().attr('name') +'[]" value="' + $(this).val() + '">');
+        });
+
+        form.append('<input type="hidden" name="nalu" value="hello">');
+
+        form.find('select[multiple]').remove();
+    });
+
     var generateMultiSelect = function (elem) {
         elem.hide();
     }
