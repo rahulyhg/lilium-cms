@@ -58,6 +58,12 @@ var HtmlParser = function() {
         for (var index in form.fields) {
             field = form.fields[index];
 
+            if (typeof field.attr.wrapper !== 'undefined') {
+                htmlForm += '<' + (field.attr.wrapper.tag || 'div') +
+                    ' class="'+ (field.attr.wrapper.class || '') +'"' +
+                    ' id="'+ (field.attr.wrapper.id || '') +'">';
+            }
+
             if (hasFieldWrapper) {
                 htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') +
                     ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || form.attr.fieldWrapper.class || 'field-') +
@@ -114,6 +120,8 @@ var HtmlParser = function() {
                     case "multiselect":
                         htmlForm += parseSelectType(field, true);
                         break;
+                    case "tags":
+                        htmlForm += parseTagsType(field);
                     default:
                         htmlForm += this.checkRegisteredTypes(field);
                 }
@@ -125,6 +133,10 @@ var HtmlParser = function() {
             }
 
             htmlForm += form.attr.afterField || "";
+
+            if (typeof field.attr.wrapper !== 'undefined') {
+                htmlForm += '</' + (field.attr.wrapper.tag || 'div') + '>';
+            }
         }
 
 
@@ -224,6 +236,18 @@ var HtmlParser = function() {
         }
 
         html += '<th><button class="lmlstacktableappendbutton">Append</button></th></tr></thead></tbody></tbody></table>';
+        return html;
+    };
+
+    var parseTagsType = function(field, hasPlaceholder) {
+        var html = "";
+        var displayName = field.attr.displayname || field.name || undefined;
+
+        html += '<label for="' + field.name + '">' + displayName + '</label>';
+        html += '<div class="lmltagswrapper" data-type="tags" data-fieldname="' + field.name + '" >';
+        html += '<div class="tags-input"><input type="text"></div>';
+        html += '<div><p>'+ (field.attr.footer || '') +'</p></div>';
+        html += '</div>'
         return html;
     };
 

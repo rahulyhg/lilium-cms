@@ -30,6 +30,7 @@ var LiliumCMS = function() {
     this.multiselects = new Array();
     var stacktables = new Array();
     var queryParams = new Object();
+    var tags = new Array();
 
     this.queryparams;
     this.formvalidator;
@@ -239,7 +240,6 @@ var LiliumCMS = function() {
     }
 
     this.fillFormFromSource = function(src, data, index) {
-
         index = typeof index == 'undefined' ? 0: index;
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
 
@@ -250,6 +250,14 @@ var LiliumCMS = function() {
                 JSON.parse(osSelect.dataset.scheme.replace(/\&lmlquote;/g, '"'))
             );
         });
+
+        $(form).find('.tags-input').each(function(index, tagsInput) {
+            var select = new Tags(
+                tagsInput,
+                data
+            );
+        });
+
 
         // Check for stacktable
         $(form).find('table.lmlstacktable').each(function(index, osTable) {
@@ -306,8 +314,22 @@ var LiliumCMS = function() {
             stacktables.push(stackTable);
         };
 
+        var makeSingleTag = this.makeSingleTag = function(index, tagsInput) {
+
+            var tag = new Tags(
+                tagsInput
+            );
+
+            tags.push(tag);
+        };
+
         var makeStackTables = function() {
             $('.lmlstacktable').each(makeSingleStackTable);
+        };
+
+        var makeTags = function() {
+            $('.lmltagswrapper .tags-input').each(makeSingleTag);
+
         };
 
         this.parse = function(selector) {
@@ -316,6 +338,7 @@ var LiliumCMS = function() {
 
         this.init = function() {
             makeStackTables();
+            makeTags();
         };
     };
 

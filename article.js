@@ -234,11 +234,16 @@ var Article = function() {
         })
         .addTemplate('article_base')
         .addTemplate('media-explorer')
-        .add('roles', 'livevar', {
-            fieldWrapper: {
-                'class': 'col-md-10'
+        .edit('media', undefined, {
+            wrapper: {
+                'class': 'col-md-4'
+            }
+        })
+        .add('categories', 'livevar', {
+            wrapper: {
+                'class': 'col-md-4'
             },
-            endpoint: 'roles',
+            endpoint: 'categories',
             tag: 'select',
             template: 'option',
             title: 'role',
@@ -250,7 +255,13 @@ var Article = function() {
                 'html': 'displayname',
                 'header': 'Select One',
             },
-            displayname: "Initial role"
+            displayname: "Categories"
+        })
+        .add('tags', 'tags', {
+            displayname : 'Tags',
+            wrapper: {
+                'class': 'col-md-4'
+            }
         })
         .trigger('bottom')
         .add('publish', 'submit');

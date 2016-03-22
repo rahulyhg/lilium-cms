@@ -140,6 +140,7 @@ var FormBuilder = function() {
         field.requirements[key] = requirements[key];
       }
     }
+    return this;
   }
 
   this.remove = function(name) {

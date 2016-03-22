@@ -1,0 +1,22 @@
+.tags-input {
+	width: 100%;
+	background: #fff;
+	height: 200px;
+	cursor: text;
+}
+.tags-input input[type=text]{
+	border: none;
+	display: inline-block;
+    width: initial;
+}
+.tags-input .tag{
+	display: inline-block;
+	padding: 2px;
+	background: #9B59B6;
+	color: #fff;
+	margin: 5px;
+}
+.tags-input .tag i {
+	margin-left: 5px;
+	cursor: pointer;
+}

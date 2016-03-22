@@ -19,10 +19,10 @@ var MultiSelect = function(tableid, lmltag, selectElem, dataSource) {
     $(document).on('click', '.multiselect span', function() {
         if ($(this).hasClass('selected')) {
             $(this).removeClass('selected');
-            selectElem.find('option[value='+ $(this).attr('id') +']').removeAttr('selected');
+            selectElem.find('option[value="'+ $(this).attr('id') +'"]').removeAttr('selected');
         } else {
             $(this).addClass('selected');
-            selectElem.find('option[value='+ $(this).attr('id') +']').attr('selected', true);
+            selectElem.find('option[value="'+ $(this).attr('id') +'"]').attr('selected', true);
 
         }
     });

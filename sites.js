@@ -93,7 +93,8 @@ var SiteInitializer = function(conf) {
 		Frontend.registerJSFile(htmlbase + "/compiled/js/multi-select.js", 2500, 'admin', conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/js/ckeditor-lilium.js", 1300, 'admin', conf.id);
 		Frontend.registerJSFile(htmlbase + "/compiled/js/media-explorer.js", 1300, 'admin', conf.id);
-        	Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
+		Frontend.registerJSFile(htmlbase + "/compiled/js/tags.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
 		Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
 		Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
@@ -104,6 +105,7 @@ var SiteInitializer = function(conf) {
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/notifications.css", 2400, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2500, 'admin', conf.id);
 		Frontend.registerCSSFile(htmlbase + "/compiled/css/multiselect.css", 2600, 'admin', conf.id);
+		Frontend.registerCSSFile(htmlbase + "/compiled/css/tags.css", 2600, 'admin', conf.id);
 
 		hooks.fire('frontend_will_precompile', {config:conf,Frontend:Frontend});
 		Precompiler.precompile(conf, function() {
