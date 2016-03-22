@@ -156,7 +156,7 @@ var LiliumDFP = function() {
 					var arr = results.rval.results;
 	
 					log('DFP', 'Running database queries');
-					db.remove(_c.default(), 'dfpcache', {}, function() {
+					db.remove(_c.default(), 'dfpcache', {}, function(err) {
 						db.insert(_c.default(), 'dfpcache', arr, function() {
 							log('DFP', 'Stored deep copy of '+arr.length+' DFP Orders');
 							if (callback) {

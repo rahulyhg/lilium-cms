@@ -136,7 +136,25 @@
                          );
                      }, camp.cli);
                  });
-	     };
+
+                 hooks.bind('campaignUpdated', 560, function(camp) {
+                     makeAdServerRequest('updateCampaign', camp, function(resp, err) {
+                         log("Advertiser", err ? 
+                             "Error sending 'updated' event : " + err : 
+                             "AdServer responded to 'updated' with code " + resp.statusCode
+                         );
+                     }, camp.cli);
+                });
+
+                 hooks.bind('campaignStatusChanged', 560, function(camp) {
+                     makeAdServerRequest('campaignStatusChanged', camp, function(resp, err) {
+                         log("Advertiser", err ? 
+                             "Error sending 'statusChanged' event : " + err : 
+                             "AdServer responded to 'statusChanged' with code " + resp.statusCode
+                         );
+                     }, camp.cli);
+                });
+             };
 
              var createAdServerHandshake = function(cb) {
                  var cconf = conf.default();
@@ -192,7 +210,7 @@
                  });
 
                  confReq.on('error', function(err) {
-                     log("Advertiser", "Error handled while executed method '" + method + "' : " + err);
+                     log("Advertiser", "Error handled while executing method '" + method + "' : " + err);
                      cb(undefined, err);
                  });
 
