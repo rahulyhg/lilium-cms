@@ -95,7 +95,6 @@ var Role = function() {
                         db.update(cli._c, 'roles', {
                             _id: id
                         }, data, function(err, r) {
-                            if (err) console.log(err);
                             cli.refresh();
                         });
 

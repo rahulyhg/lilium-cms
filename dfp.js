@@ -152,11 +152,16 @@ var LiliumDFP = function() {
 		if (_priv.client_id) {
 			log('DFP', 'Preparing for deep orders copy');
 			dfpUser.getService('LineItemService', function(err, ser) {
+                if (err) {
+                    log('DFP', "Could not deep fetch : " + err);
+                    return;
+                }
+
 				ser.getLineItemsByStatement(new DFP.Statement('WHERE 1 = 1'), function(err, results) {
 					var arr = results.rval.results;
 	
 					log('DFP', 'Running database queries');
-					db.remove(_c.default(), 'dfpcache', {}, function() {
+					db.remove(_c.default(), 'dfpcache', {}, function(err) {
 						db.insert(_c.default(), 'dfpcache', arr, function() {
 							log('DFP', 'Stored deep copy of '+arr.length+' DFP Orders');
 							if (callback) {

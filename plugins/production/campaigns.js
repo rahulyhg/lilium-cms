@@ -153,7 +153,7 @@ var Campaigns = function() {
                     var projectid = levels[1];
 
                     if (projectid) {
-                        that.getCampaignByProjectID(projectid, callback);
+                        that.getCampaignByProjectID(decodeURI(projectid), callback);
                     } else {
                         callback("[CampaignException] ProjectID must be specified as a third level");
                     }
@@ -296,7 +296,8 @@ var Campaigns = function() {
                         }, dbCamp, function(res) {
                             hooks.trigger('campaignUpdated', {
                                 "old": err || old[0],
-                                "new": dbCamp
+                                "new": dbCamp,
+                                "cli" : cli
                             });
 
                             if (!err && old[0] && old[0].campstatus != dbCamp.cmapstatus) {

@@ -1,3 +1,5 @@
+var log = require('./log.js');
+
 var events = {
 	"load" : {},
 	"request" : {},

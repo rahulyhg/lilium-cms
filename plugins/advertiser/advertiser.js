@@ -129,16 +129,52 @@
                  });
 
                  hooks.bind('campaignCreated', 560, function(camp) {
-                     makeAdServerRequest('newCampaign', camp, function(resp, err) {
+                     makeAdServerRequest('newCampaign', camp.projectid, function(resp, err) {
                          log("Advertiser", err ? 
                              "Error sending 'created' event : " + err : 
                              "AdServer responded to 'created' with code " + resp.statusCode
                          );
                      }, camp.cli);
                  });
-	     };
 
-             var createAdServerHandshake = function(cb) {
+                 hooks.bind('campaignUpdated', 560, function(camp) {
+                     makeAdServerRequest('updateCampaign', camp.new.projectid, function(resp, err) {
+                         log("Advertiser", err ? 
+                             "Error sending 'updated' event : " + err : 
+                             "AdServer responded to 'updated' with code " + resp.statusCode
+                         );
+                     }, camp.cli);
+                });
+
+                 hooks.bind('campaignStatusChanged', 560, function(camp) {
+                     makeAdServerRequest('campaignStatusChanged', camp.new.projectid, function(resp, err) {
+                         log("Advertiser", err ? 
+                             "Error sending 'statusChanged' event : " + err : 
+                             "AdServer responded to 'statusChanged' with code " + resp.statusCode
+                         );
+                     }, camp.cli);
+                });
+
+                hooks.bind('article_created', 1200, function(pkg) {
+                    makeAdServerRequest('contentCreated', pkg.article._id.toString(), function(resp, err) {
+                         log("Advertiser", err ? 
+                             "Error sending 'contentCreated' event : " + err : 
+                             "AdServer responded to 'contentCreated' with code " + resp.statusCode
+                         );
+                    }, pkg.cli);
+                });
+        
+                hooks.bind('article_edited', 1200, function(pkg) {
+                    makeAdServerRequest('contentEdited', pkg.article._id.toString(), function(resp, err) {
+                         log("Advertiser", err ? 
+                             "Error sending 'contentEdited' event : " + err : 
+                             "AdServer responded to 'contentEdtied' with code " + resp.statusCode
+                         );
+                    }, pkg.cli);
+                });
+            };
+
+            var createAdServerHandshake = function(cb) {
                  var cconf = conf.default();
                  var split = cconf.adserver.privateaddr.split(':');
                  var privAddr = split[0].replace(/\/\//g, '');
@@ -163,14 +199,24 @@
                  req.end('', 'utf8');
              };
 
-             var makeAdServerRequest = function(method, data, cb, cli) {
+             var makeAdServerRequest = function(method, data, cb, cli, skipSecondTry) {
                  log('Adversiter', 'Sending POST to AdServer using method : ' + method);
                  var cconf = cli ? cli._c : conf.default();
+
+                 if (!cconf) {
+                     cb(undefined, new Error("Could not find client configuration"));
+                     return;
+                 }
 
                  if (!cconf.adserver && !cconf.adserver.bridgeaddr) {
                      cb(undefined, new Error("AdServer is not configured."));
                      return;
                  }
+
+                 if (typeof data === 'undefined') {
+                     cb(undefined, new Errpr("Cannot send undefined variable to AdServer"));
+                 } 
+
                  
                  var split = cconf.adserver.bridgeaddr.split(':');
                  var privAddr = split[0].replace(/\/\//g, '');
@@ -192,12 +238,31 @@
                  });
 
                  confReq.on('error', function(err) {
-                     log("Advertiser", "Error handled while executed method '" + method + "' : " + err);
+                     log("Advertiser", "Error handled while executing method '" + method + "' : " + err);
+                     if (err.code == 'ECONNREFUSED' && !skipSecondTry) {
+                         log('Adversiter', 'Handshake was lost or not properly established. Retrying...');
+                         createAdServerHandshake(function(resp, err) {
+                             if (!err) {
+                                 log('Advertiser', 'Sending command back to AdServer');
+                                 makeAdServerRequest(method, data, cb, cli, true);
+                             }
+                         });
+                     }
+
                      cb(undefined, err);
                  });
 
-                 confReq.write(JSON.stringify(data));
-                 confReq.end();     
+                 try {
+                    confReq.write(
+                        typeof data == 'object' ? 
+                        JSON.stringify(data) : 
+                        '{"data":"' + data.toString().replace(/\"/g, '\\"') + '"}'
+                    );
+    
+                    confReq.end();     
+                 } catch (ex) {
+                    log('Advertiser', 'Exception caught while writing to AdServer : ' + ex);
+                 }
              };
 
              var pingAdServer = function(cb) {

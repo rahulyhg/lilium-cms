@@ -166,7 +166,7 @@ var DB = function() {
 
 	this.singleLevelFind = function(conf, topLevel, callback) {
 		this.find(conf, topLevel, {}, {}, function(err, cur) {
-			cur.toArray(function(err, docs) {
+			err ? callback(err) : cur.toArray(function(err, docs) {
 				callback(docs);
 			});
 		});
@@ -237,11 +237,7 @@ var DB = function() {
 			} else if (typeof docs !== "object") {
 				cb("[Database - Invalid document]");
 			} else {
-				col[typeof docs.length !== "undefined" ? "insertMany" : "insertOne"](
-					docs, function(err, r) {
-						cb(err, r);
-					}
-					);
+				col[typeof docs.length !== "undefined" ? "insertMany" : "insertOne"](docs, cb);
 			}
 		});
 	};
@@ -253,15 +249,13 @@ var DB = function() {
 			} else if (typeof conds != "object") {
 				cb("[Database - Invalid document]");
 			} else {
-				if (typeof conds === 'undefined' || Object.keys(conds).length == 0) {
-					cb("[Database - Deleting requires a filter. Use the empty function to clear an entire collection]");
-				} else {
-					col[one ? 'deleteOne' : 'deleteMany'](
-						conds
-					).then(function(r) {
-						cb(undefined, r);
-					});
-				}
+				col[one ? 'deleteOne' : 'deleteMany'](
+					conds, 
+                    {}, 
+                    function(err, r) {
+					    cb(err, r);
+				    }
+                );
 			}
 		});
 	};

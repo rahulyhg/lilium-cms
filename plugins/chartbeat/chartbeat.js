@@ -102,8 +102,13 @@ var Chartbeat = function() {
 	};
 
 	var parseChartbeatJSON = function(resp) {
-		var obj = JSON.parse(resp);
-		return obj;
+        try {
+		    var obj = JSON.parse(resp);
+		    return obj;
+        } catch (err) {
+            err.error = err.message;
+            return err;
+        }
 	};
 
 	var registerLiveVar = function() {
