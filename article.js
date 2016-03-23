@@ -123,9 +123,11 @@ var Article = function() {
 					formData = formBuilder.serializeForm(form);
 					formData.name = slugify(formData.title).toLowerCase();
 
+                    hooks.fire('article_will_edit', {cli : cli, article : formData});
 					db.findAndModify(cli._c, 'content', {
 						_id: id
 					}, formData, function(err, r) {
+                        hooks.fire('article_edited', {cli : cli, article : r.value});
 						filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
 							notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
 								title: "Article is updated!",
@@ -160,11 +162,13 @@ var Article = function() {
 		if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
 			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
+            hooks.fire('article_will_delete', id);
 			db.remove(cli._c, 'content', {
 				_id: id
 			}, function(err, r) {
 				var filename = r.title + '.html';
 				fs.deleteFile(filename, function() {
+                    hooks.fire('article_deleted', id);
 					cacheInvalidator.removeFileToWatch(filename);
 					return cli.sendJSON({
 						redirect: '/admin/article/list',
@@ -173,22 +177,10 @@ var Article = function() {
 				});
 
 			});
-
-<<<<<<< HEAD
 		} else {
 			return cli.throwHTTP(404, 'Article Not Found');
 		}
 	}
-=======
-                    hooks.fire('article_will_edit', {cli : cli, article : formData});
-                    db.findAndModify(cli._c, 'content', {
-                        _id: id
-                    }, formData , function(err, r) {
-                        hooks.fire('article_edited', {cli : cli, article : r.value});
-                        filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
-                            notifications.notifyUser(cli.userinfo.userid, cli._c.id, {title: "Article is updated!", url: cli._c.server.url + '/' +  formData.name , msg: "Your changes are live. Click to see the live article.", type: 'success'});
-                        });
->>>>>>> master
 
 	this.getArticle = function(cli) {
 		var id = new mongo.ObjectID(cli.routeinfo.path[3]);
@@ -240,42 +232,6 @@ var Article = function() {
                             callback(err || results);
                         });
                     });
-<<<<<<< HEAD
-=======
-
-                } else {
-                    cli.sendJSON({
-                        form: response
-                    });
-                }
-
-            } else {
-                filelogic.serveAdminLML(cli, true);
-            }
-
-
-        } else {
-            cli.throwHTTP(404, 'Article Not Found');
-        }
-    }
-
-    this.delete = function(cli) {
-        if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
-            var id = new mongo.ObjectID(cli.routeinfo.path[3]);
-
-            hooks.fire('article_will_delete', id);
-            db.remove(cli._c, 'content', {
-                _id: id
-            }, function(err, r) {
-                hooks.fire('article_deleted', id);
-                var filename = r.title + '.html';
-                fs.deleteFile(filename, function() {
-                    cacheInvalidator.removeFileToWatch(filename);
-                    return cli.sendJSON({
-                        redirect: '/admin/article/list',
-                        success: true
-                    });
->>>>>>> master
                 });
 			} else {
 				db.multiLevelFind(cli._c, 'content', levels, {
