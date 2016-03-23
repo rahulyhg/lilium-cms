@@ -226,12 +226,15 @@ var Article = function() {
                 db.find(cli._c, 'content', {}, [], function(err, cursor) {
 
                     cursor.count(function(err, size) {
-                        console.log(size);
-                        cursor.toArray(function(err, arr) {
-                            var results = {size: size, data: arr};
-                            callback(err || results);
-                        });
-                    });
+                    cursor.skip(params.skip || 0);
+                    cursor.limit(params.max || 20);
+                    if (typeof params.sortby !== 'undefined') {
+                        cursor.sort([[params.sortby, 1]]);
+                    }
+                    cursor.toArray(function(err, arr) {
+                                var results = {size: size, data: arr};
+                                callback(err || results);
+                    });});
                 });
 			} else {
 				db.multiLevelFind(cli._c, 'content', levels, {
@@ -308,10 +311,10 @@ var Article = function() {
 
 		tableBuilder.createTable({
 			name: 'article',
-			endpoint: 'content.listTable',
+			endpoint: 'content.table',
 			paginate: true,
 			searchable: true,
-			max_results: 20,
+			max_results: 4,
 			fields: [{
 				key: '_id',
 				displayname: 'ID',
@@ -321,7 +324,7 @@ var Article = function() {
 				displayname: 'Title',
 				sortable: true
 			}, {
-				key: 'featured_image.url',
+				key: 'media',
 				displayname: 'Featured Image',
 				template: 'imgArticle',
 				sortable: false

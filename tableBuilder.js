@@ -23,11 +23,11 @@ var TableBuilder = function () {
 
 	var generatehtml = function(table) {
 		var html = '';
-		html += '<table class="lmltablebuilder lmlfullwidthtable" id=' + table.name + ' data-endpoint="' + table.endpoint + '" data-max="' + (table.max || 20) + '" data-page="1" data-sortby="'+ (table.sortby || table.fields[0].key || '') +'">';
+		html += '<table class="lmltablebuilder lmlfullwidthtable" id=' + table.name + ' data-endpoint="' + table.endpoint + '" data-max="' + (table.max_results || 20) + '" data-page="1" data-sortby="'+ (table.sortby || table.fields[0].key || '') +'">';
 		html += '<thead>';
 		html += '<tr>';
 		for (var i in table.fields) {
-			html += '<th ' + (table.fields[i].sortable ? 'sortable' : '' )  +' data-key="'+ (table.fields[i].key || '') +'">' + (table.fields[i].displayname || table.fields[i].key ) + '</th>';
+			html += '<th ' + (table.fields[i].sortable ? 'sortable' : '' )  +' data-key="'+ (table.fields[i].key || '') +'" ' + (typeof table.fields[i].template !== 'undefined' ? 'data-template="' + table.fields[i].template + '"' : '' ) + '>' + (table.fields[i].displayname || table.fields[i].key ) + '</th>';
 		}
 		html += '</tr>';
 		html += '</thead>';

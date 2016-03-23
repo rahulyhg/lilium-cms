@@ -13,7 +13,7 @@
 			</ul>
 		</main>
 
-		<lml:template id="articles-list-item">
+		<lml:tabletemplate id="article-extra">
 			<li class="articles-item-list">
 				<lml:tobject data-nodetype="h3" data-key="title"></lml:tobject>
 				<div class="articles-actions">
@@ -30,4 +30,8 @@
 					</lml:tobject>
 				</div>
 			</li>
-		</lml:template>
+		</lml:tabletemplate>
+		<lml:tabletemplate id="imgArticle">
+			<lml:tobject data-nodetype="img" data-key="media"></lml:tobject>
+
+		</lml:tabletemplate>

@@ -5,7 +5,10 @@ var LiveVars = function() {
 
     this.getSingleLivevar = function(endpoint, params, cb) {
         $.get("/livevars", {
-            vars: JSON.stringify(endpoint)
+            vars :JSON.stringify([{
+                varname: endpoint,
+                params: params
+            }])
         }, cb);
     }
 
@@ -36,7 +39,6 @@ var LiveVars = function() {
                     'varname': variableName,
                     'params': typeof params === "string" ? JSON.parse(params.replace(/&lmlquote;/g, '"')) : {}
                 });
-                console.log(endpoints);
 
             }
         });
@@ -144,7 +146,8 @@ var LiveVars = function() {
     /**
      * Transform the lml:template in html node
      */
-    var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey, isSubTemplate) {
+    var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey, isSubTemplate, appendToNode) {
+        appendToNode = typeof appendToNode !== 'undefined' ? appendToNode : true;
         var templateItems = domTemplate.clone();
         while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
             obj = $(obj);
@@ -229,13 +232,18 @@ var LiveVars = function() {
         }
 
         // Appending element to some target
-        if (domTarget.data('target')) {
-            $('#' + domTarget.data('target')).append(templateItems.children());
-        } else {
-            $(domTarget).before(templateItems.children());
+        if (appendToNode) {
+            if (domTarget.data('target')) {
+                $('#' + domTarget.data('target')).append(templateItems.children());
+            } else {
+                $(domTarget).before(templateItems.children());
+            }
         }
+
         if (typeof isSubTemplate !== 'undefined' && isSubTemplate) {
             return templateItems.html();
+        } else if (!appendToNode) {
+            return templateItems.children();
         } else {
             return true;
         }
@@ -355,6 +363,24 @@ var LiveVars = function() {
             }
         }));
     };
+
+    this.templateToHtml = function(templateID, varValue, node) {
+        var templateObj = $('#' + templateID);
+        if (templateObj.length != 0) {
+            if (typeof varValue == 'Object' && varValue.length > 0) {
+                console.log('Generating template 0');
+
+                // Generate template object for array
+                varValue.forEach(function(val, index) {
+                    node.appendChild(generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false)[0]);
+                });
+            } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
+                // Generate template for single data
+                node.appendChild(generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false)[0]);
+            }
+        }
+        return node;
+    }
 
     this.livevars = function() {
         return livevars;
