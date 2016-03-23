@@ -30,19 +30,26 @@ var LmlTable = function (table) {
 
     };
 
+    var renderRows = function(data) {
+        table.find('')
+    };
+
+    this.addRow = function() {
+
+    };
+
     this.getData = function() {
-        liliumcms.livevars.getSingleLivevar({
+        liliumcms.livevars.getSingleLivevar('articles.table', {
             varname: table.data('endpoint'),
             params: {
                 sortby: table.data('sortby'),
                 max: table.data('max'),
-                skip: table.data('page') * table.data('max');
+                skip: table.data('page') * table.data('max')
             }
+        }, function(data) {
+            renderRows(data);
         });
     };
 
     this.init();
 };
-$('.lmltablebuilder').each(function(index, elem) {
-    liliumcms.tables.push(new LmlTable(elem));
-});

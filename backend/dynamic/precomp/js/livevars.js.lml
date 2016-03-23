@@ -3,7 +3,7 @@ var LiveVars = function() {
     var paramString = "?";
     var livevars;
 
-    this.getSingleLivevar = function(endpoint, cb) {
+    this.getSingleLivevar = function(endpoint, params, cb) {
         $.get("/livevars", {
             vars: JSON.stringify(endpoint)
         }, cb);
