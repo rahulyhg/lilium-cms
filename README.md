@@ -22,19 +22,30 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 #### nginx config
 
 ```
-location / {
-    root /path/to/root/of/static/files;
-    try_files $uri $uri/ @apachesite;
+server {
+        listen 8080; # or 80 if nginx listens to HTTP port
 
-    expires max;
-    access_log off;
-}
+        server_name www.liliumcms.com liliumcms.com; # replace by domain
+        port_in_redirect off;
 
-location @apachesite {
-    proxy_set_header X-Real-IP  $remote_addr;
-    proxy_set_header Host $host;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_pass http://127.0.0.1:8080;
+        if ($http_host = "www.liliumcms.com") {
+                rewrite ^ http://liliumcms.com$request_uri permanent;
+        }
+
+        location / {
+                root /path/to/html/directory;
+                try_files $uri/index.html @lilium;
+        }
+
+        location @lilium {
+                proxy_set_header X-Real-IP $remote_addr;
+                proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                proxy_set_header Host $http_host;
+                proxy_set_header X-NginX-Proxy true;
+
+                proxy_pass http://127.0.0.1:8282; # Lilium port
+                proxy_redirect off;
+        }
 }
 ```
 
