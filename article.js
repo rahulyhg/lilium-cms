@@ -8,6 +8,7 @@ var cacheInvalidator = require('./cacheInvalidator.js');
 var fs = require('./fileserver.js');
 var notifications = require('./notifications.js');
 var slugify = require('slug');
+var hooks = require('./hooks.js');
 
 var Article = function() {
     this.handlePOST = function(cli) {
@@ -73,8 +74,15 @@ var Article = function() {
                 var formData = formBuilder.serializeForm(form);
                 formData.name = slugify(formData.title).toLowerCase();
 
+                hooks.fire('article_will_create', {cli: cli, article : formData});
                 // Create post
                 db.insert(cli._c, 'content', formData, function(err, result) {
+                    if (!err) {
+                        console.log(JSON.stringify(result));
+                        formData._id = result.insertedId;
+                        hooks.fire('article_created', {cli: cli, article: formData});
+                    }
+
                     // Generate LML page
                     filelogic.renderLmlPostPage(cli, "article",formBuilder.unescapeForm(result.ops[0]) , function(name) {
                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
@@ -114,9 +122,11 @@ var Article = function() {
                     formData = formBuilder.serializeForm(form);
                     formData.name = slugify(formData.title).toLowerCase();
 
+                    hooks.fire('article_will_edit', {cli : cli, article : formData});
                     db.findAndModify(cli._c, 'content', {
                         _id: id
                     }, formData , function(err, r) {
+                        hooks.fire('article_edited', {cli : cli, article : r.value});
                         filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
                             notifications.notifyUser(cli.userinfo.userid, cli._c.id, {title: "Article is updated!", url: cli._c.server.url + '/' +  formData.name , msg: "Your changes are live. Click to see the live article.", type: 'success'});
                         });
@@ -146,9 +156,11 @@ var Article = function() {
         if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
+            hooks.fire('article_will_delete', id);
             db.remove(cli._c, 'content', {
                 _id: id
             }, function(err, r) {
+                hooks.fire('article_deleted', id);
                 var filename = r.title + '.html';
                 fs.deleteFile(filename, function() {
                     cacheInvalidator.removeFileToWatch(filename);

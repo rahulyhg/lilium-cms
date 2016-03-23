@@ -152,6 +152,11 @@ var LiliumDFP = function() {
 		if (_priv.client_id) {
 			log('DFP', 'Preparing for deep orders copy');
 			dfpUser.getService('LineItemService', function(err, ser) {
+                if (err) {
+                    log('DFP', "Could not deep fetch : " + err);
+                    return;
+                }
+
 				ser.getLineItemsByStatement(new DFP.Statement('WHERE 1 = 1'), function(err, results) {
 					var arr = results.rval.results;
 	

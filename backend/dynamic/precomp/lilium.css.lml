@@ -196,7 +196,7 @@ html, body {
 }
 
 body {
-	opacity:0;
+	opacity:1;
 	-webkit-transition: opacity 0.2s;
    	   -moz-transition: opacity 0.2s;
 	    -ms-transition: opacity 0.2s;
@@ -235,15 +235,30 @@ input[type="checkbox"], .lmlcheckbox {
 	height:32px;
 	vertical-align: middle;
 
-	margin-right: 10px;
+    font: normal normal normal 14px/1 FontAwesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
 
-	background-image: url('{=siteurl}/static/media/lmlcontrols.png');
-	background-position: 96px 0px;
+	margin-right: 10px;
 	cursor: pointer;
+
+    font-size: 26px;
+    text-align: center;
+    padding-top: 2px;
+
+    border: 1px dashed #CCC;
+    border-radius: 5px;
 }
 
-.lmlbeautifiedcheckbox.checked {
-	background-position: 0px 0px;
+
+.lmlbeautifiedcheckbox::before {
+    color: #E84C3D;
+    content: "\f00d";
+}
+
+.lmlbeautifiedcheckbox.checked::before {
+    content: "\f00c";
+    color : #2ECD71;
 }
 
 form .campaigncreatefield-checkbox label {

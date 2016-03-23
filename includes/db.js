@@ -166,7 +166,7 @@ var DB = function() {
 
 	this.singleLevelFind = function(conf, topLevel, callback) {
 		this.find(conf, topLevel, {}, {}, function(err, cur) {
-			cur.toArray(function(err, docs) {
+			err ? callback(err) : cur.toArray(function(err, docs) {
 				callback(docs);
 			});
 		});
@@ -237,11 +237,7 @@ var DB = function() {
 			} else if (typeof docs !== "object") {
 				cb("[Database - Invalid document]");
 			} else {
-				col[typeof docs.length !== "undefined" ? "insertMany" : "insertOne"](
-					docs, function(err, r) {
-						cb(err, r);
-					}
-					);
+				col[typeof docs.length !== "undefined" ? "insertMany" : "insertOne"](docs, cb);
 			}
 		});
 	};
