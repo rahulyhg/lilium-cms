@@ -373,6 +373,24 @@ var Article = function() {
 
 	});
 
+    this.generateFromName = function(cli, articleName, cb) {
+        // Check for articles in db
+        db.findToArray(cli._c, 'content', {name: articleName}, function(err, arr){
+
+            if (arr[0]) {
+                // Generate LML page
+                filelogic.renderLmlPostPage(cli, "article", arr[0], function(name) {
+                    cacheInvalidator.addFileToWatch(name, 'articleInvalidated', arr[0]._id, cli._c);
+                    cb(true);
+
+                });
+            } else {
+                cb(false);
+            }
+        })
+    }
+
+
 
 	var init = function() {
 
