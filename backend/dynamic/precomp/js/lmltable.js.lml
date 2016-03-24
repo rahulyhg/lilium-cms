@@ -51,7 +51,7 @@ var LmlTable = function(table) {
 				table.data('sort-order', sortOrder);
 				updateTable();
 			} else {
-				table.data('sortby', $(this).data('key'));
+				table.data('sortby', ($(this).data('sortkey') || $(this).data('key')));
 				$(this).addClass('sorted-asc');
 				$(this).prop('sorted', true);
 				table.data('sort-order', 1);
@@ -80,7 +80,7 @@ var LmlTable = function(table) {
 	};
 
 	this.createNav = function() {
-		table.after('<div><p>Displaying entries ' + ((currentPage - 1) * maxEntries + 1) + '-' + (currentPage * maxEntries) + ' of '+ (currentData.size || 0) + '</p>' +
+		table.after('<div><p>Displaying entries ' + ((currentPage - 1) * maxEntries + 1) + '-' + (((currentPage - 1) * maxEntries) + currentData.data.length) + ' of '+ (currentData.size || 0) + '</p>' +
         '</div>').get(0).appendChild(genButtons());
 	};
 

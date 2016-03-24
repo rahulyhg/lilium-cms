@@ -38,7 +38,7 @@ var TableBuilder = function () {
 		html += '<thead>';
 		html += '<tr>';
 		for (var i in table.fields) {
-			html += '<th ' + (table.fields[i].sortable ? 'sortable' : '' )  +' data-key="'+ (table.fields[i].key || '') +'" ' + (typeof table.fields[i].template !== 'undefined' ? 'data-template="' + table.fields[i].template + '"' : '' ) + '>' + (table.fields[i].displayname || table.fields[i].key ) + '</th>';
+			html += '<th ' + (table.fields[i].sortable ? 'sortable' : '' )  +' '+ (table.fields[i].sortkey ? 'data-sortkey="'+ table.fields[i].sortkey +'"' : '') +' data-key="'+ (table.fields[i].key || '') +'" ' + (typeof table.fields[i].template !== 'undefined' ? 'data-template="' + table.fields[i].template + '"' : '' ) + '>' + (table.fields[i].displayname || table.fields[i].key ) + '</th>';
 		}
 		html += '</tr>';
 		html += '</thead>';
