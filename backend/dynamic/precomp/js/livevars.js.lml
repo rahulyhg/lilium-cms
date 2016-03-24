@@ -168,8 +168,19 @@ var LiveVars = function() {
                 }
 
                 if (nodeType == 'img') {
-                    // Add src to image node
-                    node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+                    if (obj.data('baseurl')) {
+                        var href= fetchTemplateObjectContent(obj, data, domTarget, livevarkey)
+                        // Add src to image node
+                        var prepend = obj.data('baseurl');
+                        if (href !== '') {
+                            node.attr('src', prepend + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+
+                        }
+                    } else {
+                        // Add src to image node
+                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+                    }
+
                 } else if (nodeType == 'a') {
                     // Href for a link node
                     if (obj.data('href')) {
@@ -368,15 +379,18 @@ var LiveVars = function() {
         var templateObj = $('#' + templateID);
         if (templateObj.length != 0) {
             if (typeof varValue == 'Object' && varValue.length > 0) {
-                console.log('Generating template 0');
-
                 // Generate template object for array
                 varValue.forEach(function(val, index) {
                     node.appendChild(generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false)[0]);
                 });
             } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
                 // Generate template for single data
-                node.appendChild(generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false)[0]);
+                var nodes = generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false);
+                for (var i = 0; i < nodes.length; i++){
+                    node.appendChild(nodes[i]);
+                }
+
+
             }
         }
         return node;

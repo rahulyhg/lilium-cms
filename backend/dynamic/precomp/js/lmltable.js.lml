@@ -6,7 +6,7 @@ var LmlTable = function(table) {
 	var currentData;
     var keys = new Array();
 	var numberOfCols = table.find('thead th').size();
-    var cachedData = new Array();
+    var cachedData = {};
 
     var timeInitial;
     var timeRendering;
@@ -20,9 +20,43 @@ var LmlTable = function(table) {
             console.log('Table Initialised in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
 
 		});
+		table.parent().find('.header select').change(function() {
+			maxEntries = $(this).val();
+			cachedData = {};
+			updateTable();
+		});
+
+		table.parent().find('.header input').keydown(function(e) {
+			console.log('clickedidou');
+
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if (code == 13) {
+
+				var input = table.parent().find('.header input');
+				if ($(input).val() !== '') {
+					updateTable(undefined, true , $(input).val());
+				} else {
+					updateTable();
+				}
+			}
+		});
 
 		table.on('click', 'th[sortable]', function() {
+			if (typeof $(this).prop('sorted') !== 'undefined') {
+				// Change sort order
+				var sortOrder = table.data('sort-order') == 1 ? -1 : 1;
+				$(this).removeClass((sortOrder == 1 ? 'sorted-desc' : 'sorted-asc'));
+				$(this).addClass((sortOrder == 1 ? 'sorted-asc' : 'sorted-desc'));
 
+				table.data('sort-order', sortOrder);
+				updateTable();
+			} else {
+				table.data('sortby', $(this).data('key'));
+				$(this).addClass('sorted-asc');
+				$(this).prop('sorted', true);
+				table.data('sort-order', 1);
+				updateTable();
+			}
 		});
 
         table.on('click', '.navbuttons button', function() {
@@ -78,30 +112,45 @@ var LmlTable = function(table) {
 	};
 
 	this.changePage = function(pageNumber) {
-        timeInitial = new Date();
         currentPage = pageNumber;
-        if (typeof cachedData[currentPage] !== 'undefined') {
-            currentData = cachedData[currentPage];
-            renderRows();
-            var now = new Date();
-            console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+		table.data('page', pageNumber);
 
-        } else {
-            liliumcms.livevars.getSingleLivevar(table.data('endpoint'), {
-                sortby: table.data('sortby'),
-                max: table.data('max'),
-                skip: (pageNumber - 1) * table.data('max')
-            }, function(data) {
-                currentData = cachedData[pageNumber]  = typeof data.livevars !== 'undefined' ? data.livevars[table.data('endpoint')] : undefined;
-                renderRows();
-                var now = new Date();
-                console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
-
-                if (typeof cb !== 'undefined') cb();
-            });
-        }
-
+		updateTable();
 	};
+
+	var updateTable = function(cb, isSearch, searchTerm) {
+		timeInitial = new Date();
+
+		fieldSort = table.data('sortby');
+		fieldOrder = table.data('sort-order');
+
+		if (!isSearch && cachedData[currentPage] && cachedData[currentPage][fieldSort] && cachedData[currentPage][fieldSort][fieldOrder]) {
+			currentData = cachedData[currentPage][fieldSort][fieldOrder];
+			renderRows();
+			var now = new Date();
+			console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+
+		} else {
+			liliumcms.livevars.getSingleLivevar(table.data('endpoint'), {
+				sortby: fieldSort,
+				order : fieldOrder,
+				max: table.data('max'),
+				skip: (currentPage - 1) * table.data('max'),
+				search: (searchTerm ? searchTerm : undefined)
+			}, function(data) {
+				cachedData[currentPage] = cachedData[currentPage] ? cachedData[currentPage] : {};
+				cachedData[currentPage][fieldSort] = cachedData[currentPage][fieldSort] ? cachedData[currentPage][fieldSort] : {};
+				cachedData[currentPage][fieldSort][fieldOrder] = cachedData[currentPage][fieldSort][fieldOrder] ? cachedData[currentPage][fieldSort][fieldOrder] : {};
+
+				currentData = cachedData[currentPage][fieldSort][fieldOrder]  = typeof data.livevars !== 'undefined' ? data.livevars[table.data('endpoint')] : undefined;
+				renderRows();
+				var now = new Date();
+				console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+
+				if (typeof cb !== 'undefined') cb();
+			});
+		}
+	}
 
 	var renderRows = function() {
         timeRendering = new Date();
@@ -164,6 +213,7 @@ var LmlTable = function(table) {
             }
 
 		} else {
+			table.find('tbody tr').remove();
 			table.append('<tr><td colspan="' + numberOfCols + '">There is no entries...</td></tr>');
 		}
 
@@ -174,16 +224,7 @@ var LmlTable = function(table) {
 	};
 
 	this.getData = function(cb) {
-		liliumcms.livevars.getSingleLivevar(table.data('endpoint'), {
-			sortby: table.data('sortby'),
-			max: table.data('max'),
-			skip: (table.data('page')-1) * table.data('max')
-		}, function(data) {
-			currentData = cachedData[table.data('page')] = typeof data.livevars !== 'undefined' ? data.livevars[table.data('endpoint')] : undefined;
-            renderRows();
-
-			if (typeof cb !== 'undefined') cb();
-		});
+		updateTable(cb);
 	};
 
 	this.init();

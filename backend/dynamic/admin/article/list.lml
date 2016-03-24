@@ -1,37 +1,25 @@
 {#config;forms;tableBuilder}
 		{$
-			var baseurl = config.default.server.url;
+			var root = config.default.server.url;
+			root += "/";
+			var baseurl = root + config.default.paths.admin;
 			baseurl += "/";
-			baseurl += config.default.paths.admin;
-			baseurl += "/";
+			root += "uploads/"
 		$}
 		<h1>List of articles<a class='fab' href="{=baseurl}article/new">+</a></h1>
 		<main class="entities-main">
 			{=tableBuilder.render('article')}
-			<ul class="entity-list">
-				{*content.table(template:"articles-list-item")}
-			</ul>
 		</main>
 
-		<lml:tabletemplate id="article-extra">
-			<li class="articles-item-list">
-				<lml:tobject data-nodetype="h3" data-key="title"></lml:tobject>
-				<div class="articles-actions">
-					<lml:tobject data-nodetype="a"
-								 data-href="{=baseurl}article/edit/"
-						     data-key="_id">
-							Edit
-					</lml:tobject>
-					<lml:tobject data-nodetype="button"
-						     data-bind="click"
-						     data-action="deleteArticle"
-						     data-actionparamkey="_id">
-							Delete
-					</lml:tobject>
-				</div>
-			</li>
-		</lml:tabletemplate>
 		<lml:tabletemplate id="imgArticle">
-			<lml:tobject data-nodetype="img" data-key="media"></lml:tobject>
+			<lml:tobject data-nodetype="img" data-key="media" data-baseurl="{=root}"></lml:tobject>
+		</lml:tabletemplate>
 
+		<lml:tabletemplate id="table-article-title">
+			<lml:tobject data-nodetype="h4" data-key="title"></lml:tobject>
+			<lml:tobject data-nodetype="h6" data-key="subtitle"></lml:tobject>
+		</lml:tabletemplate>
+
+		<lml:tabletemplate id="table-article-status">
+			<lml:tobject data-nodetype="div" data-key="status"></lml:tobject>
 		</lml:tabletemplate>

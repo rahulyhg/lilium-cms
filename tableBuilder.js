@@ -23,6 +23,17 @@ var TableBuilder = function () {
 
 	var generatehtml = function(table) {
 		var html = '';
+		var pages = [(table.max_results || 20), (typeof table.max_results !== 'undefined' &&  table.max_results !== 20 ? 20 : 40), (typeof table.max_results !== 'undefined' ? 40 : 60), (typeof table.max_results !== 'undefined' ? 60 : 100)];
+		pages.sort(function(a, b){return a-b});
+		html += '<div class="lmltablebuilder tablewrapper">';
+		html += '<div class="lmltablebuilder header">';
+		html += 'Show <select>';
+		for (var i in pages) {
+			html += '<option value="'+ pages[i] +'" '+ (typeof table.max_results !== 'undefined' && table.max_results ==  pages[i] ? 'selected' : '') +'>'+ pages[i] +'</option>';
+		}
+		html += '</select> per pages';
+		html += '<label>Search</lable><input type="text" name="search-table">';
+		html += '</div>';
 		html += '<table class="lmltablebuilder lmlfullwidthtable" id=' + table.name + ' data-endpoint="' + table.endpoint + '" data-max="' + (table.max_results || 20) + '" data-page="1" data-sortby="'+ (table.sortby || table.fields[0].key || '') +'">';
 		html += '<thead>';
 		html += '<tr>';
@@ -33,6 +44,8 @@ var TableBuilder = function () {
 		html += '</thead>';
 		html += '<tbody></tbody>';
 		html += '</table>';
+		html += '<div class="lmltablebuilder footer"></div>';
+		html += '</div>';
 		return html;
 	};
 };

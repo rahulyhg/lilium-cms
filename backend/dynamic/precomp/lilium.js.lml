@@ -334,7 +334,7 @@ var LiliumCMS = function() {
         };
 
         var makeTables = function() {
-            $('.lmltablebuilder').each(function(index, elem) {
+            $('table.lmltablebuilder').each(function(index, elem) {
 
                 that.tables.push(new LmlTable(elem));
             });
