@@ -442,49 +442,55 @@ var Core = function() {
 
     var loadTheme = function(cb) {
         log('Themes', 'Loading Theme');
-        themes.bindEndpoints();
 
-        var fireEvent = function() {
-            log('Themes', 'Firing Theme event');
-            hooks.fire('themes');
-            log('Themes', 'Loaded themes');
+        themes.init(function() {
+            
+            themes.bindEndpoints();
 
-            cb();
-        };
+            var fireEvent = function() {
+                log('Themes', 'Firing Theme event');
+                hooks.fire('themes');
+                log('Themes', 'Loaded themes');
 
-        db.find(_c.default(), 'themes', {
-            "active": true
-        }, {
-            limit: [1]
-        }, function(err, cursor) {
-            if (err) {
-                log('Themes', 'Failed to find entries in database; ' + err);
-                fireEvent();
+                cb();
+            };
 
-                return;
-            }
+            db.find(_c.default(), 'themes', {
+                "active": true
+            }, {
+                limit: [1]
+            }, function(err, cursor) {
+                if (err) {
+                    log('Themes', 'Failed to find entries in database; ' + err);
+                    fireEvent();
 
-            log('Themes', 'Read themes collection in database');
-            var i = 0;
+                    return;
+                }
 
-            cursor.each(function(err, theme) {
-                if (theme != null) {
-                    i++;
-                    themes.enableTheme(theme.uName, function() {
-                        fireEvent();
-                    });
-                } else {
+                log('Themes', 'Read themes collection in database');
+                var i = 0;
 
-                    if (i == 0) {
-                        // Enable with default theme
-                        themes.enableTheme(_c.default().website.flower, function() {
+                cursor.each(function(err, theme) {
+                    if (theme != null) {
+                        i++;
+                        themes.enableTheme(theme.uName, function() {
                             fireEvent();
                         });
-                    };
-                    cursor.close();
-                }
+                    } else {
+
+                        if (i == 0) {
+                            // Enable with default theme
+                            themes.enableTheme(_c.default().website.flower, function() {
+                                fireEvent();
+                            });
+                        };
+                        cursor.close();
+                    }
+                });
             });
+
         });
+
 
     }
 

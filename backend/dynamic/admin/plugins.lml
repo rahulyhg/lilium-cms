@@ -22,8 +22,6 @@
     var togglePlugin = function(identifier, btn) {
         btn = $(btn);
 
-        console.log(btn.text());
-
         if (btn.text() == 'Enable') {
             $.post("{=config.default.server.url}/admin/plugins/registerPlugin", {
                 identifier: identifier

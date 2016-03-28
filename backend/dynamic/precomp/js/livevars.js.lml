@@ -91,7 +91,7 @@ var LiveVars = function() {
     /**
      * Gets the content in string of the object tempalte
      */
-    var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey) {
+    var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey, node) {
         var key = obj.data('key');
         var template = $('#' + obj.data('template'));
 
@@ -101,7 +101,7 @@ var LiveVars = function() {
         var contentFct = obj.data('content');
 
         if (typeof window[contentFct] === 'function') {
-            return window[contentFct].apply(data, [data]);
+            return window[contentFct].apply(data, [data, node]);
         }
 
         var content = "";
@@ -180,22 +180,22 @@ var LiveVars = function() {
 
                 if (nodeType == 'img') {
                     if (obj.data('baseurl')) {
-                        var href= fetchTemplateObjectContent(obj, data, domTarget, livevarkey)
+                        var href= fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node)
                         // Add src to image node
                         var prepend = obj.data('baseurl');
                         if (href !== '') {
-                            node.attr('src', prepend + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+                            node.attr('src', prepend + fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
 
                         }
                     } else {
                         // Add src to image node
-                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
                     }
 
                 } else if (nodeType == 'a') {
                     // Href for a link node
                     if (obj.data('href')) {
-                        node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+                        node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
                     } else if (obj.data('hrefsource')) {
                         // hrefsource just appends itself to the already existing href
                         var prepend = obj.data('prependroot') ? window.location.urlBase : "";
@@ -206,7 +206,7 @@ var LiveVars = function() {
                     node.html(obj.html());
                 } else {
                     // Other node types, we'll generate the content for nodes
-                    node.html(fetchTemplateObjectContent(obj, data, domTarget, templateItems, livevarkey));
+                    node.html(fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
                 }
 
                 // Add class to the node object

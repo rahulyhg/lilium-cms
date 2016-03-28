@@ -1,46 +1,42 @@
-{#themes;vocab;debug;config}
-{$
-	themeList = themes.getCachedThemes();
-$}
-	{%entityscript}
-	<h1>{=vocab.themes}</h1>
+{#tableBuilder;vocab;debug;config}
 
-	{$
-		for (theme in themeList);
-	 $}
-	 	{*theme.{=theme.uName}.active}
-	<div class="theme" id="theme.{=theme.uName}.active">
-		<h2>{=theme.dName}</h2>
-		<div class="themes-actions" id="{=theme.uName}">
-			<button class='enable-theme'>Enable</button>
-		</div>
-	</div>
-	{$
-		endfor;
-	$}
 
+<main class="entities-main">
+    {=tableBuilder.render('theme')}
+</main>
+
+<lml:tabletemplate id="table-themes-actions">
+    <lml:tobject data-nodetype="button"
+             data-bind="click"
+             data-action="toggleTheme"
+             data-actionparamkey="uName"
+             data-content="genButtons" >
+            Enable
+    </lml:tobject>
+</lml:tabletemplate>
 <script>
-liliumcms.livevars.getLiveVars(function() {
-	$('.theme').each(function() {
-		var id = $(this).attr('id');
-		if (liliumcms.livevars.livevars()[id] && liliumcms.livevars.livevars()[id][0]) {
-			$(this).find('.themes-actions').html("<span id='theme_enabled'>This theme is installed</span>");
-		}
-	});
+    var activeTheme;
+    var genButtons = function(data, node) {
+        if (typeof activeTheme == 'undefined' && data.active) {
+            activeTheme = $(node);
+            return "Active";
+        } else {
+            return "Enable";
+        }
+    }
 
-});
+    var toggleTheme = function(uName, btn) {
+        btn = $(btn);
 
-$('.theme').on('click','.enable-theme',function() {
-
-	var that = this;
-	$.post("{=config.default.server.url}/admin/themes/enableTheme", {uName : $(this).closest(".themes-actions").attr('id')}, function(data) {
-
-		if (data.success) {
-			$('#theme_enabled').replaceWith("<button class='enable-theme'>Enable</button>");
-			$(that).replaceWith("<span id='theme_enabled'>This theme is installed</span>");
-
-		}
-	});
-});
-
+        if (btn.text() == 'Enable') {
+            $.post("{=config.default.server.url}/admin/themes/enableTheme", {
+                uName: uName
+            }, function(data) {
+                console.log(activeTheme);
+                activeTheme.text("Enable");
+                activeTheme = btn;
+                btn.text("Active");
+            });
+        }
+    }
 </script>
