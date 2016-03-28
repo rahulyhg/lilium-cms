@@ -64,7 +64,6 @@ var Precomp = function() {
 			fileArr = files;
 			db.findToArray(conf, 'compiledfiles', {}, function(err, histo) {
 				db.remove(conf, 'compiledfiles', {}, function(remErr, res) {
-                        console.log(histo);
 					var histoObj = new Object();
 
 					for (var i = 0; i < histo.length; i++) {
@@ -88,7 +87,6 @@ var Precomp = function() {
                                                 filename : curFile,
                                                 sum : sum
                                             }, function(err) {
-                                                console.log(err);
                                                 nextFile();
                                             });
 										} else {
@@ -104,7 +102,6 @@ var Precomp = function() {
 															filename : curFile,
 															sum : sum
 														}, function(err) {
-                                                            console.log(err);
 															nextFile();
 														});
 													});

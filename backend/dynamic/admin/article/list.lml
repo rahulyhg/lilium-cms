@@ -12,7 +12,7 @@
 		</main>
 
 		<lml:tabletemplate id="imgArticle">
-			<lml:tobject data-nodetype="img" data-key="media" data-baseurl="{=root}"></lml:tobject>
+			<lml:tobject data-nodetype="img" data-key="media"></lml:tobject>
 		</lml:tabletemplate>
 
 		<lml:tabletemplate id="table-article-title">

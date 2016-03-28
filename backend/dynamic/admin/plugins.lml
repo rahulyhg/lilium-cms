@@ -1,58 +1,41 @@
-{#plugins;vocab;debug;config}
-{$
-    strPlugin = "plugins"; pluginlist = plugins.getCachedPlugins();
-$}
-{%entityscript}
-<h1>{=vocab.{=strPlugin}}</h1>
-{$
-    for (plug in pluginlist);
-$}
-{*plugin.{=plug.identifier}.active}
+{#vocab;config;tableBuilder}
+<h1>{=vocab.plugins}</h1>
 
-<div class="plugin" id="plugin.{=plug.identifier}.active">
-    <h2>{=plug.identifier}</h2>
-    <div class="plugin-actions" id="{=plug.identifier}">
-        <button class='enable-plugin'>Enable</button>
-    </div>
-</div>
-{$
-    endfor;
-$}
+<main class="entities-main">
+    {=tableBuilder.render('plugin')}
+</main>
 
+<lml:tabletemplate id="table-plugins-actions">
+    <lml:tobject data-nodetype="button"
+             data-bind="click"
+             data-action="togglePlugin"
+             data-actionparamkey="identifier"
+             data-content="genButtons" >
+            Enable
+    </lml:tobject>
+</lml:tabletemplate>
 <script>
-    document.addEventListener('livevarsRendered', function(e) {
+    var genButtons = function(data) {
+        return data.active ? "Disable" : "Enable";
+    }
 
+    var togglePlugin = function(identifier, btn) {
+        btn = $(btn);
 
-        $('.plugin').each(function() {
-            var id = $(this).attr('id');
-            if (liliumcms.livevars.livevars()[id] && liliumcms.livevars.livevars()[id][0]) {
-                $(this).find('.plugin-actions').html("<button class='disable-plugin'>Disable</button>");
-            }
-        });
+        console.log(btn.text());
 
-        $('.plugin').on('click', '.enable-plugin', function() {
-            var that = this;
+        if (btn.text() == 'Enable') {
             $.post("{=config.default.server.url}/admin/plugins/registerPlugin", {
-                identifier: $(this).closest(".plugin-actions").attr('id')
+                identifier: identifier
             }, function(data) {
-
-                if (data.success) {
-                    $(that).replaceWith("<button class='disable-plugin'>Disable</button>");
-                }
+                btn.text("Disable");
             });
-        });
-
-        $('.plugin').on('click', '.disable-plugin', function() {
-            var that = this;
+        } else {
             $.post("{=config.default.server.url}/admin/plugins/unregisterPlugin", {
-                identifier: $(this).closest(".plugin-actions").attr('id')
+                identifier: identifier
             }, function(data) {
-
-                if (data.success) {
-                    $(that).replaceWith("<button class='enable-plugin'>Enable</button>");
-                }
+                btn.text("Enable");
             });
-        });
-
-    });
+        }
+    }
 </script>

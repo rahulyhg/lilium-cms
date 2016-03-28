@@ -276,7 +276,7 @@ var Article = function() {
 						author: "$author.displayname",
 						title: 1,
 						subtitle: 1,
-						media: "$media.url"
+						media: "$media.sizes.medium.url"
 					}
 				}, {
 					$sort: sort
