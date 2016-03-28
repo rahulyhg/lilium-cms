@@ -17,7 +17,7 @@
         <lml:tabletemplate id="table-entity-roles">
             <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
         </lml:tabletemplate>
-
+        
         <lml:tabletemplate id="table-entity-actions">
             <lml:tobject data-nodetype="button"
                      data-bind="click"

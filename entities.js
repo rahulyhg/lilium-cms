@@ -273,7 +273,9 @@ var Entities = module.exports = new function() {
         newEnt.email = entData.email;
         newEnt.roles = [];
         for (var index in entData.roles) {
-            newEnt.roles.push(entData.roles[index]);
+            if (entData.roles[index] !== "") {
+                newEnt.roles.push(entData.roles[index]);
+            }
         }
         newEnt.displayname = entData.displayname;
         newEnt.firstname = entData.firstname;

@@ -6,6 +6,7 @@ var db = undefined;
 var filelogic = undefined;
 var formbuilder = undefined;
 var hooks = undefined;
+var tableBuilder = undefined;
 
 var cachedCampaigns = new Object();
 var registeredStatuses = new Array();
@@ -132,23 +133,31 @@ var Campaigns = function() {
                     }
                     break;
                 case "needsattention_advertiser":
-                    if(cli.isGranted('advertiser')) {
-                        db.findToArray(_c.default(), 'campaigns', {campstatus: {$in :['clipending', 'clipayment', 'clisign']}}, function(err, res) {
-                            callback(err||res);
+                    if (cli.isGranted('advertiser')) {
+                        db.findToArray(_c.default(), 'campaigns', {
+                            campstatus: {
+                                $in: ['clipending', 'clipayment', 'clisign']
+                            }
+                        }, function(err, res) {
+                            callback(err || res);
                         });
                     } else {
                         callback();
                     }
                     break;
-                    case "needsattention_prod":
-                        if(cli.isGranted('production')) {
-                            db.findToArray(_c.default(), 'campaigns', {campstatus: {$in :['prod', 'preprod']}}, function(err, res) {
-                                callback(err||res)
-                            });
-                        } else {
-                            callback();
-                        }
-                        break;
+                case "needsattention_prod":
+                    if (cli.isGranted('production')) {
+                        db.findToArray(_c.default(), 'campaigns', {
+                            campstatus: {
+                                $in: ['prod', 'preprod']
+                            }
+                        }, function(err, res) {
+                            callback(err || res)
+                        });
+                    } else {
+                        callback();
+                    }
+                    break;
                 case "get":
                     var projectid = levels[1];
 
@@ -229,6 +238,70 @@ var Campaigns = function() {
                         callback();
                     }
                     break;
+                case "table":
+                    var sort = {};
+                    sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+                    db.aggregate(cli._c, 'campaigns', [{
+                        $match:
+                            (params.search ? {
+                                $text: {
+                                    $search: params.search
+                                }
+                            } : {})
+
+                    }, {
+                        $lookup: {
+                            from: 'entities',
+                            localField: 'clientid',
+                            foreignField: '_id',
+                            as: 'client'
+                        }
+                    }, {
+                        $unwind: {
+                            path: "$client",
+                            preserveNullAndEmptyArrays: true
+                        }
+                    }, {
+                        $lookup: {
+                            from: 'campaignStatuses',
+                            localField: 'campstatus',
+                            foreignField: 'name',
+                            as: 'campstatus'
+                        }
+                    }, {
+                        $project: {
+                            client: "$client.displayname",
+                            projectid: 1,
+                            campname: 1,
+                            name: 1,
+                            campstatus: "$campstatus.displayName",
+                            paymentreq: 1
+                        }
+                    }, {
+                        $sort: sort
+                    }, {
+                        $skip: (params.skip || 0)
+                    }, {
+                        $limit: (params.max || 20)
+                    }], function(data) {
+                        db.find(cli._c, 'content', (params.search ? {
+                            $text: {
+                                $search: params.search
+                            }
+                        } : {}), [], function(err, cursor) {
+
+                            cursor.count(function(err, size) {
+                                results = {
+                                    size: size,
+                                    data: data
+                                }
+                                callback(err || results);
+
+                            });
+                        });
+                    });
+
+                    break;
                 default:
                     if (cli.isGranted('advertiser')) {
                         that.getAllMyCampaigns({
@@ -297,7 +370,7 @@ var Campaigns = function() {
                             hooks.trigger('campaignUpdated', {
                                 "old": err || old[0],
                                 "new": dbCamp,
-                                "cli" : cli
+                                "cli": cli
                             });
 
                             if (!err && old[0] && old[0].campstatus != dbCamp.cmapstatus) {
@@ -430,11 +503,11 @@ var Campaigns = function() {
                                 displayName: "DPF Project ID",
                                 keyName: "dfpprodid",
                                 displayCase: "bannerads",
-                                autocomplete : {
-                                     datasource : "dfpcache.all.simple",
-                                     keyValue : "id",
-                                     keyName : "name",
-                                     cantAdd : false
+                                autocomplete: {
+                                    datasource: "dfpcache.all.simple",
+                                    keyValue: "id",
+                                    keyName: "name",
+                                    cantAdd: false
                                 }
                             }, {
                                 fieldName: "fbcampid",
@@ -464,15 +537,56 @@ var Campaigns = function() {
             });
     };
 
+    var createTable = function() {
+
+        tableBuilder.createTable({
+            name: 'campaign',
+            endpoint: 'campaigns.table',
+            paginate: true,
+            searchable: true,
+            max_results: 25,
+            fields: [{
+                key: 'projectid',
+                displayname: 'ID',
+                sortable: true
+            }, {
+                key: 'campname',
+                displayname: 'Name',
+                sortable: true,
+            }, {
+                key: 'campstatus',
+                displayname: 'Status',
+                sortable: true
+            }, {
+                key: 'paymentreq',
+                displayname: 'Payment required',
+                template: 'table-campaign-payment',
+                sortable: true
+            }, {
+                key: 'client',
+                displayname: 'Client',
+                sortable: true
+            }, {
+                key: '',
+                displayname: 'Actions',
+                template: 'table-campaign-actions',
+                sortable: false
+            }]
+        });
+
+    };
+
     this.init = function(abspath) {
         log = require(abspath + 'log.js');
-        _c = require( abspath + 'config.js');
+        _c = require(abspath + 'config.js');
         Products = require(abspath + 'products.js');
         LiveVars = require(abspath + 'livevars.js');
         db = require(abspath + 'includes/db.js');
         filelogic = require(abspath + 'filelogic.js');
         formbuilder = require(abspath + 'formBuilder.js');
         hooks = require(abspath + 'hooks.js');
+        tableBuilder = require(abspath + 'tableBuilder.js');
+        createTable();
     };
 };
 

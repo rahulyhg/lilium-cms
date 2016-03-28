@@ -130,6 +130,7 @@ var Article = function() {
 				if (response.success) {
 					formData = formBuilder.serializeForm(form);
 					formData.name = slugify(formData.title).toLowerCase();
+                    formData.media = db.mongoID(formData.media);
 
 					hooks.fire('article_will_edit', {
 						cli: cli,
@@ -276,6 +277,7 @@ var Article = function() {
 						author: "$author.displayname",
 						title: 1,
 						subtitle: 1,
+                        name: 1,
 						media: "$media.sizes.medium.url"
 					}
 				}, {
@@ -420,7 +422,12 @@ var Article = function() {
 				key: 'author',
 				displayname: 'Author',
 				sortable: true
-			}, ]
+			}, {
+				key: '',
+				displayname: 'Actions',
+                template: 'table-article-actions',
+				sortable: false
+			}]
 		});
 
 	};

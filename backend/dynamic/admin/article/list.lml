@@ -1,10 +1,11 @@
 {#config;forms;tableBuilder}
+{%../articlescript}
+
 		{$
 			var root = config.default.server.url;
 			root += "/";
 			var baseurl = root + config.default.paths.admin;
-			baseurl += "/";
-			root += "uploads/"
+			root += "admin/"
 		$}
 		<h1>List of articles<a class='fab' href="{=baseurl}article/new">+</a></h1>
 		<main class="entities-main">
@@ -23,3 +24,23 @@
 		<lml:tabletemplate id="table-article-status">
 			<lml:tobject data-nodetype="div" data-key="status"></lml:tobject>
 		</lml:tabletemplate>
+
+        <lml:tabletemplate id="table-article-actions">
+            <lml:tobject data-nodetype="a"
+                         data-href="{=root}article/edit/"
+                     data-key="_id">
+                    Edit
+            </lml:tobject>
+            <lml:tobject data-nodetype="a"
+                         data-href="{=config.default.server.url}/"
+                     data-key="name">
+                    View
+            </lml:tobject>
+            <lml:tobject data-nodetype="button"
+                     data-bind="click"
+                     data-action="deleteUser"
+                     data-actionparamkey="_id"
+                     data-filter="canDelete" >
+                    Delete
+            </lml:tobject>
+    	</lml:tabletemplate>
