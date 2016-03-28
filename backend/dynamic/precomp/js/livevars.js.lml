@@ -96,6 +96,14 @@ var LiveVars = function() {
         var template = $('#' + obj.data('template'));
 
         var sep = obj.data('arrayseparator');
+
+        var elemContent;
+        var contentFct = obj.data('content');
+
+        if (typeof window[contentFct] === 'function') {
+            return window[contentFct].apply(data, [data]);
+        }
+
         var content = "";
 
         if (typeof key !== 'undefined') {
@@ -154,6 +162,8 @@ var LiveVars = function() {
             var nodeType = obj.data('nodetype');
             var action = obj.data('action');
             var filter = obj.data('filter');
+            var content = obj.data('content');
+
             var passed = true;
 
             if (typeof window[filter] === 'function') {
@@ -161,6 +171,7 @@ var LiveVars = function() {
             }
 
             if (passed) {
+
                 // Create a node based on nodetype
                 var node = $(document.createElement(nodeType));
                 if (typeof livevarkey !== 'undefined') {
