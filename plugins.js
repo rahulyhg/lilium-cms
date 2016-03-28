@@ -6,7 +6,7 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
-
+var tableBuilder = require('./tableBuilder.js');
 var RegisteredPlugins = new Object();
 var CachedPlugins = new Array();
 
@@ -118,7 +118,7 @@ var Plugins = function() {
 		} else {
 			log('Plugins', 'Registering plugin with identifier ' + identifier);
 			that.searchDirForPlugin(identifier, function(info) {
-				if (!info) {	
+				if (!info) {
 					log("PluginException", "Could not find any info on plugin with identifier " + identifier);
 					throw new Error("[PluginException] Could not find any info on plugin with identifier " + identifier);
 				}
@@ -126,9 +126,9 @@ var Plugins = function() {
 				try {
 					var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
 					var pluginInstance = require(plugindir + info.dirName + "/" + info.entry);
-	
+
 					RegisteredPlugins[identifier] = pluginInstance;
-	
+
 					db.update(_c.default(), 'plugins', {identifier : identifier}, {identifier : identifier, active : true}, function() {
 						if (typeof pluginInstance.register !== 'function') {
 							log("Plugins", 'Plugin has no method "register"');
@@ -191,17 +191,92 @@ var Plugins = function() {
 
 			if (allPlugins) {
 				db.singleLevelFind(_c.default(), 'plugins', callback);
+            }else if(levels[0] == 'table') {
+                var sort = {};
+                sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+                db.aggregate(cli._c, 'plugins', [{
+                    $match:
+                        (params.search ? {
+                            $text: {
+                                $search: params.search
+                            }
+                        } : {})
+
+                }, {
+                    $sort: sort
+                }, {
+                    $skip: (params.skip || 0)
+                }, {
+                    $limit: (params.max || 20)
+                }], function(data) {
+                    db.find(cli._c, 'plugins', (params.search ? {
+                        $text: {
+                            $search: params.search
+                        }
+                    } : {}), [], function(err, cursor) {
+
+                        cursor.count(function(err, size) {
+                            results = {
+                                size: size,
+                                data: data
+                            }
+                            callback(err || results);
+
+                        });
+                    });
+                });
 			} else {
 				db.multiLevelFind(_c.default(), 'plugins', levels, {identifier:(levels[0])}, {limit:[1]}, callback);
 			}
 		}, ['plugins']);
 	};
 
-	var init = function() {
+    this.registerForm = function() {
+        tableBuilder.createTable({
+			name: 'plugin',
+			endpoint: 'plugin.table',
+			paginate: true,
+			searchable: true,
+			max_results: 10,
+			fields: [{
+				key: 'identifier',
+				displayname: 'Name',
+				sortable: true
+			}, {
+				key: '',
+				displayname: 'Actions',
+				template: 'table-plugins-actions',
+				sortable: true,
+				sortkey: 'active'
+			},{
+				key: 'entry',
+				displayname: 'Entry Script',
+				sortable: true
+			}, ]
+		});
+    }
+
+	this.init = function(cb) {
+        this.registerForm();
+        that.getPluginsDirList(function(plugins) {
+            db.findToArray(_c.default(),'plugins', {'active' : true}, function(err, results) {
+                for (var i in results) {
+                    for (var j in plugins) {
+                        if (results[i].identifier == plugins[j].identifier) {
+                            plugins[j].active = true;
+                            break;
+                        }
+                    }
+                }
+            });
+            db.remove(_c.default(), 'plugins', {}, function() {
+                db.insert(_c.default(), 'plugins', plugins, function(err) {
+                    cb();
+                });
+            }, false);
+        });
 
 	};
-
-	init();
 };
 
 module.exports = new Plugins();

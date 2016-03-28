@@ -351,45 +351,48 @@ var Core = function() {
     };
 
     var loadPlugins = function(cb) {
-        log('Plugins', 'Loading plugins');
+        plugins.init(function() {
+            log('Plugins', 'Loading plugins');
 
-        plugins.bindEndpoints();
+            plugins.bindEndpoints();
 
-        var fireEvent = function() {
-            log('Plugins', 'Loaded plugins');
-            return cb();
-        };
-
-        db.findToArray(_c.default(), 'plugins', {
-            "active": true
-        }, function(err, results) {
-            if (err) {
-                log('Plugins', 'Failed to find entries in database; ' + err);
-                fireEvent();
-
-                return;
-            }
-
-            log('Plugins', 'Read plugins collection in database');
-            var i = -1;
-            var nextObject = function() {
-                i++
-                if (i != results.length) {
-                    plugins.registerPlugin(results[i].identifier, nextObject);
-                } else {
-                    fireEvent();
-                }
+            var fireEvent = function() {
+                log('Plugins', 'Loaded plugins');
+                return cb();
             };
 
-            if (results.length > 0) {
-                nextObject();
-            } else {
-                plugins.getPluginsDirList(function() {
-                    log('Plugins', 'Nothing to register');
+            db.findToArray(_c.default(), 'plugins', {
+                "active": true
+            }, function(err, results) {
+                if (err) {
+                    log('Plugins', 'Failed to find entries in database; ' + err);
                     fireEvent();
-                });
 
-            }
+                    return;
+                }
+
+                log('Plugins', 'Read plugins collection in database');
+                var i = -1;
+                var nextObject = function() {
+                    i++
+                    if (i != results.length) {
+                        plugins.registerPlugin(results[i].identifier, nextObject);
+                    } else {
+                        fireEvent();
+                    }
+                };
+
+                if (results.length > 0) {
+                    nextObject();
+                } else {
+                    plugins.getPluginsDirList(function() {
+                        log('Plugins', 'Nothing to register');
+                        fireEvent();
+                    });
+
+                }
+            });
+
         });
 
     };
