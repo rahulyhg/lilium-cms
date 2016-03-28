@@ -90,6 +90,10 @@ var HtmlParser = function() {
                     case 'number':
                         htmlForm += parseNumberType(field, form.attr.placeholder);
                         break;
+                    case 'money':
+                        field.requirements.step = 0.01;
+                        htmlForm += parseNumberType(field, form.attr.placeholder);
+                        break;
                     case 'hidden':
                         htmlForm += parseHiddenType(field);
                         break;
@@ -321,8 +325,9 @@ var HtmlParser = function() {
         var input = generateLabel(field, hasPlaceholder);
         input += '<input type="number" ';
         input += parseBasicFieldAttributes(field);
-        input += field.requirements.min ? 'min="' + field.requirements.min + '"' : '';
+       input += field.requirements.min ? 'min="' + field.requirements.min + '"' : '';
         input += field.requirements.max ? 'max="' + field.requirements.max + '"' : '';
+        input += field.requirements.step ? 'step="' + field.requirements.step + '"' : '1';
         input += ' />';
 
         return input;

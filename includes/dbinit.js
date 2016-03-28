@@ -72,14 +72,14 @@ var defaultPriceBases = [
 ];
 
 var defaultProducts = [
-	{name:"banbigbox",displayName:"Banner Ads - Big Box",productType:"bannerads",priceBase:"cpm",price:10,active:true},
-	{name:"banbigboxm",displayName:"Banner Ads - Big Box (Mobile)",productType:"bannerads",priceBase:"cpm",price:10,active:true},
-	{name:"banbillboard",displayName:"Banner Ads - Billboard",productType:"bannerads",priceBase:"cpm",price:10,active:true},
+	{name:"banbigbox",displayName:"Banner Ads - Big Box",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
+	{name:"banbigboxm",displayName:"Banner Ads - Big Box (Mobile)",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
+	{name:"banbillboard",displayName:"Banner Ads - Billboard",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
 	{name:"bancompto",displayName:"Banner Ads - Companion Takeover",productType:"bannerads",priceBase:"unit",price:500,active:true},
-	{name:"banlskysc",displayName:"Banner Ads - Large Skyscraper",productType:"bannerads",priceBase:"cpm",price:10,active:true},
-	{name:"banlb",displayName:"Banner Ads - Leaderboard",productType:"bannerads",priceBase:"cpm",price:10,active:true},
-	{name:"banskysc",displayName:"Banner Ads - Skyscraper",productType:"bannerads",priceBase:"cpm",price:10,active:true},
-	{name:"bantakeover",displayName:"Banner Ads - Takeover",productType:"bannerads",priceBase:"cpm",price:30,active:true},
+	{name:"banlskysc",displayName:"Banner Ads - Large Skyscraper",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
+	{name:"banlb",displayName:"Banner Ads - Leaderboard",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
+	{name:"banskysc",displayName:"Banner Ads - Skyscraper",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
+	{name:"bantakeover",displayName:"Banner Ads - Takeover",productType:"bannerads",priceBase:"cpm",price:0.03,active:true},
 	{name:"email",displayName:"Email Discovery",productType:"email",priceBase:"unit",price: 500,active:true},
 	{name:"fbdisc",displayName:"Facebook Discovery",productType:"facebook",priceBase:"unit",price: 15,active:true},
 	{name:"twdisc",displayName:"Twitter Discovery",productType:"twitter",priceBase:"unit",price: 0,active:true},

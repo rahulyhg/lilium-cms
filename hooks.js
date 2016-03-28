@@ -15,7 +15,7 @@ var events = {
 };
 
 var Hooks = function() {
-	this.bind = function(eventName, priority ,callback) {
+	this.bind = this.register = function(eventName, priority ,callback) {
 		if (typeof events[eventName] === 'undefined') {
 			events[eventName] = {};
 		}

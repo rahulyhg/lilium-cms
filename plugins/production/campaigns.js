@@ -257,7 +257,9 @@ var Campaigns = function() {
         var products = new Array();
 
         for (var key in postdata.productstable) {
-            products.push(postdata.productstable[key]);
+            var sprod = postdata.productstable[key];
+            sprod.impressions = 0;
+            products.push(sprod);
         }
 
         return {
@@ -266,7 +268,8 @@ var Campaigns = function() {
             "campstatus": postdata.campstatus,
             "clientid": postdata.clientid,
             "paymentreq": postdata.paymentreq && postdata.paymentreq == "on",
-            "products": products
+            "products": products,
+            "impression": postdata.impression || 0
         };
     };
 
@@ -377,10 +380,14 @@ var Campaigns = function() {
                         dataType: "number",
                         displayName: "Quantity",
                         defaultValue: 1,
-                        influence: {
-                            fieldName: "price",
-                            eq: "*"
-                        }
+                        influence: [{
+                                fieldName: "price",
+                                eq: "*"
+                            }, {
+                                fieldName: "targetimp",
+                                eq: "="
+                            }
+                        ]
                     }, {
                         fieldName: "pricebase",
                         displayName: "Based on",
@@ -388,7 +395,7 @@ var Campaigns = function() {
                         defaultValue: "unit"
                     }, {
                         fieldName: "price",
-                        dataType: "number",
+                        dataType: "money",
                         displayName: "Price",
                         keyName: "price",
                         prepend: "$"
@@ -397,6 +404,11 @@ var Campaigns = function() {
                         dataType: "date",
                         displayName: "End Date",
                         keyName: "enddate"
+                    }, {
+                        fieldName: "targetimp",
+                        dataType: "number",
+                        displayName : "Target Impressions",
+                        keyName: "targetimp"
                     }, {
                         fieldName: "website",
                         displayName: "Website",
@@ -415,13 +427,13 @@ var Campaigns = function() {
                     columnTemplates: {
                         "productapilink": {
                             fields: [{
-                                fieldName: "articleid",
+                                fieldName: "articlename",
                                 displayName: "Article",
-                                keyName: "articleid",
+                                keyName: "articlename",
                                 displayCase: "sponsedit",
                                 autocomplete: {
                                     datasource: "content.all.simple",
-                                    keyValue: "articleid",
+                                    keyValue: "name",
                                     keyName: "title",
                                     cantAdd: true
                                 }
@@ -462,6 +474,14 @@ var Campaigns = function() {
                 onlyWhen: "new",
                 displayName: 'Save'
             });
+    };
+
+    this.registerHooks = function() {
+        hooks.bind('article_will_create', 200, function(pkg) {
+            pkg.article.impressions = 0;
+            pkg.article.targetimpressions = -1;
+            pkg.article.targetdate = -1;
+        });
     };
 
     this.init = function(abspath) {

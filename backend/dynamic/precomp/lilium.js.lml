@@ -280,7 +280,11 @@ var LiliumCMS = function() {
                 var pt = undefined;
 
                 if (typeof val === "object") {
-                    foreachloop(val, kkString);
+                    if ((pt = findPushTableFromTitle(kkString))) {
+                        pt.fillFromSource(val);
+                    } else {
+                        foreachloop(val, kkString);
+                    }
                 } else {
                     var field = form.find('*[name="' + kkString + '"]');
                     if (field.length > 0) {
@@ -289,9 +293,7 @@ var LiliumCMS = function() {
                         } else {
                             field.val(val);
                         }
-                    } else if ((pt = findPushTableFromTitle(kkString))) {
-                        pt.fillFromSource(val);
-                    }
+                    }               
                 }
             }
 

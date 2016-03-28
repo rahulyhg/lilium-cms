@@ -47,4 +47,4 @@
 	};
 </script>
 
-{*sites.complex(template:"site_template",target:"sites_tbody")}
+{*sites.all.complex(template:"site_template",target:"sites_tbody")}

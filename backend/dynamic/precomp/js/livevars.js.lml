@@ -9,6 +9,10 @@ var LiveVars = function() {
         }, cb);
     }
 
+    this.retrieveVar = function(name) {
+        return livevars[name];
+    };
+
     this.getLiveVars = function(cb) {
         urlParams = window.location.pathname.split('/');
 

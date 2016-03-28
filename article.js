@@ -87,14 +87,24 @@ var Article = function() {
                     // Generate LML page
                     filelogic.renderLmlPostPage(cli, "article",formBuilder.unescapeForm(result.ops[0]) , function(name) {
                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
-                        notifications.notifyUser(cli.userinfo.userid, cli._c.id, {title: "Article is Live!", url: cli._c.server.url + '/' + formData.name, msg: "Your article is published. Click to see it live.", type: 'success'});
+
+                        notifications.notifyUser(
+                            cli.userinfo.userid, 
+                            cli._c.id, 
+                            {
+                                title: "Article is Live!", 
+                                url: cli._c.server.url + '/' + formData.name, 
+                                msg: "Your article is published. Click to see it live.", 
+                                type: 'success'
+                            }
+                        );
+
                         cli.sendJSON({
                             redirect: cli._c.server.url + "/" + name,
                             form: {
                                 success: true
                             }
                         });
-
                     });
                 });
 
@@ -123,25 +133,33 @@ var Article = function() {
 					formData = formBuilder.serializeForm(form);
 					formData.name = slugify(formData.title).toLowerCase();
 
-                    hooks.fire('article_will_edit', {cli : cli, article : formData});
-					db.findAndModify(cli._c, 'content', {
-						_id: id
-					}, formData, function(err, r) {
-                        hooks.fire('article_edited', {cli : cli, article : r.value});
-						filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
-							notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-								title: "Article is updated!",
-								url: cli._c.server.url + '/' + formData.name,
-								msg: "Your changes are live. Click to see the live article.",
-								type: 'success'
-							});
-						});
+                    db.find(cli._c, 'content', {_id : id}, [], function(err, row) {
+                        if (!err) {
+                            cli.sendJSON({
+                                success: false,
+                                error : "Content not found for id " + id
+                            });
+                        }
+                        hooks.fire('article_will_edit', {cli : cli, old : row, article : formData});
 
-						cli.sendJSON({
-							success: true
-						});
-					});
-
+    					db.findAndModify(cli._c, 'content', {
+    						_id: id
+    					}, formData, function(err, r) {
+                         hooks.fire('article_edited', {cli : cli, article : r.value});
+    						filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
+    							notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+    								title: "Article is updated!",
+    								url: cli._c.server.url + '/' + formData.name,
+    								msg: "Your changes are live. Click to see the live article.",
+    								type: 'success'
+    							});
+    						});
+    
+    						cli.sendJSON({
+    							success: true
+    						});
+    					});
+                    });
 				} else {
 					cli.sendJSON({
 						form: response
@@ -216,6 +234,7 @@ var Article = function() {
 					for (var i = 0; i < arr.length; i++) {
 						sentArr.push({
 							articleid: arr[i]._id,
+                            name : arr[i].name,
 							title: arr[i].title
 						});
 					};

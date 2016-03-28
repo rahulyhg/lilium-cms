@@ -133,13 +133,19 @@ var Sites = function() {
 	this.registerLiveVar = function() {
 		livevars.registerLiveVariable('sites', function(cli, levels, params, cb) {
 			var len = levels.length;
-			if (len == 0 || levels[0] == "simple") {
-				cb(config.getSimpleSites());
-			} else if (levels[0] == "complex") {
-				cb(config.getAllSites());
-			} else {
-				cb([]);
-			}
+            if (len > 0 && levels[0] == 'all') {
+		    	if (len < 2 || levels[1] == "simple") {
+		    		cb(config.getSimpleSites());
+		    	} else if (levels[1] == "complex") {
+		    		cb(config.getAllSites());
+ 		    	} else {
+		    		cb([]);
+		    	}
+            } else if (len > 0) {
+                cb("[SitesException] Cannot find sites under : " + levels[0]);
+            } else {
+                cb("[SitesException] Cannot use top level of Live Variable : Sites");
+            }
 		});
 	};
 

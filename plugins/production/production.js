@@ -33,6 +33,7 @@
 	       cli.touch("admin.POST.production");
 	       handlePOST(cli);
 	     });
+         Campaigns.registerHooks();
 	   };
 
        var initCampaigns = function(asbpath) {
@@ -114,6 +115,7 @@
 	   this.register = function(_c, info, callback) {
 	     conf = _c;
 	     initRequires(_c.default().server.base);
+         initCampaigns(_c.default().server.base);
 	     log("Production", "Initalizing plugin");
              changerequest.init(_c.default().server.base);
 
@@ -126,7 +128,6 @@
              log('Production', 'Registering forms');
              registerForms();
 
-             initCampaigns(_c.default().server.base);
 
 	     return callback();
 	   };

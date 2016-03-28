@@ -44,27 +44,29 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
 
                     (function(col) {
                         $('.lmlpushtablecolumnfield-' + col.fieldName).bind('change', function() {
-                            var affectedField = $('.lmlpushtablecolumnfield-' + col.influence.fieldName);
-                            var newValue = parseInt(affectedField.data("initvalue"));
-                            switch (col.influence.eq) {
-                                case "+":
-                                    newValue += parseInt($(this).val());
-                                    break;
-                                case "-":
-                                    newValue -= parseInt($(this).val());
-                                    break;
-                                case "*":
-                                    newValue *= parseInt($(this).val());
-                                    break;
-                                case "/":
-                                    newValue /= parseInt($(this).val());
-                                    break;
-                                case "=":
-                                    newValue = $(this).val();
-                                    break;
-                            }
+                            for (var i = 0; i < col.influence.length; i++) {
+                                var affectedField = $('.lmlpushtablecolumnfield-' + col.influence[i].fieldName);
+                                var newValue = parseFloat(affectedField.data("initvalue"));
+                                switch (col.influence[i].eq) {
+                                    case "+":
+                                        newValue += parseFloat($(this).val());
+                                        break;
+                                    case "-":
+                                        newValue -= parseFloat($(this).val());
+                                        break;
+                                    case "*":
+                                        newValue *= parseFloat($(this).val());
+                                        break;
+                                    case "/":
+                                        newValue /= parseFloat($(this).val());
+                                        break;
+                                    case "=":
+                                        newValue = $(this).val();
+                                        break;
+                                }
 
-                            affectedField.val(newValue);
+                                affectedField.val(newValue);
+                            }
                         });
                     })(col);
                 }
@@ -83,10 +85,10 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
         var er = undefined;
 
         for (var key in row) {
-            if (key[0] != "_") {
+            if (key[0] != "_" && schemeCol[key]) {
                 if (schemeCol[key].autocomplete) {
                     // Check for column in templates
-                    var livevarValue = liliumcms.livevars.livevars[schemeCol[key].autocomplete.datasource];
+                    var livevarValue = liliumcms.livevars.retrieveVar(schemeCol[key].autocomplete.datasource);
                     var required = schemeCol[key].required;
                     var isEmpty = row[key].trim() == "";
                     var foundObject = undefined;
@@ -295,8 +297,19 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
 
         html += '</select></th>';
 
+        var parseSpecialType = function(dt) {
+            if (!dt) {
+                return "text";
+            } else {
+                switch (dt) {
+                    case "money" : return 'number" step="0.01';
+                    default : return dt;
+                }
+            }
+        };
+
         var addHeaderField = function(col) {
-            html += '<input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-' + col.fieldName + (col.displayCase ? " lmlpushtablecasenotmet lmlpushtabletemplatereactive" : "") + '" type="' + (col.dataType || "text") +
+            html += '<input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-' + col.fieldName + (col.displayCase ? " lmlpushtablecasenotmet lmlpushtabletemplatereactive" : "") + '" type="' + parseSpecialType(col.dataType) +
                 '" data-fieldname="' + col.fieldName +
                 (col.keyName ? '" data-keyname="' + col.keyName : "") +
                 (col.displayCase ? '" data-displaycase="' + col.displayCase : "") +
@@ -309,7 +322,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             html += '" />';
 
             if (col.autocomplete && col.autocomplete.datasource) {
-                var datVar = liliumcms.livevars.livevars[col.autocomplete.datasource];
+                var datVar = liliumcms.livevars.retrieveVar(col.autocomplete.datasource);
 
                 if (datVar && datVar.length) {
                     html += '<datalist id="' + tableid + col.fieldName + 'list">';
