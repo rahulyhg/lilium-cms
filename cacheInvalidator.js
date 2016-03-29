@@ -101,7 +101,19 @@ var CacheInvalidator = function () {
         // Update profile page
     });
 
-    hooks.bind('');
+    hooks.bind('profile_picture_updated', 1, function(data) {
+        deleteContentByAuthor(data.cli.userinfo.userid, data.cli._c);
+    });
+
+    this.deleteContentByAuthor = function(authorId, cli) {
+        // Find articles of the Author
+        db.findToArray(cli._c, 'content', {_id: db.mongoID(authorId)}, function(err, arr) {
+            if (err) log("[CacheInvalidator] Error while requesting to db :" + err);
+            for (var i in arr) {
+                that.deleteCachedFile(cli._c, arr[i].name + '.html');
+            }
+        });
+    }
 
 };
 
