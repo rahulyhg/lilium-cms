@@ -123,7 +123,7 @@ var Article = function () {
     this.edit = function (cli) {
         if (cli.routeinfo.path[3]) {
 
-            var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+            var id =  db.mongoID(cli.routeinfo.path[3]);
             if (cli.method == 'POST') {
 
                 var form = formBuilder.handleRequest(cli);
