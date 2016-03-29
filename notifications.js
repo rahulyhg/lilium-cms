@@ -181,17 +181,17 @@ LiliumSocket.prototype.urlChanged = function (url) {
     sockets[ls.clientId].sockets[this.id].time = new Date();
 
     var clientUrls = ls.createCurrentUserPages();
-
     for (var index in groups['spy'].users) {
         var spySession = sessionManager.getSessionFromSID(groups['spy'].users[index].session);
-
         // Check if user has required power
-        if (ls.session.data.power < spySession.data.power) {
-            sockets[spySession.client].emit('spy-update', {
-                id: ls.clientId,
-                data: clientUrls,
-                displayname: sockets[ls.clientId].displayname
-            });
+        if (ls.session.data.power > spySession.data.power) {
+            for (var i in sockets[spySession.data._id].sockets) {
+                sockets[spySession.data._id].sockets[i].emit('spy-update', {
+                    id: ls.clientId,
+                    data: clientUrls,
+                    displayname: sockets[ls.clientId].displayname
+                });;
+            }
         }
     }
 

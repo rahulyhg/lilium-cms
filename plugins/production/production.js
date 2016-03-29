@@ -6,6 +6,7 @@ var conf = undefined;
 var Admin = undefined;
 var filelogic = undefined;
 var formBuilder = undefined;
+var notifications = undefined;
 var sponsoredarticle = require('./sponsoredarticle.js');
 var changerequest = require('./changeRequest.js');
 var Campaigns = require('./campaigns.js');
@@ -21,6 +22,7 @@ var Production = function () {
         Admin = require(abspath + 'backend/admin.js');
         filelogic = require(abspath + 'filelogic.js');
         formBuilder = require(abspath + 'formBuilder.js');
+        notifications = require(abspath + 'notifications.js');
         sponsoredarticle.init(abspath);
     };
 
@@ -116,6 +118,11 @@ var Production = function () {
         });
     }
 
+    var registerNotificationGroups = function() {
+        notifications.createGroup('production', 'production');
+
+    }
+
     this.unregister = function (callback) {
         log("Production", "Plugin disabled");
 
@@ -137,7 +144,7 @@ var Production = function () {
 
         log('Production', 'Registering forms');
         registerForms();
-
+        registerNotificationGroups();
 
         return callback();
     };
