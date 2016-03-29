@@ -63,7 +63,7 @@ var Precomp = function() {
 			});
 			fileArr = files;
 			db.findToArray(conf, 'compiledfiles', {}, function(err, histo) {
-				db.remove(conf, 'compiledfiles', {}, function(remErr, res) {;
+				db.remove(conf, 'compiledfiles', {}, function(remErr, res) {
 					var histoObj = new Object();
 
 					for (var i = 0; i < histo.length; i++) {
@@ -83,7 +83,12 @@ var Precomp = function() {
 									var wPath = absWritePath + curFile.slice(0, -4);
 									fileserver.fileExists(wPath, function(exists) {
 										if (exists && histoObj[curFile] == sum) {
-											nextFile();
+                                            db.insert(conf, 'compiledfiles', {
+                                                filename : curFile,
+                                                sum : sum
+                                            }, function(err) {
+                                                nextFile();
+                                            });
 										} else {
 											log('Precompiler', 'Precompiling static file : ' + curFile);
 											LML.executeToFile(
@@ -96,7 +101,7 @@ var Precomp = function() {
 														db.insert(conf, 'compiledfiles', {
 															filename : curFile,
 															sum : sum
-														}, function() {
+														}, function(err) {
 															nextFile();
 														});
 													});

@@ -12,113 +12,110 @@ var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
 
 var Article = function() {
-    this.handlePOST = function(cli) {
-        cli.touch('article.handlePOST');
-        switch (cli.routeinfo.path[2]) {
-            case 'new':
-                this.new(cli);
-                break;
-            case 'edit':
-                this.edit(cli);
-                break;
-            case 'delete':
-                this.delete(cli);
-                break;
-            default:
-                return cli.throwHTTP(404, 'Not Found');
-                break;
+	this.handlePOST = function(cli) {
+		cli.touch('article.handlePOST');
+		switch (cli.routeinfo.path[2]) {
+			case 'new':
+				this.new(cli);
+				break;
+			case 'edit':
+				this.edit(cli);
+				break;
+			case 'delete':
+				this.delete(cli);
+				break;
+			default:
+				return cli.throwHTTP(404, 'Not Found');
+				break;
+		}
+	};
 
-        }
-    };
+	this.handleGET = function(cli) {
+		cli.touch('article.handleGET');
+		if (cli.routeinfo.path.length == 2) {
+			cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
+		} else {
+			switch (cli.routeinfo.path[2]) {
+				case 'new':
+					this.new(cli);
+					break;
+				case 'edit':
+					this.edit(cli);
+					break;
+				case 'getArticle':
+					this.getArticle(cli);
+					break;
+				case 'list':
+					this.list(cli);
+					break;
+				default:
+					return cli.throwHTTP(404, 'Not Found');
+					break;
 
-    this.handleGET = function(cli) {
-        cli.touch('article.handleGET');
-        if (cli.routeinfo.path.length == 2) {
-          cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
-        } else {
-          switch (cli.routeinfo.path[2]) {
-            case 'new':
-                this.new(cli);
-                break;
-            case 'edit':
-                this.edit(cli);
-                break;
-            case 'getArticle':
-                this.getArticle(cli);
-                break;
-            case 'list':
-                this.list(cli);
-                break;
-            default:
-                return cli.throwHTTP(404, 'Not Found');
-                break;
+			}
+		}
+	};
 
-          }
-        }
-    };
+	this.list = function(cli) {
+		filelogic.serveAdminLML(cli, false);
+	}
 
-    this.list = function(cli) {
-        filelogic.serveAdminLML(cli, false);
-    }
+	this.new = function(cli) {
+		cli.touch('article.new');
 
-    this.new = function(cli) {
-        cli.touch('article.new');
+		if (cli.method == 'POST') {
+			var form = formBuilder.handleRequest(cli);
 
-        if (cli.method == 'POST') {
-            var form = formBuilder.handleRequest(cli);
+			var response = formBuilder.validate(form, true);
 
-            var response = formBuilder.validate(form, true);
+			var redirect = '';
 
-            var redirect = '';
+			if (response.success) {
+				var formData = formBuilder.serializeForm(form);
+				formData.name = slugify(formData.title).toLowerCase();
+				formData.author = cli.userinfo.userid;
+				formData.media = db.mongoID(formData.media);
+				hooks.fire('article_will_create', {cli: cli, article : formData});
+				// Create post
+				db.insert(cli._c, 'content', formData, function(err, result) {
+					if (!err) {
+						formData._id = result.insertedId;
+						hooks.fire('article_created', {
+							cli: cli,
+							article: formData
+						});
+					}
 
-            if (response.success) {
-                var formData = formBuilder.serializeForm(form);
-                formData.name = slugify(formData.title).toLowerCase();
+					// Generate LML page
+					filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
+						cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
+						notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+							title: "Article is Live!",
+							url: cli._c.server.url + '/' + formData.name,
+							msg: "Your article is published. Click to see it live.",
+							type: 'success'
+						});
+						cli.sendJSON({
+							redirect: cli._c.server.url + "/" + name,
+							form: {
+								success: true
+							}
+						});
 
-                hooks.fire('article_will_create', {cli: cli, article : formData});
-                // Create post
-                db.insert(cli._c, 'content', formData, function(err, result) {
-                    if (!err) {
-                        console.log(JSON.stringify(result));
-                        formData._id = result.insertedId;
-                        hooks.fire('article_created', {cli: cli, article: formData});
-                    }
+					});
+				});
 
-                    // Generate LML page
-                    filelogic.renderLmlPostPage(cli, "article",formBuilder.unescapeForm(result.ops[0]) , function(name) {
-                        cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
+			} else {
+				cli.sendJSON({
+					form: response
+				});
+			}
 
-                        notifications.notifyUser(
-                            cli.userinfo.userid, 
-                            cli._c.id, 
-                            {
-                                title: "Article is Live!", 
-                                url: cli._c.server.url + '/' + formData.name, 
-                                msg: "Your article is published. Click to see it live.", 
-                                type: 'success'
-                            }
-                        );
+		} else {
+			filelogic.serveAdminLML(cli);
+		}
 
-                        cli.sendJSON({
-                            redirect: cli._c.server.url + "/" + name,
-                            form: {
-                                success: true
-                            }
-                        });
-                    });
-                });
-
-            } else {
-                cli.sendJSON({
-                    form: response
-                });
-            }
-
-        } else {
-            filelogic.serveAdminLML(cli);
-        }
-
-    };
+	};
 
 	this.edit = function(cli) {
 		if (cli.routeinfo.path[3]) {
@@ -132,6 +129,7 @@ var Article = function() {
 				if (response.success) {
 					formData = formBuilder.serializeForm(form);
 					formData.name = slugify(formData.title).toLowerCase();
+                    formData.media = db.mongoID(formData.media);
 
                     db.find(cli._c, 'content', {_id : id}, [], function(err, row) {
                         if (!err) {
@@ -154,12 +152,13 @@ var Article = function() {
     								type: 'success'
     							});
     						});
-    
+
     						cli.sendJSON({
     							success: true
     						});
     					});
                     });
+
 				} else {
 					cli.sendJSON({
 						form: response
@@ -181,12 +180,15 @@ var Article = function() {
 			var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
             hooks.fire('article_will_delete', id);
+
 			db.remove(cli._c, 'content', {
 				_id: id
 			}, function(err, r) {
 				var filename = r.title + '.html';
 				fs.deleteFile(filename, function() {
-                    hooks.fire('article_deleted', id);
+
+					hooks.fire('article_deleted', id);
+
 					cacheInvalidator.removeFileToWatch(filename);
 					return cli.sendJSON({
 						redirect: '/admin/article/list',
@@ -241,17 +243,76 @@ var Article = function() {
 
 					callback(sentArr);
 				});
-			} else if (levels[0] == 'table') {
-                db.find(cli._c, 'content', {}, [], function(err, cursor) {
 
-                    cursor.count(function(err, size) {
-                        console.log(size);
-                        cursor.toArray(function(err, arr) {
-                            var results = {size: size, data: arr};
-                            callback(err || results);
-                        });
-                    });
-                });
+			} else if (levels[0] == 'table') {
+
+				var sort = {};
+				sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+				db.aggregate(cli._c, 'content', [{
+					$match:
+                        (params.search ? {
+    						$text: {
+    							$search: params.search
+    						}
+    					} : {})
+
+				}, {
+					$lookup: {
+						from: 'entities',
+						localField: 'author',
+						foreignField: '_id',
+						as: 'author'
+					}
+				}, {
+					$lookup: {
+						from: 'uploads',
+						localField: 'media',
+						foreignField: '_id',
+						as: 'media'
+					}
+				}, {
+					$unwind: {
+						path: "$media",
+						preserveNullAndEmptyArrays: true
+					}
+				}, {
+					$unwind: {
+						path: "$author",
+						preserveNullAndEmptyArrays: true
+					}
+				}, {
+					$project: {
+						author: "$author.displayname",
+						title: 1,
+						subtitle: 1,
+                        name: 1,
+						media: "$media.sizes.medium.url"
+					}
+				}, {
+					$sort: sort
+				}, {
+					$skip: (params.skip || 0)
+				}, {
+					$limit: (params.max || 20)
+				}], function(data) {
+					db.find(cli._c, 'content', (params.search ? {
+						$text: {
+							$search: params.search
+						}
+					} : {}), [], function(err, cursor) {
+
+						cursor.count(function(err, size) {
+							results = {
+								size: size,
+								data: data
+							}
+							callback(err || results);
+
+						});
+					});
+				});
+
+
 			} else {
 				db.multiLevelFind(cli._c, 'content', levels, {
 					_id: new mongo.ObjectID(levels[0])
@@ -322,27 +383,57 @@ var Article = function() {
 
 	});
 
+    this.generateFromName = function(cli, articleName, cb) {
+        // Check for articles in db
+        db.findToArray(cli._c, 'content', {name: articleName}, function(err, arr){
+
+            if (arr[0]) {
+                // Generate LML page
+                filelogic.renderLmlPostPage(cli, "article", arr[0], function(name) {
+                    cacheInvalidator.addFileToWatch(name, 'articleInvalidated', arr[0]._id, cli._c);
+                    cb(true);
+
+                });
+            } else {
+                cb(false);
+            }
+        })
+    }
+
+
 
 	var init = function() {
 
 		tableBuilder.createTable({
 			name: 'article',
-			endpoint: 'content.listTable',
+			endpoint: 'content.table',
 			paginate: true,
 			searchable: true,
-			max_results: 20,
+			max_results: 25,
 			fields: [{
-				key: '_id',
-				displayname: 'ID',
-				sortable: true
-			}, {
-				key: 'title',
-				displayname: 'Title',
-				sortable: true
-			}, {
-				key: 'featured_image.url',
+				key: 'media',
 				displayname: 'Featured Image',
 				template: 'imgArticle',
+				sortable: false
+			}, {
+				key: '',
+				displayname: 'Title - Subtitle',
+				template: 'table-article-title',
+				sortable: true,
+				sortkey: 'title'
+			}, {
+				key: 'status',
+				displayname: 'Status',
+				template: 'table-article-status',
+				sortable: true
+			}, {
+				key: 'author',
+				displayname: 'Author',
+				sortable: true
+			}, {
+				key: '',
+				displayname: 'Actions',
+                template: 'table-article-actions',
 				sortable: false
 			}]
 		});

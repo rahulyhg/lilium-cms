@@ -7,7 +7,7 @@ var CryptoJS = require('crypto-js');
 var livevars = require('./livevars.js');
 var mailer = require('./postman.js');
 var imageResizer = require('./imageResizer.js');
-
+var tableBuilder = require('./tableBuilder.js');
 var Roles = new Object();
 
 var Entity = function() {
@@ -130,31 +130,36 @@ var Entities = module.exports = new function() {
 
             if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
 
-                imageResizer.resize(saveTo, image.picture, mime, cli, function(images){
+                imageResizer.resize(saveTo, image.picture, mime, cli, function(images) {
 
-					var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
-					var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
+                    var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
+                    var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
                     // Save it in database
-                    db.update(cli._c, 'entities', {_id : cli.userinfo.userid}, {avatarURL : avatarURL, avatarID : avatarID}, function (err, result){
+                    db.update(cli._c, 'entities', {
+                        _id: cli.userinfo.userid
+                    }, {
+                        avatarURL: avatarURL,
+                        avatarID: avatarID
+                    }, function(err, result) {
 
                         // Update session
                         var sessionManager = require('./session.js');
-						var sessToken = cli.session.token;
-						var session = sessionManager.getSessionFromSID(sessToken);
+                        var sessToken = cli.session.token;
+                        var session = sessionManager.getSessionFromSID(sessToken);
 
                         session.data.avatarID = avatarID;
-						session.data.avatarURL = avatarURL;
+                        session.data.avatarURL = avatarURL;
 
-						cli.session.data.avatarURL = avatarURL;
-						cli.session.data.avatarID = avatarID;
+                        cli.session.data.avatarURL = avatarURL;
+                        cli.session.data.avatarID = avatarID;
 
-						sessionManager.saveSession(cli, function() {
+                        sessionManager.saveSession(cli, function() {
 
-							cli.sendJSON({
-	                            redirect : '',
-	                            success : true
-	                        });
-						});
+                            cli.sendJSON({
+                                redirect: '',
+                                success: true
+                            });
+                        });
                     });
 
                 });
@@ -223,14 +228,14 @@ var Entities = module.exports = new function() {
                 }
             }
         }], function(result) {
-			// Make sure there is a result
-			if (result[0] && result[0].power[0]) {
-				// Pull out the result
-				callback(result[0].power[0]);
-			} else {
-				// Poorest power
-				callback(999);
-			}
+            // Make sure there is a result
+            if (result[0] && result[0].power[0]) {
+                // Pull out the result
+                callback(result[0].power[0]);
+            } else {
+                // Poorest power
+                callback(999);
+            }
 
         });
     }
@@ -268,7 +273,9 @@ var Entities = module.exports = new function() {
         newEnt.email = entData.email;
         newEnt.roles = [];
         for (var index in entData.roles) {
-            newEnt.roles.push(entData.roles[index]);
+            if (entData.roles[index] !== "") {
+                newEnt.roles.push(entData.roles[index]);
+            }
         }
         newEnt.displayname = entData.displayname;
         newEnt.firstname = entData.firstname;
@@ -320,12 +327,12 @@ var Entities = module.exports = new function() {
     };
 
     this.validateEntityObject = function(e, cli, cb) {
-		var valid = true;
-		valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.role;
-		 cli.hasEnoughPower(e.roles, function(hasEnoughPower) {
-             valid = hasEnoughPower;
-             cb(valid);
-         });
+        var valid = true;
+        valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.role;
+        cli.hasEnoughPower(e.roles, function(hasEnoughPower) {
+            valid = hasEnoughPower;
+            cb(valid);
+        });
     };
 
     this.registerEntity = function(cli, entity, callback) {
@@ -430,6 +437,44 @@ var Entities = module.exports = new function() {
         return allowed;
     };
 
+    var registerTables = function() {
+        tableBuilder.createTable({
+            name: 'entities',
+            endpoint: 'entities.table',
+            paginate: true,
+            searchable: true,
+            max_results: 25,
+            fields: [{
+                key: 'avatarURL',
+                displayname: 'Profile Picture',
+                template: 'table-entity-profile',
+                sortable: false
+            }, {
+                key: 'username',
+                displayname: 'Username',
+                sortable: true
+            }, {
+                key: 'displayname',
+                displayname: 'Display Name',
+                sortable: true,
+            }, {
+                key: 'email',
+                displayname: 'Email',
+                sortable: true
+            }, {
+                key: 'roles',
+                displayname: 'Roles',
+                template: 'table-entity-roles',
+                sortable: false
+            }, {
+                key: '',
+                displayname: 'Actions',
+                template: 'table-entity-actions',
+                sortable: false
+            }]
+        });
+    };
+
     this.registerCreationForm = function() {
 
         formbuilder.createForm('entity_create')
@@ -487,7 +532,43 @@ var Entities = module.exports = new function() {
                 db.findToArray(cli._c, 'entities', queryInfo, function(err, arr) {
                     callback(err || arr);
                 });
-            } else {
+            } else if (levels[0] == 'table') {
+				var sort = {};
+				sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+				db.aggregate(cli._c, 'entities', [{
+					$match:
+                        (params.search ? {
+    						$text: {
+    							$search: params.search
+    						}
+    					} : {})
+
+				}, {
+					$sort: sort
+				}, {
+					$skip: (params.skip || 0)
+				}, {
+					$limit: (params.max || 20)
+				}], function(data) {
+					db.find(cli._c, 'entities', (params.search ? {
+						$text: {
+							$search: params.search
+						}
+					} : {}), [], function(err, cursor) {
+
+						cursor.count(function(err, size) {
+							results = {
+								size: size,
+								data: data
+							}
+							callback(err || results);
+
+						});
+					});
+				});
+
+
+			} else {
                 db.multiLevelFind(cli._c, 'entities', levels, {
                     username: levels[0]
                 }, {
@@ -534,7 +615,7 @@ var Entities = module.exports = new function() {
     };
 
     var init = function() {
-
+        registerTables();
     };
 
     init();

@@ -1,5 +1,6 @@
 var fileserver = require('../fileserver.js');
 var _conf = require('../config.js');
+var article = require('../article.js');
 
 var HTMLServer = function() {
 	this.serveClient = function(cli) {
@@ -28,7 +29,18 @@ var HTMLServer = function() {
 							});
 						}
 					} else {
-						cli.throwHTTP(404, 'Not Found');
+						article.generateFromName(cli, cli.routeinfo.relsitepath.substring(1), function(success) {
+							if (success) {
+								cli.routeinfo.isStatic = true;
+								fileserver.pipeFileToClient(cli, filename + '.html', function (){
+									cli.touch('htmlserver.serveClient.callback');
+								});
+							} else {
+								cli.throwHTTP(404, 'Not Found');
+
+							}
+						})
+
 					}
 				});
 			}

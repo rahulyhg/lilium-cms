@@ -173,7 +173,6 @@ var FileServer = function() {
     this.pipeFileToClient = function(cli, filename, callback) {
         cli.touch('fileserver.pipeFileToClient');
         filename = this.validateIndexPath(cli, filename);
-
         cli.response.writeHead(200, {
             "Content-Type": cli.routeinfo.mimetype || 'text/html; charset=utf-8'
         });

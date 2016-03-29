@@ -203,6 +203,14 @@ var DB = function() {
 
 	};
 
+	this.createIndex = function(conf, coln, fields, cb) {
+		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+			col.createIndex(fields, null).then(function(err, results) {
+				cb(err, results);
+			});
+		});
+	}
+
 	this.findAndModify = function(conf, coln, conds, newVal, cb, upsert, one) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
@@ -250,8 +258,8 @@ var DB = function() {
 				cb("[Database - Invalid document]");
 			} else {
 				col[one ? 'deleteOne' : 'deleteMany'](
-					conds, 
-                    {}, 
+					conds,
+                    {},
                     function(err, r) {
 					    cb(err, r);
 				    }

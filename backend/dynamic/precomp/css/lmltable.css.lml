@@ -16,3 +16,34 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	background-color: #FAFAFA;
 	padding: 15px;
 }
+.lmltablebuilder thead th {
+	border-right: 1px solid #777;
+}
+
+.lmltablebuilder thead th:last-of-type {
+	border-right : none;
+}
+.lmltablebuilder thead th[sortable] {
+	cursor: pointer;
+}
+.lmltablebuilder thead th[sortable]:hover {
+	background-color: #EEE;
+}
+.lmltablebuilder thead th[sortable]::after {
+	font: normal normal normal 14px/1 FontAwesome;
+	content : "\f0d7\f0d8";
+	margin-left: 10px;
+}
+.lmltablebuilder thead th.sorted-asc[sortable]::after {
+	font: normal normal normal 14px/1 FontAwesome;
+	content : "\f0d7";
+	margin-left: 10px;
+}
+.lmltablebuilder thead th.sorted-desc[sortable]::after {
+	font: normal normal normal 14px/1 FontAwesome;
+	content : "\f0d8";
+	margin-left: 10px;
+}
+.lmltablebuilder tbody td img {
+    max-height: 70px;
+}

@@ -46,8 +46,8 @@ var LiliumSocket = function(socket, session) {
                 this.socket.on('alert', this.alert);
 		this.socket.on('error', this.error);
 
-		return this; 
-	
+		return this;
+
 	};
 
 	LiliumSocket.prototype.join = function(groupName) {
@@ -83,7 +83,7 @@ var LiliumSocket = function(socket, session) {
 	LiliumSocket.prototype.notificationInteraction = function(notifId) {
                     var ls = this.liliumsocket;
                     var id = db.mongoID(notifId);
-                    var userId = db.mongoID(this.clientId);
+                    var userId = db.mongoID(ls.clientId);
                     // Update notification as interacted
                     db.update(ls.config, 'notifications', {
                         _id: id,
@@ -95,7 +95,7 @@ var LiliumSocket = function(socket, session) {
                     });
 
                     // Find notification in session
-                    for (var index in this.session.data.notifications) {
+                    for (var index in ls.session.data.notifications) {
                         if (ls.session.data.notifications[index]._id == notifId) {
                             ls.session.data.notifications[index].interacted = true;
                             break;
@@ -107,7 +107,7 @@ var LiliumSocket = function(socket, session) {
                     cli.session = ls.session;
                     cli._c = {};
                     cli._c.id = ls.session.data.site;
-                    
+
                     // Save it
                     sessionManager.saveSession(cli, function() {});
 	};
@@ -121,7 +121,7 @@ var LiliumSocket = function(socket, session) {
                     cli._c.id = ls.session.data.site;
                     // Save it
                     sessionManager.saveSession(cli, function() {});
- 
+
 	};
 	LiliumSocket.prototype.emitToGroup = function(emission) {
             if (emission.group) {
@@ -173,7 +173,7 @@ var LiliumSocket = function(socket, session) {
                         }
 
                         this.emit('spy', loggedInUsers);
- 
+
 	};
 	LiliumSocket.prototype.urlChanged = function(url) {
                     var ls = this.liliumsocket;
@@ -188,13 +188,13 @@ var LiliumSocket = function(socket, session) {
                         // Check if user has required power
                         if (ls.session.data.power < spySession.data.power) {
                             sockets[spySession.client].emit('spy-update', {
-                                id: ls.clientId, 
-                                data : clientUrls, 
+                                id: ls.clientId,
+                                data : clientUrls,
                                 displayname: sockets[ls.clientId].displayname}
                             );
                         }
                     }
- 
+
 	};
 	LiliumSocket.prototype.broadcast = function(emission) {
                     var ls = this.liliumsocket;
@@ -280,7 +280,7 @@ var Notification = function() {
         hooks.bind('site_initialized', 3000, function(conf) {
             that.createGroup('lmlsite_' + conf.id);
         });
-     
+
         io.on('connection', onSocketConnection);
     };
 

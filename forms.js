@@ -121,6 +121,14 @@ var Forms = function() {
             .add('title', 'text', {
                 placeholder: true,
                 displayname: 'Title'
+            },
+            {
+                minLenght: 3,
+                maxLenght: 100
+            })
+            .add('subtitle', 'text', {
+                placeholder: true,
+                displayname: 'Subtitle'
             }, {
                 minLenght: 3,
                 maxLenght: 100

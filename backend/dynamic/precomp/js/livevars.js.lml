@@ -3,9 +3,12 @@ var LiveVars = function() {
     var paramString = "?";
     var livevars;
 
-    this.getSingleLivevar = function(endpoint, cb) {
+    this.getSingleLivevar = function(endpoint, params, cb) {
         $.get("/livevars", {
-            vars: JSON.stringify(endpoint)
+            vars :JSON.stringify([{
+                varname: endpoint,
+                params: params
+            }])
         }, cb);
     }
 
@@ -40,7 +43,6 @@ var LiveVars = function() {
                     'varname': variableName,
                     'params': typeof params === "string" ? JSON.parse(params.replace(/&lmlquote;/g, '"')) : {}
                 });
-                console.log(endpoints);
 
             }
         });
@@ -93,11 +95,19 @@ var LiveVars = function() {
     /**
      * Gets the content in string of the object tempalte
      */
-    var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey) {
+    var fetchTemplateObjectContent = function(obj, data, domTarget, livevarkey, node) {
         var key = obj.data('key');
         var template = $('#' + obj.data('template'));
 
         var sep = obj.data('arrayseparator');
+
+        var elemContent;
+        var contentFct = obj.data('content');
+
+        if (typeof window[contentFct] === 'function') {
+            return window[contentFct].apply(data, [data, node]);
+        }
+
         var content = "";
 
         if (typeof key !== 'undefined') {
@@ -148,13 +158,16 @@ var LiveVars = function() {
     /**
      * Transform the lml:template in html node
      */
-    var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey, isSubTemplate) {
+    var generateTemplateFromObject = function(domTemplate, domTarget, data, livevarkey, isSubTemplate, appendToNode) {
+        appendToNode = typeof appendToNode !== 'undefined' ? appendToNode : true;
         var templateItems = domTemplate.clone();
         while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
             obj = $(obj);
             var nodeType = obj.data('nodetype');
             var action = obj.data('action');
             var filter = obj.data('filter');
+            var content = obj.data('content');
+
             var passed = true;
 
             if (typeof window[filter] === 'function') {
@@ -162,6 +175,7 @@ var LiveVars = function() {
             }
 
             if (passed) {
+
                 // Create a node based on nodetype
                 var node = $(document.createElement(nodeType));
                 if (typeof livevarkey !== 'undefined') {
@@ -169,12 +183,23 @@ var LiveVars = function() {
                 }
 
                 if (nodeType == 'img') {
-                    // Add src to image node
-                    node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+                    if (obj.data('baseurl')) {
+                        var href= fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node)
+                        // Add src to image node
+                        var prepend = obj.data('baseurl');
+                        if (href !== '') {
+                            node.attr('src', prepend + fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
+
+                        }
+                    } else {
+                        // Add src to image node
+                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
+                    }
+
                 } else if (nodeType == 'a') {
                     // Href for a link node
                     if (obj.data('href')) {
-                        node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey));
+                        node.attr('href', obj.data('href') + fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
                     } else if (obj.data('hrefsource')) {
                         // hrefsource just appends itself to the already existing href
                         var prepend = obj.data('prependroot') ? window.location.urlBase : "";
@@ -185,7 +210,7 @@ var LiveVars = function() {
                     node.html(obj.html());
                 } else {
                     // Other node types, we'll generate the content for nodes
-                    node.html(fetchTemplateObjectContent(obj, data, domTarget, templateItems, livevarkey));
+                    node.html(fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
                 }
 
                 // Add class to the node object
@@ -233,13 +258,18 @@ var LiveVars = function() {
         }
 
         // Appending element to some target
-        if (domTarget.data('target')) {
-            $('#' + domTarget.data('target')).append(templateItems.children());
-        } else {
-            $(domTarget).before(templateItems.children());
+        if (appendToNode) {
+            if (domTarget.data('target')) {
+                $('#' + domTarget.data('target')).append(templateItems.children());
+            } else {
+                $(domTarget).before(templateItems.children());
+            }
         }
+
         if (typeof isSubTemplate !== 'undefined' && isSubTemplate) {
             return templateItems.html();
+        } else if (!appendToNode) {
+            return templateItems.children();
         } else {
             return true;
         }
@@ -359,6 +389,27 @@ var LiveVars = function() {
             }
         }));
     };
+
+    this.templateToHtml = function(templateID, varValue, node) {
+        var templateObj = $('#' + templateID);
+        if (templateObj.length != 0) {
+            if (typeof varValue == 'Object' && varValue.length > 0) {
+                // Generate template object for array
+                varValue.forEach(function(val, index) {
+                    node.appendChild(generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false)[0]);
+                });
+            } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
+                // Generate template for single data
+                var nodes = generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false);
+                for (var i = 0; i < nodes.length; i++){
+                    node.appendChild(nodes[i]);
+                }
+
+
+            }
+        }
+        return node;
+    }
 
     this.livevars = function() {
         return livevars;

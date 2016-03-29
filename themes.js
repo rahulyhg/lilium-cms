@@ -6,7 +6,7 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
-
+var tableBuilder = require('./tableBuilder.js');
 var ActiveTheme = new Object();
 var CachedThemes = new Array();
 
@@ -140,17 +140,97 @@ var Themes = function() {
 		var allThemes = levels.length === 0;
 		if (allThemes) {
 			db.singleLevelFind(cli._c, 'themes', callback);
-		} else {
+		} else if(levels[0] == 'table') {
+            var sort = {};
+            sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+            db.aggregate(cli._c, 'themes', [{
+                $match:
+                    (params.search ? {
+                        $text: {
+                            $search: params.search
+                        }
+                    } : {})
+
+            }, {
+                $sort: sort
+            }, {
+                $skip: (params.skip || 0)
+            }, {
+                $limit: (params.max || 20)
+            }], function(data) {
+                db.find(cli._c, 'themes', (params.search ? {
+                    $text: {
+                        $search: params.search
+                    }
+                } : {}), [], function(err, cursor) {
+
+                    cursor.count(function(err, size) {
+                        results = {
+                            size: size,
+                            data: data
+                        }
+                        callback(err || results);
+
+                    });
+                });
+            });
+        } else {
 			db.multiLevelFind(cli._c, 'themes', levels, {uName:(levels[0])}, {limit:[1]}, callback);
 		}
 	}, ["themes"]);
   };
 
-  var init = function() {
+  this.registerForm = function() {
+      tableBuilder.createTable({
+          name: 'theme',
+          endpoint: 'theme.table',
+          paginate: true,
+          searchable: true,
+          max_results: 10,
+          fields: [{
+              key: 'dName',
+              displayname: 'Name',
+              sortable: true
+          }, {
+              key: '',
+              displayname: 'Actions',
+              template: 'table-themes-actions',
+              sortable: true,
+              sortkey: 'active'
+          },{
+              key: 'entry',
+              displayname: 'Entry Script',
+              sortable: true
+          }, ]
+      });
+  };
+
+  this.init = function(cb) {
+      this.registerForm();
+      that.getThemesDirList(function(themes) {
+          db.findToArray(_c.default(),'themes', {'active' : true}, function(err, results) {
+
+              (function() {
+                  for (var i in results) {
+                      for (var j in themes) {
+                          if (results[i].identifier == themes[j].uName) {
+                              themes[j].active = true;
+                              return;
+                          }
+                      }
+                  }
+              })();
+
+          });
+          db.remove(_c.default(), 'themes', {}, function() {
+              db.insert(_c.default(), 'themes', themes, function(err) {
+                  cb();
+              });
+          }, false);
+      });
 
   };
 
-  init();
 
 };
 

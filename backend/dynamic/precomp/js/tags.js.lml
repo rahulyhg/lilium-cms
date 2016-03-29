@@ -8,12 +8,14 @@ var Tags = function(tagForm) {
 		});
 
 		$(tagsInput).find('input').keydown(function(e) {
-			if (e.which == 13 || e.which == 188 || e.which == 9) {
+			var code = (e.keyCode ? e.keyCode : e.which);
+
+			if (code == 13 || code == 188 || code == 9) {
 				e.preventDefault();
 				that.add();
 			}
 
-			if (e.which == 46 || e.which == 8) {
+			if (code == 46 || code == 8) {
 				if ($(tagsInput).find('input[type=text]').val() == '') {
 					that.remove($(tagsInput).find('span:last-of-type'));
 				}
