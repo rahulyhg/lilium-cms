@@ -256,10 +256,13 @@ var LiliumCMS = function() {
             };
         });
         $(form).find('.tags-input').each(function(index, tagsInput) {
-            var select = new Tags(
+            var tag = new Tags(
                 tagsInput,
                 data
             );
+
+            tags.push(tag);
+            tagsInput.dataset.tagsindex = tags.length - 1;
         });
 
         // Check for stacktable
@@ -326,12 +329,14 @@ var LiliumCMS = function() {
         };
 
         var makeSingleTag = this.makeSingleTag = function(index, tagsInput) {
+            if (!tagsInput.dataset.tagsindex) {
+                var tag = new Tags(
+                    tagsInput
+                );
 
-            var tag = new Tags(
-                tagsInput
-            );
+                tags.push(tag);
+            }
 
-            tags.push(tag);
         };
 
         var makeStackTables = function() {

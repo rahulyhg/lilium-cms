@@ -1,6 +1,14 @@
-var Tags = function(tagForm) {
+var Tags = function(tagForm, data) {
 	var tagsInput = tagForm;
 	var that = this;
+	var data = data ? data[$(tagsInput).parent().data('fieldname')] : undefined;
+
+	var init = function() {
+		for (var i in data) {
+			that.add(data[i]);
+		}
+	};
+
 
 	$(document).ready(function() {
 		$(tagsInput).on('click', function() {
@@ -29,11 +37,11 @@ var Tags = function(tagForm) {
 	});
 
 
-	this.add = function() {
+	this.add = function(data) {
 		var input = $(tagsInput).find('input[type=text]');
 
-		var html = '<span class="tag">' + input.val() +
-			'<input type="hidden" name="' + $(tagsInput).closest('.lmltagswrapper').data('fieldname') + '[]" value="' + input.val() + '">' +
+		var html = '<span class="tag">' + (data || input.val()) +
+			'<input type="hidden" name="' + $(tagsInput).closest('.lmltagswrapper').data('fieldname') + '[]" value="' + (data || input.val()) + '">' +
 			'<i class="fa fa-times"></i>' +
 			'</span>';
 
@@ -58,4 +66,6 @@ var Tags = function(tagForm) {
 
 
 	};
+	init();
+
 };

@@ -7,7 +7,9 @@ var MultiSelect = function(tableid, lmltag, selectElem) {
     // selectElem.hide();
     this.render = function(data) {
         var html = '<div class="multiselect">';
-        data = data[$(selectElem).attr('name')];
+        if (data) {
+            data = data[$(selectElem).attr('name')];
+        }
         $(selectElem).find('option').each(function(index, elem) {
             var elem = $(elem);
             var selected = false;
