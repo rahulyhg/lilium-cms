@@ -2,20 +2,20 @@
  * HtmlParser is a parser for various javascript objects.
  * @return {HtmlParser} [The HtmlParser as a node module]
  */
-var HtmlParser = function() {
+var HtmlParser = function () {
     this.types = {};
 
-    this.registerType = function(name, fct) {
+    this.registerType = function (name, fct) {
         this.types[name] = fct;
     }
 
-    this.parseForm = function(form) {
+    this.parseForm = function (form) {
         var htmlForm = '';
         var submitButton = '';
         if (typeof form == 'undefined') {
             throw new Error("[HtmlParser - No form provided to parse");
         }
-        var hasFormWrapper =typeof form.attr.formWrapper !== "undefined";
+        var hasFormWrapper = typeof form.attr.formWrapper !== "undefined";
 
         if (hasFormWrapper && !form.attr.formWrapper.inner) {
             htmlForm += '<' + (form.attr.formWrapper.tag || 'div') +
@@ -60,14 +60,14 @@ var HtmlParser = function() {
 
             if (typeof field.attr.wrapper !== 'undefined') {
                 htmlForm += '<' + (field.attr.wrapper.tag || 'div') +
-                    ' class="'+ (field.attr.wrapper.class || '') +'"' +
-                    ' id="'+ (field.attr.wrapper.id || '') +'">';
+                    ' class="' + (field.attr.wrapper.class || '') + '"' +
+                    ' id="' + (field.attr.wrapper.id || '') + '">';
             }
 
             if (hasFieldWrapper) {
                 htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') +
                     ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || form.attr.fieldWrapper.class || 'field-') +
-                    (field.attr.wrapperCssSuffix || form.attr.wrapperCssSuffix ||  field.type ) +
+                    (field.attr.wrapperCssSuffix || form.attr.wrapperCssSuffix || field.type) +
                     (' lmlform-fieldwrapper-' + field.type) +
                     ' lmlform-fieldwrapper">';
             }
@@ -81,53 +81,53 @@ var HtmlParser = function() {
                 submitButton = parseSubmitType(field);
             } else {
                 switch (field.type) {
-                    case 'button':
-                        htmlForm += parseButtonType(field, form.attr.placeholder);
-                        break;
-                    case 'textarea':
-                        htmlForm += parseTextAreaType(field, form.attr.placeholder);
-                        break;
-                    case 'number':
-                        htmlForm += parseNumberType(field, form.attr.placeholder);
-                        break;
-                    case 'money':
-                        field.requirements.step = 0.01;
-                        htmlForm += parseNumberType(field, form.attr.placeholder);
-                        break;
-                    case 'hidden':
-                        htmlForm += parseHiddenType(field);
-                        break;
-                    case 'checkbox':
-                        htmlForm += parseCheckBoxType(field, form.attr.placeholder);
-                        break;
-                    case 'ckeditor':
-                        htmlForm += parseTextAreaType(field, form.attr.placeholder);
-                        break;
-                    case 'file':
-                        htmlForm += parseFileType(field);
-                        break;
-                    case 'select':
-                        htmlForm += parseSelectType(field);
-                        break;
-                    case 'multiple':
-                        htmlForm += parseMultipleType(field);
-                        break;
-                    case 'stack':
-                        htmlForm += parseStackType(field);
-                        break;
-                    case 'livevar':
-                        htmlForm += parseLiveVar(field);
-                        break;
-                    case "title":
-                        htmlForm += parseTitleType(field);
-                        break;
-                    case "multiselect":
-                        htmlForm += parseSelectType(field, true);
-                        break;
-                    case "tags":
-                        htmlForm += parseTagsType(field);
-                    default:
-                        htmlForm += this.checkRegisteredTypes(field);
+                case 'button':
+                    htmlForm += parseButtonType(field, form.attr.placeholder);
+                    break;
+                case 'textarea':
+                    htmlForm += parseTextAreaType(field, form.attr.placeholder);
+                    break;
+                case 'number':
+                    htmlForm += parseNumberType(field, form.attr.placeholder);
+                    break;
+                case 'money':
+                    field.requirements.step = 0.01;
+                    htmlForm += parseNumberType(field, form.attr.placeholder);
+                    break;
+                case 'hidden':
+                    htmlForm += parseHiddenType(field);
+                    break;
+                case 'checkbox':
+                    htmlForm += parseCheckBoxType(field, form.attr.placeholder);
+                    break;
+                case 'ckeditor':
+                    htmlForm += parseTextAreaType(field, form.attr.placeholder);
+                    break;
+                case 'file':
+                    htmlForm += parseFileType(field);
+                    break;
+                case 'select':
+                    htmlForm += parseSelectType(field);
+                    break;
+                case 'multiple':
+                    htmlForm += parseMultipleType(field);
+                    break;
+                case 'stack':
+                    htmlForm += parseStackType(field);
+                    break;
+                case 'livevar':
+                    htmlForm += parseLiveVar(field);
+                    break;
+                case "title":
+                    htmlForm += parseTitleType(field);
+                    break;
+                case "multiselect":
+                    htmlForm += parseSelectType(field, true);
+                    break;
+                case "tags":
+                    htmlForm += parseTagsType(field);
+                default:
+                    htmlForm += this.checkRegisteredTypes(field);
                 }
 
             }
@@ -168,14 +168,14 @@ var HtmlParser = function() {
         return htmlForm;
     };
 
-    this.checkRegisteredTypes = function(field) {
+    this.checkRegisteredTypes = function (field) {
         if (typeof field.type !== 'undefined' && this.types[field.type]) {
             return this.types[field.type](field);
         }
         return '';
     };
 
-    var generateLabel = function(field, placeholder) {
+    var generateLabel = function (field, placeholder) {
         if (field.nolabel) {
             return "";
         }
@@ -200,14 +200,14 @@ var HtmlParser = function() {
         return '';
     };
 
-    var parseStackField = function(field) {
+    var parseStackField = function (field) {
         return '<input type="' + (field.dataType || 'text') +
             '" class="lmlstacktableheaderfield lmlstacktableheaderfield-' + field.fieldName +
             '" data-fieldname="' + field.fieldName +
             '" value="" />';
     };
 
-    var parseTitleType = function(field) {
+    var parseTitleType = function (field) {
         var tag = field.attr.type || "h3";
         var content = field.attr.displayname || field.name || "";
 
@@ -216,7 +216,7 @@ var HtmlParser = function() {
         );
     };
 
-    var parseStackType = function(field, hasPlaceholder) {
+    var parseStackType = function (field, hasPlaceholder) {
         var scheme = field.attr.scheme;
         var columns = scheme.columns;
         var html = "";
@@ -243,19 +243,19 @@ var HtmlParser = function() {
         return html;
     };
 
-    var parseTagsType = function(field, hasPlaceholder) {
+    var parseTagsType = function (field, hasPlaceholder) {
         var html = "";
         var displayName = field.attr.displayname || field.name || undefined;
 
         html += '<label for="' + field.name + '">' + displayName + '</label>';
         html += '<div class="lmltagswrapper" data-type="tags" data-fieldname="' + field.name + '" >';
         html += '<div class="tags-input"><input type="text"></div>';
-        html += '<div><p>'+ (field.attr.footer || '') +'</p></div>';
+        html += '<div><p>' + (field.attr.footer || '') + '</p></div>';
         html += '</div>'
         return html;
     };
 
-    var parseSimpleFormType = function(field, hasPlaceholder) {
+    var parseSimpleFormType = function (field, hasPlaceholder) {
         var input = hasPlaceholder ? "" : generateLabel(field, hasPlaceholder);
         var displayName = field.attr.displayname || field.name || undefined;
         input += '<input type="' + field.type + '" ';
@@ -276,14 +276,14 @@ var HtmlParser = function() {
         return input;
     };
 
-    var parseButtonType = function(field) {
+    var parseButtonType = function (field) {
         var input = '<button ';
         input += parseBasicFieldAttributes(field);
         input += '></button>';
         return input;
     };
 
-    var parseFileType = function(field) {
+    var parseFileType = function (field) {
         var input = generateLabel(field, false);
         input += '<input type="file" ';
         input += parseBasicFieldAttributes(field);
@@ -291,7 +291,7 @@ var HtmlParser = function() {
         return input;
     };
 
-    var parseCheckBoxType = function(field, hasPlaceholder) {
+    var parseCheckBoxType = function (field, hasPlaceholder) {
         var input = generateLabel(field, hasPlaceholder);
         input += '<input type="checkbox" ';
         input += parseBasicFieldAttributes(field);
@@ -299,7 +299,7 @@ var HtmlParser = function() {
         return input;
     };
 
-    var parseSelectType = function(field, isMultiple) {
+    var parseSelectType = function (field, isMultiple) {
         var multiple = isMultiple ? ' multiple ' : '';
         var input = generateLabel(field) + '<select ' + parseBasicFieldAttributes(field) + multiple + ' >';
 
@@ -313,7 +313,7 @@ var HtmlParser = function() {
         return input + "</select>";
     };
 
-    var parseHiddenType = function(field) {
+    var parseHiddenType = function (field) {
         var input = '<input type="hidden" ';
         input += parseBasicFieldAttributes(field);
         input += ' />';
@@ -321,11 +321,11 @@ var HtmlParser = function() {
     };
 
 
-    var parseNumberType = function(field, hasPlaceholder) {
+    var parseNumberType = function (field, hasPlaceholder) {
         var input = generateLabel(field, hasPlaceholder);
         input += '<input type="number" ';
         input += parseBasicFieldAttributes(field);
-       input += field.requirements.min ? 'min="' + field.requirements.min + '"' : '';
+        input += field.requirements.min ? 'min="' + field.requirements.min + '"' : '';
         input += field.requirements.max ? 'max="' + field.requirements.max + '"' : '';
         input += field.requirements.step ? 'step="' + field.requirements.step + '"' : '1';
         input += ' />';
@@ -333,12 +333,12 @@ var HtmlParser = function() {
         return input;
     };
 
-    var parseMultipleType = function(field) {
+    var parseMultipleType = function (field) {
         var input = generateLabel(field);
 
     };
 
-    var parseTextAreaType = function(field, hasPlaceholder) {
+    var parseTextAreaType = function (field, hasPlaceholder) {
         var input = generateLabel(field, hasPlaceholder);
         input += '<textarea ';
         input += parseBasicFieldAttributes(field);
@@ -360,7 +360,7 @@ var HtmlParser = function() {
         return input;
     };
 
-    var parseSubmitType = function(field) {
+    var parseSubmitType = function (field) {
         var input = '<input type="submit" ';
         input += field.attr.value ? 'value="' + field.attr.value + '" ' : ' value="' + field.name + '" ';
         input += 'class="v_validate ' + parseClasses(field) + '" ';
@@ -368,7 +368,7 @@ var HtmlParser = function() {
         return input;
     };
 
-    var parseLiveVar = function(field) {
+    var parseLiveVar = function (field) {
         return generateLabel(field, false) +
             '<lml:livevars ' +
             'data-attribute="' + (field.attr.attr ? JSON.stringify(field.attr.attr).replace(/"/g, '&lmlquote;') : "{}") +
@@ -382,7 +382,7 @@ var HtmlParser = function() {
             '"></lml:livevars>';
     };
 
-    var parseBasicFieldAttributes = function(field) {
+    var parseBasicFieldAttributes = function (field) {
         var attributes = '';
         // Name
         attributes += field.name ? 'name="' + field.name + '" ' : '';
@@ -406,7 +406,7 @@ var HtmlParser = function() {
         return attributes;
     };
 
-    var parseClasses = function(field) {
+    var parseClasses = function (field) {
         var classHtml = '';
 
         if (typeof field.attr.classes !== 'undefined') {

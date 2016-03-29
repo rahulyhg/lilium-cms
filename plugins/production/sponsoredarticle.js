@@ -1,8 +1,7 @@
+var SponsoredArticle = function () {
+    this.init = function (abspath) {
 
-var SponsoredArticle = function() {
-  this.init = function(abspath) {
-
-  }
+    }
 
 };
 

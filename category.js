@@ -3,54 +3,56 @@ var livevars = require('./livevars.js');
 var db = require('./includes/db.js');
 var formBuilder = require('./formBuilder');
 
-var Category = function() {
+var Category = function () {
 
-    this.handleGET = function(cli) {
+    this.handleGET = function (cli) {
         cli.touch('article.handleGET');
         if (cli.routeinfo.path.length == 2) {
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
-                case 'edit':
-                    filelogic.serveAdminLML(cli, true);
-                    break;
-                case 'list':
-                    filelogic.serveAdminLML(cli);
-                    break;
-                default:
-                    return cli.throwHTTP(404, 'Not Found');
-                    break;
-
-            }
-        }
-    };
-
-    this.handlePOST = function(cli) {
-        switch (cli.routeinfo.path[2]) {
-            case 'list':
-                this.create(cli);
-                break;
             case 'edit':
-                this.edit(cli);
+                filelogic.serveAdminLML(cli, true);
                 break;
-            case 'delete':
-                this.delete(cli);
+            case 'list':
+                filelogic.serveAdminLML(cli);
                 break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
 
+            }
         }
     };
 
-    this.edit = function(cli) {
+    this.handlePOST = function (cli) {
+        switch (cli.routeinfo.path[2]) {
+        case 'list':
+            this.create(cli);
+            break;
+        case 'edit':
+            this.edit(cli);
+            break;
+        case 'delete':
+            this.delete(cli);
+            break;
+        default:
+            return cli.throwHTTP(404, 'Not Found');
+            break;
+
+        }
+    };
+
+    this.edit = function (cli) {
         var form = formBuilder.handleRequest(cli);
         var response = formBuilder.validate(form, true);
         if (response.success) {
             var formData = formBuilder.serializeForm(form);
 
             // Create post
-            db.update(cli._c, 'categories', {_id : db.mongoID(cli.routeinfo.path[3])},formData, function(err, result) {
+            db.update(cli._c, 'categories', {
+                _id: db.mongoID(cli.routeinfo.path[3])
+            }, formData, function (err, result) {
                 // Generate LML page
                 cli.refresh();
             });
@@ -62,14 +64,14 @@ var Category = function() {
         }
     };
 
-    this.create = function(cli) {
+    this.create = function (cli) {
         var form = formBuilder.handleRequest(cli);
         var response = formBuilder.validate(form, true);
         if (response.success) {
             var formData = formBuilder.serializeForm(form);
 
             // Create post
-            db.insert(cli._c, 'categories', formData, function(err, result) {
+            db.insert(cli._c, 'categories', formData, function (err, result) {
                 // Generate LML page
                 cli.refresh();
             });
@@ -81,9 +83,11 @@ var Category = function() {
         }
     };
 
-    this.delete = function(cli) {
+    this.delete = function (cli) {
         if (cli.postdata.data.id) {
-            db.remove(cli._c, 'categories', {_id : db.mongoID(cli.postdata.data.id)}, function() {
+            db.remove(cli._c, 'categories', {
+                _id: db.mongoID(cli.postdata.data.id)
+            }, function () {
                 cli.sendJSON({
                     success: true
                 });
@@ -93,14 +97,14 @@ var Category = function() {
         }
     }
 
-    this.createLivevars = function() {
-        livevars.registerLiveVariable('categories', function(cli, levels, params, callback) {
+    this.createLivevars = function () {
+        livevars.registerLiveVariable('categories', function (cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
                 db.singleLevelFind(cli._c, 'categories', callback);
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
-                db.findToArray(cli._c, 'categories', {}, function(err, arr) {
+                db.findToArray(cli._c, 'categories', {}, function (err, arr) {
                     for (var i = 0; i < arr.length; i++) {
                         sentArr.push({
                             articleid: arr[i]._id,

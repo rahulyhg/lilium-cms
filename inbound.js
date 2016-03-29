@@ -6,62 +6,70 @@ var _c = require('./config.js').default(),
     fs = require('fs'),
     reqCount = 0,
     totalReqCount = 0,
-    __inbound = new (function() {
-	var server;
-	var secureServer;
-    var io;
+    __inbound = new(function () {
+        var server;
+        var secureServer;
+        var io;
 
-	var handleReq = function(req, resp) {
-		reqCount++;
-		totalReqCount++;
-		resp.on('finish', function() {reqCount--;});
+        var handleReq = function (req, resp) {
+            reqCount++;
+            totalReqCount++;
+            resp.on('finish', function () {
+                reqCount--;
+            });
 
-		hooks.trigger('request', {req:req,resp:resp});
-	};
+            hooks.trigger('request', {
+                req: req,
+                resp: resp
+            });
+        };
 
-	var handleConn = function(req, resp) {
-		hooks.trigger('conn', {req:req,resp:resp});
-	};
+        var handleConn = function (req, resp) {
+            hooks.trigger('conn', {
+                req: req,
+                resp: resp
+            });
+        };
 
-	this.bind = function(hook, cb) {
-		log('Inbound', 'Binding ' + hook + ' to connection');
-		callbacks[hook].push(cb);
-	};
+        this.bind = function (hook, cb) {
+            log('Inbound', 'Binding ' + hook + ' to connection');
+            callbacks[hook].push(cb);
+        };
 
-	this.start = function() {
-		log('Inbound', 'Ready to receive requests');
-		server.listen(_c.server.port, handleConn);
-		// secureServer.listen(8000, handleConn);
-	};
+        this.start = function () {
+            log('Inbound', 'Ready to receive requests');
+            server.listen(_c.server.port, handleConn);
+            // secureServer.listen(8000, handleConn);
+        };
 
-  	this.io = function() {
-    		return io;
-  	};
+        this.io = function () {
+            return io;
+        };
 
-	this.createServer = function() {
-		server = _http.createServer(handleReq);
-        io = require('socket.io')(server);
-		/*
-		secureServer = _https.createServer({
-			key : fs.readFileSync("/Users/ryk/Desktop/server-key.pem"),
-			cert : fs.readFileSync("/Users/ryk/Desktop/server-crt.pem")
-		}, handleReq);
-		*/
-	};
+        this.createServer = function () {
+            server = _http.createServer(handleReq);
+            io = require('socket.io')(server);
+            /*
+            secureServer = _https.createServer({
+            	key : fs.readFileSync("/Users/ryk/Desktop/server-key.pem"),
+            	cert : fs.readFileSync("/Users/ryk/Desktop/server-crt.pem")
+            }, handleReq);
+            */
+        };
 
-	this.getRequestHandlesCount = function() {
-		return reqCount;
-	};
+        this.getRequestHandlesCount = function () {
+            return reqCount;
+        };
 
-	this.getTotalRequestHandlesCount = function() {
-		return totalReqCount;
-	};
+        this.getTotalRequestHandlesCount = function () {
+            return totalReqCount;
+        };
 
-	var init = function() {
+        var init = function () {
 
-	};
+        };
 
-	init();
-})();
+        init();
+    })();
 
 module.exports = __inbound;

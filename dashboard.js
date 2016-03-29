@@ -6,31 +6,31 @@ var lmllib = require('./lmllib.js');
 
 var _dashpetals = new Array();
 
-var Dashboard = function() {
-	this.getPetals = function() {
-		pets = new Array();
+var Dashboard = function () {
+    this.getPetals = function () {
+        pets = new Array();
 
-		for (var pos in _dashpetals) {
-			pets.push(Petal.get(_dashpetals[pos]).id);
-		}
+        for (var pos in _dashpetals) {
+            pets.push(Petal.get(_dashpetals[pos]).id);
+        }
 
-		return pets;
-	};
+        return pets;
+    };
 
-	this.registerDashPetal = function(petalID, prio) {
-		while (typeof _dashpetals[prio] !== 'undefined') prio++;
-		_dashpetals[prio] = petalID;
-	};
+    this.registerDashPetal = function (petalID, prio) {
+        while (typeof _dashpetals[prio] !== 'undefined') prio++;
+        _dashpetals[prio] = petalID;
+    };
 
-	this.handleGET = function(cli) {
-		filelogic.serveAdminLML(cli);
-	};
+    this.handleGET = function (cli) {
+        filelogic.serveAdminLML(cli);
+    };
 
-	this.registerLMLLib = function() {
-		lmllib.registerContextLibrary('dashboard', function(context) {
-			return new Dashboard();
-		});
-	};
+    this.registerLMLLib = function () {
+        lmllib.registerContextLibrary('dashboard', function (context) {
+            return new Dashboard();
+        });
+    };
 };
 
 module.exports = new Dashboard();

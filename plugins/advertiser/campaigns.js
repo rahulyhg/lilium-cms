@@ -1,16 +1,15 @@
-var formBuilder = undefined;
-var fileLogic = undefined;
-var entites = undefined;
-var transaction = undefined;
-var log = undefined;
-var _c = undefined;
-var db = undefined;
+var formBuilder;
+var fileLogic;
+var transaction;
+var log;
+var _c;
+var db;
 var adminAdvertiser = require('./adminAdvertiser.js');
-var fileserver = undefined;
-var hooks = undefined;
+var fileserver;
+var hooks;
 
-var CampaignAdvertiser = function() {
-    this.handlePOST = function(cli) {
+var CampaignAdvertiser = function () {
+    this.handlePOST = function (cli) {
         cli.touch('advertiser.campaigns.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case undefined:
@@ -36,7 +35,7 @@ var CampaignAdvertiser = function() {
     };
 
 
-    this.handleGET = function(cli) {
+    this.handleGET = function (cli) {
 
         cli.touch('advertiser.campaigns.handleGET');
 
@@ -60,28 +59,32 @@ var CampaignAdvertiser = function() {
         };
     };
 
-    this.newAdvertiser = function(cli) {
+    this.newAdvertiser = function (cli) {
 
     };
 
-    var postChangeRequest = function(cli) {
+    var postChangeRequest = function (cli) {
         if (cli.routeinfo.path[3]) {
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
-            }, function(err, array) {
+            }, function (err, array) {
                 if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipending') {
                     var campaign = array[0];
 
-                    var updatecamp = function(status) {
-                        //Update camp status
-                        db.update('campaigns', {_id: campaign._id}, {campstatus : status}, function() {
-                            cli.sendJSON({
-                                success: true,
-                                redirect: cli._c.server.url + '/advertiser/campaigns'
-                            });
-                        })
-                    }
-                    // Check if there is some post data
+                    var updatecamp = function (status) {
+                            //Update camp status
+                            db.update('campaigns', {
+                                _id: campaign._id
+                            }, {
+                                campstatus: status
+                            }, function () {
+                                cli.sendJSON({
+                                    success: true,
+                                    redirect: cli._c.server.url + '/advertiser/campaigns'
+                                });
+                            })
+                        }
+                        // Check if there is some post data
                     if (typeof cli.postdata.data !== 'undefined' && typeof cli.postdata.data.changerequests !== 'undefined') {
                         var changerequests = cli.postdata.data.changerequests
                         var changeobj = [];
@@ -95,7 +98,7 @@ var CampaignAdvertiser = function() {
                             changeobj.push(request);
                         }
 
-                        db.insert('changerequests', changeobj, function(err, r) {
+                        db.insert('changerequests', changeobj, function (err, r) {
                             // Update status
                             updatecamp('review');
 
@@ -117,7 +120,7 @@ var CampaignAdvertiser = function() {
         }
     }
 
-    var payCampaign = function(cli) {
+    var payCampaign = function (cli) {
         var that = this;
 
         //Retrieve campaign
@@ -126,7 +129,7 @@ var CampaignAdvertiser = function() {
             // Find campaing
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
-            }, function(err, array) {
+            }, function (err, array) {
 
                 if (err) log('Advertiser Plugin', err);
 
@@ -135,12 +138,12 @@ var CampaignAdvertiser = function() {
                     var campaign = array[0];
 
                     // Check if we have a stripe customer for the current Advertiser
-                    findStripeCostumer(cli, function(result) {
+                    findStripeCostumer(cli, function (result) {
 
                         if (typeof result == 'object' && result.length > 0 && result[0].isStripeClient) {
 
                             // Stripe payement
-                            stripeOrder(result[0].stripeID, campaign, function(order) {
+                            stripeOrder(result[0].stripeID, campaign, function (order) {
 
                                 if (order.paid) {
                                     cli.redirect(cli._c.server.url + "/advertiser?alert=OrderSuccessfull!");
@@ -159,10 +162,10 @@ var CampaignAdvertiser = function() {
                                 var entData = cli.postdata.data;
                                 var serializedForm = formBuilder.serializeForm(form);
                                 serializedForm.stripeToken = entData.stripeToken;
-                                adminAdvertiser.addAdvertiserStripeCostumer(entData.stripeToken, serializedForm, cli.userinfo.userid, function(success, advertiser) {
+                                adminAdvertiser.addAdvertiserStripeCostumer(entData.stripeToken, serializedForm, cli.userinfo.userid, function (success, advertiser) {
                                     if (success) {
                                         // Create order and pay it
-                                        stripeOrder(advertiser.stripeid, campaign, function(order) {
+                                        stripeOrder(advertiser.stripeid, campaign, function (order) {
                                             if (order.paid) {
 
                                                 cli.redirect(cli._c.server.url + "/advertiser");
@@ -191,7 +194,7 @@ var CampaignAdvertiser = function() {
         }
     }
 
-    var stripeOrder = function(stripeId, campaign, cb) {
+    var stripeOrder = function (stripeId, campaign, cb) {
         var charge = {
             currency: 'CAD',
             amount: 0,
@@ -202,14 +205,14 @@ var CampaignAdvertiser = function() {
             charge.amount += campaign.products[key].price * 100;
         }
 
-        transaction.charge(charge, function(err, charge) {
+        transaction.charge(charge, function (err, charge) {
             if (charge.paid) {
                 // Update campaign status
                 db.update('campaigns', {
                     _id: campaign._id
                 }, {
                     campstatus: "prod"
-                }, function(err) {
+                }, function (err) {
                     cb(charge);
                 });
             } else {
@@ -220,13 +223,13 @@ var CampaignAdvertiser = function() {
 
     };
 
-    var findStripeCostumer = this.findStripeCostumer = function(cli, callback) {
+    var findStripeCostumer = this.findStripeCostumer = function (cli, callback) {
         db.findToArray('entities', {
             _id: cli.userinfo.userid
-        }, function(err, arr) {
+        }, function (err, arr) {
             if (typeof arr[0] !== 'undefined' && typeof arr[0].stripeid !== 'undefined' && arr[0].stripeid !== '') {
                 // Get stripe client for last credit card numbers
-                transaction.getCustomer(arr[0].stripeid, function(err, client) {
+                transaction.getCustomer(arr[0].stripeid, function (err, client) {
                     if (typeof client !== 'undefined' && client.sources.data[0]) {
                         // Client is created and credit card
                         callback(err || [{
@@ -255,14 +258,14 @@ var CampaignAdvertiser = function() {
         });
     };
 
-    var uploadSignature = function(cli) {
+    var uploadSignature = function (cli) {
 
         if (cli.routeinfo.path[3]) {
 
             // Find campaing
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
-            }, function(err, camp) {
+            }, function (err, camp) {
                 if (err) log('Advertiser Plugin', err);
                 //
                 if (camp.length > 0 && cli.userinfo.userid == camp[0].clientid.toString() && camp[0].campstatus == 'clisign') {
@@ -277,27 +280,27 @@ var CampaignAdvertiser = function() {
                         var signature = image.signature;
 
                         var filename = fileserver.genRandomNameFile(signature);
-                        var path =  cli._c.server.base + "backend/static/uploads/" +filename + ".png";
+                        var path = cli._c.server.base + "backend/static/uploads/" + filename + ".png";
 
                         // Create signature image from text
-                        fileserver.genImageFromText(signature, path, "Arty Signature", 30, function() {
+                        fileserver.genImageFromText(signature, path, "Arty Signature", 30, function () {
                             //Save
 
                             var nextStatus = campaign.paymentreq ? 'clipayment' : 'prod';
 
-                                // Save it in database
-                                db.update('campaigns', {
-                                    _id: campaign._id
-                                }, {
-                                    clientsignature: filename + ".png",
-                                    campstatus: nextStatus
-                                }, function(err, result) {
-                                    if (campaign.paymentreq) {
-                                        cli.redirect(cli._c.server.url + "/advertiser/campaigns/pay/" + campaign._id);
-                                    } else {
-                                        cli.redirect(cli._c.server.url + "/advertiser?alert=Signature Successfull!");
-                                    }
-                                });
+                            // Save it in database
+                            db.update('campaigns', {
+                                _id: campaign._id
+                            }, {
+                                clientsignature: filename + ".png",
+                                campstatus: nextStatus
+                            }, function (err, result) {
+                                if (campaign.paymentreq) {
+                                    cli.redirect(cli._c.server.url + "/advertiser/campaigns/pay/" + campaign._id);
+                                } else {
+                                    cli.redirect(cli._c.server.url + "/advertiser?alert=Signature Successfull!");
+                                }
+                            });
                         });
 
                     } else {
@@ -313,16 +316,16 @@ var CampaignAdvertiser = function() {
         }
     };
 
-    var reviewArticle = function(cli) {
+    var reviewArticle = function (cli) {
         fileLogic.serveLmlPluginPage('advertiser', cli, true);
     };
 
-    var changeRequest = function(cli) {
+    var changeRequest = function (cli) {
         if (cli.routeinfo.path[3]) {
 
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
-            }, function(err, array) {
+            }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);
                 if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {} else {
                     cli.throwHTTP(400, 'Bad Request');
@@ -333,12 +336,12 @@ var CampaignAdvertiser = function() {
         }
     };
 
-    var servePayPage = function(cli) {
+    var servePayPage = function (cli) {
 
         if (cli.routeinfo.path[3]) {
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
-            }, function(err, array) {
+            }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);
                 if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipayment') {
                     fileLogic.serveLmlPluginPage('advertiser', cli, true);
@@ -352,12 +355,12 @@ var CampaignAdvertiser = function() {
 
     };
 
-    var serveSignPage = function(cli) {
+    var serveSignPage = function (cli) {
 
         if (cli.routeinfo.path[3]) {
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
-            }, function(err, array) {
+            }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);
                 if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clisign') {
                     fileLogic.serveLmlPluginPage('advertiser', cli, true);
@@ -370,7 +373,7 @@ var CampaignAdvertiser = function() {
         }
     };
 
-    this.init = function(abspath) {
+    this.init = function (abspath) {
         log = require(abspath + 'log.js');
         log("AdvertiserPlugin", "Initializing campaigns class");
         formBuilder = require(abspath + 'formBuilder.js');
@@ -380,7 +383,7 @@ var CampaignAdvertiser = function() {
         _c = require(abspath + 'config.js');
         db = require(abspath + 'includes/db.js');
         fileserver = require(abspath + 'fileserver.js');
-	hooks = require(abspath + 'hooks.js');
+        hooks = require(abspath + 'hooks.js');
 
         formBuilder.createForm('advertiser_sign')
             .add('signature', 'text', {
@@ -406,6 +409,6 @@ var CampaignAdvertiser = function() {
             .add('_id', 'hidden');
     };
 
-}
+};
 
 module.exports = new CampaignAdvertiser();

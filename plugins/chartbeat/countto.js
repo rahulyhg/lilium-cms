@@ -13,45 +13,47 @@
 // duration = duration of animation in seconds, default 2
 // options = optional object of options (see below)
 
-var CountUp = function(target, startVal, endVal, decimals, duration, options) {
+var CountUp = function (target, startVal, endVal, decimals, duration, options) {
 
     // make sure requestAnimationFrame and cancelAnimationFrame are defined
     // polyfill for browsers without native support
     // by Opera engineer Erik Möller
     var lastTime = 0;
     var vendors = ['webkit', 'moz', 'ms', 'o'];
-    for(var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x]+'RequestAnimationFrame'];
+    for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
         window.cancelAnimationFrame =
-          window[vendors[x]+'CancelAnimationFrame'] || window[vendors[x]+'CancelRequestAnimationFrame'];
+            window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
     }
     if (!window.requestAnimationFrame) {
-        window.requestAnimationFrame = function(callback, element) {
+        window.requestAnimationFrame = function (callback, element) {
             var currTime = new Date().getTime();
             var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-            var id = window.setTimeout(function() { callback(currTime + timeToCall); },
-              timeToCall);
+            var id = window.setTimeout(function () {
+                    callback(currTime + timeToCall);
+                },
+                timeToCall);
             lastTime = currTime + timeToCall;
             return id;
         };
     }
     if (!window.cancelAnimationFrame) {
-        window.cancelAnimationFrame = function(id) {
+        window.cancelAnimationFrame = function (id) {
             clearTimeout(id);
         };
     }
 
     // Robert Penner's easeOutExpo
-    this.easeOutExpo = function(t, b, c, d) {
+    this.easeOutExpo = function (t, b, c, d) {
         return c * (-Math.pow(2, -10 * t / d) + 1) * 1024 / 1023 + b;
     };
 
-     // default options
+    // default options
     this.options = {
-        useEasing : true, // toggle easing
-        useGrouping : true, // 1,000,000 vs 1000000
-        separator : ',', // character to use as a separator
-        decimal : '.', // character to use as a decimal
+        useEasing: true, // toggle easing
+        useGrouping: true, // 1,000,000 vs 1000000
+        separator: ',', // character to use as a separator
+        decimal: '.', // character to use as a decimal
         postFormatter: null, // post formatter to run after internal formatting
         easingFn: null // custom easing closure function, will default to Robert Penner's easeOutExpo
     };
@@ -65,9 +67,7 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
     if (!this.options.prefix) this.options.prefix = '';
     if (!this.options.suffix) this.options.suffix = '';
     // establish easing function
-    this.options.easingFn = !this.options.easingFn
-        ? this.easeOutExpo
-        : this.options.easingFn;
+    this.options.easingFn = !this.options.easingFn ? this.easeOutExpo : this.options.easingFn;
 
     this.d = (typeof target === 'string') ? document.getElementById(target) : target;
     this.startVal = Number(startVal);
@@ -79,23 +79,23 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
     this.duration = Number(duration) * 1000 || 2000;
     var self = this;
 
-    this.version = function () { return '1.6.1'; };
+    this.version = function () {
+        return '1.6.1';
+    };
 
     // Print value to target
-    this.printValue = function(value) {
+    this.printValue = function (value) {
         var result = (!isNaN(value)) ? self.formatNumber(value) : '--';
         if (self.d.tagName == 'INPUT') {
             this.d.value = result;
-        }
-        else if (self.d.tagName == 'text' || self.d.tagName == 'tspan') {
+        } else if (self.d.tagName == 'text' || self.d.tagName == 'tspan') {
             this.d.textContent = result;
-        }
-        else {
+        } else {
             this.d.innerHTML = result;
         }
     };
 
-    this.count = function(timestamp) {
+    this.count = function (timestamp) {
 
         if (!self.startTime) self.startTime = timestamp;
 
@@ -108,12 +108,12 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
         if (self.options.useEasing) {
             if (self.countDown) {
                 self.frameVal = self.startVal - self.options.easingFn.call(
-                        self,
-                        progress,
-                        0,
-                        self.startVal - self.endVal,
-                        self.duration
-                    );
+                    self,
+                    progress,
+                    0,
+                    self.startVal - self.endVal,
+                    self.duration
+                );
             } else {
                 self.frameVal = self.options.easingFn.call(
                     self,
@@ -139,7 +139,7 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
         }
 
         // decimal
-        self.frameVal = Math.floor(self.frameVal*self.dec)/self.dec;
+        self.frameVal = Math.floor(self.frameVal * self.dec) / self.dec;
 
         // format and print value
         self.printValue(self.frameVal);
@@ -152,13 +152,13 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
         }
     };
     // start your animation
-    this.start = function(callback) {
+    this.start = function (callback) {
         self.callback = callback;
         self.rAF = requestAnimationFrame(self.count);
         return false;
     };
     // toggles pause/resume animation
-    this.pauseResume = function() {
+    this.pauseResume = function () {
         if (!self.paused) {
             self.paused = true;
             cancelAnimationFrame(self.rAF);
@@ -171,7 +171,7 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
         }
     };
     // reset to startVal so animation can be run again
-    this.reset = function() {
+    this.reset = function () {
         self.paused = false;
         delete self.startTime;
         self.startVal = startVal;
@@ -188,7 +188,7 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
         self.countDown = (self.startVal > self.endVal);
         self.rAF = requestAnimationFrame(self.count);
     };
-    this.formatNumber = function(nStr) {
+    this.formatNumber = function (nStr) {
         nStr = nStr.toFixed(self.decimals);
         nStr += '';
         var x, x1, x2, rgx;
@@ -202,7 +202,7 @@ var CountUp = function(target, startVal, endVal, decimals, duration, options) {
             }
         }
         var value = self.options.prefix + x1 + x2 + self.options.suffix;
-        if(self.options.postFormatter != null) {
+        if (self.options.postFormatter != null) {
             value = self.options.postFormatter(value);
         }
         return value;

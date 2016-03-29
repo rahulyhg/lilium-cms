@@ -1,8 +1,8 @@
 var formBuilder = require('./formBuilder.js');
 var log = require('./log.js');
 
-var Forms = function() {
-    this.init = function() {
+var Forms = function () {
+    this.init = function () {
         log('Forms', 'Initializing default forms');
         formBuilder.registerFormTemplate('payment')
             .add('nameoncard', 'text', {
@@ -71,7 +71,7 @@ var Forms = function() {
                 template: 'option',
                 title: 'role',
                 attr: {
-                    'multiselect' : true
+                    'multiselect': true
                 },
                 props: {
                     'value': 'name',
@@ -101,7 +101,7 @@ var Forms = function() {
             .addTemplate('category')
             .add('update', 'submit');
 
-        formBuilder.registerFieldType('media-explorer', function(field) {
+        formBuilder.registerFieldType('media-explorer', function (field) {
             var displayname = typeof field.attr.displayname !== 'undefined' ? field.attr.displayname : field.name;
             var html = '<div class="media_explorer_form">';
             html += '<input type="hidden" id="media-input" name="' + field.name + '">';
@@ -115,14 +115,15 @@ var Forms = function() {
         });
 
         formBuilder.registerFormTemplate('media-explorer')
-            .add('media', 'media-explorer', {displayname: 'Banner'});
+            .add('media', 'media-explorer', {
+                displayname: 'Banner'
+            });
 
         formBuilder.registerFormTemplate('article_base')
             .add('title', 'text', {
                 placeholder: true,
                 displayname: 'Title'
-            },
-            {
+            }, {
                 minLenght: 3,
                 maxLenght: 100
             })

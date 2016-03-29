@@ -10,7 +10,7 @@ var imageResizer = require('./imageResizer.js');
 var tableBuilder = require('./tableBuilder.js');
 var Roles = new Object();
 
-var Entity = function() {
+var Entity = function () {
     // Manda fields
     this._id = undefined;
     this.username = "";
@@ -26,8 +26,8 @@ var Entity = function() {
     this.data = new Object();
 };
 
-var Entities = module.exports = new function() {
-    var entityWithData = function(oData, callback) {
+var Entities = module.exports = new function () {
+    var entityWithData = function (oData, callback) {
         var entity = new Entity();
 
         for (var key in oData) {
@@ -37,7 +37,7 @@ var Entities = module.exports = new function() {
         callback(entity);
     };
 
-    this.fetchFromDB = function(conf, idOrUsername, callback) {
+    this.fetchFromDB = function (conf, idOrUsername, callback) {
         var condition = new Object();
 
         if (typeof idOrUsername === "object") {
@@ -46,7 +46,7 @@ var Entities = module.exports = new function() {
             condition.username = idOrUsername;
         }
 
-        db.findToArray(conf, 'entities', condition, function(err, user) {
+        db.findToArray(conf, 'entities', condition, function (err, user) {
             if (!err && user.length == 1) {
                 entityWithData(user[0], callback);
             } else {
@@ -56,7 +56,7 @@ var Entities = module.exports = new function() {
     };
 
 
-    this.handleGET = function(cli) {
+    this.handleGET = function (cli) {
         cli.touch('entities.handleGET');
 
         if (cli.routeinfo.path.length == 2) {
@@ -65,50 +65,50 @@ var Entities = module.exports = new function() {
             var action = cli.routeinfo.path[2];
 
             switch (action) {
-                case "edit":
-                    this.serveEdit(cli);
-                    break;
+            case "edit":
+                this.serveEdit(cli);
+                break;
 
-                default:
-                    return cli.throwHTTP(404, 'Not Found');
-                    break;
+            default:
+                return cli.throwHTTP(404, 'Not Found');
+                break;
             }
         }
     };
 
-    this.handlePOST = function(cli) {
+    this.handlePOST = function (cli) {
         cli.touch('entities.handlePOST');
         if (cli.routeinfo.path[1] == 'me') {
             switch (cli.routeinfo.path[2]) {
-                case undefined:
-                    this.updateProfile(cli);
-                case "update_profile_picture":
-                    this.updateProfilePicture(cli);
-                    break;
-                case "change_password":
-                    this.changePassword(cli);
-                    break;
+            case undefined:
+                this.updateProfile(cli);
+            case "update_profile_picture":
+                this.updateProfilePicture(cli);
+                break;
+            case "change_password":
+                this.changePassword(cli);
+                break;
             }
         } else {
             var action = cli.postdata.data.form_name;
 
             switch (action) {
-                case "entity_create":
-                    this.createFromCli(cli);
-                    break;
+            case "entity_create":
+                this.createFromCli(cli);
+                break;
 
-                case "entity_delete":
-                    this.deleteFromCli(cli);
-                    break;
+            case "entity_delete":
+                this.deleteFromCli(cli);
+                break;
 
-                default:
-                    cli.debug();
+            default:
+                cli.debug();
             }
         }
 
     };
 
-    this.updateProfile = function(cli) {
+    this.updateProfile = function (cli) {
         cli.touch('entities.updateProfile');
         var entData = cli.postdata.data;
         var entitie = this.initialiseBaseEntity(entData);
@@ -117,7 +117,7 @@ var Entities = module.exports = new function() {
 
     };
 
-    this.updateProfilePicture = function(cli) {
+    this.updateProfilePicture = function (cli) {
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
 
@@ -130,7 +130,7 @@ var Entities = module.exports = new function() {
 
             if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
 
-                imageResizer.resize(saveTo, image.picture, mime, cli, function(images) {
+                imageResizer.resize(saveTo, image.picture, mime, cli, function (images) {
 
                     var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
                     var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
@@ -140,7 +140,7 @@ var Entities = module.exports = new function() {
                     }, {
                         avatarURL: avatarURL,
                         avatarID: avatarID
-                    }, function(err, result) {
+                    }, function (err, result) {
 
                         // Update session
                         var sessionManager = require('./session.js');
@@ -153,7 +153,7 @@ var Entities = module.exports = new function() {
                         cli.session.data.avatarURL = avatarURL;
                         cli.session.data.avatarID = avatarID;
 
-                        sessionManager.saveSession(cli, function() {
+                        sessionManager.saveSession(cli, function () {
 
                             cli.sendJSON({
                                 redirect: '',
@@ -178,7 +178,7 @@ var Entities = module.exports = new function() {
         }
     };
 
-    this.changePassword = function(cli) {
+    this.changePassword = function (cli) {
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
 
@@ -189,7 +189,7 @@ var Entities = module.exports = new function() {
                 _id: cli.userinfo.userid
             }, {
                 shhh: shhh
-            }, function(err, result) {
+            }, function (err, result) {
                 cli.refresh();
             });
         } else {
@@ -199,7 +199,7 @@ var Entities = module.exports = new function() {
         }
     }
 
-    this.maxPower = function(cli, callback) {
+    this.maxPower = function (cli, callback) {
         db.aggregate(cli._c, 'entities', [{
             "$unwind": "$roles"
         }, {
@@ -227,7 +227,7 @@ var Entities = module.exports = new function() {
                     $min: '$power'
                 }
             }
-        }], function(result) {
+        }], function (result) {
             // Make sure there is a result
             if (result[0] && result[0].power[0]) {
                 // Pull out the result
@@ -240,10 +240,10 @@ var Entities = module.exports = new function() {
         });
     }
 
-    this.update = function(cli) {
+    this.update = function (cli) {
 
 
-        this.registerEntity(cli, newEnt, function() {
+        this.registerEntity(cli, newEnt, function () {
             cli.touch('entities.registerEntity.callback');
             /*
             mailer.createEmail({
@@ -259,13 +259,13 @@ var Entities = module.exports = new function() {
         });
     }
 
-    this.serveEdit = function(cli) {
+    this.serveEdit = function (cli) {
         cli.touch('entities.serveEdit');
 
         cli.debug();
     };
 
-    this.initialiseBaseEntity = function(entData) {
+    this.initialiseBaseEntity = function (entData) {
         var newEnt = this.createEmptyEntity();
 
         newEnt.username = entData.username;
@@ -290,13 +290,13 @@ var Entities = module.exports = new function() {
         return newEnt;
     }
 
-    this.createFromCli = function(cli) {
+    this.createFromCli = function (cli) {
         cli.touch('entities.createFromCli');
         var entData = cli.postdata.data;
         console.log(entData);
         var newEnt = this.initialiseBaseEntity(entData);
 
-        this.registerEntity(cli, newEnt, function() {
+        this.registerEntity(cli, newEnt, function () {
             cli.touch('entities.registerEntity.callback');
             /*
             mailer.createEmail({
@@ -312,31 +312,31 @@ var Entities = module.exports = new function() {
         });
     };
 
-    this.deleteFromCli = function(cli) {
+    this.deleteFromCli = function (cli) {
         var id = cli.postdata.data.uid;
 
         db.remove(cli._c, 'entities', {
             _id: db.mongoID(id)
-        }, function(err, result) {
+        }, function (err, result) {
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath);
         });
     };
 
-    this.createEmptyEntity = function() {
+    this.createEmptyEntity = function () {
         return new Entity();
     };
 
-    this.validateEntityObject = function(e, cli, cb) {
+    this.validateEntityObject = function (e, cli, cb) {
         var valid = true;
         valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.role;
-        cli.hasEnoughPower(e.roles, function(hasEnoughPower) {
+        cli.hasEnoughPower(e.roles, function (hasEnoughPower) {
             valid = hasEnoughPower;
             cb(valid);
         });
     };
 
-    this.registerEntity = function(cli, entity, callback) {
-        this.validateEntityObject(entity, cli, function(valid) {
+    this.registerEntity = function (cli, entity, callback) {
+        this.validateEntityObject(entity, cli, function (valid) {
             if (valid) {
                 db.insert(cli._c, 'entities', entity, callback, true);
 
@@ -347,13 +347,13 @@ var Entities = module.exports = new function() {
         });
     };
 
-    this.updateEntity = function(valObject) {
+    this.updateEntity = function (valObject) {
 
     };
 
-    this.cacheRoles = function(callback) {
+    this.cacheRoles = function (callback) {
         log('Roles', 'Caching roles from Database');
-        db.findToArray(_c.default(), 'roles', {}, function(err, roles) {
+        db.findToArray(_c.default(), 'roles', {}, function (err, roles) {
             if (!err) {
                 for (var i = 0, len = roles.length; i < len; i++) {
                     Roles[roles[i].name] = roles[i];
@@ -368,7 +368,7 @@ var Entities = module.exports = new function() {
         });
     };
 
-    this.promoteRole = function(roleName, right, cb) {
+    this.promoteRole = function (roleName, right, cb) {
         if (typeof Roles[roleName] === 'undefined') {
             throw new Error("[RolesException] Could not promote unexisting role " + roleName);
         } else {
@@ -379,21 +379,21 @@ var Entities = module.exports = new function() {
         }
     };
 
-    this.registerRole = function(rObj, rights, callback, updateIfExists) {
+    this.registerRole = function (rObj, rights, callback, updateIfExists) {
         if (typeof Roles[rObj.name] !== 'undefined') {
             throw new Error("[RolesException] Tried to register already registered role " + rObj.name);
         } else {
             rObj.rights = rights;
             db.update(_c.default(), 'roles', {
                 name: rObj.name
-            }, rObj, function(err, result) {
+            }, rObj, function (err, result) {
                 Roles[rObj.name] = rObj;
                 callback(rObj);
             }, updateIfExists);
         }
     };
 
-    this.isAllowed = function(entity, right) {
+    this.isAllowed = function (entity, right) {
         var allowed = false;
         var that = this;
 
@@ -437,7 +437,7 @@ var Entities = module.exports = new function() {
         return allowed;
     };
 
-    var registerTables = function() {
+    var registerTables = function () {
         tableBuilder.createTable({
             name: 'entities',
             endpoint: 'entities.table',
@@ -475,7 +475,7 @@ var Entities = module.exports = new function() {
         });
     };
 
-    this.registerCreationForm = function() {
+    this.registerCreationForm = function () {
 
         formbuilder.createForm('entity_create')
             .addTemplate('entity_create');
@@ -511,8 +511,8 @@ var Entities = module.exports = new function() {
             });
     };
 
-    this.registerLiveVars = function() {
-        livevars.registerLiveVariable('entities', function(cli, levels, params, callback) {
+    this.registerLiveVars = function () {
+        livevars.registerLiveVariable('entities', function (cli, levels, params, callback) {
             var allEntities = levels.length === 0;
 
             if (allEntities) {
@@ -529,46 +529,46 @@ var Entities = module.exports = new function() {
                 } : undefined;
                 qObj.username = queryInfo.username;
 
-                db.findToArray(cli._c, 'entities', queryInfo, function(err, arr) {
+                db.findToArray(cli._c, 'entities', queryInfo, function (err, arr) {
                     callback(err || arr);
                 });
             } else if (levels[0] == 'table') {
-				var sort = {};
-				sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
-				db.aggregate(cli._c, 'entities', [{
-					$match:
+                var sort = {};
+                sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+                db.aggregate(cli._c, 'entities', [{
+                    $match:
                         (params.search ? {
-    						$text: {
-    							$search: params.search
-    						}
-    					} : {})
+                            $text: {
+                                $search: params.search
+                            }
+                        } : {})
 
-				}, {
-					$sort: sort
-				}, {
-					$skip: (params.skip || 0)
-				}, {
-					$limit: (params.max || 20)
-				}], function(data) {
-					db.find(cli._c, 'entities', (params.search ? {
-						$text: {
-							$search: params.search
-						}
-					} : {}), [], function(err, cursor) {
+                }, {
+                    $sort: sort
+                }, {
+                    $skip: (params.skip || 0)
+                }, {
+                    $limit: (params.max || 20)
+                }], function (data) {
+                    db.find(cli._c, 'entities', (params.search ? {
+                        $text: {
+                            $search: params.search
+                        }
+                    } : {}), [], function (err, cursor) {
 
-						cursor.count(function(err, size) {
-							results = {
-								size: size,
-								data: data
-							}
-							callback(err || results);
+                        cursor.count(function (err, size) {
+                            results = {
+                                size: size,
+                                data: data
+                            }
+                            callback(err || results);
 
-						});
-					});
-				});
+                        });
+                    });
+                });
 
 
-			} else {
+            } else {
                 db.multiLevelFind(cli._c, 'entities', levels, {
                     username: levels[0]
                 }, {
@@ -577,15 +577,15 @@ var Entities = module.exports = new function() {
             }
         }, ["entities"]);
 
-        livevars.registerLiveVariable('me', function(cli, levels, params, callback) {
+        livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
             db.findToArray(cli._c, 'entities', {
                 _id: db.mongoID(cli.userinfo.userid)
-            }, function(err, arr) {
+            }, function (err, arr) {
                 callback(err || arr);
             });
         }, []);
 
-        livevars.registerLiveVariable('session', function(cli, levels, params, callback) {
+        livevars.registerLiveVariable('session', function (cli, levels, params, callback) {
             var dat = cli.session.data;
             if (levels.length) {
                 for (var i = 0; i < levels.length; i++) {
@@ -614,7 +614,7 @@ var Entities = module.exports = new function() {
         }, []);
     };
 
-    var init = function() {
+    var init = function () {
         registerTables();
     };
 

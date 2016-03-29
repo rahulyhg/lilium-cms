@@ -8,384 +8,386 @@ var validator = require('validator');
 var hooks = require('./hooks.js');
 
 
-var Form = function(name, cb) {
-  this.name = name;
-  this.valid = false;
-  this.callback = cb;
-  this.fields = {};
+var Form = function (name, cb) {
+    this.name = name;
+    this.valid = false;
+    this.callback = cb;
+    this.fields = {};
 
-  this.attr = {
-    validate: true,
-    method: 'post',
-    action: '',
-    placeholder: false
-  };
+    this.attr = {
+        validate: true,
+        method: 'post',
+        action: '',
+        placeholder: false
+    };
 };
 
-var Field = function(name, type) {
+var Field = function (name, type) {
 
-  this.name = name;
-  /**
-   * Type of the field :
-   * text, textarea, button, checkbox, radio, select, option, email, date, number, ckeditor, file, livevar
-   * @type {String}
-   */
-  this.type = type || 'text';
+    this.name = name;
+    /**
+     * Type of the field :
+     * text, textarea, button, checkbox, radio, select, option, email, date, number, ckeditor, file, livevar
+     * @type {String}
+     */
+    this.type = type || 'text';
 
-  this.attr = {
-    classes: [],
-    value: ''
-  };
+    this.attr = {
+        classes: [],
+        value: ''
+    };
 
-  /**
-   * Requirements for the field to be valid
-   * @type {Object}
-   */
-  this.requirements = {
-    minLenght: "0",
-    maxLenght: "-1",
-    required: true
-  };
+    /**
+     * Requirements for the field to be valid
+     * @type {Object}
+     */
+    this.requirements = {
+        minLenght: "0",
+        maxLenght: "-1",
+        required: true
+    };
 }
 
-var FormBuilder = function() {
-  var templates = {};
-  var forms = {};
-  var currentForm = undefined;
+var FormBuilder = function () {
+    var templates = {};
+    var forms = {};
+    var currentForm = undefined;
 
-  this.createForm = function(name, attr, cb) {
+    this.createForm = function (name, attr, cb) {
 
-    instanciateForm(name, attr);
-    // Add it to the form list
-    forms[name] = currentForm;
+        instanciateForm(name, attr);
+        // Add it to the form list
+        forms[name] = currentForm;
 
-    return this;
-  }
-
-  var instanciateForm = function(name, attr) {
-    if (typeof name == 'undefined') {
-      throw new Error("[FormBuilderException] - No name provided to form");
+        return this;
     }
 
-    if (typeof forms[name] !== 'undefined') {
-      throw new Error("[FormBuilderException] - Form already created : " + name);
-    }
-
-    // Instanciate a new form
-    currentForm = new Form(name);
-
-    // Update attributes of the form
-    for (var key in attr) {
-      currentForm.attr[key] = attr[key];
-    }
-  }
-
-  this.addTemplate = function(name) {
-    if (typeof templates[name] == 'undefined') throw "[FormBuilderException] - Template not created. Please call createFormTemplate() first.";
-    for (var key in templates[name].fields) {
-      var field = templates[name].fields[key]
-      this.add(field.name, field.type, field.attr, field.requirements);
-    }
-
-    return this;
-  }
-
-  this.form = function(name) {
-      currentForm = forms[name];
-      return this;
-  }
-
-  this.registerFieldType = function(name, fct) {
-      htmlParser.registerType(name, fct);
-  }
-
-  this.add = function(name, type, attr, requirements, contextForm) {
-    // Check if it is a tempalte
-    currentForm = contextForm || currentForm;
-
-    if (typeof currentForm == 'undefined') {
-      throw new Error("[FormBuilderException] - Form not created. Please call createForm() first.");
-    }
-    if (typeof currentForm.fields == 'undefined') {
-      currentForm.fields = {};
-    }
-    if (typeof currentForm.fields[name] !== 'undefined') {
-      throw new Error("[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]));
-    }
-
-    currentForm.fields[name] = createField(name, type, attr, requirements);
-    return this;
-
-  };
-
-  this.trigger = this.trg = function(sectionname) {
-    var that = this;
-    hooks.trigger(currentForm.name + "_" + sectionname, {form : that});
-    return this;
-  };
-
-  this.edit = function(name, type, attr, requirements) {
-    if (typeof currentForm.fields[name] !== 'undefined') {
-      var field = currentForm.fields[name];
-      if (typeof type !== 'undefined' && type != '') {
-        field.type = type;
-      }
-
-      // Update attributes
-      for (var key in attr) {
-        field.attr[key] = attr[key];
-      }
-      // Update requirements
-      for (var key in requirements) {
-        field.requirements[key] = requirements[key];
-      }
-    }
-    return this;
-  }
-
-  this.remove = function(name) {
-    if (typeof currentForm.fields[name] !== 'undefined') {
-      currentForm.fields[name] = undefined;
-      delete currentForm.fields[name];
-    }
-    return this;
-  }
-
-  var createField = function(name, type, attr, requirements) {
-
-    if (typeof name == 'undefined') {
-      throw new Error("[FormBuilderException] - No name provided to field");
-    }
-
-    // Instanciate a new field
-    var field = new Field(name, type);
-
-    // Update attributes
-    for (var key in attr) {
-      field.attr[key] = attr[key];
-    }
-    // Update requirements
-    for (var key in requirements) {
-      field.requirements[key] = requirements[key];
-    }
-
-    return field;
-  }
-
-  this.registerFormTemplate = function(name) {
-    if (typeof templates[name] !== 'undefined') throw "[FormBuilderException] - Template already created: " + name;
-    currentForm = new Object();
-    templates[name] = currentForm;
-
-    return this;
-  }
-
-  this.unregisterFormTemplate = function(name) {
-    if (typeof templates[name] !== 'undefined') {
-      templates[name] = undefined;
-      delete templates[name];
-    }
-  }
-
-  this.render = function(formName) {
-    if (typeof forms[formName] == 'undefined') {
-      throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
-    }
-
-    currentForm = forms[formName];
-
-    if (typeof forms[formName].fields['form_name'] == 'undefined') {
-      this.add('form_name', 'hidden', {
-        value: formName
-      }, {
-        required: false
-      }, forms[formName]);
-    }
-
-    return htmlParser.parseForm(forms[formName]);
-  }
-
-  /**
-   * Validates a form.
-   * @param  {Form} form The form object
-   * @param  {boolean} withErrStack Whether to return a json error stack or a simple boolean
-   * @return {Array}err A stack of all the errors.
-   */
-  this.validate = function(form, callStack, cli) {
-    var valid = false;
-    // Return an error stack by default
-    if (typeof callStack == 'undefined') {
-      callStack = true;
-    }
-
-    if (typeof form == 'undefined') {
-      return false;
-    }
-    var err = {};
-
-    for (var field in form.fields) {
-      var field = form.fields[field];
-      var requirements = field.requirements;
-      // Required verification
-      if (requirements.required) {
-        if (typeof field.attr !== 'undefined' && field.attr == '') {
-          err[field.name] = '001';
-        } else if (typeof field.attr == 'undefined') {
-          err[field.name] = '001';
-        }
-      }
-
-      // Check for roles
-      if (typeof field.attr.data !== 'undefined' && field.attr.data.right && typeof cli !== 'undefined') {
-          if (!cli.isGranted(field.attr.data.right)){
-              err[field.name] = '010';
-          }
-      }
-
-      // If it is a text based field e.g. text, password, email etc..
-      if (isTextBasedField(field)) {
-
-        // Minimum lenght verification
-        if (field.attr.value.length < requirements['minLenght']) {
-          err[field.name] = '002';
+    var instanciateForm = function (name, attr) {
+        if (typeof name == 'undefined') {
+            throw new Error("[FormBuilderException] - No name provided to form");
         }
 
-        // Maximum lenght verification
-        if (requirements['maxLenght'] > 0 && field.attr.value.length > requirements['maxLenght']) {
-          err[field.name] = '003';
+        if (typeof forms[name] !== 'undefined') {
+            throw new Error("[FormBuilderException] - Form already created : " + name);
         }
 
-      }
+        // Instanciate a new form
+        currentForm = new Form(name);
 
-      // Email verification
-      if (field.type == 'email' && !validator.isEmail(field.attr.value)) {
-        err[field.name] = '004';
-      }
+        // Update attributes of the form
+        for (var key in attr) {
+            currentForm.attr[key] = attr[key];
+        }
+    }
 
-      // Date verification
-      if (field.type == 'date' && !validator.isDate(field.attr.value)) {
-        err[field.name] = '005';
-      }
+    this.addTemplate = function (name) {
+        if (typeof templates[name] == 'undefined') throw "[FormBuilderException] - Template not created. Please call createFormTemplate() first.";
+        for (var key in templates[name].fields) {
+            var field = templates[name].fields[key]
+            this.add(field.name, field.type, field.attr, field.requirements);
+        }
 
-      // Number verification
-      if (field.type == 'number') {
-        if (validator.isNumeric(field.attr.value)) {
-          if (field.attr.value > requirements['max']) {
-            err[field.name] = '006';
-          } else if (field.attr.value < requirements['min']) {
-            err[field.name] = '007';
-          }
+        return this;
+    }
+
+    this.form = function (name) {
+        currentForm = forms[name];
+        return this;
+    }
+
+    this.registerFieldType = function (name, fct) {
+        htmlParser.registerType(name, fct);
+    }
+
+    this.add = function (name, type, attr, requirements, contextForm) {
+        // Check if it is a tempalte
+        currentForm = contextForm || currentForm;
+
+        if (typeof currentForm == 'undefined') {
+            throw new Error("[FormBuilderException] - Form not created. Please call createForm() first.");
+        }
+        if (typeof currentForm.fields == 'undefined') {
+            currentForm.fields = {};
+        }
+        if (typeof currentForm.fields[name] !== 'undefined') {
+            throw new Error("[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]));
+        }
+
+        currentForm.fields[name] = createField(name, type, attr, requirements);
+        return this;
+
+    };
+
+    this.trigger = this.trg = function (sectionname) {
+        var that = this;
+        hooks.trigger(currentForm.name + "_" + sectionname, {
+            form: that
+        });
+        return this;
+    };
+
+    this.edit = function (name, type, attr, requirements) {
+        if (typeof currentForm.fields[name] !== 'undefined') {
+            var field = currentForm.fields[name];
+            if (typeof type !== 'undefined' && type != '') {
+                field.type = type;
+            }
+
+            // Update attributes
+            for (var key in attr) {
+                field.attr[key] = attr[key];
+            }
+            // Update requirements
+            for (var key in requirements) {
+                field.requirements[key] = requirements[key];
+            }
+        }
+        return this;
+    }
+
+    this.remove = function (name) {
+        if (typeof currentForm.fields[name] !== 'undefined') {
+            currentForm.fields[name] = undefined;
+            delete currentForm.fields[name];
+        }
+        return this;
+    }
+
+    var createField = function (name, type, attr, requirements) {
+
+        if (typeof name == 'undefined') {
+            throw new Error("[FormBuilderException] - No name provided to field");
+        }
+
+        // Instanciate a new field
+        var field = new Field(name, type);
+
+        // Update attributes
+        for (var key in attr) {
+            field.attr[key] = attr[key];
+        }
+        // Update requirements
+        for (var key in requirements) {
+            field.requirements[key] = requirements[key];
+        }
+
+        return field;
+    }
+
+    this.registerFormTemplate = function (name) {
+        if (typeof templates[name] !== 'undefined') throw "[FormBuilderException] - Template already created: " + name;
+        currentForm = new Object();
+        templates[name] = currentForm;
+
+        return this;
+    }
+
+    this.unregisterFormTemplate = function (name) {
+        if (typeof templates[name] !== 'undefined') {
+            templates[name] = undefined;
+            delete templates[name];
+        }
+    }
+
+    this.render = function (formName) {
+        if (typeof forms[formName] == 'undefined') {
+            throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
+        }
+
+        currentForm = forms[formName];
+
+        if (typeof forms[formName].fields['form_name'] == 'undefined') {
+            this.add('form_name', 'hidden', {
+                value: formName
+            }, {
+                required: false
+            }, forms[formName]);
+        }
+
+        return htmlParser.parseForm(forms[formName]);
+    }
+
+    /**
+     * Validates a form.
+     * @param  {Form} form The form object
+     * @param  {boolean} withErrStack Whether to return a json error stack or a simple boolean
+     * @return {Array}err A stack of all the errors.
+     */
+    this.validate = function (form, callStack, cli) {
+        var valid = false;
+        // Return an error stack by default
+        if (typeof callStack == 'undefined') {
+            callStack = true;
+        }
+
+        if (typeof form == 'undefined') {
+            return false;
+        }
+        var err = {};
+
+        for (var field in form.fields) {
+            var field = form.fields[field];
+            var requirements = field.requirements;
+            // Required verification
+            if (requirements.required) {
+                if (typeof field.attr !== 'undefined' && field.attr == '') {
+                    err[field.name] = '001';
+                } else if (typeof field.attr == 'undefined') {
+                    err[field.name] = '001';
+                }
+            }
+
+            // Check for roles
+            if (typeof field.attr.data !== 'undefined' && field.attr.data.right && typeof cli !== 'undefined') {
+                if (!cli.isGranted(field.attr.data.right)) {
+                    err[field.name] = '010';
+                }
+            }
+
+            // If it is a text based field e.g. text, password, email etc..
+            if (isTextBasedField(field)) {
+
+                // Minimum lenght verification
+                if (field.attr.value.length < requirements['minLenght']) {
+                    err[field.name] = '002';
+                }
+
+                // Maximum lenght verification
+                if (requirements['maxLenght'] > 0 && field.attr.value.length > requirements['maxLenght']) {
+                    err[field.name] = '003';
+                }
+
+            }
+
+            // Email verification
+            if (field.type == 'email' && !validator.isEmail(field.attr.value)) {
+                err[field.name] = '004';
+            }
+
+            // Date verification
+            if (field.type == 'date' && !validator.isDate(field.attr.value)) {
+                err[field.name] = '005';
+            }
+
+            // Number verification
+            if (field.type == 'number') {
+                if (validator.isNumeric(field.attr.value)) {
+                    if (field.attr.value > requirements['max']) {
+                        err[field.name] = '006';
+                    } else if (field.attr.value < requirements['min']) {
+                        err[field.name] = '007';
+                    }
+                } else {
+                    err[field.name] = '008';
+                }
+
+            }
+
+            // Checkbox verification
+            if (field.type == 'checkbox' && requirements['required'] && field.attr.value != 'on') {
+                err[field.name] = '009';
+            }
+
+        }
+
+        form.valid = valid = Object.keys(err).length == 0 ? true : false;
+        // Return
+        if (callStack) {
+            return valid ? {
+                success: true
+            } : err;
         } else {
-          err[field.name] = '008';
+            return valid;
         }
-
-      }
-
-      // Checkbox verification
-      if (field.type == 'checkbox' && requirements['required'] && field.attr.value != 'on') {
-        err[field.name] = '009';
-      }
-
     }
 
-    form.valid = valid = Object.keys(err).length == 0 ? true : false;
-    // Return
-    if (callStack) {
-      return valid ? {
-        success: true
-      } : err;
-    } else {
-      return valid;
+    var isTextBasedField = function (field) {
+        var isTextBased = false;
+        var type = field.type;
+
+        if (type == 'text' ||
+            type == 'email' ||
+            type == 'password' ||
+            type == 'textarea' ||
+            type == 'ckeditor') isTextBased = true;
+
+        return isTextBased;
     }
-  }
 
-  var isTextBasedField = function(field) {
-    var isTextBased = false;
-    var type = field.type;
+    /**
+     * Handle the cli request and return the form with the values of the request
+     * @param  {[type]} cli [description]
+     * @return {[type]}     [description]
+     */
+    this.handleRequest = function (cli) {
+        if (typeof cli.postdata !== 'undefined') {
+            if (typeof cli.postdata.data !== 'undefined' &&
+                typeof cli.postdata.data.form_name !== 'undefined' &&
+                typeof forms[cli.postdata.data.form_name] !== 'undefined'
+            ) {
+                var form = JSON.parse(JSON.stringify(forms[cli.postdata.data.form_name]));
 
-    if (type == 'text' ||
-      type == 'email' ||
-      type == 'password' ||
-      type == 'textarea' ||
-      type == 'ckeditor') isTextBased = true;
+                for (var key in cli.postdata.data) {
+                    if (typeof form.fields[key] !== 'undefined') {
+                        //Keep object for files type
+                        if (form.fields[key].type == 'form') {
+                            form.fields[key].attr.value = cli.postdata.data[key];
+                        } else {
+                            var escapedData
+                            if (typeof cli.postdata.data[key] == 'string') {
+                                escapedData = cli.postdata.data[key].replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\/g, "");
+                            } else {
+                                escapedData = cli.postdata.data[key];
+                            }
 
-    return isTextBased;
-  }
+                            form.fields[key].attr.value = escapedData
+                        }
 
-  /**
-   * Handle the cli request and return the form with the values of the request
-   * @param  {[type]} cli [description]
-   * @return {[type]}     [description]
-   */
-  this.handleRequest = function(cli) {
-    if (typeof cli.postdata !== 'undefined') {
-      if (typeof cli.postdata.data !== 'undefined' &&
-        typeof cli.postdata.data.form_name !== 'undefined' &&
-        typeof forms[cli.postdata.data.form_name] !== 'undefined'
-      ) {
-        var form = JSON.parse(JSON.stringify(forms[cli.postdata.data.form_name]));
+                    }
 
-        for (var key in cli.postdata.data) {
-          if (typeof form.fields[key] !== 'undefined') {
-              //Keep object for files type
-              if (form.fields[key].type == 'form') {
-                  form.fields[key].attr.value = cli.postdata.data[key];
-              } else {
-                   var escapedData
-                  if (typeof cli.postdata.data[key] == 'string') {
-                      escapedData = cli.postdata.data[key].replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\/g, "");
-                  } else {
-                    escapedData = cli.postdata.data[key];
-                  }
-
-                  form.fields[key].attr.value = escapedData
-              }
-
-          }
-
+                }
+                return form;
+            }
         }
-        return form;
-      }
     }
-  }
 
-  this.serializeForm = function(form) {
-    var data = {};
-    for (var field in form.fields) {
-      var field = form.fields[field];
+    this.serializeForm = function (form) {
+        var data = {};
+        for (var field in form.fields) {
+            var field = form.fields[field];
 
 
-      if (field.name != 'form_name') {
-        data[field.name] = field.attr.value;
-      }
+            if (field.name != 'form_name') {
+                data[field.name] = field.attr.value;
+            }
+        }
+        return data;
     }
-    return data;
-  }
 
-  this.deserializeForm = function(serializedForm) {
-    // TODO
-  }
-
-  this.unescapeForm = function(escapedForm) {
-    for (var field in escapedForm) {
-      if (typeof escapedForm[field] === 'string') {
-        escapedForm[field] = unescape(escapedForm[field]);
-      }
+    this.deserializeForm = function (serializedForm) {
+        // TODO
     }
-    return escapedForm;
-  }
 
-  this.isAlreadyCreated = function(name) {
-    if (typeof forms[name] == 'undefined') {
-      return false;
+    this.unescapeForm = function (escapedForm) {
+        for (var field in escapedForm) {
+            if (typeof escapedForm[field] === 'string') {
+                escapedForm[field] = unescape(escapedForm[field]);
+            }
+        }
+        return escapedForm;
     }
-    return true;
-  }
 
-  this.debug = function() {
-    console.log(forms);
+    this.isAlreadyCreated = function (name) {
+        if (typeof forms[name] == 'undefined') {
+            return false;
+        }
+        return true;
+    }
 
-  }
+    this.debug = function () {
+        console.log(forms);
+
+    }
 };
 
 module.exports = new FormBuilder();

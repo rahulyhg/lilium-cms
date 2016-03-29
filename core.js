@@ -39,8 +39,8 @@ var dashboard = undefined;
 
 var log = require('./log.js');
 
-var Core = function() {
-    var loadRequires = function() {
+var Core = function () {
+    var loadRequires = function () {
         var nn = new Date();
         _c = require('./config.js');
         settings = require('./settings.js');
@@ -81,10 +81,10 @@ var Core = function() {
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
 
-    var loadHooks = function(readyToRock) {
+    var loadHooks = function (readyToRock) {
         log('Hooks', 'Loading hooks');
         hooks.bind('init', 100, readyToRock);
-        hooks.bind('user_loggedin', 100, function(cli) {
+        hooks.bind('user_loggedin', 100, function (cli) {
             cli.redirect(cli._c.server.url + "/" + cli._c.paths.admin, false);
             return true;
         });
@@ -92,109 +92,109 @@ var Core = function() {
         log('Hooks', 'Loaded hooks');
     };
 
-    var loadEndpoints = function() {
+    var loadEndpoints = function () {
         log('Endpoints', 'Loading endpoints');
-        endpoints.register('login', 'POST', function(cli) {
+        endpoints.register('login', 'POST', function (cli) {
             cli.touch("endpoints.POST.login");
             LoginLib.authUser(cli);
         });
 
-        endpoints.register('admin', 'POST', function(cli) {
+        endpoints.register('admin', 'POST', function (cli) {
             cli.touch("endpoints.POST.admin");
             admin.handleAdminEndpoint(cli);
         });
 
-        endpoints.register('logout', 'GET', function(cli) {
+        endpoints.register('logout', 'GET', function (cli) {
             cli.touch("endpoints.POST.logout");
             sessions.logout(cli);
         });
 
-        admin.registerAdminEndpoint('sites', 'GET', function(cli) {
+        admin.registerAdminEndpoint('sites', 'GET', function (cli) {
             cli.touch('admin.GET.sites');
             sites.handleGET(cli);
         });
 
-        admin.registerAdminEndpoint('sites', 'POST', function(cli) {
+        admin.registerAdminEndpoint('sites', 'POST', function (cli) {
             cli.touch('admin.GET.sites');
             sites.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('dashboard', 'GET', function(cli) {
+        admin.registerAdminEndpoint('dashboard', 'GET', function (cli) {
             cli.touch("admin.GET.dashboard");
             dashboard.handleGET(cli);
         });
 
-        admin.registerAdminEndpoint('article', 'GET', function(cli) {
+        admin.registerAdminEndpoint('article', 'GET', function (cli) {
             cli.touch("admin.GET.article");
             Article.handleGET(cli);
         });
 
-        admin.registerAdminEndpoint('entities', 'GET', function(cli) {
+        admin.registerAdminEndpoint('entities', 'GET', function (cli) {
             cli.touch("admin.GET.entities");
             entities.handleGET(cli);
         });
 
-        admin.registerAdminEndpoint('entities', 'POST', function(cli) {
+        admin.registerAdminEndpoint('entities', 'POST', function (cli) {
             cli.touch("admin.POST.entities");
             entities.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('article', 'POST', function(cli) {
+        admin.registerAdminEndpoint('article', 'POST', function (cli) {
             cli.touch("admin.POST.article");
             Article.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('media', 'GET', function(cli) {
+        admin.registerAdminEndpoint('media', 'GET', function (cli) {
             cli.touch("admin.GET.media");
             Media.handleGET(cli);
         });
 
-        admin.registerAdminEndpoint('media', 'POST', function(cli) {
+        admin.registerAdminEndpoint('media', 'POST', function (cli) {
             cli.touch("admin.POST.media");
             Media.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('settings', 'GET', function(cli) {
+        admin.registerAdminEndpoint('settings', 'GET', function (cli) {
             cli.touch('admin.GET.settings');
             settings.handleGET(cli);
         });
 
-        admin.registerAdminEndpoint('settings', 'POST', function(cli) {
+        admin.registerAdminEndpoint('settings', 'POST', function (cli) {
             cli.touch('admin.POST.settings');
             settings.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('role', 'GET', function(cli) {
+        admin.registerAdminEndpoint('role', 'GET', function (cli) {
             cli.touch('admin.GET.role');
             Role.handleGET(cli);
         });
 
-        admin.registerAdminEndpoint('role', 'POST', function(cli) {
+        admin.registerAdminEndpoint('role', 'POST', function (cli) {
             cli.touch('admin.POST.role');
             Role.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('activities', 'GET', function(cli) {
+        admin.registerAdminEndpoint('activities', 'GET', function (cli) {
             cli.touch('admin.GET.activities');
             filelogic.serveAdminLML(cli, false);
         });
 
-        admin.registerAdminEndpoint('me', 'POST', function(cli) {
+        admin.registerAdminEndpoint('me', 'POST', function (cli) {
             cli.touch('admin.POST.me');
             entities.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('me', 'GET', function(cli) {
+        admin.registerAdminEndpoint('me', 'GET', function (cli) {
             cli.touch('admin.GET.me');
             filelogic.serveAdminLML(cli, false);
         });
 
-        admin.registerAdminEndpoint('categories', 'POST', function(cli) {
+        admin.registerAdminEndpoint('categories', 'POST', function (cli) {
             cli.touch('admin.POST.me');
             category.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('categories', 'GET', function(cli) {
+        admin.registerAdminEndpoint('categories', 'GET', function (cli) {
             cli.touch('admin.GET.me');
             category.handleGET(cli, false);
         });
@@ -208,7 +208,7 @@ var Core = function() {
      * @param  {ClientObject} cli    the ClientObject
      * @param  {class} _class the class where you want to call the function
      */
-    var callFunction = function(cli, _class) {
+    var callFunction = function (cli, _class) {
         if (typeof _class[cli.routeinfo.path[1]] ==
             'function' && typeof cli.routeinfo.path[2] !==
             'undefined') {
@@ -221,19 +221,19 @@ var Core = function() {
         }
     }
 
-    var loadGlobalPetals = function() {
+    var loadGlobalPetals = function () {
         Petals.register('adminbar', _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
         Petals.register('adminhead', _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
         Petals.register('adminsidebar', _c.default().server.base + 'backend/dynamic/admin/adminsidebar.petal');
     };
 
-    var loadImageSizes = function() {
+    var loadImageSizes = function () {
         imageSize.add("thumbnail", 150, '150');
         imageSize.add("medium", 300, '*');
         imageSize.add("Archive-thumbnail", 400, 400);
     }
 
-    var loadAdminMenus = function() {
+    var loadAdminMenus = function () {
         var aurl = "admin/"; //_c.default().server.url + "/admin/";
 
         admin.registerAdminMenu({
@@ -350,20 +350,20 @@ var Core = function() {
         log('Core', 'Registered Default Admin menus');
     };
 
-    var loadPlugins = function(cb) {
-        plugins.init(function() {
+    var loadPlugins = function (cb) {
+        plugins.init(function () {
             log('Plugins', 'Loading plugins');
 
             plugins.bindEndpoints();
 
-            var fireEvent = function() {
+            var fireEvent = function () {
                 log('Plugins', 'Loaded plugins');
                 return cb();
             };
 
             db.findToArray(_c.default(), 'plugins', {
                 "active": true
-            }, function(err, results) {
+            }, function (err, results) {
                 if (err) {
                     log('Plugins', 'Failed to find entries in database; ' + err);
                     fireEvent();
@@ -373,7 +373,7 @@ var Core = function() {
 
                 log('Plugins', 'Read plugins collection in database');
                 var i = -1;
-                var nextObject = function() {
+                var nextObject = function () {
                     i++
                     if (i != results.length) {
                         plugins.registerPlugin(results[i].identifier, nextObject);
@@ -385,7 +385,7 @@ var Core = function() {
                 if (results.length > 0) {
                     nextObject();
                 } else {
-                    plugins.getPluginsDirList(function() {
+                    plugins.getPluginsDirList(function () {
                         log('Plugins', 'Nothing to register');
                         fireEvent();
                     });
@@ -397,12 +397,12 @@ var Core = function() {
 
     };
 
-    var loadRoles = function(cb) {
+    var loadRoles = function (cb) {
         entities.registerRole({
             name: 'admin',
             displayname: 'admin',
             power: 5
-        }, ['dash', 'admin'], function() {
+        }, ['dash', 'admin'], function () {
             return;
         }, true);
 
@@ -410,25 +410,25 @@ var Core = function() {
             name: 'lilium',
             displayname: 'lilium',
             power: 1
-        }, ['dash', 'admin'], function() {
+        }, ['dash', 'admin'], function () {
             return;
         }, true);
 
         entities.cacheRoles(cb);
     };
 
-    var loadProducts = function(cb) {
-        db.findToArray(_c.default(), 'products', {}, function(err, arr) {
+    var loadProducts = function (cb) {
+        db.findToArray(_c.default(), 'products', {}, function (err, arr) {
             for (var i = 0; i < arr.length; i++) {
                 Products.registerProduct(arr[i]);
             }
 
-            db.findToArray(_c.default(), 'producttypes', {}, function(err, arr) {
+            db.findToArray(_c.default(), 'producttypes', {}, function (err, arr) {
                 for (var i = 0; i < arr.length; i++) {
                     Products.registerProductType(arr[i].name, arr[i].displayName);
                 }
 
-                db.findToArray(_c.default(), 'productpricebases', {}, function(err, arr) {
+                db.findToArray(_c.default(), 'productpricebases', {}, function (err, arr) {
                     for (var i = 0; i < arr.length; i++) {
                         Products.registerPriceBase(arr[i].name, arr[i].displayName, arr[i].divider);
                     }
@@ -440,14 +440,14 @@ var Core = function() {
         });
     };
 
-    var loadTheme = function(cb) {
+    var loadTheme = function (cb) {
         log('Themes', 'Loading Theme');
 
-        themes.init(function() {
-            
+        themes.init(function () {
+
             themes.bindEndpoints();
 
-            var fireEvent = function() {
+            var fireEvent = function () {
                 log('Themes', 'Firing Theme event');
                 hooks.fire('themes');
                 log('Themes', 'Loaded themes');
@@ -459,7 +459,7 @@ var Core = function() {
                 "active": true
             }, {
                 limit: [1]
-            }, function(err, cursor) {
+            }, function (err, cursor) {
                 if (err) {
                     log('Themes', 'Failed to find entries in database; ' + err);
                     fireEvent();
@@ -470,17 +470,17 @@ var Core = function() {
                 log('Themes', 'Read themes collection in database');
                 var i = 0;
 
-                cursor.each(function(err, theme) {
+                cursor.each(function (err, theme) {
                     if (theme != null) {
                         i++;
-                        themes.enableTheme(theme.uName, function() {
+                        themes.enableTheme(theme.uName, function () {
                             fireEvent();
                         });
                     } else {
 
                         if (i == 0) {
                             // Enable with default theme
-                            themes.enableTheme(_c.default().website.flower, function() {
+                            themes.enableTheme(_c.default().website.flower, function () {
                                 fireEvent();
                             });
                         };
@@ -494,11 +494,11 @@ var Core = function() {
 
     }
 
-    var loadStandardInput = function() {
+    var loadStandardInput = function () {
         var stdin = process.openStdin();
         stdin.liliumBuffer = "";
-        stdin.on('data', function(chunk) {
-            setTimeout(function() {
+        stdin.on('data', function (chunk) {
+            setTimeout(function () {
                 chunk = chunk.toString().trim();
                 stdin.liliumBuffer += chunk;
 
@@ -517,32 +517,32 @@ var Core = function() {
         log("STDin", 'Listening to standard input');
     };
 
-    var loadCacheInvalidator = function() {
+    var loadCacheInvalidator = function () {
         if (_c.default().env == 'dev') {
             log("CacheInvalidator", 'Clearing old cached files in db');
 
-            db.remove(_c.default(), 'cachedFiles', {}, function() {}, false);
+            db.remove(_c.default(), 'cachedFiles', {}, function () {}, false);
         }
         log("CacheInvalidator", 'Initializing cacheInvalidator');
-        cacheInvalidator.init(function() {
+        cacheInvalidator.init(function () {
             log("CacheInvalidator", 'Ready to invalidate cached files!');
         });
     };
 
-    var scheduleGC = function() {
+    var scheduleGC = function () {
         log('GC', 'Scheduling temporary file collection');
         scheduler.schedule('GCcollecttmp', {
             every: {
                 secondCount: 1000 * 60 * 60
             }
-        }, function() {
-            GC.clearTempFiles(function() {
+        }, function () {
+            GC.clearTempFiles(function () {
                 log("GC", "Scheduled temporary files collection done");
             });
         });
     };
 
-    var loadLiveVars = function() {
+    var loadLiveVars = function () {
         admin.registerLiveVar();
         Article.registerContentLiveVar();
         Media.registerMediaLiveVar();
@@ -556,19 +556,19 @@ var Core = function() {
         Livevars.registerDebugEndpoint();
     };
 
-    var loadPostman = function() {
+    var loadPostman = function () {
         postman.createTransporter();
     };
 
-    var loadDFP = function(cb) {
+    var loadDFP = function (cb) {
         log("DFP", "Loading core user");
         dfp.registerHooks();
         dfp.createUser();
         dfp.scheduleDeepCopy();
 
-        setTimeout(function() {
+        setTimeout(function () {
             log('DFP', 'Running deep fetch async');
-            dfp.deepServerFetch(function() {
+            dfp.deepServerFetch(function () {
                 log('DFP', 'Deep fetch finished');
             });
         }, 1);
@@ -578,13 +578,13 @@ var Core = function() {
         }
     };
 
-    var initForms = function() {
+    var initForms = function () {
         Forms = require('./forms');
 
         Forms.init();
     };
 
-    var loadForms = function() {
+    var loadForms = function () {
         log('Core', 'Loading multiple forms');
 
         entities.registerCreationForm();
@@ -597,42 +597,42 @@ var Core = function() {
         log('Core', 'Forms were loaded');
     };
 
-    var loadNotifications = function() {
+    var loadNotifications = function () {
         notification.init();
         log('Notifications', 'Sockets ready');
     }
 
-    var loadFrontend = function() {
+    var loadFrontend = function () {
         log('Frontend', 'Registering default values from core');
         Frontend.registerFromCore();
         hooks.fire('frontend_registered');
     };
 
-    var loadSessions = function(cb) {
+    var loadSessions = function (cb) {
         sessions.initSessionsFromDatabase(cb);
     };
 
-    var loadRequestHandler = function() {
-        hooks.bind('request', 1000, function(params) {
+    var loadRequestHandler = function () {
+        hooks.bind('request', 1000, function (params) {
             // Run main modules
             var clientObject = new ClientObject(params.req, params.resp);
             Handler.handle(clientObject);
         });
     };
 
-    var prepareDefaultSiteCreation = function(cb) {
+    var prepareDefaultSiteCreation = function (cb) {
         require('./init.js')(cb);
     };
 
-    var loadWebsites = function(loadEverything) {
+    var loadWebsites = function (loadEverything) {
         sites = require('./sites.js');
 
         var currentRoot = __dirname;
         var fss = require('./fileserver.js');
 
-        fss.dirExists(currentRoot + "/sites", function(exists) {
+        fss.dirExists(currentRoot + "/sites", function (exists) {
             if (exists) {
-                fss.fileExists(currentRoot + "/sites/default.json", function(exists) {
+                fss.fileExists(currentRoot + "/sites/default.json", function (exists) {
                     if (exists) {
                         initForms();
                         sites.loadSites(loadEverything);
@@ -646,17 +646,17 @@ var Core = function() {
         });
     };
 
-    var loadLMLLibs = function() {
+    var loadLMLLibs = function () {
         hooks.trigger('will_load_core_lml_libs');
         dashboard.registerLMLLib();
         hooks.trigger('loaded_core_lml_libs');
     };
 
-    var precompile = function(done) {
+    var precompile = function (done) {
         sites.loopPrecomp(done);
     };
 
-    var redirectIfInit = function(resp, cb) {
+    var redirectIfInit = function (resp, cb) {
         if (resp) {
             resp.writeHead(200, {
                 "Content-Type": "text/html"
@@ -664,7 +664,7 @@ var Core = function() {
             resp.end(
                 '<i>Please wait a moment...</i><script>setTimeout(function() {window.location = "' + resp.redirectTo + '"}, 1000);</script>',
                 'utf8',
-                function() {
+                function () {
                     resp.req.connection.unref();
                     resp.req.connection.destroy();
                     resp.server.close(cb);
@@ -675,9 +675,9 @@ var Core = function() {
         }
     };
 
-    this.makeEverythingSuperAwesome = function(readyToRock) {
+    this.makeEverythingSuperAwesome = function (readyToRock) {
         log('Core', 'Initializing Lilium');
-        loadWebsites(function(resp) {
+        loadWebsites(function (resp) {
             loadRequires();
             loadHooks(readyToRock);
             loadEndpoints();
@@ -689,13 +689,13 @@ var Core = function() {
             loadRequestHandler();
             loadLMLLibs();
 
-            loadPlugins(function() {
-                loadRoles(function() {
-                    loadProducts(function() {
-                        loadSessions(function() {
-                            loadTheme(function() {
-                                precompile(function() {
-                                    redirectIfInit(resp, function() {
+            loadPlugins(function () {
+                loadRoles(function () {
+                    loadProducts(function () {
+                        loadSessions(function () {
+                            loadTheme(function () {
+                                precompile(function () {
+                                    redirectIfInit(resp, function () {
                                         loadAdminMenus();
                                         loadFrontend();
                                         loadForms();
@@ -720,7 +720,7 @@ var Core = function() {
         });
     };
 
-    var init = function() {
+    var init = function () {
         log('Core', 'Lilium core object was created');
     };
 

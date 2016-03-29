@@ -12,311 +12,348 @@ var hooks = require('./hooks.js');
 
 var _cachedSites = new Array();
 
-var SiteInitializer = function(conf) {
-	var conf = conf;
-	var rootpath = __dirname;
+var SiteInitializer = function (conf) {
+    var conf = conf;
+    var rootpath = __dirname;
 
-	var loadHTMLStructure = function(done) {
-		fileserver.createDirIfNotExists(conf.server.html, function(valid) {
-			if (valid) {
-				log('FileServer',
-					'HTML Directory was validated at : ' +
-					conf.server.html
-				);
-			} else {
-				log('FileServer', 'Error validated html directory');
-			}
+    var loadHTMLStructure = function (done) {
+        fileserver.createDirIfNotExists(conf.server.html, function (valid) {
+            if (valid) {
+                log('FileServer',
+                    'HTML Directory was validated at : ' +
+                    conf.server.html
+                );
+            } else {
+                log('FileServer', 'Error validated html directory');
+            }
 
-			done();
-		}, true);
-	};
+            done();
+        }, true);
+    };
 
-	var loadStaticSymlinks = function(done) {
-		var to = conf.server.html + '/static';
-		var rootDir = conf.server.base + 'backend/static/';
-		fileserver.createSymlinkSync(rootDir, to);
+    var loadStaticSymlinks = function (done) {
+        var to = conf.server.html + '/static';
+        var rootDir = conf.server.base + 'backend/static/';
+        fileserver.createSymlinkSync(rootDir, to);
 
-		to =   conf.server.html + '/bower';
-		rootDir = conf.server.base + 'bower_components/';
-		fileserver.createSymlinkSync(rootDir, to);
+        to = conf.server.html + '/bower';
+        rootDir = conf.server.base + 'bower_components/';
+        fileserver.createSymlinkSync(rootDir, to);
 
-		to =   conf.server.html + '/uploads';
-		rootDir = conf.server.base + 'backend/static/uploads/';
-		fileserver.createSymlinkSync(rootDir, to);
+        to = conf.server.html + '/uploads';
+        rootDir = conf.server.base + 'backend/static/uploads/';
+        fileserver.createSymlinkSync(rootDir, to);
 
-		to =   conf.server.html + '/plugins';
-		rootDir = conf.server.base + 'plugins/';
-		fileserver.createSymlinkSync(rootDir, to);
+        to = conf.server.html + '/plugins';
+        rootDir = conf.server.base + 'plugins/';
+        fileserver.createSymlinkSync(rootDir, to);
 
-		done();
-	};
+        done();
+    };
 
-	var loadDatabase = function(done) {
-		var dbinit = function() {
-			log('Database', 'Initializing database if not initialized');
-			db.initDatabase(conf, function(err) {
-				log('Database', 'Firing Database init signal');
-				dbconn();
-			});
-		};
+    var loadDatabase = function (done) {
+        var dbinit = function () {
+            log('Database', 'Initializing database if not initialized');
+            db.initDatabase(conf, function (err) {
+                log('Database', 'Firing Database init signal');
+                dbconn();
+            });
+        };
 
-		var dbconn = function() {
-			log ('Database', 'Requesting dynamic connection object');
-			db.createPool(conf, function() {
-				log('Database', 'Firing Database connection signal');
-				done();
-			});
-		};
+        var dbconn = function () {
+            log('Database', 'Requesting dynamic connection object');
+            db.createPool(conf, function () {
+                log('Database', 'Firing Database connection signal');
+                done();
+            });
+        };
 
-		db.testConnection(conf, function(err) {
-			hooks.fire('dbtest', err);
-			dbinit();
-		});
-	};
+        db.testConnection(conf, function (err) {
+            hooks.fire('dbtest', err);
+            dbinit();
+        });
+    };
 
-	this.precompile = function(done) {
-		var base = conf.server.base;
-		var htmlbase = conf.server.html;
+    this.precompile = function (done) {
+        var base = conf.server.base;
+        var htmlbase = conf.server.html;
 
-		log('SiteInitializer', "Registering admin default frontend JS and CSS");
-		Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
-		Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
-		Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
-		Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
-		Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
-		Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/livevars.js", 2100, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/pushtable.js", 2200, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/stacktable.js", 2300, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/socket.js", 2400, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/multi-select.js", 2500, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/ckeditor-lilium.js", 1300, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/media-explorer.js", 1300, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/tags.js", 1300, 'admin', conf.id);
-		Frontend.registerJSFile(htmlbase + "/compiled/js/lmltable.js", 1300, 'admin', conf.id);
+        log('SiteInitializer', "Registering admin default frontend JS and CSS");
+        Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
+        Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
+        Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/livevars.js", 2100, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/pushtable.js", 2200, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/stacktable.js", 2300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/socket.js", 2400, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/multi-select.js", 2500, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/ckeditor-lilium.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/media-explorer.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/tags.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/js/lmltable.js", 1300, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
-		Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
-		Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/ckeditor.css", 2100, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/login.css", 2200, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/media.css", 2600, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/notifications.css", 2400, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2500, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/multiselect.css", 2600, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/tags.css", 2600, 'admin', conf.id);
-		Frontend.registerCSSFile(htmlbase + "/compiled/css/lmltable.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/ckeditor.css", 2100, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/login.css", 2200, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/media.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/notifications.css", 2400, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2500, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/multiselect.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/tags.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/css/lmltable.css", 2600, 'admin', conf.id);
 
-		hooks.fire('frontend_will_precompile', {config:conf,Frontend:Frontend});
-		Precompiler.precompile(conf, function() {
-			hooks.fire('frontend_precompiled', {config:conf,Frontend:Frontend});
-			done();
-		});
-	};
+        hooks.fire('frontend_will_precompile', {
+            config: conf,
+            Frontend: Frontend
+        });
+        Precompiler.precompile(conf, function () {
+            hooks.fire('frontend_precompiled', {
+                config: conf,
+                Frontend: Frontend
+            });
+            done();
+        });
+    };
 
-	this.initialize = function(done) {
-		log('Sites', 'Initializing site with id ' + conf.id);
+    this.initialize = function (done) {
+        log('Sites', 'Initializing site with id ' + conf.id);
 
-		hooks.fire('site_will_initialize', conf);
-		loadHTMLStructure(function() {
-		loadStaticSymlinks(function() {
-		loadDatabase(function() {
-			hooks.fire('site_initialized', conf);
-			done();
-		});});});
-	};
+        hooks.fire('site_will_initialize', conf);
+        loadHTMLStructure(function () {
+            loadStaticSymlinks(function () {
+                loadDatabase(function () {
+                    hooks.fire('site_initialized', conf);
+                    done();
+                });
+            });
+        });
+    };
 };
 
-var Sites = function() {
-	this.registerLiveVar = function() {
-		livevars.registerLiveVariable('sites', function(cli, levels, params, cb) {
-			var len = levels.length;
+var Sites = function () {
+    this.registerLiveVar = function () {
+        livevars.registerLiveVariable('sites', function (cli, levels, params, cb) {
+            var len = levels.length;
             if (len > 0 && levels[0] == 'all') {
-		    	if (len < 2 || levels[1] == "simple") {
-		    		cb(config.getSimpleSites());
-		    	} else if (levels[1] == "complex") {
-		    		cb(config.getAllSites());
- 		    	} else {
-		    		cb([]);
-		    	}
+                if (len < 2 || levels[1] == "simple") {
+                    cb(config.getSimpleSites());
+                } else if (levels[1] == "complex") {
+                    cb(config.getAllSites());
+                } else {
+                    cb([]);
+                }
             } else if (len > 0) {
                 cb("[SitesException] Cannot find sites under : " + levels[0]);
             } else {
                 cb("[SitesException] Cannot use top level of Live Variable : Sites");
             }
-		});
-	};
+        });
+    };
 
-	this.handleGET = function(cli) {
-		var param = cli.routeinfo.path[2];
+    this.handleGET = function (cli) {
+        var param = cli.routeinfo.path[2];
 
-		if (!param) {
-			filelogic.serveAdminLML(cli);
-		} else {
-			switch (param) {
-				case "launch" :
-					filelogic.serveAdminLML(cli);
-					break;
-				default :
-					cli.debug();
-			}
-		}
-	};
+        if (!param) {
+            filelogic.serveAdminLML(cli);
+        } else {
+            switch (param) {
+            case "launch":
+                filelogic.serveAdminLML(cli);
+                break;
+            default:
+                cli.debug();
+            }
+        }
+    };
 
-	this.handlePOST = function(cli) {
-		var dat = cli.postdata.data;
-		var that = this;
-		db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function(success, err) {
-			if (success) {
-				that.createSite(cli, dat, function() {
-					log('Sites', 'Redirecting network admin to site list');
-					cli.redirect(cli._c.server.url + "admin/sites/", false);
-				});
-			} else {
-				cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
-			}
-		});
-	};
+    this.handlePOST = function (cli) {
+        var dat = cli.postdata.data;
+        var that = this;
+        db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function (success, err) {
+            if (success) {
+                that.createSite(cli, dat, function () {
+                    log('Sites', 'Redirecting network admin to site list');
+                    cli.redirect(cli._c.server.url + "admin/sites/", false);
+                });
+            } else {
+                cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+            }
+        });
+    };
 
-	this.createSite = function(cli, postdata, done) {
-		var conf = require('./config.js.dist');
-		var that = this;
+    this.createSite = function (cli, postdata, done) {
+        var conf = require('./config.js.dist');
+        var that = this;
 
-		if (postdata.serverhtml[postdata.serverhtml.length - 1] == "/") {
-			postdata.serverhtml = postdata.serverhtml.slice(0, -1);
-		}
+        if (postdata.serverhtml[postdata.serverhtml.length - 1] == "/") {
+            postdata.serverhtml = postdata.serverhtml.slice(0, -1);
+        }
 
-		if (postdata.serverurl[postdata.serverurl.length - 1] == "/") {
-			postdata.serverurl = postdata.serverurl.slice(0, -1);
-		}
+        if (postdata.serverurl[postdata.serverurl.length - 1] == "/") {
+            postdata.serverurl = postdata.serverurl.slice(0, -1);
+        }
 
-		postdata.baseurl = "//" + postdata.serverurl.replace(/(https?\:)?\/\//, '');
+        postdata.baseurl = "//" + postdata.serverurl.replace(/(https?\:)?\/\//, '');
 
-		conf.default.data.host = postdata.dbhost;
-		conf.default.data.port = postdata.dbport;
-		conf.default.data.user = postdata.dbuser;
-		conf.default.data.pass = postdata.dbpass;
-		conf.default.data.use  = postdata.dbname;
+        conf.default.data.host = postdata.dbhost;
+        conf.default.data.port = postdata.dbport;
+        conf.default.data.user = postdata.dbuser;
+        conf.default.data.pass = postdata.dbpass;
+        conf.default.data.use = postdata.dbname;
 
-		// Server
-		conf.default.server.base = __dirname + "/";
-		conf.default.server.html = postdata.serverhtml;
-		conf.default.server.url = postdata.baseurl;
-		conf.default.server.port = postdata.serverport;
+        // Server
+        conf.default.server.base = __dirname + "/";
+        conf.default.server.html = postdata.serverhtml;
+        conf.default.server.url = postdata.baseurl;
+        conf.default.server.port = postdata.serverport;
 
-		// Admin info
-		conf.default.info.project = postdata.websitename || "A Lilium Website";
-		conf.default.website.sitetitle = conf.default.info.project;
-		conf.default.emails.default = postdata.websiteemail || "";
-		conf.default.id = postdata.baseurl.replace(/\/\//g, '');
+        // Admin info
+        conf.default.info.project = postdata.websitename || "A Lilium Website";
+        conf.default.website.sitetitle = conf.default.info.project;
+        conf.default.emails.default = postdata.websiteemail || "";
+        conf.default.id = postdata.baseurl.replace(/\/\//g, '');
 
-		var filename = postdata.baseurl.replace(/\/\//g, '').replace(/\//g, ' ');
-		var ws = fs.createWriteStream(__dirname + "/sites/" + filename + ".json", {
-			flags: 'w+',
-			defaultEncoding: 'utf8'
-		});
+        var filename = postdata.baseurl.replace(/\/\//g, '').replace(/\//g, ' ');
+        var ws = fs.createWriteStream(__dirname + "/sites/" + filename + ".json", {
+            flags: 'w+',
+            defaultEncoding: 'utf8'
+        });
 
-		ws.write(JSON.stringify(conf.default), 'utf8', function() {
-			ws.end();
-			config.registerConfigs(conf.default.id, conf.default);
+        ws.write(JSON.stringify(conf.default), 'utf8', function () {
+            ws.end();
+            config.registerConfigs(conf.default.id, conf.default);
 
-			that.initializeWebsite(conf.default, function() {
-				that.precompile(done);
-			});
-		});
-	};
+            that.initializeWebsite(conf.default, function () {
+                that.precompile(done);
+            });
+        });
+    };
 
-	this.initializeWebsite = function(conf, callback) {
-		new SiteInitializer(conf).initialize(callback);
-	};
+    this.initializeWebsite = function (conf, callback) {
+        new SiteInitializer(conf).initialize(callback);
+    };
 
-	this.loopPrecomp = function(done) {
-		var s = _cachedSites;
-		var len = s.length;
-		var index = 0;
+    this.loopPrecomp = function (done) {
+        var s = _cachedSites;
+        var len = s.length;
+        var index = 0;
 
-		log("Sites", "Precompiling static files");
-		var execPreComp = function() {
-			if (index === len) {
-				done();
-			} else {
-				(new SiteInitializer(s[index])).precompile(function() {
-					index++;
-					execPreComp();
-				});
-			}
-		};
-		execPreComp();
-	};
+        log("Sites", "Precompiling static files");
+        var execPreComp = function () {
+            if (index === len) {
+                done();
+            } else {
+                (new SiteInitializer(s[index])).precompile(function () {
+                    index++;
+                    execPreComp();
+                });
+            }
+        };
+        execPreComp();
+    };
 
-	this.loadSites = function(cb) {
-		var that = this;
+    this.loadSites = function (cb) {
+        var that = this;
 
-		fileserver.listDirContent(__dirname + "/sites/", function(files) {
-			var fileIndex = 0;
-			var nextFile = function() {
-				if (fileIndex == files.length) {
-					cb();
-				} else {
-					var sitename = files[fileIndex].replace('.json', '');
-					log('Sites', 'Loading config for website ' + sitename);
+        fileserver.listDirContent(__dirname + "/sites/", function (files) {
+            var fileIndex = 0;
+            var nextFile = function () {
+                if (fileIndex == files.length) {
+                    cb();
+                } else {
+                    var sitename = files[fileIndex].replace('.json', '');
+                    log('Sites', 'Loading config for website ' + sitename);
 
-					fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function(siteInfo) {
-						var keyname = sitename.replace('//', '').replace(/\s/g, '/');
-						siteInfo.jsonfile = files[fileIndex];
+                    fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
+                        var keyname = sitename.replace('//', '').replace(/\s/g, '/');
+                        siteInfo.jsonfile = files[fileIndex];
 
-						config.registerConfigs(keyname, siteInfo);
-						if (sitename == 'default') {
-							var urlbase = siteInfo.server.url.replace('//', '').replace(/\s/g, '/');
-							config.registerConfigs(urlbase, siteInfo);
-						}
+                        config.registerConfigs(keyname, siteInfo);
+                        if (sitename == 'default') {
+                            var urlbase = siteInfo.server.url.replace('//', '').replace(/\s/g, '/');
+                            config.registerConfigs(urlbase, siteInfo);
+                        }
 
-						_cachedSites.push(siteInfo);
-						fileIndex++;
-						that.initializeWebsite(config.fetchConfig(keyname), nextFile);
-					});
-				}
-			};
-			nextFile();
-		});
-	};
+                        _cachedSites.push(siteInfo);
+                        fileIndex++;
+                        that.initializeWebsite(config.fetchConfig(keyname), nextFile);
+                    });
+                }
+            };
+            nextFile();
+        });
+    };
 
-	this.registerForms = function() {
-		formbuilder.createForm('launch_lilium_website', {
-			fieldWrapper : {
-				tag : "div",
-				cssPrefix : "launchwebsite-field-"
-			},
-			cssClass : "form-launch-website",
-			dependencies : [],
-		})
+    this.registerForms = function () {
+        formbuilder.createForm('launch_lilium_website', {
+            fieldWrapper: {
+                tag: "div",
+                cssPrefix: "launchwebsite-field-"
+            },
+            cssClass: "form-launch-website",
+            dependencies: [],
+        })
 
-		.add('title-info', 'title', {displayname : "Website information"})
-		.add('websitename', 'text', {displayname : "Public name"})
-		.add('websiteemail', 'email', {displayname : "Admin email"})
-		.trg('websiteinfo')
+        .add('title-info', 'title', {
+                displayname: "Website information"
+            })
+            .add('websitename', 'text', {
+                displayname: "Public name"
+            })
+            .add('websiteemail', 'email', {
+                displayname: "Admin email"
+            })
+            .trg('websiteinfo')
 
-		.add('title-database', 'title', {displayname : "Database"})
-		.add('dbhost', 'text', {displayname : "Host"})
-		.add('dbport', 'text', {displayname : "Port"})
-		.add('dbuser', 'text', {displayname : "Username"})
-		.add('dbpass', 'password', {displayname : "Password"})
-		.add('dbname', 'text', {displayname : "Database Name"})
-		.trg('database')
+        .add('title-database', 'title', {
+                displayname: "Database"
+            })
+            .add('dbhost', 'text', {
+                displayname: "Host"
+            })
+            .add('dbport', 'text', {
+                displayname: "Port"
+            })
+            .add('dbuser', 'text', {
+                displayname: "Username"
+            })
+            .add('dbpass', 'password', {
+                displayname: "Password"
+            })
+            .add('dbname', 'text', {
+                displayname: "Database Name"
+            })
+            .trg('database')
 
-		.add('title-server', 'title', {displayname : "Server"})
-		.add('serverurl', 'text', {displayname : "Base URL", defaultValue:"//"})
-		.add('serverport', 'number', {displayname : "Port", defaultValue:"80"})
-		.add('serverhtml', 'text', {displayname : "HTML File Path", defaultValue:"/usr/local/lilium/html/"})
-		.trg('server')
+        .add('title-server', 'title', {
+                displayname: "Server"
+            })
+            .add('serverurl', 'text', {
+                displayname: "Base URL",
+                defaultValue: "//"
+            })
+            .add('serverport', 'number', {
+                displayname: "Port",
+                defaultValue: "80"
+            })
+            .add('serverhtml', 'text', {
+                displayname: "HTML File Path",
+                defaultValue: "/usr/local/lilium/html/"
+            })
+            .trg('server')
 
-		.trg('beforesubmit')
-		.add('submit', 'submit', {
-			displayname: "Launch"
-		});
-	};
+        .trg('beforesubmit')
+            .add('submit', 'submit', {
+                displayname: "Launch"
+            });
+    };
 };
 
 module.exports = new Sites();

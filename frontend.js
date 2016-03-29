@@ -5,121 +5,123 @@ var BodyClasses = new Object();
 var JavaScriptFiles = new Object();
 var CSSFiles = new Object();
 
-var Frontend = function() {
-	var bodyPrefix = "liliumbody-";
-	var defaultBodySuffix = "generic";
+var Frontend = function () {
+    var bodyPrefix = "liliumbody-";
+    var defaultBodySuffix = "generic";
 
-	this.registerBodyClasses = function(className, context) {
-		context = context || "all";
-	
-		var arr = BodyClasses[context];
+    this.registerBodyClasses = function (className, context) {
+        context = context || "all";
 
-		if (!arr) {
-			arr = new Array();
-			BodyClasses[context] = arr;
-		}
+        var arr = BodyClasses[context];
 
-		if (arr.indexOf(className) === -1 && (context != "all" || BodyClasses["all"].indexOf(className) !== -1)) {
-			arr.push(className);
-		};
-	};
+        if (!arr) {
+            arr = new Array();
+            BodyClasses[context] = arr;
+        }
 
-	this.bodyClassesContextExists = function(contextName) {
-		return typeof BodyClasses[contextName] !== "undefined";
-	};
+        if (arr.indexOf(className) === -1 && (context != "all" || BodyClasses["all"].indexOf(className) !== -1)) {
+            arr.push(className);
+        };
+    };
 
-	this.getBodyClasses = function(contextName) {
-		var classes = BodyClasses["all"];
-		if (contextName && contextName !== "all" && this.bodyClassesContextExists(contextName)) {
-			classes = classes.concat(BodyClasses[contextName]);
-		}
+    this.bodyClassesContextExists = function (contextName) {
+        return typeof BodyClasses[contextName] !== "undefined";
+    };
 
-		return classes.join(" ");
-	};
+    this.getBodyClasses = function (contextName) {
+        var classes = BodyClasses["all"];
+        if (contextName && contextName !== "all" && this.bodyClassesContextExists(contextName)) {
+            classes = classes.concat(BodyClasses[contextName]);
+        }
 
-	this.getBodyID = function(contextName) {
-		return bodyPrefix + (contextName ? contextName : defaultBodySuffix); 
-	};
+        return classes.join(" ");
+    };
 
-	this.registerJSFile = function(absPath, priority, context, siteid) {
-		context = context || "all";
+    this.getBodyID = function (contextName) {
+        return bodyPrefix + (contextName ? contextName : defaultBodySuffix);
+    };
 
-		// TODO Handle Site ID
-		var site = JavaScriptFiles[siteid];
+    this.registerJSFile = function (absPath, priority, context, siteid) {
+        context = context || "all";
 
-		if (!site) {
-			site = new Object();
-			JavaScriptFiles[siteid] = site;
-		}
+        // TODO Handle Site ID
+        var site = JavaScriptFiles[siteid];
 
-		var arr = site[context];
-		
-		if (!arr) {
-			arr = new Array();
-			site[context] = arr;
-		}
-	
-		if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
-			while (typeof arr[priority] !== 'undefined') {
-				priority++;
-			} 
-			
-			arr[priority] = absPath;
-		};
-	};
+        if (!site) {
+            site = new Object();
+            JavaScriptFiles[siteid] = site;
+        }
 
-	this.getJSQueue = function(contextName, siteid) {
-		var arr = JavaScriptFiles[siteid][contextName || "all"];
-		var returnedArr = new Array();
+        var arr = site[context];
 
-		if (arr) for (var index in arr) {
-			returnedArr.push(arr[index]);
-		}
+        if (!arr) {
+            arr = new Array();
+            site[context] = arr;
+        }
 
-		return returnedArr;
-	};
-	
-	this.registerCSSFile = function(absPath, priority, context, siteid) {
-		context = context || "all";
+        if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
+            while (typeof arr[priority] !== 'undefined') {
+                priority++;
+            }
 
-		var site = CSSFiles[siteid];
+            arr[priority] = absPath;
+        };
+    };
 
-		if (!site) {
-			site = new Object();
-			CSSFiles[siteid] = site;
-		}
+    this.getJSQueue = function (contextName, siteid) {
+        var arr = JavaScriptFiles[siteid][contextName || "all"];
+        var returnedArr = new Array();
 
-		var arr = site[context];
-		
-		if (!arr) {
-			arr = new Array();
-			site[context] = arr;
-		}
-	
-		if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
-			while (typeof arr[priority] !== 'undefined') {
-				priority++;
-			} 
-			
-			arr[priority] = absPath;
-		};
-	};
+        if (arr)
+            for (var index in arr) {
+                returnedArr.push(arr[index]);
+            }
 
-	this.getCSSQueue = function(contextName, siteid) {
-		var arr = CSSFiles[siteid][contextName || "all"];
-		var returnedArr = new Array();
+        return returnedArr;
+    };
 
-		if (arr) for (var index in arr) {
-			returnedArr.push(arr[index]);
-		}
+    this.registerCSSFile = function (absPath, priority, context, siteid) {
+        context = context || "all";
 
-		return returnedArr;
-	};
+        var site = CSSFiles[siteid];
 
-	this.registerFromCore = function() {
-		BodyClasses["all"] = ["lmlbody", "liliumbody", "dynamic"];
-		BodyClasses["login"] = ["lmllogin"];
-	};
-};	
+        if (!site) {
+            site = new Object();
+            CSSFiles[siteid] = site;
+        }
+
+        var arr = site[context];
+
+        if (!arr) {
+            arr = new Array();
+            site[context] = arr;
+        }
+
+        if (arr.indexOf(absPath) === -1 && (context != "all" || site["all"].indexOf(absPath) !== -1)) {
+            while (typeof arr[priority] !== 'undefined') {
+                priority++;
+            }
+
+            arr[priority] = absPath;
+        };
+    };
+
+    this.getCSSQueue = function (contextName, siteid) {
+        var arr = CSSFiles[siteid][contextName || "all"];
+        var returnedArr = new Array();
+
+        if (arr)
+            for (var index in arr) {
+                returnedArr.push(arr[index]);
+            }
+
+        return returnedArr;
+    };
+
+    this.registerFromCore = function () {
+        BodyClasses["all"] = ["lmlbody", "liliumbody", "dynamic"];
+        BodyClasses["login"] = ["lmllogin"];
+    };
+};
 
 module.exports = new Frontend();

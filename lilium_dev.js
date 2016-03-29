@@ -6,9 +6,9 @@ var lilium = require('./lilium.js');
 var _config = require('./config.js');
 var cli = require('./cli.js');
 var log = require('./log.js');
-var LiliumDev = function() {
-	_config.default().env = 'dev';
-	cli.cacheClear();
-	log('Lilium','=========== DEV MODE ===========');
+var LiliumDev = function () {
+    _config.default().env = 'dev';
+    cli.cacheClear();
+    log('Lilium', '=========== DEV MODE ===========');
 }
 LiliumDev();

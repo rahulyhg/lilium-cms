@@ -6,54 +6,54 @@ var mongo = require('mongodb');
 var livevars = require('./livevars.js');
 var fs = require('./fileserver.js');
 
-var Role = function() {
-    this.handlePOST = function(cli) {
+var Role = function () {
+    this.handlePOST = function (cli) {
         cli.touch('role.handlePOST');
         switch (cli.routeinfo.path[2]) {
-            case 'list':
-                this.new(cli);
-                break;
-            case 'edit':
-                this.edit(cli);
-                break;
-            case 'delete':
-                this.delete(cli);
-                break;
-            default:
-                return cli.throwHTTP(404, 'Not Found');
-                break;
+        case 'list':
+            this.new(cli);
+            break;
+        case 'edit':
+            this.edit(cli);
+            break;
+        case 'delete':
+            this.delete(cli);
+            break;
+        default:
+            return cli.throwHTTP(404, 'Not Found');
+            break;
 
         }
     };
 
-    this.handleGET = function(cli) {
+    this.handleGET = function (cli) {
         cli.touch('role.handleGET');
         if (cli.routeinfo.path.length == 2) {
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
-                case 'new':
-                    this.new(cli);
-                    break;
-                case 'edit':
-                    this.edit(cli);
-                    break;
-                case 'list':
-                    this.list(cli);
-                    break;
-                default:
-                    return cli.throwHTTP(404, 'Not Found');
-                    break;
+            case 'new':
+                this.new(cli);
+                break;
+            case 'edit':
+                this.edit(cli);
+                break;
+            case 'list':
+                this.list(cli);
+                break;
+            default:
+                return cli.throwHTTP(404, 'Not Found');
+                break;
 
             }
         }
     };
 
-    this.list = function(cli) {
+    this.list = function (cli) {
         filelogic.serveAdminLML(cli, false);
     }
 
-    this.new = function(cli) {
+    this.new = function (cli) {
         cli.touch('role.new');
 
         if (cli.method == 'POST' && cli.postdata) {
@@ -62,7 +62,7 @@ var Role = function() {
             // Check if current user has sufficient role power
             if (cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
-                db.insert(cli._c, 'roles', prepareRoleForDB(cli), function(err, result) {
+                db.insert(cli._c, 'roles', prepareRoleForDB(cli), function (err, result) {
                     // Generate LML page
                     cli.refresh();
                 });
@@ -80,7 +80,7 @@ var Role = function() {
 
     };
 
-    this.edit = function(cli) {
+    this.edit = function (cli) {
         if (cli.routeinfo.path[3]) {
 
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
@@ -94,7 +94,7 @@ var Role = function() {
                         var data = prepareRoleForDB(cli);
                         db.update(cli._c, 'roles', {
                             _id: id
-                        }, data, function(err, r) {
+                        }, data, function (err, r) {
                             cli.refresh();
                         });
 
@@ -120,13 +120,13 @@ var Role = function() {
         }
     }
 
-    this.delete = function(cli) {
+    this.delete = function (cli) {
         if (cli.postdata.data._id) {
             var id = new mongo.ObjectID(cli.postdata.data._id);
 
             db.remove(cli._c, 'roles', {
                 _id: id
-            }, function(err, r) {
+            }, function (err, r) {
                 return cli.sendJSON({
                     success: true
                 });
@@ -139,7 +139,7 @@ var Role = function() {
         }
     }
 
-    var prepareRoleForDB = function(cli) {
+    var prepareRoleForDB = function (cli) {
         var postdata = cli.postdata.data;
         var rights = new Array();
 
@@ -157,14 +157,14 @@ var Role = function() {
 
 
 
-    var registerContentLiveVar = function() {
-        livevars.registerLiveVariable('roles', function(cli, levels, params, callback) {
+    var registerContentLiveVar = function () {
+        livevars.registerLiveVariable('roles', function (cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
                 db.singleLevelFind(cli._c, 'roles', callback);
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
-                db.findToArray(cli._c, 'roles', {}, function(err, arr) {
+                db.findToArray(cli._c, 'roles', {}, function (err, arr) {
                     callback(arr);
                 });
             } else {
@@ -178,7 +178,7 @@ var Role = function() {
 
     }
 
-    var registerForms = function() {
+    var registerForms = function () {
         formBuilder.createForm('role_create', {
                 fieldWrapper: {
                     tag: 'div',
@@ -213,7 +213,7 @@ var Role = function() {
     }
 
 
-    var init = function() {
+    var init = function () {
         registerContentLiveVar();
         registerForms()
     };

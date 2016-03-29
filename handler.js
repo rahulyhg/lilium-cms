@@ -11,8 +11,8 @@ var db = require('./includes/db.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
 
-var Handler = function() {
-    var GET = function(cli) {
+var Handler = function () {
+    var GET = function (cli) {
         cli.touch('handler.GET');
 
         if (Router.parseClientObject(cli)) {
@@ -20,7 +20,7 @@ var Handler = function() {
         }
     };
 
-    var POST = function(cli) {
+    var POST = function (cli) {
         cli.touch('handler.POST');
 
         if (!Router.parseClientObject(cli)) return;
@@ -39,7 +39,7 @@ var Handler = function() {
                 headers: req.headers
             });
             // File upload
-            busboy.on('file', function(fieldname, file, filename, encoding, mimetype) {
+            busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
                 if (cli.request.headers['content-length'] > cli._c.server.fileMaxSize) {
                     file.resume();
                     hasFile = false;
@@ -58,7 +58,7 @@ var Handler = function() {
 
                         file.pipe(fs.createWriteStream(saveTo));
 
-                        file.on('end', function() {
+                        file.on('end', function () {
                             cli.postdata.data[fieldname] = name;
                         });
 
@@ -72,11 +72,11 @@ var Handler = function() {
 
             });
 
-            busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated) {
+            busboy.on('field', function (fieldname, val, fieldnameTruncated, valTruncated) {
                 parsePOSTField(cli, fieldname, val);
             });
 
-            busboy.on('finish', function() {
+            busboy.on('finish', function () {
                 if (!finishedCalled) {
                     finishedCalled = true;
                     Dispatcher.dispost(cli);
@@ -91,11 +91,11 @@ var Handler = function() {
 
 
     };
-    var mimeTypeIsSupported = function(mimetype, cli) {
+    var mimeTypeIsSupported = function (mimetype, cli) {
         return getMimeByMimeType(mimetype, cli) ? true : false;
     }
 
-    var getMimeByMimeType = function(mimeType, cli) {
+    var getMimeByMimeType = function (mimeType, cli) {
         var mimes = cli._c.MIMES;
         for (var prop in mimes) {
             if (mimes.hasOwnProperty(prop)) {
@@ -105,7 +105,7 @@ var Handler = function() {
         }
     }
 
-    var parsePOSTField = function(cli, fieldname, val) {
+    var parsePOSTField = function (cli, fieldname, val) {
         if (fieldname.indexOf('[') == -1) {
             cli.postdata.data[fieldname] = inspect(val).slice(1, -1);
         } else {
@@ -146,27 +146,27 @@ var Handler = function() {
         }
     };
 
-    var notSupported = function(cli) {
+    var notSupported = function (cli) {
         cli.throwHTTP(405, 'Method Not Allowed');
     };
 
-    var parseMethod = function(cli) {
+    var parseMethod = function (cli) {
         cli.touch('handler.parseMethod');
 
         switch (cli.method) {
-            case 'GET':
-                GET(cli);
-                break;
-            case 'POST':
-                POST(cli);
-                break;
-            default:
-                notSupported(cli);
-                break;
+        case 'GET':
+            GET(cli);
+            break;
+        case 'POST':
+            POST(cli);
+            break;
+        default:
+            notSupported(cli);
+            break;
         }
     };
 
-    this.handle = config.default().env == "dev" ? function(cli) {
+    this.handle = config.default().env == "dev" ? function (cli) {
         cli.touch('handler.handle');
 
         try {
@@ -174,12 +174,12 @@ var Handler = function() {
         } catch (ex) {
             cli.crash(ex);
         }
-    } : function(cli) {
+    } : function (cli) {
         cli.touch('handler.handle');
         parseMethod(cli);
     };
 
-    var init = function() {
+    var init = function () {
 
     };
 

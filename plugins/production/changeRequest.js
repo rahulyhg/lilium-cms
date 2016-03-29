@@ -4,8 +4,8 @@ var livevars = undefined;
 var db = undefined;
 var formBuilder = undefined;
 
-var ChangeRequest = function() {
-    this.handleGET = function(cli) {
+var ChangeRequest = function () {
+    this.handleGET = function (cli) {
         switch (cli.routeinfo.path[3]) {
             case 'edit':
                 this.edit(cli);
@@ -19,7 +19,7 @@ var ChangeRequest = function() {
         }
     };
 
-    this.handlePOST = function(cli) {
+    this.handlePOST = function (cli) {
         switch (cli.routeinfo.path[3]) {
             case 'edit':
                 this.updateChange(cli);
@@ -30,14 +30,14 @@ var ChangeRequest = function() {
         }
     };
 
-    this.updateChange = function(cli) {
+    this.updateChange = function (cli) {
         var form = formBuilder.handleRequest(cli);
         var response = formBuilder.validate(form, true);
         if (response.success) {
             // Retrieve changerequest
             db.findToArray(config.default(), 'changerequests', {
                 _id: db.mongoID(cli.routeinfo.path[4])
-            }, function(err, arr) {
+            }, function (err, arr) {
 
                 if (err) cli.crash(new Error("[ChangeRequest] - Error fetching changerequests : " + err));
                 if (arr && arr.length > 0) {
@@ -50,15 +50,15 @@ var ChangeRequest = function() {
                     }, {
                         title: updatedContent.title,
                         content: updatedContent.original
-                    }, function(err, doc) {
+                    }, function (err, doc) {
                         if (err) cli.crash(new Error("[ChangeRequest] - Error while modifying content : " + err));
                         // Update campaign status
                         db.update(config.default(), 'campaigns', {
                             _id: db.mongoID(changeRequest.campId)
                         }, {
                             campstatus: "clipending"
-                        }, function(err, result) {
-                            if (err)cli.crash(new Error("[ChangeRequest] - Error while updateing campaign status : " + err));
+                        }, function (err, result) {
+                            if (err) cli.crash(new Error("[ChangeRequest] - Error while updateing campaign status : " + err));
 
                             cli.sendJSON({
                                 success: true
@@ -81,13 +81,13 @@ var ChangeRequest = function() {
 
     };
 
-    this.edit = function(cli) {
+    this.edit = function (cli) {
         fileLogic.serveLmlPluginPage('production', cli, true);
     };
 
-    this.genLivevars = function() {
+    this.genLivevars = function () {
 
-        livevars.registerLiveVariable('changerequests', function(cli, levels, params, callback) {
+        livevars.registerLiveVariable('changerequests', function (cli, levels, params, callback) {
             var allRoles = levels.length === 0;
 
             if (allRoles) {
@@ -132,13 +132,13 @@ var ChangeRequest = function() {
                         _id: db.mongoID(levels[0])
                     }, {
                         limit: [1]
-                    }, function(changeRequest) {
+                    }, function (changeRequest) {
                         if (typeof changeRequest !== 'undefined' && changeRequest.length > 0) {
                             db.multiLevelFind(config.default(), 'content', levels, {
                                 _id: changeRequest[0].articleId
                             }, {
                                 limit: [1]
-                            }, function(content) {
+                            }, function (content) {
                                 changeRequest[0].original = content;
                                 return callback(changeRequest);
                             });
@@ -159,7 +159,7 @@ var ChangeRequest = function() {
 
     }
 
-    this.init = function(abspath) {
+    this.init = function (abspath) {
         log = require(abspath + 'log.js');
         log("Production", "Initializing changeRequest class");
         fileLogic = require(abspath + 'filelogic.js');
@@ -169,10 +169,10 @@ var ChangeRequest = function() {
 
         formBuilder = require(abspath + 'formBuilder.js');
 
-	log ('Production', 'Registering Live Variables');
+        log('Production', 'Registering Live Variables');
         this.genLivevars();
 
-	log('Production', 'Creating forms');
+        log('Production', 'Creating forms');
         formBuilder.createForm('changerequest_edit')
             .add('title', 'text', {
                 displayname: 'Title'
@@ -188,7 +188,9 @@ var ChangeRequest = function() {
             })
             .add('requested_content', 'ckeditor', {
                 displayname: 'Content',
-                data : {readonly : true}
+                data: {
+                    readonly: true
+                }
             })
 
     };

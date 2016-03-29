@@ -5,55 +5,55 @@ var LiveVars = require('./livevars.js');
 var log = require('./log.js');
 var entities = require('./entities.js');
 
-var Dispatcher = function() {
-	this.dispatch = function(cli) {
-		cli.touch('dispatcher.dispatch');
+var Dispatcher = function () {
+    this.dispatch = function (cli) {
+        cli.touch('dispatcher.dispatch');
 
-		if (cli.routeinfo.admin) {
-			if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
-				Admin.serveDashboard(cli);
-			} else {
-				if (cli._c.usability.admin.loginIfNotAuth) {
-					cli.redirect(cli._c.server.url + "/login?cause=401", false);
-				} else {
-					cli.throwHTTP(401, "Unauthorized");
-				}
-			}
-		} else if (cli.routeinfo.login) {
-			Admin.serveLogin(cli);
-		} else if (cli.routeinfo.livevars) {
-			LiveVars.handleRequest(cli);
-		} else if (Endpoints.isRegistered(cli.routeinfo.path[0], 'GET')) {
-			Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
-		} else {
-			HTMLServer.serveClient(cli);
-		}
-	};
+        if (cli.routeinfo.admin) {
+            if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
+                Admin.serveDashboard(cli);
+            } else {
+                if (cli._c.usability.admin.loginIfNotAuth) {
+                    cli.redirect(cli._c.server.url + "/login?cause=401", false);
+                } else {
+                    cli.throwHTTP(401, "Unauthorized");
+                }
+            }
+        } else if (cli.routeinfo.login) {
+            Admin.serveLogin(cli);
+        } else if (cli.routeinfo.livevars) {
+            LiveVars.handleRequest(cli);
+        } else if (Endpoints.isRegistered(cli.routeinfo.path[0], 'GET')) {
+            Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
+        } else {
+            HTMLServer.serveClient(cli);
+        }
+    };
 
-	this.dispost = function(cli) {
-		cli.touch("dispatcher.dispost");
+    this.dispost = function (cli) {
+        cli.touch("dispatcher.dispost");
 
-		if (Endpoints.isRegistered(cli.routeinfo.path[0], 'POST')) {
-			if (cli.routeinfo.admin) {
-				if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
-					Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
-				} else {
-						cli.throwHTTP(401, "Unauthorized");
-				}
-			} else {
-				Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
-			}
-		} else {
-			log("Dispatcher","Endpoint not registered : " + cli.routeinfo.path[0]);
-			cli.debug();
-		}
-	};
+        if (Endpoints.isRegistered(cli.routeinfo.path[0], 'POST')) {
+            if (cli.routeinfo.admin) {
+                if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
+                    Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
+                } else {
+                    cli.throwHTTP(401, "Unauthorized");
+                }
+            } else {
+                Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
+            }
+        } else {
+            log("Dispatcher", "Endpoint not registered : " + cli.routeinfo.path[0]);
+            cli.debug();
+        }
+    };
 
-	var init = function() {
+    var init = function () {
 
-	};
+    };
 
-	init();
+    init();
 };
 
 module.exports = new Dispatcher();
