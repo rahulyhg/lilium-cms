@@ -245,13 +245,13 @@ var LiliumCMS = function() {
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
 
         $(form).find('select[multiple]').each(function(index, osSelect) {
+            sSelect = $(osSelect);
             var select = new MultiSelect(
-                sTable.attr('id'),
-                sTable.data('title'),
+                form.attr('id'),
+                form.data('title'),
                 JSON.parse(osSelect.dataset.scheme.replace(/\&lmlquote;/g, '"'))
             );
         });
-
         $(form).find('.tags-input').each(function(index, tagsInput) {
             var select = new Tags(
                 tagsInput,
@@ -259,17 +259,24 @@ var LiliumCMS = function() {
             );
         });
 
-
         // Check for stacktable
         $(form).find('table.lmlstacktable').each(function(index, osTable) {
-            sTable = $(osTable);
+            var sTable = $(osTable);
             var stackTable = new StackTable(
                 sTable.attr('id'),
                 sTable.data('title'),
                 JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
             );
+            stacktables.push(stacktables);
 
-            stackTable.appendRow(data);
+            osTable.dataset.stacktableindex = stacktables.length -1 ;
+
+            console.log(osTable.dataset.stacktableindex);
+
+
+            if (stackTable) {
+                stackTable.appendRow(data);
+            }
 
         });
 
@@ -293,7 +300,7 @@ var LiliumCMS = function() {
                         } else {
                             field.val(val);
                         }
-                    }               
+                    }
                 }
             }
 
@@ -306,15 +313,16 @@ var LiliumCMS = function() {
 
     var FormParser = function() {
         var makeSingleStackTable = this.makeSingleStackTable = function(index, osTable) {
-            sTable = $(osTable);
-            var stackTable = new StackTable(
-                sTable.attr('id'),
-                sTable.data('title'),
-                JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
-            );
+            if (!osTable.dataset.stacktableindex) {
+                var sTable = $(osTable);
+                var stackTable = new StackTable(
+                    sTable.attr('id'),
+                    sTable.data('title'),
+                    JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+                );
+                stacktables.push(stackTable);
+            }
 
-            osTable.dataset.stacktableindex = index;
-            stacktables.push(stackTable);
         };
 
         var makeSingleTag = this.makeSingleTag = function(index, tagsInput) {
