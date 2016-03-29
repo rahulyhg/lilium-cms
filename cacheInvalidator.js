@@ -69,6 +69,7 @@ var CacheInvalidator = function () {
     };
 
     this.deleteCachedFile = function (cli, rel, cb) {
+        log('[CacheInvalidator] Invalidating file ' + cli._c.server.html + "/" + rel);
         fs.unlink(cli._c.server.html + "/" + rel, cb || function () {});
     };
 
@@ -87,6 +88,18 @@ var CacheInvalidator = function () {
             cb();
         });
     };
+
+    hooks.bind('article_created', 1, function(data) {
+        // Update profile page
+    });
+
+    hooks.bind('article_deleted', 1, function(data) {
+        // Update profile page
+    });
+
+    hooks.bind('article_edited', 1, function(data) {
+        // Update profile page
+    });
 
 };
 
