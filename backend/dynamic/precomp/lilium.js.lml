@@ -243,14 +243,17 @@ var LiliumCMS = function() {
     this.fillFormFromSource = function(src, data, index) {
         index = typeof index == 'undefined' ? 0: index;
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
-
         $(form).find('select[multiple]').each(function(index, osSelect) {
-            sSelect = $(osSelect);
-            var select = new MultiSelect(
-                form.attr('id'),
-                form.data('title'),
-                JSON.parse(osSelect.dataset.scheme.replace(/\&lmlquote;/g, '"'))
-            );
+            var select;
+            if (osSelect.dataset.multiselectindex) {
+                select = that.multiselects[osSelect.dataset.multiselectindex];
+                select.render(data);
+            } else {
+                select = new MultiSelect(
+                    form.attr('id'),
+                    form.data('title')
+                );
+            };
         });
         $(form).find('.tags-input').each(function(index, tagsInput) {
             var select = new Tags(
@@ -270,9 +273,6 @@ var LiliumCMS = function() {
             stacktables.push(stacktables);
 
             osTable.dataset.stacktableindex = stacktables.length -1 ;
-
-            console.log(osTable.dataset.stacktableindex);
-
 
             if (stackTable) {
                 stackTable.appendRow(data);
@@ -490,8 +490,9 @@ $(document).ready(function(){
 
 document.addEventListener('livevarsRendered', function(e) {
     liliumcms.multiselects.forEach(function(select) {
-        select.render();
-
+        if (!select.isRendered) {
+            select.render();
+        }
     });
     liliumcms.queryparams.parseURL();
     liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false ;

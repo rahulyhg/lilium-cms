@@ -101,6 +101,8 @@ var CacheInvalidator = function () {
         // Update profile page
     });
 
+    hooks.bind('');
+
 };
 
 module.exports = new CacheInvalidator();

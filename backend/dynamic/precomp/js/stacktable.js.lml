@@ -42,7 +42,6 @@ var StackTable = function(tableid, objTitle, dataScheme) {
                     append(data[valueindex], index);
                 }
             } else {
-                console.log('APPENDING');
                 append($(this).val(), index);
                 $(this).val('');
             }
