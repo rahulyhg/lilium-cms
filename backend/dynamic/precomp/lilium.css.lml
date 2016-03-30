@@ -279,7 +279,10 @@ h1, h2, h3, h4, h5, h6 {
 form input, form label{
 	display: block;
 }
-
+select {
+    color: #666;
+    background: #fff;
+}
 .lilium {
 	padding:0;
 	margin:0;

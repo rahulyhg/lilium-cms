@@ -120,6 +120,10 @@ var Article = function () {
 
     };
 
+    this.autoSave = function() {
+        
+    };
+
     this.edit = function (cli) {
         if (cli.routeinfo.path[3]) {
 
@@ -260,6 +264,7 @@ var Article = function () {
 
                 var sort = {};
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+                sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (params.order || 1);
                 db.aggregate(cli._c, 'content', [{
                     $match: (params.search ? {
                         $text: {
@@ -311,7 +316,6 @@ var Article = function () {
                             $search: params.search
                         }
                     } : {}), [], function (err, cursor) {
-
                         cursor.count(function (err, size) {
                             results = {
                                 size: size,
@@ -422,7 +426,7 @@ var Article = function () {
             endpoint: 'content.table',
             paginate: true,
             searchable: true,
-            max_results: 25,
+            max_results: 1,
             fields: [{
                 key: 'media',
                 displayname: 'Featured Image',

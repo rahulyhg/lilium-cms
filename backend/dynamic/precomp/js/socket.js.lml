@@ -45,14 +45,14 @@ $(document).ready(function() {
 
             $('#dropdown-notification').on('click', function() {
                 console.log('CLICKED');
-                // var badge = $('.dropdown .glyphicon .badge');
-                // if ($(badge).is(":visible")) {
-                //
-                // }
-                // socket.emit('notification-view', {});
-                // // Hide badge
-                // badge.html(0);
-                // badge.hide();
+                var badge = $("#dropdown-notification > span > .badge");
+                if ($(badge).is(":visible")) {
+
+                }
+                socket.emit('notification-view', {});
+                // Hide badge
+                badge.html(0);
+                badge.hide();
             });
         }
     });

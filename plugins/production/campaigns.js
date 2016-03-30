@@ -283,7 +283,7 @@ var Campaigns = function () {
 					}, {
                         $limit: (params.max || 20)
 					}], function (data) {
-                        db.find(cli._c, 'content', (params.search ? {
+                        db.find(cli._c, 'campaigns', (params.search ? {
                             $text: {
                                 $search: params.search
                             }
