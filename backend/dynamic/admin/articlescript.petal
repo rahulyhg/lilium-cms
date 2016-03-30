@@ -22,4 +22,53 @@
             liliumcms.notify({title: 'Article' ,message : 'Your article is beeing processed', type : 'info'})
         });
     });
+
+    $(document).ready(function() {
+        var timer;
+        var count = 0;
+        var startAutoSave = function() {
+            timer = $.timer(function() {
+                autoSave();
+                count += 1;
+                console.log(count);
+
+            },  2 * 1000, true);
+
+        };
+
+        window.setTimeout(startAutoSave, 2 * 1000);
+
+        var autoSave = function() {
+            console.log($('form').serialize());
+        };
+
+        if (CKEDITOR) {
+            CKEDITOR.on('instanceReady', function() {
+                CKEDITOR.instances.content.on('focus', function() {
+                    timer.play();
+                });
+
+                CKEDITOR.instances.content.on('blur', function() {
+                    console.log(document.activeElement);
+                    if (document.activeElement === document.getElementsByTagName("iframe")[0]) {
+                        timer.pause();
+                    }
+
+                });
+            });
+
+        }
+
+
+        window.onblur = function() {
+            timer.pause();
+        };
+
+        window.onfocus = function() {
+            // Bypass ckeditor onBlur event
+            console.log('focus');
+            timer.play();
+
+        };
+    });
 </script>
