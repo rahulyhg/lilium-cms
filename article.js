@@ -142,7 +142,10 @@ var Article = function () {
                                 success: false,
                                 error: "Content not found for id " + id
                             });
+
+                            return;
                         }
+
                         hooks.fire('article_will_edit', {
                             cli: cli,
                             old: row,

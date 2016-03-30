@@ -119,7 +119,7 @@ var DB = function() {
 	};
 
 	this.mongoID = function(str) {
-		try{
+		try {
 			return new mongoObjectID(str);
 		} catch (err) {
 			return;
