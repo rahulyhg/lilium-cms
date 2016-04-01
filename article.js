@@ -28,7 +28,7 @@ var Article = function () {
             this.save(cli, true);
             break;
         case 'overwrite-save':
-            this.save(cli, true, true);
+            this.overwrite(cli);
             break;
         case 'save':
             this.save(cli);
@@ -135,7 +135,45 @@ var Article = function () {
 
     };
 
-    this.save = function(cli, auto, overwrite) {
+    /**
+     * Will overwrite a content
+     * The postdata should contain :
+     * - contentid, the id of the content to overwrite
+     * - id, the id of the current save that will be removed after overwrite,
+     * if it is the case.
+     */
+    this.overwrite = function(cli) {
+        var form = formBuilder.handleRequest(cli);
+        var formData = formBuilder.serializeForm(form);
+        formData.updated = new Date();
+        console.log(cli.postdata.data);
+        var id = db.mongoID(cli.postdata.data.contentid);
+        formData.media = db.mongoID(formData.media);
+
+        db.update(cli._c, 'content', {_id: id}, formData, function(err, res) {
+            if (err) console.log(err);
+            if (cli.postdata.data._id) {
+                db.remove(cli._c, 'autosave', {_id: db.mongoID(cli.postdata.data._id)}, function(){
+                    cli.sendJSON({success: true, _id: id});
+                })
+
+            } else {
+                cli.sendJSON({success: true, _id: id});
+            }
+        });
+
+
+
+
+    }
+
+    /**
+     * Saves an article based on some parameters
+     * The cli should contain (Both not mandatory):
+     * - contentid, the id of the original content if the save is an autosave
+     * - _id, the id of whether the original content or of the auto save if it is an autosave
+     */
+    this.save = function(cli, auto) {
         // Article already exists
         var form = formBuilder.handleRequest(cli);
         var formData = formBuilder.serializeForm(form);
@@ -144,9 +182,8 @@ var Article = function () {
 
         formData.status = 'draft';
 
-        formData.date = new Date();
         formData.author = db.mongoID(cli.userinfo.userid);
-
+        formData.media = db.mongoID(formData.media);
         // Autosave
         if (auto) {
             field = 'autosave';
@@ -159,20 +196,34 @@ var Article = function () {
                 id = db.mongoID(cli.postdata.data._id);
             }
 
-        } else if (cli.postdata.data.contentid) {
+        } else if (cli.postdata.data._id) {
             // Draft save
-            id = db.mongoID(cli.postdata.data.contentid);
+            id = db.mongoID(cli.postdata.data._id);
         }
 
         if (cli.postdata.data._id) {
+            formData.date = new Date();
+
             db.update(cli._c, field,{_id: id}, formData, function(err, res) {
                 cli.sendJSON({success : true, _id: id});
             });
         } else if (cli.postdata.data.contentid && auto) {
+            formData.updated = new Date();
             db.findAndModify(cli._c, field,{contentid: formData.contentid}, formData, function(err, doc) {
-                cli.sendJSON({success : true, _id: doc._id});
+                if (doc._id) {
+                    cli.sendJSON({success : true, _id: doc._id});
+                } else {
+                    formData.updated = undefined;
+                    formData.date = new Date();
+
+                    db.insert(cli._c, field, formData, function(err, res) {
+                        cli.sendJSON({success : true, _id: res.insertedId});
+
+                    });
+                }
             });
         } else {
+            formData.date = new Date();
             db.insert(cli._c, field, formData, function(err, res) {
                 if (err) console.log(err);
                 cli.sendJSON({success: true, _id : (res.insertedId || undefined)});
@@ -395,7 +446,8 @@ var Article = function () {
                     });
                 });
 
-
+            } else if (levels[0] == 'lastEdited') {
+                db.aggre
             } else {
 
                 // First, check for saved content

@@ -1,6 +1,11 @@
 {#config}
 <script>
     var isAutoSave = false;
+    var timer;
+    var lastSave;
+    var _id;
+    var contentid;
+    var lastParamUrl = window.location.pathname.split( '/' ).pop();
 
     var deleteArticle = function(id) {
         $.post('{=config.default.server.url}/admin/article/delete/' + id, function(data) {
@@ -10,15 +15,19 @@
 
     var canDelete = function(item) {};
     document.addEventListener('livevarsFetched', function(e) {
-        console.log(e.detail);
         var content = e.detail.livevars['content.' + window.location.pathname.split( '/' ).pop()];
         if (content && content.length > 0) {
             if (content[0].recentversion) {
                 lmlAlert('There is a more recent version of this article <a href="{=config.default.server.url}/admin/article/edit/'+ content[0].recentversion +'">here</a>');
-
             }
 
             isAutoSave = content[0].status == 'autosaved';
+            if (isAutoSave) {
+                _id = lastParamUrl;
+                contentid = content[0].contentid;
+            } else {
+                contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
+            }
 
             if (content[0].status == 'autosaved' && content[0].contentid) {
                 lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/'+ content[0].contentid +'">this article</a>');
@@ -30,6 +39,7 @@
 
 
     document.addEventListener('livevarsRendered', function(e) {
+        lastSave = $('form').serialize();
         liliumcms.formvalidator.prepareValidation(function(data) {
             // Create notification
             liliumcms.notify({
@@ -41,15 +51,11 @@
     });
 
     $(document).ready(function() {
-        var timer;
-        var lastSave = $('form').serialize();
-        var _id;
+
 
         // Will be edit, new or an id
-        var lastParamUrl = window.location.pathname.split( '/' ).pop();
 
         // Check if we can get an id
-        var contentid = isAutoSave || lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
 
         timer = $.timer(function() {
             autoSave();
@@ -64,7 +70,8 @@
             if (lastSave != currentSave) {
                 console.log('New content, saving in server');
                 var tempSave = currentSave;
-
+                console.log(_id);
+                console.log(contentid);
                 if (_id) {
                     tempSave += '&_id=' + _id;
                 }
@@ -121,10 +128,23 @@
         $('form button[name=save]').on('click', function(e) {
             // Save and give notification
             var currentSave = $('form').serialize();
+            var url;
+            var tempsave = currentSave
+            if (isAutoSave) {
+                url = '/overwrite-save',
+                tempsave += contentid ? '&contentid=' +contentid : '';
+                currentSave += _id ? '&_id=' + _id : '';
+            } else {
+                url = '/save';
+                tempsave += contentid ? '&_id=' + contentid : '';
 
-            $.post('/admin/article/save', currentSave, function(data) {
+            }
+
+            // Check if
+            $.post('/admin/article' + url, tempsave, function(data) {
                 lastSave = currentSave;
                 if (data.success && data._id) {
+                    if (isAutoSave) window.location.replace("{=config.default.server.url}/admin/article/edit/" + data._id);
                     contentid = data._id;
                 }
 
@@ -137,6 +157,7 @@
                 console.log('Auto-saved (' + data.name + ')');
 
             });
+
         });
 
         $('form button[name=preview]').on('click', function(e) {
