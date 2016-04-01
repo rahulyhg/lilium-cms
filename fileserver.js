@@ -182,8 +182,16 @@ var FileServer = function () {
 
         stream.on('close', function () {
             cli.response.end();
-            callback();
+            if (callback) callback();
         });
+    };
+
+    this.pipeContentToClient = function (cli, content) {
+        cli.response.writeHead(200, {
+            "Content-Type": 'text/html; charset=utf-8'
+        });
+        cli.response.write(content);
+        cli.response.end();
     };
 
     this.validateIndexPath = function (cli, filename) {

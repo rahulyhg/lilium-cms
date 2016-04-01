@@ -277,9 +277,10 @@ var HtmlParser = function () {
     };
 
     var parseButtonType = function (field) {
-        var input = '<button ';
+        var input = '<button type="button" ';
         input += parseBasicFieldAttributes(field);
-        input += '></button>';
+        input += '>';
+        input += (field.attr.displayname || field.name) + '</button>';
         return input;
     };
 

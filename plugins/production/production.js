@@ -111,6 +111,9 @@ var Production = function () {
         hooks.bind('post_create_bottom', 200, function (pkg) {
             pkg.form.add('isSponsored', 'checkbox', {
                 displayname: 'Sponsored Content',
+                'wrapper': {
+                    'class': 'col-md-12'
+                },
                 data: {
                     right: 'production'
                 }

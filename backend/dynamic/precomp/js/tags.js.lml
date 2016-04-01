@@ -4,9 +4,11 @@ var Tags = function(tagForm, data) {
 	var data = data ? data[$(tagsInput).parent().data('fieldname')] : undefined;
 
 	var init = function() {
-		for (var i in data) {
-			that.add(data[i]);
-		}
+        if (data) {
+            for (var i in data) {
+                that.add(data[i]);
+            }
+        }
 	};
 
 

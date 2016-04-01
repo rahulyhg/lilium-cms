@@ -24,6 +24,18 @@ var Article = function () {
         case 'delete':
             this.delete(cli);
             break;
+        case 'autosave':
+            this.save(cli, true);
+            break;
+        case 'overwrite-save':
+            this.save(cli, true, true);
+            break;
+        case 'save':
+            this.save(cli);
+            break;
+        case 'preview' :
+            this.preview(cli);
+            break;
         default:
             return cli.throwHTTP(404, 'Not Found');
             break;
@@ -72,9 +84,12 @@ var Article = function () {
 
             if (response.success) {
                 var formData = formBuilder.serializeForm(form);
+
                 formData.name = slugify(formData.title).toLowerCase();
                 formData.author = cli.userinfo.userid;
+                formData.dateCreated = new Date();
                 formData.media = db.mongoID(formData.media);
+
                 hooks.fire('article_will_create', {
                     cli: cli,
                     article: formData
@@ -120,8 +135,59 @@ var Article = function () {
 
     };
 
-    this.autoSave = function() {
-        
+    this.save = function(cli, auto, overwrite) {
+        // Article already exists
+        var form = formBuilder.handleRequest(cli);
+        var formData = formBuilder.serializeForm(form);
+        var field = 'content';
+        var id;
+
+        formData.status = 'draft';
+
+        formData.date = new Date();
+        formData.author = db.mongoID(cli.userinfo.userid);
+
+        // Autosave
+        if (auto) {
+            field = 'autosave';
+            formData.status = 'autosaved';
+            if (cli.postdata.data.contentid) {
+                formData.contentid = db.mongoID(cli.postdata.data.contentid);
+            }
+
+            if (cli.postdata.data._id) {
+                id = db.mongoID(cli.postdata.data._id);
+            }
+
+        } else if (cli.postdata.data.contentid) {
+            // Draft save
+            id = db.mongoID(cli.postdata.data.contentid);
+        }
+
+        if (cli.postdata.data._id) {
+            db.update(cli._c, field,{_id: id}, formData, function(err, res) {
+                cli.sendJSON({success : true, _id: id});
+            });
+        } else if (cli.postdata.data.contentid && auto) {
+            db.findAndModify(cli._c, field,{contentid: formData.contentid}, formData, function(err, doc) {
+                cli.sendJSON({success : true, _id: doc._id});
+            });
+        } else {
+            db.insert(cli._c, field, formData, function(err, res) {
+                if (err) console.log(err);
+                cli.sendJSON({success: true, _id : (res.insertedId || undefined)});
+            });
+        }
+    };
+
+    this.preview = function(cli) {
+        var form = formBuilder.handleRequest(cli);
+        var formData = formBuilder.serializeForm(form);
+
+        filelogic.compileLmlPostPage(cli, "article", formData, function (html) {
+            var fileserver = require('./fileserver.js');
+            fileserver.pipeContentToClient(cli, html);
+        });
     };
 
     this.edit = function (cli) {
@@ -137,6 +203,7 @@ var Article = function () {
                     formData = formBuilder.serializeForm(form);
                     formData.name = slugify(formData.title).toLowerCase();
                     formData.media = db.mongoID(formData.media);
+                    formData.dateUpdated = new Date();
 
                     db.find(cli._c, 'content', {
                         _id: id
@@ -300,6 +367,7 @@ var Article = function () {
                     $project: {
                         author: "$author.displayname",
                         title: 1,
+                        status: 1,
                         subtitle: 1,
                         name: 1,
                         media: "$media.sizes.medium.url"
@@ -329,11 +397,44 @@ var Article = function () {
 
 
             } else {
-                db.multiLevelFind(cli._c, 'content', levels, {
-                    _id: new mongo.ObjectID(levels[0])
-                }, {
-                    limit: [1]
-                }, callback);
+
+                // First, check for saved content
+                db.findToArray(cli._c, 'content', {
+                    _id: db.mongoID(levels[0])
+                }, function(err, arr) {
+                    // Not found, lets check autosaves
+                    if (arr && arr.length == 0) {
+                        db.findToArray(cli._c, 'autosave', {_id :db.mongoID(levels[0])}, function(err, arr) {
+                            // Check if there is a newer version than this autosave
+                            if (arr && arr.length > 0) {
+                                db.findToArray(cli._c, 'content', {_id : db.mongoID(arr[0].contentid), date : {"$gte": arr[0].date}}, function(err, content) {
+                                    if (content && content.length > 0) {
+                                        arr[0].recentversion = content[0]._id;
+                                    }
+                                    callback(err || arr);
+                                });
+                            } else {
+                                callback(err || arr);
+                            }
+
+                        });
+                    } else {
+                        // Found a content
+                        if (arr) {
+                            // Check if there is a newer autosaved version
+                            db.findToArray(cli._c, 'autosave', {contentid : db.mongoID(arr[0]._id), date : {"$gte": arr[0].date}}, function(err, autosave) {
+                                if (autosave && autosave.length > 0) {
+                                    arr[0].recentversion = autosave[0]._id;
+                                }
+                                callback(err || arr);
+                            });
+                        } else {
+                            // Error :(
+                            callback(err);
+                        }
+
+                    }
+                });
             }
         }, ["content"]);
 
@@ -391,7 +492,27 @@ var Article = function () {
                 }
             })
             .trigger('bottom')
-            .add('publish', 'submit');
+            .add('save', 'button', {
+                'displayname': 'Save draft',
+                'classes': ['btn', 'btn-default', 'fullwidth'],
+                'wrapper': {
+                    'class': 'col-md-4'
+                }
+            })
+            .add('preview', 'button', {
+                'displayname': 'Preview in new tab',
+                'classes': ['btn', 'btn-default', 'fullwidth'],
+                'wrapper': {
+                    'class': 'col-md-4'
+                }
+            })
+            .add('publish', 'button', {
+                'displayname': 'Save and <b>Publish</b>',
+                'classes': ['btn', 'btn-default', 'fullwidth'],
+                'wrapper': {
+                    'class': 'col-md-4'
+                }
+            });
     }
 
     cacheInvalidator.emitter.on('articleInvalidated', function (data) {
@@ -426,7 +547,7 @@ var Article = function () {
             endpoint: 'content.table',
             paginate: true,
             searchable: true,
-            max_results: 1,
+            max_results: 25,
             fields: [{
                 key: 'media',
                 displayname: 'Featured Image',

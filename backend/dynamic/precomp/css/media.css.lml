@@ -83,8 +83,8 @@
 
 
 .media_explorer_form .action-desc {
-    font-size: 12px;
-    font-weight: 300;
+    font-size: 16px;
+    font-weight: 500;
 
 }
 #mediaExplorerModal .menu {

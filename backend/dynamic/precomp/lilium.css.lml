@@ -652,6 +652,34 @@ h2.subtitlestrip {
     right: -1px;
 }
 
+/* Alerts */
+.alert {
+    box-shadow: none !important;
+}
+
+.alert-wrapper{
+    position: fixed;
+    width: calc(100% - 200px);
+    z-index: 999;
+}
+
+.alert a {
+    color : #fff !important;
+    text-decoration: underline;
+}
+.alert-info {
+color: #fff !important;
+background-color: {=actioncolor}!important;
+}
+.alert-info .close{
+    color: #fff !important;
+}
+
+.alert .close{
+    font-size: 32px;
+    line-height: 20px;
+}
+
 /* Admin Bar */
 header.admin-bar {
 	position:fixed;
@@ -950,4 +978,7 @@ h1 > a.fab:hover {
 
 .clear-both{
     clear: both;
+}
+.fullwidth{
+    width : 100%;
 }

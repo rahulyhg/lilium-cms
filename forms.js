@@ -103,10 +103,10 @@ var Forms = function () {
 
         formBuilder.registerFieldType('media-explorer', function (field) {
             var displayname = typeof field.attr.displayname !== 'undefined' ? field.attr.displayname : field.name;
-            var html = '<div class="media_explorer_form">';
+            var html = '<label for="'+field.name+'">' + displayname + '</label>';
+            html += '<div class="media_explorer_form">';
             html += '<input type="hidden" id="media-input" name="' + field.name + '">';
             html += '<div class="actions">';
-            html += '<div>' + displayname + '</div>';
             html += '<div class="action-desc">Click to insert image</div>';
             html += '</div>';
             html += '<i class="fa fa-spinner fa-spin" style="display:none"></i>';
