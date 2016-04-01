@@ -40,7 +40,7 @@ var Handler = function () {
             });
             // File upload
             busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-                if (cli.request.headers['content-length'] > cli._c.server.fileMaxSize) {
+                if (parseInt(cli.request.headers['content-length']) > parseInt(cli._c.server.fileMaxSize)) {
                     file.resume();
                     hasFile = false;
                     finishedCalled = true;
