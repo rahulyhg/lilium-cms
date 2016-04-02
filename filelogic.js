@@ -24,7 +24,7 @@ var FileLogic = function () {
             callback,
             params
         );
-    }
+    };
 
     var serveSpecialPage = function (cli, fullpath) {
         cli.touch('filelogic.serveSpecialPage');
@@ -171,7 +171,7 @@ var FileLogic = function () {
             }
 
         });
-    }
+    };
 
     this.serveLmlPluginPage = function (pluginName, cli, lastIsParam, extra) {
         lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
@@ -194,14 +194,7 @@ var FileLogic = function () {
             }
 
         });
-    }
-
-    /**
-     * Remove the cached file
-     */
-    this.invalidateCachedFile = function (cli) {
-
-    }
+    };
 
     this.renderLmlPostPage = function (cli, postType, extra, cb) {
         var theme = require('./themes.js');
@@ -221,7 +214,15 @@ var FileLogic = function () {
             },
             extra
         );
-    }
+    };
+
+    this.compileLmlPostPage = function (cli, postType, extra, cb) {
+        var theme = require('./themes.js');
+
+        var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme().info.path + "/" + postType + ".lml";
+
+        LML.executeToHtml(readPath, cb, extra);
+    };
 
     this.serveAbsoluteLml = function (readPath, savePath, cli, extra) {
         FileServer.fileExists(savePath, function (isPresent) {
@@ -255,7 +256,7 @@ var FileLogic = function () {
             extra
         );
 
-    }
+    };
 
     this.executeLMLNoCache = function (cli, readPath, extra) {
         var tmpname = cli._c.server.html + "/static/tmp/" + Math.random().toString(36).slice(-12) + ".html";

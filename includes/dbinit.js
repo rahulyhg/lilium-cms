@@ -4,7 +4,7 @@ var mongoDocuments = {
 		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache",
 		"lilium", "uploads", "cachedFiles", "campaigns", "products", "dfp",
 		"producttypes", "productpricebases", "changerequests", "campaignStatuses", "notifications",
-		"categories"
+		"categories", "autosave"
 	]
 };
 

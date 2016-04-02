@@ -15,20 +15,21 @@ var LmlTable = function(table) {
 		generateKeysObj();
 		timeInitial = new Date();
 		this.getData(function() {
-			that.createNav();
 			var now = new Date();
 			console.log('Table Initialised in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
 
 		});
 		table.parent().find('.header select').change(function() {
+            currentPage = 1;
+            table.data('page', 1);
+
 			maxEntries = $(this).val();
+            table.data('max', $(this).val());
 			cachedData = {};
 			updateTable();
 		});
 
 		table.parent().find('.header input').keydown(function(e) {
-			console.log('clickedidou');
-
 			var code = (e.keyCode ? e.keyCode : e.which);
 			if (code == 13) {
 
@@ -42,7 +43,8 @@ var LmlTable = function(table) {
 		});
 
 		table.on('click', 'th[sortable]', function() {
-			if (typeof $(this).prop('sorted') !== 'undefined') {
+			if (typeof $(this).attr('sorted') !== 'undefined') {
+                table.find('thead th.sorted-desc, thead th.sorted-asc').removeClass('sorted-desc sorted-asc');
 				// Change sort order
 				var sortOrder = table.data('sort-order') == 1 ? -1 : 1;
 				$(this).removeClass((sortOrder == 1 ? 'sorted-desc' : 'sorted-asc'));
@@ -51,17 +53,26 @@ var LmlTable = function(table) {
 				table.data('sort-order', sortOrder);
 				updateTable();
 			} else {
+                table.find('thead th.sorted-desc, thead th.sorted-asc').removeClass('sorted-desc sorted-asc').removeAttr('sorted');
 				table.data('sortby', ($(this).data('sortkey') || $(this).data('key')));
 				$(this).addClass('sorted-asc');
-				$(this).prop('sorted', true);
+				$(this).attr('sorted', true);
 				table.data('sort-order', 1);
 				updateTable();
 			}
 		});
 
-		table.on('click', '.navbuttons button', function() {
+		table.closest('.tablewrapper').on('click', '.navbuttons button:not(.previous, .next)', function() {
 			that.changePage($(this).text());
 		});
+
+        table.closest('.tablewrapper').on('click', '.navbuttons .previous', function() {
+            that.previousPage();
+        });
+
+        table.closest('.tablewrapper').on('click', '.navbuttons .next', function() {
+            that.nextPage();
+        });
 
 	};
 
@@ -79,36 +90,51 @@ var LmlTable = function(table) {
 
 	};
 
-	this.createNav = function() {
-		table.after('<div><p>Displaying entries ' + ((currentPage - 1) * maxEntries + 1) + '-' + (((currentPage - 1) * maxEntries) + currentData.data.length) + ' of ' + (currentData.size || 0) + '</p>' +
-			'</div>').get(0).appendChild(genButtons());
-	};
-
 	var genButtons = function() {
 		var pages = Math.ceil(currentData.size / maxEntries);
 		var buttons = document.createElement('div');
-		buttons.className = 'navbuttons';
+		buttons.className = 'navbuttons pull-right';
+        var prevButton = document.createElement('BUTTON');
+        prevButton.appendChild(document.createTextNode('Previous'));
+        prevButton.className = 'previous';
+        if (currentPage == 1) {
+            prevButton.className = 'previous disabled';
+        }
+        buttons.appendChild(prevButton);
 
 		for (var i = 1; i <= pages; i++) {
 			var button = document.createElement('BUTTON');
 			var text = document.createTextNode('' + i);
+            if (currentPage == i) {
+                button.className = 'selected';
+            }
 			button.appendChild(text);
 			buttons.appendChild(button);
 		}
 
+        var nextButton = document.createElement('BUTTON');
+        nextButton.appendChild(document.createTextNode('Next'));
+        nextButton.className = 'next';
+        if (currentPage == pages) {
+            nextButton.className = 'next disabled';
+        }
+        buttons.appendChild(nextButton);
+
 		return buttons;
 	}
 
-	this.updateNav = function() {
-
+	var updateNav = function() {
+        table.parent().find('.footer').html('<div><p>Displaying entries ' + ((currentPage - 1) * maxEntries + 1) + '-' + (((currentPage - 1) * maxEntries) + currentData.data.length) + ' of ' + (currentData.size || 0) + '</p>' +
+			'</div>');
+        table.parent().find('.footer').append(genButtons());
 	};
 
 	this.nextPage = function() {
-
+        this.changePage(currentPage + 1);
 	};
 
 	this.previousPage = function() {
-
+        this.changePage(currentPage == 1 ? currentPage : currentPage - 1);
 	};
 
 	this.changePage = function(pageNumber) {
@@ -123,19 +149,19 @@ var LmlTable = function(table) {
 
 		fieldSort = table.data('sortby');
 		fieldOrder = table.data('sort-order');
-
 		if (!isSearch && cachedData[currentPage] && cachedData[currentPage][fieldSort] && cachedData[currentPage][fieldSort][fieldOrder]) {
-			currentData = cachedData[currentPage][fieldSort][fieldOrder];
+            currentData = cachedData[currentPage][fieldSort][fieldOrder];
 			renderRows();
+            updateNav();
 			var now = new Date();
-			console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+			console.log('Table updated from cache in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
 
 		} else {
 			liliumcms.livevars.getSingleLivevar(table.data('endpoint'), {
 				sortby: fieldSort,
 				order: fieldOrder,
-				max: table.data('max'),
-				skip: (currentPage - 1) * table.data('max'),
+				max: parseInt(maxEntries),
+				skip: (currentPage - 1) * maxEntries,
 				search: (searchTerm ? searchTerm : undefined)
 			}, function(data) {
 				cachedData[currentPage] = cachedData[currentPage] ? cachedData[currentPage] : {};
@@ -144,6 +170,7 @@ var LmlTable = function(table) {
 
 				currentData = cachedData[currentPage][fieldSort][fieldOrder] = typeof data.livevars !== 'undefined' ? data.livevars[table.data('endpoint')] : undefined;
 				renderRows();
+                updateNav();
 				var now = new Date();
 				console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
 

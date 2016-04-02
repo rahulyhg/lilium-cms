@@ -8,6 +8,8 @@ var livevars = require('./livevars.js');
 var mailer = require('./postman.js');
 var imageResizer = require('./imageResizer.js');
 var tableBuilder = require('./tableBuilder.js');
+var hooks = require('./hooks.js');
+
 var Roles = new Object();
 
 var Entity = function () {
@@ -153,6 +155,10 @@ var Entities = module.exports = new function () {
                         cli.session.data.avatarURL = avatarURL;
                         cli.session.data.avatarID = avatarID;
 
+                        hooks.fire('profile_picture_updated', {
+                            cli: cli
+                        });
+
                         sessionManager.saveSession(cli, function () {
 
                             cli.sendJSON({
@@ -293,10 +299,14 @@ var Entities = module.exports = new function () {
     this.createFromCli = function (cli) {
         cli.touch('entities.createFromCli');
         var entData = cli.postdata.data;
-        console.log(entData);
         var newEnt = this.initialiseBaseEntity(entData);
 
         this.registerEntity(cli, newEnt, function () {
+
+            hooks.fire('entity_created', {
+                cli: cli
+            });
+
             cli.touch('entities.registerEntity.callback');
             /*
             mailer.createEmail({
@@ -318,6 +328,11 @@ var Entities = module.exports = new function () {
         db.remove(cli._c, 'entities', {
             _id: db.mongoID(id)
         }, function (err, result) {
+
+            hooks.fire('entity_deleted', {
+                id: id
+            });
+
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath);
         });
     };

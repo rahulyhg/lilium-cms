@@ -357,7 +357,7 @@ var FormBuilder = function () {
             var field = form.fields[field];
 
 
-            if (field.name != 'form_name') {
+            if (field.name != 'form_name' && field.type != 'button') {
                 data[field.name] = field.attr.value;
             }
         }

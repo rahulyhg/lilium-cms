@@ -279,7 +279,10 @@ h1, h2, h3, h4, h5, h6 {
 form input, form label{
 	display: block;
 }
-
+select {
+    color: #666;
+    background: #fff;
+}
 .lilium {
 	padding:0;
 	margin:0;
@@ -649,6 +652,34 @@ h2.subtitlestrip {
     right: -1px;
 }
 
+/* Alerts */
+.alert {
+    box-shadow: none !important;
+}
+
+.alert-wrapper{
+    position: fixed;
+    width: calc(100% - 200px);
+    z-index: 999;
+}
+
+.alert a {
+    color : #fff !important;
+    text-decoration: underline;
+}
+.alert-info {
+color: #fff !important;
+background-color: {=actioncolor}!important;
+}
+.alert-info .close{
+    color: #fff !important;
+}
+
+.alert .close{
+    font-size: 32px;
+    line-height: 20px;
+}
+
 /* Admin Bar */
 header.admin-bar {
 	position:fixed;
@@ -947,4 +978,22 @@ h1 > a.fab:hover {
 
 .clear-both{
     clear: both;
+}
+.fullwidth{
+    width : 100%;
+}
+
+fieldset.title {
+    border-top: 1px dashed #aaa;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    display: block;
+    text-align: center;
+}
+
+fieldset.title legend {
+    padding: 5px 10px;
+    width: auto;
+	border-bottom: none;
 }

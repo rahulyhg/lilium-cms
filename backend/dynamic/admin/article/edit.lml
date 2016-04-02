@@ -1,14 +1,30 @@
 {#config;session;vocab;forms}
 {%../articlescript}
 	<h2>Edit a post</h2>
-	{*content.{?1}} {=forms.render('post_create')}
+	{*content.{?1}(sourceof:"post_create")} {=forms.render('post_create')}
 	<div id="editor"></div>
+	<div class="col-md-12">
+		<fieldset class="title">
+		  <legend>More Informations</legend>
+		</fieldset>
+		{*content.{?1}(template:"article-moreinfo")}
 
-	<script>
-		$(document).ready(function() {
-			document.addEventListener('livevarsFetched', function() {
-				liliumcms.formParser.parse($("body > main > lml\\:livevars").attr('data-varname'));
-			})
-		});
+	</div>
 
-	</script>
+	<lml:template id="article-moreinfo">
+			<div>
+				<span>Status : </span><lml:tobject data-nodetype="span" data-key="status"></lml:tobject>
+			</div>
+			<div>
+				<span>URL : </span><lml:tobject data-nodetype="a" data-href="{=config.default.server.url}/" data-key="name">http:{=config.default.server.url}/<lml:tobject data-nodetype="span" data-key="name"></lml:tobject></lml:tobject>
+			</div>
+			<div>
+				<span>Created : </span><lml:tobject data-nodetype="span" data-key="date"></lml:tobject>
+			</div>
+			<div>
+				<span>Last Updated : </span><lml:tobject data-nodetype="span" data-key="date"></lml:tobject>
+			</div>
+			<div>
+				<span>Author : </span><lml:tobject data-nodetype="span" data-key="author"></lml:tobject>
+			</div>
+	</lml:template>

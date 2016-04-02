@@ -7,17 +7,31 @@ table.lmlfullwidthtable thead {
 	background-color: #E3E3E3;
 }
 
-table.lmlfullwidthtable thead tr th,
 table.lmlfullwidthtable tbody tr td {
 	padding: 4px 15px
 }
+table.lmlfullwidthtable thead tr th {
+    padding: 10px 15px;
+    font-weight: 400;
 
+}
+table.lmlfullwidthtable thead tr {
+    border: 1px solid #EEE;
+    background-color: #fafafa;
+    color: #999;
+}
 table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	background-color: #FAFAFA;
 	padding: 15px;
 }
+.lmltablebuilder .footer {
+    border: 1px solid #EEE;
+    padding: 10px;
+    height: 50px;
+    background: #fafafa;
+}
 .lmltablebuilder thead th {
-	border-right: 1px solid #777;
+	border-right: 1px solid #EEE;
 }
 
 .lmltablebuilder thead th:last-of-type {
@@ -26,6 +40,20 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 .lmltablebuilder thead th[sortable] {
 	cursor: pointer;
 }
+.lmltablebuilder .header{
+    padding: 10px;
+}
+.lmltablebuilder .header > div{
+    display: inline-block;
+}
+.lmltablebuilder .header .search label{
+    font-weight: normal;
+    margin-right: 10px;
+}
+.lmltablebuilder .header .search input{
+    border: 1px solid #EEE;
+}
+
 .lmltablebuilder thead th[sortable]:hover {
 	background-color: #EEE;
 }
@@ -33,6 +61,7 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	font: normal normal normal 14px/1 FontAwesome;
 	content : "\f0d7\f0d8";
 	margin-left: 10px;
+    float: right;
 }
 .lmltablebuilder thead th.sorted-asc[sortable]::after {
 	font: normal normal normal 14px/1 FontAwesome;
@@ -44,6 +73,31 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	content : "\f0d8";
 	margin-left: 10px;
 }
+.lmltablebuilder .footer > div {
+    display: inline-block;
+}
+.lmltablebuilder .footer > div:first-of-type p{
+    line-height: 30px;
+    color: #999;
+}
 .lmltablebuilder tbody td img {
     max-height: 70px;
+}
+.lmltablebuilder .navbuttons button {
+    background: #fff;
+    border: 1px solid #EEE;
+    border-right: 0px;
+    padding: 4px 10px;
+}
+.lmltablebuilder .navbuttons button.selected{
+    color: #fff;
+    background-color: #9B59B6;
+}
+.lmltablebuilder .navbuttons button.disabled{
+    background-color: #fafafa;
+    color: #999;
+    cursor: default;
+}
+.lmltablebuilder .navbuttons button:last-of-type {
+    border-right: 1px solid #EEE;
 }

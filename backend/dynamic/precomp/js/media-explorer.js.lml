@@ -288,6 +288,19 @@ $(document).ready(function() {
 
             mediaExplorer.init();
         }
+        $('.media_explorer_form > input').each(function(){
+            var input = $(this);
+            liliumcms.livevars.getSingleLivevar('media.getUrlFromId', {
+                id: input.val()
+            }, function(data){
+                if (data.livevars['media.getUrlFromId'].url) {
+                    input.parent().css('background-image', 'url("{=baseurl}uploads/'+ data.livevars['media.getUrlFromId'].url +'")');
+
+                }
+            })
+
+        });
+
     });
 
 

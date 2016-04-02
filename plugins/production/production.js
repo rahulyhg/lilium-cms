@@ -6,6 +6,7 @@ var conf = undefined;
 var Admin = undefined;
 var filelogic = undefined;
 var formBuilder = undefined;
+var notifications = undefined;
 var sponsoredarticle = require('./sponsoredarticle.js');
 var changerequest = require('./changeRequest.js');
 var Campaigns = require('./campaigns.js');
@@ -21,6 +22,7 @@ var Production = function () {
         Admin = require(abspath + 'backend/admin.js');
         filelogic = require(abspath + 'filelogic.js');
         formBuilder = require(abspath + 'formBuilder.js');
+        notifications = require(abspath + 'notifications.js');
         sponsoredarticle.init(abspath);
     };
 
@@ -100,20 +102,28 @@ var Production = function () {
         entities.registerRole({
             name: 'production',
             displayname: 'Production'
-        }, ['dash', 'production', 'sponsoredcontent'], function () {
+        }, ['dash', 'production', 'sponsoredcontent', 'view-media',  'view-content'], function () {
             return;
-        }, true);
+        }, false);
     };
 
     var registerForms = function () {
         hooks.bind('post_create_bottom', 200, function (pkg) {
             pkg.form.add('isSponsored', 'checkbox', {
                 displayname: 'Sponsored Content',
+                'wrapper': {
+                    'class': 'col-md-12'
+                },
                 data: {
                     right: 'production'
                 }
             });
         });
+    }
+
+    var registerNotificationGroups = function() {
+        notifications.createGroup('production', 'production');
+
     }
 
     this.unregister = function (callback) {
@@ -137,7 +147,7 @@ var Production = function () {
 
         log('Production', 'Registering forms');
         registerForms();
-
+        registerNotificationGroups();
 
         return callback();
     };

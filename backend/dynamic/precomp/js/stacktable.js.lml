@@ -11,6 +11,7 @@ var StackTable = function(tableid, objTitle, dataScheme) {
     };
 
     $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
+        console.log('CLIKIDICLKED')
         that.appendRow();
         return false;
     });

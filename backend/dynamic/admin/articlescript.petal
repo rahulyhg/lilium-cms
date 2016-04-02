@@ -1,25 +1,209 @@
 {#config}
 <script>
-	var deleteArticle = function(id) {
-		$.post('{=config.default.server.url}/admin/article/delete/' + id, function(data) {
-			liliumcms.refresh();
-		});
-	};
+    var isAutoSave = false;
+    var timer;
+    var lastSave;
+    var _id;
+    var contentid;
+    var lastParamUrl = window.location.pathname.split( '/' ).pop();
 
-    var canDelete = function(item) {
+    var deleteArticle = function(id) {
+        $.post('{=config.default.server.url}/admin/article/delete/' + id, function(data) {
+            liliumcms.refresh();
+        });
     };
 
-    window.addEventListener("beforeunload", function(e) {
-        var confirmationMessage = 'It looks like you have been editing something. ' +
-         'If you leave before saving, your changes will be lost.';
+    var canDelete = function(item) {};
+    document.addEventListener('livevarsFetched', function(e) {
+        var content = e.detail.livevars['content.' + window.location.pathname.split( '/' ).pop()];
+        if (content && content.length > 0) {
+            if (content[0].recentversion) {
+                lmlAlert('There is a more recent version of this article <a href="{=config.default.server.url}/admin/article/edit/'+ content[0].recentversion +'">here</a>');
+            }
 
-        (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-        return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            isAutoSave = content[0].status == 'autosaved';
+            if (isAutoSave) {
+                _id = lastParamUrl;
+                contentid = content[0].contentid;
+            } else {
+                contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
+            }
+
+            if (content[0].status == 'autosaved' && content[0].contentid) {
+                lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/'+ content[0].contentid +'">this article</a>');
+            }
+        }
+
+
     });
+
+
     document.addEventListener('livevarsRendered', function(e) {
+        lastSave = $('form').serialize();
         liliumcms.formvalidator.prepareValidation(function(data) {
             // Create notification
-            liliumcms.notify({title: 'Article' ,message : 'Your article is beeing processed', type : 'info'})
+            liliumcms.notify({
+                title: 'Article',
+                message: 'Your article is beeing processed',
+                type: 'info'
+            })
         });
     });
+
+    $(document).ready(function() {
+
+
+        // Will be edit, new or an id
+
+        // Check if we can get an id
+
+        timer = $.timer(function() {
+            autoSave();
+        }, 1 * 10 * 1000, true);
+
+
+        var autoSave = function() {
+            timer.pause();
+            var currentSave = $('form').serialize();
+            console.log('Sarting auto-save');
+            // Save only if content has changed
+            if (lastSave != currentSave) {
+                console.log('New content, saving in server');
+                var tempSave = currentSave;
+                console.log(_id);
+                console.log(contentid);
+                if (_id) {
+                    tempSave += '&_id=' + _id;
+                }
+
+                if (contentid) {
+                    tempSave += '&contentid=' + contentid;
+                }
+
+                $.post('/admin/article/autosave', tempSave, function(data) {
+                    lastSave = currentSave;
+                    if (data.success && data._id) {
+                        _id = data._id;
+                    }
+                    if ($('.cke_bottom .status').size() == 0) {
+                        $('.cke_bottom').append('<span class="status">Last saved : <time class="date timeago" datetime="' + new Date().toString() + '">' + new Date() + '</time></span>');
+                    }
+
+                    $(".cke_bottom time.timeago").timeago("update", new Date());
+
+                });
+            }
+        };
+
+        window.addEventListener("beforeunload", function(e) {
+            if (lastSave !== $('form').serialize()) {
+                var confirmationMessage = 'It looks like you have been editing something. ' +
+                    'If you leave before saving, your changes will be lost.';
+
+                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
+                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
+            }
+        });
+
+        if (CKEDITOR) {
+            CKEDITOR.on('instanceReady', function() {
+                CKEDITOR.instances.content.on('focus', function() {
+                    if (timer) {
+                        timer.play();
+                    }
+                });
+
+                CKEDITOR.instances.content.on('blur', function() {
+                    if (document.activeElement === document.getElementsByTagName("iframe")[0]) {
+                        if (timer) {
+                            timer.pause();
+                        }
+                    }
+
+                });
+            });
+
+        }
+
+        $('form button[name=save]').on('click', function(e) {
+            // Save and give notification
+            var currentSave = $('form').serialize();
+            var url;
+            var tempsave = currentSave
+            if (isAutoSave) {
+                url = '/overwrite-save',
+                tempsave += contentid ? '&contentid=' +contentid : '';
+                currentSave += _id ? '&_id=' + _id : '';
+            } else {
+                url = '/save';
+                tempsave += contentid ? '&_id=' + contentid : '';
+
+            }
+
+            // Check if
+            $.post('/admin/article' + url, tempsave, function(data) {
+                lastSave = currentSave;
+                if (data.success && data._id) {
+                    if (isAutoSave) window.location.replace("{=config.default.server.url}/admin/article/edit/" + data._id);
+                    contentid = data._id;
+                }
+
+                if ($('.cke_bottom .status').size() == 0) {
+                    $('.cke_bottom').append('<span class="status">Last saved : <time class="date timeago" datetime="' + new Date().toString() + '">' + new Date() + '</time></span>');
+                }
+
+
+                $(".cke_bottom time.timeago").timeago("update", new Date());
+                console.log('Auto-saved (' + data.name + ')');
+
+            });
+
+        });
+
+        $('form button[name=preview]').on('click', function(e) {
+            // Open in new tab
+            $.post('/admin/article/preview', $('form').serialize(), function(html) {
+                window.open().document.write(html);
+            });
+        });
+
+        $('form button[name=publish]').on('click', function(e) {
+            // Ask for confirmation
+            $('#confirm-publish').modal('show');
+        });
+
+        window.onblur = function() {
+            if (timer) {
+                timer.pause();
+            }
+        };
+
+        window.onfocus = function() {
+            if (timer) {
+                timer.play();
+            }
+        };
+    });
 </script>
+<div id="confirm-publish" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Please confirm</h4>
+            </div>
+            <div class="modal-body">
+                <p>You are about to publish this article, are you sure?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Yes, go live!</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

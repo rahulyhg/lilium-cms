@@ -212,6 +212,14 @@ var Media = function () {
             var wholeDico = levels.length === 0;
             if (wholeDico) {
                 db.singleLevelFind(cli._c, 'uploads', callback);
+            } else if (levels[0] == 'getUrlFromId') {
+                    db.findToArray(cli._c, 'uploads', {_id : db.mongoID(params.id)}, function(err, arr){
+                        if (arr.length > 0) {
+                            callback({url: arr[0].url});
+                        } else {
+                            callback([]);
+                        }
+                    });
             } else {
                 db.multiLevelFind(cli._c, 'uploads', levels, {
                     _id: new mongo.ObjectID(levels[0])

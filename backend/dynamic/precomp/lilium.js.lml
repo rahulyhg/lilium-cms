@@ -243,33 +243,43 @@ var LiliumCMS = function() {
     this.fillFormFromSource = function(src, data, index) {
         index = typeof index == 'undefined' ? 0: index;
         var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
-
         $(form).find('select[multiple]').each(function(index, osSelect) {
-            var select = new MultiSelect(
-                sTable.attr('id'),
-                sTable.data('title'),
-                JSON.parse(osSelect.dataset.scheme.replace(/\&lmlquote;/g, '"'))
-            );
+            var select;
+            if (osSelect.dataset.multiselectindex) {
+                select = that.multiselects[osSelect.dataset.multiselectindex];
+                select.render(data);
+            } else {
+                select = new MultiSelect(
+                    form.attr('id'),
+                    form.data('title')
+                );
+            };
         });
-
         $(form).find('.tags-input').each(function(index, tagsInput) {
-            var select = new Tags(
+            var tag = new Tags(
                 tagsInput,
                 data
             );
-        });
 
+            tags.push(tag);
+            tagsInput.dataset.tagsindex = tags.length - 1;
+        });
 
         // Check for stacktable
         $(form).find('table.lmlstacktable').each(function(index, osTable) {
-            sTable = $(osTable);
+            var sTable = $(osTable);
             var stackTable = new StackTable(
                 sTable.attr('id'),
                 sTable.data('title'),
                 JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
             );
+            stacktables.push(stacktables);
 
-            stackTable.appendRow(data);
+            osTable.dataset.stacktableindex = stacktables.length -1 ;
+
+            if (stackTable) {
+                stackTable.appendRow(data);
+            }
 
         });
 
@@ -293,7 +303,7 @@ var LiliumCMS = function() {
                         } else {
                             field.val(val);
                         }
-                    }               
+                    }
                 }
             }
 
@@ -306,24 +316,27 @@ var LiliumCMS = function() {
 
     var FormParser = function() {
         var makeSingleStackTable = this.makeSingleStackTable = function(index, osTable) {
-            sTable = $(osTable);
-            var stackTable = new StackTable(
-                sTable.attr('id'),
-                sTable.data('title'),
-                JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
-            );
+            if (!osTable.dataset.stacktableindex) {
+                var sTable = $(osTable);
+                var stackTable = new StackTable(
+                    sTable.attr('id'),
+                    sTable.data('title'),
+                    JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+                );
+                stacktables.push(stackTable);
+            }
 
-            osTable.dataset.stacktableindex = index;
-            stacktables.push(stackTable);
         };
 
         var makeSingleTag = this.makeSingleTag = function(index, tagsInput) {
+            if (!tagsInput.dataset.tagsindex) {
+                var tag = new Tags(
+                    tagsInput
+                );
 
-            var tag = new Tags(
-                tagsInput
-            );
+                tags.push(tag);
+            }
 
-            tags.push(tag);
         };
 
         var makeStackTables = function() {
@@ -482,8 +495,9 @@ $(document).ready(function(){
 
 document.addEventListener('livevarsRendered', function(e) {
     liliumcms.multiselects.forEach(function(select) {
-        select.render();
-
+        if (!select.isRendered) {
+            select.render();
+        }
     });
     liliumcms.queryparams.parseURL();
     liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false ;

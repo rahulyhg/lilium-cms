@@ -44,10 +44,7 @@ $(document).ready(function() {
             });
 
             $('#dropdown-notification').on('click', function() {
-                var badge = $('.dropdown .glyphicon .badge');
-                if ($(badge).is(":visible")) {
-
-                }
+                var badge = $("#dropdown-notification > span > .badge");
                 socket.emit('notification-view', {});
                 // Hide badge
                 badge.html(0);
@@ -128,6 +125,10 @@ $(document).ready(function() {
             notification.message = notification.msg ? notification.msg : 'Notification without a message :(';
             liliumcms.notify(notification);
         });
+        var event = new CustomEvent('socketReady', {});
+        document.dispatchEvent(event);
+
+
     };
     liliumcms.notify = function(notification) {
         $.notify(notification, {

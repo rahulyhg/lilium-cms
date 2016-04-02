@@ -69,6 +69,7 @@ var CacheInvalidator = function () {
     };
 
     this.deleteCachedFile = function (cli, rel, cb) {
+        log('[CacheInvalidator] Invalidating file ' + cli._c.server.html + "/" + rel);
         fs.unlink(cli._c.server.html + "/" + rel, cb || function () {});
     };
 
@@ -87,6 +88,32 @@ var CacheInvalidator = function () {
             cb();
         });
     };
+
+    hooks.bind('article_created', 1, function(data) {
+        // Update profile page
+    });
+
+    hooks.bind('article_deleted', 1, function(data) {
+        // Update profile page
+    });
+
+    hooks.bind('article_edited', 1, function(data) {
+        // Update profile page
+    });
+
+    hooks.bind('profile_picture_updated', 1, function(data) {
+        deleteContentByAuthor(data.cli.userinfo.userid, data.cli._c);
+    });
+
+    this.deleteContentByAuthor = function(authorId, cli) {
+        // Find articles of the Author
+        db.findToArray(cli._c, 'content', {_id: db.mongoID(authorId)}, function(err, arr) {
+            if (err) log("[CacheInvalidator] Error while requesting to db :" + err);
+            for (var i in arr) {
+                that.deleteCachedFile(cli._c, arr[i].name + '.html');
+            }
+        });
+    }
 
 };
 
