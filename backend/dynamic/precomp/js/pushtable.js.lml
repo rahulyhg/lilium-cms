@@ -81,11 +81,16 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
     this.rowToHTML = function(row) {
         var _h = '<tr class="lmlpushtableaddedrow" id="' + row._rowID + '" data-value="' + row['_lmlid'] + '"><td>' +
             '<b>' + row['_title'] + '</b><input type="hidden" name="' + tableid + '[' + row._rowID + '][prodid]" value="' + row['_lmlid'] + '" /></td>';
+        var _e = '';
         var validRow = true;
         var er = undefined;
+        var hiddenFields = scheme.hiddenFields;
 
         for (var key in row) {
-            if (key[0] != "_" && schemeCol[key]) {
+            if (hiddenFields.indexOf(key) !== -1) {
+                var hval = row[key].toString().replace(/\"/g, '//"');
+                _e += '<input type="hidden" name="' + tableid + '[' + row._rowID + '][' + key + ']" value="'+hval+'" />';
+            } else if (key[0] != "_" && schemeCol[key]) {
                 if (schemeCol[key].autocomplete) {
                     // Check for column in templates
                     var livevarValue = liliumcms.livevars.retrieveVar(schemeCol[key].autocomplete.datasource);
@@ -121,13 +126,19 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             }
         }
 
-        return validRow ? _h + '<td><button class="lmlpushtableremovebutton">Remove</button></td></tr>' : er;
+        return validRow ? _h + '<td>' + _e + '<button class="lmlpushtableeditbutton">Edit</button><button class="lmlpushtableremovebutton">Remove</button></td></tr>' : er;
     };
 
     this.removeDeleteRow = function(rowID) {
         $('#' + rowID).remove();
         delete rows[rowID];
         that.updateFooter();
+
+        return false;
+    };
+
+    this.editRow = function(rowID) {
+        
 
         return false;
     };
@@ -155,6 +166,10 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
                     row[k] = sourceObj[k];
                 }
             }
+
+            if (row._editid) {
+                row._rowID = row._editid;
+            }
         } else {
             row['_lmlid'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer').val();
             row['_title'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer option:selected').html();
@@ -181,6 +196,10 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
                     .find('tr').last().find('.lmlpushtableremovebutton').bind('click', function() {
                         that.removeDeleteRow(rowID);
                     });
+                
+                $('#' + htmlIdentifier).find('tbody').find('tr').last().find('.lmlpushtableeditbutton').bind('click', function() {
+                    that.editRow(rowID);
+                });
             }
         })(row._rowID);
 

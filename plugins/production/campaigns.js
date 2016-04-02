@@ -322,7 +322,7 @@ var Campaigns = function () {
         filelogic.serveAdminLML(cli, hasParam);
     };
 
-    var cliToDatabaseCampaign = function (cli) {
+    var cliToDatabaseCampaign = function (cli, old) {
         cli.touch('campaigns.clitodatabasecampaign');
 
         var postdata = cli.postdata.data;
@@ -330,7 +330,8 @@ var Campaigns = function () {
 
         for (var key in postdata.productstable) {
             var sprod = postdata.productstable[key];
-            sprod.impressions = 0;
+            sprod.impressions = sprod.impressions ? parseInt(sprod.impressions) : 0;
+            sprod._editid = key;
             products.push(sprod);
         }
 
@@ -441,6 +442,9 @@ var Campaigns = function () {
                 displayname: "Products",
                 template: "tmpl_productrow",
                 datascheme: {
+                    hiddenFields : [
+                        "impressions"
+                    ],
                     key: {
                         displayName: "Product",
                         keyName: "displayName",
