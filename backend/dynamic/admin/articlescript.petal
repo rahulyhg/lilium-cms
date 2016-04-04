@@ -5,7 +5,7 @@
     var lastSave;
     var _id;
     var contentid;
-    var lastParamUrl = window.location.pathname.split( '/' ).pop();
+    var lastParamUrl = window.location.pathname.split('/').pop();
 
     var deleteArticle = function(id) {
         $.post('{=config.default.server.url}/admin/article/delete/' + id, function(data) {
@@ -15,10 +15,17 @@
 
     var canDelete = function(item) {};
     document.addEventListener('livevarsFetched', function(e) {
-        var content = e.detail.livevars['content.' + window.location.pathname.split( '/' ).pop()];
+        var content = e.detail.livevars['content.' + window.location.pathname.split('/').pop()];
         if (content && content.length > 0) {
+            // You can't have a draft if article is published
+            if (content[0].status == 'published') {
+                $('form button[name=save]').parent().remove();
+                $('form button[name=preview]').parent().removeClass('col-md-4').addClass('col-md-6');
+                $('form button[name=publish]').parent().removeClass('col-md-4').addClass('col-md-6');
+            }
+
             if (content[0].recentversion) {
-                lmlAlert('There is a more recent version of this article <a href="{=config.default.server.url}/admin/article/edit/'+ content[0].recentversion +'">here</a>');
+                lmlAlert('There is a more recent version of this article <a href="{=config.default.server.url}/admin/article/edit/' + content[0].recentversion + '">here</a>');
             }
 
             isAutoSave = content[0].status == 'autosaved';
@@ -30,7 +37,7 @@
             }
 
             if (content[0].status == 'autosaved' && content[0].contentid) {
-                lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/'+ content[0].contentid +'">this article</a>');
+                lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
             }
         }
 
@@ -39,15 +46,16 @@
 
 
     document.addEventListener('livevarsRendered', function(e) {
+
         lastSave = $('form').serialize();
-        liliumcms.formvalidator.prepareValidation(function(data) {
-            // Create notification
-            liliumcms.notify({
-                title: 'Article',
-                message: 'Your article is beeing processed',
-                type: 'info'
-            })
-        });
+        // liliumcms.formvalidator.prepareValidation(function(data) {
+        //     // Create notification
+        //     liliumcms.notify({
+        //         title: 'Article',
+        //         message: 'Your article is beeing processed',
+        //         type: 'info'
+        //     });
+        // });
     });
 
     $(document).ready(function() {
@@ -68,10 +76,7 @@
             console.log('Sarting auto-save');
             // Save only if content has changed
             if (lastSave != currentSave) {
-                console.log('New content, saving in server');
                 var tempSave = currentSave;
-                console.log(_id);
-                console.log(contentid);
                 if (_id) {
                     tempSave += '&_id=' + _id;
                 }
@@ -129,16 +134,10 @@
             // Save and give notification
             var currentSave = $('form').serialize();
             var url;
-            var tempsave = currentSave
-            if (isAutoSave) {
-                url = '/overwrite-save',
-                tempsave += contentid ? '&contentid=' +contentid : '';
-                currentSave += _id ? '&_id=' + _id : '';
-            } else {
-                url = '/save';
-                tempsave += contentid ? '&_id=' + contentid : '';
-
-            }
+            var tempsave = currentSave;
+            url = '/save';
+            tempsave += contentid ? '&_id=' + contentid : '';
+            tempsave += _id ? '&autosaveid= ' + _id : '';
 
             // Check if
             $.post('/admin/article' + url, tempsave, function(data) {
@@ -152,9 +151,14 @@
                     $('.cke_bottom').append('<span class="status">Last saved : <time class="date timeago" datetime="' + new Date().toString() + '">' + new Date() + '</time></span>');
                 }
 
+                liliumcms.notify({
+                        title: 'Article',
+                        message: 'Your draft is saved',
+                        type: 'success'
+                    });
+
 
                 $(".cke_bottom time.timeago").timeago("update", new Date());
-                console.log('Auto-saved (' + data.name + ')');
 
             });
 
@@ -170,6 +174,22 @@
         $('form button[name=publish]').on('click', function(e) {
             // Ask for confirmation
             $('#confirm-publish').modal('show');
+        });
+
+
+        $('#confirm-publish button.btn-primary').on('click', function(e) {
+            $('#confirm-publish').modal('hide');
+            var valid = liliumcms.formvalidator.validate($('form'));
+            if (valid) {
+                $.post('', $('form').serialize(), function(data) {
+                    if (data.success && data.redirect) {
+                        window.location(data.redirect);
+                    }
+                });
+            } else {
+                alert('You have some invalid fields, please review them');
+            }
+
         });
 
         window.onblur = function() {

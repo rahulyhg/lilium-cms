@@ -11,12 +11,12 @@ var slugify = require('slug');
 var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
 
-var Article = function () {
-    this.handlePOST = function (cli) {
+var Article = function() {
+    this.handlePOST = function(cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case 'new':
-                this.new(cli);
+                this.publish(cli);
                 break;
             case 'edit':
                 this.edit(cli);
@@ -26,9 +26,6 @@ var Article = function () {
                 break;
             case 'autosave':
                 this.save(cli, true);
-                break;
-            case 'overwrite-save':
-                this.overwrite(cli);
                 break;
             case 'save':
                 this.save(cli);
@@ -42,17 +39,21 @@ var Article = function () {
         }
     };
 
-    this.handleGET = function (cli) {
+    this.handleGET = function(cli) {
         cli.touch('article.handleGET');
         if (cli.routeinfo.path.length == 2) {
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
                 case 'new':
-                    this.new(cli);
+                    filelogic.serveAdminLML(cli);
                     break;
                 case 'edit':
-                    this.edit(cli);
+                    if (cli.routeinfo.path[3] && cli.routeinfo.path[3] == 'autosave') {
+                        filelogic.serveAdminLML(cli, true);
+                    } else {
+                        this.edit(cli);
+                    }
                     break;
                 case 'getArticle':
                     this.getArticle(cli);
@@ -68,114 +69,62 @@ var Article = function () {
         }
     };
 
-    this.list = function (cli) {
+    this.list = function(cli) {
         filelogic.serveAdminLML(cli, false);
     }
 
-    this.new = function (cli) {
+    this.publish = function(cli) {
         cli.touch('article.new');
+        var form = formBuilder.handleRequest(cli);
+        var response = formBuilder.validate(form, true);
 
-        if (cli.method == 'POST') {
-            var form = formBuilder.handleRequest(cli);
-
-            var response = formBuilder.validate(form, true);
-
-            var redirect = '';
-
-            if (response.success) {
-                var formData = formBuilder.serializeForm(form);
-
-                formData.name = slugify(formData.title).toLowerCase();
-                formData.author = cli.userinfo.userid;
-                formData.dateCreated = new Date();
-                formData.media = db.mongoID(formData.media);
-
-                hooks.fire('article_will_create', {
-                    cli: cli,
-                    article: formData
-                });
-                // Create post
-                db.insert(cli._c, 'content', formData, function (err, result) {
-                    if (!err) {
-                        formData._id = result.insertedId;
-                        hooks.fire('article_created', {
-                            cli: cli,
-                            article: formData
-                        });
-                    }
-
-                    // Generate LML page
-                    filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function (name) {
-                        cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
-                        notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                            title: "Article is Live!",
-                            url: cli._c.server.url + '/' + formData.name,
-                            msg: "Your article is published. Click to see it live.",
-                            type: 'success'
-                        });
-                        cli.sendJSON({
-                            redirect: cli._c.server.url + "/" + name,
-                            form: {
-                                success: true
-                            }
-                        });
-
+        var redirect = '';
+        if (response.success) {
+            var formData = formBuilder.serializeForm(form);
+            formData.status = 'published';
+            formData.name = slugify(formData.title).toLowerCase();
+            formData.author = cli.userinfo.userid;
+            formData.date = new Date();
+            formData.media = db.mongoID(formData.media);
+            formData.updated = new Date();
+            hooks.fire('article_will_create', {
+                cli: cli,
+                article: formData
+            });
+            // Create post
+            db.insert(cli._c, 'content', formData, function(err, result) {
+                if (!err) {
+                    formData._id = result.insertedId;
+                    hooks.fire('article_created', {
+                        cli: cli,
+                        article: formData
                     });
-                });
+                }
 
-            } else {
-                cli.sendJSON({
-                    form: response
+                // Generate LML page
+                filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
+                    cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
+                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                        title: "Article is Live!",
+                        url: cli._c.server.url + '/' + formData.name,
+                        msg: "Your article is published. Click to see it live.",
+                        type: 'success'
+                    });
+                    cli.sendJSON({
+                        redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + result.ops[0]._id,
+                        success: true
+                    });
+
                 });
-            }
+            });
 
         } else {
-            filelogic.serveAdminLML(cli);
+            cli.sendJSON({
+                form: response
+            });
         }
 
     };
-
-    /**
-     * Will overwrite a content
-     * The postdata should contain :
-     * - contentid, the id of the content to overwrite
-     * - id, the id of the current save that will be removed after overwrite,
-     * if it is the case.
-     */
-    this.overwrite = function (cli) {
-        var form = formBuilder.handleRequest(cli);
-        var formData = formBuilder.serializeForm(form);
-        formData.updated = new Date();
-        console.log(cli.postdata.data);
-        var id = db.mongoID(cli.postdata.data.contentid);
-        formData.media = db.mongoID(formData.media);
-
-        db.update(cli._c, 'content', {
-            _id: id
-        }, formData, function (err, res) {
-            if (err) console.log(err);
-            if (cli.postdata.data._id) {
-                db.remove(cli._c, 'autosave', {
-                    _id: db.mongoID(cli.postdata.data._id)
-                }, function () {
-                    cli.sendJSON({
-                        success: true,
-                        _id: id
-                    });
-                })
-
-            } else {
-                cli.sendJSON({
-                    success: true,
-                    _id: id
-                });
-            }
-        });
-
-
-
-
-    }
 
     /**
      * Saves an article based on some parameters
@@ -183,91 +132,120 @@ var Article = function () {
      * - contentid, the id of the original content if the save is an autosave
      * - _id, the id of whether the original content or of the auto save if it is an autosave
      */
-    this.save = function (cli, auto) {
+    this.save = function(cli, auto) {
         // Article already exists
         var form = formBuilder.handleRequest(cli);
         var formData = formBuilder.serializeForm(form);
-        var field = 'content';
         var id;
-
-        formData.status = 'draft';
 
         formData.author = db.mongoID(cli.userinfo.userid);
         formData.media = db.mongoID(formData.media);
         // Autosave
         if (auto) {
-            field = 'autosave';
+            // Check if article is edit, non-existing or published
             formData.status = 'autosaved';
             if (cli.postdata.data.contentid) {
-                formData.contentid = db.mongoID(cli.postdata.data.contentid);
-            }
+                formData.updated = new Date();
+                formData.status = 'draft';
 
-            if (cli.postdata.data._id) {
-                id = db.mongoID(cli.postdata.data._id);
-            }
+                db.findAndModify(cli._c, 'content', {_id : db.mongoID(cli.postdata.data.contentid), status: 'draft'}, formData, function(err, doc) {
+                    if (doc.value !== null) {
 
-        } else if (cli.postdata.data._id) {
-            // Draft save
-            id = db.mongoID(cli.postdata.data._id);
-        }
+                        var val = doc.value;
+                            // Is a draft article
+                            cli.sendJSON({
+                                success: true,
+                                _id: val._id,
+                                contentid: cli.postdata.data.contentid
+                            });
+                    } else {
+                            formData.status = 'autosaved';
+                            formData.updated = undefined;
+                            formData.contentid = db.mongoID(cli.postdata.data.contentid);
+                            formData.date = new Date();
 
-        if (cli.postdata.data._id) {
-            formData.date = new Date();
+                            // Is a published
+                            db.insert(cli._c, 'autosave', formData, function(err, doc) {
+                                cli.sendJSON({
+                                    success: true,
+                                    _id: doc.insertedId,
+                                    contentid: cli.postdata.data.contentid
+                                });
+                            });
+                    }
 
-            db.update(cli._c, field, {
-                _id: id
-            }, formData, function (err, res) {
-                cli.sendJSON({
-                    success: true,
-                    _id: id
-                });
-            });
-        } else if (cli.postdata.data.contentid && auto) {
-            formData.updated = new Date();
-            db.findAndModify(cli._c, field, {
-                contentid: formData.contentid
-            }, formData, function (err, doc) {
-                if (doc._id) {
-                    cli.sendJSON({
-                        success: true,
-                        _id: doc._id
-                    });
-                } else {
-                    formData.updated = undefined;
-                    formData.date = new Date();
+                })
+            } else {
+                formData.date = new Date();
+                formData.status = 'autosaved';
 
-                    db.insert(cli._c, field, formData, function (err, res) {
+                if (cli.postdata.data._id) {
+
+                    db.update(cli._c, 'autosave', {_id: db.mongoID(cli.postdata.data._id)}, formData, function() {
+                        // Autosave updated
                         cli.sendJSON({
                             success: true,
-                            _id: res.insertedId
+                            _id: cli.postdata.data._id
                         });
+                    })
+                } else {
 
+                    db.insert(cli._c, 'autosave', formData, function(err, doc) {
+                        // Autosave created
+                        cli.sendJSON({
+                            success: true,
+                            _id: doc.insertedId
+                        });
                     });
                 }
-            });
+
+            }
+
         } else {
-            formData.date = new Date();
-            db.insert(cli._c, field, formData, function (err, res) {
-                if (err) console.log(err);
-                cli.sendJSON({
-                    success: true,
-                    _id: (res.insertedId || undefined)
+            formData.status = 'draft';
+
+            if (cli.postdata.data._id) {
+                // Update draft
+                formData.updated = new Date();
+
+                id = db.mongoID(cli.postdata.data._id);
+                db.update(cli._c, 'content', {_id: id}, formData, function(err, doc){
+                    cli.sendJSON({
+                        success: true,
+                        _id: cli.postdata.data._id
+                    });
                 });
-            });
+            } else {
+                formData.date = new Date();
+                // Create draft
+                db.insert(cli._c, 'content', formData, function(err, doc) {
+                    cli.sendJSON({
+                        success: true,
+                        _id: doc.insertedId
+                    });
+                });
+
+                if (cli.postdata.data.autosaveid) {
+                    console.log("'" + cli.postdata.data.autosaveid + "'");
+                    db.remove(cli._c, 'autosave', {_id : db.mongoID(cli.postdata.data.autosaveid)}, function() {});
+                }
+
+            }
         }
+
     };
 
-    this.preview = function (cli) {
+    this.preview = function(cli) {
         var form = formBuilder.handleRequest(cli);
         var formData = formBuilder.serializeForm(form);
 
-        filelogic.compileLmlPostPage(cli, "article", formData, function (html) {
+        filelogic.compileLmlPostPage(cli, "article", formData, function(html) {
             var fileserver = require('./fileserver.js');
             fileserver.pipeContentToClient(cli, html);
         });
     };
 
-    this.edit = function (cli) {
+    this.edit = function(cli) {
         if (cli.routeinfo.path[3]) {
 
             var id = db.mongoID(cli.routeinfo.path[3]);
@@ -280,12 +258,13 @@ var Article = function () {
                     formData = formBuilder.serializeForm(form);
                     formData.name = slugify(formData.title).toLowerCase();
                     formData.media = db.mongoID(formData.media);
-                    formData.dateUpdated = new Date();
+                    formData.updated = new Date();
+                    formData.status = 'published';
 
-                    db.find(cli._c, 'content', {
+                    db.findToArray(cli._c, 'content', {
                         _id: id
-                    }, [], function (err, row) {
-                        if (!err) {
+                    }, function(err, row) {
+                        if (err || row.length == 0) {
                             cli.sendJSON({
                                 success: false,
                                 error: "Content not found for id " + id
@@ -302,12 +281,12 @@ var Article = function () {
 
                         db.findAndModify(cli._c, 'content', {
                             _id: id
-                        }, formData, function (err, r) {
+                        }, formData, function(err, r) {
                             hooks.fire('article_edited', {
                                 cli: cli,
                                 article: r.value
                             });
-                            filelogic.renderLmlPostPage(cli, "article", r.value, function (name) {
+                            filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
                                 notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                     title: "Article is updated!",
                                     url: cli._c.server.url + '/' + formData.name,
@@ -338,7 +317,7 @@ var Article = function () {
         }
     }
 
-    this.delete = function (cli) {
+    this.delete = function(cli) {
         if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
@@ -346,9 +325,9 @@ var Article = function () {
 
             db.remove(cli._c, 'content', {
                 _id: id
-            }, function (err, r) {
+            }, function(err, r) {
                 var filename = r.title + '.html';
-                fs.deleteFile(filename, function () {
+                fs.deleteFile(filename, function() {
 
                     hooks.fire('article_deleted', id);
 
@@ -365,14 +344,14 @@ var Article = function () {
         }
     }
 
-    this.getArticle = function (cli) {
+    this.getArticle = function(cli) {
         var id = new mongo.ObjectID(cli.routeinfo.path[3]);
         db.find(cli._c, 'content', {
             '_id': id
         }, {
             limit: [1]
-        }, function (err, cursor) {
-            cursor.next(function (err, article) {
+        }, function(err, cursor) {
+            cursor.next(function(err, article) {
                 if (article) {
                     cli.sendJSON({
                         form: formBuilder.unescapeForm(article)
@@ -388,14 +367,14 @@ var Article = function () {
     };
 
 
-    this.registerContentLiveVar = function () {
-        livevars.registerLiveVariable('content', function (cli, levels, params, callback) {
+    this.registerContentLiveVar = function() {
+        livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
                 db.singleLevelFind(cli._c, 'content', callback);
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
-                db.findToArray(cli._c, 'content', {}, function (err, arr) {
+                db.findToArray(cli._c, 'content', {}, function(err, arr) {
                     for (var i = 0; i < arr.length; i++) {
                         sentArr.push({
                             articleid: arr[i]._id,
@@ -458,13 +437,13 @@ var Article = function () {
                     $skip: (params.skip || 0)
                 }, {
                     $limit: (params.max || 20)
-                }], function (data) {
+                }], function(data) {
                     db.find(cli._c, 'content', (params.search ? {
                         $text: {
                             $search: params.search
                         }
-                    } : {}), [], function (err, cursor) {
-                        cursor.count(function (err, size) {
+                    } : {}), [], function(err, cursor) {
+                        cursor.count(function(err, size) {
                             results = {
                                 size: size,
                                 data: data
@@ -488,23 +467,19 @@ var Article = function () {
                         path: '$contentid',
                         preserveNullAndEmptyArrays: true
                     }
-                }, {
+                },{
                     $match: {
                         $or: [{
-                            date: {
-                                $gt: '$contentid.date'
+                            'date': {
+                                $gt: 'contentid.updated'
                             }
                         }, {
-                            date: {
-                                $gt: '$contentid.updated'
-                            }
-                        }, {
-                            contentid: null
+                            'contentid': null
                         }]
                     }
                 }, {
                     $sort: {
-                        'date': -1
+                        date: -  1
                     }
                 }, {
                     $limit: 3
@@ -517,12 +492,12 @@ var Article = function () {
                 // First, check for saved content
                 db.findToArray(cli._c, 'content', {
                     _id: db.mongoID(levels[0])
-                }, function (err, arr) {
+                }, function(err, arr) {
                     // Not found, lets check autosaves
                     if (arr && arr.length == 0) {
                         db.findToArray(cli._c, 'autosave', {
                             _id: db.mongoID(levels[0])
-                        }, function (err, arr) {
+                        }, function(err, arr) {
                             // Check if there is a newer version than this autosave
                             if (arr && arr.length > 0) {
                                 db.findToArray(cli._c, 'content', {
@@ -530,7 +505,7 @@ var Article = function () {
                                     date: {
                                         "$gte": arr[0].date
                                     }
-                                }, function (err, content) {
+                                }, function(err, content) {
                                     if (content && content.length > 0) {
                                         arr[0].recentversion = content[0]._id;
                                     }
@@ -550,7 +525,7 @@ var Article = function () {
                                 date: {
                                     "$gte": arr[0].date
                                 }
-                            }, function (err, autosave) {
+                            }, function(err, autosave) {
                                 if (autosave && autosave.length > 0) {
                                     arr[0].recentversion = autosave[0]._id;
                                 }
@@ -566,7 +541,7 @@ var Article = function () {
             }
         }, ["content"]);
 
-        livevars.registerLiveVariable('types', function (cli, levels, params, callback) {
+        livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
             var allTypes = levels.length === 0;
 
             if (allTypes) {
@@ -579,7 +554,7 @@ var Article = function () {
         }, ["types"]);
     }
 
-    this.registerForms = function () {
+    this.registerForms = function() {
         formBuilder.createForm('post_create', {
                 formWrapper: {
                     'tag': 'div',
@@ -643,19 +618,19 @@ var Article = function () {
             });
     }
 
-    cacheInvalidator.emitter.on('articleInvalidated', function (data) {
+    cacheInvalidator.emitter.on('articleInvalidated', function(data) {
 
     });
 
-    this.generateFromName = function (cli, articleName, cb) {
+    this.generateFromName = function(cli, articleName, cb) {
         // Check for articles in db
         db.findToArray(cli._c, 'content', {
             name: articleName
-        }, function (err, arr) {
+        }, function(err, arr) {
 
             if (arr[0]) {
                 // Generate LML page
-                filelogic.renderLmlPostPage(cli, "article", arr[0], function (name) {
+                filelogic.renderLmlPostPage(cli, "article", arr[0], function(name) {
                     cacheInvalidator.addFileToWatch(name, 'articleInvalidated', arr[0]._id, cli._c);
                     cb(true);
 
@@ -668,7 +643,7 @@ var Article = function () {
 
 
 
-    var init = function () {
+    var init = function() {
 
         tableBuilder.createTable({
             name: 'article',

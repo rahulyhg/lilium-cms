@@ -9,7 +9,7 @@
 		$}
 
 
-		<h1>List of articles<a class='fab' href="{=baseurl}article/new">+</a></h1>
+		<h1>List of articles<a class='fab' href="{=root}article/new">+</a></h1>
 
 		<main class="entities-main">
 			<h2>Continue Working on :</h2>

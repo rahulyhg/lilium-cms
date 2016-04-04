@@ -120,7 +120,7 @@ var DB = function() {
 
 	this.mongoID = function(str) {
 		try {
-			return new mongoObjectID(str);
+			return new mongoObjectID(str.replace(/ /g,''));
 		} catch (err) {
 			return;
 		}
