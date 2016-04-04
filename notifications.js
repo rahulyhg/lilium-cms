@@ -260,8 +260,8 @@ var Notification = function () {
         var sessionId = that.getSessionIDFromCookie(socket.handshake.headers.cookie);
         // Get session and get client id
         var session = sessionManager.getSessionFromSID(sessionId);
-        session.sessionId = sessionId;
         if (session) {
+            session.sessionId = sessionId;
             new LiliumSocket(socket, session).bind().joinGroup('lmlsite_' + session.data.site);
         }
     };

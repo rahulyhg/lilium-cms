@@ -92,115 +92,121 @@ var LiliumCMS = function() {
     };
 
     var FormValidator = function() {
-        this.prepareValidation = function(cb) {
-            $(document).ready(function() {
-                $('.v_form_validate').submit(function(e) {
-                    e.preventDefault();
-                    var validForm = true;
+        this.validate = function(form) {
+            var validForm = true;
 
-                    $(this).find('.v_validate ').each(function() {
-                        var validField = true;
+            $(form).find('.v_validate ').each(function() {
+                var validField = true;
 
-                        // If a field : text, textarea
-                        if ($(this).attr('type') == 'text' ||
-                            $(this).attr('type') == 'textarea' ||
-                            $(this).attr('type') == 'email' ||
-                            $(this).attr('type') == 'password') {
+                // If a field : text, textarea
+                if ($(this).attr('type') == 'text' ||
+                    $(this).attr('type') == 'textarea' ||
+                    $(this).attr('type') == 'email' ||
+                    $(this).attr('type') == 'password') {
 
-                            if ($(this).attr('required') && $(this).val().length == 0) {
-                                validField = false;
-                            }
-
-                            // Min and maxlength verification
-                            if ($(this).attr('minlength') && $(this).val().length < $(this).attr('minlength')) {
-                                validField = false;
-                            } else if ($(this).attr('maxlength') && $(this).val().length > $(this).attr('maxlength')) {
-                                validField = false;
-                            }
-                        }
-
-
-                        if ($(this).attr('type') == 'checkbox' && $(this).attr('required') && !$(this).is(':checked')) {
-                            validField = false;
-                        }
-
-                        if ($(this).attr('type') == 'number') {
-                            // Min and maxlength verification
-                            if ($(this).attr('min') && $(this).val() < $(this).attr('min')) {
-
-                                validField = false;
-                            } else if ($(this).attr('max') && $(this).val() > $(this).attr('max')) {
-
-                                validField = false;
-                            }
-                        }
-                        $('[ckeditor]').val($('[ckeditor]').ckeditor().val());
-
-                        if (!validField) {
-                            validForm = validField;
-                        }
-
-                        if (!validField) {
-                            $(this).removeClass('v_valid');
-                            $(this).addClass('v_invalid');
-                        } else {
-                            $(this).removeClass('v_invalid');
-                            $(this).addClass('v_valid');
-                        }
-
-
-                    });
-                    if (validForm) {
-                        // Send via ajax
-                        processForm($(this));
+                    if ($(this).attr('required') && $(this).val().length == 0) {
+                        validField = false;
                     }
-                    return false;
-                });
 
-                var processForm = function(form) {
-                    var that = this;
-                    var serialized_form = form.serialize();
-                    // Process files
-                    processFiles(form, function() {
-                        $.post(form.attr('action') || window.location.href.toString(), serialized_form, function(data) {
-                            if (data.success && data.redirect) {
-                                window.location.replace(data.redirect);
-                            }
-                            var event = new CustomEvent('formSubmited', {
-                                'detail': data
-                            });
-                            document.dispatchEvent(event);
-                            return false;
-                        });
-                        if (cb) cb();
-                    });
-                    return false;
-
-                };
-
-                var processFiles = function(form, cb) {
-                    if (form.find('input[type=file]').length > 0) {
-                        var data = new FormData();
-                        jQuery.each(form.find('input[type=file]')[0].files, function(i, file) {
-                            data.append('file-' + i, file);
-                        });
-
-                        jQuery.ajax({
-                            url: form.attr('action'),
-                            data: data,
-                            cache: false,
-                            contentType: false,
-                            processData: false,
-                            type: 'POST',
-                            success: function(data) {
-                                return cb();
-                            }
-                        });
-                    } else {
-                        return cb();
+                    // Min and maxlength verification
+                    if ($(this).attr('minlength') && $(this).val().length < $(this).attr('minlength')) {
+                        validField = false;
+                    } else if ($(this).attr('maxlength') && $(this).val().length > $(this).attr('maxlength')) {
+                        validField = false;
                     }
-                };
+                }
+
+
+                if ($(this).attr('type') == 'checkbox' && $(this).attr('required') && !$(this).is(':checked')) {
+                    validField = false;
+                }
+
+                if ($(this).attr('type') == 'number') {
+                    // Min and maxlength verification
+                    if ($(this).attr('min') && $(this).val() < $(this).attr('min')) {
+
+                        validField = false;
+                    } else if ($(this).attr('max') && $(this).val() > $(this).attr('max')) {
+
+                        validField = false;
+                    }
+                }
+                $('[ckeditor]').val($('[ckeditor]').ckeditor().val());
+
+                if (!validField) {
+                    console.log('INVALID FIELD IS');
+                    console.log($(this).attr('name'));
+                    validForm = validField;
+                }
+
+                if (!validField) {
+                    $(this).removeClass('v_valid');
+                    $(this).addClass('v_invalid');
+                } else {
+                    $(this).removeClass('v_invalid');
+                    $(this).addClass('v_valid');
+                }
+
             });
+            return validForm;
+
+        };
+
+        this.prepareValidation = function(cb) {
+            var that = this;
+            $('.v_form_validate').submit(function(e) {
+                e.preventDefault();
+
+                if (that.validate()) {
+                    // Send via ajax
+                    processForm($(this));
+                }
+                return false;
+            });
+
+            var processForm = function(form) {
+                var that = this;
+                var serialized_form = form.serialize();
+                // Process files
+                processFiles(form, function() {
+                    $.post(form.attr('action') || window.location.href.toString(), serialized_form, function(data) {
+                        if (data.success && data.redirect) {
+                            window.location.replace(data.redirect);
+                        }
+                        var event = new CustomEvent('formSubmited', {
+                            'detail': data
+                        });
+                        document.dispatchEvent(event);
+                        return false;
+                    });
+                    if (cb) cb();
+                });
+                return false;
+
+            };
+
+            var processFiles = function(form, cb) {
+                if (form.find('input[type=file]').length > 0) {
+                    var data = new FormData();
+                    jQuery.each(form.find('input[type=file]')[0].files, function(i, file) {
+                        data.append('file-' + i, file);
+                    });
+
+                    jQuery.ajax({
+                        url: form.attr('action'),
+                        data: data,
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        type: 'POST',
+                        success: function(data) {
+                            return cb();
+                        }
+                    });
+                } else {
+                    return cb();
+                }
+            };
         };
     }
 
@@ -241,8 +247,8 @@ var LiliumCMS = function() {
     }
 
     this.fillFormFromSource = function(src, data, index) {
-        index = typeof index == 'undefined' ? 0: index;
-        var form = $('form[name="' + src + '"]:nth-of-type('+ index+1 +')');
+        index = typeof index == 'undefined' ? 0 : index;
+        var form = $('form[name="' + src + '"]:nth-of-type(' + index + 1 + ')');
         $(form).find('select[multiple]').each(function(index, osSelect) {
             var select;
             if (osSelect.dataset.multiselectindex) {
@@ -275,7 +281,7 @@ var LiliumCMS = function() {
             );
             stacktables.push(stacktables);
 
-            osTable.dataset.stacktableindex = stacktables.length -1 ;
+            osTable.dataset.stacktableindex = stacktables.length - 1;
 
             if (stackTable) {
                 stackTable.appendRow(data);
@@ -284,7 +290,7 @@ var LiliumCMS = function() {
         });
 
         var foreachloop = function(data, kString) {
-             for (var key in data) {
+            for (var key in data) {
                 var kkString = kString + (kString == "" ? "" : ".") + key;
                 var val = data[key];
                 var pt = undefined;
@@ -487,7 +493,7 @@ var LiliumCMS = function() {
 };
 var liliumcms = new LiliumCMS();
 
-$(document).ready(function(){
+$(document).ready(function() {
 
     liliumcms.awesomestrapper.strap();
 
@@ -500,7 +506,7 @@ document.addEventListener('livevarsRendered', function(e) {
         }
     });
     liliumcms.queryparams.parseURL();
-    liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false ;
+    liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false;
     liliumcms.formbeautifier.beautify();
     liliumcms.formParser.init();
     liliumcms.adminmenu.init();
