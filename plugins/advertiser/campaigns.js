@@ -36,12 +36,11 @@ var CampaignAdvertiser = function () {
 
 
     this.handleGET = function (cli) {
-
         cli.touch('advertiser.campaigns.handleGET');
-
         switch (cli.routeinfo.path[2]) {
             case undefined:
-                fileLogic.serveLmlPluginPage('advertiser', cli, false);
+                cli.routeinfo.relsitepath = "/advertiser/campaigns";
+                fileLogic.serveAdminLML(cli, false, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
                 break;
             case 'sign':
                 serveSignPage(cli);
@@ -55,7 +54,6 @@ var CampaignAdvertiser = function () {
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
-
         };
     };
 
@@ -317,12 +315,11 @@ var CampaignAdvertiser = function () {
     };
 
     var reviewArticle = function (cli) {
-        fileLogic.serveLmlPluginPage('advertiser', cli, true);
+        fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
     };
 
     var changeRequest = function (cli) {
         if (cli.routeinfo.path[3]) {
-
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, array) {
@@ -337,20 +334,20 @@ var CampaignAdvertiser = function () {
     };
 
     var servePayPage = function (cli) {
-
         if (cli.routeinfo.path[3]) {
             db.findToArray('campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipayment') {
-                    fileLogic.serveLmlPluginPage('advertiser', cli, true);
+                
+                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipayment') { 
+                    fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
                 } else {
                     cli.throwHTTP(400, 'Bad Request');
                 }
-            });
+            }); 
         } else {
-            cli.throwHTTP(404, 'Not found');
+            cli.throwHTTP(404, 'Not Found');
         }
 
     };
@@ -363,7 +360,7 @@ var CampaignAdvertiser = function () {
             }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);
                 if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clisign') {
-                    fileLogic.serveLmlPluginPage('advertiser', cli, true);
+                    fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
                 } else {
                     cli.throwHTTP(400, 'Bad Request');
                 }

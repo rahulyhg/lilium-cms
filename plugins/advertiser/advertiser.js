@@ -4,7 +4,7 @@
 	 var entities = undefined;
 	 var conf = undefined;
 	 var Admin = undefined;
-	 var filelogic = undefined;
+	 var fileLogic = undefined;
 	 var formBuilder = undefined;
 	 var adminAdvertiser = require( './adminAdvertiser.js' );
 	 var campaigns = require( './campaigns.js' );
@@ -22,7 +22,7 @@
 	         hooks = require( abspath + "hooks.js" );
 	         entities = require( abspath + "entities.js" );
 	         Admin = require( abspath + 'backend/admin.js' );
-	         filelogic = require( abspath + 'filelogic.js' );
+	         fileLogic = require( abspath + 'filelogic.js' );
 	         formBuilder = require( abspath + 'formBuilder.js' );
 	         livevars = require( abspath + 'livevars.js' );
 	         db = require( abspath + 'includes/db.js' );
@@ -34,23 +34,19 @@
 	     };
 
 	     var registerEndpoint = function () {
-
 	         endpoints.register( 'advertiser', 'GET', function ( cli ) {
 	             if ( cli.isGranted( 'advertiser' ) ) {
-
 	                 switch ( cli.routeinfo.path[ 1 ] ) {
 	                     case undefined:
-	                         filelogic.serveLmlPluginPage( 'advertiser', cli, false );
+                             cli.routeinfo.relsitepath = "/advertiser";
+                             fileLogic.serveAdminLML(cli, false, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
 	                         break;
 	                     case 'campaigns':
 	                         campaigns.handleGET( cli );
 	                         break;
 	                     default:
 	                         cli.throwHTTP( 404, 'Not found' );
-
-
 	                 }
-
 	             } else {
 	                 cli.redirect( conf.default().server.url + '/' + conf.default().paths.login, false );
 	             }
@@ -58,20 +54,17 @@
 
 	         endpoints.register( 'advertiser', 'POST', function ( cli ) {
 	             if ( cli.isGranted( 'advertiser' ) ) {
-
 	                 switch ( cli.routeinfo.path[ 1 ] ) {
 	                     case undefined:
-	                         filelogic.serveLmlPluginPage( 'advertiser', cli, false );
+                             cli.routeinfo.relsitepath = "/advertiser";
+                             fileLogic.serveAdminLML(cli, false, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
 	                         break;
 	                     case 'campaigns':
 	                         campaigns.handlePOST( cli );
 	                         break;
 	                     default:
 	                         cli.throwHTTP( 404, 'Not found' );
-
-
 	                 }
-
 	             } else {
 	                 cli.redirect( conf.default().server.url + '/' + conf.default().paths.login, false );
 	             }
@@ -142,7 +135,7 @@
 	             if ( len != 0 && dat.adserver.publicaddr[ len - 1 ] == '/' ) {
 	                 dat.adserver.publicaddr = dat.adserver.publicaddr.substring( 0, len - 1 );
 	             }
-	         } );
+	         });
 
 	         hooks.bind( 'settings_saved', 500, function () {
 	             pingAdServer( function ( valid ) {

@@ -26,17 +26,17 @@ var AdminAdvertiser = function () {
         }
     };
 
-
     this.handleGET = function ( cli ) {
 
         cli.touch( 'advertiser.admin.handleGET' );
 
         switch ( cli.routeinfo.path[ 2 ] ) {
             case undefined:
-                fileLogic.serveLmlPluginAdminPage( 'advertiser', cli, false );
+                cli.routeinfo.relsitepath = "/advertiser";
+                fileLogic.serveAdminLML(cli, false, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
                 break;
             case 'edit':
-                fileLogic.serveLmlPluginAdminPage( 'advertiser', cli, true );
+                fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
                 break;
             default:
                 return cli.throwHTTP( 404, 'Not Found' );
@@ -110,7 +110,7 @@ var AdminAdvertiser = function () {
 
                     } else {
                         updateAdvertiser( serializedForm, id, cli, function () {
-                            fileLogic.serveLmlPluginAdminPage( 'advertiser', cli, true );
+                            fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
                         } );
                     }
 
@@ -121,7 +121,8 @@ var AdminAdvertiser = function () {
                 }
 
             } else {
-                fileLogic.serveLmlPluginAdminPage( 'advertiser', cli, true );
+                cli.routeinfo.relsitepath = "/advertiser";
+                fileLogic.serveAdminLML(cli, false, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
             }
 
         } else {

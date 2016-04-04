@@ -1,18 +1,11 @@
-{#config}
-<!DOCTYPE html>
-<html>
-<head>
-    {%adminhead;script}
+    {#config}
     {$
     	var baseurl = config.default.server.url;
     	baseurl += "/";
     	baseurl += "advertiser";
     	baseurl += "/";
     $}
-    <title></title>
-</head>
-<body>
-    
+
     <h2>Welcome advertiser</h2>
         <a href="{=config.default.server.url}/advertiser/campaigns">View your campaigns</a>
         <h3>Campaigns needing your attention</h3>
@@ -48,5 +41,3 @@
         		</div>
         	</lml:tobject>
         </lml:template>
-    </body>
-</html>

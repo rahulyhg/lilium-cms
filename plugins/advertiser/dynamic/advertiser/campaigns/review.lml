@@ -5,19 +5,6 @@
 	baseurl += "advertiser";
 	baseurl += "/";
 $}
-<!DOCTYPE html>
-<html>
-
-<head>
-	<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
-	{%../../../../../backend/dynamic/admin/globalhead;../../script}
-	<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
-	<script src="{=config.default.server.url}/bower/ckeditor/adapters/jquery.js"></script>
-</head>
-
-<body>
-
 	<h1>Review the following posts</h1>
 	<div>
 		{*campaigns.articlereview.{?1}(template:"review-article",sourceof:"advertiser_article_review")}
@@ -105,4 +92,3 @@ $}
 
     }
 	</script>
-</body>

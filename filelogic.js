@@ -86,7 +86,7 @@ var FileLogic = function () {
         });
     };
 
-    this.serveAdminLML = function (cli, lastIsParam, extra) {
+    this.serveAdminLML = function (cli, lastIsParam, extra, templatefile, dynamicroot) {
         lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
         var name = "";
 
@@ -96,10 +96,10 @@ var FileLogic = function () {
             name = cli.routeinfo.relsitepath;
         }
 
-        var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
+        var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + name + ".lml";
         var savePath = cli._c.server.html + name + '/index.html';
         var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
-        var adminPath = cli._c.server.base + "backend/dynamic/admintemplate.lml";
+        var adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml");
 
         FileServer.fileExists(savePath, function (isPresent) {
             if (!isPresent) {

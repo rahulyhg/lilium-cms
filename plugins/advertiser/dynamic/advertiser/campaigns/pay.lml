@@ -5,16 +5,6 @@
 	baseurl += "advertiser";
 	baseurl += "/";
 $}
-<!DOCTYPE html>
-<html>
-
-<head>
-	<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
-	{%../../../../../backend/dynamic/admin/globalhead;../../script}
-
-</head>
-
-<body>
 {*isStripeClient}
 <h1>Payment</h1>
 <table>
@@ -108,4 +98,3 @@ TVQ :
 
 	});
 	</script>
-</body>

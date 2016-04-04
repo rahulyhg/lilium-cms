@@ -740,6 +740,8 @@ var LML = function () {
     }
 
     this.executeToFile = function (rootpath, compilepath, callback, extra) {
+        log("LML", rootpath + " => " + compilepath);
+
         var timeStamp = new Date();
         fileserver.createDirIfNotExists(compilepath, function (dirExists) {
             if (!dirExists) throw new Error("LML.AccessException - Could not create directory for " + compilepath);

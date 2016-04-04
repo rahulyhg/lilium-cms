@@ -1,0 +1,11 @@
+{#config;extra}
+<!DOCTYPE html>
+<html>
+    <head>
+        {%adminhead;script}
+    </head>
+    <body>
+        {%adverthead}
+        {%%extra.templatefile}
+    </body>
+</html>
