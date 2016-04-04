@@ -142,8 +142,10 @@
             // Check if
             $.post('/admin/article' + url, tempsave, function(data) {
                 lastSave = currentSave;
+                if (data.success && data.redirect) {
+                    window.location.replace(data.redirect);
+                }
                 if (data.success && data._id) {
-                    if (isAutoSave) window.location.replace("{=config.default.server.url}/admin/article/edit/" + data._id);
                     contentid = data._id;
                 }
 
@@ -183,7 +185,7 @@
             if (valid) {
                 $.post('', $('form').serialize(), function(data) {
                     if (data.success && data.redirect) {
-                        window.location(data.redirect);
+                        window.location.replace(data.redirect);
                     }
                 });
             } else {

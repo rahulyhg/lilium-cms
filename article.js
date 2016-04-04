@@ -203,7 +203,8 @@ var Article = function() {
 
         } else {
             formData.status = 'draft';
-
+            formData.author = db.mongoID(cli.userinfo.userid);
+            console.log(cli.userinfo.userid);
             if (cli.postdata.data._id) {
                 // Update draft
                 formData.updated = new Date();
@@ -221,20 +222,18 @@ var Article = function() {
                 db.insert(cli._c, 'content', formData, function(err, doc) {
                     cli.sendJSON({
                         success: true,
-                        _id: doc.insertedId
+                        redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + doc.insertedId
                     });
                 });
 
                 if (cli.postdata.data.autosaveid) {
-                    console.log("'" + cli.postdata.data.autosaveid + "'");
                     db.remove(cli._c, 'autosave', {_id : db.mongoID(cli.postdata.data.autosaveid)}, function() {});
                 }
 
             }
         }
 
-    };
-
+    }
     this.preview = function(cli) {
         var form = formBuilder.handleRequest(cli);
         var formData = formBuilder.serializeForm(form);
