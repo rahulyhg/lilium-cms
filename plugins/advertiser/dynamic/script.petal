@@ -9,8 +9,9 @@
     });
   };
   $(document).ready(function() {
-    Stripe.setPublishableKey('{=config.default.stripe.publickey}');
-    document.addEventListener('livevarsRendered', function(e) {
+    if (typeof Stripe !== 'undefined') {
+      Stripe.setPublishableKey('{=config.default.stripe.publickey}');
+      document.addEventListener('livevarsRendered', function(e) {
         // Check if credit card info are added
         $('#stripe_form').on('submit', function(event) {
           if ($('[data-stripe=number]').val() != '') {
@@ -49,8 +50,8 @@
           }
 
         });
-    });
-
+      });
+    }
   });
 
   var payementNeeded = function(item) {

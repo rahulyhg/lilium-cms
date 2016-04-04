@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {%../../../backend/dynamic/admin/globalhead;script}
+    {%adminhead;script}
     {$
     	var baseurl = config.default.server.url;
     	baseurl += "/";

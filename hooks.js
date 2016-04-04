@@ -21,6 +21,20 @@ var Hooks = function () {
         }
 
         //add to Object
+        var switchedPrio = false;
+        if (events[eventName][priority]) {
+            log("Hooks", "Tried to bind on event with existing priority : " + eventName + "@" + priority);
+            switchedPrio = true;
+        }
+
+        while (events[eventName][priority]) {
+            priority++;
+        }
+        
+        if (switchedPrio) {
+            log("Hooks", "Modified priority to " + priority);
+        }
+
         events[eventName][priority] = callback;
 
         //Sort object based on priority

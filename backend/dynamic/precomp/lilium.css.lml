@@ -884,10 +884,10 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 
 /* Strips and widgets */
 .messagestrip {
-	padding: 2px 15px;
-    	margin: 0px;
-    	display: block;
-    	color: #FFF;
+	padding: 12px 15px;
+    margin: 0px;
+    display: block;
+    color: #FFF;
 }
 
 .messagestrip .fa {
