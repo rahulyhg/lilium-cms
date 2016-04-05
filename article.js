@@ -138,49 +138,61 @@ var Article = function() {
         var formData = formBuilder.serializeForm(form);
         var id;
 
+        if (cli.postdata.data.autosaveid) {
+            db.remove(cli._c, 'autosave', {
+                _id: db.mongoID(cli.postdata.data.autosaveid.replace(" ", ""))
+            }, function() {});
+        }
+
         formData.author = db.mongoID(cli.userinfo.userid);
         formData.media = db.mongoID(formData.media);
+        formData.updated = new Date();
+
         // Autosave
         if (auto) {
             // Check if article is edit, non-existing or published
             formData.status = 'autosaved';
             if (cli.postdata.data.contentid) {
-                formData.updated = new Date();
                 formData.status = 'draft';
 
-                db.findAndModify(cli._c, 'content', {_id : db.mongoID(cli.postdata.data.contentid), status: 'draft'}, formData, function(err, doc) {
+                db.findAndModify(cli._c, 'content', {
+                    _id: db.mongoID(cli.postdata.data.contentid),
+                    status: 'draft'
+                }, formData, function(err, doc) {
                     if (doc.value !== null) {
 
                         var val = doc.value;
-                            // Is a draft article
+                        // Is a draft article
+                        cli.sendJSON({
+                            success: true,
+                            _id: val._id,
+                            contentid: cli.postdata.data.contentid
+                        });
+                    } else {
+                        formData.status = 'autosaved';
+                        formData.updated = undefined;
+                        formData.contentid = db.mongoID(cli.postdata.data.contentid);
+                        formData.date = new Date();
+
+                        // Is a published
+                        db.insert(cli._c, 'autosave', formData, function(err, doc) {
                             cli.sendJSON({
                                 success: true,
-                                _id: val._id,
+                                _id: doc.insertedId,
                                 contentid: cli.postdata.data.contentid
                             });
-                    } else {
-                            formData.status = 'autosaved';
-                            formData.contentid = db.mongoID(cli.postdata.data.contentid);
-                            formData.date = new Date();
-
-                            // Is a published
-                            db.insert(cli._c, 'autosave', formData, function(err, doc) {
-                                cli.sendJSON({
-                                    success: true,
-                                    _id: doc.insertedId,
-                                    contentid: cli.postdata.data.contentid
-                                });
-                            });
+                        });
                     }
 
                 })
             } else {
-                formData.date = new Date();
                 formData.status = 'autosaved';
 
                 if (cli.postdata.data._id) {
 
-                    db.update(cli._c, 'autosave', {_id: db.mongoID(cli.postdata.data._id)}, formData, function() {
+                    db.update(cli._c, 'autosave', {
+                        _id: db.mongoID(cli.postdata.data._id)
+                    }, formData, function() {
                         // Autosave updated
                         cli.sendJSON({
                             success: true,
@@ -188,6 +200,7 @@ var Article = function() {
                         });
                     })
                 } else {
+                    formData.date = new Date();
 
                     db.insert(cli._c, 'autosave', formData, function(err, doc) {
                         // Autosave created
@@ -203,20 +216,35 @@ var Article = function() {
         } else {
             formData.status = 'draft';
             formData.author = db.mongoID(cli.userinfo.userid);
-            console.log(cli.userinfo.userid);
+
             if (cli.postdata.data._id) {
                 // Update draft
-                formData.updated = new Date();
 
                 id = db.mongoID(cli.postdata.data._id);
-                db.update(cli._c, 'content', {_id: id}, formData, function(err, doc){
-                    cli.sendJSON({
-                        success: true,
-                        _id: cli.postdata.data._id
-                    });
+                // Check if user can edit this article
+                db.find(cli._c, 'content', [], {
+                    _id: id
+                }, function(err, res) {
+                    if (res && (res._id == cli.userinfo.userid || cli.hasRight('edit-all-articles'))) {
+
+                        db.update(cli._c, 'content', {
+                            _id: id
+                        }, formData, function(err, doc) {
+                            cli.sendJSON({
+                                success: true,
+                                _id: cli.postdata.data._id
+                            });
+                        });
+                    } else {
+                        cli.sendJSON({
+                            success: false,
+                            _id: cli.postdata.data._id
+                        });
+                    }
                 });
             } else {
                 formData.date = new Date();
+
                 // Create draft
                 db.insert(cli._c, 'content', formData, function(err, doc) {
                     cli.sendJSON({
@@ -224,10 +252,6 @@ var Article = function() {
                         redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + doc.insertedId
                     });
                 });
-
-                if (cli.postdata.data.autosaveid) {
-                    db.remove(cli._c, 'autosave', {_id : db.mongoID(cli.postdata.data.autosaveid)}, function() {});
-                }
 
             }
         }
@@ -269,6 +293,11 @@ var Article = function() {
                             });
 
                             return;
+                        }
+
+                        // Check if user can edit this article
+                        if (cli.userinfo.userid !== row[0]._id && !cli.hasRight('modify_all_articles')) {
+                            cli.throwHTTP(405);
                         }
 
                         hooks.fire('article_will_edit', {
@@ -316,27 +345,42 @@ var Article = function() {
     }
 
     this.delete = function(cli) {
-        if (cli.routeinfo.path[3] && cli.routeinfo.path[3].length >= 24) {
+        if (cli.routeinfo.path[3]) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
 
-            hooks.fire('article_will_delete', id);
-
-            db.remove(cli._c, 'content', {
+            db.find(cli._c, 'content', {
                 _id: id
-            }, function(err, r) {
-                var filename = r.title + '.html';
-                fs.deleteFile(filename, function() {
+            }, function(err, result) {
+                if (result) {
+                    if (cli.hasRight('modify_all_articles') || result._id == cli.userinfo.userid) {
+                        // Can delete the current article
 
-                    hooks.fire('article_deleted', id);
+                        hooks.fire('article_will_delete', id);
 
-                    cacheInvalidator.removeFileToWatch(filename);
-                    return cli.sendJSON({
-                        redirect: '/admin/article/list',
-                        success: true
-                    });
-                });
+                        db.remove(cli._c, 'content', {
+                            _id: id
+                        }, function(err, r) {
+                            var filename = r.title + '.html';
+                            fs.deleteFile(filename, function() {
+
+                                hooks.fire('article_deleted', id);
+
+                                cacheInvalidator.removeFileToWatch(filename);
+                                return cli.sendJSON({
+                                    redirect: '/admin/article/list',
+                                    success: true
+                                });
+                            });
+
+                        });
+                    }
+                } else {
+                    return cli.throwHTTP(404);
+                }
+
 
             });
+
         } else {
             return cli.throwHTTP(404, 'Article Not Found');
         }
@@ -385,16 +429,23 @@ var Article = function() {
                 });
 
             } else if (levels[0] == 'table') {
-
                 var sort = {};
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
                 sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (params.order || 1);
+                var match = !cli.hasRight('edit-all-articles') ? {
+                    author: db.mongoID(cli.userinfo.userid)
+                } : {};
+
                 db.aggregate(cli._c, 'content', [{
                     $match: (params.search ? {
-                        $text: {
-                            $search: params.search
-                        }
-                    } : {})
+                            $and: [{
+                                $text: {
+                                    $search: params.search
+                                }
+                            }, match]
+                        } :
+                        match
+                    )
 
                 }, {
                     $lookup: {
@@ -453,6 +504,7 @@ var Article = function() {
                 });
 
             } else if (levels[0] == 'lastEdited') {
+
                 db.aggregate(cli._c, 'autosave', [{
                     $lookup: {
                         from: 'content',
@@ -465,27 +517,30 @@ var Article = function() {
                         path: '$contentid',
                         preserveNullAndEmptyArrays: true
                     }
-                },
-                {
-                    $project : {
-                        title : 1,
-                        media : 1,
+                }, {
+                    $project: {
+                        title: 1,
+                        media: 1,
                         updated: 1,
-                        contentid : 1,
+                        contentid: 1,
                         updated: 1,
-                        newer : {$cmp : ['$contentid.updated', '$updated']}
+                        newer: {
+                            $cmp: ['$contentid.updated', '$updated']
+                        }
 
                     }
-                },{
+                }, {
+                    $match: {$or : [{contentid :null}, {$and : [{author : db.mongoID(cli.userinfo.userid)}, {newer : { $lt : 0}}]}]}
+                }, {
                     $sort: {
-                        date: -  1
+                        date: -1
                     }
                 }, {
                     $limit: 3
                 }], function(res) {
                     callback(res);
 
-                })
+                });
             } else {
 
                 // First, check for saved content
@@ -521,8 +576,8 @@ var Article = function() {
                             // Check if there is a newer autosaved version
                             db.findToArray(cli._c, 'autosave', {
                                 contentid: db.mongoID(arr[0]._id),
-                                date: {
-                                    "$gte": arr[0].date
+                                updated: {
+                                    "$gte": arr[0].updated
                                 }
                             }, function(err, autosave) {
                                 if (autosave && autosave.length > 0) {

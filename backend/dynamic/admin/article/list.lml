@@ -9,11 +9,15 @@
 		$}
 
 
-		<h1>List of articles<a class='fab' href="{=root}article/new">+</a></h1>
 
 		<main class="entities-main">
-			<h2>Continue Working on :</h2>
-			{*content.lastEdited(template:"article-continue-working")}
+            <div class="continue-working-wrapper">
+                <h1>Continue Working on :</h1>
+                {*content.lastEdited(template:"article-continue-working")}
+            </div>
+
+            <h1>List of articles<a class='fab' href="{=root}article/new">+</a></h1>
+
 			{=tableBuilder.render('article')}
 		</main>
 
@@ -51,15 +55,13 @@
     	</lml:tabletemplate>
 
 		<lml:template id="article-continue-working">
-		<lml:tobject data-nodetype="a" data-key="_id">
-			<lml:tobject data-nodetype="a"
-						 data-href="{=root}article/edit/"
-					 data-key="_id">
-					Edit
-			</lml:tobject>
-			<lml:tobject data-nodetype="a"
-						 data-href="{=config.default.server.url}/"
-					 data-key="name" data-filter="isViewable">
-					View
-			</lml:tobject>
+        <div class='continue-working'>
+            <lml:tobject data-nodetype="a"
+                         data-href="{=root}article/edit/"
+                     data-key="_id">
+            <lml:tobject data-nodetype="h4" data-key="title"></lml:tobject>
+            <h4>Last updated : <lml:tobject data-nodetype="span" data-key="updated"></lml:tobject></h4>
+    		</lml:tobject>
+        </div>
+
 		</lml:template>

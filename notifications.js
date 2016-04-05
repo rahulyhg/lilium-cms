@@ -6,6 +6,7 @@ var sessionManager = require('./session.js');
 var log = require('./log.js');
 var db = require('./includes/db.js');
 var hooks = require('./hooks.js');
+var sites = require('./sites.js');
 
 var io;
 var sockets = {};
@@ -30,7 +31,7 @@ var LiliumSocket = function (socket, session) {
 };
 
 LiliumSocket.prototype.joinGroup = function (grp) {
-    var site = this.liliumsocket.session.data.site;
+    var site = this.session.data.site;
     this.socket.join(site + '_' + grp);
 };
 
@@ -274,9 +275,6 @@ var Notification = function () {
         io = inbound.io();
 
         //Create default groups
-        that.createGroup('admin', 'admin');
-        that.createGroup('lilium', 'lilium');
-        that.createGroup('spy');
 
         _c.eachSync(function (conf) {
             that.createGroup('lmlsite_' + conf.id);
@@ -285,6 +283,8 @@ var Notification = function () {
         hooks.bind('site_initialized', 3000, function (conf) {
             that.createGroup('lmlsite_' + conf.id);
         });
+
+        that.createGroup('spy');
 
         io.on('connection', onSocketConnection);
     };

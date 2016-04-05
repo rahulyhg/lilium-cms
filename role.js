@@ -6,6 +6,7 @@ var mongo = require('mongodb');
 var livevars = require('./livevars.js');
 var fs = require('./fileserver.js');
 var notification = require('./notifications.js');
+var sites = require('./sites.js');
 
 var Role = function () {
     this.handlePOST = function (cli) {
@@ -219,14 +220,21 @@ var Role = function () {
     }
 
     var initNotificationGroups = function() {
-        db.findToArray();
+        var sitesList = sites.getSites();
+        for (var i in sitesList) {
+            db.findToArray(sitesList[i].id, 'roles', {}, function(roles) {
+                for (var j in roles) {
+                    notification.createGroup(roles[j], roles[j], sitesList[i].id);
+                }
+            });
+        }
     }
 
 
     var init = function () {
         registerContentLiveVar();
         registerForms();
-        // initNotificationGroups();
+        initNotificationGroups();
     };
 
     init();

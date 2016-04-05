@@ -997,3 +997,20 @@ fieldset.title legend {
     width: auto;
 	border-bottom: none;
 }
+.continue-working {
+    background: antiquewhite;
+    border: 1px solid #DDD;
+    padding: 10px;
+    color: #333;
+}
+.continue-working a {
+    color: #333;
+}
+.continue-working a:hover {
+    text-decoration: none;
+}
+.continue-working:hover {
+    text-decoration: none;
+    color: #333;
+    background: #fff;
+}
