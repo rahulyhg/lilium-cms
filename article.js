@@ -170,7 +170,6 @@ var Article = function() {
                         });
                     } else {
                         formData.status = 'autosaved';
-                        formData.updated = undefined;
                         formData.contentid = db.mongoID(cli.postdata.data.contentid);
                         formData.date = new Date();
 
@@ -244,7 +243,6 @@ var Article = function() {
                 });
             } else {
                 formData.date = new Date();
-
                 // Create draft
                 db.insert(cli._c, 'content', formData, function(err, doc) {
                     cli.sendJSON({
@@ -523,7 +521,6 @@ var Article = function() {
                         media: 1,
                         updated: 1,
                         contentid: 1,
-                        updated: 1,
                         newer: {
                             $cmp: ['$contentid.updated', '$updated']
                         }

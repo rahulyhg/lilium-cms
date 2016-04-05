@@ -1,5 +1,4 @@
 {#config;forms;tableBuilder}
-{%../articlescript}
 
 		{$
 			var root = config.default.server.url;
@@ -65,3 +64,10 @@
         </div>
 
 		</lml:template>
+<script>
+    document.addEventListener('livevarsFetched', function(e) {
+        if(e.detail.livevars['content.lastEdited'].length == 0) {
+            $('.continue-working-wrapper').remove();
+        }
+    });
+</script>

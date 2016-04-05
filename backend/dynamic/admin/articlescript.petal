@@ -7,13 +7,6 @@
     var contentid;
     var lastParamUrl = window.location.pathname.split('/').pop();
 
-    var deleteArticle = function(id) {
-        $.post('{=config.default.server.url}/admin/article/delete/' + id, function(data) {
-            liliumcms.refresh();
-        });
-    };
-
-    var canDelete = function(item) {};
     document.addEventListener('livevarsFetched', function(e) {
         var content = e.detail.livevars['content.' + window.location.pathname.split('/').pop()];
         if (content && content.length > 0) {
@@ -183,7 +176,7 @@
             $('#confirm-publish').modal('hide');
             var valid = liliumcms.formvalidator.validate($('form'));
             if (valid) {
-                $.post('', $('form').serialize(), function(data) {
+                $.post('/admin/article/new', $('form').serialize(), function(data) {
                     if (data.success && data.redirect) {
                         window.location.replace(data.redirect);
                     }
