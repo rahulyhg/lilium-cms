@@ -293,6 +293,10 @@ var Sites = function () {
         });
     };
 
+    this.getSites = function() {
+            return _cachedSites;
+    };
+
     this.registerForms = function () {
         formbuilder.createForm('launch_lilium_website', {
             fieldWrapper: {

@@ -160,7 +160,6 @@ var Article = function() {
                             });
                     } else {
                             formData.status = 'autosaved';
-                            formData.updated = undefined;
                             formData.contentid = db.mongoID(cli.postdata.data.contentid);
                             formData.date = new Date();
 
@@ -466,17 +465,18 @@ var Article = function() {
                         path: '$contentid',
                         preserveNullAndEmptyArrays: true
                     }
-                },{
-                    $match: {
-                        $or: [{
-                            'date': {
-                                $gt: 'contentid.updated'
-                            }
-                        }, {
-                            'contentid': null
-                        }]
+                },
+                {
+                    $project : {
+                        title : 1,
+                        media : 1,
+                        updated: 1,
+                        contentid : 1,
+                        updated: 1,
+                        newer : {$cmp : ['$contentid.updated', '$updated']}
+
                     }
-                }, {
+                },{
                     $sort: {
                         date: -  1
                     }

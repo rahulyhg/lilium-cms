@@ -56,7 +56,7 @@ var Login = function() {
 			.trg('userpass')
 			.add('login', 'submit', {displayname:"Login",wrapperCssSuffix:"loginbutton"});
 	};
-	
+
 	var init = function() {
 
 	};

@@ -30,7 +30,8 @@ var LiliumSocket = function (socket, session) {
 };
 
 LiliumSocket.prototype.joinGroup = function (grp) {
-    this.socket.join(grp);
+    var site = this.liliumsocket.session.data.site;
+    this.socket.join(site + '_' + grp);
 };
 
 LiliumSocket.prototype.bind = function () {
@@ -52,12 +53,12 @@ LiliumSocket.prototype.bind = function () {
 
 LiliumSocket.prototype.join = function (groupName) {
     var ls = this.liliumsocket;
-    if (groups[groupName]) {
+    if (groups[ls.session.data.site] && groups[ls.session.data.site][groupName]) {
 
         // Check for needed roles
-        if (typeof groups[groupName].role == 'undefined' || ls.session.data.roles.indexOf(groups[groupName].role) !== -1) {
+        if (typeof groups[ls.session.data.site][groupName].role == 'undefined' || ls.session.data.roles.indexOf(groups[ls.session.data.site][groupName].role) !== -1) {
             this.join(groupName);
-            groups[groupName].users.push({
+            groups[ls.session.data.site][groupName].users.push({
                 session: ls.session.sessionId,
                 client: ls.clientId
             });
@@ -125,7 +126,9 @@ LiliumSocket.prototype.notificationView = function () {
 };
 LiliumSocket.prototype.emitToGroup = function (emission) {
     if (emission.group) {
-        if (groups[emission.group]) {
+        var ls = this.liliumsocket;
+        if (groups[ls.session.data.site] && groups[ls.session.data.site][emission.group]) {
+            console.log(this.rooms);
             if (this.rooms[emission.group]) {
                 this.broadcast.to(emission.group).emit('group', emission.data);
             } else {
@@ -341,7 +344,7 @@ var Notification = function () {
 
     };
 
-    var insertBatchNotificationInSessions = function (sessionsIDs, notification) {
+    var insertBatchNotificationInSessions = function (sessionsIDs, notification, site) {
         var sessions = sessionManager.getSessions();
         var tokens = [];
         for (var sessionID in sessionsIDs) {
@@ -352,7 +355,7 @@ var Notification = function () {
             }
         }
 
-        db.update(_c.default(), 'sessions', {
+        db.update((site || _c.default()), 'sessions', {
             'token': {
                 '$in': tokens
             }
@@ -389,13 +392,28 @@ var Notification = function () {
         }
     };
 
-    this.notifyGroup = function (groupName, notification) {
+    this.notifyGroup = function (groupName, notification, site) {
+
+        // Find users in db that has the group role
         notification.date = new Date();
         notification.interacted = false;
 
-        if (groups[groupName]) {
-            // Find users in db that has the group role
-            db.aggregate(_c.default(), 'entities', [{
+        // Create notif to one site only
+        if (site) {
+            if (groups[site][groupName]) {
+                notify(site, groups[site][groupName]);
+            }
+        } else {
+            // Create notif to all sites
+            for (var i in groups) {
+                if (groups[i][groupName]) {
+                    notify(i, groups[i][groupName]);
+                }
+            }
+        }
+
+        var notify = function (site, group) {
+            db.aggregate(site, 'entities', [{
                 "$unwind": "$roles"
             }, {
                 "$lookup": {
@@ -406,7 +424,7 @@ var Notification = function () {
                 }
             }, {
                 "$match": {
-                    "rights.name": groups[groupName].role
+                    "rights.name": group.role
                 }
             }, {
                 "$project": {
@@ -433,13 +451,119 @@ var Notification = function () {
                 }
             }], function (result) {
                 // Insert Notifications
-                db.insert(_c.default(), 'notifications', result, function (err, r) {});
+                db.insert(site, 'notifications', result, function (err, r) {});
             });
 
 
             // Insert notification in all the sessions
             // Find sessions that have dash access
-            db.aggregate(_c.default(), 'sessions', [{
+            db.aggregate(site, 'sessions', [{
+                "$unwind": "$data.roles"
+                        }, {
+                $lookup: {
+                    from: "roles",
+                    localField: "data.roles",
+                    foreignField: "name",
+                    as: "roles"
+                }
+                        }, {
+                $match: {
+                    "roles.name": group.role
+                }
+                        }, {
+                $group: {
+                    _id: "$token"
+                }
+                        }], function (result) {
+                insertBatchNotificationInSessions(result, notification, site);
+            });
+
+            io.sockets.in(site + '-' +groupName).emit('notification', notification);
+        };
+    };
+
+    this.emitToGroup = function (groupName, data, type, site) {
+        if (site) {
+            if (groups[site] && groups[site][groupName]) {
+                io.sockets.in(site + '_' +groupName).emit(type || 'notification', data);
+            }
+        } else {
+            for (var site in groups) {
+                if (groups[site][groupName]) {
+                    io.sockets.in(site + '_' +groupName).emit(type || 'notification', data);
+                }
+            }
+        }
+
+    };
+
+    this.emitToWebsite = function (siteid, data, type) {
+        this.emitToGroup('lmlsite_' + siteid, data, type);
+    };
+
+    this.removeGroup = function (groupName, site) {
+        if (groups[groupName]) {
+            groups[groupName] = undefined;
+            delete groups[groupName];
+        } else if (groups[site][groupName]) {
+            groups[site][groupName] = undefined;
+            delete groups[site][groupName];
+        }
+    };
+
+    this.broadcastNotification = function (notification) {
+        notification.date = new Date();
+        notification.interacted = false;
+        var sites = sites.getSites();
+
+        var broadcast = function (site) {
+            // Create notification for users that have dash access
+            db.aggregate(site, 'entities', [{
+                "$unwind": "$roles"
+            }, {
+                "$lookup": {
+                    from: "roles",
+                    localField: "roles",
+                    "foreignField": "name",
+                    as: "rights"
+                }
+            }, {
+                "$match": {
+                    "rights.rights": {
+                        $in: ["dash"]
+                    }
+                }
+            }, {
+                "$project": {
+                    "_id": 0,
+                    "userID": "$_id",
+                    "type": {
+                        "$literal": notification.type
+                    },
+                    "msg": {
+                        "$literal": notification.msg
+                    },
+                    "title": {
+                        "$literal": notification.title
+                    },
+                    "url": {
+                        "$literal": notification.url
+                    },
+                    "interacted": {
+                        "$literal": false
+                    },
+                    "date": {
+                        "$literal": notification.date
+                    }
+                }
+            }], function (result) {
+                // Insert Notifications
+                db.insert(site, 'notifications', result, function (err, r) {});
+            });
+
+            // Insert notification in all the sessions
+            // Find sessions that have dash access
+            db.aggregate(site, 'sessions', [{
                 "$unwind": "$data.roles"
             }, {
                 $lookup: {
@@ -450,121 +574,45 @@ var Notification = function () {
                 }
             }, {
                 $match: {
-                    "roles.name": groups[groupName].role
+                    "roles.rights": {
+                        $in: ["dash"]
+                    }
                 }
             }, {
                 $group: {
                     _id: "$token"
                 }
             }], function (result) {
-                insertBatchNotificationInSessions(result, notification);
+                insertBatchNotificationInSessions(result, notification, site);
             });
+            // Broadcast for user connected
+        };
 
-            io.sockets.in(groupName).emit('notification', notification);
+        for (var i in sites) {
+            broadcast(sites[i].id);
         }
-    };
 
-    this.emitToGroup = function (groupName, data, type) {
-        if (groups[groupName]) {
-            io.sockets.in(groupName).emit(type || 'notification', data);
-        }
-    };
-
-    this.emitToWebsite = function (siteid, data, type) {
-        this.emitToGroup('lmlsite_' + siteid, data, type);
-    };
-
-    this.removeGroup = function (groupName) {
-        if (groups[groupName]) {
-            groups[groupName] = undefined;
-            delete groups[groupName];
-        }
-    };
-
-    this.broadcastNotification = function (notification) {
-        notification.date = new Date();
-        notification.interacted = false;
-
-        // Create notification for users that have dash access
-        db.aggregate(_c.default(), 'entities', [{
-            "$unwind": "$roles"
-        }, {
-            "$lookup": {
-                from: "roles",
-                localField: "roles",
-                "foreignField": "name",
-                as: "rights"
-            }
-        }, {
-            "$match": {
-                "rights.rights": {
-                    $in: ["dash"]
-                }
-            }
-        }, {
-            "$project": {
-                "_id": 0,
-                "userID": "$_id",
-                "type": {
-                    "$literal": notification.type
-                },
-                "msg": {
-                    "$literal": notification.msg
-                },
-                "title": {
-                    "$literal": notification.title
-                },
-                "url": {
-                    "$literal": notification.url
-                },
-                "interacted": {
-                    "$literal": false
-                },
-                "date": {
-                    "$literal": notification.date
-                }
-            }
-        }], function (result) {
-            // Insert Notifications
-            db.insert(_c.default(), 'notifications', result, function (err, r) {});
-        });
-
-        // Insert notification in all the sessions
-        // Find sessions that have dash access
-        db.aggregate(_c.default(), 'sessions', [{
-            "$unwind": "$data.roles"
-        }, {
-            $lookup: {
-                from: "roles",
-                localField: "data.roles",
-                foreignField: "name",
-                as: "roles"
-            }
-        }, {
-            $match: {
-                "roles.rights": {
-                    $in: ["dash"]
-                }
-            }
-        }, {
-            $group: {
-                _id: "$token"
-            }
-        }], function (result) {
-            insertBatchNotificationInSessions(result, notification);
-        });
-        // Broadcast for user connected
         io.sockets.emit('notification', notification);
+
+
     };
 
     this.broadcast = function (data, msgType) {
         io.sockets.emit(msgType || 'message', data);
     };
 
-    this.createGroup = function (groupName, role) {
-        groups[groupName] = {};
-        groups[groupName].role = role;
-        groups[groupName].users = [];
+    this.createGroup = function (groupName, role, site) {
+        if (site) {
+            groups[site] = groups[site] ? groups[site] : {};
+            groups[site][groupName] = {};
+            groups[groupName].role = role;
+            groups[groupName].users = [];
+        } else {
+            groups[groupName] = {};
+            groups[groupName].role = role;
+            groups[groupName].users = [];
+        }
+
     };
 
     this.getSessionIDFromCookie = function (cookieString) {

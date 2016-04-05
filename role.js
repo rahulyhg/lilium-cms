@@ -5,6 +5,7 @@ var db = require('./includes/db.js');
 var mongo = require('mongodb');
 var livevars = require('./livevars.js');
 var fs = require('./fileserver.js');
+var notification = require('./notifications.js');
 
 var Role = function () {
     this.handlePOST = function (cli) {
@@ -63,6 +64,8 @@ var Role = function () {
             if (cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
                 db.insert(cli._c, 'roles', prepareRoleForDB(cli), function (err, result) {
+                    // Create a new notification group
+                    notification.createGroup(cli.postdata.data.name, cli.postdata.data.name);
                     // Generate LML page
                     cli.refresh();
                 });
@@ -127,6 +130,9 @@ var Role = function () {
             db.remove(cli._c, 'roles', {
                 _id: id
             }, function (err, r) {
+                console.log(r);
+                // Remove notification group
+                notification.deleteGroup('');
                 return cli.sendJSON({
                     success: true
                 });
@@ -212,10 +218,15 @@ var Role = function () {
             });
     }
 
+    var initNotificationGroups = function() {
+        db.findToArray();
+    }
+
 
     var init = function () {
         registerContentLiveVar();
-        registerForms()
+        registerForms();
+        // initNotificationGroups();
     };
 
     init();
