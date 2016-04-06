@@ -51,6 +51,21 @@
         // });
     });
 
+    var deleteArticle = function(id) {
+        var url = isAutoSave ? 'delete-autosave' : 'delete'
+        $.post('/admin/article/'+ url +'/' + id, {}, function(data) {
+            if (data.success && data.redirect) {
+                window.location.replace(data.redirect);
+            } else {
+                alert('There was an error deleting this post.');
+            }
+        });
+    }
+
+    var canDelete = function(id) {
+        return this.status !== 'deleted';
+    }
+
     $(document).ready(function() {
 
 
@@ -175,9 +190,15 @@
         $('#confirm-publish button.btn-primary').on('click', function(e) {
             $('#confirm-publish').modal('hide');
             var valid = liliumcms.formvalidator.validate($('form'));
+            var form = $('form').serialize();
+            var tempForm = form;
+            tempForm += contentid ? '&id=' + contentid : '';
+            tempForm += _id ? '&autosaveid= ' + _id : '';
+
             if (valid) {
-                $.post('/admin/article/new', $('form').serialize(), function(data) {
+                $.post('/admin/article/new', tempForm, function(data) {
                     if (data.success && data.redirect) {
+                        lastSave = form;
                         window.location.replace(data.redirect);
                     }
                 });

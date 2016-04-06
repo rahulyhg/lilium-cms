@@ -24,6 +24,9 @@ var Article = function() {
             case 'delete':
                 this.delete(cli);
                 break;
+            case 'delete-autosave':
+                this.deleteAutosave(cli);
+                break;
             case 'autosave':
                 this.save(cli, true);
                 break;
@@ -75,55 +78,92 @@ var Article = function() {
 
     this.publish = function(cli) {
         cli.touch('article.new');
-        var form = formBuilder.handleRequest(cli);
-        var response = formBuilder.validate(form, true);
+        if (cli.hasRight('article_publish')) {
+            var form = formBuilder.handleRequest(cli);
+            var response = formBuilder.validate(form, true);
 
-        var redirect = '';
-        if (response.success) {
-            var formData = formBuilder.serializeForm(form);
-            formData.status = 'published';
-            formData.name = slugify(formData.title).toLowerCase();
-            formData.author = cli.userinfo.userid;
-            formData.date = new Date();
-            formData.media = db.mongoID(formData.media);
-            formData.updated = new Date();
-            hooks.fire('article_will_create', {
-                cli: cli,
-                article: formData
-            });
-            // Create post
-            db.insert(cli._c, 'content', formData, function(err, result) {
-                if (!err) {
-                    formData._id = result.insertedId;
-                    hooks.fire('article_created', {
-                        cli: cli,
-                        article: formData
-                    });
-                }
-
-                // Generate LML page
-                filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(result.ops[0]), function(name) {
-                    cacheInvalidator.addFileToWatch(name, 'articleInvalidated', result.ops[0]._id, cli._c);
-                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                        title: "Article is Live!",
-                        url: cli._c.server.url + '/' + formData.name,
-                        msg: "Your article is published. Click to see it live.",
-                        type: 'success'
-                    });
-                    cli.sendJSON({
-                        redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + result.ops[0]._id,
-                        success: true
-                    });
-
+            var redirect = '';
+            if (response.success) {
+                var formData = formBuilder.serializeForm(form);
+                formData.status = 'published';
+                formData.name = slugify(formData.title).toLowerCase();
+                formData.author = cli.userinfo.userid;
+                formData.date = new Date();
+                formData.media = db.mongoID(formData.media);
+                formData.updated = new Date();
+                hooks.fire('article_will_create', {
+                    cli: cli,
+                    article: formData
                 });
-            });
 
+                var conds = cli.postdata.data.id ? {
+                    _id: db.mongoID(cli.postdata.data.id)
+                } : {
+                    _id: db.mongoID()
+                };
+
+                // Create post
+                db.update(cli._c, 'content', conds, formData, function(err, result) {
+                    if (!err) {
+                        var success = true;
+                        if (result.upsertedId !== null) {
+                            // Inserted a document
+                            formData._id = result.upsertedId._id;
+                        } else if (result.modifiedCount > 0) {
+                            // Updated a document
+                            formData._id = cli.postdata.data.id
+                        } else {
+                            // Nothing happened, failed...
+                            success = false;
+                        }
+
+                        if (success) {
+                            // hooks.fire('article_created', {
+                            //     cli: cli,
+                            //     article: formData
+                            // });
+
+                            cli.sendJSON({
+                                redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + formData._id,
+                                success: true
+                            });
+
+                            // Generate LML page
+                            filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(formData), function(name) {
+                                cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
+
+                                // Remove autosaves related to this article
+                                if (cli.postdata.data.autosaveid) {
+                                    db.remove(cli._c, 'autosave', {_id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))}, function() {});
+                                }
+
+                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                    title: "Article is Live!",
+                                    url: cli._c.server.url + '/' + formData.name,
+                                    msg: "Your article is published. Click to see it live.",
+                                    type: 'success'
+                                });
+
+                            });
+                        } else {
+                            cli.throwHTTP(500);
+                        }
+
+                    } else {
+                        cli.throwHTTP(500);
+                    }
+
+
+                }, true, true);
+
+            } else {
+                cli.sendJSON({
+                    form: response
+                });
+            }
         } else {
-            cli.sendJSON({
-                form: response
-            });
+            cli.throwHTTP(401);
         }
-
     };
 
     /**
@@ -152,6 +192,7 @@ var Article = function() {
         if (auto) {
             // Check if article is edit, non-existing or published
             formData.status = 'autosaved';
+            console.log(cli.postdata.data);
             if (cli.postdata.data.contentid) {
                 formData.status = 'draft';
 
@@ -173,14 +214,27 @@ var Article = function() {
                         formData.contentid = db.mongoID(cli.postdata.data.contentid);
                         formData.date = new Date();
 
-                        // Is a published
-                        db.insert(cli._c, 'autosave', formData, function(err, doc) {
-                            cli.sendJSON({
-                                success: true,
-                                _id: doc.insertedId,
-                                contentid: cli.postdata.data.contentid
+                        if (cli.postdata.data._id) {
+                            // Autosave an autosaved version
+                            db.update(cli._c, 'autosave', {_id: db.mongoID(cli.postdata.data._id)}, formData, function(err, doc) {
+                                cli.sendJSON({
+                                    success: true,
+                                    _id: doc.insertedId,
+                                    contentid: cli.postdata.data.contentid
+                                });
                             });
-                        });
+                            
+                        } else {
+                            // Is a published
+                            db.insert(cli._c, 'autosave', formData, function(err, doc) {
+                                cli.sendJSON({
+                                    success: true,
+                                    _id: doc.insertedId,
+                                    contentid: cli.postdata.data.contentid
+                                });
+                            });
+                        }
+
                     }
 
                 })
@@ -342,42 +396,63 @@ var Article = function() {
         }
     }
 
+    this.deleteAutosave = function(cli) {
+        if (cli.routeinfo.path[3]) {
+            var id = new mongo.ObjectID(cli.routeinfo.path[3]);
+            db.remove(cli._c, 'autosave', {
+                _id: id
+            }, function(err, res) {
+                return cli.sendJSON({
+                    redirect: '/admin/article/list',
+                    success: true
+                });
+            });
+        }
+    }
+
     this.delete = function(cli) {
         if (cli.routeinfo.path[3]) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
-
             db.find(cli._c, 'content', {
                 _id: id
-            }, function(err, result) {
+            }, [], function(err, result) {
                 if (result) {
                     if (cli.hasRight('modify_all_articles') || result._id == cli.userinfo.userid) {
                         // Can delete the current article
 
                         hooks.fire('article_will_delete', id);
 
-                        db.remove(cli._c, 'content', {
+                        db.update(cli._c, 'content', {
                             _id: id
+                        }, {
+                            status: 'deleted'
                         }, function(err, r) {
+
                             var filename = r.title + '.html';
                             fs.deleteFile(filename, function() {
-
                                 hooks.fire('article_deleted', id);
-
                                 cacheInvalidator.removeFileToWatch(filename);
+                            });
+
+                            // Remove autosave pointing to article deleted
+                            db.remove(cli._c, 'autosave', {
+                                contentid: id
+                            }, function() {
                                 return cli.sendJSON({
                                     redirect: '/admin/article/list',
                                     success: true
                                 });
-                            });
+                            }, false);
 
                         });
+                    } else {
+                        return cli.throwHTTP(401);
                     }
                 } else {
                     return cli.throwHTTP(404);
                 }
-
-
             });
+
 
         } else {
             return cli.throwHTTP(404, 'Article Not Found');
@@ -521,13 +596,26 @@ var Article = function() {
                         media: 1,
                         updated: 1,
                         contentid: 1,
+                        author: 1,
                         newer: {
                             $cmp: ['$contentid.updated', '$updated']
                         }
 
                     }
                 }, {
-                    $match: {$or : [{contentid :null}, {$and : [{author : db.mongoID(cli.userinfo.userid)}, {newer : { $lt : 0}}]}]}
+                    $match: {
+                        $or: [{
+                            contentid: null
+                        }, {
+                            $and: [{
+                                author: db.mongoID(cli.userinfo.userid)
+                            }, {
+                                newer: {
+                                    $lt: 0
+                                }
+                            }]
+                        }]
+                    }
                 }, {
                     $sort: {
                         date: -1
@@ -676,7 +764,8 @@ var Article = function() {
     this.generateFromName = function(cli, articleName, cb) {
         // Check for articles in db
         db.findToArray(cli._c, 'content', {
-            name: articleName
+            name: articleName,
+            status: 'published'
         }, function(err, arr) {
 
             if (arr[0]) {

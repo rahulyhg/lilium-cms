@@ -44,13 +44,6 @@
                      data-key="name">
                     View
             </lml:tobject>
-            <lml:tobject data-nodetype="button"
-                     data-bind="click"
-                     data-action="deleteUser"
-                     data-actionparamkey="_id"
-                     data-filter="canDelete" >
-                    Delete
-            </lml:tobject>
     	</lml:tabletemplate>
 
 		<lml:template id="article-continue-working">
