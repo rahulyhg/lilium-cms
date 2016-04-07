@@ -71,14 +71,15 @@ var Forms = function () {
                 template: 'option',
                 title: 'role',
                 attr: {
-                    'multiselect': true
+                    'lmlselect' : true,
+                    'multiple': true
                 },
                 props: {
                     'value': 'name',
                     'html': 'displayname',
                     'header': 'Select One',
                 },
-                displayname: "Initial role"
+                displayname: "Initial roles"
             })
             .add('create', 'submit');
 

@@ -1021,3 +1021,8 @@ fieldset.title legend {
     padding: 2px;
     margin: 2px;
 }
+
+input[disabled] {
+    background-color: #eee;
+    color: #999;
+}

@@ -65,7 +65,7 @@
             }
         })
 
-        $('form').on('submit', function(e) {
+        $('form:has(input[type=file])').on('submit', function(e) {
             var bar = $('.progress .progress-bar');
             bar.removeClass('progress-bar-danger');
             bar.removeClass('progress-bar-success');

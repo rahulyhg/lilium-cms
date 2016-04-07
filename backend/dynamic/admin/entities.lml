@@ -1,4 +1,10 @@
 {#config;forms;tableBuilder}
+{$
+    var root = config.default.server.url;
+    root += "/";
+    var baseurl = root + config.default.paths.admin;
+    root += "admin/"
+$}
 {%entityscript}
 
 		<h1>All entities</h1>
@@ -17,8 +23,13 @@
         <lml:tabletemplate id="table-entity-roles">
             <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
         </lml:tabletemplate>
-        
+
         <lml:tabletemplate id="table-entity-actions">
+            <lml:tobject data-nodetype="a"
+                         data-href="{=root}entities/edit/"
+                     data-key="_id">
+                    Edit
+            </lml:tobject>
             <lml:tobject data-nodetype="button"
                      data-bind="click"
                      data-action="deleteUser"

@@ -84,6 +84,7 @@ var Entities = module.exports = new function () {
             switch (cli.routeinfo.path[2]) {
             case undefined:
                 this.updateProfile(cli);
+                break;
             case "update_profile_picture":
                 this.updateProfilePicture(cli);
                 break;
@@ -91,20 +92,42 @@ var Entities = module.exports = new function () {
                 this.changePassword(cli);
                 break;
             }
-        } else {
+        } else if (cli.routeinfo.path[2] == 'edit') {
+            if (cli.hasRight('user_management')) {
+
             var action = cli.postdata.data.form_name;
-
             switch (action) {
-            case "entity_create":
-                this.createFromCli(cli);
-                break;
+                case "update_entitiy":
+                    this.update(cli);
+                    break;
+                case "update_password":
+                    this.changePassword(cli, false);
+                    break;
+                case "upload_profile_picture":
+                    this.updateProfilePicture(cli, false);
+                    break;
+                }
+            } else {
+                cli.throwHTTP(401);
+            }
+        } else {
+            if (cli.hasRight('user_management')) {
+                var action = cli.postdata.data.form_name;
 
-            case "entity_delete":
-                this.deleteFromCli(cli);
-                break;
+                switch (action) {
+                case "entity_create":
+                    this.createFromCli(cli);
+                    break;
 
-            default:
-                cli.debug();
+                case "entity_delete":
+                    this.deleteFromCli(cli);
+                    break;
+
+                default:
+                    cli.debug();
+                }
+            } else {
+                cli.throwHTTP(401);
             }
         }
 
@@ -113,13 +136,23 @@ var Entities = module.exports = new function () {
     this.updateProfile = function (cli) {
         cli.touch('entities.updateProfile');
         var entData = cli.postdata.data;
-        var entitie = this.initialiseBaseEntity(entData);
-        entitie._id = cli.
-        this.updateProfile(cli);
+        var entity = this.initialiseBaseEntity(entData);
+
+        entity._id = cli.userinfo.userid;
+
+        this.updateEntity(entity, cli._c.id, function(err, res) {
+            if (!err){
+                cli.refresh();
+            } else {
+                log('[Database] error while updating entity :');
+                console.log(err);
+                cli.throwHTTP(500);
+            }
+        });
 
     };
 
-    this.updateProfilePicture = function (cli) {
+    this.updateProfilePicture = function (cli, isProfile) {
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
 
@@ -136,36 +169,76 @@ var Entities = module.exports = new function () {
 
                     var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
                     var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
+                    var id = isProfile ? cli.userinfo.userid : cli.routeinfo.path[3];
+                    var sessionManager = require('./session.js');
+
                     // Save it in database
                     db.update(cli._c, 'entities', {
-                        _id: cli.userinfo.userid
+                        _id: db.mongoID(id)
                     }, {
                         avatarURL: avatarURL,
                         avatarID: avatarID
                     }, function (err, result) {
 
                         // Update session
-                        var sessionManager = require('./session.js');
-                        var sessToken = cli.session.token;
-                        var session = sessionManager.getSessionFromSID(sessToken);
+                        if (isProfile) {
+                            var sessToken = cli.session.token;
+                            var session = sessionManager.getSessionFromSID(sessToken);
 
-                        session.data.avatarID = avatarID;
-                        session.data.avatarURL = avatarURL;
+                            session.data.avatarID = avatarID;
+                            session.data.avatarURL = avatarURL;
 
-                        cli.session.data.avatarURL = avatarURL;
-                        cli.session.data.avatarID = avatarID;
+                            cli.session.data.avatarURL = avatarURL;
+                            cli.session.data.avatarID = avatarID;
 
-                        hooks.fire('profile_picture_updated', {
-                            cli: cli
-                        });
-
-                        sessionManager.saveSession(cli, function () {
-
-                            cli.sendJSON({
-                                redirect: '',
-                                success: true
+                            hooks.fire('profile_picture_updated', {
+                                cli: cli
                             });
-                        });
+
+                            sessionManager.saveSession(cli, function () {
+
+                                cli.sendJSON({
+                                    redirect: '',
+                                    success: true
+                                });
+                            });
+                        } else {
+                            db.findToArray(cli._c, 'sessions', {"data._id" : db.mongoID(id)}, function(err, arr){
+                                if (arr[0] && arr[0].token) {
+
+                                    var session = sessionManager.getSessionFromSID(arr[0].token);
+
+                                    if (session) {
+                                        session.data.avatarID = avatarID;
+                                        session.data.avatarURL = avatarURL;
+
+                                        cli.session.data.avatarURL = avatarURL;
+                                        cli.session.data.avatarID = avatarID;
+
+                                        // Bypass session manager taking only a cli
+                                        var dummycli = {};
+                                        dummycli.session = session;
+                                        dummycli._c = {};
+                                        dummycli._c.id = cli._c.id;
+
+                                        // Save it
+                                        sessionManager.saveSession(dummycli, function () {
+
+                                            cli.sendJSON({
+                                                redirect: '',
+                                                success: true
+                                            });
+                                        });
+                                    }
+                                } else {
+                                    cli.sendJSON({
+                                        redirect: '',
+                                        success: true
+                                    });
+                                }
+                            });
+                        }
+
                     });
 
                 });
@@ -184,15 +257,17 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.changePassword = function (cli) {
+    this.changePassword = function (cli, profile) {
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
 
         if (response.success) {
             form = formbuilder.serializeForm(form);
             var shhh = CryptoJS.SHA256(form.password).toString(CryptoJS.enc.Hex);
+            var id = profile ? db.mongoID(cli.userinfo.userid) : cli.routeinfo.path[3];
+
             db.update(cli._c, 'entities', {
-                _id: cli.userinfo.userid
+                _id: db.mongoID(id)
             }, {
                 shhh: shhh
             }, function (err, result) {
@@ -247,28 +322,28 @@ var Entities = module.exports = new function () {
     }
 
     this.update = function (cli) {
+        if (cli.hasRight('entities_management')) {
+            var entData = cli.postdata.data;
+            var entity = this.initialiseBaseEntity(entData);
 
+            entity._id = cli.routeinfo.path[3];
+            this.updateEntity(entity, cli._c.id, function(err, res) {
+                if (!err){
+                    cli.refresh();
+                } else {
+                    log('[Database] error while updating entity :');
+                    cli.throwHTTP(500);
+                }
+            });
+        } else {
+            cli.throwHTTP(401);
+        }
 
-        this.registerEntity(cli, newEnt, function () {
-            cli.touch('entities.registerEntity.callback');
-            /*
-            mailer.createEmail({
-                to: [newEnt.email],
-                from: _c.default.emails.default,
-                subject: "Your account has been Created",
-                html: 'welcome.lml'
-            },true, function() {
-
-            }, {name:newEnt.firstname + " " + newEnt.lastname});
-            */
-            cli.redirect(cli._c.server.url + cli.routeinfo.fullpath);
-        });
     }
 
     this.serveEdit = function (cli) {
         cli.touch('entities.serveEdit');
-
-        cli.debug();
+        filelogic.serveAdminLML(cli, true);
     };
 
     this.initialiseBaseEntity = function (entData) {
@@ -362,8 +437,17 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.updateEntity = function (valObject) {
+    this.updateEntity = function (valObject, siteid, cb) {
+        var id = db.mongoID(valObject._id);
+        // Removing properties we don't want to edit
+        valObject.username = undefined;
+        valObject.shhh = undefined;
+        delete valObject.username;
+        delete valObject.shhh;
+        delete valObject._id;
+        delete valObject.createdOn;
 
+        db.update(siteid, 'entities', {_id : id}, valObject, cb);
     };
 
     this.cacheRoles = function (callback) {
@@ -499,22 +583,21 @@ var Entities = module.exports = new function () {
         formbuilder.createForm('update_entitiy')
             .addTemplate('entity_create')
             .remove('password')
+            .edit('username', '', {
+                disabled : true
+            })
             .edit('create', '', {
                 value: 'Update Profile'
             });
 
-        formbuilder.createForm('update_password', {
-                action: '/admin/me/change_password'
-            })
+        formbuilder.createForm('update_password')
             .add('editpasswd', 'title', {
                 displayname: 'Edit Password'
             })
             .add('password', 'password')
             .add('update', 'submit');
 
-        formbuilder.createForm('upload_profile_picture', {
-                action: '/admin/me/update_profile_picture'
-            })
+        formbuilder.createForm('upload_profile_picture')
             .add('uppicutre', 'title', {
                 displayname: 'Upload a profile picture'
             })
@@ -583,6 +666,10 @@ var Entities = module.exports = new function () {
                 });
 
 
+            } else if (levels[0] == 'single' && levels[1]) {
+                db.findToArray(cli._c, 'entities', {_id: db.mongoID(levels[1])}, function(err, res) {
+                    callback(err || res)
+                });
             } else {
                 db.multiLevelFind(cli._c, 'entities', levels, {
                     username: levels[0]

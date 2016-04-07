@@ -1,0 +1,13 @@
+{#config;session;vocab;forms}
+<h1>Edit an entity</h1>
+{*entities.single.{?1}(sourceof:"update_entitiy")}
+{=forms.render('update_entitiy')}
+{=forms.render('update_password')}
+{=forms.render('upload_profile_picture')}
+<div class="bar">
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
+      </div>
+    </div>
+</div>
+{%../mediascript}

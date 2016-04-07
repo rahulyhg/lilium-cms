@@ -400,8 +400,10 @@ var HtmlParser = function () {
             attributes += field.requirements.required ? 'data-required="true"' : '';
         } else {
             attributes += field.requirements.required ? ' required ' : '';
-
         }
+
+        // Is disbled?
+        attributes += field.attr.disabled ? 'disabled ' : '';
 
         // Classes
         attributes += 'class="v_validate ' + parseClasses(field) + '" ';
