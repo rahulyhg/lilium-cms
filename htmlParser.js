@@ -385,6 +385,7 @@ var HtmlParser = function () {
 
     var parseBasicFieldAttributes = function (field) {
         var attributes = '';
+
         // Name
         attributes += field.name ? 'name="' + field.name + '" ' : '';
 
@@ -395,7 +396,12 @@ var HtmlParser = function () {
         attributes += field.attr.value ? 'value="' + field.attr.value + '" ' : '';
 
         // Is required?
-        attributes += field.requirements.required ? ' required ' : '';
+        if (field.type == 'checkbox') {
+            attributes += field.requirements.required ? 'data-required="true"' : '';
+        } else {
+            attributes += field.requirements.required ? ' required ' : '';
+
+        }
 
         // Classes
         attributes += 'class="v_validate ' + parseClasses(field) + '" ';

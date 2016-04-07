@@ -12,9 +12,9 @@ var Cli = function () {
     this.cacheClear = function (err) {
         var createSymlink = this.createSymlink;
         // execFile: executes a file with the specified arguments
-        child_process.execFile('rm', ['-r', './html/admin/']);
-        child_process.execFile('rm', ['-r', './html/login/']);
-        child_process.execFile('rm', ['./html/*.html'], function (error, stdout, stderr) {
+        child_process.execFile('rm', ['-r', _c.default().server.base + 'html/admin/']);
+        child_process.execFile('rm', ['-r', _c.default().server.base + 'html/login/']);
+        child_process.execFile('rm', [_c.default().server.base +'html/*.html'], function (error, stdout, stderr) {
             if (err) {
                 log('CLI', err);
             } else {

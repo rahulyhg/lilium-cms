@@ -1014,3 +1014,10 @@ fieldset.title legend {
     color: #333;
     background: #fff;
 }
+.v_invalid_msg {
+    background: #A869C6;
+    color: #fff;
+    width: fit-content;
+    padding: 2px;
+    margin: 2px;
+}

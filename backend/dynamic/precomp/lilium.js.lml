@@ -94,6 +94,7 @@ var LiliumCMS = function() {
     var FormValidator = function() {
         this.validate = function(form) {
             var validForm = true;
+            $(form).find('.v_invalid_msg').remove();
 
             $(form).find('.v_validate ').each(function() {
                 var validField = true;
@@ -106,19 +107,26 @@ var LiliumCMS = function() {
 
                     if ($(this).attr('required') && $(this).val().length == 0) {
                         validField = false;
+                        $(this).before('<div class="v_invalid_msg">This field is required</div>');
                     }
 
                     // Min and maxlength verification
                     if ($(this).attr('minlength') && $(this).val().length < $(this).attr('minlength')) {
                         validField = false;
+                        $(this).before('<div class="v_invalid_msg">Minimum length is '+ $(this).attr('minlength') +'</div>');
+
+
                     } else if ($(this).attr('maxlength') && $(this).val().length > $(this).attr('maxlength')) {
                         validField = false;
+                        $(this).before('<div class="v_invalid_msg">Maximum length is '+ $(this).attr('maxlength') +'</div>');
                     }
                 }
 
 
-                if ($(this).attr('type') == 'checkbox' && $(this).attr('required') && !$(this).is(':checked')) {
+                if ($(this).attr('type') == 'checkbox' && $(this).data('required') == true && !$(this).is(':checked')) {
                     validField = false;
+                    $(this).before('<div class="v_invalid_msg">This field is required</div>');
+
                 }
 
                 if ($(this).attr('type') == 'number') {
@@ -126,7 +134,10 @@ var LiliumCMS = function() {
                     if ($(this).attr('min') && $(this).val() < $(this).attr('min')) {
 
                         validField = false;
+                        $(this).before('<div class="v_invalid_msg">The minimum value is '+ $(this).attr('min') +'</div>');
+
                     } else if ($(this).attr('max') && $(this).val() > $(this).attr('max')) {
+                        $(this).before('<div class="v_invalid_msg">The maximum value is '+ $(this).attr('max') +'</div>');
 
                         validField = false;
                     }
@@ -134,9 +145,7 @@ var LiliumCMS = function() {
                 $('[ckeditor]').val($('[ckeditor]').ckeditor().val());
 
                 if (!validField) {
-                    console.log('INVALID FIELD IS');
-                    console.log($(this).attr('name'));
-                    validForm = validField;
+                    validForm = false;
                 }
 
                 if (!validField) {
@@ -145,9 +154,13 @@ var LiliumCMS = function() {
                 } else {
                     $(this).removeClass('v_invalid');
                     $(this).addClass('v_valid');
+
                 }
 
             });
+            if (!validForm) {
+                lmlAlert('The form contains invalid fields. Please review them.');
+            }
             return validForm;
 
         };

@@ -192,7 +192,6 @@ var Article = function() {
         if (auto) {
             // Check if article is edit, non-existing or published
             formData.status = 'autosaved';
-            console.log(cli.postdata.data);
             if (cli.postdata.data.contentid) {
                 formData.status = 'draft';
 
@@ -223,7 +222,7 @@ var Article = function() {
                                     contentid: cli.postdata.data.contentid
                                 });
                             });
-                            
+
                         } else {
                             // Is a published
                             db.insert(cli._c, 'autosave', formData, function(err, doc) {

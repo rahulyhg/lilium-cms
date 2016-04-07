@@ -7,6 +7,8 @@ var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
 var tableBuilder = require('./tableBuilder.js');
+var cli = require('./cli.js');
+
 var RegisteredPlugins = new Object();
 var CachedPlugins = new Array();
 
@@ -141,6 +143,8 @@ var Plugins = function () {
                         } else {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
                             pluginInstance.register(_c, info, function () {
+
+                                cli.cacheClear();
                                 return callback();
                             });
                         }
@@ -166,6 +170,7 @@ var Plugins = function () {
                 RegisteredPlugins[identifier].unregister(function () {
                     RegisteredPlugins[identifier] = undefined;
                     delete RegisteredPlugins[identifier];
+                    cli.cacheClear();
                     return callback();
                 });
 
