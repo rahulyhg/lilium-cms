@@ -12,27 +12,29 @@ var Cli = function () {
     this.cacheClear = function (err) {
         var createSymlink = this.createSymlink;
         // execFile: executes a file with the specified arguments
-        child_process.execFile('rm', ['-r', _c.default().server.base + 'html/admin/']);
-        child_process.execFile('rm', ['-r', _c.default().server.base + 'html/login/']);
-        child_process.execFile('rm', [_c.default().server.base +'html/*.html'], function (error, stdout, stderr) {
+        child_process.exec('rm -rf ' +  _c.default().server.base + 'html/admin/*', function(err) {
             if (err) {
-                log('CLI', err);
-            } else {
-                fs.createDirIfNotExists(_c.default().server.html, function (valid) {
-                    if (valid) {
-                        log('FileServer',
-                            'HTML Directory was validated at : ' +
-                            _c.default().server.html
-                        );
-                    } else {
-                        log('FileServer', 'Error validated html directory');
-                    }
-
-                }, true);
-                log('CLI', 'Cache Cleared.');
+                log('[CLI]', 'Error while invalidating cache');
+                console.log(err);
             }
-        });
 
+            child_process.exec('rm -rf ' +  _c.default().server.base + 'html/login/*', function(err){
+                if (err) {
+                    log('[CLI]','Error while invalidating cache');
+                    console.log(err);
+                }
+                child_process.exec('rm -rf ' +  _c.default().server.base + 'html/*.html', function(err) {
+                    if (err) {
+                        log('[CLI]','Error while invalidating cache');
+                        console.log(err);
+                    } else {
+                        log('[CLI]',
+                            'Cache invalidated!'
+                        );
+                    }
+                });
+            });
+        });
     };
 
     /**
