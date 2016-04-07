@@ -7,7 +7,7 @@
 	<title>{=config.default.website.sitetitle} - {=vocab.admintitle}</title>
 	<link rel="stylesheet" href="{=config.default.server.url}/bower/ckeditor/samples/css/samples.css">
 	<link rel="stylesheet" href="{=config.default.server.url}/static/style.css">
-	
+
 </head>
 
 <body>
@@ -73,11 +73,9 @@
 				var textarea = $('textarea[name=diff]');
 				var text = "";
 				diff.forEach(function(part) {
-				console.log(part);
 					var elem = part.added ?'<span class="__added__">' + part.value + '</span>': part.removed ? '<span class="__removed__">' + part.value + '</span>': part.value;
 						text += elem;
 				});
-					console.log(text);
 					$('textarea[name=requested_content]').val(text);
 					$('input[name=requested_title]').val(diff_title);
 					$('textarea[name=original]').val(original);

@@ -124,7 +124,6 @@ var LmlTable = function(table) {
 	}
 
 	var updateNav = function() {
-        console.log(currentData);
         table.parent().find('.footer').html('<div><p>Displaying entries ' + ((currentPage - 1) * maxEntries + (currentData.size == 0? 0 : 1)) + '-' + (((currentPage - 1) * maxEntries) + currentData.data.length) + ' of ' + (currentData.size || 0) + '</p>' +
 			'</div>');
         table.parent().find('.footer').append(genButtons());

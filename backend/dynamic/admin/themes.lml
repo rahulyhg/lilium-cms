@@ -32,7 +32,6 @@
             $.post("{=config.default.server.url}/admin/themes/enableTheme", {
                 uName: uName
             }, function(data) {
-                console.log(activeTheme);
                 activeTheme.text("Enable");
                 activeTheme = btn;
                 btn.text("Active");

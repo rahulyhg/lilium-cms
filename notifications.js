@@ -54,12 +54,13 @@ LiliumSocket.prototype.bind = function () {
 
 LiliumSocket.prototype.join = function (groupName) {
     var ls = this.liliumsocket;
-    if (groups[ls.session.data.site] && groups[ls.session.data.site][groupName]) {
+    console.log(groups);
+    if (groups[ls.session.data.site + '_' +groupName]) {
 
         // Check for needed roles
-        if (typeof groups[ls.session.data.site][groupName].role == 'undefined' || ls.session.data.roles.indexOf(groups[ls.session.data.site][groupName].role) !== -1) {
+        if (typeof groups[ls.session.data.site+ '_' +groupName].role == 'undefined' || ls.session.data.roles.indexOf(groups[ls.session.data.site + '_' +groupName].role) !== -1) {
             this.join(groupName);
-            groups[ls.session.data.site][groupName].users.push({
+            groups[ls.session.data.site +'_'+ groupName].users.push({
                 session: ls.session.sessionId,
                 client: ls.clientId
             });
@@ -129,7 +130,6 @@ LiliumSocket.prototype.emitToGroup = function (emission) {
     if (emission.group) {
         var ls = this.liliumsocket;
         if (groups[ls.session.data.site] && groups[ls.session.data.site][emission.group]) {
-            console.log(this.rooms);
             if (this.rooms[emission.group]) {
                 this.broadcast.to(emission.group).emit('group', emission.data);
             } else {
@@ -400,14 +400,14 @@ var Notification = function () {
 
         // Create notif to one site only
         if (site) {
-            if (groups[site][groupName]) {
-                notify(site, groups[site][groupName]);
+            if (groups[site +'_'+ groupName]) {
+                notify(site, groups[site +'_'+ groupName]);
             }
         } else {
             // Create notif to all sites
             for (var i in groups) {
-                if (groups[i][groupName]) {
-                    notify(i, groups[i][groupName]);
+                if (groups[i +'_'+ groupName]) {
+                    notify(i, groups[i +'_'+ groupName]);
                 }
             }
         }
@@ -484,12 +484,12 @@ var Notification = function () {
 
     this.emitToGroup = function (groupName, data, type, site) {
         if (site) {
-            if (groups[site] && groups[site][groupName]) {
+            if (groups[site] && groups[site +'_'+ groupName]) {
                 io.sockets.in(site + '_' +groupName).emit(type || 'notification', data);
             }
         } else {
             for (var site in groups) {
-                if (groups[site][groupName]) {
+                if (groups[site +'_'+ groupName]) {
                     io.sockets.in(site + '_' +groupName).emit(type || 'notification', data);
                 }
             }
@@ -505,9 +505,9 @@ var Notification = function () {
         if (groups[groupName]) {
             groups[groupName] = undefined;
             delete groups[groupName];
-        } else if (groups[site][groupName]) {
-            groups[site][groupName] = undefined;
-            delete groups[site][groupName];
+        } else if (groups[site +'_'+ groupName]) {
+            groups[site +'_'+ groupName] = undefined;
+            delete groups[site +'_'+ groupName];
         }
     };
 
@@ -603,10 +603,9 @@ var Notification = function () {
 
     this.createGroup = function (groupName, role, site) {
         if (site) {
-            groups[site] = groups[site] ? groups[site] : {};
-            groups[site][groupName] = {};
-            groups[groupName].role = role;
-            groups[groupName].users = [];
+            groups[site + '_' + groupName] = groups[site + '_' + groupName] ? groups[site + '_' + groupName] : {};
+            groups[site + '_' + groupName].role = role;
+            groups[site + '_' + groupName].users = [];
         } else {
             groups[groupName] = {};
             groups[groupName].role = role;

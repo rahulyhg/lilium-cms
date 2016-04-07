@@ -69,7 +69,6 @@ $}
 
     var changeRequest = function(id, button) {
 		$(button).parent().find('.selected').removeClass('selected');
-		console.log(button);
 		$(button).addClass('selected');
 
 		//find corresponding form

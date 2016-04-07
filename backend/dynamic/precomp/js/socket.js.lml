@@ -88,10 +88,7 @@ $(document).ready(function() {
         socket.on('join', function(data) {
             if (!data.success) {
                 console.error('[Notifications] ' + data.group + ' : ' + data.msg);
-            } else {
-                console.log('Join success : ' + data.group);
             }
-
         });
 
         socket.on('group', function(data) {

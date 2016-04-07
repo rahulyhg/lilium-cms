@@ -131,7 +131,6 @@ var Role = function () {
             db.remove(cli._c, 'roles', {
                 _id: id
             }, function (err, r) {
-                console.log(r);
                 // Remove notification group
                 notification.deleteGroup('');
                 return cli.sendJSON({
@@ -222,9 +221,9 @@ var Role = function () {
     var initNotificationGroups = function() {
         var sitesList = sites.getSites();
         for (var i in sitesList) {
-            db.findToArray(sitesList[i].id, 'roles', {}, function(roles) {
+            db.findToArray(sitesList[i].id, 'roles', {}, function(err, roles) {
                 for (var j in roles) {
-                    notification.createGroup(roles[j], roles[j], sitesList[i].id);
+                    notification.createGroup(roles[j].name, roles[j].name, sitesList[i].id);
                 }
             });
         }

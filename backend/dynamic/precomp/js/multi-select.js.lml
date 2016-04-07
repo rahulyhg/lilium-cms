@@ -14,8 +14,6 @@ var MultiSelect = function(tableid, lmltag, selectElem) {
         $(selectElem).find('option').each(function(index, elem) {
             var elem = $(elem);
             var selected = false;
-            console.log(data);
-            console.log(elem.attr('value'));
             if (data && $.inArray(elem.attr('value'), data) !== -1) {
                 html += '<span class="selected" id="'+ elem.attr('value') +'">' + elem.html();
                 html += '<input type="hidden" name="'+ selectElem.attr('name') +'[]" value="'+ elem.attr('value') +'">';
