@@ -117,6 +117,9 @@ var Production = function () {
                 data: {
                     right: 'production'
                 }
+            },
+            {
+                required: false
             });
         });
     }

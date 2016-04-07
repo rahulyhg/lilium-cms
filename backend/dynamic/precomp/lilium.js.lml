@@ -122,6 +122,13 @@ var LiliumCMS = function() {
                     }
                 }
 
+                if ($(this).attr('type') == 'email') {
+                    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                    if (!re.test($(this).val())) {
+                        $(this).before('<div class="v_invalid_msg">This email is invalid</div>');
+                    }
+                }
+
 
                 if ($(this).attr('type') == 'checkbox' && $(this).data('required') == true && !$(this).is(':checked')) {
                     validField = false;
@@ -164,7 +171,7 @@ var LiliumCMS = function() {
             } else {
                 lmlAlert('The form contains invalid fields. Please review them.');
             }
-            
+
             return validForm;
 
         };
