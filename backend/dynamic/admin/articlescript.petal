@@ -9,9 +9,20 @@
 
     document.addEventListener('livevarsFetched', function(e) {
         var content = e.detail.livevars['content.' + window.location.pathname.split('/').pop()];
+
         if (content && content.length > 0) {
+
+            isAutoSave = content[0].status == 'autosaved';
+
+            if (isAutoSave) {
+                _id = lastParamUrl;
+                contentid = content[0].contentid;
+            } else {
+                contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
+            }
+
             // You can't have a draft if article is published
-            if (content[0].status == 'published') {
+            if (content[0].status == 'published' || isAutoSave) {
                 $('form button[name=save]').parent().remove();
                 $('form button[name=preview]').parent().removeClass('col-md-4').addClass('col-md-6');
                 $('form button[name=publish]').parent().removeClass('col-md-4').addClass('col-md-6');
@@ -21,13 +32,6 @@
                 lmlAlert('There is a more recent version of this article <a href="{=config.default.server.url}/admin/article/edit/' + content[0].recentversion + '">here</a>');
             }
 
-            isAutoSave = content[0].status == 'autosaved';
-            if (isAutoSave) {
-                _id = lastParamUrl;
-                contentid = content[0].contentid;
-            } else {
-                contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
-            }
 
             if (content[0].status == 'autosaved' && content[0].contentid) {
                 lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
@@ -79,12 +83,15 @@
 
 
         var autoSave = function() {
+
             timer.pause();
+
             var currentSave = $('form').serialize();
-            console.log('Sarting auto-save');
+
             // Save only if content has changed
             if (lastSave != currentSave) {
                 var tempSave = currentSave;
+
                 if (_id) {
                     tempSave += '&_id=' + _id;
                 }
@@ -95,9 +102,11 @@
 
                 $.post('/admin/article/autosave', tempSave, function(data) {
                     lastSave = currentSave;
+
                     if (data.success && data._id) {
                         _id = data._id;
                     }
+
                     if ($('.cke_bottom .status').size() == 0) {
                         $('.cke_bottom').append('<span class="status">Last saved : <time class="date timeago" datetime="' + new Date().toString() + '">' + new Date() + '</time></span>');
                     }
@@ -109,17 +118,22 @@
         };
 
         window.addEventListener("beforeunload", function(e) {
+
             if (lastSave !== $('form').serialize()) {
+
                 var confirmationMessage = 'It looks like you have been editing something. ' +
                     'If you leave before saving, your changes will be lost.';
 
                 (e || window.event).returnValue = confirmationMessage; //Gecko + IE
                 return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
             }
+
         });
 
         if (CKEDITOR) {
+
             CKEDITOR.on('instanceReady', function() {
+
                 CKEDITOR.instances.content.on('focus', function() {
                     if (timer) {
                         timer.play();
@@ -134,6 +148,7 @@
                     }
 
                 });
+
             });
 
         }
@@ -143,6 +158,7 @@
             var currentSave = $('form').serialize();
             var url;
             var tempsave = currentSave;
+
             url = '/save';
             tempsave += contentid ? '&_id=' + contentid : '';
             tempsave += _id ? '&autosaveid= ' + _id : '';
@@ -150,9 +166,11 @@
             // Check if
             $.post('/admin/article' + url, tempsave, function(data) {
                 lastSave = currentSave;
+
                 if (data.success && data.redirect) {
                     window.location.replace(data.redirect);
                 }
+
                 if (data.success && data._id) {
                     contentid = data._id;
                 }
@@ -189,9 +207,11 @@
 
         $('#confirm-publish button.btn-primary').on('click', function(e) {
             $('#confirm-publish').modal('hide');
+            
             var valid = liliumcms.formvalidator.validate($('form'));
             var form = $('form').serialize();
             var tempForm = form;
+
             tempForm += contentid ? '&id=' + contentid : '';
             tempForm += _id ? '&autosaveid= ' + _id : '';
 

@@ -66,11 +66,11 @@ var LmlTable = function(table) {
 			that.changePage($(this).text());
 		});
 
-        table.closest('.tablewrapper').on('click', '.navbuttons .previous', function() {
+        table.closest('.tablewrapper').on('click', '.navbuttons .previous:not(.disabled)', function() {
             that.previousPage();
         });
 
-        table.closest('.tablewrapper').on('click', '.navbuttons .next', function() {
+        table.closest('.tablewrapper').on('click', '.navbuttons .next:not(.disabled)', function() {
             that.nextPage();
         });
 
@@ -115,7 +115,7 @@ var LmlTable = function(table) {
         var nextButton = document.createElement('BUTTON');
         nextButton.appendChild(document.createTextNode('Next'));
         nextButton.className = 'next';
-        if (currentPage == pages) {
+        if (currentPage == pages || currentData.size == 0) {
             nextButton.className = 'next disabled';
         }
         buttons.appendChild(nextButton);
@@ -124,7 +124,8 @@ var LmlTable = function(table) {
 	}
 
 	var updateNav = function() {
-        table.parent().find('.footer').html('<div><p>Displaying entries ' + ((currentPage - 1) * maxEntries + 1) + '-' + (((currentPage - 1) * maxEntries) + currentData.data.length) + ' of ' + (currentData.size || 0) + '</p>' +
+        console.log(currentData);
+        table.parent().find('.footer').html('<div><p>Displaying entries ' + ((currentPage - 1) * maxEntries + (currentData.size == 0? 0 : 1)) + '-' + (((currentPage - 1) * maxEntries) + currentData.data.length) + ' of ' + (currentData.size || 0) + '</p>' +
 			'</div>');
         table.parent().find('.footer').append(genButtons());
 	};
@@ -241,7 +242,7 @@ var LmlTable = function(table) {
 
 		} else {
 			table.find('tbody tr').remove();
-			table.append('<tr><td colspan="' + numberOfCols + '">There is no entries...</td></tr>');
+			table.append('<tr><td class="empty" colspan="' + numberOfCols + '">There is no entries...</td></tr>');
 		}
 
 	};

@@ -101,3 +101,7 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 .lmltablebuilder .navbuttons button:last-of-type {
     border-right: 1px solid #EEE;
 }
+
+.lmltablebuilder .empty{
+    text-align: center;
+}
