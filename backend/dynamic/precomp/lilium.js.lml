@@ -158,9 +158,13 @@ var LiliumCMS = function() {
                 }
 
             });
-            if (!validForm) {
+
+            if (validForm) {
+                $('alert.alert-info').last().remove();
+            } else {
                 lmlAlert('The form contains invalid fields. Please review them.');
             }
+            
             return validForm;
 
         };

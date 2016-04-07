@@ -307,7 +307,7 @@ var Notification = function () {
 
 
         // Add it in the user session if it exsists
-        db.findToArray(_c.default(), 'sessions', {
+        db.findToArray(dbId, 'sessions', {
             "data._id": notification.userID
         }, function (err, arr) {
             if (arr && arr[0]) {
@@ -316,7 +316,7 @@ var Notification = function () {
         })
 
         // Add notification to db
-        db.insert(_c.default(), 'notifications', notification, function () {});
+        db.insert(dbId, 'notifications', notification, function () {});
 
         // Send to every sockets connected by the user (for multi-tab)
         for (var index in sockets[userID].sockets) {
