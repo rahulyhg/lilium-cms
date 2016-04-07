@@ -122,14 +122,35 @@ var Production = function () {
                 required: false
             });
         });
-    }
+    };
 
     var registerNotificationGroups = function() {
         notifications.createGroup('production', 'production');
+    };
 
-    }
+    var unregisterHooks = function() {
+
+    };
+
+    var unregisterRoles = function() {
+
+    };
+
+    var unregisterForms = function() {
+
+    };
+
+    var unregisterNotificationGroups = function() {
+
+    };
 
     this.unregister = function (callback) {
+
+        unregisterHooks();
+        unregisterRoles();
+        unregisterForms();
+        unregisterNotificationGroups();
+
         log("Production", "Plugin disabled");
 
         callback();

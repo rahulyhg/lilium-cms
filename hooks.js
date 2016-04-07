@@ -1,4 +1,5 @@
 var log = require('./log.js');
+var _c = require('./config.js');
 
 var events = {
     "load": {},
@@ -16,6 +17,10 @@ var events = {
 
 var Hooks = function () {
     this.bind = this.register = function (eventName, priority, callback) {
+        if (binderIsPlugin()) {
+
+        }
+        _getCallerFile();
         if (typeof events[eventName] === 'undefined') {
             events[eventName] = {};
         }
@@ -30,7 +35,7 @@ var Hooks = function () {
         while (events[eventName][priority]) {
             priority++;
         }
-        
+
         if (switchedPrio) {
             log("Hooks", "Modified priority to " + priority);
         }
@@ -48,6 +53,7 @@ var Hooks = function () {
         events[eventName] = tempObj;
     };
 
+
     this.trigger = this.fire = function (eventName, params) {
         if (typeof events[eventName] !== 'undefined') {
             var keys = Object.keys(events[eventName]);
@@ -61,6 +67,31 @@ var Hooks = function () {
             }
         }
     };
+
+    var binderIsPlugin = function() {
+        var file = _getCallerFile();
+        //Remove base path
+        file.replace(_c)
+    }
+
+    var _getCallerFile = function() {
+        try {
+            var err = new Error();
+            var callerfile;
+            var currentfile;
+
+            Error.prepareStackTrace = function (err, stack) { return stack; };
+
+            currentfile = err.stack.shift().getFileName();
+
+            while (err.stack.length) {
+                callerfile = err.stack.shift().getFileName();
+
+                if(currentfile !== callerfile) return callerfile;
+            }
+        } catch (err) {}
+        return undefined;
+    }
 };
 
 module.exports = new Hooks();
