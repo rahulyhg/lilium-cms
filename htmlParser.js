@@ -109,8 +109,8 @@ var HtmlParser = function () {
                 case 'select':
                     htmlForm += parseSelectType(field);
                     break;
-                case 'multiple':
-                    htmlForm += parseMultipleType(field);
+                case 'lmlselect':
+                    htmlForm += parseSelectType(field);
                     break;
                 case 'stack':
                     htmlForm += parseStackType(field);

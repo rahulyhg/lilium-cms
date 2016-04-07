@@ -191,7 +191,7 @@
             hooks.bind('frontend_will_precompile', 5000, function( pkg ) {
                 log('Advertiser', 'Registering Scripts and CSS');
                 var base = pkg.config.server.base;
-                
+
                 pkg.Frontend.registerCSSFile(base + "plugins/advertiser/dynamic/style.css", 5000, 'admin', pkg.config.id);
                 pkg.Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', pkg.config.id);
                 log('Advertiser', 'Registered Scripts and CSS');

@@ -353,8 +353,10 @@ var LiveVars = function() {
                 } else if (fillerName != "") {
                     var filler = $(document.createElement(fillerName));
                     filler.attr('name', lmlTag.data('fieldname'));
-                    if (attributes && attributes.multiselect) {
-                        filler.attr("multiple", "multiple");
+                    if (attributes && attributes.lmlselect) {
+                        if (attributes.multiple) {
+                            filler.attr("multiple", "multiple");
+                        }
                         var datascheme = $(this).data('scheme');
                         var multiselect = new MultiSelect($(this).data('fieldname'), lmlTag, filler);
                         liliumcms.multiselects.push(multiselect);

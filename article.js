@@ -717,7 +717,7 @@ var Article = function() {
                 template: 'option',
                 title: 'role',
                 attr: {
-                    'multiselect': true
+                    'lmlselect' : true
                 },
                 props: {
                     'value': 'name',

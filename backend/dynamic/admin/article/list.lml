@@ -41,6 +41,7 @@
             </lml:tobject>
             <lml:tobject data-nodetype="a"
                          data-href="{=config.default.server.url}/"
+                         data-filter="isViewable"
                      data-key="name">
                     View
             </lml:tobject>
@@ -63,4 +64,8 @@
             $('.continue-working-wrapper').remove();
         }
     });
+
+    var isViewable = function (){
+        return (this.title !=='' && this.status == 'published');
+    }
 </script>

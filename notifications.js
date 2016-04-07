@@ -54,7 +54,6 @@ LiliumSocket.prototype.bind = function () {
 
 LiliumSocket.prototype.join = function (groupName) {
     var ls = this.liliumsocket;
-    console.log(groups);
     if (groups[ls.session.data.site + '_' +groupName]) {
 
         // Check for needed roles
