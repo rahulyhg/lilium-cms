@@ -264,6 +264,8 @@ var initMongo = function(conf, db, cb) {
 				throw "[DatabaseInit - campaignStatuses collection does not exist]";
 			}
 		});
+
+		genIndexes();
 	};
 
 	var checkForCompletion = function() {
@@ -274,6 +276,12 @@ var initMongo = function(conf, db, cb) {
 			cb(true);
 		}
 	};
+
+	var genIndexes = function(cb) {
+		db.createIndex('content', {title : "text"}, function() {
+			log('Database', 'Created Index for content');
+		});
+	}
 
 	_run();
 };
