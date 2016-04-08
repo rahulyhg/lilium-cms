@@ -429,7 +429,6 @@ var Article = function() {
 
                             var filename = r.title + '.html';
                             fs.deleteFile(filename, function() {
-                                console.log(hooks);
                                 hooks.fire('article_deleted', id);
                                 cacheInvalidator.removeFileToWatch(filename);
                             });
@@ -629,9 +628,19 @@ var Article = function() {
             } else {
 
                 // First, check for saved content
-                db.findToArray(cli._c, 'content', {
-                    _id: db.mongoID(levels[0])
-                }, function(err, arr) {
+                db.aggregate(cli._c, 'content', [
+                    {
+                        $match : {_id: db.mongoID(levels[0])}
+                    },
+                    {
+                        $lookup: {
+                            from: 'entities',
+                            localField: 'author',
+                            foreignField: '_id',
+                            as: 'author'
+                        }
+                    }
+                ], function(arr) {
                     // Not found, lets check autosaves
                     if (arr && arr.length == 0) {
                         db.findToArray(cli._c, 'autosave', {
@@ -648,16 +657,18 @@ var Article = function() {
                                     if (content && content.length > 0) {
                                         arr[0].recentversion = content[0]._id;
                                     }
-                                    callback(err || arr);
+                                    callback(arr);
                                 });
                             } else {
-                                callback(err || arr);
+                                callback(arr);
                             }
 
                         });
                     } else {
+
                         // Found a content
-                        if (arr) {
+                        if (arr && arr.length > 0) {
+                            arr[0].author = arr[0].author[0].displayname;
                             // Check if there is a newer autosaved version
                             db.findToArray(cli._c, 'autosave', {
                                 contentid: db.mongoID(arr[0]._id),
@@ -668,11 +679,10 @@ var Article = function() {
                                 if (autosave && autosave.length > 0) {
                                     arr[0].recentversion = autosave[0]._id;
                                 }
-                                callback(err || arr);
+                                callback(arr);
                             });
                         } else {
-                            // Error :(
-                            callback(err);
+                            callback([])
                         }
 
                     }
