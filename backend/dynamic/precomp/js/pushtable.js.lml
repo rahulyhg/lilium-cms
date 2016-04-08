@@ -37,6 +37,82 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             $('#' + htmlIdentifier).find('.lmlpushtablecolumnaddaction').bind('click', function() {
                 return that.appendRow()
             });
+            $('.lmlpushtablecolumnmultipleselect').each(function(index, field) {
+                var dismissMultiSelectDLG = function(field, wrapper) {
+                    $(wrapper).removeClass('shown');
+                    setTimeout(function() {
+                        $(wrapper).remove();
+                    }, 201);
+                };
+
+                var createAndShowMultiSelectDLG = function(field) {
+                    var col = schemeCol[$(field).data("fieldname")];
+                    var choices = liliumcms.livevars.livevars()[col.datasource.datasource || -1];
+                    var valKey = col.datasource.keyValue;
+                    var displayKey = col.datasource.keyName;
+
+                    var keyValAssoc = new Object();
+
+                    if (col && choices) {
+                        var wrapper = '<div class="multiselect-wrapper"><ul class="multiselect-choices">';
+                        for (var i = 0, len = choices.length; i < len; i++) {
+                            wrapper += '<li data-value="'+choices[i][valKey]+'">'+choices[i][displayKey]+'</li>';
+                            keyValAssoc[choices[i][valKey]] = choices[i][displayKey];
+                        }
+                        wrapper += '</ul></div>';
+                    }
+
+                    var jWrapper = $(wrapper);
+                    $(jWrapper).on('click:out', function() {
+                        dismissMultiSelectDLG(field, jWrapper);
+                    });
+                    $(field).after(jWrapper);
+
+                    setTimeout(function() {
+                        jWrapper.addClass('shown');
+                    }, 1);
+
+                    var vals = $(field).data('svals');
+                    if (!vals) {
+                        vals = new Array();
+                        $(field).data('svals', vals);
+                    }
+
+                    jWrapper.find('li').each(function(index, li) {
+                        if (vals.indexOf($(li).data('value')) !== -1) {
+                            $(li).addClass('selected');
+                        }
+
+                        $(li).bind('click', function() {
+                            var li = $(this);
+                            var selectState = li.hasClass('selected');
+
+                            li[selectState ? 'removeClass' : 'addClass']('selected');
+
+                            if (!selectState) {
+                                vals.push(li.data('value'));
+                            } else {
+                                var index = vals.indexOf(li.data('value'));
+                                if (index !== -1) {
+                                    vals.splice(index, 1);
+                                }
+                            }
+
+                            var textString = new Array();
+                            for (var i = 0; i < vals.length; i++) {
+                                textString.push(keyValAssoc[vals[i]]);
+                            }
+
+                            $(field).val(textString.join(', '));
+                        });
+                    });
+                };
+
+                $(field).bind('focus', function() {
+                    var field = this;
+                    createAndShowMultiSelectDLG(field);
+                });
+            });
 
             for (var i = 0; i < scheme.columns.length; i++) {
                 var col = scheme.columns[i];
@@ -119,6 +195,25 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
                         er.invalidRow = key;
                         break;
                     }
+                } else if (schemeCol[key].dataType == 'multiple') {
+                    var values = liliumcms.livevars.retrieveVar(schemeCol[key].datasource.datasource);
+                    var arr = row[key] || new Array();
+                    var displayedVal = new Array();
+
+                    var keyName = schemeCol[key].datasource.keyName;
+                    var keyValue = schemeCol[key].datasource.keyValue;
+
+                    var assoc = new Object();
+                    for (var i = 0; i < values.length; i++) {
+                        assoc[values[i][keyValue]] = values[i][keyName];
+                    }
+
+                    _h += '<td>';
+                    for (var i = 0, len = arr.length; i < len; i++) {
+                        _h += '<input type="hidden" value="'+arr[i]+'" name="'+tableid+'['+row._rowID+']['+key+'][]" />';
+                        displayedVal.push(assoc[arr[i]]);
+                    }
+                    _h += '<span>'+displayedVal.join(', ')+'</span></td>';
                 } else {
                     _h += '<td><span>' + row[key].toString() + '</span><input type="hidden" name="' +
                         tableid + '[' + row._rowID + '][' + key + ']" value="' + row[key] + '" /></td>';
@@ -138,7 +233,33 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
     };
 
     this.editRow = function(rowID) {
-        
+        var _r = rows[rowID];
+
+        if (_r) {
+            $('.lmlpushtableaddedrow#' + rowID).hide();
+            $('#' + htmlIdentifier + ' .lmlpushtablekeyer').val(_r["_lmlid"]).trigger("change");
+            $('#' + htmlIdentifier).data('editextra', new Object()).data('editid', rowID);
+
+            for (var fieldname in _r) {
+                if (fieldname[0] != '_') {
+                    var sch = schemeCol[fieldname];
+                    var editField = $('*[data-fieldname="'+fieldname+'"]');
+
+                    if (editField.length != 0) {
+                        switch (sch.dataType) {
+                            case "multiple": 
+                                editField.data('svals', _r[fieldname]).val(_r[fieldname].length == 0 ? "[no value]" : "[multiple values]");
+                                break;
+
+                            default:
+                                editField.val(_r[fieldname]);
+                        }
+                    } else {
+                        $('#' + htmlIdentifier).data('editextra')[fieldname] = _r[fieldname];
+                    }
+                }
+            }
+        }
 
         return false;
     };
@@ -171,6 +292,18 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
                 row._rowID = row._editid;
             }
         } else {
+            var editextra = $('#' + htmlIdentifier).data('editextra')
+            var editid    = $('#' + htmlIdentifier).data('editid');
+
+            if (editid) {
+                row._rowID = editid;
+                $('#' + htmlIdentifier + ' #' + editid).remove();
+
+                if (editextra) for (var extrafield in editextra) {
+                    row[extrafield] = editextra[extrafield];
+                }
+            }
+
             row['_lmlid'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer').val();
             row['_title'] = $('#' + htmlIdentifier).find('.lmlpushtablekeyer option:selected').html();
 
@@ -179,10 +312,14 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
 
                 if ($(this).prop('autocomplete') == 'on') {
                     row[fieldname] = $('#' + $(this).attr('list')).find('option[value="' + $(this).val() + '"]').html() || $(this).val();
+                } else if ($(this).data("svals")) {
+                    row[fieldname] = $(this).data("svals") || [];
                 } else {
                     row[fieldname] = $(this).val();
                 }
             });
+
+            $('#' + htmlIdentifier).data('editextra', undefined).data('editid', undefined); 
         }
 
         rows[row._rowID] = row;
@@ -199,6 +336,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
                 
                 $('#' + htmlIdentifier).find('tbody').find('tr').last().find('.lmlpushtableeditbutton').bind('click', function() {
                     that.editRow(rowID);
+                    return false;
                 });
             }
         })(row._rowID);
@@ -218,9 +356,9 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
         for (var ctn = 0; ctn < possibleFields.length; ctn++) {
             var posFld = possibleFields[ctn];
 
-            if (posFld.displayCase == valToVerify) {
+            if (posFld.displayCase && posFld.displayCase.indexOf(valToVerify) !== -1) {
                 fieldFound = posFld;
-            } else if (posFld.displayCase == "*") {
+            } else if (posFld.displayCase.indexOf("*") != -1) {
                 defaultField = posFld;
             }
         }
@@ -327,11 +465,26 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             }
         };
 
+        var generateFieldCSSClasses = function(col) {
+            classes = ['lmlpushtablecolumnfield', 'lmlpushtablecolumnfield-' + col.fieldName + 
+                (col.displayCase ? " lmlpushtablecasenotmet lmlpushtabletemplatereactive" : "")
+            ];
+
+            switch (col.dataType) {
+                case "multiple" :
+                    classes.push("lmlpushtablecolumnmultipleselect");
+                    break;
+            }
+
+            return classes.join(' ');
+        };
+
         var addHeaderField = function(col) {
-            html += '<input class="lmlpushtablecolumnfield lmlpushtablecolumnfield-' + col.fieldName + (col.displayCase ? " lmlpushtablecasenotmet lmlpushtabletemplatereactive" : "") + '" type="' + parseSpecialType(col.dataType) +
+            html += '<input class="'+generateFieldCSSClasses(col)+
+                '" type="' + parseSpecialType(col.dataType) +
                 '" data-fieldname="' + col.fieldName +
                 (col.keyName ? '" data-keyname="' + col.keyName : "") +
-                (col.displayCase ? '" data-displaycase="' + col.displayCase : "") +
+                (col.displayCase ? '" data-displaycase="' + JSON.stringify(col.displayCase) : "") +
                 (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
 
             if (col.autocomplete) {

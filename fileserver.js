@@ -253,7 +253,7 @@ var FileServer = function () {
      * @param  {function} cb     The callback once the image is generated
      */
     this.genImageFromText = function (text, path, cb) {
-
+        log("FileServer", "Initializing canvas for text to image");
         // Gen Image
         var Image = Canvas.Image
         var canvas = new Canvas(100, 60)
@@ -261,7 +261,7 @@ var FileServer = function () {
         var Font = Canvas.Font;
 
         //create signature font
-        var artySignFont = new Font('ArtySign', _c.default.server.base + "backend/static/fonts/ArtySignature.otf");
+        var artySignFont = new Font('ArtySign', _c.default().server.base + "backend/static/fonts/ArtySignature.otf");
         ctx.addFont(artySignFont);
 
         ctx.font = '100px ArtySign';
@@ -270,6 +270,7 @@ var FileServer = function () {
         // Recreate a canvas with the appropriate width
         var size = ctx.measureText(text);
 
+        log("FileServer", "Creating canvas");
         canvas = new Canvas(size.width + 30, 150);
 
         newContext = canvas.getContext('2d');
@@ -283,11 +284,13 @@ var FileServer = function () {
         var out = fs.createWriteStream(path);
         var stream = canvas.pngStream();
 
+        log("FileServer", "Streaming data to file");
         stream.on('data', function (chunk) {
             out.write(chunk);
         });
 
         stream.on('end', function () {
+            log('FileServer', "Saved text to image at " + path);
             cb(path);
         });
     }

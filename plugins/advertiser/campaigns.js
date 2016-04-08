@@ -30,7 +30,6 @@ var CampaignAdvertiser = function () {
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
-
         }
     };
 
@@ -63,7 +62,7 @@ var CampaignAdvertiser = function () {
 
     var postChangeRequest = function (cli) {
         if (cli.routeinfo.path[3]) {
-            db.findToArray('campaigns', {
+            db.findToArray(cli._c, 'campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, array) {
                 if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipending') {
@@ -71,7 +70,7 @@ var CampaignAdvertiser = function () {
 
                     var updatecamp = function (status) {
                             //Update camp status
-                            db.update('campaigns', {
+                            db.update(cli._c, 'campaigns', {
                                 _id: campaign._id
                             }, {
                                 campstatus: status
@@ -96,7 +95,7 @@ var CampaignAdvertiser = function () {
                             changeobj.push(request);
                         }
 
-                        db.insert('changerequests', changeobj, function (err, r) {
+                        db.insert(cli._c, 'changerequests', changeobj, function (err, r) {
                             // Update status
                             updatecamp('review');
 
@@ -125,7 +124,7 @@ var CampaignAdvertiser = function () {
         if (cli.routeinfo.path[3]) {
 
             // Find campaing
-            db.findToArray('campaigns', {
+            db.findToArray(cli._c, 'campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, array) {
 
@@ -206,7 +205,7 @@ var CampaignAdvertiser = function () {
         transaction.charge(charge, function (err, charge) {
             if (charge.paid) {
                 // Update campaign status
-                db.update('campaigns', {
+                db.update(cli._c, 'campaigns', {
                     _id: campaign._id
                 }, {
                     campstatus: "prod"
@@ -222,7 +221,7 @@ var CampaignAdvertiser = function () {
     };
 
     var findStripeCostumer = this.findStripeCostumer = function (cli, callback) {
-        db.findToArray('entities', {
+        db.findToArray(cli._c, 'entities', {
             _id: cli.userinfo.userid
         }, function (err, arr) {
             if (typeof arr[0] !== 'undefined' && typeof arr[0].stripeid !== 'undefined' && arr[0].stripeid !== '') {
@@ -261,7 +260,7 @@ var CampaignAdvertiser = function () {
         if (cli.routeinfo.path[3]) {
 
             // Find campaing
-            db.findToArray('campaigns', {
+            db.findToArray(cli._c, 'campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, camp) {
                 if (err) log('Advertiser Plugin', err);
@@ -281,18 +280,20 @@ var CampaignAdvertiser = function () {
                         var path = cli._c.server.base + "backend/static/uploads/" + filename + ".png";
 
                         // Create signature image from text
-                        fileserver.genImageFromText(signature, path, "Arty Signature", 30, function () {
+                        fileserver.genImageFromText(signature, path, function () {
                             //Save
 
                             var nextStatus = campaign.paymentreq ? 'clipayment' : 'prod';
 
+                            log("Campaigns", "Updating Campaigns with signature");
                             // Save it in database
-                            db.update('campaigns', {
+                            db.update(cli._c, 'campaigns', {
                                 _id: campaign._id
                             }, {
                                 clientsignature: filename + ".png",
                                 campstatus: nextStatus
                             }, function (err, result) {
+                                log("Campaigns", "Redirecting after signature");
                                 if (campaign.paymentreq) {
                                     cli.redirect(cli._c.server.url + "/advertiser/campaigns/pay/" + campaign._id);
                                 } else {
@@ -320,7 +321,7 @@ var CampaignAdvertiser = function () {
 
     var changeRequest = function (cli) {
         if (cli.routeinfo.path[3]) {
-            db.findToArray('campaigns', {
+            db.findToArray(cli._c, 'campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);
@@ -335,7 +336,7 @@ var CampaignAdvertiser = function () {
 
     var servePayPage = function (cli) {
         if (cli.routeinfo.path[3]) {
-            db.findToArray('campaigns', {
+            db.findToArray(cli._c, 'campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);
@@ -355,7 +356,7 @@ var CampaignAdvertiser = function () {
     var serveSignPage = function (cli) {
 
         if (cli.routeinfo.path[3]) {
-            db.findToArray('campaigns', {
+            db.findToArray(cli._c, 'campaigns', {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, function (err, array) {
                 if (err) log('Advertiser Plugin', err);

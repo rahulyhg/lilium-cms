@@ -11,7 +11,6 @@ $}
 	</div>
 
 	<lml:template id="review-article">
-
         <div>
 			{=forms.render(advertiser_article_review)}
         </div>
@@ -29,11 +28,10 @@ $}
                     Change Request
             </lml:tobject>
         </div>
-
-	</lml>
-
+	</lml:template>
 
     <button id="confirm-review">Confirm</button>
+
 	<script>
 	/**
 	 * all articles that we want to change
@@ -45,26 +43,19 @@ $}
         var articles;
 
 		document.addEventListener('livevarsRendered', function(e) {
-
-			        $('#confirm-review').click(function(e) {
-						//Check if everything is confirmed
-						if ($('button.selected').length == liliumcms.livevars.livevars()[$("lml\\:livevars:first").attr('data-varname')].length) {
-							$.post($(location).attr("href"), {changerequests : changeRequests}, function(data) {
-								if (data.sucess) {
-									window.location.replace(data.redirect);
-								}
-							})
-						} else {
-							alert('Please review every Articles');
-						}
-
-			        })
-
+			$('#confirm-review').click(function(e) {
+			    //Check if everything is confirmed
+			    if ($('button.selected').length == liliumcms.livevars.livevars()[$("lml\\:livevars:first").attr('data-varname')].length) {
+				    $.post($(location).attr("href"), {changerequests : changeRequests}, function(data) {
+				        if (data.sucess) {
+					        window.location.replace(data.redirect);
+					    }
+				    });
+			    } else {
+				    alert('Please review every Articles');
+			    }
+			});
 		});
-
-
-
-
 	});
 
     var changeRequest = function(id, button) {
