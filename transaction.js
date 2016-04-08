@@ -1,10 +1,14 @@
 var conf = require('./config.js');
 var log = require('./log.js');
-var stripe = require('stripe')(conf.default().stripe.secretkey);
+var stripe;
 var transaction = function () {
 
     this.init = function () {
-
+        if (conf.default().stripe && conf.default().stripe.secretkey) {
+            stripe = require('stripe')(conf.default().stripe.secretkey);
+        } else {
+            log('Transaction', 'Stripe Api access is not configured!');
+        }
     };
 
     this.deleteCustomer = function (id, cb) {

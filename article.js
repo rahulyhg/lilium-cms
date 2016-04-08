@@ -429,6 +429,7 @@ var Article = function() {
 
                             var filename = r.title + '.html';
                             fs.deleteFile(filename, function() {
+                                console.log(hooks);
                                 hooks.fire('article_deleted', id);
                                 cacheInvalidator.removeFileToWatch(filename);
                             });

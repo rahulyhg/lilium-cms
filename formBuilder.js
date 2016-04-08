@@ -6,7 +6,7 @@
 var htmlParser = require('./htmlParser');
 var validator = require('validator');
 var hooks = require('./hooks.js');
-
+var plugin = {};
 
 var Form = function (name, cb) {
     this.name = name;
@@ -387,6 +387,30 @@ var FormBuilder = function () {
     this.debug = function () {
         console.log(forms);
 
+    }
+
+    this.loadHooks = function () {
+        this.bind('plugindisabled', 2, function(identifier) {
+            // Check if plugin changed some forms
+            if (plugin[identifier]) {
+                // All forms that have been afected
+                for (var i in plugin[identifier]) {
+                    var formname = plugin[identifier][i];
+                    for (var f in formname) {
+                        var field = formname[f];
+                        if (field.changeHistory &&  field.changeHistory[identifier]) {
+                            if (field.changeHistory[identifier]) {
+
+                            } else {
+
+                            }
+                        }
+                    }
+                    delete cb;
+                }
+                console.log(events);
+            }
+        });
     }
 };
 

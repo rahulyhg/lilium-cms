@@ -8,11 +8,11 @@ var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
 var tableBuilder = require('./tableBuilder.js');
 var cli = require('./cli.js');
-
+var hooks = require('./hooks.js');
 var RegisteredPlugins = new Object();
 var CachedPlugins = new Array();
 
-var Plugins = function () {
+var Plugins = module.exports = new function () {
     var that = this;
 
     this.serveAdminList = function (cli) {
@@ -168,6 +168,8 @@ var Plugins = function () {
                 active: false
             }, function () {
                 RegisteredPlugins[identifier].unregister(function () {
+                    hooks.fire('plugindisabled', identifier);
+
                     RegisteredPlugins[identifier] = undefined;
                     delete RegisteredPlugins[identifier];
                     cli.cacheClear();
@@ -299,5 +301,3 @@ var Plugins = function () {
 
     };
 };
-
-module.exports = new Plugins();

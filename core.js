@@ -83,6 +83,7 @@ var Core = function () {
 
     var loadHooks = function (readyToRock) {
         log('Hooks', 'Loading hooks');
+        hooks.bindPluginDisabling();
         hooks.bind('init', 100, readyToRock);
         hooks.bind('user_loggedin', 100, function (cli) {
             cli.redirect(cli._c.server.url + "/" + cli._c.paths.admin, false);

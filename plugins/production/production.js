@@ -145,12 +145,6 @@ var Production = function () {
     };
 
     this.unregister = function (callback) {
-
-        unregisterHooks();
-        unregisterRoles();
-        unregisterForms();
-        unregisterNotificationGroups();
-
         log("Production", "Plugin disabled");
 
         callback();

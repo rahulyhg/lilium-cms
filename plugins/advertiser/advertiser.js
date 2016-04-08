@@ -23,6 +23,7 @@
 	         entities = require( abspath + "entities.js" );
 	         Admin = require( abspath + 'backend/admin.js' );
 	         fileLogic = require( abspath + 'filelogic.js' );
+
 	         formBuilder = require( abspath + 'formBuilder.js' );
 	         livevars = require( abspath + 'livevars.js' );
 	         db = require( abspath + 'includes/db.js' );
@@ -30,6 +31,7 @@
 	         http = require( 'http' );
 
 	         campaigns.init( abspath );
+			 transaction.init();
 	         adminAdvertiser.init( abspath );
 	     };
 
@@ -380,19 +382,20 @@
 	     this.register = function ( _c, info, callback ) {
 	         conf = _c;
 	         initRequires( _c.default().server.base );
-	         log( "Advertiser", "Initalizing plugin" );
-
-	         log( 'Advertiser', 'Registering Endpoints' );
-	         registerEndpoint();
-
-	         log( 'Advertiser', 'Hooking on events' );
-	         registerHooks();
-
-	         log( 'Advertiser', 'Adding advertiser role' );
-	         registerRoles();
-	         registerLiveVars();
-
-	         pingAdServer( callback );
+	        //  log( "Advertiser", "Initalizing plugin" );
+			 //
+	        //  log( 'Advertiser', 'Registering Endpoints' );
+	        //  registerEndpoint();
+			 //
+	        //  log( 'Advertiser', 'Hooking on events' );
+	        //  registerHooks();
+			 //
+	        //  log( 'Advertiser', 'Adding advertiser role' );
+	        //  registerRoles();
+	        //  registerLiveVars();
+			 //
+	        //  pingAdServer( callback );
+	        callback();
 	     };
 	 };
 
