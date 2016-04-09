@@ -32,7 +32,7 @@
 	     -o-border-radius: 5px;
 		border-radius: 5px;
 
-	border: 6px solid rgba(255, 255, 255, 0.1);
+	border: 0px solid rgba(255, 255, 255, 0.1);
 }
 
 .lmllogin-wrapper form input {
