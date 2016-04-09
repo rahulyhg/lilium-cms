@@ -79,6 +79,7 @@ var Handler = function () {
             busboy.on('finish', function () {
                 if (!finishedCalled) {
                     finishedCalled = true;
+
                     Dispatcher.dispost(cli);
                 }
 
@@ -113,7 +114,6 @@ var Handler = function () {
             var firstLevel = fieldname.substring(0, fieldname.indexOf('['));
 
             if (typeof cli.postdata.data[firstLevel] === 'undefined') {
-
                 if (fieldname.match(/\[/g).length > 1) {
                     cli.postdata.data[firstLevel] = new Object();
                 } else {
@@ -121,19 +121,24 @@ var Handler = function () {
                 }
             }
 
-
             if (fieldname.match(/\[/g).length > 1) {
                 var currentLevel = cli.postdata.data[firstLevel];
                 var levelsTotal = (fieldname.match(/\[/g) || []).length;
                 var levelIndex = 0;
                 var match = null;
 
+                var isArray = fieldname.substring(fieldname.length-2) === "[]";
+
                 while ((match = reg.exec(fieldname)) != null) {
                     var nIndex = match[1];
                     levelIndex++;
 
-                    if (typeof currentLevel[nIndex] === 'undefined') {
-                        currentLevel[nIndex] = levelIndex == levelsTotal ? inspect(val).slice(1, -1) : new Object();
+                    if (nIndex === '') {
+                        currentLevel.push(inspect(val).slice(1, -1));
+                    } else {
+                        if (typeof currentLevel[nIndex] === 'undefined') {
+                            currentLevel[nIndex] = isArray && levelIndex == levelsTotal - 1 ? new Array() : levelIndex == levelsTotal ? inspect(val).slice(1, -1) : new Object();
+                        }
                     }
 
                     currentLevel = currentLevel[nIndex];

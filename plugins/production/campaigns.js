@@ -192,7 +192,7 @@ var Campaigns = function () {
                     break;
                 case "articlereview": //returns articles of the campaign in need of advertiser review
                     if (cli.isGranted('advertiser')) {
-                        db.findToArray(_c.default(), 'campaigns', {
+                        db.findToArray(cli._c, 'campaigns', {
                             _id: db.mongoID(levels[1])
                         }, function (err, array) {
                             if (err) log('Campaigns livevars', err);
@@ -203,12 +203,12 @@ var Campaigns = function () {
                                 var campaign = array[0];
                                 var articlesID = [];
 
-                                for (var key in campaign.products) {
-                                    articlesID.push(db.mongoID(campaign.products[key].articleid));
+                                for (var key in campaign.products) if (campaign.products[key].articlename) {
+                                    articlesID.push(campaign.products[key].articlename);
                                 }
 
                                 db.findToArray(_c.default(), 'content', {
-                                    _id: {
+                                    name: {
                                         $in: articlesID
                                     }
                                 }, function (err, arr) {
@@ -451,7 +451,8 @@ var Campaigns = function () {
                         keyValue: "name",
                         readKey: "prodid"
                     },
-                    columns: [{
+                    columns: [
+                    {
                         fieldName: "qte",
                         dataType: "number",
                         displayName: "Quantity",
@@ -488,11 +489,11 @@ var Campaigns = function () {
                         fieldName: "website",
                         displayName: "Website",
                         keyName: "website",
-                        autocomplete: {
+                        dataType: "multiple",
+                        datasource: {
                             datasource: "sites.all.simple",
                             keyName: "displayName",
-                            keyValue: "name",
-                            cantAdd: true
+                            keyValue: "name"
                         }
 					}, {
                         fieldName: "productapilink",
@@ -505,7 +506,7 @@ var Campaigns = function () {
                                 fieldName: "articlename",
                                 displayName: "Article",
                                 keyName: "articlename",
-                                displayCase: "sponsedit",
+                                displayCase: ["sponsedit", "netdisc"],
                                 autocomplete: {
                                     datasource: "content.all.simple",
                                     keyValue: "name",
@@ -516,7 +517,7 @@ var Campaigns = function () {
                                 fieldName: "dfpprojid",
                                 displayName: "DPF Project ID",
                                 keyName: "dfpprodid",
-                                displayCase: "bannerads",
+                                displayCase: ["bannerads"],
                                 autocomplete: {
                                     datasource: "dfpcache.all.simple",
                                     keyValue: "id",
@@ -528,13 +529,13 @@ var Campaigns = function () {
                                 dataType: "text",
                                 displayName: "Facebook camp. ID",
                                 keyName: "fbcampid",
-                                displayCase: "facebook"
+                                displayCase: ["facebook"]
 							}, {
                                 fieldName: "apilink",
                                 dataType: "text",
                                 displayName: "More details",
                                 keyName: "details",
-                                displayCase: "*"
+                                displayCase: ["*"]
 							}],
                             dependsOn: "productType"
                         }
