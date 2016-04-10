@@ -37,9 +37,11 @@
 
 	     var registerEndpoint = function () {
 	         endpoints.register( 'advertiser', 'GET', function ( cli ) {
+                 cli.touch('advertiser.GET');
 	             if ( cli.isGranted( 'advertiser' ) ) {
 	                 switch ( cli.routeinfo.path[ 1 ] ) {
 	                     case undefined:
+                             cli.touch('advertiser.GET.undefined');
                              cli.routeinfo.relsitepath = "/advertiser";
                              fileLogic.serveAdminLML(cli, false, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
 	                         break;
@@ -47,6 +49,7 @@
 	                         campaigns.handleGET( cli );
 	                         break;
 	                     default:
+                             cli.touch('advertiser.GET.404');
 	                         cli.throwHTTP( 404, 'Not found' );
 	                 }
 	             } else {
@@ -382,20 +385,19 @@
 	     this.register = function ( _c, info, callback ) {
 	         conf = _c;
 	         initRequires( _c.default().server.base );
-	        //  log( "Advertiser", "Initalizing plugin" );
-			 //
-	        //  log( 'Advertiser', 'Registering Endpoints' );
-	        //  registerEndpoint();
-			 //
-	        //  log( 'Advertiser', 'Hooking on events' );
-	        //  registerHooks();
-			 //
-	        //  log( 'Advertiser', 'Adding advertiser role' );
-	        //  registerRoles();
-	        //  registerLiveVars();
-			 //
-	        //  pingAdServer( callback );
-	        callback();
+	         log( "Advertiser", "Initalizing plugin" );
+			 
+	         log( 'Advertiser', 'Registering Endpoints' );
+	         registerEndpoint();
+			 
+	         log( 'Advertiser', 'Hooking on events' );
+	         registerHooks();
+			 
+	         log( 'Advertiser', 'Adding advertiser role' );
+	         registerRoles();
+	         registerLiveVars();
+			 
+	         pingAdServer( callback );
 	     };
 	 };
 

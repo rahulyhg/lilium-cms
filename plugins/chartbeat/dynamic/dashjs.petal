@@ -140,13 +140,13 @@ var LiliumChartbeat = function($) {
 	};
 
 	var updateRetain = function() {
-		if (!latestHisto.error) {
+		if (!latestHisto.error && latestHisto.data) {
 			retainCountTo.update(Math.ceil(latestHisto.data.stats.recirc / latestHisto.data.stats.people * 100));
 		}
 	};
 
 	var updateAvgScroll = function() {
-		if (!latestHisto.error) {
+		if (!latestHisto.error && latestHisto.data) {
 			avgScrollCountTo.update(Math.ceil(latestHisto.data.stats.scroll.avg * 10));
 		}
 	};
@@ -197,9 +197,9 @@ var LiliumChartbeat = function($) {
 			html += '<span class="cb-top-tag cb-top-tag-dark">Google</span>';
 		}
 
-		if (latestHisto && !latestHisto.error && article.people > latestHisto.data.stats.people / 2) {
+		if (latestHisto && !latestHisto.error && latestHisto.data && article.people > latestHisto.data.stats.people / 2) {
 			html += '<span class="cb-top-tag cb-top-tag-red">33% of traffic</span>';
-		} else if (latestHisto && !latestHisto.error && article.people > latestHisto.data.stats.people / 3) {
+		} else if (latestHisto && !latestHisto.error && latestHisto.data && article.people > latestHisto.data.stats.people / 3) {
 			html += '<span class="cb-top-tag cb-top-tag-red">50% of traffic</span>';
 		}
 

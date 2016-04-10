@@ -57,6 +57,7 @@ var Lilium = function () {
             log('Developer', 'Hit me up at : http://erikdesjardins.com !');
             log();
             log('Developer', 'With love; enjoy. <3');
+            log();
         });
     };
 

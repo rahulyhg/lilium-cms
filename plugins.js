@@ -69,6 +69,11 @@ var Plugins = module.exports = new function () {
     this.getPluginsDirList = function (callback) {
         var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
 
+        if (CachedPlugins && CachedPlugins.length != 0) {
+            callback(CachedPlugins);
+            return;
+        }
+
         fs.readdir(plugindir, function (err, dirs) {
             if (err) {
                 throw new Error("[PluginException] Could not access plugin directory : " + err);
@@ -143,15 +148,14 @@ var Plugins = module.exports = new function () {
                         } else {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
                             pluginInstance.register(_c, info, function () {
-
                                 cli.cacheClear();
-                                return callback();
+                                callback();
                             });
                         }
                     }, true, true);
                 } catch (ex) {
                     log("Plugins", "Could not register plugin [" + identifier + "] because of an exception : " + ex);
-                    console.log(ex.stack);
+                    callback();
                 }
             });
         }
