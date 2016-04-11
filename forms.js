@@ -94,11 +94,15 @@ var Forms = function () {
                 displayname: "Description"
             })
 
-        formBuilder.createForm('category_create')
+        formBuilder.createForm('category_create', {
+                fieldWrapper : "lmlform-fieldwrapper"
+            })
             .addTemplate('category')
             .add('create', 'submit');
 
-        formBuilder.createForm('category_edit')
+        formBuilder.createForm('category_edit', {
+                fieldWrapper : "lmlform-fieldwrapper"
+            })
             .addTemplate('category')
             .add('update', 'submit');
 
@@ -140,7 +144,8 @@ var Forms = function () {
             });
 
         formBuilder.createForm('media_create', {
-                class: []
+                class: [],
+                fieldWrapper : "lmlform-fieldwrapper"
             })
             .add('File', 'file')
             .add('publish', 'submit', {
