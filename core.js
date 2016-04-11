@@ -36,6 +36,7 @@ var Role = undefined;
 var filelogic = undefined;
 var category = undefined;
 var dashboard = undefined;
+var templateBuilder = undefined;
 
 var log = require('./log.js');
 
@@ -78,6 +79,8 @@ var Core = function () {
         filelogic = require('./filelogic.js');
         category = require('./category.js');
         dashboard = require('./dashboard.js');
+        templateBuilder = require('./templateBuilder.js');
+
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
 
@@ -647,6 +650,11 @@ var Core = function () {
         });
     };
 
+    var loadTemplateBuilder = function(cb) {
+        templateBuilder.init();
+        cb();
+    };
+
     var loadLMLLibs = function () {
         hooks.trigger('will_load_core_lml_libs');
         dashboard.registerLMLLib();
@@ -695,22 +703,24 @@ var Core = function () {
                     loadProducts(function () {
                         loadSessions(function () {
                             loadTheme(function () {
-                                precompile(function () {
-                                    redirectIfInit(resp, function () {
-                                        loadAdminMenus();
-                                        loadFrontend();
-                                        loadForms();
+                                loadTemplateBuilder(function() {
+                                    precompile(function () {
+                                        redirectIfInit(resp, function () {
+                                            loadAdminMenus();
+                                            loadFrontend();
+                                            loadForms();
 
-                                        loadCacheInvalidator();
-                                        scheduleGC();
+                                            loadCacheInvalidator();
+                                            scheduleGC();
 
-                                        log('Lilium', 'Starting inbound server');
-                                        Inbound.createServer();
-                                        loadNotifications();
-                                        Inbound.start();
+                                            log('Lilium', 'Starting inbound server');
+                                            Inbound.createServer();
+                                            loadNotifications();
+                                            Inbound.start();
 
-                                        log('Core', 'Firing initialized signal');
-                                        hooks.fire('init');
+                                            log('Core', 'Firing initialized signal');
+                                            hooks.fire('init');
+                                        });
                                     });
                                 });
                             });

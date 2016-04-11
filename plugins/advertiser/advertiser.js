@@ -116,6 +116,25 @@
 	                 }, {
 	                     required: false
 	                 } );
+
+
+                     pkg.form.add( 'ad-taxes-sep', 'title', {
+                             displayname: "Sales Taxes"
+                         } )
+                         .add('taxes', 'stack', {
+                             displayname: "Taxes",
+                             scheme: {
+                                 columns: [{
+                                     fieldName: 'region',
+                                     dataType: 'text',
+                                     displayname: "Region (Province or country)"
+                                 }, {
+                                     fieldName: 'percentage',
+                                     dataType: 'number',
+                                     displayname: "Percentage"
+                                 }]
+                             }
+                         })
 	         } );
 
 	         hooks.bind( 'user_loggedin', 350, function ( cli ) {
@@ -201,6 +220,8 @@
                 pkg.Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', pkg.config.id);
                 log('Advertiser', 'Registered Scripts and CSS');
             });
+
+
 	     };
 
 	     var createAdServerHandshake = function ( cb ) {
@@ -378,9 +399,9 @@
         var registerScriptAndStyles = function() {
             hooks.bind('frontend_will_precompile', 3159, function(pkg) {
                 pkg.Frontend.registerCSSFile(
-                    pkg.config.server.base + "plugins/advertiser/dynamic/style.css", 
-                    3159, 
-                    'admin', 
+                    pkg.config.server.base + "plugins/advertiser/dynamic/style.css",
+                    3159,
+                    'admin',
                     pkg.config.id
                 );
             });
@@ -398,20 +419,20 @@
 	         conf = _c;
 	         initRequires( _c.default().server.base );
 	         log( "Advertiser", "Initalizing plugin" );
-			 
+
 	         log( 'Advertiser', 'Registering Endpoints' );
 	         registerEndpoint();
-			 
+
 	         log( 'Advertiser', 'Hooking on events' );
 	         registerHooks();
-	
+
              log( 'Advertiser', 'Hooking script and stylesheets' );
              registerScriptAndStyles();
-		 
+
 	         log( 'Advertiser', 'Adding advertiser role' );
 	         registerRoles();
 	         registerLiveVars();
-			 
+
 	         pingAdServer( callback );
 	     };
 	 };

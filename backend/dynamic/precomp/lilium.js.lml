@@ -301,7 +301,8 @@ var LiliumCMS = function() {
             var stackTable = new StackTable(
                 sTable.attr('id'),
                 sTable.data('title'),
-                JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+                JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"')),
+                sTable.data('fieldname')
             );
             stacktables.push(stacktables);
 
@@ -351,7 +352,9 @@ var LiliumCMS = function() {
                 var stackTable = new StackTable(
                     sTable.attr('id'),
                     sTable.data('title'),
-                    JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"'))
+                    JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"')),
+                    sTable.data('fieldname')
+
                 );
                 stacktables.push(stackTable);
             }

@@ -26,6 +26,17 @@ var Petals = function () {
             return new Error("Tried to fetch unregistered petal with id " + id);
         }
     };
+
+    this.compile = function (id, cb, extra) {
+        if (this.isRegistered(id)) {
+            //compile template
+            filelogic.compile(_petals[id].filepath, cb , extra);
+
+            return ;
+        } else {
+            return new Error("Tried to compile unregistered petal with id " + id);
+        }
+    }
 };
 
 module.exports = new Petals();

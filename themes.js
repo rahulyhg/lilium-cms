@@ -115,6 +115,7 @@ var Themes = function () {
                 }, info, function () {
 
                     ThemeInstance.enable(_c, info, callback);
+                    
                 }, true, true);
 
             });

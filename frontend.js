@@ -1,5 +1,6 @@
 var log = require('./log.js');
 var _c = require('./config.js');
+var templateBuilder = require('./templateBuilder.js');
 
 var BodyClasses = new Object();
 var JavaScriptFiles = new Object();
@@ -121,6 +122,10 @@ var Frontend = function () {
     this.registerFromCore = function () {
         BodyClasses["all"] = ["lmlbody", "liliumbody", "dynamic"];
         BodyClasses["login"] = ["lmllogin"];
+    };
+
+    this.registerPetal = function () {
+
     };
 };
 

@@ -72,14 +72,14 @@ TVQ :
 	$(document).ready(function() {
 
 		document.addEventListener('livevarsFetched', function(e) {
-
+            var that = this;
 			var totalPrice = calculateTotal(e.detail.livevars);
 
 			function calculateTotal(livevars) {
 				var total = 0;
 
 				// Quick fix for jquery nth-of-type problem
-				var key = $($("lml\\:livevars")[1]).attr('data-varname');
+				var key = $("lml\\:livevars").last().attr('data-varname');
 				products = livevars[key][0].products;
 				for (var index in products) {
 					// use this line if price is based on qty

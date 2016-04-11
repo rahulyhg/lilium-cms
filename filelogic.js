@@ -129,6 +129,10 @@ var FileLogic = function () {
         });
     };
 
+    this.compile = function(path, cb, extra) {
+        LML.executeToHtml(readPath, cb, extra);
+    };
+
     this.serveLmlPluginAdminPage = function (pluginName, cli, lastIsParam, extra) {
         lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
         var name;

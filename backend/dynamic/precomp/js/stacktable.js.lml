@@ -1,55 +1,74 @@
-var StackTable = function(tableid, objTitle, dataScheme) {
+var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
     var htmlIdentifier = tableid;
     var scheme = dataScheme;
-    var fieldName = dataScheme.fieldName;
     var title = objTitle;
     var linenumber = 0;
     var that = this;
-
+    var fieldname = fieldName;
+    var columns = scheme.columns.length;
+    
     var render = function() {
         // Check for livevars
     };
 
     $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
-        that.appendRow();
+        that.appendRowFromButton();
         return false;
     });
 
 
     var append = function(val, index) {
-        var row = "<tr>";
+        var row;
         row += "<td>" + val + "</td>";
         row += "<input type='hidden' name='" + $('#' + htmlIdentifier).data('fieldname') + "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' value='" + val + "'></input>";
+        return row;
+    };
+
+    this.appendRowFromButton = function() {
+        var row = '<tr>';
+
+        $('.lmlstacktable th input').each(function(index) {
+            row += append($(this).val(), index);
+            $(this).val('');
+        });
+
         row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";
-        row += "</tr>";
+        row += '</tr>';
+
         $('#' + htmlIdentifier).find('tr').last().after(row);
         $('#' + htmlIdentifier).find('.lmlstacktableremovebutton').bind('click', function() {
             $(this).parent().parent().remove();
         });
 
-        linenumber++;
-
-        return false;
     };
 
-
     this.appendRow = function(livevar) {
-        $('.lmlstacktable th input').each(function(index) {
-            if (livevar) {
-                var data = livevar[$(this).data('fieldname')];
-                for (var valueindex in data) {
-                    append(data[valueindex], index);
-                }
-            } else {
-                append($(this).val(), index);
-                $(this).val('');
+        console.log(scheme);
+        if (livevar[fieldname]) {
+            var data  = livevar[fieldname];
+
+            for (var i in data) {
+                var row = '<tr>';
+
+                $('.lmlstacktable th input').each(function(index) {
+                        var coldata = data[i][$(this).data('fieldname')];
+                        row += append(coldata, index);
+
+                });
+                row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";
+
+                row += '</tr>';
+                $('#' + htmlIdentifier).find('tr').last().after(row);
+                $('#' + htmlIdentifier).find('.lmlstacktableremovebutton').bind('click', function() {
+                    $(this).parent().parent().remove();
+                });
+                linenumber++;
+
             }
 
-        });
+            return false;
+        }
 
-
-
-        return false;
     };
 
     var init = function() {
