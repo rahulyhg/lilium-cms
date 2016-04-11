@@ -203,6 +203,20 @@ var LiveVars = function() {
                             node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
                         }
                     }
+                } else if (nodeType == 'progress') {
+                    node = $(document.createElement('div'));
+                    node.addClass("lml-progressbar-wrapper");
+                    var pval = parseInt(pullOutVarFromString(data, allDat.valuekey));
+                    var pmax = parseInt(pullOutVarFromString(data, allDat.maxkey));
+
+                    var perc = pval / pmax * 100;
+                    perc = perc >= 100 ? 100 : perc;
+
+                    barnode = $(document.createElement('div'));
+                    barnode.addClass('lml-progressbar-bar');
+                    barnode.css({width : perc + "%"});
+
+                    node.append(barnode);
                 } else if (nodeType == 'a') {
                     // Href for a link node
                     if (obj.data('href')) {
@@ -216,7 +230,7 @@ var LiveVars = function() {
                     // Set html to node
                     node.html(obj.html());
                 } else if (nodeType == 'template') {
-                    var arr = data[allDat.key];
+                    var arr = pullOutVarFromString(data, allDat.key);
 
                     for (var ii = 0; ii < arr.length; ii++) {
                         generateTemplateFromObject($('#' + allDat.template), obj, arr[ii], livevarkey, true, true);

@@ -121,3 +121,90 @@
     vertical-align: middle;
     margin-right: 10px;
 }
+
+.campaigns-product-photo-wrapper {
+    width: 120px;
+    height: 80px;
+    
+    overflow: hidden;
+    display: inline-block;
+
+    vertical-align: top;
+    border: 1px solid #EEE;
+}
+
+.campaigns-product-photo-wrapper img {
+    width: 100%;
+}
+
+.campaigns-product-photo-wrapper span {
+    display: block;
+    font-size: 28px;
+    font-weight: 500;
+    color: #EEE;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.campaigns-product-title-wrapper {
+    display: inline-block;
+    margin-left: 10px;
+
+    vertical-align: top;
+    width: 50%;
+}
+
+.campaigns-ongoing-netdisc-wrapper,
+.campaigns-ongoing-banad-wrapper {
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.campaigns-product-title-wrapper h5 {
+    font-size: 20px;
+    font-weight: 300;    
+}
+
+.campaigns-product-title-wrapper h6 {
+    font-size: 14px;
+    font-weight: 300;
+    color: #777;
+
+    margin-bottom: 8px;
+}
+
+.lml-progressbar-wrapper {
+    width: auto;
+    height: 10px;
+    border: 1px solid #E0E0E0;
+
+    overflow: hidden;
+}
+
+.lml-progressbar-wrapper .lml-progressbar-bar {
+    height: 100%;
+    background-color: #9B59B6;
+
+    -webkit-transition: 2s width;
+       -moz-transition: 2s width;
+        -ms-transition: 2s width;
+         -o-transition: 2s width;
+            transition: 2s width;
+
+    width: 0%;
+}
+
+.campaigns-product-size-tag {
+    background-color: #985986;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: #EEE;
+    border-radius: 3px;
+    margin-right: 6px;
+    display: inline-block;
+}
+
+.campaigns-impressions-count {
+    margin-top: 20px;
+    color: #333;
+} 

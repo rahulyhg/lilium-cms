@@ -374,6 +374,18 @@
 	         }, true );
 	     }
 
+
+        var registerScriptAndStyles = function() {
+            hooks.bind('frontend_will_precompile', 3159, function(pkg) {
+                pkg.Frontend.registerCSSFile(
+                    pkg.config.server.base + "plugins/advertiser/dynamic/style.css", 
+                    3159, 
+                    'admin', 
+                    pkg.config.id
+                );
+            });
+        };
+
 	     this.unregister = function ( callback ) {
 	         log( "Advertiser", "Plugin disabled" );
 	         endpoints.unregister( 'advertiser', 'GET' );
@@ -392,7 +404,10 @@
 			 
 	         log( 'Advertiser', 'Hooking on events' );
 	         registerHooks();
-			 
+	
+             log( 'Advertiser', 'Hooking script and stylesheets' );
+             registerScriptAndStyles();
+		 
 	         log( 'Advertiser', 'Adding advertiser role' );
 	         registerRoles();
 	         registerLiveVars();
