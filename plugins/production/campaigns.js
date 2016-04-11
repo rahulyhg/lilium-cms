@@ -7,12 +7,35 @@ var filelogic = undefined;
 var formbuilder = undefined;
 var hooks = undefined;
 var tableBuilder = undefined;
+var dfp = undefined;
 
 var cachedCampaigns = new Object();
 var registeredStatuses = new Array();
 
 var Campaigns = function () {
     var that = this;
+
+    var asyncForEach = function(arr, it, end) {
+        if (typeof arr !== 'object') {
+            end(new Error("[asyncForEach] First parameter must be an array (object type)"));
+        }
+
+        var len = arr.length;
+        var index = 0;
+        
+        var loopFtc = function() {
+            if (index >= len) {
+                end();
+            } else {
+                it(arr[index], function() {
+                    index++;
+                    loopFtc();
+                });
+            }
+        };
+
+        loopFtc();
+    }
 
     this.getCampaignsFromDatabase = function (conds, cb) {
         db.findToArray(_c.default(), 'campaigns', conds, function (err, data) {
@@ -128,6 +151,77 @@ var Campaigns = function () {
                         that.getAllMyCampaigns({
                             clientid: db.mongoID(cli.userinfo.userid.toString())
                         }, callback);
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "ongoing":
+                    if (cli.isGranted('advertiser')) {
+                        that.getAllMyCampaigns({
+                            campstatus : "ongoing",
+                            clientid: db.mongoID(cli.userinfo.userid.toString())
+                        }, function(arr) {
+                            if (params.deep) {
+                                asyncForEach(arr, function(obj, next) {
+                                    obj.deep = true;
+
+                                    asyncForEach(obj.products, function(prod, nextProduct) {
+                                        var prodType = Products.getTypeOfProduct(prod.prodid).name;
+                                        prod.deep = false;
+                                        prod.productType = prodType;
+
+                                        switch (prodType) {
+                                            case "netdisc":
+                                            case "sponsedit":
+                                                db.findToArray(cli._c, 'content', {
+                                                    name : prod.articlename
+                                                }, function(err, arr) {
+                                                    if (!(err && !arr[0])) {
+                                                        prod.article = arr[0];
+                                                        prod.deep = true;
+
+                                                        var mediaid = prod.article.media;
+
+                                                        if (mediaid) {
+                                                            db.findToArray(cli._c, 'uploads', {
+                                                                "_id" : db.mongoID(mediaid)
+                                                            }, function(err, arr) {
+                                                                prod.article.media = err || arr[0] || mediaid;
+                                                                prod.article.media.deep = !err;
+
+                                                                nextProduct();
+                                                            });
+                                                        } else {
+                                                            nextProduct();
+                                                        }
+                                                    } else {
+                                                        nextProduct();
+                                                    }
+                                                });
+                                                break;
+                                            case "bannerads":
+                                                db.findToArray(cli._c, 'dfpcache', {
+                                                    id : prod.dfpprojid.toString()
+                                                }, function(err, arr) {
+                                                    if (!(err && !arr[0])) {
+                                                        prod.dfp = arr[0];
+                                                        prod.deep = true;
+                                                    }
+                                                    
+                                                    nextProduct();
+                                                });
+                                                break;
+                                            default:
+                                                nextProduct();
+                                        }
+                                    }, next);
+                                }, function() {
+                                    callback(arr);
+                                });
+                            } else {
+                                callback(arr);
+                            }
+                        });
                     } else {
                         callback();
                     }
@@ -608,6 +702,7 @@ var Campaigns = function () {
         formbuilder = require(abspath + 'formBuilder.js');
         hooks = require(abspath + 'hooks.js');
         tableBuilder = require(abspath + 'tableBuilder.js');
+        dfp = require(abspath + "dfp.js");
         createTable();
     };
 };

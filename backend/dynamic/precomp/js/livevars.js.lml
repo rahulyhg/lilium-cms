@@ -163,10 +163,12 @@ var LiveVars = function() {
         var templateItems = domTemplate.clone();
         while (templateItems.find('lml\\:tobject').length !== 0) templateItems.find('lml\\:tobject').each(function(index, obj) {
             obj = $(obj);
+
             var nodeType = obj.data('nodetype');
             var action = obj.data('action');
             var filter = obj.data('filter');
             var content = obj.data('content');
+            var allDat = obj.data();
 
             var passed = true;
 
@@ -183,19 +185,24 @@ var LiveVars = function() {
                 }
 
                 if (nodeType == 'img') {
-                    if (obj.data('baseurl')) {
-                        var href= fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node)
-                        // Add src to image node
-                        var prepend = obj.data('baseurl');
-                        if (href !== '') {
-                            node.attr('src', prepend + fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
+                    if (obj.data('absurl')) {
+                        var abskey = obj.data('absurl');
+                        var absurl = pullOutVarFromString(data, abskey);
 
-                        }
+                        node.attr('src', absurl);
                     } else {
-                        // Add src to image node
-                        node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
+                        if (obj.data('baseurl')) {
+                            var href= fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node)
+                            // Add src to image node
+                            var prepend = obj.data('baseurl');
+                            if (href !== '') {
+                                node.attr('src', prepend + fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
+                            }
+                        } else {
+                            // Add src to image node
+                            node.attr('src', fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
+                        }
                     }
-
                 } else if (nodeType == 'a') {
                     // Href for a link node
                     if (obj.data('href')) {
@@ -208,6 +215,12 @@ var LiveVars = function() {
                     }
                     // Set html to node
                     node.html(obj.html());
+                } else if (nodeType == 'template') {
+                    var arr = data[allDat.key];
+
+                    for (var ii = 0; ii < arr.length; ii++) {
+                        generateTemplateFromObject($('#' + allDat.template), obj, arr[ii], livevarkey, true, true);
+                    }
                 } else {
                     // Other node types, we'll generate the content for nodes
                     node.html(fetchTemplateObjectContent(obj, data, domTarget, livevarkey, node));
@@ -248,6 +261,7 @@ var LiveVars = function() {
             } else {
                 // Ignore for now, validation stuff
                 $(obj).remove();
+                return false;
             }
         });
 

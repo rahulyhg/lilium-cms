@@ -66,4 +66,15 @@
     return item.campstatus == 'clipending';
   }
 
+  var isNetDisc = function(product) {
+    return product.productType == 'netdisc';
+  }
+
+  var isBanAd = function(product) {
+    return product.productType == 'bannerads';
+  };
+
+  var hasImage = function(product) {
+    return typeof product.article.media == 'object';
+  };
 </script>

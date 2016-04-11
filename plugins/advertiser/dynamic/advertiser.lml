@@ -6,38 +6,98 @@
     	baseurl += "/";
     $}
 
-    <h2>Welcome advertiser</h2>
+
+        <div id="campaignstbody">
+            {*campaigns.needsattention_advertiser(template:"campaigns-list-item",target:"campaignstbody")}
+        </div>
+
+        <div id="campaignsongoingtbody">
+            {*campaigns.ongoing(template:"campaigns-ongoing-list-item",target:"campaignsongoingtbody",deep:1)}
+        </div>
+
         <a href="{=config.default.server.url}/advertiser/campaigns">View your campaigns</a>
-        <h3>Campaigns needing your attention</h3>
+        
+        <lml:template id="campaigns-list-item" data-wrapper="div">
+            <div class="attention-needed-block advert-block">
+                <div class="top-color-strip"></div>
 
-        <table>
-        	<thead>
-        		<tr>
-        			<th>Campaign Name</th>
-        			<th>Status</th>
-        			<th>Action(s)</th>
+                <div class="advert-pad15">
+                    <h3>Attention needed</h3>
+                    <hr />
 
-        		</tr>
-        	</thead>
-        	<tbody id="campaignstbody">
-        		{*campaigns.needsattention_advertiser(template:"campaigns-list-item",target:"campaignstbody")}
-        	</tbody>
-        </table>
+        	        <lml:tobject data-nodetype="h4" data-key="campname"></lml:tobject>
+                    <div class="entity-action-needed-title">
+                        <lml:tobject data-nodetype="div" data-filter="signNeeded">
+                            <h5>Signature needed</h5>
+                            <p>
+                                In order to proceed with this campaign, you must first sign.
+                            </p>
+        			    </lml:tobject>
 
-        <lml:template id="campaigns-list-item" data-wrapper="tr">
-        	<lml:tobject data-nodetype="td" data-key="campname"  ></lml:tobject>
-        	<lml:tobject data-nodetype="td" data-key="campstatus" ></lml:tobject>
-        	<lml:tobject data-nodetype="td">
-        		<div class="entity-actions">
-        			<lml:tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id"  data-filter="signNeeded">
-        				Signature needed
-        			</lml:tobject>
-        			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
-        				Payment needed
-        			</lml:tobject>
-        			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-filter="reviewNeeded">
-        				Ready for review
-        			</lml:tobject>
+                        <lml:tobject data-nodetype="div" data-filter="payementNeeded">
+                            <h5>Awaiting payment</h5>
+                            <p>
+                                In order to proceed with this campaign, you must first proceed with the initial payment.
+                            </p>
+        			    </lml:tobject>
+
+                        <lml:tobject data-nodetype="div" data-filter="reviewNeeded">
+                            <h5>Pending review</h5>
+                            <p>
+                                Please review the sponsored editorial before we can publish it.
+                            </p>
+        		        </lml:tobject>
+        	        </div>
+        	    </div>
+
+                <div class="attention-needed-footer advert-pad15">
+    		        <div class="entity-actions">
+                        <lml:tobject data-nodetype="div" data-filter="signNeeded">
+        		            <lml:tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id" data-class="sign-now-a">
+        			            Sign now
+        			        </lml:tobject>
+        			    </lml:tobject>
+
+                        <lml:tobject data-nodetype="div" data-filter="payementNeeded">
+        		            <lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-class="pay-now-a">
+        			            Pay now
+        			        </lml:tobject>
+        			    </lml:tobject>
+
+                        <lml:tobject data-nodetype="div" data-filter="reviewNeeded">
+        			        <lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-class="review-now-a">
+    				            Review now
+    			            </lml:tobject>
+        		        </lml:tobject>
+        	        </div>
         		</div>
-        	</lml:tobject>
+        	</div>
+        </lml:template>
+
+        <lml:template id="campaigns-ongoing-list-item">
+            <div class="ongoing-block advert-block">
+                <div class="top-color-strip"></div>
+
+                <div class="advert-pad15">
+                    <h3><i class="fa fa-circle-o-notch fa-spin"></i> <span class="midvert">Campaign Progress</span></h3>
+                    <hr />
+
+        	        <lml:tobject data-nodetype="h4" data-key="campname"></lml:tobject>
+                    <lml:tobject data-nodetype="template" data-key="products" data-template="campaigns-editorial-listitem"></lml:tobject>
+                </div>
+            </div>
+        </lml:template>
+
+        <lml:template id="campaigns-editorial-listitem">
+            <div class="campaigns-ongoing-single-product">
+                <lml:tobject data-filter="isNetDisc">
+                    <lml:tobject data-filter="hasImage" data-nodetype="div" node-class="campaigns-product-photo-wrapper">
+                        <lml:tobject data-nodetype="img" data-absurl="article.media.sizes.medium.url" ></lml:tobject>
+                    </lml:tobject>
+                </lml:tobject>
+
+                <lml:tobject data-filter="isBanAd">
+                    Banner Ad
+                </lml:tobject>
+            </div>
         </lml:template>

@@ -20,6 +20,17 @@ var Products = function () {
         return new SingleProduct();
     };
 
+    this.getTypeOfProduct = function(prodid) {
+        var prodT = undefined;
+        try {
+            prodT = RegisteredProductTypes[RegisteredProducts[prodid].productType];
+        } catch (err) {
+            prodT = err;
+        }
+
+        return prodT;
+    };
+
     this.getProduct = function (key) {
         if (this.productIsRegistered(key)) {
             var product = Object.assign({}, RegisteredProducts[key]);

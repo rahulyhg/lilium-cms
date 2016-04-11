@@ -6,6 +6,9 @@
     </head>
     <body>
         {%adverthead}
-        {%%extra.templatefile}
+        
+        <main id="advert-main-section">
+            {%%extra.templatefile}
+        </main>
     </body>
 </html>
