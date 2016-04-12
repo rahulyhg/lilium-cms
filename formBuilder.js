@@ -6,6 +6,8 @@
 var htmlParser = require('./htmlParser');
 var validator = require('validator');
 var hooks = require('./hooks.js');
+var pluginHelper = require('./pluginHelper.js');
+
 var plugin = {};
 
 var Form = function (name, cb) {
@@ -46,27 +48,35 @@ var Field = function (name, type) {
         maxLenght: "-1",
         required: true
     };
-}
+};
 
 var FormBuilder = function () {
+    var pluginName;
     var templates = {};
     var forms = {};
     var currentForm = undefined;
+    var registerFilename;
+    var that = this;
 
-    this.createForm = function (name, attr, cb) {
+    this.createForm = function (name, attr, cb, auto) {
+        if (!auto) {
+            registerFilename = getCallerFileName();
+            history.save(this.instanciateForm, [name, attr]);
+        }
 
         instanciateForm(name, attr);
         // Add it to the form list
         forms[name] = currentForm;
 
         return this;
-    }
+    };
 
     var instanciateForm = function (name, attr) {
+
+
         if (typeof name == 'undefined') {
             throw new Error("[FormBuilderException] - No name provided to form");
         }
-
         if (typeof forms[name] !== 'undefined') {
             throw new Error("[FormBuilderException] - Form already created : " + name);
         }
@@ -78,31 +88,42 @@ var FormBuilder = function () {
         for (var key in attr) {
             currentForm.attr[key] = attr[key];
         }
-    }
+    };
 
-    this.addTemplate = function (name) {
+    this.addTemplate = function (name, auto) {
+
+        if (!auto) {
+            registerFilename = getCallerFileName();
+            history.save(this.addTemplate, [name]);
+        }
+
         if (typeof templates[name] == 'undefined') throw "[FormBuilderException] - Template not created. Please call createFormTemplate() first.";
         for (var key in templates[name].fields) {
             var field = templates[name].fields[key]
-            this.add(field.name, field.type, field.attr, field.requirements);
+            this.add(field.name, field.type, field.attr, field.requirements, undefined, true);
         }
 
         return this;
-    }
+    };
 
     this.form = function (name) {
         currentForm = forms[name];
         return this;
-    }
+    };
 
     this.registerFieldType = function (name, fct) {
         htmlParser.registerType(name, fct);
-    }
+    };
 
-    this.add = function (name, type, attr, requirements, contextForm) {
+    this.add = function (name, type, attr, requirements, contextForm, auto) {
+
+        if (!auto && !contextForm) {
+            registerFilename = getCallerFileName();
+            history.save(this.add, [name, type, attr, requirements, contextForm]);
+        }
+
         // Check if it is a tempalte
         currentForm = contextForm || currentForm;
-
         if (typeof currentForm == 'undefined') {
             throw new Error("[FormBuilderException] - Form not created. Please call createForm() first.");
         }
@@ -118,7 +139,12 @@ var FormBuilder = function () {
 
     };
 
-    this.trigger = this.trg = function (sectionname) {
+    this.trigger = this.trg = function (sectionname, auto) {
+        if (!auto) {
+            registerFilename = getCallerFileName();
+            history.save(this.trg, [sectionname, auto]);
+        }
+
         var that = this;
         hooks.trigger(currentForm.name + "_" + sectionname, {
             form: that
@@ -126,7 +152,14 @@ var FormBuilder = function () {
         return this;
     };
 
-    this.edit = function (name, type, attr, requirements) {
+    this.edit = function (name, type, attr, requirements, auto) {
+        if (!auto) {
+            registerFilename = getCallerFileName();
+            // Add to history
+            history.save(this.edit, [name, type, attr, requirements]);
+        }
+
+
         if (typeof currentForm.fields[name] !== 'undefined') {
             var field = currentForm.fields[name];
             if (typeof type !== 'undefined' && type != '') {
@@ -143,7 +176,7 @@ var FormBuilder = function () {
             }
         }
         return this;
-    }
+    };
 
     this.remove = function (name) {
         if (typeof currentForm.fields[name] !== 'undefined') {
@@ -151,7 +184,7 @@ var FormBuilder = function () {
             delete currentForm.fields[name];
         }
         return this;
-    }
+    };
 
     var createField = function (name, type, attr, requirements) {
 
@@ -172,22 +205,22 @@ var FormBuilder = function () {
         }
 
         return field;
-    }
+    };
 
-    this.registerFormTemplate = function (name) {
+    this.registerFormTemplate = function (name, auto) {
         if (typeof templates[name] !== 'undefined') throw "[FormBuilderException] - Template already created: " + name;
         currentForm = new Object();
         templates[name] = currentForm;
 
         return this;
-    }
+    };
 
     this.unregisterFormTemplate = function (name) {
         if (typeof templates[name] !== 'undefined') {
             templates[name] = undefined;
             delete templates[name];
         }
-    }
+    };
 
     this.render = function (formName) {
         if (typeof forms[formName] == 'undefined') {
@@ -205,7 +238,7 @@ var FormBuilder = function () {
         }
 
         return htmlParser.parseForm(forms[formName]);
-    }
+    };
 
     /**
      * Validates a form.
@@ -299,7 +332,7 @@ var FormBuilder = function () {
         } else {
             return valid;
         }
-    }
+    };
 
     var isTextBasedField = function (field) {
         var isTextBased = false;
@@ -312,7 +345,7 @@ var FormBuilder = function () {
             type == 'ckeditor') isTextBased = true;
 
         return isTextBased;
-    }
+    };
 
     /**
      * Handle the cli request and return the form with the values of the request
@@ -349,7 +382,7 @@ var FormBuilder = function () {
                 return form;
             }
         }
-    }
+    };
 
     this.serializeForm = function (form) {
         var data = {};
@@ -362,11 +395,89 @@ var FormBuilder = function () {
             }
         }
         return data;
-    }
+    };
 
     this.deserializeForm = function (serializedForm) {
         // TODO
-    }
+    };
+
+    var history = new function() {
+        this.save = function (fct, params) {
+            if (currentForm) {
+                if (registerFilename) {
+                    pluginName = pluginHelper.getPluginIdentifierFromFilename(registerFilename, undefined, true);
+
+                }
+
+                currentForm.history = currentForm.history ? currentForm.history : [];
+                currentForm.history.push({fct : fct, params : params, pluginnamme : pluginName});
+            }
+        };
+
+        this.recreate = function (formName) {
+            if (forms[formName]) {
+                currentForm = forms[formName];
+                for (var i in currentForm.history) {
+                    var step = currentForm.history[i];
+                    var params = currentForm.history[i].params.slice();
+                    if (currentForm.history[i].fct) {
+                        var nbOfArgs = currentForm.history[i].fct.length;
+
+                        params[nbOfArgs-1] = true;
+
+                        currentForm.history[i].fct.apply(that, params);
+
+                    }
+                }
+            }
+        };
+
+        this.invalidateFromPlugin = function (pluginID) {
+                if (pluginID) {
+                    for (var i in forms) {
+                        var hasRelatedPlugin = false;
+
+                        // Remove the form fields
+                        for (var j in forms[i].history) {
+                            if (forms[i].history[j].pluginnamme && forms[i].history[j].pluginnamme == pluginID) {
+                                // Remove history related to this plugin
+
+                                forms[i].history.splice(j,1);
+                                hasRelatedPlugin = true;
+                            }
+                        }
+
+                        if (hasRelatedPlugin) {
+                            // Destruct form fields
+                            forms[i].fields = {};
+                            this.recreate(i);
+                        }
+                    }
+                }
+
+        };
+
+        this.newPluginInitialised = function () {
+            // Recreate the forms to relaunch the hooks for the new plugin
+            try{
+                for (var i in forms) {
+                    // Delete plugin history
+                    for (var j in forms[i].history) {
+                        if (typeof forms[i].history[j].pluginnamme !== 'undefined') {
+                            forms[i].history.splice(j,1);
+                        }
+                    }
+                    forms[i].fields = {};
+                    this.recreate(i);
+                }
+            }catch(e) {
+                console.log(e);
+            }
+
+        }
+
+
+    };
 
     this.unescapeForm = function (escapedForm) {
         for (var field in escapedForm) {
@@ -375,43 +486,55 @@ var FormBuilder = function () {
             }
         }
         return escapedForm;
-    }
+    };
 
     this.isAlreadyCreated = function (name) {
         if (typeof forms[name] == 'undefined') {
             return false;
         }
         return true;
-    }
+    };
 
     this.debug = function () {
         console.log(forms);
 
-    }
+    };
 
-    this.loadHooks = function () {
-        this.bind('plugindisabled', 2, function(identifier) {
+    var loadHooks = function () {
+        hooks.bind('plugindisabled', 1, function(identifier) {
             // Check if plugin changed some forms
-            if (plugin[identifier]) {
-                // All forms that have been afected
-                for (var i in plugin[identifier]) {
-                    var formname = plugin[identifier][i];
-                    for (var f in formname) {
-                        var field = formname[f];
-                        if (field.changeHistory &&  field.changeHistory[identifier]) {
-                            if (field.changeHistory[identifier]) {
-
-                            } else {
-
-                            }
-                        }
-                    }
-                    delete cb;
-                }
-                console.log(events);
-            }
+            history.invalidateFromPlugin(identifier);
         });
+        hooks.bind('pluginregistered', 100, function(identifier) {
+            // Check if plugin changed some forms
+            history.newPluginInitialised(identifier);
+        });
+    };
+
+    var getCallerFileName = function () {
+        try {
+            var err = new Error();
+            var callerfile;
+            var currentfile;
+
+            Error.prepareStackTrace = function (err, stack) {
+                return stack;
+            };
+
+            currentfile = err.stack.shift().getFileName();
+
+            while (err.stack.length) {
+                callerfile = err.stack.shift().getFileName();
+                if (currentfile !== callerfile) return callerfile;
+            }
+        } catch (err) {}
+
+        return undefined;
     }
+
+    this.init = function() {
+        loadHooks();
+    };
 };
 
 module.exports = new FormBuilder();

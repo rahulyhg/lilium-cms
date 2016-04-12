@@ -15,21 +15,31 @@ var FileServer = function () {
         return __dirname;
     };
 
-    this.fileExists = function (fullpath, cb) {
-        fs.lstat(fullpath, function (err, stats) {
-            if (err) {
-                cb(false);
-                return;
-            }
-
+    this.fileExists = function (fullpath, cb, sync) {
+        if (sync) {
+            var stats = fs.lstatSync(fullpath);
             if (stats.isDirectory()) {
                 fullpath += "/index.html";
             }
+            return typeof fs.accessSync(fullpath, fs.F_OK) == 'undefined';
 
-            fs.access(fullpath, fs.F_OK, function (err) {
-                cb(!err);
+        } else {
+            fs.lstat(fullpath, function (err, stats) {
+                if (err) {
+                    cb(false);
+                    return;
+                }
+
+                if (stats.isDirectory()) {
+                    fullpath += "/index.html";
+                }
+
+                fs.access(fullpath, fs.F_OK, function (err) {
+                    cb(!err);
+                });
             });
-        });
+        }
+
     };
 
     this.minifyHTML = function (fullpath, cb) {
@@ -106,10 +116,15 @@ var FileServer = function () {
         });
     };
 
-    this.readJSON = function (abspath, callback) {
-        this.readFile(abspath, function (content) {
-            callback(JSON.parse(content || {}));
-        });
+    this.readJSON = function (abspath, callback, sync) {
+        if (sync) {
+            return JSON.parse(this.readFileSync(abspath)) || {};
+        } else {
+            this.readFile(abspath, function (content) {
+                callback(JSON.parse(content || {}));
+            });
+        }
+
     };
 
     this.saveJSON = function (abspath, object, callback) {
@@ -121,16 +136,26 @@ var FileServer = function () {
         });
     };
 
-    this.readFile = function (filename, callback) {
-        this.fileExists(filename, function (exists) {
+    this.readFile = function (filename, callback, sync) {
+        if (sync) {
+            var exists = this.fileExists(filename, undefined, true);
             if (exists) {
-                fs.readFile(filename, "binary", function (err, file) {
-                    callback(file);
-                });
+                return fs.readFileSync(filename, "binary");
             } else {
-                callback(undefined);
+                return undefined;
             }
-        });
+        } else {
+            this.fileExists(filename, function (exists) {
+                if (exists) {
+                    fs.readFile(filename, "binary", function (err, file) {
+                        callback(file);
+                    });
+                } else {
+                    callback(undefined);
+                }
+            });
+        }
+
     };
 
     this.readFileSync = function (filename) {

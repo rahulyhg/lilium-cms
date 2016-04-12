@@ -221,10 +221,11 @@ var AdminAdvertiser = function () {
                 id: 'stripe_form'
             } )
             .addTemplate( 'entity_create' )
-            .addTemplate( 'payment' )
             .edit( 'password', '', {}, {
                 required: false
-            } );
+            } )
+            .addTemplate( 'payment' );
+
     };
 
     this.init = function ( abspath ) {

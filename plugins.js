@@ -144,11 +144,15 @@ var Plugins = module.exports = new function () {
                     }, function () {
                         if (typeof pluginInstance.register !== 'function') {
                             log("Plugins", 'Plugin has no method "register"');
+                            hooks.fire('pluginregistered', identifier);
+
                             callback();
                         } else {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
                             pluginInstance.register(_c, info, function () {
                                 cli.cacheClear();
+                                hooks.fire('pluginregistered', identifier);
+
                                 callback();
                             });
                         }

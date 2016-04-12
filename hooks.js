@@ -77,7 +77,8 @@ var Hooks = function () {
     };
 
     this.bindPluginDisabling = function () {
-        this.bind('plugindisabled', 1, function (identifier) {
+        this.bind('plugindisabled', 9999, function (identifier) {
+            console.log('DISABLED');
             for (var i in events) {
                 for (var j in events[i]) {
                     if (events[i][j].plugin == identifier) {

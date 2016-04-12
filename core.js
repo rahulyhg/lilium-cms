@@ -584,7 +584,8 @@ var Core = function () {
 
     var initForms = function () {
         Forms = require('./forms');
-
+        var formBuilder = require('./formBuilder.js');
+        formBuilder.init();
         Forms.init();
     };
 
@@ -638,7 +639,6 @@ var Core = function () {
             if (exists) {
                 fss.fileExists(currentRoot + "/sites/default.json", function (exists) {
                     if (exists) {
-                        initForms();
                         sites.loadSites(loadEverything);
                     } else {
                         prepareDefaultSiteCreation(loadEverything);
@@ -689,6 +689,7 @@ var Core = function () {
         loadWebsites(function (resp) {
             loadRequires();
             loadHooks(readyToRock);
+            initForms();
             loadEndpoints();
             loadStandardInput();
             loadImageSizes();
