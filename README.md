@@ -39,6 +39,12 @@ server {
                 rewrite ^ http://liliumcms.com$request_uri permanent;
         }
 
+        # Always pass admin requests to Lilium
+        location /admin/* {
+                try_files @lilium =404;
+        }
+
+        # For all other requests, check for a static file before passing to Lilium
         location / {
                 alias /absolute/path/to/html;
                 try_files $uri @lilium;
