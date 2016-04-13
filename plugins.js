@@ -155,6 +155,7 @@ var Plugins = module.exports = new function () {
                     }, true, true);
                 } catch (ex) {
                     log("Plugins", "Could not register plugin [" + identifier + "] because of an exception : " + ex);
+                    log("Plugins", ex.stack);
                     callback();
                 }
             });

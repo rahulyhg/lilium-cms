@@ -176,7 +176,7 @@ var Campaigns = function () {
                                                 db.findToArray(cli._c, 'content', {
                                                     name : prod.articlename
                                                 }, function(err, arr) {
-                                                    if (!(err && !arr[0])) {
+                                                    if (!err && arr[0]) {
                                                         prod.article = arr[0];
                                                         prod.deep = true;
 
