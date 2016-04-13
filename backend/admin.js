@@ -7,6 +7,8 @@ var AdminMenus = new Array();
 
 var filelogic = require('../filelogic.js');
 var formBuilder = require('../formBuilder');
+var pluginHelper = require('../pluginHelper.js');
+var hooks = require('../hooks.js');
 
 var AdminMenu = function() {
 	this.id = "";
@@ -129,16 +131,35 @@ var Admin = function() {
 	this.registerAdminEndpoint = function(endpoint, method, func) {
 		if (!this.adminEndpointRegistered(endpoint, method)) {
 			AdminEndpoints[method][endpoint] = func;
+            AdminEndpoints[method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
+
 		} else {
 			throw "[AdminEndpointException] Endpoint is already registered : " + method + "@" + endpoint;
 		}
 	};
 
-	var init = function() {
+    deletePluginEndpoints = function (identifier) {
+        for (var i in AdminEndpoints) {
+            for (var j in AdminEndpoints[i]) {
+                if (AdminEndpoints[i][j].pluginID == identifier) {
+                    AdminEndpoints[i][j] = undefined;
+                    delete AdminEndpoints[i][j];
+                }
+            }
+        }
+    }
 
+    var loadHooks = function () {
+        hooks.bind('plugindisabled', 1, function(identifier) {
+            // Check if plugin created endpoints
+            deletePluginEndpoints(identifier);
+        });
+    };
+
+	this.init = function() {
+        loadHooks();
+        return this;
 	};
-
-	init();
 };
 
 module.exports = new Admin();

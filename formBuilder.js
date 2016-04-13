@@ -10,7 +10,7 @@ var pluginHelper = require('./pluginHelper.js');
 
 var plugin = {};
 
-var Form = function (name, cb) {
+var Form = function(name, cb) {
     this.name = name;
     this.valid = false;
     this.callback = cb;
@@ -24,7 +24,7 @@ var Form = function (name, cb) {
     };
 };
 
-var Field = function (name, type) {
+var Field = function(name, type) {
 
     this.name = name;
     /**
@@ -50,7 +50,7 @@ var Field = function (name, type) {
     };
 };
 
-var FormBuilder = function () {
+var FormBuilder = function() {
     var pluginName;
     var templates = {};
     var forms = {};
@@ -58,27 +58,29 @@ var FormBuilder = function () {
     var registerFilename;
     var that = this;
 
-    this.createForm = function (name, attr, cb, auto) {
+    this.createForm = function(name, attr, cb, auto) {
         if (!auto) {
-            registerFilename = getCallerFileName();
-            history.save(this.instanciateForm, [name, attr]);
+            registerFilename = __caller;
+            history.save(this.createForm, [name, attr]);
         }
 
-        instanciateForm(name, attr);
+        instanciateForm(name, attr, auto);
         // Add it to the form list
         forms[name] = currentForm;
 
         return this;
     };
 
-    var instanciateForm = function (name, attr) {
+    var instanciateForm = function(name, attr, auto) {
 
 
         if (typeof name == 'undefined') {
             throw new Error("[FormBuilderException] - No name provided to form");
         }
-        if (typeof forms[name] !== 'undefined') {
-            throw new Error("[FormBuilderException] - Form already created : " + name);
+        if (!auto) {
+            if (typeof forms[name] !== 'undefined') {
+                throw new Error("[FormBuilderException] - Form already created : " + name);
+            }
         }
 
         // Instanciate a new form
@@ -90,10 +92,10 @@ var FormBuilder = function () {
         }
     };
 
-    this.addTemplate = function (name, auto) {
+    this.addTemplate = function(name, auto) {
 
         if (!auto) {
-            registerFilename = getCallerFileName();
+            registerFilename = __caller;
             history.save(this.addTemplate, [name]);
         }
 
@@ -106,19 +108,19 @@ var FormBuilder = function () {
         return this;
     };
 
-    this.form = function (name) {
+    this.form = function(name) {
         currentForm = forms[name];
         return this;
     };
 
-    this.registerFieldType = function (name, fct) {
+    this.registerFieldType = function(name, fct) {
         htmlParser.registerType(name, fct);
     };
 
-    this.add = function (name, type, attr, requirements, contextForm, auto) {
+    this.add = function(name, type, attr, requirements, contextForm, auto) {
 
         if (!auto && !contextForm) {
-            registerFilename = getCallerFileName();
+            registerFilename = __caller;
             history.save(this.add, [name, type, attr, requirements, contextForm]);
         }
 
@@ -131,7 +133,8 @@ var FormBuilder = function () {
             currentForm.fields = {};
         }
         if (typeof currentForm.fields[name] !== 'undefined') {
-            throw new Error("[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]));
+            // throw new Error("[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]));
+            return this;
         }
 
         currentForm.fields[name] = createField(name, type, attr, requirements);
@@ -139,9 +142,9 @@ var FormBuilder = function () {
 
     };
 
-    this.trigger = this.trg = function (sectionname, auto) {
+    this.trigger = this.trg = function(sectionname, auto) {
         if (!auto) {
-            registerFilename = getCallerFileName();
+            registerFilename = __caller;
             history.save(this.trg, [sectionname, auto]);
         }
 
@@ -152,9 +155,9 @@ var FormBuilder = function () {
         return this;
     };
 
-    this.edit = function (name, type, attr, requirements, auto) {
+    this.edit = function(name, type, attr, requirements, auto) {
         if (!auto) {
-            registerFilename = getCallerFileName();
+            registerFilename = __caller;
             // Add to history
             history.save(this.edit, [name, type, attr, requirements]);
         }
@@ -178,7 +181,7 @@ var FormBuilder = function () {
         return this;
     };
 
-    this.remove = function (name) {
+    this.remove = function(name) {
         if (typeof currentForm.fields[name] !== 'undefined') {
             currentForm.fields[name] = undefined;
             delete currentForm.fields[name];
@@ -186,7 +189,7 @@ var FormBuilder = function () {
         return this;
     };
 
-    var createField = function (name, type, attr, requirements) {
+    var createField = function(name, type, attr, requirements) {
 
         if (typeof name == 'undefined') {
             throw new Error("[FormBuilderException] - No name provided to field");
@@ -207,7 +210,7 @@ var FormBuilder = function () {
         return field;
     };
 
-    this.registerFormTemplate = function (name, auto) {
+    this.registerFormTemplate = function(name, auto) {
         if (typeof templates[name] !== 'undefined') throw "[FormBuilderException] - Template already created: " + name;
         currentForm = new Object();
         templates[name] = currentForm;
@@ -215,14 +218,14 @@ var FormBuilder = function () {
         return this;
     };
 
-    this.unregisterFormTemplate = function (name) {
+    this.unregisterFormTemplate = function(name) {
         if (typeof templates[name] !== 'undefined') {
             templates[name] = undefined;
             delete templates[name];
         }
     };
 
-    this.render = function (formName) {
+    this.render = function(formName) {
         if (typeof forms[formName] == 'undefined') {
             throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
         }
@@ -246,7 +249,7 @@ var FormBuilder = function () {
      * @param  {boolean} withErrStack Whether to return a json error stack or a simple boolean
      * @return {Array}err A stack of all the errors.
      */
-    this.validate = function (form, callStack, cli) {
+    this.validate = function(form, callStack, cli) {
         var valid = false;
         // Return an error stack by default
         if (typeof callStack == 'undefined') {
@@ -334,7 +337,7 @@ var FormBuilder = function () {
         }
     };
 
-    var isTextBasedField = function (field) {
+    var isTextBasedField = function(field) {
         var isTextBased = false;
         var type = field.type;
 
@@ -352,7 +355,7 @@ var FormBuilder = function () {
      * @param  {[type]} cli [description]
      * @return {[type]}     [description]
      */
-    this.handleRequest = function (cli) {
+    this.handleRequest = function(cli) {
         if (typeof cli.postdata !== 'undefined') {
             if (typeof cli.postdata.data !== 'undefined' &&
                 typeof cli.postdata.data.form_name !== 'undefined' &&
@@ -384,7 +387,7 @@ var FormBuilder = function () {
         }
     };
 
-    this.serializeForm = function (form) {
+    this.serializeForm = function(form) {
         var data = {};
         for (var field in form.fields) {
             var field = form.fields[field];
@@ -397,33 +400,39 @@ var FormBuilder = function () {
         return data;
     };
 
-    this.deserializeForm = function (serializedForm) {
+    this.deserializeForm = function(serializedForm) {
         // TODO
     };
 
     var history = new function() {
-        this.save = function (fct, params) {
+        this.save = function(fct, params) {
             if (currentForm) {
+
                 if (registerFilename) {
                     pluginName = pluginHelper.getPluginIdentifierFromFilename(registerFilename, undefined, true);
-
                 }
 
                 currentForm.history = currentForm.history ? currentForm.history : [];
-                currentForm.history.push({fct : fct, params : params, pluginnamme : pluginName});
+                currentForm.history.push({
+                    fct: fct,
+                    params: params,
+                    pluginnamme: pluginName
+                });
             }
         };
 
-        this.recreate = function (formName) {
+        this.recreate = function(formName) {
+            log('FormBuilder', 'Recreating form: ' + formName);
             if (forms[formName]) {
+
                 currentForm = forms[formName];
                 for (var i in currentForm.history) {
-                    var step = currentForm.history[i];
+
                     var params = currentForm.history[i].params.slice();
                     if (currentForm.history[i].fct) {
                         var nbOfArgs = currentForm.history[i].fct.length;
 
-                        params[nbOfArgs-1] = true;
+                        params[nbOfArgs - 1] = true;
 
                         currentForm.history[i].fct.apply(that, params);
 
@@ -432,45 +441,61 @@ var FormBuilder = function () {
             }
         };
 
-        this.invalidateFromPlugin = function (pluginID) {
+        this.invalidateFromPlugin = function(pluginID) {
+            try {
+
                 if (pluginID) {
                     for (var i in forms) {
                         var hasRelatedPlugin = false;
-
+                        var deleteCompleteForm = false;
                         // Remove the form fields
                         for (var j in forms[i].history) {
-                            if (forms[i].history[j].pluginnamme && forms[i].history[j].pluginnamme == pluginID) {
-                                // Remove history related to this plugin
 
-                                forms[i].history.splice(j,1);
+                            if (forms[i].history[j].pluginnamme && forms[i].history[j].pluginnamme == pluginID) {
+
+                                if (j == 0 && forms[i].history[j].pluginnamme !== false) {
+                                    deleteCompleteForm = true;
+                                }
+
+                                // Remove history related to this plugin
+                                forms[i].history.splice(j, 1);
                                 hasRelatedPlugin = true;
                             }
                         }
 
                         if (hasRelatedPlugin) {
-                            // Destruct form fields
-                            forms[i].fields = {};
-                            this.recreate(i);
+                            if (deleteCompleteForm) {
+                                forms[i] = undefined;
+                                delete forms[i];
+                            } else {
+                                // Destruct form fields
+                                forms[i].fields = {};
+                                this.recreate(i);
+                            }
+
                         }
                     }
                 }
+            } catch (e) {
+                console.log(e);
+            }
+
 
         };
 
-        this.newPluginInitialised = function () {
+        this.newPluginInitialised = function(identifier) {
             // Recreate the forms to relaunch the hooks for the new plugin
-            try{
+            try {
+
                 for (var i in forms) {
-                    // Delete plugin history
-                    for (var j in forms[i].history) {
-                        if (typeof forms[i].history[j].pluginnamme !== 'undefined') {
-                            forms[i].history.splice(j,1);
-                        }
+                    if (i == 'post_create') {
+
                     }
+                    // Delete plugin history
                     forms[i].fields = {};
                     this.recreate(i);
                 }
-            }catch(e) {
+            } catch (e) {
                 console.log(e);
             }
 
@@ -479,7 +504,7 @@ var FormBuilder = function () {
 
     };
 
-    this.unescapeForm = function (escapedForm) {
+    this.unescapeForm = function(escapedForm) {
         for (var field in escapedForm) {
             if (typeof escapedForm[field] === 'string') {
                 escapedForm[field] = unescape(escapedForm[field]);
@@ -488,49 +513,31 @@ var FormBuilder = function () {
         return escapedForm;
     };
 
-    this.isAlreadyCreated = function (name) {
+    this.isAlreadyCreated = function(name) {
         if (typeof forms[name] == 'undefined') {
             return false;
         }
         return true;
     };
 
-    this.debug = function () {
+    this.debug = function() {
         console.log(forms);
 
     };
 
-    var loadHooks = function () {
+    var loadHooks = function() {
         hooks.bind('plugindisabled', 1, function(identifier) {
             // Check if plugin changed some forms
             history.invalidateFromPlugin(identifier);
+
+
         });
-        hooks.bind('pluginregistered', 100, function(identifier) {
+
+        hooks.bind('pluginregistered', 1, function(identifier) {
             // Check if plugin changed some forms
             history.newPluginInitialised(identifier);
         });
     };
-
-    var getCallerFileName = function () {
-        try {
-            var err = new Error();
-            var callerfile;
-            var currentfile;
-
-            Error.prepareStackTrace = function (err, stack) {
-                return stack;
-            };
-
-            currentfile = err.stack.shift().getFileName();
-
-            while (err.stack.length) {
-                callerfile = err.stack.shift().getFileName();
-                if (currentfile !== callerfile) return callerfile;
-            }
-        } catch (err) {}
-
-        return undefined;
-    }
 
     this.init = function() {
         loadHooks();

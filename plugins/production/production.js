@@ -151,23 +151,29 @@ var Production = function () {
     };
 
     this.register = function (_c, info, callback) {
-        conf = _c;
-        initRequires(_c.default().server.base);
-        initCampaigns(_c.default().server.base);
-        log("Production", "Initalizing plugin");
-        changerequest.init(_c.default().server.base);
+        try {
+            conf = _c;
+            initRequires(_c.default().server.base);
+            log("Production", "Initalizing plugin");
 
-        log('Production', 'Registering hooks');
-        registerHooks();
+            initCampaigns(_c.default().server.base);
+            changerequest.init(_c.default().server.base);
 
-        log('Production', 'Registering Roles');
-        registerRoles();
+            log('Production', 'Registering hooks');
+            registerHooks();
 
-        log('Production', 'Registering forms');
-        registerForms();
-        registerNotificationGroups();
+            log('Production', 'Registering Roles');
+            registerRoles();
 
-        return callback();
+            log('Production', 'Registering forms');
+            registerForms();
+            registerNotificationGroups();
+
+            return callback();
+        } catch (e) {
+            console.log(e);
+        }
+
     };
 };
 

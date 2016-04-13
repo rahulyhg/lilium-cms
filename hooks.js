@@ -20,7 +20,7 @@ var events = {
 
 var Hooks = function () {
     this.bind = this.register = function (eventName, priority, callback) {
-        var registerFilename = getCallerFileName();
+        var registerFilename = __caller;
         pluginHelper.getPluginIdentifierFromFilename(registerFilename, function (pluginIdentifier) {
 
             if (typeof events[eventName] === 'undefined') {
@@ -78,7 +78,6 @@ var Hooks = function () {
 
     this.bindPluginDisabling = function () {
         this.bind('plugindisabled', 9999, function (identifier) {
-            console.log('DISABLED');
             for (var i in events) {
                 for (var j in events[i]) {
                     if (events[i][j].plugin == identifier) {
@@ -87,27 +86,6 @@ var Hooks = function () {
                 }
             }
         });
-    }
-
-    var getCallerFileName = function () {
-        try {
-            var err = new Error();
-            var callerfile;
-            var currentfile;
-
-            Error.prepareStackTrace = function (err, stack) {
-                return stack;
-            };
-
-            currentfile = err.stack.shift().getFileName();
-
-            while (err.stack.length) {
-                callerfile = err.stack.shift().getFileName();
-
-                if (currentfile !== callerfile) return callerfile;
-            }
-        } catch (err) {}
-        return undefined;
     }
 };
 module.exports = new Hooks();

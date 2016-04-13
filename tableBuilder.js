@@ -1,4 +1,6 @@
 var lmllib = require('./lmllib.js');
+var hooks = require('./hooks.js');
+var pluginHelper = require('./pluginHelper.js');
 
 var TableBuilder = function () {
     lmllib.registerContextLibrary('tableBuilder', function () {
@@ -10,10 +12,13 @@ var TableBuilder = function () {
     this.createTable = function (table) {
         if (typeof tables[table.name] == 'undefined') {
             tables[table.name] = table;
+            tables[table.name].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
         } else {
-            throw ('[TableBuilder] Table with name ' + tableName + ' already exists.');
+            throw ('[TableBuilder] Table with name ' + table.name + ' already exists.');
         }
     };
+
+
 
     this.render = function (tableName) {
         if (typeof tables[tableName] !== 'undefined') {
@@ -21,6 +26,22 @@ var TableBuilder = function () {
         } else {
             throw ('[TableBuilder] Table with name ' + tableName + ' not found.');
         }
+    };
+
+    deletePluginTable = function(identifier) {
+        for (var i in tables) {
+            if (tables[i].pluginID == identifier) {
+                tables[i] = undefined;
+                delete tables[i];
+            }
+        }
+    }
+
+    var loadHooks = function () {
+        hooks.bind('plugindisabled', 2, function(identifier) {
+            // Check if plugin changed some forms
+            deletePluginTable(identifier);
+        });
     };
 
     var generatehtml = function (table) {
@@ -61,6 +82,10 @@ var TableBuilder = function () {
         }
 
     };
+
+    this.init = function() {
+        loadHooks();
+    }
 };
 
 module.exports = new TableBuilder();

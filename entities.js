@@ -9,6 +9,7 @@ var mailer = require('./postman.js');
 var imageResizer = require('./imageResizer.js');
 var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
+var pluginHelper = require('./pluginHelper.js');
 
 var Roles = new Object();
 
@@ -452,7 +453,7 @@ var Entities = module.exports = new function () {
 
     this.cacheRoles = function (callback) {
         log('Roles', 'Caching roles from Database');
-        db.findToArray(_c.default(), 'roles', {}, function (err, roles) {
+        db.findToArray(_c.default(), 'roles', {'pluginID': false}, function (err, roles) {
             if (!err) {
                 for (var i = 0, len = roles.length; i < len; i++) {
                     Roles[roles[i].name] = roles[i];
@@ -482,6 +483,8 @@ var Entities = module.exports = new function () {
         if (typeof Roles[rObj.name] !== 'undefined') {
             throw new Error("[RolesException] Tried to register already registered role " + rObj.name);
         } else {
+            console.log('REGISTERING ROLE');
+            rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
             rObj.rights = rights;
             db.update(_c.default(), 'roles', {
                 name: rObj.name
@@ -716,8 +719,29 @@ var Entities = module.exports = new function () {
         }, []);
     };
 
+    var deletePluginRole = function (identifier) {
+        for (var i in Roles) {
+            if (Roles[i].pluginID == identifier) {
+                db.remove(_c.default(), 'roles', {name : Roles[i].name}, function(err, res) {
+                    if (err) console.log(err);
+                    Roles[i] = undefined;
+                    delete Roles[i];
+                    console.log('REMOVED ROLE');
+                })
+            }
+        }
+    };
+
+    var registerHooks = function () {
+        hooks.bind('plugindisabled', 2, function(identifier) {
+            // Check if plugin changed some forms
+            deletePluginRole(identifier);
+        });
+    };
+
     var init = function () {
         registerTables();
+        registerHooks();
     };
 
     init();

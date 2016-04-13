@@ -13,13 +13,13 @@ var livevars = undefined;
 var _toppages = new Array();
 var _latestHisto = new Object();
 
-var Chartbeat = function () {
+var Chartbeat = function() {
     this.iface = new Object();
     var scheduleFetchID = "chartbeat_fetch_realtime";
     var quickstatsURL = "http://api.chartbeat.com/live/quickstats/v4/?apikey={apikey}&host={host}&section={section}";
     var toppagesURL = "http://api.chartbeat.com/live/toppages/v3/?apikey={apikey}&host={host}&section={section}&types=1";
 
-    var initRequires = function (abspath) {
+    var initRequires = function(abspath) {
         log = require(abspath + "log.js");
         config = require(abspath + "config.js");
         Petal = require(abspath + "petal.js");
@@ -33,15 +33,15 @@ var Chartbeat = function () {
         livevars = require(abspath + "livevars.js");
     };
 
-    var createPetals = function () {
+    var createPetals = function() {
         Petal.register('dashboardChartbeat', config.default().server.base + "plugins/chartbeat/dynamic/dash.petal");
         Petal.register('dashboardChartbeatJS', config.default().server.base + "plugins/chartbeat/dynamic/dashjs.petal");
     };
 
-    var hookOnDashboard = function () {
+    var hookOnDashboard = function() {
         dashboard.registerDashPetal('dashboardChartbeat', 50);
 
-        hooks.bind('frontend_will_precompile', 5000, function (pkg) {
+        hooks.bind('frontend_will_precompile', 5000, function(pkg) {
             log('Chartbeat', 'Registering CSS file to admin context');
             pkg.Frontend.registerCSSFile(
                 pkg.config.server.base + "plugins/chartbeat/dynamic/chartbeat.css",
@@ -73,8 +73,8 @@ var Chartbeat = function () {
         });
     };
 
-    var registerSettings = function () {
-        hooks.bind('settings_form_bottom', 400, function (pkg) {
+    var registerSettings = function() {
+        hooks.bind('settings_form_bottom', 400, function(pkg) {
             pkg.form.add('chartbeat-sep', 'title', {
                     displayname: "Chartbeat"
                 })
@@ -100,26 +100,26 @@ var Chartbeat = function () {
                 });
         });
 
-        hooks.bind('settings_saved', 10, function (cli) {
+        hooks.bind('settings_saved', 10, function(cli) {
             cacheInvalidator.deleteCachedFile(cli, "admin/dashboard/index.html");
         });
     };
 
-    var initDatabase = function (conf, cb) {
+    var initDatabase = function(conf, cb) {
         db.createCollection(conf, 'chartbeathisto', cb);
     };
 
-    var initDatabases = function (cb) {
-        hooks.bind('site_initialized', 1000, function (conf) {
-            initDatabase(conf, function () {});
+    var initDatabases = function(cb) {
+        hooks.bind('site_initialized', 1000, function(conf) {
+            initDatabase(conf, function() {});
         });
 
-        config.each(function (conf, next) {
+        config.each(function(conf, next) {
             initDatabase(conf, next);
         }, cb);
     };
 
-    var parseChartbeatJSON = function (resp) {
+    var parseChartbeatJSON = function(resp) {
         try {
             var obj = JSON.parse(resp);
             return obj;
@@ -129,8 +129,8 @@ var Chartbeat = function () {
         }
     };
 
-    var registerLiveVar = function () {
-        livevars.registerLiveVariable("chartbeat", function (cli, levels, params, send) {
+    var registerLiveVar = function() {
+        livevars.registerLiveVariable("chartbeat", function(cli, levels, params, send) {
             if (levels.length == 0) {
                 send("Undefined root level live variable for Chartbeat")
                 return;
@@ -148,11 +148,11 @@ var Chartbeat = function () {
                         case "history":
                         default:
                             var limit = params.limit ? parseInt(params.limit) : 100;
-                            db.find(cli._c, 'chartbeathisto', {}, {}, function (err, cur) {
+                            db.find(cli._c, 'chartbeathisto', {}, {}, function(err, cur) {
                                 if (!err) {
                                     cur.sort({
                                         "_id": -1
-                                    }).limit(limit).toArray(function (err, dat) {
+                                    }).limit(limit).toArray(function(err, dat) {
                                         send(dat);
                                     });
                                 } else {
@@ -168,7 +168,7 @@ var Chartbeat = function () {
         }, []);
     };
 
-    var storeQuickstats = function (conf, err, resp, body) {
+    var storeQuickstats = function(conf, err, resp, body) {
         if (!err) {
             notifications.emitToWebsite(conf.id, body, 'chartbeat_histo');
             var dat = parseChartbeatJSON(body);
@@ -180,7 +180,7 @@ var Chartbeat = function () {
                         recirc: dat.data.stats.recirc,
                         at: now
                     };
-                    db.insert(conf, 'chartbeathisto', item, function (err, r) {
+                    db.insert(conf, 'chartbeathisto', item, function(err, r) {
                         notifications.emitToWebsite(conf.id, item, 'chartbeat_histo_push');
                     });
                 }
@@ -192,7 +192,7 @@ var Chartbeat = function () {
         }
     };
 
-    var storeToppages = function (conf, err, resp, body) {
+    var storeToppages = function(conf, err, resp, body) {
         if (!err) {
             var dat = parseChartbeatJSON(body);
             if (!dat.error) {
@@ -221,7 +221,7 @@ var Chartbeat = function () {
         }
     };
 
-    var scheduleInterval = function (conf) {
+    var scheduleInterval = function(conf) {
         if (conf.chartbeat && conf.chartbeat.api_key && conf.chartbeat.host) {
             var qsurl = quickstatsURL
                 .replace("{apikey}", conf.chartbeat.api_key)
@@ -238,64 +238,72 @@ var Chartbeat = function () {
                 every: {
                     secondCount: 5
                 }
-            }, function () {
-                request(qsurl, function (err, resp, body) {
+            }, function() {
+                request(qsurl, function(err, resp, body) {
                     storeQuickstats(conf, err, resp, body);
                 });
 
-                request(tpurl, function (err, resp, body) {
+                request(tpurl, function(err, resp, body) {
                     storeToppages(conf, err, resp, body);
                 });
             }).start();
 
-            request(qsurl, function (err, resp, body) {
+            request(qsurl, function(err, resp, body) {
                 storeQuickstats(conf, err, resp, body);
             });
 
-            request(tpurl, function (err, resp, body) {
+            request(tpurl, function(err, resp, body) {
                 storeToppages(conf, err, resp, body);
             });
         }
     };
 
-    var scheduleIntervals = function () {
-        hooks.bind('site_initialized', 1000, function (conf) {
+    var scheduleIntervals = function() {
+        hooks.bind('site_initialized', 1000, function(conf) {
             scheduleInterval(conf);
         });
 
-        hooks.bind('settings_saved', 1000, function (conf) {
+        hooks.bind('settings_saved', 1000, function(conf) {
             scheduleInterval(conf);
         });
 
-        config.eachSync(function (conf) {
+        config.eachSync(function(conf) {
             scheduleInterval(conf);
         });
     };
 
-    this.register = function (_c, info, callback) {
-        initRequires(_c.default().server.base);
-        log('Chartbeat', "Initializing Chartbeat plugin");
+    this.unregister = function(cb) {
+        cb();
+    }
 
-        log('Chartbeat', "Adding config to settings page");
-        registerSettings();
+    this.register = function(_c, info, callback) {
+        try {
+            initRequires(_c.default().server.base);
+            log('Chartbeat', "Initializing Chartbeat plugin");
 
-        log('Chartbeat', 'Creating petal identifiers');
-        createPetals();
+            log('Chartbeat', "Adding config to settings page");
+            registerSettings();
 
-        log('Chartbeat', 'Hooking on dashboard creation');
-        hookOnDashboard();
+            log('Chartbeat', 'Creating petal identifiers');
+            createPetals();
 
-        log('Chartbeat', 'Register Live Variable');
-        registerLiveVar();
+            log('Chartbeat', 'Hooking on dashboard creation');
+            hookOnDashboard();
 
-        log('Chartbeat', 'Initializing databases');
-        initDatabases(function () {
-            log('Chartbeat', "Scheduling intervals");
-            scheduleIntervals();
+            log('Chartbeat', 'Register Live Variable');
+            registerLiveVar();
 
-            log('Chartbeat', 'All done');
-            callback();
-        });
+            log('Chartbeat', 'Initializing databases');
+            initDatabases(function() {
+                log('Chartbeat', "Scheduling intervals");
+                scheduleIntervals();
+
+                log('Chartbeat', 'All done');
+                callback();
+            });
+        } catch (e) {
+            console.log(e);
+        }
     };
 };
 

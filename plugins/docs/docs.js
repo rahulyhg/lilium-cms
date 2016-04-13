@@ -6,10 +6,10 @@ var filelogic = undefined;
 var fileserver = undefined;
 var lmllib = undefined;
 
-var Docs = function () {
+var Docs = function() {
     this.iface = new Object();
 
-    var initRequires = function (abspath) {
+    var initRequires = function(abspath) {
         log = require(abspath + "log.js");
         _c = require(abspath + 'config.js');
         endpoints = require(abspath + "endpoints.js");
@@ -19,8 +19,8 @@ var Docs = function () {
         lmllib = require(abspath + 'lmllib.js');
     };
 
-    var registerEndpoint = function () {
-        admin.registerAdminEndpoint('docs', 'GET', function (cli) {
+    var registerEndpoint = function() {
+        admin.registerAdminEndpoint('docs', 'GET', function(cli) {
             cli.touch('docs.GET.docs');
             var paths = cli.routeinfo.path;
             var isRoot = paths.length == 2;
@@ -44,16 +44,16 @@ var Docs = function () {
         });
     };
 
-    var registerLMLContextLib = function () {
-        lmllib.registerContextLibrary('docscontent', function (context) {
+    var registerLMLContextLib = function() {
+        lmllib.registerContextLibrary('docscontent', function(context) {
             return {
-                render: function () {
+                render: function() {
                     var libname = context.extra.libname;
                     var docFilePath = _c.default().server.base + "plugins/docs/content/" + libname + ".doc";
 
                     return fileserver.readFileSync(docFilePath);
                 },
-                listDir: function () {
+                listDir: function() {
                     var docFilePath = _c.default().server.base + "plugins/docs/content/";
                     var files = fileserver.listDirContentSync(docFilePath);
 
@@ -71,19 +71,22 @@ var Docs = function () {
         });
     };
 
-    this.unregister = function (callback) {
-        admin.unregisterAdminEndpoint('docs', 'GET');
+    this.unregister = function(callback) {
         callback();
     };
 
-    this.register = function (_c, info, callback) {
-        initRequires(_c.default().server.base);
-        log("Docs", "Documentation was initiated");
-        registerEndpoint();
-        registerLMLContextLib();
+    this.register = function(_c, info, callback) {
+        try {
+            initRequires(_c.default().server.base);
+            log("Docs", "Documentation was initiated");
+            registerEndpoint();
+            registerLMLContextLib();
 
-        log("Docs", "Documentation was initiated");
-        callback();
+            log("Docs", "Documentation was initiated");
+            callback();
+        } catch (e) {
+            console.log(e);
+        }
     };
 };
 

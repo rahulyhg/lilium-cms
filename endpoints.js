@@ -1,3 +1,6 @@
+var pluginHelper = require('./pluginHelper.js');
+var hooks = require('./hooks.js');
+
 var registeredEndpoints = {
     GET: {},
     POST: {}
@@ -10,6 +13,8 @@ var EndPoints = function () {
         }
 
         registeredEndpoints[method][endpoint] = callback;
+        registeredEndpoints[method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
+
     };
 
     this.unregister = function (endpoint, method) {
@@ -28,6 +33,28 @@ var EndPoints = function () {
         } else {
             throw new Error("[EndPointException - Not Found : " + method + "/" + endpoint + "]");
         }
+    };
+
+    var loadHooks = function () {
+        hooks.bind('plugindisabled', 1, function(identifier) {
+            // Check if plugin created endpoints
+            deletePluginEndpoints(identifier);
+        });
+    };
+
+    var deletePluginEndpoints = function (identifier) {
+        for (var i in registeredEndpoints) {
+            for (var j in registeredEndpoints[i]) {
+                if (registeredEndpoints[i][j].pluginID == identifier) {
+                    registeredEndpoints[i][j] = undefined;
+                    delete registeredEndpoints[i][j];
+                }
+            }
+        }
+    };
+
+    this.init = function() {
+        loadHooks();
     };
 };
 

@@ -54,7 +54,7 @@ var Core = function () {
         fs = require('fs');
         fileserver = require('./fileserver.js');
         cli = require('./cli.js');
-        admin = require('./backend/admin.js');
+        admin = require('./backend/admin.js').init();
         Article = require('./article.js');
         Media = require('./media.js');
         imageSize = require('./imageSize.js');
@@ -70,7 +70,7 @@ var Core = function () {
         Handler = require('./handler.js');
         ClientObject = require('./clientobject.js');
         Inbound = require('./inbound.js');
-        Livevars = require('./livevars.js');
+        Livevars = require('./livevars.js').init();
         Precompiler = require('./precomp.js');
         Petals = require('./petal.js');
         GC = require('./gc.js');
@@ -98,6 +98,7 @@ var Core = function () {
 
     var loadEndpoints = function () {
         log('Endpoints', 'Loading endpoints');
+        endpoints.init();
         endpoints.register('login', 'POST', function (cli) {
             cli.touch("endpoints.POST.login");
             LoginLib.authUser(cli);
@@ -564,6 +565,10 @@ var Core = function () {
         postman.createTransporter();
     };
 
+    var initTables = function () {
+        require('./tableBuilder.js').init();
+    }
+
     var loadDFP = function (cb) {
         log("DFP", "Loading core user");
         dfp.registerHooks();
@@ -686,10 +691,14 @@ var Core = function () {
 
     this.makeEverythingSuperAwesome = function (readyToRock) {
         log('Core', 'Initializing Lilium');
+
+        require('./includes/caller.js')
+
         loadWebsites(function (resp) {
             loadRequires();
             loadHooks(readyToRock);
             initForms();
+            initTables();
             loadEndpoints();
             loadStandardInput();
             loadImageSizes();
@@ -699,7 +708,6 @@ var Core = function () {
             loadRequestHandler();
             loadLMLLibs();
 
-            loadPlugins(function () {
                 loadRoles(function () {
                     loadProducts(function () {
                         loadSessions(function () {
@@ -710,6 +718,7 @@ var Core = function () {
                                             loadAdminMenus();
                                             loadFrontend();
                                             loadForms();
+                                            loadPlugins(function () {
 
                                             loadCacheInvalidator();
                                             scheduleGC();

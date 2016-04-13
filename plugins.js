@@ -149,12 +149,16 @@ var Plugins = module.exports = new function () {
                             callback();
                         } else {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
-                            pluginInstance.register(_c, info, function () {
-                                cli.cacheClear();
-                                hooks.fire('pluginregistered', identifier);
+                            try {
+                                pluginInstance.register(_c, info, function () {
+                                    cli.cacheClear();
+                                    hooks.fire('pluginregistered', identifier);
 
-                                callback();
-                            });
+                                    callback();
+                                });
+                            } catch (e) {
+                                log("Plugins", "Error while registering plugin " + identifier + ": " + e.message);
+                            }
                         }
                     }, true, true);
                 } catch (ex) {
@@ -175,16 +179,18 @@ var Plugins = module.exports = new function () {
                 identifier: identifier,
                 active: false
             }, function () {
-                RegisteredPlugins[identifier].unregister(function () {
-                    hooks.fire('plugindisabled', identifier);
+                try {
+                    RegisteredPlugins[identifier].unregister(function () {
+                        hooks.fire('plugindisabled', identifier);
 
-                    RegisteredPlugins[identifier] = undefined;
-                    delete RegisteredPlugins[identifier];
-                    cli.cacheClear();
-                    return callback();
-                });
-
-
+                        RegisteredPlugins[identifier] = undefined;
+                        delete RegisteredPlugins[identifier];
+                        cli.cacheClear();
+                        return callback();
+                    });
+                } catch(e) {
+                    console.log(e);
+                }
 
             }, true, true);
 
