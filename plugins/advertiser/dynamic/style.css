@@ -139,7 +139,7 @@
 
 .campaigns-product-photo-wrapper span {
     display: block;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 500;
     color: #EEE;
     text-align: center;
@@ -155,9 +155,14 @@
 }
 
 .campaigns-ongoing-netdisc-wrapper,
+.campaigns-ongoing-fbdisc-wrapper,
 .campaigns-ongoing-banad-wrapper {
-    padding: 10px;
-    margin-bottom: 10px;
+    padding: 20px;
+}
+
+.campaigns-ongoing-single-product {
+    border-bottom : 2px dashed #DDD;
+    margin-bottom: 20px;
 }
 
 .campaigns-product-title-wrapper h5 {
