@@ -1,0 +1,9 @@
+{
+    "uName" : "narcity",
+    "dName" : "Narcity Theme",
+    "entry": "narcity.js",
+    "settingForm" : {
+        "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}},
+        "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}}
+    }
+}

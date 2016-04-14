@@ -7,20 +7,26 @@ var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
 var tableBuilder = require('./tableBuilder.js');
+var formBuilder = require('./formBuilder.js');
+var cli = require('./cli.js');
+
 var ActiveTheme = new Object();
 var CachedThemes = new Array();
-
 var Themes = function () {
     var that = this;
 
     this.serveAdminList = function (cli) {
         cli.touch("themes.serveAdminList");
-        if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
+        if (cli.routeinfo.path.length == 2 && cli.method == 'POST') {
+            that.updateThemeSettings(cli);
+        } else if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
             that.enableTheme(cli.postdata.data.uName, function () {
                 cli.sendJSON({
                     success: true
                 });
             });
+        } else if (cli.routeinfocli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "")
+
         } else {
             filelogic.serveAdminLML(cli);
         }
@@ -30,6 +36,10 @@ var Themes = function () {
     this.getCachedThemes = function () {
         return CachedThemes;
     };
+
+    this.updateThemeSettings = function (cli) {
+
+    }
 
     this.searchDirForThemes = function (uName, callback) {
         this.getThemesDirList(function (list) {
@@ -110,17 +120,51 @@ var Themes = function () {
                 info.path = info.dirName;
                 ActiveTheme.uName = info.uName;
                 ActiveTheme.info = info;
+
+                // Register Settings for theme
+                log('Themes', 'Updating Settings form');
+                createOrUpdateThemeForm();
+
                 db.update(_c.default(), 'themes', {
                     uName: uName
                 }, info, function () {
 
-                    ThemeInstance.enable(_c, info, callback);
-                    
+                    ThemeInstance.enable(_c, info, function() {
+                        cli.cacheClear();
+                        callback();
+                    });
+
                 }, true, true);
 
             });
         }
     };
+
+    var createOrUpdateThemeForm = function () {
+        if (formBuilder.isAlreadyCreated('theme_settings')) {
+            formBuilder.deleteForm('theme_settings');
+        }
+        if (ActiveTheme.info.settingForm) {
+            var form = formBuilder.createForm('theme_settings');
+            form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme.info.uName + ')'} );
+
+            for (var name in ActiveTheme.info.settingForm) {
+                var property = ActiveTheme.info.settingForm[name];
+                if (property.type == 'submit') {
+                    throw new Error('[Themes] - ILLEGAL form type "submit" for theme settings form.')
+                }
+                form.add(name, property.type, property.attr || {} );
+            }
+            form.add('Submit', 'submit', {displayname : 'Update Settings'} );
+
+        }
+
+
+    };
+
+    this.getSettings = function() {
+        return ActiveTheme.settings;
+    }
 
     this.getEnabledTheme = function () {
         return ActiveTheme;
@@ -217,23 +261,42 @@ var Themes = function () {
                 'active': true
             }, function (err, results) {
 
-                (function () {
+                var remove = function () {
+                    db.remove(_c.default(), 'themes', {}, function () {
+                        db.insert(_c.default(), 'themes', themes, function (err) {
+                            cb();
+                        });
+                    }, false);
+                };
+
+                if (results.length == 0) {
+                    for (var i in themes) {
+                        if (themes[i].uName == _c.default().website.flower) {
+                            themes[i].active = true;
+                            that.enableTheme(_c.default().website.flower, remove);
+                            break;
+                        }
+                    }
+
+                } else {
+
                     for (var i in results) {
+
                         for (var j in themes) {
-                            if (results[i].identifier == themes[j].uName) {
+                            if (results[i].uName == themes[j].uName) {
                                 themes[j].active = true;
+                                that.enableTheme(results[i].uName, remove);
                                 return;
                             }
                         }
-                    }
-                })();
 
+                    }
+
+                }
             });
-            db.remove(_c.default(), 'themes', {}, function () {
-                db.insert(_c.default(), 'themes', themes, function (err) {
-                    cb();
-                });
-            }, false);
+
+
+
         });
 
     };

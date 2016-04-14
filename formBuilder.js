@@ -189,6 +189,13 @@ var FormBuilder = function() {
         return this;
     };
 
+    this.deleteForm = function(name) {
+        if (typeof forms[name] !== 'undefined') {
+            forms[name] = undefined;
+            delete forms[name];
+        }
+    }
+
     var createField = function(name, type, attr, requirements) {
 
         if (typeof name == 'undefined') {

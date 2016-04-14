@@ -459,40 +459,7 @@ var Core = function () {
 
                 cb();
             };
-
-            db.find(_c.default(), 'themes', {
-                "active": true
-            }, {
-                limit: [1]
-            }, function (err, cursor) {
-                if (err) {
-                    log('Themes', 'Failed to find entries in database; ' + err);
-                    fireEvent();
-
-                    return;
-                }
-
-                log('Themes', 'Read themes collection in database');
-                var i = 0;
-
-                cursor.each(function (err, theme) {
-                    if (theme != null) {
-                        i++;
-                        themes.enableTheme(theme.uName, function () {
-                            fireEvent();
-                        });
-                    } else {
-
-                        if (i == 0) {
-                            // Enable with default theme
-                            themes.enableTheme(_c.default().website.flower, function () {
-                                fireEvent();
-                            });
-                        };
-                        cursor.close();
-                    }
-                });
-            });
+            fireEvent();
 
         });
 

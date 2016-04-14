@@ -1,8 +1,18 @@
-{#tableBuilder;vocab;debug;config}
+{#tableBuilder;vocab;debug;config;forms}
 
 
 <main class="entities-main">
     {=tableBuilder.render('theme')}
+
+    {$
+    var variable = true;
+        if (forms.isAlreadyCreated('theme_settings') == true);
+    $}
+        {=forms.render('theme_settings')}
+    {$
+        endif;
+    $}
+
 </main>
 
 <lml:tabletemplate id="table-themes-actions">
