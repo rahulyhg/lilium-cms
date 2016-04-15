@@ -8,6 +8,7 @@ $(document).ready(function() {
                 // Join socket channel
                 socket.join(session.roles[index]);
             }
+            socket.join("lmlsite_" + session.site);
         }
         if (session && session.notifications) {
             var notifs = session.notifications;
