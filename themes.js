@@ -25,8 +25,6 @@ var Themes = function () {
                     success: true
                 });
             });
-        } else if (cli.routeinfocli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "")
-
         } else {
             filelogic.serveAdminLML(cli);
         }

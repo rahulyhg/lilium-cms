@@ -287,6 +287,8 @@ var LML = function () {
                                     levels[0]);
                             }
                         }
+                    } else if (levels.length == 1 && (levels[0] == 'true' || levels[0] == 'false')) {
+                        return levels[0] == 'true';
                     } else if (str.trim() == "" || levels.length == 0) {
                         throw new Error("LMLParseException - Variable cannot be empty. Tried to read : '" + str + "'");
                     } else {
