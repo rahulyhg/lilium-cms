@@ -36,7 +36,17 @@ var Themes = function () {
     };
 
     this.updateThemeSettings = function (cli) {
+        var form = formBuilder.handleRequest(cli);
+        var formData = formBuilder.serializeForm(form);
 
+        if (formData) {
+            db.update(cli._c, 'themes', {uName : ActiveTheme.uName}, {settings : formData}, function(err, res) {
+                if (err) throw new Error("[ThemeException] Error while updating theme settings " + err);
+                cli.refresh();
+            });
+        } else {
+            cli.refresh();
+        }
     }
 
     this.searchDirForThemes = function (uName, callback) {
@@ -225,6 +235,12 @@ var Themes = function () {
                 }, callback);
             }
         }, ["themes"]);
+
+        livevars.registerLiveVariable('theme_settings', function (cli, levels, params, callback) {
+            db.findToArray(cli._c, 'themes', {uName : ActiveTheme.uName}, function(err, arr) {
+                callback(err || arr[0].settings);
+            });
+        });
     };
 
     this.registerForm = function () {
@@ -260,7 +276,7 @@ var Themes = function () {
             }, function (err, results) {
 
                 var remove = function () {
-                    db.remove(_c.default(), 'themes', {}, function () {
+                    db.remove(_c.default(), 'themes', {$or : [{'active':false}, {'active': null}]}, function () {
                         db.insert(_c.default(), 'themes', themes, function (err) {
                             cb();
                         });

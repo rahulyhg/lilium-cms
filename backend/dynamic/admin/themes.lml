@@ -5,8 +5,9 @@
     {=tableBuilder.render('theme')}
 
     {$
-        if (forms.isAlreadyCreated('theme_settings') == false);
+        if (forms.isAlreadyCreated('theme_settings') == true);
     $}
+        {*theme_settings.{?1}(sourceof:"theme_settings")}
         {=forms.render('theme_settings')}
     {$
         endif;
