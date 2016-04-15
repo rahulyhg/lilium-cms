@@ -87,6 +87,9 @@
                     <div class="campaigns-products-list-wrapper">
                         <lml:tobject data-nodetype="template" data-key="products" data-template="campaigns-editorial-listitem"></lml:tobject>
                     </div>
+
+                    <h2>Campaign details</h2>
+                    <h6>TODO : Hum... well-- add campaign details.</h6>
                 </div>
             </div>
         </lml:template>
@@ -138,6 +141,39 @@
                         <lml:tobject data-nodetype="progress" data-valuekey="dfp.stats.impressionsDelivered" data-maxkey="targetimp"></lml:tobject>
                     </div>
                 </lml:tobject>
+                
+                <lml:tobject data-filter="isFbDisc" data-nodetype="div" data-class="campaigns-ongoing-fbdisc-wrapper">
+                    <div class="campaigns-product-photo-wrapper">
+                        <span>Facebook</span>
+                    </div>
+                    
+                    <div class="campaigns-product-title-wrapper">
+                        <h5><b>HEY! RIGHT HERE! NAME OF FACEBOOK AD CAMPAIGN :)</b></h5>
+                        <h6>
+                            Ends on : <lml:tobject data-nodetype="span" data-key="enddate"></lml:tobject>
+                        </h6>
+
+                        <h5>Ad sets with list of all ads with total impressions</h5>
+                        <ul>
+                            <li>Ad set 1</li>
+                            <li>Ad set 2</li>
+                            <li>Ad set 3</li>
+                            
+                        </ul>
+
+                        <div class="campaigns-impressions-count">
+                            <b>Total impressions</b>&nbsp;:&nbsp;
+                            <lml:tobject data-nodetype="span" data-key="impressions" ></lml:tobject>
+                            &nbsp;/&nbsp;
+                            <lml:tobject data-nodetype="span" data-key="targetimp" ></lml:tobject>
+                        </div> 
+
+                        <lml:tobject data-nodetype="progress" data-valuekey="impressions" data-maxkey="targetimp"></lml:tobject>
+
+                        <button>Boost posts</button
+                    </div>
+                </lml:tobject>
+
             </div>
         </lml:template>
 
