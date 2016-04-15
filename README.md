@@ -22,35 +22,41 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 #### nginx config
 
 ```
-# Upstream to Lilium
 upstream lilium_proxy  {
-        server 127.0.0.1:8282; # Change 8282 for Lilium listening port
-        keepalive 8;
+        server 127.0.0.1:[LILIUM_PORT];
+        keepalive 64;
+}
+
+map $http_sec_websocket_key $upgr {
+    ""      "";           # If the Sec-Websocket-Key header is empty, send no upgrade header
+    default "websocket";  # If the header is present, set Upgrade to "websocket"
+}
+
+map $http_sec_websocket_key $conn {
+    ""      $http_connection;  # If no Sec-Websocket-Key header exists, set $conn to the incoming Connection header
+    default "upgrade";         # Otherwise, set $conn to upgrade
 }
 
 server {
-        listen 8080;
+        listen 80;
 
-        server_name www.liliumcms.com liliumcms.com; # Accepted URL
-        port_in_redirect off;
+        server_name www.DOMAIN.com DOMAIN.com;
+        # port_in_redirect off;
 
-        # Remove www from URL
-        if ($http_host = "www.liliumcms.com") { 
-                rewrite ^ http://liliumcms.com$request_uri permanent;
+        large_client_header_buffers 8 32k;
+        index index.html;
+
+        if ($http_host = "www.DOMAIN.com") {
+                rewrite ^ http://DOMAIN.com$request_uri permanent;
         }
 
-        # Always pass admin requests to Lilium
-        location /admin/* {
-                try_files @lilium =404;
-        }
-
-        # For all other requests, check for a static file before passing to Lilium
         location / {
                 alias /absolute/path/to/html;
-                try_files $uri @lilium;
+                try_files $uri $uri/ @lilium;
+        }
 
-                # dirty hack for accepting POST to static files
-                error_page 405 =200 $uri;
+        location /admin/* {
+                try_files @lilium =404;
         }
 
         location @lilium {
@@ -59,8 +65,17 @@ server {
                 proxy_set_header Host $http_host;
                 proxy_set_header X-NginX-Proxy true;
 
+                # prevents 502 bad gateway error
+                proxy_buffers 8 32k;
+                proxy_buffer_size 64k;
+
                 proxy_pass http://lilium_proxy;
                 proxy_redirect off;
+
+                # enables WS support
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $upgr;
+                proxy_set_header Connection $conn;
         }
 }
 ```
