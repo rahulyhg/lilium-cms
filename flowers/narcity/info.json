@@ -3,7 +3,7 @@
     "dName" : "Narcity Theme",
     "entry": "narcity.js",
     "settingForm" : {
-        "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}},
-        "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}}
+        "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},
+        "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"}
     }
 }

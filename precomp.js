@@ -49,83 +49,100 @@ var Precomp = function () {
         }
     };
 
-    var runLoop = function (conf, readycb) {
-        var absReadPath = conf.server.base + "backend/dynamic/precomp/";
-        var absWritePath = conf.server.html + "/compiled/";
+    var runLoop = function (conf, readycb, themeFiles) {
+        if (themeFiles) {
+            var absWritePath = conf.server.html + "/compiled/theme/";
+            db.findToArray(conf, 'compiledfiles', {style : true}, function (err, histo) {
+                db.remove(conf, 'compiledfiles', {style : true}, function (remErr, res) {
+                    compileFiles(conf, themeFiles, histo, undefined, absWritePath, readycb, true);
+                });
+            });
+
+        } else {
+            var absReadPath = conf.server.base + "backend/dynamic/precomp/";
+            var absWritePath = conf.server.html + "/compiled/admin/";
+
+            log('Precompiler', 'Precompiling static files');
+            fileserver.listDirContentRecursive(absReadPath, function (fileArr) {
+                // Read files registered
+                var files = [];
+                fileArr.forEach(function (file) {
+                    files.push(file.replace(absReadPath, ''));
+                });
+                fileArr = files;
+                db.findToArray(conf, 'compiledfiles', {style : null}, function (err, histo) {
+                    db.remove(conf, 'compiledfiles', {style : null}, function (remErr, res) {
+                        compileFiles(conf, fileArr, histo, absReadPath, absWritePath, readycb)
+                    });
+                });
+            });
+        }
+
+    };
+
+    var compileFiles = function (conf, fileArr, histo, absReadPath, absWritePath,  readycb, isTheme) {
+        var histoObj = new Object();
+        var fileIndex = 0;
         var tempPath = conf.server.html + "/static/tmp/";
 
-        var fileIndex = 0;
-        log('Precompiler', 'Precompiling static files');
-        fileserver.listDirContentRecursive(absReadPath, function (fileArr) {
-            var files = [];
-            fileArr.forEach(function (file) {
-                files.push(file.replace(absReadPath, ''));
-            });
-            fileArr = files;
-            db.findToArray(conf, 'compiledfiles', {}, function (err, histo) {
-                db.remove(conf, 'compiledfiles', {}, function (remErr, res) {
-                    var histoObj = new Object();
+        for (var i = 0; i < histo.length; i++) {
+            histoObj[histo[i].filename] = histo[i].sum;
+        }
 
-                    for (var i = 0; i < histo.length; i++) {
-                        histoObj[histo[i].filename] = histo[i].sum;
-                    }
+        var nextFile = function () {
+            if (fileIndex < fileArr.length) {
+                var curFile = fileArr[fileIndex];
+                var mustRewrite = false;
+                fileIndex++;
 
-                    var nextFile = function () {
-                        if (fileIndex < fileArr.length) {
-                            var curFile = fileArr[fileIndex];
-                            var mustRewrite = false;
-                            fileIndex++;
-
-                            if (curFile.indexOf('.lml') !== -1) {
-                                checksum.file(absReadPath + curFile, function (err, sum) {
-                                    var rPath = absReadPath + curFile;
-                                    var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
-                                    var wPath = absWritePath + curFile.slice(0, -4);
-                                    fileserver.fileExists(wPath, function (exists) {
-                                        if (exists && histoObj[curFile] == sum) {
+                if (curFile.indexOf('.lml') !== -1) {
+                    checksum.file(isTheme ? curFile : absReadPath + curFile, function (err, sum) {
+                        var rPath = isTheme ? curFile : absReadPath + curFile;
+                        var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
+                        var wPath = absWritePath + curFile.slice(0, -4);
+                        fileserver.fileExists(wPath, function (exists) {
+                            if (exists && histoObj[curFile] == sum) {
+                                db.insert(conf, 'compiledfiles', {
+                                    filename: curFile,
+                                    sum: sum
+                                }, function (err) {
+                                    nextFile();
+                                });
+                            } else {
+                                log('Precompiler', 'Precompiling static file : ' + curFile);
+                                LML.executeToFile(
+                                    rPath,
+                                    tPath,
+                                    function () {
+                                        var beforeMinify = new Date();
+                                        minifyFile(tPath, wPath, wPath.substring(wPath.lastIndexOf('.') + 1), function () {
+                                            log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms");
                                             db.insert(conf, 'compiledfiles', {
                                                 filename: curFile,
-                                                sum: sum
+                                                sum: sum,
+                                                style: isTheme ? true : undefined
                                             }, function (err) {
                                                 nextFile();
                                             });
-                                        } else {
-                                            log('Precompiler', 'Precompiling static file : ' + curFile);
-                                            LML.executeToFile(
-                                                rPath,
-                                                tPath,
-                                                function () {
-                                                    var beforeMinify = new Date();
-                                                    minifyFile(tPath, wPath, wPath.substring(wPath.lastIndexOf('.') + 1), function () {
-                                                        log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms");
-                                                        db.insert(conf, 'compiledfiles', {
-                                                            filename: curFile,
-                                                            sum: sum
-                                                        }, function (err) {
-                                                            nextFile();
-                                                        });
-                                                    });
-                                                }, {
-                                                    minify: false,
-                                                    config: conf
-                                                }
-                                            );
-                                        }
-                                    });
-                                });
-                            } else {
-                                nextFile();
+                                        });
+                                    }, {
+                                        minify: false,
+                                        config: conf
+                                    }
+                                );
                             }
-                        } else {
-                            readycb();
-                        }
-                    };
-
+                        });
+                    });
+                } else {
                     nextFile();
-                });
-            });
-        });
-    };
+                }
+            } else {
+                readycb();
+            }
+        };
+
+        nextFile();
+    }
 
     var mergeJS = function (conf, readycb) {
         var files = frontend.getJSQueue('admin', conf.id);
@@ -151,9 +168,9 @@ var Precomp = function () {
         nextFile();
     };
 
-    var mergeCSS = function (conf, readycb) {
-        var files = frontend.getCSSQueue('admin', conf.id);
-        var compiledPath = conf.server.html + "/compiled/admin.css";
+    var mergeCSS = function (conf, readycb, compiledPath, theme) {
+        var files = frontend.getCSSQueue(theme ? 'theme' :'admin', conf.id);
+        var compiledPath = compiledPath ? compiledPath : conf.server.html + "/compiled/admin.css";
         var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
         var fileIndex = 0;
         var fileTotal = files.length;
@@ -175,13 +192,13 @@ var Precomp = function () {
         nextFile();
     };
 
-    this.precompile = function (conf, readycb) {
+    this.precompile = function (conf, readycb, themesFiles) {
         fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function () {
             runLoop(conf, function () {
                 mergeJS(conf, function () {
                     mergeCSS(conf, readycb);
-                });
-            });
+                }, themesFiles ? true : false);
+            }, themesFiles);
         }, true);
     };
 };

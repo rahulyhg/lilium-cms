@@ -153,6 +153,7 @@ var Themes = function () {
             formBuilder.deleteForm('theme_settings');
         }
         if (ActiveTheme.info.settingForm) {
+            ActiveTheme.settings = {};
             var form = formBuilder.createForm('theme_settings');
             form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme.info.uName + ')'} );
 
@@ -161,6 +162,11 @@ var Themes = function () {
                 if (property.type == 'submit') {
                     throw new Error('[Themes] - ILLEGAL form type "submit" for theme settings form.')
                 }
+
+                if (!property.default) {
+                    throw new Error('[Themes] - The field "' + name + '" has no default value.');
+                }
+                ActiveTheme.settings[name] = property.default;
                 form.add(name, property.type, property.attr || {} );
             }
             form.add('Submit', 'submit', {displayname : 'Update Settings'} );
