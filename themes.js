@@ -287,6 +287,9 @@ var Themes = function () {
                     for (var i in themes) {
                         if (themes[i].uName == _c.default().website.flower) {
                             themes[i].active = true;
+
+                            themes.splice(i, 1);
+
                             that.enableTheme(_c.default().website.flower, remove);
                             break;
                         }
@@ -299,6 +302,7 @@ var Themes = function () {
                         for (var j in themes) {
                             if (results[i].uName == themes[j].uName) {
                                 themes[j].active = true;
+                                themes.splice(j, 1);
                                 that.enableTheme(results[i].uName, remove);
                                 return;
                             }
