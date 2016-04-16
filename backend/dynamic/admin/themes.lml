@@ -1,6 +1,6 @@
 {#tableBuilder;vocab;debug;config;forms}
 
-
+<h1>Themes</h1>
 <main class="entities-main">
     {=tableBuilder.render('theme')}
 

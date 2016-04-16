@@ -77,4 +77,8 @@
   var hasImage = function(product) {
     return typeof product.article.media == 'object';
   };
+
+  var isFbDisc = function(product) {
+    return product.productType == 'facebook';
+  };
 </script>

@@ -710,7 +710,8 @@ var Article = function() {
                     'class': 'row',
                     'id': 'article_new',
                     'inner': true
-                }
+                },
+                fieldWrapper : "lmlform-fieldwrapper"
             })
             .addTemplate('article_base')
             .addTemplate('media-explorer')

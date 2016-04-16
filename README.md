@@ -22,19 +22,41 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 #### nginx config
 
 ```
+upstream lilium_proxy  {
+        server 127.0.0.1:[LILIUM_PORT];
+        keepalive 64;
+}
+
+map $http_sec_websocket_key $upgr {
+    ""      "";           # If the Sec-Websocket-Key header is empty, send no upgrade header
+    default "websocket";  # If the header is present, set Upgrade to "websocket"
+}
+
+map $http_sec_websocket_key $conn {
+    ""      $http_connection;  # If no Sec-Websocket-Key header exists, set $conn to the incoming Connection header
+    default "upgrade";         # Otherwise, set $conn to upgrade
+}
+
 server {
-        listen 8080; # or 80 if nginx listens to HTTP port
+        listen 80;
 
-        server_name www.liliumcms.com liliumcms.com; # replace by domain
-        port_in_redirect off;
+        server_name www.DOMAIN.com DOMAIN.com;
+        # port_in_redirect off;
 
-        if ($http_host = "www.liliumcms.com") {
-                rewrite ^ http://liliumcms.com$request_uri permanent;
+        large_client_header_buffers 8 32k;
+        index index.html;
+
+        if ($http_host = "www.DOMAIN.com") {
+                rewrite ^ http://DOMAIN.com$request_uri permanent;
         }
 
         location / {
-                root /path/to/html/directory;
-                try_files $uri/index.html @lilium;
+                alias /absolute/path/to/html;
+                try_files $uri $uri/ @lilium;
+        }
+
+        location /admin/* {
+                try_files @lilium =404;
         }
 
         location @lilium {
@@ -43,8 +65,17 @@ server {
                 proxy_set_header Host $http_host;
                 proxy_set_header X-NginX-Proxy true;
 
-                proxy_pass http://127.0.0.1:8282; # Lilium port
+                # prevents 502 bad gateway error
+                proxy_buffers 8 32k;
+                proxy_buffer_size 64k;
+
+                proxy_pass http://lilium_proxy;
                 proxy_redirect off;
+
+                # enables WS support
+                proxy_http_version 1.1;
+                proxy_set_header Upgrade $upgr;
+                proxy_set_header Connection $conn;
         }
 }
 ```

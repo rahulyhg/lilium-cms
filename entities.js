@@ -579,11 +579,15 @@ var Entities = module.exports = new function () {
 
     this.registerCreationForm = function () {
 
-        formbuilder.createForm('entity_create')
+        formbuilder.createForm('entity_create', {
+               fieldWrapper : "lmlform-fieldwrapper"  
+            })
             .addTemplate('entity_create');
 
 
-        formbuilder.createForm('update_entitiy')
+        formbuilder.createForm('update_entitiy', {
+                fieldWrapper : "lmlform-fieldwrapper"
+            })
             .addTemplate('entity_create')
             .remove('password')
             .edit('username', '', {
@@ -593,14 +597,18 @@ var Entities = module.exports = new function () {
                 value: 'Update Profile'
             });
 
-        formbuilder.createForm('update_password')
+        formbuilder.createForm('update_password', {
+                fieldWrapper : "lmlform-fieldwrapper"
+            })
             .add('editpasswd', 'title', {
                 displayname: 'Edit Password'
             })
             .add('password', 'password')
             .add('update', 'submit');
 
-        formbuilder.createForm('upload_profile_picture')
+        formbuilder.createForm('upload_profile_picture',{
+                fieldWrapper : "lmlform-fieldwrapper"
+            })
             .add('uppicutre', 'title', {
                 displayname: 'Upload a profile picture'
             })
@@ -710,6 +718,7 @@ var Entities = module.exports = new function () {
                     roles: dat.roles,
                     power: dat.power,
                     username: dat.username,
+                    site : dat.site,
                     notifications: dat.notifications === 'undefined' ? [] : dat.notifications,
                     newNotifications: dat.newNotifications === 'undefined' ? 0 : dat.newNotifications
                 }
