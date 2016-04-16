@@ -715,6 +715,7 @@ var Entities = module.exports = new function () {
                     roles: dat.roles,
                     power: dat.power,
                     username: dat.username,
+                    site : dat.site,
                     notifications: dat.notifications === 'undefined' ? [] : dat.notifications,
                     newNotifications: dat.newNotifications === 'undefined' ? 0 : dat.newNotifications
                 }

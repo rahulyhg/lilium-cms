@@ -30,9 +30,9 @@ var LiliumSocket = function (socket, session) {
     this.socket.liliumsocket = this;
 };
 
-LiliumSocket.prototype.joinGroup = function (grp) {
-    var site = this.session.data.site;
-    this.socket.join(site + '_' + grp);
+LiliumSocket.prototype.joinGroup = function (grp, abs) {
+    var site = abs ? "" : this.session.data.site + '_';
+    this.socket.join(site + grp);
 };
 
 LiliumSocket.prototype.bind = function () {
@@ -49,15 +49,23 @@ LiliumSocket.prototype.bind = function () {
     this.socket.on('error', this.error);
 
     return this;
-
 };
 
 LiliumSocket.prototype.join = function (groupName) {
     var ls = this.liliumsocket;
-    if (groups[ls.session.data.site + '_' +groupName]) {
-
+    if (groups[ls.session.data.site + '_' +groupName] || groups[groupName]) {
         // Check for needed roles
-        if (typeof groups[ls.session.data.site+ '_' +groupName].role == 'undefined' || ls.session.data.roles.indexOf(groups[ls.session.data.site + '_' +groupName].role) !== -1) {
+        if (groupName.indexOf("lmlsite_") === 0) {
+            this.join(groupName);
+            groups[groupName].users.push({
+                session: ls.session.sessionId,
+                client: ls.clientId
+            });
+            this.emit('debug', {
+                success: true,
+                msg: 'Joined broadcast group for site : ' + ls.session.data.site
+            });
+        } else if (typeof groups[ls.session.data.site+ '_' +groupName].role == 'undefined' || ls.session.data.roles.indexOf(groups[ls.session.data.site + '_' +groupName].role) !== -1) {
             this.join(groupName);
             groups[ls.session.data.site +'_'+ groupName].users.push({
                 session: ls.session.sessionId,
@@ -265,7 +273,7 @@ var Notification = function () {
         var session = sessionManager.getSessionFromSID(sessionId);
         if (session) {
             session.sessionId = sessionId;
-            new LiliumSocket(socket, session).bind().joinGroup('lmlsite_' + session.data.site);
+            new LiliumSocket(socket, session).bind().joinGroup('lmlsite_' + session.data.site, true);
         }
     };
 
@@ -486,6 +494,10 @@ var Notification = function () {
             if (groups[site] && groups[site +'_'+ groupName]) {
                 io.sockets.in(site + '_' +groupName).emit(type || 'notification', data);
             }
+        } else if (site === false) {
+            if (groups[groupName]) {
+                io.sockets.in(groupName).emit(type || 'notification', data);
+            }
         } else {
             for (var site in groups) {
                 if (groups[site +'_'+ groupName]) {
@@ -497,7 +509,7 @@ var Notification = function () {
     };
 
     this.emitToWebsite = function (siteid, data, type) {
-        this.emitToGroup('lmlsite_' + siteid, data, type);
+        this.emitToGroup('lmlsite_' + siteid, data, type, false);
     };
 
     this.removeGroup = function (groupName, site) {
