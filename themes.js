@@ -131,18 +131,28 @@ var Themes = function () {
 
                 // Register Settings for theme
                 log('Themes', 'Updating Settings form');
-                createOrUpdateThemeForm(config);
+                var settings = createOrUpdateThemeForm(config);
 
                 log('Themes', 'Updating database entry for site : ' + config.id);
-                db.update(config, 'themes', {
+
+                db.findAndModify(config, 'themes', {
                     uName: uName
-                }, info, function () {
+                }, info, function (err, doc) {
                     log('Themes', 'Enabling theme ' + info.uName);
                     ThemeInstance.enable(config, info, function() {
-                        cli.cacheClear();
+                        if (!doc.value.settings) {
+                            db.update(config, 'themes', {
+                                uName: uName
+                            }, { settings : settings}, function() {
 
-                        log('Themes', 'Theme enable called back');
-                        callback();
+                            });
+                        } else {
+                            cli.cacheClear();
+
+                            log('Themes', 'Theme enable called back');
+                            callback();
+                        }
+
                     });
                 }, true, true);
 
@@ -154,6 +164,8 @@ var Themes = function () {
         if (formBuilder.isAlreadyCreated('theme_settings')) {
             formBuilder.deleteForm('theme_settings');
         }
+
+        var defaults = {};
         if (ActiveTheme[config.id].info.settingForm) {
             ActiveTheme[config.id].settings = {};
             var form = formBuilder.createForm('theme_settings');
@@ -168,11 +180,13 @@ var Themes = function () {
                 if (!property.default) {
                     throw new Error('[Themes] - The field "' + name + '" has no default value.');
                 }
+                defaults[name] = property.default;
+
                 ActiveTheme[config.id].settings[name] = property.default;
                 form.add(name, property.type, property.attr || {} );
             }
             form.add('Submit', 'submit', {displayname : 'Update Settings'} );
-
+            return defaults;
         }
 
         log("Themes", "Updated setting form")

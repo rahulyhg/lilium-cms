@@ -752,7 +752,6 @@ var Entities = module.exports = new function () {
                     if (err) console.log(err);
                     Roles[i] = undefined;
                     delete Roles[i];
-                    console.log('REMOVED ROLE');
                 })
             }
         }

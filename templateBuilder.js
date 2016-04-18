@@ -26,7 +26,8 @@ var templateBuilder = function () {
             }
         } else {
             log("Template", "Exception while loading a template that does not exist : " + templateName);
-            return '<p class="theme-errorstrip">[TemplateException] Template with name <b>"' + templateName + '"</b> does not exists.<p>'
+            // return '<p class="theme-errorstrip">[TemplateException] Template with name <b>"' + templateName + '"</b> does not exists.<p>'
+            return '';
         }
     };
 

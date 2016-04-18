@@ -17,3 +17,52 @@ LML syntax is a bit similar to PHP, but has its own pros and cons. The activatio
    var a = 1000;  
 $}
 Everything between {$ and $} will be interepreted as normal server-side Javascript. You can make equations and declare new variables to be printed in your logic.
+
+*** Templates ***
+
+Lml uses the concept of blocks. Blocks are content that can be reused in templates. Blocks are generally declared in a parent template.
+
+
+The child template defines the content of the block. The content will be replaced where the parent defined the block.
+
+Here is a quick example :
+
+`parent.lml`
+
+```javascript
+<html>
+<heah>
+    {$
+        block (head)
+    $}
+</head>
+<body>
+Some header content
+    {$
+        block (content)
+    $}
+</body>
+</html>
+```
+
+`child.lml`
+
+```javascript
+{parent('./parent.lml')}
+
+{$
+    block (head)
+$}
+    This will be in the head
+{$
+    endblock
+$}
+
+{$
+    block (body)
+$}
+    This will be in the body
+{$
+    endblock
+$}
+```

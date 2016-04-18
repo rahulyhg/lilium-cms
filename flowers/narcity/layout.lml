@@ -1,3 +1,4 @@
+{#theme}
 <!DOCTYPE html>
 <html>
 {=theme.render('head_will_open')}
@@ -245,5 +246,14 @@
     </div>
     <script type="text/javascript" src="./narcityto-home_files/osd.js"></script>
 </head>
-
+<body>
+    {$
+        block (content);
+    $}
+    <div>
+        {$
+            block (hello);
+        $}
+    </div>
+</body>
 </html>

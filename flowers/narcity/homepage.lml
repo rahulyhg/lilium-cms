@@ -1,2 +1,8 @@
-{#theme}
-{=theme.extends('layout.html')}
+{parent('./layout.lml')}
+{$
+block (content);
+$}
+    THIS IS SOME CONTENT
+{$
+endblock;
+$}

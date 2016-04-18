@@ -658,7 +658,6 @@ var Core = function () {
 
             loadPlugins(function () {
                 loadRoles(function () {
-                    console.log('hello');
                     loadProducts(function () {
                         loadTemplateBuilder(function() {
                             precompile(function () {

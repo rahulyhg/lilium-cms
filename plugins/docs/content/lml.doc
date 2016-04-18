@@ -1,0 +1,56 @@
+<body id="preview">
+<ul>
+<h2>Lilium Markup Language </h2>
+</ul>
+<p>Lilium Markup Language is an easy to use markup language parsed by Lilium. It generates pute HTML pages, ready to be served to clients. LML can also be interpreted in real-time, but is really meant to be used for caching.</p>
+<h3>Syntax</h3>
+<p>LML syntax is a bit similar to PHP, but has its own pros and cons. The activation characters are curly braces.</p>
+<h4>Tags</h4>
+<p>{#inc}  Will include a Javascript context, can be multiple split by “;”
+{=var}  Will print a Javascript variable, cannot contain operations
+{*var}  Will print a live, context variable. (Will update in real-time)
+{%file} Will include an interpreted LML or HTML file at this position. In a theme, those are called “petals”.</p>
+<p>{$
+var a = 1000;<br>
+$}
+Everything between {$ and $} will be interepreted as normal server-side Javascript. You can make equations and declare new variables to be printed in your logic.</p>
+<h4>Templates </h4>
+<p>Lml uses the concept of blocks. Blocks are content that can be reused in templates. Blocks are generally declared in a parent template.</p>
+<p>The child template defines the content of the block. The content will be replaced where the parent defined the block.</p>
+<p>Here is a quick example :</p>
+<p><code>parent.lml</code></p>
+<pre>&lt;html&gt;
+<span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">head</span>&gt;</span>
+    {$
+        block (head)
+    $}
+<span class="hljs-tag">&lt;/<span class="hljs-title">head</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-title">body</span>&gt;</span>
+Some header content
+    {$
+        block (content)
+    $}
+<span class="hljs-tag">&lt;/<span class="hljs-title">body</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-title">html</span>&gt;</span>
+</span></pre>
+<p><code>child.lml</code></p>
+<pre>{parent(<span class="hljs-string">'./parent.lml'</span>)}
+
+{$
+    block (head)
+$}
+    This will be <span class="hljs-keyword">in</span> the head
+{$
+    endblock
+$}
+
+{$
+    block (body)
+$}
+    This will be <span class="hljs-keyword">in</span> the body
+{$
+    endblock
+$}
+</pre>
+
+</body>

@@ -18,13 +18,14 @@ var initRequires = function(abspath) {
 };
 
 var loadHooks = function(_c, info) {
-    endpoints.register(_c.id, '/', 'GET', function(cli) {
-        filelogic.serveAbsoluteLml(themePath + '/homepage.lml', _c.default().server.html + '/index.html', cli)
+    endpoints.register(_c.id, '', 'GET', function(cli) {
+        console.log(themePath + '/homepage.lml');
+        filelogic.serveAbsoluteLml(themePath + '/homepage.lml', _c.server.html + '/index.html', cli)
     });
 };
 
 NarcityTheme.prototype.enable = function (_c, info, callback) {
-    themePath = _c.server.base + _c.paths.theme + '/' + info.uName;
+    themePath = _c.server.base + _c.paths.themes + '/' + info.uName;
 
     initRequires(_c.server.base);
     loadHooks(_c);

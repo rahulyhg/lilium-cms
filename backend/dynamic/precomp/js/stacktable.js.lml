@@ -6,7 +6,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
     var that = this;
     var fieldname = fieldName;
     var columns = scheme.columns.length;
-    
+
     var render = function() {
         // Check for livevars
     };
@@ -43,7 +43,6 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
     };
 
     this.appendRow = function(livevar) {
-        console.log(scheme);
         if (livevar[fieldname]) {
             var data  = livevar[fieldname];
 
