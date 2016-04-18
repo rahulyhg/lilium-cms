@@ -185,10 +185,10 @@ var mediaExplorer = function(closeUpload) {
                 $('.progress').show();
 
                 }
-                var fileInput = $('#mediaExplorerModal #upload-media > input:File')[0];
+                var fileInput = $('#mediaExplorerModal #upload-media input:File')[0];
 
                 var file = fileInput.files[0];
-                var form_name = $("#mediaExplorerModal #upload-media > input[name='form_name']").val();
+                var form_name = $("#mediaExplorerModal #upload-media input[name='form_name']").val();
                 var formData = new FormData();
 
                 formData.append($(fileInput).attr('name'), file);
