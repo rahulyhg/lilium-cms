@@ -454,10 +454,9 @@ var Entities = module.exports = new function () {
     this.cacheRoles = function (callback) {
         log('Roles', 'Caching roles from Database');
         var sites = _c.getAllSites();
-        // console.log(sites);
 
         for (var i in sites) {
-            db.findToArray(sites[i], 'roles', {'pluginID': false}, function (err, roles) {
+            db.findToArray(sites[i], 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
                 if (!err) {
                     for (var i = 0, len = roles.length; i < len; i++) {
                         Roles[roles[i].name] = roles[i];
@@ -533,7 +532,6 @@ var Entities = module.exports = new function () {
             }
         } else if (typeof right === "string" && typeof entity.roles !== 'undefined') {
             allowed = entity.roles.indexOf('lilium') !== -1;
-
             if (!allowed) {
                 for (var i = 0, len = entity.roles.length; i < len; i++) {
                     if (typeof Roles[entity.roles[i]] !== 'undefined') {

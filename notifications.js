@@ -269,12 +269,15 @@ var Notification = function () {
     var onSocketConnection = function (socket) {
         // Parse cookie and get session id
         var sessionId = that.getSessionIDFromCookie(socket.handshake.headers.cookie);
-        // Get session and get client id
-        var session = sessionManager.getSessionFromSID(sessionId);
-        if (session) {
-            session.sessionId = sessionId;
-            new LiliumSocket(socket, session).bind().joinGroup('lmlsite_' + session.data.site, true);
+        if (sessionId) {
+            // Get session and get client id
+            var session = sessionManager.getSessionFromSID(sessionId);
+            if (session) {
+                session.sessionId = sessionId;
+                new LiliumSocket(socket, session).bind().joinGroup('lmlsite_' + session.data.site, true);
+            }
         }
+
     };
 
     this.init = function () {
@@ -628,6 +631,9 @@ var Notification = function () {
     };
 
     this.getSessionIDFromCookie = function (cookieString) {
+        if (!cookieString) {
+            return undefined;
+        }
         var cookies = {};
         cookieString.split(';').forEach(function (cookie) {
             var keyVal = cookie.split('=');
