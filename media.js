@@ -72,7 +72,6 @@ var Media = function () {
         if (cli.method == 'POST') {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
-
             if (response.success) {
 
                 var image = formBuilder.serializeForm(form);
