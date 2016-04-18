@@ -66,7 +66,7 @@ var Role = function () {
                 // Create post
                 db.insert(cli._c, 'roles', prepareRoleForDB(cli), function (err, result) {
                     // Create a new notification group
-                    notification.createGroup(cli.postdata.data.name, cli.postdata.data.name);
+                    notification.createGroup(cli.postdata.data.name, cli.postdata.data.name, cli._c.id);
                     // Generate LML page
                     cli.refresh();
                 });
