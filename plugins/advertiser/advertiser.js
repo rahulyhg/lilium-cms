@@ -36,7 +36,7 @@
 	     };
 
 	     var registerEndpoint = function() {
-	         endpoints.register('advertiser', 'GET', function(cli) {
+	         endpoints.register('*', 'advertiser', 'GET', function(cli) {
 	             cli.touch('advertiser.GET');
 	             if (cli.isGranted('advertiser')) {
 	                 switch (cli.routeinfo.path[1]) {
@@ -57,7 +57,7 @@
 	             }
 	         });
 
-	         endpoints.register('advertiser', 'POST', function(cli) {
+	         endpoints.register('*', 'advertiser', 'POST', function(cli) {
 	             if (cli.isGranted('advertiser')) {
 	                 switch (cli.routeinfo.path[1]) {
 	                     case undefined:

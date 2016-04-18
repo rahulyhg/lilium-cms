@@ -1,10 +1,11 @@
+{#config}
 var LiveVars = function() {
     var endpoints = this.endpoints = [];
     var paramString = "?";
     var livevars;
 
     this.getSingleLivevar = function(endpoint, params, cb) {
-        $.get("/livevars", {
+        $.get("{=config.default.server.url}/livevars", {
             vars :JSON.stringify([{
                 varname: endpoint,
                 params: params
@@ -52,7 +53,7 @@ var LiveVars = function() {
             'params': new Object()
         });
 
-        $.get("/livevars", {
+        $.get("{=config.default.server.url}/livevars", {
             vars: JSON.stringify(endpoints)
         }, function(data) {
             livevars = deepUnescape(data.livevars);

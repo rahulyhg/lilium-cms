@@ -14,7 +14,7 @@ var TableBuilder = function () {
             tables[table.name] = table;
             tables[table.name].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
         } else {
-            throw ('[TableBuilder] Table with name ' + table.name + ' already exists.');
+            return new Error ('[TableBuilder] Table with name ' + table.name + ' already exists.');
         }
     };
 
@@ -24,7 +24,7 @@ var TableBuilder = function () {
         if (typeof tables[tableName] !== 'undefined') {
             return generatehtml(tables[tableName]);
         } else {
-            throw ('[TableBuilder] Table with name ' + tableName + ' not found.');
+            return new Error ('[TableBuilder] Table with name ' + tableName + ' not found.');
         }
     };
 

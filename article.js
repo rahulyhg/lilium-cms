@@ -134,7 +134,14 @@ var Article = function() {
 
                                 // Remove autosaves related to this article
                                 if (cli.postdata.data.autosaveid) {
-                                    db.remove(cli._c, 'autosave', {_id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))}, function() {});
+                                    db.remove(
+                                        cli._c, 
+                                        'autosave', 
+                                        {
+                                            _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
+                                        }, 
+                                        function() {}
+                                    );
                                 }
 
                                 notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
@@ -143,7 +150,6 @@ var Article = function() {
                                     msg: "Your article is published. Click to see it live.",
                                     type: 'success'
                                 });
-
                             });
                         } else {
                             cli.throwHTTP(500);

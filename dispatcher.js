@@ -23,7 +23,7 @@ var Dispatcher = function () {
             Admin.serveLogin(cli);
         } else if (cli.routeinfo.livevars) {
             LiveVars.handleRequest(cli);
-        } else if (Endpoints.isRegistered(cli.routeinfo.path[0], 'GET')) {
+        } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
             Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
         } else {
             HTMLServer.serveClient(cli);
@@ -33,7 +33,7 @@ var Dispatcher = function () {
     this.dispost = function (cli) {
         cli.touch("dispatcher.dispost");
 
-        if (Endpoints.isRegistered(cli.routeinfo.path[0], 'POST')) {
+        if (Endpoints.isRegistered(cli._c.id, cli.routeinfo.path[0], 'POST')) {
             if (cli.routeinfo.admin) {
                 if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
                     Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);

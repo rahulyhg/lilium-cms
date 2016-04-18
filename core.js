@@ -99,17 +99,17 @@ var Core = function () {
     var loadEndpoints = function () {
         log('Endpoints', 'Loading endpoints');
         endpoints.init();
-        endpoints.register('login', 'POST', function (cli) {
+        endpoints.register('*', 'login', 'POST', function (cli) {
             cli.touch("endpoints.POST.login");
             LoginLib.authUser(cli);
         });
 
-        endpoints.register('admin', 'POST', function (cli) {
+        endpoints.register('*', 'admin', 'POST', function (cli) {
             cli.touch("endpoints.POST.admin");
             admin.handleAdminEndpoint(cli);
         });
 
-        endpoints.register('logout', 'GET', function (cli) {
+        endpoints.register('*', 'logout', 'GET', function (cli) {
             cli.touch("endpoints.POST.logout");
             sessions.logout(cli);
         });
@@ -445,27 +445,6 @@ var Core = function () {
         });
     };
 
-    var loadTheme = function (cb) {
-        log('Themes', 'Loading Theme');
-
-        themes.init(function () {
-
-            themes.bindEndpoints();
-
-            var fireEvent = function () {
-                log('Themes', 'Firing Theme event');
-                hooks.fire('themes');
-                log('Themes', 'Loaded themes');
-
-                cb();
-            };
-            fireEvent();
-
-        });
-
-
-    }
-
     var loadStandardInput = function () {
         var stdin = process.openStdin();
         stdin.liliumBuffer = "";
@@ -564,6 +543,7 @@ var Core = function () {
     var loadForms = function () {
         log('Core', 'Loading multiple forms');
 
+        entities.init();
         entities.registerCreationForm();
         LoginLib.registerLoginForm();
         Article.registerForms();
@@ -585,10 +565,6 @@ var Core = function () {
         hooks.fire('frontend_registered');
     };
 
-    var loadSessions = function (cb) {
-        sessions.initSessionsFromDatabase(cb);
-    };
-
     var loadRequestHandler = function () {
         hooks.bind('request', 1000, function (params) {
             // Run main modules
@@ -607,6 +583,7 @@ var Core = function () {
         var currentRoot = __dirname;
         var fss = require('./fileserver.js');
 
+        log('Core', 'Reading sites directory');
         fss.dirExists(currentRoot + "/sites", function (exists) {
             if (exists) {
                 fss.fileExists(currentRoot + "/sites/default.json", function (exists) {
@@ -623,8 +600,10 @@ var Core = function () {
     };
 
     var loadTemplateBuilder = function(cb) {
-        templateBuilder.init();
-        cb();
+        _c.each(function(cc, next) {
+            templateBuilder.init(cc);
+            next();
+        }, cb);
     };
 
     var loadLMLLibs = function () {
@@ -634,6 +613,7 @@ var Core = function () {
     };
 
     var precompile = function (done) {
+        log('Core', 'Staring precompilation');
         sites.loopPrecomp(done);
     };
 
@@ -661,6 +641,7 @@ var Core = function () {
 
         require('./includes/caller.js')
 
+        log('Core', 'Loading all websites');
         loadWebsites(function (resp) {
             loadRequires();
             loadHooks(readyToRock);
@@ -675,30 +656,26 @@ var Core = function () {
             loadRequestHandler();
             loadLMLLibs();
 
+            loadPlugins(function () {
                 loadRoles(function () {
                     loadProducts(function () {
-                        loadSessions(function () {
-                            loadTheme(function () {
-                                loadTemplateBuilder(function() {
-                                    precompile(function () {
-                                        redirectIfInit(resp, function () {
-                                            loadAdminMenus();
-                                            loadFrontend();
-                                            loadForms();
-                                            loadPlugins(function () {
+                        loadTemplateBuilder(function() {
+                            precompile(function () {
+                                redirectIfInit(resp, function () {
+                                    loadAdminMenus();
+                                    loadFrontend();
+                                    loadForms();
 
-                                            loadCacheInvalidator();
-                                            scheduleGC();
+                                    loadCacheInvalidator();
+                                    scheduleGC();
 
-                                            log('Lilium', 'Starting inbound server');
-                                            Inbound.createServer();
-                                            loadNotifications();
-                                            Inbound.start();
+                                    log('Lilium', 'Starting inbound server');
+                                    Inbound.createServer();
+                                    loadNotifications();
+                                    Inbound.start();
 
-                                            log('Core', 'Firing initialized signal');
-                                            hooks.fire('init');
-                                        });
-                                    });
+                                    log('Core', 'Firing initialized signal');
+                                    hooks.fire('init');
                                 });
                             });
                         });

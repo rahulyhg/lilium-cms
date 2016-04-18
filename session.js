@@ -117,7 +117,7 @@ var Sessions = function () {
 
     this.removeSession = function (cli, callback) {
         // Remove session from db
-        db.remove(_c.default(), 'sessions', {
+        db.remove(cli._c, 'sessions', {
             token: cli.session.token
         }, function () {
             // Remove from memory
@@ -142,9 +142,9 @@ var Sessions = function () {
         return _sesh;
     };
 
-    this.initSessionsFromDatabase = function (cb) {
+    this.initSessionsFromDatabase = function (conf, cb) {
         var seshCount = 0;
-        db.find(_c.default(), 'sessions', {}, {}, function (err, data) {
+        db.find(conf.id, 'sessions', {}, {}, function (err, data) {
             if (!err) {
                 var fetchNext = function () {
                     data.hasNext(function (err, hasNext) {

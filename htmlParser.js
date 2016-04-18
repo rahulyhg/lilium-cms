@@ -1,3 +1,4 @@
+var log = require('./log.js');
 /**
  * HtmlParser is a parser for various javascript objects.
  * @return {HtmlParser} [The HtmlParser as a node module]
@@ -10,6 +11,7 @@ var HtmlParser = function () {
     }
 
     this.parseForm = function (form) {
+        log('HTMLParser', 'Parding form ' + form.name);
         var htmlForm = '';
         var submitButton = '';
         if (typeof form == 'undefined') {
@@ -55,7 +57,9 @@ var HtmlParser = function () {
 
 
         //Generate fields
+        var fieldsRendered = 0;
         for (var index in form.fields) {
+            fieldsRendered++;
             field = form.fields[index];
 
             if (typeof field.attr.wrapper !== 'undefined') {
@@ -165,6 +169,7 @@ var HtmlParser = function () {
             }
         }
 
+        log('HTMLParser', "Parsed form " + form.name + " with " + fieldsRendered + " fields");
         return htmlForm;
     };
 

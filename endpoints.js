@@ -1,56 +1,82 @@
 var pluginHelper = require('./pluginHelper.js');
 var hooks = require('./hooks.js');
+var config = require('./config.js'); 
 
-var registeredEndpoints = {
-    GET: {},
-    POST: {}
+// Schema : {SITE_ID:{METHOD:{ENDPOINT:{ENDPOINTDATA}}}}
+var registeredEndpoints = new Object();
+
+var AllowedMethods = function() {
+    this.GET  = new Object();
+    this.POST = new Object();
 };
 
 var EndPoints = function () {
-    this.register = function (endpoint, method, callback) {
-        if (typeof registeredEndpoints[method][endpoint] !== 'undefined') {
-            throw new Error("[EndPointException - Already registered : " + method + "/" + endpoint + "]");
+    this.register = function (site, endpoint, method, callback) {
+        if (site && site != '*') {
+            if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
+                return new Error("[EndPointException - Already registered : " + method + "/" + endpoint + "]");
+            }
+
+            registeredEndpoints[site][method][endpoint] = callback;
+            registeredEndpoints[site][method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
+        } else if (site == '*') {
+            config.eachSync(function(config) {
+                var site = config.id;
+                if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
+                    return new Error("[EndPointException - Already registered : " + method + "/" + endpoint + "]");
+                }
+
+                registeredEndpoints[site][method][endpoint] = callback;
+                registeredEndpoints[site][method][endpoint].pluginID = false;
+            });
         }
-
-        registeredEndpoints[method][endpoint] = callback;
-        registeredEndpoints[method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
-
     };
 
-    this.unregister = function (endpoint, method) {
-        if (typeof registeredEndpoints[method][endpoint] !== 'undefined') {
-            delete registeredEndpoints[method][endpoint];
+    this.unregister = function (site, endpoint, method) {
+        if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
+            delete registeredEndpoints[site][method][endpoint];
         }
     };
 
-    this.isRegistered = function (endpoint, method) {
-        return typeof registeredEndpoints[method][endpoint] !== 'undefined';
+    this.isRegistered = function (site, endpoint, method) {
+        return typeof registeredEndpoints[site][method][endpoint] !== 'undefined';
     };
 
     this.execute = function (endpoint, method, cli) {
-        if (typeof registeredEndpoints[method][endpoint] !== 'undefined') {
-            registeredEndpoints[method][endpoint](cli);
+        var site = cli.routeinfo.configname;
+        if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
+            registeredEndpoints[site][method][endpoint](cli);
         } else {
             throw new Error("[EndPointException - Not Found : " + method + "/" + endpoint + "]");
         }
     };
 
+    this.addSite = function(site) {
+        if (typeof registeredEndpoints[site] === 'undefined') {
+            registeredEndpoints[site] = new AllowedMethods();
+        } else {
+            log("Endpoint", "Tried to add existing site " + site);
+            return new Error("[EndPointException - Tried to add existing site " + site + "]");
+        }
+    };
+
     var loadHooks = function () {
-        hooks.bind('plugindisabled', 1, function(identifier) {
-            // Check if plugin created endpoints
+        hooks.bind('plugindisabled', 2, function(identifier) {
             deletePluginEndpoints(identifier);
         });
     };
 
     var deletePluginEndpoints = function (identifier) {
-        for (var i in registeredEndpoints) {
-            for (var j in registeredEndpoints[i]) {
-                if (registeredEndpoints[i][j].pluginID == identifier) {
-                    registeredEndpoints[i][j] = undefined;
-                    delete registeredEndpoints[i][j];
+        config.eachSync(function(siteinfo) {
+            var regEnd = registeredEndpoints[siteinfo.id];
+            for (var i in regEnd) {
+                for (var j in regEnd[i]) {
+                    if (regEnd[i][j].pluginID == identifier) {
+                        delete regEnd[i][j];
+                    }
                 }
             }
-        }
+        });
     };
 
     this.init = function() {

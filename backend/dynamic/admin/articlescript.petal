@@ -57,7 +57,7 @@
 
     var deleteArticle = function(id) {
         var url = isAutoSave ? 'delete-autosave' : 'delete'
-        $.post('/admin/article/'+ url +'/' + id, {}, function(data) {
+        $.post('{=config.default.server.url}/admin/article/'+ url +'/' + id, {}, function(data) {
             if (data.success && data.redirect) {
                 window.location.replace(data.redirect);
             } else {
@@ -100,7 +100,7 @@
                     tempSave += '&contentid=' + contentid;
                 }
 
-                $.post('/admin/article/autosave', tempSave, function(data) {
+                $.post('{=config.default.server.url}/admin/article/autosave', tempSave, function(data) {
                     lastSave = currentSave;
 
                     if (data.success && data._id) {
@@ -164,7 +164,7 @@
             tempsave += _id ? '&autosaveid= ' + _id : '';
 
             // Check if
-            $.post('/admin/article' + url, tempsave, function(data) {
+            $.post('{=config.default.server.url}/admin/article' + url, tempsave, function(data) {
                 lastSave = currentSave;
 
                 if (data.success && data.redirect) {
@@ -194,7 +194,7 @@
 
         $('form button[name=preview]').on('click', function(e) {
             // Open in new tab
-            $.post('/admin/article/preview', $('form').serialize(), function(html) {
+            $.post('{=config.default.server.url}/admin/article/preview', $('form').serialize(), function(html) {
                 window.open().document.write(html);
             });
         });
@@ -216,7 +216,7 @@
             tempForm += _id ? '&autosaveid= ' + _id : '';
 
             if (valid) {
-                $.post('/admin/article/new', tempForm, function(data) {
+                $.post('{=config.default.server.url}/admin/article/new', tempForm, function(data) {
                     if (data.success && data.redirect) {
                         lastSave = form;
                         window.location.replace(data.redirect);

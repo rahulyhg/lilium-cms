@@ -3,6 +3,7 @@ var lmllib = require('./lmllib.js');
 var petalsManager = require('./petal.js');
 var Frontend = require('./frontend.js');
 var hooks = require('./hooks.js');
+var log = require('./log.js');
 
 var templateBuilder = function () {
     var that = this;
@@ -24,7 +25,8 @@ var templateBuilder = function () {
                 }, extra);
             }
         } else {
-            return '[Template Error] Template with name "' + templateName + '" does not exists.<br>'
+            log("Template", "Exception while loading a template that does not exist : " + templateName);
+            return '<p class="theme-errorstrip">[TemplateException] Template with name <b>"' + templateName + '"</b> does not exists.<p>'
         }
     };
 
@@ -68,21 +70,18 @@ var templateBuilder = function () {
 
     };
 
-    var registerHooks = function () {
+    var registerHooks = function (config) {
         // Hook on plugins loaded
-        hooks.bind('init', 1, function () {
-            var sites = require('./sites.js');
-            // For each sites, compile theme.
-            var siteList = sites.getSites();
-            for (var i in siteList) {
-                that.precompThemeFiles(siteList[i]);
-            }
-
-        });
+        (function(config) {
+            hooks.bind('init', 1, function () {
+                that.precompThemeFiles(config);
+            });
+        })(config);
     };
 
-    this.init = function () {
-        settings = themes.getEnabledTheme();
+    this.init = function (config) {
+        log('TemplateBuilder', "Initializing for site " + config.id);
+        settings = themes.getEnabledTheme(config);
 
         lmllib.registerContextLibrary('theme', function () {
             return {
@@ -91,7 +90,9 @@ var templateBuilder = function () {
             };
         });
 
-        registerHooks();
+        log('TemplateBuilder', "Registering theme hooks");
+        registerHooks(config);
+        log('TemplateBuilder', "Done initializing site " + config.id);
     };
 
 

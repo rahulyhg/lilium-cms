@@ -20,7 +20,7 @@ var Themes = function () {
         if (cli.routeinfo.path.length == 2 && cli.method == 'POST') {
             that.updateThemeSettings(cli);
         } else if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
-            that.enableTheme(cli.postdata.data.uName, function () {
+            that.enableTheme(cli._c, cli.postdata.data.uName, function () {
                 cli.sendJSON({
                     success: true
                 });
@@ -40,7 +40,7 @@ var Themes = function () {
         var formData = formBuilder.serializeForm(form);
 
         if (formData) {
-            db.update(cli._c, 'themes', {uName : ActiveTheme.uName}, {settings : formData}, function(err, res) {
+            db.update(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, {settings : formData}, function(err, res) {
                 if (err) throw new Error("[ThemeException] Error while updating theme settings " + err);
                 cli.refresh();
             });
@@ -50,7 +50,7 @@ var Themes = function () {
     }
 
     this.searchDirForThemes = function (uName, callback) {
-        this.getThemesDirList(function (list) {
+        this.getThemesDirList(_c.default(), function (list) {
             var themeInfo = undefined;
 
             for (var i = 0; i < list.length; i++) {
@@ -63,8 +63,8 @@ var Themes = function () {
         });
     };
 
-    this.getThemesDirList = function (callback) {
-        var themedir = _c.default().server.base + _c.default().paths.themes + "/";
+    this.getThemesDirList = function (conf, callback) {
+        var themedir = conf.server.base + conf.paths.themes + "/";
         fs.readdir(themedir, function (err, dirs) {
             if (err) {
                 throw new Error("[ThemeException] Could not access theme directory : " + err);
@@ -79,7 +79,7 @@ var Themes = function () {
                     CachedThemes = allThemes;
                     callback(allThemes)
                 } else {
-                    var infoPath = themedir + dirs[i] + "/" + _c.default().paths.themesInfo;
+                    var infoPath = themedir + dirs[i] + "/" + conf.paths.themesInfo;
                     fileserver.fileExists(infoPath, function (exists) {
                         if (exists) {
                             fileserver.readJSON(infoPath, function (json) {
@@ -98,12 +98,12 @@ var Themes = function () {
         });
     };
 
-    this.isActive = function (uName) {
-        return typeof uName !== 'undefined' && ActiveTheme.uName == uName;
+    this.isActive = function (conf, uName) {
+        return typeof uName !== 'undefined' && ActiveTheme[conf.id] && ActiveTheme[conf.id].uName == uName;
     };
 
-    this.enableTheme = function (uName, callback) {
-        if (this.isActive(uName)) {
+    this.enableTheme = function (config, uName, callback) {
+        if (this.isActive(config, uName)) {
             throw new Error("[ThemeException] Cannot register already registered theme with uName " + uName);
         } else {
             log('Themes', 'Registering theme with uName ' + uName);
@@ -112,53 +112,55 @@ var Themes = function () {
                     throw new Error("[ThemeException] Could not find any info on theme with uName " + uName);
                 }
 
-                var themedir = _c.default().server.base + _c.default().paths.themes + "/";
+                var themedir = config.server.base + config.paths.themes + "/";
                 var ThemeInstance = require(themedir + info.dirName + "/" + info.entry);
-                if (typeof ActiveTheme !== 'undefined') {
-                    db.update(_c.default(), 'themes', {
-                        uName: ActiveTheme.uName
+                if (typeof ActiveTheme[config.id] !== 'undefined') {
+                    db.update(config, 'themes', {
+                        uName: ActiveTheme[config.id].uName
                     }, {
                         active: false
                     });
                 }
 
-                ActiveTheme = ThemeInstance;
+                ActiveTheme[config.id] = ThemeInstance;
 
                 info.active = true;
                 info.path = info.dirName;
-                ActiveTheme.uName = info.uName;
-                ActiveTheme.info = info;
+                ActiveTheme[config.id].uName = info.uName;
+                ActiveTheme[config.id].info = info;
 
                 // Register Settings for theme
                 log('Themes', 'Updating Settings form');
-                createOrUpdateThemeForm();
+                createOrUpdateThemeForm(config);
 
-                db.update(_c.default(), 'themes', {
+                log('Themes', 'Updating database entry for site : ' + config.id);
+                db.update(config, 'themes', {
                     uName: uName
                 }, info, function () {
-
-                    ThemeInstance.enable(_c, info, function() {
+                    log('Themes', 'Enabling theme ' + info.uName);
+                    ThemeInstance.enable(config, info, function() {
                         cli.cacheClear();
+
+                        log('Themes', 'Theme enable called back');
                         callback();
                     });
-
                 }, true, true);
 
             });
         }
     };
 
-    var createOrUpdateThemeForm = function () {
+    var createOrUpdateThemeForm = function (config) {
         if (formBuilder.isAlreadyCreated('theme_settings')) {
             formBuilder.deleteForm('theme_settings');
         }
-        if (ActiveTheme.info.settingForm) {
-            ActiveTheme.settings = {};
+        if (ActiveTheme[config.id].info.settingForm) {
+            ActiveTheme[config.id].settings = {};
             var form = formBuilder.createForm('theme_settings');
-            form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme.info.uName + ')'} );
+            form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'} );
 
-            for (var name in ActiveTheme.info.settingForm) {
-                var property = ActiveTheme.info.settingForm[name];
+            for (var name in ActiveTheme[config.id].info.settingForm) {
+                var property = ActiveTheme[config.id].info.settingForm[name];
                 if (property.type == 'submit') {
                     throw new Error('[Themes] - ILLEGAL form type "submit" for theme settings form.')
                 }
@@ -166,30 +168,30 @@ var Themes = function () {
                 if (!property.default) {
                     throw new Error('[Themes] - The field "' + name + '" has no default value.');
                 }
-                ActiveTheme.settings[name] = property.default;
+                ActiveTheme[config.id].settings[name] = property.default;
                 form.add(name, property.type, property.attr || {} );
             }
             form.add('Submit', 'submit', {displayname : 'Update Settings'} );
 
         }
 
-
+        log("Themes", "Updated setting form")
     };
 
-    this.getSettings = function() {
-        return ActiveTheme.settings;
+    this.getSettings = function(config) {
+        return ActiveTheme[config.id].settings;
     }
 
-    this.getEnabledTheme = function () {
-        return ActiveTheme;
+    this.getEnabledTheme = function (config) {
+        return ActiveTheme[config.id];
     };
 
-    this.getEnabledThemePath = function () {
-        return _c.default().server.base + _c.default().paths.themes + '/' + ActiveTheme.info.dirName;
+    this.getEnabledThemePath = function (config) {
+        return config.server.base + config.paths.themes + '/' + ActiveTheme[config.id].info.dirName;
     }
 
 
-    this.bindEndpoints = function () {
+    this.bindEndpoints = function (conf) {
         Admin.registerAdminEndpoint('themes', 'GET', this.serveAdminList);
         Admin.registerAdminEndpoint('themes', 'POST', this.serveAdminList);
     };
@@ -243,7 +245,7 @@ var Themes = function () {
         }, ["themes"]);
 
         livevars.registerLiveVariable('theme_settings', function (cli, levels, params, callback) {
-            db.findToArray(cli._c, 'themes', {uName : ActiveTheme.uName}, function(err, arr) {
+            db.findToArray(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, function(err, arr) {
                 callback(err || arr[0].settings);
             });
         });
@@ -274,16 +276,15 @@ var Themes = function () {
         });
     };
 
-    this.init = function (cb) {
+    this.init = function (conf, cb) {
         this.registerForm();
-        that.getThemesDirList(function (themes) {
-            db.findToArray(_c.default(), 'themes', {
+        that.getThemesDirList(conf, function (themes) {
+            db.findToArray(conf.id, 'themes', {
                 'active': true
             }, function (err, results) {
-
                 var remove = function () {
-                    db.remove(_c.default(), 'themes', {$or : [{'active':false}, {'active': null}]}, function () {
-                        db.insert(_c.default(), 'themes', themes, function (err) {
+                    db.remove(conf, 'themes', {$or : [{'active':false}, {'active': null}]}, function () {
+                        db.insert(conf, 'themes', themes, function (err) {
                             cb();
                         });
                     }, false);
@@ -291,12 +292,12 @@ var Themes = function () {
 
                 if (results.length == 0) {
                     for (var i in themes) {
-                        if (themes[i].uName == _c.default().website.flower) {
+                        if (themes[i].uName == conf.website.flower) {
                             themes[i].active = true;
 
                             themes.splice(i, 1);
 
-                            that.enableTheme(_c.default().website.flower, remove);
+                            that.enableTheme(conf, conf.website.flower, remove);
                             break;
                         }
                     }
@@ -309,7 +310,7 @@ var Themes = function () {
                             if (results[i].uName == themes[j].uName) {
                                 themes[j].active = true;
                                 themes.splice(j, 1);
-                                that.enableTheme(results[i].uName, remove);
+                                that.enableTheme(conf, results[i].uName, remove);
                                 return;
                             }
                         }

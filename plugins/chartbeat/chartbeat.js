@@ -59,7 +59,7 @@ var Chartbeat = function() {
 
             pkg.Frontend.registerJSFile(
                 pkg.config.server.base + "plugins/chartbeat/countto.js",
-                2950,
+                1952,
                 'admin',
                 pkg.config.id
             );

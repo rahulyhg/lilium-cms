@@ -110,11 +110,6 @@ var defaultTheme = {
 	requiredModule : []
 };
 
-var defaultPlugin = {
-	identifier : "sayhi",
-	active : true
-};
-
 var rootEntity = {
 	id : -1, displayname:"[Root]", username : "root", shhh : '', roles : ["lilium"],
 }
@@ -123,7 +118,7 @@ var log = require('../log.js');
 
 var initMongo = function(conf, db, cb) {
 	log('Database', 'Init script was executed');
-	var totalTasks = 9;
+	var totalTasks = 8;
 	var completedTasks = 0;
 
 	// Boot Script
@@ -190,18 +185,6 @@ var initMongo = function(conf, db, cb) {
 				});
 			} else {
 				throw "[DatabaseInit - entities collection does not exist]";
-			}
-		});
-
-		log('Database', 'Creating default plugin entries');
-		db.collection('plugins', {strict:true}, function(err, col) {
-			if (!err) {
-				col.insertMany([defaultPlugin], function(err, r) {
-					completedTasks++;
-					checkForCompletion();
-				});
-			} else {
-				throw "[DatabaseInit - plugins collection does not exist]";
 			}
 		});
 

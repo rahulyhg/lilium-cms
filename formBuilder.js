@@ -7,6 +7,7 @@ var htmlParser = require('./htmlParser');
 var validator = require('validator');
 var hooks = require('./hooks.js');
 var pluginHelper = require('./pluginHelper.js');
+var log = require('./log.js');
 
 var plugin = {};
 
@@ -68,12 +69,11 @@ var FormBuilder = function() {
         // Add it to the form list
         forms[name] = currentForm;
 
+        log('FormBuilder', 'Initialized form with name ' + name);
         return this;
     };
 
     var instanciateForm = function(name, attr, auto) {
-
-
         if (typeof name == 'undefined') {
             throw new Error("[FormBuilderException] - No name provided to form");
         }
@@ -118,7 +118,6 @@ var FormBuilder = function() {
     };
 
     this.add = function(name, type, attr, requirements, contextForm, auto) {
-
         if (!auto && !contextForm) {
             registerFilename = __caller;
             history.save(this.add, [name, type, attr, requirements, contextForm]);
@@ -143,6 +142,7 @@ var FormBuilder = function() {
     };
 
     this.trigger = this.trg = function(sectionname, auto) {
+        log('FormBuilder', 'Trigger on form with section name ' + sectionname);
         if (!auto) {
             registerFilename = __caller;
             history.save(this.trg, [sectionname, auto]);
@@ -182,14 +182,18 @@ var FormBuilder = function() {
     };
 
     this.remove = function(name) {
+        log('FormBuilder', 'Attempt to remove field with name ' + name);
         if (typeof currentForm.fields[name] !== 'undefined') {
             currentForm.fields[name] = undefined;
             delete currentForm.fields[name];
+
+            log('FormBuilder', 'Removed field with name ' + name);
         }
         return this;
     };
 
     this.deleteForm = function(name) {
+        log('FormBuilder', 'Attempt to delete form with name ' + name);
         if (typeof forms[name] !== 'undefined') {
             forms[name] = undefined;
             delete forms[name];
@@ -197,7 +201,6 @@ var FormBuilder = function() {
     }
 
     var createField = function(name, type, attr, requirements) {
-
         if (typeof name == 'undefined') {
             throw new Error("[FormBuilderException] - No name provided to field");
         }
@@ -209,6 +212,7 @@ var FormBuilder = function() {
         for (var key in attr) {
             field.attr[key] = attr[key];
         }
+
         // Update requirements
         for (var key in requirements) {
             field.requirements[key] = requirements[key];
@@ -233,7 +237,8 @@ var FormBuilder = function() {
     };
 
     this.render = function(formName) {
-        if (typeof forms[formName] == 'undefined') {
+        log('FormBuilder', 'Rendering form with name : ' + formName);
+        if (typeof forms[formName] === 'undefined') {
             throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
         }
 
@@ -431,7 +436,6 @@ var FormBuilder = function() {
         this.recreate = function(formName) {
             log('FormBuilder', 'Recreating form: ' + formName);
             if (forms[formName]) {
-
                 currentForm = forms[formName];
                 for (var i in currentForm.history) {
 
@@ -449,8 +453,8 @@ var FormBuilder = function() {
         };
 
         this.invalidateFromPlugin = function(pluginID) {
+            log('FormBuilder', 'Invalidating from Plugin with ID ' + pluginID);
             try {
-
                 if (pluginID) {
                     for (var i in forms) {
                         var hasRelatedPlugin = false;
@@ -491,9 +495,15 @@ var FormBuilder = function() {
         };
 
         this.newPluginInitialised = function(identifier) {
+            // [DEBUG]
+            // TODO : Fix form complete deletion
+            // Experience : All fields are deleted from form, but the recreate function doesn't recreate the form
+            // Result : Form renders with no fields
+            return;
+
+            log('FormBuilder', "New plugin was initialized with identifier " + identifier);
             // Recreate the forms to relaunch the hooks for the new plugin
             try {
-
                 for (var i in forms) {
                     if (i == 'post_create') {
 

@@ -2,37 +2,37 @@ var endpoints = undefined;
 var livevars = undefined;
 var filelogic = undefined;
 
-var Potager = function () {
-    var themePath;
+var themePath;
 
-    var initRequires = function(abspath) {
-        endpoints = require(abspath + 'endpoints.js');
-        filelogic = require(abspath + 'filelogic.js');
-        livevars = require(abspath + 'livevars.js');
-    };
-
-    var loadHooks = function(_c, info) {
-        endpoints.register('/', 'GET', function(cli) {
-            filelogic.serveAbsoluteLml(themePath + '/homepage.lml', _c.default().server.html + '/index.html', cli)
-        });
-    };
-
+// TODO : Receive context site
+var NarcityTheme = function () {
     var initLivevars = function() {
 
     };
-
-
-    this.enable = function (_c, info, callback) {
-        themePath = _c.default().server.base + _c.default().paths.theme + '/' + info.identifier;
-
-        initRequires(_c.default().server.base);
-        loadHooks(_c.default());
-        return callback();
-    }
-
-    this.disable = function (callback) {
-        return callback();
-    }
 }
 
-module.exports = new Potager();
+var initRequires = function(abspath) {
+    endpoints = require(abspath + 'endpoints.js');
+    filelogic = require(abspath + 'filelogic.js');
+    livevars = require(abspath + 'livevars.js');
+};
+
+var loadHooks = function(_c, info) {
+    endpoints.register(_c.id, '/', 'GET', function(cli) {
+        filelogic.serveAbsoluteLml(themePath + '/homepage.lml', _c.default().server.html + '/index.html', cli)
+    });
+};
+
+NarcityTheme.prototype.enable = function (_c, info, callback) {
+    themePath = _c.server.base + _c.paths.theme + '/' + info.uName;
+
+    initRequires(_c.server.base);
+    loadHooks(_c);
+    return callback();
+}
+
+NarcityTheme.prototype.disable = function (callback) {
+    return callback();
+}
+
+module.exports = new NarcityTheme();

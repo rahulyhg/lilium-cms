@@ -9,6 +9,9 @@ var fs = require('fs');
 var Precompiler = require('./precomp.js');
 var Frontend = require('./frontend.js');
 var hooks = require('./hooks.js');
+var themes = require('./themes.js');
+var endpoints = require('./endpoints.js');
+var sessions = require('./session.js');
 
 var _cachedSites = new Array();
 
@@ -87,30 +90,30 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timer/jquery.timer.js", 1100, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery.clickout/jquery.clickout.js", 1250, "admin", conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/lilium.js", 2000, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/livevars.js", 2100, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/pushtable.js", 2200, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/stacktable.js", 2300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/socket.js", 2400, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/multi-select.js", 2500, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/ckeditor-lilium.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/media-explorer.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/tags.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/lmltable.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/js/alert.js", 1400, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/pushtable.js", 2200, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/stacktable.js", 2300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/socket.js", 2400, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/multi-select.js", 2500, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/ckeditor-lilium.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/media-explorer.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/tags.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmltable.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/alert.js", 1400, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
         Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/lilium.css", 2000, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/ckeditor.css", 2100, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/login.css", 2200, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/media.css", 2600, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/notifications.css", 2400, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/pushtable.css", 2500, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/multiselect.css", 2600, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/tags.css", 2600, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/css/lmltable.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/login.css", 2200, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/media.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/notifications.css", 2400, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/pushtable.css", 2500, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/multiselect.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/tags.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lmltable.css", 2600, 'admin', conf.id);
 
         hooks.fire('frontend_will_precompile', {
             config: conf,
@@ -125,15 +128,32 @@ var SiteInitializer = function (conf) {
         });
     };
 
+    var loadTheme = function(cb) {
+        themes.init(conf, function() {
+            themes.bindEndpoints(conf);
+            cb();
+        });
+    };
+
+    var loadSessions = function(cb) {
+        sessions.initSessionsFromDatabase(conf, cb);
+    };
+
     this.initialize = function (done) {
         log('Sites', 'Initializing site with id ' + conf.id);
 
         hooks.fire('site_will_initialize', conf);
+        endpoints.addSite(conf.id);
+
         loadHTMLStructure(function () {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
-                    hooks.fire('site_initialized', conf);
-                    done();
+                    loadTheme(function() {
+                        loadSessions(function() {
+                            hooks.fire('site_initialized', conf);
+                            done();
+                        });
+                    });
                 });
             });
         });

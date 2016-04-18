@@ -483,7 +483,6 @@ var Entities = module.exports = new function () {
         if (typeof Roles[rObj.name] !== 'undefined') {
             throw new Error("[RolesException] Tried to register already registered role " + rObj.name);
         } else {
-            console.log('REGISTERING ROLE');
             rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
             rObj.rights = rights;
             db.update(_c.default(), 'roles', {
@@ -748,10 +747,8 @@ var Entities = module.exports = new function () {
         });
     };
 
-    var init = function () {
+    this.init = function () {
         registerTables();
         registerHooks();
     };
-
-    init();
 };

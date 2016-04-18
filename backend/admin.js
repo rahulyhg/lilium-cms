@@ -134,11 +134,11 @@ var Admin = function() {
             AdminEndpoints[method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
 
 		} else {
-			throw "[AdminEndpointException] Endpoint is already registered : " + method + "@" + endpoint;
+			return new Error("[AdminEndpointException] Endpoint is already registered : " + method + "@" + endpoint);
 		}
 	};
 
-    deletePluginEndpoints = function (identifier) {
+    var deletePluginEndpoints = function (identifier) {
         for (var i in AdminEndpoints) {
             for (var j in AdminEndpoints[i]) {
                 if (AdminEndpoints[i][j].pluginID == identifier) {
