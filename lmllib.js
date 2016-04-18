@@ -63,7 +63,7 @@ var LMLLib = function () {
 
     this.registerContextLibrary = function (libName, callback) {
         if (this.isRegistered(libName)) {
-            log("Tried to add already registered LML Context Library " + libName);
+            require('./log.js')("Tried to add already registered LML Context Library " + libName);
         } else {
             registeredLibraries[libName] = callback;
         }
