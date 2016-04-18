@@ -78,14 +78,14 @@ LiliumSocket.prototype.join = function (groupName) {
         } else {
             this.emit('err', {
                 success: false,
-                msg: 'Permission denied for group: ' + groupName
+                msg: 'Permission denied for group: ' + groupName + ' on site ' + ls.session.data.site
             });
         }
 
     } else {
         this.emit('err', {
             success: false,
-            msg: 'Group "' + groupName + '" not found.'
+            msg: 'Group "' + groupName + '" not found on site ' + ls.session.data.site
         });
     }
 };
@@ -614,10 +614,12 @@ var Notification = function () {
 
     this.createGroup = function (groupName, role, site) {
         if (site) {
+            log('Noticifactions', 'Creating group ' + site + '_' + groupName);
             groups[site + '_' + groupName] = groups[site + '_' + groupName] ? groups[site + '_' + groupName] : {};
             groups[site + '_' + groupName].role = role;
             groups[site + '_' + groupName].users = [];
         } else {
+            log('Notifications', 'Creating group ' + groupName);
             groups[groupName] = {};
             groups[groupName].role = role;
             groups[groupName].users = [];

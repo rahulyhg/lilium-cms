@@ -68,7 +68,6 @@ var Admin = function() {
 	};
 
     this.registerAdminSubMenu = function(parentMenuId, adminmenu) {
-
         for (var index in AdminMenus) {
             if (AdminMenus[index].id && AdminMenus[index].id == parentMenuId) {
                 if (adminmenu.priority == -1) {
