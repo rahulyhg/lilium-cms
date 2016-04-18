@@ -409,7 +409,7 @@ var Core = function () {
             power: 5
         }, ['dash', 'admin'], function () {
             return;
-        }, true);
+        }, true, true);
 
         entities.registerRole({
             name: 'lilium',
@@ -417,7 +417,7 @@ var Core = function () {
             power: 1
         }, ['dash', 'admin'], function () {
             return;
-        }, true);
+        }, true, true);
 
         entities.cacheRoles(cb);
     };
@@ -658,6 +658,7 @@ var Core = function () {
 
             loadPlugins(function () {
                 loadRoles(function () {
+                    console.log('hello');
                     loadProducts(function () {
                         loadTemplateBuilder(function() {
                             precompile(function () {

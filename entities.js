@@ -453,19 +453,26 @@ var Entities = module.exports = new function () {
 
     this.cacheRoles = function (callback) {
         log('Roles', 'Caching roles from Database');
-        db.findToArray(_c.default(), 'roles', {'pluginID': false}, function (err, roles) {
-            if (!err) {
-                for (var i = 0, len = roles.length; i < len; i++) {
-                    Roles[roles[i].name] = roles[i];
+        var sites = _c.getAllSites();
+        // console.log(sites);
+
+        for (var i in sites) {
+            db.findToArray(sites[i], 'roles', {'pluginID': false}, function (err, roles) {
+                if (!err) {
+                    for (var i = 0, len = roles.length; i < len; i++) {
+                        Roles[roles[i].name] = roles[i];
+                    }
+
+                    log('Roles', 'Cached ' + roles.length + ' roles');
+                } else {
+                    log('Roles', 'Could not cache roles from database');
                 }
 
-                log('Roles', 'Cached ' + roles.length + ' roles');
-            } else {
-                log('Roles', 'Could not cache roles from database');
-            }
+            });
+        }
+        callback();
 
-            callback();
-        });
+
     };
 
     this.promoteRole = function (roleName, right, cb) {
@@ -479,18 +486,31 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.registerRole = function (rObj, rights, callback, updateIfExists) {
+    this.registerRole = function (rObj, rights, callback, updateIfExists, allsites) {
         if (typeof Roles[rObj.name] !== 'undefined') {
             throw new Error("[RolesException] Tried to register already registered role " + rObj.name);
         } else {
             rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
             rObj.rights = rights;
-            db.update(_c.default(), 'roles', {
-                name: rObj.name
-            }, rObj, function (err, result) {
-                Roles[rObj.name] = rObj;
-                callback(rObj);
-            }, updateIfExists);
+            if (allsites) {
+                var sites = _c.getAllSites();
+                for (var i in sites) {
+                    db.update(sites[i], 'roles', {
+                        name: rObj.name
+                    }, rObj, function (err, result) {
+                        Roles[rObj.name] = rObj;
+                        callback(rObj);
+                    }, updateIfExists);
+                }
+            } else {
+                db.update(_c.default(), 'roles', {
+                    name: rObj.name
+                }, rObj, function (err, result) {
+                    Roles[rObj.name] = rObj;
+                    callback(rObj);
+                }, updateIfExists);
+            }
+
         }
     };
 
@@ -579,7 +599,7 @@ var Entities = module.exports = new function () {
     this.registerCreationForm = function () {
 
         formbuilder.createForm('entity_create', {
-               fieldWrapper : "lmlform-fieldwrapper"  
+               fieldWrapper : "lmlform-fieldwrapper"
             })
             .addTemplate('entity_create');
 
