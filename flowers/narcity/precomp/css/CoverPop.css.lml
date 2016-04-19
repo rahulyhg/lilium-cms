@@ -1,0 +1,100 @@
+/* Styles for the CoverPop.js plugin */
+
+.CoverPop-open,
+.CoverPop-open body {
+}
+
+#CoverPop-cover {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    -webkit-animation: fade-in .15s ease-in;
+    -moz-animation-name: fade-in .15s ease-in;
+    -ms-animation-name: fade-in .15s ease-in;
+    -o-animation-name: fade-in .15s ease-in;
+    animation-name: fade-in .15s ease-in;
+}
+.splash {
+	background-color: rgba(0,0,0,.7);
+}
+.splash-center {
+	width: 700px;
+	height: 400px;
+	position:relative;
+	margin: 10% auto 0;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+.splash-center--Toronto {
+  background-image: url(http://beta.narcity.com/wp-content/themes/narcity-theme/images/popupnarcityTO.jpg?8);
+}
+.splash-center--World {
+  background-image: url(http://beta.narcity.com/wp-content/themes/narcity-theme/images/narcity_world_splash.jpg?1);
+}
+.splash-center--Montréal {
+  background-image: url(http://beta.narcity.com/wp-content/themes/narcity-theme/images/popupnarcityMTL.jpg?2);
+}
+.splash-center--Montreal {
+  background-image: url(http://beta.narcity.com/wp-content/themes/narcity-theme/images/popupmtlblog.jpg?1);
+}
+.splash-center--New {
+  background-image: url(http://beta.narcity.com/wp-content/themes/narcity-theme/images/popupnarcityNY.jpg?1);
+}
+.splash-headline {
+	font-family: Oswald,sans-serif;
+    color: #000;
+    padding: 250px 0 0;
+    text-align: center;
+    font-size: 2.5em;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+.splash-center--Montreal .splash-headline {
+  padding: 180px 0 0;
+}
+.splash-subtitle {
+	text-align: center;
+    padding: 20px 0;
+    margin: 180px 122px -15px;
+    font-weight: bold;
+    font-size: 1.5em;
+    font-family: Oswald,sans-serif;
+    text-transform: uppercase;
+    color: #000;
+    float: left;
+}
+.splash-subtitletext {
+	padding: 0 20px 0 0;
+}
+
+.CoverPop-content.splash-center form.events-placeholder {
+	display: block;
+	width: 331px;
+}
+
+.events-placeholder__submit-button {
+	margin: auto;
+}
+
+    .CoverPop-open #CoverPop-cover {
+        display: block;
+    }
+	a.splash-close {
+		color: #FFF;
+        padding: 15px;
+        display: block;
+		text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+	}
+
+
+@-webkit-keyframes fade-in {
+    0% { opacity: 0; }
+    25% { opacity: 0; }
+    100% { opacity: 1; }
+}

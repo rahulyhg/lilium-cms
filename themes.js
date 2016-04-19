@@ -42,6 +42,7 @@ var Themes = function () {
         if (formData) {
             db.update(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, {settings : formData}, function(err, res) {
                 if (err) throw new Error("[ThemeException] Error while updating theme settings " + err);
+                ActiveTheme[cli._c.id].settings = formData;
                 cli.refresh();
             });
         } else {
@@ -132,14 +133,15 @@ var Themes = function () {
                 // Register Settings for theme
                 log('Themes', 'Updating Settings form');
                 var settings = createOrUpdateThemeForm(config);
-
                 log('Themes', 'Updating database entry for site : ' + config.id);
 
                 db.findAndModify(config, 'themes', {
                     uName: uName
                 }, info, function (err, doc) {
+
                     log('Themes', 'Enabling theme ' + info.uName);
                     ThemeInstance.enable(config, info, function() {
+                        ActiveTheme[config.id].settings = doc.value.settings;
                         if (!doc.value.settings) {
                             db.update(config, 'themes', {
                                 uName: uName

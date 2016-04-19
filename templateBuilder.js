@@ -4,13 +4,14 @@ var petalsManager = require('./petal.js');
 var Frontend = require('./frontend.js');
 var hooks = require('./hooks.js');
 var log = require('./log.js');
+var _c = require('./config.js');
 
 var templateBuilder = function () {
     var that = this;
     var settings = {};
     var petals = {};
-    var css = [];
-    var js = [];
+    var css = {};
+    var js = {};
 
     var renderBlock = function (templateName) {
         if (petals[templateName]) {
@@ -31,8 +32,8 @@ var templateBuilder = function () {
         }
     };
 
-    var getSettings = function () {
-        return settings.settings;
+    var getSettings = function (config) {
+        return themes.getEnabledTheme(config).settings;
     }
 
 
@@ -71,53 +72,64 @@ var templateBuilder = function () {
 
     };
 
-    var registerHooks = function (config) {
-        // Hook on plugins loaded
-        (function(config) {
-            hooks.bind('init', 1, function () {
-                that.precompThemeFiles(config);
-            });
-        })(config);
-    };
 
     this.init = function (config) {
         log('TemplateBuilder', "Initializing for site " + config.id);
-        settings = themes.getEnabledTheme(config);
-
         lmllib.registerContextLibrary('theme', function () {
             return {
                 render: renderBlock,
-                settings: getSettings()
+                settings: getSettings(config)
             };
         });
 
-        log('TemplateBuilder', "Registering theme hooks");
-        registerHooks(config);
         log('TemplateBuilder', "Done initializing site " + config.id);
     };
 
 
-    this.registerJSFile = function (absPath) {
-        css.push(absPath);
+    this.addJS = function (absPath, siteID) {
+        js[siteID] = js[siteID] ? js[siteID] : [];
+        js[siteID].push(absPath);
     };
 
-    this.registerCSSFile = function (absPath) {
-        css.push(absPath);
+    this.addCSS = function (absPath, siteID) {
+        css[siteID] = css[siteID] ? css[siteID] : [];
+        css[siteID].push(absPath);
     };
 
-    this.precompThemeFiles = function (_c) {
-        var paths = '';
-        for (var i in css) {
-            Frontend.registerJSFile(css[i].substring(0, css[i].lastIndexOf('.')), 150, "theme", _c.id);
+    this.precompAllFiles = function () {
+        var sites = _c.getAllSites();
+        for (var i in sites) {
+            this.precompThemeFiles(sites[i], function() {});
+        }
+    };
+
+    this.precompThemeFiles = function (_c, cb) {
+        if (css[_c.id]) {
+            for (var i in css[_c.id]) {
+                var completePath = _c.server.html + '/compiled/theme' +css[_c.id][i].substring(css[_c.id][i].lastIndexOf('/'), css[_c.id][i].lenght);
+                completePath = completePath.substring(0, completePath.lastIndexOf('.'));
+                Frontend.registerCSSFile(completePath, 150, "theme", _c.id);
+                log('TemplateBuilder', 'Registered precomp CSS File :' + css[_c.id][i]);
+
+            }
+
+
+            require('./precomp.js').precompile(_c, cb, css[_c.id]);
         }
 
-        for (var i in js) {
-            Frontend.registerCSSFile(js[i].substring(0, js[i].lastIndexOf('.')), 150, "theme", _c.id);
+        if (js[_c.id]) {
+            for (var i in js[_c.id]) {
+                var completePath = _c.server.html + '/compiled/theme' +js[_c.id][i].substring(js[_c.id][i].lastIndexOf('/'), js[_c.id][i].lenght);
+                completePath = completePath.substring(0, completePath.lastIndexOf('.'));
+
+                Frontend.registerCSSFile(completePath, "theme", _c.id);
+                log('TemplateBuilder', 'Registered precomp JS File :' + js[_c.id][i]);
+
+            }
+
+            require('./precomp.js').precompile(_c, cb, js[_c.id]);
         }
 
-        require('./precomp.js').precompile(_c, function () {
-
-        }, css.concat(js));
     };
 
 };

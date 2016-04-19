@@ -1,0 +1,13 @@
+{#theme}
+
+<footer>
+    <ul class="footerLinks">
+        <li><a href="http://www.narcitymedia.com/" title="Advertise with us">Advertise</a></li>
+        <li><a href="http://www.narcity.com/toronto/contact-us/" title="Contact Us">Contact Us</a></li>
+        <li><a href="http://www.narcitymedia.com/jobs" title="Jobs">Jobs</a></li>
+        <li><a href="http://www.narcity.com/privacy-policy/" title="Read our Privacy Policy">Privacy Policy</a> </li>
+        <li><a href="http://www.narcity.com/terms-conditions/" title="Terms &amp; Conditions">Terms &amp; Conditions</a> </li>
+    </ul>
+
+    <span class="copyright">© {=theme.settings.copyright}</span>
+</footer>

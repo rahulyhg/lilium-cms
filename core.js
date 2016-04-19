@@ -599,13 +599,6 @@ var Core = function () {
         });
     };
 
-    var loadTemplateBuilder = function(cb) {
-        _c.each(function(cc, next) {
-            templateBuilder.init(cc);
-            next();
-        }, cb);
-    };
-
     var loadLMLLibs = function () {
         hooks.trigger('will_load_core_lml_libs');
         dashboard.registerLMLLib();
@@ -659,7 +652,6 @@ var Core = function () {
             loadPlugins(function () {
                 loadRoles(function () {
                     loadProducts(function () {
-                        loadTemplateBuilder(function() {
                             precompile(function () {
                                 redirectIfInit(resp, function () {
                                     loadAdminMenus();
@@ -678,7 +670,6 @@ var Core = function () {
                                     hooks.fire('init');
                                 });
                             });
-                        });
                     });
                 });
             });

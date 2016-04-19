@@ -693,7 +693,7 @@ var LML = function () {
             context.config = extra.config;
 
             delete extra.config;
-        } else {
+        } else if (!context.isParent) {
             context.stash();
         }
 

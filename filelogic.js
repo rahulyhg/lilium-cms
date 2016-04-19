@@ -223,7 +223,7 @@ var FileLogic = function () {
     this.compileLmlPostPage = function (cli, postType, extra, cb) {
         var theme = require('./themes.js');
 
-        var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme().info.path + "/" + postType + ".lml";
+        var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
 
         LML.executeToHtml(readPath, cb, extra);
     };
