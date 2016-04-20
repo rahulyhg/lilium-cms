@@ -104,7 +104,8 @@ var Precomp = function () {
                             if (exists && histoObj[curFile] == sum) {
                                 db.insert(conf, 'compiledfiles', {
                                     filename: curFile,
-                                    sum: sum
+                                    sum: sum,
+                                    style: isTheme ? true : undefined
                                 }, function (err) {
                                     nextFile();
                                 });

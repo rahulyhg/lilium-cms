@@ -6,7 +6,23 @@
         "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},
         "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"},
         "network-name" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montréal"},
-        "other-network-websites" : {"type" : "text", "attr" : {"displayname" : "Other Network Websites"}, "default" : "Montréal"},
+        "othernetworkwebsites" : {"type" : "stack",
+            "attr" : {"displayname" : "Other Network Websites",
+                "scheme": {
+
+                "columns": [{
+                    "fieldName": "sitename",
+                    "dataType": "text",
+                    "displayname": "Site Name"
+                }, {
+                    "fieldName": "url",
+                    "dataType": "text",
+                    "displayname": "Url"
+                }]}},
+            "default": [{
+                "sitename": "Toronto",
+                "url": "http://narcity.com/toronto"
+            }]},
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."}
     }
 }

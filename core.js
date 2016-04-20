@@ -236,6 +236,7 @@ var Core = function () {
         imageSize.add("thumbnail", 150, '150');
         imageSize.add("medium", 300, '*');
         imageSize.add("Archive-thumbnail", 400, 400);
+        imageSize.add("featured", 970, 400);
     }
 
     var loadAdminMenus = function () {

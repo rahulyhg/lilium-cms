@@ -18,7 +18,6 @@ var templateBuilder = function () {
             for (var i in petals[templateName]) {
                 var extra = petals[templateName][i].extra;
                 var id = petals[templateName][i].id;
-
                 extra.settings = themes.getSettings();
 
                 petalsManager.compile(id, function (html) {
@@ -104,19 +103,33 @@ var templateBuilder = function () {
     };
 
     this.precompThemeFiles = function (_c, cb) {
-        if (css[_c.id]) {
-            for (var i in css[_c.id]) {
-                var completePath = _c.server.html + '/compiled/theme' +css[_c.id][i].substring(css[_c.id][i].lastIndexOf('/'), css[_c.id][i].lenght);
-                completePath = completePath.substring(0, completePath.lastIndexOf('.'));
-                Frontend.registerCSSFile(completePath, 150, "theme", _c.id);
-                log('TemplateBuilder', 'Registered precomp CSS File :' + css[_c.id][i]);
+        var reqCB = 0;
+        var actualCB = 0;
 
+        var callback = function() {
+            actualCB ++;
+            if (actualCB == reqCB) {
+                cb();
             }
-
-
-            require('./precomp.js').precompile(_c, cb, css[_c.id]);
         }
 
+
+        if (js[_c.id]) {
+            reqCB ++;
+            this.precompJS(_c, callback);
+        }
+
+        if (css[_c.id]) {
+            reqCB ++;
+            this.precompCSS(_c, callback);
+        }
+
+        if (reqCB == 0) {
+            cb();
+        }
+    };
+
+    this.precompJS = function (_c, cb) {
         if (js[_c.id]) {
             for (var i in js[_c.id]) {
                 var completePath = _c.server.html + '/compiled/theme' +js[_c.id][i].substring(js[_c.id][i].lastIndexOf('/'), js[_c.id][i].lenght);
@@ -129,8 +142,22 @@ var templateBuilder = function () {
 
             require('./precomp.js').precompile(_c, cb, js[_c.id]);
         }
+    }
 
-    };
+    this.precompCSS = function (_c, cb) {
+        if (css[_c.id]) {
+            for (var i in css[_c.id]) {
+                var completePath = _c.server.html + '/compiled/theme' +css[_c.id][i].substring(css[_c.id][i].lastIndexOf('/'), css[_c.id][i].lenght);
+                completePath = completePath.substring(0, completePath.lastIndexOf('.'));
+                Frontend.registerCSSFile(completePath, 150, "theme", _c.id);
+                log('TemplateBuilder', 'Registered precomp CSS File :' + css[_c.id][i]);
+
+            }
+
+
+            require('./precomp.js').precompile(_c, cb, css[_c.id]);
+        }
+    }
 
 };
 

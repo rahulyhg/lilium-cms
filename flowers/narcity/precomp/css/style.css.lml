@@ -1899,7 +1899,6 @@ featured {
   width: 100%;
   height: auto;
   position: relative;
-  bottom: 10%;
   opacity: 0;
 }
 .article__content {
@@ -3207,9 +3206,6 @@ footer {
     padding: 6px;
     top: 372px;
 	}
-	.article__featured-image, featured .post-list-item__image img {
-    bottom: 50%;
-}
 
     .social-share-big-number {
     font-size: 30px;

@@ -140,15 +140,22 @@ var Themes = function () {
                 }, info, function (err, doc) {
 
                     log('Themes', 'Enabling theme ' + info.uName);
+                    try {
+
+
                     ThemeInstance.enable(config, info, function() {
-                        ActiveTheme[config.id].settings = doc.value.settings;
-                        if (!doc.value.settings) {
+                        if (!doc.value) {
                             db.update(config, 'themes', {
                                 uName: uName
                             }, { settings : settings}, function() {
+                                ActiveTheme[config.id].settings = settings;
 
                             });
+                            callback();
+
                         } else {
+                            ActiveTheme[config.id].settings = doc.value.settings;
+
                             cli.cacheClear();
 
                             log('Themes', 'Theme enable called back');
@@ -156,6 +163,9 @@ var Themes = function () {
                         }
 
                     });
+                } catch(e) {
+                    console.log(e);
+                }
                 }, true, true);
 
             });

@@ -1,8 +1,9 @@
 {parent('./layout.lml')}
 {$
+cellulaire = 'OUERRR';
 block (content);
 $}
-    THIS IS SOME CONTENT
+    {=cellulaire}
 {$
 endblock;
 $}

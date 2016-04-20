@@ -13,7 +13,13 @@
     {%petals/headscript}
 
     {=theme.render('title')}
+    {$
+        block (title);
+    $}
     {%petals/title}
+    {$
+        endblock;
+    $}
 
     {=theme.render('head_will_close')}
 

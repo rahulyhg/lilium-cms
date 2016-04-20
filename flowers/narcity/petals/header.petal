@@ -1,18 +1,27 @@
+{#theme;config}
 <header class="header">
     <div class="header__content">
         <div class="header__burger-wrapper">
             <div class="header__burger-icon"></div>
         </div>
         <div class="header__title">
-            <a class="header__title__link" href="http://www.narcity.com/toronto/"> <img class="header__logo" src="{=theme.settings.logo}"> </a>
+            <a class="header__title__link" href="{=config.default.server.url}">
+            <img class="header__logo" src="{=theme.settings.logo}"> </a>
         </div>
         <input type="checkbox" id="city-selector__checkbox" class="city-selector__checkbox">
         <ul class="city-selector">
             <li class="city-selector__item city-selector__item--current">
-                <label class="city-selector__link" for="city-selector__checkbox"><span class="city-selector__current-link-text">Chicago <small>▼</small></span></label>
+                <label class="city-selector__link" for="city-selector__checkbox"><span class="city-selector__current-link-text">{=theme.settings.network-name} <small>▼</small></span></label>
             </li>
-            <li class="city-selector__item "> <a class="city-selector__link" href="http://www.narcity.com/?w">World</a></li>
-            <li class="city-selector__item "> <a class="city-selector__link" href="http://www.narcity.com/montreal/">Montréal</a></li>
+            {$
+            arr = theme.settings.othernetworkwebsites;
+            for(site in arr);
+            $}
+            <li class="city-selector__item "> <a class="city-selector__link" href="{=site.url}">
+            {=site.sitename}</a></li>
+            {$
+            endfor;
+            $}
         </ul>
         <div class="mobile-social-footer">
             <div class="mobile-social-footer-fb">

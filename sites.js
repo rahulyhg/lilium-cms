@@ -136,6 +136,7 @@ var SiteInitializer = function (conf) {
             // Precomp files
             templateBuilder.precompThemeFiles(conf, cb);
 
+
         });
     };
 
@@ -155,7 +156,6 @@ var SiteInitializer = function (conf) {
                     templateBuilder.init(conf);
 
                     loadTheme(function() {
-
                         loadSessions(function() {
                             hooks.fire('site_initialized', conf);
                             done();

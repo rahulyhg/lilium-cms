@@ -399,9 +399,8 @@ var LML = function () {
         this.processForLoop = function (context, condObj) {
             var affectedName = condObj.values[0];
             var _arr = this.pulloutVar(context, condObj.values[1]);
-
             condObj.forIndex++;
-            if (_arr.length == 0 || condObj.forIndex >= _arr.length) {
+            if (_arr.length == 0 || condObj.forIndex >= _arr.length || condObj.forIndex >= Object.keys(_arr).length) {
                 context.skipUntilClosure = true;
             } else {
                 this.affect(context, affectedName, _arr[condObj.forIndex]);
@@ -414,9 +413,9 @@ var LML = function () {
             } else {
                 context.skipUntilClosure = false;
                 context.bufferContent = true;
-                currentContentBlock = obj.values[0];
+                context.currentContentBlock = obj.values[0];
                 context.block = context.block? context.block : {};
-                context.block[currentContentBlock] = "";
+                context.block[context.currentContentBlock] = "";
 
             }
 
@@ -623,8 +622,14 @@ var LML = function () {
                 context.cachedCommand = crop;
 
                 execTagContent(context, function () {
-                    context.compiled += context.newLine;
-                    context.newLine = "";
+                    if (context.bufferContent && context.currentContentBlock) {
+                        context.block[context.currentContentBlock] += context.newLine;
+
+                    } else {
+                        context.compiled += context.newLine;
+                        context.newLine = "";
+                    }
+
 
                     setTimeout(seekLML, 0);
                 });
@@ -652,8 +657,14 @@ var LML = function () {
 
                     nextWorkPos = detectPos + detectLength;
                     execTagContent(context, function () {
-                        context.compiled += context.newLine;
-                        context.newLine = "";
+                        if (context.bufferContent && context.currentContentBlock) {
+                            context.block[context.currentContentBlock] += context.newLine;
+                            context.newLine = "";
+
+                        } else {
+                            context.compiled += context.newLine;
+                            context.newLine = "";
+                        }
 
                         setTimeout(seekLML, 0);
                     });
@@ -664,8 +675,8 @@ var LML = function () {
                     setTimeout(seekLML, 0);
                 }
             } else {
-                if (context.bufferContent && currentContentBlock) {
-                    context.block[currentContentBlock] += line.substring(nextWorkPos) + "\n";
+                if (context.bufferContent && context.currentContentBlock) {
+                    context.block[context.currentContentBlock] += line.substring(nextWorkPos) + "\n";
                     lineCallback(context.lineFeedback);
 
                 } else {

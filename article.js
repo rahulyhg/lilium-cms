@@ -127,19 +127,20 @@ var Article = function() {
                                 redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + formData._id,
                                 success: true
                             });
+                            var extra = formBuilder.unescapeForm(formData);
 
                             // Generate LML page
-                            filelogic.renderLmlPostPage(cli, "article", formBuilder.unescapeForm(formData), function(name) {
+                            filelogic.renderLmlPostPage(cli, "article", extra , function(name) {
                                 cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
 
                                 // Remove autosaves related to this article
                                 if (cli.postdata.data.autosaveid) {
                                     db.remove(
-                                        cli._c, 
-                                        'autosave', 
+                                        cli._c,
+                                        'autosave',
                                         {
                                             _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
-                                        }, 
+                                        },
                                         function() {}
                                     );
                                 }
