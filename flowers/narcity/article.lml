@@ -1,12 +1,6 @@
 {#extra;theme;config}
 {parent('./layout.lml')}
 {$
-    block (title);
-$}
-{$
-    endblock
-$}
-{$
     block (content);
 $}
 <div id="container">
@@ -32,8 +26,9 @@ $}
         <div id="templatesection">
             <div id="tagmoretemplate"> </div>
         </div>
-        <div class="adblock-largeleader">
-            <img src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/970x250_banner_2.jpg" /> </div>
+        <!-- <div class="adblock-largeleader">
+            <img src="" />
+        </div> -->
         <div class="featured-media-container" data-href="{}"> <a class="featured-media-author" href="https://www.instagram.com/joselopez_fit/" target="_blank">@joselopez_fit</a>
             <img src="
             {=extra.media.sizes.featured.url}
@@ -142,9 +137,9 @@ $}
                         </div>
                         <div class="article__slide">
                             <div class="article__info no-mobile">
-                                <div class="social-share-big-count shown">
+                                <div class="social-share-big-count">
                                     <div class="social-share-big-count-text">
-                                        <span class="social-share-big-number">1551</span>
+                                        <span class="social-share-big-number">0</span>
                                         <span class="social-share-big-vocab">shares</span>
                                     </div>
                                     <div class="social-share-big-arrow-wrapper">
@@ -184,7 +179,9 @@ $}
                                         </span>
                                     </div>
                                     <span class="desktop-only">·</span>
-                                    <abbr class="published" title="Thursday, March 10th, 2016, 3:36 pm">March 10, 2016</abbr> &nbsp;·&nbsp;
+                                    <abbr class="published" title="Thursday, March 10th, 2016, 3:36 pm">
+                                        {=extra.date}
+                                    </abbr> &nbsp;·&nbsp;
                                     <a href="http://www.narcity.com/toronto/65-super-fun-toronto-things-to-do-with-your-significant-other-in-2016/#comments" style="font-weight:bold;">
                                         <img src="/res/images/commentbubble.png" id="commentssmallicon" title="Comments">
                                         <fb:comments-count href="http://www.narcity.com/toronto/65-super-fun-toronto-things-to-do-with-your-significant-other-in-2016/" fb-xfbml-state="rendered" class="">
@@ -213,7 +210,9 @@ $}
                                             </span>
                                         </span>
                                         <br /> &nbsp;
-                                        <abbr class="published" title="Thursday, March 10th, 2016, 3:36 pm">March 10, 2016</abbr>
+                                        <abbr class="published" title="Thursday, March 10th, 2016, 3:36 pm">
+                                            {=extra.date}
+                                        </abbr>
                                     </div>
                                 </div>
                             </div>
@@ -255,16 +254,33 @@ $}
                                 <span>Share</span>
                             </button>
                         </div>
-                        <!-- Author section -->
                         <div class="author-wrapper">
                             <div class="author-avatar-wrapper">
                                 <img alt="" src="
-                                /{=config.default.server.url}
+                                {$
+                                    if (extra.author.avatarURL != "");
+                                $}
+                                {=extra.author.avatarURL}
+                                {$
+                                    else
+                                $}
+                                /res/images/avatar.png
+                                {$
+                                    endif
+                                $}
                                 "
                                     class="avatar avatar-90 photo" height="90" width="90"> </div>
                             <div class="author-content-wrapper">
-                                <a href="http://www.narcity.com/toronto/author/lauriebergeron">
-                                    <h2>Laurie Bergeron</h2>
+                                <a href="
+                                    {=config.default.server.url}
+                                    /author/
+                                    {=extra.author.username}
+                                    /" title="
+                                    {=extra.author.displayname}
+                                    ">
+                                    <h2>
+                                        {=extra.author.displayname}
+                                    </h2>
                                 </a>
                                 <div class="author-social-wrapper">
                                     <script>
@@ -292,7 +308,9 @@ $}
                                     </div>
                                     <div class="g-follow" data-annotation="none" data-height="20" data-href="//plus.google.com/u/0/" data-rel="author" data-gapiscan="true" data-onload="true" data-gapistub="true"> </div>
                                 </div>
-                                <span class="author-desc">Accro à Grey's Anatomy, à Instagram et aux déboires des Kardashian. // Addicted to Grey's Anatomy, Instagram &amp; Keeping Up With The Kardashians. Follow me: <a href="http://instagram.com/lau_berg/">@lau_berg</a></span>
+                                <span class="author-desc">
+                                    {=extra.author.description}
+                                </span>
                             </div>
                         </div>
                         <!-- End author section -->
@@ -307,7 +325,8 @@ $}
                             $}
                             <li>
                                 <a href="
-                                {=config.default.server.url}/
+                                {=config.default.server.url}
+                                /
                                 {=content.name}
                                 " target="_blank">
                                     <strong>
@@ -360,147 +379,99 @@ $}
                             <div class="article__related-posts">
                                 <div class="yarpp-related">
                                     <div class="post-list">
+                                        {$
+                                            articles = extra.related;
+                                            for (article in articles);
+                                        $}
                                         <div id="post-235200" class="post-list-item post-list-item--medium">
                                             <div class="post-list-item__image">
                                                 <div class="post-list-item__tags">
-                                                    <div class="post-list-item__category"><a href="http://www.narcity.com/toronto/category/things-to-do-in-to/" rel="tag">Things to do in TO</a></div>
+                                                    <div class="post-list-item__category"><a href="
+                                                        {=config.default.server.url}
+                                                        /category/
+                                                        {=article.category}
+                                                        " rel="tag">
+                                                    {=article.category}
+                                                </a></div>
                                                 </div>
-                                                <a href="http://www.narcity.com/toronto/40-things-to-do-when-youre-really-bored-in-toronto/" title="40 Things To Do When You’re Really Bored In Toronto">
-                                                    <img src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/Screen-Shot-2016-01-27-at-3.33.02-PM-1.png" alt="40 Things To Do When You’re Really Bored In Toronto"
+                                                <<a href="
+                                                    {=config.default.server.url}
+                                                    /
+                                                    {=article.name}
+                                                    " title="
+                                                    {=article.name}
+                                                    ">
+                                                    <img src="
+                                                    {=article.media.sizes.thumbnail-medium.url}
+                                                    " alt="
+                                                    {=article.name}
+                                                    "
                                                         class="large " style="opacity: 1; margin-top: 0px;"> </a>
-                                                <div class="post-list-item__likes-count likes-cat-gap">2.7K</div>
+                                                <div class="post-list-item__likes-count likes-cat-gap">0</div>
                                             </div>
                                             <div class="post-list-item__title">
-                                                <h2 class="entry-title"><a href="http://www.narcity.com/toronto/40-things-to-do-when-youre-really-bored-in-toronto/">40 Things To Do When You’re Really Bored In Toronto</a></h2>
+                                                <h2 class="entry-title"><a href="
+                                                    {=config.default.server.url}
+                                                    /
+                                                    {=article.name}
+                                                    ">
+                                                    {=article.name}
+                                                </a></h2>
                                             </div>
-                                            <div class="post-list-item__subtitle"> Kill the boredom. </div>
-                                            <div class="post-list-item__info">
-                                                <img alt="" src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/8e21efc89fc2af4b6635c02c2ddfc21e" srcset="http://2.gravatar.com/avatar/8e21efc89fc2af4b6635c02c2ddfc21e?s=70&amp;d=mm&amp;r=g 2x"
-                                                    class="avatar avatar-35 photo" height="35" width="35">
-                                                <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-                                                    <span itemprop="name">
-                                                        <span class="author vcard"><a class="url fn n" href="http://www.narcity.com/toronto/author/jessicalam/" title="Jessica Lam">Jessica Lam</a></span>
-                                                    </span>
-                                                </span> · 7 months ago </div>
                                         </div>
-                                        <div id="post-240884" class="post-list-item post-list-item--small">
-                                            <div class="post-list-item__image">
-                                                <div class="post-list-item__tags">
-                                                    <div class="post-list-item__category"><a href="http://www.narcity.com/toronto/category/things-to-do-in-to/" rel="tag">Things to do in TO</a></div>
-                                                </div>
-                                                <a href="http://www.narcity.com/toronto/30-free-places-to-go-on-the-perfect-date-in-toronto/" title="30 Free Places To Go On The Perfect Date In Toronto">
-                                                    <img src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/AGO-couple-400x273.png" alt="30 Free Places To Go On The Perfect Date In Toronto" class="archive-thumbnail "> </a>
-                                                <div class="post-list-item__likes-count likes-cat-gap">1.2K</div>
-                                            </div>
-                                            <div class="post-list-item__title">
-                                                <h2 class="entry-title"><a href="http://www.narcity.com/toronto/30-free-places-to-go-on-the-perfect-date-in-toronto/">30 Free Places To Go On The Perfect Date In Toronto</a></h2>
-                                            </div>
-                                            <div class="post-list-item__subtitle"> Can't buy me love. </div>
-                                            <div class="post-list-item__info">
-                                                <img alt="" src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/8e21efc89fc2af4b6635c02c2ddfc21e" srcset="http://2.gravatar.com/avatar/8e21efc89fc2af4b6635c02c2ddfc21e?s=70&amp;d=mm&amp;r=g 2x"
-                                                    class="avatar avatar-35 photo" height="35" width="35">
-                                                <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-                                                    <span itemprop="name">
-                                                        <span class="author vcard"><a class="url fn n" href="http://www.narcity.com/toronto/author/jessicalam/" title="Jessica Lam">Jessica Lam</a></span>
-                                                    </span>
-                                                </span> · 4 months ago </div>
-                                        </div>
-                                        <div id="post-244681" class="post-list-item post-list-item--small">
-                                            <div class="post-list-item__image">
-                                                <div class="post-list-item__tags">
-                                                    <div class="post-list-item__category"><a href="http://www.narcity.com/toronto/category/things-to-do-in-to/" rel="tag">Things to do in TO</a></div>
-                                                </div>
-                                                <a href="http://www.narcity.com/toronto/12-un-places-to-take-a-first-date-in-toronto/" title="12 Unconventional Places To Go On A Date In Toronto">
-                                                    <img src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/Screen-Shot-2015-12-18-at-2.44.45-PM-400x273.png" alt="12 Unconventional Places To Go On A Date In Toronto"
-                                                        class="archive-thumbnail "> </a>
-                                                <div class="post-list-item__likes-count likes-cat-gap">1.1K</div>
-                                            </div>
-                                            <div class="post-list-item__title">
-                                                <h2 class="entry-title"><a href="http://www.narcity.com/toronto/12-un-places-to-take-a-first-date-in-toronto/">12 Unconventional Places To Go On A Date In Toronto</a></h2>
-                                            </div>
-                                            <div class="post-list-item__subtitle"> Dare to be different. </div>
-                                            <div class="post-list-item__info">
-                                                <img alt="" src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/8e21efc89fc2af4b6635c02c2ddfc21e" srcset="http://2.gravatar.com/avatar/8e21efc89fc2af4b6635c02c2ddfc21e?s=70&amp;d=mm&amp;r=g 2x"
-                                                    class="avatar avatar-35 photo" height="35" width="35">
-                                                <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-                                                    <span itemprop="name">
-                                                        <span class="author vcard"><a class="url fn n" href="http://www.narcity.com/toronto/author/jessicalam/" title="Jessica Lam">Jessica Lam</a></span>
-                                                    </span>
-                                                </span> · 3 months ago </div>
-                                        </div>
+                                        {$
+                                            endfor
+                                        $}
+
                                     </div>
                                 </div>
                             </div>
                             <div class="article__latest-posts">
                                 <div class="post-list">
-                                    <div id="post-253754" class="post-list-item post-list-item--medium">
+                                    {$
+                                        articles = extra.newest;
+                                        for (article in articles);
+                                    $}
+                                    <div id="post-235200" class="post-list-item post-list-item--medium">
                                         <div class="post-list-item__image">
                                             <div class="post-list-item__tags">
-                                                <div class="post-list-item__category"><a href="http://www.narcity.com/toronto/category/lists/" rel="tag">Lists</a></div>
+                                                <div class="post-list-item__category"><a href="
+                                                    {=config.default.server.url}
+                                                    /category/
+                                                    {=article.category}
+                                                    " rel="tag">
+                                                {=article.category}
+                                            </a></div>
                                             </div>
-                                            <a href="http://www.narcity.com/toronto/12-toronto-places-where-gorgeous-women-hang-out/" title="12 Toronto Places Where Gorgeous Women Hang Out">
-                                                <img src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/HOT.png" alt="12 Toronto Places Where Gorgeous Women Hang Out" class="large " style="opacity: 1; margin-top: 0px;"> </a>
-                                            <div class="post-list-item__likes-count likes-cat-gap">183</div>
+                                            <<a href="
+                                                {=config.default.server.url}
+                                                /
+                                                {=article.name}
+                                                " title="
+                                                {=article.name}
+                                                ">
+                                                <img src="
+                                                {=article.media.sizes.thumbnail-medium.url}
+                                                " alt="
+                                                {=article.name}
+                                                "
+                                                    class="large " style="opacity: 1; margin-top: 0px;"> </a>
+                                            <div class="post-list-item__likes-count likes-cat-gap">0</div>
                                         </div>
                                         <div class="post-list-item__title">
-                                            <h2 class="entry-title"><a href="http://www.narcity.com/toronto/12-toronto-places-where-gorgeous-women-hang-out/">12 Toronto Places Where Gorgeous Women Hang Out</a></h2>
+                                            <h2 class="entry-title"><a href="
+                                                {=config.default.server.url}
+                                                /
+                                                {=article.name}
+                                                ">
+                                                {=article.name}
+                                            </a></h2>
                                         </div>
-                                        <div class="post-list-item__subtitle"> It's not easy to find the right girl. </div>
-                                        <div class="post-list-item__info">
-                                            <img alt="" src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/9448edf5f6f441b2bcec4d3b488172cf" srcset="http://0.gravatar.com/avatar/9448edf5f6f441b2bcec4d3b488172cf?s=70&amp;d=mm&amp;r=g 2x"
-                                                class="avatar avatar-35 photo" height="35" width="35">
-                                            <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-                                                <span itemprop="name">
-                                                    <span class="author vcard"><a class="url fn n" href="http://www.narcity.com/toronto/author/nicolekolesnikov/" title="Nicole Kalashnikova">Nicole Kalashnikova</a></span>
-                                                </span>
-                                            </span> · 22 hours ago </div>
                                     </div>
-                                    <div id="post-253759" class="post-list-item post-list-item--small">
-                                        <div class="post-list-item__image">
-                                            <div class="post-list-item__tags">
-                                                <div class="post-list-item__category"><a href="http://www.narcity.com/toronto/category/lifestyle/" rel="tag">Lifestyle</a></div>
-                                            </div>
-                                            <a href="http://www.narcity.com/toronto/hilarious-conversations-every-pair-of-drunk-bffs-have/" title="12 Hilarious Conversations Every Pair Of Drunk BFFs Have">
-                                                <img src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/Screen-Shot-2016-03-11-at-2.03.41-PM-400x273.png" alt="12 Hilarious Conversations Every Pair Of Drunk BFFs Have"
-                                                    class="archive-thumbnail "> </a>
-                                            <div class="post-list-item__likes-count likes-cat-gap">127</div>
-                                        </div>
-                                        <div class="post-list-item__title">
-                                            <h2 class="entry-title"><a href="http://www.narcity.com/toronto/hilarious-conversations-every-pair-of-drunk-bffs-have/">12 Hilarious Conversations Every Pair Of Drunk BFFs Have</a></h2>
-                                        </div>
-                                        <div class="post-list-item__subtitle"> "OMG you're SO pretty" </div>
-                                        <div class="post-list-item__info">
-                                            <img alt="" src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/e3395c8823ac02c1c63256638959516d" srcset="http://2.gravatar.com/avatar/e3395c8823ac02c1c63256638959516d?s=70&amp;d=mm&amp;r=g 2x"
-                                                class="avatar avatar-35 photo" height="35" width="35">
-                                            <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-                                                <span itemprop="name">
-                                                    <span class="author vcard"><a class="url fn n" href="http://www.narcity.com/toronto/author/rebeccawebster/" title="Rebecca Webster">Rebecca Webster</a></span>
-                                                </span>
-                                            </span> · 24 hours ago </div>
-                                    </div>
-                                    <div id="post-253736" class="post-list-item post-list-item--small">
-                                        <div class="post-list-item__image">
-                                            <div class="post-list-item__tags">
-                                                <div class="post-list-item__category"><a href="http://www.narcity.com/toronto/category/lifestyle/" rel="tag">Lifestyle</a></div>
-                                            </div>
-                                            <a href="http://www.narcity.com/toronto/11-things-you-absolutely-need-to-survive-your-move-to-toronto/" title="11 Things You Absolutely Need To Survive Your Move To Toronto">
-                                                <img src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/Screen-Shot-2016-03-11-at-12.30.23-PM-400x273.png" alt="11 Things You Absolutely Need To Survive Your Move To Toronto"
-                                                    class="archive-thumbnail "> </a>
-                                            <div class="post-list-item__likes-count likes-cat-gap">88</div>
-                                        </div>
-                                        <div class="post-list-item__title">
-                                            <h2 class="entry-title"><a href="http://www.narcity.com/toronto/11-things-you-absolutely-need-to-survive-your-move-to-toronto/">11 Things You Absolutely Need To Survive Your Move To Toronto</a></h2>
-                                        </div>
-                                        <div class="post-list-item__subtitle"> The ultimate Toronto Starter Pack. </div>
-                                        <div class="post-list-item__info">
-                                            <img alt="" src="./65 Super Fun Toronto Things To Do With Your Significant Other In 2016 _ Narcity Toronto_files/e3395c8823ac02c1c63256638959516d" srcset="http://2.gravatar.com/avatar/e3395c8823ac02c1c63256638959516d?s=70&amp;d=mm&amp;r=g 2x"
-                                                class="avatar avatar-35 photo" height="35" width="35">
-                                            <span itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-                                                <span itemprop="name">
-                                                    <span class="author vcard"><a class="url fn n" href="http://www.narcity.com/toronto/author/rebeccawebster/" title="Rebecca Webster">Rebecca Webster</a></span>
-                                                </span>
-                                            </span> · 1 day ago </div>
-                                    </div>
+                                    {$
+                                        endfor
+                                    $}
+
                                 </div>
                             </div>
                         </div>

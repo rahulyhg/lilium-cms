@@ -353,6 +353,7 @@ var Entities = module.exports = new function () {
         newEnt.username = entData.username;
         newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
         newEnt.email = entData.email;
+        newEnt.description = entData.description || '';
         newEnt.roles = [];
         for (var index in entData.roles) {
             if (entData.roles[index] !== "") {
@@ -610,6 +611,7 @@ var Entities = module.exports = new function () {
             .edit('username', '', {
                 disabled : true
             })
+            .add('description', 'text', {displayname: 'BIO'}, {required:false})
             .edit('create', '', {
                 value: 'Update Profile'
             });

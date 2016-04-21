@@ -10,6 +10,7 @@ var notifications = require('./notifications.js');
 var slugify = require('slug');
 var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
+var moment = require('moment');
 
 var Article = function() {
     this.handlePOST = function(cli) {
