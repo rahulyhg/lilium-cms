@@ -380,8 +380,8 @@ $}
                                 <div class="yarpp-related">
                                     <div class="post-list">
                                         {$
-                                            articles = extra.related;
-                                            for (article in articles);
+                                            relatedArticles = extra.related;
+                                            for (relatedArticle in relatedArticles);
                                         $}
                                         <div id="post-235200" class="post-list-item post-list-item--medium">
                                             <div class="post-list-item__image">
@@ -389,22 +389,22 @@ $}
                                                     <div class="post-list-item__category"><a href="
                                                         {=config.default.server.url}
                                                         /category/
-                                                        {=article.category}
+                                                        {=relatedArticle.category.name}
                                                         " rel="tag">
-                                                    {=article.category}
+                                                    {=relatedArticle.category.displayname}
                                                 </a></div>
                                                 </div>
-                                                <<a href="
+                                                <a href="
                                                     {=config.default.server.url}
                                                     /
-                                                    {=article.name}
+                                                    {=relatedArticle.name}
                                                     " title="
-                                                    {=article.name}
+                                                    {=relatedArticle.name}
                                                     ">
                                                     <img src="
-                                                    {=article.media.sizes.thumbnail-medium.url}
+                                                    {=relatedArticle.media.sizes.thumbnail-large.url}
                                                     " alt="
-                                                    {=article.name}
+                                                    {=relatedArticle.name}
                                                     "
                                                         class="large " style="opacity: 1; margin-top: 0px;"> </a>
                                                 <div class="post-list-item__likes-count likes-cat-gap">0</div>
@@ -413,9 +413,9 @@ $}
                                                 <h2 class="entry-title"><a href="
                                                     {=config.default.server.url}
                                                     /
-                                                    {=article.name}
+                                                    {=relatedArticle.name}
                                                     ">
-                                                    {=article.name}
+                                                    {=relatedArticle.title}
                                                 </a></h2>
                                             </div>
                                         </div>
@@ -429,8 +429,8 @@ $}
                             <div class="article__latest-posts">
                                 <div class="post-list">
                                     {$
-                                        articles = extra.newest;
-                                        for (article in articles);
+                                        newestarticles = extra.newest;
+                                        for (newarticle in newestarticles);
                                     $}
                                     <div id="post-235200" class="post-list-item post-list-item--medium">
                                         <div class="post-list-item__image">
@@ -438,22 +438,22 @@ $}
                                                 <div class="post-list-item__category"><a href="
                                                     {=config.default.server.url}
                                                     /category/
-                                                    {=article.category}
+                                                    {=newarticle.category.name}
                                                     " rel="tag">
-                                                {=article.category}
+                                                {=newarticle.category.displayname}
                                             </a></div>
                                             </div>
-                                            <<a href="
+                                            <a href="
                                                 {=config.default.server.url}
                                                 /
-                                                {=article.name}
+                                                {=newarticle.name}
                                                 " title="
-                                                {=article.name}
+                                                {=newarticle.name}
                                                 ">
                                                 <img src="
-                                                {=article.media.sizes.thumbnail-medium.url}
+                                                {=newarticle.media.sizes.thumbnail-large.url}
                                                 " alt="
-                                                {=article.name}
+                                                {=newarticle.name}
                                                 "
                                                     class="large " style="opacity: 1; margin-top: 0px;"> </a>
                                             <div class="post-list-item__likes-count likes-cat-gap">0</div>
@@ -462,9 +462,9 @@ $}
                                             <h2 class="entry-title"><a href="
                                                 {=config.default.server.url}
                                                 /
-                                                {=article.name}
+                                                {=newarticle.name}
                                                 ">
-                                                {=article.name}
+                                                {=newarticle.title}
                                             </a></h2>
                                         </div>
                                     </div>

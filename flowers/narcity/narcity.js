@@ -2,6 +2,8 @@ var endpoints = undefined;
 var livevars = undefined;
 var filelogic = undefined;
 var cli = undefined;
+var imageSize = undefined;
+var articleHelper = undefined;
 
 var themePath;
 
@@ -18,12 +20,22 @@ var initRequires = function(abspath) {
     livevars = require(abspath + 'livevars.js');
     templateBuilder = require(abspath + 'templateBuilder.js');
     cli = require(abspath + 'cli.js');
+    imageSize = require(abspath + 'imageSize.js');
+    articleHelper = require(abspath + 'articleHelper.js');
+};
+
+var registerPictureSizes = function() {
+    imageSize.add("thumbnail-small", 308, 150);
+    imageSize.add("thumbnail-large", 638, 340);
+    imageSize.add("thumbnail-medium", 398, 200);
 };
 
 var loadHooks = function(_c, info) {
     endpoints.register(_c.id, '', 'GET', function(cli) {
-        console.log(themePath + '/homepage.lml');
-        filelogic.serveAbsoluteLml(themePath + '/homepage.lml', _c.server.html + '/index.html', cli)
+        articleHelper.getHomepageArticles(cli, function(extra) {
+            filelogic.serveAbsoluteLml(themePath + '/homepage.lml', _c.server.html + '/index.html', cli, extra)
+
+        });
     });
 };
 
@@ -41,6 +53,7 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
     initRequires(_c.server.base);
     loadHooks(_c);
     registerPrecompFiles(_c);
+    registerPictureSizes();
     // Symlink res to html folder
     cli.createSymlink(themePath + '/res', _c.server.html + '/res', callback())
 }

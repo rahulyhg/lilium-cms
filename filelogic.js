@@ -207,7 +207,6 @@ var FileLogic = function () {
         extra = extra || new Object();
         extra.config = cli._c;
         artcileHelper.getPostElements(cli, extra, function(extra) {
-            console.log(extra);
             // Check for the post type
             var title = slugify(extra.title).toLowerCase();
             var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
