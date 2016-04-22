@@ -4,6 +4,8 @@ var _c = require('./config.js');
 var log = require('./log.js');
 var fs = require('fs');
 var slugify = require('slug');
+var db = require('./includes/db.js');
+var artcileHelper = require('./articleHelper.js');
 
 var FileLogic = function () {
     /*
@@ -204,28 +206,31 @@ var FileLogic = function () {
         var theme = require('./themes.js');
         extra = extra || new Object();
         extra.config = cli._c;
+        artcileHelper.getPostElements(cli, extra, function(extra) {
+            // Check for the post type
+            var title = slugify(extra.title).toLowerCase();
+            var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
+            var savePath = cli._c.server.html + "/" + title + ".html";
+            LML.executeToFile(
+                readPath,
+                savePath,
+                function () {
+                    cli.responseinfo.filecreated = true;
+                    cb(title + ".html");
+                },
+                extra
+            );
+        })
 
-        // Check for the post type
-        var title = slugify(extra.title).toLowerCase();
-        var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
-        var savePath = cli._c.server.html + "/" + title + ".html";
-        LML.executeToFile(
-            readPath,
-            savePath,
-            function () {
-                cli.responseinfo.filecreated = true;
-                cb(title + ".html");
-            },
-            extra
-        );
     };
 
     this.compileLmlPostPage = function (cli, postType, extra, cb) {
         var theme = require('./themes.js');
 
-        var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme().info.path + "/" + postType + ".lml";
-
-        LML.executeToHtml(readPath, cb, extra);
+        var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
+        artcileHelper.getPostElements(cli, extra, function(extra) {
+            LML.executeToHtml(readPath, cb, extra);
+        });
     };
 
     this.serveAbsoluteLml = function (readPath, savePath, cli, extra) {

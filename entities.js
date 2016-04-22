@@ -353,6 +353,7 @@ var Entities = module.exports = new function () {
         newEnt.username = entData.username;
         newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
         newEnt.email = entData.email;
+        newEnt.description = entData.description || '';
         newEnt.roles = [];
         for (var index in entData.roles) {
             if (entData.roles[index] !== "") {
@@ -454,10 +455,8 @@ var Entities = module.exports = new function () {
     this.cacheRoles = function (callback) {
         log('Roles', 'Caching roles from Database');
         var sites = _c.getAllSites();
-        // console.log(sites);
-
         for (var i in sites) {
-            db.findToArray(sites[i], 'roles', {'pluginID': false}, function (err, roles) {
+            db.findToArray(sites[i], 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
                 if (!err) {
                     for (var i = 0, len = roles.length; i < len; i++) {
                         Roles[roles[i].name] = roles[i];
@@ -533,7 +532,6 @@ var Entities = module.exports = new function () {
             }
         } else if (typeof right === "string" && typeof entity.roles !== 'undefined') {
             allowed = entity.roles.indexOf('lilium') !== -1;
-
             if (!allowed) {
                 for (var i = 0, len = entity.roles.length; i < len; i++) {
                     if (typeof Roles[entity.roles[i]] !== 'undefined') {
@@ -612,6 +610,7 @@ var Entities = module.exports = new function () {
             .edit('username', '', {
                 disabled : true
             })
+            .add('description', 'text', {displayname: 'BIO'}, {required:false})
             .edit('create', '', {
                 value: 'Update Profile'
             });
@@ -754,7 +753,6 @@ var Entities = module.exports = new function () {
                     if (err) console.log(err);
                     Roles[i] = undefined;
                     delete Roles[i];
-                    console.log('REMOVED ROLE');
                 })
             }
         }

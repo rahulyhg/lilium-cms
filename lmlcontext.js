@@ -10,7 +10,6 @@ var LMLConstants = {
 
 var LMLContext = function (info) {
     this.touched = ["LMLContext.init"];
-
     this.lib = {
         _public: new Object()
     };

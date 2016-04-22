@@ -25,6 +25,7 @@ var _c = require('./config.js');
 var log = require('./log.js');
 var Petals = require('./petal.js');
 
+
 var LML = function () {
     // Reference to self
     var that = lml = thislml = this;
@@ -34,11 +35,13 @@ var LML = function () {
     var markSymbolClose = '}';
     var slangOpening = 'lml';
 
-    var symbols = ['=', '*', '%', '#', '$'];
+    var symbols = ['=', '*', '%', '#', '$', 'parent'];
     var symbolLen = symbols.length;
-    var condIdentifiers = ["if", "while", "for"];
-    var condClosures = ["endif", "else", "endwhile", "endfor"];
+    var condIdentifiers = ["if", "while", "for", "block"];
+    var condClosures = ["endif", "else", "endwhile", "endfor", "endblock"];
     var lmlOperators = ["+=", "-=", "*=", "/=", "="];
+
+    var proceedWhenCompleted;
 
     var execVariableTag = function (context, code, callback) {
         // Browse the context library for corresponding obhect;
@@ -92,6 +95,17 @@ var LML = function () {
 
         return true;
     };
+
+    var execParent = function (context, code, callback) {
+        context.parentLvl = context.parentLvl ? context.parentLvl + 1 : 0;
+        var filePath = code.substring(2);
+        filePath = filePath.substring(0, filePath.length -2);
+
+         that.executeFromContext(context.rootDir + '/' + filePath);
+
+
+        callback();
+    }
 
     var execIncludeTag = function (context, code, callback) {
         var split = code.split(';');
@@ -197,7 +211,8 @@ var LML = function () {
         this.validateClosure = function (condTag, closureTag) {
             var validClosure = (condTag == 'if' && closureTag == 'else' || closureTag == 'endif') ||
                 (condTag == 'while' && closureTag == 'endwhile') ||
-                (condTag == 'for' && closureTag == 'endfor');
+                (condTag == 'for' && closureTag == 'endfor') ||
+                (condTag == 'block' && closureTag == 'endblock');
 
             if (!validClosure) {
                 throw new Error("[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " +
@@ -384,20 +399,33 @@ var LML = function () {
         this.processForLoop = function (context, condObj) {
             var affectedName = condObj.values[0];
             var _arr = this.pulloutVar(context, condObj.values[1]);
-
             condObj.forIndex++;
-            if (_arr.length == 0 || condObj.forIndex >= _arr.length) {
+            if (_arr.length == 0 || condObj.forIndex >= _arr.length || condObj.forIndex >= Object.keys(_arr).length) {
                 context.skipUntilClosure = true;
             } else {
                 this.affect(context, affectedName, _arr[condObj.forIndex]);
             }
         };
+
+        this.processBlock = function (context, obj) {
+            if (context.isParent && context.block && context.block[obj.values[0]]) {
+                context.compiled += context.block[obj.values[0]];
+            } else {
+                context.skipUntilClosure = false;
+                context.bufferContent = true;
+                context.currentContentBlock = obj.values[0];
+                context.block = context.block? context.block : {};
+                context.block[context.currentContentBlock] = "";
+
+            }
+
+        }
     })();
 
     var execLMLTag = function (context, code, callback) {
         // LML parsing
-        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'][^\n]+["|'])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
-        var closureSelector = /(else|endif|endfor|endwhile)/g;
+        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\n]*)[\s]*\)|(block)[\s]*\([\s]*([^\s]+)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endblock|else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'][^\n]+["|'])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
+        var closureSelector = /(else|endif|endfor|endwhile|endblock)/g;
 
         // Split in lines array, all commands have
         var lines = typeof code === 'string' ? code.split(/\n|;/g) : code;
@@ -412,10 +440,12 @@ var LML = function () {
 
                 // Check for block opening or closure
                 if (match && match.length > 0) {
+
                     match = match[0];
                     var split = match.split(selector).filter(function (str) {
                         return str != undefined && str != "";
                     });
+
 
                     // If closure detected
                     if (condClosures.indexOf(split[0]) != -1) {
@@ -442,6 +472,11 @@ var LML = function () {
                                     } else {
                                         context.temp.looping = false;
                                     }
+                                }
+
+                                if (curCond.condTag == 'block' && split[0] == 'endblock' && context.bufferContent) {
+                                    context.currentContentBlock = undefined;
+                                    context.bufferContent = false;
                                 }
 
                                 context.storeUntilClosure = false;
@@ -472,6 +507,8 @@ var LML = function () {
                             case 'for':
                                 LMLSlang.processForLoop(context, condObj);
                                 break;
+                            case 'block':
+                                LMLSlang.processBlock(context, condObj);
                             }
                         }
                     } else if (lmlOperators.indexOf(split[1]) != -1) {
@@ -538,6 +575,10 @@ var LML = function () {
             return execLMLTag(context, code, callback);
             break;
 
+        case "parent":
+            return execParent(context, code, callback);
+            break;
+
         default:
             throw new Error("LMLParseException - Error fetching current tag. Cached character is : " + tag);
         }
@@ -564,7 +605,7 @@ var LML = function () {
         var nextWorkPos = 0;
 
         // Needs to be precompiled every line
-        var lmlDetectRegex = /{(#|%|=)([^\n\s]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\_\#\>\<\/\=\+\-.\s\']*"?,?\s*)*)\)?}/g;
+        var lmlDetectRegex = /{(#|%|=|parent)([^\n\s]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\_\#\>\<\/\=\+\-.\s\']*"?,?\s*)*)\)?}/g;
         var seekLML = function () {
             if (nextWorkPos >= line.length) {
                 lineCallback(context.lineFeedback);
@@ -581,8 +622,14 @@ var LML = function () {
                 context.cachedCommand = crop;
 
                 execTagContent(context, function () {
-                    context.compiled += context.newLine;
-                    context.newLine = "";
+                    if (context.bufferContent && context.currentContentBlock) {
+                        context.block[context.currentContentBlock] += context.newLine;
+
+                    } else {
+                        context.compiled += context.newLine;
+                        context.newLine = "";
+                    }
+
 
                     setTimeout(seekLML, 0);
                 });
@@ -599,7 +646,6 @@ var LML = function () {
             } else if ((lmlMatch = lmlDetectRegex.exec(line)) != null) {
                 detectPos = lmlMatch.index;
                 detectLength = lmlMatch[0].length;
-
                 if (typeof lmlMatch[1] !== 'undefined' || typeof lmlMatch[4] !== "undefined") {
                     var cropLength = detectPos - nextWorkPos;
                     var comp = line.substring(nextWorkPos).substring(0, cropLength);
@@ -611,8 +657,14 @@ var LML = function () {
 
                     nextWorkPos = detectPos + detectLength;
                     execTagContent(context, function () {
-                        context.compiled += context.newLine;
-                        context.newLine = "";
+                        if (context.bufferContent && context.currentContentBlock) {
+                            context.block[context.currentContentBlock] += context.newLine;
+                            context.newLine = "";
+
+                        } else {
+                            context.compiled += context.newLine;
+                            context.newLine = "";
+                        }
 
                         setTimeout(seekLML, 0);
                     });
@@ -623,8 +675,15 @@ var LML = function () {
                     setTimeout(seekLML, 0);
                 }
             } else {
-                context.compiled += line.substring(nextWorkPos) + "\n";
-                lineCallback(context.lineFeedback);
+                if (context.bufferContent && context.currentContentBlock) {
+                    context.block[context.currentContentBlock] += line.substring(nextWorkPos);
+                    lineCallback(context.lineFeedback);
+
+                } else {
+                    context.compiled += line.substring(nextWorkPos) + "\n";
+                    lineCallback(context.lineFeedback);
+                }
+
             }
         };
 
@@ -633,7 +692,7 @@ var LML = function () {
 
     // Parses content, and returns partial strings through a callback
     // The value returned is undefined when everything is done
-    this.parseContent = function (rootpath, content, callback, context, extra) {
+    this.parseContent = function (rootpath, content, callback, context, extra, sync) {
         // Per line execution, slow for minified files
         var lines = typeof content === 'string' ? content.split('\n') : typeof content === 'object' ? content : new Array();
         var cLine = 0,
@@ -645,7 +704,7 @@ var LML = function () {
             context.config = extra.config;
 
             delete extra.config;
-        } else {
+        } else if (!context.isParent) {
             context.stash();
         }
 
@@ -672,7 +731,11 @@ var LML = function () {
                         cLine++;
 
                         if (cLine == lineTotal) {
-                            callback(undefined);
+                            if (typeof proceedWhenCompleted == 'function') {
+                                proceedWhenCompleted(context, extra, callback);
+                            } else {
+                                callback(undefined);
+                            }
                         } else {
                             cont();
                         }
@@ -705,6 +768,35 @@ var LML = function () {
             }
         });
     };
+
+    this.executeFromContext = function (rootpath) {
+        var exists = fileserver.fileExists(rootpath, undefined, true);
+        if (exists) {
+            proceedWhenCompleted = function(context, extra, callback) {
+                log('Lml', 'Child file compiled, now compiling parent.');
+                proceedWhenCompleted = undefined;
+                newcontext = new LMLContext();
+                newcontext.rootDir = fileserver.dirname(rootpath);
+                newcontext.config = context.config;
+                newcontext.block = context.block;
+                newcontext.isParent = true;
+
+                var content = fileserver.readFile(rootpath, undefined, true);
+
+                that.parseContent(rootpath, content, function (pContent) {
+                    if (typeof pContent !== 'undefined') {
+                        callback(pContent.toString());
+                    } else {
+                        callback(undefined);
+                    }
+                }, newcontext);
+
+            }
+
+        } else {
+            return ("[LMLParentNotFound : " + rootpath + "]");
+        }
+    }
 
     this.executeToHtml = function (rootpath, callback, extra) {
         var timeStamp = new Date();
@@ -745,6 +837,7 @@ var LML = function () {
         log("LML", rootpath + " => " + compilepath);
 
         var timeStamp = new Date();
+        // TODO create a temp file first
         fileserver.createDirIfNotExists(compilepath, function (dirExists) {
             if (!dirExists) throw new Error("LML.AccessException - Could not create directory for " + compilepath);
 

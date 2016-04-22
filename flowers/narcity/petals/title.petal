@@ -1,1 +1,2 @@
-<title>Narcity Toronto – Look at your city</title>
+{#config}
+<title>{=config.default.info.project} - Look at your city</title>

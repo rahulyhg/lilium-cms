@@ -42,6 +42,7 @@ var Themes = function () {
         if (formData) {
             db.update(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, {settings : formData}, function(err, res) {
                 if (err) throw new Error("[ThemeException] Error while updating theme settings " + err);
+                ActiveTheme[cli._c.id].settings = formData;
                 cli.refresh();
             });
         } else {
@@ -131,19 +132,40 @@ var Themes = function () {
 
                 // Register Settings for theme
                 log('Themes', 'Updating Settings form');
-                createOrUpdateThemeForm(config);
-
+                var settings = createOrUpdateThemeForm(config);
                 log('Themes', 'Updating database entry for site : ' + config.id);
-                db.update(config, 'themes', {
-                    uName: uName
-                }, info, function () {
-                    log('Themes', 'Enabling theme ' + info.uName);
-                    ThemeInstance.enable(config, info, function() {
-                        cli.cacheClear();
 
-                        log('Themes', 'Theme enable called back');
-                        callback();
+                db.findAndModify(config, 'themes', {
+                    uName: uName
+                }, info, function (err, doc) {
+
+                    log('Themes', 'Enabling theme ' + info.uName);
+                    try {
+
+
+                    ThemeInstance.enable(config, info, function() {
+                        if (!doc.value) {
+                            db.update(config, 'themes', {
+                                uName: uName
+                            }, { settings : settings}, function() {
+                                ActiveTheme[config.id].settings = settings;
+
+                            });
+                            callback();
+
+                        } else {
+                            ActiveTheme[config.id].settings = doc.value.settings;
+
+                            cli.cacheClear();
+
+                            log('Themes', 'Theme enable called back');
+                            callback();
+                        }
+
                     });
+                } catch(e) {
+                    console.log(e);
+                }
                 }, true, true);
 
             });
@@ -151,13 +173,15 @@ var Themes = function () {
     };
 
     var createOrUpdateThemeForm = function (config) {
-        if (formBuilder.isAlreadyCreated('theme_settings')) {
-            formBuilder.deleteForm('theme_settings');
-        }
+
+
+        var defaults = {};
         if (ActiveTheme[config.id].info.settingForm) {
             ActiveTheme[config.id].settings = {};
-            var form = formBuilder.createForm('theme_settings');
-            form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'} );
+            if (!formBuilder.isAlreadyCreated('theme_settings')) {
+                var form = formBuilder.createForm('theme_settings');
+                form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'} );
+            }
 
             for (var name in ActiveTheme[config.id].info.settingForm) {
                 var property = ActiveTheme[config.id].info.settingForm[name];
@@ -168,11 +192,19 @@ var Themes = function () {
                 if (!property.default) {
                     throw new Error('[Themes] - The field "' + name + '" has no default value.');
                 }
-                ActiveTheme[config.id].settings[name] = property.default;
-                form.add(name, property.type, property.attr || {} );
-            }
-            form.add('Submit', 'submit', {displayname : 'Update Settings'} );
+                defaults[name] = property.default;
 
+                ActiveTheme[config.id].settings[name] = property.default;
+                if (!formBuilder.isAlreadyCreated('theme_settings')) {
+                    form.add(name, property.type, property.attr || {} );
+                }
+            }
+
+            if (!formBuilder.isAlreadyCreated('theme_settings')) {
+                form.add('Submit', 'submit', {displayname : 'Update Settings'} );
+            }
+            
+            return defaults;
         }
 
         log("Themes", "Updated setting form")

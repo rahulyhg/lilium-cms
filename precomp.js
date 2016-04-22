@@ -99,12 +99,13 @@ var Precomp = function () {
                     checksum.file(isTheme ? curFile : absReadPath + curFile, function (err, sum) {
                         var rPath = isTheme ? curFile : absReadPath + curFile;
                         var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
-                        var wPath = absWritePath + curFile.slice(0, -4);
+                        var wPath = isTheme ? absWritePath + curFile.slice(curFile.lastIndexOf('/'), curFile.length).slice(0, -4) : absWritePath + curFile.slice(0, -4);
                         fileserver.fileExists(wPath, function (exists) {
                             if (exists && histoObj[curFile] == sum) {
                                 db.insert(conf, 'compiledfiles', {
                                     filename: curFile,
-                                    sum: sum
+                                    sum: sum,
+                                    style: isTheme ? true : undefined
                                 }, function (err) {
                                     nextFile();
                                 });
@@ -144,14 +145,14 @@ var Precomp = function () {
         nextFile();
     }
 
-    var mergeJS = function (conf, readycb) {
-        var files = frontend.getJSQueue('admin', conf.id);
-        var compiledPath = conf.server.html + "/compiled/admin.js";
+    var mergeJS = function (conf, readycb, theme) {
+        var files = frontend.getJSQueue(theme ? 'theme' : 'admin', conf.id);
+        var compiledPath = conf.server.html + "/compiled/" + (theme ? 'scripts' : 'admin') +".js";
         var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
         var fileIndex = 0;
         var fileTotal = files.length;
 
-        log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of admin context');
+        log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of '+ (theme? 'Theme' : 'Admin') +' context');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
                 fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
@@ -168,14 +169,14 @@ var Precomp = function () {
         nextFile();
     };
 
-    var mergeCSS = function (conf, readycb, compiledPath, theme) {
-        var files = frontend.getCSSQueue(theme ? 'theme' :'admin', conf.id);
-        var compiledPath = compiledPath ? compiledPath : conf.server.html + "/compiled/admin.css";
+    var mergeCSS = function (conf, readycb, theme) {
+        var files = frontend.getCSSQueue((theme ? 'theme' :'admin'), conf.id);
+        var compiledPath = conf.server.html + "/compiled/"+ (theme? 'style' : 'admin') +".css";
         var fHandle = fileserver.getOutputFileHandle(compiledPath, 'w+');
         var fileIndex = 0;
         var fileTotal = files.length;
 
-        log('Precompiler', 'Merging ' + fileTotal + ' CSS files of admin context');
+        log('Precompiler', 'Merging ' + fileTotal + ' CSS files of '+ (theme? 'Theme' : 'Admin') +' context');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
                 fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
@@ -196,7 +197,7 @@ var Precomp = function () {
         fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function () {
             runLoop(conf, function () {
                 mergeJS(conf, function () {
-                    mergeCSS(conf, readycb);
+                    mergeCSS(conf, readycb, themesFiles ? true : false);
                 }, themesFiles ? true : false);
             }, themesFiles);
         }, true);

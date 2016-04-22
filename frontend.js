@@ -1,6 +1,5 @@
 var log = require('./log.js');
 var _c = require('./config.js');
-var templateBuilder = require('./templateBuilder.js');
 
 var BodyClasses = new Object();
 var JavaScriptFiles = new Object();
@@ -70,15 +69,20 @@ var Frontend = function () {
     };
 
     this.getJSQueue = function (contextName, siteid) {
-        var arr = JavaScriptFiles[siteid][contextName || "all"];
-        var returnedArr = new Array();
+        if (JavaScriptFiles[siteid]) {
+            var arr = JavaScriptFiles[siteid][contextName || "all"];
+            var returnedArr = new Array();
 
-        if (arr)
-            for (var index in arr) {
-                returnedArr.push(arr[index]);
-            }
+            if (arr)
+                for (var index in arr) {
+                    returnedArr.push(arr[index]);
+                }
 
-        return returnedArr;
+            return returnedArr;
+        } else {
+            return [];
+        }
+
     };
 
     this.registerCSSFile = function (absPath, priority, context, siteid) {

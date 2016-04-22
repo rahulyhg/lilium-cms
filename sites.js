@@ -12,6 +12,8 @@ var hooks = require('./hooks.js');
 var themes = require('./themes.js');
 var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
+var templateBuilder = require('./templateBuilder.js');
+
 
 var _cachedSites = new Array();
 
@@ -132,7 +134,10 @@ var SiteInitializer = function (conf) {
     var loadTheme = function(cb) {
         themes.init(conf, function() {
             themes.bindEndpoints(conf);
-            cb();
+            // Precomp files
+            templateBuilder.precompThemeFiles(conf, cb);
+
+
         });
     };
 
@@ -149,6 +154,8 @@ var SiteInitializer = function (conf) {
         loadHTMLStructure(function () {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
+                    templateBuilder.init(conf);
+
                     loadTheme(function() {
                         loadSessions(function() {
                             hooks.fire('site_initialized', conf);
@@ -342,7 +349,6 @@ var Sites = function () {
 
     this.loadSites = function (cb) {
         var that = this;
-
         fileserver.listDirContent(__dirname + "/sites/", function (files) {
             var fileIndex = 0;
             var nextFile = function () {
@@ -361,6 +367,8 @@ var Sites = function () {
                             var urlbase = siteInfo.server.url.replace('//', '').replace(/\s/g, '/');
                             config.registerConfigs(urlbase, siteInfo);
                         }
+
+
 
                         _cachedSites.push(siteInfo);
                         fileIndex++;
