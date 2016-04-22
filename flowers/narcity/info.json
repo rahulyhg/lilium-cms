@@ -23,6 +23,7 @@
                 "sitename": "Toronto",
                 "url": "http://narcity.com/toronto"
             }]},
-        "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."}
+        "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
+        "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"}
     }
 }

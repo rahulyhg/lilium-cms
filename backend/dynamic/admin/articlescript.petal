@@ -207,7 +207,7 @@
 
         $('#confirm-publish button.btn-primary').on('click', function(e) {
             $('#confirm-publish').modal('hide');
-            
+
             var valid = liliumcms.formvalidator.validate($('form'));
             var form = $('form').serialize();
             var tempForm = form;

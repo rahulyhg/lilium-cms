@@ -25,9 +25,17 @@ var initRequires = function(abspath) {
 };
 
 var registerPictureSizes = function() {
-    imageSize.add("thumbnail-small", 308, 150);
-    imageSize.add("thumbnail-large", 638, 340);
-    imageSize.add("thumbnail-medium", 398, 200);
+    if (!imageSize.exists("thumbnail-small")) {
+        imageSize.add("thumbnail-small", 308, 150);
+    }
+
+    if (!imageSize.exists("thumbnail-large")) {
+        imageSize.add("thumbnail-large", 638, 340);
+    }
+
+    if (!imageSize.exists("thumbnail-medium")) {
+        imageSize.add("thumbnail-medium", 638, 340);
+    }
 };
 
 var loadHooks = function(_c, info) {

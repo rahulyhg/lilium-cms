@@ -173,15 +173,15 @@ var Themes = function () {
     };
 
     var createOrUpdateThemeForm = function (config) {
-        if (formBuilder.isAlreadyCreated('theme_settings')) {
-            formBuilder.deleteForm('theme_settings');
-        }
+
 
         var defaults = {};
         if (ActiveTheme[config.id].info.settingForm) {
             ActiveTheme[config.id].settings = {};
-            var form = formBuilder.createForm('theme_settings');
-            form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'} );
+            if (!formBuilder.isAlreadyCreated('theme_settings')) {
+                var form = formBuilder.createForm('theme_settings');
+                form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'} );
+            }
 
             for (var name in ActiveTheme[config.id].info.settingForm) {
                 var property = ActiveTheme[config.id].info.settingForm[name];
@@ -195,9 +195,15 @@ var Themes = function () {
                 defaults[name] = property.default;
 
                 ActiveTheme[config.id].settings[name] = property.default;
-                form.add(name, property.type, property.attr || {} );
+                if (!formBuilder.isAlreadyCreated('theme_settings')) {
+                    form.add(name, property.type, property.attr || {} );
+                }
             }
-            form.add('Submit', 'submit', {displayname : 'Update Settings'} );
+
+            if (!formBuilder.isAlreadyCreated('theme_settings')) {
+                form.add('Submit', 'submit', {displayname : 'Update Settings'} );
+            }
+            
             return defaults;
         }
 

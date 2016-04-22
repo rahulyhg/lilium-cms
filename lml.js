@@ -676,7 +676,7 @@ var LML = function () {
                 }
             } else {
                 if (context.bufferContent && context.currentContentBlock) {
-                    context.block[context.currentContentBlock] += line.substring(nextWorkPos) + "\n";
+                    context.block[context.currentContentBlock] += line.substring(nextWorkPos);
                     lineCallback(context.lineFeedback);
 
                 } else {
@@ -837,6 +837,7 @@ var LML = function () {
         log("LML", rootpath + " => " + compilepath);
 
         var timeStamp = new Date();
+        // TODO create a temp file first
         fileserver.createDirIfNotExists(compilepath, function (dirExists) {
             if (!dirExists) throw new Error("LML.AccessException - Could not create directory for " + compilepath);
 

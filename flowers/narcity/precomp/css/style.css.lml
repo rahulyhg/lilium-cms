@@ -3583,11 +3583,6 @@ footer {
     width: 640px;
     border: 1px solid #D9D9D9;
   }
-  .post-list-item--medium {
-    float:left;
-    width: 640px;
-    border: 1px solid #D9D9D9;
-  }
   .post-list-item--medium .post-list-item__image {
     height: 340px;
   }
