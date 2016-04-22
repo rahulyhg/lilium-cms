@@ -16,7 +16,7 @@ var ImageResizer = function () {
         sizeKeys = Object.keys(sizes.getSizes());
         imageSizes = sizes.getSizes();
         currentFilename = path;
-        log("[ImageResizer] Resizing Image...");
+        log("ImageResizer", "Resizing image " + filename + " ["+mime+"]");
         extension = mime;
         fs.readFile(path, function (err, buffer) {
             //For all sizes;

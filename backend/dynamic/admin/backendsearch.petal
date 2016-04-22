@@ -1,0 +1,22 @@
+<div class="backendsearch-wrapper">
+    <div class="backendsearch-close-wrapper">
+        <i class="fa fa-times backendsearch-close" aria-hidden="true"></i>
+    </div>
+
+    <form id="backendsearch-form">
+        <input type="text" class="backendsearch-input" placeholder="What are you looking for..." />
+        <input type="submit" class="backendsearch-submit" value="Search" />
+    </form>
+
+    <div class="backendsearch-results">
+        <h2>Query result for : <span>[QUERIED STRING]</span></h2>
+
+        <div class="backendsearch-working-wrapper">
+            <i class="fa fa-circle-o-notch fa-spin fa-fw"></i>
+        </div>
+
+        <div class="backendsearch-results-list">
+            
+        </div>
+    </div>
+</div>

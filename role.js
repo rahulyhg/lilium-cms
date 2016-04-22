@@ -1,3 +1,4 @@
+var config = require('./config.js');
 var filelogic = require('./filelogic.js');
 var formBuilder = require('./formBuilder.js');
 var conf = require('./config.js');
@@ -219,14 +220,13 @@ var Role = function () {
     }
 
     var initNotificationGroups = function() {
-        var sitesList = sites.getSites();
-        for (var i in sitesList) {
-            db.findToArray(sitesList[i].id, 'roles', {}, function(err, roles) {
+        config.eachSync(function(site) {
+            db.findToArray(site.id, 'roles', {}, function(err, roles) {
                 for (var j in roles) {
-                    notification.createGroup(roles[j].name, roles[j].name, sitesList[i].id);
+                    notification.createGroup(roles[j].name, roles[j].name, site.id);
                 }
             });
-        }
+        });
     }
 
 

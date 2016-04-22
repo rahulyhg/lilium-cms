@@ -8,6 +8,8 @@ var log = require('./log.js');
 var livevars = require('./livevars.js');
 var imageResizer = require('./imageResizer.js');
 var imageSize = require('image-size');
+var nURL = require('url');
+var nHTTP = require('http');
 
 var Media = function () {
     this.handlePOST = function (cli) {
@@ -19,8 +21,11 @@ var Media = function () {
         case 'delete':
             this.delete(cli);
             break;
+        case 'wptr':
+            this.transferFromWordpress(cli);
+            break;
         default:
-
+            
         }
     };
 
@@ -65,6 +70,51 @@ var Media = function () {
         });
 
     }
+
+    // cli is clientObject
+    // filepathOrURL is absolute path of file, or URL to download file
+    this.transferFromWordpress = function(cli, filepathOrURL) {
+        filepathOrURL = filepathOrURL || cli.routeinfo.params.filepath;
+        var isURL = nURL.parse(filepathOrURL).protocol !== null;
+
+        var splitDot = filepathOrURL.split('.');
+        var ext = splitDot[splitDot.length - 1];
+        var fileNameLength = 48;
+
+        var fileName = "wptransferred_" + 
+            Math.round(
+                (
+                    Math.pow(36, fileNameLength + 1) - 
+                    Math.random() * 
+                    Math.pow(36, fileNameLength)
+                )
+            ).toString(36).slice(1) + 
+            "." + ext;
+
+        var filePath = cli._c.server.html + "/uploads/" + fileName;
+
+        var fileCallback = function() {
+            imageResizer.resize(filePath, fileName, ext, cli, function() {
+                // TODO : react to finish event
+                cli.sendJSON({
+                    success : true,
+                    redirect: '',
+                    filepath : filePath
+                });
+            });
+        };
+
+        var ws = require('fs').createWriteStream(filePath);
+        if (isURL) {
+            var req = nHTTP.get(filepathOrURL, function(resp) {
+                resp.pipe(ws);
+            });
+
+            ws.on('close', fileCallback);
+        } else {
+            fs.copyFile(filepathOrURL, filePath, fileCallback);
+        }
+    };
 
     this.upload = function (cli) {
         cli.touch('media.new');

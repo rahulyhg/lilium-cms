@@ -674,7 +674,7 @@ var Article = function() {
 
                         // Found a content
                         if (arr && arr.length > 0) {
-                            arr[0].author = arr[0].author[0].displayname;
+                            arr[0].author = arr[0].author[0] ? arr[0].author.displayname : "[NO AUTHOR]";
                             // Check if there is a newer autosaved version
                             db.findToArray(cli._c, 'autosave', {
                                 contentid: db.mongoID(arr[0]._id),

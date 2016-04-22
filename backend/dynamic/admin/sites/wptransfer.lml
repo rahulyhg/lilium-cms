@@ -1,0 +1,16 @@
+{#config;forms}
+<h1>Wordpress migration</h1>
+
+<span class="pad10">
+    Make sure to have two databases ready for the transfer. The first one will contain the original Wordpress data, and will be deleted upon transfer completion. The second will contain the ported Lilium website. Note that transferring a Wordpress website can take up to 60 minutes depending on the number of articles and uploaded media.
+</span>
+
+<lml:queryparam data-param="error">
+	<span class="messagestrip error">
+		<i class="fa fa-exclamation-circle"></i> 
+		<span>Could not create new website : <lml:tobject data-querystring="message"></lml:tobject></span>
+	</span>
+</lml:queryparam>
+
+{=forms.render("wptransfer_lilium_website")}
+<script src="{=config.default.server.url}/static/sites.js"></script>

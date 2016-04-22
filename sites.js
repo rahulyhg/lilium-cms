@@ -93,6 +93,7 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/pushtable.js", 2200, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/backendsearch.js", 2250, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/stacktable.js", 2300, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/socket.js", 2400, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/multi-select.js", 2500, 'admin', conf.id);
@@ -188,6 +189,7 @@ var Sites = function () {
         } else {
             switch (param) {
             case "launch":
+            case "wptransfer":
                 filelogic.serveAdminLML(cli);
                 break;
             default:
@@ -199,16 +201,69 @@ var Sites = function () {
     this.handlePOST = function (cli) {
         var dat = cli.postdata.data;
         var that = this;
+        var param = cli.routeinfo.path[2];
+        
+        switch (param) {
+            case "launch":
+                db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function (success, err) {
+                    if (success) {
+                        that.createSite(cli, dat, function () {
+                            log('Sites', 'Redirecting network admin to site list');
+                            cli.redirect(cli._c.server.url + "admin/sites/", false);
+                        });
+                    } else {
+                        cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+                    }
+                });
+            break;
+
+            case "wptransfer":
+                that.wptransfer(cli);
+                break;
+
+            default:
+                cli.throwHTTP(404, 'Not Found');
+        }
+    };
+
+    this.wptransfer = function(cli) {
+        var dat = cli.postdata.data;
+        var that = this;
+
+        log('Sites', 'Initiating Wordpress website transfer');
+        log('Sites', 'Creation of Lilium website');
         db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function (success, err) {
             if (success) {
-                that.createSite(cli, dat, function () {
-                    log('Sites', 'Redirecting network admin to site list');
-                    cli.redirect(cli._c.server.url + "admin/sites/", false);
-                });
+                db.testConnectionFromParams(
+                    dat.wpsitedataurl, 
+                    dat.wpsitedataport, 
+                    dat.wpsitedatauser, 
+                    dat.wpsitedatapwd, 
+                    dat.wpsitedataname, 
+                function (success, err) {
+                    if (success) {
+                        dat.wptransfer = true;
+                        
+                        that.createSite(cli, dat, function () {
+                            log('Sites', 'Site was created. Beginning Wordpress migration.');
+                            
+                            require('./includes/wpdump.js').dump(cli, {
+                                
+                            }, function() {
+
+                            });
+
+                            cli.redirect(cli._c.server.url + "admin/sites/", false);
+                        }); 
+                    } else {
+                        cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+                    }
+                }, 'mysql');
             } else {
                 cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
             }
         });
+
     };
 
     this.createSite = function (cli, postdata, done) {
@@ -242,6 +297,9 @@ var Sites = function () {
         conf.default.website.sitetitle = conf.default.info.project;
         conf.default.emails.default = postdata.websiteemail || "";
         conf.default.id = postdata.baseurl.replace(/\/\//g, '');
+
+        conf.default.wptransfer = postdata.wptransfer;
+        conf.default.wptransferring = postdata.wptransfer;
 
         var filename = postdata.baseurl.replace(/\/\//g, '').replace(/\//g, ' ');
         var ws = fs.createWriteStream(__dirname + "/sites/" + filename + ".json", {
@@ -319,15 +377,7 @@ var Sites = function () {
     };
 
     this.registerForms = function () {
-        formbuilder.createForm('launch_lilium_website', {
-            fieldWrapper: {
-                tag: "div",
-                cssPrefix: "launchwebsite-field-"
-            },
-            cssClass: "form-launch-website",
-            dependencies: [],
-        })
-
+        formbuilder.registerFormTemplate('lilium_website_info')
         .add('title-info', 'title', {
                 displayname: "Website information"
             })
@@ -374,11 +424,64 @@ var Sites = function () {
                 displayname: "HTML File Path",
                 defaultValue: "/usr/local/lilium/html/"
             })
-            .trg('server')
+            .trg('server');
 
+
+        formbuilder.createForm('launch_lilium_website', {
+            fieldWrapper: {
+                tag: "div",
+                cssPrefix: "launchwebsite-field-"
+            },
+            cssClass: "form-launch-website",
+            dependencies: [],
+        })
+        .addTemplate('lilium_website_info')
         .trg('beforesubmit')
             .add('submit', 'submit', {
                 displayname: "Launch"
+            });
+
+        formbuilder.createForm('wptransfer_lilium_website', {
+            fieldWrapper: {
+                tag: "div",
+                cssPrefix: "launchwebsite-field-"
+            },
+            cssClass: "form-launch-website",
+            dependencies: [],
+        })
+        .add('title-info', 'title', {
+                displayname: "Wordpress site information"
+            })
+            .add('wpsitedataurl', {
+                displayname: "Database URL"
+            })
+            .add('wpsitedataport', {
+                displayname: "Database Port",
+                datatype : "number"
+            })
+            .add('wpsitedataname', {
+                displayname: "Database Name"
+            })
+            .add('wpsitedatauser', {
+                displayname: "Database User"
+            })
+            .add('wpsitedatapwd', 'password', {
+                displayname: "Database Password"
+            })
+        .add('title-info-bridge', 'title', {
+                displayname: "Wordpress bridge"
+            })
+            .add('wpbridgedata', {
+                displayname: "Database Name"
+            })
+
+        .add('title-lml-site', 'title', {
+            displayname: "Lilium site information"
+        })
+        .addTemplate("lilium_website_info")
+        .trg('beforesubmit')
+            .add('submit', 'submit', {
+                displayname: "Transfer"
             });
     };
 };

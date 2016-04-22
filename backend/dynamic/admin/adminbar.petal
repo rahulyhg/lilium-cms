@@ -25,6 +25,9 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li id="topbar-search-icon" class="link">
+                        <span class="fa fa-search"></span>
+                    </li>
                     <li id="dropdown-notification" class="dropdown">
                         <span class="fa fa-bell link dropdown-toggle" data-toggle="dropdown" aria-hidden="true">
                             <span class="badge">0</span>
@@ -64,7 +67,6 @@
         <!--/.container-fluid -->
     </nav>
 </header>
-
 
 <lml:template id="adminbaruserbox">
     <lml:tobject data-key="displayname" data-nodetype="span"></lml:tobject>

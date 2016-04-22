@@ -1,0 +1,108 @@
+{#config}
+
+// Backend search engine
+jQuery(function($) {
+    var displayBackendSearch = function() {
+        $('.backendsearch-wrapper').show();
+        setTimeout(function() {
+            $('.backendsearch-wrapper').addClass('shown');
+        }, 10);
+    };
+
+    var dismissBackendSearch = function() {
+        $('.backendsearch-wrapper').removeClass('shown');
+        setTimeout(function() {
+            $('.backendsearch-wrapper').hide();
+        }, 201);
+    };
+
+    var displayBackendSearchResult = function(pkg) {
+        $('.backendsearch-working-wrapper').removeClass('shown');
+
+        var jList = $('.backendsearch-results-list');
+
+        jList.empty();
+        for (var fieldid in pkg.data) {
+            var entries = pkg.data[fieldid];
+            var scheme = pkg.scheme[fieldid];
+        
+            if (entries.length != 0) {
+                var jh3 = document.createElement('h3');
+                jh3.innerHTML = fieldid;
+                jList.append(jh3);
+
+                var table = document.createElement('table');
+                var thead = document.createElement('thead');
+                var trhead = document.createElement('tr');
+
+                for (var fld in scheme) if (!scheme[fld].backendOnly) {
+                    var th = document.createElement('th');
+                    th.innerHTML = scheme[fld].displayName;
+                    trhead.appendChild(th);
+                }
+
+                thead.appendChild(trhead);
+                table.appendChild(thead);
+
+                var tbody = document.createElement('tbody');
+                
+                entries.forEach(function(entry, index) {
+                    var row = document.createElement('tr');
+                    for (var entryField in scheme) if (!scheme[entryField].backendOnly && entryField[0] !== "_") {
+                        var td = document.createElement('td');
+                        td.innerHTML = entry[entryField] || "N/A";
+                        row.appendChild(td);
+                    }
+
+                    row.onclick = function() {
+                        document.location = entry._link;
+                    };
+
+                    tbody.appendChild(row);
+                });
+
+                table.appendChild(tbody);
+
+                jList.append(table);
+            }
+        }
+
+        setTimeout(function() {
+            jList.show();
+
+            setTimeout(function() {
+                jList.addClass("shown");
+            }, 10);
+        }, 101);
+    };
+
+    var besFormSubmit = function(ev) {
+        $('.backendsearch-results h2 span').html($('.backendsearch-input').val());
+        
+        $('#backendsearch-form').addClass('queried');
+        $('.backendsearch-results').show();
+        setTimeout(function() {
+            $('.backendsearch-results').addClass('shown');
+            $('.backendsearch-working-wrapper').addClass('shown');
+        }, 10);
+        
+        $('.backendsearch-results-list').hide().removeClass('shown');
+
+        $.get('{=config.default.server.url}/livevars', {vars:JSON.stringify([
+            {
+                varname : "backendsearch",
+                params : {
+                    q : $(".backendsearch-input").val()
+                }
+            }
+        ])}, function(data) {
+            displayBackendSearchResult(data.livevars.backendsearch);
+        });
+        
+        return false;
+    };
+
+    $('#topbar-search-icon').bind('click', displayBackendSearch);
+    $('.backendsearch-close-wrapper').bind('click', dismissBackendSearch);
+    $('#backendsearch-form').bind('submit', besFormSubmit);
+});

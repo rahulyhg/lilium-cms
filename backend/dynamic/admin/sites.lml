@@ -17,11 +17,11 @@
 		<tr>
 			<td colspan="4">
 				<a class="button-link" href="{=config.default.server.url}/admin/sites/launch">Launch new website</a>
+				<a class="button-link" href="{=config.default.server.url}/admin/sites/wptransfer">Transfer site from Wordpress</a>
 			</td>
 		</tr>
 	</tfoot>
 </table>
-
 
 <lml:template id="site_template">
 	<lml:tobject data-nodetype="tr">
@@ -29,6 +29,12 @@
 			<lml:tobject data-key="website.sitetitle"></lml:tobject>
 			<lml:tobject data-filter="isDefaultSite">
 				<span class="siteDefaultTag">default</span>
+			</lml:tobject>
+			<lml:tobject data-filter="isWordpress">
+				<span class="siteDefaultTag">wordpress</span>
+			</lml:tobject>
+			<lml:tobject data-filter="isTransferring">
+				<span class="siteDefaultTag">transferring</span>
 			</lml:tobject>
 		</lml:tobject>
 		<lml:tobject data-nodetype="td">
@@ -45,6 +51,12 @@
 	window.isDefaultSite = function(dat) {
 		return dat.default;
 	};
+    window.isWordpress = function(dat) {
+        return dat.wptransfer;
+    };
+    window.isTransferring = function(dat) {
+        return dat.wptransferring;
+    };
 </script>
 
 {*sites.all.complex(template:"site_template",target:"sites_tbody")}

@@ -188,7 +188,6 @@ var FileServer = function () {
             var rs = fs.createReadStream(source);
             var ws = fs.createWriteStream(dest);
 
-
             rs.on('close', callback);
             rs.pipe(ws);
         });

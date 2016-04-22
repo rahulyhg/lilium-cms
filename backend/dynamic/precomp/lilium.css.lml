@@ -1033,3 +1033,194 @@ input[disabled] {
     background-color: #eee;
     color: #999;
 }
+
+/* Backend search */
+.backendsearch-wrapper {
+    position: fixed;
+
+    top:0; bottom:0; left:0; right:0;
+    background-color: rgba(0, 0, 0, 0.8);
+
+    color: #EEE;
+    text-align: center;
+
+    z-index: 100001;
+    overflow-y: auto;
+
+    opacity:0;
+    display: none;
+
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+}
+
+.backendsearch-wrapper.shown {
+    opacity: 1;
+}
+
+#backendsearch-form {
+    margin-top: 250px;
+    display: block;
+    width: 100%;
+    
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+}
+
+#backendsearch-form.queried {
+    margin-top: 10px;
+}
+
+.backendsearch-input {
+    width: 100%;
+
+    background: none;
+    background-color: transparent;
+
+    font-size: 52px;
+    font-weight: 100;
+
+    text-align: center;
+
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+}
+
+#backendsearch-form.queried .backendsearch-input {
+    font-size: 32px;
+}
+.backendsearch-submit {
+    display: inline-block;
+    margin-top: 12px;
+
+    background: none;
+    background-color: transparent;
+
+    color: #DDD;
+    font-weight: 100;
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+.backendsearch-submit:hover {
+    color: #FFF;
+}
+
+.backendsearch-close-wrapper {
+    position: absolute;
+    top: 10px;
+    right: 18px;
+    cursor: pointer;
+
+    font-size: 28px;
+}
+
+.backendsearch-results {
+    display: none;
+    opacity: 0;
+
+    text-align: left;
+    padding: 20px;
+    min-height: 100%;
+
+    border-top: 1px dashed #777;
+
+    margin-top: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+}
+
+.backendsearch-results.shown {
+    opacity: 1;
+}
+
+.backendsearch-results h2 {
+    color: #EEE;
+    font-size: 32px;
+    display: block;
+    
+    font-weight: 300;
+}
+
+.backendsearch-working-wrapper {
+    text-align: center;
+    padding-top: 20px;
+    font-size: 42px;
+    opacity: 0;
+
+    color: #555;
+
+    -webkit-transition: all 0.1s;
+       -moz-transition: all 0.1s;
+        -ms-transition: all 0.1s;
+         -o-transition: all 0.1s;
+            transition: all 0.1s;
+}
+
+.backendsearch-working-wrapper.shown {
+    opacity: 1;
+}   
+
+.backendsearch-results-list {
+    display: none;
+    opacity: 0;
+
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+}
+
+.backendsearch-results-list.shown {
+    opacity: 1;
+}
+
+.backendsearch-results-list  h3 {
+    padding: 10px;
+    border: 1px dotted #777;
+    border-bottom: 1px dashed #777;
+
+    background-color: rgba(155,89,182, 0.3);
+}
+
+.backendsearch-results-list table {
+    border: 1px dotted #777;
+    width: 100%;
+    border-top: 0;
+}
+
+.backendsearch-results-list table thead {
+    border-bottom: 1px dashed #777;
+    background-color: rgba(155,89,182, 0.2);
+}
+
+.backendsearch-results-list table td,
+.backendsearch-results-list table th {
+    padding: 10px;
+}
+
+.backendsearch-results-list table tbody td {
+    cursor: pointer;
+}
+
+.backendsearch-results-list table tr:hover td {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #FFF;
+}
+

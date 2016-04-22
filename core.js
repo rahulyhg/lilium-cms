@@ -37,6 +37,7 @@ var filelogic = undefined;
 var category = undefined;
 var dashboard = undefined;
 var templateBuilder = undefined;
+var backendSearch = undefined;
 
 var log = require('./log.js');
 
@@ -80,6 +81,7 @@ var Core = function () {
         category = require('./category.js');
         dashboard = require('./dashboard.js');
         templateBuilder = require('./templateBuilder.js');
+        backendSearch = require('./backend/search.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
@@ -230,6 +232,7 @@ var Core = function () {
         Petals.register('adminbar', _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
         Petals.register('adminhead', _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
         Petals.register('adminsidebar', _c.default().server.base + 'backend/dynamic/admin/adminsidebar.petal');
+        Petals.register('backendsearch', _c.default().server.base + 'backend/dynamic/admin/backendsearch.petal');
     };
 
     var loadImageSizes = function () {
@@ -504,6 +507,8 @@ var Core = function () {
         themes.registerLiveVar();
         sites.registerLiveVar();
         settings.registerLiveVar();
+        backendSearch.registerLiveVar();
+
         Livevars.registerDebugEndpoint();
     };
 
@@ -636,6 +641,31 @@ var Core = function () {
         }
     };
 
+    var loadBackendSearch = function() {
+        backendSearch.registerSearchFormat({
+            collection : "content",
+            displayName : "Editorial",
+            linkBase : "{adminurl}/article/edit/{$}",
+            linkKey : "_id"
+        }, {
+            "title" : {displayName : "Title"},
+            "subtitle" : {displayName : "Subtitle"},
+            "date" : {displayName : "Published On"},
+            "content" : {displayName : "Content", backendOnly : true}
+        });
+
+        backendSearch.registerSearchFormat({
+            collection : 'entities',
+            displayName : 'Users',
+            linkBase : "{adminurl}/entities/edit/{$}",
+            linkKey : "_id"
+        }, {
+            "username" : {displayName : "Username"},
+            "displayname" : {displayName : "Display Name"},
+            "email" : {displayName : "Email Address"}
+        });
+    };
+
     this.makeEverythingSuperAwesome = function (readyToRock) {
         log('Core', 'Initializing Lilium');
 
@@ -655,6 +685,7 @@ var Core = function () {
             loadGlobalPetals();
             loadRequestHandler();
             loadLMLLibs();
+            loadBackendSearch();
 
             loadPlugins(function () {
                 loadRoles(function () {

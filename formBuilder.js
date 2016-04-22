@@ -123,6 +123,11 @@ var FormBuilder = function() {
             history.save(this.add, [name, type, attr, requirements, contextForm]);
         }
 
+        if (typeof type === 'object') {
+            attr = type;
+            type = 'text';
+        }
+
         // Check if it is a tempalte
         currentForm = contextForm || currentForm;
         if (typeof currentForm == 'undefined') {

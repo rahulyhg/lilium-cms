@@ -2,6 +2,7 @@ var _c = require('../config.js');
 var log = require('../log.js');
 var MongoClient = require('mongodb').MongoClient
 var mongoObjectID = require('mongodb').ObjectID;
+var mysql = require('mysql');
 
 var _conn = undefined;
 var _conns = new Object();
@@ -26,18 +27,39 @@ var DB = function() {
 		});
 	};
 
-	this.testConnectionFromParams = function(host, port, user, pass, name, cb) {
-		var mongoString = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/" + name;
-		log('Database', 'Testing : ' + mongoString);
-		MongoClient.connect(mongoString, function(err, tempConn) {
-			if (err) {
-				cb(false, err);
-			} else {
-				tempConn.close(false, function() {
-					cb(true);
-				});
-			}
-		});
+	this.testConnectionFromParams = function(host, port, user, pass, name, cb, dbtype) {
+        if (!dbtype || dbtype === 'mongo') {
+		    var mongoString = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/" + name;
+	    	log('Database', 'Testing : ' + mongoString);
+    		MongoClient.connect(mongoString, function(err, tempConn) {
+			    if (err) {
+		    		cb(false, err);
+	    		} else {
+    				tempConn.close(false, function() {
+					    cb(true);
+				    });
+			    }
+		    });
+        } else if (dbtype === 'mysql') {
+            log('Database', 'Testing mySQL connection @ ' + host);
+            var connection = mysql.createConnection({
+                host: host,
+                port: port,
+                user: user,
+                password: pass
+            });
+
+            connection.connect(function(err) {
+                log('Database', 'Test ' + (err ? "failed" : "passed"));
+                if (err) {
+                    log('Database', 'MySQL error ' + err);
+                }
+
+                cb(!err);
+            });
+        } else {
+            cb(false);
+        }
 	};
 
 	this.createDatabase = function(conf, callback) {
