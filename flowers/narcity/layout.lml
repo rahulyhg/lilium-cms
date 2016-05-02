@@ -1,8 +1,8 @@
-{#theme}
+{#theme;extra}
 <!DOCTYPE html>
-<html>
+<html id="lmlhtml" data-htmltype="lml" data-generated="true" data-cachehit="true">
 {=theme.render('head_will_open')}
-<head>
+<head id="lmlhead">
     {=theme.render('metas')}
     {%petals/meta}
 
@@ -13,26 +13,22 @@
     {%petals/headscript}
 
     {=theme.render('title')}
-    {$
-        block (title);
-    $}
     {%petals/title}
-    {$
-        endblock;
-    $}
 
     {=theme.render('head_will_close')}
-
 </head>
-{=theme.render('body_will_open')}
 <body>
+    {=theme.render('body_will_open')}
+    
     {%petals/header}
     {=theme.render('content_will_load')}
-    {$
-        block (content);
-    $}
+
+    {%petals/beforecontent}
+
+    {%%extra.contentpetal}
+
     {=theme.render('content_loaded')}
     {%petals/footer}
-
+    {=theme.render('footer_loaded')}
 </body>
 </html>

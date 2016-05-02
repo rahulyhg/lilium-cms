@@ -1,0 +1,31 @@
+{#config}
+
+<h1>Developer tools - LML live interpreter</h1>
+
+<span class="pad10">
+    LML in the following box will be parsed and executed as is. Output will be displayed underneath the script box.
+</span>
+
+<textarea id="lml-interpreter-input">
+    
+</textarea>
+
+<button id="send-lml-for-interpretation">Interpret</button>
+
+<div id="lml-interpreter-output">
+
+</div>
+
+<script>
+    $(function() {
+        $('#send-lml-for-interpretation').bind('click', function() {
+            $.post('{=config.default.server.url}/admin/devtools/lml/interpret', {
+                'lml' : $('#lml-interpreter-input').val()
+            }, function(result) {
+                $('#lml-interpreter-output').html(result.html);
+            });
+
+            return false;
+        });
+    });
+</script>

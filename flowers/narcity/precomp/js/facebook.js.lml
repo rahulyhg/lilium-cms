@@ -1,0 +1,49 @@
+{#config;theme}
+
+// Requires vaniryk
+var NarcityFacebook = function() {
+    var graphURL = "https://graph.facebook.com/?access_token={=theme.settings.fbid}|{=theme.settings.fbtoken}";
+  
+    var sendRequest = function(aurl, callback) {
+        _a.get(aurl, undefined, callback, false);
+    };
+ 
+    this.requestForShares = function(url, callback) {
+        sendRequest(graphURL + "&ids=" + url, function(graphresp) {
+            var graphobj = graphresp[url];
+            callback(graphobj.share.share_count);
+        });
+    };
+
+    this.bulkShareRequest = function(urls, loopCallback) {
+        sendRequest(graphURL + "&ids=" + urls.join(','), function(graphresp) {
+            for (var url in graphresp) {
+                loopCallback(graphresp[url]);
+            }
+        });
+    };
+
+    this.affectAllCounters = function() {
+        var urls = new Object();
+        var allurls = new Array();
+        Array.prototype.forEach.call(document.querySelectorAll(".fbshare"), function(htmlnode) {
+            var u = htmlnode.dataset.url == "this" ? document.location.href : htmlnode.dataset.url;
+
+            urls[u] = htmlnode;
+            allurls.push(u);
+        });
+
+        this.bulkShareRequest(allurls, function(ogobj) {
+            var htmlnode = urls[ogobj.id];
+            var min = htmlnode.dataset.min || -1;
+
+            if (ogobj.share && ogobj.share.share_count && ogobj.share.share_count > min) {
+                htmlnode.innerHTML = ogobj.share.share_count;
+    
+                if (htmlnode.dataset.show) {
+                    document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
+                }
+            }
+        });
+    };
+};

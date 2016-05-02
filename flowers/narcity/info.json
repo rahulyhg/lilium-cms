@@ -4,26 +4,68 @@
     "entry": "narcity.js",
     "settingForm" : {
         "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},
+        "buttoncolor" : {"type" : "text", "attr" : {"displayname" : "Button Color"}, "default" : "#DDD"},
+        "buttontextcolor" : {"type" : "text", "attr" : {"displayname" : "Button Text Color"}, "default" : "#FF2634"},
+        "fullwidthsize" : {"type" : "number", "attr" : {"displayname" : "Full width size (px)"}, "default" : 1024},
+        "articlewidthsize" : {"type" : "number", "attr" : {"displayname" : "Article width size (px)"}, "default" : 640},
         "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"},
-        "network-name" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montréal"},
+        "networkname" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montreal"},
+        "cityname" : {"type" : "text", "attr" : {"displayname" : "City name"}, "default" : "Montreal"},
+        "fbid" : {"type" : "text", "attr" : {"displayname" : "Facebook App ID"}, "default" : "#####"},
+        "fbtoken" : {"type" : "text", "attr" : {"displayname" : "Facebook Token"}, "default" : "#####"},
+        "mailchimpdigest" : {"type" : "text", "attr" : {"displayname" : "Mailchimp Digest ID"}, "default" : "#####"},
         "othernetworkwebsites" : {"type" : "stack",
             "attr" : {"displayname" : "Other Network Websites",
                 "scheme": {
-
-                "columns": [{
-                    "fieldName": "sitename",
-                    "dataType": "text",
-                    "displayname": "Site Name"
-                }, {
-                    "fieldName": "url",
-                    "dataType": "text",
-                    "displayname": "Url"
-                }]}},
+                    "columns": [
+                        {
+                            "fieldName": "sitename",
+                            "dataType": "text",
+                            "displayname": "Site Name"
+                        }, {
+                            "fieldName": "url",
+                            "dataType": "text",
+                            "displayname": "Url"
+                        }
+                    ]
+                }
+            },
             "default": [{
                 "sitename": "Toronto",
                 "url": "http://narcity.com/toronto"
-            }]},
+            }]
+        },
+        "headerlinks" : {"type" : "stack",
+            "attr" : {"displayname" : "Header links",
+                "scheme": {
+                    "columns": [
+                        {
+                            "fieldName": "linktext",
+                            "dataType": "text",
+                            "displayname": "Link Text"
+                        }, {
+                            "fieldName": "url",
+                            "dataType": "text",
+                            "displayname": "Url"
+                        }
+                    ]
+                }
+            },
+            "default": [{
+                "linktext": "",
+                "url": "http://"
+            }]
+        },
+
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
         "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"}
+    },
+    "contexts" : {
+        "article" : "article.lml",
+        "home" : "homepage.lml",
+        "search" : "s.lml",
+        "archive" : "archive.lml",
+        "category" : "category.lml",
+        "tag" : "tag.lml"
     }
 }

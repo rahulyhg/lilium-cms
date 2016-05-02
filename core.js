@@ -38,6 +38,7 @@ var category = undefined;
 var dashboard = undefined;
 var templateBuilder = undefined;
 var backendSearch = undefined;
+var devtools = undefined;
 
 var log = require('./log.js');
 
@@ -82,6 +83,7 @@ var Core = function () {
         dashboard = require('./dashboard.js');
         templateBuilder = require('./templateBuilder.js');
         backendSearch = require('./backend/search.js');
+        devtools = require('./devtools.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
@@ -206,6 +208,8 @@ var Core = function () {
             category.handleGET(cli, false);
         });
 
+        devtools.registerAdminEndpoint();
+
         hooks.fire('endpoints');
         log('Endpoints', 'Loaded endpoints');
     };
@@ -238,7 +242,7 @@ var Core = function () {
     var loadImageSizes = function () {
         imageSize.add("thumbnail", 150, '150');
         imageSize.add("medium", 300, '*');
-        imageSize.add("Archive-thumbnail", 400, 400);
+        imageSize.add("thumbnailarchive", 400, 400);
         imageSize.add("featured", 970, 400);
     }
 

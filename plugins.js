@@ -151,10 +151,10 @@ var Plugins = module.exports = new function () {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
                             try {
                                 pluginInstance.register(_c, info, function () {
-                                    cli.cacheClear();
-                                    hooks.fire('pluginregistered', identifier);
-
-                                    callback();
+                                    cli.cacheClear(undefined, function(err) {;
+                                        hooks.fire('pluginregistered', identifier);
+                                        callback();
+                                    });
                                 });
                             } catch (e) {
                                 log("Plugins", "Error while registering plugin " + identifier + ": " + e.message);
@@ -186,8 +186,7 @@ var Plugins = module.exports = new function () {
 
                         RegisteredPlugins[identifier] = undefined;
                         delete RegisteredPlugins[identifier];
-                        cli.cacheClear();
-                        return callback();
+                        cli.cacheClear(undefined, callback);
                     });
                 } catch(e) {
                     console.log(e);

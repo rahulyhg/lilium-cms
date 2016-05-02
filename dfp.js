@@ -149,29 +149,51 @@ var LiliumDFP = function () {
     };
 
     this.deepServerFetch = function (callback) {
-        if (_priv.client_id) {
-            log('DFP', 'Preparing for deep orders copy');
-            dfpUser.getService('LineItemService', function (err, ser) {
-                if (err) {
-                    log('DFP', "Could not deep fetch : " + err);
-                    return;
-                }
+        setTimeout(function() {
+            if (_priv.client_id) {
+                log('DFP', 'Preparing for deep orders copy');
+                dfpUser.getService('LineItemService', function (err, ser) {
+                    if (err) {
+                        log('DFP', "Could not deep fetch : " + err);
+                        if (callback) callback();
+                        return;
+                    }
+                   
+                    log('DFP', "Getting line items"); 
+                    ser.getLineItemsByStatement(new DFP.Statement('WHERE 1 = 1'), function (err, results) {
+                        if (err) {
+                            log('DFP', "Error getting line items : " + err);
+                            if (callback) callback(err);
+                            return;
+                        }
 
-                ser.getLineItemsByStatement(new DFP.Statement('WHERE 1 = 1'), function (err, results) {
-                    var arr = results.rval.results;
+                        var arr = results.rval.results;
+    
+                        log('DFP', 'Running database queries');
+                        db.remove(_c.default(), 'dfpcache', {}, function (err) {
+                            var index = 0;
+                            var jumps = 150;
+                            var insertNext = function() {
+                                var sliced = arr.slice(index, index + jumps);
 
-                    log('DFP', 'Running database queries');
-                    db.remove(_c.default(), 'dfpcache', {}, function (err) {
-                        db.insert(_c.default(), 'dfpcache', arr, function () {
-                            log('DFP', 'Stored deep copy of ' + arr.length + ' DFP Orders');
-                            if (callback) {
-                                callback();
-                            }
+                                if (sliced.length != 0) {                                
+                                    db.insert(_c.default(), 'dfpcache', sliced, function () {
+                                        log('DFP', 'Stored deep copy block ' + (index + sliced.length) + ' / ' + arr.length);
+                                        index += jumps;
+
+                                        insertNext();
+                                    });
+                                } else {
+                                    log('DFP', 'Finished storing deep copy of ' + arr.length + ' DFP Orders');
+                                    if (callback) callback();
+                                }
+                            };
+                            insertNext();
                         });
                     });
                 });
-            });
-        }
+            }
+        }, 1);
     };
 
     this.scheduleDeepCopy = function () {

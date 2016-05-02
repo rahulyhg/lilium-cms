@@ -10,10 +10,10 @@ var log = require('./log.js');
 var _c = require('./config.js');
 
 var Precomp = function () {
-    var minifyFile = function (inFile, outFile, filetype, callback) {
+    var minifyFile = function (conf, inFile, outFile, filetype, callback) {
         log('Precompiler', 'Minifying ' + filetype + ' file');
         // Only minify in prod
-        if (_c.default.env == 'prod') {
+        if (conf.env == 'prod') {
             if (filetype == 'css') {
                 new compressor.minify({
                     type: 'yui-css',
@@ -44,8 +44,8 @@ var Precomp = function () {
                 fileserver.copyFile(inFile, outFile, callback);
             }
         } else {
+            log('Precompiler', "Copying " + inFile + " => " + outFile);
             fileserver.copyFile(inFile, outFile, callback);
-
         }
     };
 
@@ -99,7 +99,7 @@ var Precomp = function () {
                     checksum.file(isTheme ? curFile : absReadPath + curFile, function (err, sum) {
                         var rPath = isTheme ? curFile : absReadPath + curFile;
                         var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
-                        var wPath = isTheme ? absWritePath + curFile.slice(curFile.lastIndexOf('/'), curFile.length).slice(0, -4) : absWritePath + curFile.slice(0, -4);
+                        var wPath = isTheme ? absWritePath + curFile.slice(curFile.lastIndexOf('/') + 1, curFile.length).slice(0, -4) : absWritePath + curFile.slice(0, -4);
                         fileserver.fileExists(wPath, function (exists) {
                             if (exists && histoObj[curFile] == sum) {
                                 db.insert(conf, 'compiledfiles', {
@@ -116,7 +116,7 @@ var Precomp = function () {
                                     tPath,
                                     function () {
                                         var beforeMinify = new Date();
-                                        minifyFile(tPath, wPath, wPath.substring(wPath.lastIndexOf('.') + 1), function () {
+                                        minifyFile(conf, tPath, wPath, wPath.substring(wPath.lastIndexOf('.') + 1), function () {
                                             log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms");
                                             db.insert(conf, 'compiledfiles', {
                                                 filename: curFile,
@@ -152,7 +152,7 @@ var Precomp = function () {
         var fileIndex = 0;
         var fileTotal = files.length;
 
-        log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of '+ (theme? 'Theme' : 'Admin') +' context');
+        log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of '+ (theme? 'theme' : 'admin') +' context');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
                 fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {

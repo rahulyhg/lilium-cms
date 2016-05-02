@@ -1,0 +1,11 @@
+{#config;theme;extra;debug}
+<!-- Big Banner ad -->
+{$ if (extra.contextname == "home"); $}
+    <div id="topHomePageBanner">
+        {=theme.snip("bannerad",["desktop"],"/1020360/custom-header-narcity",[[728|90]|[970|250]],"adblock-largeleader")}
+    </div>
+{$ endif; if (extra.contextname == "article"); $}
+    <div id="topArticleBanner">
+        {=theme.snip("bannerad",["desktop"],"/1020360/custom-header-narcity",[[728|90]|[970|250]],"adblock-largeleader")}
+    </div>
+{$ endif; $}

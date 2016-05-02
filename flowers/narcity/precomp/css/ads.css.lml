@@ -1,0 +1,7 @@
+#adblock-largeleader {
+    text-align: center;
+}
+
+#adblock-largeleader iframe {
+    margin: 10px 0px;
+}

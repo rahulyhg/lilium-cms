@@ -54,6 +54,7 @@ module.exports = function (_ready_) {
         conf.default.website.sitetitle = conf.default.info.project;
         conf.default.emails.default = postdata.adminemail || "";
         conf.default.id = postdata.baseurl.replace('//', '');
+        conf.default.uid = Math.random().toString().slice(2);
 
         if (!fs.existsSync(__dirname + "/sites/")) {
             fs.mkdirSync(__dirname + "/sites/");

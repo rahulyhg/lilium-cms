@@ -321,6 +321,52 @@ var DB = function() {
 		});
 	};
 
+    // Params accepted properties :
+    // selector :   Mongo selector
+    // limit :      Maximum number of output
+    // toArray :    flag to return an array of all returned objects
+    // iterator :   function called on each object with (object, next, cursor)
+    //              Calling next(false) will break the loop
+    this.paramQuery = function(conf, params, cb) {
+		_conns[conf.id || conf].collection(coln, params.colparam || {"strict":true}, function(err, col) {
+			if (err) {
+				cb("[Database - Error : "+err+"]");
+			} else if (typeof conds != "object") {
+				cb("[Database - Invalid document]");
+			} else {
+                var q = col.find(params.selector || {});
+                if (params.limit) {
+                    q = q.limit(params.limit);
+                }
+
+                if (params.toArray) {
+                    q.toArray(function(err, arr) {
+                        cb(err || arr);
+                    });
+                } else if (params.iterator) {
+                    var next = function(check) {
+                        if (check === false) {
+                            cb();
+                        } else {
+                            q.hasNext(function(err, has) {
+                                if (has) {
+                                    q.next(function(err, o) {
+                                        var check = params.iterator(o, next, q);
+                                    });
+                                } else {
+                                    cb();
+                                }
+                            });
+                        }
+                    };
+                    next(true);
+                } else {
+                    cb(q);
+                }
+            }
+        });
+    };
+
 	// USE CAREFULLY
 	// Will callback cb with a raw mongodb collection object
 	this.rawCollection = function(conf, coln, opt, cb) {

@@ -1,0 +1,66 @@
+var googletag = googletag || {};
+googletag.cmd = googletag.cmd || [];
+
+var narcityFacebook = new NarcityFacebook();
+
+var dimWidths = {
+    desktop : [970],
+    tablet : [480, 970],   
+    mobile : [0, 480]
+}
+
+Array.prototype.loop = function(cb) {
+    for (var i = 0; i < this.length; i++) {
+        var cont = cb.apply(this[i], this[i]);
+        if (cont === false) {break;}
+    };
+};
+
+Date.prototype.monthStrings = [
+    "January", "February", "March", "April", 
+    "May", "June", "July", "August", 
+    "September", "October", "November", "December"
+];
+
+Date.prototype.getMonthString = function() {
+    return this.monthStrings[this.getMonth()];
+};
+
+Date.prototype.toNarcityString = function() {
+    return this.getMonthString() + " " + this.getDate() + ", " + (this.getYear() + 1900);
+};
+
+window.deviceIs = function(deviceArr) {
+    deviceArr = typeof deviceArr === 'object' ? deviceArr : [deviceArr];
+    for (var i = 0; i < deviceArr.length; i++) {
+        var dims = dimWidths[deviceArr[i]];
+        if (window.outerWidth >= dims[0] && (dims.length === 1 || window.outerWidth <= dims[1])) {
+            return true;
+        }
+    }
+};
+
+var makeLinkTargetBlank = function() {
+    _v('article a').all(function(node) { 
+        node.attr('target', '_blank'); 
+    });
+};
+
+var documentReady = function() {
+    Array.prototype.forEach.call(document.querySelectorAll('.edt-datetime'), function(edtdatetime) {
+        var datestr = edtdatetime.dataset.edtdatetime;
+        var dateobj = new Date(datestr);
+
+        edtdatetime.innerHTML = dateobj.toNarcityString();
+    });
+    
+    narcityFacebook.affectAllCounters();
+    makeLinkTargetBlank();
+};
+
+var bindReady = function() {
+    document.addEventListener("DOMContentLoaded", documentReady);
+};
+
+
+bindReady();

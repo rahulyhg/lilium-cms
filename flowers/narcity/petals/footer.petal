@@ -9,5 +9,5 @@
         <li><a href="http://www.narcity.com/terms-conditions/" title="Terms &amp; Conditions">Terms &amp; Conditions</a> </li>
     </ul>
 
-    <span class="copyright">© {=theme.settings.copyright}</span>
+    <span class="copyright">&copy; {=theme.settings.copyright}</span>
 </footer>

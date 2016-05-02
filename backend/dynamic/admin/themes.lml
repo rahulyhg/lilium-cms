@@ -1,18 +1,16 @@
 {#tableBuilder;vocab;debug;config;forms}
 
+{$
+    formname = "theme_settings_";
+    formname += config.default.uid;
+$}
+
 <h1>Themes</h1>
 <main class="entities-main">
     {=tableBuilder.render('theme')}
-
-    {$
-        if (forms.isAlreadyCreated('theme_settings') == true);
-    $}
-        {*theme_settings.{?1}(sourceof:"theme_settings")}
-        {=forms.render('theme_settings')}
-    {$
-        endif;
-    $}
-
+    
+    {*themesettings(sourceof:=formname)}
+    {=forms.render(=formname)}
 </main>
 
 <lml:tabletemplate id="table-themes-actions">

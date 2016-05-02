@@ -9,31 +9,31 @@ var hooks = require('./hooks.js');
  * @return {[type]} [description]
  */
 var Cli = function () {
-    this.cacheClear = function (err) {
+    this.cacheClear = function (err, cb) {
         var createSymlink = this.createSymlink;
         // execFile: executes a file with the specified arguments
         child_process.exec('rm -rf ' +  _c.default().server.base + 'html/admin/*', function(err) {
             if (err) {
-                log('[CLI]', 'Error while invalidating cache');
-                console.log(err);
-            }
-
-            child_process.exec('rm -rf ' +  _c.default().server.base + 'html/login/*', function(err){
-                if (err) {
-                    log('[CLI]','Error while invalidating cache');
-                    console.log(err);
-                }
-                child_process.exec('rm -rf ' +  _c.default().server.base + 'html/*.html', function(err) {
+                log('[CLI]', 'Error while invalidating cache : ' + err);
+                cb();
+            } else {
+                child_process.exec('rm -rf ' +  _c.default().server.base + 'html/login/*', function(err){
                     if (err) {
-                        log('[CLI]','Error while invalidating cache');
-                        console.log(err);
+                        log('[CLI]','Error while invalidating cache : ' + err);
+                        cb();
                     } else {
-                        log('[CLI]',
-                            'Cache invalidated!'
-                        );
+                        child_process.exec('rm -rf ' +  _c.default().server.base + 'html/*.html', function(err) {
+                            if (err) {
+                                log('[CLI]','Error while invalidating cache : ' + err);
+                            } else {
+                                log('[CLI]', 'Cache invalidated!');
+                            }
+
+                            cb();
+                        });
                     }
                 });
-            });
+            }
         });
     };
 

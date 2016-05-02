@@ -38,6 +38,7 @@ var ClientObject = function (req, resp) {
 
     this.parseCookie();
 };
+
 ClientObject.prototype.throwHTTP = function (code, message) {
     this.responseinfo.httpcode = code;
     this.responseinfo.httpmessage = message;

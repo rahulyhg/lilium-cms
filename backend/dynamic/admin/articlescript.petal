@@ -194,8 +194,14 @@
 
         $('form button[name=preview]').on('click', function(e) {
             // Open in new tab
+            var btn = this;
+            var textinside = btn.innerHTML;
+            btn.innerHTML = "loading...";
+            btn.disabled = true;
             $.post('{=config.default.server.url}/admin/article/preview', $('form').serialize(), function(html) {
                 window.open().document.write(html);
+                btn.disabled = false;
+                btn.innerHTML = textinside;
             });
         });
 

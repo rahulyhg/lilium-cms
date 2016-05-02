@@ -1,2 +1,6 @@
-{#config}
-<title>{=config.default.info.project} - Look at your city</title>
+{#config;theme;extra}
+{$ if (extra.contextname == "home"); $}
+<title>{=config.default.info.project}</title>
+{$ endif; if (extra.contextname == "article") $}
+<title>{=extra.article.title} - {=config.default.info.project}</title>
+{$ endif; $}

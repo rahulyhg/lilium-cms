@@ -202,6 +202,41 @@ var FileLogic = function () {
         });
     };
 
+    this.renderThemeLML = function(cli, ctxName, preferredFileName, extra, callback) {
+        var theme = require('./themes.js');
+        extra = extra || new Object();
+        extra.config = cli._c;
+        extra.contextname = ctxName;
+
+        var cTheme = theme.getEnabledTheme(cli._c);
+
+        var readPath = cli._c.server.base + "flowers/" + cTheme.info.uName + "/" + cTheme.info.contexts[ctxName];
+        var savePath = cli._c.server.html + "/" + preferredFileName;
+        var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+        var layoutPath = cli._c.server.base + "flowers/" + cTheme.info.uName + "/layout.lml";
+
+        log('FileLogic', 'Compiling context theme page');
+        LML.executeToFile(
+            readPath,
+            tmpPath,
+            function () {
+                log('FileLogic', 'Including compiled theme page to layout');
+                extra.contentpetal = tmpPath;
+
+                LML.executeToFile(
+                    layoutPath,
+                    savePath,
+                    function () {
+                        log('FileLogic', 'Completed Theme page compilation');
+                        callback();
+                    }, 
+                    extra
+                );
+            }, 
+            extra
+        );
+    };
+
     this.renderLmlPostPage = function (cli, postType, extra, cb) {
         var theme = require('./themes.js');
         extra = extra || new Object();

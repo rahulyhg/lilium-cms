@@ -89,10 +89,28 @@ var Forms = function () {
             })
             .add('displayname', 'text', {
                 displayname: "Display Name"
+            }, {
+                required : false
             })
             .add('description', 'text', {
                 displayname: "Description"
+            }, {
+                required : false
             })
+
+        formBuilder.createForm('ckimagecredit', {
+                fieldWrapper : {
+                    tag: 'div',
+                    cssPrefix : 'ck-image-credit-field-'
+                },
+                cssClass : "ck-image-credit-form"
+            })
+            .add('ckimagecreditname', 'text', {
+                displayname: "Artist name"
+            })
+            .add('ckimagecrediturl', 'text', {
+                displayname: "URL to artist page"
+            });
 
         formBuilder.createForm('category_create', {
                 fieldWrapper : "lmlform-fieldwrapper"
@@ -110,7 +128,7 @@ var Forms = function () {
             var displayname = typeof field.attr.displayname !== 'undefined' ? field.attr.displayname : field.name;
             var html = '<label for="'+field.name+'">' + displayname + '</label>';
             html += '<div class="media_explorer_form">';
-            html += '<input type="hidden" id="media-input" name="' + field.name + '">';
+            html += '<input type="hidden" class="media-input" name="' + field.name + '">';
             html += '<div class="actions">';
             html += '<div class="action-desc">Click to insert image</div>';
             html += '</div>';
@@ -127,17 +145,19 @@ var Forms = function () {
         formBuilder.registerFormTemplate('article_base')
             .add('title', 'text', {
                 placeholder: true,
-                displayname: 'Title'
+                displayname: 'Title',
+                classes : ["article_base_title"]
             }, {
                 minLenght: 3,
-                maxLenght: 100
+                maxLenght: 200
             })
             .add('subtitle', 'text', {
                 placeholder: true,
-                displayname: 'Subtitle'
+                displayname: 'Subtitle',
+                classes : ["article_base_subtitle"]
             }, {
                 minLenght: 3,
-                maxLenght: 100
+                maxLenght: 200
             })
             .add('content', 'ckeditor', {
                 nolabel: true

@@ -73,12 +73,51 @@ var Article = function() {
         }
     };
 
+    this.query = function(cli, opts, cb) {
+        db.paramQuery(cli, opts, cb);
+    };
+
     this.list = function(cli) {
         filelogic.serveAdminLML(cli, false);
-    }
+    };
+
+    this.deepFetch = function(conf, idOrName, cb) {
+        var cond = new Object();
+        cond[typeof idOrName === "string" ? "name" : "_id"] = idOrName;
+
+        db.join(conf, 'content', [
+            {
+               $match : cond
+            }, {
+                $lookup:{
+                    from:           "uploads",
+                    localField:     "media",
+                    foreignField:   "_id",
+                    as:             "featuredimage"
+                }
+            }, {
+                $lookup:{
+                    from:           "entities",
+                    localField:     "author",
+                    foreignField:   "_id",
+                    as:             "authors"
+                }
+            }, {
+                $lookup:{
+                    from:           "uploads",
+                    localField:     "authors.0.avatarID",
+                    foreignField:   "_id",
+                    as:             "authorface"
+                }
+            }
+        ], function(arr) {
+            cb(arr[0] || arr);
+        });
+    };
 
     this.publish = function(cli) {
         cli.touch('article.new');
+        var that = this;
         if (cli.hasRight('article_publish')) {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
@@ -119,38 +158,38 @@ var Article = function() {
                         }
 
                         if (success) {
-                            // hooks.fire('article_created', {
-                            //     cli: cli,
-                            //     article: formData
-                            // });
-
                             cli.sendJSON({
                                 redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + formData._id,
                                 success: true
                             });
-                            var extra = formBuilder.unescapeForm(formData);
 
-                            // Generate LML page
-                            filelogic.renderLmlPostPage(cli, "article", extra , function(name) {
-                                cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
+                            that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
+                                var extra = new Object();
+                                extra.ctx = "article";
+                                extra.article = deepArticle;
 
-                                // Remove autosaves related to this article
-                                if (cli.postdata.data.autosaveid) {
-                                    db.remove(
-                                        cli._c,
-                                        'autosave',
-                                        {
-                                            _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
-                                        },
-                                        function() {}
-                                    );
-                                }
-
-                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                    title: "Article is Live!",
-                                    url: cli._c.server.url + '/' + formData.name,
-                                    msg: "Your article is published. Click to see it live.",
-                                    type: 'success'
+                                // Generate LML page
+                                filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
+                                    cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
+    
+                                    // Remove autosaves related to this article
+                                    if (cli.postdata.data.autosaveid) {
+                                        db.remove(
+                                            cli._c,
+                                            'autosave',
+                                            {
+                                                _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
+                                            },
+                                            function() {}
+                                        );
+                                    }
+    
+                                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                        title: "Article is Live!",
+                                        url: cli._c.server.url + '/' + formData.name,
+                                        msg: "Your article is published. Click to see it live.",
+                                        type: 'success'
+                                    });
                                 });
                             });
                         } else {
@@ -314,19 +353,29 @@ var Article = function() {
 
             }
         }
+    };
 
-    }
     this.preview = function(cli) {
         var form = formBuilder.handleRequest(cli);
         var formData = formBuilder.serializeForm(form);
 
-        filelogic.compileLmlPostPage(cli, "article", formData, function(html) {
+        var extra = new Object();
+        extra.article = formBuilder.unescapeForm(formData);
+        extra.ctx = "article";
+
+        // Generate LML page
+        var tmpName = "static/tmp/preview" + Math.random().toString().slice(2) + Math.random().toString().slice(2) + ".tmp";
+        var absPath = cli._c.server.html + "/" + tmpName;
+        filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
             var fileserver = require('./fileserver.js');
-            fileserver.pipeContentToClient(cli, html);
+            fileserver.pipeFileToClient(cli, absPath, function() {
+                fileserver.deleteFile(absPath, function() {});
+            }, true);
         });
     };
 
     this.edit = function(cli) {
+        var that = this;
         if (cli.routeinfo.path[3]) {
 
             var id = db.mongoID(cli.routeinfo.path[3]);
@@ -368,21 +417,28 @@ var Article = function() {
                         db.findAndModify(cli._c, 'content', {
                             _id: id
                         }, formData, function(err, r) {
-                            hooks.fire('article_edited', {
-                                cli: cli,
-                                article: r.value
-                            });
-                            filelogic.renderLmlPostPage(cli, "article", r.value, function(name) {
-                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                    title: "Article is updated!",
-                                    url: cli._c.server.url + '/' + formData.name,
-                                    msg: "Your changes are live. Click to see the live article.",
-                                    type: 'success'
+                            that.deepFetch(cli._c, id, function(deepArticle) {
+                                hooks.fire('article_edited', {
+                                    cli: cli,
+                                    article: r.value
                                 });
-                            });
-
-                            cli.sendJSON({
-                                success: true
+   
+                                var extra = new Object();
+                                extra.article = deepArticle;
+                                extra.ctx = "article";
+ 
+                                filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
+                                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                        title: "Article is updated!",
+                                        url: cli._c.server.url + '/' + formData.name,
+                                        msg: "Your changes are live. Click to see the live article.",
+                                        type: 'success'
+                                    });
+                                });
+    
+                                cli.sendJSON({
+                                    success: true
+                                });
                             });
                         });
                     });
@@ -752,27 +808,55 @@ var Article = function() {
                     'class': 'col-md-4'
                 }
             })
+            .trigger('fields')
+            .add('title-featuredimage', 'title', {
+                displayname : "Featured image information"
+            })
+            .add('featuredimageartist', 'text', {
+                displayname : "Artist name"
+            })
+            .add('featuredimagelink', 'text', {
+                displayname : "Artist link"
+            })
+            .add('title-industry', 'title', {
+                displayname : "Industry"
+            })
+            .add('industry', 'select', {
+                displayname : "Industry Tag",
+                datasource: [
+                    {name : "realestate", displayName : "Real Estate"},
+                    {name : "employment", displayName : "Employment"},
+                    {name : "foodresto", displayName : "Food + Restaurants"},
+                    {name : "nightlife", displayName : "Nightlife"},
+                    {name : "hnf", displayName : "Health + Fitness"},
+                    {name : "travel", displayName : "Travel"},
+                    {name : "lodging", displayName : "Lodging"},
+                    {name : "transportation", displayName : "Transportation"},
+                    {name : "fashion", displayName : "Fashion"},
+                    {name : "technology", displayName : "Technology"},
+                    {name : "education", displayName : "Education"},
+                    {name : "finance", displayName : "Finance"},
+                    {name : "relationships", displayName : "Relationships + Sex"},
+                    {name : "entertainment", displayName : "Entertainment + Tourism"},
+                    {name : "info", displayName : "Info"},
+                    {name : "sponsorship", displayName : "Sponsorship"}
+                ]
+            })
             .trigger('bottom')
+            .add('title-action', 'title', {
+                displayname: "Publish"
+            })
             .add('save', 'button', {
                 'displayname': 'Save draft',
                 'classes': ['btn', 'btn-default', 'fullwidth'],
-                'wrapper': {
-                    'class': 'col-md-4'
-                }
             })
             .add('preview', 'button', {
                 'displayname': 'Preview in new tab',
                 'classes': ['btn', 'btn-default', 'fullwidth'],
-                'wrapper': {
-                    'class': 'col-md-4'
-                }
             })
             .add('publish', 'button', {
                 'displayname': 'Save and <b>Publish</b>',
                 'classes': ['btn', 'btn-default', 'fullwidth'],
-                'wrapper': {
-                    'class': 'col-md-4'
-                }
             });
     }
 
@@ -782,22 +866,20 @@ var Article = function() {
 
     this.generateFromName = function(cli, articleName, cb) {
         // Check for articles in db
-        db.findToArray(cli._c, 'content', {
-            name: articleName,
-            status: 'published'
-        }, function(err, arr) {
-
-            if (arr[0]) {
-                // Generate LML page
-                filelogic.renderLmlPostPage(cli, "article", arr[0], function(name) {
-                    cacheInvalidator.addFileToWatch(name, 'articleInvalidated', arr[0]._id, cli._c);
-                    cb(true);
-
-                });
-            } else {
+        this.deepFetch(cli._c, articleName, function(deepArticle) {
+            if (!deepArticle) {
                 cb(false);
+            } else {
+                var extra = new Object();
+                extra.ctx = "article";
+                extra.article = deepArticle;
+
+                filelogic.renderThemeLML(cli, "article", articleName + '.html', extra , function(name) {
+                    cacheInvalidator.addFileToWatch(articleName, 'articleInvalidated', deepArticle._id, cli._c);
+                    cb(true);
+                });
             }
-        })
+        });
     }
 
 

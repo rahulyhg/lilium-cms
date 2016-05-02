@@ -25,7 +25,6 @@ var _c = require('./config.js');
 var log = require('./log.js');
 var Petals = require('./petal.js');
 
-
 var LML = function () {
     // Reference to self
     var that = lml = thislml = this;
@@ -82,6 +81,10 @@ var LML = function () {
         var templatename = params.template || "";
         var targetname = params.target || "";
         var sourceof = params.sourceof || "";
+
+        if (0 === sourceof.indexOf('=')) {
+            sourceof = LMLSlang.pulloutVar(context, sourceof.substring(1));
+        }
 
         parseStringForRecursiveVarTags(context, code, function (code) {
             context.newLine = '<lml:livevars data-varname="' + code +
@@ -251,12 +254,17 @@ var LML = function () {
         };
 
         this.pulloutVar = function (context, str) {
+            var that = this;
             var endVal = str.trim();
             var isNumber = !isNaN(str);
+            var isArray = '[' === endVal[0] && ']' === endVal.slice(-1);
             var isStringMatch = str.match(/^"(.*)"$|^'(.*)'$/g);
             var acceptUndefined = str[0] === '?';
 
-            if (isStringMatch) {
+            if (isArray) {
+                var obj = JSON.parse(endVal.split('|').join(','));
+                return obj;
+            } else if (isStringMatch) {
                 endVal = str.trim().slice(1, -1);
             } else if (!isNumber) {
                 try {
@@ -285,10 +293,16 @@ var LML = function () {
                                         curLevel.indexOf(')') - curLevel.indexOf('(') - 1
                                     ).split(',').map(function (str) {
                                         str = str.trim();
+                                        if (0 === str.indexOf('=')) {
+                                            str = that.pulloutVar(context, str.substring(1));
+                                        } else if ('[' === str[0]) {
+                                            return that.pulloutVar(context, str);
+                                        }
+
                                         return (!isNaN(str)) ? parseInt(str) : str.replace(/'|"/g, '');
                                     });
 
-                                    endVal = endVal[ftcName].apply(firstLevelLib, params);
+                                    endVal = endVal[ftcName].apply(endVal, params);
                                 } else {
                                     throw new Error("LMLParseException - Call to undefined funtion : " + ftcName);
                                 }
@@ -424,7 +438,7 @@ var LML = function () {
 
     var execLMLTag = function (context, code, callback) {
         // LML parsing
-        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\n]*)[\s]*\)|(block)[\s]*\([\s]*([^\s]+)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endblock|else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'][^\n]+["|'])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
+        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\n]*)[\s]*\)|(block)[\s]*\([\s]*([^\s]+)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endblock|else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'\[][^\n]+["|'\]])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
         var closureSelector = /(else|endif|endfor|endwhile|endblock)/g;
 
         // Split in lines array, all commands have
@@ -519,6 +533,10 @@ var LML = function () {
                     }
                 } else {
                     // Nothing was found that matches LML Slang
+                    var errmsg = "Unrecognized operation in " + (context.rootPath || "LML file") + " @ line " + context.currentLineIndex;
+                    log('LMLParserException', errmsg);
+                    log('LMLError', "Unknown operation : " + line);
+                    throw new Error(errmsg);
                 }
             }
 
@@ -539,7 +557,7 @@ var LML = function () {
                     " in " + (context.rootPath || "LML file") +
                     " @ line " + context.currentLineIndex);
                 log("Stacktrace", ex.stack);
-                throw new Error("[Fatal] [LMLParserException] Could not recover from fatal error");
+                callback(new Error("[Fatal] [LMLParserException] Could not recover from fatal error"));
             }
         }
 
@@ -605,7 +623,7 @@ var LML = function () {
         var nextWorkPos = 0;
 
         // Needs to be precompiled every line
-        var lmlDetectRegex = /{(#|%|=|parent)([^\n\s]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\_\#\>\<\/\=\+\-.\s\']*"?,?\s*)*)\)?}/g;
+        var lmlDetectRegex = /{(#|%|=|parent)([^\n\s\}]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\_\#\>\<\/\=\+\-.\s\']*"?,?\s*)*)\)?}/g;
         var seekLML = function () {
             if (nextWorkPos >= line.length) {
                 lineCallback(context.lineFeedback);
@@ -615,7 +633,7 @@ var LML = function () {
 
                 nextWorkPos += crop.length;
                 if (crop.indexOf('$}') != -1) {
-                    crop = crop.substring(0, crop.indexOf('{$'));
+                    crop = crop.substring(0, crop.indexOf('$}'));
                     context.isLMLTag = false;
                 }
 
@@ -694,7 +712,7 @@ var LML = function () {
     // The value returned is undefined when everything is done
     this.parseContent = function (rootpath, content, callback, context, extra, sync) {
         // Per line execution, slow for minified files
-        var lines = typeof content === 'string' ? content.split('\n') : typeof content === 'object' ? content : new Array();
+        var lines = typeof content === 'string' ? (extra && extra.fromClient ? content.split(/\n|\\n/) : content.split('\n')) : typeof content === 'object' ? content : new Array();
         var cLine = 0,
             lineTotal = lines.length;
 
@@ -714,6 +732,7 @@ var LML = function () {
 
         delete content;
 
+        log('LML', 'Parsing ' + lines.length + ' lines');
         if (lineTotal != 0) {
             var cont = function () {
                 setTimeout(function () {
@@ -797,6 +816,39 @@ var LML = function () {
             return ("[LMLParentNotFound : " + rootpath + "]");
         }
     }
+
+    this.executeFromString = function(contextpath, content, callback, extra) {
+        var timeStamp = new Date();
+        var html = "";
+
+        var linesToWrite = 0;
+        var linesWritten = 0;
+        var readyToFlush = false;
+        var flushing = false;
+
+        var verifyEnd = function () {
+            if (readyToFlush && linesToWrite == linesWritten && !flushing) {
+                flushing = true;
+
+                log('LML', 'Compiled dynamic LML  in ' + (new Date() - timeStamp) + 'ms');
+
+                callback(html);
+            }
+        }
+
+        that.parseContent(contextpath, content, function (pContent) {
+            // Write pContent to file @compilepath
+            if (typeof pContent === 'undefined') {
+                readyToFlush = true;
+                verifyEnd();
+            } else {
+                linesToWrite++;
+                html += pContent;
+                linesWritten++;
+                verifyEnd();
+            }
+        }, undefined, extra);
+    };
 
     this.executeToHtml = function (rootpath, callback, extra) {
         var timeStamp = new Date();

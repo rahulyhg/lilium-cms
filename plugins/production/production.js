@@ -109,16 +109,42 @@ var Production = function () {
 
     var registerForms = function () {
         hooks.bind('post_create_bottom', 200, function (pkg) {
-            pkg.form.add('isSponsored', 'checkbox', {
+            pkg.form
+            .add('spons-title', 'title', {
+                displayname : "Sponsored Post"
+            })
+            .add('isSponsored', 'checkbox', {
                 displayname: 'Sponsored Content',
-                'wrapper': {
-                    'class': 'col-md-12'
-                },
-                data: {
-                    right: 'production'
+            }, {
+                required: false
+            })
+            .add('useSponsoredBox', 'checkbox', {
+                displayname: "Display Sponsored Box"
+            }, {
+                required: false
+            })
+            .add('sponsoredBoxTitle', 'text', {
+                displayname: "Sponsored Box Title"
+            }, {
+                required: false
+            })
+            .add('sponsoredBoxURL', 'text', {
+                displayname: "Sponsored Box Link"
+            }, {
+                required: false
+            })
+            .add('sponsoredBoxLogo', 'media-explorer', {
+                displayname: "Sponsored Box Logo",
+                wrapper : {
+                    tag: 'div',
+                    class: 'sponsoredBoxLogoWrapper'
                 }
-            },
-            {
+            }, {
+                required: false
+            })
+            .add('sponsoredBoxContent', 'textarea', {
+                displayname: "Sponsored Box Context Text"
+            }, {
                 required: false
             });
         });

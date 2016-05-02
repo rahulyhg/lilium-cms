@@ -180,6 +180,19 @@ $}
 }
 
 @font-face {
+    font-family: 'Oswald';
+    src: url('{=siteurl}/static/fonts/Oswald/oswald-regular.eot');
+    src: url('{=siteurl}/static/fonts/Oswald/oswald-regular.eot?#iefix') format('embedded-opentype'),
+         url('{=siteurl}/static/fonts/Oswald/oswald-regular.woff2') format('woff2'),
+         url('{=siteurl}/static/fonts/Oswald/oswald-regular.woff') format('woff'),
+         url('{=siteurl}/static/fonts/Oswald/oswald-regular.ttf') format('truetype'),
+         url('{=siteurl}/static/fonts/Oswald/oswald-regular.svg#oswaldbook') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
   font-family: 'FontAwesome';
   src: url('{=fontdir}/fontawesome-webfont.eot?v=4.5.0');
   src: url('{=fontdir}/fontawesome-webfont.eot?#iefix&v=4.5.0') format('embedded-opentype'), url('{=fontdir}/fontawesome-webfont.woff2?v=4.5.0') format('woff2'), url('{=fontdir}/fontawesome-webfont.woff?v=4.5.0') format('woff'), url('{=fontdir}/fontawesome-webfont.ttf?v=4.5.0') format('truetype'), url('{=fontdir}/fontawesome-webfont.svg?v=4.5.0#fontawesomeregular') format('svg');
@@ -310,6 +323,12 @@ select {
 	padding: 10px;
 }
 
+.lmlform-fieldwrapper-title {
+    clear: both;
+    float: none;
+    display: block;
+}
+
 .lmlform-fieldwrapper label {
 	margin-right: 10px;
 }
@@ -342,11 +361,13 @@ select {
 }
 
 .lmlform input[type="submit"]:hover, .lmlform button:hover {
-	background-color: {=hovercolor}
+	background-color: {=hovercolor};
+    color: #EEE;
 }
 
 .lmlform input[type="submit"]:active, .lmlform button:active {
-	background-color: {=activecolor}
+	background-color: {=activecolor};
+    color: #EEE;
 }
 
 .lmlform input:focus, .lmlform select:focus,
@@ -1224,3 +1245,16 @@ input[disabled] {
     color: #FFF;
 }
 
+.lmlform input.article_base_title {
+    font-family: 'Oswald', Times New Roman, Arial, sans-serif;
+    font-size: 32px;
+}
+
+.lmlform input.article_base_subtitle {
+    margin: -10px 0px;
+}
+
+.sponsoredBoxLogoWrapper .media_explorer_form {
+    width: 200px;
+    height: 200px;
+}

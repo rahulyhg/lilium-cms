@@ -33,8 +33,7 @@ var templateBuilder = function () {
 
     var getSettings = function (config) {
         return themes.getEnabledTheme(config).settings;
-    }
-
+    };
 
     this.registerPetal = function (sectionName, absPetalPath, priority, extra) {
         var registerFilename = __caller;
@@ -71,13 +70,18 @@ var templateBuilder = function () {
 
     };
 
-
     this.init = function (config) {
         log('TemplateBuilder', "Initializing for site " + config.id);
-        lmllib.registerContextLibrary('theme', function () {
+        lmllib.registerContextLibrary('theme', function (context) {
+            var rendersnip = function(snipid, _____) {
+                var args = Array.prototype.slice.call(arguments, 1);
+                return themes.renderSnip(context.lib.config.default, snipid, args);
+            };
+
             return {
                 render: renderBlock,
-                settings: getSettings(config)
+                settings: getSettings(config),
+                snip : rendersnip
             };
         });
 
@@ -103,59 +107,40 @@ var templateBuilder = function () {
     };
 
     this.precompThemeFiles = function (_c, cb) {
-        var reqCB = 0;
-        var actualCB = 0;
+        that.precompJS(_c);
+        that.precompCSS(_c);
 
-        var callback = function() {
-            actualCB ++;
-            if (actualCB == reqCB) {
-                cb();
-            }
+        var fileArr = new Array();
+        if (js[_c.id]) for (var i = 0; i < js[_c.id].length; i++) {
+            fileArr.push(js[_c.id][i]);
+        }
+        if (css[_c.id]) for (var i = 0; i < css[_c.id].length; i++) {
+            fileArr.push(css[_c.id][i]);
         }
 
-
-        if (js[_c.id]) {
-            reqCB ++;
-            this.precompJS(_c, callback);
-        }
-
-        if (css[_c.id]) {
-            reqCB ++;
-            this.precompCSS(_c, callback);
-        }
-
-        if (reqCB == 0) {
-            cb();
-        }
+        require('./precomp.js').precompile(_c, cb, fileArr);
     };
 
-    this.precompJS = function (_c, cb) {
+    this.precompJS = function (_c) {
         if (js[_c.id]) {
             for (var i in js[_c.id]) {
-                var completePath = _c.server.html + '/compiled/theme' +js[_c.id][i].substring(js[_c.id][i].lastIndexOf('/'), js[_c.id][i].lenght);
+                var completePath = _c.server.html + '/compiled/theme' +js[_c.id][i].substring(js[_c.id][i].lastIndexOf('/'), js[_c.id][i].length);
                 completePath = completePath.substring(0, completePath.lastIndexOf('.'));
 
-                Frontend.registerCSSFile(completePath, "theme", _c.id);
+                Frontend.registerJSFile(completePath, 150, "theme", _c.id);
                 log('TemplateBuilder', 'Registered precomp JS File :' + js[_c.id][i]);
-
             }
-
-            require('./precomp.js').precompile(_c, cb, js[_c.id]);
         }
     }
 
     this.precompCSS = function (_c, cb) {
         if (css[_c.id]) {
             for (var i in css[_c.id]) {
-                var completePath = _c.server.html + '/compiled/theme' +css[_c.id][i].substring(css[_c.id][i].lastIndexOf('/'), css[_c.id][i].lenght);
+                var completePath = _c.server.html + '/compiled/theme' +css[_c.id][i].substring(css[_c.id][i].lastIndexOf('/'), css[_c.id][i].length);
                 completePath = completePath.substring(0, completePath.lastIndexOf('.'));
                 Frontend.registerCSSFile(completePath, 150, "theme", _c.id);
                 log('TemplateBuilder', 'Registered precomp CSS File :' + css[_c.id][i]);
-
             }
-
-
-            require('./precomp.js').precompile(_c, cb, css[_c.id]);
         }
     }
 

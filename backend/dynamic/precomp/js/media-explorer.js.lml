@@ -14,8 +14,9 @@ var mediaExplorer = function(closeUpload) {
     var picture_id_url = {};
     var that = this;
 
-    this.init = function() {
+    var currentOpenForm = undefined;
 
+    this.init = function() {
         getModal(function(html) {
             $('body').append(html);
             modal = $('#mediaExplorerModal');
@@ -26,9 +27,8 @@ var mediaExplorer = function(closeUpload) {
         });
 
         $('body').on('click', '.media_explorer_form', function(e) {
-            that.open();
+            that.open(this);
         })
-
     };
 
     this.event = {
@@ -38,11 +38,10 @@ var mediaExplorer = function(closeUpload) {
         mediaExplorerImageSelected: "mediaExplorerImageSelected"
     };
 
-    this.open = function(cb) {
+    this.open = function(mediaexplorerform, cb) {
+        currentOpenForm = mediaexplorerform;
         loadImages();
         modal.modal('show');
-
-
 
         $('#mediaExplorerModal .menu span').click(function(e) {
             if (typeof selectedPicture !== 'undefined') {
@@ -57,13 +56,8 @@ var mediaExplorer = function(closeUpload) {
 
             selectedId = tabid;
 
-            if ('#mediaExplorerModal') {
-
-            }
             $(tab).addClass('selected');
             $('#mediaExplorerModal #' + tabid).show();
-
-
         });
 
         $('body').on('click', '#media-list img', function(event) {
@@ -74,7 +68,6 @@ var mediaExplorer = function(closeUpload) {
 
             selectedPicture = elem;
             $(selectedPicture).addClass('selectedPicture');
-
         });
 
 
@@ -134,22 +127,21 @@ var mediaExplorer = function(closeUpload) {
                 if (typeof cb == 'function') {
                     cb(data);
                 }
-
             });
         } else {
             return modal;
         }
     };
 
-    watchForSubmition = function() {
+    var watchForSubmition = function() {
         $('#mediaExplorerModal button#add').on('click', function(e) {
             if (selectedId == 'media-list') {
                 if (typeof selectedPicture !== 'undefined') {
                     var id = $(selectedPicture).attr('id');
 
-                    $('.media_explorer_form').css('background-image', 'url(' + '{=baseurl}uploads/' + picture_id_url[id] + ')');
-                    $('.media_explorer_form .actions .action-desc').text('Click to change image');
-                    $('input#media-input').val(id);
+                    $(currentOpenForm).css('background-image', 'url(' + '{=baseurl}uploads/' + picture_id_url[id] + ')');
+                    $(currentOpenForm).find('.actions .action-desc').text('Click to change image');
+                    $(currentOpenForm).find('input.media-input').val(id);
 
                     document.dispatchEvent(new CustomEvent(that.event.mediaExplorerImageSelected, {
                         'detail': {
@@ -165,8 +157,8 @@ var mediaExplorer = function(closeUpload) {
                 if (closeOnUpload) {
                     $(modal).modal('hide');
                     // Add spinner
-                    $('.media_explorer_form .fa-spinner').show();
-                    $('.media_explorer_form .actions').hide();
+                    $(currentOpenForm).find('.fa-spinner').show();
+                    $(currentOpenForm).find('.actions').hide();
 
                 }
 
@@ -225,11 +217,11 @@ var mediaExplorer = function(closeUpload) {
                             bar.addClass('progress-bar-success');
                             bar.text('Upload Success!');
                         } else {
-                            $('.media_explorer_form .fa-spinner').hide();
-                            $('.media_explorer_form .actions').show();
-                            $('.media_explorer_form .actions .action-desc').text('Click to change image');
-                            $('input#media-input').val(res.picture._id);
-                            $('.media_explorer_form').css('background-image', 'url({=baseurl}uploads/' + res.picture.url + ')');
+                            $(currentOpenForm).find('.fa-spinner').hide();
+                            $(currentOpenForm).find('.actions').show();
+                            $(currentOpenForm).find('.actions .action-desc').text('Click to change image');
+                            $(currentOpenForm).find('input.media-input').val(res.picture._id);
+                            $(currentOpenForm).css('background-image', 'url({=baseurl}uploads/' + res.picture.url + ')');
                         }
 
 
@@ -241,7 +233,6 @@ var mediaExplorer = function(closeUpload) {
                         // Insert uploaded picture
                         picture_id_url[res.picture._id] = res.picture.url;
                         $('#mediaExplorerModal #media-list').append('<img id="' + res.picture._id + '" src="' + res.picture.sizes.thumbnail.url + '">');
-
 
                         // Broadcast open event
                         document.dispatchEvent(new CustomEvent(that.event.mediaExplorerUploaded, {
@@ -283,11 +274,10 @@ var mediaExplorer = function(closeUpload) {
 $(document).ready(function() {
     document.addEventListener('livevarsRendered', function(e) {
         if ($('.media_explorer_form').size() > 0) {
-
             mediaExplorer = new mediaExplorer(true);
-
             mediaExplorer.init();
         }
+
         $('.media_explorer_form > input').each(function(){
             var input = $(this);
             liliumcms.livevars.getSingleLivevar('media.getUrlFromId', {
@@ -295,10 +285,8 @@ $(document).ready(function() {
             }, function(data){
                 if (data.livevars['media.getUrlFromId'].url) {
                     input.parent().css('background-image', 'url("{=baseurl}uploads/'+ data.livevars['media.getUrlFromId'].url +'")');
-
                 }
             })
-
         });
 
     });

@@ -54,7 +54,7 @@ var CacheInvalidator = function () {
             file: path,
             extra: cachedFileEvents[path]
         }, function (err) {
-            log('Cache Invalidator', err);
+            log('Cache Invalidator', err || "Watching " + path);
         });
     };
 

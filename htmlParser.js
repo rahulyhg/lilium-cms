@@ -181,7 +181,7 @@ var HtmlParser = function () {
     };
 
     var generateLabel = function (field, placeholder) {
-        if (field.nolabel) {
+        if (field.attr.nolabel) {
             return "";
         }
 
@@ -244,7 +244,7 @@ var HtmlParser = function () {
             html += '<th>' + parseStackField(columns[i]) + '</th>';
         }
 
-        html += '<th><button class="lmlstacktableappendbutton">Append</button></th></tr></thead></tbody></tbody></table>';
+        html += '<th><button class="lmlstacktableappendbutton">Append</button></th></tr></thead></tbody></tbody></table></div>';
         return html;
     };
 

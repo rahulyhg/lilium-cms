@@ -291,11 +291,22 @@ var Media = function () {
                 }, callback);
             }
         }, ["uploads"]);
-    }
+    };
 
-    var init = function () {};
+    this.registerLMLLib = function() {
+        require('./lmllib.js').registerContextLibrary('media', function(context) {
+            var fetch = function(mediaid) {
+                var conf = context.lib.config.default;
+                db.findToArray(conf, 'media', {}, function(err, arr) {
+                    
+                });
+            };
 
-    init();
-}
+            return {
+                fetch : fetch
+            }
+        });
+    };
+};
 
 module.exports = new Media();

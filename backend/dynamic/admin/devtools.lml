@@ -1,0 +1,25 @@
+{#config}
+<h1>Developer tools</h1>
+
+<div class="devtools-list-wrapper">
+    <ul class="devtools-list">
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/livevars">
+                <i class="devtools-list-item-icon fa fa-database"></i>
+                <b class="devtools-list-item-title">Livevars</b>
+            </a>
+        </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/lml">
+                <i class="devtools-list-item-icon fa fa-code"></i>
+                <b class="devtools-list-item-title">LML</b>
+            </a>
+        </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/endpoints">
+                <i class="devtools-list-item-icon fa fa-dot-circle-o"></i>
+                <b class="devtools-list-item-title">Endpoints</b>
+            </a>
+        </li>
+    </ul>
+</div>

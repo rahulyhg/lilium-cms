@@ -18,6 +18,8 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
 
 
     var append = function(val, index) {
+        if (!val) return "";
+
         var row;
         row += "<td>" + val + "</td>";
         row += "<input type='hidden' name='" + $('#' + htmlIdentifier).data('fieldname') + "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' value='" + val + "'></input>";
@@ -27,7 +29,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
     this.appendRowFromButton = function() {
         var row = '<tr>';
 
-        $('.lmlstacktable th input').each(function(index) {
+        $('#'+htmlIdentifier+' th input').each(function(index) {
             row += append($(this).val(), index);
             $(this).val('');
         });
@@ -49,7 +51,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
             for (var i in data) {
                 var row = '<tr>';
 
-                $('.lmlstacktable th input').each(function(index) {
+                $('#'+htmlIdentifier+' th input').each(function(index) {
                         var coldata = data[i][$(this).data('fieldname')];
                         row += append(coldata, index);
 

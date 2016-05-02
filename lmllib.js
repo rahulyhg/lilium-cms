@@ -19,27 +19,11 @@ var registeredLibraries = {
     article: function (context) {
         return require('./article.js');
     },
-    session: function () {
-        return "";
-    },
     plugins: function (context) {
         return require('./plugins.js');
     },
     themes: function (context) {
         return require('./themes.js');
-    },
-    testarray: function (context) {
-        return {
-            array: [{
-                "text": "hello"
-            }, {
-                "text": " "
-            }, {
-                "text": "world"
-            }, {
-                "text": "!"
-            }]
-        };
     },
     extra: function (context) {
         return context.extra;

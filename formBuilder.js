@@ -46,7 +46,7 @@ var Field = function(name, type) {
      */
     this.requirements = {
         minLenght: "0",
-        maxLenght: "-1",
+        maxLenght: "",
         required: true
     };
 };

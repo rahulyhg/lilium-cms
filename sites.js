@@ -37,6 +37,7 @@ var SiteInitializer = function (conf) {
     };
 
     var loadStaticSymlinks = function (done) {
+        log('Sites', 'Initializing symlinks');
         var to = conf.server.html + '/static';
         var rootDir = conf.server.base + 'backend/static/';
         fileserver.createSymlinkSync(rootDir, to);
@@ -106,12 +107,13 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/alert.js", 1400, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
-        Frontend.registerCSSFile(htmlbase + "/bower/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "bower_components/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/login.css", 2200, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/media.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/devtools.css", 2620, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/notifications.css", 2400, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/pushtable.css", 2500, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/multiselect.css", 2600, 'admin', conf.id);
@@ -304,6 +306,8 @@ var Sites = function () {
         conf.default.website.sitetitle = conf.default.info.project;
         conf.default.emails.default = postdata.websiteemail || "";
         conf.default.id = postdata.baseurl.replace(/\/\//g, '');
+
+        conf.default.uid = Math.random().toString().slice(2);
 
         conf.default.wptransfer = postdata.wptransfer;
         conf.default.wptransferring = postdata.wptransfer;

@@ -10,13 +10,20 @@
     width: initial;
 }
 .tags-input .tag{
-	display: inline-block;
-	padding: 2px;
-	background: #9B59B6;
-	color: #fff;
-	margin: 5px;
+    display: inline-block;
+    padding: 2px 5px 0px;
+    background: #9B59B6;
+    color: #fff;
+    margin: 5px 0px 0px 5px;
+    border-radius: 5px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 .tags-input .tag i {
-	margin-left: 5px;
-	cursor: pointer;
+    margin-left: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    border-left: 1px solid #DDD;
+    padding-left: 6px;
 }

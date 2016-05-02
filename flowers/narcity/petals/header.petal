@@ -1,64 +1,41 @@
 {#theme;config}
-<header class="header">
-    <div class="header__content">
-        <div class="header__burger-wrapper">
-            <div class="header__burger-icon"></div>
+<header class="narcity-header-bar">
+    <div class="narcity-header-container">
+        <div class="narcity-logo-wrapper">
+            <a href="{=config.default.server.url}">
+                <img src="{=config.default.server.url}{=theme.settings.logo}" />
+            </a>
         </div>
-        <div class="header__title">
-            <a class="header__title__link" href="{=config.default.server.url}">
-            <img class="header__logo" src="{=theme.settings.logo}"> </a>
-        </div>
-        <input type="checkbox" id="city-selector__checkbox" class="city-selector__checkbox">
-        <ul class="city-selector">
-            <li class="city-selector__item city-selector__item--current">
-                <label class="city-selector__link" for="city-selector__checkbox"><span class="city-selector__current-link-text">{=theme.settings.network-name} <small>▼</small></span></label>
-            </li>
-            {$
-            arr = theme.settings.othernetworkwebsites;
-            for(site in arr);
-            $}
-            <li class="city-selector__item "> <a class="city-selector__link" href="{=site.url}">
-            {=site.sitename}</a></li>
-            {$
-            endfor;
-            $}
-        </ul>
-        <div class="mobile-social-footer">
-            <div class="mobile-social-footer-fb">
-                <a onclick=" window.open( 'https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href), 'facebook-share-dialog', 'width=626,height=436'); ga('send', 'event', 'Share Buttons', 'Share', 'Facebook, Mobile Clipped Footer');; return false;"
-                    href="javascript:void()"> <img src="./narcityto-home_files/facebook64.png" class="" alt="Share on Facebook"> <span>Share</span> </a>
-            </div>
-            <div class="mobile-social-footer-fv"> <img title="Favorite" src="./narcityto-home_files/star_g.png" class="mobile-clip-sharing-favorite" alt="Favorite"> <span class="mobile-favorite-count">0</span></div>
-        </div>
-        <ul class="header__nav">
-            <li class="header__nav-item"> <a class="header__nav-item-link " href="http://www.narcity.com/toronto/category/best-of-to">Best of TO</a></li>
-            <li class="header__nav-item"> <a class="header__nav-item-link " href="http://www.narcity.com/toronto/category/things-to-do-in-to">Things to do in to</a></li>
-        </ul>
-        <div class="header__toolbar">
-            <ul class="header__social-links">
-                <li class="header__social-link">
-                    <a href="http://www.facebook.com/NarcityToronto" target="_blank" title="Follow us on Facebook"><img src="./narcityto-home_files/facebook_b.png"></a>
+
+        <div class="city-selector-wrapper">
+            <a href="" class="city-selector-dropper"><span>{=theme.settings.cityname}</span></a>
+            <ul class="city-selector">
+                {$ for (city in theme.settings.othernetworkwebsites); $}
+                <li>
+                    <a href="{=city.url}">{=city.sitename}</a>
                 </li>
-                <li class="header__social-link">
-                    <a href="http://www.twitter.com/NarcityToronto" target="_blank" title="Follow us on Twitter"><img src="./narcityto-home_files/twitter_b.png"></a>
-                </li>
-                <li class="header__social-link">
-                    <a href="http://www.instagram.com/Narcity_Toronto" target="_blank" title="Follow us on Instagram"><img src="./narcityto-home_files/insta_b.png"></a>
-                </li>
-                <li class="header__social-link">
-                    <a href="http://www.youtube.com/channel/UCU-NiBfBGPm30HIDAnlb6gw" target="_blank" title="Follow us on Youtube"><img src="./narcityto-home_files/youtube_b.png"></a>
-                </li>
-                <li class="header__social-link">
-                    <a href="http://plus.google.com/106209983177171368353/" target="_blank" title="Follow us on Google+"><img src="./narcityto-home_files/google_b.png"></a>
-                </li>
+                {$ endfor; $}
             </ul>
-            <form method="get" class="header__search-form" action="http://www.narcity.com/toronto/">
-                <div>
-                    <input placeholder="Search" class="header__search-text" type="text" name="s" value="">
-                    <input class="header__search-button" name="submit" type="submit" value="Search">
+        </div>
+
+        {$ for (link in theme.settings.headerlinks) $}
+        <div class="header-link">
+            <a href="{=link.url}">{=link.linktext}</a>
+        </div>
+        {$ endfor; $}
+
+        <div class="header-float-right">
+            <div class="header-search-wrapper">
+                <form method="GET" action="{=config.default.server.url}/s">
+                    <input class="header-search" name="q" type="text" placeholder="Search" required />
+                </form>
+            </div>
+
+            <div class="header-login-wrapper">
+                <div class="login-button">
+                    Login
                 </div>
-            </form>
-            <div class="header__signup-button"> <a href="javascript:_fb.castLogin();">Login</a></div>
+            </div>
         </div>
     </div>
 </header>

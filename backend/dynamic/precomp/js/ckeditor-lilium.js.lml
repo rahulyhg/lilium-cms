@@ -1,8 +1,8 @@
 {#config;forms}
-		{$
-			var baseurl = config.default.server.url;
-			baseurl += "/";
-		$}
+{$
+	var baseurl = config.default.server.url;
+$}
+
 var CKEditor = function() {
 	var picture_id_url = {};
 	var selectedPicture;
@@ -13,9 +13,7 @@ var CKEditor = function() {
             return;
         }
 
-
-        CKEDITOR.basePath = '{=baseurl}bower/ckeditor/';
-
+        CKEDITOR.basePath = '{=baseurl}/bower/ckeditor/';
 
         if ($('[ckeditor]').ckeditor) {
             $('[ckeditor][data-readonly=true]').ckeditor(function() {
@@ -30,13 +28,16 @@ var CKEditor = function() {
             this.document.appendStyleSheet('/compiled/admin.css');
         });
         CKEDITOR.config.entities = false;
-        CKEDITOR.config.extraPlugins = 'image-finder';
+        CKEDITOR.config.height = 500;
+        CKEDITOR.config.extraPlugins = 'image-finder,youtube';
         CKEDITOR.config.entities_greek = false;
         CKEDITOR.config.entities_latin = false;
         // CKEDITOR.config.removeButtons = 'image';
         CKEDITOR.config.allowedContent = true;
         CKEDITOR.config.contentsCss = '/static/style.css';
         CKEDITOR.config.skin = "BootstrapCK4,/bower/BootstrapCK4-Skin/skins/bootstrapck/";
+
+        CKEDITOR.plugins.addExternal('youtube', '/bower/ckeditor-youtube-plugin/youtube/');
 
         //CKEDITOR plugin to choose picture
         CKEDITOR.dialog.add("imagebrowserDialog", function(editor) {
@@ -51,14 +52,14 @@ var CKEditor = function() {
                     label: "Browse for images",
                     elements: [{
                         type: "html",
-                        html: '<div id="picture-list"></div>'
+                        html: '<div id="picture-list"></div><div class="picture-list-form">{=forms.render('ckimagecredit')}</div>'
                     }]
                 }, {
                     id: "tab-step2",
                     label: "Upload an image",
                     elements: [{
                         type: "html",
-                        html: '<div id="image-upload"></div>'
+                        html: '<div id="image-upload"></div><div class="picture-upload-form">{=forms.render('ckimagecredit')}</div>'
                     }]
                 }],
                 onShow: function() {
@@ -98,6 +99,11 @@ var CKEditor = function() {
                         img.setAttribute('src', '/uploads/' + picture_id_url[id]);
                         img.setStyle('width', '300px');
                         editor.insertElement(img);
+
+                        var credits = editor.document.createElement('a');
+                        credits.setHtml($('.ck-image-credit-form input[name="ckimagecreditname"]').val());
+                        credits.setAttribute('href', $('.ck-image-credit-form input[name="ckimagecrediturl"]').val());
+                        editor.insertElement(credits);
                     }
                 }
             }
@@ -154,7 +160,7 @@ var CKEditor = function() {
 			formData.append('form_name', form_name);
 
 			var req = new XMLHttpRequest();
-			req.open('post', '{=baseurl}admin/media/upload', true);
+			req.open('post', '{=baseurl}/admin/media/upload', true);
 
 			req.upload.onprogress = function(e) {
 				if (e.lengthComputable) {

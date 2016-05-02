@@ -154,6 +154,7 @@ var Entities = module.exports = new function () {
     };
 
     this.updateProfilePicture = function (cli, isProfile) {
+        log('Entities', 'Handling entity picture upload');
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
 
@@ -167,8 +168,7 @@ var Entities = module.exports = new function () {
             if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
 
                 imageResizer.resize(saveTo, image.picture, mime, cli, function (images) {
-
-                    var avatarURL = cli._c.server.url + '/uploads/' + image.picture;
+                    var avatarURL = images.medium.url;
                     var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
                     var id = isProfile ? cli.userinfo.userid : cli.routeinfo.path[3];
                     var sessionManager = require('./session.js');
@@ -180,7 +180,6 @@ var Entities = module.exports = new function () {
                         avatarURL: avatarURL,
                         avatarID: avatarID
                     }, function (err, result) {
-
                         // Update session
                         if (isProfile) {
                             var sessToken = cli.session.token;

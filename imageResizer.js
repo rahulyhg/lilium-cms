@@ -30,6 +30,8 @@ var ImageResizer = function () {
         if (i >= 0) {
             lwip.open(buffer, mime, function (err, image) {
 
+                if (image === null) console.log(err);
+
                 var baseHeight = image.height();
                 var baseWidth = image.width();
                 var width;

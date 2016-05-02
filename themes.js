@@ -12,8 +12,35 @@ var cli = require('./cli.js');
 
 var ActiveTheme = new Object();
 var CachedThemes = new Array();
+var ThemeSnips = new Object();
+
 var Themes = function () {
     var that = this;
+
+    this.registerThemeSnip = function(conf, snipid, callback) {
+        var cTheme = that.getEnabledTheme(conf);
+
+        if ('undefined' === typeof ThemeSnips[conf.id]) {
+            ThemeSnips[conf.id] = new Object();
+        }
+
+        ThemeSnips[conf.id][snipid] = {
+            id : snipid,
+            theme : cTheme,
+            site : conf.id,
+            exec : callback
+        };
+    };
+
+    // Params are undeclared, but are to be passed.
+    // Function is executed sync, and returns mark up as string. 
+    this.renderSnip = function(conf, snipid, params) {
+        if (ThemeSnips[conf.id] && ThemeSnips[conf.id][snipid]) {
+            return ThemeSnips[conf.id][snipid].exec.apply(ThemeSnips[conf.id][snipid], params);
+        } else {
+            return "[ThemeSnipException] No snippet found with id " + snipid + " on website " + conf.id;
+        }
+    };
 
     this.serveAdminList = function (cli) {
         cli.touch("themes.serveAdminList");
@@ -28,7 +55,6 @@ var Themes = function () {
         } else {
             filelogic.serveAdminLML(cli);
         }
-
     };
 
     this.getCachedThemes = function () {
@@ -156,12 +182,9 @@ var Themes = function () {
                         } else {
                             ActiveTheme[config.id].settings = doc.value.settings;
 
-                            cli.cacheClear();
-
                             log('Themes', 'Theme enable called back');
-                            callback();
+                            cli.cacheClear(undefined, callback);
                         }
-
                     });
                 } catch(e) {
                     console.log(e);
@@ -173,14 +196,24 @@ var Themes = function () {
     };
 
     var createOrUpdateThemeForm = function (config) {
-
-
         var defaults = {};
+        var formName = 'theme_settings_' + config.uid;
+
         if (ActiveTheme[config.id].info.settingForm) {
             ActiveTheme[config.id].settings = {};
-            if (!formBuilder.isAlreadyCreated('theme_settings')) {
-                var form = formBuilder.createForm('theme_settings');
-                form.add('formsetting-sep', 'title', {displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'} );
+
+            formBuilder.deleteForm();
+            if (!formBuilder.isAlreadyCreated(formName)) {
+                var form = formBuilder.createForm(formName, {
+                    fieldWrapper: {
+                        tag: 'div',
+                        cssPrefix: 'theme-setting-field-'
+                    },
+                    cssClass: 'theme-settings-form'
+                });
+                form.add('formsetting-sep', 'title', {
+                    displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'
+                } );
             }
 
             for (var name in ActiveTheme[config.id].info.settingForm) {
@@ -195,14 +228,10 @@ var Themes = function () {
                 defaults[name] = property.default;
 
                 ActiveTheme[config.id].settings[name] = property.default;
-                if (!formBuilder.isAlreadyCreated('theme_settings')) {
-                    form.add(name, property.type, property.attr || {} );
-                }
+                form.add(name, property.type, property.attr || {} );
             }
 
-            if (!formBuilder.isAlreadyCreated('theme_settings')) {
-                form.add('Submit', 'submit', {displayname : 'Update Settings'} );
-            }
+            form.add('Submit', 'submit', {displayname : 'Update Settings'} );
             
             return defaults;
         }
@@ -276,7 +305,7 @@ var Themes = function () {
             }
         }, ["themes"]);
 
-        livevars.registerLiveVariable('theme_settings', function (cli, levels, params, callback) {
+        livevars.registerLiveVariable('themesettings', function (cli, levels, params, callback) {
             db.findToArray(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, function(err, arr) {
                 callback(err || arr[0].settings);
             });
