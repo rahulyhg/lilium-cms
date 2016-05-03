@@ -181,14 +181,14 @@ var LiliumDFP = function () {
                                         log('DFP', 'Stored deep copy block ' + (index + sliced.length) + ' / ' + arr.length);
                                         index += jumps;
 
-                                        insertNext();
+                                        setTimeout(insertNext, 50);
                                     });
                                 } else {
                                     log('DFP', 'Finished storing deep copy of ' + arr.length + ' DFP Orders');
                                     if (callback) callback();
                                 }
                             };
-                            insertNext();
+                            setTimeout(insertNext, 50);
                         });
                     });
                 });

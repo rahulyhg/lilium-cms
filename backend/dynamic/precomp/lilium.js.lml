@@ -273,18 +273,11 @@ var LiliumCMS = function() {
     this.fillFormFromSource = function(src, data, index) {
         index = typeof index == 'undefined' ? 0 : index;
         var form = $('form[name="' + src + '"]:nth-of-type(' + index + 1 + ')');
-        $(form).find('select[multiple]').each(function(index, osSelect) {
-            var select;
-            if (osSelect.dataset.multiselectindex) {
-                select = that.multiselects[osSelect.dataset.multiselectindex];
-                select.render(data);
-            } else {
-                select = new MultiSelect(
-                    form.attr('id'),
-                    form.data('title')
-                );
-            };
+
+        that.multiselects.forEach(function(mselect) {
+            mselect.fillFromData(data);
         });
+
         $(form).find('.tags-input').each(function(index, tagsInput) {
             var tag = new Tags(
                 tagsInput,

@@ -1,37 +1,57 @@
 var options;
 
 var MultiSelect = function(tableid, lmltag, selectElem) {
-    var selectElem =  selectElem;
+    var selectElem = selectElem;
+    var multiselectElem = undefined;
     var lmltag = lmltag;
     var name = selectElem.attr('name');
     var isMultiSelect = selectElem.attr('multiple') == 'multiple' ? true : false;
+    var props = JSON.parse(lmltag[0].dataset.varparam.replace(/&lmlquote;/g, '"'));
+    var fieldname = lmltag[0].dataset.fieldname;
+    var initialValues = new Array();
     this.isRendered = false;
 
-    this.render = function(data) {
-        var html = '<div class="multiselect">';
-        if (data) {
-            data = data[$(selectElem).attr('name')];
-        }
+    this.render = function() {
+        var html = '<div class="lmlmultiselect multiselect" >';
+        var data = initialValues;
+
         $(selectElem).find('option').each(function(index, elem) {
             var elem = $(elem);
             var selected = false;
-            if (data && $.inArray(elem.attr('value'), data) !== -1) {
+            if (typeof data !== "undefined" && $.inArray(elem.attr('value'), data) !== -1) {
                 html += '<span class="selected" id="'+ elem.attr('value') +'">' + elem.html();
                 html += '<input type="hidden" name="'+ selectElem.attr('name') +'[]" value="'+ elem.attr('value') +'">';
                 html += '</span>';
             } else {
-                html += '<span id="'+ elem.attr('value') +'">' + elem.html() + '</span>';
+                html += '<span id="'+ elem.attr('value') +'" class="lmlmultiselect-val-'+elem.attr('value')+'" data-value="'+ elem.attr('value') +'">' + elem.html() + '</span>';
             }
         });
         html += '</div>'
         options = selectElem;
-        lmltag.after(html);
+        multiselectElem = $(html);
+        lmltag.after(multiselectElem);
         selectElem.remove();
         this.isRendered = true;
     }
 
-    $(document).on('click', '.multiselect span', function() {
+    this.fillFromData = function(data) {
+        var selected = data[fieldname];
+        if (selected && typeof selected === 'object' && selected.length != 0) {
+            initialValues = selected;
+        }
+    };
 
+    this.getInfo = function() {
+        return {
+            fieldname : fieldname,
+            props : props,
+            isMultiSelect : isMultiSelect,
+            originalElement : selectElem,
+            isRendered : isRendered
+        };
+    };
+
+    $(document).on('click', '.multiselect span', function() {
         if ($(this).hasClass('selected')) {
             $(this).removeClass('selected');
             $(this).find('input').remove();
@@ -41,7 +61,7 @@ var MultiSelect = function(tableid, lmltag, selectElem) {
             }
 
             $(this).addClass('selected');
-            $(this).append('<input type="hidden" name="'+ name +'[]" value="'+ $(this).attr('id') +'">');
+            $(this).append('<input type="hidden" name="'+ name +'[]" value="'+ $(this).data('value') +'" />');
         }
     });
 

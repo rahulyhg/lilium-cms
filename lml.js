@@ -38,7 +38,7 @@ var LML = function () {
     var symbolLen = symbols.length;
     var condIdentifiers = ["if", "while", "for", "block"];
     var condClosures = ["endif", "else", "endwhile", "endfor", "endblock"];
-    var lmlOperators = ["+=", "-=", "*=", "/=", "="];
+    var lmlOperators = ["+=", "-=", "*=", "/=", "=", "%="];
 
     var proceedWhenCompleted;
 
@@ -217,7 +217,7 @@ var LML = function () {
                 (condTag == 'for' && closureTag == 'endfor') ||
                 (condTag == 'block' && closureTag == 'endblock');
 
-            if (!validClosure) {
+            if (false && !validClosure) {
                 throw new Error("[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " +
                     condTag + " block");
             }
@@ -256,16 +256,21 @@ var LML = function () {
         this.pulloutVar = function (context, str) {
             var that = this;
             var endVal = str.trim();
-            var isNumber = !isNaN(str);
+            var acceptUndefined = endVal[0] === '?';
+            
+            if (acceptUndefined) {
+                endVal = endVal.substring(1);
+            }
+
+            var isNumber = !isNaN(endVal);
             var isArray = '[' === endVal[0] && ']' === endVal.slice(-1);
-            var isStringMatch = str.match(/^"(.*)"$|^'(.*)'$/g);
-            var acceptUndefined = str[0] === '?';
+            var isStringMatch = endVal.match(/^"(.*)"$|^'(.*)'$/g);
 
             if (isArray) {
                 var obj = JSON.parse(endVal.split('|').join(','));
                 return obj;
             } else if (isStringMatch) {
-                endVal = str.trim().slice(1, -1);
+                endVal = endVal.slice(1, -1);
             } else if (!isNumber) {
                 try {
                     var levels = endVal.split('.');
@@ -311,9 +316,12 @@ var LML = function () {
                             }
 
                             if (typeof endVal === 'undefined') {
-                                throw new Error("LMLParseException - Undefined branch " +
+                                var err = new Error("LMLParseException - Undefined branch " +
                                     levels[i] + " in " + (useSlang ? "LML Slang" : "context library") + " : " +
                                     levels[0]);
+
+                                err.acceptUndefined = acceptUndefined;
+                                throw err;
                             }
                         }
                     } else if (levels.length == 1 && (levels[0] == 'true' || levels[0] == 'false')) {
@@ -324,7 +332,7 @@ var LML = function () {
                         throw new Error("LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found");
                     }
                 } catch (ex) {
-                    endVal = acceptUndefined ? "" : ("[" + ex + "]");
+                    endVal = ex.acceptUndefined ? "" : ("[" + ex + "]");
                 }
             } else {
                 endVal = parseInt(str);
@@ -407,6 +415,8 @@ var LML = function () {
                 return this.affect(context, affectedName, affectedValue * effect);
             case "/=":
                 return this.affect(context, affectedName, affectedValue / effect);
+            case "%=":
+                return this.affect(context, affectedName, affectedValue % effect);
             }
         };
 
@@ -438,7 +448,7 @@ var LML = function () {
 
     var execLMLTag = function (context, code, callback) {
         // LML parsing
-        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=)[\s]*([^\n]*)[\s]*\)|(block)[\s]*\([\s]*([^\s]+)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endblock|else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'\[][^\n]+["|'\]])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
+        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=|\?=)[\s]*([^\n]*)[\s]*\)|(block)[\s]*\([\s]*([^\s]+)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endblock|else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\%|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'\[][^\n]+["|'\]])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
         var closureSelector = /(else|endif|endfor|endwhile|endblock)/g;
 
         // Split in lines array, all commands have

@@ -18,6 +18,7 @@
     {=theme.render('head_will_close')}
 </head>
 <body>
+    {%petals/socialhead}
     {=theme.render('body_will_open')}
     
     {%petals/header}

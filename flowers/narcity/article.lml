@@ -5,6 +5,7 @@
     url = config.default.server.url;
 $}
 <article>
+    {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper">
         <div class="featured-image-credit">
             <a href="{=extra.article.featuredimagelink}">@{=extra.article.featuredimageartist}</a>
@@ -12,10 +13,12 @@ $}
 
         <img src="{=featimg}" />
     </div>
+    {$ endif; $}
     
     <h1>{=extra.article.title}</h1>
     <h2>{=extra.article.subtitle}</h2>   
- 
+
+    {$ if (?author.displayname != ""); $} 
     <div class="article-author-strip">
         <div class="article-author-share-section invisible" id="article-share-section">
             <div class="article-share-count-wrapper topvert">
@@ -33,8 +36,104 @@ $}
             <span class="article-published-date midvert edt-datetime" data-edtdatetime="{=extra.article.date}"></span>
         </div>
     </div>
+    {$ endif; $}
 
     <div class="article-content" id="article-content">
         {=extra.article.content}
     </div>
+
+    {$ if (?author.displayname != ""); $} 
+    <div class="article-signature">
+        <div class="article-signature-face-wrapper">
+            <img src="{=author.avatarURL}" class="article-signature-face" />
+        </div> 
+        <div class="article-signature-details-wrapper">
+            <span class="article-signature-name">
+                <a href="{=url}/author/{=author.username}">
+                    {=author.displayname}
+                </a>
+            </span>
+            <span class="article-signature-bio">
+                {=author.bio}
+            </span>
+        </div>
+    </div>  
+    {$ endif; $}
+
+    <div class="article-more-from-wrapper">
+        <h4 class="article-section-title">More from {=config.default.info.project}</h4>
+        <ul class="article-more-from-list">
+            {$ for (mf in extra.article.morefrom); $}
+            <li>
+                <a href="{=url}/{=mf.name}">{=mf.title}</a>
+            </li>
+            {$ endfor; $}
+        </ul>
+    </div>      
+
+    <div class="article-tags-wrapper">
+        {$ for (tag in ?extra.article.tags); $}
+            <a href="{=url}/tags/{=tag}">
+                {=tag}
+            </a>
+        {$ endfor; $}
+    </div>
+
+    <div class="article-comments">
+        <h4 class="article-section-title">Join the discussion</h4>
+        <div class="fb-comments" data-href="{=url}/{=extra.article.name}" data-numposts="3"></div>
+    </div>
+
+    <div class="article-digest-sub">
+        <form 
+            action="//mtlblog.us6.list-manage.com/subscribe/post?u=ae98e848ab712838adcc7f456&amp;id={=theme.settings.mailchimpdigest}" 
+            method="post" 
+            id="mc-embedded-subscribe-form" 
+            name="mc-embedded-subscribe-form" 
+            class="events-placeholder" 
+            target="_blank" 
+            novalidate>
+
+            <label for="events-placeholder__email-input" class="events-placeholder__title">
+                {=config.default.info.project} daily, in your inbox
+            </label>
+            <input type="email" value="" name="EMAIL" class="events-placeholder__email-input" id="mce-EMAIL" 
+                placeholder="email address" required>
+            <!-- real people should not fill this in and expect good things - do not remove this or risk form bot signups-->
+            <div style="position: absolute; left: -5000px;">
+                <input type="text" name="b_ae98e848ab712838adcc7f456_851c62c913" tabindex="-1" value="">
+            </div>
+            <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="events-placeholder__submit-button">
+        </form>
+    </div>
+
+    {$ if (extra.article.related.length > 2); $}
+    <div class="article-related-section">
+        <h4 class="article-section-title">Keep on reading</h4>
+        {$
+            relindex = 0;
+        $}
+        {$ for (ra in extra.article.related); $}
+            {$
+                mod = relindex; mod %= 3;
+                classes = "article-thumbnail";
+    
+                if (mod == 0);
+                    classes += " article-thumbnail-featured"
+                endif;
+            $}  
+            <a href="{=url}/{=ra.name}"> 
+            <div class="{=classes}">
+                <div class="article-thumbnail-featured-image">
+                    <img src="{=ra.featuredimage.0.sizes.thumbnaillarge.url}" />
+                </div>
+                <div class="article-thumbnail-title">
+                    {=ra.title}
+                </div>
+            </div>
+            </a>
+            {$ relindex += 1; $}
+        {$ endfor; $}
+    </div>
+    {$ endif; $}
 </article>

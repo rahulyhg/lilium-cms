@@ -111,7 +111,57 @@ var Article = function() {
                 }
             }
         ], function(arr) {
-            cb(arr[0] || arr);
+            if (arr.length === 0) {
+                cb(new Error("No article found"));
+            } else {
+                db.rawCollection(conf, 'content', {"strict":true}, function(err, col) {
+                    col.aggregate([{
+                        $match : {
+                            $text : { 
+                                $search : arr[0].title.replace(/[^a-zA-Z\s]/g, '') 
+                            }
+                        }
+                    },{
+                        $match : {
+                            $and : [{
+                                status : "published"
+                            }, {
+                                media : {
+                                    $exists : true,
+                                    $ne : ""
+                                }
+                            }]
+                        }
+                    },{
+                        $sort : { 
+                            score: { 
+                                $meta: "textScore" 
+                            } 
+                        }
+                    },{
+                        $limit : 7
+                    },{
+                        $lookup : {
+                            from:           "uploads",
+                            localField:     "media",
+                            foreignField:   "_id",
+                            as:             "featuredimage"
+                        }
+                    }]).toArray(function(err, relarr) {
+                        if (!err) {
+                            arr[0].related = relarr.slice(1);
+                        }
+                        
+                        col.find({
+                            date : { $lt : arr[0].date },
+                            author : arr[0].author
+                        }).sort({date : -1}).limit(3).toArray(function(err, mfarr) {    
+                            arr[0].morefrom = mfarr;
+                            cb(arr[0]);
+                        });
+                    });
+                });
+            }
         });
     };
 
