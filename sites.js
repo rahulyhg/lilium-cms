@@ -14,7 +14,6 @@ var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
 var templateBuilder = require('./templateBuilder.js');
 
-
 var _cachedSites = new Array();
 
 var SiteInitializer = function (conf) {
