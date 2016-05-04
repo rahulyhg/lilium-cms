@@ -115,15 +115,19 @@ var Frontend = function () {
     };
 
     this.getCSSQueue = function (contextName, siteid) {
-        var arr = CSSFiles[siteid][contextName || "all"];
-        var returnedArr = new Array();
+        if (CSSFiles[siteid]) {
+            var arr = CSSFiles[siteid][contextName || "all"];
+            var returnedArr = new Array();
 
-        if (arr)
-            for (var index in arr) {
-                returnedArr.push(arr[index]);
-            }
-
-        return returnedArr;
+            if (arr)
+                for (var index in arr) {
+                    returnedArr.push(arr[index]);
+                }
+    
+            return returnedArr;
+        } else {
+            return [];
+        }
     };
 
     this.registerFromCore = function () {

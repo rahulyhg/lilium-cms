@@ -107,9 +107,13 @@ var Forms = function () {
             })
             .add('ckimagecreditname', 'text', {
                 displayname: "Artist name"
+            }, {
+                required : false
             })
             .add('ckimagecrediturl', 'text', {
                 displayname: "URL to artist page"
+            }, {
+                required : false
             });
 
         formBuilder.createForm('category_create', {

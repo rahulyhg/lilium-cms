@@ -7,6 +7,7 @@ var Admin = undefined;
 var filelogic = undefined;
 var formBuilder = undefined;
 var notifications = undefined;
+var frontend = undefined;
 var sponsoredarticle = require('./sponsoredarticle.js');
 var changerequest = require('./changeRequest.js');
 var Campaigns = require('./campaigns.js');
@@ -23,6 +24,7 @@ var Production = function () {
         filelogic = require(abspath + 'filelogic.js');
         formBuilder = require(abspath + 'formBuilder.js');
         notifications = require(abspath + 'notifications.js');
+        frontend = require(abspath + 'frontend.js');
         sponsoredarticle.init(abspath);
     };
 
@@ -66,8 +68,9 @@ var Production = function () {
         });
 
         Campaigns.registerCreationForm();
-
         Campaigns.loadCampaignsStatuses(function () {});
+
+        // frontend.registerJSFile(abspath + "plugins/production/precomp/js/lmlprodtags.js", 4000, "theme", "all");
     };
 
     var handleGET = function (cli) {
