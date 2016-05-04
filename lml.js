@@ -217,7 +217,7 @@ var LML = function () {
                 (condTag == 'for' && closureTag == 'endfor') ||
                 (condTag == 'block' && closureTag == 'endblock');
 
-            if (false && !validClosure) {
+            if (!validClosure) {
                 throw new Error("[LMLSlangException - Invalid closure] Found " + closureTag + " at the end of " +
                     condTag + " block");
             }
@@ -239,6 +239,7 @@ var LML = function () {
                 forIndex: -1
             };
 
+            log('LML', 'Marked line index at ' + (condObj.lineIndex + 1) + ' for "' + condObj.condTag + '" block');
             context.condStack.push(condObj);
             return condObj;
         };
@@ -426,6 +427,14 @@ var LML = function () {
             condObj.forIndex++;
             if (_arr.length == 0 || condObj.forIndex >= _arr.length || condObj.forIndex >= Object.keys(_arr).length) {
                 context.skipUntilClosure = true;
+                log("LML", "Finished " +(condObj.nested?"nested ":"")+ "loop after " + condObj.forIndex + " iterations.");
+                
+                if (condObj.forIndex != 0) {    
+                    context.lineFeedback.jumpTo = condObj.closureIndex;
+                    log('LML', "Hard skipping to line " + (condObj.closureIndex));
+                } else {
+                    log('LML', "Loop did not iterate. Looking for next closure.");
+                }
             } else {
                 this.affect(context, affectedName, _arr[condObj.forIndex]);
             }
@@ -442,7 +451,6 @@ var LML = function () {
                 context.block[context.currentContentBlock] = "";
 
             }
-
         }
     })();
 
@@ -455,31 +463,35 @@ var LML = function () {
         var lines = typeof code === 'string' ? code.split(/\n|;/g) : code;
         var lineNumber = 0;
         var maxLine = lines.length;
-
         var handleLMLLine = function () {
             var line = lines[lineNumber].trim();
-
             if (line != "") {
                 var match = line.match(selector);
 
                 // Check for block opening or closure
                 if (match && match.length > 0) {
-
                     match = match[0];
                     var split = match.split(selector).filter(function (str) {
                         return str != undefined && str != "";
                     });
 
-
                     // If closure detected
                     if (condClosures.indexOf(split[0]) != -1) {
+                        if (context.condStack.length == 0) {
+                            var errmsg = "Block closure found while stack is empty : " + split[0];
+                            throw new Error(errmsg);
+                        }
+
                         var curCond = context.condStack.pop();
                         var closureTag = split[0];
 
-                        LMLSlang.validateClosure(curCond.condTag, closureTag);
                         if (curCond.requiredSkip > 0) {
                             curCond.requiredSkip--;
+                            context.condStack.push(curCond);
+                            log('LML', 'Found closure at line ' + context.currentLineIndex +
+                                ', but had to skip. Required Skips : ' + curCond.requiredSkip);
                         } else {
+                            LMLSlang.validateClosure(curCond.condTag, closureTag);
                             context.currentBlock = (context.condStack.length == 0) ?
                                 "lml" :
                                 context.condStack[context.condStack.length - 1].condTag;
@@ -489,18 +501,23 @@ var LML = function () {
                                 context.condStack.push(curCond);
                             } else {
                                 if (curCond.condTag == 'while' || curCond.condTag == 'for') {
+                                    curCond.closureIndex = context.currentLineIndex;
+
                                     if (!context.skipUntilClosure) {
                                         context.lineFeedback.jumpTo = curCond.lineIndex;
                                         context.condStack.push(curCond);
                                         context.temp.looping = true;
                                     } else {
-                                        context.temp.looping = false;
-                                    }
-                                }
+                                        var childCond = context.condStack[context.condStack.length - 1];
+                                        context.temp.looping = !(typeof childCond === 'undefined' || 
+                                            (childCond.condTag !== 'for' && childCond.condTag !== 'while'));
 
-                                if (curCond.condTag == 'block' && split[0] == 'endblock' && context.bufferContent) {
-                                    context.currentContentBlock = undefined;
-                                    context.bufferContent = false;
+                                        if (context.temp.looping) {
+                                            log('LML', 'Exited nested for loop');
+                                        } else {
+                                            log('LML', 'Exited for loop');
+                                        }
+                                    }
                                 }
 
                                 context.storeUntilClosure = false;
@@ -509,7 +526,11 @@ var LML = function () {
                         }
                     } else if (condIdentifiers.indexOf(split[0]) != -1) {
                         if (context.skipUntilClosure) {
-                            context.condStack[context.condStack.length - 1].requiredSkip++;
+                            var cstack = context.condStack[context.condStack.length - 1];
+                            cstack.requiredSkip++;
+                            log('LML', "Found identifier '"+split[0]+"' while skipping until closure at line "+
+                                context.currentLineIndex+
+                                ". Required Skips : " + cstack.requiredSkip);
                         } else {
                             var condObj = undefined;
                             if (context.temp.looping) {
@@ -517,6 +538,15 @@ var LML = function () {
                                 context.temp.looping = false;
                             } else {
                                 condObj = LMLSlang.pushToCondStack(context, split);
+                                if (condObj.condTag === 'for') {
+                                    if (context.condStack.length != 1 && context.condStack[context.condStack.length - 2].condTag == "for") {
+                                        log('LML', 'Entering nested for loop');
+                                        condObj.nested = true;
+                                    } else {
+                                        log('LML', 'Entering for loop');
+                                        condObj.nested = false;
+                                    }
+                                }
                             }
 
                             context.currentBlock = condObj.condTag;

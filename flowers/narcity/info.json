@@ -14,6 +14,28 @@
         "fbid" : {"type" : "text", "attr" : {"displayname" : "Facebook App ID"}, "default" : "#####"},
         "fbtoken" : {"type" : "text", "attr" : {"displayname" : "Facebook Token"}, "default" : "#####"},
         "mailchimpdigest" : {"type" : "text", "attr" : {"displayname" : "Mailchimp Digest ID"}, "default" : "#####"},
+        "homepagesections" : {"type" : "stack",
+            "attr" : {
+                "displayname" : "Homepage sections",
+                "scheme" : {
+                    "columns" : [
+                        {
+                            "fieldName" : "catname",
+                            "dataType" : "text",
+                            "displayname" : "Category slug"
+                        }, {
+                            "fieldName" : "cattitle",
+                            "dataType" : "text",
+                            "displayname" : "Homepage section title"
+                        }
+                    ]
+                }
+            },
+            "default" : [{
+                "catname" : "best-of",
+                "cattitle" : "Best of"
+            }]
+        },
         "othernetworkwebsites" : {"type" : "stack",
             "attr" : {"displayname" : "Other Network Websites",
                 "scheme": {

@@ -7,6 +7,7 @@ var articleHelper = undefined;
 var log = undefined;
 var fileserver = undefined;
 var themes = undefined;
+var db = undefined;
 
 var themePath;
 
@@ -28,6 +29,7 @@ var initRequires = function(abspath) {
     articleHelper = require(abspath + 'articleHelper.js');
     fileserver = require(abspath + 'fileserver.js');
     themes = require(abspath + 'themes.js');
+    db = require(abspath + 'includes/db.js');
 };
 
 var registerPictureSizes = function() {
@@ -63,12 +65,81 @@ var registerSnips = function(_c, cb) {
     });
 };
 
+var fetchHomepageArticles = function(_c, cb) {
+    var sett = themes.getEnabledTheme(_c).settings;
+    var homepageSections = sett.homepagesections;
+    var i = 0;
+    var len = Object.keys(homepageSections).length;
+    var sectionArr = new Array();
+
+    var nextSection = function() {
+        if (i < len) {
+            var csec = homepageSections[i];
+            db.join(_c, 'content', [
+                {
+                    $match : {
+                        'categories' : csec.catname,
+                        'status' : 'published'
+                    } 
+                }, {
+                    $limit : 3
+                }, {
+                    $lookup : {
+                        from:           "uploads",
+                        localField:     "media",
+                        foreignField:   "_id",
+                        as:             "featuredimage"
+                    }
+                }
+            ], function(arr) {
+                sectionArr.push({
+                    "catname" : csec.catname,
+                    "cattitle" : csec.cattitle,
+                    "articles" : arr
+                });
+
+                i++;
+                nextSection();
+            });
+        } else {
+            db.join(_c, 'content', [
+                {
+                    $sort : {
+                        date : -1
+                    }
+                }, {
+                    $limit : 9
+                }, {
+                    $lookup : {
+                        from:           "uploads",
+                        localField:     "media",
+                        foreignField:   "_id",
+                        as:             "featuredimage"
+                    }
+                }
+            ], function(latests) {
+                cb({
+                    sections : sectionArr,
+                    latests : latests
+                });
+            });
+        }
+    };
+
+    nextSection();
+};
+
 var loadHooks = function(_c, info) {
     endpoints.register(_c.id, '', 'GET', function(cli) {
-        filelogic.renderThemeLML(cli, 'home', 'index.html', {}, function() {
-            fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
-                log('Narcity', 'Recreated and served homepage');
-            }, true);
+        fetchHomepageArticles(_c, function(articles) {
+            var extra = new Object();
+            extra.sections = articles.sections;
+            extra.latests = articles.latests;
+            filelogic.renderThemeLML(cli, 'home', 'index.html', extra, function() {
+                fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
+                    log('Narcity', 'Recreated and served homepage');
+                }, true);
+            });
         });
     });
 };

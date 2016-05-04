@@ -1,1 +1,83 @@
-<h1>HOME PAGE</h1>
+{#config;extra;theme}
+
+<main class="homepage">
+    <div class="fwblock trending-now-wrapper">
+        <h4 class="article-section-title">Trending right now</h4>
+        
+    </div>
+
+    <div class="homepage-sections">
+    {$ for (section in extra.sections); $}
+        {$ if (section.articles.length != 0); $}
+        <div class="fwblock suggestions-wrapper">
+            <h5 class="article-subsection-title">Suggested</h5>
+            <lml:native></lml:native>
+            <lml:native></lml:native>
+        </div>
+
+        <div class="fwblock homepage-section-container">
+            <h4 class="article-section-title">
+                <a href="{=config.default.server.url}/category/{=section.catname}">{=section.cattitle}</a>
+            </h4>
+            {$ relindex = 0; $}
+            {$ for (sa in section.articles); $}
+                {$
+                    classes = "article-thumbnail";
+                    if (relindex == 0); 
+                        classes += " article-thumbnail-featured"; 
+                    endif;
+                $}
+                <a href="{=config.default.server.url}/{=sa.name}"> 
+                    <div class="{=classes}">
+                        <div class="article-thumbnail-featured-image">
+                            <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
+                        </div>
+                        <div class="article-thumbnail-title">
+                            {=sa.title}
+                        </div>
+                    </div>
+                </a>
+                {$ relindex += 1; $}
+            {$ endfor; $}
+        </div>
+        {$ endif; $}
+    {$ endfor; $}
+    </div>
+
+    <div class="fwblock banner-wrapper" id="middleHomePageBanner">
+        {=theme.snip("bannerad",["desktop"],"/1020360/homepage-middle-narcity",[[728|90]|[970|250]],"ad-homepage-middle-narcity")}
+    </div>
+
+    <div class="fwblock latest-content-wrapper">
+        <h4 class="article-section-title">Most recent</h4>
+  
+        {$ relindex = 0; $} 
+        {$ for (la in extra.latests); $}
+            {$
+                classes = "article-thumbnail";
+                if (relindex == 0); 
+                    classes += " article-thumbnail-featured"; 
+                endif;
+                if (relindex > 2);
+                    classes += " article-thumbnail-margined";
+                endif;
+            $}
+            <a href="{=config.default.server.url}/{=la.name}"> 
+                <div class="{=classes}">
+                    <div class="article-thumbnail-featured-image">
+                        <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}" />
+                    </div>
+                    <div class="article-thumbnail-title">
+                        {=la.title}
+                    </div>
+                </div>
+            </a>
+            {$ relindex += 1; $}
+        {$ endfor; $}
+    </div>
+
+</main>
+
+<lml:template id="lmltemplate-native">
+    
+</lml:template>

@@ -175,7 +175,7 @@ html .invisible {
     border-bottom: 2px solid #AAA;
 }
 
-article h4.article-section-title {
+h4.article-section-title {
     font-family: Oswald, sans-serif;
     font-size: 24px;
     font-weight: normal;
@@ -184,6 +184,11 @@ article h4.article-section-title {
     clear: both;
     margin: 30px 0 20px;
     text-align: left;
+}
+
+h4.article-section-title a {
+    text-decoration: none;
+    color: {=mc};
 }
 
 article .article-author-strip {
@@ -473,11 +478,12 @@ article .article-digest-sub .events-placeholder__submit-button {
 }
 
 article .article-digest-sub .events-placeholder__email-input {
-    padding: 10px;
+    padding: 11px;
     font-size: 1em;
     border: 1px solid #ddd;
     background-color: #FFF;
     color: #888;
+    margin-right: -4px;
 }
 
 article .article-related-section {
@@ -526,6 +532,9 @@ footer {
     text-align: center;
     background-color: #F6F6F6;
     box-shadow: 0px 0px 15px rgba(0,0,0,0.05);
+
+    clear: both;
+    float: none;
 }
 
 .footerLinks {
@@ -548,4 +557,94 @@ footer {
 .copyright {
     padding: 30px 0px 50px 0px;
     display: block;
+}
+
+.fwblock {
+    width: {=fw};
+    margin: auto;
+    float: none;
+    clear: both;
+}
+
+.clear {
+    clear : both;
+    float : none;
+}
+
+.banner-wrapper {
+    text-align: center;
+    padding: 10px 0px;
+}
+
+lml\:template, lml\:native {
+    display: none;
+}
+
+/* Homepage */
+{$
+    hw = theme.settings.fullwidthsize;
+    hw -= theme.settings.articlewidthsize;
+    hw -= 20;
+    hw += "px"
+$}
+.homepage .article-thumbnail.article-thumbnail-featured {
+    width: {=aw};
+    margin-right: 10px;
+}
+
+.homepage .article-thumbnail {
+    border: 1px solid #D9D9D9;
+    float: left;
+    width: {=hw};
+    margin-bottom: 10px;
+}
+
+.homepage .article-thumbnail a,
+.homepage .article-thumbnail-title {
+    color: #111;
+    text-decoration: none;
+}
+
+.homepage .article-thumbnail .article-thumbnail-featured-image img {
+    width: 100%;
+    height: auto;
+}
+
+.homepage .article-thumbnail-title {
+    font-family: "Oswald", Arial, sans-serif;
+    font-size: 20px;
+    padding: 5px 10px;
+    text-align: left;
+}
+
+.homepage .article-thumbnail-featured .article-thumbnail-title {
+    font-size: 38px;
+}
+
+.homepage .article-thumbnail.article-thumbnail-margined {
+    margin-right: 13.9999999px;
+}
+
+.homepage .latest-content-wrapper a:nth-child(3n+1) .article-thumbnail.article-thumbnail-margined {
+    margin-right: 0px;
+}
+
+.homepage .suggestions-wrapper {
+    padding: 10px 0 10px 10px;
+    background-color: #F2F2F2;
+    
+    border-top: 1px solid #D9D9D9;
+    border-bottom: 1px solid #D9D9D9;
+    margin: 10px auto 20px auto;
+}
+
+.homepage .suggestions-wrapper h5.article-subsection-title {
+    font-size: 12px;
+    color: #999;
+    margin: 0 0 20px;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: normal;
+    
+    display : inline-block;
 }

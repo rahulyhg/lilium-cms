@@ -118,9 +118,7 @@ $}
                 mod = relindex; mod %= 3;
                 classes = "article-thumbnail";
     
-                if (mod == 0);
-                    classes += " article-thumbnail-featured"
-                endif;
+                if (mod == 0); classes += " article-thumbnail-featured"; endif;
             $}  
             <a href="{=url}/{=ra.name}"> 
             <div class="{=classes}">
