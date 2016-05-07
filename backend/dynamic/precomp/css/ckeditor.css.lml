@@ -7,16 +7,29 @@
 #picture-list {
     width: 800px;
     height: 400px;
+    line-height: 0px;
+    overflow-y: auto;
+    margin-bottom: 10px;
 }
 
 div#picture-list img {
     margin : 2px;
-    float: left;
+    float: none;
+    display: inline-block;
+    white-space: normal;
 }
+
 .selectedPicture {
   border: 2px solid #000;
   margin: 0px !important;
 }
+
 .cke_maximized {
     z-index: 999999 !important;
 }
+
+#image-upload.cke_dialog_ui_html input[type="submit"],
+#image-upload.cke_dialog_ui_html .field-submit {
+    display: none;
+}
+

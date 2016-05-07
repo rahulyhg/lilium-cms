@@ -46,7 +46,7 @@ var HtmlParser = function () {
             htmlForm += ' enctype="multipart/form-data" ';
         }
 
-        htmlForm += '/>';
+        htmlForm += '>';
 
         var hasFieldWrapper = typeof form.attr.fieldWrapper !== "undefined";
         if (hasFormWrapper && form.attr.formWrapper.inner) {
@@ -127,6 +127,9 @@ var HtmlParser = function () {
                     break;
                 case "multiselect":
                     htmlForm += parseSelectType(field, true);
+                    break;
+                case "buttonset":
+                    htmlForm += parseButtonSetType(field);
                     break;
                 case "tags":
                     htmlForm += parseTagsType(field);
@@ -339,9 +342,18 @@ var HtmlParser = function () {
         return input;
     };
 
-    var parseMultipleType = function (field) {
-        var input = generateLabel(field);
+    var parseButtonSetType = function(field) {
+        var btnSet = new Array();
 
+        field.attr.buttons.forEach(function(btn, index) {
+            btnSet.push(
+                '<button class="'+(btn.classes?btn.classes.join(' '):'')+'" name="'+btn.name+'">'+
+                (btn.displayname?btn.displayname:btn.name)+
+                '</button>'
+            );
+        });
+
+        return btnSet.join(' ');
     };
 
     var parseTextAreaType = function (field, hasPlaceholder) {
@@ -380,6 +392,7 @@ var HtmlParser = function () {
             'data-attribute="' + (field.attr.attr ? JSON.stringify(field.attr.attr).replace(/"/g, '&lmlquote;') : "{}") +
             '" data-filler="' + field.attr.tag +
             '" data-fieldname="' + field.name +
+            '" data-readkey="' + (field.attr.readkey || field.name) +
             '" data-filling="' + field.attr.template +
             '" data-varname="' + field.attr.endpoint +
             '" data-title="' + (field.attr.title || "") +

@@ -72,26 +72,26 @@ var defaultPriceBases = [
 ];
 
 var defaultProducts = [
-	{name:"banbigbox",displayName:"Banner Ads - Big Box",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
-	{name:"banbigboxm",displayName:"Banner Ads - Big Box (Mobile)",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
-	{name:"banbillboard",displayName:"Banner Ads - Billboard",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
-	{name:"bancompto",displayName:"Banner Ads - Companion Takeover",productType:"bannerads",priceBase:"unit",price:500,active:true},
-	{name:"banlskysc",displayName:"Banner Ads - Large Skyscraper",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
-	{name:"banlb",displayName:"Banner Ads - Leaderboard",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
-	{name:"banskysc",displayName:"Banner Ads - Skyscraper",productType:"bannerads",priceBase:"cpm",price:0.01,active:true},
-	{name:"bantakeover",displayName:"Banner Ads - Takeover",productType:"bannerads",priceBase:"cpm",price:0.03,active:true},
-	{name:"email",displayName:"Email Discovery",productType:"email",priceBase:"unit",price: 500,active:true},
-	{name:"fbdisc",displayName:"Facebook Discovery",productType:"facebook",priceBase:"unit",price: 15,active:true},
-	{name:"twdisc",displayName:"Twitter Discovery",productType:"twitter",priceBase:"unit",price: 0,active:true},
-	{name:"igdisc",displayName:"Instagram Discovery",productType:"instagram",priceBase:"unit",price: 15,active:true},
-	{name:"igpush",displayName:"Instagram Push",productType:"instagram",priceBase:"unit",price: 750,active:true},
-	{name:"snapstory",displayName:"Snapchat Story",productType:"snapchat",priceBase:"unit",price: 300,active:true},
-	{name:"seditbasic",displayName:"Sponsored Editorial - Basic",productType:"sponsedit",priceBase:"unit",price: 725,active:true},
-	{name:"seditstand",displayName:"Sponsored Editorial - Standard",productType:"sponsedit",priceBase:"unit",price: 1500,active:true},
-	{name:"seditprem",displayName:"Sponsored Editorial - Premium",productType:"sponsedit",priceBase:"unit",price: 2000,active:true},
-	{name:"seditrev",displayName:"Revision (Sponsored Editorial)",productType:"other",priceBase:"unit",price: 120,active:true},
-	{name:"svideo",displayName:"Sponsored Video",productType:"video",priceBase:"unit",price: 3000,active:true},
-	{name:"other",displayName:"Other",productType:"other",priceBase:"unit",price: 0,active:true}
+	{name:"banbigbox",      displayName:"Banner Ads - Big Box",             productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
+	{name:"banbigboxm",     displayName:"Banner Ads - Big Box (Mobile)",    productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
+	{name:"banbillboard",   displayName:"Banner Ads - Billboard",           productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
+	{name:"bancompto",      displayName:"Banner Ads - Companion Takeover",  productType:"bannerads",    priceBase:"unit",   price:500,  active:true},
+	{name:"banlskysc",      displayName:"Banner Ads - Large Skyscraper",    productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
+	{name:"banlb",          displayName:"Banner Ads - Leaderboard",         productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
+	{name:"banskysc",       displayName:"Banner Ads - Skyscraper",          productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
+	{name:"bantakeover",    displayName:"Banner Ads - Takeover",            productType:"bannerads",    priceBase:"cpm",    price:0.03, active:true},
+	{name:"email",          displayName:"Email Discovery",                  productType:"email",        priceBase:"unit",   price: 500, active:true},
+	{name:"fbdisc",         displayName:"Facebook Discovery",               productType:"facebook",     priceBase:"unit",   price: 15,  active:true},
+	{name:"twdisc",         displayName:"Twitter Discovery",                productType:"twitter",      priceBase:"unit",   price: 0,   active:true},
+	{name:"igdisc",         displayName:"Instagram Discovery",              productType:"instagram",    priceBase:"unit",   price: 15,  active:true},
+	{name:"igpush",         displayName:"Instagram Push",                   productType:"instagram",    priceBase:"unit",   price: 750, active:true},
+	{name:"snapstory",      displayName:"Snapchat Story",                   productType:"snapchat",     priceBase:"unit",   price: 300, active:true},
+	{name:"seditbasic",     displayName:"Sponsored Editorial - Basic",      productType:"sponsedit",    priceBase:"unit",   price: 725, active:true},
+	{name:"seditstand",     displayName:"Sponsored Editorial - Standard",   productType:"sponsedit",    priceBase:"unit",   price: 1500,active:true},
+	{name:"seditprem",      displayName:"Sponsored Editorial - Premium",    productType:"sponsedit",    priceBase:"unit",   price: 2000,active:true},
+	{name:"seditrev",       displayName:"Revision (Sponsored Editorial)",   productType:"other",        priceBase:"unit",   price: 120, active:true},
+	{name:"svideo",         displayName:"Sponsored Video",                  productType:"video",        priceBase:"unit",   price: 3000,active:true},
+	{name:"other",          displayName:"Other",                            productType:"other",        priceBase:"unit",   price: 0,   active:true}
 ];
 
 var defaultTheme = {

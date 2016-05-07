@@ -3,6 +3,7 @@ var LiveVars = function() {
     var endpoints = this.endpoints = [];
     var paramString = "?";
     var livevars;
+    var that = this;
 
     this.getSingleLivevar = function(endpoint, params, cb) {
         $.get("{=config.default.server.url}/livevars", {
@@ -15,6 +16,20 @@ var LiveVars = function() {
 
     this.retrieveVar = function(name) {
         return livevars[name];
+    };
+
+    this.pulloutLiveVar = function(levelStr) {
+        var split = levelStr.split('.');
+        var curLevel = livevars[split[0]];
+
+        for (var i = 1; i < split.length; i++) {
+            curLevel = curLevel[split[i]];
+            if (typeof curLevel === 'undefined') {
+                break;
+            }
+        }
+
+        return curLevel;
     };
 
     this.getLiveVars = function(cb) {
@@ -333,6 +348,7 @@ var LiveVars = function() {
                 var sourceof = $(this).data('sourceof');
                 var cacheonly = $(this).data('cacheonly');
                 var livevarkey = this.dataset.varname;
+                var readkey = this.dataset.readkey;
                 if (typeof $(this).data('attribute') !== 'undefined') {
                     var attributes = typeof $(this).data('attribute') == "object" ? $(this).data('attribute') : JSON.parse($(this).data('attribute').replace(/&lmlquote;/g, '"'));
 
@@ -397,6 +413,11 @@ var LiveVars = function() {
                         });
                     } else {
                         generateFillingFromObject(filler, lmlTag.data(), varValue);
+                    }
+
+                    if (readkey && readkey != name) {
+                        filler.data("readkey", readkey);
+                        filler.get(0).dataset.readkey = readkey;
                     }
 
                     $(lmlTag).after(filler);

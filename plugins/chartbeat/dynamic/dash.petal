@@ -48,12 +48,6 @@
 			other stats
 	</div>
 	{$
-		else;
-	$}
-	<div>
-		<h3>Chartbeat needs to be configured <a href="{=config.default.server.url}/admin/settings">here</a>.</h3>
-	</div>
-	{$
 		endif;
 	$}
 

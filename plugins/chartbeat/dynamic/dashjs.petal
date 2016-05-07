@@ -198,9 +198,9 @@ var LiliumChartbeat = function($) {
 		}
 
 		if (latestHisto && !latestHisto.error && latestHisto.data && article.people > latestHisto.data.stats.people / 2) {
-			html += '<span class="cb-top-tag cb-top-tag-red">33% of traffic</span>';
-		} else if (latestHisto && !latestHisto.error && latestHisto.data && article.people > latestHisto.data.stats.people / 3) {
 			html += '<span class="cb-top-tag cb-top-tag-red">50% of traffic</span>';
+		} else if (latestHisto && !latestHisto.error && latestHisto.data && article.people > latestHisto.data.stats.people / 3) {
+			html += '<span class="cb-top-tag cb-top-tag-red">33% of traffic</span>';
 		}
 
 		if (article.recirc > article.people / 2) {

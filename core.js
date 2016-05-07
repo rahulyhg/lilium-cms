@@ -244,7 +244,7 @@ var Core = function () {
         imageSize.add("medium", 300, '*');
         imageSize.add("thumbnailarchive", 400, 400);
         imageSize.add("featured", 970, 400);
-    }
+    };
 
     var loadAdminMenus = function () {
         var aurl = "admin/"; //_c.default().server.url + "/admin/";

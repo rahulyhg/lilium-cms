@@ -21,7 +21,8 @@ var Form = function(name, cb) {
         validate: true,
         method: 'post',
         action: '',
-        placeholder: false
+        placeholder: false,
+        formtag : "form"
     };
 };
 

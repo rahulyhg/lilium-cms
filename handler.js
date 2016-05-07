@@ -107,8 +107,14 @@ var Handler = function () {
     }
 
     var parsePOSTField = function (cli, fieldname, val) {
+        var isBool = false;
+        if (val == "on") {
+            val = true;
+            isBool = true;
+        }
+
         if (fieldname.indexOf('[') == -1) {
-            cli.postdata.data[fieldname] = inspect(val).slice(1, -1);
+            cli.postdata.data[fieldname] = isBool ? val : inspect(val).slice(1, -1);
         } else {
             var reg = /\[([a-zA-ZÀ-ÿ0-9]*)\]/g;
             var firstLevel = fieldname.substring(0, fieldname.indexOf('['));
@@ -134,10 +140,10 @@ var Handler = function () {
                     levelIndex++;
 
                     if (nIndex === '') {
-                        currentLevel.push(inspect(val).slice(1, -1));
+                        currentLevel.push(isBool ? val : inspect(val).slice(1, -1));
                     } else {
                         if (typeof currentLevel[nIndex] === 'undefined') {
-                            currentLevel[nIndex] = isArray && levelIndex == levelsTotal - 1 ? new Array() : levelIndex == levelsTotal ? inspect(val).slice(1, -1) : new Object();
+                            currentLevel[nIndex] = isArray && levelIndex == levelsTotal - 1 ? new Array() : levelIndex == levelsTotal ? (isBool ? val : inspect(val).slice(1, -1)) : new Object();
                         }
                     }
 

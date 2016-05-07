@@ -21,8 +21,10 @@
 		</main>
 
 		<lml:tabletemplate id="imgArticle">
-			<lml:tobject data-nodetype="img" data-key="media"></lml:tobject>
-		</lml:tabletemplate>
+            <div class="imgArticleWrapper">
+			    <lml:tobject data-nodetype="img" data-key="media"></lml:tobject>
+		    </div>
+        </lml:tabletemplate>
 
 		<lml:tabletemplate id="table-article-title">
 			<lml:tobject data-nodetype="h4" data-key="title"></lml:tobject>

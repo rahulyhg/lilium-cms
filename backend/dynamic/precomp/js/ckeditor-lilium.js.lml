@@ -1,4 +1,4 @@
-{#config;forms}
+{#config;forms;theme}
 {$
 	var baseurl = config.default.server.url;
 $}
@@ -32,9 +32,9 @@ var CKEditor = function() {
         CKEDITOR.config.extraPlugins = 'image-finder,youtube';
         CKEDITOR.config.entities_greek = false;
         CKEDITOR.config.entities_latin = false;
-        // CKEDITOR.config.removeButtons = 'image';
+        CKEDITOR.config.removeButtons = 'image';
         CKEDITOR.config.allowedContent = true;
-        CKEDITOR.config.contentsCss = '/static/style.css';
+        CKEDITOR.config.contentsCss = '/compiled/theme/ckeditor.css';
         CKEDITOR.config.skin = "BootstrapCK4,/bower/BootstrapCK4-Skin/skins/bootstrapck/";
 
         CKEDITOR.plugins.addExternal('youtube', '/bower/ckeditor-youtube-plugin/youtube/');
@@ -93,17 +93,25 @@ var CKEditor = function() {
 					watchForSubmition();
                 },
                 onOk: function() {
-                    if (typeof selectedPicture !== 'undefined') {
-                        var id = $(selectedPicture).attr('id');
-                        var img = editor.document.createElement('img');
-                        img.setAttribute('src', '/uploads/' + picture_id_url[id]);
-                        img.setStyle('width', '300px');
-                        editor.insertElement(img);
+                    if ($('.cke_dialog_tab_selected').index() == 0) {
+                        if (typeof selectedPicture !== 'undefined') {
+                            var htmlPlaceholder = createImagePlaceholder(editor);                            
 
-                        var credits = editor.document.createElement('a');
-                        credits.setHtml($('.ck-image-credit-form input[name="ckimagecreditname"]').val());
-                        credits.setAttribute('href', $('.ck-image-credit-form input[name="ckimagecrediturl"]').val());
-                        editor.insertElement(credits);
+                            var id = $(selectedPicture).attr('id');
+                            var img = editor.document.createElement('img');
+
+                            insertImageInEditor(
+                                '{=config.default.server.url}/uploads/' + picture_id_url[id],
+                                $('.ck-image-credit-form input[name="ckimagecreditname"]').val(),
+                                $('.ck-image-credit-form input[name="ckimagecrediturl"]').val(),
+                                editor, 
+                                htmlPlaceholder
+                            );
+                        }
+                    } else if ($('.cke_dialog_tab_selected').index() == 1) {
+                        if ($('#image-upload input[type="file"]').val() != "") {
+                            triggerCKUpload(undefined, editor);
+                        }
                     }
                 }
             }
@@ -127,26 +135,62 @@ var CKEditor = function() {
 
             selectedPicture = elem;
             $(selectedPicture).addClass('selectedPicture');
-
         });
-    }
+    };
 
+    var insertImageInEditor = function(src, creditname, crediturl, editor, htmlPlaceholder) {
+        var mustInsert = typeof htmlPlaceholder === 'undefined';
 
-	/**
-	 * Image upload
-	 */
-	var watchForSubmition = function () {
-		$('#image-upload > input[type="submit"]').on('click', function(e) {
+        var img = editor.document.createElement('img');
+        img.setAttribute('src', src);
+
+        var em = editor.document.createElement('em');
+        em.setHtml('Photo cred - ');
+
+        var credits = editor.document.createElement('a');
+        credits.setHtml(creditname);
+        credits.setAttribute('href', crediturl);
+
+        if (mustInsert) {
+            htmlPlaceholder = editor.document.createElement('span');
+        } 
+           
+        htmlPlaceholder.setHtml(""); 
+        htmlPlaceholder.append(img);
+        htmlPlaceholder.append(em);
+        htmlPlaceholder.append(credits);
+
+        if (mustInsert) {
+            editor.insertElement(htmlPlaceholder);
+        }
+    };
+
+    var createImagePlaceholder = function(editor) {
+        var htmlPlaceholder = editor.document.createElement('span');
+        htmlPlaceholder.addClass('lmlcontentimage');
+        htmlPlaceholder.setHtml('<div class="mediaInsertPlaceholder">Please wait, inserting image</div>');
+        editor.insertElement(htmlPlaceholder);
+
+        return htmlPlaceholder;
+    };
+
+    var triggerCKUpload = function(e, editor) {
 			if (typeof selectedPicture !== 'undefined') {
 				$(selectedPicture).removeClass('selectedPicture');
 				selectedPicture = undefined;
 			}
 
+            var htmlPlaceholder = createImagePlaceholder(editor);
+            var imageCreditName = $('.picture-upload-form input[name="ckimagecreditname"]').val();
+            var imageCreditURL =  $('.picture-upload-form input[name="ckimagecrediturl"]').val();
+
 			var bar = $('.progress .progress-bar');
 			bar.removeClass('progress-bar-danger');
 			bar.removeClass('progress-bar-success');
 
-			e.preventDefault();
+			if (e && e.preventDefault) {
+                e.preventDefault();
+            }
 
 			$('.progress').show();
 
@@ -190,7 +234,14 @@ var CKEditor = function() {
 					// Insert uploaded picture
 					picture_id_url[res.picture._id] = res.picture.url;
 					$('#picture-list').append('<img id="' + res.picture._id + '" src="' + res.picture.sizes.thumbnail.url + '">');
-
+        
+                    insertImageInEditor(
+                        '{=config.default.server.url}/uploads/' + res.picture.url, 
+                        imageCreditName, 
+                        imageCreditURL,
+                        editor,
+                        htmlPlaceholder
+                    );
 				} else {
 					bar.addClass('progress-bar-danger');
 					liliumcms.notify({message: 'There was a problem uploading your media', type: 'danger', title: 'Media'})
@@ -199,10 +250,12 @@ var CKEditor = function() {
 			};
 
 			req.send(formData);
-		})
+    };
 
-
+	/**
+	 * Image upload
+	 */
+	var watchForSubmition = function () { 
+		$('#image-upload input[type="submit"]').on('click', function(e) {e.preventDefault();});
 	};
-
-
 };

@@ -122,8 +122,8 @@ var Media = function () {
         if (cli.method == 'POST') {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
-            if (response.success) {
 
+            if (response.success) {
                 var image = formBuilder.serializeForm(form);
                 var extensions = image.File.split('.');
                 var mime = extensions[extensions.length - 1];

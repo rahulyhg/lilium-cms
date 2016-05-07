@@ -3,34 +3,37 @@
 	<h1>Edit a post</h1>
 	{*content.{?1}(sourceof:"post_create")} {=forms.render('post_create')}
 	<div id="editor"></div>
-	<div class="col-md-12">
+	<div class="col-md-12 article-more-info-wrapper">
 		<fieldset class="title">
 		  <legend>More Informations</legend>
 		</fieldset>
 		{*content.{?1}(template:"article-moreinfo")}
-
 	</div>
 
 	<lml:template id="article-moreinfo">
-			<div>
-				<span>Status : </span><lml:tobject data-nodetype="span" data-key="status"></lml:tobject>
+			<div class="article-info-strip">
+				<span>Status : </span><b class="uppercase"><lml:tobject data-nodetype="span" data-key="status"></lml:tobject></b>
 			</div>
-			<div>
+			<div class="article-info-strip">
 				<span>URL : </span><lml:tobject data-nodetype="a" data-href="{=config.default.server.url}/" data-key="name">http:{=config.default.server.url}/<lml:tobject data-nodetype="span" data-key="name"></lml:tobject></lml:tobject>
 			</div>
-			<div>
-				<span>Created : </span><lml:tobject data-nodetype="span" data-key="date"></lml:tobject>
+			<div class="article-info-strip">
+				<span>Created : </span><i class="lmldatetime"><lml:tobject data-nodetype="span" data-key="date"></lml:tobject></i>
 			</div>
-			<div>
-				<span>Last Updated : </span><lml:tobject data-nodetype="span" data-key="date"></lml:tobject>
+			<div class="article-info-strip">
+				<span>Last Updated : </span><i class="lmldatetime"><lml:tobject data-nodetype="span" data-key="date"></lml:tobject></i>
 			</div>
-			<div>
-				<span>Author : </span><lml:tobject data-nodetype="span" data-key="author"></lml:tobject>
+			<div class="article-info-strip">
+				<span>Author : </span><lml:tobject data-nodetype="span" data-key="authorname"></lml:tobject>
 			</div>
-            <div>
+            <div class="article-info-strip article-delete-button-wrapper">
                 <lml:tobject data-nodetype="button"  data-bind="click"
-                 data-action="deleteArticle"
-                 data-actionparamkey="_id"
-                  data-href="{=config.default.server.url}/" data-key="id" data-filter="canDelete" >Delete</lml:tobject>
+                    data-action="deleteArticleModal"
+                    data-actionparamkey="_id"
+                    data-href="{=config.default.server.url}/" 
+                    data-key="id" 
+                    data-filter="canDelete">
+                        Unpublish
+                </lml:tobject>
             </div>
 	</lml:template>

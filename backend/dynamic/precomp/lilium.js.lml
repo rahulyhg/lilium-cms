@@ -327,6 +327,11 @@ var LiliumCMS = function() {
                         } else {
                             field.val(val);
                         }
+                    } else {
+                        var selField = $('select[data-readkey="' + kkString + '"]');
+                        if (selField.length > 0) {
+                            selField.val(val);
+                        }
                     }
                 }
             }

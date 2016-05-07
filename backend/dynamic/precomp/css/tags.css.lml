@@ -1,15 +1,15 @@
-.tags-input {
+#post_create .tags-input {
 	width: 100%;
 	background: #fff;
 	height: 200px;
 	cursor: text;
 }
-.tags-input input[type=text]{
+#post_create .tags-input input[type=text]{
 	border: none;
 	display: inline-block;
     width: initial;
 }
-.tags-input .tag{
+#post_create .tags-input .tag{
     display: inline-block;
     padding: 2px 5px 0px;
     background: #9B59B6;
@@ -20,7 +20,7 @@
     text-transform: uppercase;
     letter-spacing: 1px;
 }
-.tags-input .tag i {
+#post_create .tags-input .tag i {
     margin-left: 6px;
     cursor: pointer;
     font-size: 14px;

@@ -19,30 +19,40 @@
     background: #fff;
     padding: 15px;
     margin-bottom: 20px;
-	border : 1px solid #999;
-    border-left: 5px solid;
+	border : 1px solid #CCC;
+    border-left: 3px solid;
     border-radius: 0px;
-	-webkit-box-shadow: 0 6px 12px rgba(0,0,0,.175);
-    box-shadow: 0 6px 12px rgba(0,0,0,.175)
+    -webkit-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1) !important;
+    -moz-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1) !important;
+    -ms-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1) !important;
+    -o-box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1) !important;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1) !important;
 }
 .close {
     text-shadow: none;
+    top: 0;
+    right: -2px;
+    position: absolute;
 }
 .alert-info .close{
     color: #2980b9;
     opacity: 1;
+    font-size: 16px;
 }
 .alert-success .close{
     color: #27af61;
     opacity: 1;
+    font-size: 16px;
 }
 
 .alert-warning .close{
     color: #f1c40f;
     opacity: 1;
+    font-size: 16px;
 }
 
 .alert-danger .close{
     color: #c0392b;
     opacity: 1;
+    font-size: 16px;
 }

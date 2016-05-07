@@ -13,6 +13,19 @@ var hooks = require('./hooks.js');
 var moment = require('moment');
 
 var Article = function() {
+    var publishedNotificationTitles = [
+        "You got this!",
+        "Allllright!",
+        "Look at you!",
+        "Gratz!",
+        "Yes, you did!",
+        "You're simply great!",
+        "Say whaaat!",
+        "Annnd it's live!",
+        "You're the real deal!",
+        "Guess what!"
+    ];
+
     this.handlePOST = function(cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
@@ -177,7 +190,7 @@ var Article = function() {
                 var formData = formBuilder.serializeForm(form);
                 formData.status = 'published';
                 formData.name = slugify(formData.title).toLowerCase();
-                formData.author = cli.userinfo.userid;
+                formData.author = formData.author ? db.mongoID(formData.author) : cli.userinfo.userid;
                 formData.date = new Date();
                 formData.media = db.mongoID(formData.media);
                 formData.updated = new Date();
@@ -209,7 +222,7 @@ var Article = function() {
 
                         if (success) {
                             cli.sendJSON({
-                                redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + formData._id,
+                                // redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + formData._id,
                                 success: true
                             });
 
@@ -234,10 +247,13 @@ var Article = function() {
                                         );
                                     }
     
+                                    var nlen = publishedNotificationTitles.length;
+                                    var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
+
                                     notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                        title: "Article is Live!",
+                                        title: notifMessage,
                                         url: cli._c.server.url + '/' + formData.name,
-                                        msg: "Your article is published. Click to see it live.",
+                                        msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
                                         type: 'success'
                                     });
                                 });
@@ -664,7 +680,7 @@ var Article = function() {
                         status: 1,
                         subtitle: 1,
                         name: 1,
-                        media: "$media.sizes.medium.url"
+                        media: "$media.sizes.thumbnail.url"
                     }
                 }, {
                     $sort: sort
@@ -782,7 +798,7 @@ var Article = function() {
 
                         // Found a content
                         if (arr && arr.length > 0) {
-                            arr[0].author = arr[0].author[0] ? arr[0].author.displayname : "[NO AUTHOR]";
+                            arr[0].authorname = arr[0].author[0] ? arr[0].author[0].displayname : "[NO AUTHOR]";
                             // Check if there is a newer autosaved version
                             db.findToArray(cli._c, 'autosave', {
                                 contentid: db.mongoID(arr[0]._id),
@@ -892,22 +908,44 @@ var Article = function() {
                     {name : "sponsorship", displayName : "Sponsorship"}
                 ]
             })
+            .add('title-author', 'title', {
+                displayname : "Redaction"
+            })
+            .add('author', 'livevar', {
+                displayname : "Author",
+                endpoint : "entities",
+                tag : "select",
+                template: "option",
+                title : "author",
+                readkey : "author.0._id",
+                attr: {
+                    lmlselect : false
+                },
+                props: {
+                    'value' : "_id",
+                    'html' : 'displayname',
+                    'header' : 'Select One'
+                }
+            })
             .trigger('bottom')
             .add('title-action', 'title', {
                 displayname: "Publish"
             })
-            .add('save', 'button', {
-                'displayname': 'Save draft',
-                'classes': ['btn', 'btn-default', 'fullwidth'],
-            })
-            .add('preview', 'button', {
-                'displayname': 'Preview in new tab',
-                'classes': ['btn', 'btn-default', 'fullwidth'],
-            })
-            .add('publish', 'button', {
-                'displayname': 'Save and <b>Publish</b>',
-                'classes': ['btn', 'btn-default', 'fullwidth'],
-            });
+            .add('publish-set', 'buttonset', { buttons : [{
+                    'name' : 'save',
+                    'displayname': 'Save draft',
+                    'classes': ['btn', 'btn-default, btn-save']
+                }, {
+                    'name' : 'preview',
+                    'displayname': 'Preview in new tab',
+                    'classes': ['btn', 'btn-default, btn-preview']
+                }, {
+                    'name' : 'publish', 
+                    'displayname': 'Save and <b>Publish</b>',
+                    'classes': ['btn', 'btn-default, btn-publish']
+                }
+            ]}
+        );
     }
 
     cacheInvalidator.emitter.on('articleInvalidated', function(data) {
@@ -935,7 +973,6 @@ var Article = function() {
 
 
     var init = function() {
-
         tableBuilder.createTable({
             name: 'article',
             endpoint: 'content.table',
@@ -944,9 +981,10 @@ var Article = function() {
             max_results: 25,
             fields: [{
                 key: 'media',
-                displayname: 'Featured Image',
+                displayname: 'Media',
                 template: 'imgArticle',
-                sortable: false
+                sortable: false,
+                fixedWidth : 90
             }, {
                 key: '',
                 displayname: 'Title - Subtitle',

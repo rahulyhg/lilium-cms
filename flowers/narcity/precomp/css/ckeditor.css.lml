@@ -1,0 +1,37 @@
+{#config;theme}
+
+body.cke_editable.cke_editable_themed.cke_contents_ltr {
+    width: 640px;
+    font-family: Arial, sans-serif;
+    border-right: 1px dashed #DDD;
+    padding-right: 10px;
+}
+
+body.cke_editable.cke_editable_themed.cke_contents_ltr p {
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.7em;
+    margin-bottom: 1.7em;
+}
+
+body.cke_editable.cke_editable_themed.cke_contents_ltr a {
+    color: {=theme.settings.maincolor};
+    text-decoration: none;
+}
+
+body.cke_editable.cke_editable_themed.cke_contents_ltr img {
+    display: block;
+    max-width: 100%;
+    width: 100%;
+    height: auto;
+}
+
+.mediaInsertPlaceholder {
+    display: block;
+    text-align: center;
+    height: 100px;
+    padding-top: 50px;
+    font-size: 32px;
+    color: #DDD;
+    border: 1px dashed #DDD;
+}
