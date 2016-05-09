@@ -41,7 +41,6 @@
                     </li>
                     <li class="dropdown">
                         <div class="loggedin-user-box link dropdown-toggle" id="loggedinuserbox" data-toggle="dropdown" aria-hidden="true">
-                            {*session.displayname}
                         </div>
 
                         <div id="profile-dropdown" class="dropdown-menu">
@@ -53,11 +52,6 @@
                                     <a href="{=config.default.server.url}/logout">Logout</a>
                                 </div>
                             </span>
-                            <span id="avatar">
-                                <img src="">
-                            </span>
-
-
                         </div>
                     </li>
                 </ul>
@@ -69,6 +63,13 @@
 </header>
 
 <lml:template id="adminbaruserbox">
+    <lml:tobject data-absurl="avatarURL" data-nodetype="img" data-filter="hasAvatar"></lml:tobject>
     <lml:tobject data-key="displayname" data-nodetype="span"></lml:tobject>
 </lml:template>
 {*session(template:"adminbaruserbox",target:"loggedinuserbox")}
+
+<script>
+window.hasAvatar = function(sesh) {
+    return sesh.avatarURL && sesh.avatarURL !== '';
+};
+</script>

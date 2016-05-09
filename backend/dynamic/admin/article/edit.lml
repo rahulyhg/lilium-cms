@@ -26,14 +26,38 @@
 			<div class="article-info-strip">
 				<span>Author : </span><lml:tobject data-nodetype="span" data-key="authorname"></lml:tobject>
 			</div>
+
             <div class="article-info-strip article-delete-button-wrapper">
                 <lml:tobject data-nodetype="button"  data-bind="click"
-                    data-action="deleteArticleModal"
+                    data-action="unpublishArticleModal"
                     data-actionparamkey="_id"
                     data-href="{=config.default.server.url}/" 
                     data-key="id" 
-                    data-filter="canDelete">
+                    data-filter="canUnpublish">
                         Unpublish
                 </lml:tobject>
             </div>
+
+            <div class="article-info-strip article-destroy-button-wrapper">
+                <lml:tobject data-nodetype="button"  data-bind="click"
+                    data-action="destroyAutosave"
+                    data-actionparamkey="_id"
+                    data-href="{=config.default.server.url}/" 
+                    data-key="id" 
+                    data-filter="canDestroyAutosave">
+                        Destroy autosave
+                </lml:tobject>
+            </div>
+            
+            <div class="article-info-strip article-destroy-button-wrapper">
+                <lml:tobject data-nodetype="button"  data-bind="click"
+                    data-action="destroyArticleModal"
+                    data-actionparamkey="_id"
+                    data-href="{=config.default.server.url}/" 
+                    data-key="id" 
+                    data-filter="canDestroy">
+                        Destroy
+                </lml:tobject>
+            </div>
+
 	</lml:template>

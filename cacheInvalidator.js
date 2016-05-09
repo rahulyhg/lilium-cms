@@ -33,6 +33,8 @@ var CacheInvalidator = function () {
     var folders = [];
     this.emitter = new CacheInvalidatedEmitter();
 
+    var noOp = function() {};
+
     this.addFolderToWatch = function (path) {
         fs.watch(path, function (event, filename) {
             var fileInvalidated = cachedFileEvents[filename];
@@ -68,9 +70,9 @@ var CacheInvalidator = function () {
         }
     };
 
-    this.deleteCachedFile = function (cli, rel, cb) {
-        log('[CacheInvalidator] Invalidating file ' + cli._c.server.html + "/" + rel);
-        fs.unlink(cli._c.server.html + "/" + rel, cb || function () {});
+    this.deleteCachedFile = function (conf, rel, cb) {
+        log('[CacheInvalidator] Invalidating file ' + conf.server.html + "/" + rel);
+        fs.unlink(conf.server.html + "/" + rel, cb || function () {});
     };
 
     this.registerDeletionOnHook = function (hook, filepath) {
@@ -102,15 +104,18 @@ var CacheInvalidator = function () {
     });
 
     hooks.bind('profile_picture_updated', 1, function(data) {
-        deleteContentByAuthor(data.cli.userinfo.userid, data.cli._c);
+        that.deleteContentByAuthor(data.cli.userinfo.userid, data.cli._c);
     });
 
-    this.deleteContentByAuthor = function(authorId, cli) {
+    this.deleteContentByAuthor = function(authorId, conf) {
         // Find articles of the Author
-        db.findToArray(cli._c, 'content', {_id: db.mongoID(authorId)}, function(err, arr) {
-            if (err) log("[CacheInvalidator] Error while requesting to db :" + err);
-            for (var i in arr) {
-                that.deleteCachedFile(cli._c, arr[i].name + '.html');
+        db.findToArray(conf, 'content', {author: db.mongoID(authorId)}, function(err, arr) {
+            if (err) {
+                log("[CacheInvalidator] Error while requesting to db :" + err);
+            } else {
+                for (var i in arr) if (arr[i].name) {
+                    that.deleteCachedFile(conf, arr[i].name + '.html');
+                }
             }
         });
     }

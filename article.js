@@ -50,6 +50,9 @@ var Article = function() {
             case 'preview':
                 this.preview(cli);
                 break;
+            case 'destroy':
+                this.delete(cli, true);
+                break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -287,6 +290,8 @@ var Article = function() {
      */
     this.save = function(cli, auto) {
         // Article already exists
+        cli.postdata.data.form_name = "post_create";
+
         var form = formBuilder.handleRequest(cli);
         var formData = formBuilder.serializeForm(form);
         var id;
@@ -539,14 +544,14 @@ var Article = function() {
         }
     }
 
-    this.delete = function(cli) {
+    this.delete = function(cli, destroy) {
         if (cli.routeinfo.path[3]) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
             db.find(cli._c, 'content', {
                 _id: id
             }, [], function(err, result) {
                 if (result) {
-                    if (cli.hasRight('modify_all_articles') || result._id == cli.userinfo.userid) {
+                    if (cli.hasRight('modify_all_articles') || result.author == cli.userinfo.userid) {
                         // Can delete the current article
 
                         hooks.fire('article_will_delete', id);
@@ -554,7 +559,7 @@ var Article = function() {
                         db.update(cli._c, 'content', {
                             _id: id
                         }, {
-                            status: 'deleted'
+                            status: destroy ? 'destroyed' : 'deleted'
                         }, function(err, r) {
 
                             var filename = r.title + '.html';
@@ -629,26 +634,23 @@ var Article = function() {
 
                     callback(sentArr);
                 });
-
             } else if (levels[0] == 'table') {
                 var sort = {};
-                sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
-                sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (params.order || 1);
-                var match = !cli.hasRight('edit-all-articles') ? {
-                    author: db.mongoID(cli.userinfo.userid)
-                } : {};
+                sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (params.order || -1);
+                sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (params.order || -1);
 
+                var match = [{status : {$ne : "destroyed"}}];
+                if (!cli.hasRight('edit-all-articles')) {
+                    match.push({author: db.mongoID(cli.userinfo.userid)});
+                }
+                if (params.search) {
+                    match.push({
+                        $text : { $search: params.search }
+                    });
+                }
+    
                 db.aggregate(cli._c, 'content', [{
-                    $match: (params.search ? {
-                            $and: [{
-                                $text: {
-                                    $search: params.search
-                                }
-                            }, match]
-                        } :
-                        match
-                    )
-
+                    $match: {$and : match}
                 }, {
                     $lookup: {
                         from: 'entities',

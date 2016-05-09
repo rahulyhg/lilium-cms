@@ -15,14 +15,16 @@
 	padding: 2px;
 	background-color: #EEE;
 
-	font-size: 18px;
+	font-size: 14px;
 	font-weight: bold;
+
+    text-transform: uppercase;
 }
 
 .lmlpushtable thead th,
 .lmlpushtable tfoot td,
 .lmlpushtable tbody td {
-	padding: 10px;
+	padding: 2px 3px;
 	text-align: left;
     position:relative;
 }
@@ -35,4 +37,8 @@
 
 .lmlpushtable .lmlpushtablecasenotmet {
 	display: none;
+}
+
+.lmlpushtable thead th select.lmlpushtablekeyer {
+    width: 260px;
 }

@@ -16,9 +16,7 @@ var imageSize = undefined;
 var themes = undefined;
 var entities = undefined;
 var cacheInvalidator = undefined;
-var dfp = undefined;
 var postman = undefined;
-var Products = undefined;
 var Frontend = undefined;
 var notification = undefined;
 var Forms = undefined;
@@ -63,9 +61,7 @@ var Core = function () {
         themes = require('./themes.js');
         entities = require('./entities.js');
         cacheInvalidator = require('./cacheInvalidator.js');
-        dfp = require('./dfp.js');
         postman = require('./postman.js');
-        Products = require('./products');
         Frontend = require('./frontend.js');
         notification = require('./notifications.js');
         sessions = require('./session.js');
@@ -430,29 +426,6 @@ var Core = function () {
         entities.cacheRoles(cb);
     };
 
-    var loadProducts = function (cb) {
-        db.findToArray(_c.default(), 'products', {}, function (err, arr) {
-            for (var i = 0; i < arr.length; i++) {
-                Products.registerProduct(arr[i]);
-            }
-
-            db.findToArray(_c.default(), 'producttypes', {}, function (err, arr) {
-                for (var i = 0; i < arr.length; i++) {
-                    Products.registerProductType(arr[i].name, arr[i].displayName);
-                }
-
-                db.findToArray(_c.default(), 'productpricebases', {}, function (err, arr) {
-                    for (var i = 0; i < arr.length; i++) {
-                        Products.registerPriceBase(arr[i].name, arr[i].displayName, arr[i].divider);
-                    }
-
-                    log('Products', 'Loaded products info from database');
-                    cb();
-                });
-            });
-        });
-    };
-
     var loadStandardInput = function () {
         var stdin = process.openStdin();
         stdin.liliumBuffer = "";
@@ -505,9 +478,7 @@ var Core = function () {
         admin.registerLiveVar();
         Article.registerContentLiveVar();
         Media.registerMediaLiveVar();
-        dfp.registerLiveVar();
         entities.registerLiveVars();
-        Products.registerLiveVar();
         plugins.registerLiveVar();
         themes.registerLiveVar();
         sites.registerLiveVar();
@@ -524,24 +495,6 @@ var Core = function () {
     var initTables = function () {
         require('./tableBuilder.js').init();
     }
-
-    var loadDFP = function (cb) {
-        log("DFP", "Loading core user");
-        dfp.registerHooks();
-        dfp.createUser();
-        dfp.scheduleDeepCopy();
-
-        setTimeout(function () {
-            log('DFP', 'Running deep fetch async');
-            dfp.deepServerFetch(function () {
-                log('DFP', 'Deep fetch finished');
-            });
-        }, 1);
-
-        if (_c.default.env == 'dev') {
-            dfp.createDevEnv();
-        }
-    };
 
     var initForms = function () {
         Forms = require('./forms');
@@ -679,7 +632,6 @@ var Core = function () {
             loadStandardInput();
             loadImageSizes();
             loadLiveVars();
-            loadDFP();
             loadGlobalPetals();
             loadRequestHandler();
             loadLMLLibs();
@@ -687,8 +639,6 @@ var Core = function () {
 
             loadPlugins(function () {
                 loadRoles(function () {
-                    console.log('hello');
-                    loadProducts(function () {
                             precompile(function () {
                                 redirectIfInit(resp, function () {
                                     loadAdminMenus();
@@ -707,7 +657,6 @@ var Core = function () {
                                     hooks.fire('init');
                                 });
                             });
-                    });
                 });
             });
         });

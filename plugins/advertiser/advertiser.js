@@ -7,14 +7,16 @@
 	 var fileLogic = undefined;
 	 var formBuilder = undefined;
 	 var adminAdvertiser = require('./adminAdvertiser.js');
-	 var campaigns = require('./campaigns.js');
+	 var campaigns = require('./campaignsAdvertiser.js');
 	 var livevars = undefined;
 	 var db = undefined;
 	 var transaction = undefined;
 	 var http = undefined;
+     var dfp = require('./dfp.js');
+     var production = require('./production.js');
 
-	 var Advertiser = function() {
-	     this.iface = new Object();
+	var Advertiser = function() {
+	    this.iface = new Object();
 
 	     var initRequires = function(abspath) {
 	         log = require(abspath + "log.js");
@@ -33,6 +35,8 @@
 	         campaigns.init(abspath);
 	         transaction.init();
 	         adminAdvertiser.init(abspath);
+    
+             dfp.init(abspath, conf);
 	     };
 
 	     var registerEndpoint = function() {
@@ -339,10 +343,45 @@
 	         }
 	     };
 
+        var loadDFP = function () {
+            log("DFP", "Loading core user");
+            dfp.registerHooks();
+            dfp.createUser();
+            dfp.scheduleDeepCopy();
+
+            setTimeout(function () {
+                log('DFP', 'Running deep fetch async');
+                dfp.deepServerFetch(function () {
+                    log('DFP', 'Deep fetch finished');
+                });
+            }, 1);
+
+            if (conf.default().env == 'dev') {
+                dfp.createDevEnv();
+            }
+        };
+
 	     var registerLiveVars = function() {
+             dfp.registerLiveVar();
+
 	         livevars.registerLiveVariable('isStripeClient', function(cli, levels, params, callback) {
 	             campaigns.findStripeCostumer(cli, callback);
 	         }, ["advertisement"]);
+
+             livevars.registerLiveVariable('sponsoredcontent', function(cli, levels, params, callback) {
+                var sentArr = new Array();
+                db.findToArray(cli._c, 'content', {isSponsored:true}, function(err, arr) {  
+                    for (var i = 0; i < arr.length; i++) {  
+                        sentArr.push({ 
+                            articleid: arr[i]._id,  
+                            name: arr[i].name,
+                            title: arr[i].title  
+                        }); 
+                    };  
+                    
+                    callback(sentArr);
+                });
+             });
 
 	         livevars.registerLiveVariable('advertiser', function(cli, levels, params, callback) {
 	             var allEntities = levels.length === 0;
@@ -434,7 +473,11 @@
 	             registerRoles();
 	             registerLiveVars();
 
-	             pingAdServer(callback);
+	             loadDFP();
+             
+                 pingAdServer(function() {
+                     production.register(_c, info, callback);
+                 });
 	         } catch (e) {
 	             console.log(e);
 	         }

@@ -31,16 +31,13 @@
             }
 
             if (content[0].recentversion) {
-                lmlAlert('There is a more recent version of this article <a href="{=config.default.server.url}/admin/article/edit/' + content[0].recentversion + '">here</a>');
+                lmlAlert('There is an autosaved version of this article <a href="{=config.default.server.url}/admin/article/edit/' + content[0].recentversion + '">here</a>', 'info', 'pencil');
             }
-
 
             if (content[0].status == 'autosaved' && content[0].contentid) {
-                lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
+                // lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
             }
         }
-
-
     });
 
 
@@ -63,25 +60,59 @@
         pubBtn.innerHTML = publishButtonText;
     });
 
-    var deleteArticleModal = function(id) {    
+    var unpublishArticleModal = function(id) {    
         deleteID = id;
         $('#confirm-unpublish').modal('show');
         return false;
     };
+    
+    var destroyArticleModal = function(id) {    
+        deleteID = id;
+        $('#confirm-destroy').modal('show');
+        return false;
+    };
 
-    var deleteArticle = function() {
-        var url = isAutoSave ? 'delete-autosave' : 'delete'
-        $.post('{=config.default.server.url}/admin/article/'+ url +'/' + deleteID, {}, function(data) {
+    var unpublishArticle = function() {
+        $.post('{=config.default.server.url}/admin/article/delete/' + deleteID, {}, function(data) {
             if (data.success && data.redirect) {
                 window.location.replace(data.redirect);
             } else {
                 alert('There was an error deleting this post.');
             }
         });
+    };
+
+    var destroyAutosave = function(deleteID) {
+        $(".article-destroy-button-wrapper button").get(0).disabled = true;
+        $.post('{=config.default.server.url}/admin/article/delete-autosave/' + deleteID, {}, function(data) {
+            if (data.success && data.redirect) {
+                window.location.replace(data.redirect);
+            } else {
+                alert('There was an error deleting this autosave.');
+            }
+        });
+    };
+
+    var destroyArticle = function() {
+        $.post('{=config.default.server.url}/admin/article/destroy/' + deleteID, {}, function(data) {
+            if (data.success && data.redirect) {
+                window.location.replace(data.redirect);
+            } else {
+                alert('There was an error destroying this post.');
+            }
+        });
+    };
+
+    var canDestroyAutosave = function(id) {
+        return this.status === 'autosaved';
+    };
+
+    var canUnpublish = function(id) {
+        return this.status !== 'deleted' && this.status !== 'autosaved';
     }
 
-    var canDelete = function(id) {
-        return this.status !== 'deleted';
+    var canDestroy = function(id) {
+        return this.status === 'deleted';
     }
 
     $(document).ready(function() {
@@ -162,6 +193,7 @@
 
         }
 
+        // Save Draft
         $('form button[name=save]').on('click', function(e) {
             // Save and give notification
             var currentSave = $('form').serialize();
@@ -172,7 +204,6 @@
             tempsave += contentid ? '&_id=' + contentid : '';
             tempsave += _id ? '&autosaveid= ' + _id : '';
 
-            // Check if
             $.post('{=config.default.server.url}/admin/article' + url, tempsave, function(data) {
                 lastSave = currentSave;
 
@@ -232,12 +263,14 @@
             tempForm += contentid ? '&id=' + contentid : '';
             tempForm += _id ? '&autosaveid= ' + _id : '';
 
-            var pubBtn = $('button[name="publish"]').get(0);
-            pubBtn.disabled = true;
-            publishButtonText = pubBtn.innerHTML;
-            pubBtn.innerHTML = "Publishing...";
-
             if (valid) {
+                $('.alert-wrapper').remove();
+    
+                var pubBtn = $('button[name="publish"]').get(0);
+                pubBtn.disabled = true;
+                publishButtonText = pubBtn.innerHTML;
+                pubBtn.innerHTML = "Publishing...";
+    
                 $.post('{=config.default.server.url}/admin/article/new', tempForm, function(data) {
                     if (data.success) {
                         lastSave = form;
@@ -247,12 +280,15 @@
                         }
                     }
                 });
-            }
-
+            } 
         });
 
         $('#confirm-unpublish button.btn-danger').on('click', function() {
-            deleteArticle();
+            unpublishArticle();
+        });
+
+        $('#confirm-destroy button.btn-danger').on('click', function() {
+            destroyArticle();
         });
 
         window.onblur = function() {
@@ -306,6 +342,29 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-danger">Unpublish</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<div id="confirm-destroy" class="modal fade announcement" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Destroy article</h4>
+            </div>
+            <div class="modal-body">
+                <p>Destroying an article removes it from the list. This process is irreversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger">Destroy</button>
             </div>
         </div>
         <!-- /.modal-content -->

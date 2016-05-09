@@ -1,11 +1,18 @@
 /* Media */
+.medias-list {
+    padding: 10px;
+}
 .medias-item-list {
     float: left;
     list-style: none;
 }
 .medias-item-list {
-    width: 150px;
-    height: 150px;
+    width: 162px;
+    height: 162px;
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #DDD;
+    background-color: #EEE;
 }
 .medias-item-list:hover .medias-actions{
     display:block;

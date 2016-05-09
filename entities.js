@@ -82,15 +82,18 @@ var Entities = module.exports = new function () {
     this.handlePOST = function (cli) {
         cli.touch('entities.handlePOST');
         if (cli.routeinfo.path[1] == 'me') {
-            switch (cli.routeinfo.path[2]) {
-            case undefined:
+            switch (cli.postdata.data.form_name) {
+            case "update_entitiy":
                 this.updateProfile(cli);
                 break;
-            case "update_profile_picture":
-                this.updateProfilePicture(cli);
+            case "upload_profile_picture":
+                this.updateProfilePicture(cli, true);
                 break;
-            case "change_password":
-                this.changePassword(cli);
+            case "update_password":
+                this.changePassword(cli, true);
+                break;
+            default:
+                cli.throwHTTP(401);
                 break;
             }
         } else if (cli.routeinfo.path[2] == 'edit') {
@@ -196,9 +199,7 @@ var Entities = module.exports = new function () {
                             });
 
                             sessionManager.saveSession(cli, function () {
-
                                 cli.sendJSON({
-                                    redirect: '',
                                     success: true
                                 });
                             });
@@ -223,7 +224,6 @@ var Entities = module.exports = new function () {
 
                                         // Save it
                                         sessionManager.saveSession(dummycli, function () {
-
                                             cli.sendJSON({
                                                 redirect: '',
                                                 success: true
@@ -264,7 +264,7 @@ var Entities = module.exports = new function () {
         if (response.success) {
             form = formbuilder.serializeForm(form);
             var shhh = CryptoJS.SHA256(form.password).toString(CryptoJS.enc.Hex);
-            var id = profile ? db.mongoID(cli.userinfo.userid) : cli.routeinfo.path[3];
+            var id = profile ? cli.userinfo.userid : cli.routeinfo.path[3];
 
             db.update(cli._c, 'entities', {
                 _id: db.mongoID(id)

@@ -41,36 +41,35 @@ var Production = function () {
     };
 
     var initCampaigns = function (asbpath) {
-        Campaigns.init(asbpath);
+        Campaigns.init(asbpath, function() {
 
-        Admin.registerAdminEndpoint('campaigns', 'GET', function (cli) {
-            cli.touch('admin.GET.campaigns');
-            Campaigns.handleGET(cli);
+            Admin.registerAdminEndpoint('campaigns', 'GET', function (cli) {
+                cli.touch('admin.GET.campaigns');
+                Campaigns.handleGET(cli);
+            }); 
+
+            Admin.registerAdminEndpoint('campaigns', 'POST', function (cli) {
+                cli.touch('admin.POST.campaigns');
+                Campaigns.handlePOST(cli);
+            }); 
+
+            Campaigns.registerLiveVar();
+
+            var aurl = "admin/"; 
+
+            Admin.registerAdminMenu({
+                id: "campaigns",
+                faicon: "fa-line-chart",
+                displayname: "Campaigns",
+                priority: 300,
+                rights: ["view-campaigns"],
+                absURL: aurl + "campaigns",
+                children: []
+            });
+
+            Campaigns.registerCreationForm();
+            Campaigns.loadCampaignsStatuses(function () {});
         });
-
-        Admin.registerAdminEndpoint('campaigns', 'POST', function (cli) {
-            cli.touch('admin.POST.campaigns');
-            Campaigns.handlePOST(cli);
-        });
-
-        Campaigns.registerLiveVar();
-
-        var aurl = "admin/"; //_c.default().server.url + "/admin/";
-
-        Admin.registerAdminMenu({
-            id: "campaigns",
-            faicon: "fa-line-chart",
-            displayname: "Campaigns",
-            priority: 300,
-            rights: ["view-campaigns"],
-            absURL: aurl + "campaigns",
-            children: []
-        });
-
-        Campaigns.registerCreationForm();
-        Campaigns.loadCampaignsStatuses(function () {});
-
-        // frontend.registerJSFile(abspath + "plugins/production/precomp/js/lmlprodtags.js", 4000, "theme", "all");
     };
 
     var handleGET = function (cli) {

@@ -4,7 +4,9 @@ body.cke_editable.cke_editable_themed.cke_contents_ltr {
     width: 640px;
     font-family: Arial, sans-serif;
     border-right: 1px dashed #DDD;
-    padding-right: 10px;
+    border-left: 1px dashed #DDD;
+    padding: 0px 10px;
+    margin: auto;
 }
 
 body.cke_editable.cke_editable_themed.cke_contents_ltr p {

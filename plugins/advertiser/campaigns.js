@@ -1,412 +1,712 @@
-var formBuilder;
-var fileLogic;
-var transaction;
-var log;
-var _c;
-var db;
-var adminAdvertiser = require('./adminAdvertiser.js');
-var fileserver;
-var hooks;
+var log = undefined;
+var _c = undefined;
+var Products = undefined;
+var LiveVars = undefined;
+var db = undefined;
+var filelogic = undefined;
+var formbuilder = undefined;
+var hooks = undefined;
+var tableBuilder = undefined;
+var dfp = undefined;
 
-var CampaignAdvertiser = function () {
-    this.handlePOST = function (cli) {
-        cli.touch('advertiser.campaigns.handlePOST');
-        switch (cli.routeinfo.path[2]) {
-            case undefined:
-                return createAdvertiser(cli);
-                break;
-            case 'sign':
-                return uploadSignature(cli);
-                break;
-            case 'delete':
-                return deleteAdvertiser(cli);
-                break;
-            case 'pay':
-                return payCampaign(cli);
-                break;
-            case 'review':
-                return postChangeRequest(cli);
-                break;
-            default:
-                return cli.throwHTTP(404, 'Not Found');
-                break;
+var cachedCampaigns = new Object();
+var registeredStatuses = new Array();
+
+var Campaigns = function () {
+    var that = this;
+
+    var asyncForEach = function(arr, it, end) {
+        if (typeof arr !== 'object') {
+            end(new Error("[asyncForEach] First parameter must be an array (object type)"));
         }
-    };
 
-
-    this.handleGET = function (cli) {
-        cli.touch('advertiser.campaigns.handleGET');
-        switch (cli.routeinfo.path[2]) {
-            case undefined:
-                cli.routeinfo.relsitepath = "/advertiser/campaigns";
-                fileLogic.serveAdminLML(cli, false, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
-                break;
-            case 'sign':
-                serveSignPage(cli);
-                break;
-            case 'pay':
-                servePayPage(cli);
-                break;
-            case 'review':
-                reviewArticle(cli);
-                break;
-            default:
-                return cli.throwHTTP(404, 'Not Found');
-                break;
+        var len = arr.length;
+        var index = 0;
+        
+        var loopFtc = function() {
+            if (index >= len) {
+                end();
+            } else {
+                it(arr[index], function() {
+                    index++;
+                    loopFtc();
+                });
+            }
         };
-    };
 
-    this.newAdvertiser = function (cli) {
-
-    };
-
-    var postChangeRequest = function (cli) {
-        if (cli.routeinfo.path[3]) {
-            db.findToArray(cli._c, 'campaigns', {
-                _id: db.mongoID(cli.routeinfo.path[3])
-            }, function (err, array) {
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipending') {
-                    var campaign = array[0];
-
-                    var updatecamp = function (status) {
-                            //Update camp status
-                            db.update(cli._c, 'campaigns', {
-                                _id: campaign._id
-                            }, {
-                                campstatus: status
-                            }, function () {
-                                cli.sendJSON({
-                                    success: true,
-                                    redirect: cli._c.server.url + '/advertiser/campaigns'
-                                });
-                            })
-                        }
-                        // Check if there is some post data
-                    if (typeof cli.postdata.data !== 'undefined' && typeof cli.postdata.data.changerequests !== 'undefined') {
-                        var changerequests = cli.postdata.data.changerequests
-                        var changeobj = [];
-                        //Create changerequests
-                        for (var key in changerequests) {
-                            var request = {};
-                            request.content = escape(changerequests[key].content);
-                            request.campId = campaign._id;
-                            request.title = escape(changerequests[key].title);
-                            request.articleId = db.mongoID(key);
-                            changeobj.push(request);
-                        }
-
-                        db.insert(cli._c, 'changerequests', changeobj, function (err, r) {
-                            // Update status
-                            updatecamp('review');
-
-                        });
-
-                    } else {
-                        // Update status
-                        updatecamp('ready');
-                    }
-
-
-
-                } else {
-                    cli.throwHTTP(400, 'Bad request');
-                }
-            });
-        } else {
-            cli.throwHTTP(404, 'Not found');
-        }
+        loopFtc();
     }
 
-    var payCampaign = function (cli) {
+    this.getCampaignsFromDatabase = function (conds, cb) {
+        db.findToArray(_c.default(), 'campaigns', conds, function (err, data) {
+            cb(err || data);
+        });
+    }
+
+    this.getCampaignByProjectID = function (id, cb) {
+        db.findToArray(_c.default(), 'campaigns', {
+            "projectid": id
+        }, function (err, data) {
+            if (!err && data.length > 0) {
+                data[0].tablekey = id;
+            }
+
+            cb(err || data[0]);
+        });
+    };
+
+    this.getAllMyCampaigns = function (conds, cb) {
+        db.findToArray(_c.default(), 'campaigns', conds, function (err, data) {
+            cb(err || data);
+        });
+    };
+
+    this.loadCampaignsStatuses = function (cb) {
+        db.findToArray(_c.default(), 'campaignStatuses', new Object(), function (err, data) {
+            if (typeof data !== 'undefined') {
+                for (var i = 0; i < data.length; i++) {
+                    registeredStatuses.push(data[i]);
+                }
+            }
+            cb();
+        });
+    }
+
+    var statusByName = function (statusname) {
+        var status = undefined;
+        for (var i = 0; i < registeredStatuses.length && !status; i++) {
+            if (registeredStatuses[i].name == statusname) {
+                status = registeredStatuses[i];
+            }
+        };
+
+        return status;
+    };
+
+    var formatEntriesForList = function (entries, callback) {
+        var arr = new Array();
+        var max = entries.length;
+        var index = 0;
+
+        var nextEntry = function () {
+            if (index == max) {
+                return callback(arr);
+            }
+
+            var entry = entries[index];
+            var listObj = {
+                projectid: entry.projectid,
+                name: entry.campname,
+                status: statusByName(entry.campstatus).displayName,
+                clientid: entry.clientid,
+                url: _c.default().server.url + "/admin/campaigns/edit/" + entry.projectid
+            }
+
+            db.findToArray(_c.default(), 'entities', {
+                _id: db.mongoID(listObj.clientid)
+            }, function (err, res) {
+                if (typeof res[0] === 'undefined') {
+                    listObj.clientname = "[CLIENT NOT FOUND]";
+                } else {
+                    listObj.clientname = err || res[0].displayname;
+                }
+
+                arr.push(listObj);
+
+
+                index++;
+                nextEntry();
+            });
+        };
+
+        nextEntry();
+    };
+
+    this.registerLiveVar = function () {
         var that = this;
 
-        //Retrieve campaign
-        if (cli.routeinfo.path[3]) {
+        // levels : field to query
+        // params : {
+        //	query : value to query
+        //	operator : operator to query with, '=' is none specified
+        // };
+        LiveVars.registerLiveVariable('campaigns', function (cli, levels, params, callback) {
+            var firstLevel = levels[0];
 
-            // Find campaing
-            db.findToArray(cli._c, 'campaigns', {
-                _id: db.mongoID(cli.routeinfo.path[3])
-            }, function (err, array) {
+            switch (firstLevel) {
+                case "all":
+                    if (cli.isGranted['campaigns']) {
+                        that.getCampaignsFromDatabase(new Object(), callback);
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "list":
+                    that.getCampaignsFromDatabase(new Object(), function (arr) {
+                        formatEntriesForList(arr, callback);
+                    });
+                    break;
+                case "mine":
+                    if (cli.isGranted('advertiser')) {
+                        that.getAllMyCampaigns({
+                            clientid: db.mongoID(cli.userinfo.userid.toString())
+                        }, callback);
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "ongoing":
+                    if (cli.isGranted('advertiser')) {
+                        that.getAllMyCampaigns({
+                            campstatus : "ongoing",
+                            clientid: db.mongoID(cli.userinfo.userid.toString())
+                        }, function(arr) {
+                            if (params.deep) {
+                                asyncForEach(arr, function(obj, next) {
+                                    obj.deep = true;
 
-                if (err) log('Advertiser Plugin', err);
+                                    asyncForEach(obj.products, function(prod, nextProduct) {
+                                        var prodType = Products.getTypeOfProduct(prod.prodid).name;
+                                        prod.deep = false;
+                                        prod.productType = prodType;
 
-                // Make sure the campaingn is at the payment status
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipayment') {
-                    var campaign = array[0];
+                                        switch (prodType) {
+                                            case "netdisc":
+                                            case "sponsedit":
+                                                db.findToArray(cli._c, 'content', {
+                                                    name : prod.articlename
+                                                }, function(err, arr) {
+                                                    if (!err && arr[0]) {
+                                                        prod.article = arr[0];
+                                                        prod.deep = true;
 
-                    // Check if we have a stripe customer for the current Advertiser
-                    findStripeCostumer(cli, function (result) {
+                                                        var mediaid = prod.article.media;
 
-                        if (typeof result == 'object' && result.length > 0 && result[0].isStripeClient) {
+                                                        if (mediaid) {
+                                                            db.findToArray(cli._c, 'uploads', {
+                                                                "_id" : db.mongoID(mediaid)
+                                                            }, function(err, arr) {
+                                                                prod.article.media = err || arr[0] || mediaid;
+                                                                prod.article.media.deep = !err;
 
-                            // Stripe payement
-                            stripeOrder(result[0].stripeID, campaign, function (order) {
+                                                                nextProduct();
+                                                            });
+                                                        } else {
+                                                            nextProduct();
+                                                        }
+                                                    } else {
+                                                        nextProduct();
+                                                    }
+                                                });
+                                                break;
+                                            case "bannerads":
+                                                db.findToArray(cli._c, 'dfpcache', {
+                                                    id : prod.dfpprojid.toString()
+                                                }, function(err, arr) {
+                                                    if (!(err && !arr[0])) {
+                                                        prod.dfp = arr[0];
+                                                        prod.deep = true;
+                                                    }
+                                                    
+                                                    nextProduct();
+                                                });
+                                                break;
+                                            default:
+                                                nextProduct();
+                                        }
+                                    }, next);
+                                }, function() {
+                                    callback(arr);
+                                });
+                            } else {
+                                callback(arr);
+                            }
+                        });
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "needsattention_advertiser":
+                    if (cli.isGranted('advertiser')) {
+                        db.findToArray(_c.default(), 'campaigns', {
+                            campstatus: {
+                                $in: ['clipending', 'clipayment', 'clisign']
+                            }
+                        }, function (err, res) {
+                            callback(err || res);
+                        });
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "needsattention_prod":
+                    if (cli.isGranted('production')) {
+                        db.findToArray(_c.default(), 'campaigns', {
+                            campstatus: {
+                                $in: ['prod', 'preprod']
+                            }
+                        }, function (err, res) {
+                            callback(err || res)
+                        });
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "get":
+                    var projectid = levels[1];
 
-                                if (order.paid) {
-                                    cli.redirect(cli._c.server.url + "/advertiser?alert=OrderSuccessfull!");
-                                } else {
+                    if (projectid) {
+                        that.getCampaignByProjectID(decodeURI(projectid), callback);
+                    } else {
+                        callback("[CampaignException] ProjectID must be specified as a third level");
+                    }
+                    break;
+                case "query":
+                    var queryInfo;
+                    try {
+                        queryInfo = JSON.parse(params.query) || new Object();
+                    } catch (err) {
+                        cli.crash(new Error(err));
+                        return;
+                    }
+                    var qObj = new Object();
 
-                                    cli.refresh();
+                    queryInfo._id ? qObj._id = queryInfo._id : false;
+                    queryInfo.projectid ? qObj.projectid = queryInfo.projectid : false;
+                    queryInfo.campname ? qObj.campname = queryInfo.campname : false;
+                    queryInfo.clientid ? qObj.clientid = queryInfo.clientid : false;
+                    queryInfo.paymentreq ? qObj.paymentreq = queryInfo.paymentreq : false;
+                    queryInfo.campstatus ? qObj.campstatus = {
+                        $in: queryInfo.campstatus
+                    } : false;
+
+                    db.findToArray(_c.default(), 'campaigns', qObj, function (err, arr) {
+                        callback(err || arr);
+                    });
+                    break;
+                case "articlereview": //returns articles of the campaign in need of advertiser review
+                    if (cli.isGranted('advertiser')) {
+                        db.findToArray(cli._c, 'campaigns', {
+                            _id: db.mongoID(levels[1])
+                        }, function (err, array) {
+                            if (err) log('Campaigns livevars', err);
+                            if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipending') {
+                                var campaign = array[0];
+
+                                //Get article in need of a review
+                                var campaign = array[0];
+                                var articlesID = [];
+
+                                for (var key in campaign.products) if (campaign.products[key].articlename) {
+                                    articlesID.push(campaign.products[key].articlename);
                                 }
-                            });
-                        } else {
-                            // Create stripe client
-                            var form = formBuilder.handleRequest(cli);
-                            var response = formBuilder.validate(form, true);
 
-                            if (response.success) {
-
-                                var entData = cli.postdata.data;
-                                var serializedForm = formBuilder.serializeForm(form);
-                                serializedForm.stripeToken = entData.stripeToken;
-                                adminAdvertiser.addAdvertiserStripeCostumer(entData.stripeToken, serializedForm, cli.userinfo.userid, function (success, advertiser) {
-                                    if (success) {
-                                        // Create order and pay it
-                                        stripeOrder(advertiser.stripeid, campaign, function (order) {
-                                            if (order.paid) {
-
-                                                cli.redirect(cli._c.server.url + "/advertiser");
-                                            } else {
-                                                cli.refresh();
-                                            }
-                                        });
-                                    } else {
-                                        cli.throwHTTP(400, 'Advertiser failed to update');
+                                db.findToArray(_c.default(), 'content', {
+                                    name: {
+                                        $in: articlesID
                                     }
-
-
+                                }, function (err, arr) {
+                                    callback(arr);
                                 });
 
                             } else {
-                                cli.refresh();
+                                callback();
                             }
-                        }
-                    })
-                } else {
-                    cli.throwHTTP(400, 'Campaign not ready for payment');
-                }
-            });
-        } else {
-            cli.throwHTTP(404, 'Not found');
-        }
-    }
-
-    var stripeOrder = function (stripeId, campaign, cb) {
-        var charge = {
-            currency: 'CAD',
-            amount: 0,
-            customer: stripeId
-        }
-
-        for (var key in campaign.products) {
-            charge.amount += campaign.products[key].price * 100;
-        }
-
-        transaction.charge(charge, function (err, charge) {
-            if (charge.paid) {
-                // Update campaign status
-                db.update(cli._c, 'campaigns', {
-                    _id: campaign._id
-                }, {
-                    campstatus: "prod"
-                }, function (err) {
-                    cb(charge);
-                });
-            } else {
-                cb(charge);
-            }
-
-        });
-
-    };
-
-    var findStripeCostumer = this.findStripeCostumer = function (cli, callback) {
-        db.findToArray(cli._c, 'entities', {
-            _id: cli.userinfo.userid
-        }, function (err, arr) {
-            if (typeof arr[0] !== 'undefined' && typeof arr[0].stripeid !== 'undefined' && arr[0].stripeid !== '') {
-                // Get stripe client for last credit card numbers
-                transaction.getCustomer(arr[0].stripeid, function (err, client) {
-                    if (typeof client !== 'undefined' && client.sources.data[0]) {
-                        // Client is created and credit card
-                        callback(err || [{
-                            isStripeClient: true,
-                            stripeID: client.id,
-                            creditcard: {
-                                last4: client.sources.data[0].last4,
-                                type: client.sources.data[0].brand
-                            }
-                        }]);
+                        });
                     } else {
-                        // Client is created but no credit card
-                        callback(err || [{
-                            isStripeClient: false
-                        }]);
+                        callback();
                     }
+                    break;
+                case "query":
+                    if (cli.isGranted('advertiser')) {
+                        var queryInfo = params.query || new Object();
+                        var qObj = new Object();
 
-                });
+                        qObj._id = queryInfo._id;
+                        qObj.campstatus = queryInfo.campstatus ? {
+                            $or: queryInfo.campstatus
+                        } : undefined;
 
-            } else {
-                callback(err || [{
-                    isStripeClient: false
-                }]);
+                        that.getAllMyCampaigns(qObj, callback);
+                    } else {
+                        callback();
+                    }
+                    break;
+                case "table":
+                    var sort = {};
+                    sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+                    db.aggregate(cli._c, 'campaigns', [{
+                        $match: (params.search ? {
+                            $text: {
+                                $search: params.search
+                            }
+                        } : {})
 
-            }
-        });
-    };
+					}, {
+                        $lookup: {
+                            from: 'entities',
+                            localField: 'clientid',
+                            foreignField: '_id',
+                            as: 'client'
+                        }
+					}, {
+                        $unwind: {
+                            path: "$client",
+                            preserveNullAndEmptyArrays: true
+                        }
+					}, {
+                        $lookup: {
+                            from: 'campaignStatuses',
+                            localField: 'campstatus',
+                            foreignField: 'name',
+                            as: 'campstatus'
+                        }
+					}, {
+                        $project: {
+                            client: "$client.displayname",
+                            projectid: 1,
+                            campname: 1,
+                            name: 1,
+                            campstatus: "$campstatus.displayName",
+                            paymentreq: 1
+                        }
+					}, {
+                        $sort: sort
+					}, {
+                        $skip: (params.skip || 0)
+					}, {
+                        $limit: (params.max || 20)
+					}], function (data) {
+                        db.find(cli._c, 'campaigns', (params.search ? {
+                            $text: {
+                                $search: params.search
+                            }
+                        } : {}), [], function (err, cursor) {
 
-    var uploadSignature = function (cli) {
-
-        if (cli.routeinfo.path[3]) {
-
-            // Find campaing
-            db.findToArray(cli._c, 'campaigns', {
-                _id: db.mongoID(cli.routeinfo.path[3])
-            }, function (err, camp) {
-                if (err) log('Advertiser Plugin', err);
-                //
-                if (camp.length > 0 && cli.userinfo.userid == camp[0].clientid.toString() && camp[0].campstatus == 'clisign') {
-                    var campaign = camp[0];
-                    var form = formBuilder.handleRequest(cli);
-                    var validation = formBuilder.validate(form, false, cli);
-
-
-                    if (validation) {
-
-                        var image = formBuilder.serializeForm(form);
-                        var signature = image.signature;
-
-                        var filename = fileserver.genRandomNameFile(signature);
-                        var path = cli._c.server.base + "backend/static/uploads/" + filename + ".png";
-
-                        // Create signature image from text
-                        fileserver.genImageFromText(signature, path, function () {
-                            //Save
-
-                            var nextStatus = campaign.paymentreq ? 'clipayment' : 'prod';
-
-                            log("Campaigns", "Updating Campaigns with signature");
-                            // Save it in database
-                            db.update(cli._c, 'campaigns', {
-                                _id: campaign._id
-                            }, {
-                                clientsignature: filename + ".png",
-                                campstatus: nextStatus
-                            }, function (err, result) {
-                                log("Campaigns", "Redirecting after signature");
-                                if (campaign.paymentreq) {
-                                    cli.redirect(cli._c.server.url + "/advertiser/campaigns/pay/" + campaign._id);
-                                } else {
-                                    cli.redirect(cli._c.server.url + "/advertiser?alert=Signature Successfull!");
+                            cursor.count(function (err, size) {
+                                results = {
+                                    size: size,
+                                    data: data
                                 }
+                                callback(err || results);
+
                             });
                         });
+                    });
 
+                    break;
+                default:
+                    if (cli.isGranted('advertiser')) {
+                        that.getAllMyCampaigns({
+                            _id: db.mongoID(firstLevel)
+                        }, callback);
                     } else {
-                        cli.refresh();
+                        callback();
                     }
 
-                } else {
-                    cli.throwHTTP(400, 'Bad Request');
+            };
+        });
+    };
+
+    this.handleGET = function (cli) {
+        cli.touch('campaigns.handleGET');
+        var params = cli.routeinfo.path;
+        var hasParam = params.length > 2 && params[2] != "new";
+
+        filelogic.serveAdminLML(cli, hasParam);
+    };
+
+    var cliToDatabaseCampaign = function (cli, old) {
+        cli.touch('campaigns.clitodatabasecampaign');
+
+        var postdata = cli.postdata.data;
+        var products = new Array();
+
+        for (var key in postdata.productstable) {
+            var sprod = postdata.productstable[key];
+            sprod.impressions = sprod.impressions ? parseInt(sprod.impressions) : 0;
+            sprod._editid = key;
+            products.push(sprod);
+        }
+
+        return {
+            "projectid": postdata.projectid,
+            "campname": postdata.campname,
+            "campstatus": postdata.campstatus,
+            "clientid": postdata.clientid,
+            "paymentreq": postdata.paymentreq && postdata.paymentreq == "on",
+            "products": products,
+            "impression": postdata.impression || 0
+        };
+    };
+
+    this.handlePOST = function (cli) {
+        cli.touch('campaigns.handlePOST');
+        var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
+        var action = cli.routeinfo.path[2] || 'new';
+
+        if (true || stack.valid) {
+            dbCamp = cliToDatabaseCampaign(cli);
+            dbCamp.clientid = db.mongoID(dbCamp.clientid);
+
+            switch (action) {
+                case 'new':
+                    db.insert(cli._c, 'campaigns', dbCamp, function (res) {
+                        dbCamp.cli = cli;
+                        hooks.trigger('campaignCreated', dbCamp);
+                        cli.redirect(cli._c.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
+                    });
+                    break;
+                case 'edit':
+                    db.findToArray(cli._c, 'campaigns', {
+                        projectid: dbCamp.projectid
+                    }, function (err, old) {
+                        db.update(cli._c, 'campaigns', {
+                            projectid: dbCamp.projectid
+                        }, dbCamp, function (res) {
+                            hooks.trigger('campaignUpdated', {
+                                "old": err || old[0],
+                                "new": dbCamp,
+                                "cli": cli
+                            });
+
+                            if (!err && old[0] && old[0].campstatus != dbCamp.cmapstatus) {
+                                hooks.trigger('campaignStatusChanged', {
+                                    "old": old[0],
+                                    "new": dbCamp,
+                                    "cli": cli
+                                });
+                            }
+
+                            cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath, false);
+                        }, false, true);
+                    });
+                    break;
+                default:
+                    cli.debug();
+            }
+        } else {
+            cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?invalidform", false);
+        }
+    };
+
+    this.registerCreationForm = function () {
+        formbuilder.createForm('campaign_create', {
+                fieldWrapper: {
+                    'tag': 'div',
+                    'cssPrefix': 'campaigncreatefield-'
+                },
+                cssClass: "form-campaign-creation",
+                dependencies: ["sites.all.simple", "products.all", "sponsoredcontent", "dfpcache.all.simple"]
+            })
+            .add('projectid', 'text', {
+                displayname: "Project ID",
+                editonce: true
+            })
+            .add('campname', 'text', {
+                displayname: "Campaign name"
+            })
+            .add('campstatus', 'select', {
+                displayname: "Status",
+                datasource: registeredStatuses
+            })
+            .add('clientid', 'livevar', {
+                endpoint: "entities.query",
+                tag: "select",
+                template: "option",
+                title: "client",
+                displayname: "Client",
+                props: {
+                    query: {
+                        roles: ["advertiser"]
+                    },
+                    html: "displayname",
+                    value: "_id"
                 }
+            })
+            .add('paymentreq', 'checkbox', {
+                displayname: "Payment required prior to production"
+            }, {
+                required: false
+            })
+            .add('productstable', 'livevar', {
+                endpoint: "products.all",
+                tag: "pushtable",
+                title: "products",
+                displayname: "Products",
+                template: "tmpl_productrow",
+                datascheme: {
+                    hiddenFields : [
+                        "impressions"
+                    ],
+                    key: {
+                        displayName: "Product",
+                        keyName: "displayName",
+                        keyValue: "name",
+                        readKey: "prodid"
+                    },
+                    columns: [
+                    {
+                        fieldName: "qte",
+                        dataType: "number",
+                        displayName: "Quantity",
+                        defaultValue: 1,
+                        influence: [{
+                            fieldName: "price",
+                            eq: "*"
+						}, {
+                            fieldName: "targetimp",
+                            eq: "="
+						}]
+					}, {
+                        fieldName: "pricebase",
+                        displayName: "Based on",
+                        keyName: "priceBase",
+                        defaultValue: "unit"
+					}, {
+                        fieldName: "price",
+                        dataType: "money",
+                        displayName: "Price",
+                        keyName: "price",
+                        prepend: "$"
+					}, {
+                        fieldName: "enddate",
+                        dataType: "date",
+                        displayName: "End Date",
+                        keyName: "enddate"
+					}, {
+                        fieldName: "targetimp",
+                        dataType: "number",
+                        displayName: "Target Impressions",
+                        keyName: "targetimp"
+					}, {
+                        fieldName: "website",
+                        displayName: "Website",
+                        keyName: "website",
+                        dataType: "multiple",
+                        datasource: {
+                            datasource: "sites.all.simple",
+                            keyName: "displayName",
+                            keyValue: "name"
+                        }
+					}, {
+                        fieldName: "productapilink",
+                        dataType: "template",
+                        templateid: "productapilink"
+					}],
+                    columnTemplates: {
+                        "productapilink": {
+                            fields: [{
+                                fieldName: "articlename",
+                                displayName: "Article",
+                                keyName: "articlename",
+                                displayCase: ["sponsedit", "netdisc"],
+                                autocomplete: {
+                                    datasource: "sponsoredcontent",
+                                    keyValue: "name",
+                                    keyName: "title",
+                                    cantAdd: true
+                                }
+							}, {
+                                fieldName: "dfpprojid",
+                                displayName: "DPF Project ID",
+                                keyName: "dfpprodid",
+                                displayCase: ["bannerads"],
+                                autocomplete: {
+                                    datasource: "dfpcache.all.simple",
+                                    keyValue: "id",
+                                    keyName: "name",
+                                    cantAdd: false
+                                }
+							}, {
+                                fieldName: "fbcampid",
+                                dataType: "text",
+                                displayName: "Facebook camp. ID",
+                                keyName: "fbcampid",
+                                displayCase: ["facebook"]
+							}, {
+                                fieldName: "apilink",
+                                dataType: "text",
+                                displayName: "More details",
+                                keyName: "details",
+                                displayCase: ["*"]
+							}],
+                            dependsOn: "productType"
+                        }
+                    },
+                    footer: {
+                        title: "Total",
+                        sumIndexes: [2]
+                    }
+                }
+            })
+            .add('save', 'submit', {
+                onlyWhen: "new",
+                displayName: 'Save'
             });
-        } else {
-            cli.throwHTTP(404, 'Not found');
-        }
     };
 
-    var reviewArticle = function (cli) {
-        fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
+    this.registerHooks = function () {
+        hooks.bind('article_will_create', 200, function (pkg) {
+            pkg.article.impressions = 0;
+            pkg.article.targetimpressions = -1;
+            pkg.article.targetdate = -1;
+        });
+    };
+    var createTable = function () {
+
+        tableBuilder.createTable({
+            name: 'campaign',
+            endpoint: 'campaigns.table',
+            paginate: true,
+            searchable: true,
+            max_results: 25,
+            fields: [{
+                key: 'projectid',
+                displayname: 'ID',
+                sortable: true
+			}, {
+                key: 'campname',
+                displayname: 'Name',
+                sortable: true,
+			}, {
+                key: 'campstatus',
+                displayname: 'Status',
+                sortable: true
+			}, {
+                key: 'paymentreq',
+                displayname: 'Payment required',
+                template: 'table-campaign-payment',
+                sortable: true
+			}, {
+                key: 'client',
+                displayname: 'Client',
+                sortable: true
+			}, {
+                key: '',
+                displayname: 'Actions',
+                template: 'table-campaign-actions',
+                sortable: false
+			}]
+        });
+
     };
 
-    var changeRequest = function (cli) {
-        if (cli.routeinfo.path[3]) {
-            db.findToArray(cli._c, 'campaigns', {
-                _id: db.mongoID(cli.routeinfo.path[3])
-            }, function (err, array) {
-                if (err) log('Advertiser Plugin', err);
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid && array[0].campstatus == 'clipending') {} else {
-                    cli.throwHTTP(400, 'Bad Request');
-                }
-            });
-        } else {
-            cli.throwHTTP(404, 'Not found');
-        }
-    };
-
-    var servePayPage = function (cli) {
-        if (cli.routeinfo.path[3]) {
-            db.findToArray(cli._c, 'campaigns', {
-                _id: db.mongoID(cli.routeinfo.path[3])
-            }, function (err, array) {
-                if (err) log('Advertiser Plugin', err);
-                
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clipayment') { 
-                    fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
-                } else {
-                    cli.throwHTTP(400, 'Bad Request');
-                }
-            }); 
-        } else {
-            cli.throwHTTP(404, 'Not Found');
-        }
-
-    };
-
-    var serveSignPage = function (cli) {
-
-        if (cli.routeinfo.path[3]) {
-            db.findToArray(cli._c, 'campaigns', {
-                _id: db.mongoID(cli.routeinfo.path[3])
-            }, function (err, array) {
-                if (err) log('Advertiser Plugin', err);
-                if (array.length > 0 && cli.userinfo.userid == array[0].clientid.toString() && array[0].campstatus == 'clisign') {
-                    fileLogic.serveAdminLML(cli, true, new Object(), "plugins/advertiser/dynamic/adverttemplate.lml", "plugins/advertiser/dynamic");
-                } else {
-                    cli.throwHTTP(400, 'Bad Request');
-                }
-            });
-        } else {
-            cli.throwHTTP(404, 'Not found');
-        }
-    };
-
-    this.init = function (abspath) {
+    this.init = function (abspath, cb) {
         log = require(abspath + 'log.js');
-        log("AdvertiserPlugin", "Initializing campaigns class");
-        formBuilder = require(abspath + 'formBuilder.js');
-        fileLogic = require(abspath + 'filelogic.js');
-        entites = require(abspath + 'entities.js');
-        transaction = require(abspath + 'transaction.js');
         _c = require(abspath + 'config.js');
+        Products = require('./products.js');
+        LiveVars = require(abspath + 'livevars.js');
         db = require(abspath + 'includes/db.js');
-        fileserver = require(abspath + 'fileserver.js');
+        filelogic = require(abspath + 'filelogic.js');
+        formbuilder = require(abspath + 'formBuilder.js');
         hooks = require(abspath + 'hooks.js');
+        tableBuilder = require(abspath + 'tableBuilder.js');
+        dfp = require(abspath + "/plugins/advertiser/dfp.js");
+        createTable();
 
-        formBuilder.createForm('advertiser_sign')
-            .add('signature', 'text', {
-                'displayname': 'Sign by typing your complete name'
-            }, {
-                required: true
-            })
-            .add('term', 'checkbox', {
-                displayname: 'I agree with the terms'
-            }, {
-                required: true
-            })
-            .add('submit', 'submit');
-
-        formBuilder.createForm('advertiser_pay', {
-                id: "stripe_form"
-            })
-            .addTemplate('payment')
-            .add('Pay', 'submit');
-
-        formBuilder.createForm('advertiser_article_review')
-            .addTemplate('article_base')
-            .add('_id', 'hidden');
+        Products.init(abspath, _c, cb);
     };
-
 };
 
-module.exports = new CampaignAdvertiser();
+module.exports = new Campaigns();

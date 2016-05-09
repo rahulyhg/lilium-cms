@@ -449,7 +449,7 @@ var Sites = function () {
         .addTemplate('lilium_website_info')
         .trg('beforesubmit')
             .add('submit', 'submit', {
-                displayname: "Launch"
+                value: "Launch"
             });
 
         formbuilder.createForm('wptransfer_lilium_website', {
@@ -492,7 +492,7 @@ var Sites = function () {
         .addTemplate("lilium_website_info")
         .trg('beforesubmit')
             .add('submit', 'submit', {
-                displayname: "Transfer"
+                value: "Transfer"
             });
     };
 };
