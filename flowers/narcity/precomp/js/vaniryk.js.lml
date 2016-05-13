@@ -1,6 +1,6 @@
 var _vanirykDOMObject = function(oObj) {
     this.oObj = oObj;
-    this.originalDisplay = oObj.style.display;
+    this.originalDisplay = oObj.style ? oObj.style.display : 'special';
     this.type = "_vanirykDOMObject";
     
     this.addClass = function(str) {
@@ -27,7 +27,7 @@ var _vanirykDOMObject = function(oObj) {
     }
     
     this.style = function(prop_Arr, val) {
-        if (val) {
+        if (val || typeof prop_Arr == 'object') {
             if (typeof prop_Arr === "string") {
                 oObj.style[prop_Arr] = val;   
             } else {
@@ -134,11 +134,17 @@ var _v = function(sel, onlyone, parent) {
         return new _vanirykDOMObject(sel);
     } else if (typeof sel.type !== 'undefined' && sel.type == "_vanirykDOMObject") {
         return sel;
+    } else if (typeof sel == 'function') {
+    document.addEventListener('DOMContentLoaded', sel, false);
+    } else if (typeof sel == 'object' && sel == window) {
+    return _v('window');
     } else {
-        var domObjects = parent ? 
-            parent.querySelectorAll(sel) : 
+        var domObjects = 
+            sel == 'window' ? [window] : 
+            sel == 'document' ? [document] : 
+        parent ? parent.querySelectorAll(sel) : 
             document.querySelectorAll(sel);
-        
+ 
         var len = domObjects.length;
         var _vObj = new Object();
         _vObj.length = len;
@@ -207,22 +213,18 @@ var _a = new function() {
         }
         
         var script = document.createElement('script');
-        
-        (function(script, s) {
-            _a.jsonpCallbacks[s] = function(json, err) {
-                callback(json, err);
-                document.getElementsByTagName('head')[0].removeChild(script);
-                
-                delete _a.jsonpCallbacks[s];
-            };
-            
-            setTimeout(function() {
-                if (_a.jsonpCallbacks[s]) {
-                    _a.jsonpCallbacks[s]({}, true);
-                }
-            }, 5000);
-        })(script, s);
-            
+        script.setAttribute('async', "");
+       
+        if (callback) { 
+            (function(script, s) {
+                _a.jsonpCallbacks[s] = function(json, err) {
+                    callback(json, err);
+                    document.getElementsByTagName('head')[0].removeChild(script);
+                    
+                    delete _a.jsonpCallbacks[s];
+                };
+            })(script, s);
+        }
 
         script.src = url + (hasParams?"&":"?") + 'callback=_a.jsonpCallbacks.'+s
 

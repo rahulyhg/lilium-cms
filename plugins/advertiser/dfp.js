@@ -282,6 +282,33 @@ var LiliumDFP = function () {
                 }, {
                     required: false
                 })
+                .add('dfp.fan', 'text', {
+                    displayname: "In-content Facebook Audiance Network Placement ID"
+                }, {
+                    required: false
+                })
+                .add('dfp-incontentprop', 'stack', {
+                    displayname : "In-content DFP tags",
+                    scheme : {
+                        columns : [
+                            {
+                                fieldName : "tagid",
+                                dataType : "text",
+                                displayname : "DFP Tag ID"
+                            }, {
+                                fieldName : "sizes",
+                                dataType : "text",
+                                displayname : "Sizes (2D array)"
+                            }, {
+                                fieldName : "htmlid",
+                                dataType : "text",
+                                displayname : "HTML ID"
+                            }
+                        ]
+                    }
+                }, {
+                    required: false
+                });
 
             log('DFP', 'Added fields to Settings form');
         });

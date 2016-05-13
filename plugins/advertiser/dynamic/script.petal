@@ -71,7 +71,7 @@
   }
 
   var isBanAd = function(product) {
-    return product.productType == 'bannerads';
+    return product.productType == 'display';
   };
 
   var hasImage = function(product) {

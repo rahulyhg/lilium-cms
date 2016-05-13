@@ -12,6 +12,8 @@
     {=theme.render('scripts')}
     {%petals/headscript}
 
+    {=theme.getQueueTags()}
+
     {=theme.render('title')}
     {%petals/title}
 

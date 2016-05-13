@@ -15,8 +15,6 @@
             {*campaigns.ongoing(template:"campaigns-ongoing-list-item",target:"campaignsongoingtbody",deep:1)}
         </div>
 
-        <a href="{=config.default.server.url}/advertiser/campaigns">View your campaigns</a>
-        
         <lml:template id="campaigns-list-item" data-wrapper="div">
             <div class="attention-needed-block advert-block">
                 <div class="top-color-strip"></div>

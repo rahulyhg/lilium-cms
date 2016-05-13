@@ -8,8 +8,40 @@ var compressor = require('node-minify');
 var frontend = require('./frontend.js');
 var log = require('./log.js');
 var _c = require('./config.js');
+var hooks = require('./hooks.js');
+
+var precompQueue = new Array();
+var siteQueue = new Object();
 
 var Precomp = function () {
+    var that = this;
+
+    this.queueFile = function(conf, lmlfile) {
+        precompQueue.push(lmlfile);
+
+        if (!siteQueue[conf.id]) {
+            siteQueue[conf.id] = new Array();
+        }
+
+        var src = conf.server.html + "/compiled/" + lmlfile.slice(lmlfile.lastIndexOf('/') + 1, -4);
+        siteQueue[conf.id].push({
+            src : conf.server.url + "/compiled/" + lmlfile.slice(lmlfile.lastIndexOf('/') + 1, -4),
+            type : src.substring(src.lastIndexOf('.') + 1)
+        });
+    };
+
+    this.getSiteQueue = function(conf) {
+        return siteQueue[conf.id];
+    };
+
+    var compileQueue = function(conf, cb) {
+        hooks.fire('queue_will_compile', {config : conf});
+        that.compileMultipleFiles(conf, precompQueue, function() {
+            hooks.fire('queue_compiled', {config : conf});
+            cb();
+        });
+    };
+
     var minifyFile = function (conf, inFile, outFile, filetype, callback) {
         log('Precompiler', 'Minifying ' + filetype + ' file');
         // Only minify in prod
@@ -78,6 +110,47 @@ var Precomp = function () {
             });
         }
 
+    };
+
+    this.compileMultipleFiles = function(conf, lmlfiles, callback) {
+        var that = this;
+        var index = -1;
+        var nextFile = function() {
+            index++;
+
+            if (index < lmlfiles.length) {
+                that.compileSingleFile(conf, lmlfiles[index], nextFile);
+            } else {
+                callback();
+            }
+        };
+
+        nextFile();
+    };
+
+    this.compileSingleFile = function(conf, lmlfile, callback) {
+        var writepath = conf.server.html + "/compiled/" + lmlfile.slice(lmlfile.lastIndexOf('/') + 1, -4);
+        checksum.file(lmlfile, function(err, sum) {
+            if (err) {
+                callback(new Error(err));
+                return;
+            }
+
+            db.findToArray(conf, 'compiledfiles', {filename : lmlfile}, function(err, arr) {
+                if (arr.length == 0 || arr[0].sum !== sum) {
+                    db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, theme : false}, function() {
+                        LML.executeToFile(
+                            lmlfile,
+                            writepath,
+                            callback,
+                            {config : conf, minify : false}
+                        );
+                    });
+                } else {
+                    callback(false);
+                }
+            });
+        });
     };
 
     var compileFiles = function (conf, fileArr, histo, absReadPath, absWritePath,  readycb, isTheme) {
@@ -196,9 +269,11 @@ var Precomp = function () {
     this.precompile = function (conf, readycb, themesFiles) {
         fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function () {
             runLoop(conf, function () {
-                mergeJS(conf, function () {
-                    mergeCSS(conf, readycb, themesFiles ? true : false);
-                }, themesFiles ? true : false);
+                compileQueue(conf, function() {
+                    mergeJS(conf, function () {
+                        mergeCSS(conf, readycb, themesFiles ? true : false);
+                    }, themesFiles ? true : false);
+                });
             }, themesFiles);
         }, true);
     };

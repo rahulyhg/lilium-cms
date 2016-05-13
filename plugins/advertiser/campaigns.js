@@ -199,7 +199,7 @@ var Campaigns = function () {
                                                     }
                                                 });
                                                 break;
-                                            case "bannerads":
+                                            case "display":
                                                 db.findToArray(cli._c, 'dfpcache', {
                                                     id : prod.dfpprojid.toString()
                                                 }, function(err, arr) {
@@ -434,7 +434,7 @@ var Campaigns = function () {
             "campname": postdata.campname,
             "campstatus": postdata.campstatus,
             "clientid": postdata.clientid,
-            "paymentreq": postdata.paymentreq && postdata.paymentreq == "on",
+            "paymentreq": postdata.paymentreq,
             "products": products,
             "impression": postdata.impression || 0
         };
@@ -483,7 +483,7 @@ var Campaigns = function () {
                     });
                     break;
                 default:
-                    cli.debug();
+                    cli.throwHTTP(404, 'NOT FOUND');
             }
         } else {
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?invalidform", false);
@@ -611,7 +611,7 @@ var Campaigns = function () {
                                 fieldName: "dfpprojid",
                                 displayName: "DPF Project ID",
                                 keyName: "dfpprodid",
-                                displayCase: ["bannerads"],
+                                displayCase: ["display"],
                                 autocomplete: {
                                     datasource: "dfpcache.all.simple",
                                     keyValue: "id",

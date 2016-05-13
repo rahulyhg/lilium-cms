@@ -53,7 +53,7 @@ var adminEntity = {
 };
 
 var defaultProductTypes = [
-	{name:"bannerads",displayName:"Banner Ads"},
+	{name:"display",displayName:"Display"},
 	{name:"email",displayName:"Email"},
 	{name:"sponsedit",displayName:"Sponsored Editorial"},
 	{name:"twitter",displayName:"Twitter"},
@@ -61,6 +61,7 @@ var defaultProductTypes = [
 	{name:"facebook",displayName:"Facebook"},
 	{name:"snapchat",displayName:"Snapchat"},
 	{name:"video",displayName:"Video"},
+	{name:"netdisc",displayName:"Network Discovery"},
 	{name:"other",displayName:"Other"}
 ];
 
@@ -72,26 +73,28 @@ var defaultPriceBases = [
 ];
 
 var defaultProducts = [
-	{name:"banbigbox",      displayName:"Banner Ads - Big Box",             productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
-	{name:"banbigboxm",     displayName:"Banner Ads - Big Box (Mobile)",    productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
-	{name:"banbillboard",   displayName:"Banner Ads - Billboard",           productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
-	{name:"bancompto",      displayName:"Banner Ads - Companion Takeover",  productType:"bannerads",    priceBase:"unit",   price:500,  active:true},
-	{name:"banlskysc",      displayName:"Banner Ads - Large Skyscraper",    productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
-	{name:"banlb",          displayName:"Banner Ads - Leaderboard",         productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
-	{name:"banskysc",       displayName:"Banner Ads - Skyscraper",          productType:"bannerads",    priceBase:"cpm",    price:0.01, active:true},
-	{name:"bantakeover",    displayName:"Banner Ads - Takeover",            productType:"bannerads",    priceBase:"cpm",    price:0.03, active:true},
-	{name:"email",          displayName:"Email Discovery",                  productType:"email",        priceBase:"unit",   price: 500, active:true},
-	{name:"fbdisc",         displayName:"Facebook Discovery",               productType:"facebook",     priceBase:"unit",   price: 15,  active:true},
-	{name:"twdisc",         displayName:"Twitter Discovery",                productType:"twitter",      priceBase:"unit",   price: 0,   active:true},
-	{name:"igdisc",         displayName:"Instagram Discovery",              productType:"instagram",    priceBase:"unit",   price: 15,  active:true},
-	{name:"igpush",         displayName:"Instagram Push",                   productType:"instagram",    priceBase:"unit",   price: 750, active:true},
-	{name:"snapstory",      displayName:"Snapchat Story",                   productType:"snapchat",     priceBase:"unit",   price: 300, active:true},
-	{name:"seditbasic",     displayName:"Sponsored Editorial - Basic",      productType:"sponsedit",    priceBase:"unit",   price: 725, active:true},
-	{name:"seditstand",     displayName:"Sponsored Editorial - Standard",   productType:"sponsedit",    priceBase:"unit",   price: 1500,active:true},
-	{name:"seditprem",      displayName:"Sponsored Editorial - Premium",    productType:"sponsedit",    priceBase:"unit",   price: 2000,active:true},
-	{name:"seditrev",       displayName:"Revision (Sponsored Editorial)",   productType:"other",        priceBase:"unit",   price: 120, active:true},
-	{name:"svideo",         displayName:"Sponsored Video",                  productType:"video",        priceBase:"unit",   price: 3000,active:true},
-	{name:"other",          displayName:"Other",                            productType:"other",        priceBase:"unit",   price: 0,   active:true}
+    { "name":"dp-bbm", "displayName":"Display - Big box (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-bbm", "displayName":"Display - Big box mobile (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-bi", "displayName":"Display - Billboard (970x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-ct", "displayName":"Display - Companion Takeover", "productType":"display", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"dp-ls", "displayName":"Display - Large Skyscraper (300x600)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-lb", "displayName":"Display - Leaderboard (728x90)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-sk", "displayName":"Display - Skin", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-ss", "displayName":"Display - Skyscraper (160x600)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"email", "displayName":"Email Discovery", "productType":"email", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"fb", "displayName":"Facebook", "productType":"facebook", "priceBase":"cpm", "price":0.008, "active":true, "SKU":"-" },
+    { "name":"ig", "displayName":"Instagram", "productType":"instagram", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"igo", "displayName":"Organic Instagram", "productType":"instagram", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"fbo", "displayName":"Organic Facebook", "productType":"facebook", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"two", "displayName":"Organic Twitter", "productType":"twitter", "priceBase":"unit", "price":200, "active":true, "SKU":"-" },
+    { "name":"snapstory", "displayName":"Snapchat Story", "productType":"snapchat", "priceBase":"unit", "price":1000, "active":true, "SKU":"-" },
+    { "name":"sponsedbas", "displayName":"Sponsored editorial - BASIC", "productType":"sponsedit", "priceBase":"unit", "price":750, "active":true, "SKU":"-" },
+    { "name":"sponsedstand", "displayName":"Sponsored editorial - STANDARD", "productType":"sponsedit", "priceBase":"unit", "price":1500, "active":true, "SKU":"-" },
+    { "name":"sponsedrev", "displayName":"Sponsored editorial revision", "productType":"other", "priceBase":"unit", "price":120, "active":true, "SKU":"-" },
+    { "name":"sponsvid", "displayName":"Sponsored video", "productType":"video", "priceBase":"unit", "price":4000, "active":true, "SKU":"-" },
+    { "name":"tw", "displayName":"Twitter", "productType":"twitter", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-vad", "displayName":"Display - Video In-Content Ad", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-nad", "displayName":"Display - Native ad", "productType":"netdisc", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" }
 ];
 
 var defaultTheme = {

@@ -1,0 +1,142 @@
+{#config}
+window.LMLGetCurrentPlatformCode = function() {
+    return window.innerWidth > 460 ? 'c' : 'm';
+};
+
+window.LMLGetPackageSize = function() {
+    var contentItems = _v('.article-content > *:not(div)');
+    var numChild = contentItems.length;
+    var numPlacement = Math.floor(numChild / 4);
+
+    return numPlacement > 4 ? 4 : numPlacement;
+};
+
+window.LMLDFPTagInfo = [];
+{$ for (tag in config.default.dfp-incontentprop); $}
+window.LMLDFPTagInfo.push({
+    id : "{=tag.tagid}",
+    sizes : {=tag.sizes},
+    htmlid : "{=tag.htmlid}"
+});
+
+
+{$ endfor; $}
+
+window.LMLDFPRotationIndex = 0;
+window.LMLFormatPlacement = function(type, data) {
+    switch (type) {
+        case 'dfp' : 
+            if (window.LMLDFPTagInfo.length == 0) return "";
+            var tag = window.LMLDFPTagInfo[window.LMLDFPRotationIndex];
+            window.LMLDFPRotationIndex++;
+            if (window.LMLDFPRotationIndex == window.LMLDFPTagInfo.length) {
+                window.LMLDFPRotationIndex = 0;
+            }
+
+            var scriptTag = document.createElement('script');
+            scriptTag.setAttribute('pagespeed_no_defer', "");
+
+            scriptTag.innerHTML = 
+                "googletag.cmd.push(function() {" +
+                    "window."+tag.htmlid+" = googletag.defineSlot('"+tag.id+"', "+JSON.stringify(tag.sizes)+", '"+tag.htmlid+"').addService(googletag.pubads());" +
+                    "googletag.pubads().enableAsyncRendering();" +
+                    "googletag.enableServices();" +
+                "});" +
+                "" +
+                "document.getElementById('adwrap_"+tag.htmlid+"').innerHTML = ('<div id=\""+tag.htmlid+"\"><scr'+'ipt type=\"text/javascript\">googletag.cmd.push(function(){ var div_id = \""+tag.htmlid+"\"; if (typeof index_headertag_lightspeed !== \"undefined\") {index_headertag_lightspeed.slotDisplay(div_id);} else {googletag.display(div_id); } });</scr'+'ipt></div>');";
+
+            var adwrap = document.createElement('div');
+            adwrap.id = "adwrap_" + tag.htmlid;
+
+            adwrap.appendChild(scriptTag);
+
+            var allWrap = document.createElement('div');
+            var wTitle = document.createElement('span');
+            wTitle.classList.add("lmlnative-advertisement-span");
+            wTitle.innerHTML = "Advertisement";
+
+            allWrap.appendChild(wTitle);
+            allWrap.appendChild(adwrap);
+
+            return allWrap; break;
+        case 'native' :
+            var artObj = data;
+ 
+            var nLink = document.createElement('a');
+            nLink.setAttribute('href', "{=config.default.server.url}/" + artObj.article.name + "?na=1");
+
+            var artCard  = document.createElement('div');
+            var imgWrap  = document.createElement('div');
+            var featImg  = document.createElement('img');
+            var artTitle = document.createElement('h2');
+            var viaWrap  = document.createElement('span');
+            var varLink  = document.createElement('a');
+
+            nLink.appendChild(artCard);
+            artCard.classList.add("lmlnative-incontent-card");
+            artCard.appendChild(imgWrap);
+            artCard.appendChild(artTitle);
+            artCard.appendChild(viaWrap);
+
+            featImg.setAttribute('src', artObj.article.featuredimage[0].sizes.thumbnailarchive.url);
+            imgWrap.classList.add('lmlnative-featimg-wrapper');
+            imgWrap.appendChild(featImg);
+
+            artTitle.innerHTML = artObj.article.title;
+
+            var allWrap = document.createElement('div');
+            var wTitle = document.createElement('span');
+            wTitle.classList.add("lmlnative-suggested-span");
+            wTitle.innerHTML = "Suggested";
+
+            allWrap.appendChild(wTitle);
+            allWrap.appendChild(nLink);
+
+            return allWrap; break;
+        case 'facebook':
+            var fbad = document.createElement('div');
+            fbad.dataset.format = "300x250";
+            fbad.dataset.testmode = false;
+            fbad.dataset.placementid = "{=config.default.dfp.fan}";
+
+            var allWrap = document.createElement('div');
+            var wTitle = document.createElement('span');
+            wTitle.classList.add("lmlnative-advertisement-span");
+            wTitle.innerHTML = "Advertisement";
+            
+            allWrap.appendChild(wTitle);
+            allWrap.appendChild(fbad);
+
+            return allWrap; break;
+    }
+};
+
+window.LMLRenderPlacements = function(placements) {
+    var contentItems = _v('.article-content > *:not(div)');
+    var numChild = contentItems.length;
+
+    var jump = Math.floor(numChild / placements.total);
+    for (var i = 0; i < placements.total; i++) {
+        var index = jump * (i+1);
+
+        index = index >= numChild ? numChild - 1 : index;
+        var after = contentItems[index].original();
+        var snip = document.createElement('div');
+        snip.classList.add("lmlnativewrapper");
+        snip.appendChild(window.LMLFormatPlacement(placements.snippets[i].type, placements.snippets[i].data));
+
+        document.getElementById('article-content').insertBefore(snip, after);
+    }
+};
+
+_v(function() {
+    var LMLgetArticlePlacements = function(cb) {
+        _a.getJsonp(
+            '{=config.default.adserver.publicaddr}/gpkg?pkgsize=' + 
+            window.LMLGetPackageSize() + '&platform=' + 
+            window.LMLGetCurrentPlatformCode() + '&sid={=config.default.id}', 
+        undefined, true);
+    };
+    
+    LMLgetArticlePlacements();
+});

@@ -42,3 +42,7 @@
 .lmlpushtable thead th select.lmlpushtablekeyer {
     width: 260px;
 }
+
+.lmlpushtable .lmlpushtableheaderfieldsrow input.lmlpushtablecolumnfield {
+    padding: 2px 5px;
+}

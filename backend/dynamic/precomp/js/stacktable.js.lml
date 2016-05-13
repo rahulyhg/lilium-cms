@@ -1,5 +1,5 @@
 var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
-    var htmlIdentifier = tableid;
+    var htmlIdentifier = tableid.replace(/\./g, '\\.');
     var scheme = dataScheme;
     var title = objTitle;
     var linenumber = 0;

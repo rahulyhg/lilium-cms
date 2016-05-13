@@ -10,7 +10,7 @@ var sessions = require('../session.js');
 
 var Login = function() {
 	var loginSuccess = function(cli, userObj) {
-		cli.touch('login.loginsuccess('+userObj.id+')');
+		cli.touch('login.loginsuccess');
 		sessions.createSessionInCli(cli, userObj);
 
 		hooks.fire('user_loggedin', cli);

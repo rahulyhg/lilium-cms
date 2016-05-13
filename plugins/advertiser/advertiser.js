@@ -14,6 +14,10 @@
 	 var http = undefined;
      var dfp = require('./dfp.js');
      var production = require('./production.js');
+     var backendsearch = undefined;
+     var precomp = undefined;
+
+    var noop = noOp = function() {};    
 
 	var Advertiser = function() {
 	    this.iface = new Object();
@@ -30,6 +34,8 @@
 	         livevars = require(abspath + 'livevars.js');
 	         db = require(abspath + 'includes/db.js');
 	         transaction = require(abspath + 'transaction.js');
+             backendsearch = require(abspath + 'backend/search.js');
+             precomp = require(abspath + "precomp.js");
 	         http = require('http');
 
 	         campaigns.init(abspath);
@@ -78,6 +84,16 @@
 	                 cli.redirect(conf.default().server.url + '/' + conf.default().paths.login, false);
 	             }
 	         });
+
+             backendsearch.registerSearchFormat({
+                 collection: "campaigns",
+                 displayName : 'Campaigns', 
+                 linkBase : "{adminurl}/campaigns/edit/{$}",
+                 linkKey : "projectid"
+             }, {
+                 "projectid" : {displayName : "Project ID"},
+                 "campname" : {displayName : "Campaign Name"}
+             });
 	     };
 
 	     var registerHooks = function() {
@@ -219,13 +235,23 @@
 	         hooks.bind('frontend_will_precompile', 5000, function(pkg) {
 	             log('Advertiser', 'Registering Scripts and CSS');
 	             var base = pkg.config.server.base;
+                 var html = pkg.config.server.html;
 
 	             pkg.Frontend.registerCSSFile(base + "plugins/advertiser/dynamic/style.css", 5000, 'admin', pkg.config.id);
 	             pkg.Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', pkg.config.id);
+	             pkg.Frontend.registerCSSFile(html + "/compiled/lmlnaradserv.css", 6000, 'theme', pkg.config.id);
+	             pkg.Frontend.registerJSFile (html + "/compiled/lmlnaradserv.js",  6000, 'theme', pkg.config.id);
+
 	             log('Advertiser', 'Registered Scripts and CSS');
 	         });
 
+             hooks.bind('queue_will_compile', 5000, function(pkg) {
+                 log('Advertiser', "Queuing frontend scripts for compilation");
 
+	             var base = pkg.config.server.base;
+                 precomp.queueFile(pkg.config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.js.lml" );
+                 precomp.queueFile(pkg.config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.css.lml");
+             });
 	     };
 
 	     var createAdServerHandshake = function(cb) {
