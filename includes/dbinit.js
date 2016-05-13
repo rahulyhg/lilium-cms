@@ -73,7 +73,7 @@ var defaultPriceBases = [
 ];
 
 var defaultProducts = [
-    { "name":"dp-bbm", "displayName":"Display - Big box (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-bb", "displayName":"Display - Big box (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
     { "name":"dp-bbm", "displayName":"Display - Big box mobile (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
     { "name":"dp-bi", "displayName":"Display - Billboard (970x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
     { "name":"dp-ct", "displayName":"Display - Companion Takeover", "productType":"display", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
