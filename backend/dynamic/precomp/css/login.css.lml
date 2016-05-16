@@ -13,9 +13,16 @@
     width: 50%; 
 }
 
+html.lmllogin {
+    height: 100%;
+}
+
 .lmlbody.lmllogin {
+    background-position: center;
     background-image: url('{=config.default.login.wallpaper}');
     background-size: cover;
+
+    height: 100%;
 }
 
 .lmllogin {

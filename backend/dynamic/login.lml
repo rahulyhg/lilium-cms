@@ -1,6 +1,6 @@
 {#config;vocab;frontend;forms}
 <!DOCTYPE html>
-<html>
+<html class="lmllogin">
 	<head>
 		<title>{=config.default.website.sitetitle} - {=vocab.logintitle}</title>
 		{%loginhead}
