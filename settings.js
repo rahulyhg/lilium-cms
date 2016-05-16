@@ -147,6 +147,15 @@ var Settings = function () {
             }, {
                 required: false
             })
+        .add('login-sep', 'title', {
+                displayname: "Login screen"
+            })
+            .add('login.wallpaper', 'text', {
+                displayname: "Login Wallpaper"
+            }, {
+                required: false
+            })
+
             .trg('bottom')
 
         .add('dev-sep', 'title', {

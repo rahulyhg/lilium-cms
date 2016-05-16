@@ -10,6 +10,7 @@ var imageResizer = require('./imageResizer.js');
 var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
 var pluginHelper = require('./pluginHelper.js');
+var preferences = require('./preferences.js');
 
 var Roles = new Object();
 
@@ -24,6 +25,7 @@ var Entity = function () {
     this.avatarID = -1;
     this.avatarURL = "";
     this.createdOn = undefined;
+    this.preferences = new Object();
 
     // Various data; should always be checked for undefined
     this.data = new Object();
@@ -736,8 +738,9 @@ var Entities = module.exports = new function () {
                     power: dat.power,
                     username: dat.username,
                     site : dat.site,
-                    notifications: dat.notifications === 'undefined' ? [] : dat.notifications,
-                    newNotifications: dat.newNotifications === 'undefined' ? 0 : dat.newNotifications
+                    preferences : dat.preferences || preferences.getDefault(cli._c),
+                    notifications: dat.notifications || [],
+                    newNotifications: dat.newNotifications || 0
                 }
             }
 

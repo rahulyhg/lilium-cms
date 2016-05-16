@@ -1,5 +1,5 @@
 {#config;session;vocab;forms}
-<h1>Your Profile</h1>
+<h1>My Profile</h1>
 {*me(sourceof:"update_entitiy")}
 {=forms.render('update_entitiy')}
 {=forms.render('update_password')}

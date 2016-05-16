@@ -1,4 +1,4 @@
-{#config;vocab;frontend;forms;debug}
+{#config;vocab;frontend;forms}
 <!DOCTYPE html>
 <html>
 	<head>
@@ -6,10 +6,22 @@
 		{%loginhead}
 	</head>
 	<body class="{=frontend.getBodyClasses("login")}" id="{=frontend.getBodyID("login")}">
-		<main class="lmllogin-wrapper">		
-			<header><h1>{=config.default.vendor.productname}</h1></header>
-			{=forms.render("login_form")}
-			<footer>v{=config.default.vendor.version}</footer>
-		</main>
+        <div class="lmlhalf-right">
+		    <main class="lmllogin-wrapper">		
+		    	<header>
+                    <h1>Login</h1>
+                </header>
+
+	    		{=forms.render("login_form")}
+
+    			<footer>
+                    {=config.default.vendor.productname} v{=config.default.vendor.version}
+                </footer>
+		    </main>
+        </div>
 	</body>
+
+    <script>
+        $(function() { $('.lmllogin-wrapper').css('margin-top', (window.innerHeight / 2 - 152) + "px"); });
+    </script>
 </html>

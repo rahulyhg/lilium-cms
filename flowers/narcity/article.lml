@@ -54,7 +54,7 @@ $}
                 </a>
             </span>
             <span class="article-signature-bio">
-                {=author.bio}
+                {=author.description}
             </span>
         </div>
     </div>  

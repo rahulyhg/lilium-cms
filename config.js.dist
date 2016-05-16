@@ -3,7 +3,7 @@ var _config = {
 		"env" : 'prod',
 		"info" : {
 			project : "Lilium CMS",
-			version : "dev 0.5",
+			version : "0.8.1 ALPHA",
 			author : "Erik Desjardins"
 		},
 		"emails" : {
@@ -95,7 +95,7 @@ var _config = {
 		},
 		"vendor" : {
 			"productname" : "Lilium CMS",
-			"version" : "0.5 DEV",
+			"version" : "0.8.1 ALPHA",
 			"infourl" : "http://liliumcms.com/info"
 		}
 	}

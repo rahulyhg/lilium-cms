@@ -85,6 +85,7 @@ var Sessions = function () {
         for (var k in userObj) {
             cli.session.data[k] = userObj[k];
         }
+
         cli.session.data.admin = entities.isAllowed(userObj, 'admin');
         cli.session.data.god = entities.isAllowed(userObj, 'lilium');
         cli.session.data.user = userObj.username;
@@ -92,7 +93,9 @@ var Sessions = function () {
 
         cli.userinfo = cli.session.data;
 
-        // Find  highest power of user
+        cli.session.data.preferences = cli.session.data.preferences || {};
+        cli.session.data.power = 999;
+        cli.session.data.notifications = [];
 
         // Load notifications in db
         db.findToArray(cli._c, 'notifications', {
@@ -107,12 +110,7 @@ var Sessions = function () {
             });
         });
 
-
-        cli.session.data.power = 999;
-        cli.session.data.notifications = [];
-
         this.setCookieToCli(cli);
-
     };
 
     this.removeSession = function (cli, callback) {

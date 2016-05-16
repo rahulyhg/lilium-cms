@@ -305,6 +305,7 @@ select {
 	margin:0;
 }
 
+/* Lilium */
 /* Bootstrap */
 .container {
     padding-left: 200px;
@@ -410,7 +411,7 @@ select {
 }
 
 .lmladminsidebardecowrapper {
-overflow: hidden;
+    overflow: hidden;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -430,6 +431,11 @@ overflow: hidden;
     	opacity: 0.05;
 }
 
+.lmladminbardisplayname {
+    width: 130px;
+    text-overflow: ellipsis;
+    overflow: hidden;    
+}
 
 .lmladminsidebardeco:nth-child(1) {
 	-webkit-transform: translateX(79px) translateY(86px) rotateZ(25deg);

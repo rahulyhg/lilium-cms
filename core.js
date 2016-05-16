@@ -37,6 +37,7 @@ var dashboard = undefined;
 var templateBuilder = undefined;
 var backendSearch = undefined;
 var devtools = undefined;
+var preferences = undefined;
 
 var log = require('./log.js');
 
@@ -80,6 +81,7 @@ var Core = function () {
         templateBuilder = require('./templateBuilder.js');
         backendSearch = require('./backend/search.js');
         devtools = require('./devtools.js');
+        preferences = require('./preferences.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
@@ -192,6 +194,16 @@ var Core = function () {
         admin.registerAdminEndpoint('me', 'GET', function (cli) {
             cli.touch('admin.GET.me');
             filelogic.serveAdminLML(cli, false);
+        });
+
+        admin.registerAdminEndpoint('preferences', 'GET', function(cli) {
+            cli.touch('admin.GET.preferences');
+            preferences.handleGET(cli);
+        });
+
+        admin.registerAdminEndpoint('preferences', 'POST', function(cli) {
+            cli.touch('admin.POST.preferences');
+            preferences.handlePOST(cli);
         });
 
         admin.registerAdminEndpoint('categories', 'POST', function (cli) {
@@ -484,6 +496,7 @@ var Core = function () {
         sites.registerLiveVar();
         settings.registerLiveVar();
         backendSearch.registerLiveVar();
+        preferences.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };
@@ -512,6 +525,7 @@ var Core = function () {
         Article.registerForms();
         settings.registerForm();
         sites.registerForms();
+        preferences.registerForm();
 
         hooks.fire('forms_init');
         log('Core', 'Forms were loaded');

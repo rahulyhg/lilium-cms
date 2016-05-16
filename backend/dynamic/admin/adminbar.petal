@@ -18,10 +18,8 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>
-                        <a class="admin-publish-button" href="{=config.default.server.url}/admin/article/new">
-                            <span>Publish</span>
-                        </a>
+                    <li id="adminquickaction">
+                        
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
@@ -46,7 +44,10 @@
                         <div id="profile-dropdown" class="dropdown-menu">
                             <span class="links">
                                 <div>
-                                    <a href="{=config.default.server.url}/admin/me">Profile</a>
+                                    <a href="{=config.default.server.url}/admin/me">My profile</a>
+                                </div>
+                                <div>
+                                    <a href="{=config.default.server.url}/admin/preferences">My Lilium</a>
                                 </div>
                                 <div>
                                     <a href="{=config.default.server.url}/logout">Logout</a>
@@ -62,11 +63,18 @@
     </nav>
 </header>
 
+<lml:template id="adminquickactionbutton">
+    <lml:tobject data-hrefsource="topbuttonlink" data-nodetype="a" data-class="admin-publish-button">
+        <lml:tobject data-key="topbuttontext" data-nodetype="span"></lml:tobject>
+    </lml:tobject>
+</lml:template>
+
 <lml:template id="adminbaruserbox">
     <lml:tobject data-absurl="avatarURL" data-nodetype="img" data-filter="hasAvatar"></lml:tobject>
-    <lml:tobject data-key="displayname" data-nodetype="span"></lml:tobject>
+    <lml:tobject data-key="displayname" data-nodetype="span" data-class="lmladminbardisplayname"></lml:tobject>
 </lml:template>
 {*session(template:"adminbaruserbox",target:"loggedinuserbox")}
+{*preferences.mine(template:"adminquickactionbutton",target:"adminquickaction")}
 
 <script>
 window.hasAvatar = function(sesh) {
