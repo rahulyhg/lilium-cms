@@ -103,10 +103,11 @@ var Production = function () {
     var registerRoles = function () {
         entities.registerRole({
             name: 'production',
-            displayname: 'Production'
-        }, ['dash', 'production', 'sponsoredcontent', 'view-media',  'view-content'], function () {
+            displayname: 'Production',
+            power : 2900
+        }, ['dash', 'production', 'sponsoredcontent', 'list-campaigns', 'edit-campaigns'], function () {
             return;
-        }, false);
+        }, true);
     };
 
     var registerForms = function () {

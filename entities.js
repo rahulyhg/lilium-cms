@@ -155,7 +155,6 @@ var Entities = module.exports = new function () {
                 cli.refresh();
             } else {
                 log('[Database] error while updating entity :');
-                console.log(err);
                 cli.throwHTTP(500);
             }
         });
@@ -651,7 +650,6 @@ var Entities = module.exports = new function () {
                 if (cli.hasRight('list-all-entities')) {
                     db.singleLevelFind(cli._c, 'entities', callback);
                 } else {
-                    console.log(cli.session.data);
                     db.findToArray(cli._c, 'entities', {
                         _id : db.mongoID(cli.session.data._id)
                     }, function(err, arr) {
@@ -696,7 +694,6 @@ var Entities = module.exports = new function () {
 
                     powerConstraint.maxpower = {$gt : maxpower};
                 }
-                console.log(powerConstraint);
 
                 var sort = {};
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
@@ -809,7 +806,6 @@ var Entities = module.exports = new function () {
         for (var i in Roles) {
             if (Roles[i].pluginID == identifier) {
                 db.remove(_c.default(), 'roles', {name : Roles[i].name}, function(err, res) {
-                    if (err) console.log(err);
                     Roles[i] = undefined;
                     delete Roles[i];
                 })

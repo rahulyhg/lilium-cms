@@ -454,7 +454,8 @@
 	     var registerRoles = function() {
 	         entities.registerRole({
 	             name: 'advertiser',
-	             displayname: 'Advertisement'
+	             displayname: 'Advertiser',
+                 power : 3000
 	         }, ['dash', 'advertisement'], function() {
 	             return;
 	         }, true);

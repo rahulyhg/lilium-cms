@@ -777,7 +777,6 @@ var LML = function () {
 
         delete content;
 
-        log('LML', 'Parsing ' + lines.length + ' lines');
         if (lineTotal != 0) {
             var cont = function () {
                 setTimeout(function () {
