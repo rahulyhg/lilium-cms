@@ -42,6 +42,8 @@ var LML = function () {
 
     var proceedWhenCompleted;
 
+    // {=toplevellib.level1.level2}
+    // {=toplevellib.func(paras:"value")}
     var execVariableTag = function (context, code, callback) {
         // Browse the context library for corresponding obhect;
         parseStringForRecursiveVarTags(context, code, function (code) {
@@ -75,7 +77,8 @@ var LML = function () {
     var stringifyLiveParams = function (json) {
         return JSON.stringify(json).replace(/"/g, '&lmlquote;');
     };
-
+    
+    // {*endpoint.level(params:"value")}
     var execLiveTag = function (context, code, callback) {
         var params = fetchLiveParams(context.extra.livevarsParams);
         var templatename = params.template || "";
@@ -110,6 +113,7 @@ var LML = function () {
         callback();
     }
 
+    // {%petalname}
     var execIncludeTag = function (context, code, callback) {
         var split = code.split(';');
         var currentIndex = 0;
@@ -165,6 +169,7 @@ var LML = function () {
         return true;
     };
 
+    // {#lib1;lib2;lib3}
     var execContextTag = function (context, code, callback) {
         context.newLine = "";
 

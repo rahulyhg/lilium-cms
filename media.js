@@ -276,7 +276,7 @@ var Media = function () {
                     limit: [1]
                 }, callback);
             }
-        }, ["media"]);
+        }, ["list-uploads"]);
 
         livevars.registerLiveVariable('uploads', function (cli, levels, params, callback) {
             var allMedia = levels.length === 0;
@@ -290,7 +290,7 @@ var Media = function () {
                     limit: [1]
                 }, callback);
             }
-        }, ["uploads"]);
+        }, ["list-uploads"]);
     };
 
     this.registerLMLLib = function() {

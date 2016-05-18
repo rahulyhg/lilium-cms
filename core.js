@@ -280,7 +280,7 @@ var Core = function () {
             faicon: "fa-pencil",
             displayname: "Posts",
             priority: 200,
-            rights: ["view-content"],
+            rights: ["publish"],
             absURL: aurl + "article",
             children: []
         });
@@ -290,7 +290,7 @@ var Core = function () {
             faicon: "fa-cubes",
             displayname: "Categories",
             priority: 200,
-            rights: ["view-content"],
+            rights: ["manage-categories"],
             absURL: aurl + "categories",
             children: []
         });
@@ -299,16 +299,16 @@ var Core = function () {
             faicon: "fa-picture-o",
             displayname: "Media",
             priority: 400,
-            rights: ["view-media"],
+            rights: ["list-uploads"],
             absURL: aurl + "media/list",
             children: []
         });
         admin.registerAdminMenu({
             id: "entities",
             faicon: "fa-users",
-            displayname: "Entities    ",
+            displayname: "Entities",
             priority: 500,
-            rights: ["view-entities"],
+            rights: ["list-entities"],
             absURL: aurl + "entities",
             children: []
         });
@@ -353,7 +353,7 @@ var Core = function () {
             faicon: "fa-minus-circle",
             displayname: "Roles",
             priority: 100,
-            rights: ["dash"],
+            rights: ["manage-roles"],
             absURL: aurl + "role",
             children: []
         });

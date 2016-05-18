@@ -30,13 +30,13 @@ var Article = function() {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case 'new':
-                this.publish(cli);
+                if (cli.hasRightOrRefuse("publish")) this.publish(cli);
                 break;
             case 'edit':
-                this.edit(cli);
+                if (cli.hasRightOrRefuse("publish")) this.edit(cli);
                 break;
             case 'delete':
-                this.delete(cli);
+                if (cli.hasRightOrRefuse("publish")) this.delete(cli);
                 break;
             case 'delete-autosave':
                 this.deleteAutosave(cli);
@@ -51,7 +51,7 @@ var Article = function() {
                 this.preview(cli);
                 break;
             case 'destroy':
-                this.delete(cli, true);
+                if (cli.hasRightOrRefuse("destroy")) this.delete(cli, true);
                 break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
@@ -66,13 +66,17 @@ var Article = function() {
         } else {
             switch (cli.routeinfo.path[2]) {
                 case 'new':
-                    filelogic.serveAdminLML(cli);
+                    cli.hasRight('publish') ?
+                        filelogic.serveAdminLML(cli) :
+                        cli.refuse();
                     break;
                 case 'edit':
-                    if (cli.routeinfo.path[3] && cli.routeinfo.path[3] == 'autosave') {
-                        filelogic.serveAdminLML(cli, true);
-                    } else {
-                        this.edit(cli);
+                    if (cli.hasRight('publish')) {
+                        if (cli.routeinfo.path[3] && cli.routeinfo.path[3] == 'autosave') {
+                            filelogic.serveAdminLML(cli, true);
+                        } else {
+                            this.edit(cli);
+                        }
                     }
                     break;
                 case 'getArticle':
@@ -83,8 +87,6 @@ var Article = function() {
                     break;
                 default:
                     return cli.throwHTTP(404, 'Not Found');
-                    break;
-
             }
         }
     };
@@ -820,7 +822,7 @@ var Article = function() {
                     }
                 });
             }
-        }, ["content"]);
+        }, ["publish"]);
 
         livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
             var allTypes = levels.length === 0;
@@ -913,6 +915,9 @@ var Article = function() {
             .add('title-author', 'title', {
                 displayname : "Redaction"
             })
+            .beginSection('authorbox', {
+                "session.rights" : "edit-all-articles"
+            })
             .add('author', 'livevar', {
                 displayname : "Author",
                 endpoint : "entities",
@@ -929,6 +934,7 @@ var Article = function() {
                     'header' : 'Select One'
                 }
             })
+            .closeSection('authorbox')
             .trigger('bottom')
             .add('title-action', 'title', {
                 displayname: "Publish"

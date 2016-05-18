@@ -42,6 +42,10 @@ var Entities = module.exports = new function () {
         callback(entity);
     };
 
+    this.getCachedRoles = function() {
+        return Object.assign({}, Roles);
+    }
+
     this.fetchFromDB = function (conf, idOrUsername, callback) {
         var condition = new Object();
 
@@ -644,7 +648,16 @@ var Entities = module.exports = new function () {
             var allEntities = levels.length === 0;
 
             if (allEntities) {
-                db.singleLevelFind(cli._c, 'entities', callback);
+                if (cli.hasRight('list-all-entities')) {
+                    db.singleLevelFind(cli._c, 'entities', callback);
+                } else {
+                    console.log(cli.session.data);
+                    db.findToArray(cli._c, 'entities', {
+                        _id : db.mongoID(cli.session.data._id)
+                    }, function(err, arr) {
+                        callback(arr);
+                    });
+                }
             } else if (levels[0] == 'query') {
                 var queryInfo = params.query || new Object();
                 var qObj = new Object();
@@ -657,20 +670,60 @@ var Entities = module.exports = new function () {
                 } : undefined;
                 qObj.username = queryInfo.username;
 
+                if (!cli.hasRight('list-all-entities')) {
+                    qObj._id = cli.session.data._id;
+                }
+
                 db.findToArray(cli._c, 'entities', queryInfo, function (err, arr) {
                     callback(err || arr);
                 });
             } else if (levels[0] == 'table') {
+                if (!cli.hasRight('list-entities')) {
+                    callback({size:0,data:[]});
+                    return;
+                }
+
+                var powerConstraint = {};
+                if (!cli.hasRight('list-all-entities')) {
+                    var maxpower = 100000000000;
+                    for (var i in cli.session.data.roles) {
+                        var role = cli.session.data.roles[i];
+
+                        if (Roles[role] && Roles[role].power < maxpower) {
+                            maxpower = Roles[role].power;
+                        }
+                    }
+
+                    powerConstraint.maxpower = {$gt : maxpower};
+                }
+                console.log(powerConstraint);
+
                 var sort = {};
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
                 db.aggregate(cli._c, 'entities', [{
-                    $match:
-                        (params.search ? {
-                            $text: {
-                                $search: params.search
-                            }
-                        } : {})
-
+                    $unwind : "$roles"
+                }, {
+                    $lookup : { 
+                        from : "roles", 
+                        localField : "roles", 
+                        foreignField : "name", 
+                        as : "deeproles" 
+                    }
+                }, { 
+                    $project : { 
+                        user : "$$ROOT", 
+                        maxpower : { 
+                            $max : "$deeproles.power" 
+                        }
+                    }
+                }, {
+                    $match: powerConstraint
+                }, {
+                    $match: (params.search ? {
+                        $text: {
+                            $search: params.search
+                        }
+                    } : {})
                 }, {
                     $sort: sort
                 }, {
@@ -678,40 +731,38 @@ var Entities = module.exports = new function () {
                 }, {
                     $limit: (params.max || 20)
                 }], function (data) {
-                    db.find(cli._c, 'entities', (params.search ? {
-                        $text: {
-                            $search: params.search
-                        }
-                    } : {}), [], function (err, cursor) {
-
-                        cursor.count(function (err, size) {
-                            results = {
-                                size: size,
-                                data: data
-                            }
-                            callback(err || results);
-
-                        });
-                    });
+                    results = {
+                        size: data.length,
+                        data: data.map( (usr) => {
+                            return Object.assign(usr.user, usr.maxpower);
+                        })
+                    };
+                    callback(results);
                 });
-
-
             } else if (levels[0] == 'single' && levels[1]) {
-                db.findToArray(cli._c, 'entities', {_id: db.mongoID(levels[1])}, function(err, res) {
-                    callback(err || res)
-                });
+                if (!cli.hasRight('list-entities') && levels[1] !== cli.session.data._id) {
+                    callback([]);
+                } else {
+                    db.findToArray(cli._c, 'entities', {_id: db.mongoID(levels[1])}, function(err, res) {
+                        callback(err || res)
+                    });
+                }
             } else {
-                db.multiLevelFind(cli._c, 'entities', levels, {
-                    username: levels[0]
-                }, {
-                    limit: [1]
-                }, callback);
+                if (!cli.hasRight('list-all-entities') && levels[0] !== cli.session.data.username) {
+                    callback([]);
+                } else {
+                    db.multiLevelFind(cli._c, 'entities', levels, {
+                        username: levels[0]
+                    }, {
+                        limit: [1]
+                    }, callback);
+                }
             }
-        }, ["entities"]);
+        });
 
         livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
             db.findToArray(cli._c, 'entities', {
-                _id: db.mongoID(cli.userinfo.userid)
+                _id: db.mongoID(cli.session.data._id)
             }, function (err, arr) {
                 callback(err || arr);
             });
@@ -719,6 +770,11 @@ var Entities = module.exports = new function () {
 
         livevars.registerLiveVariable('session', function (cli, levels, params, callback) {
             var dat = cli.session.data;
+            var rights = [];
+            for (var k in dat.roles) {
+                rights.push(...(Roles[k] || []));
+            }
+
             if (levels.length) {
                 for (var i = 0; i < levels.length; i++) {
                     if (levels[i] == "shhh") {
@@ -735,6 +791,7 @@ var Entities = module.exports = new function () {
                     avatarURL: dat.avatarURL,
                     displayname: dat.displayname,
                     roles: dat.roles,
+                    rights : rights,
                     power: dat.power,
                     username: dat.username,
                     site : dat.site,

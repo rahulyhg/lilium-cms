@@ -113,6 +113,17 @@ var defaultTheme = {
 	requiredModule : []
 };
 
+var basicRoles = [
+    {name : "author", displayname : "Author", power : 5000, pluginID : false, rights : [
+        "dash", "publish", "preferences", "upload", "list-uploads"
+    ]},
+    {name : "editor", displayname : "Editor", power : 4500, pluginID : false, rights : [
+        "dash", "publish", "preferences", "upload", "list-uploads", 
+        "list-all-articles", "list-entities", "create-entities", "edit-all-articles",
+        "destroy-articles"
+    ]}
+];
+
 var rootEntity = {
 	id : -1, displayname:"[Root]", username : "root", shhh : '', roles : ["lilium"],
 }

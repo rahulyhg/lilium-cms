@@ -104,6 +104,19 @@ ClientObject.prototype.refresh = function () {
     this.redirect(this.routeinfo.fullpath);
 };
 
+ClientObject.prototype.refuse = function() {
+    this.redirect("//" + this.routeinfo.rootdomain + "/admin/401?from=" + this.routeinfo.relsitepath, false);
+};
+
+ClientObject.prototype.hasRightOrRefuse = function(right) {
+    if (this.hasRight(right)) {
+        return true;
+    } else {
+        this.refuse();
+        return false;
+    }
+};
+
 ClientObject.prototype.sendJSON = function (json) {
     if (typeof json === 'object') {
         json = JSON.stringify(json);

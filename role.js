@@ -11,6 +11,11 @@ var sites = require('./sites.js');
 
 var Role = function () {
     this.handlePOST = function (cli) {
+        if (!cli.hasRight('manage-roles')) {
+            cli.refuse();
+            return;
+        }
+
         cli.touch('role.handlePOST');
         switch (cli.routeinfo.path[2]) {
         case 'list':
@@ -66,10 +71,12 @@ var Role = function () {
             if (cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
                 db.insert(cli._c, 'roles', prepareRoleForDB(cli), function (err, result) {
-                    // Create a new notification group
-                    notification.createGroup(cli.postdata.data.name, cli.postdata.data.name, cli._c.id);
-                    // Generate LML page
-                    cli.refresh();
+                    require('./entities').cacheRoles(function() {
+                        // Create a new notification group
+                        notification.createGroup(cli.postdata.data.name, cli.postdata.data.name, cli._c.id);
+                        // Generate LML page
+                        cli.refresh();
+                    });
                 });
             } else {
                 cli.sendJSON({
@@ -162,16 +169,22 @@ var Role = function () {
         };
     }
 
-
-
     var registerContentLiveVar = function () {
         livevars.registerLiveVariable('roles', function (cli, levels, params, callback) {
             var allContent = levels.length === 0;
-            if (allContent) {
-                db.singleLevelFind(cli._c, 'roles', callback);
-            } else if (levels[0] == "all") {
-                var sentArr = new Array();
-                db.findToArray(cli._c, 'roles', {}, function (err, arr) {
+
+            var maxpower = 100000000000;
+            var Roles = require('./entities.js').getCachedRoles();
+            for (var i in cli.session.data.roles) {
+                var role = cli.session.data.roles[i];
+
+                if (Roles[role] && Roles[role].power < maxpower) {
+                    maxpower = Roles[role].power;
+                }
+            }
+
+            if (allContent || levels[0] == "all") {
+                db.findToArray(cli._c, 'roles', { power : {$gt : maxpower} }, function (err, arr) {
                     callback(arr);
                 });
             } else {
@@ -181,7 +194,7 @@ var Role = function () {
                     limit: [1]
                 }, callback);
             }
-        }, ["roles"]);
+        });
 
     }
 

@@ -68,7 +68,7 @@ var HtmlParser = function () {
                     ' id="' + (field.attr.wrapper.id || '') + '">';
             }
 
-            if (hasFieldWrapper) {
+            if (hasFieldWrapper && field.attr.nowrap !== true) {
                 htmlForm += '<' + (form.attr.fieldWrapper.tag || 'div') +
                     ' class="' + (field.attr.wrapperCssPrefix || form.attr.fieldWrapper.cssPrefix || form.attr.fieldWrapper.class || 'field-') +
                     (field.attr.wrapperCssSuffix || form.attr.wrapperCssSuffix || field.type) +
@@ -133,13 +133,20 @@ var HtmlParser = function () {
                     break;
                 case "tags":
                     htmlForm += parseTagsType(field);
+                    break;
+                case "lmlsection":
+                    htmlForm += parseSection(field);
+                    break;
+                case "lmlclosure":
+                    htmlForm += parseClosure(field);
+                    break;
                 default:
                     htmlForm += this.checkRegisteredTypes(field);
                 }
 
             }
 
-            if (hasFieldWrapper) {
+            if (hasFieldWrapper && field.attr.nowrap !== true) {
                 htmlForm += "</" + (form.attr.fieldWrapper.tag || "div") + ">";
             }
 
@@ -149,8 +156,6 @@ var HtmlParser = function () {
                 htmlForm += '</' + (field.attr.wrapper.tag || 'div') + '>';
             }
         }
-
-
 
         //Insert submit form
         htmlForm += submitButton;
@@ -213,6 +218,16 @@ var HtmlParser = function () {
             '" class="lmlstacktableheaderfield lmlstacktableheaderfield-' + field.fieldName +
             '" data-fieldname="' + field.fieldName +
             '" value="" />';
+    };
+
+    var parseSection = function(field) {
+        return '<section class="lmlform-cond-section lmlform-section"  data-if="' +
+            JSON.stringify(field.attr).replace(/\"/g, '&lmlquote;') +'" data-sectionname="' +
+            field.attr.sectionname + '">';
+    };
+
+    var parseClosure = function(field) {
+        return '<input type="hidden" class="lmlsection-ignore" name="lmlsection-'+field.attr.sectionname+'-ignore" value="0" /></section>';
     };
 
     var parseTitleType = function (field) {

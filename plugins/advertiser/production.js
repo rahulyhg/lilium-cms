@@ -112,6 +112,9 @@ var Production = function () {
     var registerForms = function () {
         hooks.bind('post_create_bottom', 200, function (pkg) {
             pkg.form
+            .beginSection('sponsoredArticle', {
+                "session.roles" : 'production'
+            })
             .add('spons-title', 'title', {
                 displayname : "Sponsored Post"
             })
@@ -148,7 +151,18 @@ var Production = function () {
                 displayname: "Sponsored Box Context Text"
             }, {
                 required: false
-            });
+            })
+            .add('spons-act-title', 'title', {
+                displayname : "Production actions"
+            })
+            .add('sponsoredBtnAttach', 'button', {
+                displayname : "Attach to existing campaign"
+            }, {
+                required: false,
+                submits : false
+            })
+            .closeSection('sponsoredArticle')
+            ;
         });
     };
 

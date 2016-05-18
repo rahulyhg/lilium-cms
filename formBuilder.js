@@ -118,6 +118,20 @@ var FormBuilder = function() {
         htmlParser.registerType(name, fct);
     };
 
+    this.beginSection = function(sectionName, conditions) {
+        conditions = conditions || {};
+        conditions.sectionname = sectionName;
+        conditions.nowrap = true;
+        return this.add('lmlsection-' + sectionName, 'lmlsection', conditions);
+    };
+
+    this.closeSection = function(sectionName) {
+        return this.add('lmlclosure-' + sectionName, 'lmlclosure', { 
+            sectionname : sectionName,
+            nowrap : true
+        });
+    };
+
     this.add = function(name, type, attr, requirements, contextForm, auto) {
         if (!auto && !contextForm) {
             registerFilename = __caller;

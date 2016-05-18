@@ -384,7 +384,33 @@ var LiliumCMS = function() {
 
                 that.tables.push(new LmlTable(elem));
             });
-        }
+        };
+
+        var makeSections = function() {
+            if (liliumcms.livevars.retrieveVar('session').roles.indexOf('lilium') === -1) {
+                $('.lmlform-cond-section').each(function(index, section) {
+                    var ifstr = JSON.parse(section.dataset['if'].replace(/\&lmlquote\;/g, '"'));
+                    var cshow = true;
+
+                    for (var k in ifstr) {
+                        var lval = liliumcms.livevars.pulloutLiveVar(k);
+                        if (typeof lval === 'object' && typeof lval.indexOf === 'function') {
+                            if (lval.indexOf(ifstr[k] === -1)) {
+                                cshow = false;
+                                break;
+                            }
+                        } else if (lval !== ifstr[k]) {
+                            cshow = false;
+                            break;
+                        }
+                    }
+    
+                    if (!cshow) {
+                        $(section).hide().find('input.lmlsection-ignore').val(1);
+                    }
+                });
+            }
+        };
 
         this.parse = function(selector) {
             $("form").deserialize(that.livevars.livevars()[selector][0]);
@@ -394,6 +420,7 @@ var LiliumCMS = function() {
             makeStackTables();
             makeTags();
             makeTables();
+            makeSections();
         };
     };
 

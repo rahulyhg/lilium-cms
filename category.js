@@ -20,12 +20,16 @@ var Category = function () {
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
-
             }
         }
     };
 
     this.handlePOST = function (cli) {
+        if (!cli.hasRight('manage-categories')) {
+            cli.refresh();
+            return;
+        }
+
         switch (cli.routeinfo.path[2]) {
         case 'list':
             this.create(cli);
@@ -121,7 +125,7 @@ var Category = function () {
                     limit: [1]
                 }, callback);
             }
-        }, ["categories"]);
+        });
     };
     this.createLivevars();
 };
