@@ -438,6 +438,31 @@ var Core = function () {
         entities.cacheRoles(cb);
     };
 
+    var gracefullyCrash = function(err) {
+        var stack = err.stack.split('\n');
+
+        log('Core', '------------------------------------------------');
+        log('Core', 'Exception made its way to core process');
+        log('Core', '------------------------------------------------');
+        log('Core', 'Error stack : ' + err);
+        for (var i = 1; i < stack.length; i++) {
+            log('Stack', stack[i]);
+        }
+        log('Core', '------------------------------------------------');
+        log('Core', 'Gracefully firing crash event to all modules');
+        hooks.fire('crash', err);
+
+        log('Core', 'Contacting handler to request a crash to all handles');
+        require('./handler.js').crash(err);
+
+        log('Lilium', 'Shutting down');
+        process.exit();
+    };
+
+    var bindCrash = function() {
+        process.on('uncaughtException', gracefullyCrash);
+    };
+
     var loadStandardInput = function () {
         var stdin = process.openStdin();
         stdin.liliumBuffer = "";
@@ -446,14 +471,18 @@ var Core = function () {
                 chunk = chunk.toString().trim();
                 stdin.liliumBuffer += chunk;
 
-                if (chunk === '') {
-                    eval(
-                        'try{' +
-                        stdin.liliumBuffer +
-                        '}catch(ex){log' +
-                        '("STDin", "Error : " + ex)}'
-                    );
-                    stdin.liliumBuffer = "";
+                if (chunk.length == 0) {
+                    try {
+                        eval(
+                            'try{' +
+                            stdin.liliumBuffer +
+                            '}catch(ex){log("STDin","Error : "+ex)}'
+                        );
+                    } catch (err) {
+                        log('STDin', 'Interpretation error : ' + err)
+                    } finally {
+                        stdin.liliumBuffer = "";
+                    }
                 }
             }, 0);
         });
@@ -464,7 +493,6 @@ var Core = function () {
     var loadCacheInvalidator = function () {
         if (_c.default().env == 'dev') {
             log("CacheInvalidator", 'Clearing old cached files in db');
-
             db.remove(_c.default(), 'cachedFiles', {}, function () {}, false);
         }
         log("CacheInvalidator", 'Initializing cacheInvalidator');
@@ -519,8 +547,7 @@ var Core = function () {
     var loadForms = function () {
         log('Core', 'Loading multiple forms');
 
-        entities.init();
-        entities.registerCreationForm();
+        entities.init().registerCreationForm();
         LoginLib.registerLoginForm();
         Article.registerForms();
         settings.registerForm();
@@ -533,7 +560,6 @@ var Core = function () {
 
     var loadNotifications = function () {
         notification.init();
-        log('Notifications', 'Sockets ready');
     }
 
     var loadFrontend = function () {
@@ -633,6 +659,7 @@ var Core = function () {
 
     this.makeEverythingSuperAwesome = function (readyToRock) {
         log('Core', 'Initializing Lilium');
+        bindCrash();
 
         require('./includes/caller.js')
 
@@ -653,24 +680,24 @@ var Core = function () {
 
             loadPlugins(function () {
                 loadRoles(function () {
-                            precompile(function () {
-                                redirectIfInit(resp, function () {
-                                    loadAdminMenus();
-                                    loadFrontend();
-                                    loadForms();
+                    precompile(function () {
+                        redirectIfInit(resp, function () {
+                            loadAdminMenus();
+                            loadFrontend();
+                            loadForms();
 
-                                    loadCacheInvalidator();
-                                    scheduleGC();
+                            loadCacheInvalidator();
+                            scheduleGC();
 
-                                    log('Lilium', 'Starting inbound server');
-                                    Inbound.createServer();
-                                    loadNotifications();
-                                    Inbound.start();
+                            log('Lilium', 'Starting inbound server');
+                            Inbound.createServer();
+                            loadNotifications();
+                            Inbound.start();
 
-                                    log('Core', 'Firing initialized signal');
-                                    hooks.fire('init');
-                                });
-                            });
+                            log('Core', 'Firing initialized signal');
+                            hooks.fire('init');
+                        });
+                    });
                 });
             });
         });

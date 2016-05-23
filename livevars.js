@@ -200,7 +200,7 @@ var LiveVariables = function() {
             RegisteredLiveVariables[endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
 
         } else {
-            throw new Error("[LiveVariables] Tried to register an already defined endpoint : " + endpoint);
+            log('LiveVariables', new Error("[LiveVariables] Tried to register an already defined endpoint : " + endpoint));
         }
     };
 

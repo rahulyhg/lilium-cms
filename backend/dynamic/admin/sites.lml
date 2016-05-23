@@ -28,13 +28,14 @@
 		<lml:tobject data-nodetype="td">
 			<lml:tobject data-key="website.sitetitle"></lml:tobject>
 			<lml:tobject data-filter="isDefaultSite">
-				<span class="siteDefaultTag">default</span>
+				<span class="siteDefaultTag">root</span>
 			</lml:tobject>
 			<lml:tobject data-filter="isWordpress">
 				<span class="siteDefaultTag">wordpress</span>
 			</lml:tobject>
 			<lml:tobject data-filter="isTransferring">
 				<span class="siteDefaultTag">transferring</span>
+                <i class="fa fa-cog" aria-hidden="true"></i>
 			</lml:tobject>
 		</lml:tobject>
 		<lml:tobject data-nodetype="td">

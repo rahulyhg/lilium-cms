@@ -124,11 +124,17 @@ var SiteInitializer = function (conf) {
             Frontend: Frontend
         });
         Precompiler.precompile(conf, function () {
-            hooks.fire('frontend_precompiled', {
-                config: conf,
-                Frontend: Frontend
-            });
-            done();
+            fileserver.copyFile(
+                base + "bower_components/bootstrap/dist/css/bootstrap.min.css.map", 
+                htmlbase + "/compiled/bootstrap.min.css.map",
+                function() {
+                    hooks.fire('frontend_precompiled', {
+                        config: conf,
+                        Frontend: Frontend
+                    });
+                    done();
+                }
+            );
         });
     };
 

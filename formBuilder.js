@@ -80,7 +80,9 @@ var FormBuilder = function() {
         }
         if (!auto) {
             if (typeof forms[name] !== 'undefined') {
-                throw new Error("[FormBuilderException] - Form already created : " + name);
+                var err = new Error("[FormBuilderException] - Form already created : " + name);
+                log('FormBuilder', err);
+                return;
             }
         }
 
@@ -100,7 +102,11 @@ var FormBuilder = function() {
             history.save(this.addTemplate, [name]);
         }
 
-        if (typeof templates[name] == 'undefined') throw "[FormBuilderException] - Template not created. Please call createFormTemplate() first.";
+        if (typeof templates[name] == 'undefined') {
+            var err = new Error ( "[FormBuilderException] - Template not created. Please call createFormTemplate() first.");
+            log('FormBuilder', err);
+            return this;
+         }
         for (var key in templates[name].fields) {
             var field = templates[name].fields[key]
             this.add(field.name, field.type, field.attr, field.requirements, undefined, true);
@@ -242,7 +248,11 @@ var FormBuilder = function() {
     };
 
     this.registerFormTemplate = function(name, auto) {
-        if (typeof templates[name] !== 'undefined') throw "[FormBuilderException] - Template already created: " + name;
+        if (typeof templates[name] !== 'undefined') {
+            var err = new Error( "[FormBuilderException] - Template already created: " + name );
+            log('FormBuilder', err);
+            return this;
+        }
         currentForm = new Object();
         templates[name] = currentForm;
 

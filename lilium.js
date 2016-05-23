@@ -33,17 +33,14 @@
  *    Documentation : http://liliumcms.com/docs                                                          *
  *                                                                                                       *
  *********************************************************************************************************/
-var startupTime = new Date();
-
-// Required module for startup
-var _config = require('./config.js');
-var log = require('./log.js');
-var core = require('./core.js');
-
 var Lilium = function () {
     var init = function () {
+        var startupTime = new Date();
+        var log = require('./log.js');
         log('Lilium', 'Starting up...');
-        core.makeEverythingSuperAwesome(function () {
+        
+        require('./core.js').makeEverythingSuperAwesome(function (core) {
+            var _config = require('./config.js');
             log('Lilium', 'Initialization signal received');
             log('Config', 'App is located at ' + _config.default().server.base);
             log('Config', 'Root PATH is at ' + _config.default().server.html);

@@ -114,7 +114,9 @@ var Production = function () {
         hooks.bind('post_create_bottom', 200, function (pkg) {
             pkg.form
             .beginSection('sponsoredArticle', {
-                "session.roles" : 'production'
+                show : {
+                    "session.roles" : 'production'
+                }
             })
             .add('spons-title', 'title', {
                 displayname : "Sponsored Post"

@@ -213,3 +213,16 @@
     margin-top: 20px;
     color: #333;
 } 
+
+.lmlform.form-campaign-creation input:not([type="file"]):not([type="submit"]), 
+.lmlform.form-campaign-creation select {
+    width: 480px;
+}
+
+.lmlform .half-inline {
+    display: inline-block;
+}
+
+.lmlform.form-campaign-creation .lmlpushtableheaderfieldsrow input.lmlpushtablecolumnfield {
+    width: 100%
+}

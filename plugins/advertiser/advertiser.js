@@ -187,7 +187,8 @@
 	             });
 	         });
 
-	         hooks.bind('campaignCreated', 560, function(camp) {
+	         hooks.bind('campaignCreated', 560, function(pkg) {
+                 var camp = pkg.camp;
 	             makeAdServerRequest('newCampaign', camp.projectid, function(resp, err) {
 	                 log("Advertiser", err ?
 	                     "Error sending 'created' event : " + err :

@@ -109,24 +109,10 @@ var LiliumDFP = function () {
         } else {
             if (actionName == "all") {
                 if (complexity == 'simple') {
-                    db.find(cli._c, 'dfpcache', {}, {}, function (err, cur) {
-                        var bigArr = new Array();
-                        var nextObject = function () {
-                            cur.hasNext(function (err, hasNext) {
-                                if (!err && hasNext) {
-                                    cur.next(function (err, obj) {
-                                        bigArr.push({
-                                            id: obj.id,
-                                            name: obj.name
-                                        });
-                                        nextObject();
-                                    });
-                                } else {
-                                    cb(bigArr);
-                                }
-                            });
-                        };
-                        nextObject();
+                    db.find(cli._c, 'dfpcache', {}, [], function (err, cur) {
+                        cur.project({id : 1, name : 1, _id : 0}).toArray(function(err, arr) {
+                            cb(err || arr);
+                        });
                     });
                 } else if (complexity == 'complete') {
                     db.findToArray(cli._c, 'dfpcache', {}, function (err, arr) {
@@ -135,6 +121,23 @@ var LiliumDFP = function () {
                 } else {
                     cb("[DFPCachedLiveVarException] Complexity '" + complexity + "' does not exist for action 'all'");
                 }
+            } else if (!isNaN(actionName)) {
+                var limit = parseInt(actionName);
+
+                db.rawCollection(cli._c, "dfpcache", {}, function(err, col) {
+                    var cur = col.find().sort([["id", -1]]).limit(limit);
+                    if (complexity === "simple") {
+                        cur = cur.project({id : 1, name : 1, _id : 0});
+                    }
+                    cur.toArray(function(err, arr) {
+                        if (err) {
+                            cb("[DFPCacheLiveVarException] " + err);
+                            return;
+                        }
+
+                        cb(arr);
+                    });
+                })
             } else if (actionName == "some") {
                 var limit = params.limit;
                 if (!limit) {
@@ -161,7 +164,7 @@ var LiliumDFP = function () {
                   
                     var deepFetchNow = new Date(); 
                     log('DFP', "Getting line items"); 
-                    ser.getLineItemsByStatement(new DFP.Statement("WHERE status <> 'COMPLETED' AND status <> 'PAUSED' AND status <> 'DRAFT'"), function (err, results) {
+                    ser.getLineItemsByStatement(new DFP.Statement(""), function (err, results) {
                         if (err) {
                             log('DFP', "Error getting line items : " + err);
                             if (callback) callback(err);
@@ -186,12 +189,24 @@ var LiliumDFP = function () {
                                 var sliced = arr.slice(index, index + jumps);
 
                                 if (sliced.length != 0) {                                
-                                    db.insert(_c.default(), 'dfpcache', sliced, function () {
-                                        log('DFP', 'Stored deep copy block ' + (index + sliced.length) + ' / ' + arr.length);
-                                        index += jumps;
-
-                                        setTimeout(insertNext, 5);
+                                    sliced = sliced.filter(function(item) {
+                                        return item.name && 
+                                            item.name.toLowerCase().indexOf("index") !== 0 && 
+                                            item.name.indexOf('Dummy') !== 0;
                                     });
+
+                                    if (sliced.length != 0) {
+                                        db.insert(_c.default(), 'dfpcache', sliced, function () {
+                                            log('DFP', 'Stored deep copy block ' + (index + sliced.length) + ' / ' + arr.length);
+                                            index += jumps;
+    
+                                            setTimeout(insertNext, 5);
+                                        });
+                                    } else {
+                                        log("DFP", "Skipped entire block for containing only Index Exchange items");
+                                        index += jumps;
+                                        insertNext();
+                                    }
                                 } else {
                                     log('DFP', 'Finished storing deep copy of ' + arr.length + ' DFP Orders');
                                     if (callback) callback();

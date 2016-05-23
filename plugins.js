@@ -121,7 +121,9 @@ var Plugins = module.exports = new function () {
     this.registerPlugin = function (identifier, callback) {
         var that = this;
         if (this.isRegistered(identifier)) {
-            throw new Error("[PluginException] Cannot register already registered plugin with identifier " + identifier);
+            log('Plugins', new Error("[PluginException] Cannot register already registered plugin with identifier " + identifier));
+            callback();
+            return;
         } else {
             log('Plugins', 'Registering plugin with identifier ' + identifier);
             that.searchDirForPlugin(identifier, function (info) {
@@ -195,7 +197,7 @@ var Plugins = module.exports = new function () {
             }, true, true);
 
         } else {
-            throw new Error("[PluginException] Cannot unregister unregistered plugin with identifier " + identifier);
+            log('Plugins', new Error("[PluginException] Cannot unregister unregistered plugin with identifier " + identifier));
         }
     };
 
@@ -207,7 +209,7 @@ var Plugins = module.exports = new function () {
                 throw new Error("[PluginException] Plugin with identifier " + identifier + " has no public iface");
             }
         } else {
-            throw new Error("[PluginException] Could not get public iface of unregistered plugin with identifier " + identifier);
+            log('Plugins', new Error("[PluginException] Could not get public iface of unregistered plugin with identifier " + identifier));
         }
     };
 

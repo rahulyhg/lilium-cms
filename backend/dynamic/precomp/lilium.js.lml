@@ -115,7 +115,6 @@ var LiliumCMS = function() {
                         validField = false;
                         $(this).before('<div class="v_invalid_msg">Minimum length is '+ $(this).attr('minlength') +'</div>');
 
-
                     } else if ($(this).attr('maxlength') && $(this).val().length > $(this).attr('maxlength')) {
                         validField = false;
                         $(this).before('<div class="v_invalid_msg">Maximum length is '+ $(this).attr('maxlength') +'</div>');
@@ -133,7 +132,6 @@ var LiliumCMS = function() {
                 if ($(this).attr('type') == 'checkbox' && $(this).data('required') == true && !$(this).is(':checked')) {
                     validField = false;
                     $(this).before('<div class="v_invalid_msg">This field is required</div>');
-
                 }
 
                 if ($(this).attr('type') == 'number') {
@@ -389,25 +387,29 @@ var LiliumCMS = function() {
         var makeSections = function() {
             if (liliumcms.livevars.retrieveVar('session').roles.indexOf('lilium') === -1) {
                 $('.lmlform-cond-section').each(function(index, section) {
-                    var ifstr = JSON.parse(section.dataset['if'].replace(/\&lmlquote\;/g, '"'));
-                    var cshow = true;
-
-                    for (var k in ifstr) {
-                        var lval = liliumcms.livevars.pulloutLiveVar(k);
-                        if (typeof lval === 'object' && typeof lval.indexOf === 'function') {
-                            if (lval.indexOf(ifstr[k] === -1)) {
+                    if (section.dataset.if) {
+                        var ifstr = JSON.parse(section.dataset['if'].replace(/\&lmlquote\;/g, '"'));
+                        var cshow = true;
+    
+                        for (var k in ifstr) {
+                            var lval = liliumcms.livevars.pulloutLiveVar(k);
+                            if (typeof lval === 'object' && typeof lval.indexOf === 'function') {
+                                if (lval.indexOf(ifstr[k] === -1)) {
+                                    cshow = false;
+                                    break;
+                                }
+                            } else if (lval !== ifstr[k]) {
                                 cshow = false;
                                 break;
                             }
-                        } else if (lval !== ifstr[k]) {
-                            cshow = false;
-                            break;
+                        }
+        
+                        if (!cshow) {
+                            $(section).hide().find('input.lmlsection-ignore').val(1);
                         }
                     }
-    
-                    if (!cshow) {
-                        $(section).hide().find('input.lmlsection-ignore').val(1);
-                    }
+
+
                 });
             }
         };

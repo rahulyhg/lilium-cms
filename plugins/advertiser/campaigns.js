@@ -11,6 +11,7 @@ var dfp = undefined;
 
 var cachedCampaigns = new Object();
 var registeredStatuses = new Array();
+var noOp = function() {};
 
 var Campaigns = function () {
     var that = this;
@@ -434,7 +435,6 @@ var Campaigns = function () {
             "campname": postdata.campname,
             "campstatus": postdata.campstatus,
             "clientid": postdata.clientid,
-            "paymentreq": postdata.paymentreq,
             "products": products,
             "impression": postdata.impression || 0
         };
@@ -453,7 +453,7 @@ var Campaigns = function () {
                 case 'new':
                     db.insert(cli._c, 'campaigns', dbCamp, function (res) {
                         dbCamp.cli = cli;
-                        hooks.trigger('campaignCreated', dbCamp);
+                        hooks.trigger('campaignCreated', {camp:dbCamp, cli : cli});
                         cli.redirect(cli._c.server.url + "/admin/campaigns/edit/" + dbCamp.projectid, false);
                     });
                     break;
@@ -499,6 +499,41 @@ var Campaigns = function () {
                 cssClass: "form-campaign-creation",
                 dependencies: ["sites.all.simple", "products.all", "sponsoredcontent", "dfpcache.all.simple"]
             })
+            .beginSection('clientbox', {
+                classes : ""
+            })
+            .add('clienttitle', 'title', {
+                displayname: "Client"
+            })          
+            .add('clientid', 'livevar', {
+                endpoint: "entities.query",
+                tag: "select",
+                template: "option",
+                title: "client",
+                nolabel : true,
+                props: {
+                    query: {
+                        roles: ["advertiser"]
+                    },
+                    html: "displayname",
+                    value: "_id"
+                },
+                wrapper : {
+                    class : ["half-inline"]
+                }       
+            })
+            .add('actionaddclient', 'button', {
+                displayname: "New Client",
+                classes : ["btn-default", "btn-add"],
+                wrapper : {
+                    class : "nopad field-wrapper-nopad half-inline"
+                },
+                nowrap : true
+            })
+            .closeSection('clientbox')
+            .add('campprojtitle', 'title', {
+                displayname : "Campaign information"
+            })
             .add('projectid', 'text', {
                 displayname: "Project ID",
                 editonce: true
@@ -510,29 +545,13 @@ var Campaigns = function () {
                 displayname: "Status",
                 datasource: registeredStatuses
             })
-            .add('clientid', 'livevar', {
-                endpoint: "entities.query",
-                tag: "select",
-                template: "option",
-                title: "client",
-                displayname: "Client",
-                props: {
-                    query: {
-                        roles: ["advertiser"]
-                    },
-                    html: "displayname",
-                    value: "_id"
-                }
-            })
-            .add('paymentreq', 'checkbox', {
-                displayname: "Payment required prior to production"
-            }, {
-                required: false
+            .add('producttitle', 'title', {
+                displayname : "Products"
             })
             .add('productstable', 'livevar', {
                 endpoint: "products.all",
                 tag: "pushtable",
-                title: "products",
+                nolabel : true,
                 displayname: "Products",
                 template: "tmpl_productrow",
                 datascheme: {
@@ -646,11 +665,90 @@ var Campaigns = function () {
             });
     };
 
+    var getCampHistory = function(cli, campid, cb) {
+        db.aggregate(cli._c, 'campaignHistory', [ 
+            { $lookup: {
+                from:"entities", 
+                localField:"actionby", 
+                foreignField:"_id", 
+                as:"user" }
+            }, {
+                $unwind : "$user"
+            }  
+        ], function(err, arr) {
+            if (err) {
+                log('Campaigns', "Error while fetching history from DB : " + err);
+                cb([]);
+                return;
+            }
+
+            arr.forEach(function(obj, index) {
+                obj.user = {
+                    displayname : obj.user.displayname
+                }
+            });
+
+            cb(arr);
+        })
+    };
+
     this.registerHooks = function () {
         hooks.bind('article_will_create', 200, function (pkg) {
             pkg.article.impressions = 0;
             pkg.article.targetimpressions = -1;
             pkg.article.targetdate = -1;
+        });
+ 
+        hooks.bind('campaignCreated', 315, function(pkg) {
+            var camp = pkg.camp;
+            var cli = pkg.cli;
+
+            log('Campaigns', 'Inserting first history entry for new ampaign');
+            db.insert(cli._c, 'campaignHistory', {
+                campaignid : camp._id,
+                mutations : {
+                    "campstatus" : ["none", camp.campstatus]
+                },
+                actionby : cli.session.data._id,
+                at : new Date()
+            }, function(err, res) {
+                log('Campaigns', err || 'Inserted new campaign in mutation history');
+            });
+        });
+
+        hooks.bind('campaignUpdated', 320, function(pkg) {
+            var older  = pkg.old;
+            var latest = pkg.new;
+            var cli = pkg.cli;
+
+            log('Campaigns', 'Computing differences');
+            var mutations = new Object();
+            for (var key in latest) {
+                if (
+                    key[0] !== '_' && (
+                        typeof older[key] === 'undefined' ||
+                        older[key] === null || latest[key] === null ||
+                        older[key].toString() !== latest[key].toString()
+                    ) && (
+                        older[key] !== null && latest[key] !== null
+                    )
+                ) {
+                    mutations[key] = [
+                        older[key],
+                        latest[key]
+                    ];
+                }
+            }
+
+            log('Campaigns', 'Inserting history entry');
+            db.insert(cli._c, "campaignHistory", {
+                campaignid : older._id,
+                mutations : mutations,
+                actionby : cli.session.data._id,
+                at : new Date()
+            }, function(err, res) {
+                log('Campaigns', err || "Inserted history entry");
+            });
         });
     };
     var createTable = function () {
@@ -674,11 +772,6 @@ var Campaigns = function () {
                 displayname: 'Status',
                 sortable: true
 			}, {
-                key: 'paymentreq',
-                displayname: 'Payment required',
-                template: 'table-campaign-payment',
-                sortable: true
-			}, {
                 key: 'client',
                 displayname: 'Client',
                 sortable: true
@@ -689,7 +782,6 @@ var Campaigns = function () {
                 sortable: false
 			}]
         });
-
     };
 
     this.init = function (abspath, cb) {

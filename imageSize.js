@@ -6,12 +6,13 @@ var ImageSize = function () {
     var sizes = {};
 
     this.add = function (name, width, height) {
-        if (this.exists(name)) throw new Error("[ImageSizeException] - Image size already exists: " + name);
+        if (this.exists(name)) log('ImageSize', new Error("[ImageSizeException] - Image size already exists: " + name));
         sizes[name] = [width, height];
     }
 
     this.remove = function (name) {
-        if (!this.exists(name)) throw new Error("[ImageSizeException] - Image size doesn't exists: " + name);
+        if (!this.exists(name)) log('ImageSize', new Error("[ImageSizeException] - Image size doesn't exists: " + name));
+        delete sizes[name];
     }
 
     this.exists = function (name) {

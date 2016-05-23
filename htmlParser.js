@@ -221,9 +221,9 @@ var HtmlParser = function () {
     };
 
     var parseSection = function(field) {
-        return '<section class="lmlform-cond-section lmlform-section"  data-if="' +
-            JSON.stringify(field.attr).replace(/\"/g, '&lmlquote;') +'" data-sectionname="' +
-            field.attr.sectionname + '">';
+        return '<section class="lmlform-cond-section lmlform-section ' + (field.attr.classes ? field.attr.classes.join(' ') : '') +
+            '" data-if="' + (field.attr.show ? JSON.stringify(field.attr.show).replace(/\"/g, '&lmlquote;') : "") +
+            '" data-sectionname="' + field.attr.sectionname + '">';
     };
 
     var parseClosure = function(field) {

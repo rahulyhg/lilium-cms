@@ -82,15 +82,12 @@ var Handler = function () {
 
                     Dispatcher.dispost(cli);
                 }
-
             });
             req.pipe(busboy);
         } catch (err) {
             Dispatcher.dispost(cli);
 
         }
-
-
     };
     var mimeTypeIsSupported = function (mimetype, cli) {
         return getMimeByMimeType(mimetype, cli) ? true : false;
@@ -152,8 +149,6 @@ var Handler = function () {
             } else {
                 cli.postdata.data[firstLevel].push(val)
             }
-
-
         }
     };
 
@@ -177,16 +172,42 @@ var Handler = function () {
         }
     };
 
-    this.handle = config.default().env == "dev" ? function (cli) {
+    var clients = new Object();
+    var totalRequests = 0;
+
+    this.crash = function(err) {
+        for (var k in clients) {
+            clients[k].crash(err);
+        }
+    }
+
+    var cleanClients = function() {
+        log('Handler', 'Clearing undefined clients');
+        var ctn = 0;
+        var msNow = new Date();
+        for (var k in clients) if (!clients[k]) {
+            delete clients[k];
+            ctn++;
+        }
+        
+        log('Handler', 'Cleared ' + ctn + ' clients in ' + (new Date() - msNow) + 'ms');
+    };
+
+    var handleEnd = function(cli) {
+        clients[cli.id] = undefined;
+        totalRequests++;
+
+        if (totalRequests % 1000 == 0) {
+            cleanClients();
+        }
+    };
+
+    this.handle = function (cli) {
         cli.touch('handler.handle');
 
-        try {
-            parseMethod(cli);
-        } catch (ex) {
-            cli.crash(ex);
-        }
-    } : function (cli) {
-        cli.touch('handler.handle');
+        clients[cli.id] = cli;
+        cli.bindEnd(handleEnd);
+
         parseMethod(cli);
     };
 

@@ -37,6 +37,8 @@ var ClientObject = function (req, resp) {
     };
 
     this.parseCookie();
+    this.setID();
+    this.createdAt = new Date();
 };
 
 ClientObject.prototype.throwHTTP = function (code, message) {
@@ -197,6 +199,18 @@ ClientObject.prototype.parseCookie = function () {
             }
         });
     }
+};
+
+ClientObject.prototype.setID = function() {
+    this.id = Math.random().toString().slice(2) + new Date().getTime();
+};
+
+ClientObject.prototype.bindEnd = function(cb) {
+    var that = this;
+    this.response.on('finish', function() {
+        that.requestduration = new Date() - that.createdAt;
+        cb(that);
+    });
 };
 
 module.exports = ClientObject;

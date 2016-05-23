@@ -281,11 +281,9 @@ var Notification = function () {
     };
 
     this.init = function () {
-        registerLivevars();
         io = inbound.io();
 
-        //Create default groups
-
+        log('Notifications', 'Creating site groups');
         _c.eachSync(function (conf) {
             that.createGroup('lmlsite_' + conf.id);
         });
@@ -297,6 +295,7 @@ var Notification = function () {
         that.createGroup('spy');
 
         io.on('connection', onSocketConnection);
+        log('Notifications', 'Sockets ready');
     };
 
     this.emitToUser = function (userID, message) {
@@ -642,12 +641,6 @@ var Notification = function () {
 
         return cookies['lmlsid'];
     };
-
-    var registerLivevars = function () {
-        //Get last 5 of user
-        //Get last x of user
-        //Get x to y of user
-    };
-}
+};
 
 module.exports = new Notification();

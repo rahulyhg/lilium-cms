@@ -480,7 +480,7 @@ var Entities = module.exports = new function () {
 
     this.promoteRole = function (roleName, right, cb) {
         if (typeof Roles[roleName] === 'undefined') {
-            throw new Error("[RolesException] Could not promote unexisting role " + roleName);
+            log('Roles', new Error("[RolesException] Could not promote unexisting role " + roleName));
         } else {
             Roles[roleName].rights.push(right);
             db.update(_c.default(), 'roles', {
@@ -491,7 +491,7 @@ var Entities = module.exports = new function () {
 
     this.registerRole = function (rObj, rights, callback, updateIfExists, allsites) {
         if (typeof Roles[rObj.name] !== 'undefined') {
-            throw new Error("[RolesException] Tried to register already registered role " + rObj.name);
+            log('Roles', new Error("[RolesException] Tried to register already registered role " + rObj.name));
         } else {
             rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
             rObj.rights = rights;
@@ -823,5 +823,7 @@ var Entities = module.exports = new function () {
     this.init = function () {
         registerTables();
         registerHooks();
+
+        return this;
     };
 };

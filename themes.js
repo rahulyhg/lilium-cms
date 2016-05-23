@@ -131,7 +131,9 @@ var Themes = function () {
 
     this.enableTheme = function (config, uName, callback) {
         if (this.isActive(config, uName)) {
-            throw new Error("[ThemeException] Cannot register already registered theme with uName " + uName);
+            var err = new Error("[ThemeException] Cannot register already registered theme with uName " + uName);
+            log('Themes', err);
+            callback(err);
         } else {
             log('Themes', 'Registering theme with uName ' + uName);
             this.searchDirForThemes(uName, function (info) {
