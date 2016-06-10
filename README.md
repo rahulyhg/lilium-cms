@@ -13,7 +13,7 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 **MAC:** `brew install pkg-config cairo libpng jpeg giflib`
 
 **UBUNTU:**
-`sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++`
+`sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev`
 
 #### *Arty Signature font*
 [Download link](http://www.1001fonts.com/arty-signature-font.html)
