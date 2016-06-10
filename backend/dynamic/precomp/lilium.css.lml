@@ -24,8 +24,8 @@
 	activecolor = "#8B49A6";
 	siteurl = config.default.server.url;
 	fontcolor = "#111";
-	barcolor = "#555";
-	barcolorhover = "#777";
+	barcolor = "#454545";
+	barcolorhover = "#656565";
 	infocolor = "#2980b9";
 	dangercolor = "#c0392b";
 	warningcolor = "#f1c40f";

@@ -99,10 +99,11 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/stacktable.js", 2300, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/socket.js", 2400, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/multi-select.js", 2500, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/ckeditor-lilium.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/media-explorer.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/tags.js", 1300, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmltable.js", 1300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/ckeditor-lilium.js", 1320, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/media-explorer.js", 1330, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/tags.js", 1340, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lys.js", 1350, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmltable.js", 1360, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/alert.js", 1400, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 

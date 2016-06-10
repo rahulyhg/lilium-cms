@@ -426,6 +426,8 @@ var Campaigns = function () {
         for (var key in postdata.productstable) {
             var sprod = postdata.productstable[key];
             sprod.impressions = sprod.impressions ? parseInt(sprod.impressions) : 0;
+            sprod.paid = typeof sprod.paid === 'undefined' ? false : sprod.paid;
+            sprod.status = sprod.status || 'new';
             sprod._editid = key;
             products.push(sprod);
         }
@@ -497,7 +499,7 @@ var Campaigns = function () {
                     'cssPrefix': 'campaigncreatefield-'
                 },
                 cssClass: "form-campaign-creation",
-                dependencies: ["sites.all.simple", "products.all", "sponsoredcontent", "dfpcache.all.simple"]
+                dependencies: ["sites.all.simple", "products.all", "sponsoredcontent", "dfpcache.all.simple", "products.status.all"]
             })
             .beginSection('clientbox', {
                 classes : ""
@@ -549,6 +551,8 @@ var Campaigns = function () {
                 displayname : "Products"
             })
             .add('productstable', 'livevar', {
+                nowrap : true,
+                title : "products",
                 endpoint: "products.all",
                 tag: "pushtable",
                 nolabel : true,
@@ -568,7 +572,7 @@ var Campaigns = function () {
                     {
                         fieldName: "qte",
                         dataType: "number",
-                        displayName: "Quantity",
+                        displayName: "Qte",
                         defaultValue: 1,
                         influence: [{
                             fieldName: "price",
@@ -577,11 +581,6 @@ var Campaigns = function () {
                             fieldName: "targetimp",
                             eq: "="
 						}]
-					}, {
-                        fieldName: "pricebase",
-                        displayName: "Based on",
-                        keyName: "priceBase",
-                        defaultValue: "unit"
 					}, {
                         fieldName: "price",
                         dataType: "money",
@@ -596,7 +595,7 @@ var Campaigns = function () {
 					}, {
                         fieldName: "targetimp",
                         dataType: "number",
-                        displayName: "Target Impressions",
+                        displayName: "Trgt. Impr.",
                         keyName: "targetimp"
 					}, {
                         fieldName: "website",
@@ -612,7 +611,18 @@ var Campaigns = function () {
                         fieldName: "productapilink",
                         dataType: "template",
                         templateid: "productapilink"
-					}],
+					}, {
+                        fieldName: "status",
+                        displayName : "Status",
+                        keyName : "status",
+                        dataType: "readonly",
+                        initValue : "new",
+                        datasource : {
+                            datasource: "products.status.all",
+                            keyName : "displayName",
+                            keyValue: "name"
+                        }
+                    }],
                     columnTemplates: {
                         "productapilink": {
                             fields: [{
@@ -655,7 +665,7 @@ var Campaigns = function () {
                     },
                     footer: {
                         title: "Total",
-                        sumIndexes: [2]
+                        sumIndexes: [1]
                     }
                 }
             })

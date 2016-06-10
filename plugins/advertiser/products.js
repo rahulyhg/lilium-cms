@@ -136,6 +136,12 @@ var Products = function () {
         }
     };
 
+    var getProductStatuses = function(cb) {
+        db.findToArray('productstatus', {}, function(err, arr) {
+            cb(arr);
+        });
+    };
+
     var keyValToArray = function (obj) {
         var arr = new Array();
         for (key in obj) {
@@ -160,6 +166,9 @@ var Products = function () {
                 case "pricebases":
                     callback(keyValToArray(RegisteredPriceBases));
                     break;
+                case "statuses":
+                    getProductStatuses(callback);
+                    break;
                 default:
                     callback("[ProductException] Undefined action : " + ftc);
                     break;
@@ -167,8 +176,7 @@ var Products = function () {
             } else {
                 callback("[ProductException] Root level if forbidden. A first level must be defined");
             }
-
-        }, ["products"]);
+        });
     };
 };
 

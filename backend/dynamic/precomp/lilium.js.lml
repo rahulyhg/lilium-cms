@@ -41,6 +41,7 @@ var LiliumCMS = function() {
     this.formbeautifier;
     this.multiselect;
     this.tables = new Array();
+    this.lys = new Lys();
 
     var that = this;
 
@@ -529,7 +530,25 @@ var LiliumCMS = function() {
         window.location.reload();
     };
 
+    var oldBrowsers = function() {
+        if (typeof Object.assign === 'undefined') {
+            Object.assign = function() {
+                var len = arguments.length;
+                var newObj = {};
+                for (var i = 0; i < len; i++) {
+                    var o = arguments[i];
+                    for (var k in o) {
+                        newObj[k] = o[k];
+                    }
+                }
+
+                return newObj;
+            }
+        };
+    };
+
     var init = function() {
+        oldBrowsers();
         var pathname = window.location.pathname;
         var split = pathname.split('?')[1];
         window.location.params = new Object();

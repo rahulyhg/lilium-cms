@@ -67,6 +67,10 @@ var LiveVars = function() {
             'varname': 'session',
             'params': new Object()
         });
+        endpoints.push({
+            'varname' : 'lys',
+            'params': new Object()
+        });
 
         $.get("{=config.default.server.url}/livevars", {
             vars: JSON.stringify(endpoints)

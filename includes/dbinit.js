@@ -4,7 +4,7 @@ var mongoDocuments = {
 		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache",
 		"lilium", "uploads", "cachedFiles", "campaigns", "campaignshistory", "products", "dfp",
 		"producttypes", "productpricebases", "changerequests", "campaignStatuses", "notifications",
-		"categories", "autosave"
+		"productstatus", "categories", "autosave"
 	]
 };
 
@@ -22,17 +22,22 @@ var typesDefaultStructure = {
 
 var defaultCampaignStatuses = [
 	{name:"new", displayName:"New"},
-	{name:"preprod", displayName:"Preproduction"},
 	{name:"clisign", displayName:"Pending Client Signature"},
 	{name:"clipayment", displayName:"Pending Client Payment"},
-	{name:"clipending", displayName:"Pending Client Action"},
 	{name:"prod", displayName:"Production"},
-	{name:"review", displayName:"Reviewed"},
-	{name:"ready", displayName:"Ready"},
 	{name:"ongoing", displayName:"Ongoing"},
 	{name:"cliendpay", displayName:"Pending Client Closure"},
 	{name:"finished", displayName:"Finished"}
 ];
+
+var defaultProductStatuses = [
+    {name:"unpaid", displayName:"Unpaid"},
+    {name:"paid", displayName:"Paid"},
+    {name:"ongoing", displayName:"Ongoing"},
+    {name:"paused", displayName:"Paused"},
+    {name:"finished", displayName:"Finished"},
+    {name:"invalid", displayName:"Invalid"}
+]
 
 var adminEntity = {
 	id : 0,
@@ -132,7 +137,7 @@ var log = require('../log.js');
 
 var initMongo = function(conf, db, cb) {
 	log('Database', 'Init script was executed');
-	var totalTasks = 8;
+	var totalTasks = 9;
 	var completedTasks = 0;
 
 	// Boot Script
@@ -189,6 +194,14 @@ var initMongo = function(conf, db, cb) {
 				throw "[DatabaseInit - types collection does not exist]";
 			}
 		});
+
+        log('Database', 'inserting default product statuses');
+        db.collection('productstatus', {strict:true}, function(err, col) {
+            col.insertMany(defaultProductStatuses, function(err, r) {
+				completedTasks++;
+				checkForCompletion();
+            });
+        });
 
 		log('Database', 'Creating admin and root access');
 		db.collection('entities', {strict:true}, function(err, col) {

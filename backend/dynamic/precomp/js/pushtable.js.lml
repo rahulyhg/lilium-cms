@@ -195,6 +195,29 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
                         er.invalidRow = key;
                         break;
                     }
+                } else if (schemeCol[key].dataType == 'readonly') {
+                    // Displays plain text, can be styled
+                    var spanClass = "";
+                    var displayText = "";                    
+                    var rowVal = row[key];
+
+                    if (schemeCol[key].datasource) {
+                        var values = liliumcms.livevars.retrieveVar(schemeCol[key].datasource.datasource);
+                        var lookupKey = schemeCol[key].datasource.keyValue;
+                        var lookupVal = row[key];
+                        displayText = "N/A";
+
+                        for (var i = 0; i < values.length; i++) {
+                            if (values[i][lookupKey] == lookupVal) {
+                                displayText = values[i][schemeCol[key].datasource.keyName];
+                                spanClass = key + "-" + row[key];
+                            }
+                        }
+                    } else {
+                        displayText = rowVal;
+                    }
+
+                    _h += '<td><span class="'+spanClass+'">'+displayText+'</span></td>';
                 } else if (schemeCol[key].dataType == 'multiple') {
                     var values = liliumcms.livevars.retrieveVar(schemeCol[key].datasource.datasource);
                     var arr = row[key] || new Array();
@@ -221,7 +244,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             }
         }
 
-        return validRow ? _h + '<td>' + _e + '<button class="lmlpushtableeditbutton">Edit</button><button class="lmlpushtableremovebutton">Remove</button></td></tr>' : er;
+        return validRow ? _h + '<td class="lmlpushtableheadaction">' + _e + '<a class="lmlpushtableeditbutton fa fa-pencil-square-o lmlpushtablerowaction"></a><a class="lmlpushtableremovebutton fa fa-times lmlpushtablerowaction"></a></td></tr>' : er;
     };
 
     this.removeDeleteRow = function(rowID) {
@@ -460,6 +483,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             } else {
                 switch (dt) {
                     case "money" : return 'number" step="0.01';
+                    case "readonly" : return 'hidden';
                     default : return dt;
                 }
             }
@@ -480,31 +504,44 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
         };
 
         var addHeaderField = function(col) {
-            html += '<input class="'+generateFieldCSSClasses(col)+
-                '" type="' + parseSpecialType(col.dataType) +
-                '" data-fieldname="' + col.fieldName +
-                (col.keyName ? '" data-keyname="' + col.keyName : "") +
-                (col.displayCase ? '" data-displaycase="' + JSON.stringify(col.displayCase) : "") +
-                (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
+            if (!false) {
+                var h = "";
+                h += '<input class="'+generateFieldCSSClasses(col)+
+                    '" type="' + parseSpecialType(col.dataType) +
+                    '" data-fieldname="' + col.fieldName +
+                    (col.keyName ? '" data-keyname="' + col.keyName : "") +
+                    (col.displayCase ? '" data-displaycase="' + JSON.stringify(col.displayCase) : "") +
+                    (col.defaultValue ? '" data-defaultvalue="' + col.defaultValue : "");
 
-            if (col.autocomplete) {
-                html += '" list="' + tableid + col.fieldName + 'list" autocomplete="on" data-acsource="' + col.autocomplete.datasource + '"';
-            }
-
-            html += '" />';
-
-            if (col.autocomplete && col.autocomplete.datasource) {
-                var datVar = liliumcms.livevars.retrieveVar(col.autocomplete.datasource);
-
-                if (datVar && datVar.length) {
-                    html += '<datalist id="' + tableid + col.fieldName + 'list">';
-
-                    for (var j = 0; j < datVar.length; j++) {
-                        html += '<option  value="' + datVar[j][col.autocomplete.keyName] + '">' + datVar[j][col.autocomplete.keyValue] + '</option>';
-                    }
-
-                    html += '</datalist>';
+                if (col.autocomplete) {
+                    h += '" list="' + tableid + col.fieldName + 
+                        'list" autocomplete="on" data-acsource="' + 
+                        col.autocomplete.datasource + '"';
                 }
+
+                if (col.initValue) {
+                    h += '" value="' + (col.initValue || "");
+                }
+    
+                h += '" />';
+    
+                if (col.autocomplete && col.autocomplete.datasource) {
+                    var datVar = liliumcms.livevars.retrieveVar(col.autocomplete.datasource);
+    
+                    if (datVar && datVar.length) {
+                        h += '<datalist id="' + tableid + col.fieldName + 'list">';
+    
+                        for (var j = 0; j < datVar.length; j++) {
+                            h += '<option  value="' + datVar[j][col.autocomplete.keyName] + '">' + 
+                                datVar[j][col.autocomplete.keyValue] + 
+                                '</option>';
+                        }
+    
+                        h += '</datalist>';
+                    }
+                }
+    
+                html += h;
             }
         }
 
@@ -533,7 +570,7 @@ var PushTable = function(tableid, objTitle, dataScheme, dataSource) {
             }
         }
 
-        html += '<th><button class="lmlpushtablecolumnaddaction">Add</button></th>' +
+        html += '<th class="lmlpushtableheadaction"><a class="lmlpushtablecolumnaddaction fa fa-plus lmlpushtablerowaction"></a></th>' +
             '</tr></thead><tbody></tbody>';
 
         if (scheme.footer) {

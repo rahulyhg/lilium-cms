@@ -35,6 +35,7 @@ var filelogic = undefined;
 var category = undefined;
 var dashboard = undefined;
 var templateBuilder = undefined;
+var lys = undefined;
 var backendSearch = undefined;
 var devtools = undefined;
 var preferences = undefined;
@@ -71,6 +72,7 @@ var Core = function () {
         Inbound = require('./inbound.js');
         Livevars = require('./livevars.js').init();
         Precompiler = require('./precomp.js');
+        lys = require('./lys.js');
         Petals = require('./petal.js');
         GC = require('./gc.js');
         scheduler = require('./scheduler.js');
@@ -523,6 +525,7 @@ var Core = function () {
         themes.registerLiveVar();
         sites.registerLiveVar();
         settings.registerLiveVar();
+        lys.registerLiveVar();
         backendSearch.registerLiveVar();
         preferences.registerLiveVar();
 

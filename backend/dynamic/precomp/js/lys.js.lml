@@ -1,0 +1,38 @@
+/*
+    Layout : {
+        indexes : [],
+        actions : {
+            indexes : callback
+        }
+    }
+*/
+
+var Lys = function() {
+    this.commandHistory = new Array();
+    this.commandsLib = new Object();
+    this.commandsKeys = new Array();
+
+    this.addLys = function(index, action, info) {
+        this.commandsKeys.push(index);
+        this.commandsLib[index] = Object.assign(info, action);
+    }
+
+    var init = function() {
+        document.addEventListener('livevarsRendered', function(pkg) {
+            var lv = pkg.detail.livevars;
+            var adminmenus = lv.adminmenus;
+
+            if (adminmenus) {
+                for (var i = 0; i < adminmenus; i++) {
+                    var menu = adminmenus[i];
+                    var k = menu.displayname.toLowerCase();
+                    this.addLys(k, function() {
+                        document.location.href = "{=config.default.server.url}/" + menu.absURL;
+                    });
+                }
+            }
+        });
+    };
+
+    init();
+};

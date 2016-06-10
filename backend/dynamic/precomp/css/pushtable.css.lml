@@ -13,7 +13,7 @@
 .lmlpushtable thead tr,
 .lmlpushtable tfoot tr {
 	padding: 2px;
-	background-color: #EEE;
+	background-color: #F0F0F0;
 
 	font-size: 14px;
 	font-weight: bold;
@@ -21,18 +21,32 @@
     text-transform: uppercase;
 }
 
-.lmlpushtable thead th,
 .lmlpushtable tfoot td,
 .lmlpushtable tbody td {
-	padding: 2px 3px;
+	padding: 1px 10px;
 	text-align: left;
     position:relative;
 }
 
+.lmlpushtable thead tr.lmlpushtableheadertitlesrow {
+    background-color: #FAFAFA;
+}
+
+.lmlpushtable thead th, 
+.lmlpushtable tfoot td {
+    position:relative;
+	text-align: left;
+    padding: 10px;
+    text-align: left;
+    position: relative;
+    text-transform: none;
+    font-weight: 400;
+    border-bottom: 1px solid #DDD;
+}
 
 .lmlpushtable thead th input,
 .lmlpushtable thead th select {
-	padding: 6px;
+	padding: 2px;
 }
 
 .lmlpushtable .lmlpushtablecasenotmet {
@@ -45,4 +59,38 @@
 
 .lmlpushtable .lmlpushtableheaderfieldsrow input.lmlpushtablecolumnfield {
     padding: 2px 5px;
+}
+
+.lmlpushtablerowaction {
+    margin: 4px;
+    font-size: 20px;    
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.lmlpushtablerowaction:hover {
+    text-decoration: none;
+}
+
+.lmlpushtableremovebutton {
+    color : #FF2634;
+}
+
+.lmlpushtableremovebutton:hover {
+    color : #FF4654;
+}
+
+.lmlpushtablecolumnaddaction {
+    color: #66CC66;
+    font-size: 20px;
+}
+
+.lmlpushtablecolumnaddaction:hover {
+    color: #86EC86;
+}
+
+.lmlpushtableheadaction,
+.lmlpushtable thead th.lmlpushtableheadaction {
+    width: 80px;
+    text-align: center;    
 }

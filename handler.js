@@ -176,7 +176,7 @@ var Handler = function () {
     var totalRequests = 0;
 
     this.crash = function(err) {
-        for (var k in clients) {
+        for (var k in clients) if (clients[k]) {
             clients[k].crash(err);
         }
     }

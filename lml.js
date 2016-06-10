@@ -244,7 +244,7 @@ var LML = function () {
                 forIndex: -1
             };
 
-            log('LML', 'Marked line index at ' + (condObj.lineIndex + 1) + ' for "' + condObj.condTag + '" block');
+            // log('LML', 'Marked line index at ' + (condObj.lineIndex + 1) + ' for "' + condObj.condTag + '" block');
             context.condStack.push(condObj);
             return condObj;
         };
@@ -432,13 +432,13 @@ var LML = function () {
             condObj.forIndex++;
             if (_arr.length == 0 || condObj.forIndex >= _arr.length || condObj.forIndex >= Object.keys(_arr).length) {
                 context.skipUntilClosure = true;
-                log("LML", "Finished " +(condObj.nested?"nested ":"")+ "loop after " + condObj.forIndex + " iterations.");
+                // log("LML", "Finished " +(condObj.nested?"nested ":"")+ "loop after " + condObj.forIndex + " iterations.");
                 
                 if (condObj.forIndex != 0) {    
                     context.lineFeedback.jumpTo = condObj.closureIndex;
-                    log('LML', "Hard skipping to line " + (condObj.closureIndex));
+                    // log('LML', "Hard skipping to line " + (condObj.closureIndex));
                 } else {
-                    log('LML', "Loop did not iterate. Looking for next closure.");
+                    // log('LML', "Loop did not iterate. Looking for next closure.");
                 }
             } else {
                 this.affect(context, affectedName, _arr[condObj.forIndex]);
@@ -493,8 +493,8 @@ var LML = function () {
                         if (curCond.requiredSkip > 0) {
                             curCond.requiredSkip--;
                             context.condStack.push(curCond);
-                            log('LML', 'Found closure at line ' + context.currentLineIndex +
-                                ', but had to skip. Required Skips : ' + curCond.requiredSkip);
+                            // log('LML', 'Found closure at line ' + context.currentLineIndex +
+                            //    ', but had to skip. Required Skips : ' + curCond.requiredSkip);
                         } else {
                             LMLSlang.validateClosure(curCond.condTag, closureTag);
                             context.currentBlock = (context.condStack.length == 0) ?
@@ -518,9 +518,9 @@ var LML = function () {
                                             (childCond.condTag !== 'for' && childCond.condTag !== 'while'));
 
                                         if (context.temp.looping) {
-                                            log('LML', 'Exited nested for loop');
+                                            // log('LML', 'Exited nested for loop');
                                         } else {
-                                            log('LML', 'Exited for loop');
+                                            // log('LML', 'Exited for loop');
                                         }
                                     }
                                 }
@@ -533,9 +533,9 @@ var LML = function () {
                         if (context.skipUntilClosure) {
                             var cstack = context.condStack[context.condStack.length - 1];
                             cstack.requiredSkip++;
-                            log('LML', "Found identifier '"+split[0]+"' while skipping until closure at line "+
-                                context.currentLineIndex+
-                                ". Required Skips : " + cstack.requiredSkip);
+                            // log('LML', "Found identifier '"+split[0]+"' while skipping until closure at line "+
+                            //    context.currentLineIndex+
+                            //    ". Required Skips : " + cstack.requiredSkip);
                         } else {
                             var condObj = undefined;
                             if (context.temp.looping) {
@@ -545,10 +545,10 @@ var LML = function () {
                                 condObj = LMLSlang.pushToCondStack(context, split);
                                 if (condObj.condTag === 'for') {
                                     if (context.condStack.length != 1 && context.condStack[context.condStack.length - 2].condTag == "for") {
-                                        log('LML', 'Entering nested for loop');
+                                        // log('LML', 'Entering nested for loop');
                                         condObj.nested = true;
                                     } else {
-                                        log('LML', 'Entering for loop');
+                                        // log('LML', 'Entering for loop');
                                         condObj.nested = false;
                                     }
                                 }
@@ -836,7 +836,7 @@ var LML = function () {
         var exists = fileserver.fileExists(rootpath, undefined, true);
         if (exists) {
             proceedWhenCompleted = function(context, extra, callback) {
-                log('Lml', 'Child file compiled, now compiling parent.');
+                // log('Lml', 'Child file compiled, now compiling parent.');
                 proceedWhenCompleted = undefined;
                 newcontext = new LMLContext();
                 newcontext.rootDir = fileserver.dirname(rootpath);
