@@ -6,6 +6,7 @@ var db = require('./includes/db.js');
 var article = require('./article.js')
 
 var api = function(){
+	var that = this;
 
 	this.serveApi = function(cli) {
 		cli.touch('api.serveApi');
@@ -44,11 +45,31 @@ var api = function(){
 		ApiEndpoints[cli.method][cli.routeinfo.path[1]](cli);
 	};	
 
-	this.articlesHandleGET = function(cli) {
+	this.paramsFindToArray = function(cli, coln){
+		db.findToArray(cli._c, coln, cli.routeinfo.params, function(err, row) {
+	        if (err || Object.keys(row).length === 0) {
+	            cli.sendJSON({
+	                success: false,
+	                error: "Content not found"
+	            })
+	        } else {
+	        	cli.sendJSON(row)
+	       	}
+	   	});
+	};
 
+	this.authorsHandleGET = function(cli) {
+		that.paramsFindToArray(cli, 'entities')
+	};
+
+	this.categoriesHandleGET = function(cli){
+		that.paramsFindToArray(cli, 'categories')
+	};
+
+	this.articlesHandleGET = function(cli) {
 		var contentSingleSearch = function(cli, id){
 			article.deepFetch(cli._c, id, function(row){
-		        if (row || row.length == 0) {
+		        if (Object.keys(row).length === 0) {
 		            cli.sendJSON({
 		                success: false,
 		                error: "Content not found"
@@ -59,34 +80,17 @@ var api = function(){
 			});
 		};
 
-		var contentListSearch = function(cli, params) {
-			db.findToArray(cli._c, 'content', params, function(err, row) {
-		        if (err || row.length == 0) {
-		            cli.sendJSON({
-		                success: false,
-		                error: "Content not found"
-		            })
-		        } else {
-		        	cli.sendJSON(row)
-		       	}
-	   	 	});
-		};
-
 		if (cli.routeinfo.path.length > 2) {
 			switch (cli.routeinfo.path[2]) {
 				case "single":
 					contentSingleSearch(cli, cli.routeinfo.path[3])
 					break;
 				case  "list":
-					var moderatedSearchParameters = cli.routeinfo.params;
-					moderatedSearchParameters.status = "published"
-				    contentListSearch(cli, moderatedSearchParameters)
+				    that.paramsFindToArray(cli, 'content')
 					break;
 			}
 		} else {
-			var moderatedSearchParameters = cli.routeinfo.params;
-			moderatedSearchParameters.status = "published"
-		    contentListSearch(cli, moderatedSearchParameters)
+			that.paramsFindToArray(cli, 'content')
 		}
 
 	};

@@ -225,7 +225,17 @@ var Core = function () {
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');
             api.articlesHandleGET(cli);
-        });        
+        });      
+
+        api.registerApiEndpoint('authors', 'GET', function (cli) {
+            cli.touch('admin.GET.authors');
+            api.authorsHandleGET(cli);
+        });  
+
+        api.registerApiEndpoint('categories', 'GET', function (cli) {
+        cli.touch('admin.GET.categories');
+        api.categoriesHandleGET(cli);
+        });  
 
         hooks.fire('endpoints');
         log('Endpoints', 'Loaded endpoints');
