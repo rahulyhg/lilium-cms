@@ -39,12 +39,14 @@ var lys = undefined;
 var backendSearch = undefined;
 var devtools = undefined;
 var preferences = undefined;
+var api = undefined;
 
 var log = require('./log.js');
 
 var Core = function () {
     var loadRequires = function () {
         var nn = new Date();
+        api = require('./api.js');
         _c = require('./config.js');
         settings = require('./settings.js');
         hooks = require('./hooks.js');
@@ -219,6 +221,11 @@ var Core = function () {
         });
 
         devtools.registerAdminEndpoint();
+
+        api.registerApiEndpoint('articles', 'GET', function (cli) {
+            cli.touch('admin.GET.articles');
+            api.articlesHandleGET(cli);
+        });        
 
         hooks.fire('endpoints');
         log('Endpoints', 'Loaded endpoints');
