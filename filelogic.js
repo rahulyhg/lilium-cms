@@ -209,6 +209,7 @@ var FileLogic = function () {
         extra.contextname = ctxName;
 
         var cTheme = theme.getEnabledTheme(cli._c);
+        extra.theme = cTheme;
 
         var readPath = cli._c.server.base + "flowers/" + cTheme.info.uName + "/" + cTheme.info.contexts[ctxName];
         var savePath = cli._c.server.html + "/" + preferredFileName;

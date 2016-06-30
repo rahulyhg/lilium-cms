@@ -136,13 +136,18 @@ var LiveVars = function() {
             var currentData = data;
 
             keys.forEach(function(elem, i) {
+                if (elem[0] === '{' && elem[elem.length-1] === '}') {
+                    var pos = elem.substring(2, elem.length - 1);
+                    var hArr = window.location.href.split('/');
+                    elem = hArr[hArr.length - parseInt(pos)];
+                }
+
                 //Check if data[key] exists
                 if (typeof currentData[elem] !== 'undefined') {
                     currentData = currentData[elem];
 
                     //Check if it is the last key
                     if (keys.length == i + 1) {
-
                         // Append data
                         // Check if array or object
                         if (typeof currentData === 'object' && Object.prototype.toString.call(currentData) === '[object Array]' && currentData.length != 0) {
@@ -365,12 +370,13 @@ var LiveVars = function() {
                 if (sourceof && sourceof != "") {
                     (function(src, data) {
                         document.addEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, function() {
+                            var fCtx = $('#' + src).data('context');
                             if ($.isArray(data)) {
                                 for (var key in data) {
-                                    liliumcms.fillFormFromSource(src, data[key], key);
+                                    liliumcms.fillFormFromSource(src, data[key], key, fCtx);
                                 }
                             } else {
-                                liliumcms.fillFormFromSource(src, data);
+                                liliumcms.fillFormFromSource(src, data, undefined, fCtx);
                             }
                         });
                     })(sourceof, varValue);
@@ -434,6 +440,22 @@ var LiveVars = function() {
         // Lilium Templates
         $('lml\\:template').remove();
 
+        // Parse remaining independent tObjects
+        $('lml\\:tobject').not('lml\\:template lml\\:tobject').not('lml\\:tabletemplate lml\\:tobject').each(function(index, tobj) {
+            var nodeType = tobj.dataset.nodetype || "span";
+            var node = $(document.createElement(nodeType));
+            var content = fetchTemplateObjectContent(
+                $(tobj),        
+                liliumcms.livevars.deepLivevars(), 
+                $(tobj).parent(), 
+                $(tobj).data('key'), 
+                node
+            );
+
+            node.html(content || ("[TObjectException - Undefined live variable key " + $(tobj).data('key') + "]"));
+            $(tobj).after(node).remove();
+        });
+
         // Fire ready event
         document.dispatchEvent(new CustomEvent('livevarsPrerendered', {
             'detail': {
@@ -466,6 +488,30 @@ var LiveVars = function() {
             }
         }
         return node;
+    }
+
+    this.deepLivevars = function() {
+        if (typeof liliumcms.livevars.deeplivevars === 'undefined') {
+            var dlv = new Object;
+            liliumcms.livevars.deeplivevars = dlv;
+
+            for (var k in livevars) {
+                var levels = k.split('.');
+                if (levels.length !== 1) {
+                    var curLevel = dlv[levels[0]] = new Object();
+
+                    for (var i = 1; i < levels.length - 1; i++) {
+                        curLevel = curLevel[levels[i]] = new Object();
+                    }
+
+                    curLevel[levels[levels.length-1]] = livevars[k];
+                } else {
+                    dlv[k] = livevars[k];
+                }
+            };
+        }
+
+        return liliumcms.livevars.deeplivevars;
     }
 
     this.livevars = function() {

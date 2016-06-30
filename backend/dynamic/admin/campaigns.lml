@@ -8,9 +8,9 @@ $}
             {=tableBuilder.render('campaign')}
         </main>
 
-        <lml:tabletemplate id="table-campaign-payment">
+        <!--lml:tabletemplate id="table-campaign-payment">
             <lml:tobject data-nodetype="span" data-content="isPaymentReq"></lml:tobject>
-        </lml:tabletemplate>
+        </lml:tabletemplate-->
 
         <lml:tabletemplate id="table-campaign-actions">
             <lml:tobject data-nodetype="a"

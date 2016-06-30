@@ -74,8 +74,30 @@ var DB = function() {
 		});
 	};
 
-	this.createCollection = function(conf, col, callback) {
-		_conns[conf.id || conf].createCollection(col, {}, callback);
+	this.createCollection = this.createCollections = function(conf, col, callback) {
+        if (typeof col === 'object') {
+            var colIndex = 0;
+            var colMax = col.length;
+            var results = { err : [], res : [] };
+
+            var ins = function() {
+                if (colIndex < colMax) {
+		            _conns[conf.id || conf].createCollection(col[colIndex], {}, function(err, res) {
+                        results.err.push(err);
+                        results.res.push(res);
+                        colIndex++;
+                        
+                        ins();
+                    });
+                } else {
+                    callback();
+                }
+            };
+
+            ins();
+        } else {
+		    _conns[conf.id || conf].createCollection(col, {}, callback);
+        }
 	};
 
 	this.initDatabase = function(conf, callback) {

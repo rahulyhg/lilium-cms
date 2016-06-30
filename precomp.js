@@ -168,7 +168,7 @@ var Precomp = function () {
                 var mustRewrite = false;
                 fileIndex++;
 
-                if (curFile.indexOf('.lml') !== -1) {
+                if (curFile.indexOf('.lml') !== -1 && curFile.indexOf('.swp') === -1) {
                     checksum.file(isTheme ? curFile : absReadPath + curFile, function (err, sum) {
                         var rPath = isTheme ? curFile : absReadPath + curFile;
                         var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";

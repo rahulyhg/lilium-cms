@@ -166,31 +166,27 @@ var Themes = function () {
                 db.findAndModify(config, 'themes', {
                     uName: uName
                 }, info, function (err, doc) {
-
                     log('Themes', 'Enabling theme ' + info.uName);
                     try {
+                        ThemeInstance.enable(config, info, function() {
+                            if (!doc.value) {
+                                db.update(config, 'themes', {
+                                    uName: uName
+                                }, { settings : settings}, function() {
+                                    ActiveTheme[config.id].settings = settings;
+                                });
+                                callback();
 
-
-                    ThemeInstance.enable(config, info, function() {
-                        if (!doc.value) {
-                            db.update(config, 'themes', {
-                                uName: uName
-                            }, { settings : settings}, function() {
-                                ActiveTheme[config.id].settings = settings;
-
-                            });
-                            callback();
-
-                        } else {
-                            ActiveTheme[config.id].settings = doc.value.settings;
-
-                            log('Themes', 'Theme enable called back');
-                            cli.cacheClear(undefined, callback);
-                        }
-                    });
-                } catch(e) {
-                    console.log(e);
-                }
+                            } else {
+                                ActiveTheme[config.id].settings = doc.value.settings || ActiveTheme[config.id].settings;
+    
+                                log('Themes', 'Theme enable called back');
+                                cli.cacheClear(undefined, callback);
+                            }
+                        });
+                    } catch(e) {
+                        console.log(e);
+                    }
                 }, true, true);
 
             });
@@ -242,11 +238,11 @@ var Themes = function () {
     };
 
     this.getSettings = function(config) {
-        return ActiveTheme[config.id].settings;
+        return ActiveTheme[config.id || config].settings;
     }
 
     this.getEnabledTheme = function (config) {
-        return ActiveTheme[config.id];
+        return ActiveTheme[config.id || config];
     };
 
     this.getEnabledThemePath = function (config) {

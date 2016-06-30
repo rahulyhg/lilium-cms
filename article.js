@@ -186,7 +186,7 @@ var Article = function() {
     this.publish = function(cli) {
         cli.touch('article.new');
         var that = this;
-        if (cli.hasRight('article_publish')) {
+        if (cli.hasRight('publish')) {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
 
@@ -394,11 +394,11 @@ var Article = function() {
 
                 id = db.mongoID(cli.postdata.data._id);
                 // Check if user can edit this article
-                db.find(cli._c, 'content', [], {
+                db.findToArray(cli._c, 'content', {
                     _id: id
-                }, function(err, res) {
-                    if (res && (res._id == cli.userinfo.userid || cli.hasRight('edit-all-articles'))) {
-
+                }, function(err, ress) {
+                    var res = err ? undefined : ress[0];
+                    if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('edit-all-articles'))) {
                         db.update(cli._c, 'content', {
                             _id: id
                         }, formData, function(err, doc) {
@@ -549,11 +549,12 @@ var Article = function() {
     this.delete = function(cli, destroy) {
         if (cli.routeinfo.path[3]) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
-            db.find(cli._c, 'content', {
+            db.findToArray(cli._c, 'content', {
                 _id: id
-            }, [], function(err, result) {
+            }, function(err, results) {
+                var result = err ? undefined : results[0];
                 if (result) {
-                    if (cli.hasRight('modify_all_articles') || result.author == cli.userinfo.userid) {
+                    if (cli.hasRight('modify_all_articles') || result.author.toString() == cli.userinfo.userid.toString()) {
                         // Can delete the current article
 
                         hooks.fire('article_will_delete', id);
@@ -911,6 +912,13 @@ var Article = function() {
                     {name : "info", displayName : "Info"},
                     {name : "sponsorship", displayName : "Sponsorship"}
                 ]
+            })
+            .add('title-geolocation', 'title', {
+                displayname : "Geolocalisation"
+            })
+            .add('geolocation', 'map', {
+                notitle : true,
+                format : 'array'
             })
             .add('title-author', 'title', {
                 displayname : "Redaction"

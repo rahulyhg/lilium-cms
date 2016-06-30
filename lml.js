@@ -89,15 +89,31 @@ var LML = function () {
             sourceof = LMLSlang.pulloutVar(context, sourceof.substring(1));
         }
 
-        parseStringForRecursiveVarTags(context, code, function (code) {
-            context.newLine = '<lml:livevars data-varname="' + code +
-                '" data-template="' + templatename +
-                '" data-target="' + targetname +
-                '" data-sourceof="' + sourceof +
-                '" data-varparam="' + stringifyLiveParams(params) + '" ></lml:livevars>';
-
-            callback();
-        });
+        if ("=" === code[0]) {
+            code = code.substring(1);
+            parseStringForRecursiveVarTags(context, code, function(code) {
+                context.newLine = '<lml:tobject data-key="' + code +
+                    '" data-nodetype="' + (params.nodetype || "span") + 
+                    (params.nodetype === 'a' ? ('" data-href="' + params.href) : '') + 
+                    (params.filter ? ('" data-filter="' + params.filter) : '') + 
+                    (params.action ? ('" data-action="' + params.action) : '') +
+                    (params.actionparamkey ? ('" data-actionparamkey="' + params.actionparamkey) : '') +
+                    (params.bind ? ('" data-bind="' + params.bind) : '') +
+                    '"></lml:tobject>';
+        
+                callback();
+            });
+        } else {
+            parseStringForRecursiveVarTags(context, code, function (code) {
+                context.newLine = '<lml:livevars data-varname="' + code +
+                    '" data-template="' + templatename +
+                    '" data-target="' + targetname +
+                    '" data-sourceof="' + sourceof +
+                    '" data-varparam="' + stringifyLiveParams(params) + '" ></lml:livevars>';
+    
+                callback();
+            });
+        }
 
         return true;
     };
@@ -773,6 +789,8 @@ var LML = function () {
 
         if (typeof extra !== 'undefined') {
             context.extra = extra;
+            context.theme = extra.theme || context.theme;
+            context.config = extra.config || context.config;
         }
 
         delete content;

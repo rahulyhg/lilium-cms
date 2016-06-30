@@ -11,7 +11,6 @@ $}
 			<th>Campaign Name</th>
 			<th>Status</th>
 			<th>Action(s)</th>
-
 		</tr>
 	</thead>
 	<tbody id="campaignstbody">

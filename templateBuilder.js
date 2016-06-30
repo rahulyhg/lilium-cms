@@ -100,9 +100,9 @@ var templateBuilder = function () {
 
             return {
                 render: renderBlock,
-                settings: getSettings(config),
+                settings: context.theme.settings,
                 snip : rendersnip,
-                getQueueTags : function() {return getQueueTags(config);}
+                getQueueTags : function() {return getQueueTags(context.lib.config.default);}
             };
         });
 

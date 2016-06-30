@@ -361,6 +361,10 @@ select {
     display: block;
 }
 
+.lmlform-fieldwrapper-hidden {
+    display: none;
+}
+
 .lmlform-fieldwrapper label {
 	margin-right: 10px;
 }
@@ -949,6 +953,23 @@ header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
 }
 
 header.admin-bar .navbar-default .navbar-nav  .notifications {
+}
+
+/* Leaflet */
+.lml-leafletmap {
+    height: 380px;
+    display: block;
+}
+
+.field-map.lmlform-fieldwrapper-map,
+.field-map {
+    padding: 0px;
+}
+
+body .lml-leaflet-search-input,
+#post_create input[type="text"].lml-leaflet-search-input,
+input.lml-leaflet-search-input {
+    width: 100%;
 }
 
 /* Error Reports */

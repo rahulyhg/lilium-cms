@@ -28,6 +28,7 @@ var LiliumCMS = function() {
     var urlParams;
     this.pushtables = new Array();
     this.multiselects = new Array();
+    this.$url = new Array();
     var stacktables = new Array();
     var queryParams = new Object();
     var tags = new Array();
@@ -160,7 +161,6 @@ var LiliumCMS = function() {
                 } else {
                     $(this).removeClass('v_invalid');
                     $(this).addClass('v_valid');
-
                 }
 
             });
@@ -269,7 +269,7 @@ var LiliumCMS = function() {
         return pt;
     }
 
-    this.fillFormFromSource = function(src, data, index) {
+    this.fillFormFromSource = function(src, data, index, fCtx) {
         index = typeof index == 'undefined' ? 0 : index;
         var form = $('form[name="' + src + '"]:nth-of-type(' + index + 1 + ')');
 
@@ -321,11 +321,15 @@ var LiliumCMS = function() {
                 } else {
                     var field = form.find('*[name="' + kkString + '"]');
                     if (field.length > 0) {
-                        if (field.attr('type') == 'checkbox') {
+                        if (field.data("type") == "leaflet") {
+                            var locSplit = val.split('_');
+                            liliumcms.formParser.setLeafletLocation(kkString, undefined, locSplit[1], locSplit[0]);
+                        } else if (field.attr('type') == 'checkbox') {
                             field.get(0).checked = val === true;
                         } else {
                             field.val(val);
                         }
+
                     } else {
                         var selField = $('select[data-readkey="' + kkString + '"]');
                         if (selField.length > 0) {
@@ -334,7 +338,6 @@ var LiliumCMS = function() {
                     }
                 }
             }
-
         }
 
         if (form.length != 0) {
@@ -419,11 +422,77 @@ var LiliumCMS = function() {
             $("form").deserialize(that.livevars.livevars()[selector][0]);
         };
 
+        this.setLeafletLocation = function(llName, realName, lat, lng) {
+            if (realName) {
+                $('#leaflet-search-' + llName).val(realName);
+            }
+
+            var llmap = window["llmap" + llName];
+
+            llmap.setZoom(12);
+            llmap.panTo({lat:lat,lng:lng});
+            llmap.removeLayer(llmap.mm || "");
+            var mm = llmap.mm = L.marker({lat:lat,lng:lng});
+            mm.addTo(window["llmap" + llName]);
+
+            $('#' + llName + 'coords').val(lng + "_" + lat);
+        };
+
+        var handleLeafletSearchResponse = function(llName, resp) {
+            if (resp && resp.status === "OK") {
+                if (resp.results.length == 1) {
+                    var place = resp.results[0];
+                    var geo = place.geometry.location;
+
+                    liliumcms.formParser.setLeafletLocation(llName, place.formatted_address, geo.lat, geo.lng);
+                } else {
+                    console.log("TODO : Show choices");
+                }
+            }
+        };
+
+        var handleLeafletSearch = function(llName) {
+            var gKey = "AIzaSyBljaDhXP-YM10jxnWXvlQq9wZq1B6WVvE";
+            var rcn = Math.random().toString().substring(2) + Math.random().toString().substring(2);
+            var geocodeAddr = "https://maps.googleapis.com/maps/api/geocode/json?callback=llcb"+rcn+"&key="+gKey+"&address=";
+            var addr = $('#leaflet-search-' + llName).val();
+            
+            // Only used for JSONP
+            window["llcb" + rcn] = function(data) {};
+
+            if (addr && addr.trim() !== '') {
+                $.getJSON(geocodeAddr + addr, function(data) {
+                    handleLeafletSearchResponse(llName, data);
+                });
+            }
+        };
+
+        var bindFromClasses = function() {
+            $('.lml-field-nosubmit').bind('keydown', function(e) {
+                if (event.keyCode == 13) {
+                    event.cancelBubble = true;
+                    event.returnValue = false;
+
+                    return false;
+                }
+            });
+
+            $('.lml-leaflet-search-input').bind('keydown', function(e) {
+                if (event.keyCode == 13) {
+                    handleLeafletSearch($(this).data("leafletname"));
+
+                    event.cancelBubble = true;
+                    event.returnValue = false;
+                }
+            });
+        };
+
         this.init = function() {
             makeStackTables();
             makeTags();
             makeTables();
             makeSections();
+            bindFromClasses();
         };
     };
 
@@ -487,6 +556,16 @@ var LiliumCMS = function() {
         };
     }
 
+    this.parseURL = function() {
+        this.$url = new Array();
+        var urlarr = document.location.href.split('/');
+
+        this.$url.push(document.location.href);
+        for (var i = urlarr.length - 1; i >= 0; i--) if (urlarr[i] !== '') {
+            this.$url.push(urlarr[i]);
+        }
+    };
+
     var Hooks = function() {
 
     };
@@ -510,6 +589,8 @@ var LiliumCMS = function() {
             that.queryparams = new QueryParams();
             that.formvalidator = new FormValidator();
             that.formParser = new FormParser();
+            that.parseURL();        
+            L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
 
             if (typeof LiveVars !== 'undefined') {
                 that.livevars = new LiveVars();

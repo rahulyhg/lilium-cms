@@ -2,9 +2,8 @@ var mongoDocuments = {
 	names : [
 		"entities", "roles", "plugins", "themes", "config", "compiledfiles",
 		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache",
-		"lilium", "uploads", "cachedFiles", "campaigns", "campaignshistory", "products", "dfp",
-		"producttypes", "productpricebases", "changerequests", "campaignStatuses", "notifications",
-		"productstatus", "categories", "autosave"
+		"lilium", "uploads", "cachedFiles", "dfp",
+		"notifications", "categories", "autosave"
 	]
 };
 
@@ -30,15 +29,6 @@ var defaultCampaignStatuses = [
 	{name:"finished", displayName:"Finished"}
 ];
 
-var defaultProductStatuses = [
-    {name:"unpaid", displayName:"Unpaid"},
-    {name:"paid", displayName:"Paid"},
-    {name:"ongoing", displayName:"Ongoing"},
-    {name:"paused", displayName:"Paused"},
-    {name:"finished", displayName:"Finished"},
-    {name:"invalid", displayName:"Invalid"}
-]
-
 var adminEntity = {
 	id : 0,
 	username : "lilium",
@@ -56,51 +46,6 @@ var adminEntity = {
 		birthday : new Date()
 	}
 };
-
-var defaultProductTypes = [
-	{name:"display",displayName:"Display"},
-	{name:"email",displayName:"Email"},
-	{name:"sponsedit",displayName:"Sponsored Editorial"},
-	{name:"twitter",displayName:"Twitter"},
-	{name:"instagram",displayName:"Instagram"},
-	{name:"facebook",displayName:"Facebook"},
-	{name:"snapchat",displayName:"Snapchat"},
-	{name:"video",displayName:"Video"},
-	{name:"netdisc",displayName:"Network Discovery"},
-	{name:"other",displayName:"Other"}
-];
-
-var defaultPriceBases = [
-	{name:"unit",displayName:"Unit",divider:1},
-	{name:"cpm",displayName:"CPM",divider:1000},
-	{name:"cpc",displayName:"CPC",divider:1},
-	{name:"cpv",displayName:"CPV",divider:1}
-];
-
-var defaultProducts = [
-    { "name":"dp-bb", "displayName":"Display - Big box (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-bbm", "displayName":"Display - Big box mobile (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-bi", "displayName":"Display - Billboard (970x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-ct", "displayName":"Display - Companion Takeover", "productType":"display", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
-    { "name":"dp-ls", "displayName":"Display - Large Skyscraper (300x600)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-lb", "displayName":"Display - Leaderboard (728x90)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-sk", "displayName":"Display - Skin", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-ss", "displayName":"Display - Skyscraper (160x600)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"email", "displayName":"Email Discovery", "productType":"email", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
-    { "name":"fb", "displayName":"Facebook", "productType":"facebook", "priceBase":"cpm", "price":0.008, "active":true, "SKU":"-" },
-    { "name":"ig", "displayName":"Instagram", "productType":"instagram", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"igo", "displayName":"Organic Instagram", "productType":"instagram", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
-    { "name":"fbo", "displayName":"Organic Facebook", "productType":"facebook", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
-    { "name":"two", "displayName":"Organic Twitter", "productType":"twitter", "priceBase":"unit", "price":200, "active":true, "SKU":"-" },
-    { "name":"snapstory", "displayName":"Snapchat Story", "productType":"snapchat", "priceBase":"unit", "price":1000, "active":true, "SKU":"-" },
-    { "name":"sponsedbas", "displayName":"Sponsored editorial - BASIC", "productType":"sponsedit", "priceBase":"unit", "price":750, "active":true, "SKU":"-" },
-    { "name":"sponsedstand", "displayName":"Sponsored editorial - STANDARD", "productType":"sponsedit", "priceBase":"unit", "price":1500, "active":true, "SKU":"-" },
-    { "name":"sponsedrev", "displayName":"Sponsored editorial revision", "productType":"other", "priceBase":"unit", "price":120, "active":true, "SKU":"-" },
-    { "name":"sponsvid", "displayName":"Sponsored video", "productType":"video", "priceBase":"unit", "price":4000, "active":true, "SKU":"-" },
-    { "name":"tw", "displayName":"Twitter", "productType":"twitter", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-vad", "displayName":"Display - Video In-Content Ad", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
-    { "name":"dp-nad", "displayName":"Display - Native ad", "productType":"netdisc", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" }
-];
 
 var defaultTheme = {
 	id : 0,
@@ -137,7 +82,7 @@ var log = require('../log.js');
 
 var initMongo = function(conf, db, cb) {
 	log('Database', 'Init script was executed');
-	var totalTasks = 9;
+	var totalTasks = 5;
 	var completedTasks = 0;
 
 	// Boot Script
@@ -195,14 +140,6 @@ var initMongo = function(conf, db, cb) {
 			}
 		});
 
-        log('Database', 'inserting default product statuses');
-        db.collection('productstatus', {strict:true}, function(err, col) {
-            col.insertMany(defaultProductStatuses, function(err, r) {
-				completedTasks++;
-				checkForCompletion();
-            });
-        });
-
 		log('Database', 'Creating admin and root access');
 		db.collection('entities', {strict:true}, function(err, col) {
 			if (!err) {
@@ -236,42 +173,6 @@ var initMongo = function(conf, db, cb) {
 				});
 			} else {
 				throw "[DatabaseInit - plugins collection does not exist]";
-			}
-		});
-
-		log('Database', 'Creating default product price bases entries');
-		db.collection('productpricebases', {strict:true}, function(err, col) {
-			if (!err) {
-				col.insertMany(defaultPriceBases, function(err, r) {
-					completedTasks++;
-					checkForCompletion();
-				});
-			} else {
-				throw "[DatabaseInit - plugins collection does not exist]";
-			}
-		});
-
-		log('Database', 'Creating default products entries');
-		db.collection('products', {strict:true}, function(err, col) {
-			if (!err) {
-				col.insertMany(defaultProducts, function(err, r) {
-					completedTasks++;
-					checkForCompletion();
-				});
-			} else {
-				throw "[DatabaseInit - plugins collection does not exist]";
-			}
-		});
-
-		log('Database', 'Creating default Campaigns Statuses');
-		db.collection('campaignStatuses', {strict:true}, function(err, col) {
-			if (!err) {
-				col.insertMany(defaultCampaignStatuses, function(err, r) {
-					completedTasks++;
-					checkForCompletion();
-				});
-			} else {
-				throw "[DatabaseInit - campaignStatuses collection does not exist]";
 			}
 		});
 

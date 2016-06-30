@@ -5,9 +5,27 @@ var Lys = function() {
     
 };
 
+Lys.prototype.registerDefaultLys = function() {
+
+};
+
+Lys.prototype.registerLys = function(index, presentationName, icon, ftc) {
+    cachedLys[index] = {
+        index : index,
+        title : presentationName,
+        icon : icon, 
+        ftc : ftc
+    }
+};
+
 Lys.prototype.registerLiveVar = function() {
     require('./livevars.js').registerLiveVariable('lys', function(cli, levels, params, cb) {
-        cb(new Array());
+        var arr = [];
+        for (var k in cachedLys) {
+            arr.push(cachedLys[k]);
+        }
+
+        cb(arr);
     });
 };
 
