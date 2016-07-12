@@ -136,6 +136,8 @@ var Precomp = function () {
                 return;
             }
 
+            var siteTheme = require('./themes.js').getEnabledTheme(conf);
+
             db.findToArray(conf, 'compiledfiles', {filename : lmlfile}, function(err, arr) {
                 if (arr.length == 0 || arr[0].sum !== sum) {
                     db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, theme : false}, function() {
@@ -143,7 +145,7 @@ var Precomp = function () {
                             lmlfile,
                             writepath,
                             callback,
-                            {config : conf, minify : false}
+                            {config : conf, minify : false, theme : siteTheme}
                         );
                     });
                 } else {

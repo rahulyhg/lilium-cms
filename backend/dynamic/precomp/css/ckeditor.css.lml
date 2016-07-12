@@ -14,7 +14,7 @@
 
 div#picture-list img {
     margin : 2px;
-    float: none;
+    float: left;
     display: inline-block;
     white-space: normal;
 }

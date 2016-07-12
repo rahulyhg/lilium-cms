@@ -70,7 +70,7 @@ var basicRoles = [
     {name : "editor", displayname : "Editor", power : 4500, pluginID : false, rights : [
         "dash", "publish", "preferences", "upload", "list-uploads", 
         "list-all-articles", "list-entities", "create-entities", "edit-all-articles",
-        "destroy-articles"
+        "destroy-articles", "user_management"
     ]}
 ];
 

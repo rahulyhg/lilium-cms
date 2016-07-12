@@ -928,7 +928,7 @@ var Article = function() {
             })
             .add('author', 'livevar', {
                 displayname : "Author",
-                endpoint : "entities",
+                endpoint : "entities.simple",
                 tag : "select",
                 template: "option",
                 title : "author",
@@ -1011,6 +1011,11 @@ var Article = function() {
                 key: 'status',
                 displayname: 'Status',
                 template: 'table-article-status',
+                sortable: true
+            }, {
+                key: 'date',
+                displayname: 'Publish date',
+                template: 'table-article-date',
                 sortable: true
             }, {
                 key: 'author',

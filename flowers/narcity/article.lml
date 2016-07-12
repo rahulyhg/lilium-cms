@@ -7,9 +7,11 @@ $}
 <article>
     {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper">
+        {$ if (?extra.article.featuredimageartist != ""); $}
         <div class="featured-image-credit">
             <a href="{=extra.article.featuredimagelink}">@{=extra.article.featuredimageartist}</a>
         </div>
+        {$ endif; $}
 
         <img src="{=featimg}" />
     </div>

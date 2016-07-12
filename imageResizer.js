@@ -1,4 +1,4 @@
-var lwip = require('lwip');
+// var lwip = require('lwip');
 var fs = require('fs');
 var log = require('./log.js');
 var sizes = require('./imageSize.js');
@@ -18,19 +18,19 @@ var ImageResizer = function () {
         currentFilename = path;
         log("ImageResizer", "Resizing image " + filename + " ["+mime+"]");
         extension = mime;
-        fs.readFile(path, function (err, buffer) {
-            //For all sizes;
-            execute(buffer, mime, sizeKeys.length - 1, cli, function () {
-                return cb(images);
-            });
+        execute(path, mime, sizeKeys.length - 1, cli, function () {
+            return cb(images);
         });
     };
 
-    var execute = function (buffer, mime, i, cli, cb) {
+    var execute = function (path, mime, i, cli, cb) {
         if (i >= 0) {
-            lwip.open(buffer, mime, function (err, image) {
+            lwip.open(path, mime, function (err, image) {
 
-                if (image === null) console.log(err);
+                if (image === null) {
+                    log('ImageResizer', 'Error : ' + err);
+                    return execute(path, mime, i - 1, cli, cb); 
+                }
 
                 var baseHeight = image.height();
                 var baseWidth = image.width();
@@ -71,7 +71,7 @@ var ImageResizer = function () {
                             images[sizeKeys[i]] = {};
                             images[sizeKeys[i]].path = resizedFilename;
                             images[sizeKeys[i]].url = cli._c.server.url + '/uploads/' + fileName + resizedEndName;
-                            execute(buffer, mime, i - 1, cli, cb);
+                            execute(path, mime, i - 1, cli, cb);
                         }
                     );
 

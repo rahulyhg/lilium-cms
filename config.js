@@ -31,7 +31,16 @@ Config.prototype.getSimpleSites = function () {
 };
 
 Config.prototype.fetchConfig = function (site) {
-    return _configs[site];
+    var s = _configs[site];
+    if (!s) {
+        for (cc in _configs) {
+            if (_configs[cc].uid == site) {
+                s = _configs[cc];
+                break;
+            }
+        }
+    }
+    return s;
 }
 
 Config.prototype.fetchConfigFromCli = function (cli) {

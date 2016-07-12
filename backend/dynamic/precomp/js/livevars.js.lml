@@ -328,13 +328,13 @@ var LiveVars = function() {
         }
     };
 
-    var generateFillingFromObject = function(filler, fillingData, data) {
+    var generateFillingFromObject = function(filler, fillingData, data, dataStr) {
         var props = typeof fillingData.varparam == "object" ? fillingData.varparam : JSON.parse(fillingData.varparam.replace(/&lmlquote;/g, '"'));
         var filling = $(document.createElement(fillingData.filling));
 
         for (var key in props) {
             if (key === 'html') {
-                filling.html(data[props[key]]);
+                filling.html(dataStr ? data : pullOutVarFromString(data, props[key]));
             } else {
                 filling.attr(key, data[props[key]]);
             }
@@ -418,11 +418,21 @@ var LiveVars = function() {
                         filler[0].dataset.multiselectindex = liliumcms.multiselects.length - 1;
                     }
                     if (typeof varValue.length !== 'undefined' && varValue.forEach) {
+                        var d = lmlTag.data();
+                        if (attributes && attributes.header) {
+                            generateFillingFromObject(filler, d, attributes.header, true);
+                        }
+
                         varValue.forEach(function(val, index) {
-                            generateFillingFromObject(filler, lmlTag.data(), val);
+                            generateFillingFromObject(filler, d, val);
                         });
                     } else {
-                        generateFillingFromObject(filler, lmlTag.data(), varValue);
+                        var d = lmlTag.data();
+                        if (attributes && attributes.header) {
+                            generateFillingFromObject(filler, d, attributes.header, true);
+                        }
+
+                        generateFillingFromObject(filler, d, varValue);
                     }
 
                     if (readkey && readkey != name) {

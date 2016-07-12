@@ -781,6 +781,7 @@ var LML = function () {
             context = new LMLContext();
             context.rootDir = fileserver.dirname(rootpath);
             context.config = extra.config;
+            context.theme = 
 
             delete extra.config;
         } else if (!context.isParent) {

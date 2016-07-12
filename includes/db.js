@@ -170,7 +170,7 @@ var DB = function() {
 		}
 	};
 
-	this.findToArray = function(conf, coln, conds, cb) {
+	this.findToArray = function(conf, coln, conds, cb, projection) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -178,7 +178,13 @@ var DB = function() {
 				cb("[Database - Invalid document]");
 			} else {
 				conds = typeof conds === 'undefined' ? {} : conds;
-				col.find(conds).toArray(function(err, arr) {
+				var stk = col.find(conds);
+
+                if (projection) {
+                    stk = stk.project(projection);
+                }
+
+                stk.toArray(function(err, arr) {
 					cb(err, arr);
 				});
 			}

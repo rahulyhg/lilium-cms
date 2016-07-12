@@ -82,7 +82,7 @@ var CKEditor = function() {
                                 pictures.forEach(function(picture, index) {
                                     picture_id_url[picture._id] = picture.url;
 
-                                    $('#picture-list').append('<img id="' + picture._id + '" src="' + picture.sizes.thumbnail.url + '">');
+                                    $('#picture-list').prepend('<img id="' + picture._id + '" src="' + picture.sizes.thumbnail.url + '">');
                                 });
                             }
 
@@ -233,7 +233,7 @@ var CKEditor = function() {
 					liliumcms.notify({message: 'Upload Success', type: 'success', title: 'Media'});
 					// Insert uploaded picture
 					picture_id_url[res.picture._id] = res.picture.url;
-					$('#picture-list').append('<img id="' + res.picture._id + '" src="' + res.picture.sizes.thumbnail.url + '">');
+					$('#picture-list').prepend('<img id="' + res.picture._id + '" src="' + res.picture.sizes.thumbnail.url + '">');
         
                     insertImageInEditor(
                         '{=config.default.server.url}/uploads/' + res.picture.url, 
