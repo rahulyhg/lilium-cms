@@ -403,6 +403,8 @@ var Sites = function () {
     this.loadSites = function (cb) {
         var that = this;
         fileserver.listDirContent(__dirname + "/sites/", function (files) {
+            files.unshift(files.splice(files.indexOf('default.json'), 1)[0]);
+
             var fileIndex = 0;
             var nextFile = function () {
                 if (fileIndex == files.length) {
