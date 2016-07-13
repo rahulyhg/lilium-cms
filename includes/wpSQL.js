@@ -191,23 +191,13 @@ var ftUploads = function(siteid, mysqldb, done) {
 
                 request.get(upload.guid, function(error, response, body) {
                     var filename = upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
-                    var ext = upload.guid.substring(upload.guid.lastIndexOf('.') + 1);
                     var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
                     if (response && response.statusCode === 200) {
                         fs.writeFile(saveTo, body, function() {
-                            imageResizer.resize(saveTo, filename, ext, {_c : cconf}, function(images) {
-                                db.insert(siteid, 'uploads', {
-                                    path: saveTo,
-                                    url: filename,
-                                    name: "Full Size",
-                                    size: imageSize(saveTo),
-                                    type: 'image',
-                                    sizes: images
-                                }, function (err, result) {
-                                    uploadIndex++;
-                                    nextUpload();
-                                });
+                            require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
+                                uploadIndex++;
+                                nextUpload();
                             });
                         });
                     } else {
@@ -270,14 +260,23 @@ var WordpressSQLToLiliumMongo = function() {
             log('WP', 'Database connection was established and stabilized');
             log('WP', 'Background work starting now');
             setTimeout(function() {
-                runTasks(siteid, mdb);
+                runTasks(siteid, mdb, function() {
+                    var Configs = require('../config.js');
+                    var siteConf = Configs.fetchConfig(siteid);
+                    siteConf.wptransferring = false;
+                    siteConf.wptransfer = true;        
+
+                    Configs.saveConfigs(siteConf, function() {
+                        log('Sites', 'Site configuration was saved');
+                    });
+                });
             }, 1);
 
             callback();
         });
     };
 
-    var runTasks = function(siteid, mdb) {
+    var runTasks = function(siteid, mdb, cb) {
         var numOfTasks = transTasks.length;
         
         var next = function(i) {
@@ -288,6 +287,7 @@ var WordpressSQLToLiliumMongo = function() {
             } else {
                 mdb.end(function(err) { 
                     log('WP', 'Done transferring Wordpress data to website with site id ' + siteid);
+                    cb();
                 });
             }
         };

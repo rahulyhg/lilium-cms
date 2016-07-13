@@ -116,6 +116,34 @@ var Media = function () {
         }
     };
 
+    this.handleUploadedFile = function(_c, filename, cb) {
+        var extensions = filename.split('.');
+        var mime = extensions[extensions.length - 1];
+        var saveTo = _c.server.base + "backend/static/uploads/" + filename;
+
+        if (_c.supported_pictures.indexOf('.' + mime) != -1) {
+            imageResizer.resize(saveTo, filename, mime, _c, function (images) {
+                // Save it in database
+                try {
+                    db.insert(_c, 'uploads', {
+                        path: saveTo,
+                        url: filename,
+                        name: "Full Size",
+                        size: imageSize(saveTo),
+                        type: 'image',
+                        sizes: images
+                    }, function (err, result) {
+                        cb(undefined, result)
+                    });
+                } catch (ex) {
+                    cb(ex);
+                }
+            });
+        } else {
+            cb(true);
+        }
+    };
+
     this.upload = function (cli) {
         cli.touch('media.new');
 
@@ -124,50 +152,28 @@ var Media = function () {
             var response = formBuilder.validate(form, true);
 
             if (response.success) {
-                var image = formBuilder.serializeForm(form);
-                var extensions = image.File.split('.');
-                var mime = extensions[extensions.length - 1];
-                var saveTo = cli._c.server.base + "backend/static/uploads/" + image.File;
-
-                if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
-                    imageResizer.resize(saveTo, image.File, mime, cli, function (images) {
-
-                        // Save it in database
-                        db.insert(cli._c, 'uploads', {
-                            path: saveTo,
-                            url: image.File,
-                            name: "Full Size",
-                            size: imageSize(saveTo),
-                            type: 'image',
-                            sizes: images
-                        }, function (err, result) {
-                            cli.sendJSON({
-                                redirect: '',
-                                success: true,
-                                picture: result.ops[0]
-                            });
-
+                var imagefile = formBuilder.serializeForm(form).File;
+                this.handleUploadedFile(cli._c, imagefile, function(err, result) {
+                    if (err) {
+                        cli.sendJSON({
+                            form: response
                         });
-
-                    });
-                } else {
-                    cli.sendJSON({
-                        form: response
-                    });
-                }
-                // var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
-                // Create post
-
+                    } else {
+                        cli.sendJSON({
+                            redirect: '',
+                            success: true,
+                            picture: result.ops[0]
+                        });
+                    }
+                });
             } else {
                 cli.sendJSON({
                     msg: 'Invalid file type'
                 });
             }
-
         } else {
             filelogic.serveAdminLML(cli);
         }
-
     };
 
     this.delete = function (cli) {
