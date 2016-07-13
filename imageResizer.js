@@ -1,7 +1,9 @@
-var lwip = require('lwip');
 var fs = require('fs');
 var log = require('./log.js');
 var sizes = require('./imageSize.js');
+
+var fs = require('fs')
+  , gm = require('gm').subClass({imageMagick: true});
 
 var ImageResizer = function () {
     var extension;
@@ -19,67 +21,48 @@ var ImageResizer = function () {
         log("ImageResizer", "Resizing image " + filename + " ["+mime+"]");
         extension = mime;
         fs.readFile(path, function (err, buffer) {
-            //For all sizes;
-            execute(buffer, mime, sizeKeys.length - 1, cli, function () {
-                return cb(images);
-            });
+            // executeGm(buffer, cli, function(){
+            //     return cb(images);
+            // })
+            execute(buffer, sizeKeys.length - 1, cli, function(){
+                return cb(images)
+            })
         });
     };
 
-    var execute = function (buffer, mime, i, cli, cb) {
+    var execute = function (buffer, i, cli, cb){
         if (i >= 0) {
-            lwip.open(buffer, mime, function (err, image) {
+                if (buffer === null) console.log(err)
 
-                if (image === null) console.log(err);
+                var key = sizeKeys[i]
+                var width = imageSizes[key][0];
+                var height = imageSizes[key][1];
 
-                var baseHeight = image.height();
-                var baseWidth = image.width();
-                var width;
-                var height;
-                var ratio = 1;
-
-                if (imageSizes[sizeKeys[i]][0] == '*') {
-
-                    height = [sizeKeys[i]][1];
-                    ratio = baseHeight / height;
-                    width = baseWidth / ratio;
-
-                } else if (imageSizes[sizeKeys[i]][1] == '*') {
-
-                    width = imageSizes[sizeKeys[i]][0];
-                    ratio = baseWidth / width;
-                    height = baseHeight / ratio;
-
-                } else {
-                    width = imageSizes[sizeKeys[i]][0];
-                    height = imageSizes[sizeKeys[i]][1];
-                }
-                width = Math.floor(width);
-                height = Math.floor(height);
+                //Give a number to the * dimentions, aspect ratio is taken care of in the gm resize crop function after
+                if (imageSizes[key][0] == "*") {
+                    width = imageSizes[key][1] 
+                } else if (imageSizes[key][1] == "*") {
+                    height = imageSizes[key][0]
+                } 
 
                 var resizedEndName = "_" + width + "x" + height + "." + extension
                 var resizedFilename = currentFilename + resizedEndName;
 
-                // Resize file
-                image.batch()
-                    .cover(width, height)
-                    .crop(width, height)
-                    .writeFile(
-                        resizedFilename,
-                        extension, {},
-                        function (err) {
-                            images[sizeKeys[i]] = {};
-                            images[sizeKeys[i]].path = resizedFilename;
-                            images[sizeKeys[i]].url = cli._c.server.url + '/uploads/' + fileName + resizedEndName;
-                            execute(buffer, mime, i - 1, cli, cb);
-                        }
-                    );
+                gm(buffer, currentFilename)
+                .resize(width, height, "^")
+                .gravity('Center')
+                .crop(width, height,"!")
+                .write(resizedFilename, function (err) {
+                  if (!err) console.log(key + ' image upload success');
+                    images[key] = {};
+                    images[key].path = resizedFilename;
+                    images[key].url = cli._c.server.url + '/uploads/' + fileName + resizedEndName;
 
-            });
-        } else {
-            return cb(images);
-        }
-
+                  execute(buffer, i - 1, cli, cb)
+                });
+            } else {
+            return cb(images)
+        };
     };
 };
 
