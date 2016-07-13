@@ -10,10 +10,10 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 
 ### Required dependencies
 #### *cairo*
-**MAC:** `brew install pkg-config cairo libpng jpeg giflib`
+**MAC:** `brew install pkg-config cairo libpng jpeg giflib imagemagick`
 
 **UBUNTU:**
-`sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev`
+`sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick`
 
 #### *Arty Signature font*
 [Download link](http://www.1001fonts.com/arty-signature-font.html)
