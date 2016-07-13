@@ -38,7 +38,10 @@ var _c = require('./config.js').default(),
 
         this.start = function () {
             log('Inbound', 'Ready to receive requests');
+
+            hooks.fire("server_will_start", {server : server});
             server.listen(_c.server.port, handleConn);
+            hooks.fire("server_did_start",  {server : server});
             // secureServer.listen(8000, handleConn);
         };
 
