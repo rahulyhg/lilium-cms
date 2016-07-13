@@ -1,7 +1,6 @@
 var fs = require('fs');
 var log = require('./log.js');
 var sizes = require('./imageSize.js');
-
 var fs = require('fs')
   , gm = require('gm').subClass({imageMagick: true});
 
@@ -21,9 +20,6 @@ var ImageResizer = function () {
         log("ImageResizer", "Resizing image " + filename + " ["+mime+"]");
         extension = mime;
         fs.readFile(path, function (err, buffer) {
-            // executeGm(buffer, cli, function(){
-            //     return cb(images);
-            // })
             execute(buffer, sizeKeys.length - 1, cli, function(){
                 return cb(images)
             })
@@ -32,11 +28,12 @@ var ImageResizer = function () {
 
     var execute = function (buffer, i, cli, cb){
         if (i >= 0) {
-                if (buffer === null) console.log(err)
-
+            if (buffer === null) console.log(err)
                 var key = sizeKeys[i]
                 var width = imageSizes[key][0];
                 var height = imageSizes[key][1];
+                var resizedEndName = "_" + width + "x" + height + "." + extension
+                var resizedFilename = currentFilename + resizedEndName;
 
                 //Give a number to the * dimentions, aspect ratio is taken care of in the gm resize crop function after
                 if (imageSizes[key][0] == "*") {
@@ -44,9 +41,6 @@ var ImageResizer = function () {
                 } else if (imageSizes[key][1] == "*") {
                     height = imageSizes[key][0]
                 } 
-
-                var resizedEndName = "_" + width + "x" + height + "." + extension
-                var resizedFilename = currentFilename + resizedEndName;
 
                 gm(buffer, currentFilename)
                 .resize(width, height, "^")

@@ -233,8 +233,13 @@ var Core = function () {
         });  
 
         api.registerApiEndpoint('categories', 'GET', function (cli) {
-        cli.touch('admin.GET.categories');
-        api.categoriesHandleGET(cli);
+            cli.touch('admin.GET.categories');
+            api.categoriesHandleGET(cli);
+        });  
+
+        api.registerApiEndpoint('search', 'GET', function (cli) {
+            cli.touch('admin.GET.search');
+            api.searchArticles(cli);
         });  
 
         hooks.fire('endpoints');
