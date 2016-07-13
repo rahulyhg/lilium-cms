@@ -30,6 +30,7 @@ var Router = function () {
         cli.routeinfo.params = pObj.query;
         cli.routeinfo.admin = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.admin;
         cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.login;
+        cli.routeinfo.api = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === "api";
         cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.livevars;
         cli.routeinfo.root = pObj.pathname == "/";
 

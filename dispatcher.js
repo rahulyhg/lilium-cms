@@ -4,6 +4,7 @@ var Endpoints = require('./endpoints.js');
 var LiveVars = require('./livevars.js');
 var log = require('./log.js');
 var entities = require('./entities.js');
+var api = require('./api.js');
 
 var Dispatcher = function () {
     this.dispatch = function (cli) {
@@ -21,6 +22,8 @@ var Dispatcher = function () {
             }
         } else if (cli.routeinfo.login) {
             Admin.serveLogin(cli);
+        } else if (cli.routeinfo.api) {
+            api.serveApi(cli);
         } else if (cli.routeinfo.livevars) {
             LiveVars.handleRequest(cli);
         } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
