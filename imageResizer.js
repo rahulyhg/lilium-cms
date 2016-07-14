@@ -12,7 +12,7 @@ var ImageResizer = function () {
     var currentFilename;
     var fileName;
 
-    this.resize = function (path, filename, mime, cli, cb) {
+    this.resize = function (path, filename, mime, _c, cb) {
         fileName = filename;
         sizeKeys = Object.keys(sizes.getSizes());
         imageSizes = sizes.getSizes();
@@ -20,13 +20,13 @@ var ImageResizer = function () {
         log("ImageResizer", "Resizing image " + filename + " ["+mime+"]");
         extension = mime;
         fs.readFile(path, function (err, buffer) {
-            execute(buffer, sizeKeys.length - 1, cli, function(){
+            execute(buffer, sizeKeys.length - 1, _c, function(){
                 return cb(images)
             })
         });
     };
 
-    var execute = function (buffer, i, cli, cb){
+    var execute = function (buffer, i, _c, cb){
         if (i >= 0) {
             if (buffer === null) console.log(err)
                 var key = sizeKeys[i]
@@ -50,9 +50,9 @@ var ImageResizer = function () {
                   if (!err) console.log(key + ' image upload success');
                     images[key] = {};
                     images[key].path = resizedFilename;
-                    images[key].url = cli._c.server.url + '/uploads/' + fileName + resizedEndName;
+                    images[key].url = _c.server.url + '/uploads/' + fileName + resizedEndName;
 
-                  execute(buffer, i - 1, cli, cb)
+                  execute(buffer, i - 1, _c, cb)
                 });
             } else {
             return cb(images)

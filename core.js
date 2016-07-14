@@ -276,6 +276,8 @@ var Core = function () {
         imageSize.add("medium", 300, '*');
         imageSize.add("thumbnailarchive", 400, 400);
         imageSize.add("featured", 970, 400);
+
+        hooks.fire('image_sized_loaded');
     };
 
     var loadAdminMenus = function () {
@@ -403,6 +405,8 @@ var Core = function () {
 
             var fireEvent = function () {
                 log('Plugins', 'Loaded plugins');
+                hooks.fire('plugins_loaded');
+        
                 return cb();
             };
 
@@ -635,7 +639,11 @@ var Core = function () {
 
     var precompile = function (done) {
         log('Core', 'Staring precompilation');
-        sites.loopPrecomp(done);
+        hooks.fire("will_precompile");
+        sites.loopPrecomp(function() {
+            hooks.fire("did_precompile");
+            done();
+        });
     };
 
     var redirectIfInit = function (resp, cb) {
