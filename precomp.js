@@ -136,15 +136,21 @@ var Precomp = function () {
                 return;
             }
 
+            var siteTheme = require('./themes.js').getEnabledTheme(conf);
+
             db.findToArray(conf, 'compiledfiles', {filename : lmlfile}, function(err, arr) {
+                log('Precomp', "Registered sum for " + lmlfile + " is " + (arr[0] ? arr[0].sum : "unknown") + " compared to actual " + sum);
                 if (arr.length == 0 || arr[0].sum !== sum) {
-                    db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, theme : false}, function() {
-                        LML.executeToFile(
-                            lmlfile,
-                            writepath,
-                            callback,
-                            {config : conf, minify : false}
-                        );
+                    log('Precomp', 'Inserting sum ' + sum + ' for file ' + lmlfile + ' of website ' + conf.id)
+                    db.remove(conf, 'compiledfiles', {filename : lmlfile}, function() {
+                        db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, style : false}, function(err, r) {
+                            LML.executeToFile(
+                                lmlfile,
+                                writepath,
+                                callback,
+                                {config : conf, minify : false, theme : siteTheme}
+                            );
+                        });
                     });
                 } else {
                     callback(false);
@@ -168,11 +174,14 @@ var Precomp = function () {
                 var mustRewrite = false;
                 fileIndex++;
 
-                if (curFile.indexOf('.lml') !== -1) {
+                if (curFile.indexOf('.lml') !== -1 && curFile.indexOf('.swp') === -1) {
                     checksum.file(isTheme ? curFile : absReadPath + curFile, function (err, sum) {
                         var rPath = isTheme ? curFile : absReadPath + curFile;
                         var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
-                        var wPath = isTheme ? absWritePath + curFile.slice(curFile.lastIndexOf('/') + 1, curFile.length).slice(0, -4) : absWritePath + curFile.slice(0, -4);
+                        var wPath = isTheme ? 
+                            absWritePath + curFile.slice(curFile.lastIndexOf('/') + 1, curFile.length).slice(0, -4) : 
+                            absWritePath + curFile.slice(0, -4);
+
                         fileserver.fileExists(wPath, function (exists) {
                             if (exists && histoObj[curFile] == sum) {
                                 db.insert(conf, 'compiledfiles', {

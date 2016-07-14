@@ -216,7 +216,7 @@ var Production = function () {
 
             return callback();
         } catch (e) {
-            console.log(e);
+            console.log(e.stack);
         }
 
     };

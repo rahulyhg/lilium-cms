@@ -35,7 +35,7 @@
 			</lml:tobject>
 			<lml:tobject data-filter="isTransferring">
 				<span class="siteDefaultTag">transferring</span>
-                <i class="fa fa-cog" aria-hidden="true"></i>
+                <i class="fa fa-cog fa-spin" aria-hidden="true"></i>
 			</lml:tobject>
 		</lml:tobject>
 		<lml:tobject data-nodetype="td">
@@ -43,8 +43,12 @@
 				<lml:tobject data-nodetype="span" data-key="server.url" >
 			</lml:tobject>
 		</lml:tobject>
-		<lml:tobject data-nodetype="td"></lml:tobject>
-		<lml:tobject data-nodetype="td"></lml:tobject>
+		<lml:tobject data-nodetype="td">
+
+        </lml:tobject>
+		<lml:tobject data-nodetype="td">
+
+        </lml:tobject>
 	</lml:tobject>
 </lml:template>
 

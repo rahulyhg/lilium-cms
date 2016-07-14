@@ -435,10 +435,18 @@ var Campaigns = function () {
         return {
             "projectid": postdata.projectid,
             "campname": postdata.campname,
-            "campstatus": postdata.campstatus,
+            "campstatus": postdata.campstatus || "new",
             "clientid": postdata.clientid,
             "products": products,
+            "createdby" : cli.session.data.userid,
             "impression": postdata.impression || 0
+        };
+    };
+
+    var cliToDatabaseCampaignSet = function(cli, old) {
+        var mSet = new Object();
+        mSet.$set = {
+            
         };
     };
 
@@ -492,6 +500,7 @@ var Campaigns = function () {
         }
     };
 
+    // Form Creation
     this.registerCreationForm = function () {
         formbuilder.createForm('campaign_create', {
                 fieldWrapper: {
@@ -538,14 +547,10 @@ var Campaigns = function () {
             })
             .add('projectid', 'text', {
                 displayname: "Project ID",
-                editonce: true
+                editonce : true
             })
             .add('campname', 'text', {
                 displayname: "Campaign name"
-            })
-            .add('campstatus', 'select', {
-                displayname: "Status",
-                datasource: registeredStatuses
             })
             .add('producttitle', 'title', {
                 displayname : "Products"
@@ -559,9 +564,6 @@ var Campaigns = function () {
                 displayname: "Products",
                 template: "tmpl_productrow",
                 datascheme: {
-                    hiddenFields : [
-                        "impressions"
-                    ],
                     key: {
                         displayName: "Product",
                         keyName: "displayName",
@@ -588,11 +590,6 @@ var Campaigns = function () {
                         keyName: "price",
                         prepend: "$"
 					}, {
-                        fieldName: "enddate",
-                        dataType: "date",
-                        displayName: "End Date",
-                        keyName: "enddate"
-					}, {
                         fieldName: "targetimp",
                         dataType: "number",
                         displayName: "Trgt. Impr.",
@@ -607,66 +604,12 @@ var Campaigns = function () {
                             keyName: "displayName",
                             keyValue: "name"
                         }
-					}, {
-                        fieldName: "productapilink",
-                        dataType: "template",
-                        templateid: "productapilink"
-					}, {
-                        fieldName: "status",
-                        displayName : "Status",
-                        keyName : "status",
-                        dataType: "readonly",
-                        initValue : "new",
-                        datasource : {
-                            datasource: "products.status.all",
-                            keyName : "displayName",
-                            keyValue: "name"
-                        }
                     }],
-                    columnTemplates: {
-                        "productapilink": {
-                            fields: [{
-                                fieldName: "articlename",
-                                displayName: "Article",
-                                keyName: "articlename",
-                                displayCase: ["sponsedit", "netdisc"],
-                                autocomplete: {
-                                    datasource: "sponsoredcontent",
-                                    keyValue: "name",
-                                    keyName: "title",
-                                    cantAdd: true
-                                }
-							}, {
-                                fieldName: "dfpprojid",
-                                displayName: "DPF Project ID",
-                                keyName: "dfpprodid",
-                                displayCase: ["display"],
-                                autocomplete: {
-                                    datasource: "dfpcache.all.simple",
-                                    keyValue: "id",
-                                    keyName: "name",
-                                    cantAdd: false
-                                }
-							}, {
-                                fieldName: "fbcampid",
-                                dataType: "text",
-                                displayName: "Facebook camp. ID",
-                                keyName: "fbcampid",
-                                displayCase: ["facebook"]
-							}, {
-                                fieldName: "apilink",
-                                dataType: "text",
-                                displayName: "More details",
-                                keyName: "details",
-                                displayCase: ["*"]
-							}],
-                            dependsOn: "productType"
-                        }
-                    },
                     footer: {
                         title: "Total",
                         sumIndexes: [1]
-                    }
+                    },
+                    hiddenFields : []
                 }
             })
             .add('save', 'submit', {

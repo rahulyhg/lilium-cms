@@ -87,6 +87,7 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
+        Frontend.registerJSFile(base + "backend/static/leaflet/leaflet.js", 410, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
@@ -109,6 +110,7 @@ var SiteInitializer = function (conf) {
 
         Frontend.registerCSSFile(base + "bower_components/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/login.css", 2200, 'admin', conf.id);
@@ -245,40 +247,81 @@ var Sites = function () {
         var dat = cli.postdata.data;
         var that = this;
 
+        var existingSite = dat.originalsite;
+
         log('Sites', 'Initiating Wordpress website transfer');
-        log('Sites', 'Creation of Lilium website');
-        db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function (success, err) {
-            if (success) {
-                db.testConnectionFromParams(
-                    dat.wpsitedataurl, 
-                    dat.wpsitedataport, 
-                    dat.wpsitedatauser, 
-                    dat.wpsitedatapwd, 
-                    dat.wpsitedataname, 
-                function (success, err) {
-                    if (success) {
-                        dat.wptransfer = true;
+        if (existingSite && existingSite != "") {
+            log('Sites', 'Transferring Wordpress data to site with uid ' + existingSite);
+            var Configs = require('./config.js');
+            var siteConf = Configs.fetchConfig(existingSite);
+            siteConf.wptransferring = true;
+
+            require('./includes/wpSQL.js').transfer(siteConf.id, dat, function(err) {
+                log('Sites', 'Transfer in process');
+                if (err) {
+                    log('Sites', 'Error while transferring site with uid ' + existingSite + ' : ' + err);
+                    cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+                } else {
+                    log('Sites', 'No error detected so far for Wordpress transfer to site with uid ' + existingSite);
+
+                    Configs.saveConfigs(siteConf, function() {
+                        log('Sites', 'Redirecting client to sites list');
+                        cli.redirect(cli._c.server.url + "/admin/sites/", false);
+                    });
+                }
+            });
+        } else {
+            log('Sites', 'Creation of Lilium website');
+            db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function (success, err) {
+                if (success) {
+                    db.testConnectionFromParams(
+                        dat.wpsitedataurl, 
+                        dat.wpsitedataport, 
+                        dat.wpsitedatauser, 
+                        dat.wpsitedatapwd, 
+                        dat.wpsitedataname, 
+                    function (success, err) {
+                        if (success) {
+                            dat.wptransfer = true;
                         
-                        that.createSite(cli, dat, function () {
-                            log('Sites', 'Site was created. Beginning Wordpress migration.');
-                            
-                            require('./includes/wpdump.js').dump(cli, {
-                                
-                            }, function() {
-
-                            });
-
-                            cli.redirect(cli._c.server.url + "admin/sites/", false);
-                        }); 
-                    } else {
-                        cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
-                    }
-                }, 'mysql');
-            } else {
-                cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
-            }
-        });
-
+                            if (!existingSite || existingSite == '') {
+                                cli.redirect(cli_c.server.url + "admin/sites/", false);
+                                return;
+        
+                                that.createSite(cli, dat, function () {
+                                    log('Sites', 'Site was created. Beginning Wordpress migration.');
+                                    
+                                    require('./includes/wpdump.js').dump(cli, {
+                                        
+                                    }, function() {
+    
+                                    });
+    
+                                    cli.redirect(cli._c.server.url + "admin/sites/", false);
+                                }); 
+                            } else {
+                                require('./includes.wpSQL.js').transfer(existingSite, dat, function(err) {
+                                    if (err) {
+                                        cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+                                    } else {
+                                        var siteConf = require('./config.js').fetchConfig(existingSite);
+                                        siteConf.wptransferring = true;
+    
+                                        siteConf.saveConfigs(siteConf, function() {
+                                            cli.redirect(cli._c.server.url + "/admin/sites/", false);
+                                        });
+                                    }
+                                });
+                            }
+                        } else {
+                            cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+                        }
+                    }, 'mysql');
+                } else {
+                    cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+                }
+            });
+        }
     };
 
     this.createSite = function (cli, postdata, done) {
@@ -360,6 +403,8 @@ var Sites = function () {
     this.loadSites = function (cb) {
         var that = this;
         fileserver.listDirContent(__dirname + "/sites/", function (files) {
+            files.unshift(files.splice(files.indexOf('default.json'), 1)[0]);
+
             var fileIndex = 0;
             var nextFile = function () {
                 if (fileIndex == files.length) {
@@ -377,8 +422,6 @@ var Sites = function () {
                             var urlbase = siteInfo.server.url.replace('//', '').replace(/\s/g, '/');
                             config.registerConfigs(urlbase, siteInfo);
                         }
-
-
 
                         _cachedSites.push(siteInfo);
                         fileIndex++;
@@ -465,7 +508,26 @@ var Sites = function () {
                 cssPrefix: "launchwebsite-field-"
             },
             cssClass: "form-launch-website",
-            dependencies: [],
+            dependencies: ["sites.all.complex"],
+        })
+        .add('title-existing-site', 'title', {
+            displayname : "Existing Lilium Site"
+        })
+        .add('originalsite', 'livevar', {
+            displayname : "Lilium Site",
+            endpoint : "sites.all.complex",
+            tag : "select",
+            template: "option",
+            title : "originalsite",
+            readkey : "originalsite",
+            attr: {
+                lmlselect : false,
+                header : 'Create a new Lilium Site'
+            },
+            props: {
+                'value' : "uid",
+                'html' : 'website.sitetitle'
+            }            
         })
         .add('title-info', 'title', {
                 displayname: "Wordpress site information"
@@ -496,7 +558,11 @@ var Sites = function () {
         .add('title-lml-site', 'title', {
             displayname: "Lilium site information"
         })
+        .beginSection('lilium_website_info_section', {
+
+        })
         .addTemplate("lilium_website_info")
+        .closeSection('lilium_website_info_section')
         .trg('beforesubmit')
             .add('submit', 'submit', {
                 value: "Transfer"

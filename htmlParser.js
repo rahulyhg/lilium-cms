@@ -10,7 +10,7 @@ var HtmlParser = function () {
         this.types[name] = fct;
     }
 
-    this.parseForm = function (form) {
+    this.parseForm = function (form, formContext) {
         log('HTMLParser', 'Parding form ' + form.name);
         var htmlForm = '';
         var submitButton = '';
@@ -26,6 +26,10 @@ var HtmlParser = function () {
         }
         // Form tag generation
         htmlForm = '<form ';
+
+        if (formContext) {
+            htmlForm += ' data-context="' + formContext + '" ';
+        }
 
         if (form.attr.validate) {
             htmlForm += 'class="v_form_validate lmlform ' + (form.attr.cssClass || "") + '" ';
@@ -137,6 +141,9 @@ var HtmlParser = function () {
                 case "lmlsection":
                     htmlForm += parseSection(field);
                     break;
+                case "map" :
+                    htmlForm += parseMap(field);
+                    break;
                 case "lmlclosure":
                     htmlForm += parseClosure(field);
                     break;
@@ -228,6 +235,22 @@ var HtmlParser = function () {
 
     var parseClosure = function(field) {
         return '<input type="hidden" class="lmlsection-ignore" name="lmlsection-'+field.attr.sectionname+'-ignore" value="0" /></section>';
+    };
+
+    var parseMap = function(field) {
+        var purifiedName = field.name.replace(/\-\.\s/g, '');
+        
+        return '<div class="fieldmap-wrapper"><input type="text" class="lml-leaflet-search-input lml-field-nosubmit" placeholder="Input address or business name" data-leafletname="'+purifiedName+'" id="leaflet-search-'+purifiedName+'" name="'+purifiedName+'display" /><div id="leaflet-'+purifiedName+'" class="lml-leafletmap"></div></div><input type="hidden" name="'+purifiedName+'" data-type="leaflet" id="'+purifiedName+'coords" />' +
+        '<script>window.llmap'+purifiedName+' = L.map("leaflet-'+purifiedName+'", {' +
+            'scrollWheelZoom : false,' +
+            'keyboard : false,' +
+            'zoomControl : false' +
+        '}).setView([0, 0], 2);' +
+        'L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnlrZGVzamFyZGlucyIsImEiOiJjaWpoczBoY2IwMnd3dTZtNXFydWE0b2FyIn0.YQopNaZuNF0Rh0ESi4rDVw", {' +
+            'attribution: "",' +
+            'maxZoom: 18,' +
+            'id: "mapbox.streets"' +
+        '}).addTo(window.llmap'+purifiedName+');</script>';
     };
 
     var parseTitleType = function (field) {

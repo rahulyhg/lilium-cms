@@ -78,6 +78,10 @@ var Entities = module.exports = new function () {
                 this.serveEdit(cli);
                 break;
 
+            case "new":
+                this.serveNew(cli);
+                break;
+
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -349,6 +353,11 @@ var Entities = module.exports = new function () {
     this.serveEdit = function (cli) {
         cli.touch('entities.serveEdit');
         filelogic.serveAdminLML(cli, true);
+    };
+
+    this.serveNew = function (cli) {
+        cli.touch('entities.serveNew');
+        filelogic.serveAdminLML(cli);
     };
 
     this.initialiseBaseEntity = function (entData) {
@@ -655,6 +664,23 @@ var Entities = module.exports = new function () {
                     }, function(err, arr) {
                         callback(arr);
                     });
+                }
+            } else if (levels[0] == "simple") {
+                var simpProj = {
+                    displayname : 1,
+                    _id : 1
+                };
+            
+                if (cli.hasRight('list-entities')) {
+                    db.findToArray(cli._c, 'entities', {}, function(err, arr) {
+                        callback(arr);
+                    }, simpProj);
+                } else {
+                    db.findToArray(cli._c, 'entities', {
+                        _id : db.mongoID(cli.session.data._id)
+                    }, function(err, arr) {
+                        callback(arr);
+                    }, simpProj);
                 }
             } else if (levels[0] == 'query') {
                 var queryInfo = params.query || new Object();

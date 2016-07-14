@@ -266,7 +266,7 @@ var FormBuilder = function() {
         }
     };
 
-    this.render = function(formName) {
+    this.render = function(formName, formContext) {
         log('FormBuilder', 'Rendering form with name : ' + formName);
         if (typeof forms[formName] === 'undefined') {
             throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
@@ -282,7 +282,7 @@ var FormBuilder = function() {
             }, forms[formName]);
         }
 
-        return htmlParser.parseForm(forms[formName]);
+        return htmlParser.parseForm(forms[formName], formContext || "noctx");
     };
 
     /**
@@ -307,7 +307,7 @@ var FormBuilder = function() {
             var field = form.fields[field];
             var requirements = field.requirements;
             // Required verification
-            if (requirements.required) {
+            if (requirements && requirements.required) {
                 if (typeof field.attr !== 'undefined' && field.attr == '') {
                     err[field.name] = '001';
                 } else if (typeof field.attr == 'undefined') {
@@ -411,18 +411,25 @@ var FormBuilder = function() {
                         if (form.fields[key].type == 'form') {
                             form.fields[key].attr.value = cli.postdata.data[key];
                         } else {
-                            var escapedData
+                            var escapedData;
                             if (typeof cli.postdata.data[key] == 'string') {
                                 escapedData = cli.postdata.data[key].replace(/\\r/g, "\r").replace(/\\n/g, "\n").replace(/\\/g, "");
                             } else {
                                 escapedData = cli.postdata.data[key];
                             }
 
-                            form.fields[key].attr.value = escapedData
+                            form.fields[key].attr.value = escapedData;
+
+                            if (form.fields[key].type == "map") {
+                                form.fields[key + "display"] = {
+                                    attr : {
+                                        value : cli.postdata.data[key + "display"]
+                                    },
+                                    name : key + "display"
+                                };
+                            }
                         }
-
                     }
-
                 }
                 return form;
             }
@@ -433,7 +440,6 @@ var FormBuilder = function() {
         var data = {};
         for (var field in form.fields) {
             var field = form.fields[field];
-
 
             if (field.name != 'form_name' && field.type != 'button') {
                 data[field.name] = field.attr.value;

@@ -361,6 +361,10 @@ select {
     display: block;
 }
 
+.lmlform-fieldwrapper-hidden {
+    display: none;
+}
+
 .lmlform-fieldwrapper label {
 	margin-right: 10px;
 }
@@ -375,6 +379,23 @@ select {
 	font-size: 14px;
 	border: 1px solid #DFDFDF;
 	width: 100%;
+    box-sizing: border-box;
+}
+
+.lmlform .ck-image-credit-field-text input {
+    background-color: #FFF;
+}
+
+.cke_dialog #image-upload h1 {
+    font-size: 18px;
+    font-family: Open Sans, sans-serif;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.cke_dialog .picture-list-form,
+.cke_dialog .picture-upload-form {
+    margin: 0px -10px -10px -10px;
 }
 
 .lmlform input[type="submit"], .lmlform button {
@@ -949,6 +970,23 @@ header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
 }
 
 header.admin-bar .navbar-default .navbar-nav  .notifications {
+}
+
+/* Leaflet */
+.lml-leafletmap {
+    height: 380px;
+    display: block;
+}
+
+.field-map.lmlform-fieldwrapper-map,
+.field-map {
+    padding: 0px;
+}
+
+body .lml-leaflet-search-input,
+#post_create input[type="text"].lml-leaflet-search-input,
+input.lml-leaflet-search-input {
+    width: 100%;
 }
 
 /* Error Reports */

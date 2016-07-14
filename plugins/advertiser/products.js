@@ -3,41 +3,53 @@ var _c = undefined;
 var livevars = undefined;
 var db;
 
-var RegisteredProducts = new Object();
-var RegisteredProductTypes = new Object();
-var RegisteredPriceBases = new Object();
+var RegisteredProducts = new Array();
+
+var RegisteredProductStatuses = [
+    {name:"unpaid", displayName:"Unpaid"},
+    {name:"paid", displayName:"Paid"},
+    {name:"ongoing", displayName:"Ongoing"},
+    {name:"paused", displayName:"Paused"},
+    {name:"finished", displayName:"Finished"},
+    {name:"invalid", displayName:"Invalid"}
+];
+
+var defaultProducts = [
+    { "name":"dp-bb", "displayName":"Display - Big box (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-bbm", "displayName":"Display - Big box mobile (300x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-bi", "displayName":"Display - Billboard (970x250)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-ct", "displayName":"Display - Companion Takeover", "productType":"display", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"dp-ls", "displayName":"Display - Large Skyscraper (300x600)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-lb", "displayName":"Display - Leaderboard (728x90)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-sk", "displayName":"Display - Skin", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-ss", "displayName":"Display - Skyscraper (160x600)", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"email", "displayName":"Email Discovery", "productType":"email", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"fb", "displayName":"Facebook", "productType":"facebook", "priceBase":"cpm", "price":0.008, "active":true, "SKU":"-" },
+    { "name":"ig", "displayName":"Instagram", "productType":"instagram", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"igo", "displayName":"Organic Instagram", "productType":"instagram", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"fbo", "displayName":"Organic Facebook", "productType":"facebook", "priceBase":"unit", "price":500, "active":true, "SKU":"-" },
+    { "name":"two", "displayName":"Organic Twitter", "productType":"twitter", "priceBase":"unit", "price":200, "active":true, "SKU":"-" },
+    { "name":"snapstory", "displayName":"Snapchat Story", "productType":"snapchat", "priceBase":"unit", "price":1000, "active":true, "SKU":"-" },
+    { "name":"sponsedbas", "displayName":"Sponsored editorial - BASIC", "productType":"sponsedit", "priceBase":"unit", "price":750, "active":true, "SKU":"-" },
+    { "name":"sponsedstand", "displayName":"Sponsored editorial - STANDARD", "productType":"sponsedit", "priceBase":"unit", "price":1500, "active":true, "SKU":"-" },
+    { "name":"sponsedrev", "displayName":"Sponsored editorial revision", "productType":"other", "priceBase":"unit", "price":120, "active":true, "SKU":"-" },
+    { "name":"sponsvid", "displayName":"Sponsored video", "productType":"video", "priceBase":"unit", "price":4000, "active":true, "SKU":"-" },
+    { "name":"tw", "displayName":"Twitter", "productType":"twitter", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-vad", "displayName":"Display - Video In-Content Ad", "productType":"display", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" },
+    { "name":"dp-nad", "displayName":"Display - Native ad", "productType":"netdisc", "priceBase":"cpm", "price":0.01, "active":true, "SKU":"-" }
+];
 
 var Products = function () {
     var that = this;
 
-    this.init = function(abspath, _c, cb) {
+    this.init = function(abspath, cc, cb) {
         log = require(abspath + "log.js");
-        _c = _c;
+        _c = cc;
         livevars = require(abspath + "livevars.js");
         db = require(abspath + "includes/db.js");
 
         this.registerLiveVar();
-
-        db.findToArray(_c.default(), 'products', {}, function (err, arr) {
-            for (var i = 0; i < arr.length; i++) {
-                that.registerProduct(arr[i]); 
-            }
-    
-            db.findToArray(_c.default(), 'producttypes', {}, function (err, arr) {
-                for (var i = 0; i < arr.length; i++) {
-                    that.registerProductType(arr[i].name, arr[i].displayName);
-                }
-    
-                db.findToArray(_c.default(), 'productpricebases', {}, function (err, arr) {
-                    for (var i = 0; i < arr.length; i++) {
-                        that.registerPriceBase(arr[i].name, arr[i].displayName, arr[i].divider);
-                    }
-
-                    log('Products', 'Loaded products info from database');
-                    cb();
-                });
-            });
-        });
+        this.loadDatabase(cc, cb);
     };
 
     var SingleProduct = function () {
@@ -47,6 +59,29 @@ var Products = function () {
         this.price = 0;
         this.priceBase = "";
         this.active = true;
+    };
+
+    this.loadDatabase = function(_c, cb) {
+        log('Products', 'Checking products collection');
+        db.createCollection(_c.default(), 'products', function(err, res) {
+            if (!err) {
+                log('Products', 'Created products collection');
+                db.insert(_c.default(), 'products', defaultProducts, function(ierr, res) {
+                    RegisteredProducts = defaultProducts;
+                    log('Products', 'Inserted default products into database');
+                    db.createCollections(_c.default(), ['campaigns', 'campaignHistory'], function(cerr, res) {
+                        log('Products', 'Created campaign collections');
+                        cb();
+                    });
+                });
+            } else {
+                db.findToArray(_c.default(), 'products', {}, function(err, arr) {
+                    log('Products', 'Products collection found');
+                    RegisteredProducts = arr;
+                    cb();
+                });
+            }
+        });
     };
 
     this.createEmptyProduct = function () {

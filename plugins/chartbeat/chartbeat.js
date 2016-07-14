@@ -199,7 +199,7 @@ var Chartbeat = function() {
                 var arr = new Array();
                 for (var i = 0; i < dat.pages.length; i++) {
                     var p = dat.pages[i];
-                    var author = p.authors[0];
+                    var author = p.authors ? p.authors[0] : "";
 
                     arr.push({
                         url: p.path,
