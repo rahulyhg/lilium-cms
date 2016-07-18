@@ -116,26 +116,27 @@ var Media = function () {
         }
     };
 
-    this.handleUploadedFile = function(_c, filename, cb) {
+    this.handleUploadedFile = function(_c, filename, cb, force, extra) {
         var extensions = filename.split('.');
         var mime = extensions[extensions.length - 1];
         var saveTo = _c.server.base + "backend/static/uploads/" + filename;
 
-        if (_c.supported_pictures.indexOf('.' + mime) != -1) {
-            imageResizer.resize(saveTo, filename, mime, _c, function (images) {
+        if (force || _c.supported_pictures.indexOf('.' + mime) != -1) {
+            imageResizer.resize(saveTo, filename, mime, _c, function (images, oSize) {
                 // Save it in database
                 try {
-                    db.insert(_c, 'uploads', {
+                    db.insert(_c, 'uploads', Object.assign({
                         path: saveTo,
                         url: filename,
                         name: "Full Size",
-                        size: imageSize(saveTo),
+                        size: oSize,
                         type: 'image',
                         sizes: images
-                    }, function (err, result) {
+                    }, extra || {}), function (err, result) {
                         cb(undefined, result)
                     });
                 } catch (ex) {
+                    console.log(ex + " : " + saveTo);
                     cb(ex);
                 }
             });

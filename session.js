@@ -93,7 +93,7 @@ var Sessions = function () {
 
         cli.userinfo = cli.session.data;
 
-        cli.session.data.preferences = cli.session.data.preferences || {};
+        cli.session.data.preferences = userObj.preferences || {};
         cli.session.data.power = 999;
         cli.session.data.notifications = [];
 

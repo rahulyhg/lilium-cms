@@ -168,6 +168,8 @@ var Precomp = function () {
             histoObj[histo[i].filename] = histo[i].sum;
         }
 
+        var siteTheme = require('./themes.js').getEnabledTheme(conf);
+
         var nextFile = function () {
             if (fileIndex < fileArr.length) {
                 var curFile = fileArr[fileIndex];
@@ -210,7 +212,8 @@ var Precomp = function () {
                                         });
                                     }, {
                                         minify: false,
-                                        config: conf
+                                        config: conf,
+                                        theme : siteTheme
                                     }
                                 );
                             }

@@ -1,4 +1,4 @@
-{#config;extra;theme}
+{#config;extra;theme;debug}
 
 <main class="homepage">
     <div class="fwblock trending-now-wrapper">

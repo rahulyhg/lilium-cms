@@ -51,12 +51,12 @@ $}
         </div> 
         <div class="article-signature-details-wrapper">
             <span class="article-signature-name">
-                <a href="{=url}/author/{=author.username}">
+                <a href="{=url}/author/{=author.username}">  
                     {=author.displayname}
                 </a>
             </span>
             <span class="article-signature-bio">
-                {=author.description}
+                {=?author.description}
             </span>
         </div>
     </div>  
