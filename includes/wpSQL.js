@@ -199,6 +199,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                     log('WP', 'Uploaded ' + uploadIndex + ' / ' + uploadTotal + ' files');
                 }
 
+                log('WP', 'Downloading image ' + upload.guid);
                 request(upload.guid, {encoding: 'binary'}, function(error, response, body) {
                     var filename = upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
                     var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
