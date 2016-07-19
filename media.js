@@ -123,21 +123,25 @@ var Media = function () {
 
         if (force || _c.supported_pictures.indexOf('.' + mime) != -1) {
             imageResizer.resize(saveTo, filename, mime, _c, function (images, oSize) {
-                // Save it in database
-                try {
-                    db.insert(_c, 'uploads', Object.assign({
-                        path: saveTo,
-                        url: filename,
-                        name: "Full Size",
-                        size: oSize,
-                        type: 'image',
-                        sizes: images
-                    }, extra || {}), function (err, result) {
-                        cb(undefined, result)
-                    });
-                } catch (ex) {
-                    console.log(ex + " : " + saveTo);
-                    cb(ex);
+                if (oSize.code !== 1) {
+                    try {
+                        // Save it in database
+                        db.insert(_c, 'uploads', Object.assign({
+                            path: saveTo,
+                            url: filename,
+                            name: "Full Size",
+                            size: oSize,
+                            type: 'image',
+                            sizes: images
+                        }, extra || {}), function (err, result) {
+                            cb(undefined, result)
+                        });
+                    } catch (ex) {
+                        console.log(ex + " : " + saveTo);
+                        cb(ex);
+                    }
+                } else {
+                    cb(new Error(oSize.core));
                 }
             });
         } else {

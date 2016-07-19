@@ -207,16 +207,22 @@ var ftUploads = function(siteid, mysqldb, done) {
                     if (!error) {
                         fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
                             require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
-                                var objid = result.insertedId;
-                                log('WP', 'Inserted media with mongo ID ' + objid);
-                                db.update(cconf, 'content', {"data._thumbnail_id" : upload.ID.toString()}, {"media" : objid}, function(ue, r) {
-                                    if (r.modifiedCount != 0) {
-                                        log('WP', "Affected featured image for a found article");
-                                    }
-
+                                if (err) {
+                                    log('WP', 'Invalid image download');
                                     uploadIndex++;
                                     nextUpload();
-                                });
+                                } else {
+                                    var objid = result.insertedId;
+                                    log('WP', 'Inserted media with mongo ID ' + objid);
+                                    db.update(cconf, 'content', {"data._thumbnail_id" : upload.ID.toString()}, {"media" : objid}, function(ue, r) {
+                                        if (r.modifiedCount != 0) {
+                                            log('WP', "Affected featured image for a found article");
+                                        }
+    
+                                        uploadIndex++;
+                                        nextUpload();
+                                    });
+                                }
                             }, true, {wpid : upload.ID});
                         });
                     } else {
