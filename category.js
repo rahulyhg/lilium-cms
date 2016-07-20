@@ -140,7 +140,7 @@ var Category = function () {
     };
 
     this.registerLiveVar = function () {
-        livevars.registerLiveVariable('category', function (cli, levels, params, callback) {
+        livevars.registerLiveVariable('categories', function (cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
                 db.singleLevelFind(cli._c, 'categories', callback);
