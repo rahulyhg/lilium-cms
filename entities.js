@@ -179,7 +179,7 @@ var Entities = module.exports = new function () {
 
             if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
 
-                imageResizer.resize(saveTo, image.picture, mime, cli, function (images) {
+                imageResizer.resize(saveTo, image.picture, mime, cli._c, function (images) {
                     var avatarURL = images.medium.url;
                     var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
                     var id = isProfile ? cli.userinfo.userid : cli.routeinfo.path[3];

@@ -9,7 +9,9 @@ body.cke_editable.cke_editable_themed.cke_contents_ltr {
     margin: auto;
 }
 
-body.cke_editable.cke_editable_themed.cke_contents_ltr p {
+body.cke_editable.cke_editable_themed.cke_contents_ltr p,
+body.cke_editable.cke_editable_themed.cke_contents_ltr address,
+body.cke_editable.cke_editable_themed.cke_contents_ltr div {
     font-family: Arial, sans-serif;
     font-size: 18px;
     line-height: 1.7em;

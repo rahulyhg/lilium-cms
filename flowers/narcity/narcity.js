@@ -10,6 +10,7 @@ var themes = undefined;
 var db = undefined;
 
 var themePath;
+var noOp = function() {};
 
 // TODO : Receive context site
 var NarcityTheme = function () {
@@ -129,18 +130,25 @@ var fetchHomepageArticles = function(_c, cb) {
     nextSection();
 };
 
+var needsHomeRefresh = true;
 var loadHooks = function(_c, info) {
     endpoints.register(_c.id, '', 'GET', function(cli) {
-        fetchHomepageArticles(_c, function(articles) {
-            var extra = new Object();
-            extra.sections = articles.sections;
-            extra.latests = articles.latests;
-            filelogic.renderThemeLML(cli, 'home', 'index.html', extra, function() {
-                fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
-                    log('Narcity', 'Recreated and served homepage');
-                }, true);
+        if (needsHomeRefresh) {
+            fetchHomepageArticles(_c, function(articles) {
+                var extra = new Object();
+                extra.sections = articles.sections;
+                extra.latests = articles.latests;
+    
+                filelogic.renderThemeLML(cli, 'home', 'index.html', extra, function() {
+                    fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
+                        needsHomeRefresh = false;
+                        log('Narcity', 'Recreated and served homepage');
+                    }, true);
+                });
             });
-        });
+        } else {
+            fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
+        }
     });
 };
 

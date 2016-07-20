@@ -38,6 +38,7 @@ var templateBuilder = undefined;
 var lys = undefined;
 var backendSearch = undefined;
 var devtools = undefined;
+var postleaf = undefined;
 var preferences = undefined;
 var api = undefined;
 
@@ -84,6 +85,7 @@ var Core = function () {
         dashboard = require('./dashboard.js');
         templateBuilder = require('./templateBuilder.js');
         backendSearch = require('./backend/search.js');
+        postleaf = require('./postleaf.js');
         devtools = require('./devtools.js');
         preferences = require('./preferences.js');
 
@@ -554,6 +556,8 @@ var Core = function () {
         lys.registerLiveVar();
         backendSearch.registerLiveVar();
         preferences.registerLiveVar();
+        category.registerLiveVar();
+        postleaf.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };
@@ -585,6 +589,16 @@ var Core = function () {
 
         hooks.fire('forms_init');
         log('Core', 'Forms were loaded');
+    };
+
+    var loadPostLeaves = function() {
+        hooks.fire('post_leaves_will_register');
+
+        require('./quiz.js').registerPostLeaf();
+        // require('./albums.js').registerPostLeaf();
+        postleaf.loadHooks();
+
+        hooks.fire('post_leaves_registered');
     };
 
     var loadNotifications = function () {
@@ -634,6 +648,7 @@ var Core = function () {
     var loadLMLLibs = function () {
         hooks.trigger('will_load_core_lml_libs');
         dashboard.registerLMLLib();
+        category.registerLMLLib();
         hooks.trigger('loaded_core_lml_libs');
     };
 
@@ -700,6 +715,7 @@ var Core = function () {
         loadWebsites(function (resp) {
             loadRequires();
             loadHooks(readyToRock);
+            loadPostLeaves();
             initForms();
             initTables();
             loadEndpoints();

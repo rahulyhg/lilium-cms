@@ -37,7 +37,6 @@
 	fontdir += "/static/fonts/font-awesome";
 $}
 
-
 @font-face {
   font-family: 'Raleway';
   font-weight: 100;

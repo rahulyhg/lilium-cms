@@ -41,7 +41,22 @@ var Sessions = function () {
         cli.response.setHeader('Set-Cookie', 'lmlsid=' + cli.session.token);
     };
 
-    this.injectSessionInCli = function (cli) {
+    var seshToUserInfo = function(cli) {
+        cli.userinfo = {
+            loggedin: cli.session.loggedin,
+            roles: cli.session.data.roles,
+            userid: cli.session.data._id,
+            logintime: cli.session.data.logintime,
+            displayname: cli.session.data.displayname,
+            admin: cli.session.data.admin,
+            god: cli.session.data.god,
+            user: cli.session.data.user,
+            power: cli.session.data.power,
+            site: cli.routeinfo.configname
+        };
+    }
+
+    this.injectSessionInCli = function (cli, cb) {
         var ids = cli.cookies.lmlsid;
         var injected = false;
         if (typeof ids !== 'object') {
@@ -53,27 +68,32 @@ var Sessions = function () {
 
             if (curSesh && cli.routeinfo.configname == curSesh.data.site) {
                 cli.session = curSesh;
-
-                cli.userinfo = {
-                    loggedin: cli.session.loggedin,
-                    roles: cli.session.data.roles,
-                    userid: cli.session.data._id,
-                    logintime: cli.session.data.logintime,
-                    displayname: cli.session.data.displayname,
-                    admin: cli.session.data.admin,
-                    god: cli.session.data.god,
-                    user: cli.session.data.user,
-                    power: cli.session.data.power,
-                    site: cli.routeinfo.configname
-                };
+                seshToUserInfo(cli);
 
                 injected = true;
                 break;
             }
         }
 
-        if (!injected) {
-            cli.session = new UserSesh();
+        if (injected) {
+            cb(true);
+        } else {
+            db.findToArray(cli._c, "sessions", {token : ids[0]}, function(err, arr) {
+                if (arr.length == 0) {
+                    cli.session = new UserSesh();   
+                    cb(false);
+                } else {
+                    if (arr[0].data.site == cli.routeinfo.configname) {
+                        cli.session = arr[0];
+                        seshToUserInfo(cli);
+                        _sesh[cli.session.token] = arr[0];
+
+                        cb(true);
+                    } else {
+                        cb(false);
+                    }
+                }
+            });
         }
     };
 
@@ -93,7 +113,7 @@ var Sessions = function () {
 
         cli.userinfo = cli.session.data;
 
-        cli.session.data.preferences = cli.session.data.preferences || {};
+        cli.session.data.preferences = userObj.preferences || {};
         cli.session.data.power = 999;
         cli.session.data.notifications = [];
 

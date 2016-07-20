@@ -15,79 +15,81 @@ var Handler = function () {
     var GET = function (cli) {
         cli.touch('handler.GET');
 
-        if (Router.parseClientObject(cli)) {
+        Router.parseClientObject(cli, function(loggedin) {
             Dispatcher.dispatch(cli);
-        }
+        });
     };
 
     var POST = function (cli) {
         cli.touch('handler.POST');
 
-        if (!Router.parseClientObject(cli)) return;
+        Router.parseClientObject(cli, function(loggedin) { 
+            if (loggedin) {
+               cli.postdata = new Object();
+               cli.postdata.length = cli.request.headers["content-length"];
+               cli.postdata.data = {};
+       
+               var finishedCalled = false;
+               var req = cli.request;
+               var hasFile = false;
+       
+               req.headers["content-type"] = typeof req.headers["content-type"] == "undefined" ? "application/x-www-form-urlencoded" : req.headers["content-type"];
+               try {
+                   var busboy = new Busboy({
+                       headers: req.headers
+                   });
+                   // File upload
+                   busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+                       if (parseInt(cli.request.headers['content-length']) > parseInt(cli._c.server.fileMaxSize)) {
+                           file.resume();
+                           hasFile = false;
+                           finishedCalled = true;
+                           return cli.throwHTTP(413, 'File is too large');
 
-        cli.postdata = new Object();
-        cli.postdata.length = cli.request.headers["content-length"];
-        cli.postdata.data = {};
+                       } else {
+                           if (mimeTypeIsSupported(mimetype, cli)) {
+                               hasFile = true;
+       
+                               var mime = getMimeByMimeType(mimetype, cli);
+                               //Gen random name
+                               filename = fileserver.genRandomNameFile(filename);
+                               var saveTo = cli._c.server.base + "backend/static/uploads/" + filename + mime;
+                               var name = filename + mime;
 
-        var finishedCalled = false;
-        var req = cli.request;
-        var hasFile = false;
+                               file.pipe(fs.createWriteStream(saveTo));
 
-        req.headers["content-type"] = typeof req.headers["content-type"] == "undefined" ? "application/x-www-form-urlencoded" : req.headers["content-type"];
-        try {
-            var busboy = new Busboy({
-                headers: req.headers
-            });
-            // File upload
-            busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-                if (parseInt(cli.request.headers['content-length']) > parseInt(cli._c.server.fileMaxSize)) {
-                    file.resume();
-                    hasFile = false;
-                    finishedCalled = true;
-                    return cli.throwHTTP(413, 'File is too large');
+                               file.on('end', function () {
+                                   cli.postdata.data[fieldname] = name;
+                               });
+                           } else {
+        
+                                file.resume();
+                                return notSupported(cli);
+                            }
+                        }
+        
+                    });
+        
+                    busboy.on('field', function (fieldname, val, fieldnameTruncated, valTruncated) {
+                        parsePOSTField(cli, fieldname, val);
+                    });
+        
+                    busboy.on('finish', function () {
+                        if (!finishedCalled) {
+                            finishedCalled = true;
 
-                } else {
-                    if (mimeTypeIsSupported(mimetype, cli)) {
-                        hasFile = true;
-
-                        var mime = getMimeByMimeType(mimetype, cli);
-                        //Gen random name
-                        filename = fileserver.genRandomNameFile(filename);
-                        var saveTo = cli._c.server.base + "backend/static/uploads/" + filename + mime;
-                        var name = filename + mime;
-
-                        file.pipe(fs.createWriteStream(saveTo));
-
-                        file.on('end', function () {
-                            cli.postdata.data[fieldname] = name;
-                        });
-
-
-                    } else {
-
-                        file.resume();
-                        return notSupported(cli);
-                    }
+                            Dispatcher.dispost(cli);
+                        }
+                    });
+                    req.pipe(busboy);
+                } catch (err) {
+                     Dispatcher.dispost(cli);
                 }
-
-            });
-
-            busboy.on('field', function (fieldname, val, fieldnameTruncated, valTruncated) {
-                parsePOSTField(cli, fieldname, val);
-            });
-
-            busboy.on('finish', function () {
-                if (!finishedCalled) {
-                    finishedCalled = true;
-
-                    Dispatcher.dispost(cli);
-                }
-            });
-            req.pipe(busboy);
-        } catch (err) {
-            Dispatcher.dispost(cli);
-
-        }
+            } else {
+                cli.throwHTTP(401, "Unauthorized");
+                return;
+            }
+        });
     };
     var mimeTypeIsSupported = function (mimetype, cli) {
         return getMimeByMimeType(mimetype, cli) ? true : false;

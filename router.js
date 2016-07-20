@@ -4,7 +4,7 @@ var session = require('./session.js');
 var _c = require('./config.js');
 
 var Router = function () {
-    this.parseClientObject = function (cli) {
+    this.parseClientObject = function (cli, cb) {
         cli.touch('router.parseClientObject');
 
         pObj = url.parse(cli.request.url, true);
@@ -18,6 +18,7 @@ var Router = function () {
         _c.fetchConfigFromCli(cli);
         if (!cli._c) {
             cli.throwHTTP(404, "Not Found");
+            cb(false);
             return false;
         }
 
@@ -35,10 +36,10 @@ var Router = function () {
         cli.routeinfo.root = pObj.pathname == "/";
 
         if (!cli.routeinfo.isStatic) {
-            session.injectSessionInCli(cli);
+            session.injectSessionInCli(cli, cb);
+        } else {
+            cb(false);
         };
-
-        return true;
     };
 
     var init = function () {

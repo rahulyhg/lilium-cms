@@ -21,7 +21,9 @@ var ImageResizer = function () {
         extension = mime;
         fs.readFile(path, function (err, buffer) {
             execute(buffer, sizeKeys.length - 1, _c, function(){
-                return cb(images)
+                gm(buffer, path).size(function(err, size) {
+                    return cb(images, size || err)
+                });
             })
         });
     };
@@ -48,6 +50,7 @@ var ImageResizer = function () {
                 .crop(width, height,"!")
                 .write(resizedFilename, function (err) {
                   if (!err) console.log(key + ' image upload success');
+                  else console.log(err);
                     images[key] = {};
                     images[key].path = resizedFilename;
                     images[key].url = _c.server.url + '/uploads/' + fileName + resizedEndName;

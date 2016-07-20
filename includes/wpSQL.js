@@ -31,8 +31,8 @@ var ftCategories = function(siteid, mysqldb, done) {
                 catIndex++;
 
                 db.insert(siteid, 'categories', {
-                    name : cat.name,
-                    displayname : cat.slug,
+                    name : cat.slug,
+                    displayname : cat.name,
                     wpid : cat.term_id
                 }, nextCat);
             } else {
@@ -78,7 +78,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                         email : wp_user.user_email,
                         firstname : wp_usermeta.first_name,
                         lastname : wp_usermeta.last_name,
-                        descroption : wp_usermeta.description,
+                        description : wp_usermeta.description,
                         displayname : wp_user.display_name,
                         createdOn : new Date(wp_user.user_registered),
                         avatarID : null,
@@ -115,6 +115,8 @@ var ftPosts = function(siteid, mysqldb, done) {
         var postIndex = 0;
         var postTotal = wp_posts.length;
 
+        log('WP', 'Transferring around ' + postTotal + " posts");
+        var wpPostStartAt = new Date();
         var nextPost = function() {
             setTimeout(function() {
                 if (postIndex < postTotal) {
@@ -131,6 +133,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                             });
                             postdata.wp_author = wp_post.post_author;
 
+                            var contentRegex = /^(.+)$/gm;
                             mysqldb.query(fetchTagsForPosts + " WHERE ID = " + wp_post.ID, function(err, wp_tags) {
                                 mysqldb.query(fetchCatsForPosts + " WHERE p.ID = " + wp_post.ID, function(err, wp_cats) {
                                     db.insert(siteid, 'content', {
@@ -140,7 +143,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                                         data : postdata,
                                         name : wp_post.post_name,
                                         date : new Date(wp_post.post_date),
-                                        content : wp_post.post_content,
+                                        content : wp_post.post_content.replace(contentRegex, "<p>$1</p>"),
                                         type : wp_post.post_type,
                                         wptype : wp_post.post_type,
                                         categories : wp_cats.length ? [wp_cats[0].slug] : [],
@@ -149,11 +152,16 @@ var ftPosts = function(siteid, mysqldb, done) {
                                     }, function() {
                                         postIndex++;
 
-                                        if (postIndex > 0 && postIndex % 500 == 0) {
-                                            log('WP', 'Created ' + postIndex + ' posts');
+                                        if (postIndex > 0 && postIndex % 250 == 0) {
+                                            var postPerSec = parseFloat(250 / ((new Date() - wpPostStartAt) / 1000.00)).toFixed(2);
+                                            log('WP', 'Created ' + 
+                                                postIndex + ' / ' + postTotal + ' posts at ' + 
+                                                postPerSec + ' posts per second');
+
+                                            wpPostStartAt = new Date();
                                         }
                                     
-                                        nextPost();
+                                        setTimeout(nextPost, 0);
                                     });
                                 });
                             });
@@ -177,6 +185,8 @@ var ftUploads = function(siteid, mysqldb, done) {
 
     log('WP', 'Querying uploads');
     mysqldb.query(fetchAttachmentIDs, function(err, uploads) {
+        mysqldb.end();
+
         var uploadIndex = 0;
         var uploadTotal = uploads.length;
 
@@ -185,20 +195,35 @@ var ftUploads = function(siteid, mysqldb, done) {
             if (uploadIndex < uploadTotal) {
                 var upload = uploads[uploadIndex];
 
-                if (uploadIndex > 0 && uploadIndex % 10 == 0) {
+                if (uploadIndex > 0 && uploadIndex % 50 == 0) {
                     log('WP', 'Uploaded ' + uploadIndex + ' / ' + uploadTotal + ' files');
                 }
 
-                request.get(upload.guid, function(error, response, body) {
+                log('WP', 'Downloading image ' + upload.guid);
+                request(upload.guid, {encoding: 'binary'}, function(error, response, body) {
                     var filename = upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
                     var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
-                    if (response && response.statusCode === 200) {
-                        fs.writeFile(saveTo, body, function() {
+                    if (!error) {
+                        fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
                             require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
-                                uploadIndex++;
-                                nextUpload();
-                            });
+                                if (err) {
+                                    log('WP', 'Invalid image download');
+                                    uploadIndex++;
+                                    nextUpload();
+                                } else {
+                                    var objid = result.insertedId;
+                                    log('WP', 'Inserted media with mongo ID ' + objid);
+                                    db.update(cconf, 'content', {"data._thumbnail_id" : upload.ID.toString()}, {"media" : objid}, function(ue, r) {
+                                        if (r.modifiedCount != 0) {
+                                            log('WP', "Affected featured image for a found article");
+                                        }
+    
+                                        uploadIndex++;
+                                        nextUpload();
+                                    });
+                                }
+                            }, true, {wpid : upload.ID});
                         });
                     } else {
                         log('WP', 'Download error : ' + error);

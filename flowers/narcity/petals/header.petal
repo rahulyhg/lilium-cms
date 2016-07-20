@@ -1,12 +1,19 @@
 {#theme;config}
 <header class="narcity-header-bar">
     <div class="narcity-header-container">
+        <div class="header-menu-bar-wrapper">
+            <div class="header-menu-bar"></div>
+            <div class="header-menu-bar"></div>
+            <div class="header-menu-bar"></div>
+        </div>
+
         <div class="narcity-logo-wrapper">
             <a href="{=config.default.server.url}">
                 <img src="{=config.default.server.url}{=theme.settings.logo}" />
             </a>
         </div>
 
+        {$ if (theme.settings.othernetworkwebsites.length > 0); $}
         <div class="city-selector-wrapper">
             <a href="" class="city-selector-dropper"><span>{=?theme.settings.cityname}</span></a>
             <ul class="city-selector">
@@ -17,6 +24,7 @@
                 {$ endfor; $}
             </ul>
         </div>
+        {$ endif; $}
 
         {$ for (link in ?theme.settings.headerlinks) $}
         <div class="header-link">
