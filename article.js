@@ -685,6 +685,7 @@ var Article = function() {
                         status: 1,
                         subtitle: 1,
                         name: 1,
+                        date: 1,
                         media: "$media.sizes.thumbnail.url"
                     }
                 }, {

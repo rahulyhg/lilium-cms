@@ -554,6 +554,7 @@ var Core = function () {
         lys.registerLiveVar();
         backendSearch.registerLiveVar();
         preferences.registerLiveVar();
+        category.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };
@@ -634,6 +635,7 @@ var Core = function () {
     var loadLMLLibs = function () {
         hooks.trigger('will_load_core_lml_libs');
         dashboard.registerLMLLib();
+        category.registerLMLLib();
         hooks.trigger('loaded_core_lml_libs');
     };
 

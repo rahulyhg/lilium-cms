@@ -48,7 +48,7 @@ html .invisible {
 
 .narcity-header-bar {
     height: 60px;
-    background-color: {=mc};
+    background-color: {=theme.settings.headercolor};
 
     font-family: "Oswald", Arial, sans-serif;
     font-size: 25px;
@@ -526,6 +526,7 @@ article .article-related-section .article-thumbnail {
 
 article .article-related-section .article-thumbnail-featured-image img {
     width: 100%;
+    position: relative;
 }
 
 article .article-related-section .article-thumbnail-title {
@@ -619,9 +620,20 @@ $}
 }
 
 .homepage .article-thumbnail a,
-.homepage .article-thumbnail-title {
+.homepage .article-thumbnail-title,
+.homepage a {
     color: #111;
     text-decoration: none;
+}
+
+.homepage .article-thumbnail .article-thumbnail-featured-image {
+    max-height: 160px;
+    overflow: hidden;
+}
+
+.homepage .article-thumbnail.article-thumbnail-featured .article-thumbnail-featured-image {
+    max-height: 340px;
+    overflow: hidden;
 }
 
 .homepage .article-thumbnail .article-thumbnail-featured-image img {
@@ -666,6 +678,26 @@ $}
     font-weight: normal;
     
     display : inline-block;
+}
+
+.homepage .article-thumbnail-featured-image {
+    position : relative; 
+}
+
+.homepage .article-cat-name {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+
+    padding: 5px 8px;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 1;
+    background-color: #fff;
+}
+
+.homepage .article-cat-name {
+    color: {=mc};
 }
 
 /* Mobile */
@@ -786,8 +818,66 @@ $}
         font-size: 14px;
     }  
 
+    h4.article-section-title {
+        font-family: Oswald, sans-serif;
+        font-size: 24px;
+        font-weight: normal;
+        text-transform: uppercase;
+        color: #ff2634;
+        margin: 30px 0 20px 20px;
+    }
+
+    .homepage .article-thumbnail .article-thumbnail-featured-image img {
+        width: auto;
+        height: 250px;
+        display: inline-block;
+    }
+
+    .homepage .article-thumbnail .article-thumbnail-featured-image {
+        height: 250px;
+        width: 100%;
+        overflow: hidden;
+        text-align: center;
+    }
+
+    .homepage .article-thumbnail.article-thumbnail-featured {
+        height: auto;
+        width: auto;
+        margin-right: 0px;
+    }
+
+    .homepage .article-thumbnail {
+        width: auto;
+        float: none;
+        border: none;
+        margin-bottom: 30px;
+    }
+
+    .homepage .article-thumbnail-title,
+    .homepage .article-thumbnail-featured .article-thumbnail-title {
+        font-family: Oswald, sans-serif;
+        font-size: 22px;
+        margin: 10px 0;
+        line-height: 1.4;
+        font-weight: normal;
+    }
+
+    .homepage .article-thumbnail.article-thumbnail-margined {
+        margin: none;
+        padding-bottom: 12px;
+    }
+
     .footerLinks li {
         display: block;
         margin: 10px;
     }
+
+    .fwblock {
+        width: auto;
+        margin: auto;
+        float: none;
+        clear: both;
+    }
 }
+
+{=theme.settings.customcss}

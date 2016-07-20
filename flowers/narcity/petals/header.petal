@@ -13,6 +13,7 @@
             </a>
         </div>
 
+        {$ if (theme.settings.othernetworkwebsites.length > 0); $}
         <div class="city-selector-wrapper">
             <a href="" class="city-selector-dropper"><span>{=?theme.settings.cityname}</span></a>
             <ul class="city-selector">
@@ -23,6 +24,7 @@
                 {$ endfor; $}
             </ul>
         </div>
+        {$ endif; $}
 
         {$ for (link in ?theme.settings.headerlinks) $}
         <div class="header-link">

@@ -13,6 +13,7 @@ var themes = require('./themes.js');
 var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
 var templateBuilder = require('./templateBuilder.js');
+var category = require('./category.js');
 
 var _cachedSites = new Array();
 
@@ -167,9 +168,11 @@ var SiteInitializer = function (conf) {
                     templateBuilder.init(conf);
 
                     loadTheme(function() {
-                        loadSessions(function() {
-                            hooks.fire('site_initialized', conf);
-                            done();
+                        category.preload(conf, function() {
+                            loadSessions(function() {
+                                hooks.fire('site_initialized', conf);
+                                done();
+                            });
                         });
                     });
                 });

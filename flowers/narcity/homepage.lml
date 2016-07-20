@@ -1,9 +1,9 @@
-{#config;extra;theme;debug}
+{#config;extra;theme;debug;category}
 
 <main class="homepage">
     <div class="fwblock trending-now-wrapper">
         <h4 class="article-section-title">Trending right now</h4>
-        
+        <h6 class="dev-message">Will be added later according to traffic</h6>
     </div>
 
     <div class="homepage-sections">
@@ -62,16 +62,29 @@
                     classes += " article-thumbnail-margined";
                 endif;
             $}
-            <a href="{=config.default.server.url}/{=la.name}"> 
                 <div class="{=classes}">
                     <div class="article-thumbnail-featured-image">
-                        <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}" />
+                        <a href="{=config.default.server.url}/{=la.name}"> 
+                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}" />
+                            {$ if (?la.categories.0 != "") $}
+                            <div class="article-cat-name">
+                                <a href="{=config.default.server.url}/category/{=la.categories.0}">
+                                    {$ 
+                                        slug = la.categories.0;
+                                        ccat = category.getCatName(=slug); 
+                                    $}
+                                    {=ccat}
+                              </a>
+                            </div>
+                            {$ endif; $}
+                        </a>
                     </div>
                     <div class="article-thumbnail-title">
-                        {=la.title}
+                        <a href="{=config.default.server.url}/{=la.name}"> 
+                            {=la.title}
+                        </a>
                     </div>
                 </div>
-            </a>
             {$ relindex += 1; $}
         {$ endfor; $}
     </div>

@@ -72,20 +72,23 @@ var templateBuilder = function () {
 
     var getQueueTags = function(config) {
         var string = "";
+        var queue =  require('./precomp.js').getSiteQueue(config);
 
-        require('./precomp.js').getSiteQueue(config).forEach(function(tag) {
-            switch (tag.type) {
-                case 'css':
-                    string += '<link rel="stylesheet" type="text/css" href="'+tag.src+'" />\n';
-                    break;
-                case 'js':
-                    string += '<script src="'+tag.src+'"></script>\n'
-                    break;
-                default:
-                    string += '';
-                    break;
-            }
-        });
+        if (queue) {
+            queue.forEach(function(tag) {
+                switch (tag.type) {
+                    case 'css':
+                        string += '<link rel="stylesheet" type="text/css" href="'+tag.src+'" />\n';
+                        break;
+                    case 'js':
+                        string += '<script src="'+tag.src+'"></script>\n'
+                        break;
+                    default:
+                        string += '';
+                        break;
+                }
+            });
+        }
 
         return string;
     };

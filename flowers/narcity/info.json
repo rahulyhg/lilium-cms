@@ -4,6 +4,7 @@
     "entry": "narcity.js",
     "settingForm" : {
         "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},
+        "headercolor" : {"type" : "text", "attr" : {"displayname" : "Header Color"}, "default" : "#FF2634"},
         "buttoncolor" : {"type" : "text", "attr" : {"displayname" : "Button Color"}, "default" : "#DDD"},
         "buttontextcolor" : {"type" : "text", "attr" : {"displayname" : "Button Text Color"}, "default" : "#FF2634"},
         "fullwidthsize" : {"type" : "number", "attr" : {"displayname" : "Full width size (px)"}, "default" : 1024},
@@ -80,7 +81,8 @@
         },
 
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
-        "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"}
+        "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"},
+        "customcss" : {"type" : "textarea", "attr" : {"displayname" : "Custom plain CSS"}, "default" : ".logo {}"}
     },
     "contexts" : {
         "article" : "article.lml",

@@ -2,6 +2,10 @@ var filelogic = require('./filelogic.js');
 var livevars = require('./livevars.js');
 var db = require('./includes/db.js');
 var formBuilder = require('./formBuilder');
+var lmllib = require('./lmllib.js');
+var log = require('./log.js');
+
+var catAssoc = {};
 
 var Category = function () {
 
@@ -58,6 +62,7 @@ var Category = function () {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, formData, function (err, result) {
                 // Generate LML page
+                catAssoc[cli._c][formData.name] = formData.displayname;
                 cli.refresh();
             });
 
@@ -77,6 +82,7 @@ var Category = function () {
             // Create post
             db.insert(cli._c, 'categories', formData, function (err, result) {
                 // Generate LML page
+                catAssoc[cli._c][formData.name] = formData.displayname;
                 cli.refresh();
             });
 
@@ -101,8 +107,40 @@ var Category = function () {
         }
     }
 
-    this.createLivevars = function () {
-        livevars.registerLiveVariable('categories', function (cli, levels, params, callback) {
+    this.preload = function(_c, cb) {
+        log('Category', 'Preloading categories');
+        catAssoc[_c.id] = new Object();
+        var assoc = catAssoc[_c.id];
+
+        db.findToArray(_c, 'categories', {}, function(err, arr) {
+            arr.forEach(function(cc) {
+                assoc[cc.name] = cc.displayname;
+            });
+
+            log('Category', 'Proloaded categories');
+            cb(assoc);
+        });
+    };
+
+    var getCatName = function(_c, slug) {
+        return catAssoc[_c.id][slug] || slug;
+    };
+
+    this.getRawAssoc = function() {
+        return catAssoc;
+    };
+        
+    this.registerLMLLib = function() {
+        log('Category', 'Registering LML lib');
+        lmllib.registerContextLibrary('category', function(context) {
+            return {
+                getCatName : function(slug) { return getCatName(context.lib.config.default, slug); }
+            }
+        });
+    };
+
+    this.registerLiveVar = function () {
+        livevars.registerLiveVariable('category', function (cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
                 db.singleLevelFind(cli._c, 'categories', callback);
@@ -127,7 +165,6 @@ var Category = function () {
             }
         });
     };
-    this.createLivevars();
 };
 
 module.exports = new Category();

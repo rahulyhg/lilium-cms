@@ -78,7 +78,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                         email : wp_user.user_email,
                         firstname : wp_usermeta.first_name,
                         lastname : wp_usermeta.last_name,
-                        descroption : wp_usermeta.description,
+                        description : wp_usermeta.description,
                         displayname : wp_user.display_name,
                         createdOn : new Date(wp_user.user_registered),
                         avatarID : null,
