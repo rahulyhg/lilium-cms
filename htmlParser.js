@@ -458,6 +458,10 @@ var HtmlParser = function () {
             attributes += field.requirements.required ? ' required ' : '';
         }
 
+        if (field.type == 'button') {
+            attributes += field.attr.onclick ? ' onclick="window.'+field.attr.onclick+'(this);" ' : '';
+        }
+
         // Is disbled?
         attributes += field.attr.disabled ? 'disabled ' : '';
 

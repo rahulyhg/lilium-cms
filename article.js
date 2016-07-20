@@ -880,6 +880,10 @@ var Article = function() {
                     'class': 'col-md-4'
                 }
             })
+            .add('title-postleaf', 'title', {
+                displayname : "Interactive features"
+            })
+            .trigger('postleaf')
             .trigger('fields')
             .add('title-featuredimage', 'title', {
                 displayname : "Featured image information"

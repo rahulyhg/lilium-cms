@@ -106,6 +106,7 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/tags.js", 1340, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lys.js", 1350, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmltable.js", 1360, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/quiz.js", 1380, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/alert.js", 1400, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
