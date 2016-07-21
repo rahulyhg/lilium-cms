@@ -34,7 +34,7 @@ Config.prototype.fetchConfig = function (site) {
     var s = _configs[site];
     if (!s) {
         for (cc in _configs) {
-            if (_configs[cc].uid == site) {
+            if (_configs[cc].uid == site || _configs[cc].id == site) {
                 s = _configs[cc];
                 break;
             }
