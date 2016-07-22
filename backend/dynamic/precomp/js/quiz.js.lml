@@ -1,3 +1,7 @@
-window.addQuizToPost = function() {
-    alert("Adding quiz to post...");
+{#config}
+var quizLiliumRootURL = "{=config.default.server.url}";
+window.addQuizToPost = function(caller) {
+    $.get(quizLiliumRootURL + '/static/admin-quiz-form.html', function(data) {
+        $(caller).parent().html(data);
+    });
 };
