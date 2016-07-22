@@ -207,6 +207,7 @@ var FileLogic = function () {
         extra = extra || new Object();
         extra.config = cli._c;
         extra.contextname = ctxName;
+        extra.siteid = cli._c.id;
 
         var cTheme = theme.getEnabledTheme(cli._c);
         extra.theme = cTheme;
@@ -242,6 +243,7 @@ var FileLogic = function () {
         var theme = require('./themes.js');
         extra = extra || new Object();
         extra.config = cli._c;
+        extra.siteid = cli._c.id;
         artcileHelper.getPostElements(cli, extra, function(extra) {
             // Check for the post type
             var title = slugify(extra.title).toLowerCase();
@@ -277,6 +279,7 @@ var FileLogic = function () {
                 log("FileLogic", "Interpreting LML from absolute path : " + readPath);
                 extra = extra || new Object();
                 extra.config = cli._c;
+                extra.siteid = cli._c.id;
 
                 LML.executeToFile(readPath, savePath, function () {
                     cli.responseinfo.filecreated = true;
@@ -288,6 +291,7 @@ var FileLogic = function () {
 
     var saveLmlPage = function (cli, readPath, savePath, extra) {
         extra = extra || new Object();
+        extra.siteid = cli._c.id;
         extra.config = cli._c;
 
         LML.executeToFile(

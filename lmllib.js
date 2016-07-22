@@ -2,7 +2,7 @@ var log = require('./log.js');
 
 var registeredLibraries = {
     config: function (context) {
-        var conf = context.config || require('./config.js').default();
+        var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
         return {
             default: conf
         };
