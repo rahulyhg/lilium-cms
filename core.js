@@ -595,7 +595,7 @@ var Core = function () {
         hooks.fire('post_leaves_will_register');
 
         require('./quiz.js').registerPostLeaf();
-        // require('./albums.js').registerPostLeaf();
+        require('./album.js').registerPostLeaf();
         postleaf.loadHooks();
 
         hooks.fire('post_leaves_registered');

@@ -1,0 +1,7 @@
+{#config}
+var albumRootUrl = "{=config.default.server.url}";
+window.addAlbumToPost = function(caller) {
+    $.get(albumRootUrl + '/static/admin-album-form.html', function(data){
+    	$(caller).parent().html(data)
+    })
+};
