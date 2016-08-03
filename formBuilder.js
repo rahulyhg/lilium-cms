@@ -429,8 +429,18 @@ var FormBuilder = function() {
                                 };
                             }
                         }
-                    }
+                    } //else {
+                        // form.field[key] = {
+                        //     type : 'unknown',
+                        //     name : key,
+                        //     attr : {
+                        //         value : cli.postdata.data[key]
+                        //     },
+                        //     requirements : {}
+                        // };
+                    // }
                 }
+
                 return form;
             }
         }
