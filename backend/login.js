@@ -7,6 +7,7 @@ var entities = require('../entities.js');
 var formbuilder = require('../formBuilder.js');
 var hooks = require('../hooks.js');
 var sessions = require('../session.js');
+var log = require('../log.js');
 
 var Login = function() {
 	var loginSuccess = function(cli, userObj) {
