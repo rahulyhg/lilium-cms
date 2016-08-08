@@ -21,5 +21,11 @@
                 <b class="devtools-list-item-title">Endpoints</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/cache">
+                <i class="devtools-list-item-icon fa fa-file-code-o"></i>
+                <b class="devtools-list-item-title">Cache</b>
+            </a>
+        </li>
     </ul>
 </div>

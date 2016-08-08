@@ -136,18 +136,18 @@ var FileServer = function () {
         });
     };
 
-    this.readFile = function (filename, callback, sync) {
+    this.readFile = function (filename, callback, sync, encoding) {
         if (sync) {
             var exists = this.fileExists(filename, undefined, true);
             if (exists) {
-                return fs.readFileSync(filename, "binary");
+                return fs.readFileSync(filename, encoding || "binary");
             } else {
                 return undefined;
             }
         } else {
             this.fileExists(filename, function (exists) {
                 if (exists) {
-                    fs.readFile(filename, "binary", function (err, file) {
+                    fs.readFile(filename, encoding || "binary", function (err, file) {
                         callback(file);
                     });
                 } else {
@@ -155,7 +155,6 @@ var FileServer = function () {
                 }
             });
         }
-
     };
 
     this.readFileSync = function (filename) {

@@ -102,6 +102,9 @@ var HtmlParser = function () {
                     field.requirements.step = 0.01;
                     htmlForm += parseNumberType(field, form.attr.placeholder);
                     break;
+                case 'date':
+                    htmlForm += parseDateType(field, form.attr.placeholder);
+                    break;
                 case 'hidden':
                     htmlForm += parseHiddenType(field);
                     break;
@@ -375,6 +378,15 @@ var HtmlParser = function () {
         input += field.requirements.min ? 'min="' + field.requirements.min + '"' : '';
         input += field.requirements.max ? 'max="' + field.requirements.max + '"' : '';
         input += field.requirements.step ? 'step="' + field.requirements.step + '"' : '1';
+        input += ' />';
+
+        return input;
+    };
+
+    var parseDateType = function(field, hasPlaceholder) {
+        var input = generateLabel(field, hasPlaceholder);
+        input += '<input type="date' + (field.attr.datetime ? "time-local" : "") +'" ';
+        input += parseBasicFieldAttributes(field);
         input += ' />';
 
         return input;

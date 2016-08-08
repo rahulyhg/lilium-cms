@@ -89,7 +89,8 @@
         "home" : "homepage.lml",
         "search" : "s.lml",
         "archive" : "archive.lml",
-        "category" : "category.lml",
-        "tag" : "tag.lml"
+        "author" : "archive.lml",
+        "category" : "archive.lml",
+        "tags" : "archive.lml"
     }
 }

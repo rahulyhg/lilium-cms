@@ -125,6 +125,19 @@ var Settings = function () {
                 displayname: "POST Maximum File Size"
             })
 
+        .add('social-sep', 'title', {
+                displayname: "Social networking"
+            })
+            .add('social.facebook.appid', 'text', {
+                displayname: "Facebook Application ID"
+            })
+            .add('social.facebook.token', 'text', {
+                displayname: "Facebook Public Access Token"
+            })
+            .add('social.facebook.apiversion', 'text', {
+                displayname: "Facebook Graph API Version"
+            })
+
         .add('stripe-sep', "title", {
                 displayname: "Stripe"
             })
@@ -155,6 +168,21 @@ var Settings = function () {
             }, {
                 required: false
             })
+
+        .add('post-sep', 'title', {
+                displayname: "Posts"
+            })
+            .add('posts.backend.dateformat', 'text', {
+                displayname: "Post list date format"
+            }, {
+                required: false
+            })
+/*            .add('posts.frontend.dateformat', 'text', {
+                displayname: "Presented date format"
+            }, {
+                required: false
+            })
+*/
 
             .trg('bottom')
 

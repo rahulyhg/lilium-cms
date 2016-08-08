@@ -7,8 +7,6 @@
 			root += "admin/"
 		$}
 
-
-
 		<main class="entities-main">
             <div class="continue-working-wrapper">
                 <h1>Continue Working on :</h1>
@@ -31,6 +29,10 @@
 			<lml:tobject data-nodetype="h6" data-key="subtitle"></lml:tobject>
 		</lml:tabletemplate>
 
+        <lml:tabletemplate id="table-article-date">
+            <lml:tobject data-nodetype="div" data-key="date" data-formatter="lmldate"></lml:tobject>
+        </lml:tabletemplate>
+    
 		<lml:tabletemplate id="table-article-status">
 			<lml:tobject data-nodetype="div" data-key="status"></lml:tobject>
 		</lml:tabletemplate>

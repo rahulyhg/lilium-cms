@@ -47,9 +47,7 @@ var LML = function () {
     var execVariableTag = function (context, code, callback) {
         // Browse the context library for corresponding obhect;
         parseStringForRecursiveVarTags(context, code, function (code) {
-            var endVal = LMLSlang.pulloutVar(context, code);
-
-            context.newLine = endVal;
+            context.newLine = LMLSlang.pulloutVar(context, code) || "";
             callback();
         });
 
@@ -176,7 +174,7 @@ var LML = function () {
                         context.newLine += fContent || ("[LMLIncludeException] File not found : " + fullpath);
                         currentIndex++;
                         next();
-                    });
+                    }, false, 'utf8');
                 }
             }
         };
@@ -843,7 +841,7 @@ var LML = function () {
                             callback(undefined);
                         }
                     }, context);
-                });
+                }, false, 'utf8');
             } else {
                 callback("[LMLIncludeNotFound : " + rootpath + "]");
                 callback(undefined);
@@ -863,7 +861,7 @@ var LML = function () {
                 newcontext.block = context.block;
                 newcontext.isParent = true;
 
-                var content = fileserver.readFile(rootpath, undefined, true);
+                var content = fileserver.readFile(rootpath, undefined, true, 'utf8');
 
                 that.parseContent(rootpath, content, function (pContent) {
                     if (typeof pContent !== 'undefined') {
@@ -872,9 +870,7 @@ var LML = function () {
                         callback(undefined);
                     }
                 }, newcontext);
-
             }
-
         } else {
             return ("[LMLParentNotFound : " + rootpath + "]");
         }
@@ -945,7 +941,7 @@ var LML = function () {
                     verifyEnd();
                 }
             }, undefined, extra);
-        });
+        }, false, 'utf8');
     }
 
     this.executeToFile = function (rootpath, compilepath, callback, extra) {
@@ -993,7 +989,7 @@ var LML = function () {
                         });
                     }
                 }, undefined, extra);
-            });
+            }, false, 'utf8');
         });
     }
 

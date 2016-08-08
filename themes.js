@@ -249,6 +249,9 @@ var Themes = function () {
         return config.server.base + config.paths.themes + '/' + ActiveTheme[config.id].info.dirName;
     }
 
+    this.getEnabledThemeEntry = function(config) {
+        return this.getEnabledThemePath(config) + '/' + this.getEnabledTheme(config).info.entry;
+    };
 
     this.bindEndpoints = function (conf) {
         Admin.registerAdminEndpoint('themes', 'GET', this.serveAdminList);

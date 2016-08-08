@@ -91,6 +91,8 @@ var LmlTable = function(table) {
 	};
 
 	var genButtons = function() {
+        currentPage = currentPage || 1;
+
 		var pages = Math.ceil(currentData.size / maxEntries);
 		var buttons = document.createElement('div');
 		buttons.className = 'navbuttons pull-right';
@@ -101,8 +103,23 @@ var LmlTable = function(table) {
             prevButton.className = 'previous disabled';
         }
         buttons.appendChild(prevButton);
+        var totalPages = pages;
+        var smallest = 1;
+        var highest = totalPages;
+        
+        if (totalPages > 5) {
+            var cPage = parseInt(currentPage);
+            if (totalPages - cPage < 3) {
+                smallest = highest - 5;
+            } else if (cPage < 4) {
+                highest = 5;
+            } else {
+                highest = cPage + 2;
+                smallest = cPage - 2;
+            }
+        }
 
-		for (var i = 1; i <= pages; i++) {
+		for (var i = smallest; i <= highest; i++) {
 			var button = document.createElement('BUTTON');
 			var text = document.createTextNode('' + i);
             if (currentPage == i) {

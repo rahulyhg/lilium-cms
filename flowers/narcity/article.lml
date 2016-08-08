@@ -1,19 +1,18 @@
-{#config;extra}
+{#config;extra;slug}
 {$
     featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
     author = extra.article.authors.0;
     url = config.default.server.url;
+    rooturl = url.substring(2);
 $}
 <article>
     {$ if (extra.article.featuredimage.length != 0); $}
-    <div class="featured-image-wrapper">
+    <div class="featured-image-wrapper" style="background-image : url('{=featimg}')">
         {$ if (?extra.article.featuredimageartist != ""); $}
         <div class="featured-image-credit">
             <a href="{=extra.article.featuredimagelink}">@{=extra.article.featuredimageartist}</a>
         </div>
         {$ endif; $}
-
-        <img src="{=featimg}" />
     </div>
     {$ endif; $}
     
@@ -48,10 +47,10 @@ $}
     <div class="article-signature">
         <div class="article-signature-face-wrapper">
             <img src="{=author.avatarURL}" class="article-signature-face" />
-        </div> 
+        </div>
         <div class="article-signature-details-wrapper">
             <span class="article-signature-name">
-                <a href="{=url}/author/{=author.username}">  
+                <a href="{=url}/author/{=author.slug}">  
                     {=author.displayname}
                 </a>
             </span>
@@ -75,7 +74,8 @@ $}
 
     <div class="article-tags-wrapper">
         {$ for (tag in ?extra.article.tags); $}
-            <a href="{=url}/tags/{=tag}">
+            {$ slugtag = slug.ify(=tag); $}
+            <a href="{=url}/tags/{=slugtag}">
                 {=tag}
             </a>
         {$ endfor; $}
@@ -83,7 +83,10 @@ $}
 
     <div class="article-comments">
         <h4 class="article-section-title">Join the discussion</h4>
-        <div class="fb-comments" data-href="{=url}/{=extra.article.name}" data-numposts="3"></div>
+        <div class="fb-comments" 
+            data-href="{=rooturl}/{=extra.article.name}" data-numposts="3" 
+            style="width:100%;" data-width="100%">
+        </div>
     </div>
 
     <div class="article-digest-sub">
@@ -137,3 +140,9 @@ $}
     </div>
     {$ endif; $}
 </article>
+
+{$ if (?config.default.social.facebook.token != ""); $}
+<script>
+    var reqURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?id=http:{=config.default.server.url}/{=extra.article.name}/&access_token={=config.default.social.facebook.appid}|{=config.default.social.facebook.token}";
+</script>
+{$ endif; $}

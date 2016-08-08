@@ -1,0 +1,81 @@
+{#config;extra}
+<!DOCTYPE html>
+<html>
+    <head>
+		{%adminhead}
+        <title>Lilium | Welcome</title>
+    </head>
+    <body id="lml-welcome">
+        <!-- Live variable returning current user -->
+        {*me}
+        <main>
+            <section class="slide-1">
+                <h1 class="vert">Hi.</h1>
+            </section>
+
+            <section class="slide-2">
+                <h1 class="vert">Let me begin by saying </h1>
+            </section>
+
+            <section class="slide-3">
+                <h1 class="vert">Is your name as pretty as your face?</h1>
+                <input type="text" id="fullname" class="opacity0 transiant bouncy" placeholder="Firstname and lastname" />
+            </section>
+        </main>
+    
+        <script>
+            // document.location = "{=config.default.server.url}/admin";
+            var randomComp = [
+                "your hair looks great today.",
+                "you look absolutely amazing today.",
+                "your smile is especially beautiful today.",
+                "your eyes are beautiful when you're looking at your backlit computer screen.",
+                "I wish I'd be as good-looking as you are today."
+            ];
+
+            var slides = [
+                function() {
+                    $("section.slide-1").show();
+                    setTimeout(function() {
+                        $("section.slide-1").addClass('shown');
+                        setTimeout(slides[1], 3000);
+                    }, 200);
+                }, function() {
+                    $("section.slide-1").removeClass('shown');
+                    setTimeout(function() {
+                        $("section.slide-1").hide();
+                        slides[2]();
+                    }, 1510);
+                }, function() {
+                    $("section.slide-2").show();
+                    setTimeout(function() {
+                        $("section.slide-2").addClass('shown');
+                        setTimeout(slides[3], 5000);
+                    }, 10);
+                }, function() {
+                    $("section.slide-2").removeClass('shown');
+                    setTimeout(function() {
+                        $("section.slide-2").hide();
+                        slides[4]();
+                    }, 1510);
+                }, function() {
+                    $("section.slide-3").show();
+                    setTimeout(function() {
+                        $("section.slide-3").addClass('shown');
+                        setTimeout(function() {
+                            $('#fullname').removeClass('opacity0');
+                        }, 1500);
+                    }, 10); 
+                }
+            ]
+
+            var makeEverythingGreat = function() {
+                var randh1 = $("section.slide-2 h1");
+                randh1.html(randh1.html() + "<i>" + randomComp[Math.floor(Math.random()*randomComp.length)] + "</i>");
+                slides[0]();
+            };
+
+            $(makeEverythingGreat);
+        </script>
+    </body>
+</html>

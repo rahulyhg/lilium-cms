@@ -8,6 +8,7 @@ var log = undefined;
 var fileserver = undefined;
 var themes = undefined;
 var db = undefined;
+var hooks = undefined;
 
 var themePath;
 var noOp = function() {};
@@ -30,6 +31,7 @@ var initRequires = function(abspath) {
     articleHelper = require(abspath + 'articleHelper.js');
     fileserver = require(abspath + 'fileserver.js');
     themes = require(abspath + 'themes.js');
+    hooks = require(abspath + 'hooks.js');
     db = require(abspath + 'includes/db.js');
 };
 
@@ -105,6 +107,10 @@ var fetchHomepageArticles = function(_c, cb) {
         } else {
             db.join(_c, 'content', [
                 {
+                    $match : {
+                        'status' : 'published'
+                    } 
+                }, {
                     $sort : {
                         date : -1
                     }
@@ -130,7 +136,155 @@ var fetchHomepageArticles = function(_c, cb) {
     nextSection();
 };
 
+var articleChanged = function(cli, article) {
+
+};
+
+var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
+    var match = {
+        status : 'published'
+    };
+
+    var typeMatch = {};
+    var typeCollection = "";
+
+    switch (section) {
+        case 'tags':
+            match['tagslugs'] = mtc;
+            typeCollection = "tags";
+            typeMatch.name = mtc;
+            break;
+        case 'category':
+            match['categories'] = mtc;
+            typeCollection = "categories";
+            typeMatch = [
+                { 
+                    $match : { name : mtc } 
+                }
+            ];
+            break;
+        case 'author':
+            typeCollection = "entities";
+            typeMatch = [
+                {
+                    $match : {
+                        slug : mtc
+                    }
+                }
+            ];
+            break;
+        default:
+            match['NONE'] = '$';
+    }
+
+    var limit = 18;
+    var skip = skp * limit;
+    var matchCallback = function(archTypeRes, err) { 
+        if (err || archTypeRes.length == 0) {
+            return cb(404);
+        }
+
+        if (section == 'author') {
+            match["author"] = db.mongoID(archTypeRes[0]._id);
+        }
+
+        db.join(cli._c || cli, 'content', [
+            {
+                $match : match
+            }, {
+                $sort : {
+                    date : -1
+                }
+            }, {
+                $lookup : {
+                    from:           "uploads",
+                    localField:     "media",
+                    foreignField:   "_id",
+                    as:             "featuredimage"
+                }
+            }
+        ], function(latests) {
+            var totalPages = Math.ceil(latests.length / limit);
+            var smallest = 1;
+            var highest = totalPages;
+            var indices = [];
+        
+            if (totalPages > 5) {
+                var cPage = parseInt(skp);
+                if (totalPages - cPage < 3) {
+                    smallest = highest - 5;
+                } else if (cPage < 4) {
+                    highest = 5;
+                } else {
+                    highest = cPage + 2;
+                    smallest = cPage - 2;
+                }
+            }
+
+            for (var i = smallest; i <= highest; i++) {
+                indices.push(i);
+            }
+
+            indices.totalpages = totalPages;
+
+            cb(err || archTypeRes[0], latests.splice(skip, limit), latests.length, indices);
+        });
+    }
+
+    if (section == "tags") {
+        matchCallback([{tag : mtc}]);
+    } else {
+        db.join(cli._c || cli, typeCollection, typeMatch, matchCallback);
+    }
+};
+
+var serveArchive = function(cli, archType) {
+        var _c = cli._c;
+        var tagName = cli.routeinfo.path[1];
+        var tagIndex = cli.routeinfo.path[2] || 1;
+
+        if (isNaN(tagIndex)) {
+            return cli.throwHTTP(404, 'NOT FOUND');
+        }
+
+        if (typeof cachedTags[archType] === 'undefined') {
+            cachedTags[archType] = {};
+        }
+
+        if (typeof cachedTags[archType][tagName] === 'undefined') {
+            cachedTags[archType][tagName] = [];
+        }
+
+        if (typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
+            fetchArchiveArticles(_c, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices) {
+                if (typeof archDetails === "number") {
+                    return cli.throwHTTP(404, 'NOT FOUND');
+                }
+
+                var extra = new Object();
+                extra.articles = articles;
+                extra.totalarticles = total;
+                extra.searchname = tagName;
+                extra.indices = indices;
+                extra.currentpage = tagIndex;
+                extra.archivename = archType;
+                extra.archivedetails = archDetails;
+                
+                filelogic.renderThemeLML(cli, archType, archType + "/" + tagName + '/' + tagIndex + '/index.html', extra, function() {
+                    fileserver.pipeFileToClient(cli, _c.server.html + '/' + archType +'/' + tagName + '/' + tagIndex + '/index.html', function() {
+                        cachedTags[archType][tagName][tagIndex] = true;
+                        log('Narcity', 'Generated tag archive for type ' + archType + ' : ' + tagName);
+                    });
+                });
+            });
+        } else {
+            fileserver.pipeFileToClient(cli, _c.server.html + '/' + archType + '/' + tagName + '/' + tagIndex + "/index.html", noOp, true);
+        }
+
+}
+
 var needsHomeRefresh = true;
+var cachedTags = {};
 var loadHooks = function(_c, info) {
     endpoints.register(_c.id, '', 'GET', function(cli) {
         if (needsHomeRefresh) {
@@ -146,10 +300,30 @@ var loadHooks = function(_c, info) {
                     }, true);
                 });
             });
+
+            setTimeout(function() {
+                needsHomeRefresh = true;
+            }, 1000 * 60 * 5);
         } else {
             fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
         }
     });
+
+    ["tags", "author", "category"].forEach(function(archType) {
+        endpoints.register(_c.id, archType, 'GET', function(cli) { serveArchive(cli, archType); }); 
+    });
+
+    hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
+    hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
+    hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
+};
+
+NarcityTheme.prototype.clearCache = function(ctx, detail) {
+    switch (ctx) {
+        case "home": needsHomeRefresh = true; break;
+        case "tags": delete cachedTags[ctx][detail]; break;
+        default: break;
+    }
 };
 
 var registerPrecompFiles = function(_c) {
@@ -186,8 +360,14 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
 
         // Symlink res to html folder
         fileserver.createSymlink(themePath + '/res', _c.server.html + '/res', function() {
-            log('Narcity', 'Created symlink. Ready to callback');
-            callback();
+            fileserver.createDirIfNotExists(_c.server.html + "/tags", function() {
+                fileserver.createDirIfNotExists(_c.server.html + "/authors", function() {
+                    fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
+                        log('Narcity', 'Created symlink and content directories. Ready to callback');
+                        callback();
+                    }, true);
+                }, true);
+            }, true);
         });
     });
 }

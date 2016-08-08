@@ -326,6 +326,8 @@ var LiliumCMS = function() {
                             liliumcms.formParser.setLeafletLocation(kkString, undefined, locSplit[1], locSplit[0]);
                         } else if (field.attr('type') == 'checkbox') {
                             field.get(0).checked = val === true;
+                        } else if (field.attr('type') == 'datetime-local') {
+                            field.val(html5datetime(val));
                         } else {
                             field.val(val);
                         }

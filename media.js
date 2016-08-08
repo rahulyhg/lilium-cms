@@ -293,7 +293,14 @@ var Media = function () {
             var allMedia = levels.length === 0;
 
             if (allMedia) {
-                db.singleLevelFind(cli._c, 'uploads', callback);
+                var limit = params.limit || 50;
+                var skip = params.skip || 0;
+
+                db.aggregate(cli._c, 'uploads', [
+                    {$skip : skip}, {$limit: limit}
+                ], function(data) {
+                    callback(data);
+                });
             } else {
                 db.multiLevelFind(cli._c, 'uploads', levels, {
                     _id: new mongo.ObjectID(levels[0])

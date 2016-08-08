@@ -1,4 +1,14 @@
 {#config}
+
+var lmldate = function(str) {
+    var format = "{=?config.default.posts.backend.dateformat}";
+    return dateFormat(str, format == '' ? 'mmm dd yyyy, HH:MM' : format);
+}
+
+var html5datetime = function(dt) {
+    return dateFormat(new Date(dt || ""), 'yyyy-MM-dd\'T\'hh:mm');
+}
+
 var LiveVars = function() {
     var endpoints = this.endpoints = [];
     var paramString = "?";
@@ -292,6 +302,14 @@ var LiveVars = function() {
                     node.bind(bindName, function() {
                         window[action].apply(data, [data[paramkey], node]);
                     });
+                }
+
+                if (formatting = obj.data('formatter')) {
+                    switch (formatting) {
+                        case 'lmldate':
+                            node.html(lmldate(node.html()));
+                            break;
+                    }
                 }
 
                 // Replace the actual template with the node

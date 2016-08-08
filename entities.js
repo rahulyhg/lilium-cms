@@ -21,14 +21,20 @@ var Entity = function () {
     this.shhh = "";
     this.email = "";
     this.roles = new Array();
+    this.jobtitle = "";
     this.displayname = "";
     this.avatarID = -1;
     this.avatarURL = "";
     this.createdOn = undefined;
     this.preferences = new Object();
+    this.slug = "";
 
     // Various data; should always be checked for undefined
     this.data = new Object();
+};
+
+var toEntitySlug = function(str) {
+    return require('slugify')(str).toLowerCase().replace(/\'/g, "");
 };
 
 var Entities = module.exports = new function () {
@@ -45,6 +51,14 @@ var Entities = module.exports = new function () {
     this.getCachedRoles = function() {
         return Object.assign({}, Roles);
     }
+
+    this.firstLogin = function(cli, userObj, cb) {
+        db.update(cli._c, 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : 1}, cb);
+    };
+
+    this.registerLogin = function(cli, userObj, cb) {
+        db.update(cli._c, 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : userObj.totalLogin++}, cb);
+    };
 
     this.fetchFromDB = function (conf, idOrUsername, callback) {
         var condition = new Object();
@@ -158,7 +172,7 @@ var Entities = module.exports = new function () {
             if (!err){
                 cli.refresh();
             } else {
-                log('[Database] error while updating entity :');
+                log('[Database] error while updating entity : ' + err);
                 cli.throwHTTP(500);
             }
         });
@@ -190,7 +204,7 @@ var Entities = module.exports = new function () {
                         _id: db.mongoID(id)
                     }, {
                         avatarURL: avatarURL,
-                        avatarID: avatarID
+                        avatarID: db.mongoID(avatarID)
                     }, function (err, result) {
                         // Update session
                         if (isProfile) {
@@ -360,6 +374,26 @@ var Entities = module.exports = new function () {
         filelogic.serveAdminLML(cli);
     };
 
+    this.refreshSlugs = function(cli, cb) {
+        db.findToArray(cli._c, 'entities', {}, function(err, arr) {
+            var i = 0;
+            var nextEnt = function() {
+                db.update(cli._c, 'entities', {_id : db.mongoID(arr[i]._id)}, {
+                    slug : toEntitySlug(arr[i].displayname || arr[i].username || "")
+                }, function() {
+                    i++;
+
+                    if (arr.length == i) {
+                        cb(arr.length);
+                    } else {
+                        setTimeout(nextEnt, 0);
+                    }
+                });
+            };
+            nextEnt();
+        });
+    };
+
     this.initialiseBaseEntity = function (entData) {
         var newEnt = this.createEmptyEntity();
 
@@ -373,10 +407,12 @@ var Entities = module.exports = new function () {
                 newEnt.roles.push(entData.roles[index]);
             }
         }
+        newEnt.jobtitle = entData.jobtitle;
         newEnt.displayname = entData.displayname;
         newEnt.firstname = entData.firstname;
         newEnt.lastname = entData.lastname;
         newEnt.createdOn = new Date();
+        newEnt.slug = entData.slug || toEntitySlug(entData.displayname || entData.username || "");
 
         if (typeof newEnt.meta === "object") {
             for (var key in newEnt.meta) {
@@ -461,6 +497,8 @@ var Entities = module.exports = new function () {
         delete valObject.shhh;
         delete valObject._id;
         delete valObject.createdOn;
+        delete valObject.avatarID;
+        delete valObject.avatarURL;
 
         db.update(siteid, 'entities', {_id : id}, valObject, cb);
     };
@@ -623,7 +661,8 @@ var Entities = module.exports = new function () {
             .edit('username', '', {
                 disabled : true
             })
-            .add('description', 'text', {displayname: 'BIO'}, {required:false})
+            .add('jobtitle', 'text', {displayname : "Job title"}, {required:false})
+            .add('description', 'textarea', {displayname: 'BIO'}, {required:false})
             .edit('create', '', {
                 value: 'Update Profile'
             });
@@ -718,7 +757,7 @@ var Entities = module.exports = new function () {
                         }
                     }
 
-                    powerConstraint.maxpower = {$gt : maxpower};
+                    powerConstraint.maxpower = {$or : [{$gt : maxpower}, {roles : ["wptransferred"]}]};
                 }
 
                 var sort = {};
@@ -749,14 +788,12 @@ var Entities = module.exports = new function () {
                     } : {})
                 }, {
                     $sort: sort
-                }, {
-                    $skip: (params.skip || 0)
-                }, {
-                    $limit: (params.max || 20)
                 }], function (data) {
+                    var skip = params.skip || 0;
+                    var limit = params.max || 20;
                     results = {
                         size: data.length,
-                        data: data.map( (usr) => {
+                        data: data.splice(skip, limit).map( (usr) => {
                             return Object.assign(usr.user, usr.maxpower);
                         })
                     };
@@ -820,7 +857,8 @@ var Entities = module.exports = new function () {
                     site : dat.site,
                     preferences : dat.preferences || preferences.getDefault(cli._c),
                     notifications: dat.notifications || [],
-                    newNotifications: dat.newNotifications || 0
+                    newNotifications: dat.newNotifications || 0,
+                    data : (params.withdata ? dat.data : undefined)
                 }
             }
 

@@ -13,7 +13,15 @@ var Login = function() {
 		cli.touch('login.loginsuccess');
 		sessions.createSessionInCli(cli, userObj);
 
-		hooks.fire('user_loggedin', cli);
+        if (typeof userObj.totalLogin === "undefined") {
+            log('Login', 'Logged in user ' + userObj.username + " for the first time");
+            handleFirstLogin(cli, userObj);
+        } else {
+		    entities.registerLogin(cli, userObj, function() {
+                log('Login', 'Logged in user ' + userObj.username);
+                hooks.fire('user_loggedin', cli);
+            });
+        }
 	};
 
 	this.authUser = function(cli) {
@@ -56,6 +64,12 @@ var Login = function() {
 			.trg('userpass')
 			.add('login', 'submit', {displayname:"Login",wrapperCssSuffix:"loginbutton"});
 	};
+
+    var handleFirstLogin = function(cli, userObj) {
+        entities.firstLogin(cli, userObj, function() {
+            cli.redirect(cli._c.server.url + '/admin/welcome', false);
+        });
+    };
 
 	var init = function() {
 

@@ -66,6 +66,7 @@
     "node-minify": "^1.3.7",
     "nodemailer": "^2.1.0",
     "path": "^0.12.7",
+    "pokemongo-api": "^0.1.10",
     "process": "^0.11.2",
     "sendgrid": "^2.0.0",
     "sesh": "^0.1.0",

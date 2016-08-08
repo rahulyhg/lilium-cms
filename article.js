@@ -130,7 +130,7 @@ var Article = function() {
             }
         ], function(arr) {
             if (arr.length === 0) {
-                cb(new Error("No article found"));
+                cb(false, new Error("No article found"));
             } else {
                 db.rawCollection(conf, 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
@@ -183,6 +183,28 @@ var Article = function() {
         });
     };
 
+    this.refreshTagSlugs = function(_c, cb) {
+        db.find(_c, 'content', {}, [], function(err, cursor) {
+            var handleNext = function() {
+                cursor.hasNext(function(err, hasnext) {
+                    if (hasnext) {
+                        cursor.next(function(err, dbart) {
+                            var tagslugs = dbart.tags.map(function(tagname) {
+                                return slugify(tagname).toLowerCase();
+                            });
+
+                            db.update(_c, 'content', {_id : db.mongoID(dbart._id)}, {tagslugs : tagslugs}, handleNext);
+                        });
+                    } else {
+                        cb();
+                    }
+                });
+            };
+
+            handleNext();
+        });
+    };
+
     this.publish = function(cli) {
         cli.touch('article.new');
         var that = this;
@@ -209,6 +231,10 @@ var Article = function() {
                 } : {
                     _id: db.mongoID()
                 };
+
+                formData.tagslugs = formData.tags.map(function(tagname) {
+                    return slugify(tagname).toLowerCase();
+                });
 
                 // Create post
                 db.update(cli._c, 'content', conds, formData, function(err, result) {
@@ -307,6 +333,10 @@ var Article = function() {
         formData.author = db.mongoID(cli.userinfo.userid);
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
+
+        formData.tagslugs = formData.tags.map(function(tagname) {
+            return slugify(tagname).toLowerCase();
+        });
 
         // Autosave
         if (auto) {
@@ -463,6 +493,10 @@ var Article = function() {
                     formData.media = db.mongoID(formData.media);
                     formData.updated = new Date();
                     formData.status = 'published';
+
+                    formData.tagslugs = formData.tags.map(function(tagname) {
+                        return slugify(tagname).toLowerCase();
+                    });
 
                     db.findToArray(cli._c, 'content', {
                         _id: id
@@ -690,24 +724,12 @@ var Article = function() {
                     }
                 }, {
                     $sort: sort
-                }, {
-                    $skip: (params.skip || 0)
-                }, {
-                    $limit: (params.max || 20)
                 }], function(data) {
-                    db.find(cli._c, 'content', (params.search ? {
-                        $text: {
-                            $search: params.search
-                        }
-                    } : {}), [], function(err, cursor) {
-                        cursor.count(function(err, size) {
-                            results = {
-                                size: size,
-                                data: data
-                            }
-                            callback(err || results);
-
-                        });
+                    var skip = (params.skip || 0);
+                    var limit = (params.max || 20);
+                    callback({
+                        size: data.length,
+                        data: data.splice(skip, limit)
                     });
                 });
 
@@ -928,6 +950,11 @@ var Article = function() {
             .add('title-author', 'title', {
                 displayname : "Redaction"
             })
+            .add('date', 'date', {
+                displayname : "Publish date",
+                datetime : true,
+                context : 'edit'
+            })
             .beginSection('authorbox', {
                 "session.rights" : "edit-all-articles"
             })
@@ -990,8 +1017,6 @@ var Article = function() {
             }
         });
     }
-
-
 
     var init = function() {
         tableBuilder.createTable({

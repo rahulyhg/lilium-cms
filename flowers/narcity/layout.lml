@@ -20,6 +20,7 @@
     {=theme.render('head_will_close')}
 </head>
 <body>
+    {%petals/lib}
     {%petals/socialhead}
     {=theme.render('body_will_open')}
     

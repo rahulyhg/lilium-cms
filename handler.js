@@ -113,7 +113,7 @@ var Handler = function () {
         }
 
         if (fieldname.indexOf('[') == -1) {
-            cli.postdata.data[fieldname] = isBool ? val : inspect(val).slice(1, -1);
+            cli.postdata.data[fieldname] = val;
         } else {
             var reg = /\[([a-zA-ZÀ-ÿ0-9]*)\]/g;
             var firstLevel = fieldname.substring(0, fieldname.indexOf('['));

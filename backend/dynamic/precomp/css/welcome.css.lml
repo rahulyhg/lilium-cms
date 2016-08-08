@@ -1,0 +1,93 @@
+{#config}
+
+body#lml-welcome {
+    background-color: #333;
+
+    position:fixed;
+    top:0; bottom:0; left:0; right:0;
+}
+
+#lml-welcome main, 
+#lml-welcome section {
+    height: 100%;
+}
+
+#lml-welcome section h1 {
+    font-size: 48px;
+    font-weight: 100;
+}
+
+#lml-welcome .vert {
+    position: relative;
+    top: 40%;
+}
+
+#lml-welcome section {
+    float: none;
+    margin: 0 auto;
+    color: #EEE;
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    text-align: center;
+
+    display: none;
+    opacity: 0;
+    position:fixed;
+
+    top:0; bottom:0; right:0; left:0;
+
+    -webkit-transition: all 1.5s;
+       -moz-transition: all 1.5s;
+        -ms-transition: all 1.5s;
+         -o-transition: all 1.5s;
+            transition: all 1.5s;
+}
+
+#lml-welcome .transiant {
+    -webkit-transition: all 1.5s;
+       -moz-transition: all 1.5s;
+        -ms-transition: all 1.5s;
+         -o-transition: all 1.5s;
+            transition: all 1.5s;
+}
+
+#lml-welcome .bouncy {
+    -webkit-transition-timing-function : cubic-bezier(.87,-.41,.19,1.44);
+       -moz-transition-timing-function : cubic-bezier(.87,-.41,.19,1.44);
+        -ms-transition-timing-function : cubic-bezier(.87,-.41,.19,1.44);
+         -o-transition-timing-function : cubic-bezier(.87,-.41,.19,1.44);
+            transition-timing-function : cubic-bezier(.87,-.41,.19,1.44);
+}
+    
+#lml-welcome .opacity0 {
+    opacity: 0;
+    margin-top: -20px;
+}
+
+#lml-welcome section.shown {
+    opacity: 1;
+}
+
+#lml-welcome section.slide-1 {
+    
+}
+
+#lml-welcome input {
+    display: block;
+    background-color: #EEE;
+    color: #333;
+    padding: 20px 20px;
+    width: 50%;
+    text-align: center;
+    font-size: 22px;
+    margin: 20px auto;
+    font-weight: 500;
+    border-radius: 10px;
+
+    position: relative;
+    top: 40%;
+}
+
+#lml-welcome #fullname {
+    text-transform: capitalize;
+}

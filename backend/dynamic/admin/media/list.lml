@@ -33,7 +33,7 @@
 
 			</li>
 		</lml:template>
-		<input type=text id='copyLink' style='position: fixed; top : 9999999px; left: 999999px'>
+		<input type=text id='copyLink' style='position: fixed; top : 9999999px; left: 999999px;'>
 
 		<div id='confirm_media' class="modal fade" role="dialog">
 		  <div class="modal-dialog">

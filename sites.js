@@ -89,6 +89,7 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/leaflet/leaflet.js", 410, "admin", conf.id);
+        Frontend.registerJSFile(base + "/backend/static/dateformat.js", 600, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
@@ -106,9 +107,7 @@ var SiteInitializer = function (conf) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/tags.js", 1340, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lys.js", 1350, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmltable.js", 1360, 'admin', conf.id);
-        Frontend.registerJSFile(base + "/backend/static/dropzone.js", 1370, 'admin', conf.id);        
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/quiz.js", 1380, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/album.js", 1385, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/alert.js", 1400, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
@@ -116,7 +115,6 @@ var SiteInitializer = function (conf) {
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
-        Frontend.registerCSSFile(base + "/backend/static/dropzone.css", 2050, 'admin', conf.id);        
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/login.css", 2200, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/media.css", 2600, 'admin', conf.id);
@@ -126,6 +124,7 @@ var SiteInitializer = function (conf) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/multiselect.css", 2600, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/tags.css", 2600, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lmltable.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/welcome.css", 2800, 'admin', conf.id);
 
         hooks.fire('frontend_will_precompile', {
             config: conf,
@@ -367,6 +366,9 @@ var Sites = function () {
 
         conf.default.wptransfer = postdata.wptransfer;
         conf.default.wptransferring = postdata.wptransfer;
+        conf.default.wordpress = {
+            originalurl : postdata.originalurl
+        };
 
         var filename = postdata.baseurl.replace(/\/\//g, '').replace(/\//g, ' ');
         var ws = fs.createWriteStream(__dirname + "/sites/" + filename + ".json", {
@@ -538,6 +540,9 @@ var Sites = function () {
         })
         .add('title-info', 'title', {
                 displayname: "Wordpress site information"
+            })
+            .add('originalurl', {
+                displayname: "Original URL without trailing slash"
             })
             .add('wpsitedataurl', {
                 displayname: "Database URL"

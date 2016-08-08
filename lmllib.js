@@ -25,6 +25,14 @@ var registeredLibraries = {
     themes: function (context) {
         return require('./themes.js');
     },
+    slug : function(context) {
+        return {
+            ify : function(str) {
+                var sl = require('slugify')(str);
+                return sl ? sl.toLowerCase() : "";
+            }
+        };
+    },
     extra: function (context) {
         return context.extra;
     },

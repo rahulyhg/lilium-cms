@@ -1,5 +1,12 @@
+{#config;article;extra}
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="template" content="Narcity 3.0">
+
+{$ if (?extra.article.wptype != ""); $}
+<link rel="canonical" href="{=config.default.wordpress.originalurl}/{=extra.article.name}/" />
+{$ endif; $}
+
+

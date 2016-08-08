@@ -40,6 +40,10 @@ var Admin = function() {
 		filelogic.runLogic(cli);
 	};
 
+    this.welcome = function(cli) {
+        filelogic.serveLmlPage(cli, false);
+    };
+
 	this.handleAdminEndpoint = function(cli) {
 		cli.touch('admin.handleAdminEndpoint');
 

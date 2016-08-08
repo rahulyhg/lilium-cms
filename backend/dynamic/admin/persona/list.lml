@@ -1,0 +1,32 @@
+{#config}
+<h1>
+    Personas
+    <a class='fab' href="{=config.default.server.url}/admin/persona/new">+</a>
+</h1>
+
+<div class="persona-list-wrapper">
+    <ul class="persona-list">
+        {*personas.list(template:"persona-template")}
+    </ul>
+</div>
+
+<lml:template id="persona-template">
+    <li>
+        <div class="persona-image-wrapper">
+            <lml:tobject data-nodetype="a"
+                data-href="{=config.default.server.url}/persona/edit/"
+                data-key="_id"
+                >
+                <lml:tobject data-nodetype="img" data-key="pictureurl"></lml:tobject>
+            </lml:tobject>
+        </div>
+        <div class="persona-details-wrapper">
+            <lml:tobject data-nodetype="a"
+                data-href="{=config.default.server.url}/persona/edit/"
+                data-key="_id"
+                >
+                <lml:tobject data-nodetype="span" data-key="fullname"></lml:tobject>
+            </lml:tobject>
+        </div>
+    </li>
+</lml:template>

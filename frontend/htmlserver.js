@@ -37,10 +37,8 @@ var HTMLServer = function() {
 								});
 							} else {
 								cli.throwHTTP(404, 'Not Found');
-
 							}
 						})
-
 					}
 				});
 			}

@@ -35,6 +35,7 @@ var filelogic = undefined;
 var category = undefined;
 var dashboard = undefined;
 var templateBuilder = undefined;
+var persona = undefined;
 var lys = undefined;
 var backendSearch = undefined;
 var devtools = undefined;
@@ -75,6 +76,7 @@ var Core = function () {
         Inbound = require('./inbound.js');
         Livevars = require('./livevars.js').init();
         Precompiler = require('./precomp.js');
+        persona = require('./personas.js');
         lys = require('./lys.js');
         Petals = require('./petal.js');
         GC = require('./gc.js');
@@ -122,6 +124,11 @@ var Core = function () {
             sessions.logout(cli);
         });
 
+        admin.registerAdminEndpoint('welcome', 'GET', function(cli) {
+            cli.touch('admin.GET.welcome');
+            admin.welcome(cli);
+        });
+
         admin.registerAdminEndpoint('sites', 'GET', function (cli) {
             cli.touch('admin.GET.sites');
             sites.handleGET(cli);
@@ -150,6 +157,16 @@ var Core = function () {
         admin.registerAdminEndpoint('entities', 'POST', function (cli) {
             cli.touch("admin.POST.entities");
             entities.handlePOST(cli);
+        });
+
+        admin.registerAdminEndpoint('persona', 'GET', function(cli) {
+            cli.touch('admin.GET.persona');
+            persona.handleGET(cli);
+        });
+
+        admin.registerAdminEndpoint('persona', 'POST', function(cli) {
+            cli.touch('admin.POST.persona');
+            persona.handlePOST(cli);
         });
 
         admin.registerAdminEndpoint('article', 'POST', function (cli) {
@@ -385,6 +402,15 @@ var Core = function () {
             absURL: aurl + "role",
             children: []
         });
+        admin.registerAdminSubMenu('entities', {
+            id: "entities-personas",
+            faicon: "fa-users",
+            displayname: "Personas",
+            priority: 120,
+            rights: ["manage-personas"],
+            absURL: aurl + "persona/list",
+            children: []
+        });
         admin.registerAdminMenu({
             id: "activities",
             faicon: "fa-eye",
@@ -558,6 +584,7 @@ var Core = function () {
         preferences.registerLiveVar();
         category.registerLiveVar();
         postleaf.registerLiveVar();
+        persona.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };
@@ -586,6 +613,7 @@ var Core = function () {
         settings.registerForm();
         sites.registerForms();
         preferences.registerForm();
+        persona.registerForms();
 
         hooks.fire('forms_init');
         log('Core', 'Forms were loaded');
