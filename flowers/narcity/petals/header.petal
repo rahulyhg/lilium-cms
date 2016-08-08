@@ -34,7 +34,7 @@
 
         <div class="header-float-right">
             <div class="header-search-wrapper">
-                <form method="GET" action="{=config.default.server.url}/s">
+                <form method="GET" action="{=config.default.server.url}/search">
                     <input class="header-search" name="q" type="text" placeholder="Search" required />
                 </form>
             </div>

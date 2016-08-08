@@ -87,7 +87,7 @@
     "contexts" : {
         "article" : "article.lml",
         "home" : "homepage.lml",
-        "search" : "s.lml",
+        "search" : "archive.lml",
         "archive" : "archive.lml",
         "author" : "archive.lml",
         "category" : "archive.lml",

@@ -173,6 +173,11 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 }
             ];
             break;
+        case 'search':
+            match["$text"] = {
+                $search : mtc
+            }
+            break;      
         default:
             match['NONE'] = '$';
     }
@@ -231,7 +236,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
         });
     }
 
-    if (section == "tags") {
+    if (section == "tags" || section == "search") {
         matchCallback([{tag : mtc}]);
     } else {
         db.join(cli._c || cli, typeCollection, typeMatch, matchCallback);
@@ -242,6 +247,13 @@ var serveArchive = function(cli, archType) {
         var _c = cli._c;
         var tagName = cli.routeinfo.path[1];
         var tagIndex = cli.routeinfo.path[2] || 1;
+
+        if (archType === "search" && !tagName) {
+            tagName = cli.routeinfo.params.q;
+            if (!tagName || tagName == "") {
+                return cli.throwHTTP(404, 'NOT FOUND');
+            }
+        }
 
         if (isNaN(tagIndex)) {
             return cli.throwHTTP(404, 'NOT FOUND');
@@ -309,7 +321,7 @@ var loadHooks = function(_c, info) {
         }
     });
 
-    ["tags", "author", "category"].forEach(function(archType) {
+    ["tags", "author", "category", "search"].forEach(function(archType) {
         endpoints.register(_c.id, archType, 'GET', function(cli) { serveArchive(cli, archType); }); 
     });
 
