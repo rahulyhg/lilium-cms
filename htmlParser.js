@@ -451,6 +451,9 @@ var HtmlParser = function () {
         // Value
         attributes += field.attr.value ? 'value="' + field.attr.value + '" ' : '';
 
+        // Tab Index
+        attributes += field.attr.tabindex ? 'tabindex="' + field.attr.tabindex + '" ' : '';
+
         // Is required?
         if (field.type == 'checkbox') {
             attributes += field.requirements.required ? 'data-required="true"' : '';

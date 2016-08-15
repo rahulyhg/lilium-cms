@@ -106,12 +106,15 @@ var Forms = function () {
                 cssClass : "ck-image-credit-form"
             })
             .add('ckimagecreditname', 'text', {
-                displayname: "Artist name"
-            }, {
+                displayname: "Artist name",
+                tabindex: 0
+                }, 
+            {
                 required : false
             })
             .add('ckimagecrediturl', 'text', {
-                displayname: "URL to artist page"
+                displayname: "URL to artist page",
+                tabindex: 0
             }, {
                 required : false
             });

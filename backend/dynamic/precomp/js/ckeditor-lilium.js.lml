@@ -29,15 +29,17 @@ var CKEditor = function() {
         });
         CKEDITOR.config.entities = false;
         CKEDITOR.config.height = 360;
-        CKEDITOR.config.extraPlugins = 'image-finder,youtube';
+        CKEDITOR.config.extraPlugins = 'image-finder,youtube,image-editor';
         CKEDITOR.config.entities_greek = false;
         CKEDITOR.config.entities_latin = false;
         CKEDITOR.config.removeButtons = 'image';
+        CKEDITOR.config.removePlugins = 'image';    
         CKEDITOR.config.allowedContent = true;
         CKEDITOR.config.contentsCss = '/compiled/theme/ckeditor.css';
         CKEDITOR.config.skin = "BootstrapCK4,/bower/BootstrapCK4-Skin/skins/bootstrapck/";
 
         CKEDITOR.plugins.addExternal('youtube', '/bower/ckeditor-youtube-plugin/youtube/');
+
 
         //CKEDITOR plugin to choose picture
         CKEDITOR.dialog.add("imagebrowserDialog", function(editor) {
@@ -63,7 +65,7 @@ var CKEditor = function() {
                     }]
                 }],
                 onShow: function() {
-					dialog = this;
+					dialog = this;  
 
 					// Bypass the bug where tabs are disabled if they only contain html
 					$('.cke_dialog_tabs > a').removeClass('cke_dialog_tab_disabled');
@@ -92,8 +94,16 @@ var CKEditor = function() {
 					$('#image-upload').html('<h1>Upload a media</h1>{=forms.render('media_create')}<div class="bar"><div class="progress"><div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;"></div></div></div>');
 					watchForSubmition();
                 },
-                onOk: function() {
-                    if ($('.cke_dialog_tab_selected').index() == 0) {
+                onOk: function(e) {
+
+                if ($('.ck-image-credit-form input[name="ckimagecreditname"]').val() < 2){
+                        $('.ck-image-credit-form input[name="ckimagecreditname"]').focus();
+                        e.preventDefault();
+                       } else if ($('.ck-image-credit-form input[name="ckimagecrediturl"]').val() < 2){
+                        $('.ck-image-credit-form input[name="ckimagecrediturl"]').focus();
+                        e.preventDefault();
+                } else if ($('.cke_dialog_tab_selected').index() == 0) {
+
                         if (typeof selectedPicture !== 'undefined') {
                             var htmlPlaceholder = createImagePlaceholder(editor);                            
 
@@ -116,6 +126,32 @@ var CKEditor = function() {
                 }
             }
         })
+        CKEDITOR.plugins.add('image-editor', {
+          init: function(editor) {
+            editor.addCommand('editcommand', new CKEDITOR.dialogCommand('imagebrowserDialog'));
+            if (editor.addMenuItem) {
+              // A group menu is required
+              // order, as second parameter, is not required
+              editor.addMenuGroup('edit');
+             
+              // Create a manu item
+              editor.addMenuItem('edititem', {
+                label: 'Edit Image',
+                command: 'editcommand',
+                group: 'edit'
+              });
+            }
+              
+            if (editor.contextMenu) {
+              editor.contextMenu.addListener(function(element, selection) {
+               if ( element.getAscendant( 'img', true ) ) {
+                return { edititem: CKEDITOR.TRISTATE_ON };
+                }
+              });
+            }
+          }
+        });
+
         CKEDITOR.plugins.add("image-finder", {
             init: function(editor) {
                 editor.addCommand('imagebrowser', new CKEDITOR.dialogCommand('imagebrowserDialog'));
