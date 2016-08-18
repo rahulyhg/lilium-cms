@@ -48,7 +48,7 @@ var registeredLibraries = {
 
 var LMLLib = function () {
     this.pulloutLib = function (libName, context) {
-        return registeredLibraries[libName].apply(this, [context]);
+        return registeredLibraries[libName].apply(context, [context]);
     };
 
     this.isRegistered = function (libName) {

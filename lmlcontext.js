@@ -5,7 +5,9 @@ var lmllib = require('./lmllib.js');
 // Those will be loaded runtime instead of on boot
 var LMLConstants = {
     "false": false,
-    "true": true
+    "true": true,
+    "null" : null,
+    "undefined" : undefined
 }
 
 var LMLContext = function (info) {

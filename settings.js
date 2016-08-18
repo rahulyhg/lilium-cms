@@ -3,6 +3,9 @@ var filelogic = require('./filelogic.js');
 var fileserver = require('./fileserver.js');
 var forms = require('./formBuilder.js');
 var hooks = require('./hooks.js');
+var request = require('request');
+var dates = require('./dates.js');
+var log = require('./log.js');
 
 var Settings = function () {
     this.handleGET = function (cli) {
@@ -10,7 +13,7 @@ var Settings = function () {
         filelogic.serveAdminLML(cli);
     };
 
-    this.handlePOST = function (cli) {
+    this.handlePOST = function(cli) {
         cli.touch('settings.handlePOST');
 
         if (cli.hasRight('edit_settings')) {
@@ -33,11 +36,31 @@ var Settings = function () {
                 nextLevel[keyLevel[keyLevel.length - 1]] = val;
             }
 
-            hooks.fire('settings_will_save', cli);
-            _c.saveConfigs(cli._c, function () {
-                hooks.fire('settings_saved', cli);
-                cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?updated=true", false);
-            });
+            var saveSetts = function() {
+                hooks.fire('settings_will_save', cli);
+                _c.saveConfigs(cli._c, function () {
+                    hooks.fire('settings_saved', cli);
+                    cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?updated=true", false);
+                });
+            };
+
+            if (cli._c.google.apikey) {
+                log('Settings', 'Requesting timezone from Google');
+                dates.getTimezoneInfo(cli._c, dat.timezoneplace.split('_').reverse().join(','), function(result) {
+                    var offset = result.rawOffset / 3600;
+                    cli._c.timezone = result.timeZoneId;
+
+                    log('Settings', 'Timezone returned for location (' + 
+                        dat.timezoneplace.split('_').reverse().join(',') + 
+                        ') is ' + cli._c.timezone
+                    );
+
+                    saveSetts();
+                });
+            } else {
+                log('Settings', 'Saving without Google API key');
+                saveSetts();
+            }
         } else {
             cli.throwHTTP(403, 'Unauthorized');
         }
@@ -125,6 +148,13 @@ var Settings = function () {
                 displayname: "POST Maximum File Size"
             })
 
+        .add('google-sep', 'title', {
+                displayname: "Google API"
+            })
+            .add('google.apikey', 'text', {
+                displayname: "API Key"
+            })
+
         .add('social-sep', 'title', {
                 displayname: "Social networking"
             })
@@ -170,12 +200,19 @@ var Settings = function () {
             })
 
         .add('post-sep', 'title', {
-                displayname: "Posts"
+                displayname: "Date / Time"
             })
             .add('posts.backend.dateformat', 'text', {
                 displayname: "Post list date format"
             }, {
                 required: false
+            })
+        .add('tz-sep', 'title', {
+                displayname: "Timezone"
+            })
+            .add('timezoneplace', 'map', {
+                notitle: true,
+                format : "array"
             })
 /*            .add('posts.frontend.dateformat', 'text', {
                 displayname: "Presented date format"

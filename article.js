@@ -10,6 +10,7 @@ var notifications = require('./notifications.js');
 var slugify = require('slug');
 var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
+var dates = require('./dates.js');
 var moment = require('moment');
 
 var Article = function() {
@@ -218,7 +219,7 @@ var Article = function() {
                 formData.status = 'published';
                 formData.name = slugify(formData.title).toLowerCase();
                 formData.author = formData.author ? db.mongoID(formData.author) : cli.userinfo.userid;
-                formData.date = new Date();
+                formData.date = dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone);
                 formData.media = db.mongoID(formData.media);
                 formData.updated = new Date();
                 hooks.fire('article_will_create', {
@@ -493,6 +494,7 @@ var Article = function() {
                     formData.media = db.mongoID(formData.media);
                     formData.updated = new Date();
                     formData.status = 'published';
+                    formData.date = new Date(formData.date);
 
                     formData.tagslugs = formData.tags.map(function(tagname) {
                         return slugify(tagname).toLowerCase();
@@ -954,6 +956,8 @@ var Article = function() {
                 displayname : "Publish date",
                 datetime : true,
                 context : 'edit'
+            }, {
+                required : false
             })
             .beginSection('authorbox', {
                 "session.rights" : "edit-all-articles"

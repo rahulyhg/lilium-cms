@@ -349,7 +349,7 @@ var LML = function () {
                     } else if (str.trim() == "" || levels.length == 0) {
                         throw new Error("LMLParseException - Variable cannot be empty. Tried to read : '" + str + "'");
                     } else {
-                        throw new Error("LMLParseException - Cannot print root level of library '" + levels[0] + "', LML slang not found");
+                        throw new Error("LMLParseException - Cannot print root level of library '"+levels[0]+"', LML slang not found");
                     }
                 } catch (ex) {
                     endVal = ex.acceptUndefined ? "" : ("[" + ex + "]");
@@ -437,6 +437,8 @@ var LML = function () {
                 return this.affect(context, affectedName, affectedValue / effect);
             case "%=":
                 return this.affect(context, affectedName, affectedValue % effect);
+            case "&=":
+                return this.affect(context, affectedName, affectValue);
             }
         };
 

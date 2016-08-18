@@ -244,7 +244,7 @@ var HtmlParser = function () {
         var purifiedName = field.name.replace(/\-\.\s/g, '');
         
         return '<div class="fieldmap-wrapper"><input type="text" class="lml-leaflet-search-input lml-field-nosubmit" placeholder="Input address or business name" data-leafletname="'+purifiedName+'" id="leaflet-search-'+purifiedName+'" name="'+purifiedName+'display" /><div id="leaflet-'+purifiedName+'" class="lml-leafletmap"></div></div><input type="hidden" name="'+purifiedName+'" data-type="leaflet" id="'+purifiedName+'coords" />' +
-        '<script>window.llmap'+purifiedName+' = L.map("leaflet-'+purifiedName+'", {' +
+        '<script>window["llmap'+purifiedName+'"] = L.map("leaflet-'+purifiedName+'", {' +
             'scrollWheelZoom : false,' +
             'keyboard : false,' +
             'zoomControl : false' +
@@ -253,7 +253,7 @@ var HtmlParser = function () {
             'attribution: "",' +
             'maxZoom: 18,' +
             'id: "mapbox.streets"' +
-        '}).addTo(window.llmap'+purifiedName+');</script>';
+        '}).addTo(window["llmap'+purifiedName+'"]);</script>';
     };
 
     var parseTitleType = function (field) {

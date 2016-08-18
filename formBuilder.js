@@ -343,7 +343,7 @@ var FormBuilder = function() {
             }
 
             // Date verification
-            if (field.type == 'date' && !validator.isDate(field.attr.value)) {
+            if (false && field.type == 'date' && !validator.isDate(field.attr.value)) {
                 err[field.name] = '005';
             }
 

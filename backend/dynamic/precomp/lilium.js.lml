@@ -429,6 +429,11 @@ var LiliumCMS = function() {
                 $('#leaflet-search-' + llName).val(realName);
             }
 
+            if (isNaN(lat) || isNaN(lng)) {
+                lat = 45.56028;
+                lng = -73.8524761;
+            }
+
             var llmap = window["llmap" + llName];
 
             llmap.setZoom(12);
@@ -454,7 +459,7 @@ var LiliumCMS = function() {
         };
 
         var handleLeafletSearch = function(llName) {
-            var gKey = "AIzaSyBljaDhXP-YM10jxnWXvlQq9wZq1B6WVvE";
+            var gKey = "{=config.default.google.apikey}";
             var rcn = Math.random().toString().substring(2) + Math.random().toString().substring(2);
             var geocodeAddr = "https://maps.googleapis.com/maps/api/geocode/json?callback=llcb"+rcn+"&key="+gKey+"&address=";
             var addr = $('#leaflet-search-' + llName).val();
@@ -463,9 +468,13 @@ var LiliumCMS = function() {
             window["llcb" + rcn] = function(data) {};
 
             if (addr && addr.trim() !== '') {
-                $.getJSON(geocodeAddr + addr, function(data) {
-                    handleLeafletSearchResponse(llName, data);
-                });
+                if (gKey == "") {
+                    alert("A Google API key must be configured before the map can be used");
+                } else {
+                    $.getJSON(geocodeAddr + addr, function(data) {
+                        handleLeafletSearchResponse(llName, data);
+                    });
+                }
             }
         };
 

@@ -209,6 +209,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 }
             }
         ], function(latests) {
+            var totalArticles = latests.length;
             var totalPages = Math.ceil(latests.length / limit);
             var smallest = 1;
             var highest = totalPages;
@@ -231,8 +232,9 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             }
 
             indices.totalpages = totalPages;
+            indices.totalarticles = totalArticles;
 
-            cb(err || archTypeRes[0], latests.splice(skip, limit), latests.length, indices);
+            cb(err || archTypeRes[0], latests.splice(skip, limit), totalArticles, indices);
         });
     }
 
