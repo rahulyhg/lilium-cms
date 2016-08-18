@@ -9,6 +9,7 @@
 */
 
 var Lys = function() {
+    var that = this;
     this.commandHistory = new Array();
     this.commandsLib = new Object();
     this.commandsKeys = new Array();
@@ -29,7 +30,8 @@ var Lys = function() {
     };
 
     this.execute = function(cmd) {
-        var levels = cmd.toLowerCase().split(' ');
+        cmd = cmd.replace(/please|\!|\,|\./g, '');
+        var levels = cmd.trim().toLowerCase().split(' ');
         var base = levels[0];
 
         if (this.commandsLib[base].callback.apply(this, levels)) {
@@ -55,10 +57,12 @@ var Lys = function() {
     this.bindKeys = function() {
         var that = this;
 
-        Mousetrap.bind('shift+space', function(e) {
+        Mousetrap.bind(['shift+space', 'shift+l'], function(e) {
             that.castLys();
             return false;
         });
+
+        $('#topbar-lys-toggle').bind('click', that.castLys);
 
         var lysDOM = $('#lys');
         lysDOM.bind('keyup', function(ev) {
@@ -76,7 +80,7 @@ var Lys = function() {
     };
 
     var basicShowLys = function(commandName, pageName) {
-        if (pageName === "my") {
+        if (pageName === "my" || pageName === "all" || pageName === "the") {
             pageName = arguments[2];
         }
 
@@ -84,6 +88,9 @@ var Lys = function() {
             "posts" : "article",
             "articles" : "article",
             "dashboard" : "dashboard",
+            "traffic" : "dashboard",
+            "stats" : "dashboard",
+            "chartbeat" : "dashboard",
             "sites" : "sites",
             "media" : "media/list",
             "entities" : "entities",
@@ -171,6 +178,11 @@ var Lys = function() {
             return true;
         }
 
+        if (callname === "hello" || callname === "hi") {
+            liliumcms.notify({type:"success", title:"Hey there!", message:"Have a wonderful day :)"});
+            return true;
+        }
+
         if (subject === "me") {
             liliumcms.notify({type:"success", title:"Of course I love you!", message:"From the bottom of my binary heart :)"});
             return true;
@@ -185,6 +197,11 @@ var Lys = function() {
     var basicPersonalAction = function(callname, action, subject) {
         if (action === "love") {
             return basicEasterEgg(action, subject);
+        } else if (action === "want" || action === "need") {
+            if (subject === "a" || subject === "to") {
+                var args = Array.prototype.splice.call(arguments, 3).join(' ');
+                that.execute(args);
+            }
         }
 
         return false;
@@ -195,10 +212,41 @@ var Lys = function() {
         return true;
     }
 
+    var basicWebSearch = function(website, _____) {
+        var query = Array.prototype.splice.call(arguments, 1).join(' ').trim();
+
+        if (query === "") {
+            return false;
+        }
+        
+        switch (website) {
+            case "google":
+                window.open("https://google.com/search?q=" + query)
+                break;
+
+            case "instagram":
+                if (query[0] === "#") {
+                    window.open("https://www.instagram.com/explore/tags/" + query.substring(1));
+                } else {
+                    if (query[0] === "@") {
+                        query = query.substring(1);
+                    }
+
+                    window.open("https://www.instagram.com/" + query);
+                }
+                break;
+
+            default :
+                return false;
+        }
+
+        return true;
+    }
+
     var init = function() {
         document.addEventListener('livevarsRendered', function(pkg) {
             document.dispatchEvent(new CustomEvent("lysWillRegister"));
-            liliumcms.lys.addLys(["show", "display", "list", "visit", "see"], basicShowLys, {
+            liliumcms.lys.addLys(["show", "display", "list", "visit", "see", "view"], basicShowLys, {
                 description : "Shows a specific section of the admin panel",
                 displayname : "Show"
             });
@@ -213,7 +261,7 @@ var Lys = function() {
                 displayname : "Edit"
             });
 
-            liliumcms.lys.addLys(['love', 'thanks'], basicEasterEgg, {
+            liliumcms.lys.addLys(['love', 'thanks', 'hello', 'hi'], basicEasterEgg, {
                 description : "...",
                 displayname : "Love"
             });
@@ -223,9 +271,14 @@ var Lys = function() {
                 displayname : "The current user will..."
             });
 
-            liliumcms.lys.addLys(["login", "logout"], basicLogout, {
+            liliumcms.lys.addLys(["login", "logout", "bye"], basicLogout, {
                 description : "Logs out the current user and displays the login page",
                 displayname : "Logout"
+            });
+
+            liliumcms.lys.addLys(["google", "instagram"], basicWebSearch, {
+                description : "Queries a third-party in a child window",
+                displayname : "Website query"
             });
 
             liliumcms.lys.addLys(["search", "lookup", "find"], function(_____, terms, _____) {

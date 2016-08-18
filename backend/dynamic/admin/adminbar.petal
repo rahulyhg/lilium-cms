@@ -23,6 +23,9 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li id="topbar-lys-toggle" class="link">
+                        <span class="fa fa-leaf"></span>
+                    </li>
                     <li id="topbar-search-icon" class="link">
                         <span class="fa fa-search"></span>
                     </li>

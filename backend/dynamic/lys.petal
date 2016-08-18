@@ -1,3 +1,3 @@
 <div class="lys-container" id="lys-container">
-    <input type="text" id="lys" placeholder="Show articles" />
+    <input type="text" id="lys" placeholder="Publish a new article" />
 </div>
