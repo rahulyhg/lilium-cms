@@ -76,7 +76,11 @@ var Lys = function() {
     };
 
     var basicShowLys = function(commandName, pageName) {
-         var sameToPage = {
+        if (pageName === "my") {
+            pageName = arguments[2];
+        }
+
+        var sameToPage = {
             "posts" : "article",
             "articles" : "article",
             "dashboard" : "dashboard",
@@ -90,10 +94,17 @@ var Lys = function() {
             "settings" : "settings",
             "parameters" : "settings",
             "devtools" : "devtools",
-            "dev" : "devtools"
+            "dev" : "devtools", 
+            "profile" : "me",
+            "preferences" : "preferences",
+            "settings" : "preferences",
+            "lilium" : "preferences"
         };
 
-        if (!pageName || pageName == "" || !sameToPage[pageName]) {
+        if (pageName === "site") {
+            document.location.href = "{=config.default.server.url}";
+            return true;
+        } else if (!pageName || pageName == "" || !sameToPage[pageName]) {
             return false;
         }
 
@@ -102,6 +113,11 @@ var Lys = function() {
     };
 
     var basicCreateLys = function(commandName, objName) {
+        if (commandName === "publish") {
+            document.location.href = "{=config.default.server.url}/admin/article/new";
+            return true;
+        }
+
         var objTypes = {
             "entity" : "entities/new",
             "user" : "entities/new",
@@ -111,6 +127,12 @@ var Lys = function() {
             "script" : "devtools/lml",
             "persona" : "persona/new"
         };
+
+        var jumpIndex = 2;
+        while (objName === "new" || objName === "an" || objName === "a") {
+            objName = arguments[jumpIndex];
+            jumpIndex++;
+        }
 
         if (!objName || objName == "" || !objTypes[objName]) {
             return false;
@@ -130,47 +152,103 @@ var Lys = function() {
             site : "settings"
         };
 
-        if (lvl = levels[keyword]) {
-            if (url = lvl[detail]) {
-                document.location.href = "{=config.default.server.url}/admin/" + url;
-                return true;
-            }
+        if (!levels[keyword]) {
+            detail = keyword;
+            keyword = 'my';
+        }
+        
+        if (url = levels[keyword][detail]) {
+            document.location.href = "{=config.default.server.url}/admin/" + url;
+            return true;
         }
 
         return false;
     };
 
+    var basicEasterEgg = function(callname, subject) {
+        if (callname === "thanks") {
+            liliumcms.notify({type:"success", title:"You're welcome", message:"It's always a pleasure working with you :D"});
+            return true;
+        }
+
+        if (subject === "me") {
+            liliumcms.notify({type:"success", title:"Of course I love you!", message:"From the bottom of my binary heart :)"});
+            return true;
+        } else if (subject === "you" || subject === "lilium") {
+            liliumcms.notify({type:"success", title:"Aww", message:"I love you too, buddy :)"});
+            return true;
+        }
+
+        return false;
+    };
+
+    var basicPersonalAction = function(callname, action, subject) {
+        if (action === "love") {
+            return basicEasterEgg(action, subject);
+        }
+
+        return false;
+    };
+
+    var basicLogout = function(callname, levels) {
+        document.location.href = "{=config.default.server.url}/logout";
+        return true;
+    }
+
     var init = function() {
         document.addEventListener('livevarsRendered', function(pkg) {
-            liliumcms.lys.addLys("show", basicShowLys, {
+            document.dispatchEvent(new CustomEvent("lysWillRegister"));
+            liliumcms.lys.addLys(["show", "display", "list", "visit", "see"], basicShowLys, {
                 description : "Shows a specific section of the admin panel",
                 displayname : "Show"
             });
 
-            liliumcms.lys.addLys(["create", "new"], basicCreateLys, {
+            liliumcms.lys.addLys(["create", "new", "publish"], basicCreateLys, {
                 description : "Creates a new Lilium object",
                 displayname : "Create"
             });
 
-            liliumcms.lys.addLys("edit", basicEditLys, {
+            liliumcms.lys.addLys(["edit", "modify", "alter"], basicEditLys, {
                 description : "Edit a lilium object",
                 displayname : "Edit"
             });
 
-            liliumcms.lys.addLys("search", function(_____, terms, _____) {
+            liliumcms.lys.addLys(['love', 'thanks'], basicEasterEgg, {
+                description : "...",
+                displayname : "Love"
+            });
+
+            liliumcms.lys.addLys('i', basicPersonalAction, {
+                description : "Action by the current user",
+                displayname : "The current user will..."
+            });
+
+            liliumcms.lys.addLys(["login", "logout"], basicLogout, {
+                description : "Logs out the current user and displays the login page",
+                displayname : "Logout"
+            });
+
+            liliumcms.lys.addLys(["search", "lookup", "find"], function(_____, terms, _____) {
                 displayBackendSearch();
                 if (terms && terms !== "") {
                     var query = Array.prototype.splice.call(arguments, 1).join(' ');
+                    if (query.indexOf('for') === 0) {
+                        query = query.substring(4);
+                    }
 
                     $('.backendsearch-input').val(query);
                     besFormSubmit();
+
+                    return true;
                 }
 
-                return true;
+                return false;
             }, {
                 description : "Popup search overlay",
                 displayname : "Search"
             });
+
+            document.dispatchEvent(new CustomEvent("lysRegistered"));
         });
     };
 
