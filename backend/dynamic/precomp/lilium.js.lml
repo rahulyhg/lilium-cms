@@ -611,11 +611,12 @@ var LiliumCMS = function() {
             that.ckeditor = typeof CKEditor !== 'undefined' ? new CKEditor() : undefined;
             that.adminmenu = new AdminMenu();
             that.formbeautifier = new FormBeautifier();
+            
+            liliumcms.lys.bindKeys();
         };
     };
 
     this.awesomestrapper = new AwesomeStrapper();
-
 
     // API
     this.refresh = function() {

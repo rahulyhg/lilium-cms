@@ -1,3 +1,4 @@
+{#config}
 /*
     Layout : {
         indexes : [],
@@ -13,24 +14,163 @@ var Lys = function() {
     this.commandsKeys = new Array();
 
     this.addLys = function(index, action, info) {
-        this.commandsKeys.push(index);
-        this.commandsLib[index] = Object.assign(info, action);
-    }
+        if (typeof index == "object") {
+            for (var i = 0; i < index.length; i++) {
+                this.addLys(index[i], action, info);
+            }
+        } else {
+            this.commandsKeys.push(index);
+            this.commandsLib[index] = {
+                callback : action,
+                info : info.description || index,
+                name : info.displayname || index
+            };
+        }
+    };
+
+    this.execute = function(cmd) {
+        var levels = cmd.toLowerCase().split(' ');
+        var base = levels[0];
+
+        if (this.commandsLib[base].callback.apply(this, levels)) {
+            this.dismissLys();
+        }
+    };
+
+    this.castLys = function() {
+        $('#lys-container').show();
+        setTimeout(function() {
+            $('#lys').addClass('shown').focus();
+        }, 10);
+    };
+
+    this.dismissLys = function() { 
+        $('#lys').removeClass('shown').blur();
+        setTimeout(function() {
+            $('#lys-container').hide();
+            $('#lys').val('');
+        }, 210);
+    };
+
+    this.bindKeys = function() {
+        var that = this;
+
+        Mousetrap.bind('shift+space', function(e) {
+            that.castLys();
+            return false;
+        });
+
+        var lysDOM = $('#lys');
+        lysDOM.bind('keyup', function(ev) {
+            if (ev.keyCode === 27) {
+                that.dismissLys();
+            } else if (ev.keyCode == 13) {
+                var txt = lysDOM.val().trim();
+                if (txt === "") {
+                    lysDOM.val(lysDOM.attr("placeholder"));
+                } else {
+                    that.execute(lysDOM.val());
+                }
+            }
+        });
+    };
+
+    var basicShowLys = function(commandName, pageName) {
+         var sameToPage = {
+            "posts" : "article",
+            "articles" : "article",
+            "dashboard" : "dashboard",
+            "sites" : "sites",
+            "media" : "media/list",
+            "entities" : "entities",
+            "users" : "entities",
+            "personas" : "persona/list",
+            "themes" : "themes",
+            "plugins" : "plugins",
+            "settings" : "settings",
+            "parameters" : "settings",
+            "devtools" : "devtools",
+            "dev" : "devtools"
+        };
+
+        if (!pageName || pageName == "" || !sameToPage[pageName]) {
+            return false;
+        }
+
+        document.location.href = "{=config.default.server.url}/admin/" + sameToPage[pageName];
+        return true;
+    };
+
+    var basicCreateLys = function(commandName, objName) {
+        var objTypes = {
+            "entity" : "entities/new",
+            "user" : "entities/new",
+            "post" : "article/new",
+            "article": "article/new",
+            "site" : "sites/launch",
+            "script" : "devtools/lml",
+            "persona" : "persona/new"
+        };
+
+        if (!objName || objName == "" || !objTypes[objName]) {
+            return false;
+        }
+
+        document.location.href = "{=config.default.server.url}/admin/" + objTypes[objName];
+        return true;
+    };
+
+    var basicEditLys = function(commandName, keyword, detail) {
+        levels = new Object();
+        levels.my = {
+            profile : "me",
+            preferences : "preferences",
+            lilium : "preferences",
+            settings : "preferences",
+            site : "settings"
+        };
+
+        if (lvl = levels[keyword]) {
+            if (url = lvl[detail]) {
+                document.location.href = "{=config.default.server.url}/admin/" + url;
+                return true;
+            }
+        }
+
+        return false;
+    };
 
     var init = function() {
         document.addEventListener('livevarsRendered', function(pkg) {
-            var lv = pkg.detail.livevars;
-            var adminmenus = lv.adminmenus;
+            liliumcms.lys.addLys("show", basicShowLys, {
+                description : "Shows a specific section of the admin panel",
+                displayname : "Show"
+            });
 
-            if (adminmenus) {
-                for (var i = 0; i < adminmenus; i++) {
-                    var menu = adminmenus[i];
-                    var k = menu.displayname.toLowerCase();
-                    this.addLys(k, function() {
-                        document.location.href = "{=config.default.server.url}/" + menu.absURL;
-                    });
+            liliumcms.lys.addLys(["create", "new"], basicCreateLys, {
+                description : "Creates a new Lilium object",
+                displayname : "Create"
+            });
+
+            liliumcms.lys.addLys("edit", basicEditLys, {
+                description : "Edit a lilium object",
+                displayname : "Edit"
+            });
+
+            liliumcms.lys.addLys("search", function(_____, terms, _____) {
+                displayBackendSearch();
+                if (terms && terms !== "") {
+                    var query = Array.prototype.splice.call(arguments, 1).join(' ');
+
+                    $('.backendsearch-input').val(query);
+                    besFormSubmit();
                 }
-            }
+
+                return true;
+            }, {
+                description : "Popup search overlay",
+                displayname : "Search"
+            });
         });
     };
 

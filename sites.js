@@ -87,6 +87,7 @@ var SiteInitializer = function (conf) {
         log('SiteInitializer', "Registering admin default frontend JS and CSS");
         Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
+        Frontend.registerJSFile(base + "backend/static/mousetrap.js", 250, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/leaflet/leaflet.js", 410, "admin", conf.id);
         Frontend.registerJSFile(base + "/backend/static/dateformat.js", 600, 'admin', conf.id);
@@ -116,6 +117,7 @@ var SiteInitializer = function (conf) {
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lys.css", 2120, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/login.css", 2200, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/media.css", 2600, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/devtools.css", 2620, 'admin', conf.id);

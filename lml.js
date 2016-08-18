@@ -331,6 +331,8 @@ var LML = function () {
                                 } else {
                                     throw new Error("LMLParseException - Call to undefined funtion : " + ftcName);
                                 }
+                            } else if (levels[i].indexOf('=') !== -1) {
+                                endVal = endVal[that.pulloutVar(context, levels[i].substring(1))];
                             } else {
                                 endVal = endVal[levels[i]];
                             }

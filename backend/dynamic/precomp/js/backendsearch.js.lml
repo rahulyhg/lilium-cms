@@ -1,11 +1,11 @@
 {#config}
 
 // Backend search engine
-jQuery(function($) {
     var displayBackendSearch = function() {
         $('.backendsearch-wrapper').show();
         setTimeout(function() {
             $('.backendsearch-wrapper').addClass('shown');
+            $('.backendsearch-input').focus();
         }, 10);
     };
 
@@ -102,7 +102,15 @@ jQuery(function($) {
         return false;
     };
 
+    var besCheckForEscape = function(ev) {
+        if (ev.keyCode == 27) {
+            dismissBackendSearch();
+        }
+    };
+
+jQuery(function($) {
     $('#topbar-search-icon').bind('click', displayBackendSearch);
     $('.backendsearch-close-wrapper').bind('click', dismissBackendSearch);
     $('#backendsearch-form').bind('submit', besFormSubmit);
+    $('.backendsearch-input').bind('keyup', besCheckForEscape);
 });

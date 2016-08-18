@@ -9,6 +9,7 @@
 		{%adminsidebar}
         {%backendsearch}
         {%adminwelcome}
+        {%lys}
 		<main class="container lmladminmain lmladmincontentwrapper">
 			{%%extra.templatefile}
 		</main>
