@@ -42,12 +42,14 @@ var devtools = undefined;
 var postleaf = undefined;
 var preferences = undefined;
 var api = undefined;
+var album = undefined;
 
 var log = require('./log.js');
 
 var Core = function () {
     var loadRequires = function () {
         var nn = new Date();
+        album = require('./album.js');
         api = require('./api.js');
         _c = require('./config.js');
         settings = require('./settings.js');
@@ -207,6 +209,11 @@ var Core = function () {
         admin.registerAdminEndpoint('activities', 'GET', function (cli) {
             cli.touch('admin.GET.activities');
             filelogic.serveAdminLML(cli, false);
+        });
+
+        admin.registerAdminEndpoint('album', 'POST', function (cli) {
+            cli.touch('admin.POST.albums');
+            album.handlePOST(cli);
         });
 
         admin.registerAdminEndpoint('me', 'POST', function (cli) {
