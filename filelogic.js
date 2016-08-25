@@ -98,12 +98,13 @@ var FileLogic = function () {
             name = cli.routeinfo.relsitepath;
         }
 
-        var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + name + ".lml";
         var savePath = cli._c.server.html + name + '/index.html';
-        var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
-        var adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml");
 
         FileServer.fileExists(savePath, function (isPresent) {
+            var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + name + ".lml";
+            var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+            var adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml");
+
             if (!isPresent) {
                 LML.executeToFile(
                     readPath,
@@ -116,14 +117,14 @@ var FileLogic = function () {
                                 FileServer.pipeFileToClient(cli, savePath, function () {
                                     log('FileLogic', 'Admin page generated and served');
                                 });
-                            }, {
-                                templatefile: tmpPath,
-                                config: cli._c
-                            }
+                            }, Object.assign(extra || {}, {
+                                config : cli._c,
+                                templatefile : tmpPath
+                            })
                         );
-                    }, {
-                        config: cli._c
-                    }
+                    }, Object.assign(extra || {}, {
+                        config : cli._c
+                    })
                 );
             } else {
                 serveCachedFile(cli, savePath);

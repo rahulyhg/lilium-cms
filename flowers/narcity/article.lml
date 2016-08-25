@@ -35,6 +35,21 @@ $}
             <span class="article-author-displayname midvert">{=author.displayname}</span>
             <span class="midvert">&middot;</span>
             <span class="article-published-date midvert edt-datetime" data-edtdatetime="{=extra.article.date}"></span>
+            <span class="midvert">&middot;</span>
+            <a href="#comments" target="" style="font-weight:bold; text-decoration: none; color: #111;">
+                <img src="{=config.default.server.url}/res/images/commentbubble.png" id="commentssmallicon" title="Comments">
+                <span class="article-comment-count">0</span>
+            </a>
+
+            <div class="social-share-big-count">
+                <div class="social-share-big-count-text">
+                    <span class="social-share-big-number narcity-facebook-self-shares">0</span>
+                    <span class="social-share-big-vocab">shares</span>
+                </div>
+                <div class="social-share-big-arrow-wrapper">
+                    <img src="{=config.default.server.url}/res/images/sharearrow.png">
+                </div>
+            </div>
         </div>
     </div>
     {$ endif; $}
@@ -144,5 +159,18 @@ $}
 {$ if (?config.default.social.facebook.token != ""); $}
 <script>
     var reqURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?id=http:{=config.default.server.url}/{=extra.article.name}/&access_token={=config.default.social.facebook.appid}|{=config.default.social.facebook.token}";
+
+    _v(function() {
+        _fb.runForCurrentPage(function(data) {
+            var shares = data && data.share && data.share_count ? data.share.share_count : 0;
+            var comments = shares > 0 ? data.share.comment_count : 0;
+            _v('.narcity-facebook-self-shares')[0].html(shares);
+            _v('.article-comment-count')[0].html(comments).attr('target', '');
+
+            if (shares > 100) {
+                _v('.narcity-facebook-self-shares')[0].addClass('shown');
+            }
+        });
+    });
 </script>
 {$ endif; $}

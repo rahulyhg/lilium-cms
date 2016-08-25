@@ -673,6 +673,18 @@ h2.subtitlestrip {
     background-color: {=barcolor};
 }
 
+/* Formatted forms */
+.lmlformattedform {
+
+}
+
+.lmlformattedform h2 {
+    background-color: #F6F6F6;
+    border-bottom: 1px solid #EEE;
+    text-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    padding: 5px 10px;
+}
+
 /* Notifications */
 #notification-dropdown{
 	padding: 0px;

@@ -125,6 +125,7 @@ var Sessions = function () {
             // Find the maximum power the user has
             entities.maxPower(cli, function (maxUserPower) {
                 cli.session.data.power = maxUserPower;
+                cli.session.lastupdate = new Date();
                 // No need for callback
                 db.insert(cli._c, 'sessions', cli.session, function () {});
             });
@@ -134,6 +135,7 @@ var Sessions = function () {
     };
 
     this.removeSession = function (cli, callback) {
+        log('Session', "Destroying session for token " + cli.session.token);
         // Remove session from db
         db.remove(cli._c, 'sessions', {
             token: cli.session.token
@@ -148,7 +150,8 @@ var Sessions = function () {
 
     this.saveSession = function (cli, callback) {
         db.update(cli._c, 'sessions', {
-            token: cli.session.token
+            token: cli.session.token,
+            lastupdate : new Date()
         }, cli.session, callback);
     };
 

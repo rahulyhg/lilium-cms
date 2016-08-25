@@ -14,7 +14,7 @@ var Login = function() {
 		cli.touch('login.loginsuccess');
 		sessions.createSessionInCli(cli, userObj);
 
-        if (typeof userObj.totalLogin === "undefined") {
+        if (!userObj.welcomed) {
             log('Login', 'Logged in user ' + userObj.username + " for the first time");
             handleFirstLogin(cli, userObj);
         } else {
@@ -31,8 +31,10 @@ var Login = function() {
 		var psw = cli.postdata.data.psw;
 
 		if (
-			typeof usr !== 'undefined' && typeof psw !== 'undefined'
-			&& usr !== '' && psw !== ''
+			typeof usr !== 'undefined' && 
+            typeof psw !== 'undefined' && 
+            usr !== '' && 
+            psw !== ''
 		) {
 			db.match(cli._c, "entities", {
 				'username' : usr,

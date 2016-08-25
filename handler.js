@@ -10,6 +10,7 @@ var htmlserver = require('./frontend/htmlserver.js');
 var db = require('./includes/db.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
+var log = require('./log.js');
 
 var Handler = function () {
     var GET = function (cli) {

@@ -40,8 +40,18 @@ var Admin = function() {
 		filelogic.runLogic(cli);
 	};
 
-    this.welcome = function(cli) {
-        filelogic.serveLmlPage(cli, false);
+    this.welcome = function(cli, method) {
+        if (method == 'GET') {
+            filelogic.serveLmlPage(cli, false);
+        } else if (method == 'POST') {
+            switch (cli.routeinfo.path[2]) {
+                case "upload": require('../entities.js').uploadFirstAvatar(cli); break;
+                case "finish": require('../entities.js').welcome(cli); break;
+                default: cli.debug(); break;
+            }
+        } else {
+            cli.debug();
+        }
     };
 
 	this.handleAdminEndpoint = function(cli) {

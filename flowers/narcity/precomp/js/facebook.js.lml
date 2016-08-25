@@ -2,12 +2,13 @@
 
 // Requires vaniryk
 var NarcityFacebook = function() {
-    var graphURL = "https://graph.facebook.com/?access_token={=theme.settings.fbid}|{=theme.settings.fbtoken}";
-  
+    var graphURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?access_token={=theme.settings.fbid}|{=theme.settings.fbtoken}";
+    var noOp = function() {};
+
     var sendRequest = function(aurl, callback) {
         _a.get(aurl, undefined, callback, false);
     };
- 
+
     this.requestForShares = function(url, callback) {
         sendRequest(graphURL + "&ids=" + url, function(graphresp) {
             var graphobj = graphresp[url];
@@ -23,6 +24,12 @@ var NarcityFacebook = function() {
         });
     };
 
+    this.runForCurrentPage = function(done) {
+        sendRequest(graphURL + "&id=" + document.location.href, function(data) {
+            (done || noOp)(data);
+        });
+    };
+
     this.affectAllCounters = function() {
         var urls = new Object();
         var allurls = new Array();
@@ -35,6 +42,8 @@ var NarcityFacebook = function() {
 
         this.bulkShareRequest(allurls, function(ogobj) {
             var htmlnode = urls[ogobj.id];
+            if (!htmlnode) return;
+
             var min = htmlnode.dataset.min || -1;
 
             if (ogobj.share && ogobj.share.share_count && ogobj.share.share_count > min) {
@@ -47,3 +56,5 @@ var NarcityFacebook = function() {
         });
     };
 };
+
+var _fb = new NarcityFacebook();

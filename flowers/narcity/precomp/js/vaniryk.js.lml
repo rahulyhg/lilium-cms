@@ -27,7 +27,7 @@ var _vanirykDOMObject = function(oObj) {
     }
     
     this.style = function(prop_Arr, val) {
-        if (val || typeof prop_Arr == 'object') {
+        if (typeof val !== "undefined" || typeof prop_Arr == 'object') {
             if (typeof prop_Arr === "string") {
                 oObj.style[prop_Arr] = val;   
             } else {
@@ -86,7 +86,7 @@ var _vanirykDOMObject = function(oObj) {
     };
     
     this.value = function(val) {
-        if (val) {
+        if (typeof val !== "undefined") {
             oObj.value = val;
             return this;
         } else {
@@ -95,7 +95,7 @@ var _vanirykDOMObject = function(oObj) {
     }
     
     this.data = function(prop, val) {
-        if (val) {
+        if (typeof val !== "undefined") {
             oObj.dataset[prop] = val;
             return this;
         } else {
@@ -108,7 +108,7 @@ var _vanirykDOMObject = function(oObj) {
     };  
     
     this.attr = function(attr, val) {
-        if (val) {
+        if (typeof val !== "undefined") {
             oObj.setAttribute(attr, val);
             return this;
         } else {
@@ -117,7 +117,7 @@ var _vanirykDOMObject = function(oObj) {
     }
     
     this.html = function(val) {
-        if (val) {
+        if (typeof val !== "undefined") {
             oObj.innerHTML = val;
             return this;
         } else {
@@ -173,9 +173,10 @@ var _a = new function() {
     // id : function(json)
     this.jsonpCallbacks = {};
     
-    this.get = function(action, params, callback, withCreds, headers) {
+    this.get = function(action, params, callback, withCreds, headers, options) {
         var req = new XMLHttpRequest();
         withCreds = typeof withCreds == 'undefined' ? true : withCreds;
+        options = options || {};
         
         function formatParams( params ){
               return params ? "?" + Object
@@ -187,7 +188,7 @@ var _a = new function() {
         }
 
         req.open('GET', action + formatParams(params), true);
-        req.responseType = "json";
+        req.responseType = options.responseType || "json";
         req.withCredentials = withCreds;
         
         if (headers) {

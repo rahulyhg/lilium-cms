@@ -2,7 +2,7 @@ var mongoDocuments = {
 	names : [
 		"entities", "roles", "plugins", "themes", "config", "compiledfiles",
 		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache",
-		"lilium", "uploads", "cachedFiles", "dfp", "personas",
+		"lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets",
 		"notifications", "categories", "autosave"
 	]
 };

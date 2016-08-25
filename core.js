@@ -43,6 +43,7 @@ var postleaf = undefined;
 var preferences = undefined;
 var api = undefined;
 var album = undefined;
+var secrets = undefined;
 
 var log = require('./log.js');
 
@@ -92,6 +93,7 @@ var Core = function () {
         postleaf = require('./postleaf.js');
         devtools = require('./devtools.js');
         preferences = require('./preferences.js');
+        secrets = require('./secrets.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
@@ -128,7 +130,12 @@ var Core = function () {
 
         admin.registerAdminEndpoint('welcome', 'GET', function(cli) {
             cli.touch('admin.GET.welcome');
-            admin.welcome(cli);
+            admin.welcome(cli, 'GET');
+        });
+
+        admin.registerAdminEndpoint('welcome', 'POST', function(cli) {
+            cli.touch('admin.POST.welcome');
+            admin.welcome(cli, 'POST');
         });
 
         admin.registerAdminEndpoint('sites', 'GET', function (cli) {
@@ -246,6 +253,7 @@ var Core = function () {
             category.handleGET(cli, false);
         });
 
+        secrets.registerAdminEndpoint();
         devtools.registerAdminEndpoint();
 
         api.registerApiEndpoint('articles', 'GET', function (cli) {
@@ -312,7 +320,7 @@ var Core = function () {
         admin.registerAdminMenu({
             id: "sites",
             faicon: "fa-sitemap",
-            displayname: "Sites",
+            displayname: "Network",
             priority: 50,
             rights: ["manage-sites"],
             absURL: aurl + "sites",
@@ -330,7 +338,7 @@ var Core = function () {
         admin.registerAdminMenu({
             id: "articles",
             faicon: "fa-pencil",
-            displayname: "Posts",
+            displayname: "Content",
             priority: 200,
             rights: ["publish"],
             absURL: aurl + "article",
@@ -362,6 +370,15 @@ var Core = function () {
             priority: 500,
             rights: ["list-entities"],
             absURL: aurl + "entities",
+            children: []
+        });
+        admin.registerAdminMenu({
+            id: "secrets",
+            faicon: "fa-key",
+            displayname: "Secrets",
+            priority: 540,
+            rights: ["list-secrets"],
+            absURL: aurl + "secrets",
             children: []
         });
         admin.registerAdminMenu({
@@ -421,7 +438,7 @@ var Core = function () {
         admin.registerAdminMenu({
             id: "activities",
             faicon: "fa-eye",
-            displayname: "User Activities",
+            displayname: "Activities",
             priority: 800,
             rights: ["view-user-activities"],
             absURL: aurl + "activities/",
@@ -592,6 +609,7 @@ var Core = function () {
         category.registerLiveVar();
         postleaf.registerLiveVar();
         persona.registerLiveVar();
+        secrets.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };

@@ -42,7 +42,9 @@ window.deviceIs = function(deviceArr) {
 
 var makeLinkTargetBlank = function() {
     _v('article a').all(function(node) { 
-        node.attr('target', '_blank'); 
+        if (!node.attr('target')) {
+            node.attr('target', '_blank'); 
+        }
     });
 };
 

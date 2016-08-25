@@ -21,6 +21,55 @@
                 <h1 class="vert">Is your name as pretty as your face?</h1>
                 <input type="text" id="fullname" class="opacity0 transiant bouncy" placeholder="Firstname and lastname" />
             </section>
+
+            <section class="slide-4">
+                <h1 class="vert"><span class="pFirstname"></span>. My name is Lys. Nice to meet you, <span class="pFirstname"></span>.</h1>
+            </section>
+
+            <section class="slide-5">
+                <h1 class="vert-30">Tell me: what do you do?</h1>
+                <span class="details vert-30">This information is displayed in your article signature</span>
+                <input type="text" id="jobtitle" class="opacity0 transiant bouncy vert-30" placeholder="Your job title" />
+                <input type="text" id="shortbio" class="opacity0 transiant bouncy vert-30" placeholder="A short bio (around 100 words)" />
+                <button id="tellmeaboutyounext" class="text-button opacity0 transiant bouncy vert-30">Next &gt;</button>
+            </section>
+
+            <section class="slide-6">
+                <h1 class="vert">I know we just met, but... May I have your number?</h1>
+                <span class="details">This information is only visible to your team members</span>
+                <input type="text" id="phone" class="opacity0 transiant bouncy" placeholder="Phone number" />
+            </section>
+
+            <section class="slide-7">
+                <h1 class="vert-30">Let's get you some followers.</h1>
+                <div class="vert-30 halfwidth">    
+                    <input type="text" id="facebook" class="opacity0 transiant bouncy halfwidth" placeholder="Facebook URL" />
+                    <input type="text" id="twitter" class="opacity0 transiant bouncy halfwidth" placeholder="Twitter username" />
+                    <input type="text" id="googleplus" class="opacity0 transiant bouncy halfwidth" placeholder="Google+ username" />
+                    <input type="text" id="instagram" class="opacity0 transiant bouncy halfwidth" placeholder="Instagram username" />
+                </div>
+                <button id="socialnetworksnext" class="text-button opacity0 transiant bouncy vert-30">Next &gt;</button>
+            </section>
+
+            <section class="slide-8">
+                <h1 class="vert"><span class="pFirstname"></span>, let's upload a picture of you.</h1>
+                <input type="file" style="opacity: 0; width: 0; height:0;" id="picture" />
+                <button id="uploadpicture" class="text-button opacity0 transiant bouncy vert">Select a file</button>
+                <span class="details error opacity0" id="uploaderror">Invalid image file. Please select an image file smaller than 2Mb.</span>
+            </section>
+
+            <section class="slide-9">
+                <img src="" class="welcome-profile-pic" />
+                <h1>Great shot! Now, let’s choose a password you won’t forget. </h1>
+                <span class="details no-top">Make sure to include a number and a symbol.</span>
+                <input type="password" id="password" class="opacity0 transiant bouncy no-top" placeholder="Password" />
+            </section>
+
+            <section class="slide-10">
+                <h1 class="vert">You're all set!</h1>
+                <span class="details vert">Enjoy.</span>
+                <button class="opacity0 transiant bouncy vert" id="finish">Thanks, Lys!</button>
+            </section>
         </main>
     
         <script>
@@ -30,8 +79,84 @@
                 "you look absolutely amazing today.",
                 "your smile is especially beautiful today.",
                 "your eyes are beautiful when you're looking at your backlit computer screen.",
-                "I wish I'd be as good-looking as you are today."
+                "I wish I'd be as good-looking as you are today.",
+                "you look stunning as always."
             ];
+
+            var firstname = "";
+            var lastname = "";
+            var jobtitle = "";
+            var shortbio = "";
+            var phone = "";
+            var socialnetworks = {
+                facebook : "",
+                twitter : "",
+                googleplus : "",
+                instagram : ""
+            };
+            var password = "";
+            var avatarURL = "";
+    
+            var hasFormData = typeof FormData !== 'undefined';
+
+            var capitalize = function(str) {
+                var strArr = str.split(' ');
+                for (var i = 0; i < strArr.length; i++) {
+                    strArr[i] = strArr[i].charAt(0).toUpperCase() + strArr[i].substring(1);
+                }
+
+                return strArr.join(' ');
+            };
+
+            var castupload = function() {
+                document.getElementById('picture').click();
+            };
+
+            var validatefile = function(event) {
+                var cb = slides[15];
+        
+                if (hasFormData) {
+                    files = event.target.files;
+                
+                    var fdata = new FormData();
+                    $.each(files, function(key, value) {
+                        fdata.append(key, value);
+                    });
+
+                    $('#uploadpicture').addClass('opacity0');
+
+                    $.ajax({
+                        url: '{=config.default.server.url}/admin/welcome/upload',
+                        type: 'POST',
+                        data: fdata,
+                        cache: false,
+                        dataType: 'json',
+                        processData: false, 
+                        contentType: false, 
+                        success: function(data, textStatus, jqXHR) {
+                            if (typeof data !== "object" && typeof data === "string") {
+                                data = JSON.parse(data);
+                            }
+    
+                            if (data.success) {
+                                avatarURL = data.thumbnailarchive.url;
+                                cb();
+                            } else {
+                                $('#uploadpicture').removeClass('opacity0');
+                                $('#uploaderror').removeClass('opacity0');
+                                console.log('ERRORS: ' + data.error);
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            $('#uploadpicture').removeClass('opacity0');
+                            $('#uploaderror').removeClass('opacity0');
+                            console.log('ERRORS: ' + textStatus);
+                        }
+                    }); 
+                } else {
+                    cb();
+                }
+            };
 
             var slides = [
                 function() {
@@ -44,20 +169,20 @@
                     $("section.slide-1").removeClass('shown');
                     setTimeout(function() {
                         $("section.slide-1").hide();
-                        slides[2]();
-                    }, 1510);
+                        setTimeout(slides[2], 50);
+                    }, 1550);
                 }, function() {
                     $("section.slide-2").show();
                     setTimeout(function() {
                         $("section.slide-2").addClass('shown');
                         setTimeout(slides[3], 5000);
-                    }, 10);
+                    }, 50);
                 }, function() {
                     $("section.slide-2").removeClass('shown');
                     setTimeout(function() {
                         $("section.slide-2").hide();
-                        slides[4]();
-                    }, 1510);
+                        setTimeout(slides[4], 50);
+                    }, 1550);
                 }, function() {
                     $("section.slide-3").show();
                     setTimeout(function() {
@@ -65,13 +190,187 @@
                         setTimeout(function() {
                             $('#fullname').removeClass('opacity0');
                         }, 1500);
-                    }, 10); 
+                    }, 50); 
+                }, function() {
+                    $('#fullname').addClass('opacity0');
+                    $('section.slide-3').removeClass('shown');
+                    var namearr = $('#fullname').val().split(' ');
+                    firstname = capitalize(namearr.shift());
+                    lastname = capitalize(namearr.join(' '));
+
+                    $('.pFirstname').html(firstname);
+                    $('.pLastname').html(lastname);
+
+                    setTimeout(function() {
+                        $('section.slide-3').hide();
+                        setTimeout(slides[6], 50);
+                    }, 1550);
+                }, function() {
+                    $("section.slide-4").show();
+                    setTimeout(function() {
+                        $("section.slide-4").addClass('shown');
+                        setTimeout(slides[7], 3000);
+                    }, 50);
+                }, function() {
+                    $("section.slide-4").removeClass('shown');
+                    setTimeout(function() {
+                        $("section.slide-4").hide();
+                        setTimeout(slides[8], 50);
+                    }, 1550);
+                }, function() {
+                    $("section.slide-5").show();
+                    setTimeout(function() {
+                        $("section.slide-5").addClass('shown');
+                        setTimeout(function() {
+                            $('#jobtitle').removeClass('opacity0');
+                            setTimeout(function() { $('#shortbio').removeClass('opacity0');}, 500);
+                            setTimeout(function() { $('#tellmeaboutyounext').removeClass('opacity0');}, 1000);
+                        }, 1500);
+                    }, 50); 
+                }, function() {
+                    shortbio = $('#shortbio').addClass('opacity0').val();
+                    jobtitle = $('#jobtitle').addClass('opacity0').val();
+                    $('section.slide-5').removeClass('shown');
+
+                    setTimeout(function() {
+                        $('section.slide-5').hide();
+                        setTimeout(slides[10], 50);
+                    }, 1550);
+                }, function() {
+                    $("section.slide-6").show();
+                    setTimeout(function() {
+                        $("section.slide-6").addClass('shown');
+                        setTimeout(function() {
+                            $('#phone').removeClass('opacity0');
+                        }, 1500);
+                    }, 50); 
+                }, function() {
+                    phone = $('#phone').addClass('opacity0').val();
+                    $('section.slide-6').removeClass('shown');
+
+                    setTimeout(function() {
+                        $('section.slide-6').hide();
+                        setTimeout(slides[12], 50);
+                    }, 1550);
+                }, function() {
+                    $("section.slide-7").show();
+                    setTimeout(function() {
+                        $("section.slide-7").addClass('shown');
+                        setTimeout(function() {
+                            setTimeout(function() { $('#facebook').removeClass('opacity0');}, 200);
+                            setTimeout(function() { $('#twitter').removeClass('opacity0');}, 400);
+                            setTimeout(function() { $('#googleplus').removeClass('opacity0');}, 600);
+                            setTimeout(function() { $('#instagram').removeClass('opacity0');}, 800);
+                            setTimeout(function() { $('#socialnetworksnext').removeClass('opacity0');}, 1000);
+                        }, 1500);
+                    }, 50); 
+                }, function() {    
+                    socialnetworks = {
+                        facebook : $('#facebook').val(),
+                        twitter : $('#twitter').val(),
+                        googleplus : $('#googleplus').val(),
+                        instagram : $('#instagram').val()
+                    };
+
+                    $('section.slide-7').removeClass('shown');
+
+                    setTimeout(function() {
+                        $('section.slide-7').hide();
+                        setTimeout(slides[14], 50);
+                    }, 1550);
+                }, function() {
+                    $("section.slide-8").show();
+                    setTimeout(function() {
+                        $("section.slide-8").addClass('shown');
+                        setTimeout(function() {
+                            $('#uploadpicture').removeClass('opacity0');
+                        }, 1500);
+                    }, 50); 
+                }, function() {
+                    $("section.slide-8").removeClass('shown');
+                    
+                    setTimeout(function() {
+                        $('section.slide-8').hide();
+                        setTimeout(slides[16], 50);
+                    }, 1550);
+                }, function() {
+                    $('.welcome-profile-pic').attr('src', avatarURL);
+                    $("section.slide-9").show();
+                    setTimeout(function() {
+                        $("section.slide-9").addClass('shown');
+                        setTimeout(function() {
+                            if (hasFormData) {
+                                $('.welcome-profile-pic').addClass('shown');
+                            }
+
+                            setTimeout(function() {
+                                $('#password').removeClass('opacity0');
+                            }, 500);
+                        }, 1550);
+                    }, 50); 
+                }, function() {
+                    $("section.slide-9").removeClass('shown');
+                    password = $('#password').addClass('opacity0').val(); 
+
+                    setTimeout(function() {
+                        $('section.slide-9').hide();
+                        setTimeout(slides[18], 50);
+                    }, 1550);
+                }, function() {
+                    $("section.slide-10").show();
+                    setTimeout(function() {
+                        $("section.slide-10").addClass('shown');
+                        setTimeout(function() {
+                            $('#finish').removeClass('opacity0');
+                        }, 1500);
+                    }, 50); 
+                }, function() {
+                    submitEverything();    
+    
+                    $("section.slide-10").removeClass('shown');
+                    $('#finish').addClass('opacity0');                    
+
+                    setTimeout(function() {
+                        $('section.slide-10').hide();
+                    }, 1550);
                 }
-            ]
+            ];
+
+            var submitEverything = function() {
+                var fdata = {
+                    firstname : firstname,
+                    lastname : lastname,
+                    jobtitle : jobtitle,
+                    shortbio : shortbio,
+                    phone : phone,
+                    socialnetworks : socialnetworks,
+                    password : password
+                }
+
+                $.ajax({
+                    url: '{=config.default.server.url}/admin/welcome/finish',
+                    type: 'POST',
+                    data: fdata,
+                    cache: false,
+                    dataType: 'json',
+                    complete : function() {
+                        window.location = "{=config.default.server.url}/admin";
+                    }
+                });
+            }
 
             var makeEverythingGreat = function() {
                 var randh1 = $("section.slide-2 h1");
                 randh1.html(randh1.html() + "<i>" + randomComp[Math.floor(Math.random()*randomComp.length)] + "</i>");
+                $('#fullname').bind('keyup', function(ev) { if (ev.keyCode === 13 || ev.which === 13) { slides[5](); } });
+                $('#tellmeaboutyounext').bind('click', slides[9]);
+                $('#phone').bind('keyup', function(ev) { if (ev.keyCode === 13 || ev.which === 13) { slides[11](); } });
+                $('#socialnetworksnext').bind('click', slides[13]);
+                $('#uploadpicture').bind('click', castupload);
+                $('#picture').bind('change', validatefile);
+                $('#password').bind('keyup', function(ev) { if (ev.keyCode === 13 || ev.which === 13) { slides[17](); } });
+                $('#finish').bind('click', slides[19]);
+
                 slides[0]();
             };
 

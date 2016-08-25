@@ -295,6 +295,58 @@ article .featured-image-wrapper .featured-image-credit a {
     font-size: 14px;
 }
 
+article .social-share-big-count {
+    float : right;
+    display: none;
+}
+
+article .social-share-big-count.shown {
+    display: block;
+}
+
+article .social-share-big-count-text {
+    display: inline-block;
+    vertical-align: bottom;
+    color: #FF2634;
+    text-align: center;
+}
+
+article .social-share-big-number {
+    font-size: 30px;
+    line-height: 30px;
+    display: block;
+    text-align: right;
+}
+
+article .social-share-big-vocab {
+    font-size: 18px;
+    display: block;
+}
+
+article #commentssmallicon {
+    vertical-align: middle;
+}
+
+article .social-share-big-arrow-wrapper {
+    background-color: #DDD;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    -ms-border-radius: 4px;
+    -o-border-radius: 4px;
+    border-radius: 4px;
+    display: inline-block;
+    vertical-align: bottom;
+
+    padding: 10px 6px 0px;
+    height: 32px;
+    margin-left: 6px;
+    margin-bottom: 10px;
+}
+
+article .social-share-big-arrow-wrapper img {
+    width: 34px;
+}
+
 article #article-content {
     width: {=aw};
     margin: 20px auto;

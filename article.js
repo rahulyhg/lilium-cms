@@ -335,9 +335,11 @@ var Article = function() {
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
 
-        formData.tagslugs = formData.tags.map(function(tagname) {
-            return slugify(tagname).toLowerCase();
-        });
+        if (formData.tags.map) {
+            formData.tagslugs = formData.tags.map(function(tagname) {
+                return slugify(tagname).toLowerCase();
+            });
+        }
 
         // Autosave
         if (auto) {

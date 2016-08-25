@@ -17,9 +17,21 @@ body#lml-welcome {
     font-weight: 100;
 }
 
+#lml-welcome .vert-30,
+#lml-welcome .details.vert-30 {
+    position:relative;
+    top: 30%;
+}
+
+#lml-welcome .vert-40, 
 #lml-welcome .vert {
     position: relative;
     top: 40%;
+}
+
+#lml-welcome input.no-top,
+#lml-welcome span.details.no-top {
+    top: 0 !important;
 }
 
 #lml-welcome section {
@@ -68,11 +80,7 @@ body#lml-welcome {
     opacity: 1;
 }
 
-#lml-welcome section.slide-1 {
-    
-}
-
-#lml-welcome input {
+#lml-welcome input, #lml-welcome button {
     display: block;
     background-color: #EEE;
     color: #333;
@@ -86,6 +94,49 @@ body#lml-welcome {
 
     position: relative;
     top: 40%;
+}
+
+#lml-welcome input.halfwidth {
+    width: 45%;
+    display: inline-block;
+    margin: 2px 0px;
+}
+
+#lml-welcome div.halfwidth {
+    width: 70%;
+    display: block;
+    margin: 20px auto 0px auto;
+}
+
+#lml-welcome .welcome-profile-pic {
+    border-radius: 200px;
+    height: 250px;
+    margin: 30px;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+
+    transition: all 0.5s cubic-bezier(0.5,0.50,.14,1.50);
+    transform: scale(0); 
+}
+
+#lml-welcome .welcome-profile-pic.shown {
+    transform: scale(1);
+}
+
+#lml-welcome .details {
+    display: block;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 14px;
+    margin: 0px auto;
+    font-weight: 300;
+    position: relative;
+    top: 40%;
+    letter-spacing: 1px;
+    color: #DDD;
+}   
+
+#lml-welcome .details.error {
+    color: #FF2634;
 }
 
 #lml-welcome #fullname {

@@ -1,6 +1,12 @@
-{#config;theme}
+{#config;theme;extra}
 <!-- Scripts -->
+<script>
+    // Head globals
+    window.lmlcontext = "{=extra.contextname}";
+</script>
+
 <script src="//www.googletagservices.com/tag/js/gpt.js" async=""></script>
 <script src="{=config.default.server.url}/compiled/theme/vaniryk.js"></script>
 <script src="{=config.default.server.url}/compiled/theme/facebook.js"></script>
 <script src="{=config.default.server.url}/compiled/theme/global.js"></script>
+<script src="{=config.default.server.url}/compiled/admin/js/frontendbar.js"></script>

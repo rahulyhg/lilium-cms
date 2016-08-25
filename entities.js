@@ -78,6 +78,30 @@ var Entities = module.exports = new function () {
         });
     };
 
+    this.welcome = function(cli) {
+        var dat = {
+            welcomed : true,
+            firstname : cli.postdata.data.firstname,
+            lastname : cli.postdata.data.lastname,
+            jobtitle : cli.postdata.data.jobtitle,
+            description : cli.postdata.data.shortbio, 
+            phone : cli.postdata.data.phone,
+            socialnetworks : cli.postdata.data.socialnetworks
+        };
+
+        dat.displayname = dat.firstname + " " + dat.lastname;
+
+        if (cli.postdata.data.password) {
+            dat.shhh = CryptoJS.SHA256(cli.postdata.data.password).toString(CryptoJS.enc.Hex);
+        }
+
+        db.update(cli._c, "entities", {_id : db.mongoID(cli.userinfo.userid)}, dat, function() {
+            cli.postdata.data.usr = cli.userinfo.user;
+            cli.postdata.data.psw = cli.postdata.data.password;
+
+            require('./backend/login.js').authUser(cli);
+        });
+    };
 
     this.handleGET = function (cli) {
         cli.touch('entities.handleGET');
@@ -177,6 +201,34 @@ var Entities = module.exports = new function () {
             }
         });
 
+    };
+
+    this.commitProfilePic = function(cli, filename, cb) {
+        var sessionManager = require('./session.js');
+        var ext = filename.substring(filename.lastIndexOf('.') + 1);
+
+        imageResizer.resize(cli._c.server.base + "backend/static/uploads/" + filename, filename, ext, cli._c, function(images) {
+            var userid = cli.userinfo.userid;
+            var avatarURL = images.medium.url;
+            var avatarID = filename.substring(0, filename.lastIndexOf('.'));
+
+            db.update(cli._c, 'entities', {
+                _id: db.mongoID(userid)
+            }, {
+                avatarURL: avatarURL,
+                avatarID: db.mongoID(avatarID)
+            }, function(err, result) {
+                images.success = true;
+                cb(err, images);
+            });
+        });
+    };
+
+    this.uploadFirstAvatar = function(cli) {
+        var filename = cli.postdata.data[0];
+        this.commitProfilePic(cli, filename, function(err, images) {
+            cli.sendJSON(err || images);
+        });
     };
 
     this.updateProfilePicture = function (cli, isProfile) {
