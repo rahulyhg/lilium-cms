@@ -1,7 +1,7 @@
 var log = require('./log.js');
 var livevars = require('./livevars.js');
 var postleaf = require('./postleaf.js');
-var imageResizer = require('./imageresizer.js')
+var imageResizer = require('./imageResizer.js')
 
 var Album = function() {
     this.registerPostLeaf = function() {
