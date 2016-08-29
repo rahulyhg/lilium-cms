@@ -1,3 +1,5 @@
+![LML masthead.png](https://bitbucket.org/repo/yqaMzz/images/269442748-LML%20masthead.png)
+
 # Lilium CMS #
 
 Lilium is a lightning-fast, online Content Management System built with node.js, without express. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.
