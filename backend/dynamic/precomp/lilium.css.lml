@@ -876,26 +876,48 @@ header.admin-bar > * {
 }
 
 header.admin-bar .lilium-logo-link {
-	width: 50px;
-	height: 100%;
-	overflow: hidden;
+    width: 200px;
+    height: 100%;
+    display: inline-block;
+    background-color: rgba(0,0,0, 0.2);
+    padding: 2px 6px 3px 5px;
 
-	display: inline-block;
+    cursor: pointer;
+}
+
+header.admin-bar .lilium-logo-link:hover {
+    background-color : rgba(0,0,0,0.4);
+}
+
+header.admin-bar .lilium-logo-link:hover span.product-text {
+    color : #AB69C6;
 }
 
 header.admin-bar .lilium-logo-link img {
-	height: 55px;
-    	width: auto;
-    	position: relative;
-    	bottom: 8px;
-    	right: 10px;
+    height: 45px;
+    width: auto;
 }
+
+header.admin-bar .lilium-logo-link a {
+    display: block;
+    height: 100%;
+    width: auto;
+}
+
+header.admin-bar .lilium-logo-link span.product-text {
+    font-weight: 300;
+    font-size: 26px;
+    vertical-align: middle;
+    padding-top: 3px;
+    display: inline-block;
+}
+
 header.admin-bar .navbar-default .navbar-header {
 	position: absolute;
 }
 
 #navbar.navbar-collapse {
-	padding-left: 40px;
+	padding-left: 190px;
 }
 
 

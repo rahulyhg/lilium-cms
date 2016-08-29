@@ -13,6 +13,9 @@
                 <div class="lilium-logo-link">
                     <a href="{=config.default.server.url}/admin">
                         <img src="{=config.default.server.url}/static/media/lmllogo.png" />
+                        <span class="product-text">
+                            Lilium CMS
+                        </span>
                     </a>
                 </div>
             </div>
