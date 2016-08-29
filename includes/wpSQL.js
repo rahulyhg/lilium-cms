@@ -182,6 +182,10 @@ var ftPosts = function(siteid, mysqldb, done) {
 var ftUploads = function(siteid, mysqldb, done) {
     var Media = require('../media.js');
     var cconf = require('../config.js').fetchConfig(siteid);
+    var oUrl = cconf.wordpress.originalurl;
+    if (oUrl.charAt(oUrl.length-1) == "/") {
+        oUrl = oUrl.substring(0, oUrl.length-1);
+    }
 
     log('WP', 'Querying uploads');
     mysqldb.query(fetchAttachmentIDs, function(err, uploads) {
@@ -199,9 +203,12 @@ var ftUploads = function(siteid, mysqldb, done) {
                     log('WP', 'Uploaded ' + uploadIndex + ' / ' + uploadTotal + ' files');
                 }
 
+                var uUrl = upload.guid;
+                uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
+
                 log('WP', 'Downloading image ' + upload.guid);
-                request(upload.guid, {encoding: 'binary'}, function(error, response, body) {
-                    var filename = upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
+                request(uUrl, {encoding: 'binary'}, function(error, response, body) {
+                    var filename = upload.ID + "_" + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
                     var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
                     if (!error) {
@@ -223,7 +230,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                         nextUpload();
                                     });
                                 }
-                            }, true, {wpid : upload.ID});
+                            }, true, {wpid : upload.ID, wpguid : upload.guid});
                         });
                     } else {
                         log('WP', 'Download error : ' + error);

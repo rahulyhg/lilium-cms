@@ -1,0 +1,75 @@
+{#config;extra}
+
+<div id="badge-modal" class="modal fade announcement" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Acquired new badge</h4>
+            </div>
+            <div class="modal-body">
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">Receive badge</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+<script>
+var levels = [
+    "green",
+    "bronze", "silver", "gold", 
+    "platinum", "diamond", "rainbow"
+];
+
+window.receiveBadge = function(title, icon, color) {
+    $('#badge-modal').modal('show');
+};
+
+$(function() {
+    $('#badge-modal button.btn-primary').bind('click', function() {
+        $('#badge-modal').modal('hide');
+    });
+});
+</script>
+
+<style>
+
+#badge-modal.announcement.modal .modal-body::before {
+    transform : translate3d(0px, 0px, 0px) scale(1);
+}
+
+#badge-modal.announcement.modal.animated .modal-body::before {
+    transition: 0.5s all;
+}
+
+#badge-modal.announcement.modal.dismissed .modal-body::before {
+    transform : translate3d(-400px, 400px, 0px) scale(0);
+}
+
+#badge-modal.announcement.modal .modal-body.bronze::before {
+    background: #f2c88a; /* Old browsers */
+    background: -moz-linear-gradient(top, #f2c88a 0%, #d6ae5e 50%, #e8a33c 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #f2c88a 0%,#d6ae5e 50%,#e8a33c 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #f2c88a 0%,#d6ae5e 50%,#e8a33c 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f2c88a', endColorstr='#e8a33c',GradientType=0 ); /* IE6-9 */
+    border: 10px solid #8e7e52;
+}
+
+#badge-modal.announcement.modal .modal-body.silver::before {
+    background: #f6f8f9; /* Old browsers */
+    background: -moz-linear-gradient(top, #f6f8f9 0%, #e5ebee 50%, #d7dee3 51%, #f5f7f9 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #f6f8f9 0%,#e5ebee 50%,#d7dee3 51%,#f5f7f9 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f6f8f9', endColorstr='#f5f7f9',GradientType=0 ); /* IE6-9 */
+    border: 10px solid #bfbfbf;
+}
+
+
+</style>

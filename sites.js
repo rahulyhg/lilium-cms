@@ -264,6 +264,7 @@ var Sites = function () {
             var Configs = require('./config.js');
             var siteConf = Configs.fetchConfig(existingSite);
             siteConf.wptransferring = true;
+            siteConf.wordpress.originalurl = dat.originalurl;
 
             require('./includes/wpSQL.js').transfer(siteConf.id, dat, function(err) {
                 log('Sites', 'Transfer in process');
