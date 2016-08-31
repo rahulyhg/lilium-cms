@@ -214,12 +214,12 @@ var ftUploads = function(siteid, mysqldb, done) {
                     uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
                     log('WP', 'Downloading image ' + upload.guid);
-                    request(uUrl, {encoding: 'binary'}, function(error, response, body) {handleSingle(error, body, upload)});
+                    request(uUrl, {encoding: 'binary'}, function(error, response, body) {handleSingle(error, body, upload);});
                 } else {
                     var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
                     log('WP', 'Transferring local image ' + filename);
-                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload});
+                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload);});
                 }
             } else {
                 log('WP', 'Done transferring uploads');
