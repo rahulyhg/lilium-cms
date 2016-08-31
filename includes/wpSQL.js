@@ -209,7 +209,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                     log('WP', 'Transferred ' + uploadIndex + ' / ' + uploadTotal + ' files');
                 }
 
-                if (isLocal) {
+                if (!isLocal) {
                     var uUrl = upload.guid;
                     uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
