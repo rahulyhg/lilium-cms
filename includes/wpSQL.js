@@ -214,12 +214,12 @@ var ftUploads = function(siteid, mysqldb, done) {
                     uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
                     log('WP', 'Downloading image ' + upload.guid);
-                    request(uUrl, {encoding: 'binary'}, handleSingle);
+                    request(uUrl, {encoding: 'binary'}, function(error, response, body) {handleSingle(error, body, upload)});
                 } else {
                     var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
                     log('WP', 'Transferring local image ' + filename);
-                    fu.readFile(filename, function(file, err) {});
+                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload});
                 }
             } else {
                 log('WP', 'Done transferring uploads');
@@ -227,7 +227,7 @@ var ftUploads = function(siteid, mysqldb, done) {
             }
         };
 
-        var handleSingle = function(error, response, body) {
+        var handleSingle = function(error, body, upload) {
             var filename = upload.ID + "_" + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
