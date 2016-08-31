@@ -268,7 +268,8 @@ var Sites = function () {
                 siteConf.wordpress = {};
             }
 
-            siteConf.wordpress.originalurl = dat.originalurl;
+            siteConf.wordpress.originalurl = dat.originalurl || "";
+            siteConf.wordpress.wpuploadslocaldir = dat.wpuploadslocaldir || "";
 
             require('./includes/wpSQL.js').transfer(siteConf.id, dat, function(err) {
                 log('Sites', 'Transfer in process');
@@ -375,7 +376,8 @@ var Sites = function () {
         conf.default.wptransfer = postdata.wptransfer;
         conf.default.wptransferring = postdata.wptransfer;
         conf.default.wordpress = {
-            originalurl : postdata.originalurl
+            originalurl : postdata.originalurl,
+            wpuploadslocaldir : postdata.wpuploadslocaldir
         };
 
         var filename = postdata.baseurl.replace(/\/\//g, '').replace(/\//g, ' ');
@@ -567,6 +569,14 @@ var Sites = function () {
             })
             .add('wpsitedatapwd', 'password', {
                 displayname: "Database Password"
+            })
+        .add('title-info-uploads', 'title', {
+                displayname : "Uploads"
+            })
+            .add('wpuploadslocaldir', 'text', {
+                displayname : "Local directory"
+            }, {
+                required : false
             })
         .add('title-info-bridge', 'title', {
                 displayname: "Wordpress bridge"

@@ -148,10 +148,10 @@ var FileServer = function () {
             this.fileExists(filename, function (exists) {
                 if (exists) {
                     fs.readFile(filename, encoding || "binary", function (err, file) {
-                        callback(file);
+                        callback(file, err);
                     });
                 } else {
-                    callback(undefined);
+                    callback("File does not exist.");
                 }
             });
         }

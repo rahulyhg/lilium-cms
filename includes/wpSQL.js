@@ -182,10 +182,15 @@ var ftPosts = function(siteid, mysqldb, done) {
 var ftUploads = function(siteid, mysqldb, done) {
     var Media = require('../media.js');
     var cconf = require('../config.js').fetchConfig(siteid);
+    var fu = require('../fileserver.js');
+
     var oUrl = cconf.wordpress.originalurl;
     if (oUrl.charAt(oUrl.length-1) == "/") {
         oUrl = oUrl.substring(0, oUrl.length-1);
     }
+
+    var localUploadDir = cconf.wordpress.wpuploadslocaldir;
+    var isLocal = localUploadDir !== "";
 
     log('WP', 'Querying uploads');
     mysqldb.query(fetchAttachmentIDs, function(err, uploads) {
@@ -194,54 +199,64 @@ var ftUploads = function(siteid, mysqldb, done) {
         var uploadIndex = 0;
         var uploadTotal = uploads.length;
 
+
         log('WP', 'Queried ' + uploadTotal + ' uploads. Ready to request');
         var nextUpload = function() {
             if (uploadIndex < uploadTotal) {
                 var upload = uploads[uploadIndex];
 
                 if (uploadIndex > 0 && uploadIndex % 50 == 0) {
-                    log('WP', 'Uploaded ' + uploadIndex + ' / ' + uploadTotal + ' files');
+                    log('WP', 'Transferred ' + uploadIndex + ' / ' + uploadTotal + ' files');
                 }
 
-                var uUrl = upload.guid;
-                uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
+                if (isLocal) {
+                    var uUrl = upload.guid;
+                    uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
-                log('WP', 'Downloading image ' + upload.guid);
-                request(uUrl, {encoding: 'binary'}, function(error, response, body) {
-                    var filename = upload.ID + "_" + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
-                    var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
+                    log('WP', 'Downloading image ' + upload.guid);
+                    request(uUrl, {encoding: 'binary'}, handleSingle);
+                } else {
+                    var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
-                    if (!error) {
-                        fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
-                            require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
-                                if (err) {
-                                    log('WP', 'Invalid image download');
-                                    uploadIndex++;
-                                    nextUpload();
-                                } else {
-                                    var objid = result.insertedId;
-                                    log('WP', 'Inserted media with mongo ID ' + objid);
-                                    db.update(cconf, 'content', {"data._thumbnail_id" : upload.ID.toString()}, {"media" : objid}, function(ue, r) {
-                                        if (r.modifiedCount != 0) {
-                                            log('WP', "Affected featured image for a found article");
-                                        }
-    
-                                        uploadIndex++;
-                                        nextUpload();
-                                    });
-                                }
-                            }, true, {wpid : upload.ID, wpguid : upload.guid});
-                        });
-                    } else {
-                        log('WP', 'Download error : ' + error);
-
-                        uploadIndex++;
-                        nextUpload();
-                    }
-                });
+                    log('WP', 'Transferring local image ' + filename);
+                    fu.readFile(filename, function(file, err) {});
+                }
             } else {
                 log('WP', 'Done transferring uploads');
                 done();
+            }
+        };
+
+        var handleSingle = function(error, response, body) {
+            var filename = upload.ID + "_" + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
+            var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
+
+            if (!error) {
+                fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
+                    require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
+                        if (err) {
+                            log('WP', 'Invalid image download');
+                            uploadIndex++;
+                            nextUpload();
+                        } else {
+                            var objid = result.insertedId;
+                            log('WP', 'Inserted media with mongo ID ' + objid);
+                            db.update(cconf, 'content', {"data._thumbnail_id" : upload.ID.toString()}, {"media" : objid}, function(ue, r) {
+                                if (r.modifiedCount != 0) {
+                                    log('WP', "Affected featured image for a found article");
+                                }
+    
+                                uploadIndex++;
+                                nextUpload();
+                            });
+                        }
+                    }, true, {wpid : upload.ID, wpguid : upload.guid});
+                });
+            } else {
+                log('WP', 'Download error : ' + error);
+
+                uploadIndex++;
+                nextUpload();
             }
         };
 
