@@ -204,13 +204,13 @@ var ftUploads = function(siteid, mysqldb, done) {
         var nextUpload = function() {
             if (uploadIndex < uploadTotal) {
                 var upload = uploads[uploadIndex];
+                var uUrl = upload.guid;
 
                 if (uploadIndex > 0 && uploadIndex % 50 == 0) {
                     log('WP', 'Transferred ' + uploadIndex + ' / ' + uploadTotal + ' files');
                 }
 
                 if (!isLocal) {
-                    var uUrl = upload.guid;
                     uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
                     log('WP', 'Downloading image ' + upload.guid);
