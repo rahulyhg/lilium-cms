@@ -30,11 +30,17 @@ var ftCategories = function(siteid, mysqldb, done) {
                 var cat = wp_cat[catIndex];
                 catIndex++;
 
-                db.insert(siteid, 'categories', {
-                    name : cat.slug,
-                    displayname : cat.name,
-                    wpid : cat.term_id
-                }, nextCat);
+                db.toArray(siteid, 'categories', {wpid : cat.term_id}, function(err, arr) {
+                    if (arr.length !== 0) {
+                        return nextCat();
+                    }
+
+                    db.insert(siteid, 'categories', {
+                        name : cat.slug,
+                        displayname : cat.name,
+                        wpid : cat.term_id
+                    }, nextCat);
+                });
             } else {
                 wp_cat = undefined;
                 log('WP', 'Created all ' + catTotal + ' categories');
@@ -63,40 +69,46 @@ var ftUsers = function(siteid, mysqldb, done) {
                 var wp_user = wp_users[userIndex];         
                 userIndex++;
     
-                mysqldb.query(fetchUsersMetas + " AND user_id = " + wp_user.ID, function(err, wp_usermeta) {
-                    var userdata = {};
-                    wp_usermeta.forEach(function(meta, i) {
-                        userdata[meta.meta_key] = meta.meta_value;
-                    });
+                db.toArray(siteid, 'entities', {wpid : wp_user.ID}, function(err, arr) {
+                    if (arr.length !== 0) {
+                        return nextUser();
+                    }
 
-                    db.insert(siteid, 'entities', {
-                        wpid : wp_user.ID,
-                        username : wp_user.user_login,
-                        shhh : "0c4c440a9684f73788048e6e45e047f7eddc1d24ff25c77600d932d741f4b0bc", // narcitymedia1+
-                        pwdmustchange : true,
-                        wptransferred : true,
-                        email : wp_user.user_email,
-                        firstname : wp_usermeta.first_name,
-                        lastname : wp_usermeta.last_name,
-                        description : wp_usermeta.description,
-                        displayname : wp_user.display_name,
-                        createdOn : new Date(wp_user.user_registered),
-                        avatarID : null,
-                        avatarURL : "",
-                        roles : [parseWPRole(userdata.wp_capabilities)],
-                        preferences : {
-                            topbuttontext : "Publish",
-                            topbuttonlink : "/admin/article/new"
-                        },
-                        data : userdata
-                    }, function(err, r) {
-                        cachedUsers[siteid][wp_user.ID] = r.insertedId;
-
-                        if (userIndex > 0 && userIndex % 10 == 0) {
-                            log('WP', 'Created ' + userIndex + ' entities');
-                        }
-
-                        nextUser();
+                    mysqldb.query(fetchUsersMetas + " AND user_id = " + wp_user.ID, function(err, wp_usermeta) {
+                        var userdata = {};
+                        wp_usermeta.forEach(function(meta, i) {
+                            userdata[meta.meta_key] = meta.meta_value;
+                        });
+    
+                        db.insert(siteid, 'entities', {
+                            wpid : wp_user.ID,
+                            username : wp_user.user_login,
+                            shhh : "0c4c440a9684f73788048e6e45e047f7eddc1d24ff25c77600d932d741f4b0bc", // narcitymedia1+
+                            pwdmustchange : true,
+                            wptransferred : true,
+                            email : wp_user.user_email,
+                            firstname : wp_usermeta.first_name,
+                            lastname : wp_usermeta.last_name,
+                            description : wp_usermeta.description,
+                            displayname : wp_user.display_name,
+                            createdOn : new Date(wp_user.user_registered),
+                            avatarID : null,
+                            avatarURL : "",
+                            roles : [parseWPRole(userdata.wp_capabilities)],
+                            preferences : {
+                                topbuttontext : "Publish",
+                                topbuttonlink : "/admin/article/new"
+                            },
+                            data : userdata
+                        }, function(err, r) {
+                            cachedUsers[siteid][wp_user.ID] = r.insertedId;
+    
+                            if (userIndex > 0 && userIndex % 10 == 0) {
+                                log('WP', 'Created ' + userIndex + ' entities');
+                            }
+    
+                            nextUser();
+                        });
                     });
                 });
             } else {
@@ -122,46 +134,55 @@ var ftPosts = function(siteid, mysqldb, done) {
                 if (postIndex < postTotal) {
                     var wp_post = wp_posts[postIndex];
     
-                    if (wp_post.post_status == 'inherit' || wp_post.post_title == "") {
+                    if (wp_post.post_status == 'inherit' || wp_post.post_status == 'auto-draft' || wp_post.post_title == "") {
                         postIndex++;
                         nextPost();
                     } else {
-                        mysqldb.query(fetchPostsMetas   + " AND post_id = " + wp_post.ID, function(err, wp_postmeta) {
-                            var postdata = {};
-                            wp_postmeta.forEach(function(meta, i) {
-                                postdata[meta.meta_key] = meta.meta_value;
-                            });
-                            postdata.wp_author = wp_post.post_author;
+                        db.toArray(siteid, 'content', {data.wp_id : wp_post.ID}, function(err, arr) {
+                            if (arr.length != 0) {
+                                postIndex++;
+                                nextPost();
+                                return;
+                            }
 
-                            var contentRegex = /^(.+)$/gm;
-                            mysqldb.query(fetchTagsForPosts + " WHERE ID = " + wp_post.ID, function(err, wp_tags) {
-                                mysqldb.query(fetchCatsForPosts + " WHERE p.ID = " + wp_post.ID, function(err, wp_cats) {
-                                    db.insert(siteid, 'content', {
-                                        status : wp_post.post_status == 'publish' ? 'published' : wp_post.post_status,
-                                        title : wp_post.post_title,
-                                        subtitle : postdata.subtitle,
-                                        data : postdata,
-                                        name : wp_post.post_name,
-                                        date : new Date(wp_post.post_date),
-                                        content : wp_post.post_content.replace(contentRegex, "<p>$1</p>"),
-                                        type : wp_post.post_type,
-                                        wptype : wp_post.post_type,
-                                        categories : wp_cats.length ? [wp_cats[0].slug] : [],
-                                        tags : wp_tags.map(function(wptag) { return wptag.name }),
-                                        author : db.mongoID(cachedUsers[siteid][wp_post.post_author])
-                                    }, function() {
-                                        postIndex++;
+                            mysqldb.query(fetchPostsMetas + " AND post_id = " + wp_post.ID, function(err, wp_postmeta) {
+                                var postdata = {};
+                                wp_postmeta.forEach(function(meta, i) {
+                                    postdata[meta.meta_key] = meta.meta_value;
+                                });
+                                postdata.wp_author = wp_post.post_author;
+                                postdata.wp_id = wp_post.ID;
 
-                                        if (postIndex > 0 && postIndex % 250 == 0) {
-                                            var postPerSec = parseFloat(250 / ((new Date() - wpPostStartAt) / 1000.00)).toFixed(2);
-                                            log('WP', 'Created ' + 
-                                                postIndex + ' / ' + postTotal + ' posts at ' + 
-                                                postPerSec + ' posts per second');
-
-                                            wpPostStartAt = new Date();
-                                        }
-                                    
-                                        setTimeout(nextPost, 0);
+                                var contentRegex = /^(.+)$/gm;
+                                mysqldb.query(fetchTagsForPosts + " WHERE ID = " + wp_post.ID, function(err, wp_tags) {
+                                    mysqldb.query(fetchCatsForPosts + " WHERE p.ID = " + wp_post.ID, function(err, wp_cats) {
+                                        db.insert(siteid, 'content', {
+                                            status : wp_post.post_status == 'publish' ? 'published' : wp_post.post_status,
+                                            title : wp_post.post_title,
+                                            subtitle : postdata.subtitle,
+                                            data : postdata,
+                                            name : wp_post.post_name,
+                                            date : new Date(wp_post.post_date),
+                                            content : wp_post.post_content.replace(contentRegex, "<p>$1</p>"),
+                                            type : wp_post.post_type,
+                                            wptype : wp_post.post_type,
+                                            categories : wp_cats.length ? [wp_cats[0].slug] : [],
+                                            tags : wp_tags.map(function(wptag) { return wptag.name }),
+                                            author : db.mongoID(cachedUsers[siteid][wp_post.post_author])
+                                        }, function() {
+                                            postIndex++;
+    
+                                            if (postIndex > 0 && postIndex % 250 == 0) {
+                                                var postPerSec = parseFloat(250 / ((new Date() - wpPostStartAt) / 1000.00)).toFixed(2);
+                                                log('WP', 'Created ' + 
+                                                    postIndex + ' / ' + postTotal + ' posts at ' + 
+                                                    postPerSec + ' posts per second');
+    
+                                                wpPostStartAt = new Date();
+                                            }
+                                        
+                                            setTimeout(nextPost, 0);
+                                        });
                                     });
                                 });
                             });
@@ -196,30 +217,36 @@ var ftUploads = function(siteid, mysqldb, done) {
     mysqldb.query(fetchAttachmentIDs, function(err, uploads) {
         mysqldb.end();
 
-        var uploadIndex = 0;
         var uploadTotal = uploads.length;
 
+        var threadNumbers = 10;
+        var threadIndices = new Array(threadNumbers);
+        var threadIDs = new Array(threadNumbers);
+
+        for (var i = 0; i < threadNumbers; i++) {
+            threadIndices[i] = i;
+        }
 
         log('WP', 'Queried ' + uploadTotal + ' uploads. Ready to request');
-        var nextUpload = function() {
-            if (uploadIndex < uploadTotal) {
-                var upload = uploads[uploadIndex];
+        var nextUpload = function(threadid) {
+            if (threadIndices[threadid] < uploadTotal) {
+                var upload = uploads[threadIndices[threadid]];
                 var uUrl = upload.guid;
 
-                if (uploadIndex > 0 && uploadIndex % 50 == 0) {
-                    log('WP', 'Transferred ' + uploadIndex + ' / ' + uploadTotal + ' files');
+                if (threadIndices[threadid] > 0 && threadIndices[threadid] % 50 == 0) {
+                    log('WP', 'Transferred ' + threadIndices[threadid] + ' / ' + uploadTotal + ' files');
                 }
 
                 if (!isLocal) {
                     uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
                     log('WP', 'Downloading image ' + upload.guid);
-                    request(uUrl, {encoding: 'binary'}, function(error, response, body) {handleSingle(error, body, upload);});
+                    request(uUrl, {encoding: 'binary'}, function(error, response, body) {handleSingle(error, body, upload, threadid);});
                 } else {
                     var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
                     log('WP', 'Transferring local image ' + filename);
-                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload);});
+                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);});
                 }
             } else {
                 log('WP', 'Done transferring uploads');
@@ -227,40 +254,55 @@ var ftUploads = function(siteid, mysqldb, done) {
             }
         };
 
-        var handleSingle = function(error, body, upload) {
+        var handleSingle = function(error, body, upload, threadid) {
             var filename = upload.ID + "_" + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
-                fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
-                    require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
-                        if (err) {
-                            log('WP', 'Invalid image download');
-                            uploadIndex++;
-                            nextUpload();
-                        } else {
-                            var objid = result.insertedId;
-                            log('WP', 'Inserted media with mongo ID ' + objid);
-                            db.update(cconf, 'content', {"data._thumbnail_id" : upload.ID.toString()}, {"media" : objid}, function(ue, r) {
-                                if (r.modifiedCount != 0) {
-                                    log('WP', "Affected featured image for a found article");
-                                }
+                fs.fileExists(saveTo, function(exists) {
+                    if (exists) {
+                        log('WP', 'Skipping eisting file : ' + saveTo);
+                        threadIndices[threadid]++; 
+                        nextUpload();
+                    } else {
+                        fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
+                            require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
+                                if (err) {
+                                    log('WP', 'Invalid image download');
+                                    threadIndices[threadid]++;
+                                    nextUpload(threadid);
+                                } else {
+                                    var objid = result.insertedId;
+                                    log('WP', 'Inserted media with mongo ID ' + objid);
+                                    db.update(cconf, 'content', 
+                                        {"data._thumbnail_id" : upload.ID.toString()}, 
+                                        {"media" : objid}, 
+                                    function(ue, r) {
+                                        if (r.modifiedCount != 0) {
+                                            log('WP', "Affected featured image for a found article");
+                                        }
     
-                                uploadIndex++;
-                                nextUpload();
-                            });
-                        }
-                    }, true, {wpid : upload.ID, wpguid : upload.guid});
+                                        threadIndices[threadid]++;
+                                        nextUpload(threadid);
+                                    });
+                                }
+                            }, true, {wpid : upload.ID, wpguid : upload.guid});
+                        });
+                    }
                 });
             } else {
                 log('WP', 'Download error : ' + error);
 
-                uploadIndex++;
-                nextUpload();
+                threadIndices[threadid]++;
+                nextUpload(threadid);
             }
         };
 
-        nextUpload();
+        for (var i = 0; i < threadNumbers; i++) {
+            setTimeout(function() { 
+                nextUpload(i);
+            }, 1);
+        }
     });
 };
 
