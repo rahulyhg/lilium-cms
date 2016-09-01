@@ -30,7 +30,7 @@ var ftCategories = function(siteid, mysqldb, done) {
                 var cat = wp_cat[catIndex];
                 catIndex++;
 
-                db.toArray(siteid, 'categories', {wpid : cat.term_id}, function(err, arr) {
+                db.findToArray(siteid, 'categories', {wpid : cat.term_id}, function(err, arr) {
                     if (arr.length !== 0) {
                         return nextCat();
                     }
@@ -69,7 +69,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                 var wp_user = wp_users[userIndex];         
                 userIndex++;
     
-                db.toArray(siteid, 'entities', {wpid : wp_user.ID}, function(err, arr) {
+                db.findToArray(siteid, 'entities', {wpid : wp_user.ID}, function(err, arr) {
                     if (arr.length !== 0) {
                         return nextUser();
                     }
@@ -138,7 +138,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                         postIndex++;
                         nextPost();
                     } else {
-                        db.toArray(siteid, 'content', {"data.wp_id" : wp_post.ID}, function(err, arr) {
+                        db.findToArray(siteid, 'content', {"data.wp_id" : wp_post.ID}, function(err, arr) {
                             if (arr.length != 0) {
                                 postIndex++;
                                 nextPost();
