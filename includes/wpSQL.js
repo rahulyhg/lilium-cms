@@ -138,7 +138,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                         postIndex++;
                         nextPost();
                     } else {
-                        db.toArray(siteid, 'content', {data.wp_id : wp_post.ID}, function(err, arr) {
+                        db.toArray(siteid, 'content', {"data.wp_id" : wp_post.ID}, function(err, arr) {
                             if (arr.length != 0) {
                                 postIndex++;
                                 nextPost();
