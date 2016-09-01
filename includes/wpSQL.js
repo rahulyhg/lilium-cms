@@ -219,9 +219,9 @@ var ftUploads = function(siteid, mysqldb, done) {
 
         var uploadTotal = uploads.length;
 
-        var threadNumbers = 10;
-        var threadIndices = new Array(threadNumbers);
-        var threadIDs = new Array(threadNumbers);
+        var threadNumbers   = 1;
+        var threadIndices   = new Array(threadNumbers);
+        var threadDone      = 0;
 
         for (var i = 0; i < threadNumbers; i++) {
             threadIndices[i] = i;
@@ -249,8 +249,12 @@ var ftUploads = function(siteid, mysqldb, done) {
                     fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);});
                 }
             } else {
-                log('WP', 'Done transferring uploads');
-                done();
+                log('WP', 'Done transferring uploads for thread ' + threadid + " at index " + threadIndices[threadid]);
+                threadDone++;
+
+                if (threadDone == threadNumbers) {
+                    done();
+                }
             }
         };
 
@@ -259,17 +263,17 @@ var ftUploads = function(siteid, mysqldb, done) {
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
-                fs.fileExists(saveTo, function(exists) {
+                fu.fileExists(saveTo, function(exists) {
                     if (exists) {
                         log('WP', 'Skipping eisting file : ' + saveTo);
-                        threadIndices[threadid]++; 
-                        nextUpload();
+                        threadIndices[threadid] += threadNumbers; 
+                        nextUpload(threadid);
                     } else {
                         fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
                             require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
                                 if (err) {
                                     log('WP', 'Invalid image download');
-                                    threadIndices[threadid]++;
+                                    threadIndices[threadid]+=threadNumbers;
                                     nextUpload(threadid);
                                 } else {
                                     var objid = result.insertedId;
@@ -293,15 +297,17 @@ var ftUploads = function(siteid, mysqldb, done) {
             } else {
                 log('WP', 'Download error : ' + error);
 
-                threadIndices[threadid]++;
+                threadIndices[threadid]+=threadNumbers;
                 nextUpload(threadid);
             }
         };
 
         for (var i = 0; i < threadNumbers; i++) {
-            setTimeout(function() { 
-                nextUpload(i);
-            }, 1);
+            (function(i) {
+                setTimeout(function() { 
+                    nextUpload(i);
+                }, 1);
+            })(i);
         }
     });
 };
@@ -326,6 +332,7 @@ var parseWPRole = function(roleString) {
 };
 
 var transTasks = [ftUsers, ftCategories, ftPosts, ftUploads];    
+var transTasks = [ftUploads];    
 
 var WordpressSQLToLiliumMongo = function() {
     this.transfer = function(siteid, mysqlConnInfo, callback) {

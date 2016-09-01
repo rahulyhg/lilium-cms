@@ -5,14 +5,14 @@ var fs = require('fs')
   , gm = require('gm').subClass({imageMagick: true});
 
 var ImageResizer = function () {
-    var extension;
-    var sizeKeys;
-    var imageSizes;
-    var images = {};
-    var currentFilename;
-    var fileName;
-
     this.resize = function (path, filename, mime, _c, cb) {
+        var extension;
+        var sizeKeys;
+        var imageSizes;
+        var images = {};
+        var currentFilename;
+        var fileName;
+
         fileName = filename;
         sizeKeys = Object.keys(sizes.getSizes());
         imageSizes = sizes.getSizes();
@@ -24,11 +24,11 @@ var ImageResizer = function () {
                 gm(buffer, path).size(function(err, size) {
                     return cb(images, size || err)
                 });
-            })
+            }, extension, sizeKeys, imageSizes, images, currentFilename, fileName);
         });
     };
 
-    var execute = function (buffer, i, _c, cb){
+    var execute = function (buffer, i, _c, cb, extension, sizeKeys, imageSizes, images, currentFilename, fileName){
         if (i >= 0) {
             if (buffer === null) console.log(err)
                 var key = sizeKeys[i]
@@ -55,7 +55,7 @@ var ImageResizer = function () {
                     images[key].path = resizedFilename;
                     images[key].url = _c.server.url + '/uploads/' + fileName + resizedEndName;
 
-                  execute(buffer, i - 1, _c, cb)
+                  execute(buffer, i - 1, _c, cb, extension, sizeKeys, imageSizes, images, currentFilename, fileName);
                 });
             } else {
             return cb(images)
