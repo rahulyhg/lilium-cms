@@ -219,7 +219,7 @@ var ftUploads = function(siteid, mysqldb, done) {
 
         var uploadTotal = uploads.length;
 
-        var threadNumbers   = 1;
+        var threadNumbers   = 20;
         var threadIndices   = new Array(threadNumbers);
         var threadDone      = 0;
 
@@ -332,7 +332,6 @@ var parseWPRole = function(roleString) {
 };
 
 var transTasks = [ftUsers, ftCategories, ftPosts, ftUploads];    
-var transTasks = [ftUploads];    
 
 var WordpressSQLToLiliumMongo = function() {
     this.transfer = function(siteid, mysqlConnInfo, callback) {
