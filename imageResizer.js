@@ -49,8 +49,10 @@ var ImageResizer = function () {
                 .gravity('Center')
                 .crop(width, height,"!")
                 .write(resizedFilename, function (err) {
-                  if (!err) console.log(key + ' image upload success');
-                  else console.log(err);
+                  if (err) {
+                    console.log(err);
+                  }
+
                     images[key] = {};
                     images[key].path = resizedFilename;
                     images[key].url = _c.server.url + '/uploads/' + fileName + resizedEndName;

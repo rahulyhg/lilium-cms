@@ -17,9 +17,10 @@ var category = require('./category.js');
 
 var _cachedSites = new Array();
 
-var SiteInitializer = function (conf) {
+var SiteInitializer = function (conf, siteobj) {
     var conf = conf;
     var rootpath = __dirname;
+    var siteobj = siteobj;
 
     var loadHTMLStructure = function (done) {
         fileserver.createDirIfNotExists(conf.server.html, function (valid) {
@@ -153,13 +154,18 @@ var SiteInitializer = function (conf) {
             themes.bindEndpoints(conf);
             // Precomp files
             templateBuilder.precompThemeFiles(conf, cb);
-
-
         });
     };
 
     var loadSessions = function(cb) {
         sessions.initSessionsFromDatabase(conf, cb);
+    };
+
+    var checkForWP = function(conf) {
+        if (conf.wptransferring) {
+            log('Sites', 'Resuming Wordpress transfer for site ' + conf.id);
+            siteobj.wptransfer(undefined, conf.wpdb, true);
+        }
     };
 
     this.initialize = function (done) {
@@ -176,6 +182,7 @@ var SiteInitializer = function (conf) {
                     loadTheme(function() {
                         category.preload(conf, function() {
                             loadSessions(function() {
+                                checkForWP(conf);
                                 hooks.fire('site_initialized', conf);
                                 done();
                             });
@@ -252,8 +259,8 @@ var Sites = function () {
         }
     };
 
-    this.wptransfer = function(cli) {
-        var dat = cli.postdata.data;
+    this.wptransfer = function(cli, dat, noredir) {
+        var dat = cli ? cli.postdata.data : dat;
         var that = this;
 
         var existingSite = dat.originalsite;
@@ -264,6 +271,7 @@ var Sites = function () {
             var Configs = require('./config.js');
             var siteConf = Configs.fetchConfig(existingSite);
             siteConf.wptransferring = true;
+            siteConf.wpdb = dat;
             if (!siteConf.wordpress) {
                 siteConf.wordpress = {};
             }
@@ -275,13 +283,13 @@ var Sites = function () {
                 log('Sites', 'Transfer in process');
                 if (err) {
                     log('Sites', 'Error while transferring site with uid ' + existingSite + ' : ' + err);
-                    cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
+                    if (!noredir) cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?error=db&message=" + err, false);
                 } else {
                     log('Sites', 'No error detected so far for Wordpress transfer to site with uid ' + existingSite);
 
                     Configs.saveConfigs(siteConf, function() {
                         log('Sites', 'Redirecting client to sites list');
-                        cli.redirect(cli._c.server.url + "/admin/sites/", false);
+                        if (!noredir) cli.redirect(cli._c.server.url + "/admin/sites/", false);
                     });
                 }
             });
@@ -321,6 +329,7 @@ var Sites = function () {
                                     } else {
                                         var siteConf = require('./config.js').fetchConfig(existingSite);
                                         siteConf.wptransferring = true;
+                                        siteConf.wpdb = dat;
     
                                         siteConf.saveConfigs(siteConf, function() {
                                             cli.redirect(cli._c.server.url + "/admin/sites/", false);
@@ -397,7 +406,7 @@ var Sites = function () {
     };
 
     this.initializeWebsite = function (conf, callback) {
-        new SiteInitializer(conf).initialize(callback);
+        new SiteInitializer(conf, this).initialize(callback);
     };
 
     this.loopPrecomp = function (done) {

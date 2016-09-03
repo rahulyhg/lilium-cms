@@ -137,7 +137,7 @@ var Media = function () {
                             cb(undefined, result)
                         });
                     } catch (ex) {
-                        console.log(ex + " : " + saveTo);
+                        log("Media", "ERROR : " + ex + " : " + saveTo);
                         cb(ex);
                     }
                 } else {

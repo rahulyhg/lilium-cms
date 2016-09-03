@@ -50,7 +50,7 @@
     "facebook-ads-sdk": "0.0.1",
     "fs": "0.0.2",
     "globe": "^0.3.0",
-    "gm": "^1.22.0",
+    "gm": "^1.23.0",
     "googleapis": "^2.1.7",
     "html-minifier": "^1.2.0",
     "http": "0.0.0",

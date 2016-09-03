@@ -219,7 +219,7 @@ var ftUploads = function(siteid, mysqldb, done) {
 
         var uploadTotal = uploads.length;
 
-        var threadNumbers   = 20;
+        var threadNumbers   = 10;
         var threadIndices   = new Array(threadNumbers);
         var threadDone      = 0;
 
@@ -240,8 +240,10 @@ var ftUploads = function(siteid, mysqldb, done) {
                 if (!isLocal) {
                     uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
-                    log('WP', 'Downloading image ' + upload.guid);
-                    request(uUrl, {encoding: 'binary'}, function(error, response, body) {handleSingle(error, body, upload, threadid);});
+                    log('WP', 'Downloading image ' + uUrl);
+                    request(uUrl, function(error, response, body) {
+                        handleSingle(error, body, upload, threadid);
+                    });
                 } else {
                     var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
@@ -360,6 +362,7 @@ var WordpressSQLToLiliumMongo = function() {
                     var siteConf = Configs.fetchConfig(siteid);
                     siteConf.wptransferring = false;
                     siteConf.wptransfer = true;        
+                    siteConf.wpdb = undefined;
 
                     Configs.saveConfigs(siteConf, function() {
                         log('Sites', 'Site configuration was saved');
