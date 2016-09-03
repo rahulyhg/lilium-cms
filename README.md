@@ -1,4 +1,4 @@
-![LML masthead.png](https://bitbucket.org/repo/yqaMzz/images/269442748-LML%20masthead.png)
+![LML masthead copy.png](https://bitbucket.org/repo/yqaMzz/images/422959623-LML%20masthead%20copy.png)
 
 # Lilium CMS #
 
@@ -91,4 +91,4 @@ server {
 The latest **nginx** setup tests reflected an issue with session constancy, and is still experimental. Sockets seem to be working fine unless the session gets flushed. 
 
 ### pm2 ###
-Lilium should be able to run under **pm2**, but has been showing some weird behaviours probably due to variables not being shared between instances. 
+Lilium should be able to run under **pm2**, but has been showing some weird behaviours probably due to variables not being shared between instances.
