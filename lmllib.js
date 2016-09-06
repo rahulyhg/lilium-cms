@@ -7,6 +7,11 @@ var registeredLibraries = {
             default: conf
         };
     },
+    output : function(context) {
+        return function(str) {
+            context.writeToBuffer(str);
+        };
+    },
     frontend: function (context) {
         return require('./frontend.js');
     },

@@ -1,0 +1,36 @@
+welcomemsg + "Here : " + library.sublib.ftc( library.variable , 10,  library.getParam(  true, 10 - llibrary.total )).toString( ) + " !";
+
+stack : 
+
+welcomemsg
++
+"Here : "
++
+library
+.
+sublib
+.
+ftc
+(
+library
+.
+variable
+10
+library
+.
+getParam
+(
+true
+10
+-
+library
+.
+total
+)
+)
+.
+toString
+(
+)
++
+" !"

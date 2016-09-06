@@ -707,7 +707,7 @@ $}
 }
 
 .homepage .article-thumbnail.article-thumbnail-margined {
-    margin-right: 13.9999999px;
+    margin-right: 11px;
 }
 
 .homepage .latest-content-wrapper a:nth-child(3n+1) .article-thumbnail.article-thumbnail-margined {

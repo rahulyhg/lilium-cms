@@ -1,7 +1,7 @@
 {
   "name": "LiliumCMS",
   "version": "0.0.1",
-  "description": "Lightning-fast online CMS built with NodeJS, without express",
+  "description": "Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.",
   "main": "lilium.js",
   "scripts": {
     "test": "liliumtest"
@@ -69,7 +69,6 @@
     "node-rsync": "^1.0.3",
     "nodemailer": "^2.1.0",
     "path": "^0.12.7",
-    "pokemongo-api": "^0.1.10",
     "process": "^0.11.2",
     "readability-checker": "^0.2.1",
     "readability-meter": "^1.0.0",
