@@ -5,7 +5,7 @@ for (var i = 0; i < nameMaxLength; i++) {
     separator += " ";
 }
 
-var log = function (sender, message) {
+module.exports = function (sender, message) {
     if (typeof message !== 'undefined') {
         var spacing = nameMaxLength - sender.length;
         console.log("[" + new Date() + " - " + sender + "] " + (spacing > 0 ? separator.substr(0, spacing) : '') + message);
@@ -13,5 +13,3 @@ var log = function (sender, message) {
         console.log('');
     }
 }
-
-module.exports = log;
