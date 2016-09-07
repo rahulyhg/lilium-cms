@@ -1,4 +1,11 @@
 {#config}
+{$
+    loginwallpaper = config.default.login.wallpaper?;
+    if (loginwallpaper == "");
+        loginwallpaper = config.default.server.url;
+        loginwallpaper += "/static/media/defaultlogin.jpg";
+    endif;
+$}
 
 /* @/login */
 .lmllogin-wrapper form.dashboard-login-form {
@@ -19,7 +26,7 @@ html.lmllogin {
 
 .lmlbody.lmllogin {
     background-position: center;
-    background-image: url('{=config.default.login.wallpaper}');
+    background-image: url('{=loginwallpaper}');
     background-size: cover;
 
     height: 100%;
