@@ -56,6 +56,25 @@ LMLContext.prototype.writeToBuffer = function(cTxt) {
 };
 
 LMLContext.prototype.burnStack = function() {
+    // Current stack value
+    var stackValue;
+    var firstval = this.stack[0];
+    switch (firstval.type) {
+        case "number": stackValue = parseInt(firstval.value); break;
+        case "object": stackValue = firstval.value; break;
+        case "undefined": stackValue = ""; break;
+        default : stackValue = firstval.value.toString();
+    }
+
+    for (var i = 1; i < this.stack.length; i++) {
+        var curStack = this.stack[i];
+
+        switch (curStack.type) {
+            case "operator":
+                this.executeOperator(
+        }
+    }
+
     // Run stack command
     return this.stack;
 };
@@ -101,7 +120,8 @@ LMLContext.prototype.beginStack = function(lngName) {
             curStack.originalObject += "." + wk
         } else if (wk === ",") {
             // Parameter separator
-
+            var newParam = this.stack.pop();
+            this.stack[this.stack.length-1].params.push(newParam);
         } else if (!isNaN(wk)) {
             // Is actually a number
             var numVal = parseInt(mk);
@@ -130,14 +150,20 @@ LMLContext.prototype.beginStack = function(lngName) {
             }
         } else if (wk === ")") {
             // Is parameter closure
-            var lastParams = this.stack.shift;
+            var lastParams = this.stack.pop();
+            this.stack[this.stack.length-1].params.push(newParam);
         } else {
             // Look in library for an object
-            
+            var po = this.lib[mk];
+            this.stack[this.stack.length-1].push({
+                value : po,
+                type : typeof po,
+                originalvalue : mk
+            });
         }
     }
 
-    return finalValue;
+    return this.burnStack();
 };
 
 var findNextTag = function(context) {
