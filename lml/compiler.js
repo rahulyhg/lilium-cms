@@ -9,7 +9,7 @@ const opetators = ["+", "-", "*", "/", "=", "+=", "-=", "*=", "/="];
 const comparators = ["==", "!="];
 const delimiters = ["=", "$", "%", "#", "*"];
 const constants = ["true", "false", "null", "undefined"];
-const stackRegex = /([\+\-\*\/\,\.\(\)])/;
+const stackRegex = /([\=\+\-\*\/\,\.\(\)])/;
 const opener = "{";
 
 var noOp = function() {};
@@ -28,7 +28,7 @@ var LMLContext = function() {}
     LMLContext.prototype.writing = false;
     LMLContext.prototype.done = false;
     LMLContext.prototype.endHook = noOp;
-    LMLContext.prototype.lib;
+    LMLContext.prototype.lib = {};
     
 LMLContext.prototype.writeToBuffer = function(cTxt) {
     if (typeof end === "number") {
@@ -55,23 +55,36 @@ LMLContext.prototype.writeToBuffer = function(cTxt) {
     }
 };
 
+LMLContext.prototype.burnFunction = function() {
+
+};
+
 LMLContext.prototype.burnStack = function() {
     // Current stack value
     var stackValue;
-    var firstval = this.stack[0];
-    switch (firstval.type) {
-        case "number": stackValue = parseInt(firstval.value); break;
-        case "object": stackValue = firstval.value; break;
-        case "undefined": stackValue = ""; break;
-        default : stackValue = firstval.value.toString();
-    }
+    var stackedOperator;
+    var stackedChain;
+    var workingValue;
+    var toAffect;
 
-    for (var i = 1; i < this.stack.length; i++) {
+    for (var i = 0; i < this.stack.length; i++) {
         var curStack = this.stack[i];
 
-        switch (curStack.type) {
-            case "operator":
-                this.executeOperator(
+        if (curStack.type == "operator") {
+            if (curStack.value == "=") {
+                toAffect = stackedChain;
+            } else if (curStack.value == ".") {
+                var nextStack = this.stack[i++];
+                
+                stackedChain += "." + nextStack.value;
+                stackedValue = stackedValue[nextStack.value];
+            } else {
+                stackedOperator = curStack.value;
+            }
+        } else if (curStack.type == "identifier') {
+            workingValue = this.lib[curStack.value];
+        } else {
+            this.pulloutValue
         }
     }
 
@@ -88,12 +101,18 @@ LMLContext.prototype.beginStack = function(lngName) {
 
     for (var i = 0; i < this.stack.length; i++) {
         var wk = cmds[i].trim();
+        var mk = wk;
+
+        if (wk === "") {
+            continue;
+        }
+
         if (wk == '"') {
             // String delimiter
             if (!isInString) {
                 this.stack.push({
                     type : "string",
-                    originalObject : false,
+                    originalValue : false,
                     value : ""
                 });
             }
@@ -107,58 +126,61 @@ LMLContext.prototype.beginStack = function(lngName) {
             this.stack.push({
                 type : "operator",
                 value : wk,
-                originalObject : wk
+                originalValue : wk
             });
         } else if (wk === '.') {
             // Object operator
-            wk = cmds[i++].trim();
-            var curStack = this.stack[this.stack.length-1];
-
-            var newLevel = curStack.value[wk];
-            curStack.type = typeof newLevel;
-            curStack.value = newLevel;
-            curStack.originalObject += "." + wk
+            this.stack.push({
+                type : "operator",
+                value : wk,
+                originalValue : "."
+            });
         } else if (wk === ",") {
             // Parameter separator
-            var newParam = this.stack.pop();
-            this.stack[this.stack.length-1].params.push(newParam);
+            this.stack.push({
+                type : "separator",
+                value : wk,
+                originalValue : wk
+            });
         } else if (!isNaN(wk)) {
             // Is actually a number
             var numVal = parseInt(mk);
             this.stack.push({
                 type : "number",
                 value : numVal,
-                originalObject : mk
+                originalValue : mk
             });
         } else if (constants.indexOf(wk) !== -1) {
             // EVAL HERE //////////////////////////////////////////////////////////////////////////
             // Is a constant. SAFE eval, can only be a value contained in the "constants" array  //
             // Injection should not be possible unless the "constants" const array is modified   //
             this.stack.push({                                                                   ///
-                value : /* We all hate eval, but there it is. */ WARNING_EVAL(wk),          ///////
+                value : /* We all hate eval, but there it is. */ WARNING_EVAL(mk),          ///////
                 type : "constant",                                                      ///////////
-                originalValue : wk                                                  ///////////////
+                originalValue : mk                                                  ///////////////
             );                                                                  ///////////////////
             //                                                       //////////////////////////////
             ///////////////////////////////////////////////////////////  Yes, I'm paranoid too.  //
          } else if (wk === "(") {                                    //  And I love formatting.  //
             // Is parameter opener                                   /////////////////////////////
-            this.stack[this.stack.length-1].params = [];
-            
-            if (cmds[i+1].trim() == ")") {
-                i++;
-            }
+            this.stack.push({
+                value : wk,
+                type : "paramstart"
+                originalValue : wk
+            });
         } else if (wk === ")") {
             // Is parameter closure
-            var lastParams = this.stack.pop();
-            this.stack[this.stack.length-1].params.push(newParam);
+            this.stack.push({
+                value : wk,
+                type : "paramend"
+                originalValue : wk
+            });
         } else {
             // Look in library for an object
-            var po = this.lib[mk];
             this.stack[this.stack.length-1].push({
-                value : po,
-                type : typeof po,
-                originalvalue : mk
+                value : mk,
+                type : "identifier",
+                originalValue : mk
             });
         }
     }
@@ -174,7 +196,7 @@ var findNextTag = function(context) {
         context.done = true;
         context.writeToBuffer("");
     } else if (delimiters.indexOf(tagType) != -1) {
-        writeToBuffer(nextOpener, context);
+        writeToBuffer(nextOpener);
         context.cursor = nextOpener;
 
         switch (tagType) {

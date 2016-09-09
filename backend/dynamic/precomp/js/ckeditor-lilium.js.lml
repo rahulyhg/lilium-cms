@@ -7,6 +7,70 @@ var CKEditor = function() {
 	var picture_id_url = {};
 	var selectedPicture;
 	var pictures = [];
+    var supportedEmbed = ["instagram", "facebook", "youtube", "soundcloud"];    
+
+    var ckIsUrl = function(s) {
+        var regexp = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})).?)(?::\d{2,5})?(?:[/?#]\S*)?$/i;
+        return regexp.test(s);
+    }
+
+    var embedCurIndex = 0;
+
+    var ckBindEmbedPaste = function(ev) {
+        ev.editor.on('paste', function (evt) {
+            if(evt.data.type == "text") {
+                var vdata = evt.data.dataValue;
+                var embedFound = false;
+
+                if (ckIsUrl(vdata)) {
+                    // Look for embed
+                    for (var domainid in supportedEmbed) {
+                        var domain = supportedEmbed[domainid];
+    
+                        if (vdata.indexOf(domain) !== -1) {
+                            switch (domain) {
+                                case "instagram":
+                                    var rand = embedCurIndex++;
+                                    (function(rand, evt) {
+                                        evt.data.type = "html";
+                                        evt.data.dataValue = '<div class="ck-temp-spacer"></div><div id="instagramEmbed'+
+                                            rand+
+                                            '" class="ck-embed-placeholder mediaInsertPlaceholder">[Loading Instagram embed]</div>';
+
+                                        $.get('{=config.default.server.url}/admin/embed?type=instagram&url=' + vdata, function(html) {
+                                            evt.editor.document.$.querySelector('#instagramEmbed' + rand).outerHTML = html;
+                                            evt.editor.document.$.querySelector('.ck-temp-spacer').outerHTML = "";
+                                        });
+                                    })(rand, evt);
+                                    break;
+    
+                                case "youtube":
+                                    evt.data.type = "html";
+                                    evt.data.dataValue = '<iframe allowfullscreen="" frameborder="0" src="'+
+                                        vdata.replace("watch?v=", 'embed/') +
+                                        '" class="ck-embed-video"></iframe>';
+                                    break;
+    
+                                case "facebook":
+                                    if (vdata.indexOf('video') !== -1) {
+                                        evt.data.type = "html";
+                                        evt.data.dataValue = '<iframe src="https://www.facebook.com/plugins/video.php?href='+
+                                            vdata + 
+                                            '&show_text=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true" class="ck-embed-video"></iframe>';
+                                    break;
+                                    }
+                            }
+    
+                            embedFound = true;
+                            break;
+                        }
+                    }
+                } else if (vdata.indexOf("<iframe")) {
+                    evt.data.type = "html";
+                }
+            }
+        });
+    };
 
     this.initEditor = function() {
         if (typeof CKEDITOR === 'undefined') {
@@ -26,6 +90,7 @@ var CKEditor = function() {
         CKEDITOR.on('instanceReady', function(ev) {
             // Output paragraphs as <p>Text</p>.
             this.document.appendStyleSheet('/compiled/admin.css');
+            ckBindEmbedPaste(ev);
         });
         CKEDITOR.config.entities = false;
         CKEDITOR.config.height = 360;

@@ -44,6 +44,7 @@ var preferences = undefined;
 var api = undefined;
 var album = undefined;
 var secrets = undefined;
+var oembed = undefined;
 
 var log = require('./log.js');
 
@@ -94,6 +95,7 @@ var Core = function () {
         devtools = require('./devtools.js');
         preferences = require('./preferences.js');
         secrets = require('./secrets.js');
+        oembed = require('./embed.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
@@ -255,6 +257,7 @@ var Core = function () {
 
         secrets.registerAdminEndpoint();
         devtools.registerAdminEndpoint();
+        oembed.registerAdminEndpoint();
 
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');

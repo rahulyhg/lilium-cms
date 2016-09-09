@@ -1,36 +1,44 @@
-welcomemsg + "Here : " + library.sublib.ftc( library.variable , 10,  library.getParam(  true, 10 - llibrary.total )).toString( ) + " !";
+str = welcomemsg + "Here : " + library.sublib.ftc( library.variable , 10,  library.getParam(  true, 10 - llibrary.total )) + " !";
 
-stack : 
-
-welcomemsg
-+
-"Here : "
-+
-library
-.
-sublib
-.
-ftc
-(
-library
-.
-variable
-10
-library
-.
-getParam
-(
-true
-10
--
-library
-.
-total
-)
-)
-.
-toString
-(
-)
-+
-" !"
+STACK :
+  'str ',
+  '=',
+  'welcomemsg',
+  '+',
+  ' "Here : " ',
+  '+',
+  ' library',
+  '.',
+  'sublib',
+  '.',
+  'ftc',
+  '(',
+  ' library',
+  '.',
+  'variable ',
+  ',',
+  ' 10',
+  ',',
+  '  library',
+  '.',
+  'getParam',
+  '(',
+  '  true',
+  ',',
+  ' 10 ',
+  '-',
+  ' llibrary',
+  '.',
+  'total ',
+  ')',
+  '',
+  ')',
+  '',
+  '.',
+  'toString',
+  '(',
+  ' ',
+  ')',
+  ' ',
+  '+',
+  ' "!";'

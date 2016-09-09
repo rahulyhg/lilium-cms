@@ -12,6 +12,9 @@
     
     <h2>Entities</h2>
     <a class="cache-post-link" data-postto="{=config.default.server.url}/admin/devtools/cache/refresh/entityslug">Refresh Entity slugs</a>
+
+    <h2>Embed</h2>
+    <a class="cache-post-link" data-postto="{=config.default.server.url}/admin/devtools/cache/refresh/instagram">Scan for Instagram</a>
 </div>
 
 <script>

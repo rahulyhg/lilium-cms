@@ -4,9 +4,7 @@ var filelogic = require('./filelogic.js');
 var lml = require('./lml.js');
 var notif = require('./notifications.js');
 
-var DevTools = function() {
-
-};
+var DevTools = function() {};
 
 var interpretLMLToCli = function(cli) {
     lml.executeFromString(cli._c.server.base + "/backend/dynamic/admin/", cli.postdata.data.lml, function(html) {
@@ -116,6 +114,9 @@ var refreshCache = function(cli, ctx) {
                     type: "success"
                 });
             });
+            break;
+        case 'instagram':
+            require('./embed.js').scanInstagram(cli);
             break;
     }
     cli.response.end('');
