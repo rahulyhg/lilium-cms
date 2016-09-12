@@ -11,8 +11,9 @@
         {%adminwelcome}
         {%adminbadges}
         {%lys}
+        <!-- Contains current page -->
 		<main class="container lmladminmain lmladmincontentwrapper">
-			{%%extra.templatefile}
+            
 		</main>
 	</body>
 </html>

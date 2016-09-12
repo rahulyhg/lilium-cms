@@ -1,5 +1,11 @@
 $(document).ready(function() {
+    window.socketInit = false;
     document.addEventListener(liliumcms.LiliumEvents.livevarsRendered.name, function(e) {
+        if (window.socketInit) {
+            return;
+        }
+        window.socketInit = true;
+
         var session = e.detail.livevars.session;
 
         // Subscribe to channels based on user roles

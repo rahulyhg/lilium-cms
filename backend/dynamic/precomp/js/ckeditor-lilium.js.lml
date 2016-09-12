@@ -79,14 +79,6 @@ var CKEditor = function() {
 
         CKEDITOR.basePath = '{=baseurl}/bower/ckeditor/';
 
-        if ($('[ckeditor]').ckeditor) {
-            $('[ckeditor][data-readonly=true]').ckeditor(function() {
-
-            }, {
-                readOnly: true
-            })
-            $('[ckeditor]').ckeditor();
-        }
         CKEDITOR.on('instanceReady', function(ev) {
             // Output paragraphs as <p>Text</p>.
             this.document.appendStyleSheet('/compiled/admin.css');
@@ -227,6 +219,18 @@ var CKEditor = function() {
                 });
             }
         });
+
+    };
+
+    this.parseDocument = function() {
+        if ($('[ckeditor]').ckeditor) {
+            $('[ckeditor][data-readonly=true]').ckeditor(function() {
+
+            }, {
+                readOnly: true
+            })
+            $('[ckeditor]').ckeditor();
+        }
 
         $('body').on('click', '#picture-list img', function(event) {
             var elem = event.target;

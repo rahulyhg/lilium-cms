@@ -6,6 +6,7 @@ var fs = require('fs');
 var slugify = require('slug');
 var db = require('./includes/db.js');
 var artcileHelper = require('./articleHelper.js');
+var noOp = function() {};
 
 var FileLogic = function () {
     /*
@@ -88,6 +89,29 @@ var FileLogic = function () {
         });
     };
 
+    this.serveAdminTemplate = function(cli, extra, templatefile, cb) {
+        var adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml"); 
+        var savePath = cli._c.server.html + "/admin/_index.html";
+        FileServer.fileExists(savePath, function (isPresent) {
+            if (isPresent) { 
+                serveCachedFile(cli, savePath);
+            } else {
+                LML.executeToFile(
+                    adminPath,
+                    savePath,
+                    function () {
+                        FileServer.pipeFileToClient(cli, savePath, function () {
+                            log('FileLogic', 'Admin page generated and served');
+                            (cb || noOp)();
+                        });
+                    }, Object.assign(extra || {}, {
+                        config : cli._c
+                    })
+                );
+            }
+        });
+    };
+
     this.serveAdminLML = function (cli, lastIsParam, extra, templatefile, dynamicroot) {
         lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
         var name = "";
@@ -99,29 +123,16 @@ var FileLogic = function () {
         }
 
         var savePath = cli._c.server.html + name + '/index.html';
-
         FileServer.fileExists(savePath, function (isPresent) {
             var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + name + ".lml";
-            var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
-            var adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml");
-
             if (!isPresent) {
                 LML.executeToFile(
                     readPath,
-                    tmpPath,
+                    savePath,
                     function () {
-                        LML.executeToFile(
-                            adminPath,
-                            savePath,
-                            function () {
-                                FileServer.pipeFileToClient(cli, savePath, function () {
-                                    log('FileLogic', 'Admin page generated and served');
-                                });
-                            }, Object.assign(extra || {}, {
-                                config : cli._c,
-                                templatefile : tmpPath
-                            })
-                        );
+                        FileServer.pipeFileToClient(cli, savePath, function () {
+                            log('FileLogic', 'Admin page generated and served');
+                        });
                     }, Object.assign(extra || {}, {
                         config : cli._c
                     })

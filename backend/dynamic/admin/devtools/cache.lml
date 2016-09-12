@@ -20,11 +20,15 @@
 <script>
 $(function() {
     $('.cache-post-link').each(function(i, a) {
-        $(a).attr('href', '#').bind('click', function() {
+        $(a).attr('href', '#').bind('click', function(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
             $(a).attr('disabled', 'disabled');
             $.post($(a).data('postto'), {}, function(resp) {
                 $(a).removeAttr('disabled');
             });
+
+            return false;
         });
     });
 });

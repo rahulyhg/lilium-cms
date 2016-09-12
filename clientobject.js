@@ -159,6 +159,11 @@ ClientObject.prototype.isLoggedIn = function () {
 }
 
 ClientObject.prototype.redirect = function (path, perm) {
+    if (this.routeinfo.params.async) {
+        path += (path.indexOf('?') === -1 ? "?" : "&") + "async=*";
+        log('ClientObject', "Redirecting with async param : " + path);
+    }
+
     this.response.writeHead(perm ? 301 : 302, {
         'Location': path
     });

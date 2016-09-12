@@ -1,7 +1,7 @@
 <script>
 // jQuery
 var LiliumChartbeat = function($) {
-	var socket = io ? io() : undefined;
+	var socket = window.lmlsocket;
 	var gauge;
 	var histo;
 	var latestHisto;
@@ -24,6 +24,10 @@ var LiliumChartbeat = function($) {
 	var historyChart = undefined;
 
 	var createGauge = function() {
+        if (gauge) {
+            gauge.destroy();
+        }
+
 		gauge = new Donut(document.getElementById('chartbeat-live-gauge'), {
   			lines: 12, 
   			angle: 0.15,
@@ -47,27 +51,33 @@ var LiliumChartbeat = function($) {
 
 	var bindSocket = function() {
 		socket.on('chartbeat_histo', function(dat) {
-			var cbdat = JSON.parse(dat);
-			if (gauge && !cbdat.error) {
-				gauge.set(cbdat.data.stats.people);
-			}
-			latestHisto = cbdat;
-			updateHeader();
-		});
+		    var cbdat = JSON.parse(dat);
+	    	if (gauge && !cbdat.error) {
+    			gauge.set(cbdat.data.stats.people);
+		    }
+		    latestHisto = cbdat;
+	    	updateHeader();
+    	});
 
 		socket.on('chartbeat_top', function(dat) {
-			topList = dat;
-			makeTopList();
-		});
+	    	topList = dat;
+    		makeTopList();
+    	});
 
-		socket.on('chartbeat_histo_push', function(dat) {
-			var dat = typeof dat === 'object' ? dat : JSON.prase(dat);
-			historyChart.addData([dat.people], new Date(Date.parse(dat.at)).toLocaleTimeString());
-		});
+    	socket.on('chartbeat_histo_push', function(dat) {
+		    var dat = typeof dat === 'object' ? dat : JSON.prase(dat);
+	    	historyChart.addData([dat.people], new Date(Date.parse(dat.at)).toLocaleTimeString());
+    	});
 	};
 
 	var bindLivevars = function() {
-		document.addEventListener('livevarsPrerendered', function(pkg) {
+		document.removeEventListener('livevarsPrerendered', livevarsPrerendered);
+		document.addEventListener('livevarsPrerendered', livevarsPrerendered);
+	};
+
+    var livevarsPrerendered = function(pkg) {
+            if (!document.getElementById("dash-cb-histo-canvas")) return;
+
 			var livevars = pkg.detail.livevars;
 			histo = livevars["chartbeat.dashboard.history"];
 			topList = livevars["chartbeat.dashboard.top"];
@@ -100,12 +110,14 @@ var LiliumChartbeat = function($) {
 				}
 			};
 
-			['resize', 'focus'].forEach(function(ev) {
-				window.addEventListener(ev, function() {
-					resizeCanvas();
-				});
-			});
-			resizeCanvas();
+			window.removeEventListener("resize", resizeCanvas);
+		    window.removeEventListener("focus", resizeCanvas);
+			window.addEventListener("resize", resizeCanvas);
+		    window.addEventListener("focus", resizeCanvas);
+
+            if (historyChart) {
+                historyChart.destroy();
+            }
 
 			historyChart = new Chart(canv.getContext('2d')).Line({
 				labels : labelsData,
@@ -129,10 +141,10 @@ var LiliumChartbeat = function($) {
 				pointHitDetectionRadius : 4
 			});
 
+			resizeCanvas();
 			updateHeader();
 			makeTopList();
-		});
-	};
+    };
 
 	var updateHeader = function(dat) {
 		updateRetain();
@@ -219,15 +231,19 @@ var LiliumChartbeat = function($) {
 			'</a></li>';
 	};
 
+    this.destroy = function() {
+
+    };
+
 	this.start = function() {
+	    createGauge();
+	    bindLivevars();
 		bindSocket();
-		bindLivevars();
-		createGauge();
 	};
 };
 
 jQuery(function($) {
-	var _lmlcBeat = new LiliumChartbeat($);
-	_lmlcBeat.start();
+    window._lmlcBeat = new LiliumChartbeat($);
+    window._lmlcBeat.start();
 });
 </script>

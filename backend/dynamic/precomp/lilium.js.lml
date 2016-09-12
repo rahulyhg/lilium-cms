@@ -20,6 +20,7 @@
 {#config}
 var debugMode = 'true';
 var socket = typeof io !== 'undefined' ? io() : undefined;
+window.lmlsocket = socket;
 
 window.location.urlBase = "{=config.default.server.url}/";
 
@@ -510,7 +511,6 @@ var LiliumCMS = function() {
     var AdminMenu = function() {
         this.init = function() {
             var currentHref = window.location.href;
-            var looping = true;
 
             $('.lmladminsidebaritems li').each(function(index, li) {
                 li = $(li);
@@ -520,17 +520,36 @@ var LiliumCMS = function() {
                     li.addClass('parent');
                     li.find('> a').append('<i class="fa fa-angle-left"></i>');
                 }
-                if (looping) {
-                    if (currentHref.indexOf(href) !== -1) {
-                        // Check if child
-                        if (li.parent().parent().hasClass('parent')) {
-                            li.parent().parent().addClass('child-selected');
-                        }
-                        li.addClass('lmladminsidebarselected');
-                        looping = false;
+            });
+        
+            this.highlight();
+        };
+
+        this.highlight = function() {
+            var currentHref = window.location.href;
+            var found = false;
+            $('.lmladminsidebaritems li').each(function(index, li) {
+                li = $(li);
+                var href = li.find('a').attr('href');
+                if (currentHref.indexOf(href) !== -1) {
+                    // Check if child
+                    if (li.parent().parent().hasClass('parent')) {
+                        li.parent().parent().addClass('child-selected');
                     }
+
+                    if (!li.hasClass("lmladminsidebarselected")) {
+                        $(".lmladminsidebaritems li.lmladminsidebarselected").removeClass("lmladminsidebarselected");
+                        li.addClass('lmladminsidebarselected');
+                    }
+
+                    found = true;
+                    return false;
                 }
             });
+
+            if (!found) {
+                $(".lmladminsidebaritems li.lmladminsidebarselected").removeClass("lmladminsidebarselected");
+            }
         };
     };
 
@@ -589,6 +608,81 @@ var LiliumCMS = function() {
         init();
     };
 
+    var PageLoader = function() {   
+        var that = this;
+
+        this.present = function() {
+
+        };
+    
+        this.tidy = function() {
+            
+        };
+
+        this.bindHistory = function() {
+            window.onpopstate = function(event) {
+                that.load(document.location.href, true);
+            };
+        };
+
+        this.pushHistory = function(url) {
+            window.history.pushState(null, null, url);
+        };
+
+        this.load = function(url, ignoreHistory) {
+            this.tidy();
+            if (!ignoreHistory) {
+                this.pushHistory(url);
+            }
+
+            liliumcms.adminmenu.highlight();
+
+            var formattedUrl = url + (url.indexOf('?') === -1 ? "?" : "&") + "async=*";
+            $.get(formattedUrl, function(html) {
+                $('main.lmladminmain').html(html);
+                that.postload();
+            });
+        };  
+
+        this.loadCurrentURL = function() {
+            this.load(location.href, true);
+        }
+
+        this.postload = function() {
+            liliumcms.livevars.exec();
+        };
+
+        this.parseDocument = function() {
+            $('main.lmladminmain a').each(function(index, a) {
+                a = $(a);
+                var href = a.attr('href');
+                if (href.indexOf('#') === -1 && href.indexOf("{=config.default.server.url}") !== -1) {
+                    a.attr("href", href).on('click', function(ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        that.load(href);
+                        return false;
+                    });
+                }
+            });
+        };
+
+        this.parseAdminPanel = function() {
+            $('a').each(function(index, a) {
+                a = $(a);
+                var href = a.attr('href');
+                if (href.indexOf("#") === -1 && href.indexOf("{=config.default.server.url}") !== -1) {
+                    a.attr("href", href).on('click', function(ev) {
+                        ev.preventDefault();
+                        ev.stopPropagation();
+                        that.load(href);
+                        return false;
+                    });
+                }
+            });
+        };
+    };
+
     this.everythingIsAwesome = function() {
         $('.dropdown-menu #avatar img').attr('src', that.livevars.livevars().session.avatarURL);
         $('body').addClass('lmlrendered');
@@ -600,6 +694,7 @@ var LiliumCMS = function() {
             that.queryparams = new QueryParams();
             that.formvalidator = new FormValidator();
             that.formParser = new FormParser();
+            that.pageloader = new PageLoader();
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
 
@@ -663,16 +758,28 @@ $(document).ready(function() {
 });
 
 document.addEventListener('livevarsRendered', function(e) {
-    liliumcms.multiselects.forEach(function(select) {
-        if (!select.isRendered) {
-            select.render();
-        }
-    });
+    if (!liliumcms.admininit) {
+        liliumcms.admininit = true;
 
-    liliumcms.queryparams.parseURL();
-    liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false;
-    liliumcms.formbeautifier.beautify();
-    liliumcms.formParser.init();
-    liliumcms.adminmenu.init();
-    liliumcms.everythingIsAwesome();
+        liliumcms.queryparams.parseURL();
+        liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false;
+        liliumcms.adminmenu.init();
+        liliumcms.pageloader.parseAdminPanel();
+        liliumcms.pageloader.loadCurrentURL();
+        liliumcms.pageloader.bindHistory();
+        liliumcms.everythingIsAwesome();
+    } else {
+        liliumcms.multiselects.forEach(function(select) {
+            if (!select.isRendered) {
+                select.render();
+            }
+        });
+
+        liliumcms.queryparams.parseURL();
+        liliumcms.ckeditor ? liliumcms.ckeditor.parseDocument() : false;
+        liliumcms.formbeautifier.beautify();
+        liliumcms.formParser.init();
+        liliumcms.pageloader.parseDocument();
+        liliumcms.pageloader.present();
+    }
 });

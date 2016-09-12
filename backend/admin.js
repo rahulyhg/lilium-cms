@@ -56,8 +56,10 @@ var Admin = function() {
 
 	this.handleAdminEndpoint = function(cli) {
 		cli.touch('admin.handleAdminEndpoint');
-
-		if (this.adminEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
+    
+        if (cli.method === "GET" && !cli.routeinfo.params.async) {
+            filelogic.serveAdminTemplate(cli);
+		} else if (this.adminEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
 			this.executeEndpoint(cli);
 		} else {
 			cli.throwHTTP(404, 'Unregistered Admin Endpoint : ' + cli.routeinfo.path[1]);
