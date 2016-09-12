@@ -1,25 +1,30 @@
+![LML masthead copy.png](https://bitbucket.org/repo/yqaMzz/images/422959623-LML%20masthead%20copy.png)
+
 # Lilium CMS #
 
-Lilium is a lightning-fast, online Content Management System built with node.js, without express. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.
+Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.
 
-Interpreting its own simple language, Lilium used LML (Lilium Markup Language) to create the templates and generate the served files. LML is user friendly, ressemble HTML and makes it easy for new developers or web designers to customize their very own themes (gardens).
+Interpreting its own simple language, Lilium used LML (Lilium Markup Language) to create the templates and generate the served files. LML is user friendly, ressemble HTML and makes it easy for new developers or web designers to customize their very own themes.
+
+The platform has its own framework and unique API. Lilium makes it easy to create a mobile app for a website, and is network based. It can hold multiple domains for a single instance, can use multiple different databases, and is compatible with content delivery network services. 
 
 ## Installation guide
 
 All NodeJS plugins are to be installed, and are documented in the package file so you can simply run *npm install* in the root folder where you setup Lilium.
 
 ### Required dependencies
-#### *cairo*
+*Might need **cairo***
+
 **MAC:** `brew install pkg-config cairo libpng jpeg giflib imagemagick`
 
 **UBUNTU:**
 `sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick`
 
-#### *Arty Signature font*
+#### Arty Signature font
 [Download link](http://www.1001fonts.com/arty-signature-font.html)
-## NPM or GIT
 
-#### nginx config
+## Working with nginx ##
+###Experimental configuration file###
 
 ```
 upstream lilium_proxy  {
@@ -80,5 +85,10 @@ server {
 }
 ```
 
+## Known Issues ##
 
-The CMS will be available on NPM and GitHub once ready to be released as a beta version.
+### nginx ###
+The latest **nginx** setup tests reflected an issue with session constancy, and is still experimental. Sockets seem to be working fine unless the session gets flushed. 
+
+### pm2 ###
+Lilium should be able to run under **pm2**, but has been showing some weird behaviours probably due to variables not being shared between instances.
