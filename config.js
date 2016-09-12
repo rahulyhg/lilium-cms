@@ -8,10 +8,7 @@ var Config = function () {
 Config.prototype.getAllSites = function () {
     var arr = new Array();
 
-    for (var key in _configs)
-        if (key != 'default') {
-            arr.push(_configs[key]);
-        }
+    for (var key in _configs) if (key != 'default') arr.push(_configs[key]);
 
     return arr;
 };

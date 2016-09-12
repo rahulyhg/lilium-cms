@@ -308,7 +308,7 @@ var Notification = function () {
         }
     };
 
-    this.notifyUser = function (userID, dbId, notification) {
+    this.notifyUser = function (userID, dbId, notification, difftype) {
         //Check if user will receive notification
         notification.interacted = false;
         notification.userID = db.mongoID(userID);
@@ -331,7 +331,7 @@ var Notification = function () {
         for (var index in sockets[userID].sockets) {
             var socket = sockets[userID].sockets[index];
             if (socket) {
-                socket.emit('notification', notification);
+                socket.emit(difftype || 'notification', notification);
             }
         }
     };

@@ -108,6 +108,10 @@ $(document).ready(function() {
             console.error('[Notification] ' + data.msg);
         });
 
+        socket.on('badge', function(badge) {
+            window.receiveBadge(badge.title, badge.msg, badge.icon, badge.level)
+        });
+
         socket.on('notification', function(notification) {
             var notif = generateNotification(notification);
             var badge = $('.dropdown .dropdown-toggle .badge');

@@ -12,6 +12,12 @@ var registeredLibraries = {
             context.writeToBuffer(str);
         };
     },
+    badges : function(context) {
+        var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
+        return {
+            userbadges : require('./badges.js').listUserBadges(conf)
+        };
+    },
     frontend: function (context) {
         return require('./frontend.js');
     },

@@ -15,7 +15,6 @@ var preferences = require('./preferences.js');
 var Roles = new Object();
 
 var Entity = function () {
-    // Manda fields
     this._id = undefined;
     this.username = "";
     this.shhh = "";
@@ -28,6 +27,7 @@ var Entity = function () {
     this.createdOn = undefined;
     this.preferences = new Object();
     this.slug = "";
+    this.badges = {}; // title : level
 
     // Various data; should always be checked for undefined
     this.data = new Object();

@@ -11,6 +11,7 @@ var slugify = require('slug');
 var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
 var dates = require('./dates.js');
+var badges = require('./badges.js');
 var moment = require('moment');
 
 var Article = function() {
@@ -288,6 +289,8 @@ var Article = function() {
                                         msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
                                         type: 'success'
                                     });
+
+                                    badges.check(cli, 'publish', function(acquired, level) {});
                                 });
                             });
                         } else {
@@ -677,8 +680,8 @@ var Article = function() {
                 });
             } else if (levels[0] == 'table') {
                 var sort = {};
-                sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (params.order || -1);
-                sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (params.order || -1);
+                sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (typeof params.order == "undefined" ? -1 : params.order);
+                // sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (typeof params.order == "undefined" ? -1 : params.order);
 
                 var match = [{status : {$ne : "destroyed"}}];
                 if (!cli.hasRight('edit-all-articles')) {
@@ -728,12 +731,16 @@ var Article = function() {
                     }
                 }, {
                     $sort: sort
+                }, {
+                    $skip : (params.skip || 0)
+                }, {
+                    $limit : (params.max || 20)
                 }], function(data) {
-                    var skip = (params.skip || 0);
-                    var limit = (params.max || 20);
-                    callback({
-                        size: data.length,
-                        data: data.splice(skip, limit)
+                    db.count(cli._c, 'content', {}, function(err, total) {
+                        callback({
+                            size: total,
+                            data: data
+                        });
                     });
                 });
 
@@ -782,7 +789,7 @@ var Article = function() {
                         date: -1
                     }
                 }, {
-                    $limit: 3
+                    $limit: 5
                 }], function(res) {
                     callback(res);
 
@@ -1031,6 +1038,8 @@ var Article = function() {
             paginate: true,
             searchable: true,
             max_results: 25,
+            sortby : 'date',
+            sortorder : -1,
             fields: [{
                 key: 'media',
                 displayname: 'Media',

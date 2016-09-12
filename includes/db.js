@@ -162,6 +162,20 @@ var DB = function() {
 		});
 	};
 
+    this.count = this.length = function(conf, coln, conds, cb) {
+        _conns[conf.id || conf].collection(coln, {strict:true}, function(err, col) {
+			if (err) {
+				cb("[Database - Error : "+err+"]");
+			} else if (typeof conds != "object") {
+				cb("[Database - Invalid document]");
+			} else {
+                col.find(conds).count(function(err, count) {
+                    cb(err, count);
+                });
+            }
+        });
+    };
+    
 	this.mongoID = function(str) {
 		try {
 			return new mongoObjectID(str);

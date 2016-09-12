@@ -14,6 +14,7 @@ var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
 var templateBuilder = require('./templateBuilder.js');
 var category = require('./category.js');
+var badges = require('./badges.js');
 
 var _cachedSites = new Array();
 
@@ -182,9 +183,11 @@ var SiteInitializer = function (conf, siteobj) {
                     loadTheme(function() {
                         category.preload(conf, function() {
                             loadSessions(function() {
-                                checkForWP(conf);
-                                hooks.fire('site_initialized', conf);
-                                done();
+                                badges.addSite(conf, function() {
+                                    checkForWP(conf);
+                                    hooks.fire('site_initialized', conf);
+                                    done();
+                                });
                             });
                         });
                     });
