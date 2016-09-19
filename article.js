@@ -32,7 +32,7 @@ var Article = function() {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case 'new':
-                if (cli.hasRightOrRefuse("publish")) this.publish(cli);
+                if (cli.hasRightOrRefuse("publish")) this.publish(cli, "create");
                 break;
             case 'edit':
                 if (cli.hasRightOrRefuse("publish")) this.edit(cli);
@@ -50,7 +50,7 @@ var Article = function() {
                 this.save(cli);
                 break;
             case 'preview':
-                this.preview(cli);
+                if (cli.hasRightOrRefuse("publish")) this.publish(cli, "preview");
                 break;
             case 'destroy':
                 if (cli.hasRightOrRefuse("destroy")) this.delete(cli, true);
@@ -207,8 +207,15 @@ var Article = function() {
         });
     };
 
-    this.publish = function(cli) {
+    this.publish = function(cli, pubCtx) {
         cli.touch('article.new');
+        pubCtx = pubCtx || "create";
+
+        var dbCol = {
+            "create" : "content",
+            "preview" : "preview"
+        }
+
         var that = this;
         if (cli.hasRight('publish')) {
             var form = formBuilder.handleRequest(cli);
@@ -223,7 +230,7 @@ var Article = function() {
                 formData.date = dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone);
                 formData.media = db.mongoID(formData.media);
                 formData.updated = new Date();
-                hooks.fire('article_will_create', {
+                hooks.fire('article_will_' + pubCtx, {
                     cli: cli,
                     article: formData
                 });
@@ -239,7 +246,9 @@ var Article = function() {
                 });
 
                 // Create post
-                db.update(cli._c, 'content', conds, formData, function(err, result) {
+                var params = [cli._c, dbCol[pubCtx], conds];
+
+                db.update.apply(db, [...params, formData, function(err, result) {
                     if (!err) {
                         var success = true;
                         if (result.upsertedId !== null) {
@@ -264,34 +273,50 @@ var Article = function() {
                                 extra.ctx = "article";
                                 extra.article = deepArticle;
 
-                                // Generate LML page
-                                filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
-                                    cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
-    
-                                    // Remove autosaves related to this article
-                                    if (cli.postdata.data.autosaveid) {
-                                        db.remove(
-                                            cli._c,
-                                            'autosave',
-                                            {
-                                                _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
-                                            },
-                                            function() {}
-                                        );
-                                    }
-    
-                                    var nlen = publishedNotificationTitles.length;
-                                    var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
 
-                                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                        title: notifMessage,
-                                        url: cli._c.server.url + '/' + formData.name,
-                                        msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
-                                        type: 'success'
+                                if (pubCtx === "create") {
+                                    // Generate LML page
+                                    filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
+                                        cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
+        
+                                        // Remove autosaves related to this article
+                                        if (cli.postdata.data.autosaveid) {
+                                            db.remove(
+                                                cli._c,
+                                                'autosave',
+                                                {
+                                                    _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
+                                                },
+                                                function() {}
+                                            );
+                                        }
+        
+                                        var nlen = publishedNotificationTitles.length;
+                                        var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
+    
+                                        notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                            title: notifMessage,
+                                            url: cli._c.server.url + '/' + formData.name,
+                                            msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
+                                            type: 'success'
+                                        });
+    
+                                        badges.check(cli, 'publish', function(acquired, level) {});
                                     });
+                                } else if (pubCtx === "preview") {
+                                    var tmpName = "static/tmp/preview" + 
+                                        Math.random().toString().slice(2) + 
+                                        Math.random().toString().slice(2) + 
+                                        ".tmp";
+                                    var absPath = cli._c.server.html + "/" + tmpName;
 
-                                    badges.check(cli, 'publish', function(acquired, level) {});
-                                });
+                                    filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
+                                        var fileserver = require('./fileserver.js');
+                                        fileserver.pipeFileToClient(cli, absPath, function() {
+                                            fileserver.deleteFile(absPath, function() {});
+                                        }, true);
+                                    });
+                                }
                             });
                         } else {
                             cli.throwHTTP(500);
@@ -302,7 +327,7 @@ var Article = function() {
                     }
 
 
-                }, true, true);
+                }, true, true]);
 
             } else {
                 cli.sendJSON({
@@ -465,22 +490,11 @@ var Article = function() {
     };
 
     this.preview = function(cli) {
-        var form = formBuilder.handleRequest(cli);
-        var formData = formBuilder.serializeForm(form);
+        this.publich(cli, "preview");
+        return;
 
-        var extra = new Object();
-        extra.article = formBuilder.unescapeForm(formData);
-        extra.ctx = "article";
-
+        // UNREACHABLE CODE 
         // Generate LML page
-        var tmpName = "static/tmp/preview" + Math.random().toString().slice(2) + Math.random().toString().slice(2) + ".tmp";
-        var absPath = cli._c.server.html + "/" + tmpName;
-        filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
-            var fileserver = require('./fileserver.js');
-            fileserver.pipeFileToClient(cli, absPath, function() {
-                fileserver.deleteFile(absPath, function() {});
-            }, true);
-        });
     };
 
     this.edit = function(cli) {

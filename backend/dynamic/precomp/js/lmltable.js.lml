@@ -163,6 +163,7 @@ var LmlTable = function(table) {
 
 	var updateTable = function(cb, isSearch, searchTerm) {
 		timeInitial = new Date();
+        liliumcms.pageloader.tidy();
 
 		fieldSort = table.data('sortby');
 		fieldOrder = table.data('sort-order');
@@ -172,7 +173,7 @@ var LmlTable = function(table) {
             updateNav();
 			var now = new Date();
 			console.log('Table updated from cache in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
-
+            liliumcms.pageloader.present();
 		} else {
 			liliumcms.livevars.getSingleLivevar(table.data('endpoint'), {
 				sortby: fieldSort,
@@ -190,8 +191,9 @@ var LmlTable = function(table) {
                 updateNav();
 				var now = new Date();
 				console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+                liliumcms.pageloader.present();
 
-				if (typeof cb !== 'undefined') cb();
+                cb && cb();
 			});
 		}
 	}

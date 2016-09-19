@@ -12,7 +12,7 @@
                 </button>
                 <div class="lilium-logo-link">
                     <a href="{=config.default.server.url}/admin">
-                        <img src="{=config.default.server.url}/static/media/lmllogo.png" />
+                        <img src="{=config.default.server.url}/static/media/lmllogo.png" id="lilium-logo" class="lilium-logo" />
                         <span class="product-text">
                             Lilium CMS
                         </span>
@@ -56,7 +56,7 @@
                                     <a href="{=config.default.server.url}/admin/preferences">My Lilium</a>
                                 </div>
                                 <div>
-                                    <a href="{=config.default.server.url}/logout">Logout</a>
+                                    <a href="{=config.default.server.url}/logout" data-replace="true">Logout</a>
                                 </div>
                             </span>
                         </div>

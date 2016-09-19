@@ -239,7 +239,7 @@
             var textinside = btn.innerHTML;
             btn.innerHTML = "loading...";
             btn.disabled = true;
-            $.post('{=config.default.server.url}/admin/article/preview', $('form').serialize(), function(html) {
+            $.post('{=config.default.server.url}/admin/article/preview', $('form#post_create').serialize(), function(html) {
                 window.open().document.write(html);
                 btn.disabled = false;
                 btn.innerHTML = textinside;

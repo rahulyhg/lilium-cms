@@ -612,11 +612,11 @@ var LiliumCMS = function() {
         var that = this;
 
         this.present = function() {
-
+            $("#lilium-logo").removeClass('quickrotate');
         };
     
         this.tidy = function() {
-            
+            $("#lilium-logo").addClass('quickrotate');
         };
 
         this.bindHistory = function() {
@@ -656,7 +656,7 @@ var LiliumCMS = function() {
             $('main.lmladminmain a').each(function(index, a) {
                 a = $(a);
                 var href = a.attr('href');
-                if (href.indexOf('#') === -1 && href.indexOf("{=config.default.server.url}") !== -1) {
+                if (href.indexOf('#') === -1 && href.indexOf("{=config.default.server.url}") !== -1 && !a.data("replace")) {
                     a.attr("href", href).on('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
@@ -671,7 +671,7 @@ var LiliumCMS = function() {
             $('a').each(function(index, a) {
                 a = $(a);
                 var href = a.attr('href');
-                if (href.indexOf("#") === -1 && href.indexOf("{=config.default.server.url}") !== -1) {
+                if (href.indexOf("#") === -1 && href.indexOf("{=config.default.server.url}") !== -1 && !a.data("replace")) {
                     a.attr("href", href).on('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();

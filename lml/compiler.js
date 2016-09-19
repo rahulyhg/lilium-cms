@@ -5,11 +5,10 @@ var lmllib = require('../lmllib.js');
 var configs = require('../config.js');
 var WARNING_EVAL = eval;
 
-const opetators = ["+", "-", "*", "/", "=", "+=", "-=", "*=", "/="];
-const comparators = ["==", "!="];
+const opetators = ["+", "-", "*", "/", "=", "!", ">", "<"];
 const delimiters = ["=", "$", "%", "#", "*"];
 const constants = ["true", "false", "null", "undefined"];
-const stackRegex = /([\=\+\-\*\/\,\.\(\)])/;
+const stackRegex = /([\!\=\+\-\*\/\,\.\(\)])/;
 const opener = "{";
 
 var noOp = function() {};
@@ -23,12 +22,14 @@ var LMLContext = function() {}
     LMLContext.prototype.text = "";
     LMLContext.prototype.cursor = 0;
     LMLContext.prototype.stack = [];
+    LMLContext.prototype.functionStack = [];
     LMLContext.prototype.initialized = false;
     LMLContext.prototype.buffer = [];
     LMLContext.prototype.writing = false;
     LMLContext.prototype.done = false;
     LMLContext.prototype.endHook = noOp;
     LMLContext.prototype.lib = {};
+    LMLContext.prototype.affectation = false;
     
 LMLContext.prototype.writeToBuffer = function(cTxt) {
     if (typeof end === "number") {
@@ -59,6 +60,32 @@ LMLContext.prototype.burnFunction = function() {
 
 };
 
+LMLContext.prototype.pulloutValue = function() {
+    
+};
+
+LMLContext.prototype.operand = function(left, operator, right) {
+    switch (operator) {
+        case "+":   return left + right;   break;
+        case "-":   return left - right;   break;
+        case "*":   return left * right;   break;
+        case "/":   return left / right;   break;
+        case "+=":  return left += right;  break;
+        case "-=":  return left -= right;  break;
+        case "*=":  return left *= right;  break;
+        case "/=":  return left /= right;  break;
+        case "==":  return left == right;  break;
+        case "!=":  return left != right;  break;
+        case ">" :  return left > right;   break;
+        case "<" :  return left < right;   break;
+        case "<=":  return left <= right;  break;
+        case ">=":  return left >= right;  break;
+        case "===": return left === right; break;
+
+        default:   throw new Error("[LMLParseException] - Use of undefined LML operator " + operator);
+    }
+};
+
 LMLContext.prototype.burnStack = function() {
     // Current stack value
     var stackValue;
@@ -66,30 +93,43 @@ LMLContext.prototype.burnStack = function() {
     var stackedChain;
     var workingValue;
     var toAffect;
+    var finalValue;
 
     for (var i = 0; i < this.stack.length; i++) {
         var curStack = this.stack[i];
 
-        if (curStack.type == "operator") {
-            if (curStack.value == "=") {
-                toAffect = stackedChain;
-            } else if (curStack.value == ".") {
-                var nextStack = this.stack[i++];
-                
-                stackedChain += "." + nextStack.value;
-                stackedValue = stackedValue[nextStack.value];
-            } else {
-                stackedOperator = curStack.value;
-            }
-        } else if (curStack.type == "identifier') {
-            workingValue = this.lib[curStack.value];
-        } else {
-            this.pulloutValue
+        // string, operator, 
+        switch (curStack.type) {
+            case "string":
+                if (stackedOperator) {
+                    finalValue = this.operand(finalValue, stackOperator, curStack.value);
+                    stackedOperator = undefined;
+                } else {
+                    finalValue = curStack.value;
+                }
+                break;
+
+            case "operator":
+                if (stackedOperator) {
+                    stackedOperator += curStack.value;
+                } else {
+                    stackedOperator = curStack.value;
+                }
+                break;
+
+            
         }
     }
 
     // Run stack command
     return this.stack;
+};
+
+LMLContext.prototype.createFunction = function(ftc) {
+    this.functionStack.push({
+        func : ftc,
+        params : []
+    });
 };
 
 LMLContext.prototype.beginStack = function(lngName) {
@@ -105,6 +145,8 @@ LMLContext.prototype.beginStack = function(lngName) {
 
         if (wk === "") {
             continue;
+        } else if (!this.affectation && wk === "=") {
+            this.affectation = true;
         }
 
         if (wk == '"') {
@@ -131,7 +173,7 @@ LMLContext.prototype.beginStack = function(lngName) {
         } else if (wk === '.') {
             // Object operator
             this.stack.push({
-                type : "operator",
+                type : "parent",
                 value : wk,
                 originalValue : "."
             });
@@ -158,7 +200,7 @@ LMLContext.prototype.beginStack = function(lngName) {
                 value : /* We all hate eval, but there it is. */ WARNING_EVAL(mk),          ///////
                 type : "constant",                                                      ///////////
                 originalValue : mk                                                  ///////////////
-            );                                                                  ///////////////////
+            });                                                                  ///////////////////
             //                                                       //////////////////////////////
             ///////////////////////////////////////////////////////////  Yes, I'm paranoid too.  //
          } else if (wk === "(") {                                    //  And I love formatting.  //

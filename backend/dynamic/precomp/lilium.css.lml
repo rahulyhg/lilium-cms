@@ -1562,3 +1562,25 @@ input[disabled] {
     81%  { transform: translate3d(0px,   0px, 0px); opacity: 0; }
     100% { transform: translate3d(0px,   0px, 0px); opacity: 1;   }
 }   
+
+.slowrotate {
+    -webkit-animation : slowrotate 5s infinite;
+       -moz-animation : slowrotate 5s infinite;
+        -ms-animation : slowrotate 5s infinite;
+         -o-animation : slowrotate 5s infinite;
+            animation : slowrotate 5s infinite;
+}
+
+.quickrotate {
+    -webkit-animation: slowrotate 1s infinite linear;
+       -moz-animation: slowrotate 1s infinite linear;
+        -ms-animation: slowrotate 1s infinite linear;
+         -o-animation: slowrotate 1s infinite linear;
+            animation: slowrotate 1s infinite linear;
+}
+
+@-webkit-keyframes  slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
+@-moz-keyframes     slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
+@-ms-keyframes      slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
+@-o-keyframes       slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
+@keyframes          slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
