@@ -6,7 +6,7 @@ var fs = require('fs');
 var slugify = require('slug');
 var db = require('./includes/db.js');
 var artcileHelper = require('./articleHelper.js');
-var noOp = function() {};
+var noOp = require('./noop.js');
 
 var FileLogic = function () {
     /*

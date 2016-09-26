@@ -16,21 +16,44 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         return false;
     });
 
-
-    var append = function(val, index) {
+    var append = function(val, index, obj) {
         if (!val) return "";
 
-        var row;
-        row += "<td>" + val + "</td>";
-        row += "<input type='hidden' name='" + $('#' + htmlIdentifier).data('fieldname') + "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' value='" + val + "'></input>";
-        return row;
+        var row = "<td>";
+        
+        switch (scheme.columns[index].dataType) {
+            case "text":
+                row += "<input type='text' name='" +
+                    $('#' + htmlIdentifier).data('fieldname') + 
+                    "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' value='" + val + 
+                    "'></input>";
+
+                break;
+            case "select":
+                var nSelect = obj.clone().removeClass().val(val);
+                nSelect.find('option[value="'+val+'"]').prop('selected', true).attr('selected', 'selected');
+                nSelect.attr('name', $('#' + htmlIdentifier).data('fieldname') + 
+                    "[" + linenumber + "][" + scheme.columns[index].fieldName + "]");
+
+                row += nSelect.prop('outerHTML');
+
+                break;
+            default:
+                row += "<input type='hidden' name='" +
+                    $('#' + htmlIdentifier).data('fieldname') + 
+                    "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' value='" + val + 
+                    "'></input>";
+        }
+
+        return row + "</td>";
     };
 
     this.appendRowFromButton = function() {
         var row = '<tr>';
+        var selector = "#" + htmlIdentifier + ' th input, #' + htmlIdentifier + ' th select';    
 
-        $('#'+htmlIdentifier+' th input').each(function(index) {
-            row += append($(this).val(), index);
+        $(selector).each(function(index) {
+            row += append($(this).val(), index, $(this));
             $(this).val('');
         });
 
@@ -42,6 +65,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
             $(this).parent().parent().remove();
         });
 
+        linenumber++;
     };
 
     this.appendRow = function(livevar) {
@@ -51,10 +75,9 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
             for (var i in data) {
                 var row = '<tr>';
 
-                $('#'+htmlIdentifier+' th input').each(function(index) {
+                $('#'+htmlIdentifier+' th input, #' + htmlIdentifier + ' th select').each(function(index) {
                         var coldata = data[i][$(this).data('fieldname')];
-                        row += append(coldata, index);
-
+                        row += append(coldata, index, $(this));
                 });
                 row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";
 
@@ -64,7 +87,6 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
                     $(this).parent().parent().remove();
                 });
                 linenumber++;
-
             }
 
             return false;

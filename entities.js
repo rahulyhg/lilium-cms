@@ -907,6 +907,7 @@ var Entities = module.exports = new function () {
                     power: dat.power,
                     username: dat.username,
                     site : dat.site,
+                    badges : dat.badges,
                     preferences : dat.preferences || preferences.getDefault(cli._c),
                     notifications: dat.notifications || [],
                     newNotifications: dat.newNotifications || 0,

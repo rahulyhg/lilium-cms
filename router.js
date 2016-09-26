@@ -34,6 +34,7 @@ var Router = function () {
         cli.routeinfo.api = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === "api";
         cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.livevars;
         cli.routeinfo.root = pObj.pathname == "/";
+        cli.routeinfo.async = cli.routeinfo.params.async || false;
 
         if (!cli.routeinfo.isStatic) {
             session.injectSessionInCli(cli, cb);

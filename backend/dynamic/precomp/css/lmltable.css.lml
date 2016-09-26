@@ -105,3 +105,32 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 .lmltablebuilder .empty{
     text-align: center;
 }
+
+.field-stack thead th {
+    padding-right: 10px;
+    width: 220px;
+}
+
+.lmlform button.lmlstacktableremovebutton {
+    background-color: #c74747;
+}
+
+.lmlform button.lmlstacktableremovebutton:hover {
+    background-color: #e76767;
+}
+
+.lmlform button.lmlstacktableremovebutton:active {
+    background-color: #a72727;
+}
+
+.lmlform button.lmlstacktableappendbutton {
+    background-color: #58d062;
+}
+
+.lmlform button.lmlstacktableappendbutton:hover {
+    background-color: #68e072;
+}
+
+.lmlform button.lmlstacktableappendbutton:active {
+    background-color: #38b042;
+}

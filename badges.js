@@ -123,6 +123,28 @@ BadgeWrapper.prototype.acquire = function(cli, site, user, badge, level, cb) {
     });
 };
 
+BadgeWrapper.prototype.registerLiveVar = function() {
+    require('./livevars.js').registerLiveVariable('badges', function(cli, levels, params, cb) {
+        switch (levels[0]) {
+            case undefined:
+            case "user":
+                db.findToArray(cli._c, 'userbadges', {}, function(err, arr) {
+                    cb(arr);
+                });
+                break;
+
+            case "team":
+                db.findToArray(cli._c, 'teambadges', {}, function(err, arr) {
+                    cb(arr);
+                });
+                break;
+
+            default:
+                cb(new Error("[BadgesException] Undefined level " + levels[0] + " for badges live variable"));
+        }
+    });
+};
+
 // First param can be ClientObject type
 BadgeWrapper.prototype.getUserBadges = function(_c, useridOrName, cb, isId) {
     var conds = {};

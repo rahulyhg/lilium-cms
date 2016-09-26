@@ -1,4 +1,5 @@
 {#config;extra}
+{*badges.user}
 
 <div id="badge-modal" class="modal fade announcement" tabindex="-1" role="dialog">
     <div class="modal-dialog">
@@ -24,9 +25,8 @@
 
 <script>
 var levels = [
-    "green",
-    "bronze", "silver", "gold", 
-    "platinum", "diamond", "rainbow"
+    "green", "bronze", "silver", "gold", 
+    "platinum", "diamond", "rainbow", "master"
 ];
 
 window.receiveBadge = function(title, message, icon, level) {
@@ -43,9 +43,85 @@ $(function() {
         $('#badge-modal').modal('hide');
     });
 });
+
+var LiliumBadges = function() {
+    var that = this;
+    var current;
+    var sidebarContainer = document.querySelector('.lmladminsidebadges');
+    var bCache = {};
+
+    this.addSideBadge = function(type, level) {
+        var hBadge = document.createElement('div');
+        var hBadgeImage = document.createElement('i');
+        
+        hBadgeImage.innerHTML = ("&#x" + bCache[type].icon + ";");
+        hBadgeImage.classList.add("fa");
+
+        hBadge.classList.add("sidebadge");
+        hBadge.classList.add("sidebadge-" + levels[level]);
+        hBadge.dataset.type = type;
+        hBadge.dataset.level = level;
+        hBadge.dataset.levelname = levels[levels];
+
+        hBadge.appendChild(hBadgeImage);
+        sidebarContainer.appendChild(hBadge);
+    };
+
+    this.fillSidebar = function() {
+        var bdgs = liliumcms.livevars.retrieveVar('session').badges;
+        var current = bdgs;
+        var total = 0;
+
+        for (var index in bdgs) {
+            that.addSideBadge(index, bdgs[index]);
+            total++;
+        }
+
+        var badgeboxHeight = Math.floor((total-1) / 6) * 35 + 35;
+        sidebarContainer.style.height = badgeboxHeight + "px";        
+    };
+
+    this.createCache = function() {
+        var arr = liliumcms.livevars.retrieveVar('badges.user');
+        for (var i = 0; i < arr.length; i++) {
+            bCache[arr[i].code] = arr[i];
+        }
+    };
+};
 </script>
 
 <style>
+
+.lmladminsidebadges {
+    position:absolute;
+    bottom: 0; left:0; right:0; 
+    height: 50px; /* flat(50 times number of badges) + 50 */
+
+    z-index: 1500;
+}
+
+.lmladminsidebadges .sidebadge {
+    color: #FFF;
+    font-size: 14px;
+    display: inline-block;
+    margin: 5px;
+    padding: 0px 0px;
+    width: 23px;
+    height: 23px;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    text-align: center;
+}
+
+.lmladminsidebadges .sidebadge-green    { background-color : #409c2a; }
+.lmladminsidebadges .sidebadge-bronze   { background-color : #906d1b; }
+.lmladminsidebadges .sidebadge-silver   { background-color : #909090; }
+.lmladminsidebadges .sidebadge-gold     { background-color : #cac617; }
+.lmladminsidebadges .sidebadge-platinum { background-color : #2184ef; }
+.lmladminsidebadges .sidebadge-diamond  { background-color : #f4f8ff; color: #AAA; }
+.lmladminsidebadges .sidebadge-rainbow  { background-color : #FF0084; }
+.lmladminsidebadges .sidebadge-master   { background-color : #E80404; }
+
 
 #badge-modal.announcement.modal .modal-body::before {
     content: '';

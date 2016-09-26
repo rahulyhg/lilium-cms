@@ -695,6 +695,7 @@ var LiliumCMS = function() {
             that.formvalidator = new FormValidator();
             that.formParser = new FormParser();
             that.pageloader = new PageLoader();
+            that.badges = new LiliumBadges();
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
 
@@ -767,6 +768,8 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.pageloader.parseAdminPanel();
         liliumcms.pageloader.loadCurrentURL();
         liliumcms.pageloader.bindHistory();
+        liliumcms.badges.createCache();
+        liliumcms.badges.fillSidebar();
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.multiselects.forEach(function(select) {

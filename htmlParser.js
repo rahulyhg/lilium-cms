@@ -224,10 +224,21 @@ var HtmlParser = function () {
     };
 
     var parseStackField = function (field) {
-        return '<input type="' + (field.dataType || 'text') +
-            '" class="lmlstacktableheaderfield lmlstacktableheaderfield-' + field.fieldName +
-            '" data-fieldname="' + field.fieldName +
-            '" value="" />';
+        switch (field.dataType) {
+            case undefined:
+            case 'text':
+                return '<input type="text" class="lmlstacktableheaderfield lmlstacktableheaderfield-' + field.fieldName +
+                    '" data-fieldname="' + field.fieldName +
+                    '" value="" />';
+            case 'select': 
+                var str = '<select class="lmlstacktableheaderfield lmlstacktableheaderfield-'+field.fieldName+'">';
+                if (field.dataSource) {
+                    field.dataSource.forEach(function(opt) {
+                        str += '<option value="'+(opt.value || opt.name || opt)+'">'+(opt.displayname || opt.value || opt)+'</option>';
+                    });
+                }
+                return str + '</select>';
+        }
     };
 
     var parseSection = function(field) {
@@ -271,7 +282,10 @@ var HtmlParser = function () {
         var html = "";
         var displayName = field.attr.displayname || field.name || undefined;
 
-        html += '<label for="' + field.name + '">' + displayName + '</label>';
+        if (field.attr.displayname && !field.attr.notitle) { 
+            html += '<label for="' + field.name + '">' + displayName + '</label>'; 
+        }
+
         html += '<div class="lmlstacktablewrapper" data-fieldname="' + field.name + '" >';
         html += '<table class="lmlstacktable" data-fieldname="' + field.name +
             '" id="lmlstacktable-' + field.name +

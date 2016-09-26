@@ -1,0 +1,57 @@
+{#config}
+<h1>Tools</h1>
+
+<div class="tools-list">
+    {*tools.list(template:"tool-template")}
+</div>
+
+<lml:template id="tool-template">
+    <lml:tobject data-nodetype="a"
+        data-href="{=config.default.server.url}/admin/tools/"
+        data-key="endpoint"
+    >
+        <div class="tool-list-item">
+            <lml:tobject data-nodetype="i" data-classsource="icon" data-class="tool-list-item-icon fa "></lml:tobject>
+            <lml:tobject data-nodetype="span"
+                data-key="displayname"
+            ></lml:tobject>
+        </div>
+    </lml:tobject>
+</lml:template>
+
+<style>
+    .tools-list {
+        padding: 5px;
+    }
+
+    .tools-list a {
+        display: inline-block;
+        border: 1px solid #DDD;
+
+        font-weight: 300;
+        text-align: center;
+        color: #333;
+
+        margin: 5px;
+        padding: 40px 10px;
+        height: 180px;
+    }
+
+    .tools-list a:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    .tools-list a:hover {
+        text-decoration: none;
+    }
+
+    .tools-list a span {
+        font-size: 16px;
+    }
+
+    .tools-list .tool-list-item-icon {
+        font-size: 52px;
+        display: block;
+        margin: 5px auto;
+    }
+</style>

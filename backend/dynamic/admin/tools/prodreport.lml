@@ -1,0 +1,24 @@
+{#config;tableBuilder}
+<h1>
+    Production Social Reports
+    <a class="fab" href="{=config.default.server.url}/admin/tools/prodreport/new">+</a>
+</h1>
+<div class="prod-report-list">
+    {=tableBuilder.render('prodreportlist')} 
+</div>
+
+
+<lml:tabletemplate id="table-title">
+	<lml:tobject data-nodetype="b" data-key="title"></lml:tobject>
+</lml:tabletemplate>
+
+<lml:tabletemplate id="table-notes">
+	<lml:tobject data-nodetype="p" data-key="notes"></lml:tobject>
+</lml:tabletemplate>
+
+<lml:tabletemplate id="table-name">
+	<lml:tobject data-nodetype="div" data-key="status"></lml:tobject>
+</lml:tabletemplate>
+
+<lml:tabletemplate id="table-actions">
+</lml:tabletemplate>

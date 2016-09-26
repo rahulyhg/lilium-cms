@@ -151,7 +151,7 @@ var FileServer = function () {
                         callback(file, err);
                     });
                 } else {
-                    callback("File does not exist.");
+                    callback(undefined, new Error("File does not exist."));
                 }
             });
         }

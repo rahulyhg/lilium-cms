@@ -45,6 +45,8 @@ var api = undefined;
 var album = undefined;
 var secrets = undefined;
 var oembed = undefined;
+var tools = undefined;
+var badges = undefined;
 
 var log = require('./log.js');
 
@@ -94,7 +96,9 @@ var Core = function () {
         postleaf = require('./postleaf.js');
         devtools = require('./devtools.js');
         preferences = require('./preferences.js');
+        tools = require('./tools.js');
         secrets = require('./secrets.js');
+        badges = require('./badges.js');
         oembed = require('./embed.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
@@ -258,6 +262,7 @@ var Core = function () {
         secrets.registerAdminEndpoint();
         devtools.registerAdminEndpoint();
         oembed.registerAdminEndpoint();
+        tools.registerAdminEndpoint();
 
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');
@@ -403,6 +408,15 @@ var Core = function () {
             children: []
         });
         admin.registerAdminMenu({
+            id: "tools",
+            faicon: "fa-wrench",
+            displayname: "Tools",
+            priority: 800,
+            rights: [],
+            absURL: aurl + "tools",
+            children: []
+        });
+        admin.registerAdminMenu({
             id: "settings",
             faicon: "fa-cogs",
             displayname: "Settings",
@@ -438,7 +452,7 @@ var Core = function () {
             absURL: aurl + "persona/list",
             children: []
         });
-        admin.registerAdminMenu({
+        /*admin.registerAdminMenu({
             id: "activities",
             faicon: "fa-eye",
             displayname: "Activities",
@@ -446,7 +460,7 @@ var Core = function () {
             rights: ["view-user-activities"],
             absURL: aurl + "activities/",
             children: []
-        });
+        });*/
 
         hooks.fire('adminmenus_created');
         log('Core', 'Registered Default Admin menus');
@@ -613,6 +627,8 @@ var Core = function () {
         postleaf.registerLiveVar();
         persona.registerLiveVar();
         secrets.registerLiveVar();
+        tools.registerLiveVar();
+        badges.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };
@@ -665,6 +681,10 @@ var Core = function () {
         log('Frontend', 'Registering default values from core');
         Frontend.registerFromCore();
         hooks.fire('frontend_registered');
+    };
+
+    var loadTools = function(cb) {
+        tools.preloadTools(cb);
     };
 
     var loadRequestHandler = function () {
@@ -785,22 +805,24 @@ var Core = function () {
 
             loadPlugins(function () {
                 loadRoles(function () {
-                    precompile(function () {
-                        redirectIfInit(resp, function () {
-                            loadAdminMenus();
-                            loadFrontend();
-                            loadForms();
-
-                            loadCacheInvalidator();
-                            scheduleGC();
-
-                            log('Lilium', 'Starting inbound server');
-                            Inbound.createServer();
-                            loadNotifications();
-                            Inbound.start();
-
-                            log('Core', 'Firing initialized signal');
-                            hooks.fire('init');
+                    loadTools(function() {
+                        precompile(function () {
+                            redirectIfInit(resp, function () {
+                                loadAdminMenus();
+                                loadFrontend();
+                                loadForms();
+    
+                                loadCacheInvalidator();
+                                scheduleGC();
+    
+                                log('Lilium', 'Starting inbound server');
+                                Inbound.createServer();
+                                loadNotifications();
+                                Inbound.start();
+    
+                                log('Core', 'Firing initialized signal');
+                                hooks.fire('init');
+                            });
                         });
                     });
                 });

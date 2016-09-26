@@ -33,7 +33,7 @@ var CacheInvalidator = function () {
     var folders = [];
     this.emitter = new CacheInvalidatedEmitter();
 
-    var noOp = function() {};
+    var noOp = require('./noop.js');
 
     this.addFolderToWatch = function (path) {
         fs.watch(path, function (event, filename) {

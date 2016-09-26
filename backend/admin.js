@@ -162,7 +162,7 @@ var Admin = function() {
                 }
             }
         }
-    }
+    };
 
     var loadHooks = function () {
         hooks.bind('plugindisabled', 1, function(identifier) {

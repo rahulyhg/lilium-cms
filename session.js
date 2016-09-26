@@ -51,6 +51,7 @@ var Sessions = function () {
             admin: cli.session.data.admin,
             god: cli.session.data.god,
             user: cli.session.data.user,
+            badges: cli.session.data.badges,
             power: cli.session.data.power,
             site: cli.routeinfo.configname
         };

@@ -1,0 +1,4 @@
+{#config;forms}
+<h1>New Production Report</h1>
+
+{=forms.render("prodreportstack")}

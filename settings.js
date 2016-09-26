@@ -72,7 +72,10 @@ var Settings = function () {
                 tag: 'div',
                 cssPrefix: 'settingsfield-'
             },
-            cssClass: 'admin-settings-form'
+            cssClass: 'admin-settings-form',
+            requirements : {
+                required : false
+            }
         })
 
         .trg('top')
@@ -153,6 +156,195 @@ var Settings = function () {
             })
             .add('google.apikey', 'text', {
                 displayname: "API Key"
+            })
+            .add('google.clientid', 'text', {
+                displayname: "Client ID"
+            })
+            .add('google.clientsecret', 'text', {
+                displayname: "Client Secret"
+            })
+            .add('google.redirecturl', 'text', {
+                displayname: "Redirect URL"
+            })
+            .add('google.accesstoken', 'text', {
+                displayname : "Access Token"
+            })
+            .add('google.refreshtoken', 'text', {
+                displayname : "Refresh Token"
+            })
+
+        .add('lickstats_title', 'title', {
+            displayname : "Lickstats Combos"
+        })
+        .add('lickstatscombos', 'stack', {
+            displayname : "Lickstats ID / Secret combo",
+            scheme : {
+                columns : [
+                    {
+                        fieldName : "websiteurl",
+                        dataType : "text",
+                        displayname : "Website URL"
+                    }, {
+                        fieldName : "id",
+                        dataType : "text",
+                        displayname : "Account ID"
+                    }, {
+                        fieldName : "secret",
+                        dataType : "text",
+                        displayname : "Access Secret"
+                    }
+                ]
+            }
+        }).add('facebook_title', 'title', {
+            displayname : "Facebook Combos"
+        }).add('facebookcombos', 'stack', {
+            displayname : "Facebook ID / Token combos",
+            scheme : {
+                columns : [
+                    {
+                        fieldName : "websiteurl",
+                        dataType : "text",
+                        displayname : "Website URL"
+                    }, {
+                        fieldName : "id",
+                        dataType : "text",
+                        displayname : "Account ID"
+                    }, {
+                        fieldName : "token",
+                        dataType : "text",
+                        displayname : "Access Token"
+                    }
+                ]
+            }
+        }).add('twitter_title', 'title', {
+            displayname : "Twitter Combos"
+        }).add('twittercombos', 'stack', {
+            displayname : "Twitter ID / Token combos",
+            scheme : {
+                columns : [
+                    {
+                        fieldName : "username",
+                        dataType : "text",
+                        displayname : "Twitter username"
+                    }, {
+                        fieldName : "consumerkey",
+                        dataType : "text",
+                        displayname : "Consumer Key"
+                    }, {
+                        fieldName : "consumersecret",
+                        dataType : "text",
+                        displayname : "Consumer Secret"
+                    }, {
+                        fieldName : "tokenkey",
+                        dataType : "text",
+                        displayname : "Access Token Key"
+                    }, {
+                        fieldName : "tokensecret",
+                        dataType : "text",
+                        displayname : "Access Token Secret"
+                    }
+                ]
+            }
+        }).add('instagram_title', 'title', {
+            displayname : "Instagram Combos"
+        }).add('instagramcombos', 'stack', {
+            displayname : "Instagram ID / Token combos",
+            scheme : {
+                columns : [
+                    {
+                        fieldName : "account",
+                        dataType : "text",
+                        displayname : "Account name"
+                    }, {
+                        fieldName : "clientid",
+                        dataType : "text",
+                        displayname : "Client ID"
+                    }, {
+                        fieldName : "clientsecret",
+                        dataType : "text",
+                        displayname : "Client Secret"
+                    }
+                ]
+            }
+        }).add('dfp_title', 'title', {
+                displayname: "DFP"
+            })
+            .add('dfp.client_id', 'text', {
+                displayname: "Client ID"
+            }, {
+                required: false
+            })
+            .add('dfp.client_secret', 'text', {
+                displayname: "Client Secret"
+            }, {
+                required: false
+            })
+            .add('dfp.redirect_url', 'text', {
+                displayname: "Redirect URL"
+            }, {
+                required: false
+            })
+            .add('dfp.scope', 'text', {
+                displayname: "Scope"
+            }, {
+                required: false
+            })
+            .add('dfp.code', 'text', {
+                displayname: "Code"
+            }, {
+                required: false
+            })
+            .add('dfp.access_token', 'text', {
+                displayname: "Access Token"
+            }, {
+                required: false
+            })
+            .add('dfp.refresh_token', 'text', {
+                displayname: "Refresh Token"
+            }, {
+                required: false
+            })
+            .add('dfp.version', 'text', {
+                displayname: "API Version"
+            }, {
+                required: false
+            })
+            .add('dfp.network_code', 'text', {
+                displayname: "Network Code"
+            }, {
+                required: false
+            })
+            .add('dfp.app_name', 'text', {
+                displayname: "DFP App Name"
+            }, {
+                required: false
+            })
+            .add('dfp.fan', 'text', {
+                displayname: "In-content Facebook Audiance Network Placement ID"
+            }, {
+                required: false
+            })
+            .add('dfp-incontentprop', 'stack', {
+                displayname : "In-content DFP tags",
+                scheme : {
+                    columns : [
+                        {
+                            fieldName : "tagid",
+                            dataType : "text",
+                            displayname : "DFP Tag ID"
+                        }, {
+                            fieldName : "sizes",
+                            dataType : "text",
+                            displayname : "Sizes (2D array)"
+                        }, {
+                            fieldName : "htmlid",
+                            dataType : "text",
+                            displayname : "HTML ID"
+                        }
+                    ]
+                }
+            }, {
+                required: false
             })
 
         .add('social-sep', 'title', {

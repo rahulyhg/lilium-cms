@@ -10,6 +10,9 @@
 		<div class="lmladminsidebardeco"></div>
 		<div class="lmladminsidebardeco"></div>
 	</div>
+    <div class="lmladminsidebadges">
+        
+    </div>
 </div>
 
 <lml:template id="lmladminsidebaritemtemplate">

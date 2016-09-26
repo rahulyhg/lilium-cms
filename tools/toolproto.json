@@ -1,0 +1,9 @@
+{
+    "name" : "Tool name without spaces",
+    "displayname" : "Name displayed in titles and menus",
+    "rights" : ["Rights needed to use/view tool"],
+    "endpoint" : "Endpoint used under ~/tools/",
+    "icon" : "Font awesome icon code",
+    "livevar" : function() { "Can be undefined. Uses .name as first level which meaning levels[0] is always .name"; },
+    "register" : function() { "Can be undefined. Called once during init phrase. No async."; }
+}

@@ -16,6 +16,7 @@ var Form = function(name, cb) {
     this.valid = false;
     this.callback = cb;
     this.fields = {};
+    this.requirements = {};
 
     this.attr = {
         validate: true,
@@ -162,9 +163,8 @@ var FormBuilder = function() {
             return this;
         }
 
-        currentForm.fields[name] = createField(name, type, attr, requirements);
+        currentForm.fields[name] = createField(name, type, attr, currentForm.attr ? Object.assign(currentForm.attr.requirements || {}, requirements) : requirements);
         return this;
-
     };
 
     this.trigger = this.trg = function(sectionname, auto) {
