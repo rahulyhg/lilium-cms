@@ -1516,6 +1516,15 @@ input[disabled] {
     animation: slowfloat 8s ease-in-out 0s infinite;
 }
 
+#urlchanged-modal .modal-body::before {
+    content: '\f0c1';
+}
+
+#urlchanged-modal .modal-body p {
+    font-size: 18px;
+    font-weight: normal;
+}
+
 #confirm-unpublish .modal-body::before {
     content: '\f04a';
     -webkit-animation: rew 4s linear 2s infinite;

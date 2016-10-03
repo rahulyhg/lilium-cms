@@ -29,12 +29,16 @@ var HTMLServer = function() {
 							});
 						}
 					} else {
-						article.generateFromName(cli, cli.routeinfo.relsitepath.substring(1), function(success) {
+						article.generateFromName(cli, cli.routeinfo.relsitepath.substring(1), function(success, details) {
 							if (success) {
-								cli.routeinfo.isStatic = true;
-								fileserver.pipeFileToClient(cli, filename + '.html', function (){
-									cli.touch('htmlserver.serveClient.callback');
-								});
+                                if (details && details.realName) {
+                                    cli.redirect(cli._c.server.url + "/" + details.realName, true);
+                                } else {
+			    					cli.routeinfo.isStatic = true;
+		    						fileserver.pipeFileToClient(cli, filename + '.html', function (){
+	    								cli.touch('htmlserver.serveClient.callback');
+    								});
+                                }
 							} else {
 								cli.throwHTTP(404, 'Not Found');
 							}

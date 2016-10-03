@@ -220,12 +220,18 @@ var Article = function() {
         if (cli.hasRight('publish')) {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
+            var oldSlug = "";
 
             var redirect = '';
             if (response.success) {
                 var formData = formBuilder.serializeForm(form);
                 formData.status = 'published';
-                formData.name = slugify(formData.title).toLowerCase();
+
+                if (!cli.postdata.data._keepURL || cli.postdata.data._keepURL == "false") {
+                    formData.name = slugify(formData.title).toLowerCase();
+                    oldSlug = cli.postdata.data.currentSlug;
+                }
+
                 formData.author = formData.author ? db.mongoID(formData.author) : cli.userinfo.userid;
                 formData.date = dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone);
                 formData.media = db.mongoID(formData.media);
@@ -269,10 +275,18 @@ var Article = function() {
                             });
 
                             that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
+                                if (oldSlug != "") {
+                                    db.update(cli._c, 'content', 
+                                        {_id : db.mongoID(formData._id)}, 
+                                        {$push : {aliases : oldSlug}}, 
+                                    function() {
+                                        log('Article', 'Added alias for slug ' + oldSlug);
+                                    }, false, true, true);
+                                }
+
                                 var extra = new Object();
                                 extra.ctx = "article";
                                 extra.article = deepArticle;
-
 
                                 if (pubCtx === "create") {
                                     // Generate LML page
@@ -492,9 +506,6 @@ var Article = function() {
     this.preview = function(cli) {
         this.publich(cli, "preview");
         return;
-
-        // UNREACHABLE CODE 
-        // Generate LML page
     };
 
     this.edit = function(cli) {
@@ -509,7 +520,11 @@ var Article = function() {
 
                 if (response.success) {
                     formData = formBuilder.serializeForm(form);
-                    formData.name = slugify(formData.title).toLowerCase();
+
+                    if (!cli.postdata.data._keepURL) {
+                        formData.name = slugify(formData.title).toLowerCase();
+                    }
+
                     formData.media = db.mongoID(formData.media);
                     formData.updated = new Date();
                     formData.status = 'published';
@@ -1031,7 +1046,15 @@ var Article = function() {
         // Check for articles in db
         this.deepFetch(cli._c, articleName, function(deepArticle) {
             if (!deepArticle) {
-                cb(false);
+                db.findToArray(cli._c, 'content', {aliases : articleName}, function(err, arr) {
+                    if (err || !arr.length) {
+                        cb(false);
+                    } else {
+                        cb(true, {
+                            realName : arr[0].name
+                        });
+                    }
+                }, {name : 1});
             } else {
                 var extra = new Object();
                 extra.ctx = "article";
