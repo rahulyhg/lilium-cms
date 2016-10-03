@@ -118,6 +118,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(base + "bower_components/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lys.css", 2120, 'admin', conf.id);

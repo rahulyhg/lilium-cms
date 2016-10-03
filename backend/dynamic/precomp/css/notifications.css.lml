@@ -1,19 +1,29 @@
 /* Notifications */
-.alert-info {
+.lmladminbody .alert .close {
+    font-size: 20px;
+    line-height: 18px;
+    margin: 5px 8px;
+}
+.alert.alert-log {
     border-left-color: #2980b9;
     color: #2980b9;
 }
-.alert-danger {
+.alert.alert-danger {
     border-left-color: #c0392b;
     color: #c0392b;
 }
-.alert-warning {
+.alert.alert-warning {
     border-left-color: #f1c40f;
     color: #f1c40f;
 }
-.alert-success {
+.alert.alert-success {
     border-left-color: #27af61;
     color: #27af61;
+}
+.alert.alert-system {
+    border-left: 3px solid #9B59B6;
+    color: #5B1976;
+    background-color: #ECD9F6;
 }
 .alert {
     background: #fff;
@@ -34,24 +44,27 @@
     right: -2px;
     position: absolute;
 }
-.alert-info .close{
+.alert.alert-info .close{
     color: #2980b9;
     opacity: 1;
     font-size: 16px;
 }
-.alert-success .close{
+.alert.alert-success .close{
     color: #27af61;
     opacity: 1;
     font-size: 16px;
 }
+.alert.alert-system .close {
+    color: #9B59B6;
+}
 
-.alert-warning .close{
+.alert.alert-warning .close{
     color: #f1c40f;
     opacity: 1;
     font-size: 16px;
 }
 
-.alert-danger .close{
+.alert.alert-danger .close{
     color: #c0392b;
     opacity: 1;
     font-size: 16px;

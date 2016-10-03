@@ -114,6 +114,39 @@ $(document).ready(function() {
             console.error('[Notification] ' + data.msg);
         });
 
+        socket.on('disconnect', function(err) {
+            console.warn("[Lilium] Lost connection with server.");
+            $('body').addClass('offline');
+            liliumcms.notify({
+                title : "You are now offline",
+                message : "Lilium server is currently unreachable. Let me try to reconnect.",
+                type : "system",
+                delay: 4000
+            });
+        });
+
+        socket.on('reconnect', function(rec) {
+            console.log('[Lilium] Reconnected with server after ' + rec + ' tries.');
+            $('body').removeClass('offline');
+            liliumcms.notify({
+                title : "And we're back online!",
+                message : "Connection with Lilium server was established successfully. Yay!",
+                type : "system",
+                delay : 4000
+            });
+        });
+
+        socket.on('reconnecting', function(rec) {
+            if (rec == 6) {
+                liliumcms.notify({
+                    title : "Well, that's inconvenient",
+                    message : "Connection with Lilium server could not be established. Please verify that your internet connection is stable, or check the server status with an administrator. You will be notified once a stable connection is established.",
+                    type : "system",
+                    delay : 12000
+                });
+            }
+        });
+
         socket.on('badge', function(badge) {
             window.receiveBadge(badge.title, badge.msg, badge.icon, badge.level)
         });
@@ -144,12 +177,12 @@ $(document).ready(function() {
         $.notify(notification, {
             type: notification.type,
             newest_on_top: false,
-            delay: -1,
+            delay: notification.delay || 5000,
             animate: {
-                enter: 'animated fadeInUp',
-                exit: 'animated fadeOutDown'
+                enter: 'animated fadeInRightBig',
+                exit: 'animated zoomOut'
             },
-            placement: {
+            placement: notification.placement || {
                 from: "bottom",
                 align: "right"
             },

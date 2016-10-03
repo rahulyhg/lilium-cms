@@ -58,7 +58,8 @@ ClientObject.prototype.debug = function () {
         nodes: this.nodes,
         time: {
             created: this.createdon,
-            served: new Date()
+            served: new Date(),
+            total: new Date() - this.createdon
         }
     }));
     this.response.end();
