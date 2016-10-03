@@ -11,7 +11,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         // Check for livevars
     };
 
-    $('#' + htmlIdentifier).find('.lmlstacktableappendbutton').bind('click', function() {
+    $('#' + htmlIdentifier).find('.lmlstacktableappendbutton:not(.bound)').addClass("bound").bind('click', function() {
         that.appendRowFromButton();
         return false;
     });

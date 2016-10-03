@@ -1,0 +1,5 @@
+{#config;forms}
+<h1>Edit Report</h1>
+{*tools.prodsocial.get.{?1}(sourceof:"prodreportstack")}
+
+{=forms.render("prodreportstack")}

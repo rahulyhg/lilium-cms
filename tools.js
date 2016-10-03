@@ -6,8 +6,18 @@ var filelogic = require('./filelogic.js');
 var Tools = function() {};
 Tools.prototype.tools = {};
 
-var handleGET = function(cli) {
-    filelogic.serveAdminLML(cli);
+Tools.prototype.handleGET = function(cli) {
+    for (var n in this.tools) {
+        if (this.tools[n].name === n) {
+            var t = this.tools[n];
+            if (typeof t.get !== "function") {
+                return false;
+            } else {
+                return t.get.apply(t, arguments);
+            }
+        } 
+    }
+
 };
 
 Tools.prototype.handlePOST = function(cli) {
@@ -84,7 +94,9 @@ Tools.prototype.registerAdminEndpoint = function() {
 
     Admin.registerAdminEndpoint('tools', 'GET', function(cli) {
         cli.touch("tools.GET");
-        handleGET(cli);
+        if (!that.handleGET(cli)) {
+            filelogic.serveAdminLML(cli);
+        }
     });
 
     Admin.registerAdminEndpoint('tools', 'POST', function(cli) {

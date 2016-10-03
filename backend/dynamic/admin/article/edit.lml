@@ -1,7 +1,9 @@
 {#config;session;vocab;forms}
 {%../articlescript}
 	<h1>Edit a post</h1>
-	{*content.{?1}(sourceof:"post_create")} {=forms.render('post_create')}
+	{*content.{?1}(sourceof:"post_create")} 
+    {=forms.render('post_create')}
+
 	<div id="editor"></div>
 	<div class="col-md-12 article-more-info-wrapper">
 		<fieldset class="title">

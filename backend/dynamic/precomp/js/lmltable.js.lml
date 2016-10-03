@@ -1,6 +1,7 @@
 var LmlTable = function(table) {
 	var that = this;
 	var table = $(table);
+    var domid = table.attr('id');
 	var maxEntries = table.data('max');
 	var currentPage = 1;
 	var currentData;
@@ -161,6 +162,15 @@ var LmlTable = function(table) {
 		updateTable();
 	};
 
+    var fireUpdated = function() {
+        var ev = new CustomEvent('lmltablerefresh', {detail : { 'table': table, 'id' : domid, lmltable : that }});
+        document.dispatchEvent(ev);
+    };
+
+    this.forceUpdate = function() {
+        updateTable(undefined, true, "");
+    };
+
 	var updateTable = function(cb, isSearch, searchTerm) {
 		timeInitial = new Date();
         liliumcms.pageloader.tidy();
@@ -174,6 +184,7 @@ var LmlTable = function(table) {
 			var now = new Date();
 			console.log('Table updated from cache in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
             liliumcms.pageloader.present();
+            fireUpdated();
 		} else {
 			liliumcms.livevars.getSingleLivevar(table.data('endpoint'), {
 				sortby: fieldSort,
@@ -193,6 +204,7 @@ var LmlTable = function(table) {
 				console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
                 liliumcms.pageloader.present();
 
+                fireUpdated();
                 cb && cb();
 			});
 		}

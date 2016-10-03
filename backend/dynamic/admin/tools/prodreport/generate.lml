@@ -1,0 +1,3 @@
+{#config}
+{*tools.prodsocial.report.{?1}}
+<h1>Report : </h1>

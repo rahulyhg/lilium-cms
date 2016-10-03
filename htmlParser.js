@@ -231,7 +231,8 @@ var HtmlParser = function () {
                     '" data-fieldname="' + field.fieldName +
                     '" value="" />';
             case 'select': 
-                var str = '<select class="lmlstacktableheaderfield lmlstacktableheaderfield-'+field.fieldName+'">';
+                var str = '<select class="lmlstacktableheaderfield lmlstacktableheaderfield-'+field.fieldName+'" ' +
+                    'data-fieldname="'+field.fieldName+'">';
                 if (field.dataSource) {
                     field.dataSource.forEach(function(opt) {
                         str += '<option value="'+(opt.value || opt.name || opt)+'">'+(opt.displayname || opt.value || opt)+'</option>';
