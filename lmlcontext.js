@@ -1,5 +1,6 @@
 var log = require('./log.js');
 var lmllib = require('./lmllib.js');
+var fileserver = require('./fileserver.js');
 
 // LML Context Object Namespace
 // Those will be loaded runtime instead of on boot
@@ -99,11 +100,38 @@ var LMLContext = function (info) {
         // Carried between stashes
         this.compiled = '';
         this.newLine = '';
+        this.finished = false;
+
+        this.outputstream;
+        this.linesToWrite = 0;
+        this.linesWritten = 0;
 
         this.temp = new Object();
     };
 
     this.init();
+};
+
+LMLContext.bindFinished = function(cb) {
+    this.finishedCallback = cb;
+}
+
+LMLContext.flagEnd = function() {
+    this.readyToClose = true;
+}
+
+LMLContext.prototype.write = LMLContext.prototype.w = function(str) {
+    this.linesToWrite++;
+    fileserver.writeToFile(this.outputstream, str, this.lineWritten);
+};
+
+LMLContext.prototype.lineWritten = function() {
+    this.linesWritten++;
+
+    if (this.readyToClose && this.linesToWrite == this.linesWritten) {
+        this.finished = true;
+        this.bindFinished && this.bindFinished();
+    }
 };
 
 module.exports = LMLContext;

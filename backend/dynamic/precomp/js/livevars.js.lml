@@ -397,16 +397,23 @@ var LiveVars = function() {
                 }
                 if (sourceof && sourceof != "") {
                     (function(src, data) {
-                        document.addEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, function() {
-                            var fCtx = $('#' + src).data('context');
-                            if ($.isArray(data)) {
-                                for (var key in data) {
-                                    liliumcms.fillFormFromSource(src, data[key], key, fCtx);
+                        var evnt = function() {
+                            if (!$('#' + src).data('_lmlfilled')) {
+                                var fCtx = $('#' + src).data('context');
+                                if ($.isArray(data)) {
+                                    for (var key in data) {
+                                        liliumcms.fillFormFromSource(src, data[key], key, fCtx);
+                                    }
+                                } else {
+                                    liliumcms.fillFormFromSource(src, data, undefined, fCtx);
                                 }
-                            } else {
-                                liliumcms.fillFormFromSource(src, data, undefined, fCtx);
+    
+                                $('#' + src).data('_lmlfilled', true);
+                                document.removeEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
                             }
-                        });
+                        };
+
+                        document.addEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
                     })(sourceof, varValue);
                 }
                 if (cacheonly) {

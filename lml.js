@@ -30,15 +30,15 @@ var LML = function () {
     var that = lml = thislml = this;
 
     // Print, execute, live, include, context
-    var markSymbolOpen = '{';
-    var markSymbolClose = '}';
-    var slangOpening = 'lml';
+    const markSymbolOpen = '{';
+    const markSymbolClose = '}';
+    const slangOpening = 'lml';
 
-    var symbols = ['=', '*', '%', '#', '$', 'parent'];
-    var symbolLen = symbols.length;
-    var condIdentifiers = ["if", "while", "for", "block"];
-    var condClosures = ["endif", "else", "endwhile", "endfor", "endblock"];
-    var lmlOperators = ["+=", "-=", "*=", "/=", "=", "%="];
+    const symbols = ['=', '*', '%', '#', '$', 'parent'];
+    const symbolLen = symbols.length;
+    const condIdentifiers = ["if", "while", "for", "block"];
+    const condClosures = ["endif", "else", "endwhile", "endfor", "endblock"];
+    const lmlOperators = ["+=", "-=", "*=", "/=", "=", "%="];
 
     var proceedWhenCompleted;
 
@@ -773,7 +773,7 @@ var LML = function () {
 
     // Parses content, and returns partial strings through a callback
     // The value returned is undefined when everything is done
-    this.parseContent = function (rootpath, content, callback, context, extra, sync) {
+    this.parseContent = function (rootpath, content, callback, context, extra, sync, outputstream) {
         // Per line execution, slow for minified files
         var lines = typeof content === 'string' ? (extra && extra.fromClient ? content.split(/\n|\\n/) : content.split('\n')) : typeof content === 'object' ? content : new Array();
         var cLine = 0,
@@ -784,6 +784,7 @@ var LML = function () {
             context.rootDir = fileserver.dirname(rootpath);
             context.config = extra.config;
             context.theme = extra.theme;
+            context.outputstream = outputstream;
 
             delete extra.config;
         } else if (!context.isParent) {
@@ -838,17 +839,11 @@ var LML = function () {
         fileserver.fileExists(rootpath, function (exists) {
             if (exists) {
                 fileserver.readFile(rootpath, function (content) {
-                    that.parseContent(rootpath, content, function (pContent) {
-                        if (typeof pContent !== 'undefined') {
-                            callback(pContent.toString());
-                        } else {
-                            callback(undefined);
-                        }
-                    }, context);
+                    that.parseContent(rootpath, content, callback, context);
                 }, false, 'utf8');
             } else {
                 callback("[LMLIncludeNotFound : " + rootpath + "]");
-                callback(undefined);
+                callback();
             }
         });
     };
@@ -981,16 +976,21 @@ var LML = function () {
 
                 that.parseContent(rootpath, content, function (pContent) {
                     // Write pContent to file @compilepath
-                    if (typeof pContent === 'undefined') {
+                    if (typeof pContent == 'undefined') {
                         readyToFlush = true;
                         verifyEnd();
                     } else {
                         linesToWrite++;
 
-                        fileserver.writeToFile(fileHandle, pContent, function () {
+                        if (pContent.length != 0) {
+                            fileserver.writeToFile(fileHandle, pContent, function () {
+                                linesWritten++;
+                                verifyEnd();
+                            });
+                        } else {
                             linesWritten++;
                             verifyEnd();
-                        });
+                        }   
                     }
                 }, undefined, extra);
             }, false, 'utf8');

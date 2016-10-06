@@ -725,6 +725,12 @@ var Article = function() {
                 db.aggregate(cli._c, 'content', [{
                     $match: {$and : match}
                 }, {
+                    $sort: sort
+                }, {
+                    $skip : (params.skip || 0)
+                }, {
+                    $limit : (params.max || 20)
+                }, {
                     $lookup: {
                         from: 'entities',
                         localField: 'author',
@@ -758,12 +764,6 @@ var Article = function() {
                         date: 1,
                         media: "$media.sizes.thumbnail.url"
                     }
-                }, {
-                    $sort: sort
-                }, {
-                    $skip : (params.skip || 0)
-                }, {
-                    $limit : (params.max || 20)
                 }], function(data) {
                     db.count(cli._c, 'content', {}, function(err, total) {
                         callback({
