@@ -47,7 +47,7 @@ var LML = function () {
     var execVariableTag = function (context, code, callback) {
         // Browse the context library for corresponding obhect;
         parseStringForRecursiveVarTags(context, code, function (code) {
-            context.newLine = LMLSlang.pulloutVar(context, code) || "";
+            context.w(LMLSlang.pulloutVar(context, code) || "");
             callback();
         });
 
@@ -90,24 +90,24 @@ var LML = function () {
         if ("=" === code[0]) {
             code = code.substring(1);
             parseStringForRecursiveVarTags(context, code, function(code) {
-                context.newLine = '<lml:tobject data-key="' + code +
+                context.w('<lml:tobject data-key="' + code +
                     '" data-nodetype="' + (params.nodetype || "span") + 
                     (params.nodetype === 'a' ? ('" data-href="' + params.href) : '') + 
                     (params.filter ? ('" data-filter="' + params.filter) : '') + 
                     (params.action ? ('" data-action="' + params.action) : '') +
                     (params.actionparamkey ? ('" data-actionparamkey="' + params.actionparamkey) : '') +
                     (params.bind ? ('" data-bind="' + params.bind) : '') +
-                    '"></lml:tobject>';
+                    '"></lml:tobject>');
         
                 callback();
             });
         } else {
             parseStringForRecursiveVarTags(context, code, function (code) {
-                context.newLine = '<lml:livevars data-varname="' + code +
+                context.w('<lml:livevars data-varname="' + code +
                     '" data-template="' + templatename +
                     '" data-target="' + targetname +
                     '" data-sourceof="' + sourceof +
-                    '" data-varparam="' + stringifyLiveParams(params) + '" ></lml:livevars>';
+                    '" data-varparam="' + stringifyLiveParams(params) + '" ></lml:livevars>');
     
                 callback();
             });
@@ -115,17 +115,6 @@ var LML = function () {
 
         return true;
     };
-
-    var execParent = function (context, code, callback) {
-        context.parentLvl = context.parentLvl ? context.parentLvl + 1 : 0;
-        var filePath = code.substring(2);
-        filePath = filePath.substring(0, filePath.length -2);
-
-         that.executeFromContext(context.rootDir + '/' + filePath);
-
-
-        callback();
-    }
 
     // {%petalname}
     var execIncludeTag = function (context, code, callback) {
@@ -156,22 +145,18 @@ var LML = function () {
 
                 if (executeLML) {
                     that.executeToContext(fullpath, context, function (pContent) {
-                        if (typeof pContent !== 'undefined') {
-                            includeBuffer += pContent;
-                        } else {
-                            context.merge();
-                            context.newLine += includeBuffer;
-                            currentIndex++;
+                        context.merge();
+                        context.w(includeBuffer);
+                        currentIndex++;
 
-                            next();
-                        }
+                        next();
                     });
                 } else {
                     var fullpath = LMLSlang.pulloutVar(context, fullpath.substring(1));
 
                     fileserver.readFile(fullpath, function (fContent) {
                         context.merge();
-                        context.newLine += fContent || ("[LMLIncludeException] File not found : " + fullpath);
+                        context.w(fContent || ("[LMLIncludeException] File not found : " + fullpath));
                         currentIndex++;
                         next();
                     }, false, 'utf8');
@@ -185,8 +170,6 @@ var LML = function () {
 
     // {#lib1;lib2;lib3}
     var execContextTag = function (context, code, callback) {
-        context.newLine = "";
-
         var codeArr = code.split(';');
 
         for (var i = 0, len = codeArr.length; i < len; i++) {
@@ -462,19 +445,6 @@ var LML = function () {
                 this.affect(context, affectedName, _arr[condObj.forIndex]);
             }
         };
-
-        this.processBlock = function (context, obj) {
-            if (context.isParent && context.block && context.block[obj.values[0]]) {
-                context.compiled += context.block[obj.values[0]];
-            } else {
-                context.skipUntilClosure = false;
-                context.bufferContent = true;
-                context.currentContentBlock = obj.values[0];
-                context.block = context.block? context.block : {};
-                context.block[context.currentContentBlock] = "";
-
-            }
-        }
     })();
 
     var execLMLTag = function (context, code, callback) {
@@ -511,8 +481,6 @@ var LML = function () {
                         if (curCond.requiredSkip > 0) {
                             curCond.requiredSkip--;
                             context.condStack.push(curCond);
-                            // log('LML', 'Found closure at line ' + context.currentLineIndex +
-                            //    ', but had to skip. Required Skips : ' + curCond.requiredSkip);
                         } else {
                             LMLSlang.validateClosure(curCond.condTag, closureTag);
                             context.currentBlock = (context.condStack.length == 0) ?
@@ -534,12 +502,6 @@ var LML = function () {
                                         var childCond = context.condStack[context.condStack.length - 1];
                                         context.temp.looping = !(typeof childCond === 'undefined' || 
                                             (childCond.condTag !== 'for' && childCond.condTag !== 'while'));
-
-                                        if (context.temp.looping) {
-                                            // log('LML', 'Exited nested for loop');
-                                        } else {
-                                            // log('LML', 'Exited for loop');
-                                        }
                                     }
                                 }
 
@@ -551,9 +513,6 @@ var LML = function () {
                         if (context.skipUntilClosure) {
                             var cstack = context.condStack[context.condStack.length - 1];
                             cstack.requiredSkip++;
-                            // log('LML', "Found identifier '"+split[0]+"' while skipping until closure at line "+
-                            //    context.currentLineIndex+
-                            //    ". Required Skips : " + cstack.requiredSkip);
                         } else {
                             var condObj = undefined;
                             if (context.temp.looping) {
@@ -584,8 +543,6 @@ var LML = function () {
                             case 'for':
                                 LMLSlang.processForLoop(context, condObj);
                                 break;
-                            case 'block':
-                                LMLSlang.processBlock(context, condObj);
                             }
                         }
                     } else if (lmlOperators.indexOf(split[1]) != -1) {
@@ -656,10 +613,6 @@ var LML = function () {
             return execLMLTag(context, code, callback);
             break;
 
-        case "parent":
-            return execParent(context, code, callback);
-            break;
-
         default:
             throw new Error("LMLParseException - Error fetching current tag. Cached character is : " + tag);
         }
@@ -686,7 +639,7 @@ var LML = function () {
         var nextWorkPos = 0;
 
         // Needs to be precompiled every line
-        var lmlDetectRegex = /{(#|%|=|parent)([^\n\s\}]*)}|({[\$|@]|[\$|@]})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\_\#\>\<\/\=\+\-.\s\']*"?,?\s*)*)\)?}/g;
+        var lmlDetectRegex = /{(#|%|=)([^\n\s\}]*)}|({\$|\$})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\_\#\>\<\/\=\+\-.\s\']*"?,?\s*)*)\)?}/g;
         var seekLML = function () {
             if (nextWorkPos >= line.length) {
                 lineCallback(context.lineFeedback);
@@ -703,14 +656,8 @@ var LML = function () {
                 context.cachedCommand = crop;
 
                 execTagContent(context, function () {
-                    if (context.bufferContent && context.currentContentBlock) {
-                        context.block[context.currentContentBlock] += context.newLine;
-
-                    } else {
-                        context.compiled += context.newLine;
-                        context.newLine = "";
-                    }
-
+                    context.w(context.newLine);
+                    context.newLine = "";
 
                     setTimeout(seekLML, 0);
                 });
@@ -724,47 +671,34 @@ var LML = function () {
                 }
 
                 setTimeout(seekLML, 0);
-            } else if ((lmlMatch = lmlDetectRegex.exec(line)) != null) {
+            } else if (line.indexOf('{') != -1 && (lmlMatch = lmlDetectRegex.exec(line)) != null) {
                 detectPos = lmlMatch.index;
                 detectLength = lmlMatch[0].length;
                 if (typeof lmlMatch[1] !== 'undefined' || typeof lmlMatch[4] !== "undefined") {
                     var cropLength = detectPos - nextWorkPos;
                     var comp = line.substring(nextWorkPos).substring(0, cropLength);
 
-                    context.compiled += comp;
+                    context.w(comp);
                     context.currentInTag = lmlMatch[1] || lmlMatch[4];
                     context.cachedCommand = lmlMatch[2] || lmlMatch[5];
                     context.extra.livevarsParams = lmlMatch[6];
 
                     nextWorkPos = detectPos + detectLength;
                     execTagContent(context, function () {
-                        if (context.bufferContent && context.currentContentBlock) {
-                            context.block[context.currentContentBlock] += context.newLine;
-                            context.newLine = "";
-
-                        } else {
-                            context.compiled += context.newLine;
-                            context.newLine = "";
-                        }
+                        context.w(context.newLine);
+                        context.newLine = "";
 
                         setTimeout(seekLML, 0);
                     });
                 } else {
-                    // Is LML opening or EXEC tag
+                    // Is LML opening
                     context.isLMLTag = true;
                     nextWorkPos = detectPos + detectLength;
                     setTimeout(seekLML, 0);
                 }
             } else {
-                if (context.bufferContent && context.currentContentBlock) {
-                    context.block[context.currentContentBlock] += line.substring(nextWorkPos);
-                    lineCallback(context.lineFeedback);
-
-                } else {
-                    context.compiled += line.substring(nextWorkPos) + "\n";
-                    lineCallback(context.lineFeedback);
-                }
-
+                context.w(line.substring(nextWorkPos) + "\n");
+                lineCallback(context.lineFeedback);
             }
         };
 
@@ -775,8 +709,8 @@ var LML = function () {
     // The value returned is undefined when everything is done
     this.parseContent = function (rootpath, content, callback, context, extra, sync, outputstream) {
         // Per line execution, slow for minified files
-        var lines = typeof content === 'string' ? (extra && extra.fromClient ? content.split(/\n|\\n/) : content.split('\n')) : typeof content === 'object' ? content : new Array();
-        var cLine = 0,
+        var lines = typeof content === 'string' ? (extra && extra.fromClient ? content.split(/\n|\\n/) : content.split('\n')) : typeof content === 'object' ? content : new Array(),
+            cLine = 0,
             lineTotal = lines.length;
 
         if (typeof context === 'undefined') {
@@ -784,7 +718,7 @@ var LML = function () {
             context.rootDir = fileserver.dirname(rootpath);
             context.config = extra.config;
             context.theme = extra.theme;
-            context.outputstream = outputstream;
+            context.setStream(outputstream);
 
             delete extra.config;
         } else if (!context.isParent) {
@@ -796,8 +730,6 @@ var LML = function () {
             context.theme = extra.theme || context.theme;
             context.config = extra.config || context.config;
         }
-
-        delete content;
 
         if (lineTotal != 0) {
             var cont = function () {
@@ -811,15 +743,13 @@ var LML = function () {
                         }
 
                         context.currentLineIndex = cLine;
-                        callback(context.compiled.toString());
-                        context.compiled = "";
                         cLine++;
 
                         if (cLine == lineTotal) {
                             if (typeof proceedWhenCompleted == 'function') {
                                 proceedWhenCompleted(context, extra, callback);
                             } else {
-                                callback(undefined);
+                                callback(context);
                             }
                         } else {
                             cont();
@@ -830,9 +760,11 @@ var LML = function () {
             cont();
         } else {
             setTimeout(function () {
-                callback(undefined);
+                callback(context);
             }, 0);
         }
+
+        return context;
     };
 
     this.executeToContext = function (rootpath, context, callback) {
@@ -842,104 +774,48 @@ var LML = function () {
                     that.parseContent(rootpath, content, callback, context);
                 }, false, 'utf8');
             } else {
-                callback("[LMLIncludeNotFound : " + rootpath + "]");
+                context.w("[LMLIncludeNotFound : " + rootpath + "]");
                 callback();
             }
         });
     };
 
-    this.executeFromContext = function (rootpath) {
-        var exists = fileserver.fileExists(rootpath, undefined, true);
-        if (exists) {
-            proceedWhenCompleted = function(context, extra, callback) {
-                // log('Lml', 'Child file compiled, now compiling parent.');
-                proceedWhenCompleted = undefined;
-                newcontext = new LMLContext();
-                newcontext.rootDir = fileserver.dirname(rootpath);
-                newcontext.config = context.config;
-                newcontext.block = context.block;
-                newcontext.isParent = true;
-
-                var content = fileserver.readFile(rootpath, undefined, true, 'utf8');
-
-                that.parseContent(rootpath, content, function (pContent) {
-                    if (typeof pContent !== 'undefined') {
-                        callback(pContent.toString());
-                    } else {
-                        callback(undefined);
-                    }
-                }, newcontext);
-            }
-        } else {
-            return ("[LMLParentNotFound : " + rootpath + "]");
-        }
-    }
-
     this.executeFromString = function(contextpath, content, callback, extra) {
         var timeStamp = new Date();
         var html = "";
-
-        var linesToWrite = 0;
-        var linesWritten = 0;
-        var readyToFlush = false;
-        var flushing = false;
+        var buffer = new (function() {
+            this._c = "";
+            this.write = function(str, format, cb) {
+                this._c += str;
+                cb();
+            }   
+        })();
 
         var verifyEnd = function () {
-            if (readyToFlush && linesToWrite == linesWritten && !flushing) {
-                flushing = true;
-
-                log('LML', 'Compiled dynamic LML  in ' + (new Date() - timeStamp) + 'ms');
-
-                callback(html);
-            }
+            callback(buffer._c);
         }
 
-        that.parseContent(contextpath, content, function (pContent) {
-            // Write pContent to file @compilepath
-            if (typeof pContent === 'undefined') {
-                readyToFlush = true;
-                verifyEnd();
-            } else {
-                linesToWrite++;
-                html += pContent;
-                linesWritten++;
-                verifyEnd();
-            }
-        }, undefined, extra);
+        that.parseContent(contextpath, content, verifyEnd, undefined, extra, false, buffer);
     };
 
     this.executeToHtml = function (rootpath, callback, extra) {
         var timeStamp = new Date();
         var html = "";
+        var buffer = new (function() {
+            this._c = "";
+            this.write = function(str, format, cb) {
+                this._c += str;
+                cb();
+            }   
+        })();
 
         fileserver.readFile(rootpath, function (content) {
-            var linesToWrite = 0;
-            var linesWritten = 0;
-            var readyToFlush = false;
-            var flushing = false;
-
             var verifyEnd = function () {
-                if (readyToFlush && linesToWrite == linesWritten && !flushing) {
-                    flushing = true;
-
-                    log('LML', 'Compiled File : ' + rootpath + ' in ' + (new Date() - timeStamp) + 'ms');
-
-                    callback(html);
-                }
+                log('LML', 'Compiled File : ' + rootpath + ' in ' + (new Date() - timeStamp) + 'ms');
+                callback(buffer._c);
             }
 
-            that.parseContent(rootpath, content, function (pContent) {
-                // Write pContent to file @compilepath
-                if (typeof pContent === 'undefined') {
-                    readyToFlush = true;
-                    verifyEnd();
-                } else {
-                    linesToWrite++;
-                    html += pContent;
-                    linesWritten++;
-                    verifyEnd();
-                }
-            }, undefined, extra);
+            that.parseContent(rootpath, content, verifyEnd, undefined, extra, false, buffer);
         }, false, 'utf8');
     }
 
@@ -953,46 +829,23 @@ var LML = function () {
 
             fileserver.readFile(rootpath, function (content) {
                 var fileHandle = fileserver.getOutputFileHandle(compilepath, 'w+');
-                var linesToWrite = 0;
-                var linesWritten = 0;
-                var readyToFlush = false;
-                var flushing = false;
+                var context = that.parseContent(rootpath, content, function(context) {
+                    context.flagEnd();
+                }, undefined, extra, false, fileHandle);
 
-                var verifyEnd = function () {
-                    if (readyToFlush && linesToWrite == linesWritten && !flushing) {
-                        flushing = true;
-                        fileserver.closeFileHandle(fileHandle);
+                context.bindFinished(function (context) {
+                    fileserver.closeFileHandle(fileHandle);
 
-                        log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms');
+                    log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms');
 
-                        var willMinify = !extra || extra.minify;
-                        if (willMinify) {
-                            fileserver.minifyHTML(compilepath, callback);
-                        } else {
-                            callback();
-                        }
-                    }
-                }
-
-                that.parseContent(rootpath, content, function (pContent) {
-                    // Write pContent to file @compilepath
-                    if (typeof pContent == 'undefined') {
-                        readyToFlush = true;
-                        verifyEnd();
+                    var willMinify = !extra || extra.minify;
+                    if (willMinify) {
+                        fileserver.minifyHTML(compilepath, callback);
                     } else {
-                        linesToWrite++;
-
-                        if (pContent.length != 0) {
-                            fileserver.writeToFile(fileHandle, pContent, function () {
-                                linesWritten++;
-                                verifyEnd();
-                            });
-                        } else {
-                            linesWritten++;
-                            verifyEnd();
-                        }   
+                        callback();
                     }
-                }, undefined, extra);
+                });
+
             }, false, 'utf8');
         });
     }

@@ -105,6 +105,7 @@ var LMLContext = function (info) {
         this.outputstream;
         this.linesToWrite = 0;
         this.linesWritten = 0;
+        this.readyToClose = false;
 
         this.temp = new Object();
     };
@@ -112,26 +113,40 @@ var LMLContext = function (info) {
     this.init();
 };
 
-LMLContext.bindFinished = function(cb) {
+LMLContext.prototype.setStream = function(s) {
+    this.outputstream = s;
+};
+
+LMLContext.prototype.bindFinished = function(cb) {
     this.finishedCallback = cb;
+    this.lineWritten(true);
 }
 
-LMLContext.flagEnd = function() {
+LMLContext.prototype.flagEnd = function() {
     this.readyToClose = true;
+    this.lineWritten(true);
 }
 
 LMLContext.prototype.write = LMLContext.prototype.w = function(str) {
     this.linesToWrite++;
-    fileserver.writeToFile(this.outputstream, str, this.lineWritten);
+
+    if (str && str.length !== 0) {
+        var that = this;
+        fileserver.writeToFile(this.outputstream, str.toString(), function() {that.lineWritten(false)});
+    } else {
+        this.lineWritten(false);
+    }
 };
 
-LMLContext.prototype.lineWritten = function() {
-    this.linesWritten++;
+LMLContext.prototype.lineWritten = function(skip) {
+    if (!skip) {
+        this.linesWritten++;
+    }
 
     if (this.readyToClose && this.linesToWrite == this.linesWritten) {
         this.finished = true;
-        this.bindFinished && this.bindFinished();
-    }
+        this.finishedCallback && this.finishedCallback();
+    } 
 };
 
 module.exports = LMLContext;
