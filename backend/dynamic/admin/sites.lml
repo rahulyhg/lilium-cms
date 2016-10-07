@@ -65,3 +65,4 @@
 </script>
 
 {*sites.all.complex(template:"site_template",target:"sites_tbody")}
+ 

@@ -232,6 +232,8 @@ var Article = function() {
                     oldSlug = cli.postdata.data.currentSlug;
                 }
 
+                var newSlug = formData.name;
+
                 formData.author = formData.author ? db.mongoID(formData.author) : cli.userinfo.userid;
                 formData.date = dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone);
                 formData.media = db.mongoID(formData.media);
@@ -275,7 +277,7 @@ var Article = function() {
                             });
 
                             that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
-                                if (oldSlug != "") {
+                                if (oldSlug && oldSlug != "") {
                                     db.update(cli._c, 'content', 
                                         {_id : db.mongoID(formData._id)}, 
                                         {$push : {aliases : oldSlug}}, 
@@ -290,7 +292,7 @@ var Article = function() {
 
                                 if (pubCtx === "create") {
                                     // Generate LML page
-                                    filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
+                                    filelogic.renderThemeLML(cli, "article", deepArticle.name + '.html', extra , function(name) {
                                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
         
                                         // Remove autosaves related to this article
@@ -310,7 +312,7 @@ var Article = function() {
     
                                         notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                             title: notifMessage,
-                                            url: cli._c.server.url + '/' + formData.name,
+                                            url: cli._c.server.url + '/' + deepArticle.name,
                                             msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
                                             type: 'success'
                                         });

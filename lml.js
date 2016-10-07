@@ -34,7 +34,7 @@ var LML = function () {
     const markSymbolClose = '}';
     const slangOpening = 'lml';
 
-    const symbols = ['=', '*', '%', '#', '$', 'parent'];
+    const symbols = ['=', '*', '%', '#', '$'];
     const symbolLen = symbols.length;
     const condIdentifiers = ["if", "while", "for", "block"];
     const condClosures = ["endif", "else", "endwhile", "endfor", "endblock"];
@@ -521,11 +521,12 @@ var LML = function () {
                             } else {
                                 condObj = LMLSlang.pushToCondStack(context, split);
                                 if (condObj.condTag === 'for') {
-                                    if (context.condStack.length != 1 && context.condStack[context.condStack.length - 2].condTag == "for") {
-                                        // log('LML', 'Entering nested for loop');
+                                    if (
+                                        context.condStack.length != 1 && 
+                                        context.condStack[context.condStack.length - 2].condTag == "for"
+                                    ) {
                                         condObj.nested = true;
                                     } else {
-                                        // log('LML', 'Entering for loop');
                                         condObj.nested = false;
                                     }
                                 }
@@ -593,10 +594,6 @@ var LML = function () {
             return execVariableTag(context, code, callback);
             break;
 
-        case "@":
-            return execCodeTag(context, code, callback);
-            break;
-
         case "*":
             return execLiveTag(context, code, callback);
             break;
@@ -621,9 +618,15 @@ var LML = function () {
     };
 
     // Content of line should be trimmedd
-    var parseLine = function (line, context, lineCallback) {
+    var parseLine = function (line, context, lineCallback, linetype) {
         line = line.trim();
         if (line.length == 0) {
+            lineCallback(context.lineFeedback);
+            return;
+        }
+
+        if (linetype == "plain") {
+            context.w(line);
             lineCallback(context.lineFeedback);
             return;
         }
@@ -654,13 +657,7 @@ var LML = function () {
                 }
 
                 context.cachedCommand = crop;
-
-                execTagContent(context, function () {
-                    context.w(context.newLine);
-                    context.newLine = "";
-
-                    setTimeout(seekLML, 0);
-                });
+                execTagContent(context, seekLML);
             } else if (context.skipUntilClosure) {
                 var ind = line.indexOf('{$');
                 if (ind != -1) {
@@ -684,12 +681,7 @@ var LML = function () {
                     context.extra.livevarsParams = lmlMatch[6];
 
                     nextWorkPos = detectPos + detectLength;
-                    execTagContent(context, function () {
-                        context.w(context.newLine);
-                        context.newLine = "";
-
-                        setTimeout(seekLML, 0);
-                    });
+                    execTagContent(context, seekLML);
                 } else {
                     // Is LML opening
                     context.isLMLTag = true;
@@ -709,8 +701,72 @@ var LML = function () {
     // The value returned is undefined when everything is done
     this.parseContent = function (rootpath, content, callback, context, extra, sync, outputstream) {
         // Per line execution, slow for minified files
-        var lines = typeof content === 'string' ? (extra && extra.fromClient ? content.split(/\n|\\n/) : content.split('\n')) : typeof content === 'object' ? content : new Array(),
-            cLine = 0,
+        // var lines = typeof content === 'string' ? (extra && extra.fromClient ? content.split(/\n|\\n/) : content.split('\n')) : typeof content === 'object' ? content : new Array(),
+    
+        var lines = [];
+        var done = false;
+        var pos = -1;
+        var nxt = 0;
+        var cls = 0;
+        var acceptPosNxt = false;
+
+        while (!done) {
+            nxt = content.indexOf("{", pos);
+
+            while (symbols.indexOf(content[nxt+1]) == -1 && nxt != -1) {
+                nxt = content.indexOf('{', nxt+1);
+            }
+
+            if (nxt != -1 && pos != nxt || acceptPosNxt) {
+                acceptPosNxt = false;
+                lines.push({
+                    text : content.substring(pos, nxt),
+                    type : "plain"
+                });
+
+                var chr = content[nxt+1];
+                switch (chr) {
+                    case "$":
+                        cls = content.indexOf('$}', nxt) + 2;
+                    default:
+                        var recur = true;
+                        var cls = content.indexOf('}', nxt);
+                        var vNxt = nxt+1;
+                        while ((mv = content.indexOf('{', vNxt)) < cls && mv != -1) {
+                            cls = content.indexOf('}', cls+1);
+                            vNxt = mv+1;
+                        }
+                        cls++;
+                }
+
+                lines.push({
+                    text : content.substring(nxt, cls),
+                    type : chr
+                });
+                pos = cls;
+
+                if (content[pos] == '{') {
+                    acceptPosNxt = true;
+                }
+            } else {
+                lines.push({
+                    text : content.substring(pos),
+                    type : "plain"
+                });
+
+                done = true;
+            }
+        }
+
+        if ((txt = lines.map(function(elem) { return elem.text}).join('')) != content) {
+            var dfs = require('diff').diffTrimmedLines(txt, content);
+            if (dfs.length > 1) {
+                console.log(dfs);
+                throw new Error("Error while doing the split");
+            }
+        }
+
+        var cLine = 0,
             lineTotal = lines.length;
 
         if (typeof context === 'undefined') {
@@ -732,9 +788,17 @@ var LML = function () {
         }
 
         if (lineTotal != 0) {
+            var fin = function() {
+                if (typeof proceedWhenCompleted == 'function') {
+                    proceedWhenCompleted(context, extra, callback);
+                } else {
+                    callback(context);
+                }
+            };
+
             var cont = function () {
                 setTimeout(function () {
-                    parseLine(lines[cLine], context, function (feedback) {
+                    parseLine(lines[cLine].text, context, function (feedback) {
                         if (feedback) {
                             if (typeof feedback.jumpTo !== 'undefined') {
                                 cLine = feedback.jumpTo;
@@ -746,15 +810,11 @@ var LML = function () {
                         cLine++;
 
                         if (cLine == lineTotal) {
-                            if (typeof proceedWhenCompleted == 'function') {
-                                proceedWhenCompleted(context, extra, callback);
-                            } else {
-                                callback(context);
-                            }
+                            fin();
                         } else {
                             cont();
                         }
-                    });
+                    }, lines[cLine].type);
                 }, 0);
             };
             cont();

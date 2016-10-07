@@ -157,7 +157,7 @@
             var currentSave = $('form').serialize();
 
             // Save only if content has changed
-            if (lastSave != currentSave) {
+            if (lastSave != currentSave && $('.article_base_title').val().trim() != "" && $('textarea[name="content"]').val() != "") {
                 var tempSave = currentSave;
 
                 if (_id) {
@@ -182,6 +182,8 @@
                     $(".cke_bottom time.timeago").timeago("update", new Date());
 
                 });
+            } else {
+                console.log("Skipping auto-save");
             }
         };
 
