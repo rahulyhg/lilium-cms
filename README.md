@@ -95,10 +95,13 @@ Lilium should be able to run under **pm2**, but has been showing some weird beha
 
 ## Contributors ##
 
-Erik Desjardins
-Samuel Rondeau-Millaire
-Daniel McAuley
-Narcity Media inc.
+* Erik Desjardins
+* Samuel Rondeau-Millaire
+* Daniel McAuley
+* Narcity Media inc.
+
+## License ##
+This software does not come with a license. 
 
 ## Copyright ##
 © Erik Desjardins, 2016
