@@ -92,3 +92,13 @@ The latest **nginx** setup tests reflected an issue with session constancy, and 
 
 ### pm2 ###
 Lilium should be able to run under **pm2**, but has been showing some weird behaviours probably due to variables not being shared between instances.
+
+## Contributors ##
+
+Erik Desjardins
+Samuel Rondeau-Millaire
+Daniel McAuley
+Narcity Media inc.
+
+## Copyright ##
+© Erik Desjardins, 2016
