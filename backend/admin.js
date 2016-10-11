@@ -57,7 +57,7 @@ var Admin = function() {
 	this.handleAdminEndpoint = function(cli) {
 		cli.touch('admin.handleAdminEndpoint');
     
-        if (cli.method === "GET" && !cli.routeinfo.params.async) {
+        if (cli.method === "GET" && !cli.routeinfo.params.async && cli.routeinfo.path[1] != "welcome") {
             filelogic.serveAdminTemplate(cli);
 		} else if (this.adminEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
 			this.executeEndpoint(cli);

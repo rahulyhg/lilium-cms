@@ -12,7 +12,7 @@ $}
 				{*roles(template:"entity-list-item")}
 			</ul>
 
-			<h2>Add new role</h2>
+			<h1>Add new role</h1>
     			{=forms.render('role_create')}
 		</main>
 
@@ -20,15 +20,17 @@ $}
 			<li class="entity-item-list">
 				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
 				<h6>
-					Rights : <lml:tobject data-nodetype="span" data-key="rights" data-arrayseparator=", "></lml:tobject>
+					<lml:tobject data-nodetype="span" data-key="rights" data-arrayseparator=", "></lml:tobject>
 				</h6>
 				<div class="entity-actions">
 					<lml:tobject data-nodetype="a"
+                             data-class="btn btn-accept"
 								 data-href="{=baseurl}role/edit/"
 						     data-key="_id">
 							Edit
 					</lml:tobject>
 					<lml:tobject data-nodetype="button"
+                             data-class="btn btn-remove"
 						     data-bind="click"
 						     data-action="deleteUser"
 						     data-actionparamkey="_id">
@@ -42,10 +44,31 @@ $}
 		<script>
 		var deleteUser = function(id) {
 			$.post('/{=config.default.paths.admin}/role/delete', {_id: id}, function(data){
-				if (data.success) {
-					document.location.reload();
-
-				}
+				document.location.reload();
 			});
 		};
 		</script>
+
+
+<style>
+    .entity-list {
+        padding:0px;
+        margin:0;
+    }
+
+    .entity-list li {
+        padding: 10px 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .entity-list h3 {
+        font-weight: 300;
+        margin-bottom: 3px;
+    }
+
+    .entity-list h6 {
+        margin-bottom: 20px;
+        font-size: 16px;
+        font-weight: 300;
+    }
+</style>

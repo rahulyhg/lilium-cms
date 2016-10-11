@@ -37,7 +37,7 @@ var Role = function () {
     this.handleGET = function (cli) {
         cli.touch('role.handleGET');
         if (cli.routeinfo.path.length == 2) {
-            cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
+            cli.redirect(cli._c.server.url + "admin/role/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
             case 'new':
@@ -227,7 +227,7 @@ var Role = function () {
                     }, ]
                 }
             })
-            .add('submit', 'submit', {
+            .add('Create', 'submit', {
                 displayname: "Create Role"
             });
     }

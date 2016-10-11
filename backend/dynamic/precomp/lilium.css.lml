@@ -24,7 +24,7 @@
 	activecolor = "#8B49A6";
 	siteurl = config.default.server.url;
 	fontcolor = "#111";
-	barcolor = "#454545";
+	barcolor = "rgba(0,0,0,0.75)";
 	barcolorhover = "#656565";
 	infocolor = "#2980b9";
 	dangercolor = "#c0392b";
@@ -1031,6 +1031,23 @@ header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
 }
 
 header.admin-bar .navbar-default .navbar-nav  .notifications {
+}
+
+.btn {
+    padding: 6px 10px;
+    color: #FFF;
+    font-size: 14px;
+    border-radius: 6px;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.btn-remove {
+    background-color: #FF2634;
+}
+
+.btn-accept {
+    background-color: #9B59B6;
 }
 
 /* Leaflet */

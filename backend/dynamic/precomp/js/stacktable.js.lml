@@ -76,7 +76,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
                 var row = '<tr>';
 
                 $('#'+htmlIdentifier+' th input, #' + htmlIdentifier + ' th select').each(function(index) {
-                        var coldata = data[i][$(this).data('fieldname')];
+                        var coldata = typeof data[i] == "object" ? data[i][$(this).data('fieldname')] : data[i];
                         row += append(coldata, index, $(this));
                 });
                 row += "<td><button class='lmlstacktableremovebutton'>Remove</button></td>";

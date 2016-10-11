@@ -710,7 +710,7 @@ var LiliumCMS = function() {
             that.formvalidator = new FormValidator();
             that.formParser = new FormParser();
             that.pageloader = new PageLoader();
-            that.badges = new LiliumBadges();
+            that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
 

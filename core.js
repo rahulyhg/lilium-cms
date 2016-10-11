@@ -380,6 +380,7 @@ var Core = function () {
             absURL: aurl + "entities",
             children: []
         });
+        /*
         admin.registerAdminMenu({
             id: "secrets",
             faicon: "fa-key",
@@ -389,6 +390,7 @@ var Core = function () {
             absURL: aurl + "secrets",
             children: []
         });
+        */
         admin.registerAdminMenu({
             id: "themes",
             faicon: "fa-paint-brush",
@@ -440,7 +442,7 @@ var Core = function () {
             displayname: "Roles",
             priority: 100,
             rights: ["manage-roles"],
-            absURL: aurl + "role",
+            absURL: aurl + "role/list",
             children: []
         });
         admin.registerAdminSubMenu('entities', {
@@ -552,8 +554,8 @@ var Core = function () {
         log('Core', 'Contacting handler to request a crash to all handles');
         require('./handler.js').crash(err);
 
-        log('Lilium', 'Shutting down');
-        process.exit();
+        // log('Lilium', 'Shutting down');
+        // process.exit();
     };
 
     var bindCrash = function() {
