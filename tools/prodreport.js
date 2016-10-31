@@ -197,7 +197,7 @@ ProdReport.prototype.registerTable = function() {
             key : '',
             displayname : "Actions",
             template : 'table-actions',
-            sotable : false
+            sortable : false
         }]
     });
 }
