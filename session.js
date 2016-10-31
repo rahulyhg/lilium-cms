@@ -5,7 +5,6 @@ var log = require('./log.js');
 
 var _sesh = new Object();
 
-
 var UserSesh = function (token) {
     this.data = new Object();
     this.token = token || "";
@@ -32,6 +31,7 @@ var Sessions = function () {
 
     this.logout = function (cli) {
         this.removeSession(cli, function () {
+            cli.did('auth', 'logout');
             cli.response.setHeader('Set-Cookie', 'lmlsid=""');
             cli.redirect(cli._c.server.url + '/admin');
         })
@@ -150,9 +150,9 @@ var Sessions = function () {
     }
 
     this.saveSession = function (cli, callback) {
+        cli.session.lastUpdate = new Date();
         db.update(cli._c, 'sessions', {
             token: cli.session.token,
-            lastupdate : new Date()
         }, cli.session, callback);
     };
 

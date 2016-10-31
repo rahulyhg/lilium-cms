@@ -31,6 +31,7 @@ var MultiSelect = function(tableid, lmltag, selectElem) {
         multiselectElem = $(html);
         lmltag.after(multiselectElem);
         selectElem.remove();
+        bindClicks();
         this.isRendered = true;
     }
 
@@ -47,27 +48,29 @@ var MultiSelect = function(tableid, lmltag, selectElem) {
             props : props,
             isMultiSelect : isMultiSelect,
             originalElement : selectElem,
-            isRendered : isRendered
+            isRendered : this.isRendered
         };
     };
 
-    $(document).on('click', '.multiselect span', function() {
-        if ($(this).hasClass('selected')) {
-            $(this).removeClass('selected');
-            $(this).find('input').remove();
-        } else {
-            if (!isMultiSelect) {
-                $(this).parent().find('.selected').removeClass('selected').find('input').remove();
+    var bindClicks = function() {
+        $(multiselectElem).find('span').bind('click', function() {
+            if ($(this).hasClass('selected')) {
+                $(this).removeClass('selected');
+                $(this).find('input').remove();
+            } else {
+                if (!isMultiSelect) {
+                    $(this).parent().find('.selected').removeClass('selected').find('input').remove();
+                }
+
+                $(this).addClass('selected');
+                $(this).append('<input type="hidden" name="'+ name +'[]" value="'+ $(this).data('value') +'" />');
             }
+        });
 
-            $(this).addClass('selected');
-            $(this).append('<input type="hidden" name="'+ name +'[]" value="'+ $(this).data('value') +'" />');
-        }
-    });
-
-    $('form').on('submit', function(e) {
-        var form = $(this);
-    });
+        $('form').on('submit', function(e) {
+            var form = $(this);
+        });
+    };
 
     var generateMultiSelect = function (elem) {
         elem.hide();

@@ -40,14 +40,18 @@
 		</lml:tobject>
 		<lml:tobject data-nodetype="td">
 			<lml:tobject data-nodetype="a" data-hrefsource="server.url">
-				<lml:tobject data-nodetype="span" data-key="server.url" >
+                <lml:tobject data-nodetype="span" data-key="server.url"></lml:tobject>
 			</lml:tobject>
 		</lml:tobject>
 		<lml:tobject data-nodetype="td">
-
+			<lml:tobject data-nodetype="a" data-hrefsource="server.url" data-append="/admin">
+                <span>Admin Panel</span>
+			</lml:tobject>
         </lml:tobject>
 		<lml:tobject data-nodetype="td">
-
+			<lml:tobject data-nodetype="a" data-hrefsource="server.url" data-append="/admin/settings">
+                <span>Settings</span>
+			</lml:tobject>
         </lml:tobject>
 	</lml:tobject>
 </lml:template>

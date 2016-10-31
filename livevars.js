@@ -198,7 +198,6 @@ var LiveVariables = function() {
         if (typeof RegisteredLiveVariables[endpoint] === 'undefined') {
             RegisteredLiveVariables[endpoint] = createEndpoint(func, rights);
             RegisteredLiveVariables[endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
-
         } else {
             log('LiveVariables', new Error("[LiveVariables] Tried to register an already defined endpoint : " + endpoint));
         }

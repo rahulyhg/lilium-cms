@@ -62,6 +62,7 @@ var Admin = function() {
 		} else if (this.adminEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
 			this.executeEndpoint(cli);
 		} else {
+            cli.did('request', '404', {url : cli.routeinfo.fullpath});
 			cli.throwHTTP(404, 'Unregistered Admin Endpoint : ' + cli.routeinfo.path[1]);
 		}
 	};
@@ -106,6 +107,7 @@ var Admin = function() {
 
 	this.executeEndpoint = function(cli) {
 		cli.touch('admin.executeEndpoint');
+        cli.did('request', 'admin', {'endpoint' : cli.routeinfo.fullpath});
 		AdminEndpoints[cli.method][cli.routeinfo.path[1]](cli);
 	};
 
@@ -147,11 +149,14 @@ var Admin = function() {
 		if (!this.adminEndpointRegistered(endpoint, method)) {
 			AdminEndpoints[method][endpoint] = func;
             AdminEndpoints[method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
-
 		} else {
 			return new Error("[AdminEndpointException] Endpoint is already registered : " + method + "@" + endpoint);
 		}
 	};
+
+    this.getEndpoints = function() {
+        return AdminEndpoints;
+    };
 
     var deletePluginEndpoints = function (identifier) {
         for (var i in AdminEndpoints) {

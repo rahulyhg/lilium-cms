@@ -47,24 +47,55 @@ var Forms = function () {
             });
 
         formBuilder.registerFormTemplate('entity_create')
+            .add('creds-info-title', 'title', {
+                displayname : "Credentials"
+            })
             .add('username', 'text', {
                 displayname: "Username"
             })
             .add('password', 'password', {
                 displayname: "Password"
+            }, {required:false})
+            .add('public-info-title', 'title', {
+                displayname : "User information"
             })
             .add('firstname', 'text', {
                 displayname: "First name"
-            })
+            }, {required:false})
             .add('lastname', 'text', {
                 displayname: "Last name"
-            })
+            }, {required:false})
             .add('email', 'text', {
                 displayname: "Email"
+            })
+            .add('phone', 'text', {
+                displayname: "Phone"
             })
             .add('displayname', 'text', {
                 displayname: "Display name"
             })
+            .add('jobtitle', 'text', {displayname : "Job title"}, {required:false})
+            .add('description', 'textarea', {displayname: 'BIO'}, {required:false})
+            .add('create', 'submit');
+
+        formBuilder.registerFormTemplate('entity_social')
+            .add('social-title', 'title', {
+                displayname: "Social networks"
+            })
+            .add('socialnetworks.facebook', 'text', {
+                displayname: "Facebook"
+            })
+            .add('socialnetworks.twitter', 'text', {
+                displayname: "Twitter"
+            })
+            .add('socialnetworks.googleplus', 'text', {
+                displayname: "Google Plus"
+            })
+            .add('socialnetworks.instagram', 'text', {
+                displayname: "Instagram"
+            })
+
+        formBuilder.registerFormTemplate('entity_rights')            
             .add('roles', 'livevar', {
                 endpoint: 'roles',
                 tag: 'select',
@@ -81,7 +112,23 @@ var Forms = function () {
                 },
                 displayname: "Initial roles"
             })
-            .add('create', 'submit');
+            .add('sites', 'livevar', {
+                endpoint: "sites.all.simple",
+                tag: 'select',
+                template : 'option',
+                title : 'sites',
+                attr : {
+                    lmlselect : true,
+                    multiple : true
+                },
+                props : {
+                    value : 'id',
+                    html : 'displayName',
+                    header : 'Select Multiple'
+                },
+                displayname : "Website access"
+            })
+ 
 
         formBuilder.registerFormTemplate('category')
             .add('name', 'text', {

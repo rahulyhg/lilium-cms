@@ -51,24 +51,4 @@ $}
 
 
 <style>
-    .entity-list {
-        padding:0px;
-        margin:0;
-    }
-
-    .entity-list li {
-        padding: 10px 10px;
-        border-bottom: 1px solid #ddd;
-    }
-
-    .entity-list h3 {
-        font-weight: 300;
-        margin-bottom: 3px;
-    }
-
-    .entity-list h6 {
-        margin-bottom: 20px;
-        font-size: 16px;
-        font-weight: 300;
-    }
 </style>

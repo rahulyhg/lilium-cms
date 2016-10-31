@@ -631,6 +631,7 @@ var Core = function () {
         secrets.registerLiveVar();
         tools.registerLiveVar();
         badges.registerLiveVar();
+        devtools.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };

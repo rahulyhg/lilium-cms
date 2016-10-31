@@ -269,8 +269,9 @@ var LiveVars = function() {
                     } else if (obj.data('hrefsource')) {
                         // hrefsource just appends itself to the already existing href
                         var prepend = obj.data('prependroot') ? window.location.urlBase : "";
+                        var append = obj.data('append') || "";
 
-                        node.attr('href', prepend + pullOutVarFromString(data, obj.data('hrefsource')));
+                        node.attr('href', prepend + pullOutVarFromString(data, obj.data('hrefsource')) + append);
                     }
                     // Set html to node
                     node.html(obj.html());
@@ -516,8 +517,13 @@ var LiveVars = function() {
 
     this.templateToHtml = function(templateID, varValue, node) {
         var templateObj = $('#' + templateID);
+
+        if (templateObj.data('classes')) {
+            node.classList.add(templateObj.data("classes"));
+        }
+
         if (templateObj.length != 0) {
-            if (typeof varValue == 'Object' && varValue.length > 0) {
+            if (typeof varValue == 'object' && varValue.length > 0) {
                 // Generate template object for array
                 varValue.forEach(function(val, index) {
                     node.appendChild(generateTemplateFromObject(templateObj, $(node), varValue, undefined, false, false)[0]);
@@ -528,8 +534,6 @@ var LiveVars = function() {
                 for (var i = 0; i < nodes.length; i++){
                     node.appendChild(nodes[i]);
                 }
-
-
             }
         }
         return node;

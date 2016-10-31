@@ -41,6 +41,7 @@ var serveMyPreferences = function(cli, callback) {
 var savePreferences = function(cli, prefs, callback) {
     cli.session.data.preferences = prefs;
 
+    cli.did('preferences', 'save', prefs);
     db.update(cli._c, 'entities', { _id : db.mongoID(cli.session.data._id) }, {
         preferences : prefs
     }, callback, false, true);

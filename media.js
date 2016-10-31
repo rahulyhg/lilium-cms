@@ -164,6 +164,8 @@ var Media = function () {
                             form: response
                         });
                     } else {
+                        cli.did('media', 'upload', { file : imagefile });
+
                         cli.sendJSON({
                             redirect: '',
                             success: true,
@@ -202,6 +204,8 @@ var Media = function () {
                         fs.deleteFile(media.path, function (err) {
                             log("file : " + media.path + " removed.");
                         });
+
+                        cli.did('media', 'delete', { file : media.path });
 
                         db.remove(cli._c, 'uploads', {
                             _id: id

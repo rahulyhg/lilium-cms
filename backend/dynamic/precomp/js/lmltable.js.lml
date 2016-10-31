@@ -81,7 +81,8 @@ var LmlTable = function(table) {
 		table.find('thead th').each(function() {
 			keys.push({
 				key: $(this).data('key'),
-				template: typeof $(this).data('template') !== 'undefined' ? $(this).data('template') : undefined
+				template: typeof $(this).data('template') !== 'undefined' ? $(this).data('template') : undefined,
+                classes: $(this).data()
 			})
 
 		});

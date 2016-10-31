@@ -249,9 +249,11 @@ var Article = function() {
                     _id: db.mongoID()
                 };
 
-                formData.tagslugs = formData.tags.map(function(tagname) {
-                    return slugify(tagname).toLowerCase();
-                });
+                if (formData.tags.map) {
+                    formData.tagslugs = formData.tags.map(function(tagname) {
+                        return slugify(tagname).toLowerCase();
+                    });
+                }
 
                 // Create post
                 var params = [cli._c, dbCol[pubCtx], conds];
@@ -271,6 +273,8 @@ var Article = function() {
                         }
 
                         if (success) {
+                            cli.did('content', 'published', {title : cli.postdata.data.title});
+
                             cli.sendJSON({
                                 // redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + formData._id,
                                 success: true
@@ -532,9 +536,11 @@ var Article = function() {
                     formData.status = 'published';
                     formData.date = new Date(formData.date);
 
-                    formData.tagslugs = formData.tags.map(function(tagname) {
-                        return slugify(tagname).toLowerCase();
-                    });
+                    if (formData.tags.map) {
+                        formData.tagslugs = formData.tags.map(function(tagname) {
+                            return slugify(tagname).toLowerCase();
+                        });
+                    }
 
                     db.findToArray(cli._c, 'content', {
                         _id: id
@@ -563,6 +569,8 @@ var Article = function() {
                             _id: id
                         }, formData, function(err, r) {
                             that.deepFetch(cli._c, id, function(deepArticle) {
+                                cli.did('content', 'edited', {title : cli.postdata.data.title});
+                                
                                 hooks.fire('article_edited', {
                                     cli: cli,
                                     article: r.value
@@ -637,6 +645,8 @@ var Article = function() {
                             status: destroy ? 'destroyed' : 'deleted'
                         }, function(err, r) {
 
+                            cli.did('content', destroy ? 'destroyed' : 'deleted', {id : id});
+                            
                             var filename = r.title + '.html';
                             fs.deleteFile(filename, function() {
                                 hooks.fire('article_deleted', id);
@@ -767,7 +777,7 @@ var Article = function() {
                         media: "$media.sizes.thumbnail.url"
                     }
                 }], function(data) {
-                    db.count(cli._c, 'content', {}, function(err, total) {
+                    db.count(cli._c, 'content', {$and : match}, function(err, total) {
                         callback({
                             size: total,
                             data: data
@@ -799,7 +809,6 @@ var Article = function() {
                         newer: {
                             $cmp: ['$contentid.updated', '$updated']
                         }
-
                     }
                 }, {
                     $match: {

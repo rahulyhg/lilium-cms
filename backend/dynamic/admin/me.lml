@@ -1,7 +1,7 @@
 {#config;session;vocab;forms}
 <h1>My Profile</h1>
-{*me(sourceof:"update_entitiy")}
-{=forms.render('update_entitiy')}
+{*me(sourceof:"update_profile")}
+{=forms.render('update_profile')}
 {=forms.render('update_password')}
 {=forms.render('upload_profile_picture')}
 <div class="bar">

@@ -22,11 +22,13 @@ $}
                 <lml:tobject data-nodetype="h6" data-key="description"></lml:tobject>
 				<div class="entity-actions">
                     <lml:tobject data-nodetype="a"
-                                 data-href="{=baseurl}categories/edit/"
-                             data-key="_id">
+                            data-class="btn btn-accept"
+                            data-href="{=baseurl}categories/edit/"
+                            data-key="_id">
                             Edit
                     </lml:tobject>
 					<lml:tobject data-nodetype="button"
+                             data-class="btn btn-remove"
 						     data-bind="click"
 						     data-action="deleteCampaign"
 						     data-actionparamkey="_id" >

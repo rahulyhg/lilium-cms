@@ -13,6 +13,7 @@ var Login = function() {
 	var loginSuccess = function(cli, userObj) {
 		cli.touch('login.loginsuccess');
 		sessions.createSessionInCli(cli, userObj);
+        cli.did("auth", "login");
 
         if (!userObj.welcomed) {
             log('Login', 'Logged in user ' + userObj.username + " for the first time");
@@ -36,21 +37,26 @@ var Login = function() {
             usr !== '' && 
             psw !== ''
 		) {
-			db.match(cli._c, "entities", {
+            var conds = {
 				'username' : usr,
 				'shhh' : CryptoJS.SHA256(psw).toString(CryptoJS.enc.Hex)
-			}, function(found) {
-				cli.touch('db.match('+found+')');
+			};
 
-				if (found) {
-					entities.fetchFromDB(cli._c, usr, function(userObj) {
-						loginSuccess(cli, userObj);
-					});
-				} else {
-					hooks.fire('user_login_failed', cli);
-					cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
-				}
-			});
+            if (usr !== 'lilium') {
+                conds.sites = cli._c.id;
+            }
+
+            cli.touch("login.authUser@networkcheck");
+            db.match(_c.default(), 'entities', conds, function(found) {
+    			    if (found) {
+        				entities.fetchFromDB(cli._c, usr, function(userObj) {
+	        			loginSuccess(cli, userObj);
+		        	});
+			    } else {
+	    		    hooks.fire('user_login_failed', cli);
+    			    cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
+                }
+            });
 		}
 	};
 

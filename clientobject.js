@@ -1,6 +1,7 @@
 var entities = require('./entities.js');
 var log = require('./log.js');
 var db = require('./includes/db.js');
+var events = require('./events.js');
 
 var ClientObject = function (req, resp) {
     this.request = req;
@@ -39,6 +40,10 @@ var ClientObject = function (req, resp) {
     this.parseCookie();
     this.setID();
     this.createdAt = new Date();
+};
+
+ClientObject.prototype.did = function(cat, type, extra, cb) {
+    events.register(this._c, cat, type, this.userinfo.user, extra, cb);
 };
 
 ClientObject.prototype.throwHTTP = function (code, message) {

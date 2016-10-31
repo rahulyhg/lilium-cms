@@ -15,6 +15,7 @@ var sessions = require('./session.js');
 var templateBuilder = require('./templateBuilder.js');
 var category = require('./category.js');
 var badges = require('./badges.js');
+var events = require('./events.js');
 
 var _cachedSites = new Array();
 
@@ -170,6 +171,10 @@ var SiteInitializer = function (conf, siteobj) {
         }
     };
 
+    var initEvents = function(cb) {
+        events.init(conf, cb);
+    };
+
     this.initialize = function (done) {
         log('Sites', 'Initializing site with id ' + conf.id);
 
@@ -179,15 +184,17 @@ var SiteInitializer = function (conf, siteobj) {
         loadHTMLStructure(function () {
             loadStaticSymlinks(function () {
                 loadDatabase(function () {
-                    templateBuilder.init(conf);
-
-                    loadTheme(function() {
-                        category.preload(conf, function() {
-                            loadSessions(function() {
-                                badges.addSite(conf, function() {
-                                    checkForWP(conf);
-                                    hooks.fire('site_initialized', conf);
-                                    done();
+                    initEvents(function() {
+                        templateBuilder.init(conf);
+    
+                        loadTheme(function() {
+                            category.preload(conf, function() {
+                                loadSessions(function() {
+                                    badges.addSite(conf, function() {
+                                        checkForWP(conf);
+                                        hooks.fire('site_initialized', conf);
+                                        done();
+                                    });
                                 });
                             });
                         });
@@ -246,6 +253,7 @@ var Sites = function () {
                     if (success) {
                         that.createSite(cli, dat, function () {
                             log('Sites', 'Redirecting network admin to site list');
+                            cli.did('sites', 'created', dat.websitename);
                             cli.redirect(cli._c.server.url + "admin/sites/", false);
                         });
                     } else {
@@ -269,6 +277,7 @@ var Sites = function () {
 
         var existingSite = dat.originalsite;
 
+        cli.did('sites', 'wptransfer', dat);
         log('Sites', 'Initiating Wordpress website transfer');
         if (existingSite && existingSite != "") {
             log('Sites', 'Transferring Wordpress data to site with uid ' + existingSite);

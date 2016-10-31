@@ -30,6 +30,9 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
     height: 50px;
     background: #fafafa;
 }
+.lmltablebuilder td.first-cap {
+    text-transform: capitalize;
+}
 .lmltablebuilder thead th {
 	border-right: 1px solid #EEE;
 }

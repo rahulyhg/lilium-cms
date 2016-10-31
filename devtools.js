@@ -34,7 +34,7 @@ var handleGET = function(cli) {
 
 var handlePOST = function(cli) {
     if (!cli.hasRight('develop')) {
-        return cli.throwHTTP(401, "401 UNAUTHORIZED");
+        return cli.throwHTTP(401, "401 GET OUT OF MY FACE");
     }
 
     switch (cli.routeinfo.path[2]) {
@@ -125,6 +125,28 @@ var refreshCache = function(cli, ctx) {
 DevTools.prototype.registerAdminEndpoint = function() {
     Admin.registerAdminEndpoint('devtools', 'GET', handleGET);
     Admin.registerAdminEndpoint('devtools', 'POST', handlePOST);
+};
+
+DevTools.prototype.registerLiveVar = function() {
+    require('./livevars.js').registerLiveVariable("devtools", function(cli, levels, params, cb) {
+        cli.touch("devtools.livevar");
+        var endpoints = require("./backend/admin.js").getEndpoints();
+        var formattedOutput = {};
+
+        for (var method in endpoints) {
+            formattedOutput[method] = [];
+            
+            var curMethod = endpoints[method];
+            for (var func in curMethod) {
+                formattedOutput[method].push({
+                    endpoint : func,
+                    pluginid : curMethod[func].pluginID
+                });
+            }
+        }
+
+        cb(formattedOutput);
+    }, ["develop"]);
 };
 
 module.exports = new DevTools();

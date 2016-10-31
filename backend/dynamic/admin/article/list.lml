@@ -33,7 +33,7 @@
             <lml:tobject data-nodetype="div" data-key="date" data-formatter="lmldate"></lml:tobject>
         </lml:tabletemplate>
     
-		<lml:tabletemplate id="table-article-status">
+		<lml:tabletemplate id="table-article-status" data-classes="first-cap">
 			<lml:tobject data-nodetype="div" data-key="status"></lml:tobject>
 		</lml:tabletemplate>
 

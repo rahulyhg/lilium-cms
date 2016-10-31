@@ -184,7 +184,7 @@ var DB = function() {
 		}
 	};
 
-	this.findToArray = function(conf, coln, conds, cb, projection) {
+	this.findToArray = function(conf, coln, conds, cb, projection, skip, max) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -196,6 +196,14 @@ var DB = function() {
 
                 if (projection) {
                     stk = stk.project(projection);
+                }
+
+                if (typeof skip == "number") {
+                    stk = stk.skip(skip);
+                }
+
+                if (typeof max == "number") {
+                    stk = stk.limit(max);
                 }
 
                 stk.toArray(function(err, arr) {

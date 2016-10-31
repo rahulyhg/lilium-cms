@@ -20,7 +20,9 @@ Config.prototype.getSimpleSites = function () {
         if (key != 'default') {
             arr.push({
                 displayName: _configs[key].website.sitetitle,
-                name: key
+                name: key,
+                id : _configs[key].id,
+                network : _configs[key].default || false
             });
         }
 
