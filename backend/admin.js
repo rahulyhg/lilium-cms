@@ -41,16 +41,18 @@ var Admin = function() {
 	};
 
     this.welcome = function(cli, method) {
-        if (method == 'GET') {
-            filelogic.serveLmlPage(cli, false);
-        } else if (method == 'POST') {
-            switch (cli.routeinfo.path[2]) {
-                case "upload": require('../entities.js').uploadFirstAvatar(cli); break;
-                case "finish": require('../entities.js').welcome(cli); break;
-                default: cli.debug(); break;
+        if (cli.hasRightOrRefuse("login")) {
+            if (method == 'GET') {
+                filelogic.serveLmlPage(cli, false);
+            } else if (method == 'POST') {
+                switch (cli.routeinfo.path[2]) {
+                    case "upload": require('../entities.js').uploadFirstAvatar(cli); break;
+                    case "finish": require('../entities.js').welcome(cli); break;
+                    default: cli.debug(); break;
+                }
+            } else {
+                cli.debug();
             }
-        } else {
-            cli.debug();
         }
     };
 
@@ -63,7 +65,7 @@ var Admin = function() {
 			this.executeEndpoint(cli);
 		} else {
             cli.did('request', '404', {url : cli.routeinfo.fullpath});
-			cli.throwHTTP(404, 'Unregistered Admin Endpoint : ' + cli.routeinfo.path[1]);
+            filelogic.serveErrorPage(cli, '404');
 		}
 	};
 

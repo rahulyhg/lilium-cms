@@ -11,6 +11,8 @@ var Category = function () {
 
     this.handleGET = function (cli) {
         cli.touch('article.handleGET');
+        if (!cli.hasRightOrRefuse("list-categories")) { return; }
+
         if (cli.routeinfo.path.length == 2) {
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
         } else {
@@ -29,7 +31,7 @@ var Category = function () {
     };
 
     this.handlePOST = function (cli) {
-        if (!cli.hasRight('manage-categories')) {
+        if (!cli.hasRight('edit-categories')) {
             cli.refresh();
             return;
         }

@@ -48,6 +48,7 @@
     "exec": "^0.2.1",
     "eyes": "^0.1.8",
     "facebook-ads-sdk": "0.0.1",
+    "facebook-js-ads-sdk": "0.0.0",
     "fs": "0.0.2",
     "globe": "^0.3.0",
     "gm": "^1.23.0",

@@ -1,0 +1,56 @@
+{#config}
+<style>
+    .lml-error-page-wrapper {
+        text-align: center;
+        font-family: 'Raleway', sans-serif;
+    }
+
+    .lml-error-header {
+        padding-top: 100px;
+        background: -webkit-repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
+        background: repeating-linear-gradient(45deg, #2f2f2f, #2f2f2f 10px, #272627 10px, #272627 20px);
+    }
+
+    .lml-error-page-wrapper .error-message {
+        display: block;
+        color: #EEE;
+        font-size: 32px;
+        font-weight: 300;
+    }
+
+    .lml-error-page-wrapper img.error-logo {
+        margin: 30px;
+    }
+
+    p.error-precision {
+        color: #777;
+        font-size: 20px;
+        max-width: 480px;
+        margin: 30px auto;
+        font-weight: 300;
+    }
+
+    .lml-error-return {
+        text-decoration: none;
+        text-transform: uppercase;
+
+        color: #eee;
+        background-color: #9B59B6;
+        padding: 10px 22px;
+        font-size: 18px;
+
+        border-radius: 10px;
+    }
+</style>
+<div class="lml-error-page-wrapper">
+    <div class="lml-error-header">
+        <span class="error-message">
+            I wish I could let you see that, but you are not allowed to.
+        </span>
+        <img class="error-logo" src="{=config.default.server.url}/static/media/lmllogo.png" />
+    </div>
+    <p class="error-precision">
+        In geek language, that means 403 Forbidden. If you know you absolutely need access, please contact the geekiest person in your office. This person usually has the rights to grant you access. 
+    </p>
+    <a href="{=config.default.server.url}/admin" class="lml-error-return">Return to Dashboard</a>
+</div>

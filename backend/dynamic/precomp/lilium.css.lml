@@ -216,6 +216,10 @@ body {
 		transition: opacity 0.2s;
 }
 
+body.block-scroll {
+    overflow: hidden;
+}
+
 body.lmlrendered {
 	opacity: 1;
 }
@@ -354,6 +358,10 @@ select {
 	padding: 10px;
 }
 
+.lmlform-fieldwrapper.postleaf-wrapper {
+    padding: 0px;
+}
+
 .lmlform-fieldwrapper-title {
     clear: both;
     float: none;
@@ -414,6 +422,24 @@ select {
     font-family: "Open Sans", sans-serif;
     text-shadow: 0px 0px 1px rgba(0,0,0,0.2);
     letter-spacing: 0px;
+}
+
+.lmlform button.red {
+    padding: 6px 10px;
+    background-color: #FF2634;
+    color: #FFF;
+    font-size: 14px;
+    border-radius: 6px;
+    border: none;
+    display: inline-block;
+}
+
+.lmlform button.red:hover {
+    background-color: #FF4654;
+}
+
+.lmlform button.red:active {
+    background-color: #DF0614;
 }
 
 .lmlform input[type="submit"]:hover, .lmlform button:hover {
@@ -531,7 +557,7 @@ main.lmladminmain .pad10 {
 	display: block;
 }
 
-h2.subtitlestrip {
+h2.subtitlestrip, h2.subtitle {
 	padding: 10px;
     	border-bottom: 1px solid #EEE;
     	border-top: 1px solid #eee;

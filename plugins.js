@@ -17,11 +17,14 @@ var Plugins = module.exports = new function () {
 
     this.serveAdminList = function (cli) {
         cli.touch("plugins.serveAdminList");
+        if (!cli.hasRightOrRefuse("site-admin")) {return;} 
+
         filelogic.serveAdminLML(cli)
     };
 
     this.handlePOST = function (cli) {
         cli.touch("plugins.handlePOST");
+        if (!cli.hasRightOrRefuse("site-admin")) {return;} 
 
         if (cli.routeinfo.path.length > 2) {
             switch (cli.routeinfo.path[2]) {
@@ -221,6 +224,7 @@ var Plugins = module.exports = new function () {
     this.registerLiveVar = function () {
         livevars.registerLiveVariable("plugin", function (cli, levels, params, callback) {
             var allPlugins = levels.length === 0;
+            if (!cli.hasRightOrRefuse("site-admin")) {return callback([]);} 
 
             if (allPlugins) {
                 db.singleLevelFind(_c.default(), 'plugins', callback);

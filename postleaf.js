@@ -28,7 +28,9 @@ var PostLeaf = function() {
 
                 pkg.form.add('create-postleaf-' + pl.name, 'button', {
                     displayname : "Add " + pl.displayname,
-                    onclick : pl.backend
+                    onclick : pl.backend,
+                    wrapperCssPrefix : "postleaf-wrapper no-pad",
+                    wrapperCssSuffix : ""
                 });
             }
         });

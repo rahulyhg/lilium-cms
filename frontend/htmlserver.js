@@ -1,4 +1,5 @@
 var fileserver = require('../fileserver.js');
+var filelogic = require('../filelogic.js');
 var _conf = require('../config.js');
 var article = require('../article.js');
 
@@ -40,7 +41,9 @@ var HTMLServer = function() {
     								});
                                 }
 							} else {
-								cli.throwHTTP(404, 'Not Found');
+								// cli.throwHTTP(404, 'Not Found');
+                                // 404
+                                filelogic.serveErrorPage(cli, 404);
 							}
 						})
 					}

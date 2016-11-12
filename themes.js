@@ -44,16 +44,19 @@ var Themes = function () {
 
     this.serveAdminList = function (cli) {
         cli.touch("themes.serveAdminList");
-        if (cli.routeinfo.path.length == 2 && cli.method == 'POST') {
-            that.updateThemeSettings(cli);
-        } else if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
-            that.enableTheme(cli._c, cli.postdata.data.uName, function () {
-                cli.sendJSON({
-                    success: true
+        
+        if (cli.hasRightOrRefuse("manage-themes")) {
+            if (cli.routeinfo.path.length == 2 && cli.method == 'POST') {
+                that.updateThemeSettings(cli);
+            } else if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
+                that.enableTheme(cli._c, cli.postdata.data.uName, function () {
+                    cli.sendJSON({
+                        success: true
+                    });
                 });
-            });
-        } else {
-            filelogic.serveAdminLML(cli);
+            } else {
+                filelogic.serveAdminLML(cli);
+            }
         }
     };
 

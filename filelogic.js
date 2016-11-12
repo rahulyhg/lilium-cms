@@ -77,15 +77,30 @@ var FileLogic = function () {
             name = cli.routeinfo.relsitepath;
         }
 
-        var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
         var savePath = cli._c.server.html + name + '/index.html';
         FileServer.fileExists(savePath, function (isPresent) {
+            var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
             if (!isPresent) {
                 saveLmlPage(cli, readPath, savePath, extra);
             } else {
                 serveCachedFile(cli, savePath);
             }
+        });
+    };
 
+    this.serveErrorPage = function(cli, code) {
+        this.serveRelativeLML(cli, 'http/' + code, {});
+    };
+
+    this.serveRelativeLML = function(cli, path, extra) {
+        var savePath = cli._c.server.html + "/" + path + '/index.html';
+        FileServer.fileExists(savePath, function (isPresent) {
+            var readPath = cli._c.server.base + "backend/dynamic/" + path + ".lml";
+            if (!isPresent) {
+                saveLmlPage(cli, readPath, savePath, extra);
+            } else {
+                serveCachedFile(cli, savePath);
+            }
         });
     };
 
@@ -266,7 +281,7 @@ var FileLogic = function () {
                 savePath,
                 function () {
                     cli.responseinfo.filecreated = true;
-                    cb(title + ".html");
+                    cb && cb(title + ".html");
                 },
                 extra
             );

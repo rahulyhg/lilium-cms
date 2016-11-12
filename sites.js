@@ -102,6 +102,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/pushtable.js", 2200, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/imagepicker.js", 2220, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/backendsearch.js", 2250, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/stacktable.js", 2300, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/socket.js", 2400, 'admin', conf.id);
@@ -123,6 +124,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lys.css", 2120, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/imagepicker.css", 2150, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/login.css", 2200, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/media.css", 2600, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/devtools.css", 2620, 'admin', conf.id);
@@ -226,23 +228,27 @@ var Sites = function () {
     };
 
     this.handleGET = function (cli) {
-        var param = cli.routeinfo.path[2];
+        if (cli.hasRightOrRefuse("list-websites")) {
+            var param = cli.routeinfo.path[2];
 
-        if (!param) {
-            filelogic.serveAdminLML(cli);
-        } else {
-            switch (param) {
-            case "launch":
-            case "wptransfer":
+            if (!param) {
                 filelogic.serveAdminLML(cli);
-                break;
-            default:
-                cli.debug();
+            } else {
+                switch (param) {
+                case "launch":
+                case "wptransfer":
+                    filelogic.serveAdminLML(cli);
+                    break;
+                default:
+                    cli.debug();
+                }
             }
         }
     };
 
     this.handlePOST = function (cli) {
+        if (!cli.hasRightOrRefuse("launch-websites")) { return; }
+
         var dat = cli.postdata.data;
         var that = this;
         var param = cli.routeinfo.path[2];

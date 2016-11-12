@@ -9,14 +9,15 @@ var log = require('./log.js');
 
 var Settings = function () {
     this.handleGET = function (cli) {
-        cli.touch('settings.handleGET');
+        cli.touch('settings.handleGET');        
+        if (!cli.hasRightOrRefuse("site-admin")) { return; }
+
         filelogic.serveAdminLML(cli);
     };
 
     this.handlePOST = function(cli) {
         cli.touch('settings.handlePOST');
-
-        if (cli.hasRight('edit_settings')) {
+        if (cli.hasRight('site-admin')) {
             var dat = cli.postdata.data;
             delete dat.form_name;
 
@@ -263,6 +264,10 @@ var Settings = function () {
                         fieldName : "clientsecret",
                         dataType : "text",
                         displayname : "Client Secret"
+                    }, {
+                        fieldName : "accesstoken",
+                        dataType : "text",
+                        displayname : "Access Token"
                     }
                 ]
             }
@@ -440,7 +445,7 @@ var Settings = function () {
     this.registerLiveVar = function () {
         require('./livevars.js').registerLiveVariable('settings', function (cli, levels, params, callback) {
             callback(cli._c);
-        }, ["admin"]);
+        }, ["site-admin"]);
     };
 };
 

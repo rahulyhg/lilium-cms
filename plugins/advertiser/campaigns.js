@@ -134,6 +134,10 @@ var Campaigns = function () {
         LiveVars.registerLiveVariable('campaigns', function (cli, levels, params, callback) {
             var firstLevel = levels[0];
 
+            if (cli.hasRightOrRefuse("production")) {
+                return callback([]);
+            }
+
             switch (firstLevel) {
                 case "all":
                     if (cli.isGranted['campaigns']) {
@@ -411,6 +415,8 @@ var Campaigns = function () {
 
     this.handleGET = function (cli) {
         cli.touch('campaigns.handleGET');
+        if (!cli.hasRightOrRefuse("production")) {return;}
+
         var params = cli.routeinfo.path;
         var hasParam = params.length > 2 && params[2] != "new";
 
@@ -452,6 +458,7 @@ var Campaigns = function () {
 
     this.handlePOST = function (cli) {
         cli.touch('campaigns.handlePOST');
+        if (!cli.hasRightOrRefuse("production")) {return;}
         var stack = formbuilder.validate(formbuilder.handleRequest(cli), true);
         var action = cli.routeinfo.path[2] || 'new';
 

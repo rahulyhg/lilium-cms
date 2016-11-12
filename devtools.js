@@ -3,6 +3,7 @@ var Admin = require('./backend/admin.js');
 var filelogic = require('./filelogic.js');
 var lml = require('./lml.js');
 var notif = require('./notifications.js');
+var formBuilder = require('./formBuilder.js');
 
 var DevTools = function() {};
 
@@ -18,6 +19,8 @@ var interpretLMLToCli = function(cli) {
 };
 
 var handleGET = function(cli) {
+    if (!cli.hasRightOrRefuse("develop")) {return;} 
+
     switch (cli.routeinfo.path[2]) {
         case 'livevars':
         case 'lml':
@@ -49,6 +52,8 @@ var handlePOST = function(cli) {
                 case 'clear': clearCache(cli, cli.routeinfo.path[4]);
             }
             break;
+        default:
+            cli.refresh();
     }
 };
 
@@ -130,23 +135,99 @@ DevTools.prototype.registerAdminEndpoint = function() {
 DevTools.prototype.registerLiveVar = function() {
     require('./livevars.js').registerLiveVariable("devtools", function(cli, levels, params, cb) {
         cli.touch("devtools.livevar");
-        var endpoints = require("./backend/admin.js").getEndpoints();
-        var formattedOutput = {};
 
-        for (var method in endpoints) {
-            formattedOutput[method] = [];
+        if (levels[0] == "endpoints") { 
+            var endpoints = require("./backend/admin.js").getEndpoints();
+            var formattedOutput = {};
+
+            for (var method in endpoints) {
+                formattedOutput[method] = [];
             
-            var curMethod = endpoints[method];
-            for (var func in curMethod) {
-                formattedOutput[method].push({
-                    endpoint : func,
-                    pluginid : curMethod[func].pluginID
-                });
+                var curMethod = endpoints[method];
+                for (var func in curMethod) {
+                    formattedOutput[method].push({
+                        endpoint : func,
+                        pluginid : curMethod[func].pluginID
+                    });
+                }
             }
-        }
 
-        cb(formattedOutput);
+            cb(formattedOutput);
+        } else if (levels[0] == "livevars") {
+            var allLV = require('./livevars.js').getAll();
+            var arr = [];
+
+            for (var ep in allLV) {
+                arr.push(
+                    Object.assign(allLV[ep], {name : ep})
+                );
+            }
+
+            cb(arr); 
+        }
     }, ["develop"]);
+};
+
+DevTools.prototype.registerForms = function() {
+    formBuilder.createForm('devtools_livevar', {
+        formWrapper: {
+            'tag': 'div',
+            'class': 'row',
+                'id': 'article_new',
+                'inner': true
+            },
+        fieldWrapper : "lmlform-fieldwrapper"
+    })
+    .add('endvar', 'livevar', {
+        displayname : "End Variable",
+        title: 'name',
+        template: 'option', 
+        tag: 'select', 
+        endpoint: 'devtools.livevars.all',
+        attr : {
+            lmlselect : false
+        },
+        props: {
+            value: 'name',
+            html : 'name',
+            header : 'Select One'
+        }
+    })
+    .add('levels', 'stack', {
+        scheme : {
+            columns : [
+                {
+                    fieldName : "level",
+                    dataType : "text",
+                    displayname : "Level"
+                }
+            ]
+        },
+        displayname : "Levels"
+    })
+    .add('params', 'stack', {
+        scheme : {
+            columns : [
+                {
+                    fieldName : "paramname",
+                    dataType : "text",
+                    displayname : "Name"
+                },
+                {
+                    fieldName : "paramvalue",
+                    dataType : "text",
+                    displayname : "Value"
+                }
+            ]
+        },
+        displayname : "Parameters"
+    })
+    .add('query-set', 'buttonset', { buttons: [{
+            name : 'query', 
+            displayname : 'Query', 
+            classes : ['btn', 'btn-default', 'btn-query']
+        }
+    ]})
 };
 
 module.exports = new DevTools();

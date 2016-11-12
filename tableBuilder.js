@@ -18,8 +18,6 @@ var TableBuilder = function () {
         }
     };
 
-
-
     this.render = function (tableName) {
         if (typeof tables[tableName] !== 'undefined') {
             return generatehtml(tables[tableName]);
@@ -75,6 +73,7 @@ var TableBuilder = function () {
         html += '</div>';
         return html;
     };
+
     var findFirstSortable = function(table) {
         for (var i in table.fields) {
             if (table.fields[i].sortable) {

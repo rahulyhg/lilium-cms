@@ -1,0 +1,53 @@
+{#config;forms}
+<h1>Live Variables</h1>
+
+{=forms.render("devtools_livevar")}
+
+<h2 class="subtitle">Response</h2>
+<div id="lvresp">
+
+</div>
+
+<style>
+    #lvresp {
+        white-space: pre;
+        display: block;
+        height: 500px;
+        margin: 10px;
+        border: 1px solid #DDD;
+        background-color: #000;
+        color: #FFF;
+        font-family: "Consolas", "monospace", monospace;
+        margin: 10px 0px;
+        padding: 4px;
+        font-size: 14px;
+        overflow-y: scroll;
+    }
+</style>
+
+<script>
+    // Receive Callback
+    var gotLivevar = function(p1, p2) {
+        $('#lvresp').html(JSON.stringify(p1, null, 4));
+    };
+    
+    // On Query 
+    $('.btn-query').bind('click', function() {
+        var lvendpoint = $('select[name="endvar"]').val();
+        var params = {};
+
+        $('#lmlstacktable-levels td input').each(function() {
+            lvendpoint += '.' + $(this).val();
+        });
+
+        var paramsfields = $('#lmlstacktable-params td input');
+        var len = paramsfields.length;
+
+        for (var i = 0; i < len; i+=2) {
+            params[paramsfields[i].value] = paramsfields[i+1];
+        }
+
+        liliumcms.livevars.getSingleLivevar(lvendpoint, params, gotLivevar);
+        return false;
+    });
+</script>

@@ -11,6 +11,8 @@ var dir = require('node-dir');
 
 
 var FileServer = function () {
+    var defaultCT = 'text/html; charset=utf-8';
+
     this.workDir = function () {
         return __dirname;
     };
@@ -193,11 +195,11 @@ var FileServer = function () {
 
     };
 
-    this.pipeFileToClient = function (cli, filename, callback, abs) {
+    this.pipeFileToClient = function (cli, filename, callback, abs, mime) {
         cli.touch('fileserver.pipeFileToClient');
         filename = abs ? filename : this.validateIndexPath(cli, filename);
         cli.response.writeHead(200, {
-            "Content-Type": cli.routeinfo.mimetype || 'text/html; charset=utf-8'
+            "Content-Type": mime === "default" ? defaultCT : mime || cli.routeinfo.mimetype || defaultCT
         });
 
         var stream = fs.createReadStream(filename)

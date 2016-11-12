@@ -17,7 +17,7 @@ var LmlTable = function(table) {
 		timeInitial = new Date();
 		this.getData(function() {
 			var now = new Date();
-			console.log('Table Initialised in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+			console.log('Table Initialized in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
 
 		});
 		table.parent().find('.header select').change(function() {

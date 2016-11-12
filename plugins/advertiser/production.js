@@ -31,11 +31,17 @@ var Production = function () {
     var registerHooks = function () {
         Admin.registerAdminEndpoint('production', 'GET', function (cli) {
             cli.touch("admin.GET.production");
-            handleGET(cli);
+
+            if (cli.hasRightOrRefuse("production")) {
+                handleGET(cli);
+            }
         });
         Admin.registerAdminEndpoint('production', 'POST', function (cli) {
             cli.touch("admin.POST.production");
-            handlePOST(cli);
+
+            if (cli.hasRightOrRefuse("production")) {
+                handlePOST(cli);
+            }
         });
         Campaigns.registerHooks();
     };

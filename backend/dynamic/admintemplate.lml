@@ -10,6 +10,7 @@
         {%backendsearch}
         {%adminwelcome}
         {%adminbadges}
+        {%imagepicker}
         {%lys}
         <!-- Contains current page -->
 		<main class="container lmladminmain lmladmincontentwrapper">

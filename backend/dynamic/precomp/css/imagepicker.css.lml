@@ -1,0 +1,273 @@
+.lmlform img.lml-pickable, img.lml-pickable {
+    border: 1px solid #EEE;
+    cursor: pointer;
+}
+
+.lmlform img.lml-pickable:hover, img.lml-pickable:hover {
+    border-color: #9B59B6;
+}
+
+#lmlimagepicker {
+    position: fixed;
+    top: 0; bottom: 0; left: 0; right:0; 
+
+    background-color: rgba(0,0,0,0.5);
+    z-index: 20000;
+
+    opacity: 0;
+
+    -webkit-transition: opacity 0.1s;
+       -moz-transition: opacity 0.1s;
+        -ms-transition: opacity 0.1s;
+         -o-transition: opacity 0.1s;
+            transition: opacity 0.1s;
+
+    -webkit-transform: translate3d(0, 0, 0) rotateZ(0deg);
+       -moz-transform: translate3d(0, 0, 0) rotateZ(0deg);
+        -ms-transform: translate3d(0, 0, 0) rotateZ(0deg);
+         -o-transform: translate3d(0, 0, 0) rotateZ(0deg);
+            transform: translate3d(0, 0, 0) rotateZ(0deg);
+}
+
+#lmlimagepicker.shown {
+    opacity: 1;
+}
+
+.lmlimagepicker-container {
+    position: absolute;
+    top: 30px; bottom: 30px;
+    left: 30px; right: 30px;
+
+    background-color: #F9F9F9;
+    border: 1px solid #CCC;
+
+    -webkit-transform: translate3d(0, 100px, 0) rotateZ(0deg);
+       -moz-transform: translate3d(0, 100px, 0) rotateZ(0deg);
+        -ms-transform: translate3d(0, 100px, 0) rotateZ(0deg);
+         -o-transform: translate3d(0, 100px, 0) rotateZ(0deg);
+            transform: translate3d(0, 100px, 0) rotateZ(0deg);
+
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+    
+    opacity: 0;
+}
+
+.lmlimagepicker-container.shown {
+    -webkit-transform: translate3d(0, 0, 0) rotateZ(0deg);
+       -moz-transform: translate3d(0, 0, 0) rotateZ(0deg);
+        -ms-transform: translate3d(0, 0, 0) rotateZ(0deg);
+         -o-transform: translate3d(0, 0, 0) rotateZ(0deg);
+            transform: translate3d(0, 0, 0) rotateZ(0deg);
+    
+    opacity: 1;
+}
+
+.lmlimagepicker-container h1 {
+    padding: 10px;
+    background-color: #EEE;
+    border-bottom: 1px solid #CCC;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.2);
+
+    height: 60px;
+}
+
+.lmlimagepicker-body {
+    position: absolute;
+    top: 60px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.lmlimagepicker-details {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 50px;
+    width: 320px;
+}
+
+.lmlimagepicker-list {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 50px;
+    right: 320px;
+    overflow-y: auto;
+    border-right: 1px solid #CCC;
+
+    padding: 5px;
+}
+
+.lmlimagepicker-actions {
+    position: absolute;
+    bottom:0;
+    left:0; right:0;
+    height: 50px;
+
+    border-top: 1px solid #CCC;
+
+    text-align: right;
+}
+
+.lmlimagepicker-image {
+    width: 150px;
+    height: 150px;
+
+    background-size: cover;
+    background-position: center center;
+
+    border: 1px solid #CCC;
+    margin: 5px;
+
+    display: inline-block;
+
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+}
+
+#lmlimagepicker .placeholder,
+#lmlimagepicker .placeholder-add {
+    width: 150px;
+    height: 150px;
+
+    background-color: #DDD;
+    border: 1px solid #CCC;
+
+    display: inline-block;
+    margin: 5px;
+
+    vertical-align: top;
+    padding: 59px 55px;
+    font-size: 9px;
+}
+
+#lmlimagepicker .placeholder.placeholder-add {
+    padding: 33px 55px;
+    font-size: 60px;
+    color: #BBB; 
+    cursor: pointer;
+}
+
+#lmlimagepicker .placeholder.placeholder-add:hover {
+    background-color: #9B59B6;
+    color: #FFF;
+}
+
+.lmlimagepicker-image.selected {
+    -webkit-transform: rotateZ(5deg) scale(1.05) translate3d(0,0,0);
+    -moz-transform: rotateZ(5deg) scale(1.05) translate3d(0,0,0);
+    transform: rotateZ(5deg) scale(1.05) translate3d(0,0,0);
+
+    border: 1px solid #9B59B6;
+}
+
+.lmlimagepicker-actions button {
+    display: inline-block;
+    margin-right: 8px;
+    color: #FFF;
+    border-radius: 5px;
+    font-size: 16px;
+    padding: 5px 11px;
+    font-weight: 300;
+    margin-top: 9px;
+    cursor: pointer;
+}
+
+.lmlimagepicker-actions button::before {
+    display: inline-block;
+    font: normal normal normal 16px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;   
+    margin-right: 6px;
+}
+
+.lmlimagepicker-actions button.accept {
+    background-color: #83ce71; 
+} 
+
+.lmlimagepicker-actions button.accept::before {
+    content: '\f00c';
+}
+
+.lmlimagepicker-actions button.refresh {
+    
+}
+
+.lmlimagepicker-actions button.refresh::before {
+    content: '\f021';
+}
+
+.lmlimagepicker-actions button.dismiss,
+.lmlimagepicker-actions button.remove {
+    background-color: #c15f5f;
+}
+
+.lmlimagepicker-actions button.remove::before,
+.lmlimagepicker-actions button.dismiss::before {
+    content: '\f00d';
+}
+
+.lmlimagepicker-actions button.upload {
+    background-color: #5f74c1; 
+} 
+
+.lmlimagepicker-actions button.upload::before {
+    content: '\f0ee';
+}
+
+#lmlimagepicker-file {
+    opacity: 0;
+    width: 0px;
+    height: 0px;
+    visibility: hidden;
+}
+
+.no-image-message {
+    font-size: 32px;
+    font-weight: 300;
+    color: #CCC;
+    padding-top: 100px;
+    text-align: center;
+    display: block;
+}
+
+.lmlimagepicker-details.with-details .no-image-message {
+    display: none;
+}
+
+.image-details-wrapper {
+    padding: 0px;
+
+    display: none;
+}
+
+.lmlimagepicker-details.with-details .image-details-wrapper {
+    display: block;
+}
+
+.image-details-wrapper img.image-details-bigger {
+    width: 100%;
+    height: auto;
+
+    border-bottom: 1px solid #ccc;
+}
+
+.image-details-line {
+    padding: 5px 10px;
+}
+
+.image-details-view-original {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 300;
+}

@@ -22,6 +22,8 @@ var Docs = function() {
     var registerEndpoint = function() {
         admin.registerAdminEndpoint('docs', 'GET', function(cli) {
             cli.touch('docs.GET.docs');
+            if (!cli.hasRightOrRefuse("develop")) {return;}
+
             var paths = cli.routeinfo.path;
             var isRoot = paths.length == 2;
             var rootLMLDir = _c.default().server.base + "plugins/docs/";

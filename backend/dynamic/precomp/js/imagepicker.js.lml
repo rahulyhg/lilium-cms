@@ -1,0 +1,286 @@
+{#config}
+var LMLImagePicker = function() {
+    var that = this;
+    var ePicker = document.getElementById("lmlimagepicker");
+    var listelem = document.querySelector(".lmlimagepicker-list");
+    var currentLoadIndex = -1;
+    var imgpickercache = {};
+    var currentCaller = undefined;
+    var selectedImage = undefined;
+    var state = "hidden";
+
+    this.bind = function(elem) {
+        elem.classList.add("lml-pickable");
+        elem.addEventListener('click', function() {
+            that.cast(function(img) {
+                if (img === -1) {
+                    elem.dataset.photoid = undefined;
+                    elem.dataset.photo = undefined;
+                    elem.src = "";
+                } else if (typeof img === "object") {
+                    elem.dataset.photoid = img._id;
+                    elem.dataset.photo = img;
+                    elem.src = img.sizes.thumbnail.url;
+                }
+            }, elem.dataset.photoid);
+        });
+    };
+
+    this.seek = function() {
+        $('main.lmladminmain img.pickable').not(".lml-pickable").each(function(index, elem) {
+            that.bind(elem);
+        });
+    };
+
+    this.addPlaceholder = function() {
+        var ph = document.createElement('div');
+        ph.classList.add("placeholder");
+        ph.innerHTML = '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>';
+
+        listelem.insertBefore(ph, listelem.querySelector(".lmlimagepicker-image"));
+        return ph;
+    };
+
+    this.appendImage = function(img, asFirst) {
+        var src = img.sizes.thumbnail.url;
+
+        var elem = document.createElement('div');
+        elem.classList.add("lmlimagepicker-image");
+        elem.style.backgroundImage = "url('"+src+"')";
+        elem.id = "lmlimagepicker-image-" + img._id;                
+
+        (function(id) {
+            elem.addEventListener('click', function() {
+                that.select(id);
+            });
+        })(img._id);
+
+        imgpickercache[img._id] = img;
+
+        if (asFirst) {
+            listelem.insertBefore(elem, listelem.querySelector(".lmlimagepicker-image"));
+        } else {
+            listelem.append(elem);
+        }
+    };
+
+    this.fill = function(images) {
+        if (images) {
+            for (var i = 0; i < images.length; i++) {
+                var img = images[i];
+                that.appendImage(img);
+            }
+
+            if (images.length == 50) {
+                that.addLoadMoreButton();
+            }
+        }
+    };
+
+    this.addLoadMoreButton = function() {
+        var ph = document.createElement('div');
+        ph.classList.add("placeholder");
+        ph.classList.add("placeholder-add");
+        ph.innerHTML = '<i class="fa fa-chevron-right" aria-hidden="true"></i>';
+
+        ph.addEventListener('click', function() {
+            ph.remove();
+            that.loadMore();
+        });
+
+        listelem.appendChild(ph);
+    }
+
+    this.fillWithLatests = this.refresh = function() {
+        document.querySelector(".lmlimagepicker-list").innerHTML = "";
+        currentLoadIndex = -1;
+        imgpickercache = {};
+        that.loadMore();
+    };
+
+    this.select = function(id) {
+        var img = document.getElementById("lmlimagepicker-image-" + id);
+        var sel = document.querySelector('.lmlimagepicker-image.selected');
+        if (sel) {
+            sel.classList.remove("selected")
+        }
+
+        if (selectedImage && selectedImage._id == id) {
+            selectedImage = undefined;
+            img.classList.remove('selected');
+            that.hideinfo();
+        } else {
+            img.classList.add("selected");
+            selectedImage = imgpickercache[id];
+            that.displayinfo(id);
+        }
+    };
+
+    this.hideinfo = function() {
+        ePicker.querySelector(".lmlimagepicker-details").classList.remove("with-details");
+    };
+
+    this.displayinfo = function(imgid) {
+        var imginfo = imgpickercache[imgid];
+    
+        ePicker.querySelector(".image-details-bigger").setAttribute('src', imginfo.sizes.medium.url);
+        ePicker.querySelector(".image-details-size span").innerHTML = imginfo.size.width + " x " + imginfo.size.height;
+        ePicker.querySelector(".image-details-filename span").innerHTML = imginfo.url;
+        ePicker.querySelector(".image-details-view-original a").setAttribute('href', "{=config.default.server.url}/uploads/" + imginfo.url);
+
+        ePicker.querySelector(".lmlimagepicker-details").classList.add("with-details");
+    };
+
+    this.loadMore = function() {
+        currentLoadIndex++;
+        liliumcms.livevars.getSingleLivevar('uploads', {limit:50, skip:currentLoadIndex*50}, function(lvcb) {
+            that.fill(lvcb.livevars.uploads);
+        });
+    };
+
+    this.dismiss = function() {
+        state = "transition";
+        document.body.classList.remove("block-scroll");
+        ePicker.classList.remove('shown');
+        document.querySelector("#lmlimagepicker .lmlimagepicker-container").classList.remove("shown");
+        setTimeout(function() {
+            ePicker.style.display = "none";
+            state = "hidden";
+        }, 300);
+
+        var sel = document.querySelector('.lmlimagepicker-image.selected');
+        if (sel) {
+            sel.classList.remove("selected")
+        }
+
+        return false;
+    };
+
+    this.cast = function(cb, imageid) {
+        doneCallback = cb
+        ePicker.style.display = "block";
+        state = "transition";
+        document.body.classList.add("block-scroll");
+
+        setTimeout(function() {
+            ePicker.classList.add('shown');
+
+            if (imageid) {
+                var strid = imageid.toString();
+                
+                if (imgpickercache[strid]) {
+                    selectedImage = imgpickercache[strid];
+                    that.displayinfo(strid);
+                } else {
+                    liliumcms.livevars.getSingleLivevar('uploads.single.' + strid, {}, function(resp) {
+                        var imgobj = resp.livevars["uploads.single." + strid];
+                        imgpickercache[imgobj._id] = imgobj;
+                        selectedImage = imgobj;
+        
+                        that.displayinfo(imgobj._id);
+                    });
+                }
+            } else {
+                selectedImage = undefined;
+                that.hideinfo();
+            }
+
+            setTimeout(function() {
+                document.querySelector("#lmlimagepicker .lmlimagepicker-container").classList.add("shown");
+                state = "shown";
+            }, 210);
+        }, 20);
+    };
+
+    this.accept = function() {
+        doneCallback && selectedImage && doneCallback(selectedImage);
+        that.dismiss();
+    };
+
+    this.remove = function() {
+        doneCallback && doneCallback(-1);
+        that.dismiss();
+    };
+
+    this.castUpload = function() {
+        document.getElementById("lmlimagepicker-file").click();
+    };
+
+    this.fileboxChanged = function() {
+        var fileinput = document.getElementById("lmlimagepicker-file");
+        var files = fileinput.files;
+
+        if (files.length != 0) {
+            for (var i = 0; i < files.length; i++) {
+                that.processUpload(files[i]);
+            }
+        }
+    };
+
+    this.processUpload = function(ff) {
+        var ph = that.addPlaceholder();
+        var file = ff;
+        var formData = new FormData();
+
+        if (file) {        
+            formData.append("File", file);
+            formData.append("form_name", "lmlimagepicker");
+
+            var req = new XMLHttpRequest();
+            req.open('post', '{=config.default.server.url}/admin/media/upload', true);
+
+            req.onload = function(e) {
+                var res = JSON.parse(e.target.response);
+                ph.remove();
+
+                if (res.success) {
+                    var img = res.picture;
+                    that.appendImage(img, true);
+                    that.select(img._id);
+                } else {
+                    alert("Upload failed");
+                }
+            }
+    
+            req.send(formData); 
+        }
+    };
+
+    this.enterDrag = function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+    };
+
+    this.fileDropped = function(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        var files = e.dataTransfer.files;
+
+        if (files.length != 0) {
+            for (var i = 0; i < files.length; i++) {
+                that.processUpload(files[i]);
+            }
+        }
+    };
+
+    this.init = function() {
+        document.querySelector(".lmlimagepicker-actions button.dismiss").addEventListener('click', that.dismiss);
+        document.querySelector(".lmlimagepicker-actions button.refresh").addEventListener('click', that.refresh);
+        document.querySelector(".lmlimagepicker-actions button.accept").addEventListener('click', that.accept);
+        document.querySelector(".lmlimagepicker-actions button.remove").addEventListener('click', that.remove);
+        document.querySelector(".lmlimagepicker-actions button.upload").addEventListener('click', that.castUpload);
+        document.querySelector(".lmlimagepicker-actions #lmlimagepicker-file").addEventListener('change', that.fileboxChanged);
+
+        ePicker.addEventListener('dragover', that.enterDrag);
+        ePicker.addEventListener('drop', that.fileDropped);
+
+        Mousetrap.bind(['esc', 'escape'], function() {
+            if (state == "shown") {
+                that.dismiss();
+            };
+        });
+    };
+}
+
+

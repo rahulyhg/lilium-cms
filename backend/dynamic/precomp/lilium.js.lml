@@ -42,6 +42,7 @@ var LiliumCMS = function() {
     this.adminmenu;
     this.formbeautifier;
     this.multiselect;
+    this.imagepicker;
     this.tables = new Array();
     this.lys = new Lys();
 
@@ -686,7 +687,7 @@ var LiliumCMS = function() {
             $('a').each(function(index, a) {
                 a = $(a);
                 var href = a.attr('href');
-                if (href.indexOf("#") === -1 && href.indexOf("{=config.default.server.url}") !== -1 && !a.data("replace")) {
+                if (href && href.indexOf("#") === -1 && href.indexOf("{=config.default.server.url}") !== -1 && !a.data("replace")) {
                     a.attr("href", href).on('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
@@ -710,6 +711,7 @@ var LiliumCMS = function() {
             that.formvalidator = new FormValidator();
             that.formParser = new FormParser();
             that.pageloader = new PageLoader();
+            that.imagepicker = new LMLImagePicker();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -722,6 +724,7 @@ var LiliumCMS = function() {
             that.ckeditor = typeof CKEditor !== 'undefined' ? new CKEditor() : undefined;
             that.adminmenu = new AdminMenu();
             that.formbeautifier = new FormBeautifier();
+            that.imagepicker.init();
             
             liliumcms.lys.bindKeys();
         };
@@ -793,6 +796,8 @@ document.addEventListener('livevarsRendered', function(e) {
             }
         });
 
+        liliumcms.imagepicker.seek();
+        liliumcms.imagepicker.refresh();
         liliumcms.queryparams.parseURL();
         liliumcms.ckeditor ? liliumcms.ckeditor.parseDocument() : false;
         liliumcms.formbeautifier.beautify();

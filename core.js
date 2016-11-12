@@ -221,7 +221,9 @@ var Core = function () {
 
         admin.registerAdminEndpoint('activities', 'GET', function (cli) {
             cli.touch('admin.GET.activities');
-            filelogic.serveAdminLML(cli, false);
+            if (cli.hasRightOrRefuse("entities-act")) {
+                filelogic.serveAdminLML(cli, false);
+            }
         });
 
         admin.registerAdminEndpoint('album', 'POST', function (cli) {
@@ -661,6 +663,7 @@ var Core = function () {
         sites.registerForms();
         preferences.registerForm();
         persona.registerForms();
+        devtools.registerForms();
 
         hooks.fire('forms_init');
         log('Core', 'Forms were loaded');

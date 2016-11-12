@@ -32,28 +32,28 @@ var Article = function() {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case 'new':
-                if (cli.hasRightOrRefuse("publish")) this.publish(cli, "create");
+                if (cli.hasRightOrRefuse("create-articles")) this.publish(cli, "create");
                 break;
             case 'edit':
-                if (cli.hasRightOrRefuse("publish")) this.edit(cli);
+                if (cli.hasRightOrRefuse("create-articles")) this.edit(cli);
                 break;
             case 'delete':
-                if (cli.hasRightOrRefuse("publish")) this.delete(cli);
+                if (cli.hasRightOrRefuse("publish-articles")) this.delete(cli);
                 break;
             case 'delete-autosave':
-                this.deleteAutosave(cli);
+                if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli);
                 break;
             case 'autosave':
-                this.save(cli, true);
+                if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true);
                 break;
             case 'save':
-                this.save(cli);
+                if (cli.hasRightOrRefuse("create-articles")) this.save(cli);
                 break;
             case 'preview':
-                if (cli.hasRightOrRefuse("publish")) this.publish(cli, "preview");
+                if (cli.hasRightOrRefuse("create-articles")) this.publish(cli, "preview");
                 break;
             case 'destroy':
-                if (cli.hasRightOrRefuse("destroy")) this.delete(cli, true);
+                if (cli.hasRightOrRefuse("destroy-articles")) this.delete(cli, true);
                 break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
@@ -63,17 +63,19 @@ var Article = function() {
 
     this.handleGET = function(cli) {
         cli.touch('article.handleGET');
+        if (!cli.hasRightOrRefuse("list-articles")) { return; }
+
         if (cli.routeinfo.path.length == 2) {
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
                 case 'new':
-                    cli.hasRight('publish') ?
+                    cli.hasRight('publish-articles') ?
                         filelogic.serveAdminLML(cli) :
                         cli.refuse();
                     break;
                 case 'edit':
-                    if (cli.hasRight('publish')) {
+                    if (cli.hasRight('publish-articles')) {
                         if (cli.routeinfo.path[3] && cli.routeinfo.path[3] == 'autosave') {
                             filelogic.serveAdminLML(cli, true);
                         } else {
@@ -217,7 +219,7 @@ var Article = function() {
         }
 
         var that = this;
-        if (cli.hasRight('publish')) {
+        if (cli.hasRight('publish-articles')) {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
             var oldSlug = "";
@@ -510,7 +512,7 @@ var Article = function() {
     };
 
     this.preview = function(cli) {
-        this.publich(cli, "preview");
+        this.publish(cli, "preview");
         return;
     };
 
@@ -634,7 +636,7 @@ var Article = function() {
             }, function(err, results) {
                 var result = err ? undefined : results[0];
                 if (result) {
-                    if (cli.hasRight('modify_all_articles') || result.author.toString() == cli.userinfo.userid.toString()) {
+                    if (cli.hasRight('editor') || result.author.toString() == cli.userinfo.userid.toString()) {
                         // Can delete the current article
 
                         hooks.fire('article_will_delete', id);
@@ -705,27 +707,42 @@ var Article = function() {
         livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
-                db.singleLevelFind(cli._c, 'content', callback);
+                if (cli.hasRight('editor')) {
+                    db.singleLevelFind(cli._c, 'content', callback);
+                } else {
+                    db.findToArray(cli._c, 'content', {author : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+                        callback(arr);
+                    });
+                }
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
-                db.findToArray(cli._c, 'content', {}, function(err, arr) {
-                    for (var i = 0; i < arr.length; i++) {
-                        sentArr.push({
-                            articleid: arr[i]._id,
-                            name: arr[i].name,
-                            title: arr[i].title
-                        });
-                    };
 
-                    callback(sentArr);
-                });
+                if (cli.hasRight("list-articles")) {
+                    db.findToArray(cli._c, 'content', {}, function(err, arr) {
+                        for (var i = 0; i < arr.length; i++) {
+                            sentArr.push({
+                                articleid: arr[i]._id,
+                                name: arr[i].name,
+                                title: arr[i].title
+                            });
+                        };
+    
+                        callback(sentArr);
+                    });
+                } else {
+                    callback([]);
+                }
             } else if (levels[0] == 'table') {
+                if (!cli.hasRight("list-articles")) {
+                    return callback({size:0,data:[],code:403});
+                }
+
                 var sort = {};
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (typeof params.order == "undefined" ? -1 : params.order);
                 // sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (typeof params.order == "undefined" ? -1 : params.order);
 
                 var match = [{status : {$ne : "destroyed"}}];
-                if (!cli.hasRight('edit-all-articles')) {
+                if (!cli.hasRight('editor')) {
                     match.push({author: db.mongoID(cli.userinfo.userid)});
                 }
                 if (params.search) {
@@ -786,6 +803,9 @@ var Article = function() {
                 });
 
             } else if (levels[0] == 'lastEdited') {
+                if (!cli.hasRight("list-articles")) {
+                    return callback({size:0,data:[],code:403});
+                }
 
                 db.aggregate(cli._c, 'autosave', [{
                     $lookup: {
@@ -835,6 +855,9 @@ var Article = function() {
 
                 });
             } else {
+                if (!cli.hasRight("list-articles")) {
+                    return callback({size:0,data:[],code:403});
+                }
 
                 // First, check for saved content
                 db.aggregate(cli._c, 'content', [
@@ -900,6 +923,10 @@ var Article = function() {
         }, ["publish"]);
 
         livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
+            if (cli.hasRight("list-articles")) {
+                return callback({size:0,data:[],code:403});
+            }
+
             var allTypes = levels.length === 0;
 
             if (allTypes) {

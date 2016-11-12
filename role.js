@@ -11,7 +11,7 @@ var sites = require('./sites.js');
 
 var Role = function () {
     this.handlePOST = function (cli) {
-        if (!cli.hasRight('manage-roles')) {
+        if (!cli.hasRight('edit-roles')) {
             cli.refuse();
             return;
         }
@@ -36,6 +36,11 @@ var Role = function () {
 
     this.handleGET = function (cli) {
         cli.touch('role.handleGET');
+        if (!cli.hasRight('edit-roles')) {
+            cli.refuse();
+            return;
+        }
+
         if (cli.routeinfo.path.length == 2) {
             cli.redirect(cli._c.server.url + "admin/role/list", true);
         } else {

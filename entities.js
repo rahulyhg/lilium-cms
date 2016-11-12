@@ -84,6 +84,8 @@ var Entities = module.exports = new function () {
     };
 
     this.welcome = function(cli) {
+        if (!cli.hasRightOrRefuse("login")) {return;}
+
         var dat = {
             welcomed : true,
             firstname : cli.postdata.data.firstname,
@@ -118,6 +120,7 @@ var Entities = module.exports = new function () {
 
     this.handleGET = function (cli) {
         cli.touch('entities.handleGET');
+        if (!cli.hasRightOrRefuse("list-entities")) {return;}
 
         if (cli.routeinfo.path.length == 2) {
             filelogic.serveAdminLML(cli);
@@ -130,6 +133,7 @@ var Entities = module.exports = new function () {
                 break;
 
             case "new":
+                if (!cli.hasRightOrRefuse("create-entities")) {return;}
                 this.serveNew(cli);
                 break;
 
@@ -158,7 +162,7 @@ var Entities = module.exports = new function () {
                 break;
             }
         } else if (cli.routeinfo.path[2] == 'edit') {
-            if (cli.hasRight('user_management')) {
+            if (cli.hasRight('edit-entities')) {
 
             var action = cli.postdata.data.form_name;
             switch (action) {
@@ -173,10 +177,10 @@ var Entities = module.exports = new function () {
                     break;
                 }
             } else {
-                cli.throwHTTP(401);
+                cli.refuse();
             }
         } else {
-            if (cli.hasRight('user_management')) {
+            if (cli.hasRight('edit-entities')) {
                 var action = cli.postdata.data.form_name;
 
                 switch (action) {
@@ -192,7 +196,7 @@ var Entities = module.exports = new function () {
                     cli.debug();
                 }
             } else {
-                cli.throwHTTP(401);
+                cli.refuse();
             }
         }
 
@@ -419,7 +423,7 @@ var Entities = module.exports = new function () {
     }
 
     this.update = function (cli) {
-        if (cli.hasRight('entities_management')) {
+        if (cli.hasRight('edit-entities')) {
             var entData = cli.postdata.data;
             var entity = this.initialiseBaseEntity(entData);
 
@@ -783,7 +787,7 @@ var Entities = module.exports = new function () {
             var allEntities = levels.length === 0;
 
             if (allEntities) {
-                db.findToArray(_c.default(), 'entities', cli.hasRight('list-all-entities') ? {} : {
+                db.findToArray(_c.default(), 'entities', cli.hasRight('list-entities') ? {} : {
                     _id : db.mongoID(cli.session.data._id)
                 }, function(err, arr) { 
                     callback(arr); 
@@ -817,7 +821,7 @@ var Entities = module.exports = new function () {
                 } : undefined;
                 qObj.username = queryInfo.username;
 
-                if (!cli.hasRight('list-all-entities')) {
+                if (!cli.hasRight('list-entities')) {
                     qObj._id = cli.session.data._id;
                 }
 
@@ -862,7 +866,7 @@ var Entities = module.exports = new function () {
                     });
                 }
             } else {
-                if (!cli.hasRight('list-all-entities') && levels[0] !== cli.session.data.username) {
+                if (!cli.hasRight('list-entities') && levels[0] !== cli.session.data.username) {
                     callback([]);
                 } else {
                     db.multiLevelFind(_c.default(), 'entities', levels, {

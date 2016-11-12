@@ -154,10 +154,6 @@ var LiveVariables = function() {
 
     this.registerDebugEndpoint = function() {
         log("Livevars", "Registering admin endpoint for debug");
-        require('./backend/admin.js').registerAdminEndpoint('livevars', 'GET', function(cli) {
-            cli.touch('livevars.GET');
-            require('./filelogic.js').serveAdminLML(cli);
-        });
 
         require('./formBuilder.js').createForm('debug_livevars', {
                 fieldWrapper: {
@@ -201,6 +197,9 @@ var LiveVariables = function() {
         } else {
             log('LiveVariables', new Error("[LiveVariables] Tried to register an already defined endpoint : " + endpoint));
         }
+    
+        // Possibility to chain
+        return this;
     };
 
     deletePluginLivevars = function(identifier) {
@@ -219,6 +218,9 @@ var LiveVariables = function() {
         });
     };
 
+    this.getAll = function() {
+        return Object.freeze(RegisteredLiveVariables);
+    };
 
     this.init = function() {
         loadHooks();

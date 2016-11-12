@@ -16,10 +16,14 @@ var Media = function () {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
         case 'upload':
-            this.upload(cli);
+            if (cli.hasRightOrRefuse("upload")) {
+                this.upload(cli);
+            }
             break;
         case 'delete':
-            this.delete(cli);
+            if (cli.hasRightOrRefuse("delete-upload")) {
+                this.delete(cli);
+            }
             break;
         case 'wptr':
             this.transferFromWordpress(cli);
@@ -31,22 +35,25 @@ var Media = function () {
 
     this.handleGET = function (cli) {
         cli.touch('article.handleGET');
-        switch (cli.routeinfo.path[2]) {
-        case 'upload':
-            this.upload(cli);
-            break;
-        case 'view':
-            this.view(cli);
-            break;
-        case 'getMedia':
-            this.getMedia(cli);
-            break;
-        case 'list':
-            this.list(cli);
-            break;
-        default:
-            return cli.throwHTTP(404, 'Not Found');
-            break;
+
+        if (cli.hasRightOrRefuse("list-uploads")) {
+            switch (cli.routeinfo.path[2]) {
+            case 'upload':
+                this.upload(cli);
+                break;
+            case 'view':
+                this.view(cli);
+                break;
+            case 'getMedia':
+                this.getMedia(cli);
+                break;
+            case 'list':
+                this.list(cli);
+                break;
+            default:
+                return cli.throwHTTP(404, 'Not Found');
+                break;
+            }
         }
     };
 
@@ -156,8 +163,8 @@ var Media = function () {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
 
-            if (response.success) {
-                var imagefile = formBuilder.serializeForm(form).File;
+            if (response.success || cli.postdata.data.form_name == "lmlimagepicker") {
+                var imagefile = response.success ? formBuilder.serializeForm(form).File : cli.postdata.data.File;
                 this.handleUploadedFile(cli._c, imagefile, function(err, result) {
                     if (err) {
                         cli.sendJSON({
@@ -301,9 +308,21 @@ var Media = function () {
                 var skip = params.skip || 0;
 
                 db.aggregate(cli._c, 'uploads', [
-                    {$skip : skip}, {$limit: limit}
+                    {$sort : {_id : -1}}, {$skip : skip}, {$limit: limit}
                 ], function(data) {
                     callback(data);
+                });
+            } else if (levels[0] == "single") {
+                db.find(cli._c, 'uploads', {_id : db.mongoID(levels[1])}, [], function(err, cur) {
+                    cur.hasNext(function(err, nxt) {
+                        if (nxt) {
+                            cur.next(function(err, img) {
+                                callback(img);
+                            });
+                        } else {
+                            callback({notfound: true});
+                        }
+                    });
                 });
             } else {
                 db.multiLevelFind(cli._c, 'uploads', levels, {

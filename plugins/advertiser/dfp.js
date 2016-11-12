@@ -60,7 +60,9 @@ var LiliumDFP = function () {
     that = this;
 
     this.handleDebug = function (cli) {
-        require('./filelogic.js').serveLmlPage(cli);
+        if (cli.hasRightOrRefuse("develop")) {
+            require('./filelogic.js').serveLmlPage(cli);
+        }
     };
 
     // Format : dfp.service.action (statement:DFPStatement)

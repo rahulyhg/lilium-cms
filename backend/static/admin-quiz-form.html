@@ -1,19 +1,101 @@
-<div>
-    <h3>Lilium Quiz</h3>
+<div class="lmlquiz">
+    <h2>Lilium Quiz</h2>
     <section>
-        <h2>Personalities and labels</h2>
+        <h3>Personalities and labels</h3>
+        <div class="quiz-personality-list">
+        </div>
+        <div class="">
+            <button class="quiz-add-personality">Add a personality</button>
+        </div>
+    </section>
+
+    <section>
+        <h3>Questions</h3>
         <div class="">
             <ul>
 
             </ul>
         </div>
-    </section>
-
-    <section>
-
+        <div class="">
+            <button class="quiz-add-question">Add a question</button>
+        </div>
     </section>
 </div>
 
 <script>
     $('#post-quiz-section').html("LOADED!");
 </script>
+
+<style>
+.lmlquiz h2 {
+    background-color: #EEE;
+    color: #111;
+    padding: 10px;
+    font-weight: 100;
+    border-bottom: 1px solid #DDD;
+    text-align: left;
+    font-size: 32px;
+    box-shadoow: 0px 1px 5px 0px rgba(0,0,0,0.1);
+}
+
+.lmlquiz h3 {
+    padding: 10px;
+    font-size: 20px;
+    font-weight: 300;
+}
+
+.quiz-personality-wrapper {
+    margin: 0px 10px;
+    border: 1px solid #DDD;
+    background-color: #EEE;
+    padding: 10px;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.1);
+}
+
+.quiz-personality-photo-wrapper {
+    float: left;
+    width: 150px;
+    margin-bottom: 10px;
+}
+
+.quiz-personality-details-wrapper {
+    float: left;
+    clear: right;
+    width: calc(100% - 170px);
+    margin-left: 20px;
+}
+
+.quiz-personality-remove {
+    float: none;
+    clear: both;
+    display: block;
+}
+
+.quiz-personality-image {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #EEE;
+}
+
+#post_create input[type="text"].quiz-personality-image-cred {
+    width: 148px;
+    margin-top: 5px;
+}
+
+#post_create input[type="text"].quiz-personality-name {
+    width: 100%;
+}
+
+#post_create textarea.quiz-personality-details {
+    width: 100%;
+    height: 155px;
+}
+
+.quiz-personality-actions {
+    clear: both;
+    float: none;
+    display: block;   
+    margin: -10px;
+    text-align: right;
+}
+</style>

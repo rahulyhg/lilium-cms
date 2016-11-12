@@ -49,7 +49,12 @@ ClientObject.prototype.did = function(cat, type, extra, cb) {
 ClientObject.prototype.throwHTTP = function (code, message) {
     this.responseinfo.httpcode = code;
     this.responseinfo.httpmessage = message;
-    this.debug();
+    
+    if (code >= 400 && code < 500) {
+        require('./filelogic.js').serveErrorPage(this, code);
+    } else {
+        this.debug();
+    }
 };
 
 ClientObject.prototype.debug = function () {
@@ -113,7 +118,8 @@ ClientObject.prototype.refresh = function () {
 };
 
 ClientObject.prototype.refuse = function() {
-    this.redirect("//" + this.routeinfo.rootdomain + "/admin/401?from=" + this.routeinfo.relsitepath, false);
+    // this.redirect("//" + this.routeinfo.rootdomain + "/admin/401?from=" + this.routeinfo.relsitepath, false);
+    this.throwHTTP(403);
 };
 
 ClientObject.prototype.hasRightOrRefuse = function(right) {

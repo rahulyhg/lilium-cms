@@ -1,0 +1,39 @@
+<div id="lmlimagepicker" class="shown" style="display: none;">
+    <div class="lmlimagepicker-container">
+        <h1>Image selection</h1>
+        <div class="lmlimagepicker-body">
+            <div class="lmlimagepicker-list">
+                
+            </div>
+            <div class="lmlimagepicker-details">
+                <div class="no-image-message">
+                    <div>
+                        <i class="fa fa-picture-o" aria-hidden="true"></i>
+                    </div>
+                    <span>No image selected</span>
+                </div>
+                <div class="image-details-wrapper">
+                    <img src="" class="image-details-bigger" />
+                    <div class="image-details-size image-details-line">
+                        <b>Original size : </b><span></span>
+                    </div>
+                    <div class="image-details-filename image-details-line">
+                        <b>Filename : </b><span></span>
+                    </div>
+                    <div class="image-details-view-original image-details-line">
+                        <a target="_blank">View original</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lmlimagepicker-actions">
+            <input type="file" name="lmlimagepicker-file" id="lmlimagepicker-file" multiple="multiple" />
+
+            <button class="dismiss">Dismiss</button>
+            <button class="remove">Remove image</button>
+            <button class="refresh">Refresh</button>
+            <button class="upload">Upload</button>
+            <button class="accept">Select</button>
+        </div>
+    </div>
+</div>

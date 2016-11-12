@@ -1,3 +1,4 @@
+/*
 $.ajax({
         url: "https://api.lickstats.com/v1/campaignlinks/57ddc918861cce673bfc593d/stats?terms=yo",
         beforeSend: function(xhr) {
@@ -6,3 +7,4 @@ $.ajax({
             alert(data);
         }
 })
+*/

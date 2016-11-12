@@ -19,7 +19,7 @@ var handleRequest = function(cli) {
 };
 
 var canRequest = function(cli) {
-    return cli.hasRightOrRefuse('publish');
+    return cli.hasRightOrRefuse('create-articles');
 };
 
 Embed.prototype.registerAdminEndpoint = function() {

@@ -8,6 +8,9 @@ var lickstatsCred = {
   narcitySecret : '580638ca993144835fb57133-f5d9fff3-7300-45c6-be6d-061cee8aa821'
 };
 
+var instagram = require('instagram-node').instagram();
+
+
 var jwtClient = new google.auth.JWT(
   'ganalytics@production-team-146115.iam.gserviceaccount.com',
   './ganalyticskey.pem',

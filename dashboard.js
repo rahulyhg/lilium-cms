@@ -23,7 +23,9 @@ var Dashboard = function () {
     };
 
     this.handleGET = function (cli) {
-        filelogic.serveAdminLML(cli);
+        if (cli.hasRightOrRefuse("dashboard")) {
+            filelogic.serveAdminLML(cli);
+        }
     };
 
     this.registerLMLLib = function () {
