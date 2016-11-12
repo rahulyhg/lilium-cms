@@ -10,3 +10,5 @@
 
 <!-- Lilium Admin Styles and Scripts  -->
 <link type="text/css" rel="stylesheet" href="{=config.default.server.url}/compiled/admin.css"/>
+<title>{=config.default.website.sitetitle}</title>
+<link rel="icon" type="image/png" href="{=config.default.server.url}/static/media/favicon.png" />

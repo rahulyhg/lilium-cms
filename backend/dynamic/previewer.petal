@@ -1,0 +1,19 @@
+{#config}
+<div id="lmlpreviewer">
+    <div class="lmlpreviewer-wrapper">
+        <div class="lmlpreview-tools">
+            <h1>Preview</h1>
+            <div class="lmlpreview-tools-right">
+                <i class="fa fa-refresh refresh-preview" aria-hidden="true"></i>
+                <i class="fa fa-desktop toggle-desktop" aria-hidden="true"></i>
+                <i class="fa fa-mobile toggle-mobile" aria-hidden="true"></i>
+                <i class="fa fa-arrows-alt preview-in-tab" aria-hidden="true"></i>
+                <i class="fa fa-times dismiss" aria-hidden="true"></i>
+            </div>
+        </div>
+        <div class="lmlpreview-container">
+            <iframe id="lmlpreview-frame" ></iframe>
+        </div>
+    </div>
+</div>
+

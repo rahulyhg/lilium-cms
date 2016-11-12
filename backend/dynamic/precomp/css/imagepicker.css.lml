@@ -1,6 +1,8 @@
 .lmlform img.lml-pickable, img.lml-pickable {
     border: 1px solid #EEE;
     cursor: pointer;
+
+    object-fit: cover;
 }
 
 .lmlform img.lml-pickable:hover, img.lml-pickable:hover {

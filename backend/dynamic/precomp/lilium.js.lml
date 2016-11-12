@@ -42,6 +42,7 @@ var LiliumCMS = function() {
     this.adminmenu;
     this.formbeautifier;
     this.multiselect;
+    this.previewer;
     this.imagepicker;
     this.tables = new Array();
     this.lys = new Lys();
@@ -339,6 +340,11 @@ var LiliumCMS = function() {
                             field.get(0).checked = val === true;
                         } else if (field.attr('type') == 'datetime-local') {
                             field.val(html5datetime(val));
+                        } else if (field.hasClass("media-input")) {
+                            field.val(val);
+                            
+                            var mediaimg = field.siblings("img");
+                            liliumcms.imagepicker.setImageToElement(mediaimg[0], val);
                         } else {
                             field.val(val);
                         }
@@ -662,8 +668,8 @@ var LiliumCMS = function() {
             liliumcms.livevars.exec(true);
         };
 
-        this.parseDocument = function() {
-            $('main.lmladminmain a').each(function(index, a) {
+        this.parseDocument = function(wrapper) {
+            $(wrapper || 'main.lmladminmain a').each(function(index, a) {
                 a = $(a);
                 var href = a.attr('href');
                 if (
@@ -712,6 +718,7 @@ var LiliumCMS = function() {
             that.formParser = new FormParser();
             that.pageloader = new PageLoader();
             that.imagepicker = new LMLImagePicker();
+            that.previewer = new LMLPreviewer();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -725,6 +732,7 @@ var LiliumCMS = function() {
             that.adminmenu = new AdminMenu();
             that.formbeautifier = new FormBeautifier();
             that.imagepicker.init();
+            that.previewer.init();
             
             liliumcms.lys.bindKeys();
         };

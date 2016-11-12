@@ -5,6 +5,7 @@
 $}
 var mediaExplorer;
 
+// DEPRECATED
 var mediaExplorer = function(closeUpload) {
     var closeOnUpload = closeUpload;
     var modal;
@@ -39,6 +40,8 @@ var mediaExplorer = function(closeUpload) {
     };
 
     this.open = function(mediaexplorerform, cb) {
+        return cb && cb();
+
         currentOpenForm = mediaexplorerform;
         loadImages();
         modal.modal('show');
@@ -122,15 +125,7 @@ var mediaExplorer = function(closeUpload) {
     }
 
     var getModal = function(cb) {
-        if (typeof modal == 'undefined') {
-            $.get('/static/media-explorer.html', function(data) {
-                if (typeof cb == 'function') {
-                    cb(data);
-                }
-            });
-        } else {
-            return modal;
-        }
+        return "";
     };
 
     var watchForSubmition = function() {
@@ -272,7 +267,7 @@ var mediaExplorer = function(closeUpload) {
 
 
 $(document).ready(function() {
-    document.addEventListener('livevarsRendered', function(e) {
+    if (false) document.addEventListener('livevarsRendered', function(e) {
         if ($('.media_explorer_form').size() > 0) {
             mediaExplorer = new mediaExplorer(true);
             mediaExplorer.init();

@@ -2,7 +2,6 @@
 <!DOCTYPE html>
 <html class="lmllogin">
 	<head>
-		<title>{=config.default.website.sitetitle} - {=vocab.logintitle}</title>
 		{%loginhead}
 	</head>
 	<body class="{=frontend.getBodyClasses("login")}" id="{=frontend.getBodyID("login")}">

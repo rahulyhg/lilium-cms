@@ -1,0 +1,50 @@
+{#config}
+var LMLPreviewer = function() {
+    var that = this;
+    var ePreview = document.getElementById("lmlpreviewer");
+    var eFrame = ePreview.querySelector('iframe');
+    var frameContent = "";
+
+    this.setContent = function(content) {
+        frameContent = content;
+        that.refresh();
+    };
+
+    this.cast = function(title, url, content) {
+        ePreview.querySelector('h1').innerHTML = title || "Preview";
+        url && that.setURL(url);
+        that.setContent(content || "");
+
+        ePreview.style.display = "block";
+    };
+
+    this.dismiss = function() {
+        ePreview.style.display = "none";
+    };
+
+    this.setMobileView = function() {
+        eFrame.classList.add("mobileview");
+    }
+
+    this.setDesktopView = function() {
+        eFrame.classList.remove("mobileview");
+    }
+
+    this.refresh = function() {
+        eFrame.contentWindow.document.open();
+        eFrame.contentWindow.document.write(frameContent || "");
+        eFrame.contentWindow.document.close();
+    };
+
+    this.openInTab = function() {
+        window.open().document.write(frameContent);
+    };
+
+    this.init = function() {
+        ePreview.querySelector('.dismiss').addEventListener('click', that.dismiss);
+        ePreview.querySelector('.preview-in-tab').addEventListener('click', that.openInTab);
+        ePreview.querySelector('.toggle-mobile').addEventListener('click', that.setMobileView);
+        ePreview.querySelector('.toggle-desktop').addEventListener('click', that.setDesktopView);
+        ePreview.querySelector('.refresh-preview').addEventListener('click', that.refresh);
+    };
+};

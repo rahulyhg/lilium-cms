@@ -1,3 +1,6 @@
 <link rel="stylesheet" href="{=config.default.server.url}/compiled/admin.css">
 <script src="{=config.default.server.url}/static/jq.js"></script>
 <script src="{=config.default.server.url}/compiled/admin.js"></script>
+
+<title>Lilium 🌺  Login</title>
+<link rel="icon" type="image/png" href="{=config.default.server.url}/static/media/favicon.png" />

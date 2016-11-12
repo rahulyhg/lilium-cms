@@ -262,8 +262,10 @@
             var textinside = btn.innerHTML;
             btn.innerHTML = "loading...";
             btn.disabled = true;
+
+            liliumcms.previewer.cast(document.querySelector("input[name=title]").value);
             $.post('{=config.default.server.url}/admin/article/preview', $('form#post_create').serialize(), function(html) {
-                window.open().document.write(html);
+                liliumcms.previewer.setContent(html);
                 btn.disabled = false;
                 btn.innerHTML = textinside;
             });

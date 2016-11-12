@@ -103,11 +103,11 @@ var Article = function() {
         filelogic.serveAdminLML(cli, false);
     };
 
-    this.deepFetch = function(conf, idOrName, cb) {
+    this.deepFetch = function(conf, idOrName, cb, preview) {
         var cond = new Object();
         cond[typeof idOrName === "string" ? "name" : "_id"] = idOrName;
 
-        db.join(conf, 'content', [
+        db.join(conf, preview ? 'preview' : 'content', [
             {
                $match : cond
             }, {
@@ -277,13 +277,8 @@ var Article = function() {
                         if (success) {
                             cli.did('content', 'published', {title : cli.postdata.data.title});
 
-                            cli.sendJSON({
-                                // redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + formData._id,
-                                success: true
-                            });
-
                             that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
-                                if (oldSlug && oldSlug != "") {
+                                if (pubCtx != "preview" && oldSlug && oldSlug != "") {
                                     db.update(cli._c, 'content', 
                                         {_id : db.mongoID(formData._id)}, 
                                         {$push : {aliases : oldSlug}}, 
@@ -297,6 +292,10 @@ var Article = function() {
                                 extra.article = deepArticle;
 
                                 if (pubCtx === "create") {
+                                    cli.sendJSON({
+                                        success: true
+                                    });
+
                                     // Generate LML page
                                     filelogic.renderThemeLML(cli, "article", deepArticle.name + '.html', extra , function(name) {
                                         cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
@@ -333,13 +332,14 @@ var Article = function() {
                                     var absPath = cli._c.server.html + "/" + tmpName;
 
                                     filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
+                                        log('Preview', 'Sending preview file before deletion : ' + absPath);
                                         var fileserver = require('./fileserver.js');
                                         fileserver.pipeFileToClient(cli, absPath, function() {
                                             fileserver.deleteFile(absPath, function() {});
                                         }, true);
                                     });
                                 }
-                            });
+                            }, pubCtx);
                         } else {
                             cli.throwHTTP(500);
                         }
@@ -1065,7 +1065,7 @@ var Article = function() {
                     'classes': ['btn', 'btn-default, btn-save']
                 }, {
                     'name' : 'preview',
-                    'displayname': 'Preview in new tab',
+                    'displayname': 'Preview',
                     'classes': ['btn', 'btn-default, btn-preview']
                 }, {
                     'name' : 'publish', 

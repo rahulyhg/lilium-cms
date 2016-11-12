@@ -271,6 +271,7 @@ var LmlTable = function(table) {
 				}
 			}
 
+            liliumcms.pageloader.parseDocument(tableContent.querySelectorAll('a'));
 		} else {
 			table.find('tbody tr').remove();
 			table.append('<tr><td class="empty" colspan="' + numberOfCols + '">There is no entries...</td></tr>');

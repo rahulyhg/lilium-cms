@@ -37,7 +37,7 @@ var CKEditor = function() {
                                             rand+
                                             '" class="ck-embed-placeholder mediaInsertPlaceholder">[Loading Instagram embed]</div>';
 
-                                        $.get('{=config.default.server.url}/admin/embed?type=instagram&url=' + vdata, function(html) {
+                                        $.get('{=config.default.server.url}/admin/embed?async=*&type=instagram&url=' + vdata, function(html) {
                                             evt.editor.document.$.querySelector('#instagramEmbed' + rand).outerHTML = html;
                                             evt.editor.document.$.querySelector('.ck-temp-spacer').outerHTML = "";
                                         });

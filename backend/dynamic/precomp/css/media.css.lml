@@ -50,12 +50,14 @@
 /* Media Explorer */
 .media_explorer_form {
     height: 200px;
+    width: 100%;
     text-align: center;
     background-color: #ccc;
     cursor: pointer;
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    object-fit: cover;
 }
 #mediaExplorerModal .modal-dialog {
     width: 618px;

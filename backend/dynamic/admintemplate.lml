@@ -11,6 +11,7 @@
         {%adminwelcome}
         {%adminbadges}
         {%imagepicker}
+        {%previewer}
         {%lys}
         <!-- Contains current page -->
 		<main class="container lmladminmain lmladmincontentwrapper">
