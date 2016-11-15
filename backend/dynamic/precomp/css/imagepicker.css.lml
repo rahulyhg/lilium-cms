@@ -14,7 +14,7 @@
     top: 0; bottom: 0; left: 0; right:0; 
 
     background-color: rgba(0,0,0,0.5);
-    z-index: 20000;
+    z-index: 25000;
 
     opacity: 0;
 
@@ -272,4 +272,14 @@
     text-align: center;
     font-size: 22px;
     font-weight: 300;
+}
+
+.image-details-line input {
+    width: 100%;
+    border: 1px solid #DDD;
+    padding: 10px;
+}
+
+.image-details-line input.invalid {
+    border: 3px solid #FF2634;
 }

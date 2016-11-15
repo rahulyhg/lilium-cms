@@ -268,7 +268,7 @@ var Article = function() {
                             formData._id = result.upsertedId._id;
                         } else if (result.modifiedCount > 0) {
                             // Updated a document
-                            formData._id = cli.postdata.data.id
+                            formData._id = cli.postdata.data.id;
                         } else {
                             // Nothing happened, failed...
                             success = false;
@@ -293,13 +293,12 @@ var Article = function() {
 
                                 if (pubCtx === "create") {
                                     cli.sendJSON({
-                                        success: true
+                                        success: true,
+                                        dbdata : deepArticle
                                     });
 
                                     // Generate LML page
                                     filelogic.renderThemeLML(cli, "article", deepArticle.name + '.html', extra , function(name) {
-                                        cacheInvalidator.addFileToWatch(name, 'articleInvalidated', formData._id, cli._c);
-        
                                         // Remove autosaves related to this article
                                         if (cli.postdata.data.autosaveid) {
                                             db.remove(
@@ -339,7 +338,7 @@ var Article = function() {
                                         }, true);
                                     });
                                 }
-                            }, pubCtx);
+                            }, pubCtx == "preview");
                         } else {
                             cli.throwHTTP(500);
                         }
@@ -621,7 +620,7 @@ var Article = function() {
                 _id: id
             }, function(err, res) {
                 return cli.sendJSON({
-                    redirect: '/admin/article/list',
+                    redirect: cli._c.server.url + '/admin/article/list',
                     success: true
                 });
             });
@@ -660,7 +659,7 @@ var Article = function() {
                                 contentid: id
                             }, function() {
                                 return cli.sendJSON({
-                                    redirect: '/admin/article/list',
+                                    redirect: cli._c.server.url + '/admin/article/list',
                                     success: true
                                 });
                             }, false);

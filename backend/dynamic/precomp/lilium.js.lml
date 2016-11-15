@@ -513,6 +513,45 @@ var LiliumCMS = function() {
                     event.returnValue = false;
                 }
             });
+
+            $("form.lml-async").bind('submit', function(ev) {
+                var cb = window[$(this).attr('name') + "_callback"] || function() {};
+                var btn = document.activeElement;
+                var loading = $('<i class="fa fa-circle-o-notch" aria-hidden="true"></i>');
+                var check = $('<i class="fa fa-check async-form-check-icon" aria-hidden="true"></i>');
+
+                $.ajax({   
+                    type: 'POST',   
+                    url: $(this).attr('action') || window.location.href,
+                    data: $(this).serialize(),
+                    success: function(a) {
+                        btn.style.display = "";
+                        $(loading).remove();
+                        $(btn).after(check);
+                        
+                        setTimeout(function() {
+                            check.addClass('shown');
+                            setTimeout(function() {
+                                check.removeClass('shown');
+                                setTimeout(function() {
+                                    check.remove();
+                                }, 200);
+                            }, 5000);
+                        }, 50);
+
+                        cb(a, $(this));
+                    },
+                    error : window[$(this).attr('name') + "_error"] || function() {},
+                    contentType: "application/json",
+                }); 
+
+                var onclick = window[$(this).attr("name") + "_submit"];
+                onclick($(this));
+
+                $(btn).after(loading);
+                btn.style.display = "none";
+                return false;
+            });
         };
 
         this.init = function() {

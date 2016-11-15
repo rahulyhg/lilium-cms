@@ -745,7 +745,8 @@ var Entities = module.exports = new function () {
             .add('Save', 'submit');
 
         formbuilder.createForm('update_profile', {
-               fieldWrapper : "lmlform-fieldwrapper"
+            fieldWrapper : "lmlform-fieldwrapper",
+            async : true
         })
             .addTemplate('entity_create')
             .addTemplate('entity_social')

@@ -24,12 +24,11 @@ div#picture-list img {
   margin: 0px !important;
 }
 
-.cke_maximized {
-    z-index: 999999 !important;
-}
-
 #image-upload.cke_dialog_ui_html input[type="submit"],
 #image-upload.cke_dialog_ui_html .field-submit {
     display: none;
 }
 
+body .cke_maximized {
+    z-index: 21000 !important;
+}

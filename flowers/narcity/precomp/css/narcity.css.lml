@@ -965,7 +965,8 @@ article.archive-article h3 a {
     article #article-content, 
     article .article-more-from-wrapper, 
     article .article-tags-wrapper, 
-    article .article-comments {
+    article .article-comments,
+    article .article-related-section {
         width: auto;
     }
 

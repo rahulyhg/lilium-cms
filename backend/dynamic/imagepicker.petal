@@ -14,6 +14,13 @@
                 </div>
                 <div class="image-details-wrapper">
                     <img src="" class="image-details-bigger" />
+                    <div class="image-details-artist image-details-line">
+                        <input class="image-details-artist-input mousetrap" placeholder="Artist Name" />
+                    </div>
+                    <div class="image-details-artist-url image-details-line">
+                        <input class="image-details-artist-url-input mousetrap" placeholder="Link to original image" />
+                    </div>
+
                     <div class="image-details-size image-details-line">
                         <b>Original size : </b><span></span>
                     </div>

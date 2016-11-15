@@ -101,6 +101,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "bower_components/jquery.clickout/jquery.clickout.js", 1250, "admin", conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/badges.js", 2130, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/preview.js", 2150, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/pushtable.js", 2200, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/imagepicker.js", 2220, 'admin', conf.id);
@@ -124,6 +125,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/badges.css", 2105, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/preview.css", 2110, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lys.css", 2120, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/imagepicker.css", 2150, 'admin', conf.id);

@@ -45,7 +45,7 @@ var LiliumChartbeat = function($) {
 		});
 		gauge.setTextField(document.getElementById("chartbeat-live-count"));
 		gauge.maxValue = 3000; 
-		gauge.animationSpeed = 62;
+		gauge.animationSpeed = 100;
 		gauge.set(0);
 	};
 

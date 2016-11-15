@@ -236,14 +236,15 @@ var Chartbeat = function() {
             scheduler.remove(scheduleFetchID + conf.id);
             scheduler.schedule(scheduleFetchID + conf.id, {
                 every: {
-                    secondCount: 5
+                    secondCount: 6
                 }
             }, function() {
-                request(qsurl, function(err, resp, body) {
+                var t = new Date();
+                request.get(qsurl, {timeout:250}, function(err, resp, body) {
                     storeQuickstats(conf, err, resp, body);
                 });
 
-                request(tpurl, function(err, resp, body) {
+                request.get(tpurl, {timeout:250}, function(err, resp, body) {
                     storeToppages(conf, err, resp, body);
                 });
             }).start();

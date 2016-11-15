@@ -1,0 +1,66 @@
+{#config;extra}
+var levels = [
+    "green", "bronze", "silver", "gold", 
+    "platinum", "diamond", "rainbow", "master"
+];
+
+window.receiveBadge = function(title, message, icon, level) {
+    var modal = $('#badge-modal');
+    modal.find('h4').html(title);
+    modal.find('.modal-body p').html(message);
+    modal.find('.acquired-badge').removeClass(levels.join(' ')).addClass(levels[level]).html("&#x"+icon+";");
+    
+    modal.modal('show');
+};
+
+$(function() {
+    $('#badge-modal button.btn-primary').bind('click', function() {
+        $('#badge-modal').modal('hide');
+    });
+});
+
+var LiliumBadges = function() {
+    var that = this;
+    var current;
+    var sidebarContainer = document.querySelector('.lmladminsidebadges');
+    var bCache = {};
+
+    this.addSideBadge = function(type, level) {
+        var hBadge = document.createElement('div');
+        var hBadgeImage = document.createElement('i');
+        
+        hBadgeImage.innerHTML = ("&#x" + bCache[type].icon + ";");
+        hBadgeImage.classList.add("fa");
+
+        hBadge.classList.add("sidebadge");
+        hBadge.classList.add("sidebadge-" + levels[level]);
+        hBadge.dataset.type = type;
+        hBadge.dataset.level = level;
+        hBadge.dataset.levelname = levels[levels];
+
+        hBadge.appendChild(hBadgeImage);
+        sidebarContainer.appendChild(hBadge);
+    };
+
+    this.fillSidebar = function() {
+        var bdgs = liliumcms.livevars.retrieveVar('session').badges;
+        var current = bdgs;
+        var total = 0;
+
+        for (var index in bdgs) {
+            that.addSideBadge(index, bdgs[index]);
+            total++;
+        }
+
+        var badgeboxHeight = Math.floor((total-1) / 6) * 35 + 35;
+        sidebarContainer.style.height = badgeboxHeight + "px";        
+    };
+
+    this.createCache = function() {
+        var arr = liliumcms.livevars.retrieveVar('badges.user');
+        for (var i = 0; i < arr.length; i++) {
+            bCache[arr[i].code] = arr[i];
+        }
+    };
+};
+

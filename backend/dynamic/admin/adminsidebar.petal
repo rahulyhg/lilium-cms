@@ -22,7 +22,6 @@
 			<lml:tobject data-nodetype="span" data-key="displayname"></lml:tobject>
 		</lml:tobject>
         <lml:tobject data-nodetype="ul" data-key="children" data-template="sub-menu" data-target="this"></lml:tobject>
-
 	</li>
 </lml:template>
 

@@ -1,5 +1,8 @@
 {#config;session;vocab;forms}
 <h1>My Profile</h1>
+<div class="profile-form">
+    
+</div>
 {*me(sourceof:"update_profile")}
 {=forms.render('update_profile')}
 {=forms.render('update_password')}
@@ -11,3 +14,13 @@
     </div>
 </div>
 {%mediascript}
+
+<script>
+    window.update_profile_submit = function() {
+        console.log('updating...');
+    };
+
+    window.update_profile_callback = function() {
+        console.log('updated');
+    };
+</script>

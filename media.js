@@ -20,6 +20,11 @@ var Media = function () {
                 this.upload(cli);
             }
             break;
+        case 'updatecredit':
+            if (cli.hasRightOrRefuse("upload")) {
+                this.updatecredit(cli);
+            }
+            break;
         case 'delete':
             if (cli.hasRightOrRefuse("delete-upload")) {
                 this.delete(cli);
@@ -75,8 +80,18 @@ var Media = function () {
                 }
             });
         });
+    };
 
-    }
+    this.updatecredit = function(cli) {
+        db.update(cli._c, 'uploads', {_id : db.mongoID(cli.postdata.data.id)}, {
+            artistname : cli.postdata.data.name,
+            artisturl : cli.postdata.data.url
+        }, function(res) {
+            cli.sendJSON({
+                "success" : true
+            });
+        });
+    };
 
     // cli is clientObject
     // filepathOrURL is absolute path of file, or URL to download file

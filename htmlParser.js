@@ -32,7 +32,7 @@ var HtmlParser = function () {
         }
 
         if (form.attr.validate) {
-            htmlForm += 'class="v_form_validate lmlform ' + (form.attr.cssClass || "") + '" ';
+            htmlForm += 'class="v_form_validate lmlform ' + (form.attr.cssClass || "") +  (form.attr.async ? " lml-async" : "") +'" ';
         }
 
         // Name

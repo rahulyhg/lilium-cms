@@ -8,6 +8,7 @@ var LMLImagePicker = function() {
     var currentCaller = undefined;
     var selectedImage = undefined;
     var state = "hidden";
+    var sessionInfo = {};
 
     this.bind = function(elem) {
         elem.classList.add("lml-pickable");
@@ -158,6 +159,8 @@ var LMLImagePicker = function() {
         ePicker.querySelector(".image-details-size span").innerHTML = imginfo.size.width + " x " + imginfo.size.height;
         ePicker.querySelector(".image-details-filename span").innerHTML = imginfo.url;
         ePicker.querySelector(".image-details-view-original a").setAttribute('href', "{=config.default.server.url}/uploads/" + imginfo.url);
+        ePicker.querySelector(".image-details-artist-input").value = imginfo.artistname || "";
+        ePicker.querySelector(".image-details-artist-url-input").value = imginfo.artisturl || "";
 
         ePicker.querySelector(".lmlimagepicker-details").classList.add("with-details");
     };
@@ -183,15 +186,39 @@ var LMLImagePicker = function() {
         if (sel) {
             sel.classList.remove("selected")
         }
+    
+        ePicker.querySelector(".image-details-artist-input").classList.remove("invalid");
+        ePicker.querySelector(".image-details-artist-url-input").classList.remove("invalid");
 
         return false;
     };
 
-    this.cast = function(cb, imageid) {
+    this.setCredits = function(name, url) {
+        if (selectedImage) {
+            selectedImage.artistname = ePicker.querySelector(".image-details-artist-input").value = name;
+            selectedImage.artisturl = ePicker.querySelector(".image-details-artist-url-input").value = url;
+
+            that.saveCredits();
+        }
+    };
+
+    this.saveCredits = function() {
+        selectedImage.artistname = ePicker.querySelector(".image-details-artist-input").value;
+        selectedImage.artisturl = ePicker.querySelector(".image-details-artist-url-input").value;
+
+        $.post('{=config.default.server.url}/admin/media/updatecredit', {
+            id : selectedImage._id, 
+            name : selectedImage.artistname,
+            url : selectedImage.artisturl
+        });
+    };      
+
+    this.cast = function(cb, imageid, extra) {
         doneCallback = cb
         ePicker.style.display = "block";
         state = "transition";
         document.body.classList.add("block-scroll");
+        sessionInfo = extra || {};
 
         setTimeout(function() {
             ePicker.classList.add('shown');
@@ -224,8 +251,18 @@ var LMLImagePicker = function() {
     };
 
     this.accept = function() {
-        doneCallback && selectedImage && doneCallback(selectedImage);
-        that.dismiss();
+        if (sessionInfo.withcredit && (!selectedImage.artistname || !selectedImage.artisturl || selectedImage.artistname.trim() == "" || selectedImage.artisturl.trim() == "")) {
+            var artistname = ePicker.querySelector(".image-details-artist-input");
+            var artisturl = ePicker.querySelector(".image-details-artist-url-input");
+
+            artistname.classList[artistname.value.trim() == "" ? "add" : "remove"]("invalid");
+            artisturl.classList[artisturl.value.trim() == "" ? "add" : "remove"]("invalid");
+        } else {
+            ePicker.querySelector(".image-details-artist-input").classList.remove("invalid");
+            ePicker.querySelector(".image-details-artist-url-input").classList.remove("invalid");
+            doneCallback && selectedImage && doneCallback(selectedImage);
+            that.dismiss();
+        }
     };
 
     this.remove = function() {
@@ -302,6 +339,9 @@ var LMLImagePicker = function() {
         document.querySelector(".lmlimagepicker-actions button.remove").addEventListener('click', that.remove);
         document.querySelector(".lmlimagepicker-actions button.upload").addEventListener('click', that.castUpload);
         document.querySelector(".lmlimagepicker-actions #lmlimagepicker-file").addEventListener('change', that.fileboxChanged);
+
+        ePicker.querySelector(".image-details-artist-input").addEventListener('change', that.saveCredits)
+        ePicker.querySelector(".image-details-artist-url-input").addEventListener('change', that.saveCredits);
 
         ePicker.addEventListener('dragover', that.enterDrag);
         ePicker.addEventListener('drop', that.fileDropped);

@@ -422,6 +422,38 @@ select {
     font-family: "Open Sans", sans-serif;
     text-shadow: 0px 0px 1px rgba(0,0,0,0.2);
     letter-spacing: 0px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.lmlform .async-form-check-icon {
+    font-size: 32px;
+    vertical-align: middle;
+    color: #59b664;
+
+    -webkit-transition: 0.5s all;
+   -moz-transition: 0.5s all;
+    -ms-transition: 0.5s all;
+     -o-transition: 0.5s all;
+        transition: 0.5s all;
+
+    -webkit-transform: translate3d(-50px, 0, 0);
+   -moz-transform: translate3d(-50px, 0, 0);
+    -ms-transform: translate3d(-50px, 0, 0);
+     -o-transform: translate3d(-50px, 0, 0);
+        transform: translate3d(-50px, 0, 0);
+
+    opacity: 0;
+}
+
+.lmlform .async-form-check-icon.shown {
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+
+    opacity: 1;
 }
 
 .lmlform button.red {
