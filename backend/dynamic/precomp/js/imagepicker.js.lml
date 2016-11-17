@@ -13,6 +13,10 @@ var LMLImagePicker = function() {
     this.bind = function(elem) {
         elem.classList.add("lml-pickable");
         elem.addEventListener('click', function() {
+            if (window[elem.id + "_picker_cast"]) {
+                window[elem.id + "_picker_cast"](elem);
+            }
+
             that.cast(function(img) {
                 if (img === -1) {
                     elem.dataset.photoid = undefined;
@@ -22,7 +26,9 @@ var LMLImagePicker = function() {
                     elem.dataset.photoid = img._id;
                     elem.dataset.photo = img;
 
-                    if (elem.width > 150 || elem.height > 150) {
+                    if (elem.dataset.size) {
+                        elem.src = img.sizes[elem.dataset.size].url;
+                    } else if (elem.width > 150 || elem.height > 150) {
                         elem.src = img.sizes.thumbnailmedium.url;
                     } else {
                         elem.src = img.sizes.thumbnail.url;
@@ -37,6 +43,10 @@ var LMLImagePicker = function() {
                     if (hf.length != 0) {
                         hf[0].value = elem.dataset.photoid;
                     }
+                }
+
+                if (window[elem.id + "_image_selected"]) {
+                    window[elem.id + "_image_selected"](elem, img);
                 }
             }, elem.dataset.photoid);
         });

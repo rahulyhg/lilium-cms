@@ -584,5 +584,24 @@ var LiveVars = function() {
                 $(this).remove();
             };
         });
-    })
+    });
+
+    this.parseDataLivevars = function() {
+        var tags = document.querySelectorAll(".data-livevar");
+        for (var i = 0; i < tags.length; i++) {
+            var tt = tags[i];
+            var lvname = tt.dataset.livevar;
+            var lbobj = JSON.parse("{" + lvname + "}");
+
+            for (var attr in lbobj) {
+                var val = liliumcms.livevars.pulloutLiveVar(lbobj[attr]);
+
+                if (attr == "html") {
+                    tags[i].innerHTML = val;
+                } else {
+                    tags[i].setAttribute(attr, val);
+                }
+            }   
+        }
+    };
 };

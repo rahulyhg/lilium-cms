@@ -26,6 +26,8 @@ var LiliumBadges = function() {
     var bCache = {};
 
     this.addSideBadge = function(type, level) {
+        if (!bCache[type]) { return; }
+
         var hBadge = document.createElement('div');
         var hBadgeImage = document.createElement('i');
         

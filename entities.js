@@ -152,7 +152,7 @@ var Entities = module.exports = new function () {
                 this.updateProfile(cli);
                 break;
             case "upload_profile_picture":
-                this.updateProfilePicture(cli, true);
+                this.updateProfilePictureID(cli, true);
                 break;
             case "update_password":
                 this.changePassword(cli, true);
@@ -215,13 +215,42 @@ var Entities = module.exports = new function () {
         this.updateEntity(entity, cli._c.id, function(err, res) {
             cli.did("entity", "update");
             if (!err){
-                cli.refresh();
+                log('Entities', 'Updated entity with id ' + cli.userinfo.userid);
+                require('./session.js').reloadSession(cli, function() {
+                    cli.sendJSON({
+                        success : true
+                    });
+                });
             } else {
                 log('[Database] error while updating entity : ' + err);
                 cli.throwHTTP(500);
             }
         });
 
+    };
+
+    this.updateProfilePictureID = function(cli, selff) {
+        var imgid = cli.postdata.data.imageid;
+        var imgurl = cli.postdata.data.imageurl;
+
+        if (imgid && imgurl) {
+            db.update(cli._c, "entities", {_id : db.mongoID(cli.userinfo.userid)}, {avatarURL : imgurl, avatarID : db.mongoID(imgid)}, function(err, res) {
+                cli.sendJSON({
+                    imgid : db.mongoID(imgid),
+                    imgurl : imgurl,
+                    error : err,
+                    success : !err
+                });
+            });
+        } else {
+            cli.sendJSON({
+                error : "Wrong parameters",
+                params : {
+                    imgid : imgid,
+                    imgurl : imgurl
+                }
+            });
+        }
     };
 
     this.commitProfilePic = function(cli, filename, cb) {

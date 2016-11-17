@@ -32,10 +32,10 @@ var Article = function() {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case 'new':
-                if (cli.hasRightOrRefuse("create-articles")) this.publish(cli, "create");
+                if (cli.hasRightOrRefuse("create-articles")) this.create(cli);
                 break;
             case 'edit':
-                if (cli.hasRightOrRefuse("create-articles")) this.edit(cli);
+                if (cli.hasRightOrRefuse("publish-articles")) this.publish(cli, "create");
                 break;
             case 'delete':
                 if (cli.hasRightOrRefuse("publish-articles")) this.delete(cli);
@@ -206,6 +206,27 @@ var Article = function() {
             };
 
             handleNext();
+        });
+    };
+
+    this.create = function(cli) {
+        cli.touch('article.create');
+        var articleObject = {};
+
+        articleObject.title = cli.postdata.data.title;
+        articleObject.author = db.mongoID(cli.userinfo.userid);
+        articleObject.updated = new Date();
+        articleObject.status = "draft";
+        articleObject.type = "post";
+
+        db.insert(cli._c, 'content', articleObject, function(err, result) {
+            var id = articleObject._id;
+            cli.sendJSON({
+                articleid : id,
+                editurl : cli._c.server.url + "/admin/article/edit/" + id,
+                error : err,
+                valid : !err
+            });
         });
     };
 

@@ -1,19 +1,17 @@
-{#config;session;vocab;forms}
-<h1>My Profile</h1>
-<div class="profile-form">
-    
-</div>
+{#config;forms}
+<div>
+    <form data-context="noctx" class="lmlform" name="upload_profile_picture" id="upload_profile_picture" method="POST" enctype="multipart/form-data">
+        <div class="profile-photo-form">
+            <h1 class="data-livevar" data-livevar='"html":"session.displayname"'></h1>
+            <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="medium" />
+            <h2>( This is you! )</h2>
+        </div>
+    </form>
+</div> 
+
 {*me(sourceof:"update_profile")}
 {=forms.render('update_profile')}
 {=forms.render('update_password')}
-{=forms.render('upload_profile_picture')}
-<div class="bar">
-    <div class="progress">
-      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%;">
-      </div>
-    </div>
-</div>
-{%mediascript}
 
 <script>
     window.update_profile_submit = function() {
@@ -22,5 +20,24 @@
 
     window.update_profile_callback = function() {
         console.log('updated');
+    };
+
+    window.profile_photo_image_selected = function(elem, img) {
+        var imgid = elem.dataset.photoid;
+        var imgurl = imgid ? img.sizes.medium.url : undefined;
+
+        var dat = {
+            form_name : "upload_profile_picture",
+            imageid : imgid,
+            imageurl : imgurl
+        };
+
+        $.post("{=config.default.server.url}/admin/me", dat, function() {
+
+        });
+    };
+
+    window.profile_photo_picker_cast = function(elem) {
+
     };
 </script>

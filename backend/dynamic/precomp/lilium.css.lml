@@ -327,6 +327,11 @@ select {
 	border-bottom: 1px solid #DDD;
 }
 
+.lmlform.no-back {
+    background-color: transparent;
+    border: none;
+}
+
 .lmlform select {
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -1022,6 +1027,43 @@ header.admin-bar .navbar-default .navbar-header {
  color: #fff;
 }
 
+#upload_profile_picture.lmlform {
+    border: none;
+}
+
+#upload_profile_picture .profile-photo-form {
+    padding: 20px;
+    text-align: center;
+
+    background: -webkit-repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
+    background: repeating-linear-gradient(45deg, #2f2f2f, #2f2f2f 10px, #272627 10px, #272627 20px);
+}
+
+#upload_profile_picture h1 {
+    background: none;
+    border: none;
+    color: #DDD;
+    font-size: 38px;
+    margin-bottom: 10px;
+    font-weight: 300;
+}
+
+#upload_profile_picture #profile_photo {
+    width: 250px;
+    height: 250px;
+    border-radius: 250px;
+    border-width: 5px;
+
+    box-shadow: 0px 0px 100px 10px rgba(255, 255, 255, 0.08);
+}
+
+#upload_profile_picture h2 {
+    color: #777;
+    font-weight: 500;
+    margin-top: 20px;
+    font-size: 26px;
+}
+
 header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
 	-webkit-border-radius: 3px;
    	   -moz-border-radius: 3px;
@@ -1508,10 +1550,75 @@ input[disabled] {
     color: #FFF;
 }
 
-#post_create input[type="text"].article_base_title {
+.publish-new-title {
+    padding: 50px;
+    text-align: center;
+    background-color: #333;
+    color: #EEE;
+    font-weight: 300;
+    font-size: 34px;
+
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    
+    z-index: 25000;
+    overflow-y: auto;
+}
+
+.publish-new-title .fa {
+    font-size: 160px;
+    margin: 40px auto 50px;
+    display: block;
+    color: #555;
+}
+
+.publish-new-title small {    
+    display: block;
+    color: #777;
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.publish-new-title input {
+    margin-bottom: 20px;
+}
+
+button.bigger {
+    font-size: 20px;
+    padding: 12px 50px;
+    display: block;
+    margin: auto;
+}
+
+.post-create-back {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #9B59B6;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.post-create-back .fa {
+    font-size: 16px;
+    display: inline-block;
+    color: #9B59B6
+}
+
+
+#post_create input[type="text"].article_base_title,
+#post_create_new input[name="title"] {
     font-family: 'Oswald', Times New Roman, Arial, sans-serif;
     font-size: 32px;
     width: 100%;
+    color: #111;
+}
+
+#post_create_new input[name="title"] {
+    max-width: 900px;
+    margin: 20px auto;
 }
 
 #post_create input[type="text"].article_base_subtitle {
@@ -1638,6 +1745,31 @@ input[disabled] {
     -webkit-animation: drop 4s linear 2s infinite;
     -moz-animation: drop 4s linear 2s infinite;
     animation: drop 4s linear 0s infinite;
+}
+
+.init-anim {
+    opacity: 0;
+    -webkit-transition: 0.5s all;
+   -moz-transition: 0.5s all;
+    -ms-transition: 0.5s all;
+     -o-transition: 0.5s all;
+        transition: 0.5s all;
+
+    -webkit-transform: translate3d(0px, 100px, 0px);
+   -moz-transform: translate3d(0px, 100px, 0px);
+    -ms-transform: translate3d(0px, 100px, 0px);
+     -o-transform: translate3d(0px, 100px, 0px);
+        transform: translate3d(0px, 100px, 0px);
+}
+
+.init-anim.anim-slid {
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+
+    opacity: 1;
 }
 
 @-webkit-keyframes slowfloat {

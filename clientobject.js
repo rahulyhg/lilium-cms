@@ -46,6 +46,10 @@ ClientObject.prototype.did = function(cat, type, extra, cb) {
     events.register(this._c, cat, type, this.userinfo.user, extra, cb);
 };
 
+ClientObject.prototype.reloadSession = function(cb) {
+    require('./session.js').reloadSession(this, cb);
+};
+
 ClientObject.prototype.throwHTTP = function (code, message) {
     this.responseinfo.httpcode = code;
     this.responseinfo.httpmessage = message;

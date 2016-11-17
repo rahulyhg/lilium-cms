@@ -57,7 +57,7 @@ var TableBuilder = function () {
             html += '<option value="' + pages[i] + '" ' + (typeof table.max_results !== 'undefined' && table.max_results == pages[i] ? 'selected' : '') + '>' + pages[i] + '</option>';
         }
         html += '</select> entries</div>';
-        html += '<div class="search pull-right"><label>Search : </label><input type="text" name="search-table"></div>';
+        html += '<div class="search pull-right"><label>Search : </label><input type="text" name="search-table" class="search-table"></div>';
         html += '</div>';
         html += '<table class="lmltablebuilder lmlfullwidthtable" id=' + table.name + ' data-endpoint="' + table.endpoint + '" data-max="' + (table.max_results || 20) + '" data-page="1" data-sort-order="'+sortOrder+'" data-sortby="' + sortbyKey + '">';
         html += '<thead>';

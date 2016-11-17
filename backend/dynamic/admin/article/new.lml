@@ -1,5 +1,27 @@
-{#config;session;vocab;forms}
-{%../articlescript}
-<h1>Publish a new post</h1>
-{=forms.render('post_create')}
-<div id="editor"></div>
+{#config}
+<div class="publish-new-title">
+    <span class="init-anim">Publish a new post</span>
+    <small class="subtitle init-anim">Give it some love.</small>
+    <i class="fa fa-paper-plane init-anim" aria-hidden="true"></i>
+
+    <form data-context="noctx" class="v_form_validate lmlform lml-async no-back no-check" name="post_create_new" id="post_create_new" method="POST" >
+        <input type="text" name="title" placeholder="Post title" class="init-anim" />
+        <button class="bigger init-anim">Create new post</button>
+        <a href="javascript:liliumcms.pageloader.back();" class="post-create-back init-anim async">
+            <i class="fa fa-chevron-left" aria-hidden="true"></i>
+            Discard
+        </a>
+    </form>
+</div>
+
+<script>
+    window.post_create_new_submit = function() {
+        liliumcms.animator.finish(50);
+    };
+
+    window.post_create_new_callback = function(data) {
+        if (data.valid) {
+            liliumcms.pageloader.load(data.editurl);
+        }
+    }; 
+</script>

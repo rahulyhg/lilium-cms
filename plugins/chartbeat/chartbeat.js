@@ -189,6 +189,7 @@ var Chartbeat = function() {
             }
         } else {
             log('Chartbeat', 'Network error : ' + err);
+            return err;
         }
     };
 
@@ -218,6 +219,7 @@ var Chartbeat = function() {
             }
         } else {
             log("Chartbeat", "Network error : " + err);
+            return err;
         }
     };
 
@@ -233,21 +235,36 @@ var Chartbeat = function() {
                 .replace("{host}", conf.chartbeat.host)
                 .replace("{section}", conf.chartbeat.section);
 
-            scheduler.remove(scheduleFetchID + conf.id);
-            scheduler.schedule(scheduleFetchID + conf.id, {
-                every: {
-                    secondCount: 6
-                }
-            }, function() {
+            var scCall = function() {
                 var t = new Date();
                 request.get(qsurl, {timeout:250}, function(err, resp, body) {
                     storeQuickstats(conf, err, resp, body);
+
+                    if (err) {
+                        scheduler.remove(scheduleFetchID + conf.id);
+                        setTimeout(function() {
+                            /*
+                            scheduler.schedule(scheduleFetchID + conf.id, {
+                                every: {
+                                    secondCount: 6
+                                }
+                            }, scCall).start();
+                            */
+                        }, 10000);
+                    }
                 });
 
                 request.get(tpurl, {timeout:250}, function(err, resp, body) {
                     storeToppages(conf, err, resp, body);
                 });
-            }).start();
+            };
+
+            scheduler.remove(scheduleFetchID + conf.id);
+            scheduler.schedule(scheduleFetchID + conf.id, {
+                every: {
+                    secondCount: 6
+                }
+            }, scCall).start();
 
             request(qsurl, function(err, resp, body) {
                 storeQuickstats(conf, err, resp, body);

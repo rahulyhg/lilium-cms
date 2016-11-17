@@ -277,7 +277,7 @@ var DB = function() {
 
 	this.createIndex = function(conf, coln, fields, cb) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
-			col.createIndex(fields, null).then(function(err, results) {
+			col.createIndex(fields, {}, function(err, results) {
 				cb(err, results);
 			});
 		});

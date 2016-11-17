@@ -61,6 +61,10 @@ var _c = require('./config.js').default(),
             */
         };
 
+        this.getServer = function() {
+            return server;
+        };
+
         this.getRequestHandlesCount = function () {
             return reqCount;
         };

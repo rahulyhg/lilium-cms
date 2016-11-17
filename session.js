@@ -12,6 +12,17 @@ var UserSesh = function (token) {
 };
 
 var Sessions = function () {
+    var that = this;
+
+    var getFormattedPath = function(cli) {
+        var url = cli._c.server.url + "/";
+        var indx = url.indexOf('/', 2);
+        var domain = url.substring(2, indx);
+
+        var str = "Domain=" + domain;
+        return "Path=/";
+    };
+
     this.createToken = function (prefix) {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
@@ -23,8 +34,8 @@ var Sessions = function () {
             s4() + s4() + s4() + s4();
     };
 
-    this.createSession = function () {
-        var token = this.createToken(new Date().getTime());
+    this.createSession = function (tkn) {
+        var token = tkn || this.createToken(new Date().getTime());
         var newSesh = new UserSesh(token);
         return newSesh;
     };
@@ -32,13 +43,13 @@ var Sessions = function () {
     this.logout = function (cli) {
         this.removeSession(cli, function () {
             cli.did('auth', 'logout');
-            cli.response.setHeader('Set-Cookie', 'lmlsid=""');
+            cli.response.setHeader('Set-Cookie', 'lmlsid=""; ' + getFormattedPath(cli));
             cli.redirect(cli._c.server.url + '/admin');
         })
     }
 
     this.setCookieToCli = function (cli) {
-        cli.response.setHeader('Set-Cookie', 'lmlsid=' + cli.session.token);
+        cli.response.setHeader('Set-Cookie', 'lmlsid=' + cli.session.token + ';' + getFormattedPath(cli));
     };
 
     var seshToUserInfo = function(cli) {
@@ -60,6 +71,7 @@ var Sessions = function () {
     this.injectSessionInCli = function (cli, cb) {
         var ids = cli.cookies.lmlsid;
         var injected = false;
+
         if (typeof ids !== 'object') {
             ids = [ids || ""];
         }
@@ -98,7 +110,18 @@ var Sessions = function () {
         }
     };
 
-    this.createSessionInCli = function (cli, userObj) {
+    this.reloadSession = function(cli, cb) {
+        log('Session', 'Reloading session for token ' + cli.userinfo.userid);
+        db.findToArray(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+            log('Session', 'Removing session from client object');
+            that.removeSession(cli, function() {
+                log('Session', 'Recreating session');
+                that.createSessionInCli(cli, arr[0], cb);
+            });
+        });
+    };
+
+    this.createSessionInCli = function (cli, userObj, cb) {
         cli.session = this.createSession();
         _sesh[cli.session.token] = cli.session;
         cli.session.loggedin = true;
@@ -133,6 +156,7 @@ var Sessions = function () {
         });
 
         this.setCookieToCli(cli);
+        cb && cb();
     };
 
     this.removeSession = function (cli, callback) {
@@ -142,9 +166,7 @@ var Sessions = function () {
             token: cli.session.token
         }, function () {
             // Remove from memory
-            _sesh[cli.session.token] = undefined;
             delete _sesh[cli.session.token];
-
             callback();
         });
     }

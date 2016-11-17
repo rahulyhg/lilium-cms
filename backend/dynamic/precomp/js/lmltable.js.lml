@@ -8,6 +8,7 @@ var LmlTable = function(table) {
 	var keys = new Array();
 	var numberOfCols = table.find('thead th').size();
 	var cachedData = {};
+    var currentFilter = "";
 
 	var timeInitial;
 	var timeRendering;
@@ -30,18 +31,16 @@ var LmlTable = function(table) {
 			updateTable();
 		});
 
-		table.parent().find('.header input').keydown(function(e) {
-			var code = (e.keyCode ? e.keyCode : e.which);
-			if (code == 13) {
-
-				var input = table.parent().find('.header input');
-				if ($(input).val() !== '') {
-					updateTable(undefined, true, $(input).val());
-				} else {
-					updateTable();
-				}
-			}
-		});
+        table.parent().on('keyup', '.search-table', function() {
+            if (currentFilter != $(this).val().trim()) {
+                currentFilter = $(this).val().trim();
+                if (currentFilter && currentFilter.length > 3) {
+			        updateTable(undefined, true, currentFilter);
+                } else {
+                    updateTable(undefined, false, "");
+                }
+            }
+        });
 
 		table.on('click', 'th[sortable]', function() {
 			if (typeof $(this).attr('sorted') !== 'undefined') {
@@ -214,6 +213,7 @@ var LmlTable = function(table) {
 	var renderRows = function() {
 		timeRendering = new Date();
 		if (typeof currentData !== 'undefined' && currentData.size !== 0) {
+			table.find('tbody tr.lmltable-no-entry').remove();
 			// Replace rows if they exists, create them if not, remove the over
 			var rowNum = table.find('tbody tr').size();
 			// Contains every row
@@ -274,7 +274,7 @@ var LmlTable = function(table) {
             liliumcms.pageloader.parseDocument(tableContent.querySelectorAll('a'));
 		} else {
 			table.find('tbody tr').remove();
-			table.append('<tr><td class="empty" colspan="' + numberOfCols + '">There is no entries...</td></tr>');
+			table.append('<tr class="lmltable-no-entry"><td class="empty" colspan="' + numberOfCols + '">There is no entries...</td></tr>');
 		}
 
 	};

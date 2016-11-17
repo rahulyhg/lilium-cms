@@ -305,7 +305,7 @@
                     tempForm += "&currentSlug=" + currentSlug;
                 }
     
-                $.post('{=config.default.server.url}/admin/article/new', tempForm, function(data) {
+                $.post('{=config.default.server.url}/admin/article/edit', tempForm, function(data) {
                     if (data.success) {
                         lastSave = form;
                         

@@ -4,6 +4,7 @@ var filelogic = require('./filelogic.js');
 var livevars = require('./livevars.js');
 var db = require('./includes/db.js');
 var formBuilder = require('./formBuilder.js');
+var config = require('./config.js');
 
 var Preferences = function() {
 
@@ -35,14 +36,18 @@ Preferences.prototype.handlePOST = function(cli) {
 };
 
 var serveMyPreferences = function(cli, callback) {
-    callback(cli.session.data.preferences);
+    db.find(config.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, [], function(err, cur) {
+        cur.next(function(err, obj) {
+            callback(err || obj ? obj.preferences : {});
+        });
+    });
 };
 
 var savePreferences = function(cli, prefs, callback) {
     cli.session.data.preferences = prefs;
 
     cli.did('preferences', 'save', prefs);
-    db.update(cli._c, 'entities', { _id : db.mongoID(cli.session.data._id) }, {
+    db.update(config.default(), 'entities', { _id : db.mongoID(cli.session.data._id) }, {
         preferences : prefs
     }, callback, false, true);
 };

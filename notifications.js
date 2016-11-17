@@ -286,6 +286,11 @@ var Notification = function () {
         log('Notifications', 'Creating site groups');
         _c.eachSync(function (conf) {
             that.createGroup('lmlsite_' + conf.id);
+            var url = conf.server.url + "/";
+            var path = url.substring(url.indexOf('/', 2));
+            path = path == "/" ? path : path.substring(0, path.length-1);
+            log('Socket', 'Created connection for channel : ' + path);
+            io.of(path).on('connection', onSocketConnection);
         });
 
         hooks.bind('site_initialized', 3000, function (conf) {
@@ -294,7 +299,6 @@ var Notification = function () {
 
         that.createGroup('spy');
 
-        io.on('connection', onSocketConnection);
         log('Notifications', 'Sockets ready');
     };
 
@@ -612,6 +616,10 @@ var Notification = function () {
 
     this.broadcast = function (data, msgType) {
         io.sockets.emit(msgType || 'message', data);
+    };
+
+    this.getAvailableGroups = function() {
+        return groups;
     };
 
     this.createGroup = function (groupName, role, site) {

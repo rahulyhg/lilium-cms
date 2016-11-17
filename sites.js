@@ -73,7 +73,17 @@ var SiteInitializer = function (conf, siteobj) {
             log('Database', 'Requesting dynamic connection object');
             db.createPool(conf, function () {
                 log('Database', 'Firing Database connection signal');
-                done();
+                createIndices();
+            });
+        };
+
+        var createIndices = function() {
+            log('Database', 'Creating indices');
+            db.createIndex(conf, "content", {title : 'text', content : 'text', subtitle : 'text'}, function() {
+                db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
+                    log('Database', 'Created indices');
+                    done();
+                });
             });
         };
 

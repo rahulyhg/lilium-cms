@@ -18,11 +18,17 @@
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
 {#config}
+window.location.urlBase = "{=config.default.server.url}/";
+var __indx = window.location.urlBase.indexOf('/', 2);
+window.location.lmldomain = window.location.urlBase.substring(2, __indx); 
+window.location.lmlpath = window.location.urlBase.substring(__indx);
+
 var debugMode = 'true';
-var socket = typeof io !== 'undefined' ? io() : undefined;
+var socket = typeof io !== 'undefined' ? io("{=config.default.server.url}", {
+    transports : ['websocket']
+}) : undefined;
 window.lmlsocket = socket;
 
-window.location.urlBase = "{=config.default.server.url}/";
 
 var LiliumCMS = function() {
     var livevarsResponse;
@@ -518,17 +524,16 @@ var LiliumCMS = function() {
                 var cb = window[$(this).attr('name') + "_callback"] || function() {};
                 var btn = document.activeElement;
                 var loading = $('<i class="fa fa-circle-o-notch" aria-hidden="true"></i>');
-                var check = $('<i class="fa fa-check async-form-check-icon" aria-hidden="true"></i>');
+                var hasCheck = !$(this).hasClass("no-check");
 
-                $.ajax({   
-                    type: 'POST',   
-                    url: $(this).attr('action') || window.location.href,
-                    data: $(this).serialize(),
-                    success: function(a) {
+                var check = hasCheck ? $('<i class="fa fa-check async-form-check-icon" aria-hidden="true"></i>') : "";
+
+                $.post($(this).attr('action') || window.location.href, $(this).serialize(), function(a) {
+                    if (hasCheck) {
                         btn.style.display = "";
                         $(loading).remove();
                         $(btn).after(check);
-                        
+                    
                         setTimeout(function() {
                             check.addClass('shown');
                             setTimeout(function() {
@@ -538,18 +543,19 @@ var LiliumCMS = function() {
                                 }, 200);
                             }, 5000);
                         }, 50);
+                    }
 
-                        cb(a, $(this));
-                    },
-                    error : window[$(this).attr('name') + "_error"] || function() {},
-                    contentType: "application/json",
+                    cb(a, $(this));
                 }); 
 
                 var onclick = window[$(this).attr("name") + "_submit"];
                 onclick($(this));
 
-                $(btn).after(loading);
-                btn.style.display = "none";
+                if (hasCheck) {
+                    $(btn).after(loading);
+                    btn.style.display = "none";
+                }
+
                 return false;
             });
         };
@@ -684,6 +690,10 @@ var LiliumCMS = function() {
             window.history.pushState(null, null, url);
         };
 
+        this.back = function() {
+            window.history.back();
+        };
+
         this.load = function(url, ignoreHistory) {
             this.tidy();
             if (!ignoreHistory) {
@@ -744,6 +754,43 @@ var LiliumCMS = function() {
         };
     };
 
+    var Animator = function() {
+        var that = this;
+        this.slide = function() {
+            var sliders = document.querySelectorAll(".init-anim");
+            var delay = 200;
+
+            for (var i = 0; i < sliders.length; i++) {
+                (function(i) {
+                    setTimeout(function() {
+                        sliders[i].classList.add("anim-slid");
+                    }, delay * i);
+                })(i);
+            }
+        };
+
+        this.unslide = function(ddelay) {
+            var sliders = document.querySelectorAll(".anim-slid");
+            var delay = ddelay || 200;
+
+            for (var i = sliders.length; i >= 0; i--) {
+                (function(i) {
+                    setTimeout(function() {
+                        sliders[i] && sliders[i].classList.remove("anim-slid");
+                    }, delay * i);
+                })(i);
+            }
+        };
+
+        this.present = function() {
+            this.slide();
+        };  
+
+        this.finish = function(delay) {
+            this.unslide(delay);
+        };
+    };
+
     this.everythingIsAwesome = function() {
         $('.dropdown-menu #avatar img').attr('src', that.livevars.livevars().session.avatarURL);
         $('body').addClass('lmlrendered');
@@ -758,6 +805,7 @@ var LiliumCMS = function() {
             that.pageloader = new PageLoader();
             that.imagepicker = new LMLImagePicker();
             that.previewer = new LMLPreviewer();
+            that.animator = new Animator();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -850,6 +898,8 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.formbeautifier.beautify();
         liliumcms.formParser.init();
         liliumcms.pageloader.parseDocument();
+        liliumcms.livevars.parseDataLivevars();
         liliumcms.pageloader.present();
+        liliumcms.animator.present();
     }
 });
