@@ -1,0 +1,220 @@
+#chat-slider {
+    width: 320px;
+    position: fixed;
+    top: 50px;
+    bottom: 0;
+    right: 0px;
+
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+
+    
+    -webkit-transform: translate3d(320px, 0, 0);
+       -moz-transform: translate3d(320px, 0, 0);
+        -ms-transform: translate3d(320px, 0, 0);
+         -o-transform: translate3d(320px, 0, 0);
+            transform: translate3d(320px, 0, 0);
+
+    background-color: #404040;
+    color: #FFF;
+
+    z-index: 200;
+    overflow-y : auto;
+
+    border-right: 1px solid #444;
+    box-shadow: 3px 0px 0px rgba(0,0,0,0.08);
+}
+
+#chat-slider.left {
+    -webkit-transform: translate3d(0, 0, 0);
+       -moz-transform: translate3d(0, 0, 0);
+        -ms-transform: translate3d(0, 0, 0);
+         -o-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+}
+
+#chat-slider.lefter {
+    right: calc(100% - 320px);
+}
+
+.chat-slider-title {
+    display: block;
+    color: #EEE;
+    padding: 10px 16px;
+    font-size: 26px;
+    font-weight: 300;
+    background-color: #333;
+
+    position: relative;
+}
+
+.fa.fa-fam {
+    bottom: -20px;
+    position: absolute;
+    right: 20px;
+    background-color: #FFF;
+    height: 40px;
+    width: 40px;
+    padding: 11px 12px;
+    font-size: 20px;
+    border-radius: 25px;
+
+    cursor: pointer;
+    background-color: #9B59B6;
+}
+
+.fa.fa-fam:hover {
+    background-color: #AB69C6;
+}
+
+span.chat-slider-subtitle {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-bottom: 1px solid #555;
+    border-top: 1px solid #555;
+    color: #FFF;
+}
+
+#chat-slider ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+#chat-slider li {
+    padding: 5px 8px;
+    color: #CCC;
+    font-size: 14px;
+    font-weight: 300;
+    cursor: pointer;
+}
+#chat-slider li:hover {
+    color: #F6F6F6;
+}
+#chat-slider li img {
+    width: 32px;
+    height: auto;
+    margin-right: 8px;
+    border-radius: 20px;
+}
+
+#chat-slider li i.no-avatar {
+    font-size: 30px;
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    color: #999;
+    margin-right: 8px;
+    overflow: hidden;
+    text-align: center;
+    padding: 1px;
+}
+#chat-slider #chat-list-online li {
+    font-weight: 500;
+}
+
+#chat-conversation {
+    position: fixed;
+    top: 50px;
+    bottom: 0;
+    left: 320px;
+    right: 0;
+    background-color: #333;
+    z-index: 50;
+
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+
+    -webkit-transform: translate3d(100%, 0, 0);
+       -moz-transform: translate3d(100%, 0, 0);
+        -ms-transform: translate3d(100%, 0, 0);
+         -o-transform: translate3d(100%, 0, 0);
+            transform: translate3d(100%, 0, 0);
+}
+
+#chat-conversation.lefter {
+    -webkit-transform: translate3d(0, 0, 0);
+       -moz-transform: translate3d(0, 0, 0);
+        -ms-transform: translate3d(0, 0, 0);
+         -o-transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0);
+}
+
+#chat-conversation .chat-fullname {
+    color: #FFF;
+    font-weight: 300;
+    padding: 12px 15px;
+}
+
+ul.chat-messages {
+    position: absolute;
+    top: 56px;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 10px;
+
+    overflow-y: auto;
+}
+
+.chat-input-wrapper {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 80px;
+    padding: 0px;  
+}
+
+.chat-input-wrapper textarea.chat-input {
+    width: 100%;
+    height: 100%;
+    resize: none;
+    background-color: #555;
+    color: #ddd;
+    padding: 8px 12px;
+}
+
+.chat-messages li {
+    color: #FFF;
+    background-color: #222;
+    margin: 10px 10px 0px;
+    padding: 5px 10px;
+    display: inline-block;
+    clear: both;
+    float: right;
+    border-radius: 8px;
+}
+
+.chat-messages li.sending {
+    opacity: 0.5;
+}
+
+.chat-messages li span {
+    vertical-align: middle;
+}
+
+.chat-messages li.bigger span {
+    font-size: 32px;
+}
+
+.chat-messages li.in {
+    float: left;
+    background-color: #4c1963;
+    padding: 5px 10px 5px 5px;
+}
+
+.chat-messages li.in img.sender {
+    width: 32px;
+    border-radius: 5px;
+    margin-right: 10px;
+}

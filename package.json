@@ -53,6 +53,7 @@
     "globe": "^0.3.0",
     "gm": "^1.23.0",
     "googleapis": "^2.1.7",
+    "html-entities": "^1.2.0",
     "html-minifier": "^1.2.0",
     "http": "0.0.0",
     "https": "^1.0.0",

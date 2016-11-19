@@ -1,0 +1,288 @@
+{#config}
+var LMLConversations = function() {
+    var that = this;
+    var currentConv = "";
+    var cachedusers = {};
+    var drawn = false;
+
+    var isEmoji = function(str) {
+        var ranges = [
+            '\ud83c[\udf00-\udfff]', // U+1F300 to U+1F3FF
+            '\ud83d[\udc00-\ude4f]', // U+1F400 to U+1F64F
+            '\ud83d[\ude80-\udeff]'  // U+1F680 to U+1F6FF
+        ];
+
+        var reg = new RegExp(ranges.join('|'), 'g');
+        var count = 0;
+        while (reg.exec(str)) {
+            count++;
+        }
+
+        return count*2 == str.length;
+    };
+
+    this.updateState = function(user) {
+        if (user.status == "online") {
+            document.getElementById("chat-list-online").appendChild(document.getElementById("user" + user.id));
+        } else {
+            document.getElementById("chat-list-everyone").appendChild(document.getElementById("user" + user.id));
+        }
+    };
+
+    this.initState = function() {
+        var users = liliumcms.livevars.retrieveVar("online.list");
+        var container = document.getElementById("chat-list-online");
+
+        for (var i = 0; i < users.length; i++) {
+            container.appendChild(document.getElementById("user" + users[i]));
+        }
+    };
+
+    this.clearConversation = function() {
+        document.querySelector('.chat-messages').innerHTML = "";
+    };
+
+    this.addMessage = function(msg, list) {
+        var li = document.createElement('li');
+        
+        if (msg.userid != liliumcms.livevars.retrieveVar('session')._id) {
+            li.classList.add('in');
+            
+            var avat = document.createElement('img');
+            avat.setAttribute('src', cachedusers[msg.userid].avatarURL);
+            avat.classList.add("sender");
+
+            li.appendChild(avat);
+        } else {
+            li.classList.add('out');
+        }
+
+        msg.content = msg.content.trim();
+        var cc = document.createElement('span');
+        cc.innerHTML = msg.content;
+        li.appendChild(cc);
+        li.dataset._id = msg._id;
+
+        if (li.dataset._id == '*') {
+            li.classList.add('sending');
+        }
+
+        if (isEmoji(msg.content)) {
+            li.classList.add('bigger');
+        }
+
+        list.appendChild(li);
+        list.scrollTop = list.scrollHeight;
+    };
+
+    this.maybeAddMessage = function(msg) {
+        if (drawn && currentConv == msg.conversationid) {
+            that.addMessage(msg, document.getElementById("chat-messages"));
+            return true;
+        }
+    };
+
+    this.fillConversation = function(messages) {
+        var container = document.querySelector('.chat-messages');
+        for (var i = 0; i < messages.length; i++) {
+            this.addMessage(messages[i], container);
+
+            setTimeout(function() {
+                container.scrollTop = container.scrollHeight;
+            }, 50);
+        }
+    };
+
+    this.addUser = function(user, container) {
+        var listitem = document.createElement('li');
+        var avatar = user.avatarURL ? document.createElement('img') : document.createElement('i');
+        var fullname = document.createElement('span');
+
+        if (user.avatarURL) {
+            avatar.setAttribute('src', user.avatarURL);
+        } else {
+            avatar.classList.add('fa'); 
+            avatar.classList.add('fa-user'); 
+            avatar.classList.add('no-avatar');
+            avatar.setAttribute('aria-hidden', "true");
+        }
+
+        fullname.innerHTML = user.displayname;
+
+        listitem.dataset.userid = user._id;
+        listitem.dataset.user = JSON.stringify(user);
+        listitem.dataset.status = "offline";
+
+        listitem.appendChild(avatar);
+        listitem.appendChild(fullname);
+
+        listitem.id = "user" + user._id;
+        listitem.addEventListener('click', that.showConversation);
+
+        container.appendChild(listitem);
+
+        if (user._id == liliumcms.livevars.retrieveVar('session')._id) {
+            listitem.style.display = "none";
+        }
+
+        cachedusers[user._id] = user;
+    };
+
+    this.fillChat = function() {
+        var users = liliumcms.livevars.retrieveVar("entities.chat");
+        var container = document.getElementById("chat-list-everyone");
+
+        for (var i = 0; i < users.length; i++) {
+            this.addUser(users[i], container);
+        }
+
+        this.initState();
+    };
+
+    this.toggleChat = function() {
+        document.getElementById("chat-slider").classList.toggle('left');
+        document.querySelector('main.lmladminmain').classList.toggle('left');
+        document.querySelector('.lmladminsidebar').classList.toggle('left');
+
+        document.getElementById("chat-slider").classList.remove('lefter');
+        document.querySelector('main.lmladminmain').classList.remove('lefter');
+        document.querySelector('.lmladminsidebar').classList.remove('lefter');
+        document.getElementById('chat-conversation').classList.remove('lefter');
+
+        drawn = false;
+    };
+
+    this.closeChat = function() {
+        document.getElementById("chat-slider").classList.remove('left');
+        document.querySelector('main.lmladminmain').classList.remove('left');
+        document.querySelector('.lmladminsidebar').classList.remove('left');
+
+        document.getElementById("chat-slider").classList.remove('lefter');
+        document.querySelector('main.lmladminmain').classList.remove('lefter');
+        document.querySelector('.lmladminsidebar').classList.remove('lefter');
+        document.getElementById('chat-conversation').classList.remove('lefter');
+    };
+
+    this.toggleConversation = function() {
+        document.getElementById("chat-slider").classList.toggle('lefter');
+        document.querySelector('main.lmladminmain').classList.toggle('lefter');
+        document.querySelector('.lmladminsidebar').classList.toggle('lefter');
+        document.getElementById('chat-conversation').classList.toggle('lefter');
+
+    };
+
+    this.showConversation = function(e, user) {
+        drawn = true;
+
+        if (!user) {
+            var li = e.target;
+            while (li.nodeName != "LI") {
+                li = li.parentElement;
+            }
+            user = JSON.parse(li.dataset.user);
+        }
+
+        document.querySelector('.chat-fullname').innerHTML = user.displayname;
+
+        document.getElementById("chat-slider").classList.add('left');
+        document.querySelector('main.lmladminmain').classList.add('left');
+        document.querySelector('.lmladminsidebar').classList.add('left');
+        document.getElementById("chat-slider").classList.add('lefter');
+        document.querySelector('main.lmladminmain').classList.add('lefter');
+        document.querySelector('.lmladminsidebar').classList.add('lefter');
+        document.getElementById('chat-conversation').classList.add('lefter');
+
+        $.get('{=config.default.server.url}/admin/conversations/find?type=private&orcreate=1&async=*&with=' + user._id, function(resp) {
+            if (!resp.err) {
+                currentConv = resp.id;
+                $.get('{=config.default.server.url}/admin/conversations/messages/' + resp.id + '?async=*&limit=30', function(resp) {
+                    that.clearConversation();
+                    that.fillConversation(resp.messages);
+                });
+            }
+        });
+    };
+
+    this.send = function() {
+        var txt = document.getElementById('chat-input').value;
+
+        if (txt.trim() != "") {
+            var container = document.querySelector('.chat-messages');
+            that.addMessage({
+                time : new Date(),
+                userid : liliumcms.livevars.retrieveVar('session')._id,
+                content : txt.trim().replace(/\n/g, '<br />'),
+                _id : "*"       
+            }, container);
+
+            $.post('{=config.default.server.url}/admin/conversations/'+currentConv+'/send', {
+                t : "text",
+                c : txt.trim()
+            }, function(resp) {
+                var li = document.querySelector(".chat-messages li.sending")
+                li.dataset._id = resp.id;
+                li.classList.remove("sending");
+            });
+            document.getElementById('chat-input').value = "";
+        }
+    };
+
+    this.bindSend = function() {
+        var sent = false;
+        document.getElementById('chat-input').addEventListener('keydown', function(e) {
+            if (e.keyCode == 13 && !e.shiftKey) {
+                that.send();
+                sent = true;
+                return false;
+            }   
+        });
+
+        document.getElementById('chat-input').addEventListener('keyup', function(e) {
+            if (e.keyCode == 13 && !e.shiftKey && sent) {
+                sent=false;
+                document.getElementById('chat-input').value = "";
+                return false;
+            }
+        });
+    };
+
+    this.getConversation = function(type, users, cb) {
+        
+    };
+
+    this.notifyMsg = function(msg) {
+        if (Notification.permission === "granted") {
+            var notification = new Notification('New message from ' + cachedusers[msg.userid].displayname, {
+                icon: cachedusers[msg.userid].avatarURL,
+                body: $('<textarea/>').html(msg.content).text(),
+            });
+
+            notification.onclick = function() {
+                that.showConversation(undefined, cachedusers[msg.userid]);
+                this.close();
+            };
+        } else {
+
+        }
+    };
+
+    this.init = function() {
+        document.getElementById('nav-conversations').addEventListener('click', that.toggleChat);
+        Mousetrap.bind(["shift+="], that.toggleChat);
+        Mousetrap.bind(["escape"], that.closeChat);
+
+        socket.on('userstatus', function(data) {
+            that.updateState(data);
+        });
+
+        socket.on('message', function(msg) {
+            if (!that.maybeAddMessage(msg)) {
+                that.notifyMsg(msg);
+            }
+        });
+
+        this.bindSend();
+    }
+
+    this.init();
+};

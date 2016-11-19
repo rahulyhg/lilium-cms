@@ -112,7 +112,7 @@ var Sessions = function () {
 
     this.reloadSession = function(cli, cb) {
         log('Session', 'Reloading session for token ' + cli.userinfo.userid);
-        db.findToArray(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+        db.findToArray(_c.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
             log('Session', 'Removing session from client object');
             that.removeSession(cli, function() {
                 log('Session', 'Recreating session');
@@ -139,20 +139,12 @@ var Sessions = function () {
 
         cli.session.data.preferences = userObj.preferences || {};
         cli.session.data.power = 999;
-        cli.session.data.notifications = [];
 
-        // Load notifications in db
-        db.findToArray(cli._c, 'notifications', {
-            userID: db.mongoID(cli.session.data._id)
-        }, function (err, arr) {
-            cli.session.data.notifications = arr.slice(0, 4);
-            // Find the maximum power the user has
-            entities.maxPower(cli, function (maxUserPower) {
-                cli.session.data.power = maxUserPower;
-                cli.session.lastupdate = new Date();
-                // No need for callback
-                db.insert(cli._c, 'sessions', cli.session, function () {});
-            });
+        entities.maxPower(cli, function (maxUserPower) {
+            cli.session.data.power = maxUserPower;
+            cli.session.lastupdate = new Date();
+            // No need for callback
+            db.insert(cli._c, 'sessions', cli.session, function () {});
         });
 
         this.setCookieToCli(cli);

@@ -46,7 +46,8 @@
             <lml:tobject data-nodetype="a"
                          data-href="{=config.default.server.url}/"
                          data-filter="isViewable"
-                     data-key="name">
+                         data-key="name"
+                         data-target="_blank">
                     View
             </lml:tobject>
     	</lml:tabletemplate>

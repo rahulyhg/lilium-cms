@@ -57,7 +57,7 @@ var Lys = function() {
     this.bindKeys = function() {
         var that = this;
 
-        Mousetrap.bind(['shift+space', 'shift+l'], function(e) {
+        Mousetrap.bind(['shift+space'], function(e) {
             that.castLys();
             return false;
         });

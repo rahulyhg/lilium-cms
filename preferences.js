@@ -10,11 +10,15 @@ var Preferences = function() {
 
 };
 
-Preferences.prototype.getDefault = function(conf) {
+var getDefault = function(conf) {
     return {
         topbuttontext : "Publish", 
-        topbuttonlink : conf.server.url + "/admin/article/new"
+        topbuttonlink : "admin/article/new"
     }
+};
+
+Preferences.prototype.getDefault = function(conf) {
+    return getDefault(conf);
 };
 
 Preferences.prototype.handleGET = function(cli) {
@@ -38,7 +42,7 @@ Preferences.prototype.handlePOST = function(cli) {
 var serveMyPreferences = function(cli, callback) {
     db.find(config.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, [], function(err, cur) {
         cur.next(function(err, obj) {
-            callback(err || obj ? obj.preferences : {});
+            callback(err || obj ? (obj.preferences.form_name ? obj.preferences : getDefault(cli._c)) : {});
         });
     });
 };

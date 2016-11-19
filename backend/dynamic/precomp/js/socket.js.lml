@@ -15,9 +15,12 @@ $(document).ready(function() {
                 socket.join(session.roles[index]);
             }
             socket.join("lmlsite_" + session.site);
+            socket.join("lml_network");
         }
-        if (session && session.notifications) {
-            var notifs = session.notifications;
+
+        var nnotifications = liliumcms.livevars.livevars()["notifications.mine"];
+        if (nnotifications) {
+            var notifs = nnotifications;
             var notificationList = $('.nav > .dropdown #notification-dropdown #notification_list');
             var nbUnviewed = session.newNotifications ? session.newNotifications : 0;
             for (var index in notifs) {
@@ -134,6 +137,18 @@ $(document).ready(function() {
                 type : "system",
                 delay : 4000
             });
+
+            var session = liliumcms.livevars.retrieveVar("session");
+
+            // Subscribe to channels based on user roles
+            if (session) {
+                for (var index in session.roles) {
+                    // Join socket channel
+                    socket.join(session.roles[index]);
+                }
+                socket.join("lmlsite_" + session.site);
+                socket.join("lml_network");
+            }   
         });
 
         socket.on('reconnecting', function(rec) {

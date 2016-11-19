@@ -264,7 +264,7 @@ var Chartbeat = function() {
                 every: {
                     secondCount: 6
                 }
-            }, scCall).start();
+            }, scCall);//.start();
 
             request(qsurl, function(err, resp, body) {
                 storeQuickstats(conf, err, resp, body);

@@ -7,10 +7,12 @@ var log = require('./log.js');
 var db = require('./includes/db.js');
 var hooks = require('./hooks.js');
 var sites = require('./sites.js');
+var livevars = require('./livevars.js');
 
 var io;
 var sockets = {};
 var groups = {};
+var namespaces = [];
 
 var LiliumSocket = function (socket, session) {
     this.socket = socket;
@@ -55,7 +57,34 @@ LiliumSocket.prototype.join = function (groupName) {
     var ls = this.liliumsocket;
     if (groups[ls.session.data.site + '_' +groupName] || groups[groupName]) {
         // Check for needed roles
-        if (groupName.indexOf("lmlsite_") === 0) {
+        if (groupName == "lml_network") {
+            this.join(groupName);
+            groups[groupName].sessions[ls.socket.id] = {
+                session: ls.session.sessionId,
+                client: ls.clientId,
+                site : ls.session.data.site,
+                user : {
+                    displayname : ls.session.data.displayname,
+                    avatarURL : ls.session.data.avatarURL
+                },
+                socket : this
+            };
+
+            groups[groupName].users[ls.clientId] = groups[groupName].users[ls.clientId] || [];
+            groups[groupName].users[ls.clientId].push(ls.socket.id);
+            this.emit('debug', {
+                success: true,
+                msg: 'Joined network channel'
+            });
+
+            for (var i = 0; i < namespaces.length; i++) {
+                io.of(namespaces[i]).emit('userstatus', {
+                    id: ls.clientId,
+                    displayname: sockets[ls.clientId].displayname,
+                    status : 'online'
+                });
+            }
+        } else if (groupName.indexOf("lmlsite_") === 0) {
             this.join(groupName);
             groups[groupName].users.push({
                 session: ls.session.sessionId,
@@ -230,13 +259,18 @@ LiliumSocket.prototype.disconnect = function () {
         delete sockets[ls.clientId];
     }
 
-    // Notify users currently spying
-    var clientUrls = ls.createCurrentUserPages();
-    io.sockets.in('spy').emit('spy-update', {
-        id: ls.clientId,
-        data: clientUrls,
-        displayname: sockets[ls.clientId].displayname
-    });
+    delete groups["lml_network"].sessions[ls.socket.id];
+    groups["lml_network"].users[ls.clientId].splice(groups["lml_network"].users[ls.clientId].indexOf(ls.socket.id), 1);
+
+    var sessionCount = groups["lml_network"].users[ls.clientId].length;
+    for (var i = 0; i < namespaces.length; i++) {
+        io.of(namespaces[i]).emit('userstatus', {
+            id: ls.clientId,
+            displayname: sockets[ls.clientId].displayname,
+            status : sessionCount == 0 ? 'offline' : 'online',
+            seshCount : sessionCount
+        });
+    }
 };
 LiliumSocket.prototype.alert = function () {
     this.broadcast.emit('message', {
@@ -288,10 +322,12 @@ var Notification = function () {
             that.createGroup('lmlsite_' + conf.id);
             var url = conf.server.url + "/";
             var path = url.substring(url.indexOf('/', 2));
-            path = path == "/" ? path : path.substring(0, path.length-1);
-            log('Socket', 'Created connection for channel : ' + path);
-            io.of(path).on('connection', onSocketConnection);
+            log('Socket', 'Created connection for channel : ' + path + conf.uid);
+            io.of(path + conf.uid).on('connection', onSocketConnection);
+            namespaces.push(path + conf.uid);
         });
+
+        that.createGroup('lml_network');
 
         hooks.bind('site_initialized', 3000, function (conf) {
             that.createGroup('lmlsite_' + conf.id);
@@ -318,17 +354,7 @@ var Notification = function () {
         notification.userID = db.mongoID(userID);
         notification.date = new Date();
 
-
         // Add it in the user session if it exsists
-        db.findToArray(dbId, 'sessions', {
-            "data._id": notification.userID
-        }, function (err, arr) {
-            if (arr && arr[0]) {
-                insertNotificationInSession(arr[0].token, notification, dbId);
-            }
-        })
-
-        // Add notification to db
         db.insert(dbId, 'notifications', notification, function () {});
 
         // Send to every sockets connected by the user (for multi-tab)
@@ -518,6 +544,15 @@ var Notification = function () {
         this.emitToGroup('lmlsite_' + siteid, data, type, false);
     };
 
+    this.messageNotif = function(user, msg) {
+        var seshes = groups["lml_network"].users[user];
+        
+        if (seshes) for (var i = 0; i < seshes.length; i++) {
+            var sesh = groups["lml_network"].sessions[seshes[i]];
+            sesh.socket.emit('message', msg);   
+        }
+    };
+
     this.removeGroup = function (groupName, site) {
         if (groups[groupName]) {
             groups[groupName] = undefined;
@@ -623,8 +658,14 @@ var Notification = function () {
     };
 
     this.createGroup = function (groupName, role, site) {
-        if (site) {
-            log('Noticifactions', 'Creating group ' + site + '_' + groupName);
+        if (groupName == "lml_network") {
+            log("Notifications", "Creating network channel")
+            groups["lml_network"] = {
+                users : {},
+                sessions : {}
+            };
+        } else if (site) {
+            log('Notifications', 'Creating group ' + site + '_' + groupName);
             groups[site + '_' + groupName] = groups[site + '_' + groupName] ? groups[site + '_' + groupName] : {};
             groups[site + '_' + groupName].role = role;
             groups[site + '_' + groupName].users = [];
@@ -648,6 +689,45 @@ var Notification = function () {
         });
 
         return cookies['lmlsid'];
+    };
+
+    this.registerLiveVar = function() {
+        livevars.registerLiveVariable('notifications', function(cli, levels, params, cb) {
+            db.join(cli._c, 'notifications', [
+                {$match : {userID : db.mongoID(cli.userinfo.userid)}},
+                {$sort : {_id : -1}},
+                {$limit : 10},
+                {$sort : {_id : 1}}
+            ], function(result) {
+                cb(result);
+            });
+        });
+
+        livevars.registerLiveVariable('online', function(cli, levels, params, cb) {
+            if (levels[0] == "list") {
+                var arr = [];
+                for (var i in groups["lml_network"].sessions) {
+                    arr.push(groups["lml_network"].sessions[i].client)
+                }
+                cb(arr);
+            } else {
+                var net = groups["lml_network"];
+                var newnet = {
+                    users : net.users,
+                    sessions : {}
+                };
+                for (var sid in net.sessions) {
+                    newnet.sessions[sid] = {
+                        session : net.sessions[sid].session,
+                        client :  net.sessions[sid].client,
+                        site :  net.sessions[sid].site,
+                        user :  net.sessions[sid].user
+                    };
+                }
+
+                cb(newnet);
+            }
+        }, ["dash"]);
     };
 };
 

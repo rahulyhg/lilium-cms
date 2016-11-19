@@ -47,6 +47,7 @@ var secrets = undefined;
 var oembed = undefined;
 var tools = undefined;
 var badges = undefined;
+var conversations = undefined;
 
 var log = require('./log.js');
 
@@ -100,6 +101,7 @@ var Core = function () {
         secrets = require('./secrets.js');
         badges = require('./badges.js');
         oembed = require('./embed.js');
+        conversations = require("./conversations.js");
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
@@ -265,6 +267,7 @@ var Core = function () {
         devtools.registerAdminEndpoint();
         oembed.registerAdminEndpoint();
         tools.registerAdminEndpoint();
+        conversations.registerAdminEndpoint();
 
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');
@@ -635,6 +638,8 @@ var Core = function () {
         tools.registerLiveVar();
         badges.registerLiveVar();
         devtools.registerLiveVar();
+        notification.registerLiveVar();
+        conversations.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
     };

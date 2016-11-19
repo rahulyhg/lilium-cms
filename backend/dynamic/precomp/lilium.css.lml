@@ -577,7 +577,27 @@ select {
 
 /* Admin Body */
 main.lmladminmain {
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+}
 
+main.lmladminmain.left {
+    -webkit-transform: translate3d(-120px, 0, 0);
+       -moz-transform: translate3d(-120px, 0, 0);
+        -ms-transform: translate3d(-120px, 0, 0);
+         -o-transform: translate3d(-120px, 0, 0);
+            transform: translate3d(-120px, 0, 0);
+}
+
+main.lmladminmain.left.lefter {
+    -webkit-transform: translate3d(-320px, 0, 0);
+       -moz-transform: translate3d(-320px, 0, 0);
+        -ms-transform: translate3d(-320px, 0, 0);
+         -o-transform: translate3d(-320px, 0, 0);
+            transform: translate3d(-320px, 0, 0);
 }
 
 main.lmladminmain h1 {
@@ -614,6 +634,28 @@ h2.subtitlestrip, h2.subtitle {
 
 	overflow-x: hidden;
 	z-index: 20000;
+
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+}
+
+.lmladminsidebar.left {
+    -webkit-transform: translate3d(-120px, 0, 0);
+       -moz-transform: translate3d(-120px, 0, 0);
+        -ms-transform: translate3d(-120px, 0, 0);
+         -o-transform: translate3d(-120px, 0, 0);
+            transform: translate3d(-120px, 0, 0);
+}
+
+.lmladminsidebar.left.lefter {
+    -webkit-transform: translate3d(-320px, 0, 0);
+       -moz-transform: translate3d(-320px, 0, 0);
+        -ms-transform: translate3d(-320px, 0, 0);
+         -o-transform: translate3d(-320px, 0, 0);
+            transform: translate3d(-320px, 0, 0);
 }
 
 .lmladminsidebar .lmladminsidebaritems {

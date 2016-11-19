@@ -5,17 +5,16 @@
 		{%adminhead}
 	</head>
 	<body class="lmladminbody lmladmin">
-		{%adminbar}
-		{%adminsidebar}
         {%backendsearch}
         {%adminwelcome}
         {%adminbadges}
         {%imagepicker}
         {%previewer}
         {%lys}
-        <!-- Contains current page -->
-		<main class="container lmladminmain lmladmincontentwrapper">
-            
-		</main>
+
+	    {%adminbar}
+        {%adminsidebar}
+        {%chatslider}
+		<main class="container lmladminmain lmladmincontentwrapper"></main>
 	</body>
 </html>

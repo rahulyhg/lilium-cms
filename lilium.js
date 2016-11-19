@@ -64,6 +64,6 @@ var Lilium = function () {
     };
 };
 
-module.exports = (new Lilium()).cms();
+module.exports = new Lilium().cms();
 
 // With love; enjoy. <3

@@ -19,12 +19,13 @@
  *********************************************************************************************************/
 {#config}
 window.location.urlBase = "{=config.default.server.url}/";
+window.location.urlBaseStrip = "{=config.default.server.url}";
 var __indx = window.location.urlBase.indexOf('/', 2);
 window.location.lmldomain = window.location.urlBase.substring(2, __indx); 
 window.location.lmlpath = window.location.urlBase.substring(__indx);
 
 var debugMode = 'true';
-var socket = typeof io !== 'undefined' ? io("{=config.default.server.url}", {
+var socket = typeof io !== 'undefined' ? io("{=config.default.server.url}/{=config.default.uid}", {
     transports : ['websocket']
 }) : undefined;
 window.lmlsocket = socket;
@@ -50,6 +51,7 @@ var LiliumCMS = function() {
     this.multiselect;
     this.previewer;
     this.imagepicker;
+    this.conversations;
     this.tables = new Array();
     this.lys = new Lys();
 
@@ -794,6 +796,10 @@ var LiliumCMS = function() {
     this.everythingIsAwesome = function() {
         $('.dropdown-menu #avatar img').attr('src', that.livevars.livevars().session.avatarURL);
         $('body').addClass('lmlrendered');
+
+        if (Notification.permission !== "granted") {
+            Notification.requestPermission();
+        }
     };
 
     var AwesomeStrapper = function() {
@@ -805,6 +811,7 @@ var LiliumCMS = function() {
             that.pageloader = new PageLoader();
             that.imagepicker = new LMLImagePicker();
             that.previewer = new LMLPreviewer();
+            that.conversations = new LMLConversations();
             that.animator = new Animator();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
@@ -883,6 +890,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.pageloader.bindHistory();
         liliumcms.badges.createCache();
         liliumcms.badges.fillSidebar();
+        liliumcms.conversations.fillChat();
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.multiselects.forEach(function(select) {

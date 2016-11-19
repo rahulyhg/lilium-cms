@@ -1,4 +1,5 @@
 {#config;vocab}
+{*notifications.mine}
 <header class="admin-bar">
 
     <nav class="navbar navbar-default">
@@ -26,11 +27,12 @@
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li id="topbar-lys-toggle" class="link">
-                        <span class="fa fa-leaf"></span>
-                    </li>
                     <li id="topbar-search-icon" class="link">
                         <span class="fa fa-search"></span>
+                    </li>
+                    <li id="nav-conversations" class="link">
+                        <span class="fa fa-comment" aria-hidden="true">
+                        </span>
                     </li>
                     <li id="dropdown-notification" class="dropdown">
                         <span class="fa fa-bell link dropdown-toggle" data-toggle="dropdown" aria-hidden="true">
@@ -70,7 +72,7 @@
 </header>
 
 <lml:template id="adminquickactionbutton">
-    <lml:tobject data-hrefsource="topbuttonlink" data-nodetype="a" data-class="admin-publish-button">
+    <lml:tobject data-hrefsource="topbuttonlink" data-nodetype="a" data-class="admin-publish-button" data-prependroot="true" >
         <lml:tobject data-key="topbuttontext" data-nodetype="span"></lml:tobject>
     </lml:tobject>
 </lml:template>

@@ -1,0 +1,30 @@
+{*conversations.list}
+{*entities.chat}
+{*online.list}
+<div id="chat-slider">
+    <span class="chat-slider-title">
+        Conversations
+        <i class="fa fa-plus fa-fam" aria-hidden="true"></i>
+    </span>
+    <span class="chat-slider-subtitle">
+        Online
+    </span>
+    <ul id="chat-list-online">
+            
+    </ul>
+    <span class="chat-slider-subtitle">
+        Everyone
+    </span>
+    <ul id="chat-list-everyone">
+            
+    </ul>
+</div>
+<div id="chat-conversation">
+    <h2 class="chat-fullname">New Conversation</h2>
+    <ul class="chat-messages" id="chat-messages">
+
+    </ul>
+    <div class="chat-input-wrapper">
+        <textarea class="chat-input" id="chat-input" placeholder="Say something nice..." ></textarea>
+    </div>
+</div>

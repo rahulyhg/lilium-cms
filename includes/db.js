@@ -138,7 +138,7 @@ var DB = function() {
 		]
 		cb : End callback with format function(err, cursor)
 	*/
-	this.find = this.query = function(conf, coln, conds, stack, cb) {
+	this.find = this.query = function(conf, coln, conds, stack, cb, proj) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -148,7 +148,7 @@ var DB = function() {
 				stack = typeof stack === 'undefined' ? [] : stack;
 				conds = typeof conds === 'undefined' ? {} : conds;
 
-				var cursor = col.find(conds);
+				var cursor = col.find(conds, proj);
 				if (typeof stack === 'object') {
 					for (var key in stack) {
 						if (typeof cursor[key] === 'function') {

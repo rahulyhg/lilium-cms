@@ -117,20 +117,6 @@ var Article = function() {
                     foreignField:   "_id",
                     as:             "featuredimage"
                 }
-            }, {
-                $lookup:{
-                    from:           "entities",
-                    localField:     "author",
-                    foreignField:   "_id",
-                    as:             "authors"
-                }
-            }, {
-                $lookup:{
-                    from:           "uploads",
-                    localField:     "authors.0.avatarID",
-                    foreignField:   "_id",
-                    as:             "authorface"
-                }
             }
         ], function(arr) {
             if (arr.length === 0) {
@@ -178,8 +164,11 @@ var Article = function() {
                             date : { $lt : arr[0].date },
                             author : arr[0].author
                         }).sort({date : -1}).limit(3).toArray(function(err, mfarr) {    
-                            arr[0].morefrom = mfarr;
-                            cb(arr[0]);
+                            db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                arr[0].authors = autarr;
+                                arr[0].morefrom = mfarr;
+                                cb(arr[0]);
+                            });
                         });
                     });
                 });

@@ -273,6 +273,10 @@ var LiveVars = function() {
 
                         node.attr('href', prepend + pullOutVarFromString(data, obj.data('hrefsource')) + append);
                     }
+                    if (obj.data('target')) {
+                        node.attr('target', obj.data('target'));
+                        node.data('async', true);
+                    }
                     // Set html to node
                     node.html(obj.html());
                 } else if (nodeType == 'template') {

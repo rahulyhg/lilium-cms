@@ -10,8 +10,8 @@ var mongoDocuments = {
 	names : [
 		"entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview",
 		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache",
-		"lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets",
-		"notifications", "categories", "autosave", "userbadges", "teambadges"
+		"lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations",
+		"messages", "notifications", "categories", "autosave", "userbadges", "teambadges"
 	]
 };
 

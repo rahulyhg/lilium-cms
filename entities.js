@@ -234,12 +234,14 @@ var Entities = module.exports = new function () {
         var imgurl = cli.postdata.data.imageurl;
 
         if (imgid && imgurl) {
-            db.update(cli._c, "entities", {_id : db.mongoID(cli.userinfo.userid)}, {avatarURL : imgurl, avatarID : db.mongoID(imgid)}, function(err, res) {
-                cli.sendJSON({
-                    imgid : db.mongoID(imgid),
-                    imgurl : imgurl,
-                    error : err,
-                    success : !err
+            db.update(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, {avatarURL : imgurl, avatarID : db.mongoID(imgid)}, function(err, res) {
+                require('./session.js').reloadSession(cli, function() {
+                    cli.sendJSON({
+                        imgid : db.mongoID(imgid),
+                        imgurl : imgurl,
+                        error : err,
+                        success : !err
+                    });
                 });
             });
         } else {
@@ -619,7 +621,7 @@ var Entities = module.exports = new function () {
         delete valObject.avatarURL;
         delete valObject.badges;
 
-        db.update(siteid, 'entities', {_id : id}, valObject, cb);
+        db.update(_c.default(), 'entities', {_id : id}, valObject, cb);
     };
 
     this.cacheRoles = function (callback) {
@@ -790,7 +792,8 @@ var Entities = module.exports = new function () {
 
 
         formbuilder.createForm('update_password', {
-                fieldWrapper : "lmlform-fieldwrapper"
+                fieldWrapper : "lmlform-fieldwrapper",
+                async : true
             })
             .add('editpasswd', 'title', {
                 displayname: 'Edit Password'
@@ -821,6 +824,15 @@ var Entities = module.exports = new function () {
                     _id : db.mongoID(cli.session.data._id)
                 }, function(err, arr) { 
                     callback(arr); 
+                });
+            } else if (levels[0] == "chat") {
+                db.find(_c.default(), 'entities', {}, [], function(err, cur) {
+                    cur.sort({fullname : 1}).toArray(function(err, arr) {
+                        callback(err || arr);
+                    });
+                }, {
+                    displayname : 1, 
+                    avatarURL : 1
                 });
             } else if (levels[0] == "simple") {
                 var simpProj = {
@@ -906,7 +918,7 @@ var Entities = module.exports = new function () {
                     }, callback);
                 }
             }
-        });
+        }, ["dash"]);
 
         livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
             db.findToArray(_c.default(), 'entities', {
@@ -945,7 +957,6 @@ var Entities = module.exports = new function () {
                     site : dat.site,
                     badges : dat.badges,
                     preferences : dat.preferences || preferences.getDefault(cli._c),
-                    notifications: dat.notifications || [],
                     newNotifications: dat.newNotifications || 0,
                     data : (params.withdata ? dat.data : undefined)
                 }
