@@ -117,6 +117,21 @@ span.chat-slider-subtitle {
     font-weight: 500;
 }
 
+#chat-slider #chat-list-online li.unread,
+#chat-slider #chat-list-everyone li.unread {
+    font-weight: 700;
+    color: #f7f7f7;
+}
+
+#chat-slider #chat-list-online li b {
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    background-color: #81c180;
+    border-radius: 10px;
+    margin-left: 6px;    
+}
+
 #chat-conversation {
     position: fixed;
     top: 50px;
@@ -151,11 +166,13 @@ span.chat-slider-subtitle {
     color: #FFF;
     font-weight: 300;
     padding: 12px 15px;
+    position: relative;
+    z-index: 20;
 }
 
 ul.chat-messages {
     position: absolute;
-    top: 56px;
+    top: 58px;
     bottom: 80px;
     left: 0;
     right: 0;
@@ -164,6 +181,7 @@ ul.chat-messages {
     padding: 0 0 10px;
 
     overflow-y: auto;
+    z-index: 5;
 }
 
 .chat-input-wrapper {

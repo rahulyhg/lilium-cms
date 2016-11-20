@@ -34,6 +34,7 @@
     "jquery-timeago": "https://github.com/rmm5t/jquery-timeago.git#^1.5.2",
     "jquery-timer": "https://github.com/jchavannes/jquery-timer.git",
     "jquery.clickout": "^0.0.1",
-    "ckeditor-youtube-plugin": "^2.1.0"
+    "ckeditor-youtube-plugin": "^2.1.0",
+    "linkifyjs": "^2.1.3"
   }
 }

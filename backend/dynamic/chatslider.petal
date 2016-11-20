@@ -1,3 +1,4 @@
+{#config}
 {*conversations.list}
 {*entities.chat}
 {*online.list}
@@ -28,3 +29,5 @@
         <textarea class="chat-input" id="chat-input" placeholder="Say something nice..." ></textarea>
     </div>
 </div>
+<audio preload="metadata" src="{=config.default.server.url}/static/audio/notif1.mp3" id="notification1" style="display: none" ></audio>
+

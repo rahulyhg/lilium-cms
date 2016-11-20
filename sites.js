@@ -109,6 +109,8 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timer/jquery.timer.js", 1100, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery.clickout/jquery.clickout.js", 1250, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify.min.js", 1500, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify-html.min.js", 1510, "admin", conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/badges.js", 2130, 'admin', conf.id);

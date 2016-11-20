@@ -1130,6 +1130,24 @@ header.admin-bar .navbar-default .navbar-nav>li>* {
     line-height: 25px;
 }
 
+#nav-conversations b {
+    width: 10px;
+    height: 10px;
+    background-color: #ce92e6;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: 14px;
+    right: 15px;
+    border-radius: 6px;
+
+    display: none;
+}
+
+#nav-conversations b.shown {
+    display: block;
+}
+
 .link {
 	cursor : pointer;
 }

@@ -4,6 +4,9 @@ var LMLConversations = function() {
     var currentConv = "";
     var cachedusers = {};
     var drawn = false;
+    var unreadConv = {};
+    var notificationSound = undefined;
+    var pendingMessages = [];
 
     var isEmoji = function(str) {
         var ranges = [
@@ -23,19 +26,41 @@ var LMLConversations = function() {
 
     this.updateState = function(user) {
         if (user.status == "online") {
-            document.getElementById("chat-list-online").appendChild(document.getElementById("user" + user.id));
+            var ctn = document.getElementById("chat-list-online");
+            ctn.insertBefore(document.getElementById("user" + user.id), ctn.firstChild);
         } else {
-            document.getElementById("chat-list-everyone").appendChild(document.getElementById("user" + user.id));
+            var ctn = document.getElementById("chat-list-everyone");
+            ctn.insertBefore(document.getElementById("user" + user.id), ctn.firstChild);
         }
     };
 
     this.initState = function() {
+        var myid = liliumcms.livevars.retrieveVar('session')._id;
         var users = liliumcms.livevars.retrieveVar("online.list");
         var container = document.getElementById("chat-list-online");
 
         for (var i = 0; i < users.length; i++) {
             container.appendChild(document.getElementById("user" + users[i]));
         }
+
+        var allconv = liliumcms.livevars.retrieveVar('conversations.list');
+        for (var i = 0; i < allconv.length; i++) {
+            var cconv = allconv[i];
+            if (cconv.uptodate.indexOf(myid) == -1) {
+                if (cconv.type == "private") {
+                    var usr = cconv.users[Math.abs(cconv.users.indexOf(myid) - 1)];
+                    document.getElementById("user" + usr).classList.add("unread");
+                    document.getElementById('nav-conversations').querySelector('b').classList.add('shown');
+                    unreadConv[cconv._id] = usr;
+                } else {
+
+                }
+            }
+        }
+    };
+
+    this.seen = this.read = function(conversationid) {
+        $.post('{=config.default.server.url}/admin/conversations/'+conversationid+'/read', {}, function() {});
     };
 
     this.clearConversation = function() {
@@ -59,7 +84,7 @@ var LMLConversations = function() {
 
         msg.content = msg.content.trim();
         var cc = document.createElement('span');
-        cc.innerHTML = msg.content;
+        cc.innerHTML = linkifyHtml(msg.content);
         li.appendChild(cc);
         li.dataset._id = msg._id;
 
@@ -115,6 +140,7 @@ var LMLConversations = function() {
 
         listitem.appendChild(avatar);
         listitem.appendChild(fullname);
+        listitem.appendChild(document.createElement('b'));
 
         listitem.id = "user" + user._id;
         listitem.addEventListener('click', that.showConversation);
@@ -153,14 +179,15 @@ var LMLConversations = function() {
     };
 
     this.closeChat = function() {
-        document.getElementById("chat-slider").classList.remove('left');
-        document.querySelector('main.lmladminmain').classList.remove('left');
-        document.querySelector('.lmladminsidebar').classList.remove('left');
-
         document.getElementById("chat-slider").classList.remove('lefter');
         document.querySelector('main.lmladminmain').classList.remove('lefter');
         document.querySelector('.lmladminsidebar').classList.remove('lefter');
         document.getElementById('chat-conversation').classList.remove('lefter');
+        document.getElementById("chat-slider").classList.remove('left');
+        document.querySelector('main.lmladminmain').classList.remove('left');
+        document.querySelector('.lmladminsidebar').classList.remove('left');
+
+        currentConv = "";
     };
 
     this.toggleConversation = function() {
@@ -168,7 +195,6 @@ var LMLConversations = function() {
         document.querySelector('main.lmladminmain').classList.toggle('lefter');
         document.querySelector('.lmladminsidebar').classList.toggle('lefter');
         document.getElementById('chat-conversation').classList.toggle('lefter');
-
     };
 
     this.showConversation = function(e, user) {
@@ -180,7 +206,10 @@ var LMLConversations = function() {
                 li = li.parentElement;
             }
             user = JSON.parse(li.dataset.user);
+        } else if (typeof user === "string") {
+            user = cachedusers[user];
         }
+
 
         document.querySelector('.chat-fullname').innerHTML = user.displayname;
 
@@ -195,33 +224,62 @@ var LMLConversations = function() {
         $.get('{=config.default.server.url}/admin/conversations/find?type=private&orcreate=1&async=*&with=' + user._id, function(resp) {
             if (!resp.err) {
                 currentConv = resp.id;
+                if (unreadConv[currentConv]) {
+                    delete unreadConv[currentConv];
+                    if (Object.keys(unreadConv).length == 0) {
+                        document.getElementById('nav-conversations').querySelector('b').classList.remove('shown');
+                    }
+
+                    document.getElementById('user' + user._id).classList.remove("unread");
+                }
                 $.get('{=config.default.server.url}/admin/conversations/messages/' + resp.id + '?async=*&limit=30', function(resp) {
                     that.clearConversation();
                     that.fillConversation(resp.messages);
+                    that.read(currentConv);
                 });
             }
         });
     };
 
-    this.send = function() {
+    this.sendPending = function() {
+        for (var i = 0; i < pendingMessages.length; i++) {
+            that.send(pendingMessages[i]);
+        }
+    };
+
+    this.send = function(customMessage) {
         var txt = document.getElementById('chat-input').value;
+        var msg = customMessage || {
+            t : "text",
+            c : txt.trim(),
+            v : currentConv
+        };
 
-        if (txt.trim() != "") {
+        if (msg.c != "") {
             var container = document.querySelector('.chat-messages');
-            that.addMessage({
-                time : new Date(),
-                userid : liliumcms.livevars.retrieveVar('session')._id,
-                content : txt.trim().replace(/\n/g, '<br />'),
-                _id : "*"       
-            }, container);
 
-            $.post('{=config.default.server.url}/admin/conversations/'+currentConv+'/send', {
+            if (typeof customMessage == "undefined") {
+                that.addMessage({
+                    time : new Date(),
+                    userid : liliumcms.livevars.retrieveVar('session')._id,
+                    content : msg.c.replace(/\n/g, '<br />'),
+                    _id : "*"       
+                }, container);
+
+                pendingMessages.push(msg);
+            }
+
+            $.post('{=config.default.server.url}/admin/conversations/'+msg.v+'/send', {
                 t : "text",
-                c : txt.trim()
+                c : msg.c
             }, function(resp) {
-                var li = document.querySelector(".chat-messages li.sending")
-                li.dataset._id = resp.id;
-                li.classList.remove("sending");
+                pendingMessages.shift();
+
+                if (currentConv == msg.v) {
+                    var li = document.querySelector(".chat-messages li.sending")
+                    li.dataset._id = resp.id;
+                    li.classList.remove("sending");
+                }
             });
             document.getElementById('chat-input').value = "";
         }
@@ -252,7 +310,7 @@ var LMLConversations = function() {
 
     this.notifyMsg = function(msg) {
         if (Notification.permission === "granted") {
-            var notification = new Notification('New message from ' + cachedusers[msg.userid].displayname, {
+            var notification = new Notification("✉️ " + cachedusers[msg.userid].displayname, {
                 icon: cachedusers[msg.userid].avatarURL,
                 body: $('<textarea/>').html(msg.content).text(),
             });
@@ -262,8 +320,16 @@ var LMLConversations = function() {
                 this.close();
             };
         } else {
-
+            liliumcms.notify({type : "message", title : "✉️ " + cachedusers[msg.userid].displayname, message : $('<textarea/>').html(msg.content).text(), url : "javascript:liliumcms.conversations.showConversation(undefined, '"+msg.userid+"');"});
         }
+
+        if (currentConv != msg.conversationid || !drawn) {
+            unreadConv[msg.conversationid] = msg.userid;
+            document.getElementById("user" + msg.userid).classList.add("unread");
+            document.getElementById('nav-conversations').querySelector('b').classList.add('shown');
+        }
+
+        notificationSound.play();
     };
 
     this.init = function() {
@@ -276,11 +342,20 @@ var LMLConversations = function() {
         });
 
         socket.on('message', function(msg) {
-            if (!that.maybeAddMessage(msg)) {
+            if (!that.maybeAddMessage(msg) || !liliumcms.state.focused) {
                 that.notifyMsg(msg);
+            }
+
+            if (liliumcms.state.focused && drawn && currentConv == msg.conversationid) {
+                that.read(msg.conversationid);
             }
         });
 
+        document.addEventListener('reconnected', function() {
+            that.sendPending();
+        });
+
+        notificationSound = document.getElementById("notification1");
         this.bindSend();
     }
 

@@ -149,10 +149,12 @@ $(document).ready(function() {
                 socket.join("lmlsite_" + session.site);
                 socket.join("lml_network");
             }   
+
+            document.dispatchEvent(new CustomEvent("reconnected"))
         });
 
         socket.on('reconnecting', function(rec) {
-            if (rec == 6) {
+            if (rec == 8) {
                 liliumcms.notify({
                     title : "Well, that's inconvenient",
                     message : "Connection with Lilium server could not be established. Please verify that your internet connection is stable, or check the server status with an administrator. You will be notified once a stable connection is established.",

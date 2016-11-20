@@ -75,11 +75,16 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                                     conversationid : db.mongoID(conversationid)
                                 }
                                 db.insert(_c.default(), 'messages', msg, function(err, res) {
-                                    cli.sendJSON({err : undefined, success : true, id : res.insertedId});
-
-                                    for (var i = 0; i < conv.users.length; i++) if (conv.users[i].toString() != cli.userinfo.userid) {
-                                        notifications.messageNotif(conv.users[i], msg);
-                                    }
+                                    db.update(_c.default(), 'conversations', 
+                                        {_id : db.mongoID(conversationid)}, 
+                                        {uptodate : [db.mongoID(cli.userinfo.userid)]}, 
+                                    function() {
+                                        cli.sendJSON({err : undefined, success : true, id : res.insertedId});
+    
+                                        for (var i = 0; i < conv.users.length; i++) if (conv.users[i].toString() != cli.userinfo.userid) {
+                                            notifications.messageNotif(conv.users[i], msg);
+                                        }
+                                    });
                                 });
                             } else {
                                 cli.sendJSON({err : "NOT IN CONVERSATION"});
@@ -90,6 +95,14 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                     }
                 });
             });
+        } else if (cli.routeinfo.path[3] == "read") {
+            db.update(_c.default(), 'conversations', {
+                _id : db.mongoID(conversationid)
+            },{
+                $addToSet : {uptodate : cli.userinfo.userid}
+            }, function() {
+                cli.sendJSON({read : true});
+            }, false, true, true);
         } else {
             cli.throwHTTP(404, 'NOT FOUND');
         }
@@ -111,7 +124,7 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                             });
                         });
                     } else if (cli.routeinfo.params.orcreate) {
-                        db.insert(_c.default(), 'conversations', {type : type, users : participants}, function(err, res) {
+                        db.insert(_c.default(), 'conversations', {type : type, users : participants, uptodate : participants}, function(err, res) {
                             cli.sendJSON({
                                 id : res.insertedId, 
                                 users : participants, 
@@ -174,7 +187,11 @@ LMLConversations.prototype.registerLiveVar = function() {
         } else if (type == "group") {
 
         } else if (type == "list") {
-            cb([]);
+            db.findToArray(_c.default(), 'conversations', {
+                users : cli.userinfo.userid,
+            }, function(err, arr) {
+                cb(arr);
+            });
         }
     });
 };

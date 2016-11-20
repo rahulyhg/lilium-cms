@@ -33,6 +33,7 @@
                     <li id="nav-conversations" class="link">
                         <span class="fa fa-comment" aria-hidden="true">
                         </span>
+                        <b></b>
                     </li>
                     <li id="dropdown-notification" class="dropdown">
                         <span class="fa fa-bell link dropdown-toggle" data-toggle="dropdown" aria-hidden="true">

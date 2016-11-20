@@ -69,6 +69,19 @@ var LiliumCMS = function() {
         }
     };
 
+    this.state = {
+        focused : true
+    };
+
+    this.bindFocus = function() {
+        window.addEventListener('blur', function() {
+            liliumcms.state.focused = false;
+        });
+        
+        window.addEventListener('focus', function() {
+            liliumcms.state.focused = true;
+        });
+    };
 
     this.getUrlParams = function() {
         return urlParams;
@@ -703,6 +716,7 @@ var LiliumCMS = function() {
             }
 
             liliumcms.adminmenu.highlight();
+            liliumcms.conversations.closeChat();
 
             var formattedUrl = url + (url.indexOf('?') === -1 ? "?" : "&") + "async=*";
             $.get(formattedUrl, function(html) {
@@ -827,6 +841,7 @@ var LiliumCMS = function() {
             that.formbeautifier = new FormBeautifier();
             that.imagepicker.init();
             that.previewer.init();
+            that.bindFocus();
             
             liliumcms.lys.bindKeys();
         };
