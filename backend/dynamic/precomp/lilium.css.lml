@@ -1788,9 +1788,14 @@ button.bigger {
     content: '\f0c1';
 }
 
+#fb-auth-modal .modal-body p,
 #urlchanged-modal .modal-body p {
     font-size: 18px;
     font-weight: normal;
+}
+
+#fb-auth-modal .modal-body::before {
+    content : '\f082';
 }
 
 #confirm-unpublish .modal-body::before {

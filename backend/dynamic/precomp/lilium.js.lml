@@ -52,6 +52,7 @@ var LiliumCMS = function() {
     this.previewer;
     this.imagepicker;
     this.conversations;
+    this.facebook;
     this.tables = new Array();
     this.lys = new Lys();
 
@@ -827,6 +828,7 @@ var LiliumCMS = function() {
             that.previewer = new LMLPreviewer();
             that.conversations = new LMLConversations();
             that.animator = new Animator();
+            that.facebook = new LMLFacebook();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -841,6 +843,7 @@ var LiliumCMS = function() {
             that.formbeautifier = new FormBeautifier();
             that.imagepicker.init();
             that.previewer.init();
+            that.facebook.loadfbscript();
             that.bindFocus();
             
             liliumcms.lys.bindKeys();

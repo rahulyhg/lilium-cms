@@ -157,6 +157,9 @@ var Entities = module.exports = new function () {
             case "update_password":
                 this.changePassword(cli, true);
                 break;
+            case "commitfbauth":
+                this.commitfbauth(cli);
+                break;
             default:
                 cli.throwHTTP(401);
                 break;
@@ -199,7 +202,12 @@ var Entities = module.exports = new function () {
                 cli.refuse();
             }
         }
+    };
 
+    this.commitfbauth = function(cli) {
+        db.update(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, {fbid : cli.postdata.data.fbid}, function() {
+            cli.sendJSON({done : true});
+        });
     };
 
     this.updateProfile = function (cli) {
@@ -799,7 +807,17 @@ var Entities = module.exports = new function () {
                 displayname: 'Edit Password'
             })
             .add('password', 'password')
-            .add('Edit Password', 'submit');
+            .add('authbtnset', 'buttonset', {
+                buttons: [{
+                    displayname : 'Edit Password',
+                    name : 'update'
+                }, {
+                    name : 'allowfbauth',
+                    displayname : 'Allow Facebook Authentication',
+                    type : 'button',
+                    callback : "liliumcms.facebook.allowfbauth();"
+                }]
+            });
 
         formbuilder.createForm('upload_profile_picture',{
                 fieldWrapper : "lmlform-fieldwrapper"

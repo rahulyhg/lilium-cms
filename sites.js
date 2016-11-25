@@ -112,6 +112,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify.min.js", 1500, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify-html.min.js", 1510, "admin", conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/facebook.js", 2025, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/badges.js", 2130, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/preview.js", 2150, 'admin', conf.id);

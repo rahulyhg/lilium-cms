@@ -13,6 +13,30 @@
 {=forms.render('update_profile')}
 {=forms.render('update_password')}
 
+<div id="fb-auth-modal" class="modal fade announcement" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Facebook authentication confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Activating Facebook authentication will let you log into Lilium using your Facebook credentials.</p>
+                <p>This won't give Lilium access to your Facebook password and private information.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="button-confirm-facebook-auth">Let's do it</button>
+                <button type="button" class="btn btn-default" id="button-deny-facebook-auth">Nevermind</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
 <script>
     window.update_profile_submit = function() {
         console.log('updating...');
@@ -33,11 +57,21 @@
         };
 
         $.post("{=config.default.server.url}/admin/me", dat, function() {
-
+            liliumcms.notify({type : "success", title : "You look amazing!", message : "Profile picture was successfully updated."});
         });
     };
 
     window.profile_photo_picker_cast = function(elem) {
 
     };
+    
+    $('#fb-auth-modal #button-confirm-facebook-auth').bind('click', function() {
+        liliumcms.facebook.commitFbAuth();
+        $('#fb-auth-modal').modal('hide');
+    });
+
+    $('#button-deny-facebook-auth').bind('click', function() {
+        $('#fb-auth-modal').modal('hide');
+    });
 </script>
+

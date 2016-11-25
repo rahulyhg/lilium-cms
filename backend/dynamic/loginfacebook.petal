@@ -1,9 +1,5 @@
 {#config}
 <script>
-var lmlcheckfbstatus = function(resp) {
-    window.fbstatus = resp;
-};
-
 window.loginwithfacebook = function() {
     if (!window.fbstatus || window.fbstatus.status !== "connected") {
         // Grab facebook token, then login
