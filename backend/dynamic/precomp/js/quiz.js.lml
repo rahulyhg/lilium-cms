@@ -9,8 +9,9 @@ window.addQuizToPost = function(caller) {
 
 window.LMLQuiz = function() {
     var that = this;
-    this.questions = [];
-    this.personalities = [];
+    var quizautosave = false;
+    this.questions = {};
+    this.personalities = {};
 
     var ce = function(tag, classes, attr, prt) {
         var elem = document.createElement(tag);
@@ -37,6 +38,10 @@ window.LMLQuiz = function() {
         return elem;
     };
 
+    this.bindQuizAutoSave = function() {
+        quizautosave = true;
+    };
+
     this.eraseOtherLeaves = function(toIgnore) {
         $('.postleaf-wrapper > button').each(function(index, elem) {
             if (elem.name != toIgnore.name) {
@@ -53,8 +58,171 @@ window.LMLQuiz = function() {
         return this;
     };
 
+    this.updatePersoSelect = function(persoid) {
+        var perso = that.personalities[persoid];
+        var options = document.querySelectorAll('.lmlquiz .quiz-answer-personality-select option[value="'+persoid+'"]');
+        
+        for (var i = 0; i < options.length; i++) {
+            options[i].innerHTML = perso.name;
+        }
+    };
+
+    this.removeFromPersoSelect = function(persoid) {
+        var options = document.querySelectorAll('.lmlquiz .quiz-answer-personality-select option[value="'+persoid+'"]');
+        
+        for (var i = 0; i < options.length; i++) {
+            options[i].remove();
+        }
+    };
+
+    this.addPersoSelect = function(persoid) {
+        var perso = that.personalities[persoid];
+        var selects = document.querySelectorAll('.lmlquiz .quiz-question-list .quiz-answer-personality-select');
+        
+        for (var i = 0; i < selects.length; i++) {
+            var sel = selects[i];
+            var opt = document.createElement('option');
+            opt.value = perso.id;
+            opt.innerHTML = perso.name;
+
+            sel.appendChild(opt);
+        }
+    };
+
+    this.fillSelectWithPerso = function(select) {
+        var opt = document.createElement('option');
+        opt.value = "none";
+        opt.innerHTML = " - No personality - ";
+        select.appendChild(opt);
+
+        for (var id in that.personalities) {
+            var opt = document.createElement('option');
+            opt.value = id;
+            opt.innerHTML = that.personalities[id].name;
+
+            select.appendChild(opt);
+        }
+    };
+
+    this.addAnswer = function(answer, questid) {
+        var genID = answer ? answer.id : ("ans-" + Math.random().toString(36).substring(2));
+        
+        var wrapper = ce('div', ["quiz-answer-wrapper"], {id:genID});
+
+        var answerimg = ce('img', ["quiz-answer-photo"], answer ? {src:answer.photo} : undefined, wrapper);
+        liliumcms.imagepicker.bind(answerimg);
+
+        var answername = ce('input', ["quiz-answer-answer"], {
+            type : "text",
+            placeholder : "Answer",
+            value : answer ? answer.answer : ""
+        }, wrapper);         
+
+        var answerperso = ce('select', ["quiz-answer-personality-select"], {
+            placeholder : "Personality",
+            value : answer ? answer.personality : ""
+        }, wrapper);
+        that.fillSelectWithPerso(answerperso);
+
+        var answerimgcred = ce('input', ["quiz-answer-photo-cred"], {
+            type : "text",
+            placeholder : "Image credit",
+            value : answer ? answer.photocred : ""
+        }, wrapper);
+
+        var answerimgcredlink = ce('input', ["quiz-answer-photo-cred-link"], {
+            type : "text",
+            placeholder : "Image credit link",
+            value : answer ? answer.photocredlink : ""
+        }, wrapper);
+
+        if (answer) {
+            answerperso.value = answer.personality;
+        }
+
+        var answeractionwrap = ce('div', ["quiz-answer-action-wrapper"], undefined, wrapper);
+
+        var btndeleteanswer = ce('button', ["quiz-answer-button-remove", "red"], {
+            html : "Remove answer",
+            type : "button"
+        }, answeractionwrap);
+
+        (function(genid) {
+            btndeleteanswer.addEventListener('click', function() {
+                document.getElementById(genid).remove();
+            }); 
+        })(genID)
+
+        document.getElementById("answerwrapper-for-" + questid)
+            .insertBefore(wrapper, document.getElementById(questid).querySelector('.quiz-question-button-add-answer'));
+    };
+
+    this.addQuestion = function(quest) {
+        var genID = quest ? quest.id : ("quest-" + Math.random().toString(36).substring(2));
+
+        var wrapper = ce('div', ["quiz-question-wrapper"], {id:genID});
+
+        var questinterogation = ce('input', ["quiz-question-interogation"], {
+            type : "text",
+            placeholder : "Interogation",
+            value : quest ? quest.interogation : ""
+        }, wrapper);
+
+        var photowrapper = ce('div', ["quiz-question-photo-wrapper"], {id:genID}, wrapper);
+        var questimg = ce('img', ["quiz-question-image"], quest ? {src:quest.photo} : undefined, photowrapper);
+        liliumcms.imagepicker.bind(questimg);
+
+        var questimgcred = ce('input', ["quiz-question-photo-cred"], {
+            type : "text",
+            placeholder : "Image credit",
+            value : quest ? quest.photocred : ""
+        }, photowrapper);
+
+        var questimgcredlink = ce('input', ["quiz-question-photo-cred-link"], {
+            type : "text",
+            placeholder : "Image credit link",
+            value : quest ? quest.photocredlink : ""
+        }, photowrapper);
+
+        var answerstitle = ce('h4', [], {
+            html : "List of answers"
+        }, wrapper);    
+
+        var answerswrapper = ce('div', ["quiz-question-answers-wrapper"], {
+            id : "answerwrapper-for-" + genID
+        }, wrapper);
+
+        var btnaddanswer = ce('button', ["quiz-question-button-add-answer"], {
+            id : "add-answer-to-" + genID,
+            html : "Add answer",    
+            type : "button"
+        }, answerswrapper);
+
+        var actionwrapper = ce('div', ["quiz-question-action-wrapper"], undefined, wrapper);
+        
+        var btnremovequest = ce('button', ["quiz-question-button-remove", "red"], {
+            html: "Remove question",
+            type: "button"
+        }, actionwrapper);
+
+        (function(genid) {
+            btnremovequest.addEventListener('click', function(e) {
+                document.getElementById(genid).remove();
+            });
+        })(genID);
+
+        (function(genid) {
+            btnaddanswer.addEventListener('click', function(e) {
+                that.addAnswer(undefined, genid);
+                return false;
+            });
+        })(genID);
+
+        document.querySelector('.lmlquiz .quiz-question-list').appendChild(wrapper);
+    };
+
     this.addPersonality = function(pers) {
-        var genID = pers ? pers.id : ("pers-" + Math.random().toString(36));
+        var genID = pers ? pers.id : ("pers-" + Math.random().toString(36).substring(2));
 
         var wrapper = ce("div", ["quiz-personality-wrapper"], {id:genID});        
         var photowrap = ce("div", ["quiz-personality-photo-wrapper"], undefined, wrapper);
@@ -65,6 +233,12 @@ window.LMLQuiz = function() {
             type:"text", 
             placeholder:"Photo Credit", 
             value : pers ? pers.photocred : ""
+        }, photowrap);
+
+        var persoimgcredlink = ce('input', ["quiz-personality-image-cred-link"], {
+            type:"text", 
+            placeholder:"Credit Link", 
+            value : pers ? pers.photocredlink : ""
         }, photowrap);
 
         var personame = ce('input', ["quiz-personality-name"], {
@@ -80,32 +254,61 @@ window.LMLQuiz = function() {
         }, detailswrap);
 
         var btnwrapper = ce('div', ["quiz-personality-actions"], undefined, wrapper);
-        var removebtn = ce('button', ["quiz-personality-remove", "red"], {html:"Remove"}, btnwrapper);
+        var removebtn = ce('button', ["quiz-personality-remove", "red"], {html:"Remove personality", type:"button"}, btnwrapper);
 
         (function(genid) {
-            removebtn.addEventListener('click', function() {
+            removebtn.addEventListener('click', function(e) {
                 document.getElementById(genid).remove();
+                that.removeFromPersoSelect(genid);
+                delete that.personalities[genid];
             });
         })(genID);
 
         liliumcms.imagepicker.bind(persoimg);
 
+        var tbs = wrapper.querySelectorAll('input[type="text"]');
+        for (var i = 0; i < tbs.length; i++) {
+            tbs[i].addEventListener('keypress', function(e) {
+                if (e.keyCode == 13) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+
+        wrapper.querySelector('.quiz-personality-name').addEventListener('change', function() {
+            that.personalities[wrapper.id].name = this.value;
+            that.updatePersoSelect(wrapper.id);
+        });
+        
+        that.personalities[genID] = {
+            id : genID,
+            name : pers ? pers.name : ""
+        };
+
         document.querySelector(".quiz-personality-list").appendChild(wrapper);
+        that.addPersoSelect(genID);
     };
 
     this.addEmptyPersonality = function() {
-            that.addPersonality();
-            return false;
+        that.addPersonality();
+        return false;
     };
 
     this.addEmptyQuestion = function() {
-
+        that.addQuestion();
         return false;
     };
 
     this.bind = function() {
         $('.quiz-add-personality').bind('click', that.addEmptyPersonality);
         $('.quiz-add-question').bind('click', that.addEmptyQuestion);
+        that.tryToFill();
+
+        if (!isPublished) {
+            that.bindQuizAutoSave();
+        }       
+ 
         return this;
     };
 };

@@ -5,6 +5,7 @@
 		{%adminhead}
 	</head>
 	<body class="lmladminbody lmladmin">
+        {%adminfacebook}
         {%backendsearch}
         {%adminwelcome}
         {%adminbadges}

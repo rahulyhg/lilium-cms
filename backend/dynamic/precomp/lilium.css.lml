@@ -417,8 +417,8 @@ select {
     width: auto;
     margin: 10px;
     border-radius: 6px;
-    padding: 8px 15px 6px;
-    font-size: 16px;
+    padding: 6px 9px;
+    font-size: 14px;
     border: 1px solid #7B3996;
 	background-color: {=actioncolor};
     color: #EEE;

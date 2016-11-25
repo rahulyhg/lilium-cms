@@ -243,14 +243,12 @@ var Chartbeat = function() {
                     if (err) {
                         scheduler.remove(scheduleFetchID + conf.id);
                         setTimeout(function() {
-                            /*
                             scheduler.schedule(scheduleFetchID + conf.id, {
                                 every: {
                                     secondCount: 6
                                 }
                             }, scCall).start();
-                            */
-                        }, 10000);
+                        }, 6000);
                     }
                 });
 
@@ -264,7 +262,7 @@ var Chartbeat = function() {
                 every: {
                     secondCount: 6
                 }
-            }, scCall);//.start();
+            }, scCall).start();
 
             request(qsurl, function(err, resp, body) {
                 storeQuickstats(conf, err, resp, body);

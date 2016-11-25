@@ -5,6 +5,8 @@
 		{%loginhead}
 	</head>
 	<body class="{=frontend.getBodyClasses("login")}" id="{=frontend.getBodyID("login")}">
+        {%adminfacebook}
+        {%loginfacebook}
         <div class="lmlhalf-right">
 		    <main class="lmllogin-wrapper">		
 		    	<header>
@@ -19,8 +21,4 @@
 		    </main>
         </div>
 	</body>
-
-    <script>
-        $(function() { $('.lmllogin-wrapper').css('margin-top', (window.innerHeight / 2 - 152) + "px"); });
-    </script>
 </html>

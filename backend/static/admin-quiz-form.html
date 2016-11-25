@@ -1,30 +1,27 @@
 <div class="lmlquiz">
     <h2>Lilium Quiz</h2>
+    <p class="tutorial">
+        <b>Personalities</b> represent the possible quiz results. Each <b>question</b> is tied to its different <b>answers</b>. All answers are attached to a certain personality. For instance, the answer <i>"2 hours"</i> to the question <i>"How many hours of sleep did you get last night"</i> would be tied to the <i>"Programmer"</i> personality. Don't worry about losing your work : we automatically save your quiz everytime you edit a textbox. 😘 Have fun! 
+    </p>
+
     <section>
-        <h3>Personalities and labels</h3>
+        <h3>Personalities</h3>
         <div class="quiz-personality-list">
         </div>
         <div class="">
-            <button class="quiz-add-personality">Add a personality</button>
+            <button class="quiz-add-personality" type="button">Add a personality</button>
         </div>
     </section>
 
     <section>
-        <h3>Questions</h3>
-        <div class="">
-            <ul>
-
-            </ul>
+        <h3>Questions and answers</h3>
+        <div class="quiz-question-list">
         </div>
         <div class="">
-            <button class="quiz-add-question">Add a question</button>
+            <button class="quiz-add-question" type="button">Add a question</button>
         </div>
     </section>
 </div>
-
-<script>
-    $('#post-quiz-section').html("LOADED!");
-</script>
 
 <style>
 .lmlquiz h2 {
@@ -40,16 +37,37 @@
 
 .lmlquiz h3 {
     padding: 10px;
-    font-size: 20px;
+    font-size: 30px;
+    font-weight: 500;
+    color: #BBB;
+    margin-bottom: 10px;
+    border-bottom: 1px dashed #CCC;
+    border-top: 1px dashed #CCC;
+}
+
+.lmlform .lmlquiz button {
+    padding: 6px 9px 6px;
+    font-size: 14px;
+}
+
+.lmlquiz .tutorial {
+    padding: 10px;
+    border-bottom: 1px solid #737373;
+    color: #CCC;
+    background-color: #333;
+    margin-bottom: 0;
+    letter-spacing: 0.2px;
     font-weight: 300;
 }
 
 .quiz-personality-wrapper {
-    margin: 0px 10px;
+    margin: 20px;
     border: 1px solid #DDD;
     background-color: #EEE;
     padding: 10px;
-    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.1);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.2);
+    border-left: 3px solid #BBB;
+    border-bottom: 1px solid #CCC;
 }
 
 .quiz-personality-photo-wrapper {
@@ -77,18 +95,20 @@
     border: 1px solid #EEE;
 }
 
-#post_create input[type="text"].quiz-personality-image-cred {
+#post_create input[type="text"].quiz-personality-image-cred,
+#post_create input[type="text"].quiz-personality-image-cred-link {
     width: 148px;
     margin-top: 5px;
 }
 
 #post_create input[type="text"].quiz-personality-name {
     width: 100%;
+    border-bottom-color: transparent;
 }
 
 #post_create textarea.quiz-personality-details {
     width: 100%;
-    height: 155px;
+    height: 202px;
 }
 
 .quiz-personality-actions {
@@ -97,5 +117,101 @@
     display: block;   
     margin: -10px;
     text-align: right;
+}
+
+.quiz-question-wrapper {
+    margin: 20px;
+    padding: 0px;
+    background-color: #eee;
+    border: 1px solid #DDD;
+    box-shadow: 0px 0px 5px 1px rgba(0,0,0,0.08);
+    border-left: 3px solid #BBB;
+}
+
+#post_create .quiz-question-wrapper input[type="text"],
+#post_create .quiz-question-wrapper select {
+    width: 100%;
+}
+
+#post_create .lmlquiz input[type="text"].quiz-question-interogation {
+    font-size: 24px;
+    margin: 10px;
+    width: calc(100% - 20px);
+}
+
+.quiz-question-image {
+    height: 150px;
+    width: 280px;
+    margin: 0px 10px;
+    float: left;
+}
+
+.quiz-question-photo-wrapper {
+    height: 150px;
+    margin-bottom: 10px;
+}
+
+.lmlquiz h4 {
+    clear: both;
+    background-color: #E9E9E9;
+    color: #777;
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+    padding: 10px;
+    font-weight: 500;
+    font-size: 24px;
+}
+
+#post_create .quiz-question-wrapper input[type="text"].quiz-question-photo-cred {
+    width: calc(100% - 310px);
+}
+
+#post_create .quiz-question-wrapper input[type="text"].quiz-question-photo-cred-link {
+    width: calc(100% - 310px);
+    margin-top: 10px;
+}
+
+.quiz-question-answers-wrapper {
+    clear: both;
+}
+
+.quiz-question-action-wrapper {
+    text-align: right;
+    border-top: 1px solid #CCC;
+    background-color: #E9E9E9;
+}
+
+.quiz-answer-wrapper {
+    margin: 10px;
+    border: 1px solid #CCC;
+    background-color: #DDDDDD;
+    clear: both;
+    padding: 10px;
+    min-height: 200px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.quiz-answer-photo {
+    float: left;
+    width: 180px;
+    height: 180px;
+    border-radius: 6px;
+}
+
+#post_create .quiz-question-wrapper .quiz-answer-wrapper input[type="text"], 
+#post_create .quiz-question-wrapper .quiz-answer-wrapper select {
+    width: calc(100% - 190px);
+    float: right;
+    margin-bottom: 4px;
+}
+
+.quiz-answer-action-wrapper {
+    text-align: right;
+    margin: 190px -10px -10px;
+    clear: both;
+    background-color: #C9C9C9;
+    border-top: 1px solid #E6E6E6;
+    box-shadow: 0px 1px 1px 0px rgba(0,0,0,0.2) inset;
 }
 </style>

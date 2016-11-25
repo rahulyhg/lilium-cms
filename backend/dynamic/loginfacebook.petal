@@ -1,0 +1,27 @@
+{#config}
+<script>
+var lmlcheckfbstatus = function(resp) {
+    window.fbstatus = resp;
+};
+
+window.loginwithfacebook = function() {
+    if (!window.fbstatus || window.fbstatus.status !== "connected") {
+        // Grab facebook token, then login
+        FB.login(function(response) {
+            if (response.status == "connected") {
+                $.post('{=config.default.server.url}/login/fb', response.authResponse, function(lmlresp) {
+                    if (lmlresp.success) {
+                        document.location.href = "{=config.default.server.url}/admin";
+                    }
+                });     
+            }
+        });
+
+        return false;
+    } else {
+        // Try sending fb token
+    }
+};
+
+$(function() { $('.lmllogin-wrapper').css('margin-top', (window.innerHeight / 2 - 152) + "px"); });
+</script>

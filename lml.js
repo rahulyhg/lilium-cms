@@ -734,7 +734,7 @@ var LML = function () {
                         var vNxt = nxt+1;
                         while ((mv = content.indexOf('{', vNxt)) < cls && mv != -1) {
                             cls = content.indexOf('}', cls+1);
-                            vNxt = mv+1;
+                            vNxt = mv;
                         }
                         cls++;
                 }

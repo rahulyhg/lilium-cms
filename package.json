@@ -37,6 +37,7 @@
   "homepage": "https://bitbucket.org/RykDesjardins/lilium-cms#readme",
   "dependencies": {
     "JSONStream": "^1.1.1",
+    "binaryjs": "^0.2.1",
     "bower": "^1.7.2",
     "buffertools": "^2.1.4",
     "busboy": "^0.2.12",
@@ -90,6 +91,7 @@
     "uglify": "^0.1.5",
     "uglifyjs": "^2.4.10",
     "util": "^0.10.3",
-    "validator": "^4.5.0"
+    "validator": "^4.5.0",
+    "websocket": "^1.0.23"
   }
 }

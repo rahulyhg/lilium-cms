@@ -12,6 +12,16 @@ $}
     background-color: rgba(0,0,0,0.3);
 }
 
+.lmllogin-wrapper header h1 {
+    text-align: center;
+}
+
+.lmllogin-wrapper button.fbloginbutton {
+    margin-left: 0;
+    padding: 0 6px;
+    font-size: 23px;
+}
+
 .lmlhalf-right {
     position: fixed;
     right: 0;
@@ -50,7 +60,7 @@ html.lmllogin {
 	height: auto;
 	margin: 200px auto 0px auto;
 
-	text-align: center;
+	text-align: left;
 }
 
 .lmllogin-wrapper header {

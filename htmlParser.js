@@ -412,8 +412,12 @@ var HtmlParser = function () {
 
         field.attr.buttons.forEach(function(btn, index) {
             btnSet.push(
-                '<button class="'+(btn.classes?btn.classes.join(' '):'')+'" name="'+btn.name+'">'+
-                (btn.displayname?btn.displayname:btn.name)+
+                '<button '+(btn.type?'type="'+btn.type+'"':'')+
+                ' class="'+(btn.classes?btn.classes.join(' '):'')+
+                '" name="'+btn.name+
+                '" '+ (btn.callback ? ('onclick="'+btn.callback+'"') : '') +
+                '>'+
+                    (btn.displayname?btn.displayname:btn.name)+
                 '</button>'
             );
         });

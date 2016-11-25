@@ -10,7 +10,7 @@ var sessions = require('../session.js');
 var log = require('../log.js');
 
 var Login = function() {
-	var loginSuccess = function(cli, userObj) {
+	var loginSuccess = function(cli, userObj, cb) {
 		cli.touch('login.loginsuccess');
 		sessions.createSessionInCli(cli, userObj);
         cli.did("auth", "login");
@@ -21,13 +21,59 @@ var Login = function() {
         } else {
 		    entities.registerLogin(cli, userObj, function() {
                 log('Login', 'Logged in user ' + userObj.username);
-                hooks.fire('user_loggedin', cli);
+
+                if (cb) {
+                    cb();
+                } else {
+                    hooks.fire('user_loggedin', cli);
+                }
             });
         }
 	};
 
+    this.fbAuth = function(cli) {
+        require('request').get('https://graph.facebook.com/debug_token/?input_token=' + cli.postdata.data.accessToken +
+            '&access_token=' + cli._c.social.facebook.token, {}, function(err, resp) {
+            if (resp.statusCode == 200) {
+                db.findToArray(cli._c, 'entities', {
+                    fbid : cli.postdata.data.userID
+                }, function(err, arr) {    
+                    if (arr.length == 0) {
+                        cli.sendJSON({
+                            status : 200,
+                            success : false,
+                            invalidator : "lilium",
+                            reason : "entities"
+                        });
+                    } else {
+            			entities.fetchFromDB(cli._c, arr[0].username, function(userObj) {
+	            		    loginSuccess(cli, userObj, function() {
+                                cli.sendJSON({
+                                    status : 200,
+                                    success : true,
+                                    userid : userObj._id
+                                });
+                            });
+                        });
+                    }
+                });
+            } else {
+                cli.sendJSON({
+                    status : resp.statusCode,
+                    success : false,
+                    invalidator : "facebook",
+                    reason : "token"
+                });
+            }
+        });
+    };
+
 	this.authUser = function(cli) {
 		cli.touch('login.authUser');
+        if (cli.routeinfo.path[1] == "fb") {
+            return this.fbAuth(cli);
+        }
+
 		var usr = cli.postdata.data.usr;
 		var psw = cli.postdata.data.psw;
 
@@ -71,7 +117,19 @@ var Login = function() {
 			.add('usr', 'text', {displayname:"Username", placeholder:true,wrapperCssSuffix:"username"})
 			.add('psw', 'password', {displayname:"Password", placeholder:true,wrapperCssSuffix:"password"})
 			.trg('userpass')
-			.add('login', 'submit', {displayname:"Login",wrapperCssSuffix:"loginbutton"});
+            .add('loginbtnset', 'buttonset', {
+                buttons : [{
+                    name : 'login', 
+                    displayname : "Login",
+                    classes : ["loginbutton"]
+                }, {
+                    name : 'login-fb', 
+                    displayname : '<i class="fa fa-facebook-official" aria-hidden="true"></i>',
+                    classes : ["fbloginbutton"],
+                    type : "button",
+                    callback : "window.loginwithfacebook();"
+                }]
+            });
 	};
 
     var handleFirstLogin = function(cli, userObj) {
