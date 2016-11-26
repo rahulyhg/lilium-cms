@@ -1,10 +1,24 @@
 {#config}
-var quizLiliumRootURL = "{=config.default.server.url}";
-window.addQuizToPost = function(caller) {
-    $.get(quizLiliumRootURL + '/static/admin-quiz-form.html', function(data) {
+window.addQuizToPost = function(caller, isEdit, cb) {
+    $.get('{=config.default.server.url}/static/admin-quiz-form.html', function(data) {
         $(caller).parent().html(data);
-        window.lmlquiz = new window.LMLQuiz().eraseOtherLeaves(caller).bind().tryToFill();
+        window.lmlquiz = new window.LMLQuiz().eraseOtherLeaves(caller).bind();
+
+        cb && cb(window.lmlquiz);
     });
+    
+    if (!isEdit) {
+        $.post("{=config.default.server.url}/admin/article/addfeature/" + contentid, {feature : "quiz", overwrite : false, props : {} }, function() {});
+    }
+};
+
+window.editQuizToPost = function() {
+    var curart = liliumcms.livevars.livevars()["content." + contentid];
+    if (curart && curart[0] && curart[0].feature === "quiz") {
+        window.addQuizToPost($('button[name="create-postleaf-quiz"]'), true, function(quizobj) {
+            quizobj.tryToFill(curart[0]);
+        });
+    };
 };
 
 window.LMLQuiz = function() {
@@ -12,6 +26,7 @@ window.LMLQuiz = function() {
     var quizautosave = false;
     this.questions = {};
     this.personalities = {};
+    var curart;
 
     var ce = function(tag, classes, attr, prt) {
         var elem = document.createElement(tag);
@@ -38,6 +53,67 @@ window.LMLQuiz = function() {
         return elem;
     };
 
+    this.createQuizObject = function() {
+        var quiz = {
+            personalities : [],
+            questions : []
+        };
+        var allpersos = document.querySelectorAll(".quiz-personality-wrapper");
+        var allquests = document.querySelectorAll(".quiz-question-wrapper");
+
+        for (var i = 0; i < allpersos.length; i++) {
+            var pers = allpersos[i];
+
+            quiz.personalities.push({
+                id : pers.id,
+                name : pers.querySelector(".quiz-personality-name").value,
+                details : pers.querySelector(".quiz-personality-details").value,
+                photo : pers.querySelector(".quiz-personality-image").dataset.photoid,
+                photourl : pers.querySelector(".quiz-personality-image").getAttribute('src'),
+                photocred : pers.querySelector(".quiz-personality-image-cred").value,
+                photocredlink : pers.querySelector(".quiz-personality-image-cred-link").value
+            });
+        }
+
+        for (var i = 0; i < allquests.length; i++) {
+            var quest = allquests[i];
+            var allans = quest.querySelectorAll(".quiz-answer-wrapper");
+            
+            var answers = [];
+            for (var j = 0; j < allans.length; j++) {
+                var ans = allans[j];
+                answers.push({
+                    id : ans.id,
+                    photo : ans.querySelector('.quiz-answer-photo').dataset.photoid,
+                    photourl : ans.querySelector('.quiz-answer-photo').getAttribute('src'),
+                    answer : ans.querySelector('.quiz-answer-answer').value,
+                    personality : ans.querySelector('.quiz-answer-personality-select').value,
+                    photocred : ans.querySelector('.quiz-answer-photo-cred').value,
+                    photocredlink : ans.querySelector('.quiz-answer-photo-cred-link').value
+                });
+            } 
+
+            quiz.questions.push({
+                id : quest.id,
+                answers : answers,
+                interogation : quest.querySelector('.quiz-question-interogation').value,
+                photo : quest.querySelector('.quiz-question-photo').dataset.photoid,
+                photourl : quest.querySelector('.quiz-question-photo').getAttribute('src'),
+                photocred : quest.querySelector('.quiz-question-photo-cred').value,
+                photocredlink : quest.querySelector('.quiz-question-photo-cred-link').value
+            });
+        }
+
+        return quiz;
+    };
+
+    this.saveQuiz = function() {
+        var quizjson = JSON.stringify(that.createQuizObject());
+        $.post('{=config.default.server.url}/admin/quiz/save', {quizjson : quizjson, contentid : contentid}, function() {
+            console.log("Quiz auto-saved.");
+        });
+    };
+
     this.bindQuizAutoSave = function() {
         quizautosave = true;
     };
@@ -53,7 +129,24 @@ window.LMLQuiz = function() {
         return this;
     };  
  
-    this.tryToFill = function() {
+    this.tryToFill = function(curart) {
+        props = curart.featuredata;
+
+        if (props) {
+            var persos = props.personalities;
+            var quests = props.questions;
+
+            that.personalities = persos;
+            that.questions = quests;
+
+            for (var i = 0; i < persos.length; i++) {
+                that.addPersonality(persos[i]);
+            }
+
+            for (var i = 0; i < quests.length; i++) {
+                that.addQuestion(quests[i]);
+            }
+        }
 
         return this;
     };
@@ -109,7 +202,7 @@ window.LMLQuiz = function() {
         
         var wrapper = ce('div', ["quiz-answer-wrapper"], {id:genID});
 
-        var answerimg = ce('img', ["quiz-answer-photo"], answer ? {src:answer.photo} : undefined, wrapper);
+        var answerimg = ce('img', ["quiz-answer-photo"], answer && answer.photo ? {src:answer.photourl, "data-photoid" : answer.photo} : undefined, wrapper);
         liliumcms.imagepicker.bind(answerimg);
 
         var answername = ce('input', ["quiz-answer-answer"], {
@@ -169,7 +262,7 @@ window.LMLQuiz = function() {
         }, wrapper);
 
         var photowrapper = ce('div', ["quiz-question-photo-wrapper"], {id:genID}, wrapper);
-        var questimg = ce('img', ["quiz-question-image"], quest ? {src:quest.photo} : undefined, photowrapper);
+        var questimg = ce('img', ["quiz-question-photo"], quest && quest.photourl ? {src:quest.photourl, "data-photoid" : quest.photo} : undefined, photowrapper);
         liliumcms.imagepicker.bind(questimg);
 
         var questimgcred = ce('input', ["quiz-question-photo-cred"], {
@@ -219,6 +312,12 @@ window.LMLQuiz = function() {
         })(genID);
 
         document.querySelector('.lmlquiz .quiz-question-list').appendChild(wrapper);
+
+        if (quest) {
+            for (var i = 0; i < quest.answers.length; i++) {
+                that.addAnswer(quest.answers[i], quest.id);
+            }
+        }
     };
 
     this.addPersonality = function(pers) {
@@ -228,7 +327,7 @@ window.LMLQuiz = function() {
         var photowrap = ce("div", ["quiz-personality-photo-wrapper"], undefined, wrapper);
         var detailswrap = ce("div", ["quiz-personality-details-wrapper"], undefined, wrapper);
 
-        var persoimg = ce('img', ["quiz-personality-image"], pers ? {src:pers.photo} : undefined, photowrap);
+        var persoimg = ce('img', ["quiz-personality-image"], pers && pers.photourl ? {src:pers.photourl, "data-photoid":pers.photo} : undefined, photowrap);
         var persoimgcred = ce('input', ["quiz-personality-image-cred"], {
             type:"text", 
             placeholder:"Photo Credit", 
@@ -303,7 +402,6 @@ window.LMLQuiz = function() {
     this.bind = function() {
         $('.quiz-add-personality').bind('click', that.addEmptyPersonality);
         $('.quiz-add-question').bind('click', that.addEmptyQuestion);
-        that.tryToFill();
 
         if (!isPublished) {
             that.bindQuizAutoSave();

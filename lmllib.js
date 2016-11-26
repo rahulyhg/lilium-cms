@@ -44,6 +44,11 @@ var registeredLibraries = {
             }
         };
     },
+    postleaf : function(context) {
+        return {
+            all : function() { return require('./postleaf.js').getLeaves(); }
+        }
+    },
     extra: function (context) {
         return context.extra;
     },

@@ -55,6 +55,9 @@ var Article = function() {
             case 'destroy':
                 if (cli.hasRightOrRefuse("destroy-articles")) this.delete(cli, true);
                 break;
+            case 'addfeature':
+                if (cli.hasRightOrRefuse("create-articles")) this.addFeature(cli);
+                break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -195,6 +198,31 @@ var Article = function() {
             };
 
             handleNext();
+        });
+    };
+
+    this.addFeature = function(cli) {
+        var featurename = cli.postdata.data.feature;
+        var conds = {
+            _id : db.mongoID(cli.routeinfo.path[3])
+        };        
+
+        if (!cli.hasRight("editor")) {
+            conds.author = db.mongoID(cli.userinfo.userid);
+        }
+
+        if (cli.postdata.data.overwrite !== true) {
+            conds.feature = {$exists : false};
+        }
+
+        var featuredata = cli.postdata.data.props;
+
+        db.update(cli._c, 'content', conds, {
+            feature: featurename,
+            featuredata : featuredata
+        }, function() {
+            log('Content', 'Added feature "' + featurename + '" to article with id ' + cli.routeinfo.path[3]);
+            cli.sendJSON({done : true})
         });
     };
 

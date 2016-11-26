@@ -1,4 +1,4 @@
-{#config}
+{#config;postleaf}
 <script>
     var isAutoSave = false;
     var timer;
@@ -68,6 +68,16 @@
                 // lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
             }
         }
+
+        {$
+            postleaves = postleaf.all();
+        $}
+
+        {$ for (leaf in postleaves); $}
+        if (window.{=leaf.backendload}) {
+            window.{=leaf.backendload}();
+        }
+        {$ endfor; $}
     });
 
 

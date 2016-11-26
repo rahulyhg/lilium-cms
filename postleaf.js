@@ -6,11 +6,12 @@ var _registeredPostLeaves = new Array();
 
 // AKA Post interactive feature
 var PostLeaf = function() {
-    this.registerLeaf = function(leafname, leafDisplayname, backendScript, frontendScript) {
+    this.registerLeaf = function(leafname, leafDisplayname, backendScript, backendFill, frontendScript) {
         _registeredPostLeaves.push({
             name : leafname,
             displayname : leafDisplayname, 
             backend : backendScript, 
+            backendload : backendFill,
             frontend : frontendScript
         });
     };
@@ -34,6 +35,10 @@ var PostLeaf = function() {
                 });
             }
         });
+    };
+
+    this.getLeaves = function() {
+        return _registeredPostLeaves;
     };
 };
 
