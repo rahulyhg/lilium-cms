@@ -18,87 +18,81 @@
         urlWillChangeWarningShown : false
     };
 
-    document.addEventListener('livevarsFetched', function(e) {
-        var content = e.detail.livevars['content.' + window.location.pathname.split('/').pop()];
+    if (!window.lmlarticlebound) {
+        window.lmlarticlebound = true;
+        document.addEventListener('livevarsFetched', function(e) {
+            var content = e.detail.livevars['content.' + window.location.pathname.split('/').pop()];
+    
+            if (content && content.length > 0) {
+                isAutoSave    = content[0].status == 'autosaved';
+                isPublished   = content[0].status == 'published';
+                originalTitle = content[0].title;
+                currentSlug   = content[0].name;
 
-        if (content && content.length > 0) {
-            isAutoSave    = content[0].status == 'autosaved';
-            isPublished   = content[0].status == 'published';
-            originalTitle = content[0].title;
-            currentSlug   = content[0].name;
+                if (isAutoSave) {
+                    _id = lastParamUrl;
+                    contentid = content[0].contentid;
+                } else {
+                    contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
+                }
 
-            if (isAutoSave) {
-                _id = lastParamUrl;
-                contentid = content[0].contentid;
-            } else {
-                contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
+                if (isPublished) {
+                    $('.article_base_title').bind('keyup', function(e) {
+                        if (!articleEdit.urlWillChangeWarningShown && originalTitle !== $('.article_base_title').val()) {
+                            articleEdit.urlWillChangeWarningShown = true;
+                            $('#urlchanged-modal').modal('show');
+                        }
+                    });
+
+                    $('#button-update-url').bind('click', function() {
+                        articleEdit.keepURL = false;
+                        $('#urlchanged-modal').modal('hide');
+                    });
+
+                    $('#button-keep-url').bind('click', function() {
+                        articleEdit.keepURL = true;
+                        $('#urlchanged-modal').modal('hide');
+                    });
+                }
+
+                // You can't have a draft if article is published
+                if (content[0].status == 'published' || isAutoSave) {
+                    $('form button[name=save]').hide();
+                    // $('form button[name=preview]').parent().removeClass('col-md-4').addClass('col-md-6');
+                    // $('form button[name=publish]').parent().removeClass('col-md-4').addClass('col-md-6');
+                }
+
+                if (content[0].recentversion) {
+                    lmlAlert('There is an autosaved version of this article <a href="{=config.default.server.url}/admin/article/edit/' + content[0].recentversion + '">here</a>', 'info', 'pencil');
+                }
+
+                if (content[0].status == 'autosaved' && content[0].contentid) {
+                    // lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
+                }
             }
 
-            if (isPublished) {
-                $('.article_base_title').bind('keyup', function(e) {
-                    if (!articleEdit.urlWillChangeWarningShown && originalTitle !== $('.article_base_title').val()) {
-                        articleEdit.urlWillChangeWarningShown = true;
-                        $('#urlchanged-modal').modal('show');
-                    }
-                });
+            {$
+                postleaves = postleaf.all();
+            $}
 
-                $('#button-update-url').bind('click', function() {
-                    articleEdit.keepURL = false;
-                    $('#urlchanged-modal').modal('hide');
-                });
-
-                $('#button-keep-url').bind('click', function() {
-                    articleEdit.keepURL = true;
-                    $('#urlchanged-modal').modal('hide');
-                });
-            }
-
-            // You can't have a draft if article is published
-            if (content[0].status == 'published' || isAutoSave) {
-                $('form button[name=save]').hide();
-                // $('form button[name=preview]').parent().removeClass('col-md-4').addClass('col-md-6');
-                // $('form button[name=publish]').parent().removeClass('col-md-4').addClass('col-md-6');
-            }
-
-            if (content[0].recentversion) {
-                lmlAlert('There is an autosaved version of this article <a href="{=config.default.server.url}/admin/article/edit/' + content[0].recentversion + '">here</a>', 'info', 'pencil');
-            }
-
-            if (content[0].status == 'autosaved' && content[0].contentid) {
-                // lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
-            }
-        }
-
-        {$
-            postleaves = postleaf.all();
-        $}
-
-        {$ for (leaf in postleaves); $}
-        if (window.{=leaf.backendload}) {
-            window.{=leaf.backendload}();
-        }
-        {$ endfor; $}
-    });
+            {$ for (leaf in postleaves); $}
+            if (window.{=leaf.backendload}) {
+                window.{=leaf.backendload}();
+            }   
+            {$ endfor; $}
+        });
 
 
-    document.addEventListener('livevarsRendered', function(e) {
+        document.addEventListener('livevarsRendered', function(e) {
+            lastSave = $('form').serialize();
+        });
 
-        lastSave = $('form').serialize();
-        // liliumcms.formvalidator.prepareValidation(function(data) {
-        //     // Create notification
-        //     liliumcms.notify({
-        //         title: 'Article',
-        //         message: 'Your article is beeing processed',
-        //         type: 'info'
-        //     });
-        // });
-    });
-
-    document.addEventListener('lmlnotification', function(event, notification) {
-        pubBtn = $('button[name="publish"]').get(0);
-        pubBtn.disabled = false;
-        pubBtn.innerHTML = publishButtonText;
-    });
+        document.addEventListener('lmlnotification', function(event, notification) {
+            pubBtn = $('button[name="publish"]').get(0);
+            pubBtn.disabled = false;
+            pubBtn.innerHTML = publishButtonText;
+        });
+    }
 
     var unpublishArticleModal = function(id) {    
         deleteID = id;
@@ -228,6 +222,8 @@
 
         // Save Draft
         $('form button[name=save]').on('click', function(e) {
+            document.dispatchEvent(new CustomEvent("articleWillSave"));
+
             // Save and give notification
             var currentSave = $('form').serialize();
             var url;
@@ -273,6 +269,8 @@
             btn.innerHTML = "loading...";
             btn.disabled = true;
 
+            document.dispatchEvent(new CustomEvent("articleWillPreview"));
+
             liliumcms.previewer.cast(document.querySelector("input[name=title]").value);
             $.post('{=config.default.server.url}/admin/article/preview', $('form#post_create').serialize(), function(html) {
                 liliumcms.previewer.setContent(html);
@@ -299,6 +297,8 @@
 
             if (valid) {
                 $('.alert-wrapper').remove();
+
+                document.dispatchEvent(new CustomEvent("articleWillPublish"));
     
                 var pubBtn = $('button[name="publish"]').get(0);
                 pubBtn.disabled = true;
@@ -334,18 +334,6 @@
         $('#confirm-destroy button.btn-danger').on('click', function() {
             destroyArticle();
         });
-
-        window.onblur = function() {
-            if (timer) {
-                timer.pause();
-            }
-        };
-
-        window.onfocus = function() {
-            if (timer) {
-                timer.play();
-            }
-        };
     });
 </script>
 

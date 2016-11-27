@@ -21,6 +21,15 @@ window.editQuizToPost = function() {
     };
 };
 
+var _lmlSaveQuiz = function() {
+    if (window.lmlquiz) {
+        window.lmlquiz.saveQuiz();
+    }
+}
+
+document.addEventListener('articleWillSave', _lmlSaveQuiz);
+document.addEventListener('articleWillPublish', _lmlSaveQuiz);
+
 window.LMLQuiz = function() {
     var that = this;
     var quizautosave = false;
@@ -108,10 +117,14 @@ window.LMLQuiz = function() {
     };
 
     this.saveQuiz = function() {
-        var quizjson = JSON.stringify(that.createQuizObject());
-        $.post('{=config.default.server.url}/admin/quiz/save', {quizjson : quizjson, contentid : contentid}, function() {
-            console.log("Quiz auto-saved.");
-        });
+        var curart = liliumcms.livevars.livevars()["content." + contentid];
+
+        if (curart && curart[0] && curart[0].feature === "quiz") {
+            var quizjson = JSON.stringify(that.createQuizObject());
+            $.post('{=config.default.server.url}/admin/quiz/save', {quizjson : quizjson, contentid : contentid}, function() {
+                console.log("Quiz was saved.");
+            });
+        }
     };
 
     this.bindQuizAutoSave = function() {
@@ -246,6 +259,19 @@ window.LMLQuiz = function() {
             }); 
         })(genID)
 
+        var inputboxes = wrapper.querySelectorAll('input, select');
+        for (var i = 0; i < inputboxes.length; i++) {
+            inputboxes[i].addEventListener('change', function() {
+                window.lmlquiz.saveQuiz();
+            });
+        }
+
+        answerimg.addEventListener("DOMAttrModified", function(event) {
+            if (event.attrName == "src") {
+                window.lmlquiz.saveQuiz();
+            }
+        });
+
         document.getElementById("answerwrapper-for-" + questid)
             .insertBefore(wrapper, document.getElementById(questid).querySelector('.quiz-question-button-add-answer'));
     };
@@ -312,6 +338,21 @@ window.LMLQuiz = function() {
         })(genID);
 
         document.querySelector('.lmlquiz .quiz-question-list').appendChild(wrapper);
+
+        var inputboxes = wrapper.querySelectorAll('input, select');
+        for (var i = 0; i < inputboxes.length; i++) {
+            inputboxes[i].addEventListener('change', function() {
+                window.lmlquiz.saveQuiz();
+            });
+        }
+
+        questimg.addEventListener("DOMAttrModified", function(event) {
+            if (event.attrName == "src") {
+                window.lmlquiz.saveQuiz();
+            }
+        });
+
+
 
         if (quest) {
             for (var i = 0; i < quest.answers.length; i++) {
@@ -384,6 +425,19 @@ window.LMLQuiz = function() {
             id : genID,
             name : pers ? pers.name : ""
         };
+
+        var inputboxes = wrapper.querySelectorAll('input, select, textarea');
+        for (var i = 0; i < inputboxes.length; i++) {
+            inputboxes[i].addEventListener('change', function() {
+                window.lmlquiz.saveQuiz();
+            });
+        }
+
+        persoimg.addEventListener("DOMAttrModified", function(event) {
+            if (event.attrName == "src") {
+                window.lmlquiz.saveQuiz();
+            }
+        });
 
         document.querySelector(".quiz-personality-list").appendChild(wrapper);
         that.addPersoSelect(genID);
