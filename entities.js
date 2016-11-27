@@ -984,6 +984,7 @@ var Entities = module.exports = new function () {
         }, []);
     };
 
+    // Not working properly
     this.getRights = function(cli, entityid, cb) {
         db.find(cli._c, 'entities', {_id : db.mongoID(entityid)}, [], function(err, cur) {
             cur.hasNext(function(err, hasnext) {
@@ -995,7 +996,7 @@ var Entities = module.exports = new function () {
                         } else {
                             var urights = [];
                             for (var i = 0; i < rls.length; i++) {
-                                urights.push(...rls[i]);
+                                urights.push(...Roles[rls[i]]);
                             }
 
                             cb(urights);

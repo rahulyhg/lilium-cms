@@ -1,5 +1,13 @@
 {#config}
+/*
+    LMLDom Tags
 
+    lml:foreach     => var="newlyDefinedVariable" in="currentArray"
+    lml:wrapper     => tag="tagName" id="id_and_{variableName}" class="class passed to new node"
+    lml:text /      => var="variableName"
+    lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
+    lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
+*/
 var LMLDom = function() {
     var maindom;
     var livevars;
@@ -22,14 +30,11 @@ var LMLDom = function() {
         }
 
         for (var i = 0; i < itt.length; i++) {
-            var elemclone = elem.cloneNode(true);
-
             ldContext[varname] = itt[i];
             var wrap = document.createElement(elem.getAttribute('wrapper') || "div");
-            for (var j = 0; j < elemclone.children.length; j++) {
-                wrap.appendChild(elemclone.children[j]);
+            for (var j = 0; j < elem.childNodes.length; j++) {
+                wrap.appendChild(elem.childNodes[j].cloneNode(true));
             }
-            elemclone.remove();
 
             this.parseNode(wrap);
             elem.insertAfter(wrap);
@@ -48,6 +53,99 @@ var LMLDom = function() {
             fe = elem.querySelector('lml\\:foreach');
         }
 
+        var wr = elem.querySelector('lml\\:wrapper');
+        while (wr) {
+            var tagname = wr.getAttribute('tag') || 'div';
+            var idstr = wr.id;
+            var newid = idstr;
+
+            while (-1 != newid.indexOf('{')) {
+                var varlevels = newid.slice(newid.indexOf('{') + 1, newid.indexOf('}')).split('.');
+                var newval = ldContext;
+                for (var i = 0; i < varlevels.length; i++) {
+                    newval = newval[varlevels[i]];
+                }
+
+                newid = newid.replace("{" + varlevels.join('.') + "}", newval);
+            }
+
+            var wrap = document.createElement(tagname);
+            wrap.id = newid;
+            wrap.className = wr.className;
+
+            while (wr.children.length != 0) {
+                wrap.appendChild(wr.children[0]);
+            }
+            
+            wr.insertAfter(wrap);
+            wr.remove();
+
+            wr = elem.querySelector('lml\\:wrapper');
+        }
+
+        var act = elem.querySelector('lml\\:action');
+        while (act) {
+            var button = document.createElement('button');
+            button.setAttribute('type', 'button');
+            button.className = act.className;
+            var cbname = act.getAttribute('callback');
+            var paramName = act.getAttribute('pass') || "";
+            
+            paramstr = paramName;
+            while (-1 != paramstr.indexOf('{')) {
+                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
+                var newval = ldContext;
+                for (var i = 0; i < varlevels.length; i++) {
+                    newval = newval[varlevels[i]];
+                }
+
+                paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
+            }
+
+            cbname = cbname.split('.');
+            var ftc = window;
+
+            for (var i = 0; i < cbname.length; i++) {
+                ftc = ftc[cbname[i]];
+            }
+            
+            (function(ftc, param) {
+                button.addEventListener('click', function() {
+                    ftc(param);
+                });
+            })(ftc, paramstr);
+
+            button.innerHTML = act.innerHTML;
+            
+            act.insertAfter(button);
+            act.remove();
+
+            act = elem.querySelector('lml\\:action');
+        }
+
+        var ed = elem.querySelector('lml\\:editable');
+        while (ed) {
+            var varlevels = ed.getAttribute('value').split('.');
+            var txt = ldContext;
+            
+            for (var k = 0; k < varlevels.length; k++) {
+                txt = txt[varlevels[k]];
+            }
+
+            var inp = document.createElement('input');
+            inp.setAttribute('type', 'text');
+            inp.setAttribute('placeholder', ed.getAttribute('placeholder') || "");
+            inp.setAttribute('name', ed.getAttribute('name') || "");
+            inp.className = (ed.className || "") + " lmleditable-seemless";
+            inp.value = txt;
+
+            ed.insertAfter(inp);
+            ed.remove();
+            
+            ed = elem.querySelector('lml\\:editable');
+        }
+
+
         var tn = elem.querySelector('lml\\:text');
         while (tn) {
             var varlevels = tn.getAttribute('var').split('.');
@@ -57,8 +155,15 @@ var LMLDom = function() {
                 txt = txt[varlevels[k]];
             }
 
-            var spann = document.createElement('span');
-            spann.innerHTML = txt;
+            var elementtype = tn.getAttribute('wrapper');
+            
+            var spann;
+            if (elementtype) {
+                spann = document.createElement('span');
+                spann.innerHTML = txt;
+            } else {
+                spann = document.createTextNode(txt);
+            }
 
             tn.insertAfter(spann);
             tn.remove();
@@ -77,7 +182,7 @@ var LMLDom = function() {
             return;
         }
 
-        ldContext.livevars = liliumcms.livevars.deepLivevars();
+        ldContext.livevars = liliumcms.livevars.deepLivevars(true);
 
         var now = new Date();
         this.parseNode(maindom);
@@ -101,6 +206,10 @@ var LMLDom = function() {
 
         HTMLUnknownElement.prototype.insertAfter = function (newNode) { 
             this.parentNode.insertBefore(newNode, this.nextSibling); 
+        };
+
+        HTMLElement.prototype.getElementsByName = function(name) {
+            return this.querySelectorAll('[name="'+name+'"]');
         };
     };
 };

@@ -546,8 +546,8 @@ var LiveVars = function() {
         return node;
     }
 
-    this.deepLivevars = function() {
-        if (typeof liliumcms.livevars.deeplivevars === 'undefined') {
+    this.deepLivevars = function(reload) {
+        if (reload || typeof liliumcms.livevars.deeplivevars === 'undefined') {
             var dlv = new Object;
             liliumcms.livevars.deeplivevars = dlv;
 
