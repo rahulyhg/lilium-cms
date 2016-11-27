@@ -16,6 +16,6 @@
 	    {%adminbar}
         {%adminsidebar}
         {%chatslider}
-		<main class="container lmladminmain lmladmincontentwrapper"></main>
+		<main class="container lmladminmain lmladmincontentwrapper" id="lml-main"></main>
 	</body>
 </html>

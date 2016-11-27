@@ -1,38 +1,19 @@
 {#theme;extra}
 <!DOCTYPE html>
 <html id="lmlhtml" data-htmltype="lml" data-generated="true" data-cachehit="true">
-{=theme.render('head_will_open')}
 <head id="lmlhead">
-    {=theme.render('metas')}
     {%petals/meta}
-
-    {=theme.render('styles')}
     {%petals/headstyle}
-
-    {=theme.render('scripts')}
     {%petals/headscript}
-
     {=theme.getQueueTags()}
-
-    {=theme.render('title')}
     {%petals/title}
-
-    {=theme.render('head_will_close')}
 </head>
 <body>
     {%petals/lib}
     {%petals/socialhead}
-    {=theme.render('body_will_open')}
-    
     {%petals/header}
-    {=theme.render('content_will_load')}
-
     {%petals/beforecontent}
-
     {%%extra.contentpetal}
-
-    {=theme.render('content_loaded')}
     {%petals/footer}
-    {=theme.render('footer_loaded')}
 </body>
 </html>

@@ -386,7 +386,6 @@ var Core = function () {
             absURL: aurl + "entities",
             children: []
         });
-        /*
         admin.registerAdminMenu({
             id: "secrets",
             faicon: "fa-key",
@@ -396,7 +395,6 @@ var Core = function () {
             absURL: aurl + "secrets",
             children: []
         });
-        */
         admin.registerAdminMenu({
             id: "themes",
             faicon: "fa-paint-brush",

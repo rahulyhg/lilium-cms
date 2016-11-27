@@ -379,132 +379,135 @@ var LiveVars = function() {
      * Generate view based on livevars and lml:templates
      */
     this.parseTextToView = function(local) {
-        $((local ? "main.lmladminmain " : "") + "lml\\:livevars").each(function() {
-            var lmlTag = $(this);
+        if (!document.querySelector('lml\\:dom')) {
+            $((local ? "main.lmladminmain " : "") + "lml\\:livevars").each(function() {
+                var lmlTag = $(this);
 
-            if (typeof livevars[this.dataset.varname] === "object") {
+                if (typeof livevars[this.dataset.varname] === "object") {
 
-                var templateName = $(this).data('template');
-                var varValue = livevars[this.dataset.varname];
-                var fillerName = $(this).data('filler');
-                var sourceof = $(this).data('sourceof');
-                var cacheonly = $(this).data('cacheonly');
-                var livevarkey = this.dataset.varname;
-                var readkey = this.dataset.readkey;
-                if (typeof $(this).data('attribute') !== 'undefined') {
-                    var attributes = typeof $(this).data('attribute') == "object" ? $(this).data('attribute') : JSON.parse($(this).data('attribute').replace(/&lmlquote;/g, '"'));
+                    var templateName = $(this).data('template');
+                    var varValue = livevars[this.dataset.varname];
+                    var fillerName = $(this).data('filler');
+                    var sourceof = $(this).data('sourceof');
+                    var cacheonly = $(this).data('cacheonly');
+                    var livevarkey = this.dataset.varname;
+                    var readkey = this.dataset.readkey;
+                    if (typeof $(this).data('attribute') !== 'undefined') {
+                        var attributes = typeof $(this).data('attribute') == "object" ? $(this).data('attribute') : JSON.parse($(this).data('attribute').replace(/&lmlquote;/g, '"'));
 
-                }
+                    }
 
-                if (livevars[this.dataset.varname].length == 0) {
-                    var template = $('#' + templateName);
-                    $(this).after($(template).find('lml\\:empty').html());
-                }
-                if (sourceof && sourceof != "") {
-                    (function(src, data) {
-                        var evnt = function() {
-                            if (!$('#' + src).data('_lmlfilled')) {
-                                var fCtx = $('#' + src).data('context');
-                                if ($.isArray(data)) {
-                                    for (var key in data) {
-                                        liliumcms.fillFormFromSource(src, data[key], key, fCtx);
+                    if (livevars[this.dataset.varname].length == 0) {
+                        var template = $('#' + templateName);
+                        $(this).after($(template).find('lml\\:empty').html());
+                    }
+                    if (sourceof && sourceof != "") {
+                        (function(src, data) {
+                            var evnt = function() {
+                                if (!$('#' + src).data('_lmlfilled')) {
+                                    var fCtx = $('#' + src).data('context');
+                                    if ($.isArray(data)) {
+                                        for (var key in data) {
+                                            liliumcms.fillFormFromSource(src, data[key], key, fCtx);
+                                        }
+                                    } else {
+                                        liliumcms.fillFormFromSource(src, data, undefined, fCtx);
                                     }
-                                } else {
-                                    liliumcms.fillFormFromSource(src, data, undefined, fCtx);
-                                }
     
-                                $('#' + src).data('_lmlfilled', true);
-                                document.removeEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
-                            }
-                        };
-
-                        document.addEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
-                    })(sourceof, varValue);
-                }
-                if (cacheonly) {
-                    // $(lmlTag).remove();
-                } else if (fillerName == "pushtable") {
-                    var datascheme = $(this).data('scheme');
-                    var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);
-                    liliumcms.pushtables.push(pushTable);
-
-                    $(lmlTag).after(pushTable.render());
-                } else if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
-                    var templateObj = $('#' + $(this).data('template'));
-
-                    if (templateObj.length != 0) {
-                        if (varValue.length > 0) {
-                            // Generate template object for array
-                            varValue.forEach(function(val, index) {
-                                generateTemplateFromObject(templateObj, lmlTag, val, livevarkey);
-                            });
-                        } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
-                            // Generate template for single data
-                            generateTemplateFromObject(templateObj, lmlTag, varValue, livevarkey);
-                        }
+                                    $('#' + src).data('_lmlfilled', true);
+                                    document.removeEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
+                                }
+                            };
+    
+                            document.addEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
+                        })(sourceof, varValue);
                     }
-
-                    // $(lmlTag).remove();
-                } else if (fillerName != "") {
-                    var filler = $(document.createElement(fillerName));
-                    filler.attr('name', lmlTag.data('fieldname'));
-                    if (attributes && attributes.lmlselect) {
-                        if (attributes.multiple) {
-                            filler.attr("multiple", "multiple");
-                        }
+                    if (cacheonly) {
+                        // $(lmlTag).remove();
+                    } else if (fillerName == "pushtable") {
                         var datascheme = $(this).data('scheme');
-                        var multiselect = new MultiSelect($(this).data('fieldname'), lmlTag, filler);
-                        liliumcms.multiselects.push(multiselect);
-                        filler[0].dataset.multiselectindex = liliumcms.multiselects.length - 1;
-                    }
-                    if (typeof varValue.length !== 'undefined' && varValue.forEach) {
-                        var d = lmlTag.data();
-                        if (attributes && attributes.header) {
-                            generateFillingFromObject(filler, d, attributes.header, true);
-                        }
+                        var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);
+                        liliumcms.pushtables.push(pushTable);
 
-                        varValue.forEach(function(val, index) {
-                            generateFillingFromObject(filler, d, val);
-                        });
+                        $(lmlTag).after(pushTable.render());
+                    } else if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
+                        var templateObj = $('#' + $(this).data('template'));
+    
+                        if (templateObj.length != 0) {
+                            if (varValue.length > 0) {
+                                // Generate template object for array
+                                varValue.forEach(function(val, index) {
+                                    generateTemplateFromObject(templateObj, lmlTag, val, livevarkey);
+                                });
+                            } else if (typeof varValue !== 'undefined' && typeof varValue.length === 'undefined') {
+                                // Generate template for single data
+                                generateTemplateFromObject(templateObj, lmlTag, varValue, livevarkey);
+                            }
+                        }
+    
+                        // $(lmlTag).remove();
+                    } else if (fillerName != "") {
+                        var filler = $(document.createElement(fillerName));
+                        filler.attr('name', lmlTag.data('fieldname'));
+                        if (attributes && attributes.lmlselect) {
+                            if (attributes.multiple) {
+                                filler.attr("multiple", "multiple");
+                            }
+                            var datascheme = $(this).data('scheme');
+                            var multiselect = new MultiSelect($(this).data('fieldname'), lmlTag, filler);
+                            liliumcms.multiselects.push(multiselect);
+                            filler[0].dataset.multiselectindex = liliumcms.multiselects.length - 1;
+                        }
+                        if (typeof varValue.length !== 'undefined' && varValue.forEach) {
+                            var d = lmlTag.data();
+                            if (attributes && attributes.header) {
+                                generateFillingFromObject(filler, d, attributes.header, true);
+                            }
+
+                            varValue.forEach(function(val, index) {
+                                generateFillingFromObject(filler, d, val);
+                            });
+                        } else {
+                            var d = lmlTag.data();
+                            if (attributes && attributes.header) {
+                                generateFillingFromObject(filler, d, attributes.header, true);
+                            }
+    
+                            generateFillingFromObject(filler, d, varValue);
+                        }
+    
+                        if (readkey && readkey != name) {
+                            filler.data("readkey", readkey);
+                            filler.get(0).dataset.readkey = readkey;
+                        }
+    
+                        $(lmlTag).after(filler);
                     } else {
-                        var d = lmlTag.data();
-                        if (attributes && attributes.header) {
-                            generateFillingFromObject(filler, d, attributes.header, true);
-                        }
-
-                        generateFillingFromObject(filler, d, varValue);
-                    }
-
-                    if (readkey && readkey != name) {
-                        filler.data("readkey", readkey);
-                        filler.get(0).dataset.readkey = readkey;
-                    }
-
-                    $(lmlTag).after(filler);
-                } else {
-                    $(this).text(JSON.stringify(livevars[$(this).data('varname')]));
-                    $(this).text(unescape(livevars[$(this).data('varname')]));
+                        $(this).text(JSON.stringify(livevars[$(this).data('varname')]));
+                        $(this).text(unescape(livevars[$(this).data('varname')]));
+                    }   
                 }
-            }
-        });
-        // Lilium Templates
-        $('lml\\:template').remove();
+            });
 
-        // Parse remaining independent tObjects
-        $('lml\\:tobject').not('lml\\:template lml\\:tobject').not('lml\\:tabletemplate lml\\:tobject').each(function(index, tobj) {
-            var nodeType = tobj.dataset.nodetype || "span";
-            var node = $(document.createElement(nodeType));
-            var content = fetchTemplateObjectContent(
-                $(tobj),        
-                liliumcms.livevars.deepLivevars(), 
-                $(tobj).parent(), 
-                $(tobj).data('key'), 
-                node
-            );
+            // Lilium Templates
+            $('lml\\:template').remove();
+
+            // Parse remaining independent tObjects
+            $('lml\\:tobject').not('lml\\:template lml\\:tobject').not('lml\\:tabletemplate lml\\:tobject').each(function(index, tobj) {
+                var nodeType = tobj.dataset.nodetype || "span";
+                var node = $(document.createElement(nodeType));
+                var content = fetchTemplateObjectContent(
+                    $(tobj),        
+                    liliumcms.livevars.deepLivevars(), 
+                    $(tobj).parent(), 
+                    $(tobj).data('key'), 
+                    node
+                );
             
-            node.html(content || ("[TObjectException - Undefined live variable key " + $(tobj).data('key') + "]"));
-            $(tobj).after(node).remove();
-        });
+                node.html(content || ("[TObjectException - Undefined live variable key " + $(tobj).data('key') + "]"));
+                $(tobj).after(node).remove();
+            });
+        }
 
         // Fire ready event
         document.dispatchEvent(new CustomEvent('livevarsPrerendered', {

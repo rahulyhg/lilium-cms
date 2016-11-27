@@ -720,6 +720,15 @@ var LiliumCMS = function() {
             liliumcms.conversations.closeChat();
 
             var formattedUrl = url + (url.indexOf('?') === -1 ? "?" : "&") + "async=*";
+            var adminpath = url.substring(url.indexOf('/admin/') + 7);
+            var endofadminpath = adminpath.indexOf('/');
+
+            if (endofadminpath != -1) {
+                adminpath = adminpath.substring(0, endofadminpath);
+            }
+
+            document.location.lmladminpath = adminpath;
+
             $.get(formattedUrl, function(html) {
                 $('main.lmladminmain').html(html);
                 that.postload();
@@ -829,6 +838,7 @@ var LiliumCMS = function() {
             that.conversations = new LMLConversations();
             that.animator = new Animator();
             that.facebook = new LMLFacebook();
+            that.lmldom = new LMLDom();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -909,6 +919,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.badges.createCache();
         liliumcms.badges.fillSidebar();
         liliumcms.conversations.fillChat();
+        liliumcms.lmldom.init();
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.multiselects.forEach(function(select) {
@@ -925,6 +936,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.formParser.init();
         liliumcms.pageloader.parseDocument();
         liliumcms.livevars.parseDataLivevars();
+        liliumcms.lmldom.parse();
         liliumcms.pageloader.present();
         liliumcms.animator.present();
     }

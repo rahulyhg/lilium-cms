@@ -114,6 +114,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/facebook.js", 2025, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmldom.js", 2110, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/badges.js", 2130, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/preview.js", 2150, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/pushtable.js", 2200, 'admin', conf.id);

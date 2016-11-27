@@ -984,6 +984,30 @@ var Entities = module.exports = new function () {
         }, []);
     };
 
+    this.getRights = function(cli, entityid, cb) {
+        db.find(cli._c, 'entities', {_id : db.mongoID(entityid)}, [], function(err, cur) {
+            cur.hasNext(function(err, hasnext) {
+                if (hasnext) {
+                    cur.next(function(err, usrr) {
+                        var rls = usrr.roles;
+                        if (rls.indexOf('lilium') != -1 || rls.indexOf('admin') != -1) {
+                            cb(["*"]);
+                        } else {
+                            var urights = [];
+                            for (var i = 0; i < rls.length; i++) {
+                                urights.push(...rls[i]);
+                            }
+
+                            cb(urights);
+                        }
+                    });
+                } else {
+                    cb([]);
+                }
+            });
+        }, {roles : 1})
+    };
+
     var deletePluginRole = function (identifier) {
         for (var i in Roles) {
             if (Roles[i].pluginID == identifier) {

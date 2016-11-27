@@ -1,0 +1,106 @@
+{#config}
+
+var LMLDom = function() {
+    var maindom;
+    var livevars;
+    var ldContext = {};
+
+    this.foreach = function(elem) {
+        var nodes = [];
+
+        var itt = ldContext[elem.getAttribute('in')];
+        var varname = elem.getAttribute('var');
+
+        if (typeof itt == "undefined") {
+            // Try deep variable
+            var ittlevels = elem.getAttribute('in').split('.');
+            var itt = ldContext;
+            
+            for (var i = 0; i < ittlevels.length; i++) {
+                itt = itt[ittlevels[i]];
+            }
+        }
+
+        for (var i = 0; i < itt.length; i++) {
+            var elemclone = elem.cloneNode(true);
+
+            ldContext[varname] = itt[i];
+            var wrap = document.createElement(elem.getAttribute('wrapper') || "div");
+            for (var j = 0; j < elemclone.children.length; j++) {
+                wrap.appendChild(elemclone.children[j]);
+            }
+            elemclone.remove();
+
+            this.parseNode(wrap);
+            elem.insertAfter(wrap);
+        }
+
+        ldContext[varname] = undefined;
+
+        elem.remove();
+        return nodes;
+    };
+
+    this.parseNode = function(elem) {
+        var fe = elem.querySelector('lml\\:foreach');
+        while (fe) {
+            var nd = this.foreach(fe);
+            fe = elem.querySelector('lml\\:foreach');
+        }
+
+        var tn = elem.querySelector('lml\\:text');
+        while (tn) {
+            var varlevels = tn.getAttribute('var').split('.');
+            var txt = ldContext;
+            
+            for (var k = 0; k < varlevels.length; k++) {
+                txt = txt[varlevels[k]];
+            }
+
+            var spann = document.createElement('span');
+            spann.innerHTML = txt;
+
+            tn.insertAfter(spann);
+            tn.remove();
+            
+            tn = elem.querySelector('lml\\:text');
+        }
+
+        return elem;
+    };
+
+    this.parse = function() {
+        var domv = document.querySelector('lml\\:dom');
+        if (domv) {
+            domv = domv.getAttribute('v');
+        } else {
+            return;
+        }
+
+        ldContext.livevars = liliumcms.livevars.deepLivevars();
+
+        var now = new Date();
+        this.parseNode(maindom);
+        var lvs = maindom.querySelectorAll("lml\\:livevars");
+        for (var i = 0; i < lvs.length; i++) {
+            lvs[i].remove();
+        }
+
+        console.log("Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
+        document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
+            detail : {
+                version : domv,
+                protocol : "lmldom",
+                timetoparse : (new Date() - now)
+            }
+        }));
+    };
+
+    this.init = function() {
+        maindom = document.getElementById('lml-main');
+
+        HTMLUnknownElement.prototype.insertAfter = function (newNode) { 
+            this.parentNode.insertBefore(newNode, this.nextSibling); 
+        };
+    };
+};

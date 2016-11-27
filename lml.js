@@ -396,8 +396,6 @@ var LML = function () {
             var truthfulness = this.compare(firstVal, compVal, op);
             context.skipUntilClosure = !truthfulness;
 
-            console.log (firstVal + " " + op + " " + compVal + " => " + truthfulness);
-
             return truthfulness;
         }
 

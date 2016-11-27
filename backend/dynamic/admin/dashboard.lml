@@ -1,14 +1,10 @@
 {#config;vocab;dashboard}
-{$
-	dashpetals = dashboard.getPetals();
-$}
-{$
-	for (petalname in dashpetals);
-$}
+
+{$ dashpetals = dashboard.getPetals(); $}
+{$ for (petalname in dashpetals); $}
 	{%=petalname}
-{$
-	endfor;
-$}
+{$ endfor; $}
+
 <footer>
 
 </footer>
