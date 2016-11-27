@@ -396,6 +396,8 @@ var LML = function () {
             var truthfulness = this.compare(firstVal, compVal, op);
             context.skipUntilClosure = !truthfulness;
 
+            console.log (firstVal + " " + op + " " + compVal + " => " + truthfulness);
+
             return truthfulness;
         }
 
@@ -619,14 +621,17 @@ var LML = function () {
 
     // Content of line should be trimmedd
     var parseLine = function (line, context, lineCallback, linetype) {
-        line = line.trim();
+        // line = line.trim();
         if (line.length == 0) {
             lineCallback(context.lineFeedback);
             return;
         }
 
         if (linetype == "plain") {
-            context.w(line);
+            if (!context.skipUntilClosure) {
+                context.w(line);
+            }
+
             lineCallback(context.lineFeedback);
             return;
         }
