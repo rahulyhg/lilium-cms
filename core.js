@@ -114,6 +114,8 @@ var Core = function () {
             cli.redirect(cli._c.server.url + "/" + cli._c.paths.admin, false);
             return true;
         });
+
+        persona.bindHooks();
         hooks.fire('hooks');
         log('Hooks', 'Loaded hooks');
     };

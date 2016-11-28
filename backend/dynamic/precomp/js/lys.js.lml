@@ -121,7 +121,7 @@ var Lys = function() {
 
     var basicCreateLys = function(commandName, objName) {
         if (commandName === "publish") {
-            document.location.href = "{=config.default.server.url}/admin/article/new";
+            liliumcms.pageloader.load("{=config.default.server.url}/admin/article/new");
             return true;
         }
 
@@ -145,7 +145,7 @@ var Lys = function() {
             return false;
         }
 
-        document.location.href = "{=config.default.server.url}/admin/" + objTypes[objName];
+        liliumcms.pageloader.load("{=config.default.server.url}/admin/" + objTypes[objName]);
         return true;
     };
 
@@ -165,7 +165,7 @@ var Lys = function() {
         }
         
         if (url = levels[keyword][detail]) {
-            document.location.href = "{=config.default.server.url}/admin/" + url;
+            liliumcms.pageloader.load("{=config.default.server.url}/admin/" + url);
             return true;
         }
 

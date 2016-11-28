@@ -690,6 +690,7 @@ var LiliumCMS = function() {
 
         this.present = function() {
             $("#lilium-logo").removeClass('quickrotate');
+            $('undefined, lml\\:livevars').remove();
         };
     
         this.tidy = function() {
@@ -820,6 +821,7 @@ var LiliumCMS = function() {
     this.everythingIsAwesome = function() {
         $('.dropdown-menu #avatar img').attr('src', that.livevars.livevars().session.avatarURL);
         $('body').addClass('lmlrendered');
+        $('undefined, lml\\:livevars').remove();
 
         if (Notification.permission !== "granted") {
             Notification.requestPermission();

@@ -70,9 +70,12 @@ var LiliumChartbeat = function($) {
     	});
 	};
 
+    // NEEDS TO BE FIXED : MEMORY LEAK
 	var bindLivevars = function() {
-		document.removeEventListener('livevarsPrerendered', livevarsPrerendered);
-		document.addEventListener('livevarsPrerendered', livevarsPrerendered);
+        if (true || !window.lmlchartbeatlivevarprerenderedbound) {
+            window.lmlchartbeatlivevarprerenderedbound = true;
+		    document.addEventListener('livevarsPrerendered', livevarsPrerendered);
+        }
 	};
 
     var livevarsPrerendered = function(pkg) {
@@ -110,10 +113,11 @@ var LiliumChartbeat = function($) {
 				}
 			};
 
-			window.removeEventListener("resize", resizeCanvas);
-		    window.removeEventListener("focus", resizeCanvas);
-			window.addEventListener("resize", resizeCanvas);
-		    window.addEventListener("focus", resizeCanvas);
+            if (!window.lmlchartbeatresizebound) {
+                window.lmlchartbeatresizebound = true;
+	    		window.addEventListener("resize", resizeCanvas);
+    		    window.addEventListener("focus", resizeCanvas);
+            }
 
             if (historyChart) {
                 historyChart.destroy();

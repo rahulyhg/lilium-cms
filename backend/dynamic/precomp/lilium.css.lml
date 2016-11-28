@@ -1039,6 +1039,8 @@ background-color: {=actioncolor}!important;
     padding: 10px;
     border: 1px solid #DDD;
     background-color: #F9F9F9;    
+
+    color: #777;
 }
 
 .persona-list li .persona-image-wrapper {
@@ -1053,7 +1055,11 @@ background-color: {=actioncolor}!important;
 .persona-list li .persona-details-wrapper {
     display: inline-block;
     vertical-align: top;
-    font-size: 28px;    
+    width: calc(100% - 165px);
+}
+
+.persona-list li .persona-details-wrapper a {
+    font-size: 28px;
 }
 
 /* Admin Bar */

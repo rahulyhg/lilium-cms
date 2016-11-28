@@ -1007,7 +1007,7 @@ var Article = function() {
                 props: {
                     'value': 'name',
                     'html': 'displayname',
-                    'header': 'Select One',
+                    'header': 'Select One'
                 },
                 displayname: "Categories"
             })
@@ -1017,10 +1017,6 @@ var Article = function() {
                     'class': 'col-md-4'
                 }
             })
-            .add('title-postleaf', 'title', {
-                displayname : "Interactive features"
-            })
-            .trigger('postleaf')
             .trigger('fields')
             .add('title-featuredimage', 'title', {
                 displayname : "Featured image information"
@@ -1031,6 +1027,14 @@ var Article = function() {
             .add('featuredimagelink', 'text', {
                 displayname : "Artist link"
             })
+            .add('title-postleaf', 'title', {
+                displayname : "Interactive features"
+            })
+            .trigger('postleaf')
+            .add('title-persona', 'title', {
+                displayname : "Persona targeting"
+            })
+            .trigger('persona')
             .add('title-industry', 'title', {
                 displayname : "Industry"
             })

@@ -7,6 +7,8 @@
     lml:text /      => var="variableName"
     lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
     lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
+    lml:link        => href="//domain.com/admin/{variableName}" class=""
+    lml:image       => src="//domain.com/uploads/{variableName}" 
 */
 var LMLDom = function() {
     var maindom;
@@ -145,6 +147,59 @@ var LMLDom = function() {
             ed = elem.querySelector('lml\\:editable');
         }
 
+        var lim = elem.querySelector('lml\\:image');
+        while (lim) {
+            var img = document.createElement('img');
+
+            var paramName = lim.getAttribute('src') || "";
+            
+            paramstr = paramName;
+            while (-1 != paramstr.indexOf('{')) {
+                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
+                var newval = ldContext;
+                for (var i = 0; i < varlevels.length; i++) {
+                    newval = newval[varlevels[i]];
+                }
+
+                paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
+            }
+
+            img.setAttribute('src', paramstr);
+            img.className = lim.className;
+            img.innerHTML = lim.innerHTML;
+
+            lim.insertAfter(img);
+            lim.remove();
+
+            lim = elem.querySelector('lml\\:image');
+        }
+
+        var lnk = elem.querySelector('lml\\:link');
+        while (lnk) {
+            var a = document.createElement('a');
+
+            var paramName = lnk.getAttribute('href') || "";
+            
+            paramstr = paramName;
+            while (-1 != paramstr.indexOf('{')) {
+                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
+                var newval = ldContext;
+                for (var i = 0; i < varlevels.length; i++) {
+                    newval = newval[varlevels[i]];
+                }
+
+                paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
+            }
+
+            a.setAttribute('href', paramstr);
+            a.className = lnk.className;
+            a.innerHTML = lnk.innerHTML;
+
+            lnk.insertAfter(a);
+            lnk.remove();
+
+            lnk = elem.querySelector('lml\\:link');
+        }
 
         var tn = elem.querySelector('lml\\:text');
         while (tn) {
@@ -192,6 +247,8 @@ var LMLDom = function() {
         }
 
         console.log("Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
+
+        liliumcms.pageloader.parseDocument();
         document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
             detail : {
                 version : domv,

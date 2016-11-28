@@ -17,6 +17,9 @@ Personas.prototype.handleGET = function(cli) {
             case "new":
                 filelogic.serveAdminLML(cli);
                 break;
+            case "edit":
+                filelogic.serveAdminLML(cli, true);
+                break;
             default:
                 cli.throwHTTP(404, 'NOT FOUND');
         }
@@ -28,6 +31,8 @@ Personas.prototype.handlePOST = function(cli) {
         case "new":
             handleSave(cli);
             break;
+        case "edit":
+            handleSave(cli, true, cli.routeinfo.path[3]);
         default:
             cli.throwHTTP(404, 'NOT FOUND');
     }
@@ -35,9 +40,16 @@ Personas.prototype.handlePOST = function(cli) {
 
 Personas.prototype.registerLiveVar = function() {
     livevars.registerLiveVariable('personas', function(cli, levels, params, cb) {
-        db.findToArray(cli._c, 'personas', {}, function(err, arr) {
-            cb(err || arr);
-        });
+        if (levels[0] === "list") {
+            db.findToArray(cli._c, 'personas', {}, function(err, arr) {
+                cb(err || arr);
+            });
+        } else if (levels[0] == "get") {
+            var id = levels[1];
+            db.findToArray(cli._c, 'personas', {_id : db.mongoID(id)}, function(err, arr) {
+                cb(err || arr[0]);
+            });
+        }
     });
 };
 
@@ -48,82 +60,107 @@ Personas.prototype.registerForms = function() {
     .add('title-info', 'title', {
         displayname : "Personal information"
     })
-    .add('personafullname', 'text', {
+    .add('fullname', 'text', {
         displayname : "Full name"
     })
-    .add('personaage', 'number', {
+    .add('age', 'number', {
         displayname : "Age"
     })
-    .add('personacityfrom', 'text', {
+    .add('fromcity', 'text', {
         displayname : "Place of birth (city)"
     })
-    .add('personacitycurrent', 'text', {
+    .add('currentcity', 'text', {
         displayname : "Current city"
     })
     .add('title-life', 'title', {
         displayname : "Life"
     })
-    .add('personapresentation', 'textarea', {
+    .add('presentation', 'textarea', {
         displayname : "Presentation paragraph"
     })
-    .add('personajob', 'text', {
+    .add('job', 'text', {
         displayname : "Current job / Field of study"
     })
     .add('title-intests', 'title', {
         displayname : "Interests"
     })
-    .add('personahottopics', 'text', {
+    .add('hottopics', 'text', {
         displayname : "Hot topics (comma-separated)"
     })
-    .add('personanegativetopics', 'text', {
+    .add('negativetopics', 'text', {
         displayname : "Negative topics (comma-separated)"
     })
-    .add('personatone', 'text', {
+    .add('tone', 'text', {
         displayname : "Preferred tone (i.e. cynical, bubbly, bold)"
     })
-    .add('personaexemple', 'text', {
+    .add('titleexemple', 'text', {
          displayname : "Title this person would click on (just one)"
     })
     .add('title-picture', 'title', {
         displayname : "Looks"
     })   
-    .add('personapicture', 'file', {
-        displayname : "Profile picture"
+    .add('pictureid', 'media-explorer', {
+        displayname : "Profile picture",
+        size: 250,
+        urlfield : "pictureurl"
     })
 
     .add('Save', 'submit', {
         displayname : "Save"
-    }) 
+    });
 };
 
-var handleSave = function(cli) {
+Personas.prototype.bindHooks = function() {
+    require('./hooks.js').bind('post_create_persona', 15, function(pkg) {
+        pkg.form.add('persona-select', 'livevar', {
+            displayname : "Persona",
+            endpoint: 'personas.list', 
+            tag : 'select',
+            template: 'option',
+            title: 'persona',
+            props : {
+                value : '_id',
+                html : 'fullname',
+                header : 'Select One'
+            },
+            allowempty : true,
+            emptytext : "- No persona -"
+        });
+    });
+};
+
+var handleSave = function(cli, update, updateid) {
     var form = forms.handleRequest(cli);  
     var response = forms.validate(form, true);  
 
     if (response.success) {
-        form.personepicture;
-
         var fields = forms.serializeForm(form);
-        var extensions = fields.personapicture.split('.'); 
-        var mime = extensions[extensions.length - 1]; 
-        var saveTo = cli._c.server.base + "backend/static/uploads/" + fields.personapicture;
 
-        imageResizer.resize(saveTo, fields.personapicture, mime, cli._c, function (images) { 
-            db.insert(cli._c, 'personas', {
-                fullname : fields.personafullname,
-                age : fields.personaage,
-                fromcity : fields.personacityfrom,
-                currentcity : fields.personacitycurrent,
-                persentation : fields.personapresentation,
-                job : fields.personajob,
-                hottopics : fields.personahottopics,
-                negativetopics : fields.personanegativetopics,
-                tone : fields.personatone,
-                titleexemple : fields.exemple,
-                pictureurl : images.thumbnailarchive.url
-            }, function() {
-                cli.redirect(cli._c.server.url + "/admin/persona", false);
-            });
+        db.findToArray(cli._c, 'uploads', {_id : db.mongoID(fields.pictureid)}, function(err, arr) {
+            var newobj = {
+                fullname : fields.fullname,
+                age : fields.age,
+                fromcity : fields.fromcity,
+                currentcity : fields.currentcity,
+                presentation : fields.presentation,
+                job : fields.job,
+                hottopics : fields.hottopics,
+                negativetopics : fields.negativetopics,
+                tone : fields.tone,
+                titleexemple : fields.titleexemple,
+                pictureid : fields.pictureid,
+                pictureurl : arr.length == 0 ? "" : arr[0].sizes.thumbnailarchive.url
+            };
+
+            if (update) {
+                db.update(cli._c, 'personas', {_id : db.mongoID(updateid)}, newobj, function() {
+                    cli.redirect(cli._c.server.url + "/admin/persona/", false);
+                });
+            } else {
+                db.insert(cli._c, 'personas', newobj, function() {
+                    cli.redirect(cli._c.server.url + "/admin/persona/", false);
+                });
+            }
         });
     } else {
         cli.sendJSON({ 

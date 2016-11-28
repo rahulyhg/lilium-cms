@@ -182,7 +182,8 @@ var Forms = function () {
             var displayname = typeof field.attr.displayname !== 'undefined' ? field.attr.displayname : field.name;
             var html = '<label for="'+field.name+'">' + displayname + '</label>';
             html += '<div>';
-            html += '<img class="media_explorer_form pickable" data-hiddenfield="'+field.name+'"  />';
+            html += '<img class="media_explorer_form pickable" data-hiddenfield="'+field.name+'"';
+            html += (field.attr.size ? ('style="width: '+field.attr.size+'px; height: '+field.attr.size+'px;" ') : '') + ' />';
             html += '<input type="hidden" class="media-input" name="' + field.name + '">';
             html += '</div>';
             return html;
