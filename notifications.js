@@ -14,6 +14,8 @@ var sockets = {};
 var groups = {};
 var namespaces = [];
 
+var idToNamespace = {};
+
 var LiliumSocket = function (socket, session) {
     this.socket = socket;
     this.session = session;
@@ -325,6 +327,7 @@ var Notification = function () {
             log('Socket', 'Created connection for channel : ' + path + conf.uid);
             io.of(path + conf.uid).on('connection', onSocketConnection);
             namespaces.push(path + conf.uid);
+            idToNamespace[conf.id] = path + conf.uid
         });
 
         that.createGroup('lml_network');
@@ -536,12 +539,11 @@ var Notification = function () {
                     io.sockets.in(site + '_' +groupName).emit(type || 'notification', data);
                 }
             }
-        }
-
+        }   
     };
 
     this.emitToWebsite = function (siteid, data, type) {
-        this.emitToGroup('lmlsite_' + siteid, data, type, false);
+        io.of(idToNamespace[siteid]).emit(type || 'notification', data);
     };
 
     this.messageNotif = function(user, msg) {

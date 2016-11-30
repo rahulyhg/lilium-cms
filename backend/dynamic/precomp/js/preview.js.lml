@@ -2,7 +2,7 @@
 var LMLPreviewer = function() {
     var that = this;
     var ePreview = document.getElementById("lmlpreviewer");
-    var eFrame = ePreview.querySelector('iframe');
+    var eFrame = ePreview ? ePreview.querySelector('iframe') : undefined;
     var frameContent = "";
 
     this.setContent = function(content) {
@@ -41,6 +41,8 @@ var LMLPreviewer = function() {
     };
 
     this.init = function() {
+        if (!ePreview) return;
+
         ePreview.querySelector('.dismiss').addEventListener('click', that.dismiss);
         ePreview.querySelector('.preview-in-tab').addEventListener('click', that.openInTab);
         ePreview.querySelector('.toggle-mobile').addEventListener('click', that.setMobileView);

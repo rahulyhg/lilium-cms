@@ -237,7 +237,7 @@ var Chartbeat = function() {
 
             var scCall = function() {
                 var t = new Date();
-                request.get(qsurl, {timeout:250}, function(err, resp, body) {
+                request.get(qsurl, {timeout:350}, function(err, resp, body) {
                     storeQuickstats(conf, err, resp, body);
 
                     if (err) {

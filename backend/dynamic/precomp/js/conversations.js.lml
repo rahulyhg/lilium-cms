@@ -179,6 +179,8 @@ var LMLConversations = function() {
     };
 
     this.closeChat = function() {
+        if (!document.getElementById('nav-conversations')) return;
+
         document.getElementById("chat-slider").classList.remove('lefter');
         document.querySelector('main.lmladminmain').classList.remove('lefter');
         document.querySelector('.lmladminsidebar').classList.remove('lefter');
@@ -333,6 +335,8 @@ var LMLConversations = function() {
     };
 
     this.init = function() {
+        if (!document.getElementById('nav-conversations')) return;
+
         document.getElementById('nav-conversations').addEventListener('click', that.toggleChat);
         Mousetrap.bind(["shift+="], that.toggleChat);
         Mousetrap.bind(["escape"], that.closeChat);

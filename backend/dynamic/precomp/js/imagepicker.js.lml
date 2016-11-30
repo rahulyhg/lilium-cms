@@ -343,6 +343,8 @@ var LMLImagePicker = function() {
     };
 
     this.init = function() {
+        if (!ePicker) return;
+
         document.querySelector(".lmlimagepicker-actions button.dismiss").addEventListener('click', that.dismiss);
         document.querySelector(".lmlimagepicker-actions button.refresh").addEventListener('click', that.refresh);
         document.querySelector(".lmlimagepicker-actions button.accept").addEventListener('click', that.accept);
