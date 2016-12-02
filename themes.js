@@ -132,7 +132,7 @@ var Themes = function () {
         return typeof uName !== 'undefined' && ActiveTheme[conf.id] && ActiveTheme[conf.id].uName == uName;
     };
 
-    this.enableTheme = function (config, uName, callback) {
+    this.enableTheme = function (config, uName, callback, curSettings) {
         if (this.isActive(config, uName)) {
             var err = new Error("[ThemeException] Cannot register already registered theme with uName " + uName);
             log('Themes', err);
@@ -176,12 +176,12 @@ var Themes = function () {
                                 db.update(config, 'themes', {
                                     uName: uName
                                 }, { settings : settings}, function() {
-                                    ActiveTheme[config.id].settings = settings;
+                                    ActiveTheme[config.id].settings = curSettings || settings;
+                                    callback();
                                 });
-                                callback();
 
                             } else {
-                                ActiveTheme[config.id].settings = doc.value.settings || ActiveTheme[config.id].settings;
+                                ActiveTheme[config.id].settings = curSettings || doc.value.settings || ActiveTheme[config.id].settings;
     
                                 log('Themes', 'Theme enable called back');
                                 cli.cacheClear(undefined, callback);
@@ -200,44 +200,39 @@ var Themes = function () {
         var defaults = {};
         var formName = 'theme_settings_' + config.uid;
 
-        if (ActiveTheme[config.id].info.settingForm) {
-            ActiveTheme[config.id].settings = {};
-
-            formBuilder.deleteForm();
-            if (!formBuilder.isAlreadyCreated(formName)) {
-                var form = formBuilder.createForm(formName, {
-                    fieldWrapper: {
-                        tag: 'div',
-                        cssPrefix: 'theme-setting-field-'
-                    },
-                    cssClass: 'theme-settings-form'
-                });
-                form.add('formsetting-sep', 'title', {
-                    displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'
-                } );
-            }
-
-            for (var name in ActiveTheme[config.id].info.settingForm) {
-                var property = ActiveTheme[config.id].info.settingForm[name];
-                if (property.type == 'submit') {
-                    throw new Error('[Themes] - ILLEGAL form type "submit" for theme settings form.')
-                }
-
-                if (!property.default) {
-                    throw new Error('[Themes] - The field "' + name + '" has no default value.');
-                }
-                defaults[name] = property.default;
-
-                ActiveTheme[config.id].settings[name] = property.default;
-                form.add(name, property.type, property.attr || {} );
-            }
-
-            form.add('Submit', 'submit', {displayname : 'Update Settings'} );
-            
-            return defaults;
+        log('Themes', 'Recreating form ' + formName);
+        if (formBuilder.isAlreadyCreated(formName)) {
+            formBuilder.deleteForm(formName);
         }
 
+        var form = formBuilder.createForm(formName, {
+            fieldWrapper: {
+                tag: 'div',
+                cssPrefix: 'theme-setting-field-'
+            },
+            cssClass: 'theme-settings-form'
+        });
+        form.add('formsetting-sep', 'title', {
+            displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'
+        });
+
+        for (var name in ActiveTheme[config.id].info.settingForm) {
+            var property = ActiveTheme[config.id].info.settingForm[name];
+            if (property.type == 'submit') {
+                throw new Error('[Themes] - ILLEGAL form type "submit" for theme settings form.')
+            }
+
+            if (!property.default) {
+                throw new Error('[Themes] - The field "' + name + '" has no default value.');
+            }
+            defaults[name] = property.default;
+            form.add(name, property.type, property.attr || {} );
+        }
+
+        form.add('Submit', 'submit', {displayname : 'Update Settings'} );
+            
         log("Themes", "Updated setting form")
+        return defaults;
     };
 
     this.getSettings = function(config) {
@@ -254,6 +249,10 @@ var Themes = function () {
 
     this.getEnabledThemeEntry = function(config) {
         return this.getEnabledThemePath(config) + '/' + this.getEnabledTheme(config).info.entry;
+    };
+
+    this.debug = function() {
+        console.log(ActiveTheme);
     };
 
     this.bindEndpoints = function (conf) {
@@ -342,12 +341,11 @@ var Themes = function () {
     };
 
     this.init = function (conf, cb) {
-        this.registerForm();
         that.getThemesDirList(conf, function (themes) {
             db.findToArray(conf.id, 'themes', {
                 'active': true
             }, function (err, results) {
-                var remove = function () {
+                var remove = function () {            
                     db.remove(conf, 'themes', {$or : [{'active':false}, {'active': null}]}, function () {
                         db.insert(conf, 'themes', themes, function (err) {
                             cb();
@@ -366,32 +364,22 @@ var Themes = function () {
                             break;
                         }
                     }
-
                 } else {
-
-                    for (var i in results) {
-
-                        for (var j in themes) {
-                            if (results[i].uName == themes[j].uName) {
-                                themes[j].active = true;
-                                themes.splice(j, 1);
-                                that.enableTheme(conf, results[i].uName, remove);
-                                return;
-                            }
+                    var curt = results[0]
+                    for (var j in themes) {
+                        if (curt.uName == themes[j].uName) {
+                            themes[j].active = true;
+                            themes.splice(j, 1);
+                            that.enableTheme(conf, curt.uName, function() {
+                                remove();
+                            }, curt.settings);
+                            return;
                         }
-
                     }
-
                 }
             });
-
-
-
         });
-
     };
-
-
 };
 
 module.exports = new Themes();

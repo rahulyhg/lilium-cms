@@ -75,6 +75,8 @@ var LMLImagePicker = function() {
                 if (img) {
                     if (elem.width > 150 || elem.height > 150) {
                         elem.src = img.sizes.thumbnailmedium.url;
+                    } else if (elem.dataset.size) {
+                        elem.src = img.sizes[elem.dataset.size];
                     } else {
                         elem.src = img.sizes.thumbnail.url;
                     }

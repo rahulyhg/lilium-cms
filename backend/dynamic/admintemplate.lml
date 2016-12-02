@@ -5,17 +5,9 @@
 		{%adminhead}
 	</head>
 	<body class="lmladminbody lmladmin">
-        {%adminfacebook}
-        {%backendsearch}
-        {%adminwelcome}
-        {%adminbadges}
-        {%imagepicker}
-        {%previewer}
-        {%lys}
+        {%adminfacebook;backendsearch;adminwelcome;adminbadges;imagepicker;previewer;lys}
+	    {%adminbar;adminsidebar;chatslider}
 
-	    {%adminbar}
-        {%adminsidebar}
-        {%chatslider}
 		<main class="container lmladminmain lmladmincontentwrapper" id="lml-main"></main>
 	</body>
 </html>

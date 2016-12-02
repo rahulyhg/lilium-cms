@@ -47,7 +47,14 @@ var LML = function () {
     var execVariableTag = function (context, code, callback) {
         // Browse the context library for corresponding obhect;
         parseStringForRecursiveVarTags(context, code, function (code) {
-            context.w(LMLSlang.pulloutVar(context, code) || "");
+            var txt = LMLSlang.pulloutVar(context, code);
+            if (typeof txt === "object") {
+                txt = JSON.stringify(txt);
+            } else if (typeof txt === "undefiend") {
+                txt = "";
+            }
+
+            context.w(txt);
             callback();
         });
 
@@ -141,12 +148,9 @@ var LML = function () {
                     fullpath = context.rootDir + "/" + split[currentIndex] + ".petal";
                 }
 
-                var includeBuffer = "";
-
                 if (executeLML) {
                     that.executeToContext(fullpath, context, function (pContent) {
                         context.merge();
-                        context.w(includeBuffer);
                         currentIndex++;
 
                         next();
@@ -155,7 +159,6 @@ var LML = function () {
                     var fullpath = LMLSlang.pulloutVar(context, fullpath.substring(1));
 
                     fileserver.readFile(fullpath, function (fContent) {
-                        context.merge();
                         context.w(fContent || ("[LMLIncludeException] File not found : " + fullpath));
                         currentIndex++;
                         next();
@@ -307,7 +310,16 @@ var LML = function () {
                                             return that.pulloutVar(context, str);
                                         }
 
-                                        return (!isNaN(str)) ? parseInt(str) : str.replace(/'|"/g, '');
+                                        var finalval;
+                                        if (!isNaN(str)) {
+                                            finalval = parseInt(str);
+                                        } else if (typeof str == "string") {
+                                            finalval = str.replace(/(^["'])|(["']$)|(\|)/g, "");
+                                        } else {
+                                            finalval = str;
+                                        }
+
+                                        return finalval;
                                     });
 
                                     endVal = endVal[ftcName].apply(endVal, params);

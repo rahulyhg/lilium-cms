@@ -177,7 +177,6 @@ var SiteInitializer = function (conf, siteobj) {
     var loadTheme = function(cb) {
         themes.init(conf, function() {
             themes.bindEndpoints(conf);
-            // Precomp files
             templateBuilder.precompThemeFiles(conf, cb);
         });
     };

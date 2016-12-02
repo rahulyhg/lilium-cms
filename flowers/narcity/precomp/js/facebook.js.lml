@@ -2,7 +2,7 @@
 
 // Requires vaniryk
 var NarcityFacebook = function() {
-    var graphURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?access_token={=theme.settings.fbid}|{=theme.settings.fbtoken}";
+    var graphURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?access_token={=config.default.social.facebook.token}";
     var noOp = function() {};
 
     var sendRequest = function(aurl, callback) {

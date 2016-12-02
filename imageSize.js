@@ -22,6 +22,10 @@ var ImageSize = function () {
     this.getSizes = function () {
         return sizes;
     }
+
+    this.debug = function() {
+        console.log(sizes);
+    }
 }
 
 module.exports = new ImageSize();

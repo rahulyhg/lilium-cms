@@ -38,6 +38,7 @@ var Category = function () {
 
         switch (cli.routeinfo.path[2]) {
         case 'list':
+        case undefined:
             this.create(cli);
             break;
         case 'edit':
@@ -64,8 +65,8 @@ var Category = function () {
                 _id: db.mongoID(cli.routeinfo.path[3])
             }, formData, function (err, result) {
                 // Generate LML page
-                catAssoc[cli._c][formData.name] = formData.displayname;
                 cli.refresh();
+                catAssoc[cli._c.id][formData.name] = formData.displayname;
             });
 
         } else {
@@ -84,7 +85,7 @@ var Category = function () {
             // Create post
             db.insert(cli._c, 'categories', formData, function (err, result) {
                 // Generate LML page
-                catAssoc[cli._c][formData.name] = formData.displayname;
+                catAssoc[cli._c.id][formData.name] = formData.displayname;
                 cli.refresh();
             });
 

@@ -95,19 +95,24 @@ var templateBuilder = function () {
 
     this.init = function (config) {
         log('TemplateBuilder', "Initializing for site " + config.id);
-        lmllib.registerContextLibrary('theme', function (context) {
-            var rendersnip = function(snipid, _____) {
-                var args = Array.prototype.slice.call(arguments, 1);
-                return themes.renderSnip(context.lib.config.default, snipid, args);
-            };
+    
+        (function(gconf) {
+            lmllib.registerContextLibrary('theme', function (context) {
+                var rendersnip = function(snipid, _____) {
+                    var args = Array.prototype.slice.call(arguments, 1);
+                    return themes.renderSnip(gconf, snipid, args);
+                };
 
-            return {
-                render: renderBlock,
-                settings: context.theme.settings,
-                snip : rendersnip,
-                getQueueTags : function() {return getQueueTags(context.lib.config.default);}
-            };
-        });
+                var enabledTheme = themes.getEnabledTheme(gconf.id);
+
+                return {
+                    render: renderBlock,
+                    settings: enabledTheme.settings,
+                    snip : rendersnip,
+                    getQueueTags : function() {return getQueueTags(gconf);}
+                };
+            });
+        })(config);
 
         log('TemplateBuilder', "Done initializing site " + config.id);
     };

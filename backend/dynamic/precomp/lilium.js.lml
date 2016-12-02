@@ -55,6 +55,7 @@ var LiliumCMS = function() {
     this.facebook;
     this.tables = new Array();
     this.lys = new Lys();
+    this.ssl = document.location.protocol === "https:";
 
     var that = this;
 

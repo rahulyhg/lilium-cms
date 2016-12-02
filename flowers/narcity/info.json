@@ -12,8 +12,6 @@
         "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"},
         "networkname" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montreal"},
         "cityname" : {"type" : "text", "attr" : {"displayname" : "City name"}, "default" : "Montreal"},
-        "fbid" : {"type" : "text", "attr" : {"displayname" : "Facebook App ID"}, "default" : "#####"},
-        "fbtoken" : {"type" : "text", "attr" : {"displayname" : "Facebook Token"}, "default" : "#####"},
         "mailchimpdigest" : {"type" : "text", "attr" : {"displayname" : "Mailchimp Digest ID"}, "default" : "#####"},
         "homepagesections" : {"type" : "stack",
             "attr" : {

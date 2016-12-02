@@ -21,6 +21,9 @@ var registeredLibraries = {
     frontend: function (context) {
         return require('./frontend.js');
     },
+    json: function(context) {
+        return JSON;
+    },
     vocab: function (context) {
         return require('./vocab.js');
     },

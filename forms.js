@@ -131,18 +131,13 @@ var Forms = function () {
  
 
         formBuilder.registerFormTemplate('category')
-            .add('name', 'text', {
-                displayname: "Name"
-            })
             .add('displayname', 'text', {
                 displayname: "Display Name"
             }, {
                 required : false
             })
-            .add('description', 'text', {
-                displayname: "Description"
-            }, {
-                required : false
+            .add('name', 'text', {
+                displayname: "Slug"
             })
 
         formBuilder.createForm('ckimagecredit', {
@@ -169,11 +164,17 @@ var Forms = function () {
         formBuilder.createForm('category_create', {
                 fieldWrapper : "lmlform-fieldwrapper"
             })
+            .add('cat-title', 'title', {
+                displayname : "Create a category"
+            })
             .addTemplate('category')
             .add('create', 'submit');
 
         formBuilder.createForm('category_edit', {
                 fieldWrapper : "lmlform-fieldwrapper"
+            })
+            .add('cat-title', 'title', {
+                displayname : "Edit a category"
             })
             .addTemplate('category')
             .add('update', 'submit');

@@ -1,0 +1,236 @@
+{#config;extra;theme;json;base64}
+{$
+    personalities = extra.article.featuredata.personalities;
+    persjson = json.stringify(=personalities);
+    persencoded = base64.encode(=persjson);
+$}
+<div class="nm-quiz-wrapper">
+    {$ for (question in extra.article.featuredata.questions); $}
+
+    <div class="nm-quiz-question-wrapper" id="{=question.id}" data-questid="{=question.id}">
+        <div class="nm-quiz-question-image" data-imgurl="{=?question.photourl}">
+            <img src="{=?question.photourl}" />
+        </div>
+        <h3>{=question.interogation}</h3>
+        <div class="nm-quiz-answers-wrapper">
+            {$ for (answer in question.answers); $}
+            <div class="nm-quiz-answer" id="{=answer.id}" data-ansid="{=answer.id}" onclick="selectAnswer('{=question.id}', '{=answer.id}','{=answer.personality}');">
+                <div class="nm-quiz-answer-wrapper" data-imgurl="{=?answer.photourl}">
+                    <img src="{=?answer.photourl}" />
+                </div>
+                <div class="nm-quiz-answer-text">
+                    {=answer.answer}
+                </div>
+            </div>
+            {$ endfor; $}
+        </div>
+    </div>
+
+    {$ endfor; $}
+
+    <div id="nm-result-anchor"></div>
+
+    <div id="nm-result-wrapper">
+        <img src="" id="nm-result-image"/>
+        <h6>{=extra.article.title}</h6>
+        <h3 id="nm-result-name"></h3>
+        <p id="nm-result-desc"></p>
+
+        <div>
+            <div class="quiz-fb-share" onclick="quizfbshare(winningpers);">
+                <i class="fa fa-facebook-square" aria-hidden="true"></i> Share
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var curquiz = {};
+    var winningpers;
+    var jj = JSON;
+    var jp = jj.parse;
+    var totalQuest = {=extra.article.featuredata.questions.length};
+    var quizlocked = false;
+    var _pers = '{=persencoded}';
+    
+    var showPers = function(persobj) {
+        document.getElementById('nm-result-image').setAttribute('src', persobj.photourl);
+        document.getElementById('nm-result-name').textContent = persobj.name;
+        document.getElementById('nm-result-desc').textContent = persobj.details;
+        document.getElementById('nm-result-wrapper').classList.add('shown');
+
+        scrollToItem(document.body, document.getElementById('nm-result-anchor'), -20);
+        winningpers = persobj;
+    };
+
+    var getResult = function() {
+        var keys = Object.keys(curquiz);
+        var persscore = {};
+
+        for (var i = 0; i < keys.length; i++) {
+            var perscode = curquiz[keys[i]];
+            if (!persscore[perscode]) {persscore[perscode]=1;}
+            else {persscore[perscode]++}
+        }
+
+        var perscodes = Object.keys(persscore);
+        var highest = 0;
+        var wpers = "";
+
+        for (var i = 0; i < perscodes.length; i++) {
+            if (persscore[perscodes[i]] > highest) {
+                highest = persscore[perscodes[i]];
+                wpers = perscodes[i]
+            }
+        }
+
+        var jps = jp(_b64.decode(_pers));
+        for (var i = 0; i < jps.length; i++) {
+            if (jps[i].id == wpers) {return jps[i]}
+        }
+
+        return false;
+    };
+
+    var quizFinished = function() {
+        quizlocked = true;
+        showPers(getResult());
+    };
+
+    var selectAnswer = function(questid, ansid, persid) {
+        if (quizlocked) {return;}
+
+        var answers = document.getElementById(questid).querySelectorAll(".nm-quiz-answer");
+
+        for (var i = 0; i < answers.length; i++){ 
+            if (answers[i].id != ansid) {
+                answers[i].classList.add('faded');
+                answers[i].classList.remove('selected');
+            } else {
+                answers[i].classList.remove('faded');
+                answers[i].classList.add('selected');
+            }
+        }
+
+        curquiz[questid] = persid;
+
+        if (Object.keys(curquiz).length == totalQuest) {
+            quizFinished();
+        }
+    };
+
+    var quizfbshare = function(persobj) {
+        FB.ui({
+            method: 'feed',
+            caption: '{=config.default.website.sitetitle}',
+            description: persobj.details,
+            display: 'popup',
+            link: document.location.protocol + '{=config.default.server.url}/{=extra.article.name}',
+            name: "I got " + persobj.name + "! {=extra.article.title}",
+            picture: document.location.protocol + persobj.photourl
+        });
+    }
+</script>
+
+<style>
+.nm-quiz-question-wrapper {
+    margin: 10px 0 40px;
+}
+
+.nm-quiz-question-wrapper h3 {
+    font-family: "Oswald", sans-serif;
+    font-weight: normal;
+    font-size: 30px;
+    margin-top: 12px;
+}
+
+.nm-quiz-answer-wrapper {
+    width : 196px;
+    height: 196px;
+    text-align: center;
+}
+
+.nm-quiz-answer {
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+
+    padding: 3px;
+    margin: 0px 3px 8px;
+    background: #f6f6f6;
+
+    width: 196px;
+    cursor: pointer;
+}
+
+.nm-quiz-answer.faded {
+    opacity: 0.5;
+}
+
+.nm-quiz-answer:hover, 
+.nm-quiz-answer.selected {
+    background-color : {=theme.settings.maincolor};
+    color: #FFF;
+}
+
+.nm-quiz-answer-text {
+    padding: 2px 5px 0px;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+#nm-result-wrapper {
+    display: none;
+    padding: 20px;
+    border: 1px solid #D9D9D9;
+
+    border-radius : 8px;
+    background-color: #FCFCFC;
+    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.1);
+}
+
+#nm-result-wrapper.shown {
+    display: block;
+}
+
+#nm-result-image {
+    width: 100%;
+    height: auto;
+
+    border-radius: 8px;
+}
+
+#nm-result-wrapper h6 {
+    margin: 10px 0 0;
+    font-size: 18px;
+    font-family: "Oswald", sans-serif;
+    font-weight: normal;
+    color: #999;
+}
+
+#nm-result-name {
+    margin: 10px 0px 10px;
+    font-size: 34px;
+    font-family: "Oswald";
+    font-weight: normal;
+    line-height: 42px;
+}
+
+#nm-result-desc {
+    color: #333;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.quiz-fb-share {
+    background-color: #3B5998;
+    display: inline-block;
+    padding: 2px 10px;
+    font-size: 18px;
+    color: #FFF;
+    border-radius: 8px;
+    cursor: pointer;
+}
+</style>
+
+

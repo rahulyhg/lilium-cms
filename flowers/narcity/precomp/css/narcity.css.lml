@@ -1,4 +1,4 @@
-{#config;theme;debug}
+{#config;theme}
 {$
     siteurl = config.default.server.url;
     fw = theme.settings.fullwidthsize;
@@ -9,8 +9,6 @@
 
     mc = theme.settings.maincolor;
 $}
-
-{=debug.printcontext()}
 
 @font-face {
     font-family: 'Oswald';

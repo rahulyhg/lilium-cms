@@ -216,6 +216,7 @@ window.LMLQuiz = function() {
         var wrapper = ce('div', ["quiz-answer-wrapper"], {id:genID});
 
         var answerimg = ce('img', ["quiz-answer-photo"], answer && answer.photo ? {src:answer.photourl, "data-photoid" : answer.photo} : undefined, wrapper);
+        answerimg.dataset.size = "medium";
         liliumcms.imagepicker.bind(answerimg);
 
         var answername = ce('input', ["quiz-answer-answer"], {
@@ -289,6 +290,8 @@ window.LMLQuiz = function() {
 
         var photowrapper = ce('div', ["quiz-question-photo-wrapper"], {id:genID}, wrapper);
         var questimg = ce('img', ["quiz-question-photo"], quest && quest.photourl ? {src:quest.photourl, "data-photoid" : quest.photo} : undefined, photowrapper);
+        questimg.dataset.size = "featured";
+
         liliumcms.imagepicker.bind(questimg);
 
         var questimgcred = ce('input', ["quiz-question-photo-cred"], {
@@ -369,6 +372,7 @@ window.LMLQuiz = function() {
         var detailswrap = ce("div", ["quiz-personality-details-wrapper"], undefined, wrapper);
 
         var persoimg = ce('img', ["quiz-personality-image"], pers && pers.photourl ? {src:pers.photourl, "data-photoid":pers.photo} : undefined, photowrap);
+        persoimg.dataset.size = "thumbnaillarge";
         var persoimgcred = ce('input', ["quiz-personality-image-cred"], {
             type:"text", 
             placeholder:"Photo Credit", 

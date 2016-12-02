@@ -266,9 +266,14 @@ var FormBuilder = function() {
         }
     };
 
+    this.debug = function() {
+        console.log(forms);
+    };
+
     this.render = function(formName, formContext) {
         log('FormBuilder', 'Rendering form with name : ' + formName);
         if (typeof forms[formName] === 'undefined') {
+            log('FormBuilder', 'Tried to render undefined form with name : ' + formName);
             throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
         }
 

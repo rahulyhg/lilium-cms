@@ -1,5 +1,4 @@
 {#tableBuilder;vocab;debug;config;forms}
-
 {$
     formname = "theme_settings_";
     formname += config.default.uid;

@@ -4,6 +4,7 @@ var filelogic = require('./filelogic.js');
 var lml = require('./lml.js');
 var notif = require('./notifications.js');
 var formBuilder = require('./formBuilder.js');
+var configs = require('./config');
 
 var DevTools = function() {};
 
@@ -62,24 +63,42 @@ var clearCache = function(cli, ctx) {
 
     switch (ctx) {
         case 'html':
-            child_process.exec('rm -rf ' + cli._c.server.html + '/*.html', function(err) {
-                cli.response.end(err || 'ok');
-                notif.notifyUser(cli.userinfo.userid, cli._c.id, {
-                    title: "HTML Cache",
-                    msg : err || "HTML files were successfully invalidated and destroyed.",
-                    type: err ? "error" : "success"
+            var sites = configs.getAllSites();
+            for (var i = 0; i < sites.length; i++) {
+                child_process.exec('rm -rf ' + sites[i].server.html + '/*.html', function(err) {
+                    notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                        title: "HTML Cache",
+                        msg : err || "HTML files were successfully invalidated and destroyed.",
+                        type: err ? "error" : "success"
+                    });
                 });
-            });
+            }
+            cli.response.end(err || 'ok');
             break;
         case 'admin':
-            child_process.exec('rm -rf ' + cli._c.server.html + '/admin/*', function(err) {
-                cli.response.end(err || 'ok');
-                notif.notifyUser(cli.userinfo.userid, cli._c.id, {
-                    title: "Admin Cache",
-                    msg : err || "Admin cache files were successfully invalidated and destroyed.",
-                    type: err ? "error" : "success"
+            var sites = configs.getAllSites();
+            var i = 0;
+
+            cli.response.end('ok');
+            var nextSite = function() {
+                if (i == sites.length) {
+                    return notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                        title: "Admin Cache",
+                        msg : "Admin cache files were successfully invalidated and destroyed for all " + i + " sites.",
+                        type: "success"
+                    });
+                }
+
+                var site = sites[i];
+                child_process.exec('rm -rf ' + site.server.html + '/admin/*', function(err) {
+                    child_process.exec('rm -rf ' + site.server.html + '/login/*', function(err) {
+                        i++;
+                        nextSite();
+                    });
                 });
-            });
+            };
+            nextSite();
+
             break;
         default:
             cli.response.end("");

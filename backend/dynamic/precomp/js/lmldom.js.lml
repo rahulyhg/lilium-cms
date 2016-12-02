@@ -1,3 +1,12 @@
+/****************************************/
+// Lilium Document Object Model         //
+// v.0.6                                //
+// ------------------------------------ //
+// Author : Erik Desjardins             //
+// End : Frontend                       //
+//                                      //
+// Doesn't use jQuery                   //
+/****************************************/
 {#config}
 /*
     LMLDom Tags
@@ -13,6 +22,10 @@
 var LMLDom = function() {
     var maindom;
     var livevars;
+    var currentSiteURL = "{=config.default.server.url}";
+    var adminEndpoint = currentSiteURL + "/admin";
+    var edgeVersion = 0.6;
+
     var ldContext = {};
 
     this.foreach = function(elem) {

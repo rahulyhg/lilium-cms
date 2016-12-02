@@ -1,49 +1,50 @@
 {#config;forms}
+{*categories}
 {$
     var baseurl = config.default.server.url;
     baseurl += "/";
     baseurl += config.default.paths.admin;
     baseurl += "/";
 $}
+    <lml:dom v="0.6" />
+
+	<main class="entities-main">
+    	{=forms.render('category_create')}
+
 		<h1>All Categories</h1>
-
-		<main class="entities-main">
-			<ul class="entity-list">
-				{*categories(template:"category-list-item")}
-			</ul>
-
-			<h2>Add new category</h2>
-    			{=forms.render('category_create')}
-		</main>
-
-		<lml:template id="category-list-item">
-			<li class="entity-item-list">
-				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
-                <lml:tobject data-nodetype="h6" data-key="description"></lml:tobject>
-				<div class="entity-actions">
-                    <lml:tobject data-nodetype="a"
-                            data-class="btn btn-accept"
-                            data-href="{=baseurl}categories/edit/"
-                            data-key="_id">
+		<ul class="entity-list">
+	    	<lml:foreach var="cat" in="livevars.categories">
+        		<lml:wrapper id="cat_{cat._id}" tag="li" class="entity-item-list">
+                    <h3>
+	    			    <lml:text var="cat.displayname" />
+                    </h3>
+	        		<div class="entity-actions">
+                        <lml:link href="{=baseurl}categories/edit/{cat._id}">
                             Edit
-                    </lml:tobject>
-					<lml:tobject data-nodetype="button"
-                             data-class="btn btn-remove"
-						     data-bind="click"
-						     data-action="deleteCampaign"
-						     data-actionparamkey="_id" >
-							Delete
-					</lml:tobject>
-				</div>
-			</li>
-		</lml:template>
+                        </lml:link>
+			            <lml:link href="javascript: deleteCampaign('{cat._id}');" class="text-red float-right" >
+			        		Delete <lml:text var="cat.displayname" />
+				        </lml:link>
+	    			</div>
+	        	</lml:wrapper>
+        	</lml:foreach>
+		</ul>
+	</main>
+
 <script>
- var deleteCampaign = function(id) {
-         $.post('{=config.default.server.url}/admin/categories/delete', {
-             "id" : id,
-             "form_name" : "category_delete"
-         }, function(data) {
-             liliumcms.refresh();
-         });
- }
+var deleteCampaign = function(id) {
+    $.post('{=config.default.server.url}/admin/categories/delete', {
+        "id" : id,
+        "form_name" : "category_delete"
+    }, function(data) {
+        liliumcms.notify({
+            type : "success",
+            message : "",
+            title : "Category deleted"
+        });
+    });
+
+    document.getElementById('cat_' + id).remove();
+    return false;
+};
 </script>

@@ -59,6 +59,10 @@ $}
 
     <div class="article-content" id="article-content">
         {=extra.article.content}
+
+        {$ if (?extra.article.feature != ""); $}
+            {%=extra.article.feature}
+        {$ endif; $}
     </div>
 
     {$ if (?author.displayname != ""); $} 

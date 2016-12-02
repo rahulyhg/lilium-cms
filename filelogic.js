@@ -271,9 +271,11 @@ var FileLogic = function () {
         extra = extra || new Object();
         extra.config = cli._c;
         extra.siteid = cli._c.id;
+        extra.theme = theme.getSettings(cli._c);
+
         artcileHelper.getPostElements(cli, extra, function(extra) {
             // Check for the post type
-            var title = slugify(extra.title).toLowerCase();
+            var title = extra.name;
             var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
             var savePath = cli._c.server.html + "/" + title + ".html";
             LML.executeToFile(
