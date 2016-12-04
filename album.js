@@ -2,11 +2,36 @@ var log = require('./log.js');
 var livevars = require('./livevars.js');
 var postleaf = require('./postleaf.js');
 var db = require('./includes/db.js');
+var hooks = require('./hooks.js');
 
 var Album = function() {
+    var that = this;
+
     this.registerPostLeaf = function() {
         postleaf.registerLeaf('album', 'Album', 'addAlbumToPost', 'editAlbumToPost', 'renderAlbum');
+
+        hooks.bind('article_deepfetch', 50, function(conf, article, cb) {
+            if (article.feature !== "album" || !article.featuredata || article.featuredata.length == 0) { return cb() };
+
+            that.getArticleImages(conf, article._id, function(arr) {
+                article.featuredata.fullpics = arr;
+                cb();
+            });
+        });
     };
+
+    this.getArticleImages = function(conf, postid, cb) {
+                db.find(conf, 'content', {_id : db.mongoID(postid)}, [], function(err, cur) {
+                    cur.hasNext(function(err, hasnext) {
+                        cur.next(function(err, article) {
+                            var arr = article.featuredata.photos;
+                            db.findToArray(conf, 'uploads', {_id : {$in : arr}}, function(err, arr) {
+                                cb(arr);
+                            });
+                        });
+                    });
+                }, {featuredata : 1});
+    }
 
     this.registerLiveVar = function() {
         livevars.registerLiveVariable('album', function(cli, levels, params, cb) {
@@ -14,16 +39,7 @@ var Album = function() {
                 cb("[AlbumLivevarException] Need at least one level");
             } else if (levels[0] == "images") {
                 var postid = levels[1];
-                db.find(cli._c, 'content', {_id : db.mongoID(postid)}, [], function(err, cur) {
-                    cur.hasNext(function(err, hasnext) {
-                        cur.next(function(err, article) {
-                            var arr = article.featuredata.photos;
-                            db.findToArray(cli._c, 'uploads', {_id : {$in : arr}}, function(err, arr) {
-                                cb(arr);
-                            });
-                        });
-                    });
-                }, {featuredata : 1});
+                that.getArticleImages(cli._c, postid, cb);
             } else {
                 cb("[AlbumLivevarException] Unknown level " + levels[0]);
             }

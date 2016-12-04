@@ -170,7 +170,22 @@ var Article = function() {
                             db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
                                 arr[0].authors = autarr;
                                 arr[0].morefrom = mfarr;
-                                cb(arr[0]);
+
+                                var evts = hooks.getHooksFor('article_deepfetch');
+                                var keys = Object.keys(evts);
+                                var kIndex = -1;
+
+                                var next = function() {
+                                    kIndex++;
+
+                                    if (kIndex == keys.length) {
+                                        cb(arr[0]);
+                                    } else {
+                                        evts[keys[kIndex]].cb(conf, arr[0], next);
+                                    }
+                                };
+
+                                next();
                             });
                         });
                     });

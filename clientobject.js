@@ -50,11 +50,14 @@ ClientObject.prototype.reloadSession = function(cb) {
     require('./session.js').reloadSession(this, cb);
 };
 
-ClientObject.prototype.throwHTTP = function (code, message) {
+ClientObject.prototype.throwHTTP = function (code, message, hard) {
     this.responseinfo.httpcode = code;
     this.responseinfo.httpmessage = message;
-    
-    if (code >= 400 && code < 500) {
+   
+    if (hard) {
+        this.response.writeHead(code);
+        this.response.end();
+    } else if (code >= 400 && code < 500) {
         require('./filelogic.js').serveErrorPage(this, code);
     } else {
         this.debug();

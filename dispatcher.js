@@ -10,7 +10,9 @@ var Dispatcher = function () {
     this.dispatch = function (cli) {
         cli.touch('dispatcher.dispatch');
 
-        if (cli.routeinfo.admin) {
+        if (cli.routeinfo.isStatic) {
+            HTMLServer.serveStatic(cli);
+        } else if (cli.routeinfo.admin) {
             if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
                 Admin.serveDashboard(cli);
             } else {

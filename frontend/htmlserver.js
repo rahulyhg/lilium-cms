@@ -2,8 +2,23 @@ var fileserver = require('../fileserver.js');
 var filelogic = require('../filelogic.js');
 var _conf = require('../config.js');
 var article = require('../article.js');
+var noop = function() {};
 
 var HTMLServer = function() {
+    this.serveStatic = function(cli) {
+		cli.touch('htmlserver.serveStatic');
+		cli.routeinfo.mimetype = this.mimeOrRefused(cli.routeinfo.fileExt);
+
+        var filepath = cli._c.server.html + cli.routeinfo.relsitepath;
+        fileserver.fileExists(filepath, function(exists) {
+            if (exists) {
+                fileserver.pipeFileToClient(cli, filepath, noop);
+            } else {
+                cli.throwHTTP(404, 'Not found', true);
+            }
+        });
+    };
+
 	this.serveClient = function(cli) {
 		cli.touch('htmlserver.serveClient');
 

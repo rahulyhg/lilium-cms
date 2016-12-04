@@ -941,6 +941,20 @@ article.archive-article h3 a {
     }
 }
 
+/* Photo albums */
+.nm-album-wrapper {
+    text-align: center;
+}
+
+article #article-content .nm-album-wrapper img {
+    width: 145px;
+    height: 145px;
+    display : inline-block;
+    margin: 5px;
+
+    cursor: pointer;
+}
+
 /* Mobile */
 @media only screen and (max-width: 478px) {
     #topArticleBanner {

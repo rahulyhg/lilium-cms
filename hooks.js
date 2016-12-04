@@ -19,6 +19,10 @@ var events = {
 
 
 var Hooks = function () {
+    this.getHooksFor = function(eventName) {
+        return events[eventName] || {};
+    }
+
     this.bind = this.register = function (eventName, priority, callback) {
         var registerFilename = __caller;
         pluginHelper.getPluginIdentifierFromFilename(registerFilename, function (pluginIdentifier) {
