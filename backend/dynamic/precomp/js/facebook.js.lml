@@ -34,7 +34,7 @@ LMLFacebook.prototype.noOp = function() {};
 
 LMLFacebook.prototype.castLogin = function(cb) {
     FB.login(function(resp) {
-        window.fbstatus = resp.status;
+        window.fbstatus = resp;
 
         if (resp.status === "connected") {
             window.fbid = resp.authResponse.userID
@@ -56,8 +56,8 @@ LMLFacebook.prototype.confirmFbAuthActivation = function(resp) {
 
 LMLFacebook.prototype.allowfbauth = function() {
     var that = this;
-    if (window.fbstatus && window.fbstatus == "connected") {
-        
+    if (window.fbstatus && window.fbstatus.status == "connected") {
+        that.confirmFbAuthActivation(window.fbstatus);
     } else {
         this.castLogin(function(resp) {
             if (resp.status === "connected") {
