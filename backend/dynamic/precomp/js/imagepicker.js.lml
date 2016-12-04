@@ -10,14 +10,14 @@ var LMLImagePicker = function() {
     var state = "hidden";
     var sessionInfo = {};
 
-    this.bind = function(elem) {
+    this.bind = function(elem, callback, params) {
         elem.classList.add("lml-pickable");
         elem.addEventListener('click', function() {
             if (window[elem.id + "_picker_cast"]) {
                 window[elem.id + "_picker_cast"](elem);
             }
 
-            that.cast(function(img) {
+            that.cast(callback || function(img) {
                 if (img === -1) {
                     elem.dataset.photoid = undefined;
                     elem.dataset.photo = undefined;
@@ -48,7 +48,7 @@ var LMLImagePicker = function() {
                 if (window[elem.id + "_image_selected"]) {
                     window[elem.id + "_image_selected"](elem, img);
                 }
-            }, elem.dataset.photoid);
+            }, elem.dataset.photoid, params);
         });
     };
 
@@ -145,18 +145,30 @@ var LMLImagePicker = function() {
     this.select = function(id) {
         var img = document.getElementById("lmlimagepicker-image-" + id);
         var sel = document.querySelector('.lmlimagepicker-image.selected');
-        if (sel) {
+        if (sel && !sessionInfo.multiple) {
             sel.classList.remove("selected")
         }
+    
+        if (sessionInfo.multiple) {
+            if (selectedImage[id]) {
+                delete selectedImage[id];
+                img.classList.remove('selected');
+            } else {
+                selectedImage[id] = imgpickercache[id];
+                img.classList.add('selected');
+            }
 
-        if (selectedImage && selectedImage._id == id) {
-            selectedImage = undefined;
-            img.classList.remove('selected');
-            that.hideinfo();
-        } else {
-            img.classList.add("selected");
-            selectedImage = imgpickercache[id];
             that.displayinfo(id);
+        } else {
+            if (selectedImage && selectedImage._id == id) {
+                selectedImage = undefined;
+                img.classList.remove('selected');
+                that.hideinfo();
+            } else {
+                img.classList.add("selected");
+                selectedImage = imgpickercache[id];
+                that.displayinfo(id);
+            }
         }
     };
 
@@ -230,7 +242,9 @@ var LMLImagePicker = function() {
         ePicker.style.display = "block";
         state = "transition";
         document.body.classList.add("block-scroll");
-        sessionInfo = extra || {};
+        sessionInfo = extra || {
+            multiple : false
+        };
 
         setTimeout(function() {
             ePicker.classList.add('shown');
@@ -251,8 +265,13 @@ var LMLImagePicker = function() {
                     });
                 }
             } else {
-                selectedImage = undefined;
+                selectedImage = sessionInfo.multiple ? {} : undefined;
                 that.hideinfo();
+
+                var selected = document.querySelectorAll('.lmlimagepicker-image.selected');
+                for (var i = 0; i < selected.length; i++) {
+                    selected[i].classList.remove('selected');
+                }
             }
 
             setTimeout(function() {

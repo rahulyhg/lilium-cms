@@ -1,68 +1,22 @@
-<div>
+<div class="lml-album-wrapper">
 	<h1>Lilium Album</h1>
-	<script>
-	$(function() {
-	    $("div#myDropZone").dropzone({
-	        url : "/admin/album/upload",
-	        addRemoveLinks:true,
-	        clickable:true,
-	        uploadMultiple:true,
-	        parallelUploads: 1,
-	        acceptedFiles: "image/jpeg,image/jpg,image/gif,image/png",
-	        // autoProcessQueue: false,
-		    init: function(){
-		    	this.on("processing", function(item) {
-		    		var imageName = item.name.replace(".","/");
-		    		this.options.autoProcessQueue = true;
-		    		this.options.url = "/admin/album/upload/" + imageName;
-					});
-		    	this.on('success', function( file, resp ){
-		    		console.log(file)
-				    });
-				}
-			});
-	});
 
-	//CAN BE DELETED 
-	// var myDropzone = new Dropzone("#div1",{
-	//     url: '/upload',
-	//     acceptedFiles: "image/*",
-	//     addRemoveLinks: true,
-	//     removedfile: function(file) {
-	//         $.get('remove.php',function(data){
-	//             var _ref;
-	//             return (_ref = file.previewElement) != null ? _ref.parentNode.removeChild(file.previewElement) : void 0;
-	//         });
-	//     },
-	//     init: function() {
-	//         var thisDropzone = this;
-	//         $('body').on('click','a.menu',function(event){
-	//             href = $(this).attr('href');
-
-	//             thisDropzone.options.url = href;
-	//         });
-
-	//         $("body").on('click','#btnRemoveAll',function () {
-	//                 thisDropzone.removeAllFiles();
-	//             }
-	//         );
-
-	//     }
-	// });
-
-    </script>
-	  <div class="content-wrap">
-	   <div class="row">
-	      <div class="col-sm-12">
-	         <div class="nest" id="DropZoneClose">
-	            <div class="body-nest" id="DropZone">
-	               <div id="myDropZone" class="dropzone" >
-	               </div>
-	             <!--   <button style="margin-top: 10px;" class="btn btn-info"
-	                  id="submit-all">Submit all files</button> -->
-	            </div>
-	         </div>
-	      </div>
-	   </div>
-	</div>
+    <div class="lml-album-action-wrapper">
+        <button type="button" id="lml-album-action-add">Add pictures</button>
+    </div>
+    <div id="lml-album-photo-list">
+        
+    </div>
 </div>
+
+<style>
+#lml-album-photo-list { 
+    padding: 2px;
+    border: 3px dashed #CCC;
+    margin: 0px 10px 10px;
+}   
+                                                                                                                                           
+#lml-album-photo-list img {
+    margin: 4px;
+}   
+</style>

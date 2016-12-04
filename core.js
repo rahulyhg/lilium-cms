@@ -638,6 +638,7 @@ var Core = function () {
         tools.registerLiveVar();
         badges.registerLiveVar();
         devtools.registerLiveVar();
+        album.registerLiveVar();
         notification.registerLiveVar();
         conversations.registerLiveVar();
 

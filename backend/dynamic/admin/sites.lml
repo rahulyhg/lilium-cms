@@ -1,60 +1,40 @@
-{#config;forms;extra}
+{#config}
+{*sites.all.complex}
+<lml:dom v="0.6" />
+
 <h1>Network Sites</h1>
-
-<table class="lmlfullwidthtable">
-	<thead>
-		<tr>
-			<th>Name</th>
-			<th>URL</th>
-			<th>Links</th>
-			<th>Actions</th>
-		</tr>
-	</thead>
-	<tbody id="sites_tbody">
-
-	</tbody>
-	<tfoot class="lmlactionfooter">
-		<tr>
-			<td colspan="4">
-				<a class="button-link" href="{=config.default.server.url}/admin/sites/launch">Launch new website</a>
-				<a class="button-link" href="{=config.default.server.url}/admin/sites/wptransfer">Transfer site from Wordpress</a>
-			</td>
-		</tr>
-	</tfoot>
-</table>
-
-<lml:template id="site_template">
-	<lml:tobject data-nodetype="tr">
-		<lml:tobject data-nodetype="td">
-			<lml:tobject data-key="website.sitetitle"></lml:tobject>
-			<lml:tobject data-filter="isDefaultSite">
-				<span class="siteDefaultTag">root</span>
-			</lml:tobject>
-			<lml:tobject data-filter="isWordpress">
-				<span class="siteDefaultTag">wordpress</span>
-			</lml:tobject>
-			<lml:tobject data-filter="isTransferring">
-				<span class="siteDefaultTag">transferring</span>
+<lml:table class="lmlfullwidthtable" cols='["Name","URL","Links","Actions"]'>
+    <lml:tsection for="site" in="livevars.sites.all.complex" id="sites_body" section="body">
+        <lml:tcol>
+            <lml:text var="site.website.sitetitle" />
+            <lml:filter if="isDefaultSite" pass="site">
+                <span class="siteDefaultTag">root</span>
+            </lml:filter>
+            <lml:filter if="isWordpress" pass="site">
+                <span class="siteDefaultTag">wordpress</span>
+            </lml:filter>
+            <lml:filter if="isTransferring" pass="site">
+                <span class="siteDefaultTag">transferring</span>
                 <i class="fa fa-cog fa-spin" aria-hidden="true"></i>
-			</lml:tobject>
-		</lml:tobject>
-		<lml:tobject data-nodetype="td">
-			<lml:tobject data-nodetype="a" data-hrefsource="server.url">
-                <lml:tobject data-nodetype="span" data-key="server.url"></lml:tobject>
-			</lml:tobject>
-		</lml:tobject>
-		<lml:tobject data-nodetype="td">
-			<lml:tobject data-nodetype="a" data-hrefsource="server.url" data-append="/admin">
-                <span>Admin Panel</span>
-			</lml:tobject>
-        </lml:tobject>
-		<lml:tobject data-nodetype="td">
-			<lml:tobject data-nodetype="a" data-hrefsource="server.url" data-append="/admin/settings">
-                <span>Settings</span>
-			</lml:tobject>
-        </lml:tobject>
-	</lml:tobject>
-</lml:template>
+            </lml:filter>
+        </lml:tcol>
+        <lml:tcol>
+            <lml:link href="{site.server.url}" ><lml:text var="site.server.url" /></lml:link>
+        </lml:tcol>
+        <lml:tcol>
+            <lml:link href="{site.server.url}/admin" >Admin Panel</lml:link>
+        </lml:tcol>
+        <lml:tcol>
+            <lml:link href="{site.server.url}/admin/settings" >Settings</lml:link>
+        </lml:tcol>
+    </lml:tsection>
+    <lml:tsection section="foot" class="lmlactionfooter">
+        <lml:tcol colspan="4"> 
+		    <a class="button-link" href="{=config.default.server.url}/admin/sites/launch">Launch new website</a>
+			<a class="button-link" href="{=config.default.server.url}/admin/sites/wptransfer">Transfer site from Wordpress</a>
+        </lml:tcol>
+    </lml:tsection>
+</lml:table>
 
 <script>
 	window.isDefaultSite = function(dat) {
@@ -68,5 +48,3 @@
     };
 </script>
 
-{*sites.all.complex(template:"site_template",target:"sites_tbody")}
- 

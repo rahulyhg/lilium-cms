@@ -137,3 +137,6 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 .lmlform button.lmlstacktableappendbutton:active {
     background-color: #38b042;
 }
+lml\\:table {
+    display: none;
+}

@@ -9,15 +9,28 @@
 /****************************************/
 {#config}
 /*
-    LMLDom Tags
+    -- LMLDom Tags --------
 
+    - Loops & Wrappers --
     lml:foreach     => var="newlyDefinedVariable" in="currentArray"
     lml:wrapper     => tag="tagName" id="id_and_{variableName}" class="class passed to new node"
+
+    - Tables --
+    lml:table       => id="string_{variableName}" class="" 
+    lml:tbody       => id="string_{variableName}" class="" for="variableName" in="variableName"
+    lml:tcol        => id="string_{variableName}" class="" colspan="number"
+    lml:tfooter     => id="string_{variableName}" class=""
+
+    - Filters --
+    lml:filter      => id="functionName" pass="variableName"
+
+    - Normal Tags --
     lml:text /      => var="variableName"
+    lml:image /     => src="//domain.com/uploads/{variableName}" 
     lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
     lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
     lml:link        => href="//domain.com/admin/{variableName}" class=""
-    lml:image       => src="//domain.com/uploads/{variableName}" 
+
 */
 var LMLDom = function() {
     var maindom;
@@ -28,11 +41,89 @@ var LMLDom = function() {
 
     var ldContext = {};
 
-    this.foreach = function(elem) {
+    // Appends nodes into one another, 0 => 1 => 2 => ... => n
+    // Returns last node
+    var chainAppend = function(___) {
+        var len = arguments.length;
+        var ctn = 0;
+        while (ctn < len-1) {
+            arguments[ctn+1].appendChild(arguments[ctn]);
+            ctn++;
+        }
+
+        return arguments[len-1];
+    };
+
+    // Appends an array of nodes to a parent node
+    // Returns the parent node
+    var bulkAppend = function(arr, newparent) {
+        for (var i = 0; i < arr.length; i++) {
+            newparent.appendChild(arr[i]);
+        }
+
+        return newparent;
+    };
+
+    this.table = function(tab) {
+        var etab = document.createElement('table');
+        etab.className = tab.className;
+        
+        // Header
+        var columns = JSON.parse(tab.getAttribute('cols'));
+        var thead = document.createElement('thead');
+        var theadrow = document.createElement('tr');
+
+        for (var i = 0; i < columns.length; i++) {
+            var th = document.createElement('th');
+            th.textContent = columns[i];
+            theadrow.appendChild(th);
+        }
+        chainAppend(theadrow, thead, etab);
+
+        // Body
+        var tbody = tab.querySelector('lml\\:tsection[section="body"]');
+        tbody.setAttribute('wrapper', 'tr');
+        var ebody = document.createElement('tbody');
+        ebody.className = tbody.className;
+        ebody.id = tbody.id;
+        etab.appendChild(ebody);
+        
+        bulkAppend(this.foreach(tbody, ebody), ebody)
+
+        // Footer (optional)
+        var tfoot = tab.querySelector('lml\\:tsection[section="foot"]');
+        if (tfoot) {
+            var efoot = document.createElement('tfoot');
+            efoot.className = tfoot.className;
+            efoot.id = tfoot.id;
+
+            var cols = tfoot.querySelectorAll('lml\\:tcol');
+            var tr = document.createElement('tr');
+            for (var i = 0; i < cols.length; i++) {
+                var foottd = document.createElement('td');
+                foottd.setAttribute('colspan', cols[i].getAttribute('colspan'));
+
+                this.parseNode(cols[i]);                
+                while (cols[i].children.length != 0) {
+                    foottd.appendChild(cols[i].children[0]);
+                }
+                
+                tr.appendChild(foottd);
+            }
+            
+            chainAppend(tr, efoot, etab);
+        }
+
+        tab.insertAfter(etab);
+        tab.remove();
+        return etab;
+    };
+
+    this.foreach = function(elem, virtual) {
         var nodes = [];
 
         var itt = ldContext[elem.getAttribute('in')];
-        var varname = elem.getAttribute('var');
+        var varname = elem.getAttribute('var') || elem.getAttribute('for');
 
         if (typeof itt == "undefined") {
             // Try deep variable
@@ -52,7 +143,11 @@ var LMLDom = function() {
             }
 
             this.parseNode(wrap);
-            elem.insertAfter(wrap);
+            if (virtual) {
+                virtual.appendChild(wrap);
+            } else {
+                elem.insertAfter(wrap);
+            }
         }
 
         ldContext[varname] = undefined;
@@ -96,6 +191,54 @@ var LMLDom = function() {
             wr.remove();
 
             wr = elem.querySelector('lml\\:wrapper');
+        }
+
+        var tab = elem.querySelector('lml\\:table');
+        while (tab) {
+            var otab = this.table(tab);
+            tab = document.querySelector('lml\\:table');
+        }
+
+        var tcols = elem.querySelectorAll('lml\\:tcol');
+        for (var i = 0; i < tcols.length; i++) {
+            var col = tcols[i]
+            var tdd = document.createElement('td');
+            
+            while (col.children.length != 0) {
+                tdd.appendChild(col.children[0]);
+            }
+
+            this.parseNode(tdd);
+            col.insertAfter(tdd);
+            col.remove();
+        }
+
+        var iftag = elem.querySelector('lml\\:filter');
+        while (iftag) {
+            var cbname = iftag.getAttribute('if');
+            var paramname = iftag.getAttribute('pass');
+            var paramobj;
+
+            if (paramname) {
+                paramobj = ldContext[paramname];
+                if (!paramobj) {
+                    var levels = paramname.split('.');
+                    paramobj = ldContext;
+                    for (var i = 0; i < levels.length; i++) {
+                        paramobj = paramobj[levels[i]];
+                    }
+                }
+            }
+
+            var truthfulness = window[cbname](paramobj);
+            if (truthfulness) {
+                while (iftag.children.length != 0) {
+                    iftag.insertAfter(iftag.children[0]);
+                }
+            } 
+
+            iftag.remove();
+            iftag = elem.querySelector('lml\\:filter');
         }
 
         var act = elem.querySelector('lml\\:action');
@@ -274,7 +417,7 @@ var LMLDom = function() {
     this.init = function() {
         maindom = document.getElementById('lml-main');
 
-        HTMLUnknownElement.prototype.insertAfter = function (newNode) { 
+        HTMLUnknownElement.prototype.insertAfter = HTMLElement.prototype.insertAfter = function (newNode) { 
             this.parentNode.insertBefore(newNode, this.nextSibling); 
         };
 
