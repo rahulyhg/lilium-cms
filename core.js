@@ -105,11 +105,11 @@ var Core = function () {
         conversations = require("./conversations.js");
         localcast = require('./localcast.js');
 
-        log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
+        log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
 
     var loadHooks = function (readyToRock) {
-        log('Hooks', 'Loading hooks');
+        log('Hooks', 'Loading hooks', 'info');
         hooks.bindPluginDisabling();
         hooks.bind('init', 100, readyToRock);
         hooks.bind('user_loggedin', 100, function (cli) {
@@ -119,11 +119,11 @@ var Core = function () {
 
         persona.bindHooks();
         hooks.fire('hooks');
-        log('Hooks', 'Loaded hooks');
+        log('Hooks', 'Loaded hooks', 'success');
     };
 
     var loadEndpoints = function () {
-        log('Endpoints', 'Loading endpoints');
+        log('Endpoints', 'Loading endpoints', 'info');
         endpoints.init();
         endpoints.register('*', 'login', 'POST', function (cli) {
             cli.touch("endpoints.POST.login");
@@ -294,7 +294,7 @@ var Core = function () {
         });  
 
         hooks.fire('endpoints');
-        log('Endpoints', 'Loaded endpoints');
+        log('Endpoints', 'Loaded endpoints', 'success');
     };
 
     /**
@@ -362,7 +362,6 @@ var Core = function () {
             absURL: aurl + "article",
             children: []
         });
-
         admin.registerAdminSubMenu('articles', {
             id: "articles-category",
             faicon: "fa-cubes",
@@ -462,18 +461,9 @@ var Core = function () {
             absURL: aurl + "persona/list",
             children: []
         });
-        /*admin.registerAdminMenu({
-            id: "activities",
-            faicon: "fa-eye",
-            displayname: "Activities",
-            priority: 800,
-            rights: ["view-user-activities"],
-            absURL: aurl + "activities/",
-            children: []
-        });*/
 
         hooks.fire('adminmenus_created');
-        log('Core', 'Registered Default Admin menus');
+        log('Core', 'Registered Default Admin menus', 'success');
     };
 
     var loadPlugins = function (cb) {
@@ -493,7 +483,7 @@ var Core = function () {
                 "active": true
             }, function (err, results) {
                 if (err) {
-                    log('Plugins', 'Failed to find entries in database; ' + err);
+                    log('Plugins', 'Failed to find entries in database; ' + err, 'err');
                     fireEvent();
 
                     return;
@@ -514,7 +504,7 @@ var Core = function () {
                     nextObject();
                 } else {
                     plugins.getPluginsDirList(function () {
-                        log('Plugins', 'Nothing to register');
+                        log('Plugins', 'Nothing to register', 'info');
                         fireEvent();
                     });
 
@@ -548,18 +538,18 @@ var Core = function () {
     var gracefullyCrash = function(err) {
         var stack = err.stack.split('\n');
 
-        log('Core', '------------------------------------------------');
-        log('Core', 'Exception made its way to core process');
-        log('Core', '------------------------------------------------');
-        log('Core', 'Error stack : ' + err);
+        log('Core', '------------------------------------------------', 'err');
+        log('Core', 'Exception made its way to core process', 'err');
+        log('Core', '------------------------------------------------', 'err');
+        log('Core', 'Error stack : ' + err, 'err');
         for (var i = 1; i < stack.length; i++) {
-            log('Stack', stack[i]);
+            log('Stack', stack[i], 'err');
         }
-        log('Core', '------------------------------------------------');
-        log('Core', 'Gracefully firing crash event to all modules');
+        log('Core', '------------------------------------------------', 'err');
+        log('Core', 'Gracefully firing crash event to all modules', 'err');
         hooks.fire('crash', err);
 
-        log('Core', 'Contacting handler to request a crash to all handles');
+        log('Core', 'Contacting handler to request a crash to all handles', 'err');
         require('./handler.js').crash(err);
 
         // log('Lilium', 'Shutting down');
@@ -586,7 +576,7 @@ var Core = function () {
                             '}catch(ex){log("STDin","Error : "+ex)}'
                         );
                     } catch (err) {
-                        log('STDin', 'Interpretation error : ' + err)
+                        log('STDin', 'Interpretation error : ' + err, 'err')
                     } finally {
                         stdin.liliumBuffer = "";
                     }
@@ -594,29 +584,29 @@ var Core = function () {
             }, 0);
         });
 
-        log("STDin", 'Listening to standard input');
+        log("STDin", 'Listening to standard input', 'info');
     };
 
     var loadCacheInvalidator = function () {
         if (_c.default().env == 'dev') {
-            log("CacheInvalidator", 'Clearing old cached files in db');
+            log("CacheInvalidator", 'Clearing old cached files in db', 'info');
             db.remove(_c.default(), 'cachedFiles', {}, function () {}, false);
         }
-        log("CacheInvalidator", 'Initializing cacheInvalidator');
+        log("CacheInvalidator", 'Initializing cacheInvalidator', 'info');
         cacheInvalidator.init(function () {
-            log("CacheInvalidator", 'Ready to invalidate cached files!');
+            log("CacheInvalidator", 'Ready to invalidate cached files', 'success');
         });
     };
 
     var scheduleGC = function () {
-        log('GC', 'Scheduling temporary file collection');
+        log('GC', 'Scheduling temporary file collection', 'info');
         scheduler.schedule('GCcollecttmp', {
             every: {
                 secondCount: 1000 * 60 * 60
             }
         }, function () {
             GC.clearTempFiles(function () {
-                log("GC", "Scheduled temporary files collection done");
+                log("GC", "Scheduled temporary files collection done", 'success');
             });
         });
     };
@@ -645,6 +635,7 @@ var Core = function () {
         conversations.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
+        log('Core', 'Loaded live variables', 'success');
     };
 
     var loadPostman = function () {
@@ -663,7 +654,7 @@ var Core = function () {
     };
 
     var loadForms = function () {
-        log('Core', 'Loading multiple forms');
+        log('Core', 'Loading multiple forms', 'info');
 
         entities.init().registerCreationForm();
         LoginLib.registerLoginForm();
@@ -676,7 +667,7 @@ var Core = function () {
         devtools.registerForms();
 
         hooks.fire('forms_init');
-        log('Core', 'Forms were loaded');
+        log('Core', 'Forms were loaded', 'success');
     };
 
     var loadPostLeaves = function() {
@@ -694,7 +685,7 @@ var Core = function () {
     }
 
     var loadFrontend = function () {
-        log('Frontend', 'Registering default values from core');
+        log('Frontend', 'Registering default values from core', 'info');
         Frontend.registerFromCore();
         hooks.fire('frontend_registered');
     };
@@ -721,7 +712,7 @@ var Core = function () {
         var currentRoot = __dirname;
         var fss = require('./fileserver.js');
 
-        log('Core', 'Reading sites directory');
+        log('Core', 'Reading sites directory', 'info');
         fss.dirExists(currentRoot + "/sites", function (exists) {
             if (exists) {
                 fss.fileExists(currentRoot + "/sites/default.json", function (exists) {
@@ -745,7 +736,7 @@ var Core = function () {
     };
 
     var precompile = function (done) {
-        log('Core', 'Staring precompilation');
+        log('Core', 'Staring precompilation', 'info');
         hooks.fire("will_precompile");
         sites.loopPrecomp(function() {
             hooks.fire("did_precompile");
@@ -775,7 +766,7 @@ var Core = function () {
     var bindLocalCast = function() {
         localcast.init();
         localcast.bind('lilium', function(payload) {
-            log('Core', 'New process spawned with pid : ' + payload.from);
+            log('Core', 'New process spawned with pid : ' + payload.from, 'info');
         });
 
         localcast.broadcast('lilium', {
@@ -809,11 +800,11 @@ var Core = function () {
     };
 
     this.makeEverythingSuperAwesome = function (readyToRock) {
-        log('Core', 'Initializing Lilium');
+        log('Core', 'Initializing Lilium', 'lilium');
         bindCrash();
 
         require('./includes/caller.js')
-        log('Core', 'Loading all websites');
+        log('Core', 'Loading all websites', 'info');
         loadWebsites(function (resp) {
             loadRequires();
             loadHooks(readyToRock);
@@ -842,12 +833,12 @@ var Core = function () {
                                 loadCacheInvalidator();
                                 scheduleGC();
     
-                                log('Lilium', 'Starting inbound server');
+                                log('Lilium', 'Starting inbound server', 'info');
                                 Inbound.createServer();
                                 loadNotifications();
                                 Inbound.start();
     
-                                log('Core', 'Firing initialized signal');
+                                log('Core', 'Firing initialized signal', 'info');
                                 hooks.fire('init');
                             });
                         });
@@ -858,7 +849,7 @@ var Core = function () {
     };
 
     var init = function () {
-        log('Core', 'Lilium core object was created');
+        log('Core', 'Lilium core object was created', 'success');
     };
 
     init();

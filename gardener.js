@@ -2,6 +2,7 @@ var config = require('./config.js');
 var fileserver = require('./fileserver.js');
 var cluster = require('cluster');
 var RedisServer = require('redis-server');
+var log = require('./log.js');
 
 var networkConfig = {loaded:false};
 var garden = {};
@@ -13,9 +14,14 @@ var Gardener = function() {
 
     if (cluster.isMaster) {
         var that = this;
+        
+        log('Network', 'Loading network config', 'lilium');
         this.loadConfig(function() {
+            log('Network', 'Network configuration loaded', 'success');
+            log('Network', 'Spawning redis server', 'lilium');
             var redisserver = new RedisServer(6379);
             redisserver.open(function() {
+                log('Network', 'Redis server spawned', 'success');
                 var lmlinstances = networkConfig.familysize || require('os').cpus().length;
 
                 var server = require('http').createServer();
@@ -24,6 +30,7 @@ var Gardener = function() {
     
                 io.adapter(redis());
     
+                log('Network', 'Starting ' + lmlinstances + ' processes', 'lilium');
                 for (var i = 0; i < lmlinstances; i++) {
                     var chld = cluster.fork({instancenum : i, parent : "gardener"});
                     chld.instancenum = i;
@@ -33,12 +40,12 @@ var Gardener = function() {
                 }
 
                 cluster.on('online', function(worker) {
-                    console.log('Worker ' + worker.process.pid + ' is online');
+                    log('Network', 'Worker ' + worker.process.pid + ' is online', 'success');
                 });
 
                 cluster.on('exit', function(worker, code, signal) {
-                    console.log('Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal);
-                    console.log('Starting a new worker');
+                    log('Network', 'Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal, 'err');
+                    log('Network', 'Starting a new worker', 'info');
                     var dyingChld = garden[worker.process.pid];
                     var chld = cluster.fork({instancenum : dyingChld.instancenum});
                     chld.on('message', that.broadcast);
@@ -46,6 +53,7 @@ var Gardener = function() {
                     delete garden[worker.process.pid];
                     garden[chld.process.pid] = chld;
                     bootCount++;
+                    log('Network', 'Started a new worked with process ' + worker.process.pid, 'success');
                 }); 
             });       
         });

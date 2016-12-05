@@ -116,7 +116,7 @@ var FileLogic = function () {
                     savePath,
                     function () {
                         FileServer.pipeFileToClient(cli, savePath, function () {
-                            log('FileLogic', 'Admin page generated and served');
+                            log('FileLogic', 'Admin page generated and served', 'success');
                             (cb || noOp)();
                         });
                     }, Object.assign(extra || {}, {
@@ -146,7 +146,7 @@ var FileLogic = function () {
                     savePath,
                     function () {
                         FileServer.pipeFileToClient(cli, savePath, function () {
-                            log('FileLogic', 'Admin page generated and served');
+                            log('FileLogic', 'Admin page generated and served', 'success');
                         });
                     }, Object.assign(extra || {}, {
                         config : cli._c
@@ -188,7 +188,7 @@ var FileLogic = function () {
                             savePath,
                             function () {
                                 FileServer.pipeFileToClient(cli, savePath, function () {
-                                    log('FileLogic', 'Admin page generated and served');
+                                    log('FileLogic', 'Admin page generated and served', 'success');
                                 });
                             }, {
                                 templatefile: tmpPath,
@@ -244,19 +244,19 @@ var FileLogic = function () {
         var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
         var layoutPath = cli._c.server.base + "flowers/" + cTheme.info.uName + "/layout.lml";
 
-        log('FileLogic', 'Compiling context theme page');
+        log('FileLogic', 'Compiling context theme page', 'info');
         LML.executeToFile(
             readPath,
             tmpPath,
             function () {
-                log('FileLogic', 'Including compiled theme page to layout');
+                log('FileLogic', 'Including compiled theme page to layout', 'detail');
                 extra.contentpetal = tmpPath;
 
                 LML.executeToFile(
                     layoutPath,
                     savePath,
                     function () {
-                        log('FileLogic', 'Completed Theme page compilation');
+                        log('FileLogic', 'Completed Theme page compilation', 'success');
                         callback();
                     }, 
                     extra
@@ -305,7 +305,7 @@ var FileLogic = function () {
             if (isPresent) {
                 serveCachedFile(cli, savePath);
             } else {
-                log("FileLogic", "Interpreting LML from absolute path : " + readPath);
+                log("FileLogic", "Interpreting LML from absolute path : " + readPath, 'info');
                 extra = extra || new Object();
                 extra.config = cli._c;
                 extra.siteid = cli._c.id;

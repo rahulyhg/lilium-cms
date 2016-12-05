@@ -32,12 +32,12 @@ var _c = require('./config.js').default(),
         };
 
         this.bind = function (hook, cb) {
-            log('Inbound', 'Binding ' + hook + ' to connection');
+            log('Inbound', 'Binding ' + hook + ' to connection', 'info');
             callbacks[hook].push(cb);
         };
 
         this.start = function () {
-            log('Inbound', 'Ready to receive requests');
+            log('Inbound', 'Ready to receive requests', 'success');
             _c = require('./config.js').default();
 
             hooks.fire("server_will_start", {server : server});

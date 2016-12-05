@@ -7,7 +7,7 @@ var LocalCast = function() {
 };
 
 LocalCast.prototype.isElderChild = function() {
-    return process.env.instancenum == 0;
+    return process.env.instancenum == 0 || typeof process.env.parent == "undefined";
 };
 
 LocalCast.prototype.clustered = process.env.parent == "gardener";
@@ -45,7 +45,7 @@ LocalCast.prototype.init = function() {
     process.on('message', this.messageReceived);
     
     if (this.isElderChild()) {
-        log('Localcast', 'Elder child speaking');
+        log('Localcast', 'Elder child speaking', 'lilium');
     }
 };
 

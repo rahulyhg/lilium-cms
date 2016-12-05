@@ -67,7 +67,7 @@ var Frontend = function () {
             arr[priority] = absPath;
         };
 
-        log('Frontend', 'Registered JS file ' + absPath + '@' + priority + " with context " + context + ' on site ' + siteid);
+        log('Frontend', 'Registered JS file ' + absPath + '@' + priority + " with context " + context + ' on site ' + siteid, 'detail');
     };
 
     this.getJSQueue = function (contextName, siteid) {
@@ -111,7 +111,7 @@ var Frontend = function () {
             arr[priority] = absPath;
         };
 
-        log('Frontend', 'Registered CSS file ' + absPath + '@' + priority + " with context " + context + ' on site ' + siteid);
+        log('Frontend', 'Registered CSS file ' + absPath + '@' + priority + " with context " + context + ' on site ' + siteid, 'detail');
     };
 
     this.getCSSQueue = function (contextName, siteid) {

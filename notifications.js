@@ -295,8 +295,8 @@ LiliumSocket.prototype.createCurrentUserPages = function () {
 };
 
 LiliumSocket.prototype.error = function (err) {
-    log('Socket', 'Error with socket : ' + err.message);
-    log('Stacktrace', err.stack);
+    log('Socket', 'Error with socket : ' + err.message, 'err');
+    log('Stacktrace', err.stack, 'err');
 };
 
 var Notification = function () {
@@ -319,12 +319,12 @@ var Notification = function () {
     this.init = function () {
         io = inbound.io();
 
-        log('Notifications', 'Creating site groups');
+        log('Notifications', 'Creating site groups', 'live');
         _c.eachSync(function (conf) {
             that.createGroup('lmlsite_' + conf.id);
             var url = conf.server.url + "/";
             var path = url.substring(url.indexOf('/', 2));
-            log('Socket', 'Created connection for channel : ' + path + conf.uid);
+            log('Socket', 'Created connection for channel : ' + path + conf.uid, 'live');
             io.of(path + conf.uid).on('connection', onSocketConnection);
             namespaces.push(path + conf.uid);
             idToNamespace[conf.id] = path + conf.uid
@@ -338,7 +338,7 @@ var Notification = function () {
 
         that.createGroup('spy');
 
-        log('Notifications', 'Sockets ready');
+        log('Notifications', 'Sockets ready', 'live');
     };
 
     this.emitToUser = function (userID, message) {
@@ -661,18 +661,18 @@ var Notification = function () {
 
     this.createGroup = function (groupName, role, site) {
         if (groupName == "lml_network") {
-            log("Notifications", "Creating network channel")
+            log("Notifications", "Creating network channel", 'live')
             groups["lml_network"] = {
                 users : {},
                 sessions : {}
             };
         } else if (site) {
-            log('Notifications', 'Creating group ' + site + '_' + groupName);
+            log('Notifications', 'Creating group ' + site + '_' + groupName, 'live');
             groups[site + '_' + groupName] = groups[site + '_' + groupName] ? groups[site + '_' + groupName] : {};
             groups[site + '_' + groupName].role = role;
             groups[site + '_' + groupName].users = [];
         } else {
-            log('Notifications', 'Creating group ' + groupName);
+            log('Notifications', 'Creating group ' + groupName, 'live');
             groups[groupName] = {};
             groups[groupName].role = role;
             groups[groupName].users = [];

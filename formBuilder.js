@@ -71,7 +71,7 @@ var FormBuilder = function() {
         // Add it to the form list
         forms[name] = currentForm;
 
-        log('FormBuilder', 'Initialized form with name ' + name);
+        log('FormBuilder', 'Initialized form with name ' + name, 'success');
         return this;
     };
 
@@ -82,7 +82,7 @@ var FormBuilder = function() {
         if (!auto) {
             if (typeof forms[name] !== 'undefined') {
                 var err = new Error("[FormBuilderException] - Form already created : " + name);
-                log('FormBuilder', err);
+                log('FormBuilder', err, 'warn');
                 return;
             }
         }
@@ -105,7 +105,7 @@ var FormBuilder = function() {
 
         if (typeof templates[name] == 'undefined') {
             var err = new Error ( "[FormBuilderException] - Template not created. Please call createFormTemplate() first.");
-            log('FormBuilder', err);
+            log('FormBuilder', err, 'warn');
             return this;
          }
         for (var key in templates[name].fields) {
@@ -168,7 +168,7 @@ var FormBuilder = function() {
     };
 
     this.trigger = this.trg = function(sectionname, auto) {
-        log('FormBuilder', 'Trigger on form with section name ' + sectionname);
+        log('FormBuilder', 'Trigger on form with section name ' + sectionname, 'detail');
         if (!auto) {
             registerFilename = __caller;
             history.save(this.trg, [sectionname, auto]);
@@ -208,18 +208,18 @@ var FormBuilder = function() {
     };
 
     this.remove = function(name) {
-        log('FormBuilder', 'Attempt to remove field with name ' + name);
+        log('FormBuilder', 'Attempt to remove field with name ' + name, 'info');
         if (typeof currentForm.fields[name] !== 'undefined') {
             currentForm.fields[name] = undefined;
             delete currentForm.fields[name];
 
-            log('FormBuilder', 'Removed field with name ' + name);
+            log('FormBuilder', 'Removed field with name ' + name, 'success');
         }
         return this;
     };
 
     this.deleteForm = function(name) {
-        log('FormBuilder', 'Attempt to delete form with name ' + name);
+        log('FormBuilder', 'Attempt to delete form with name ' + name, 'info');
         if (typeof forms[name] !== 'undefined') {
             forms[name] = undefined;
             delete forms[name];
@@ -250,7 +250,7 @@ var FormBuilder = function() {
     this.registerFormTemplate = function(name, auto) {
         if (typeof templates[name] !== 'undefined') {
             var err = new Error( "[FormBuilderException] - Template already created: " + name );
-            log('FormBuilder', err);
+            log('FormBuilder', err, 'warn');
             return this;
         }
         currentForm = new Object();
@@ -271,9 +271,9 @@ var FormBuilder = function() {
     };
 
     this.render = function(formName, formContext) {
-        log('FormBuilder', 'Rendering form with name : ' + formName);
+        log('FormBuilder', 'Rendering form with name : ' + formName, 'info');
         if (typeof forms[formName] === 'undefined') {
-            log('FormBuilder', 'Tried to render undefined form with name : ' + formName);
+            log('FormBuilder', 'Tried to render undefined form with name : ' + formName, 'err');
             throw new Error("[FormBuilderException] - Form to render doesn't exists : " + formName);
         }
 
@@ -485,7 +485,7 @@ var FormBuilder = function() {
         };
 
         this.recreate = function(formName) {
-            log('FormBuilder', 'Recreating form: ' + formName);
+            log('FormBuilder', 'Recreating form: ' + formName, 'info');
             if (forms[formName]) {
                 currentForm = forms[formName];
                 for (var i in currentForm.history) {
@@ -504,7 +504,7 @@ var FormBuilder = function() {
         };
 
         this.invalidateFromPlugin = function(pluginID) {
-            log('FormBuilder', 'Invalidating from Plugin with ID ' + pluginID);
+            log('FormBuilder', 'Invalidating from Plugin with ID ' + pluginID, 'info');
             try {
                 if (pluginID) {
                     for (var i in forms) {
@@ -552,7 +552,7 @@ var FormBuilder = function() {
             // Result : Form renders with no fields
             return;
 
-            log('FormBuilder', "New plugin was initialized with identifier " + identifier);
+            log('FormBuilder', "New plugin was initialized with identifier " + identifier, 'info');
             // Recreate the forms to relaunch the hooks for the new plugin
             try {
                 for (var i in forms) {

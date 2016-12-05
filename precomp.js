@@ -43,7 +43,7 @@ var Precomp = function () {
     };
 
     var minifyFile = function (conf, inFile, outFile, filetype, callback) {
-        log('Precompiler', 'Minifying ' + filetype + ' file');
+        log('Precompiler', 'Minifying ' + filetype + ' file', 'info');
         // Only minify in prod
         if (conf.env == 'prod') {
             if (filetype == 'css') {
@@ -76,7 +76,7 @@ var Precomp = function () {
                 fileserver.copyFile(inFile, outFile, callback);
             }
         } else {
-            log('Precompiler', "Copying " + inFile + " => " + outFile);
+            log('Precompiler', "Copying " + inFile + " => " + outFile, 'info');
             fileserver.copyFile(inFile, outFile, callback);
         }
     };
@@ -94,7 +94,7 @@ var Precomp = function () {
             var absReadPath = conf.server.base + "backend/dynamic/precomp/";
             var absWritePath = conf.server.html + "/compiled/admin/";
 
-            log('Precompiler', 'Precompiling static files');
+            log('Precompiler', 'Precompiling static files', 'info');
             fileserver.listDirContentRecursive(absReadPath, function (fileArr) {
                 // Read files registered
                 var files = [];
@@ -139,9 +139,9 @@ var Precomp = function () {
             var siteTheme = require('./themes.js').getEnabledTheme(conf);
 
             db.findToArray(conf, 'compiledfiles', {filename : lmlfile}, function(err, arr) {
-                log('Precomp', "Registered sum for " + lmlfile + " is " + (arr[0] ? arr[0].sum : "unknown") + " compared to actual " + sum);
+                log('Precomp', "Registered sum for " + lmlfile + " is " + (arr[0] ? arr[0].sum : "unknown") + " compared to actual " + sum, 'info');
                 if (arr.length == 0 || arr[0].sum !== sum) {
-                    log('Precomp', 'Inserting sum ' + sum + ' for file ' + lmlfile + ' of website ' + conf.id)
+                    log('Precomp', 'Inserting sum ' + sum + ' for file ' + lmlfile + ' of website ' + conf.id, 'info')
                     db.remove(conf, 'compiledfiles', {filename : lmlfile}, function() {
                         db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, style : false}, function(err, r) {
                             LML.executeToFile(
@@ -194,14 +194,14 @@ var Precomp = function () {
                                     nextFile();
                                 });
                             } else {
-                                log('Precompiler', 'Precompiling static file : ' + curFile);
+                                log('Precompiler', 'Precompiling static file : ' + curFile, 'info');
                                 LML.executeToFile(
                                     rPath,
                                     tPath,
                                     function () {
                                         var beforeMinify = new Date();
                                         minifyFile(conf, tPath, wPath, wPath.substring(wPath.lastIndexOf('.') + 1), function () {
-                                            log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms");
+                                            log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms", 'success');
                                             db.insert(conf, 'compiledfiles', {
                                                 filename: curFile,
                                                 sum: sum,
@@ -237,17 +237,17 @@ var Precomp = function () {
         var fileIndex = 0;
         var fileTotal = files.length;
 
-        log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of '+ (theme? 'theme' : 'admin') +' context');
+        log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of '+ (theme? 'theme' : 'admin') +' context', 'info');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
                 fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
-                    log('Precompiler', 'Appended ' + files[fileIndex]);
+                    log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
                     fileIndex++;
                     nextFile();
                 });
             } else {
                 fileserver.closeFileHandle(fHandle);
-                log('Precompiled', 'Merged ' + fileIndex + ' JS files');
+                log('Precompiled', 'Merged ' + fileIndex + ' JS files', 'success');
                 readycb();
             }
         };
@@ -261,17 +261,17 @@ var Precomp = function () {
         var fileIndex = 0;
         var fileTotal = files.length;
 
-        log('Precompiler', 'Merging ' + fileTotal + ' CSS files of '+ (theme? 'Theme' : 'Admin') +' context');
+        log('Precompiler', 'Merging ' + fileTotal + ' CSS files of '+ (theme? 'Theme' : 'Admin') +' context', 'info');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
                 fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
-                    log('Precompiler', 'Appended ' + files[fileIndex]);
+                    log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
                     fileIndex++;
                     nextFile();
                 });
             } else {
                 fileserver.closeFileHandle(fHandle);
-                log('Precompiled', 'Merged ' + fileIndex + ' CSS files');
+                log('Precompiled', 'Merged ' + fileIndex + ' CSS files', 'success');
                 readycb();
             }
         };

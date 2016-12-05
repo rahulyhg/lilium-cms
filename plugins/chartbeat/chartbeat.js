@@ -9,6 +9,7 @@ var db = undefined;
 var request = undefined;
 var notifications = undefined;
 var livevars = undefined;
+var localcast = undefined;
 
 var _toppages = new Array();
 var _latestHisto = new Object();
@@ -31,6 +32,7 @@ var Chartbeat = function() {
         notifications = require(abspath + "notifications.js");
         request = require('request');
         livevars = require(abspath + "livevars.js");
+        localcast = require(abspath + "localcast.js");
     };
 
     var createPetals = function() {
@@ -188,7 +190,7 @@ var Chartbeat = function() {
                 _latestHisto = dat;
             }
         } else {
-            log('Chartbeat', 'Network error : ' + err);
+            log('Chartbeat', 'Network error : ' + err, 'err');
             return err;
         }
     };
@@ -218,13 +220,13 @@ var Chartbeat = function() {
                 notifications.emitToWebsite(conf.id, _toppages, 'chartbeat_top');
             }
         } else {
-            log("Chartbeat", "Network error : " + err);
+            log("Chartbeat", "Network error : " + err, 'err');
             return err;
         }
     };
 
     var scheduleInterval = function(conf) {
-        if (conf.chartbeat && conf.chartbeat.api_key && conf.chartbeat.host) {
+        if (conf.chartbeat && conf.chartbeat.api_key && conf.chartbeat.host && localcast.isElderChild()) {
             var qsurl = quickstatsURL
                 .replace("{apikey}", conf.chartbeat.api_key)
                 .replace("{host}", conf.chartbeat.host)
@@ -295,7 +297,7 @@ var Chartbeat = function() {
     this.register = function(_c, info, callback) {
         try {
             initRequires(_c.default().server.base);
-            log('Chartbeat', "Initializing Chartbeat plugin");
+            log('Chartbeat', "Initializing Chartbeat plugin", 'info');
 
             log('Chartbeat', "Adding config to settings page");
             registerSettings();
@@ -314,7 +316,7 @@ var Chartbeat = function() {
                 log('Chartbeat', "Scheduling intervals");
                 scheduleIntervals();
 
-                log('Chartbeat', 'All done');
+                log('Chartbeat', 'All done', 'success');
                 callback();
             });
         } catch (e) {

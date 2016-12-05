@@ -21,7 +21,7 @@ var LMLContext = function (info) {
 
     this.loadLibrary = function (libName) {
         if (!lmllib.isRegistered(libName)) {
-            log("LMLParseException", "Unable to add unregistered library '" + libName + "' to current context");
+            log("LMLParseException", "Unable to add unregistered library '" + libName + "' to current context", 'warn');
             return;
         }
 

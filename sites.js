@@ -29,10 +29,11 @@ var SiteInitializer = function (conf, siteobj) {
             if (valid) {
                 log('FileServer',
                     'HTML Directory was validated at : ' +
-                    conf.server.html
+                    conf.server.html,
+                    'success'
                 );
             } else {
-                log('FileServer', 'Error validated html directory');
+                log('FileServer', 'Error validated html directory', 'err');
             }
 
             done();
@@ -62,23 +63,23 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadDatabase = function (done) {
         var dbinit = function () {
-            log('Database', 'Initializing database if not initialized');
+            log('Database', 'Initializing database if not initialized', 'info');
             db.initDatabase(conf, function (err) {
-                log('Database', 'Firing Database init signal');
+                log('Database', 'Firing Database init signal', 'success');
                 dbconn();
             });
         };
 
         var dbconn = function () {
-            log('Database', 'Requesting dynamic connection object');
+            log('Database', 'Requesting dynamic connection object', 'info');
             db.createPool(conf, function () {
-                log('Database', 'Firing Database connection signal');
+                log('Database', 'Firing Database connection signal', 'success');
                 createIndices();
             });
         };
 
         var createIndices = function() {
-            log('Database', 'Creating indices');
+            log('Database', 'Creating indices', 'info');
             db.createIndex(conf, "content", {title : 'text', content : 'text', subtitle : 'text'}, function() {
                 db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
                     log('Database', 'Created indices');
@@ -97,7 +98,7 @@ var SiteInitializer = function (conf, siteobj) {
         var base = conf.server.base;
         var htmlbase = conf.server.html;
 
-        log('SiteInitializer', "Registering admin default frontend JS and CSS");
+        log('SiteInitializer', "Registering admin default frontend JS and CSS", 'info');
         Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/mousetrap.js", 250, "admin", conf.id);
@@ -198,7 +199,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     this.initialize = function (done) {
-        log('Sites', 'Initializing site with id ' + conf.id);
+        log('Sites', 'Initializing site with id ' + conf.id, 'lilium');
 
         hooks.fire('site_will_initialize', conf);
         endpoints.addSite(conf.id);
@@ -215,6 +216,7 @@ var SiteInitializer = function (conf, siteobj) {
                                     badges.addSite(conf, function() {
                                         checkForWP(conf);
                                         hooks.fire('site_initialized', conf);
+                                        log('Sites', 'Initialized site with id ' + conf.id, 'success');
                                         done();
                                     });
                                 });
@@ -333,7 +335,7 @@ var Sites = function () {
                 }
             });
         } else {
-            log('Sites', 'Creation of Lilium website');
+            log('Sites', 'Creation of Lilium website', 'lilium');
             db.testConnectionFromParams(dat.dbhost, dat.dbport, dat.dbuser, dat.dbpass, dat.dbname, function (success, err) {
                 if (success) {
                     db.testConnectionFromParams(
@@ -351,7 +353,7 @@ var Sites = function () {
                                 return;
         
                                 that.createSite(cli, dat, function () {
-                                    log('Sites', 'Site was created. Beginning Wordpress migration.');
+                                    log('Sites', 'Site was created. Beginning Wordpress migration.', 'success');
                                     
                                     require('./includes/wpdump.js').dump(cli, {
                                         
@@ -453,7 +455,7 @@ var Sites = function () {
         var len = s.length;
         var index = 0;
 
-        log("Sites", "Precompiling static files");
+        log("Sites", "Precompiling static files", 'info');
         var execPreComp = function () {
             if (index === len) {
                 done();
@@ -478,7 +480,7 @@ var Sites = function () {
                     cb();
                 } else {
                     var sitename = files[fileIndex].replace('.json', '');
-                    log('Sites', 'Loading config for website ' + sitename);
+                    log('Sites', 'Loading config for website ' + sitename, 'lilium');
 
                     fileserver.readJSON(__dirname + "/sites/" + files[fileIndex], function (siteInfo) {
                         var keyname = sitename.replace('//', '').replace(/\s/g, '/');

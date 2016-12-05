@@ -567,8 +567,8 @@ var LML = function () {
                 } else {
                     // Nothing was found that matches LML Slang
                     var errmsg = "Unrecognized operation in " + (context.rootPath || "LML file") + " @ line " + context.currentLineIndex;
-                    log('LMLParserException', errmsg);
-                    log('LMLError', "Unknown operation : " + line);
+                    log('LMLParserException', errmsg, 'warn');
+                    log('LMLError', "Unknown operation : " + line, 'err');
                     throw new Error(errmsg);
                 }
             }
@@ -588,8 +588,8 @@ var LML = function () {
             } catch (ex) {
                 log("LMLParserException", ex +
                     " in " + (context.rootPath || "LML file") +
-                    " @ line " + context.currentLineIndex);
-                log("Stacktrace", ex.stack);
+                    " @ line " + context.currentLineIndex, 'warn');
+                log("Stacktrace", ex.stack, 'warn');
                 callback(new Error("[Fatal] [LMLParserException] Could not recover from fatal error"));
             }
         }
@@ -776,7 +776,6 @@ var LML = function () {
         if ((txt = lines.map(function(elem) { return elem.text}).join('')) != content) {
             var dfs = require('diff').diffTrimmedLines(txt, content);
             if (dfs.length > 1) {
-                console.log(dfs);
                 throw new Error("Error while doing the split");
             }
         }
@@ -886,7 +885,7 @@ var LML = function () {
 
         fileserver.readFile(rootpath, function (content) {
             var verifyEnd = function () {
-                log('LML', 'Compiled File : ' + rootpath + ' in ' + (new Date() - timeStamp) + 'ms');
+                log('LML', 'Compiled File : ' + rootpath + ' in ' + (new Date() - timeStamp) + 'ms', 'success');
                 callback(buffer._c);
             }
 
@@ -895,7 +894,7 @@ var LML = function () {
     }
 
     this.executeToFile = function (rootpath, compilepath, callback, extra) {
-        log("LML", rootpath + " => " + compilepath);
+        log("LML", rootpath + " => " + compilepath, 'info');
 
         var timeStamp = new Date();
         // TODO create a temp file first
@@ -911,7 +910,7 @@ var LML = function () {
                 context.bindFinished(function (context) {
                     fileserver.closeFileHandle(fileHandle);
 
-                    log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms');
+                    log('LML', 'Generated file : ' + compilepath + ' in ' + (new Date() - timeStamp) + 'ms', 'success');
 
                     var willMinify = !extra || extra.minify;
                     if (willMinify) {
