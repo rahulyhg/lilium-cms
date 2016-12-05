@@ -94,6 +94,9 @@ Sockets seem to be working fine unless the session gets flushed.
 ### pm2 ###
 Lilium should be able to run under **pm2**, but has been showing some weird behaviours when forked into multiple threads, probably due to variables not being shared between instances.
 
+### Gardener ###
+The forked version requires Redis installed. Not stable yet since messages are not passed and cached items are inconsistent + chat is buggy.
+
 ## Contributors ##
 
 * Erik Desjardins

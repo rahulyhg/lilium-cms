@@ -53,6 +53,11 @@ var _c = require('./config.js').default(),
         this.createServer = function () {
             server = _http.createServer(handleReq);
             io = require('socket.io')(server);
+
+            if (require('./localcast').clustered) {
+                redis = require('socket.io-redis');
+                io.adapter(redis());
+            }
             /*
             secureServer = _https.createServer({
             	key : fs.readFileSync("/Users/ryk/Desktop/server-key.pem"),

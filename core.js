@@ -48,6 +48,7 @@ var oembed = undefined;
 var tools = undefined;
 var badges = undefined;
 var conversations = undefined;
+var localcast = undefined;
 
 var log = require('./log.js');
 
@@ -102,6 +103,7 @@ var Core = function () {
         badges = require('./badges.js');
         oembed = require('./embed.js');
         conversations = require("./conversations.js");
+        localcast = require('./localcast.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize');
     };
@@ -770,6 +772,17 @@ var Core = function () {
         }
     };
 
+    var bindLocalCast = function() {
+        localcast.init();
+        localcast.bind('lilium', function(payload) {
+            log('Core', 'New process spawned with pid : ' + payload.from);
+        });
+
+        localcast.broadcast('lilium', {
+            initialized : true
+        });
+    };
+
     var loadBackendSearch = function() {
         backendSearch.registerSearchFormat({
             collection : "content",
@@ -800,7 +813,6 @@ var Core = function () {
         bindCrash();
 
         require('./includes/caller.js')
-
         log('Core', 'Loading all websites');
         loadWebsites(function (resp) {
             loadRequires();
@@ -825,6 +837,7 @@ var Core = function () {
                                 loadAdminMenus();
                                 loadFrontend();
                                 loadForms();
+                                bindLocalCast();
     
                                 loadCacheInvalidator();
                                 scheduleGC();
