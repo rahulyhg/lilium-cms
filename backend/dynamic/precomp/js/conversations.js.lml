@@ -248,12 +248,34 @@ var LMLConversations = function() {
             that.send(pendingMessages[i]);
         }
     };
+    
+    var txtEmoMap = {
+        "\\:\\D" : "😄",
+        "\\;\\)" : "😉",
+        "\\:\\)" : "😀",
+        "\\<3" : "❤️",
+        "\\:\\(" : "😔",
+        "\\:\\'\\(": "😢"
+    };
+    var txtToEmojis = function(txt) {
+        for (var emot in txtEmoMap) {
+            txt = txt.replace(new RegExp(emot, 'g'), txtEmoMap[emot]);
+        }
+
+        return txt;
+    };
+
+    var parseMsg = function(txt) {
+        return txtToEmojis(
+            txt
+        ).trim();
+    };
 
     this.send = function(customMessage) {
         var txt = document.getElementById('chat-input').value;
         var msg = customMessage || {
             t : "text",
-            c : txt.trim(),
+            c : parseMsg(txt),
             v : currentConv
         };
 
