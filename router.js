@@ -36,6 +36,8 @@ var Router = function () {
         cli.routeinfo.root = pObj.pathname == "/";
         cli.routeinfo.async = cli.routeinfo.params.async || false;
 
+        cli.response.setHeader("Backend", "Lilium");
+
         if (!cli.routeinfo.isStatic) {
             session.injectSessionInCli(cli, cb);
         } else {
