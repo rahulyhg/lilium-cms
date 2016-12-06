@@ -3,6 +3,7 @@ var LMLConversations = function() {
     var that = this;
     var currentConv = "";
     var cachedusers = {};
+    var cachedgroups = {};
     var drawn = false;
     var unreadConv = {};
     var notificationSound = undefined;
@@ -132,9 +133,10 @@ var LMLConversations = function() {
             avatar.setAttribute('aria-hidden', "true");
         }
 
-        fullname.innerHTML = user.displayname;
+        fullname.textContent = user.displayname;
 
         listitem.dataset.userid = user._id;
+        listitem.dataset.type = "private";
         listitem.dataset.user = JSON.stringify(user);
         listitem.dataset.status = "offline";
 
@@ -154,6 +156,31 @@ var LMLConversations = function() {
         cachedusers[user._id] = user;
     };
 
+    this.addGroup = function(group, container) {
+        var listitem = document.createElement('li');
+        var avatar = document.createElement('i');
+        var fullname = document.createElement('span');
+ 
+        avatar.classList.add('fa'); 
+        avatar.classList.add('fa-users'); 
+        avatar.classList.add('no-avatar');
+
+        fullname.textContent = group.topic;
+        
+        listitem.dataset.groupid = group._id;
+        listitem.dataset.type = "group";
+        listitem.dataset.group = JSON.stringify(group);
+        listitem.appendChild(avatar);
+        listitem.appendChild(fullname);
+
+        listitem.id = "group" + group._id;
+        listitem.addEventListener('click', that.showConversation);
+
+        container.appendChild(listitem);
+
+        cachedgroups[group._id] = group;
+    };
+
     this.fillChat = function() {
         var users = liliumcms.livevars.retrieveVar("entities.chat");
         var container = document.getElementById("chat-list-everyone");
@@ -162,8 +189,116 @@ var LMLConversations = function() {
             this.addUser(users[i], container);
         }
 
+        var conversations = liliumcms.livevars.retrieveVar("conversations.list");
+        container = document.getElementById("chat-list-group");
+        for (var i = 0; i < conversations.length; i++) if (conversations[i].type == "group") {
+            this.addGroup(conversations[i], container);
+        }
+
         this.initState();
     };
+
+    this.createNewGroupForm = function() {
+        var wrapper = document.querySelector('.lml-participants-suggestion');
+        
+        for (var userid in cachedusers) if (liliumcms.session.current._id != cachedusers[userid]._id) {
+            var usr = cachedusers[userid];
+            var userwrapper = document.createElement('div');
+            var userimage;
+
+            if (usr.avatarURL != "") {
+                 userimage = document.createElement('img');
+            } else {
+                userimage = document.createElement('i');
+                userimage.className = "fa fa-user no-avatar";
+            }
+            var userfullname = document.createElement('span');
+
+            userfullname.textContent = usr.displayname;
+            userimage.setAttribute('src', usr.avatarURL);
+
+            userwrapper.appendChild(userimage);
+            userwrapper.appendChild(userfullname);
+
+            userwrapper.dataset.fullname = usr.displayname.toLowerCase();
+            userwrapper.dataset.userid = usr._id;
+            userwrapper.className = "lml-participants-suggestion-item";
+            userwrapper.id = "newgroup_user_" + usr._id;
+
+            userwrapper.addEventListener('click', function() {
+                this.classList.toggle('selected');
+            });
+
+            wrapper.appendChild(userwrapper);
+        }
+
+        var searchinput = document.getElementById('lml-participants-add');
+        searchinput.addEventListener('keyup', function() {
+            that.filterParticipantsSuggestion(this.value.toLowerCase());
+        });
+
+        document.getElementById('chat-slider').querySelector('.fa-fam').addEventListener('click', function() {
+            liliumcms.modals.get('conversation-group-new').show();
+        });
+
+        liliumcms.modals.get('conversation-group-new').bind('accept', that.prepareNewGroup.bind(that), that);
+        liliumcms.modals.get('conversation-group-new').bind('show', that.resetNewGroup.bind(that), that);
+    };
+
+    this.fillForms = function() {
+        this.createNewGroupForm();
+    };
+
+    this.resetNewGroup = function(modal) {
+        document.getElementById('conversation-group-new-topic').value = "";
+        document.getElementById('lml-participants-add').value = "";
+        
+        var userwraps = document.querySelectorAll('.lml-participants-suggestion-item.selected, .lml-participants-suggestion-item.hidden');
+
+        for (var i = 0; i < userwraps.length; i++) {
+            userwraps[i].classList.remove('selected');
+            userwraps[i].classList.remove('hidden');
+        }
+    };
+
+    this.prepareNewGroup = function(modal) {
+        console.log("Preparing");
+        var ids = [];
+        var topic = document.getElementById('conversation-group-new-topic').value;
+
+        var userwraps = document.querySelectorAll('.lml-participants-suggestion-item.selected');
+        for (var i = 0; i < userwraps.length; i++) {
+            ids.push(userwraps[i].dataset.userid);
+        }
+     
+        console.log(ids);
+        console.log(topic);
+        if (ids.length != 0 && topic.trim() != "") {
+            modal.elem.querySelector('.lml-modal-accept').setAttribute('disabled', 'disabled');
+            that.createNewGroup(topic, ids, function() {
+                modal.elem.querySelector('.lml-modal-accept').removeAttribute('disabled');
+                modal.close();
+            });
+        }
+    };
+
+    this.createNewGroup = function(topic, participants, cb) {
+        $.post('{=config.default.server.url}/admin/conversations/0/create', {
+            topic : topic, 
+            people : JSON.stringify(participants)
+        }, function(resp) {
+            that.addGroup(resp, document.getElementById("chat-list-group"));
+            cb && cb(resp);
+        });
+    };
+
+    this.filterParticipantsSuggestion = function(str) {
+        var userwraps = document.querySelectorAll('.lml-participants-suggestion-item');
+
+        for (var i = 0; i < userwraps.length; i++) {
+            userwraps[i].classList[(userwraps[i].dataset.fullname.indexOf(str) == -1) ? "add" : "remove"]("hidden");
+        }
+    }
 
     this.toggleChat = function() {
         document.getElementById("chat-slider").classList.toggle('left');
@@ -199,21 +334,30 @@ var LMLConversations = function() {
         document.getElementById('chat-conversation').classList.toggle('lefter');
     };
 
-    this.showConversation = function(e, user) {
+    this.showConversation = function(e, user, type) {
         drawn = true;
+        var type = type || "";
 
         if (!user) {
             var li = e.target;
             while (li.nodeName != "LI") {
                 li = li.parentElement;
             }
-            user = JSON.parse(li.dataset.user);
+            if (li.dataset.user) {
+                user = JSON.parse(li.dataset.user);
+            } else if (li.dataset.group) {
+                user = cachedgroups[li.dataset.groupid];
+            }
+
+            type = li.dataset.type;
         } else if (typeof user === "string") {
-            user = cachedusers[user];
-        }
-
-
-        document.querySelector('.chat-fullname').innerHTML = user.displayname;
+            if (type == "" || type == "private") {
+                user = cachedusers[user];
+                type = "private";
+            } else if (type === "group") {
+                user = cachedgroups[user];
+            }
+        } 
 
         document.getElementById("chat-slider").classList.add('left');
         document.querySelector('main.lmladminmain').classList.add('left');
@@ -223,24 +367,71 @@ var LMLConversations = function() {
         document.querySelector('.lmladminsidebar').classList.add('lefter');
         document.getElementById('chat-conversation').classList.add('lefter');
 
-        $.get('{=config.default.server.url}/admin/conversations/find?type=private&orcreate=1&async=*&with=' + user._id, function(resp) {
-            if (!resp.err) {
-                currentConv = resp.id;
-                if (unreadConv[currentConv]) {
-                    delete unreadConv[currentConv];
-                    if (Object.keys(unreadConv).length == 0) {
-                        document.getElementById('nav-conversations').querySelector('b').classList.remove('shown');
+        var partswrapper = document.getElementById('chat-participants-list');
+        var oldparts = partswrapper.querySelectorAll("span");
+        for (var i = 0; i < oldparts.length; i++) {
+            oldparts[i].remove();
+        }
+
+        if (type == "private" || type == "") {
+            document.querySelector('.chat-fullname').innerHTML = user.displayname;
+
+            $.get('{=config.default.server.url}/admin/conversations/find?type=private&orcreate=1&async=*&with=' + user._id, function(resp) {
+                if (!resp.err) {
+                    currentConv = resp.id;
+                    if (unreadConv[currentConv]) {
+                        delete unreadConv[currentConv];
+                        if (Object.keys(unreadConv).length == 0) {
+                            document.getElementById('nav-conversations').querySelector('b').classList.remove('shown');
+                        }
+    
+                        document.getElementById('user' + user._id).classList.remove("unread");
                     }
 
-                    document.getElementById('user' + user._id).classList.remove("unread");
+                    partswrapper.style.display = "none";
+                    $.get('{=config.default.server.url}/admin/conversations/messages/' + resp.id + '?async=*&limit=30', function(resp) {
+                        that.clearConversation();
+                        that.fillConversation(resp.messages);
+                        that.read(currentConv);
+                    });
                 }
-                $.get('{=config.default.server.url}/admin/conversations/messages/' + resp.id + '?async=*&limit=30', function(resp) {
-                    that.clearConversation();
-                    that.fillConversation(resp.messages);
-                    that.read(currentConv);
-                });
+            });
+        } else if (type == "group") {
+            var group = user;
+            document.querySelector('.chat-fullname').innerHTML = group.topic;
+
+            for (var i = 0; i < group.users.length; i++) {
+                var usertag = document.createElement('span');
+                usertag.textContent = cachedusers[group.users[i]].displayname;
+                partswrapper.appendChild(usertag);
+
+                var sep = document.createElement('span');
+                if (i == group.users.length-2) {
+                    sep.style.fontStyle = "italic";
+                    sep.textContent = ' and ';
+                } else if (i != group.users.length-1) {
+                    sep.textContent = ', ';
+                }
+
+                partswrapper.appendChild(sep);
             }
-        });
+            partswrapper.style.display = "block";
+
+            currentConv = group._id;
+            if (unreadConv[currentConv]) {
+                delete unreadConv[currentConv];
+                if (Object.keys(unreadConv).length == 0) {
+                    document.getElementById('nav-conversations').querySelector('b').classList.remove('shown');
+                }
+    
+                document.getElementById('group' + group._id).classList.remove("unread");
+            }
+            $.get('{=config.default.server.url}/admin/conversations/messages/' + group._id + '?async=*&limit=30', function(resp) {
+                that.clearConversation();
+                that.fillConversation(resp.messages);
+                that.read(currentConv);
+            });
+        }
     };
 
     this.sendPending = function() {
@@ -250,12 +441,13 @@ var LMLConversations = function() {
     };
     
     var txtEmoMap = {
-        "\\:\\D" : "😄",
+        "\\:D" : "😄",
         "\\;\\)" : "😉",
         "\\:\\)" : "😀",
         "\\<3" : "❤️",
         "\\:\\(" : "😔",
-        "\\:\\'\\(": "😢"
+        "\\:\\'\\(": "😢",
+        "\\:O" : "😲"
     };
     var txtToEmojis = function(txt) {
         for (var emot in txtEmoMap) {
@@ -334,23 +526,36 @@ var LMLConversations = function() {
 
     this.notifyMsg = function(msg) {
         if (Notification.permission === "granted") {
-            var notification = new Notification("✉️ " + cachedusers[msg.userid].displayname, {
+            var notification = new Notification(
+                "✉️ " + cachedusers[msg.userid].displayname + (msg.type === "group" ? " in " + cachedgroups[msg.conversationid].topic : ""), 
+            {
                 icon: cachedusers[msg.userid].avatarURL,
                 body: $('<textarea/>').html(msg.content).text(),
             });
 
             notification.onclick = function() {
-                that.showConversation(undefined, cachedusers[msg.userid]);
+                if (msg.type == "group") {
+                    that.showConversation(undefined, msg.conversationid.toString(), 'group');
+                } else {
+                    that.showConversation(undefined, cachedusers[msg.userid]);
+                }
+
                 this.close();
             };
         } else {
-            liliumcms.notify({type : "message", title : "✉️ " + cachedusers[msg.userid].displayname, message : $('<textarea/>').html(msg.content).text(), url : "javascript:liliumcms.conversations.showConversation(undefined, '"+msg.userid+"');"});
+            liliumcms.notify({type : "message", title : "✉️ " + cachedusers[msg.userid].displayname + (msg.type === "group" ? " in " + cachedgroups[msg.conversationid].topic : ""), message : $('<textarea/>').html(msg.content).text(), url : "javascript:liliumcms.conversations.showConversation(undefined, '"+(msg.type == "group" ? msg.conversationid.toString() + "', 'group" : msg.userid)+"');"});
         }
 
         if (currentConv != msg.conversationid || !drawn) {
-            unreadConv[msg.conversationid] = msg.userid;
-            document.getElementById("user" + msg.userid).classList.add("unread");
-            document.getElementById('nav-conversations').querySelector('b').classList.add('shown');
+            if (!msg.type || msg.type === "private") {
+                unreadConv[msg.conversationid] = msg.userid;
+                document.getElementById("user" + msg.userid).classList.add("unread");
+                document.getElementById('nav-conversations').querySelector('b').classList.add('shown');
+            } else if (msg.type === "group") {
+                unreadConv[msg.conversationid] = msg.userid;
+                document.getElementById("group" + msg.conversationid).classList.add("unread");
+                document.getElementById('nav-conversations').querySelector('b').classList.add('shown');
+            }
         }
 
         notificationSound.play();
@@ -375,6 +580,14 @@ var LMLConversations = function() {
             if (liliumcms.state.focused && drawn && currentConv == msg.conversationid) {
                 that.read(msg.conversationid);
             }
+        });
+
+        socket.on('newchatgroup', function(chatGroup) {
+            that.addGroup(chatGroup, document.getElementById("chat-list-group"));
+        });
+
+        socket.on('typingstatus', function(payload) {
+            
         });
 
         document.addEventListener('reconnected', function() {

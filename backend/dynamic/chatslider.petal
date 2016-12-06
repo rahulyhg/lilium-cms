@@ -8,6 +8,12 @@
         <i class="fa fa-plus fa-fam" aria-hidden="true"></i>
     </span>
     <span class="chat-slider-subtitle">
+        Groups
+    </span>
+    <ul id="chat-list-group">
+
+    </ul>
+    <span class="chat-slider-subtitle">
         Online
     </span>
     <ul id="chat-list-online">
@@ -22,6 +28,9 @@
 </div>
 <div id="chat-conversation">
     <h2 class="chat-fullname">New Conversation</h2>
+    <div id="chat-participants-list">
+        
+    </div>
     <ul class="chat-messages" id="chat-messages">
 
     </ul>
@@ -31,3 +40,215 @@
 </div>
 <audio preload="metadata" src="{=config.default.server.url}/static/audio/notif1.mp3" id="notification1" style="display: none" ></audio>
 
+<div id="conversation-group-new" class="lml-modal">
+    <div class="lml-modal-title">
+        New group conversation
+    </div>    
+    <div class="lml-modal-body">
+        <span>Topic</span>
+        <input id="conversation-group-new-topic" placeholder="The main topic of this private group conversation" />
+
+        <span>Participants</span>
+        <div>
+            <input id="lml-participants-add" placeholder="Search for a beautiful face..." />
+            <div class="lml-participants-suggestion">
+                    
+            </div>
+        </div>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Create</button>
+    </div>
+</div>
+
+<style>
+    .lml-modal-wrapper {
+        position: fixed;
+        top: 0; bottom:0;
+        left: 0; right:0;
+
+        background-color: rgba(0,0,0,0.5);
+        z-index: 20000;
+        display: none;
+        opacity: 0;
+
+        -webkit-transition: all 0.1s;
+           -moz-transition: all 0.1s;
+            -ms-transition: all 0.1s;
+             -o-transition: all 0.1s;
+                transition: all 0.1s;
+
+        -webkit-transform: translate3d(0,0,0);
+           -moz-transform: translate3d(0,0,0);
+            -ms-transform: translate3d(0,0,0);
+             -o-transform: translate3d(0,0,0);
+                transform: translate3d(0,0,0);
+    }
+
+    .lml-modal-wrapper.shown {
+        opacity: 1;
+    }
+
+    .lml-modal {
+        display: block;
+        width: 520px;
+        margin: 60px auto;
+        background-color: #F9F9F9;
+        overflow: hidden;
+
+        border-radius : 5px;
+
+        opacity: 0;
+
+        -webkit-transform: translate3d(0, -50px, 0) rotateZ(8deg);
+           -moz-transform: translate3d(0, -50px, 0) rotateZ(8deg);
+            -ms-transform: translate3d(0, -50px, 0) rotateZ(8deg);
+             -o-transform: translate3d(0, -50px, 0) rotateZ(8deg);
+                transform: translate3d(0, -50px, 0) rotateZ(8deg);
+
+        -webkit-transition: all 0.2s;
+           -moz-transition: all 0.2s;
+            -ms-transition: all 0.2s;
+             -o-transition: all 0.2s;
+                transition: all 0.2s;
+    }
+
+    .lml-modal.shown {
+        opacity: 1;
+
+        -webkit-transform: translate3d(0,0,0) rotateZ(0deg);
+           -moz-transform: translate3d(0,0,0) rotateZ(0deg);
+            -ms-transform: translate3d(0,0,0) rotateZ(0deg);
+             -o-transform: translate3d(0,0,0) rotateZ(0deg);
+                transform: translate3d(0,0,0) rotateZ(0deg);
+    }
+
+    .lml-modal-title {
+        display: block;
+        padding: 10px 15px;
+        border-bottom: 1px solid #DDD;
+
+        font-size: 22px;
+        font-weight :300;
+    }
+
+    .lml-modal-body {
+        padding: 10px 15px;
+    }
+
+    .lml-modal-body input {
+        width: 100%;
+        padding: 5px 10px;
+        border: 1px solid #DDD;
+        margin: 5px 0px 15px;
+        font-size: 18px;
+        font-weight: 500;
+    }
+
+    .lml-modal-body span {
+        display: block;
+        font-size: 16px;
+        font-weight: 300;
+        color: #999;
+    }
+
+    .lml-modal-footer {
+        border-top: 1px solid #CCC;
+        text-align: right;
+        padding: 10px 15px;
+    }
+
+    .lml-modal-footer button {
+        background-color: #EEEEEE;
+        border: 1px solid #CCC;
+        font-size: 16px;
+        padding: 5px 12px;
+        border-radius: 5px;
+        color: #333;
+        margin-left: 12px;
+    }
+
+    .lml-modal-footer button:hover {
+        background-color: #FEFEFE;
+    }
+
+    .lml-modal-footer button:active {
+        background-color: #DEDEDE;
+    }
+
+    .lml-modal-footer button[disabled="disabled"] {
+        opacity: 0.5;
+    }
+
+    .lml-modal-footer .lml-modal-accept {
+        background-color: #9B59B6;
+        color: #FFF;
+    }
+
+    .lml-modal-footer .lml-modal-accept:hover {
+        background-color: #AB69C6;
+    }
+
+    .lml-modal-footer .lml-modal-accept:active {
+        background-color: #8B49A6;
+    }
+
+    #conversation-group-new {
+        
+    }
+
+    .lml-participants-suggestion {
+        height: 200px;
+        overflow: scroll;
+        border: 1px solid #DDD;
+    }
+
+    .lml-participants-suggestion .lml-participants-suggestion-item {
+        padding: 10px;
+        border-bottom: 1px solid #DDD;
+        cursor: pointer;
+    }
+
+    .lml-participants-suggestion .lml-participants-suggestion-item:hover {
+        background-color: #FCFCFC;
+    }
+
+    .lml-participants-suggestion .lml-participants-suggestion-item:hover span {
+        color: #000;
+    }
+
+    .lml-participants-suggestion .lml-participants-suggestion-item.hidden {
+        display: none;
+    }
+
+    .lml-participants-suggestion .lml-participants-suggestion-item.selected {
+        background-color: #9B59B6;
+        border-bottom: 1px solid #6d3286;
+    }
+
+    .lml-participants-suggestion .lml-participants-suggestion-item.selected span {
+        color: #FFF;
+        font-weight: 500;
+    }
+
+    .lml-participants-suggestion span {
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 18px;
+        font-weight: 300;
+    }
+
+    .lml-participants-suggestion i.fa,
+    .lml-participants-suggestion img {
+        width: 32px;
+        height: 32px;
+        border-radius: 32px;
+        display: inline-block;
+        vertical-align: middle;
+        font-size: 32px;
+
+        margin-right: 10px;
+        text-align: center;
+    }
+</style>

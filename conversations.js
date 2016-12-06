@@ -82,6 +82,8 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                                         cli.sendJSON({err : undefined, success : true, id : res.insertedId});
     
                                         for (var i = 0; i < conv.users.length; i++) if (conv.users[i].toString() != cli.userinfo.userid) {
+                                            msg.type = conv.type;
+                                            msg.convid = conv._id;
                                             notifications.messageNotif(conv.users[i], msg);
                                         }
                                     });
@@ -103,6 +105,31 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
             }, function() {
                 cli.sendJSON({read : true});
             }, false, true, true);
+        } else if (cli.routeinfo.path[3] == "create") {
+            var topic = cli.postdata.data.topic;
+            var people = JSON.parse(cli.postdata.data.people);
+            var peopleids = new Array(people.length + 1);
+            for (var i = 0; i < people.length; i++) {
+                peopleids[i] = db.mongoID(people[i]);
+            }
+
+            peopleids[peopleids.length - 1] = db.mongoID(cli.userinfo.userid);
+
+            var newconv = {
+                type : "group",
+                users : peopleids,
+                uptodate : peopleids,
+                topic : topic
+            };
+            db.insert(_c.default(), 'conversations', newconv, function(err, res) {
+                newconv._id = res.insertedId;
+                newconv.created = true;
+                cli.sendJSON(newconv);
+
+                for (var i = 0; i < people.length; i++) if (people[i] != cli.userinfo.userid) {
+                    notifications.messageNotif(people[i], newconv, 'newchatgroup');
+                }
+            });
         } else {
             cli.throwHTTP(404, 'NOT FOUND');
         }
@@ -185,7 +212,7 @@ LMLConversations.prototype.registerLiveVar = function() {
                 }
             });
         } else if (type == "group") {
-
+            
         } else if (type == "list") {
             db.findToArray(_c.default(), 'conversations', {
                 users : cli.userinfo.userid,

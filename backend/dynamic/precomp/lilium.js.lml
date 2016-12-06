@@ -782,6 +782,106 @@ var LiliumCMS = function() {
         };
     };
 
+    var LMLModals = function() {
+        _modals = {};
+
+        var LMLModal = function(elem) {
+            var that = this;
+            this.elem = elem;
+            this.wrapper;
+            this.events = {
+                show : [],
+                cancel : [],
+                accept : [],
+                close : []
+            };
+
+            this.show = function() {
+                that.fire('show');
+                that.wrapper.style.display = "block";
+                setTimeout(function() {
+                    that.wrapper.classList.add('shown');
+                    setTimeout(function() {
+                        that.elem.classList.add('shown');
+                    }, 110);
+                }, 10);
+            };
+
+            this.fire = function(event) {
+                for (var i = 0; i < that.events[event].length; i++) {
+                    var cb = that.events[event][i];
+                    if (cb.caller) {
+                        cb.ftc.apply(cb.caller, [that]);
+                    } else {
+                        cb.ftc(that);
+                    }
+                }
+            }
+
+            this.close = this.dismiss = function() {
+                that.fire('close');
+                that.elem.classList.remove('shown');
+                setTimeout(function() {
+                    that.wrapper.classList.remove('shown');
+                    setTimeout(function() {
+                        that.wrapper.style.display = "none";
+                    }, 110);
+                }, 50);
+            };
+
+            this.initbind = function() {
+                var cancel = that.elem.querySelector('.lml-modal-cancel');
+                if (cancel) {
+                    cancel.addEventListener('click', this.close);
+                }
+
+                var accept = that.elem.querySelector('.lml-modal-accept');
+                if (accept) {
+                    accept.addEventListener('click', function() {
+                        that.fire.apply(that, ['accept']);
+                    });
+                }
+            };
+
+            this.initwrap = function() {
+                var wrapper = document.createElement('div');
+                wrapper.className = "lml-modal-wrapper";
+                wrapper.appendChild(that.elem);
+                document.body.appendChild(wrapper);
+
+                that.wrapper = wrapper;
+            };
+
+            this.bind = function(event, cb, caller) {
+                that.events[event].push({ftc : caller ? cb.bind(caller) : cb, caller : caller});
+            };
+
+            this.initwrap();
+            this.initbind();
+        };
+
+        this.find = function() {
+            var allmodals = document.querySelectorAll('.lml-modal');
+            for (var i = 0; i < allmodals.length; i++) {
+                var mod = allmodals[i];
+
+                _modals[mod.id] = new LMLModal(mod);
+            }
+        };
+
+        this.get = function(id) {
+            return _modals[id];
+        };
+    };
+
+    var LMLSession = function() {
+        this.current = {};
+
+        this.init = function() {
+            this.current = liliumcms.livevars.retrieveVar('session');
+        }
+    };
+
     var Animator = function() {
         var that = this;
         this.slide = function() {
@@ -842,6 +942,8 @@ var LiliumCMS = function() {
             that.animator = new Animator();
             that.facebook = new LMLFacebook();
             that.lmldom = new LMLDom();
+            that.modals = new LMLModals();
+            that.session = new LMLSession();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -914,14 +1016,17 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.admininit = true;
 
         liliumcms.queryparams.parseURL();
+        liliumcms.session.init();
         liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false;
         liliumcms.adminmenu.init();
+        liliumcms.modals.find();
         liliumcms.pageloader.parseAdminPanel();
         liliumcms.pageloader.loadCurrentURL();
         liliumcms.pageloader.bindHistory();
         liliumcms.badges.createCache();
         liliumcms.badges.fillSidebar();
         liliumcms.conversations.fillChat();
+        liliumcms.conversations.fillForms();
         liliumcms.lmldom.init();
         liliumcms.everythingIsAwesome();
     } else {

@@ -546,12 +546,12 @@ var Notification = function () {
         io.of(idToNamespace[siteid]).emit(type || 'notification', data);
     };
 
-    this.messageNotif = function(user, msg) {
+    this.messageNotif = function(user, msg, type) {
         var seshes = groups["lml_network"].users[user];
         
         if (seshes) for (var i = 0; i < seshes.length; i++) {
             var sesh = groups["lml_network"].sessions[seshes[i]];
-            sesh.socket.emit('message', msg);   
+            sesh.socket.emit(type||'message', msg);   
         }
     };
 

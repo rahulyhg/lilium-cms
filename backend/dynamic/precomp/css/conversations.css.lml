@@ -77,7 +77,8 @@ span.chat-slider-subtitle {
     padding: 5px 10px;
     border-bottom: 1px solid #555;
     border-top: 1px solid #555;
-    color: #FFF;
+    color: #EEE;
+    background-color: #3a3a3a;
 }
 
 #chat-slider ul {
@@ -118,6 +119,7 @@ span.chat-slider-subtitle {
 }
 
 #chat-slider #chat-list-online li.unread,
+#chat-slider #chat-list-group li.unread,
 #chat-slider #chat-list-everyone li.unread {
     font-weight: 700;
     color: #f7f7f7;
@@ -165,14 +167,25 @@ span.chat-slider-subtitle {
 #chat-conversation .chat-fullname {
     color: #FFF;
     font-weight: 300;
-    padding: 12px 15px;
+    padding: 12px 15px 0px;
     position: relative;
     z-index: 20;
 }
 
+#chat-participants-list {
+    color: #AAA;
+    padding: 0px 16px;
+    height: 30px;
+    font-weight: 300;
+    font-size: 15px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    overflow-x : auto;
+}
+
 ul.chat-messages {
     position: absolute;
-    top: 58px;
+    top: 70px;
     bottom: 80px;
     left: 0;
     right: 0;
