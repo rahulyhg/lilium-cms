@@ -42,25 +42,29 @@ map $http_sec_websocket_key $conn {
     default "upgrade";         # Otherwise, set $conn to upgrade
 }
 
+proxy_cache_path /usr/share/lilium/html/nginxcache levels=1:2 keys_zone=my_cache:10m max_size=10g inactive=60m use_temp_path=off;
+
 server {
         listen 80;
 
-        server_name www.DOMAIN.com DOMAIN.com;
+        server_name website.com;
         # port_in_redirect off;
 
         large_client_header_buffers 8 32k;
         index index.html;
 
-        if ($http_host = "www.DOMAIN.com") {
-                rewrite ^ http://DOMAIN.com$request_uri permanent;
-        }
-
         location / {
-                alias /absolute/path/to/html;
-                try_files $uri $uri/ @lilium;
+                proxy_cache my_cache;
+                proxy_cache_revalidate on;
+                proxy_cache_min_uses 3;
+                proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+                proxy_cache_lock on;
+
+                alias /usr/share/lilium/html/website/;
+                try_files $uri $uri.html @lilium;
         }
 
-        location /admin/* {
+        location /(admin|login)/ {
                 try_files @lilium =404;
         }
 
@@ -68,6 +72,7 @@ server {
                 proxy_set_header X-Real-IP $remote_addr;
                 proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
                 proxy_set_header Host $http_host;
+                proxy_set_header Host $host;
                 proxy_set_header X-NginX-Proxy true;
 
                 # prevents 502 bad gateway error
