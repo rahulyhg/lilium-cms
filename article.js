@@ -13,6 +13,7 @@ var hooks = require('./hooks.js');
 var dates = require('./dates.js');
 var badges = require('./badges.js');
 var moment = require('moment');
+var log = require('./log.js');
 
 var Article = function() {
     var publishedNotificationTitles = [
