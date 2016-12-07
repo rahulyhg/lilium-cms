@@ -1010,7 +1010,7 @@ var liliumcms = new LiliumCMS();
 $(document).ready(function() {
     liliumcms.awesomestrapper.strap();
 });
-
+ 
 document.addEventListener('livevarsRendered', function(e) {
     if (!liliumcms.admininit) {
         liliumcms.admininit = true;

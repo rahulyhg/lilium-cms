@@ -18,7 +18,7 @@
  * Documentation : http://liliumcms.com/docs                                                             *
  *********************************************************************************************************/
 {#config;debug}
-{$
+{$ 
 	actioncolor = "#9B59B6";
 	hovercolor =  "#A869C6";
 	activecolor = "#8B49A6";

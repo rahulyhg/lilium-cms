@@ -5,6 +5,7 @@ var lml = require('./lml.js');
 var notif = require('./notifications.js');
 var formBuilder = require('./formBuilder.js');
 var configs = require('./config');
+var precomp = require('./precomp.js');
 
 var DevTools = function() {};
 
@@ -142,8 +143,26 @@ var refreshCache = function(cli, ctx) {
         case 'instagram':
             require('./embed.js').scanInstagram(cli);
             break;
+        case 'precompile':
+            recompileQueue(cli);
+            break;
     }
     cli.response.end('');
+};
+
+var recompileQueue = function(cli) {
+    require('./config.js').each(function(_c, next) {
+        precomp.precompile(_c, function() {
+            require('./templateBuilder.js').precompThemeFiles(_c, function() {
+                notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                    title: "Precompiler",
+                    msg : "Precompiled files for website " + _c.website.sitetitle,
+                    type: "success"
+                });
+                next();
+            });
+        });
+    }, function() {});
 };
 
 DevTools.prototype.registerAdminEndpoint = function() {
