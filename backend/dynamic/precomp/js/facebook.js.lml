@@ -45,7 +45,7 @@ LMLFacebook.prototype.castLogin = function(cb) {
 };
 
 LMLFacebook.prototype.commitFbAuth = function() {
-    $.post('{=config.default.server.url}/admin/me/commitfbauth', {fbid : window.fbstatus.authResponse, form_name : "commitfbauth"}, function(resp) {
+    $.post('{=config.default.server.url}/admin/me/commitfbauth', {fbid : window.fbstatus.authResponse.userID, form_name : "commitfbauth"}, function(resp) {
         liliumcms.notify({type : "success", title : "Facebook auth activated", message : "You can now log in with Facebook."});
     });
 };
