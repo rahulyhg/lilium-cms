@@ -57,7 +57,7 @@ LMLFacebook.prototype.confirmFbAuthActivation = function(resp) {
 LMLFacebook.prototype.allowfbauth = function() {
     var that = this;
     if (window.fbstatus && window.fbstatus.status == "connected") {
-        that.confirmFbAuthActivation(window.fbstatus);
+        that.confirmFbAuthActivation(window.fbstatus.authResponse);
     } else {
         this.castLogin(function(resp) {
             if (resp.status === "connected") {
