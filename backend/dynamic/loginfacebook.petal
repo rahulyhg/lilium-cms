@@ -16,6 +16,11 @@ window.loginwithfacebook = function() {
         return false;
     } else {
         // Try sending fb token
+        $.post('{=config.default.server.url}/login/fb', window.fbstatus.authResponse, function(lmlresp) {
+            if (lmlresp.success) {
+                document.location.href = "{=config.default.server.url}/admin";
+            }
+        });     
     }
 };
 

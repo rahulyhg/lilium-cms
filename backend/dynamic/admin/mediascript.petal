@@ -6,18 +6,9 @@
  $}
 <script>
     var deleteMedia = function(id) {
-        var url = '{=baseurl}' + this.url;
-
-        $('#confirm_media .modal-body img').attr('src', url);
-        $('#confirm_media').modal();
-
-        // Hide modal if "Okay" is pressed
-        $('#confirm_media .btn-ok').click(function() {
-            $.post('{=config.default.server.url}/admin/media/delete/' + id, function(data) {
-                liliumcms.refresh();
-            });
+        $.post('{=config.default.server.url}/admin/media/hide/' + id, function(data) {
+            liliumcms.refresh();
         });
-
     }
 
     var copyLink = function(id) {
