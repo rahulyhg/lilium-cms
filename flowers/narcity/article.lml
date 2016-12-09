@@ -37,7 +37,7 @@ $}
                 <span class="article-author-displayname midvert">{=author.displayname}</span>
             </a>
             <span class="midvert">&middot;</span>
-            <span class="article-published-date midvert edt-datetime" data-edtdatetime="{=extra.article.date}"></span>
+            <span class="article-published-date midvert edt-datetime" data-edtdatetime={=extra.article.date}></span>
             <span class="midvert">&middot;</span>
             <a href="#comments" target="" style="font-weight:bold; text-decoration: none; color: #111;">
                 <img src="{=config.default.server.url}/res/images/commentbubble.png" id="commentssmallicon" title="Comments">

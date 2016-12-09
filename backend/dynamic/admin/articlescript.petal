@@ -254,9 +254,7 @@
                     type: 'success'
                 });
 
-
                 $(".cke_bottom time.timeago").timeago("update", new Date());
-
             });
 
             return false;

@@ -107,8 +107,8 @@ var Article = function() {
         filelogic.serveAdminLML(cli, false);
     };
 
-    this.deepFetch = function(conf, idOrName, cb, preview) {
-        var cond = new Object();
+    this.deepFetch = function(conf, idOrName, cb, preview, extraconds) {
+        var cond = extraconds || new Object();
         cond[typeof idOrName === "string" ? "name" : "_id"] = idOrName;
 
         db.join(conf, preview ? 'preview' : 'content', [
@@ -702,7 +702,8 @@ var Article = function() {
 
                             cli.did('content', destroy ? 'destroyed' : 'deleted', {id : id});
                             
-                            var filename = r.title + '.html';
+                            var filename = cli._c.server.html + "/" + result.name + '.html';
+    console.log(filename);
                             fs.deleteFile(filename, function() {
                                 hooks.fire('article_deleted', id);
                                 cacheInvalidator.removeFileToWatch(filename);
@@ -1119,14 +1120,17 @@ var Article = function() {
             .add('publish-set', 'buttonset', { buttons : [{
                     'name' : 'save',
                     'displayname': 'Save draft',
+                    'type' : 'button',
                     'classes': ['btn', 'btn-default, btn-save']
                 }, {
                     'name' : 'preview',
                     'displayname': 'Preview',
+                    'type' : 'button',
                     'classes': ['btn', 'btn-default, btn-preview']
                 }, {
                     'name' : 'publish', 
                     'displayname': 'Save and <b>Publish</b>',
+                    'type' : 'button',
                     'classes': ['btn', 'btn-default, btn-publish']
                 }
             ]}
@@ -1137,7 +1141,7 @@ var Article = function() {
 
     });
 
-    this.generateFromName = function(cli, articleName, cb) {
+    this.generateFromName = function(cli, articleName, cb, onlyPublished) {
         // Check for articles in db
         this.deepFetch(cli._c, articleName, function(deepArticle) {
             if (!deepArticle) {
@@ -1151,16 +1155,21 @@ var Article = function() {
                     }
                 }, {name : 1});
             } else {
-                var extra = new Object();
-                extra.ctx = "article";
-                extra.article = deepArticle;
-
-                filelogic.renderThemeLML(cli, "article", articleName + '.html', extra , function(name) {
-                    cacheInvalidator.addFileToWatch(articleName, 'articleInvalidated', deepArticle._id, cli._c);
-                    cb(true);
-                });
+                if (onlyPublished && deepArticle.status !== "published") {
+                    console.log(deepArticle);
+                    cb(false);
+                } else {
+                    var extra = new Object();
+                    extra.ctx = "article";
+                    extra.article = deepArticle;
+    
+                    filelogic.renderThemeLML(cli, "article", articleName + '.html', extra , function(name) {
+                        cacheInvalidator.addFileToWatch(articleName, 'articleInvalidated', deepArticle._id, cli._c);
+                        cb(true);
+                    });
+                }
             }
-        });
+        }, onlyPublished ? {status : "published"} : {});
     }
 
     var init = function() {

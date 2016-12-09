@@ -430,7 +430,7 @@ var LiveVars = function() {
                         liliumcms.pushtables.push(pushTable);
 
                         $(lmlTag).after(pushTable.render());
-                    } else if (templateName != "" && $('#' + $(this).data('template')).length != 0) {
+                    } else if (templateName && templateName != "" && $('#' + $(this).data('template')).length != 0) {
                         var templateObj = $('#' + $(this).data('template'));
     
                         if (templateObj.length != 0) {

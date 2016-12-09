@@ -32,6 +32,8 @@ Secrets.prototype.registerAdminEndpoint = function() {
     });
 
     admin.registerAdminEndpoint('secrets', 'POST', function(cli) {
+        if (!cli.hasRightOrRefuse('edit-secrets')) {}
+
         if (cli.routeinfo.path[2] === "add") {
             switch (cli.routeinfo.path[3]) {
                 case "group":

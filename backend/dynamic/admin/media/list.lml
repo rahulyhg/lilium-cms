@@ -22,12 +22,6 @@
 							 data-actionparamkey="_id">
 							Copy Link
 					</lml:tobject>
-					<lml:tobject data-nodetype="button"
-							 data-bind="click"
-							 data-action="deleteMedia"
-							 data-actionparamkey="_id">
-							Delete
-					</lml:tobject>
 				</div>
 				<lml:tobject data-nodetype="img" data-key="sizes.thumbnail.url"></lml:tobject>
 

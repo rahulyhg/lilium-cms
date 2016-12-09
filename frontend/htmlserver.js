@@ -56,11 +56,9 @@ var HTMLServer = function() {
     								});
                                 }
 							} else {
-								// cli.throwHTTP(404, 'Not Found');
-                                // 404
                                 filelogic.serveErrorPage(cli, 404);
 							}
-						})
+						}, true)
 					}
 				});
 			}
