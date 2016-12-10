@@ -84,8 +84,6 @@ var Entities = module.exports = new function () {
     };
 
     this.welcome = function(cli) {
-        if (!cli.hasRightOrRefuse("login")) {return;}
-
         var dat = {
             welcomed : true,
             firstname : cli.postdata.data.firstname,

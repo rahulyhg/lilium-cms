@@ -379,6 +379,12 @@ var LMLImagePicker = function() {
         ePicker.addEventListener('dragover', that.enterDrag);
         ePicker.addEventListener('drop', that.fileDropped);
 
+        document.getElementById('lmlimagepicker').addEventListener('click', function(e) {
+            if (e.target.id = "lmlimagepicker") {
+                // liliumcms.imagepicker.dismiss();
+            }
+        });
+
         Mousetrap.bind(['esc', 'escape'], function() {
             if (state == "shown") {
                 that.dismiss();
