@@ -261,7 +261,7 @@ var ftUploads = function(siteid, mysqldb, done) {
         };
 
         var handleSingle = function(error, body, upload, threadid) {
-            var filename = upload.ID + "_" + fu.genRandomNameFile(upload.ID) + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
+            var filename = upload.ID + "_" + fu.genRandomNameFile(upload.ID) + "." + upload.guid.split('.').pop();
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
