@@ -173,7 +173,6 @@ span.chat-slider-subtitle {
 }
 
 #chat-participants-list {
-    color: #AAA;
     padding: 0px 16px;
     height: 30px;
     font-weight: 300;
@@ -248,4 +247,23 @@ ul.chat-messages {
     width: 32px;
     border-radius: 5px;
     margin-right: 10px;
+}
+
+#chat-participants-list img {
+    width: 18px;
+    height: 18px;
+    vertical-align: middle;
+    border-radius: 12px;
+    margin-right: 5px;
+}
+
+#chat-participants-list span {
+    vertical-align: middle;
+    color: #999;
+    margin-right: 5px;
+}
+
+#chat-participants-list span.read,
+#chat-participants-list span.you {
+    color: #EEE;
 }

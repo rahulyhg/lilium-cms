@@ -270,7 +270,7 @@ var FormBuilder = function() {
         console.log(forms);
     };
 
-    this.render = function(formName, formContext) {
+    this.render = function(formName, formContext, filledBy) {
         log('FormBuilder', 'Rendering form with name : ' + formName, 'info');
         if (typeof forms[formName] === 'undefined') {
             log('FormBuilder', 'Tried to render undefined form with name : ' + formName, 'err');
@@ -287,7 +287,7 @@ var FormBuilder = function() {
             }, forms[formName]);
         }
 
-        return htmlParser.parseForm(forms[formName], formContext || "noctx");
+        return htmlParser.parseForm(forms[formName], formContext || "noctx", filledBy);
     };
 
     /**

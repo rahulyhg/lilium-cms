@@ -56,6 +56,8 @@ var ImageResizer = function () {
                     images[key] = {};
                     images[key].path = resizedFilename;
                     images[key].url = _c.server.url + '/uploads/' + fileName + resizedEndName;
+                    images[key].width = width;
+                    images[key].height = height;
 
                   execute(buffer, i - 1, _c, cb, extension, sizeKeys, imageSizes, images, currentFilename, fileName);
                 });

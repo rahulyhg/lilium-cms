@@ -249,7 +249,7 @@ var DB = function() {
 	// Will find documents from collection coln according to conds,
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
-	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one, operators) {
+	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one, operators, getDoc) {
         _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -260,7 +260,10 @@ var DB = function() {
 				if (typeof newVal !== 'object') {
 					cb('[Database - Invalid mod values]');
 				} else {
-					col[one ? 'updateOne' : 'updateMany'](
+					col[
+                        getDoc ? (one ? 'findOneAndUpdate' : 'findManyAndUpdate')
+                               : (one ? 'updateOne' : 'updateMany')
+                    ](
 						conds,
 						operators ? newVal : {$set:newVal},
 						{

@@ -652,7 +652,7 @@ var Notification = function () {
     };
 
     this.broadcast = function (data, msgType) {
-        io.sockets.emit(msgType || 'message', data);
+        io.emit(msgType || 'message', data);
     };
 
     this.getAvailableGroups = function() {

@@ -899,7 +899,7 @@ var LML = function () {
         var timeStamp = new Date();
         // TODO create a temp file first
         fileserver.createDirIfNotExists(compilepath, function (dirExists) {
-            if (!dirExists) throw new Error("LML.AccessException - Could not create directory for " + compilepath);
+            if (!dirExists) throw new Error("LMLAccessException - Could not create directory for " + compilepath);
 
             fileserver.readFile(rootpath, function (content) {
                 var fileHandle = fileserver.getOutputFileHandle(compilepath, 'w+');

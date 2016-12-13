@@ -12,6 +12,7 @@
 var log = require('./log.js');
 var db = require('./includes/db.js');
 var notifications = require('./notifications.js');
+var config = require('./config.js');
 
 // Consts
 // Badge colors
@@ -38,12 +39,12 @@ BadgeSystem.prototype.cacheDatabase = function(cb) {
     var that = this;
     log('Badges', 'Caching badges from database for website with uid : ' + that._c.uid);
 
-    db.findToArray(that._c, "userbadges", {}, function(err, arr) {
+    db.findToArray(config.default(), "userbadges", {}, function(err, arr) {
         for (var i = 0; i < arr.length; i++) {
             that.userBadges[arr[i].code] = arr[i];
         }
 
-        db.findToArray(that._c, "teambadges", {}, function(err, arr) {
+        db.findToArray(config.default(), "teambadges", {}, function(err, arr) {
             for (var i = 0; i < arr.length; i++) {
                 that.teamBadges[arr[i].code] = arr[i];
             }
@@ -81,7 +82,7 @@ BadgeWrapper.prototype.check = function(cli, context, cb) {
     var that = this;
 
     if (typeof that["checkFor_" + context] === "function") {
-        db.find(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, [], function(err, cur) {
+        db.find(config.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, [], function(err, cur) {
             cur.hasNext(function(err, hasNext) {
                 if (!err && hasNext) {
                     cur.next(function(err, user) {
@@ -107,7 +108,7 @@ BadgeWrapper.prototype.acquire = function(cli, site, user, badge, level, cb) {
     updt["badges." + badge] = level;
 
     log("Badges", "User " + user.username + " acquiring badge " + badge + " level " + level);
-    db.update(cli._c, 'entities', {_id : user._id}, updt, function() {
+    db.update(config.default(), 'entities', {_id : user._id}, updt, function() {
         log('Badges', "Badge successfully acquired for user " + user.username);
 
         notifications.notifyUser(user._id, cli._c.id, {
@@ -128,13 +129,13 @@ BadgeWrapper.prototype.registerLiveVar = function() {
         switch (levels[0]) {
             case undefined:
             case "user":
-                db.findToArray(cli._c, 'userbadges', {}, function(err, arr) {
+                db.findToArray(config.default(), 'userbadges', {}, function(err, arr) {
                     cb(arr);
                 });
                 break;
 
             case "team":
-                db.findToArray(cli._c, 'teambadges', {}, function(err, arr) {
+                db.findToArray(config.default(), 'teambadges', {}, function(err, arr) {
                     cb(arr);
                 });
                 break;
@@ -155,7 +156,7 @@ BadgeWrapper.prototype.getUserBadges = function(_c, useridOrName, cb, isId) {
         conds.username = useridOrName;
     }
 
-    db.findToArray(_c, "entities", conds, function(err, arr) {
+    db.findToArray(config.default(), "entities", conds, function(err, arr) {
         if (!err && arr.length !== 0) {
             cb(arr[0].badges);
         } else {

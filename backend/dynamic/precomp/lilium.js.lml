@@ -754,8 +754,9 @@ var LiliumCMS = function() {
                     !a.data("replace") && 
                     href.indexOf('#') === -1 && 
                     href.indexOf("{=config.default.server.url}") !== -1 && 
-                    href.indexOf('*') === -1) 
-                {
+                    href.indexOf('*') === -1 &&
+                    a.attr('target') !== "_blank"
+                ) {
                     a.data("async", true).attr("href", href).on('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
@@ -1024,7 +1025,6 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.pageloader.loadCurrentURL();
         liliumcms.pageloader.bindHistory();
         liliumcms.badges.createCache();
-        liliumcms.badges.fillSidebar();
         liliumcms.conversations.fillChat();
         liliumcms.conversations.fillForms();
         liliumcms.lmldom.init();

@@ -1,0 +1,38 @@
+{#config}
+<h1>Meme Maker - NOT FINISHED</h1>
+
+<div class="tutorial">
+    Click on the rectangle to upload an image.
+</div>
+
+<div class="meme-image-wrapper">
+    <img class="pickable" id="meme-image" data-size="thumbnaillarge" />
+</div>
+
+<script>
+    window["meme-image_image_selected"] = function(picker, img) {
+        var w = img.size.width;
+        var h = img.size.height;
+    };
+</script>
+
+<style>
+.meme-image-wrapper {
+    display: block;        
+
+    text-align: center;
+    width: 640px;
+    height: 480px;
+    margin: 10px auto;
+}
+
+#meme-image {
+    width: 640px;
+    height: 480px;
+
+    border: 1px solid #CCC;
+    border-radius: 10px;
+
+    display: inline-block;
+}
+</style>

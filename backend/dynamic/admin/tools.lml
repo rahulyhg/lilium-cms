@@ -35,6 +35,9 @@
         margin: 5px;
         padding: 40px 10px;
         height: 180px;
+        width: 200px;
+    
+        vertical-align: top;
     }
 
     .tools-list a:hover {

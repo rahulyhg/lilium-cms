@@ -1,4 +1,7 @@
 {#config;forms}
+{*me}
+<lml:dom v="0.6" />
+
 <div>
     <form data-context="noctx" class="lmlform" name="upload_profile_picture" id="upload_profile_picture" method="POST" enctype="multipart/form-data">
         <div class="profile-photo-form">
@@ -6,11 +9,19 @@
             <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="medium" />
             <h2>( This is you! )</h2>
         </div>
+
+        <div class="me-decoration-wrapper">
+            <h2>Decorations</h2>
+            <div class="me-decorations">
+                <lml:foreach var="deco" in="livevars.me.0.badges" wrapper="div">
+                    <lml:generate call="generatedeco" />
+                </lml:foreach>
+            </div>
+        </div>
     </form>
 </div> 
 
-{*me(sourceof:"update_profile")}
-{=forms.render('update_profile')}
+{=forms.render('update_profile','edit','me/0')}
 {=forms.render('update_password')}
 
 <div id="fb-auth-modal" class="modal fade announcement" tabindex="-1" role="dialog">
@@ -38,12 +49,56 @@
 <!-- /.modal -->
 
 <script>
+    window.generatedeco = function(ctx) {
+        var wrap = document.createElement('div');
+        wrap.classList.add("me-decoration");
+
+        var allbdgs = liliumcms.livevars.retrieveVar('badges.user');
+        var curbadge = ctx.foreachkey;
+        var badgeval = ctx.deco;
+
+        for (var i = 0; i < allbdgs.length; i++) if (allbdgs[i].code == curbadge) {
+            var bdg = allbdgs[i];
+            var level = -1;
+
+            for (var j = 0; j < bdg.ranks.length; j++) {
+                var toCompare = bdg.ranks[j];
+                if (badgeval >= toCompare) {
+                    level = j;
+                } else {
+                    break;
+                }
+            }
+
+            var iconwrap = document.createElement('div');
+            iconwrap.classList.add('badge-level' + level);
+            iconwrap.classList.add("me-badge");
+
+            var icon = document.createElement('i');
+            icon.innerHTML = ('&#x' + bdg.icon + ';');
+            icon.classList.add('fa');
+            iconwrap.appendChild(icon);   
+
+            var label = document.createElement('div');
+            label.textContent = bdg.name;
+            label.classList.add("me-badge-label");
+
+            wrap.appendChild(iconwrap);
+            wrap.appendChild(label);    
+
+            break;
+        }
+        
+        return wrap;
+    };
+
     window.update_profile_submit = function() {
         console.log('updating...');
     };
 
     window.update_profile_callback = function() {
         console.log('updated');
+        
     };
 
     window.profile_photo_image_selected = function(elem, img) {
@@ -58,6 +113,7 @@
 
         $.post("{=config.default.server.url}/admin/me", dat, function() {
             liliumcms.notify({type : "success", title : "You look amazing!", message : "Profile picture was successfully updated."});
+            document.querySelector('.loggedin-user-box img').setAttribute("src", imgurl);
         });
     };
 

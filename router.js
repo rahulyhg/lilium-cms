@@ -27,13 +27,17 @@ var Router = function () {
             cli.routeinfo.path.shift();
         }
 
+        if (cli.routeinfo.path.length == 0) {
+            cli.routeinfo.path = [""];
+        }
+
         cli.routeinfo.relsitepath = "/" + cli.routeinfo.path.join('/');
         cli.routeinfo.params = pObj.query;
         cli.routeinfo.admin = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.admin;
         cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.login;
         cli.routeinfo.api = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === "api";
         cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.livevars;
-        cli.routeinfo.root = pObj.pathname == "/";
+        cli.routeinfo.root = cli.routeinfo.relsitepath.relsitepath == "/";
         cli.routeinfo.async = cli.routeinfo.params.async || false;
 
         cli.response.setHeader("Backend", "Lilium");

@@ -235,7 +235,11 @@ var Sites = function () {
             var len = levels.length;
             if (len > 0 && levels[0] == 'all') {
                 if (len < 2 || levels[1] == "simple") {
-                    cb(config.getSimpleSites());
+                    if (levels[2] == "assoc") {
+                        cb(config.getSimpleSitesAssoc());
+                    } else {
+                        cb(config.getSimpleSites());
+                    }
                 } else if (levels[1] == "complex") {
                     cb(config.getAllSites());
                 } else {

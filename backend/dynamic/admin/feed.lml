@@ -1,0 +1,277 @@
+{#config}
+{*feed}
+{*sites.all.simple.assoc}
+<lml:dom v="0.6" />
+
+<span class="admin-title">
+    What's up
+    <small>buttercup</small>
+</span>
+
+<div class="real-time-feed-wrapper">
+    <div class="real-time-feed">
+        <lml:foreach var="card" in="livevars.feed" wrapper="span">
+            <lml:generate call="generateFeedCard" />
+        </lml:foreach>
+    </div>
+</div>
+
+<script>
+window.generateFeedCard = function(ctx) {
+    var card = ctx.card;
+    var content = window["generateFeedCard_" + card.action](card, ctx);   
+    var wrapper = document.createElement('div');
+    wrapper.classList.add('real-time-card');
+    wrapper.classList.add("real-time-card-" + card.action)
+    wrapper.appendChild(content);
+
+    return wrapper;
+}
+
+window.generateFeedCard_welcomed = function(card, ctx) {
+    var wrap = document.createElement('div');
+    var picture = document.createElement('img');
+    var welcometext = document.createElement('span');
+    
+    wrap.appendChild(picture);
+    wrap.appendChild(welcometext);
+
+    picture.setAttribute('src', card.extra.avatarURL);
+    welcometext.textContent = (card.actor == liliumcms.session.current._id ? "You" : card.extra.displayname) + 
+        " joined the " + 
+        ctx.livevars.sites.all.simple.assoc[card.site].displayName +
+        " team!";
+
+    wrap.classList.add('card-wrap-entity');
+    picture.classList.add('card-big-avatar');
+    welcometext.classList.add('card-welcome-text');
+
+    return wrap;
+};
+
+window.generateFeedCard_badge = function(card, ctx) {
+    var user = liliumcms.conversations.getCachedUsers()[card.actor];
+    
+    var wrap = document.createElement('div');
+    var picture = document.createElement('img');
+    var welcometext = document.createElement('span');
+    var ribbon = document.createElement('div');
+    
+    wrap.appendChild(picture);
+    wrap.appendChild(welcometext);
+    wrap.appendChild(ribbon);
+
+    ribbon.classList.add('card-ribbon');
+
+    picture.setAttribute('src', user.avatarURL);
+
+    var aptxt = "";
+    switch (card.extra.badge) {
+        case "artist" : 
+            aptxt = " acquired a badge for writing " + card.extra.count + " articles!";
+            break;
+    } 
+
+    welcometext.textContent = (card.actor == liliumcms.session.current._id ? "You" : user.displayname) + aptxt;
+
+    wrap.classList.add('card-wrap-entity');
+    picture.classList.add('card-big-avatar');
+    welcometext.classList.add('card-welcome-text');
+
+    return wrap;
+};
+
+window.generateFeedCard_published = function(card, ctx) {
+    var wrap = document.createElement('a');
+    var header = document.createElement('div');
+    var avatar = document.createElement('img');
+    var announce = document.createElement('span');
+    var timespan = document.createElement('span');
+    var articletitle = document.createElement('h2');
+    var articleimg = document.createElement('div');
+
+    wrap.classList.add('card-link');
+    avatar.classList.add('card-avatar');
+    announce.classList.add('card-title');
+    header.classList.add('card-header');
+    timespan.classList.add('card-datetime');
+    articleimg.classList.add('card-image');
+    articletitle.classList.add('card-details');
+
+    wrap.appendChild(header);
+    header.appendChild(avatar);
+    header.appendChild(announce);
+
+    wrap.appendChild(articleimg);
+    articleimg.appendChild(articletitle);
+
+    avatar.setAttribute('src', card.extra.authoravatar);
+    announce.textContent = card.extra.authorname.split(' ')[0] + 
+        " published on " + ctx.livevars.sites.all.simple.assoc[card.site].displayName;
+
+    articletitle.textContent = card.extra.title;
+    articleimg.style.backgroundImage = "url('"+card.extra.image+"')";
+    
+    timespan.textContent = dateFormat(card.time, 'd mmmm, h:MMTT');
+    articleimg.appendChild(timespan);
+
+    wrap.setAttribute('href', ctx.livevars.sites.all.simple.assoc[card.site].url + '/' + card.extra.slug);
+    wrap.setAttribute('target', '_blank');
+
+    return wrap;
+};
+</script>
+
+<style>
+.real-time-feed-wrapper {
+    padding: 80px 10px;
+    text-align: center;
+}
+
+.real-time-card {
+    text-align: left;
+    width: calc(50% - 16px);
+    background-color: #FFF;
+    box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.2);
+    margin: 8px;
+    display: inline-block;
+    float: left;
+    height: 300px;
+}
+
+.real-time-card-welcomed {
+    border: 5px dotted rgba(255, 255, 255, 0.8);
+    background: #9b59b6;
+}
+
+.real-time-card-badge {
+    background-color: #e2b95e;
+    border: 6px double rgba(255, 255, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.card-ribbon {
+    position: absolute;
+    width: 50px;
+    height: 300px;
+    background-color: #4e4d9e;
+
+    -webkit-transform: rotateZ(45deg);
+       -moz-transform: rotateZ(45deg);
+        -ms-transform: rotateZ(45deg);
+         -o-transform: rotateZ(45deg);
+            transform: rotateZ(45deg);
+
+    top: -90px;
+}
+
+.read-time-card:nth-child(even) {
+    float: right;
+}
+
+.card-big-avatar {
+    display: block;
+    border-radius: 100px;
+    height: 180px;
+    width: 180px;
+    margin: 20px auto;
+    border: 5px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0px 0px 50px rgba(255, 255, 255, 0.15);
+}
+
+.card-welcome-text {
+    text-align: center;
+    display: block;
+    color: #F9F9F9;
+    font-size: 20px;
+    line-height: 24px;
+    font-weight: 500;
+    padding: 0px 20px;
+}
+
+.card-header {
+    height: 60px;
+    position: relative;
+}
+
+.card-datetime {
+    position: absolute;
+    left: 0;
+    color: #000;
+    font-size: 12px;
+    padding: 4px 0px 4px 91px;
+    font-weight: 700;
+    background-color: rgba(255, 255, 255, 0.8);
+    right: 0;
+}
+
+.card-avatar {
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    left: 15px;
+    top: 20px;
+    border-radius: 40px;
+    border: 4px solid #FFF;
+    z-index: 10;
+}
+
+.card-title {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 85px;
+    text-align: left;
+    padding: 5px;
+    line-height: 20px;
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    font-family: "Oswald", sans-serif;
+}
+
+.card-image {
+    position: relative;
+    height: 240px;
+    background-position: center center;
+    background-size: cover;
+}
+
+h2.card-details {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-family: "Oswald", sans-serif;
+    color: #FFF;
+    text-shadow: 0px 0px 2px #000;
+    font-size: 26px;
+}
+
+main.lmladminmain {
+    background: linear-gradient(#ffffff 50%, rgba(255,255,255,0) 0) 0 0, radial-gradient(circle closest-side, #FFFFFF 53%, rgba(255,255,255,0) 0) 0 0, radial-gradient(circle closest-side, #FFFFFF 50%, rgba(255,255,255,0) 0) 55px 0 #f1e1ff;
+    background-size: 110px 400px;
+    background-repeat: repeat-x;
+
+    min-height: 1000px;
+}
+
+.admin-title {
+    font-size: 46px;
+    font-weight: 300;
+    color: #9B59B6;
+    display: block;
+    margin: 50px 15px 0px;
+    text-align: center;
+}
+
+.admin-title small {
+    display: block;
+    font-size: 16px;
+    color: #BBB;
+    margin-top: -10px;
+}
+</style>

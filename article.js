@@ -14,6 +14,7 @@ var dates = require('./dates.js');
 var badges = require('./badges.js');
 var moment = require('moment');
 var log = require('./log.js');
+var feed = require('./feed.js');
 
 var Article = function() {
     var publishedNotificationTitles = [
@@ -130,7 +131,7 @@ var Article = function() {
                     col.aggregate([{
                         $match : {
                             $text : { 
-                                $search : arr[0].title.replace(/[^a-zA-Z\s]/g, '') 
+                                $search : arr[0].title ? arr[0].title.replace(/[^a-zA-Z\s]/g, '') : arr[0].name
                             }
                         }
                     },{
@@ -163,7 +164,7 @@ var Article = function() {
                         if (!err) {
                             arr[0].related = relarr.slice(1);
                         }
-                        
+
                         col.find({
                             date : { $lt : arr[0].date },
                             author : arr[0].author
@@ -317,9 +318,11 @@ var Article = function() {
                 db.update.apply(db, [...params, formData, function(err, result) {
                     if (!err) {
                         var success = true;
+                        var createdArticle = false;
                         if (result.upsertedId !== null) {
                             // Inserted a document
                             formData._id = result.upsertedId._id;
+                            createdArticle = true;
                         } else if (result.modifiedCount > 0) {
                             // Updated a document
                             formData._id = cli.postdata.data.id;
@@ -373,6 +376,17 @@ var Article = function() {
                                             url: cli._c.server.url + '/' + deepArticle.name,
                                             msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
                                             type: 'success'
+                                        });
+
+                                        feed.plop(deepArticle._id, function() {
+                                            feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
+                                                title : deepArticle.title,
+                                                subtitle : deepArticle.subtitle,
+                                                slug : deepArticle.name,
+                                                image : deepArticle.featuredimage[0].sizes.featured.url,
+                                                authorname : deepArticle.authors[0].displayname,
+                                                authoravatar : deepArticle.authors[0].avatarURL
+                                            });
                                         });
     
                                         badges.check(cli, 'publish', function(acquired, level) {});
@@ -703,7 +717,6 @@ var Article = function() {
                             cli.did('content', destroy ? 'destroyed' : 'deleted', {id : id});
                             
                             var filename = cli._c.server.html + "/" + result.name + '.html';
-    console.log(filename);
                             fs.deleteFile(filename, function() {
                                 hooks.fire('article_deleted', id);
                                 cacheInvalidator.removeFileToWatch(filename);
@@ -1156,7 +1169,6 @@ var Article = function() {
                 }, {name : 1});
             } else {
                 if (onlyPublished && deepArticle.status !== "published") {
-                    console.log(deepArticle);
                     cb(false);
                 } else {
                     var extra = new Object();
@@ -1169,7 +1181,7 @@ var Article = function() {
                     });
                 }
             }
-        }, onlyPublished ? {status : "published"} : {});
+        }, false, onlyPublished ? {status : "published"} : {});
     }
 
     var init = function() {

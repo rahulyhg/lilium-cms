@@ -24,13 +24,15 @@
     - Filters --
     lml:filter      => id="functionName" pass="variableName"
 
+    - Generators --
+    lml:generate    => call="functionName"
+
     - Normal Tags --
     lml:text /      => var="variableName"
     lml:image /     => src="//domain.com/uploads/{variableName}" 
     lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
     lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
     lml:link        => href="//domain.com/admin/{variableName}" class=""
-
 */
 var LMLDom = function() {
     var maindom;
@@ -135,8 +137,11 @@ var LMLDom = function() {
             }
         }
 
-        for (var i = 0; i < itt.length; i++) {
-            ldContext[varname] = itt[i];
+        var keys = Object.keys(itt);
+        for (var i = 0; i < keys.length; i++) {
+            ldContext[varname] = itt[keys[i]];
+            ldContext.foreachkey = keys[i];
+
             var wrap = document.createElement(elem.getAttribute('wrapper') || "div");
             for (var j = 0; j < elem.childNodes.length; j++) {
                 wrap.appendChild(elem.childNodes[j].cloneNode(true));
@@ -239,6 +244,19 @@ var LMLDom = function() {
 
             iftag.remove();
             iftag = elem.querySelector('lml\\:filter');
+        }
+
+        var gen = elem.querySelector('lml\\:generate');
+        while (gen) {
+            var generator = gen.getAttribute('call');
+            var genelem = window[generator](ldContext);
+
+            if (genelem) {
+                gen.insertAfter(genelem);
+            }
+
+            gen.remove();
+            gen = elem.querySelector('lml\\:generate');
         }
 
         var act = elem.querySelector('lml\\:action');
@@ -385,6 +403,33 @@ var LMLDom = function() {
         return elem;
     };
 
+    this.fillField = function(field, values) {
+        var fieldname = field.name;
+        if (fieldname && values[fieldname]) {
+            field.value = values[fieldname];
+        }
+    };
+
+    this.fillForm = function(domForm) {
+        var livevarsource = domForm.dataset.livevarsource;
+        var livevardata = liliumcms.livevars.pulloutLiveVar(livevarsource);
+
+        var fields = domForm.querySelectorAll('input, select, textarea');
+        for (var i = 0; i < fields.length; i++) {
+            this.fillField(fields[i], livevardata);
+        }
+
+        domForm.dataset.filled = true;
+        domForm.classList.add('lmldom-filled');
+    };
+
+    this.fillForms = function() {
+        var forms = document.querySelectorAll('.lmldom-filled-form');
+        for (var i = 0; i < forms.length; i++) {
+            this.fillForm(forms[i]);
+        }
+    };
+
     this.parse = function() {
         var domv = document.querySelector('lml\\:dom');
         if (domv) {
@@ -403,6 +448,8 @@ var LMLDom = function() {
         }
 
         console.log("Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
+
+        this.fillForms();
 
         liliumcms.pageloader.parseDocument();
         document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {

@@ -261,7 +261,7 @@ var ftUploads = function(siteid, mysqldb, done) {
         };
 
         var handleSingle = function(error, body, upload, threadid) {
-            var filename = upload.ID + "_" + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
+            var filename = upload.ID + "_" + fu.genRandomNameFile(upload.ID) + upload.guid.substring(upload.guid.lastIndexOf('/') + 1);
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
@@ -282,7 +282,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                     log('WP', 'Inserted media with mongo ID ' + objid);
                                     db.update(cconf, 'content', 
                                         {"data._thumbnail_id" : upload.ID.toString()}, 
-                                        {"media" : objid}, 
+                                        {"media" : (typeof objid == "string" ? db.mongoID(objid) : objid) }, 
                                     function(ue, r) {
                                         if (r.modifiedCount != 0) {
                                             log('WP', "Affected featured image for a found article");

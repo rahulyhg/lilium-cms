@@ -9,7 +9,6 @@ var api = require('./api.js');
 var Dispatcher = function () {
     this.dispatch = function (cli) {
         cli.touch('dispatcher.dispatch');
-
         if (cli.routeinfo.isStatic) {
             HTMLServer.serveStatic(cli);
         } else if (cli.routeinfo.admin) {

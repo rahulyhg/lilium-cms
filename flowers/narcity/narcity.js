@@ -10,6 +10,7 @@ var themes = undefined;
 var db = undefined;
 var hooks = undefined;
 var lmllib = undefined;
+var cc = undefined;
 
 var themePath;
 var noOp = function() {};
@@ -35,6 +36,7 @@ var initRequires = function(abspath) {
     hooks = require(abspath + 'hooks.js');
     db = require(abspath + 'includes/db.js');
     lmllib = require(abspath + 'lmllib.js');
+    cc = require(abspath + "config.js");
 };
 
 var registerPictureSizes = function() {
@@ -251,7 +253,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
     if (section == "tags" || section == "search") {
         matchCallback([{tag : mtc}]);
     } else {
-        db.join(cli._c || cli, typeCollection, typeMatch, matchCallback);
+        db.join(typeCollection == "entities" ? cc.default() : cli._c || cli, typeCollection, typeMatch, matchCallback);
     }
 };
 

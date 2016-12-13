@@ -102,9 +102,13 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                 _id : db.mongoID(conversationid)
             },{
                 $addToSet : {uptodate : cli.userinfo.userid}
-            }, function() {
+            }, function(err, r) {
+                var people = r.value.users;
+                for (var i = 0; i < people.length; i++) if (people[i] != cli.userinfo.userid) {
+                    notifications.messageNotif(people[i], {convid : r.value._id, userid : cli.userinfo.userid}, 'readreport');
+                }
                 cli.sendJSON({read : true});
-            }, false, true, true);
+            }, false, true, true, true);
         } else if (cli.routeinfo.path[3] == "create") {
             var topic = cli.postdata.data.topic;
             var people = JSON.parse(cli.postdata.data.people);
@@ -147,7 +151,8 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                             cli.sendJSON ({
                                 id : cconv._id, 
                                 users : participants, 
-                                type : type
+                                type : type,
+                                uptodate : cconv.uptodate
                             });
                         });
                     } else if (cli.routeinfo.params.orcreate) {
@@ -155,6 +160,7 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                             cli.sendJSON({
                                 id : res.insertedId, 
                                 users : participants, 
+                                uptodate : participants,
                                 type : type,
                                 created : true
                             });
@@ -166,7 +172,7 @@ LMLConversations.prototype.registerAdminEndpoint = function() {
                         });
                     }
                 });
-            }, {_id : 1});
+            }, {_id : 1, uptodate : 1});
         } else if(cli.routeinfo.path[2] == "messages") {
             var convid = cli.routeinfo.path[3];
             db.find(_c.default(), 'messages', {conversationid : db.mongoID(convid)}, [], function(err, cur) {

@@ -10,7 +10,7 @@ var HtmlParser = function () {
         this.types[name] = fct;
     }
 
-    this.parseForm = function (form, formContext) {
+    this.parseForm = function (form, formContext, livevarSource) {
         log('HTMLParser', 'Parding form ' + form.name);
         var htmlForm = '';
         var submitButton = '';
@@ -31,8 +31,14 @@ var HtmlParser = function () {
             htmlForm += ' data-context="' + formContext + '" ';
         }
 
+        // LMLDom v.0.6+
+        if (livevarSource) {
+            htmlForm += ' data-livevarsource="'+livevarSource.replace(/\//g, '.')+'" ';
+        }
+
         if (form.attr.validate) {
-            htmlForm += 'class="v_form_validate lmlform ' + (form.attr.cssClass || "") +  (form.attr.async ? " lml-async" : "") +'" ';
+            htmlForm += 'class="v_form_validate lmlform ' + (form.attr.cssClass || "") +  (form.attr.async ? " lml-async" : "") +
+                (livevarSource ? " lmldom-filled-form" : "") + '" ';
         }
 
         // Name

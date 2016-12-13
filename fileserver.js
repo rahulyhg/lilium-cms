@@ -197,10 +197,17 @@ var FileServer = function () {
 
     this.pipeFileToClient = function (cli, filename, callback, abs, mime) {
         cli.touch('fileserver.pipeFileToClient');
+        if (cli.response.finished) {
+            return callback && callback();
+        }
+
         filename = abs ? filename : this.validateIndexPath(cli, filename);
-        cli.response.writeHead(200, {
-            "Content-Type": mime === "default" ? defaultCT : mime || cli.routeinfo.mimetype || defaultCT
-        });
+
+        if (!cli.response.headersSent) {
+            cli.response.writeHead(200, {
+                "Content-Type": mime === "default" ? defaultCT : mime || cli.routeinfo.mimetype || defaultCT
+            });
+        }
 
         var stream = fs.createReadStream(filename)
         stream.pipe(cli.response);
@@ -267,8 +274,11 @@ var FileServer = function () {
     };
 
     this.genRandomNameFile = function (filename) {
-        filename = crypto.randomBytes(10).toString('hex') + filename + dateFormat(new Date(), "isoDateTime");
-        return crypto.createHash('md5').update(filename).digest('hex');
+        filename = crypto.randomBytes(10).toString('hex') + 
+            filename + dateFormat(new Date(), "isoDateTime") + 
+            crypto.randomBytes(10).toString('hex');
+
+        return crypto.createHash('sha1').update(filename).digest('hex');
     }
 
     /**

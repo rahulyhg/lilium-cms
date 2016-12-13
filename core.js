@@ -49,6 +49,7 @@ var tools = undefined;
 var badges = undefined;
 var conversations = undefined;
 var localcast = undefined;
+var feed = undefined;
 
 var log = require('./log.js');
 
@@ -104,6 +105,7 @@ var Core = function () {
         oembed = require('./embed.js');
         conversations = require("./conversations.js");
         localcast = require('./localcast.js');
+        feed = require('./feed.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
@@ -272,6 +274,7 @@ var Core = function () {
         oembed.registerAdminEndpoint();
         tools.registerAdminEndpoint();
         conversations.registerAdminEndpoint();
+        feed.registerAdminEndpoint();
 
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');
@@ -344,6 +347,17 @@ var Core = function () {
             absURL: aurl + "sites",
             children: []
         });
+
+        admin.registerAdminMenu({
+            id: "feed",
+            faicon: "fa-newspaper-o",
+            displayname: "What's up",
+            priority: 80,
+            rights: ["dash"],
+            absURL: aurl + "feed",
+            children: []
+        });
+ 
         admin.registerAdminMenu({
             id: "dashboard",
             faicon: "fa-tachometer",
@@ -633,6 +647,7 @@ var Core = function () {
         album.registerLiveVar();
         notification.registerLiveVar();
         conversations.registerLiveVar();
+        feed.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
         log('Core', 'Loaded live variables', 'success');

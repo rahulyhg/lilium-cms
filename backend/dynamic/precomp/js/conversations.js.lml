@@ -8,6 +8,7 @@ var LMLConversations = function() {
     var unreadConv = {};
     var notificationSound = undefined;
     var pendingMessages = [];
+    var writestate = false;
 
     var isEmoji = function(str) {
         var ranges = [
@@ -23,6 +24,10 @@ var LMLConversations = function() {
         }
 
         return count*2 == str.length;
+    };
+
+    this.getCachedUsers = function() {
+        return cachedusers;
     };
 
     this.updateState = function(user) {
@@ -368,15 +373,12 @@ var LMLConversations = function() {
         document.getElementById('chat-conversation').classList.add('lefter');
 
         var partswrapper = document.getElementById('chat-participants-list');
-        var oldparts = partswrapper.querySelectorAll("span");
-        for (var i = 0; i < oldparts.length; i++) {
-            oldparts[i].remove();
-        }
+        partswrapper.innerHTML = "";
 
         if (type == "private" || type == "") {
             document.querySelector('.chat-fullname').innerHTML = user.displayname;
 
-            $.get('{=config.default.server.url}/admin/conversations/find?type=private&orcreate=1&async=*&with=' + user._id, function(resp) {
+            $.get('{=config.default.server.url}/admin/conversations/find?type=private&orcreate=1&async=*&with='+user._id, function(resp) {
                 if (!resp.err) {
                     currentConv = resp.id;
                     if (unreadConv[currentConv]) {
@@ -388,8 +390,23 @@ var LMLConversations = function() {
                         document.getElementById('user' + user._id).classList.remove("unread");
                     }
 
-                    partswrapper.style.display = "none";
-                    $.get('{=config.default.server.url}/admin/conversations/messages/' + resp.id + '?async=*&limit=30', function(resp) {
+                    var userspic = document.createElement('img');
+                    userspic.dataset.userid = user._id;
+                    userspic.setAttribute('src', cachedusers[user._id].avatarURL);
+                    partswrapper.appendChild(userspic);
+
+                    var usertag = document.createElement('span');
+                    usertag.textContent = cachedusers[user._id].displayname;
+                    usertag.dataset.userid = user._id;
+                    usertag.classList.add("pars-list-user-" + user._id);
+                    partswrapper.appendChild(usertag);
+
+                    if (resp.uptodate.indexOf(user._id) != -1) {
+                        usertag.classList.add('read');
+                    }
+
+                    partswrapper.style.display = "block";
+                    $.get('{=config.default.server.url}/admin/conversations/messages/' + resp.id + '?async=*&limit=50', function(resp) {
                         that.clearConversation();
                         that.fillConversation(resp.messages);
                         that.read(currentConv);
@@ -398,22 +415,32 @@ var LMLConversations = function() {
             });
         } else if (type == "group") {
             var group = user;
+            var uptodate = group.uptodate;
             document.querySelector('.chat-fullname').innerHTML = group.topic;
 
             for (var i = 0; i < group.users.length; i++) {
-                var usertag = document.createElement('span');
-                usertag.textContent = cachedusers[group.users[i]].displayname;
-                partswrapper.appendChild(usertag);
-
-                var sep = document.createElement('span');
-                if (i == group.users.length-2) {
-                    sep.style.fontStyle = "italic";
-                    sep.textContent = ' and ';
-                } else if (i != group.users.length-1) {
-                    sep.textContent = ', ';
+                if (cachedusers[group.users[i]].avatarURL) {
+                    var userspic = document.createElement('img');
+                    userspic.dataset.userid = group.users[i];
+                    userspic.setAttribute('src', cachedusers[group.users[i]].avatarURL);
+                    partswrapper.appendChild(userspic);
                 }
 
-                partswrapper.appendChild(sep);
+                var usertag = document.createElement('span');
+
+                if (group.users[i] == liliumcms.session.current._id) {
+                    usertag.textContent = "You";
+                    usertag.classList.add("you")
+                } else {
+                    usertag.textContent = cachedusers[group.users[i]].displayname;
+                }
+                usertag.dataset.userid = group.users[i];
+                usertag.classList.add("pars-list-user-" + group.users[i]);
+                partswrapper.appendChild(usertag);
+
+                if (uptodate.indexOf(group.users[i]) != -1 || liliumcms.session.current._id == group.users[i]) {
+                    usertag.classList.add('read');
+                }
             }
             partswrapper.style.display = "block";
 
@@ -426,7 +453,7 @@ var LMLConversations = function() {
     
                 document.getElementById('group' + group._id).classList.remove("unread");
             }
-            $.get('{=config.default.server.url}/admin/conversations/messages/' + group._id + '?async=*&limit=30', function(resp) {
+            $.get('{=config.default.server.url}/admin/conversations/messages/' + group._id + '?async=*&limit=50', function(resp) {
                 that.clearConversation();
                 that.fillConversation(resp.messages);
                 that.read(currentConv);
@@ -489,6 +516,11 @@ var LMLConversations = function() {
                 t : "text",
                 c : msg.c
             }, function(resp) {
+                var parts = document.querySelectorAll('#chat-participants-list span');
+                for (var i = 0; i < parts.length; i++) if (parts[i].dataset.userid != liliumcms.session.current._id) {
+                    parts[i].classList.remove('read');
+                }
+
                 pendingMessages.shift();
 
                 if (currentConv == msg.v) {
@@ -577,6 +609,14 @@ var LMLConversations = function() {
                 that.notifyMsg(msg);
             }
 
+            if (currentConv == msg.conversationid) {
+                var parts = document.querySelectorAll('#chat-participants-list span');
+                for (var i = 0; i < parts.length; i++) if (parts[i].dataset.userid != liliumcms.session.current._id) {
+                    parts[i].classList.remove('read');
+                }
+                document.querySelector('.pars-list-user-' + msg.userid).classList.add("read");
+            }
+
             if (liliumcms.state.focused && drawn && currentConv == msg.conversationid) {
                 that.read(msg.conversationid);
             }
@@ -586,8 +626,18 @@ var LMLConversations = function() {
             that.addGroup(chatGroup, document.getElementById("chat-list-group"));
         });
 
+        socket.on('readreport', function(details) {
+            if (currentConv == details.convid) {
+                document.querySelector(".pars-list-user-" + details.userid).classList.add("read");
+            }
+        });
+
         socket.on('typingstatus', function(payload) {
             
+        });
+
+        document.getElementById('chat-input', 'keyup', function(e) {
+            writingstate = e.target.value.length != 0;
         });
 
         document.addEventListener('reconnected', function() {

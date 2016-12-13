@@ -29,6 +29,22 @@ Config.prototype.getSimpleSites = function () {
     return arr;
 };
 
+Config.prototype.getSimpleSitesAssoc = function() {
+    var obj = {};
+
+    for (var key in _configs)
+        if (key != 'default') {
+            obj[_configs[key].id] = ({
+                displayName: _configs[key].website.sitetitle,
+                name: key,
+                url : _configs[key].server.url,
+                network : _configs[key].default || false
+            });
+        }
+
+    return obj;
+};
+
 Config.prototype.fetchConfig = function (site) {
     var s = _configs[site];
     if (!s) {

@@ -380,8 +380,8 @@ var LMLImagePicker = function() {
         ePicker.addEventListener('drop', that.fileDropped);
 
         document.getElementById('lmlimagepicker').addEventListener('click', function(e) {
-            if (e.target.id = "lmlimagepicker") {
-                // liliumcms.imagepicker.dismiss();
+            if (e.target.id == "lmlimagepicker") {
+                liliumcms.imagepicker.dismiss();
             }
         });
 

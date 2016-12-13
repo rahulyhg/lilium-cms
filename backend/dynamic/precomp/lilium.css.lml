@@ -285,6 +285,16 @@ form .campaigncreatefield-checkbox label {
 	display: inline-block;
 }
 
+.tutorial {
+    padding: 10px;
+    border-bottom: 1px solid #737373;
+    color: #CCC;
+    background-color: #333;
+    margin-bottom: 0;
+    letter-spacing: 0.2px;
+    font-weight: 300;
+}
+
 lml\:template, lml\:tobject, lml,
 lml\:queryparam, .lmlloading, .lmlhidden,
 lml\:foreach, lml\:wrapper, lml\:text {
@@ -675,6 +685,14 @@ select {
     	left: 0;
     	right: 0;
     	opacity: 0.05;
+}
+
+.lmladminsidebarbottom {
+    position:absolute;
+    bottom: 0; left:0; right:0; 
+    height: 50px; /* flat(50 times number of badges) + 50 */
+
+    z-index: 1500;
 }
 
 .lmladminbardisplayname {
@@ -1211,7 +1229,7 @@ header.admin-bar .navbar-default .navbar-header {
     border: none;
 }
 
-#upload_profile_picture .profile-photo-form {
+#upload_profile_picture {
     padding: 20px;
     text-align: center;
 

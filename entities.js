@@ -11,6 +11,7 @@ var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
 var pluginHelper = require('./pluginHelper.js');
 var preferences = require('./preferences.js');
+var feed = require('./feed.js');
 
 var Roles = new Object();
 
@@ -110,6 +111,14 @@ var Entities = module.exports = new function () {
         db.update(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, dat, function() {
             cli.postdata.data.usr = cli.userinfo.user;
             cli.postdata.data.psw = cli.postdata.data.password;
+
+            db.findToArray(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+                feed.push(cli.userinfo.userid, cli.userinfo.userid, 'welcomed', cli._c.id, {
+                    displayname : dat.displayname,
+                    avatarURL : arr[0].avatarURL,
+                    job : dat.jobtitle
+                });
+            }, {avatarURL : 1});
 
             cli.did("auth", "welcome");
             require('./backend/login.js').authUser(cli);

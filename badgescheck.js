@@ -1,5 +1,7 @@
 var log = require('./log.js');
 var db = require('./includes/db.js');
+var feed = require("./feed.js");
+var config = require('./config.js');
 
 module.exports = function(BadgeWrapper) {
     if (typeof BadgeWrapper === "undefined") {
@@ -28,6 +30,11 @@ module.exports = function(BadgeWrapper) {
                 while (count >= newLevel+1) {newLevel++;}
 
                 that.acquire(cli, site, user, "artist", newLevel, cb);
+                feed.push(user._id, user._id, "badge", config.default(), {
+                    level : newLevel,
+                    count : count,
+                    badge : "artist"
+                });
             } else {
                 log('Badges', "No artist badge was acquired for " + user.username + " because " + count + " < " + scales[current+1]);
                 cb(false);
