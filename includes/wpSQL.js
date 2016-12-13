@@ -288,7 +288,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                             log('WP', "Affected featured image for a found article", 'info');
                                         }
     
-                                        threadIndices[threadid]++;
+                                        threadIndices[threadid]+=threadNumbers;
                                         nextUpload(threadid);
                                     });
                                 }
