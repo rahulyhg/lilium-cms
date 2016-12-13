@@ -227,14 +227,14 @@ var ftUploads = function(siteid, mysqldb, done) {
             threadIndices[i] = i;
         }
 
-        log('WP', 'Queried ' + uploadTotal + ' uploads. Ready to request');
+        log('WP', 'Queried ' + uploadTotal + ' uploads. Ready to request', 'lilium');
         var nextUpload = function(threadid) {
             if (threadIndices[threadid] < uploadTotal) {
                 var upload = uploads[threadIndices[threadid]];
                 var uUrl = upload.guid;
 
                 if (threadIndices[threadid] > 0 && threadIndices[threadid] % 50 == 0) {
-                    log('WP', 'Transferred ' + threadIndices[threadid] + ' / ' + uploadTotal + ' files');
+                    log('WP', 'Transferred ' + threadIndices[threadid] + ' / ' + uploadTotal + ' files', 'success');
                 }
 
                 if (!isLocal) {
@@ -251,7 +251,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                     fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);});
                 }
             } else {
-                log('WP', 'Done transferring uploads for thread ' + threadid + " at index " + threadIndices[threadid]);
+                log('WP', 'Done transferring uploads for thread ' + threadid + " at index " + threadIndices[threadid], 'lilium');
                 threadDone++;
 
                 if (threadDone == threadNumbers) {
@@ -267,7 +267,7 @@ var ftUploads = function(siteid, mysqldb, done) {
             if (!error) {
                 fu.fileExists(saveTo, function(exists) {
                     if (exists) {
-                        log('WP', 'Skipping eisting file : ' + saveTo);
+                        log('WP', 'Skipping eisting file : ' + saveTo, 'detail');
                         threadIndices[threadid] += threadNumbers; 
                         nextUpload(threadid);
                     } else {
@@ -285,7 +285,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                         {"media" : (typeof objid == "string" ? db.mongoID(objid) : objid) }, 
                                     function(ue, r) {
                                         if (r.modifiedCount != 0) {
-                                            log('WP', "Affected featured image for a found article");
+                                            log('WP', "Affected featured image for a found article", 'info');
                                         }
     
                                         threadIndices[threadid]++;
@@ -297,7 +297,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                     }
                 });
             } else {
-                log('WP', 'Download error : ' + error);
+                log('WP', 'Download error : ' + error, 'error');
 
                 threadIndices[threadid]+=threadNumbers;
                 nextUpload(threadid);
