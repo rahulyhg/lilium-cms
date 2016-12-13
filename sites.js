@@ -309,7 +309,7 @@ var Sites = function () {
 
         var existingSite = dat.originalsite;
 
-        cli.did('sites', 'wptransfer', dat);
+        // cli.did('sites', 'wptransfer', dat);
         log('Sites', 'Initiating Wordpress website transfer');
         if (existingSite && existingSite != "") {
             log('Sites', 'Transferring Wordpress data to site with uid ' + existingSite);
