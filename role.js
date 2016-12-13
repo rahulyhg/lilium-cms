@@ -75,7 +75,7 @@ var Role = function () {
             // Check if current user has sufficient role power
             if (cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
-                db.insert(cli._c, 'roles', prepareRoleForDB(cli), function (err, result) {
+                db.insert(conf.default(), 'roles', prepareRoleForDB(cli), function (err, result) {
                     require('./entities').cacheRoles(function() {
                         // Create a new notification group
                         notification.createGroup(cli.postdata.data.name, cli.postdata.data.name, cli._c.id);
@@ -109,7 +109,7 @@ var Role = function () {
 
                     if (response.success) {
                         var data = prepareRoleForDB(cli);
-                        db.update(cli._c, 'roles', {
+                        db.update(conf.default(), 'roles', {
                             _id: id
                         }, data, function (err, r) {
                             cli.refresh();
@@ -141,7 +141,7 @@ var Role = function () {
         if (cli.postdata.data._id) {
             var id = new mongo.ObjectID(cli.postdata.data._id);
 
-            db.remove(cli._c, 'roles', {
+            db.remove(conf.default(), 'roles', {
                 _id: id
             }, function (err, r) {
                 // Remove notification group
@@ -189,11 +189,11 @@ var Role = function () {
             }
 
             if (allContent || levels[0] == "all") {
-                db.findToArray(cli._c, 'roles', { power : {$gt : maxpower} }, function (err, arr) {
+                db.findToArray(conf.default(), 'roles', { power : {$gt : maxpower} }, function (err, arr) {
                     callback(arr);
                 });
             } else {
-                db.multiLevelFind(cli._c, 'roles', levels, {
+                db.multiLevelFind(conf.default(), 'roles', levels, {
                     _id: db.mongoID(levels[0])
                 }, {
                     limit: [1]

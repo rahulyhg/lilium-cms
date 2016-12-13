@@ -643,7 +643,7 @@ var Entities = module.exports = new function () {
         log('Roles', 'Caching roles from Database');
         var sites = _c.getAllSites();
         for (var i in sites) {
-            db.findToArray(sites[i], 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
+            db.findToArray(_c.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
                 if (!err) {
                     for (var i = 0, len = roles.length; i < len; i++) {
                         Roles[roles[i].name] = roles[i];
@@ -668,7 +668,7 @@ var Entities = module.exports = new function () {
             if (allsites) {
                 var sites = _c.getAllSites();
                 for (var i in sites) {
-                    db.update(sites[i], 'roles', {
+                    db.update(_c.default(), 'roles', {
                         name: rObj.name
                     }, rObj, function (err, result) {
                         Roles[rObj.name] = rObj;
