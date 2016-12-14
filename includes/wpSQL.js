@@ -16,7 +16,7 @@ var request = require('request');
 var fs = require('fs');
 var imageSize = require('image-size'); 
 var imageResizer = require('../imageResizer.js');
-var conf = require('./config.js');
+var conf = require('../config.js');
 
 // Wordpress ID => Lilium Mongo ID
 var cachedUsers = new Object();
@@ -266,7 +266,7 @@ var ftUploads = function(siteid, mysqldb, done) {
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
-                fu.fileExists(saveTo, function(exists) {
+                db.exists(cconf, 'uploads', {wpid : upload.ID}, function(exists) {
                     if (exists) {
                         log('WP', 'Skipping eisting file : ' + saveTo, 'detail');
                         threadIndices[threadid] += threadNumbers; 
