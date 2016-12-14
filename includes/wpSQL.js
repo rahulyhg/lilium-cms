@@ -135,6 +135,16 @@ var ftPosts = function(siteid, mysqldb, done) {
                 if (postIndex < postTotal) {
                     var wp_post = wp_posts[postIndex];
     
+                    if (postIndex > 0 && postIndex % 250 == 0) {
+                        var postPerSec = parseFloat(250 / ((new Date() - wpPostStartAt) / 1000.00)).toFixed(2);
+                        log('WP', 'Created ' + 
+                            postIndex + ' / ' + postTotal + ' posts at ' + 
+                            postPerSec + ' posts per second');
+    
+                        wpPostStartAt = new Date();
+                    }
+
+
                     if (wp_post.post_status == 'inherit' || wp_post.post_status == 'auto-draft' || wp_post.post_title == "") {
                         postIndex++;
                         nextPost();
@@ -142,7 +152,13 @@ var ftPosts = function(siteid, mysqldb, done) {
                         db.findToArray(siteid, 'content', {"data.wp_id" : wp_post.ID}, function(err, arr) {
                             if (arr.length != 0) {
                                 postIndex++;
-                                nextPost();
+                                db.findToArray(conf.default(), 'entities', {wpid : arr[0].data.wp_author}, function(err, earr) {
+                                    if (earr.length == 0) {
+                                        nextPost();
+                                    } else {
+                                        db.update(siteid, 'content', {_id : arr[0]._id}, {author : earr[0]._id}, nextPost);
+                                    }
+                                });
                                 return;
                             }
 
@@ -171,17 +187,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                                             tags : wp_tags.map(function(wptag) { return wptag.name }),
                                             author : db.mongoID(cachedUsers[siteid][wp_post.post_author])
                                         }, function() {
-                                            postIndex++;
-    
-                                            if (postIndex > 0 && postIndex % 250 == 0) {
-                                                var postPerSec = parseFloat(250 / ((new Date() - wpPostStartAt) / 1000.00)).toFixed(2);
-                                                log('WP', 'Created ' + 
-                                                    postIndex + ' / ' + postTotal + ' posts at ' + 
-                                                    postPerSec + ' posts per second');
-    
-                                                wpPostStartAt = new Date();
-                                            }
-                                        
+                                            postIndex++;                                        
                                             setTimeout(nextPost, 0);
                                         });
                                     });
