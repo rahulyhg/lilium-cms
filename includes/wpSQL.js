@@ -16,6 +16,7 @@ var request = require('request');
 var fs = require('fs');
 var imageSize = require('image-size'); 
 var imageResizer = require('../imageResizer.js');
+var conf = require('./config.js');
 
 // Wordpress ID => Lilium Mongo ID
 var cachedUsers = new Object();
@@ -69,7 +70,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                 var wp_user = wp_users[userIndex];         
                 userIndex++;
     
-                db.findToArray(siteid, 'entities', {wpid : wp_user.ID}, function(err, arr) {
+                db.findToArray(conf.default(), 'entities', {wpid : wp_user.ID}, function(err, arr) {
                     if (arr.length !== 0) {
                         return nextUser();
                     }
@@ -80,7 +81,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                             userdata[meta.meta_key] = meta.meta_value;
                         });
     
-                        db.insert(siteid, 'entities', {
+                        db.insert(conf.default(), 'entities', {
                             wpid : wp_user.ID,
                             username : wp_user.user_login,
                             shhh : "0c4c440a9684f73788048e6e45e047f7eddc1d24ff25c77600d932d741f4b0bc", // narcitymedia1+

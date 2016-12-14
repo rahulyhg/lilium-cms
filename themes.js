@@ -243,6 +243,14 @@ var Themes = function () {
         return ActiveTheme[config.id || config];
     };
 
+    this.fetchCurrentTheme = function(config, cb) {
+        db.find(config, 'themes', {active : true}, [], function(err, cur) {
+            cur.next(function(err, th) {
+                cb(th);
+            });
+        });
+    };
+
     this.getEnabledThemePath = function (config) {
         return config.server.base + config.paths.themes + '/' + ActiveTheme[config.id].info.dirName;
     }

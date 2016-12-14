@@ -139,6 +139,12 @@ window.generateFeedCard_published = function(card, ctx) {
     height: 300px;
 }
 
+@media screen and (min-width: 1600px) {
+    .real-time-card {
+        width: calc(33% - 12px);
+    }
+}
+
 .real-time-card-welcomed {
     border: 5px dotted rgba(255, 255, 255, 0.8);
     background: #9b59b6;
@@ -164,10 +170,6 @@ window.generateFeedCard_published = function(card, ctx) {
             transform: rotateZ(45deg);
 
     top: -90px;
-}
-
-.read-time-card:nth-child(even) {
-    float: right;
 }
 
 .card-big-avatar {

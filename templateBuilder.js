@@ -97,20 +97,20 @@ var templateBuilder = function () {
         log('TemplateBuilder', "Initializing for site " + config.id);
     
         (function(gconf) {
-            lmllib.registerContextLibrary('theme', function (context) {
-                var rendersnip = function(snipid, _____) {
-                    var args = Array.prototype.slice.call(arguments, 1);
-                    return themes.renderSnip(gconf, snipid, args);
-                };
-
-                var enabledTheme = themes.getEnabledTheme(gconf.id);
-
-                return {
-                    render: renderBlock,
-                    settings: enabledTheme.settings,
-                    snip : rendersnip,
-                    getQueueTags : function() {return getQueueTags(gconf);}
-                };
+            themes.fetchCurrentTheme(gconf, function(enabledTheme) {
+                lmllib.registerContextLibrary('theme', function (context) {
+                    var rendersnip = function(snipid, _____) {
+                        var args = Array.prototype.slice.call(arguments, 1);
+                        return themes.renderSnip(gconf, snipid, args);
+                    };
+    
+                    return {
+                        render: renderBlock,
+                        settings: context.extra.theme.settings,
+                        snip : rendersnip,
+                        getQueueTags : function() {return getQueueTags(gconf);}
+                    };
+                });
             });
         })(config);
 
@@ -135,7 +135,7 @@ var templateBuilder = function () {
         }
     };
 
-    this.precompThemeFiles = function (_c, cb) {
+    this.precompThemeFiles = function (_c, cb, force) {
         that.precompJS(_c);
         that.precompCSS(_c);
 
@@ -147,7 +147,7 @@ var templateBuilder = function () {
             fileArr.push(css[_c.id][i]);
         }
 
-        require('./precomp.js').precompile(_c, cb, fileArr);
+        require('./precomp.js').precompile(_c, cb, fileArr, force);
     };
 
     this.precompJS = function (_c) {

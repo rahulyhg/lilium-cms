@@ -236,34 +236,35 @@ var FileLogic = function () {
         extra.contextname = ctxName;
         extra.siteid = cli._c.id;
 
-        var cTheme = theme.getEnabledTheme(cli._c);
-        extra.theme = cTheme;
+        theme.fetchCurrentTheme(cli._c, function(cTheme) {
+            extra.theme = cTheme;
 
-        var readPath = cli._c.server.base + "flowers/" + cTheme.info.uName + "/" + cTheme.info.contexts[ctxName];
-        var savePath = cli._c.server.html + "/" + preferredFileName;
-        var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
-        var layoutPath = cli._c.server.base + "flowers/" + cTheme.info.uName + "/layout.lml";
+            var readPath = cli._c.server.base + "flowers/" + cTheme.uName + "/" + cTheme.contexts[ctxName];
+            var savePath = cli._c.server.html + "/" + preferredFileName;
+            var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+            var layoutPath = cli._c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
 
-        log('FileLogic', 'Compiling context theme page', 'info');
-        LML.executeToFile(
-            readPath,
-            tmpPath,
-            function () {
-                log('FileLogic', 'Including compiled theme page to layout', 'detail');
-                extra.contentpetal = tmpPath;
+            log('FileLogic', 'Compiling context theme page', 'info');
+            LML.executeToFile(
+                readPath,
+                tmpPath,
+                function () {
+                    log('FileLogic', 'Including compiled theme page to layout', 'detail');
+                    extra.contentpetal = tmpPath;
 
-                LML.executeToFile(
-                    layoutPath,
-                    savePath,
-                    function () {
-                        log('FileLogic', 'Completed Theme page compilation', 'success');
-                        callback();
-                    }, 
-                    extra
-                );
-            }, 
-            extra
-        );
+                    LML.executeToFile(
+                        layoutPath,
+                        savePath,
+                        function () {
+                            log('FileLogic', 'Completed Theme page compilation', 'success');
+                            callback();
+                        }, 
+                        extra
+                    );
+                }, 
+                extra
+            );
+        });
     };
 
     this.renderLmlPostPage = function (cli, postType, extra, cb) {

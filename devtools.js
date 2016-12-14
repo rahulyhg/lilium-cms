@@ -160,9 +160,9 @@ var recompileQueue = function(cli) {
                     type: "success"
                 });
                 next();
-            });
+            }, true);
         });
-    }, function() {});
+    }, function() {}, undefined, true);
 };
 
 DevTools.prototype.registerAdminEndpoint = function() {

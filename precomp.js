@@ -81,12 +81,12 @@ var Precomp = function () {
         }
     };
 
-    var runLoop = function (conf, readycb, themeFiles) {
+    var runLoop = function (conf, readycb, themeFiles, force) {
         if (themeFiles) {
             var absWritePath = conf.server.html + "/compiled/theme/";
             db.findToArray(conf, 'compiledfiles', {style : true}, function (err, histo) {
                 db.remove(conf, 'compiledfiles', {style : true}, function (remErr, res) {
-                    compileFiles(conf, themeFiles, histo, undefined, absWritePath, readycb, true);
+                    compileFiles(conf, themeFiles, histo, undefined, absWritePath, readycb, true, force);
                 });
             });
 
@@ -104,7 +104,7 @@ var Precomp = function () {
                 fileArr = files;
                 db.findToArray(conf, 'compiledfiles', {style : null}, function (err, histo) {
                     db.remove(conf, 'compiledfiles', {style : null}, function (remErr, res) {
-                        compileFiles(conf, fileArr, histo, absReadPath, absWritePath, readycb)
+                        compileFiles(conf, fileArr, histo, absReadPath, absWritePath, readycb, false, force)
                     });
                 });
             });
@@ -136,30 +136,30 @@ var Precomp = function () {
                 return;
             }
 
-            var siteTheme = require('./themes.js').getEnabledTheme(conf);
-
-            db.findToArray(conf, 'compiledfiles', {filename : lmlfile}, function(err, arr) {
-                log('Precomp', "Registered sum for " + lmlfile + " is " + (arr[0] ? arr[0].sum : "unknown") + " compared to actual " + sum, 'info');
-                if (arr.length == 0 || arr[0].sum !== sum) {
-                    log('Precomp', 'Inserting sum ' + sum + ' for file ' + lmlfile + ' of website ' + conf.id, 'info')
-                    db.remove(conf, 'compiledfiles', {filename : lmlfile}, function() {
-                        db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, style : false}, function(err, r) {
-                            LML.executeToFile(
-                                lmlfile,
-                                writepath,
-                                callback,
-                                {config : conf, minify : false, theme : siteTheme}
-                            );
+            require('./themes.js').fetchCurrentTheme(function(siteTheme) {
+                db.findToArray(conf, 'compiledfiles', {filename : lmlfile}, function(err, arr) {
+                    log('Precomp', "Registered sum for " + lmlfile + " is " + (arr[0] ? arr[0].sum : "unknown") + " compared to actual " + sum, 'info');
+                    if (arr.length == 0 || arr[0].sum !== sum) {
+                        log('Precomp', 'Inserting sum ' + sum + ' for file ' + lmlfile + ' of website ' + conf.id, 'info')
+                        db.remove(conf, 'compiledfiles', {filename : lmlfile}, function() {
+                            db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, style : false}, function(err, r) {
+                                LML.executeToFile(
+                                    lmlfile,
+                                    writepath,
+                                    callback,
+                                    {config : conf, minify : false, theme : siteTheme}
+                                );
+                            });
                         });
-                    });
-                } else {
-                    callback(false);
-                }
+                    } else {
+                        callback(false);
+                    }
+                });
             });
         });
     };
 
-    var compileFiles = function (conf, fileArr, histo, absReadPath, absWritePath,  readycb, isTheme) {
+    var compileFiles = function (conf, fileArr, histo, absReadPath, absWritePath,  readycb, isTheme, force) {
         var histoObj = new Object();
         var fileIndex = 0;
         var tempPath = conf.server.html + "/static/tmp/";
@@ -168,7 +168,7 @@ var Precomp = function () {
             histoObj[histo[i].filename] = histo[i].sum;
         }
 
-        var siteTheme = require('./themes.js').getEnabledTheme(conf);
+        var siteTheme;
 
         var nextFile = function () {
             if (fileIndex < fileArr.length) {
@@ -185,7 +185,7 @@ var Precomp = function () {
                             absWritePath + curFile.slice(0, -4);
 
                         fileserver.fileExists(wPath, function (exists) {
-                            if (exists && histoObj[curFile] == sum) {
+                            if (!force && exists && histoObj[curFile] == sum) {
                                 db.insert(conf, 'compiledfiles', {
                                     filename: curFile,
                                     sum: sum,
@@ -227,7 +227,10 @@ var Precomp = function () {
             }
         };
 
-        nextFile();
+        require('./themes.js').fetchCurrentTheme(conf, function(th) {
+            siteTheme = th;
+            nextFile();
+        });
     }
 
     var mergeJS = function (conf, readycb, theme) {
@@ -278,7 +281,7 @@ var Precomp = function () {
         nextFile();
     };
 
-    this.precompile = function (conf, readycb, themesFiles) {
+    this.precompile = function (conf, readycb, themesFiles, force) {
         fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function () {
             runLoop(conf, function () {
                 compileQueue(conf, function() {
@@ -286,7 +289,7 @@ var Precomp = function () {
                         mergeCSS(conf, readycb, themesFiles ? true : false);
                     }, themesFiles ? true : false);
                 });
-            }, themesFiles);
+            }, themesFiles, force);
         }, true);
     };
 };
