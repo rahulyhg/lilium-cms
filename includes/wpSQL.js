@@ -254,16 +254,18 @@ var ftUploads = function(siteid, mysqldb, done) {
                             uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
         
                             log('WP', 'Downloading image ' + uUrl);
-                            request(uUrl, function(error, response, body) {
+                            request({url : uUrl, encoding : "binary"}, function(error, response, body) {
                                 var filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + "." + uUrl.split('.').pop();
                                 var handle = fu.getOutputFileHandle(filename, 'a+', 'binary');
-                                handle.write(body, 'binary', function() {
-                                    handle.end();
-                                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);}, 
-                                    function(valid) {
-                                        if (valid) {
-                                            fu.deleteFile(filename, function() {});
-                                        }
+                                handle.write(body, 'binary', function(err) {
+                                    handle.end(undefined, undefined, function() {
+                                        fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid, 
+                                            function(valid) {
+                                                if (valid) {
+                                                    fu.deleteFile(filename, function() {});
+                                                }
+                                            });
+                                        });
                                     });
                                 });
                             });
@@ -273,10 +275,11 @@ var ftUploads = function(siteid, mysqldb, done) {
                             log('WP', 'Transferring local image ' + filename);
                             fu.fileExists(filename, function(exx) {
                                 if (exx) {
-                                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);}, function(valid) {
-                                        if (valid) {
-                                            fu.deleteFile(filename, function() {});
-                                        }
+                                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid, function(valid) {
+                                            if (valid) {
+                                                fu.deleteFile(filename, function() {});
+                                            }
+                                        }); 
                                     });
                                 } else {
                                     nextUpload(threadid, 'download');
