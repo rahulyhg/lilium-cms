@@ -271,9 +271,15 @@ var ftUploads = function(siteid, mysqldb, done) {
                             var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
                             log('WP', 'Transferring local image ' + filename);
-                            fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);}, function(valid) {
-                                if (valid) {
-                                    fu.deleteFile(filename, function() {});
+                            fu.fileExists(filename, function(exx) {
+                                if (exx) {
+                                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);}, function(valid) {
+                                        if (valid) {
+                                            fu.deleteFile(filename, function() {});
+                                        }
+                                    });
+                                } else {
+                                    nextUpload(threadid, 'download');
                                 }
                             });
                         }
@@ -321,15 +327,9 @@ var ftUploads = function(siteid, mysqldb, done) {
                         });
             } else {
                 log('WP', 'Download error : ' + error, 'error');
-
-                if (error.toString().indexOf("Error: File does not exist") != -1) {
-                    cb(false);
-                    nextUpload(threadid, "download");
-                } else {
-                    threadIndices[threadid]+=threadNumbers;
-                    cb(true);
-                    nextUpload(threadid);
-                }
+                threadIndices[threadid]+=threadNumbers;
+                cb(true);
+                nextUpload(threadid);
             }
         };
 
