@@ -246,7 +246,7 @@ var ftUploads = function(siteid, mysqldb, done) {
 
                 db.exists(cconf, 'uploads', {wpid : upload.ID}, function(exists) {
                     if (exists) {
-                        log('WP', 'Skipping eisting file : ' + saveTo, 'detail');
+                        log('WP', 'Skipping eisting file', 'detail');
                         threadIndices[threadid] += threadNumbers; 
                         nextUpload(threadid);
                     } else {
@@ -306,7 +306,7 @@ var ftUploads = function(siteid, mysqldb, done) {
             } else {
                 log('WP', 'Download error : ' + error, 'error');
 
-                if (error == "exist") {
+                if (error.indexOf("exist") != -1) {
                     nextUpload(threadid, "download");
                 } else {
                     threadIndices[threadid]+=threadNumbers;
