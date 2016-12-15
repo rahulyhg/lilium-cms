@@ -244,19 +244,27 @@ var ftUploads = function(siteid, mysqldb, done) {
                     log('WP', 'Transferred ' + threadIndices[threadid] + ' / ' + uploadTotal + ' files', 'success');
                 }
 
-                if (!isLocal || retry == "download") {
-                    uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
+                db.exists(cconf, 'uploads', {wpid : upload.ID}, function(exists) {
+                    if (exists) {
+                        log('WP', 'Skipping eisting file : ' + saveTo, 'detail');
+                        threadIndices[threadid] += threadNumbers; 
+                        nextUpload(threadid);
+                    } else {
+                        if (!isLocal || retry == "download") {
+                            uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
+        
+                            log('WP', 'Downloading image ' + uUrl);
+                            request(uUrl, function(error, response, body) {
+                                handleSingle(error, body, upload, threadid);
+                            });
+                        } else {
+                            var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
-                    log('WP', 'Downloading image ' + uUrl);
-                    request(uUrl, function(error, response, body) {
-                        handleSingle(error, body, upload, threadid);
-                    });
-                } else {
-                    var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
-
-                    log('WP', 'Transferring local image ' + filename);
-                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);});
-                }
+                            log('WP', 'Transferring local image ' + filename);
+                            fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);});
+                        }
+                    }
+                });
             } else {
                 log('WP', 'Done transferring uploads for thread ' + threadid + " at index " + threadIndices[threadid], 'lilium');
                 threadDone++;
@@ -272,12 +280,6 @@ var ftUploads = function(siteid, mysqldb, done) {
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
-                db.exists(cconf, 'uploads', {wpid : upload.ID}, function(exists) {
-                    if (exists) {
-                        log('WP', 'Skipping eisting file : ' + saveTo, 'detail');
-                        threadIndices[threadid] += threadNumbers; 
-                        nextUpload(threadid);
-                    } else {
                         fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
                             require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
                                 if (err) {
@@ -301,8 +303,6 @@ var ftUploads = function(siteid, mysqldb, done) {
                                 }
                             }, true, {wpid : upload.ID, wpguid : upload.guid});
                         });
-                    }
-                });
             } else {
                 log('WP', 'Download error : ' + error, 'error');
 
