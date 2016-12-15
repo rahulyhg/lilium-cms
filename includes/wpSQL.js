@@ -226,7 +226,7 @@ var ftUploads = function(siteid, mysqldb, done) {
 
         var uploadTotal = uploads.length;
 
-        var threadNumbers   = 10;
+        var threadNumbers   = 4;
         var threadIndices   = new Array(threadNumbers);
         var threadDone      = 0;
 
@@ -235,7 +235,7 @@ var ftUploads = function(siteid, mysqldb, done) {
         }
 
         log('WP', 'Queried ' + uploadTotal + ' uploads. Ready to request', 'lilium');
-        var nextUpload = function(threadid) {
+        var nextUpload = function(threadid, retry) {
             if (threadIndices[threadid] < uploadTotal) {
                 var upload = uploads[threadIndices[threadid]];
                 var uUrl = upload.guid;
@@ -244,7 +244,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                     log('WP', 'Transferred ' + threadIndices[threadid] + ' / ' + uploadTotal + ' files', 'success');
                 }
 
-                if (!isLocal) {
+                if (!isLocal || retry == "download") {
                     uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
 
                     log('WP', 'Downloading image ' + uUrl);
@@ -306,8 +306,12 @@ var ftUploads = function(siteid, mysqldb, done) {
             } else {
                 log('WP', 'Download error : ' + error, 'error');
 
-                threadIndices[threadid]+=threadNumbers;
-                nextUpload(threadid);
+                if (error == "exist") {
+                    nextUpload(threadid, "download");
+                } else {
+                    threadIndices[threadid]+=threadNumbers;
+                    nextUpload(threadid);
+                }
             }
         };
 

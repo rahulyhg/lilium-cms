@@ -189,6 +189,12 @@ var Entities = module.exports = new function () {
             } else {
                 cli.refuse();
             }
+        } else if (cli.routeinfo.path[2] == "revoke") {
+            // Double check this portion of code
+            // Async call
+            if (cli.hasRightOrRefuse('create-entities')) {
+                this.maybeRevoke(cli, cli.postdata.data.userid);
+            }
         } else {
             if (cli.hasRight('edit-entities')) {
                 var action = cli.postdata.data.form_name;
@@ -214,6 +220,32 @@ var Entities = module.exports = new function () {
     this.commitfbauth = function(cli) {
         db.update(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, {fbid : cli.postdata.data.fbid}, function() {
             cli.sendJSON({done : true});
+        });
+    };
+
+    this.canActOn = function(actor, subject, cb) {
+        var that = this;
+        this.maxPower(undefined, function(actorpower) {
+            that.maxPower(undefined, function(subpower) {
+                cb(actor < subject);
+            }, subject);
+        }, actor);
+    }
+
+    this.maybeRevoke = function(cli, userid) {
+        var that = this;
+        userid = userid || cli.postdata.data.userid;
+
+        this.maxPower(cli, function(userpower) {
+            that.maxPower(cli, function(entitypower) {
+                if (userpower < entitypower) {
+                    db.update(_c.default(), 'entities', {_id : db.mongoID(userid)}, {revoked : true}, function() {
+                        cli.sendJSON({revoked : true});
+                    });
+                } else {
+                    cli.sendJSON({revoked : false, reason : "power", powerlevel : {you : userpower, entity : entitypower}});
+                }
+            }, db.mongoID(userid));
         });
     };
 
@@ -427,7 +459,7 @@ var Entities = module.exports = new function () {
         }
     }
 
-    this.maxPower = function (cli, callback) {
+    this.maxPower = function (cli, callback, userid) {
         db.aggregate(_c.default(), 'entities', [{
             "$unwind": "$roles"
         }, {
@@ -439,7 +471,7 @@ var Entities = module.exports = new function () {
             }
         }, {
             $match: {
-                '_id': db.mongoID(cli.userinfo._id ? cli.userinfo._id : cli.userinfo.userid)
+                '_id': userid || db.mongoID(cli.userinfo._id ? cli.userinfo._id : cli.userinfo.userid)
             }
         }, {
             $group: {
@@ -469,20 +501,48 @@ var Entities = module.exports = new function () {
     }
 
     this.update = function (cli) {
+        var that = this;
         if (cli.hasRight('edit-entities')) {
             var entData = cli.postdata.data;
             var entity = this.initialiseBaseEntity(entData);
+            entity._id = cli.routeinfo.path[3];
 
             delete entity.badges;
 
-            entity._id = cli.routeinfo.path[3];
-            this.updateEntity(entity, cli._c.id, function(err, res) {
-                if (!err){
-                    cli.refresh();
-                } else {
-                    log('[Database] error while updating entity : ' + err);
-                    cli.throwHTTP(500);
+            that.canActOn(db.mongoID(cli.userinfo.userid), db.mongoID(cli.userinfo.userid), function(allowed) {
+                if (!allowed) {
+                    return cli.throwHTTP(401);
                 }
+
+                db.findToArray(_c.default(), 'entities', {_id : db.mongoID(entity._id)}, function(err, arr) {
+                    db.findToArray(_c.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, function(err, uarr) {
+                        if (arr[0].roles.indexOf("lilium") != -1) {  
+                            entity.roles.push("lilium");
+                        }
+        
+                        if (arr[0].sites) {
+                            var loggeduser = uarr[0];
+        
+                            var currentsites = arr[0].sites;
+                            var newsites = entity.sites;
+        
+                            for (var i = 0; i < currentsites.length; i++) if (loggeduser.sites.indexOf(currentsites[i]) == -1) {
+                                newsites.push(currentsites[i]);
+                            }
+    
+                            entity.sites = newsites;
+                        }    
+    
+                        that.updateEntity(entity, cli._c.id, function(err, res) {
+                            if (!err){
+                                cli.refresh();
+                            } else {
+                                log('[Database] error while updating entity : ' + err);
+                                cli.throwHTTP(500);
+                            }
+                        });
+                    });
+                });
             });
         } else {
             cli.throwHTTP(401);
@@ -790,6 +850,19 @@ var Entities = module.exports = new function () {
             })
             .add('Save', 'submit');
 
+        formbuilder.createForm('disable_entity', {
+            fieldWrapper : "lmlform-fieldwrapper"
+        })
+            .add('disent-title', 'title', {
+                displayname : "Disable Entity"
+            })
+            .add('disable-entity', 'button', {
+                type : "button",
+                displayname : "Revoke access to Lilium",
+                classes : ["red"],
+                callback : "confirmLockUser"
+            })
+
         formbuilder.createForm('update_profile', {
             fieldWrapper : "lmlform-fieldwrapper",
             async : true
@@ -851,7 +924,7 @@ var Entities = module.exports = new function () {
                     callback(arr); 
                 });
             } else if (levels[0] == "chat") {
-                db.find(_c.default(), 'entities', {}, [], function(err, cur) {
+                db.find(_c.default(), 'entities', {revoked : {$ne : true}}, [], function(err, cur) {
                     cur.sort({fullname : 1}).toArray(function(err, arr) {
                         callback(err || arr);
                     });
@@ -904,12 +977,15 @@ var Entities = module.exports = new function () {
                 var sort = {};
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
 
+                var mtch = (params.search ? {
+                    $text: {
+                        $search: params.search
+                    }
+                } : {});
+                mtch.revoked = {$ne : true};
+
                 db.aggregate(_c.default(), 'entities', [{
-                    $match: (params.search ? {
-                        $text: {
-                            $search: params.search
-                        }
-                    } : {})
+                    $match: mtch
                 }, {
                     $sort: sort
                 }, {

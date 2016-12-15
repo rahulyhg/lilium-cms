@@ -73,4 +73,9 @@
     var isViewable = function (){
         return (this.title !=='' && this.status == 'published');
     }
+
+    window.articleTableGenAuthor = function(dat, td) {
+        var writer = liliumcms.conversations.getCachedUsers()[dat.author];
+        td.textContent = writer ? writer.displayname : "[Inactive author]";
+    };
 </script>

@@ -3,3 +3,39 @@
 {*entities.single.{?1}(sourceof:"update_entitiy")}
 {=forms.render('update_entitiy')}
 {=forms.render('update_password')}
+{=forms.render('disable_entity')}
+
+<div id="lock-user-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Revoke access to Lilium
+    </div>
+    <div class="lml-modal-body">
+        <p>
+            Revoking access from an entity to access Lilium does not delete anything related to it. All articles written by the entity will still remain visible and editable. The entity won't appear in the list and will become immutable. <b>This operation can't be reverted.</b>
+        </p>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Revoke access</button>
+    </div>
+</div>
+
+<script>
+window.confirmLockUser = function() {
+    liliumcms.modals.get("lock-user-modal").show();
+};
+
+window["lock-user-modal_accept"] = function() {
+    document.getElementById('lock-user-modal').querySelector('.lml-modal-accept').setAttribute('disabled', 'disabled');
+    $.post('{=config.default.server.url}/admin/entities/revoke', {userid : document.location.href.split('/').pop()}, function(resp) {
+        liliumcms.modals.get("lock-user-modal").close();
+
+        if (resp.revoked) {
+            liliumcms.notify({type : "success", title : "Revoked Access", message : 'Successfully revoked access from user to access Lilium'});
+            liliumcms.pageloader.load("{=config.default.server.url}/admin/entities");
+        } else {
+            liliumcms.notify({type : "error", title : "Revoke Access Denied", message : 'You tried to revoke access from an entity with a higher power level'});
+        }
+    });
+};
+</script>

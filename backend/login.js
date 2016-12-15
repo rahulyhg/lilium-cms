@@ -36,7 +36,8 @@ var Login = function() {
             '&access_token=' + cli._c.social.facebook.token, {}, function(err, resp) {
             if (resp.statusCode == 200) {
                 db.findToArray(cli._c, 'entities', {
-                    fbid : cli.postdata.data.userID
+                    fbid : cli.postdata.data.userID,
+                    revoked : {$ne : true}
                 }, function(err, arr) {    
                     if (arr.length == 0) {
                         cli.sendJSON({
@@ -84,13 +85,15 @@ var Login = function() {
             psw !== ''
 		) {
             var conds = {
-				'username' : usr,
-				'shhh' : CryptoJS.SHA256(psw).toString(CryptoJS.enc.Hex)
+                revoked : {$ne : true},
+				username : usr,
+				shhh : CryptoJS.SHA256(psw).toString(CryptoJS.enc.Hex)
 			};
 
-            if (usr !== 'lilium') {
-                conds.sites = cli._c.id;
-            }
+            conds.$or = [
+                {sites : cli._c.id},
+                {roles : {$in : ["admin", "lilium"]}}
+            ];
 
             cli.touch("login.authUser@networkcheck");
             db.match(_c.default(), 'entities', conds, function(found) {

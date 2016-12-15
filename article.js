@@ -828,13 +828,6 @@ var Article = function() {
                     $limit : (params.max || 20)
                 }, {
                     $lookup: {
-                        from: 'entities',
-                        localField: 'author',
-                        foreignField: '_id',
-                        as: 'author'
-                    }
-                }, {
-                    $lookup: {
                         from: 'uploads',
                         localField: 'media',
                         foreignField: '_id',
@@ -852,7 +845,7 @@ var Article = function() {
                     }
                 }, {
                     $project: {
-                        author: "$author.displayname",
+                        author: 1,
                         title: 1,
                         status: 1,
                         subtitle: 1,
@@ -1218,6 +1211,7 @@ var Article = function() {
             }, {
                 key: 'author',
                 displayname: 'Author',
+                generator : "articleTableGenAuthor",
                 sortable: true
             }, {
                 key: '',

@@ -349,6 +349,7 @@ var HtmlParser = function () {
     var parseButtonType = function (field) {
         var input = '<button type="button" ';
         input += parseBasicFieldAttributes(field);
+        input += (field.attr.callback ? ' onclick="window.'+field.attr.callback+'();" ' : '')
         input += '>';
         input += (field.attr.displayname || field.name) + '</button>';
         return input;

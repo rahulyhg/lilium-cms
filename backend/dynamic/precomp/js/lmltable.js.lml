@@ -81,6 +81,7 @@ var LmlTable = function(table) {
 			keys.push({
 				key: $(this).data('key'),
 				template: typeof $(this).data('template') !== 'undefined' ? $(this).data('template') : undefined,
+                generator: this.dataset.generator || false,
                 classes: $(this).data()
 			})
 
@@ -237,6 +238,8 @@ var LmlTable = function(table) {
 						// Check if templating is needed
 						if (typeof keys[j].template !== 'undefined') {
 							td = liliumcms.livevars.templateToHtml(keys[j].template, trdata, td);
+                        } else if (keys[j].generator && window[keys[j].generator]) {
+                            window[keys[j].generator](trdata, td);
 						} else {
 							td.appendChild(document.createTextNode(trdata[keys[j].key]));
 						}
@@ -252,6 +255,8 @@ var LmlTable = function(table) {
 						// Check if templating is needed
 						if (typeof keys[j].template !== 'undefined') {
 							td = liliumcms.livevars.templateToHtml(keys[j].template, trdata, td);
+                        } else if (keys[j].generator && window[keys[j].generator]) {
+                            window[keys[j].generator](trdata, td);
 						} else {
 							td.appendChild(document.createTextNode(trdata[keys[j].key]));
 
