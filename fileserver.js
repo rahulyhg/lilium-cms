@@ -234,10 +234,10 @@ var FileServer = function () {
         return filename;
     };
 
-    this.getOutputFileHandle = function (filename, flag) {
+    this.getOutputFileHandle = function (filename, flag, encoding) {
         return fs.createWriteStream(filename, {
             flags: flag ? flag : 'a+',
-            defaultEncoding: 'utf8',
+            defaultEncoding: encoding || 'utf8',
             mode: '0644'
         });
     };
@@ -250,8 +250,8 @@ var FileServer = function () {
         });
     };
 
-    this.writeToFile = function (handle, content, callback) {
-        handle.write(content, 'utf8', callback);
+    this.writeToFile = function (handle, content, callback, encoding) {
+        handle.write(content, encoding || 'utf8', callback);
     };
 
     this.closeFileHandle = function (handle) {

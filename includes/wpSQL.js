@@ -255,13 +255,27 @@ var ftUploads = function(siteid, mysqldb, done) {
         
                             log('WP', 'Downloading image ' + uUrl);
                             request(uUrl, function(error, response, body) {
-                                handleSingle(error, body, upload, threadid);
+                                var filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + "." + uUrl.split('.').pop();
+                                var handle = fu.getOutputFileHandle(filename, 'a+', 'binary');
+                                handle.write(body, 'binary', function() {
+                                    handle.end();
+                                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);}, 
+                                    function(valid) {
+                                        if (valid) {
+                                            fu.deleteFile(filename, function() {});
+                                        }
+                                    });
+                                });
                             });
                         } else {
                             var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
 
                             log('WP', 'Transferring local image ' + filename);
-                            fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);});
+                            fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid);}, function(valid) {
+                                if (valid) {
+                                    fu.deleteFile(filename, function() {});
+                                }
+                            });
                         }
                     }
                 });
@@ -275,7 +289,7 @@ var ftUploads = function(siteid, mysqldb, done) {
             }
         };
 
-        var handleSingle = function(error, body, upload, threadid) {
+        var handleSingle = function(error, body, upload, threadid, cb) {
             var filename = upload.ID + "_" + fu.genRandomNameFile(upload.ID) + "." + upload.guid.split('.').pop();
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
@@ -285,6 +299,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                 if (err) {
                                     log('WP', 'Invalid image download');
                                     threadIndices[threadid]+=threadNumbers;
+                                    cb(false);
                                     nextUpload(threadid);
                                 } else {
                                     var objid = result.insertedId;
@@ -298,6 +313,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                         }
     
                                         threadIndices[threadid]+=threadNumbers;
+                                        cb(true);
                                         nextUpload(threadid);
                                     });
                                 }
@@ -306,10 +322,12 @@ var ftUploads = function(siteid, mysqldb, done) {
             } else {
                 log('WP', 'Download error : ' + error, 'error');
 
-                if (error.indexOf("exist") != -1) {
+                if (error.toString().indexOf("Error: File does not exist") != -1) {
+                    cb(false);
                     nextUpload(threadid, "download");
                 } else {
                     threadIndices[threadid]+=threadNumbers;
+                    cb(true);
                     nextUpload(threadid);
                 }
             }
