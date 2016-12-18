@@ -545,7 +545,8 @@ var LiliumCMS = function() {
 
                 var check = hasCheck ? $('<i class="fa fa-check async-form-check-icon" aria-hidden="true"></i>') : "";
 
-                $.post($(this).attr('action') || window.location.href, $(this).serialize(), function(a) {
+                $.post($(this).attr('action') || window.location.href, $(this).serialize()
+                ).success(function(a) {
                     if (hasCheck) {
                         btn.style.display = "";
                         $(loading).remove();
@@ -563,10 +564,17 @@ var LiliumCMS = function() {
                     }
 
                     cb(a, $(this));
+                }).fail(function(msg) {
+                    btn.style.display = "";
+                    $(loading).remove();
+
+                    if (msg && msg.responseText) {
+                        liliumcms.modals.error("Failed", msg.responseText);
+                    }
                 }); 
 
                 var onclick = window[$(this).attr("name") + "_submit"];
-                onclick($(this));
+                onclick && onclick($(this));
 
                 if (hasCheck) {
                     $(btn).after(loading);
@@ -797,7 +805,7 @@ var LiliumCMS = function() {
                 close : []
             };
 
-            this.show = function() {
+            this.show = this.cast = function() {
                 that.fire('show');
                 that.wrapper.style.display = "block";
                 setTimeout(function() {
@@ -870,10 +878,20 @@ var LiliumCMS = function() {
 
                 _modals[mod.id] = new LMLModal(mod);
             }
+
+            _modals["lml-error-modal"] = new LMLModal(document.getElementById('lml-error-modal'));
         };
 
         this.get = function(id) {
             return _modals[id];
+        };
+
+        this.error = function(title, message) {
+            var errmod = _modals["lml-error-modal"];
+            errmod.elem.querySelector('.lml-modal-title').textContent = title || "Error";
+            errmod.elem.querySelector('.lml-modal-body p').textContent = message || "";
+
+            errmod.show();
         };
     };
 

@@ -32,3 +32,4 @@ div#picture-list img {
 body .cke_maximized {
     z-index: 21000 !important;
 }
+

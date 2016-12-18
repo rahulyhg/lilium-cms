@@ -14,7 +14,7 @@ var mysql = require('mysql');
 var log = require('../log.js');
 var request = require('request');
 var fs = require('fs');
-var imageSize = require('image-size'); 
+var imageSize = require('image-size');
 var imageResizer = require('../imageResizer.js');
 var conf = require('../config.js');
 
@@ -48,7 +48,7 @@ var ftCategories = function(siteid, mysqldb, done) {
                 done();
             }
         };
-    
+
         nextCat();
     });
 };
@@ -67,9 +67,9 @@ var ftUsers = function(siteid, mysqldb, done) {
 
         var nextUser = function() {
             if (userIndex < userTotal) {
-                var wp_user = wp_users[userIndex];         
+                var wp_user = wp_users[userIndex];
                 userIndex++;
-    
+
                 db.findToArray(conf.default(), 'entities', {wpid : wp_user.ID}, function(err, arr) {
                     if (arr.length !== 0) {
                         return nextUser();
@@ -80,7 +80,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                         wp_usermeta.forEach(function(meta, i) {
                             userdata[meta.meta_key] = meta.meta_value;
                         });
-    
+
                         db.insert(conf.default(), 'entities', {
                             wpid : wp_user.ID,
                             username : wp_user.user_login,
@@ -103,11 +103,11 @@ var ftUsers = function(siteid, mysqldb, done) {
                             data : userdata
                         }, function(err, r) {
                             cachedUsers[siteid][wp_user.ID] = r.insertedId;
-    
+
                             if (userIndex > 0 && userIndex % 10 == 0) {
                                 log('WP', 'Created ' + userIndex + ' entities');
                             }
-    
+
                             nextUser();
                         });
                     });
@@ -134,13 +134,13 @@ var ftPosts = function(siteid, mysqldb, done) {
             setTimeout(function() {
                 if (postIndex < postTotal) {
                     var wp_post = wp_posts[postIndex];
-    
+
                     if (postIndex > 0 && postIndex % 250 == 0) {
                         var postPerSec = parseFloat(250 / ((new Date() - wpPostStartAt) / 1000.00)).toFixed(2);
-                        log('WP', 'Created ' + 
-                            postIndex + ' / ' + postTotal + ' posts at ' + 
+                        log('WP', 'Created ' +
+                            postIndex + ' / ' + postTotal + ' posts at ' +
                             postPerSec + ' posts per second');
-    
+
                         wpPostStartAt = new Date();
                     }
 
@@ -187,7 +187,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                                             tags : wp_tags.map(function(wptag) { return wptag.name }),
                                             author : db.mongoID(cachedUsers[siteid][wp_post.post_author])
                                         }, function() {
-                                            postIndex++;                                        
+                                            postIndex++;
                                             setTimeout(nextPost, 0);
                                         });
                                     });
@@ -220,6 +220,8 @@ var ftUploads = function(siteid, mysqldb, done) {
     var localUploadDir = cconf.wordpress.wpuploadslocaldir;
     var isLocal = localUploadDir !== "";
 
+    var wpids = [];
+
     log('WP', 'Querying uploads');
     mysqldb.query(fetchAttachmentIDs, function(err, uploads) {
         mysqldb.end();
@@ -244,30 +246,40 @@ var ftUploads = function(siteid, mysqldb, done) {
                     log('WP', 'Transferred ' + threadIndices[threadid] + ' / ' + uploadTotal + ' files', 'success');
                 }
 
-                db.exists(cconf, 'uploads', {wpid : upload.ID}, function(exists) {
-                    if (exists) {
+                    if (wpids.indexOf(upload.ID) != -1) {
                         log('WP', 'Skipping eisting file', 'detail');
-                        threadIndices[threadid] += threadNumbers; 
-                        nextUpload(threadid);
+                        threadIndices[threadid] += threadNumbers;
+                        setTimeout(function() { nextUpload(threadid) }, 0);
                     } else {
                         if (!isLocal || retry == "download") {
                             uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
-        
                             log('WP', 'Downloading image ' + uUrl);
                             request({url : uUrl, encoding : "binary"}, function(error, response, body) {
+                            try {
                                 var filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + "." + uUrl.split('.').pop();
+                                if (filename.indexOf('.com') != -1) {
+                                        filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + ".jpg";
+                                }
+
                                 var handle = fu.getOutputFileHandle(filename, 'a+', 'binary');
                                 handle.write(body, 'binary', function(err) {
                                     handle.end(undefined, undefined, function() {
-                                        fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid, 
-                                            function(valid) {
-                                                if (valid) {
-                                                    fu.deleteFile(filename, function() {});
-                                                }
-                                            });
+                                        fu.fileExists(filename, function(exx) {
+                                            if (exx) {
+                                                fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid,
+                                                    function(valid) {
+                                                        if (valid) {
+                                                            fu.deleteFile(filename, function() {});
+                                                        }
+                                                    });
+                                                });
+                                            } else {
+                                                threadIndices[threadid] += threadNumbers; nextUpload(threadid);
+                                            }
                                         });
                                     });
                                 });
+                            } catch (ex) { threadIndices[threadid] += threadNumbers; nextUpload(threadid); }
                             });
                         } else {
                             var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
@@ -279,7 +291,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                             if (valid) {
                                                 fu.deleteFile(filename, function() {});
                                             }
-                                        }); 
+                                        });
                                     });
                                 } else {
                                     nextUpload(threadid, 'download');
@@ -287,7 +299,6 @@ var ftUploads = function(siteid, mysqldb, done) {
                             });
                         }
                     }
-                });
             } else {
                 log('WP', 'Done transferring uploads for thread ' + threadid + " at index " + threadIndices[threadid], 'lilium');
                 threadDone++;
@@ -300,6 +311,10 @@ var ftUploads = function(siteid, mysqldb, done) {
 
         var handleSingle = function(error, body, upload, threadid, cb) {
             var filename = upload.ID + "_" + fu.genRandomNameFile(upload.ID) + "." + upload.guid.split('.').pop();
+            if (filename.indexOf('.com') != -1) {
+                filename = upload.ID + "_" + fu.genRandomNameFile(upload.ID) + ".jpg";
+            }
+
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
@@ -313,14 +328,14 @@ var ftUploads = function(siteid, mysqldb, done) {
                                 } else {
                                     var objid = result.insertedId;
                                     log('WP', 'Inserted media with mongo ID ' + objid);
-                                    db.update(cconf, 'content', 
-                                        {"data._thumbnail_id" : upload.ID.toString()}, 
-                                        {"media" : (typeof objid == "string" ? db.mongoID(objid) : objid) }, 
+                                    db.update(cconf, 'content',
+                                        {"data._thumbnail_id" : upload.ID.toString()},
+                                        {"media" : (typeof objid == "string" ? db.mongoID(objid) : objid) },
                                     function(ue, r) {
                                         if (r.modifiedCount != 0) {
                                             log('WP', "Affected featured image for a found article", 'info');
                                         }
-    
+
                                         threadIndices[threadid]+=threadNumbers;
                                         cb(true);
                                         nextUpload(threadid);
@@ -336,13 +351,19 @@ var ftUploads = function(siteid, mysqldb, done) {
             }
         };
 
-        for (var i = 0; i < threadNumbers; i++) {
-            (function(i) {
-                setTimeout(function() { 
-                    nextUpload(i);
-                }, 1);
-            })(i);
-        }
+        db.findToArray(cconf, 'uploads', {}, function(err, arr) {
+            for (var i = 0; i < arr.length; i++) if (arr[i].wpid) {
+                wpids.push(arr[i].wpid);
+            }
+
+            for (var i = 0; i < threadNumbers; i++) {
+                (function(i) {
+                    setTimeout(function() {
+                        nextUpload(i);
+                    }, 1);
+                })(i);
+            }
+        }, {wpid : 1});
     });
 };
 
@@ -365,7 +386,7 @@ var parseWPRole = function(roleString) {
     return rr;
 };
 
-var transTasks = [ftUsers, ftCategories, ftPosts, ftUploads];    
+var transTasks = [ftUploads];
 
 var WordpressSQLToLiliumMongo = function() {
     this.transfer = function(siteid, mysqlConnInfo, callback) {
@@ -393,7 +414,7 @@ var WordpressSQLToLiliumMongo = function() {
                     var Configs = require('../config.js');
                     var siteConf = Configs.fetchConfig(siteid);
                     siteConf.wptransferring = false;
-                    siteConf.wptransfer = true;        
+                    siteConf.wptransfer = true;
                     siteConf.wpdb = undefined;
 
                     Configs.saveConfigs(siteConf, function() {
@@ -408,14 +429,14 @@ var WordpressSQLToLiliumMongo = function() {
 
     var runTasks = function(siteid, mdb, cb) {
         var numOfTasks = transTasks.length;
-        
+
         var next = function(i) {
             if (i < numOfTasks) {
                 runWPFunction(transTasks[i], siteid, mdb, function() {
                     next(i+1);
                 });
             } else {
-                mdb.end(function(err) { 
+                mdb.end(function(err) {
                     log('WP', 'Done transferring Wordpress data to website with site id ' + siteid);
                     cb();
                 });

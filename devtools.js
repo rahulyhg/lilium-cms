@@ -143,11 +143,75 @@ var refreshCache = function(cli, ctx) {
         case 'instagram':
             require('./embed.js').scanInstagram(cli);
             break;
+        case 'insertads':
+            parseContentAds(cli);
+            break;
         case 'precompile':
             recompileQueue(cli);
             break;
     }
     cli.response.end('');
+};
+
+var parseContentAds = function(cli) {
+    var pcount = cli._c.content.adsperp;
+    var db = require('./includes/db.js');
+    log('Devtools', 'Parsing ads for all articles', 'info');
+    if (pcount) {
+        var adtag = "<ad></ad>";
+        db.findToArray(cli._c, 'content', {}, function(err, arr) {
+            var index = -1;
+            var next = function() {
+                index++;
+                if (index == arr.length) {
+                    log('Devtools', '[100.0%] Finished ads insertion', 'success');
+                    notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                        title : "Content ads",
+                        msg : "Parsed all " + index + " articles, inserting ads every " + pcount + " paragraphs.",
+                        type : "success"
+                    });
+                } else {
+                    var content = arr[index].content ? arr[index].content
+                        .replace(/\<ad\>\<?\/?a?d?\>?/g, "")
+                        .replace(/\<lml\:ad\>/g, "")
+                        .replace(/\<\/lml\:ad\>/g, "")
+                        .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
+                        .replace(/\n/g, "").replace(/\r/g, "")
+                        .replace(/\<p\>\<\/p\>/g, "") : "";
+
+                    var pind = 0;
+                    var sind = 0;
+                    var changed = false;
+                    while ((pind = content.indexOf('</p>', pind)) != -1) {
+                        pind += 4;
+                        sind++;
+                        if (sind == pcount) {
+                            content = content.substring(0, pind) + adtag + content.substring(pind);
+                            pind += adtag.length;
+                            sind = 0;
+                            changed = true;
+                        }
+                    }
+
+                    if (changed) {
+                        var perc = (index / arr.length * 100).toFixed(2);
+                        log('Devtools', "["+perc+"%] Insert ads inside article with title " + arr[index].title, 'success');
+                        db.update(cli._c, 'content', {_id : arr[index]._id}, {content : content}, next);
+                    } else {
+                        next();
+                    }
+                }
+            };
+
+            next();
+        });
+    } else {
+        notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+            title : "Content ads",
+            msg : "No paragraphs count for ad insertion",
+            type : "warning"
+        });
+    }
 };
 
 var recompileQueue = function(cli) {

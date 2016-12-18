@@ -181,6 +181,11 @@ var Article = function() {
                                     kIndex++;
 
                                     if (kIndex == keys.length) {
+                                        hooks.fire('article_will_render', {
+                                            _c : conf,
+                                            article: arr[0]
+                                        });
+                                    
                                         cb(arr[0]);
                                     } else {
                                         evts[keys[kIndex]].cb(conf, arr[0], next);

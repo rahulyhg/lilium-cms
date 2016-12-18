@@ -1,0 +1,12 @@
+<div id="lml-error-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Error
+    </div>
+    <div class="lml-modal-body">
+        <p>
+        </p>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Got it</button>
+    </div>
+</div>

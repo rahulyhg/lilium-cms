@@ -94,3 +94,7 @@
     width: 80px;
     text-align: center;    
 }
+
+table.lmlstacktable {
+    width: 100%;
+}

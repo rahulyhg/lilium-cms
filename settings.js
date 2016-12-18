@@ -152,6 +152,30 @@ var Settings = function () {
                 displayname: "POST Maximum File Size"
             })
 
+        .add('content-sep', 'title', {
+                displayname : "Content"
+            })
+            .add('content.adsperp', 'number', {
+                displayname : "Paragraph count between in-content ads"
+            })
+            .add('contentadsnip', 'stack', {
+                displayname : "Ad Code",
+                scheme : {
+                    columns : [
+                        {
+                            fieldName : "id",
+                            dataType : "text",
+                            displayname : "Identifier"
+                        }, 
+                        {
+                            fieldName : "code",
+                            dataType : "text",
+                            displayname : "Javascript Code"
+                        }
+                    ]
+                }
+            })
+
         .add('google-sep', 'title', {
                 displayname: "Google API"
             })

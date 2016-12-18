@@ -56,7 +56,7 @@ ClientObject.prototype.throwHTTP = function (code, message, hard) {
    
     if (hard) {
         this.response.writeHead(code);
-        this.response.end();
+        this.response.end(message || undefined);
     } else if (code >= 400 && code < 500) {
         require('./filelogic.js').serveErrorPage(this, code);
     } else {

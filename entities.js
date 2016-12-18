@@ -225,9 +225,9 @@ var Entities = module.exports = new function () {
 
     this.canActOn = function(actor, subject, cb) {
         var that = this;
-        this.maxPower(undefined, function(actorpower) {
+        that.maxPower(undefined, function(actorpower) {
             that.maxPower(undefined, function(subpower) {
-                cb(actor < subject);
+                cb(actorpower < subpower);
             }, subject);
         }, actor);
     }
@@ -507,11 +507,10 @@ var Entities = module.exports = new function () {
             var entity = this.initialiseBaseEntity(entData);
             entity._id = cli.routeinfo.path[3];
 
-            delete entity.badges;
-
-            that.canActOn(db.mongoID(cli.userinfo.userid), db.mongoID(cli.userinfo.userid), function(allowed) {
+            log("Entities", "User " + cli.userinfo.displayname + " validates its right to update user with id " + entity._id, "info");
+            that.canActOn(db.mongoID(cli.userinfo.userid), db.mongoID(entity._id), function(allowed) {
                 if (!allowed) {
-                    return cli.throwHTTP(401);
+                    return cli.throwHTTP(401, "I'm so sorry... I simply can't let you edit this user. Contact your admin!", true);
                 }
 
                 db.findToArray(_c.default(), 'entities', {_id : db.mongoID(entity._id)}, function(err, arr) {
@@ -532,20 +531,21 @@ var Entities = module.exports = new function () {
     
                             entity.sites = newsites;
                         }    
-    
+                    
                         that.updateEntity(entity, cli._c.id, function(err, res) {
                             if (!err){
-                                cli.refresh();
+                                log("Entities", "User " + cli.userinfo.displayname + " updated user " + entity.displayname + " (" + arr[0]._id + ")", "success");
+                                cli.sendJSON({error : err, updated : !err});
                             } else {
                                 log('[Database] error while updating entity : ' + err);
-                                cli.throwHTTP(500);
+                                cli.throwHTTP(500, err, true);
                             }
                         });
                     });
                 });
             });
         } else {
-            cli.throwHTTP(401);
+            cli.throwHTTP(401, "I'm so sorry... I simply can't let you edit this user. Contact your admin!", true);
         }
     }
 
@@ -684,10 +684,8 @@ var Entities = module.exports = new function () {
     };
 
     this.updateEntity = function (valObject, siteid, cb) {
-        var id = db.mongoID(valObject._id);
+        var id = typeof valObject._id !== "object" ? db.mongoID(valObject._id) : valObject._id;
         // Removing properties we don't want to edit
-        valObject.username = undefined;
-        valObject.shhh = undefined;
         delete valObject.username;
         delete valObject.shhh;
         delete valObject._id;
@@ -837,7 +835,8 @@ var Entities = module.exports = new function () {
             .add('Create', 'submit');
 
         formbuilder.createForm('update_entitiy', {
-                fieldWrapper : "lmlform-fieldwrapper"
+                fieldWrapper : "lmlform-fieldwrapper",
+                async : true
             })
             .addTemplate('entity_create')
             .addTemplate('entity_rights')
