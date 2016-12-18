@@ -386,7 +386,7 @@ var parseWPRole = function(roleString) {
     return rr;
 };
 
-var transTasks = [ftUploads];
+var transTasks = [ftUsers, ftCategories, ftPosts, ftUploads];
 
 var WordpressSQLToLiliumMongo = function() {
     this.transfer = function(siteid, mysqlConnInfo, callback) {
