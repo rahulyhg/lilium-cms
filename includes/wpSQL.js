@@ -71,15 +71,23 @@ var ftUsers = function(siteid, mysqldb, done) {
                 userIndex++;
 
                 db.findToArray(conf.default(), 'entities', {wpid : wp_user.ID}, function(err, arr) {
-                    if (arr.length !== 0) {
-                        return nextUser();
-                    }
-
                     mysqldb.query(fetchUsersMetas + " AND user_id = " + wp_user.ID, function(err, wp_usermeta) {
                         var userdata = {};
                         wp_usermeta.forEach(function(meta, i) {
                             userdata[meta.meta_key] = meta.meta_value;
                         });
+                    
+                        if (arr.length !== 0) {
+                            return db.update(conf.default(), 'entities', {
+                                _id : arr[0]._id
+                            }, {
+                                firstname : userdata.first_name,
+                                lastname : userdata.last_name,
+                                description : wp_user.description
+                            }, function() {
+                                return nextUser();
+                            }
+                        }
 
                         db.insert(conf.default(), 'entities', {
                             wpid : wp_user.ID,
@@ -88,9 +96,9 @@ var ftUsers = function(siteid, mysqldb, done) {
                             pwdmustchange : true,
                             wptransferred : true,
                             email : wp_user.user_email,
-                            firstname : wp_usermeta.first_name,
-                            lastname : wp_usermeta.last_name,
-                            description : wp_usermeta.description,
+                            firstname : userdata.first_name,
+                            lastname : userdata.last_name,
+                            description : wp_user.description,
                             displayname : wp_user.display_name,
                             createdOn : new Date(wp_user.user_registered),
                             avatarID : null,
