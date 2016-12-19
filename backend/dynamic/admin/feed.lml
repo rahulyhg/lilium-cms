@@ -22,7 +22,6 @@ if (!window.feedSocketBound) {
 
     socket.on('feed', function(data) {
         var feedwrap = document.querySelector('.real-time-feed');
-        debugger;
 
         if (feedwrap) {
             var domcard = window.generateFeedCard({
