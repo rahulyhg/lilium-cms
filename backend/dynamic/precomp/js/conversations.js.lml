@@ -46,7 +46,11 @@ var LMLConversations = function() {
         var container = document.getElementById("chat-list-online");
 
         for (var i = 0; i < users.length; i++) {
-            container.appendChild(document.getElementById("user" + users[i]));
+            var ddobj = document.getElementById("user" + users[i]);
+
+            if (ddobj) {
+                container.appendChild(ddobj);
+            }
         }
 
         var allconv = liliumcms.livevars.retrieveVar('conversations.list');
