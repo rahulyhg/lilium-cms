@@ -86,7 +86,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                                 description : wp_user.description
                             }, function() {
                                 return nextUser();
-                            }
+                            });
                         }
 
                         db.insert(conf.default(), 'entities', {
