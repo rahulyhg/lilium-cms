@@ -17,9 +17,11 @@ LMLFeed.prototype.registerAdminEndpoint = function() {
 
 LMLFeed.prototype.registerLiveVar = function() {
     livevars.registerLiveVariable('feed', function(cli, levels, params, cb) {
-        db.findToArray(config.default(), 'feed', {}, function(err, arr) {
-            cb(arr);
-        }, undefined, 0, 30);
+        db.find(config.default(), 'feed', {}, [], function(err, cur) {
+            cur.sort({_id : 1}).limit(30).toArray(function(err, arr) {
+                cb(arr);
+            });
+        });
     });
 };
 
