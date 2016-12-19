@@ -17,6 +17,24 @@
 </div>
 
 <script>
+if (!window.feedSocketBound) {
+    window.feedSocketBound = true;
+
+    socket.on('feed', function(data) {
+        var feedwrap = document.querySelector('.real-time-feed');
+        debugger;
+
+        if (feedwrap) {
+            var domcard = window.generateFeedCard({
+                livevars : liliumcms.livevars.deepLivevars(),
+                card : data
+            });
+
+            feedwrap.insertBefore(domcard, feedwrap.firstChild);
+        }
+    });
+}
+
 window.generateFeedCard = function(ctx) {
     var card = ctx.card;
     var content = window["generateFeedCard_" + card.action](card, ctx);   
@@ -24,6 +42,10 @@ window.generateFeedCard = function(ctx) {
     wrapper.classList.add('real-time-card');
     wrapper.classList.add("real-time-card-" + card.action)
     wrapper.appendChild(content);
+
+    setTimeout(function() {
+        wrapper.classList.add('shown');
+    }, 50);
 
     return wrapper;
 }
@@ -137,6 +159,29 @@ window.generateFeedCard_published = function(card, ctx) {
     display: inline-block;
     float: left;
     height: 300px;
+
+    opacity: 0;
+
+    -webkit-transform: translate3d(0,100px,0);
+   -moz-transform: translate3d(0,100px,0);
+    -ms-transform: translate3d(0,100px,0);
+     -o-transform: translate3d(0,100px,0);
+        transform: translate3d(0,100px,0);
+
+    -webkit-transition: all 0.2s;
+   -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+     -o-transition: all 0.2s;
+        transition: all 0.2s;
+}
+
+.real-time-card.shown {
+    opacity: 1;
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
 }
 
 @media screen and (min-width: 1600px) {

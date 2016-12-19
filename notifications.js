@@ -652,7 +652,9 @@ var Notification = function () {
     };
 
     this.broadcast = function (data, msgType) {
-        io.emit(msgType || 'message', data);
+        for (var i = 0; i < namespaces.length; i++) {
+            io.of(namespaces[i]).emit(msgType || 'message', data);
+        }
     };
 
     this.getAvailableGroups = function() {
