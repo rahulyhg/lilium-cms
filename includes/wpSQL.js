@@ -83,7 +83,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                             }, {
                                 firstname : userdata.first_name,
                                 lastname : userdata.last_name,
-                                description : wp_user.description
+                                description : userdata.description
                             }, function() {
                                 return nextUser();
                             });
@@ -98,7 +98,7 @@ var ftUsers = function(siteid, mysqldb, done) {
                             email : wp_user.user_email,
                             firstname : userdata.first_name,
                             lastname : userdata.last_name,
-                            description : wp_user.description,
+                            description : userdata.description,
                             displayname : wp_user.display_name,
                             createdOn : new Date(wp_user.user_registered),
                             avatarID : null,

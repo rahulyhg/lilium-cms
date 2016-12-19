@@ -992,7 +992,7 @@ var Entities = module.exports = new function () {
                 }, {
                     $limit : params.max || 20
                 }], function (data) {
-                    db.count(_c.default(), 'entities', {}, function(err, total) {
+                    db.count(_c.default(), 'entities', mtch, function(err, total) {
                         callback({
                             size : total,
                             data : data
