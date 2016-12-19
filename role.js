@@ -239,7 +239,7 @@ var Role = function () {
 
     var initNotificationGroups = function() {
         config.eachSync(function(site) {
-            db.findToArray(site.id, 'roles', {}, function(err, roles) {
+            db.findToArray(conf.default(), 'roles', {}, function(err, roles) {
                 for (var j in roles) {
                     notification.createGroup(roles[j].name, roles[j].name, site.id);
                 }
