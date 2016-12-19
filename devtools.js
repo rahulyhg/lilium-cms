@@ -174,6 +174,7 @@ var maybeExecuteScript = function(cli) {
 var parseContentAds = function(cli) {
     var pcount = cli._c.content.adsperp;
     var db = require('./includes/db.js');
+    var jsdom = require("jsdom");
     log('Devtools', 'Parsing ads for all articles', 'info');
     if (pcount) {
         var adtag = "<ad></ad>";
@@ -196,28 +197,25 @@ var parseContentAds = function(cli) {
                         .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
                         .replace(/\n/g, "").replace(/\r/g, "")
                         .replace(/\<p\>\<\/p\>/g, "") : "";
-
-                    var pind = 0;
-                    var sind = 0;
+                
                     var changed = false;
-                    while ((pind = content.indexOf('</p>', pind)) != -1) {
-                        pind += 4;
-                        sind++;
-                        if (sind == pcount) {
-                            content = content.substring(0, pind) + adtag + content.substring(pind);
-                            pind += adtag.length;
-                            sind = 0;
+                    jsdom.env(content, function(err, dom) {
+                        var parags = dom.document.querySelectorAll("body > p");
+                        for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
+                            var adtag = dom.document.createElement('ad');
+                            dom.document.body.insertBefore(adtag, parags[i]);
                             changed = true;
                         }
-                    }
 
-                    if (changed) {
-                        var perc = (index / arr.length * 100).toFixed(2);
-                        log('Devtools', "["+perc+"%] Insert ads inside article with title " + arr[index].title, 'success');
-                        db.update(cli._c, 'content', {_id : arr[index]._id}, {content : content}, next);
-                    } else {
-                        next();
-                    }
+                        if (changed) {
+                            var perc = (index / arr.length * 100).toFixed(2);
+                            log('Devtools', "["+perc+"%] Insert ads inside article with title " + arr[index].title, 'success');
+                            content = dom.document.body.innerHTML;
+                            db.update(cli._c, 'content', {_id : arr[index]._id}, {content : content}, next);
+                        } else {
+                            next();
+                        }
+                    });
                 }
             };
 

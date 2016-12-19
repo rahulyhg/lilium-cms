@@ -60,6 +60,7 @@
     "https": "^1.0.0",
     "image-size": "^0.4.0",
     "instagram-node": "^0.5.8",
+    "jsdom": "^9.9.1",
     "kerberos": "0.0.21",
     "meme-maker": "^2.1.2",
     "mkdirp": "^0.5.1",
