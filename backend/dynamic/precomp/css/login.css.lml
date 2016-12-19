@@ -1,6 +1,6 @@
 {#config}
 {$
-    loginwallpaper = config.default.login.wallpaper?;
+    loginwallpaper = config.default.login.wallpaper;
     if (loginwallpaper == "");
         loginwallpaper = config.default.server.url;
         loginwallpaper += "/static/media/defaultlogin.jpg";
