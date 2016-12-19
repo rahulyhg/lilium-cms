@@ -158,7 +158,10 @@ var refreshCache = function(cli, ctx) {
 };
 
 var runScript = function(cli, name) {
-    require('./scripts/' + name);
+    log('Devtools', "Executing script : " + name);
+
+    delete require.cache[require.resolve('./scripts/' + name)];
+    require('./scripts/' + name)(cli);
 }
 
 var maybeExecuteScript = function(cli) {
