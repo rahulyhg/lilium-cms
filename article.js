@@ -946,7 +946,12 @@ var Article = function() {
                                     if (content && content.length > 0) {
                                         arr[0].recentversion = content[0]._id;
                                     }
-                                    callback(arr);
+
+                                    db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                        arr[0].authorname = autarr[0].displayname;
+                                        arr[0].author = autarr;
+                                        callback(arr);
+                                    });
                                 });
                             } else {
                                 callback(arr);
