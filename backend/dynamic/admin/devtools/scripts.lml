@@ -1,0 +1,39 @@
+{#config}
+<lml:dom v="0.6" />
+{*devtools.scripts}
+
+<h1>Execute scripts</h1>
+
+<lml:foreach var="script" in="livevars.devtools.scripts">
+    <div class="devtools-script-wrapper">
+        <lml:action callback="devtoolsExecScript" class="button" pass="{script}">
+            <lml:text var="script" />
+        </lml:action>
+    </div>
+</lml:foreach>
+
+<style>
+.devtools-script-wrapper {
+    padding: 10px;
+    font-size: 18px;
+}
+</style>
+
+<script>
+var devtoolsExecScript = function(scr) {
+    var req = new XMLHttpRequest();
+
+    req.open('POST', "{=config.default.server.url}/admin/devtools/scripts/" + scr.replace(/\..*/, ''), true);
+    req.responseType = "json";        
+    req.withCredentials = true;
+    req.onreadystatechange = function() {
+        if (req.readyState == 4) {
+            liliumcms.modals.alert("Script executed", "Server responded to script request.");
+        }
+    };
+
+    req.send();      
+
+    return false;
+};
+</script>

@@ -886,7 +886,7 @@ var LiliumCMS = function() {
             return _modals[id];
         };
 
-        this.error = function(title, message) {
+        this.error = this.alert = function(title, message) {
             var errmod = _modals["lml-error-modal"];
             errmod.elem.querySelector('.lml-modal-title').textContent = title || "Error";
             errmod.elem.querySelector('.lml-modal-body p').textContent = message || "";

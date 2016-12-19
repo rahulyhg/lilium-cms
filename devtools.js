@@ -28,6 +28,7 @@ var handleGET = function(cli) {
         case 'lml':
         case 'endpoints':
         case 'cache':
+        case 'scripts':
         case undefined:
             filelogic.serveAdminLML(cli);
             break;
@@ -53,6 +54,9 @@ var handlePOST = function(cli) {
                 case 'refresh': refreshCache(cli, cli.routeinfo.path[4]);
                 case 'clear': clearCache(cli, cli.routeinfo.path[4]);
             }
+            break;
+        case 'scripts':
+            maybeExecuteScript(cli);
             break;
         default:
             cli.refresh();
@@ -151,6 +155,17 @@ var refreshCache = function(cli, ctx) {
             break;
     }
     cli.response.end('');
+};
+
+var runScript = function(cli, name) {
+    require('./scripts/' + name);
+}
+
+var maybeExecuteScript = function(cli) {
+    if (cli.hasRightOrRefuse("develop")) {
+        runScript(cli, cli.routeinfo.path[3] + ".js");
+        cli.sendJSON({executed : true});
+    }
 };
 
 var parseContentAds = function(cli) {
@@ -266,6 +281,10 @@ DevTools.prototype.registerLiveVar = function() {
             }
 
             cb(arr); 
+        } else if (levels[0] == "scripts") {
+            require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
+                cb(list);
+            });
         }
     }, ["develop"]);
 };
