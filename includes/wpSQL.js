@@ -1,4 +1,4 @@
-var fetchPosts = "SELECT ID, post_author, post_date, post_content, post_title, post_status, post_name, post_type FROM wp_posts WHERE post_type = 'post' OR post_type = 'qquiz' OR post_type = 'page'";
+var fetchPosts = "SELECT ID, post_author, post_date, post_content, post_title, post_status, post_name, post_type FROM wp_posts WHERE post_type = 'post' OR post_type = 'qquiz' OR post_type = 'page' ORDER BY ID ASC";
 var fetchAttachmentIDs = "select ID, post_date, guid from wp_posts where post_type = 'attachment'";
 var fetchAttachmentMetas = "select post_id, meta_key, meta_value from wp_postmeta m INNER JOIN wp_posts p ON p.ID = m.post_id where post_type = 'attachment' AND m.meta_value NOT LIKE '\\_%'"
 var fetchCategories = "select t.term_id, t.name, t.slug from wp_terms t INNER JOIN wp_term_taxonomy tax ON tax.term_id = t.term_id WHERE tax.taxonomy = 'category'";
@@ -173,22 +173,27 @@ var ftPosts = function(siteid, mysqldb, done) {
                                 var contentRegex = /^(.+)$/gm;
                                 mysqldb.query(fetchTagsForPosts + " WHERE ID = " + wp_post.ID, function(err, wp_tags) {
                                     mysqldb.query(fetchCatsForPosts + " WHERE p.ID = " + wp_post.ID, function(err, wp_cats) {
-                                        db.insert(siteid, 'content', {
-                                            status : wp_post.post_status == 'publish' ? 'published' : wp_post.post_status,
-                                            title : wp_post.post_title,
-                                            subtitle : postdata.subtitle,
-                                            data : postdata,
-                                            name : wp_post.post_name,
-                                            date : new Date(wp_post.post_date),
-                                            content : wp_post.post_content.replace(contentRegex, "<p>$1</p>"),
-                                            type : wp_post.post_type,
-                                            wptype : wp_post.post_type,
-                                            categories : wp_cats.length ? [wp_cats[0].slug] : [],
-                                            tags : wp_tags.map(function(wptag) { return wptag.name }),
-                                            author : db.mongoID(cachedUsers[siteid][wp_post.post_author])
-                                        }, function() {
-                                            postIndex++;
-                                            setTimeout(nextPost, 0);
+                                        db.findToArrau(siteid, 'uploads', {wpid : postdata._thumbnail_id}, function(err, wpmediaarr) {
+                                            db.insert(siteid, 'content', {
+                                                status : wp_post.post_status == 'publish' ? 'published' : wp_post.post_status,
+                                                title : wp_post.post_title,
+                                                subtitle : postdata.subtitle,
+                                                data : postdata,
+                                                name : wp_post.post_name,
+                                                date : new Date(wp_post.post_date),
+                                                content : wp_post.post_content.replace(contentRegex, "<p>$1</p>"),
+                                                type : wp_post.post_type,
+                                                wptype : wp_post.post_type,
+                                                categories : wp_cats.length ? [wp_cats[0].slug] : [],
+                                                tags : wp_tags.map(function(wptag) { return wptag.name }),
+                                                author : db.mongoID(cachedUsers[siteid][wp_post.post_author]),
+                                                featuredimageartist : postdata.featured_image_credits_name,
+                                                featuredimagelink : postdata.featured_image_credits_url,
+                                                media : wpmediaarr.length == 0 ? "" : db.mongoID(wpmediaarr[0]._id)
+                                            }, function() {
+                                                postIndex++;
+                                                setTimeout(nextPost, 0);
+                                            });
                                         });
                                     });
                                 });
