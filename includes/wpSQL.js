@@ -173,7 +173,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                                 var contentRegex = /^(.+)$/gm;
                                 mysqldb.query(fetchTagsForPosts + " WHERE ID = " + wp_post.ID, function(err, wp_tags) {
                                     mysqldb.query(fetchCatsForPosts + " WHERE p.ID = " + wp_post.ID, function(err, wp_cats) {
-                                        db.findToArray(siteid, 'uploads', {wpid : postdata._thumbnail_id}, function(err, wpmediaarr) {
+                                        db.findToArray(siteid, 'uploads', {wpid : postdata._thumbnail_id ? parseInt(postdata._thumbnail_id) : "---"}, function(err, wpmediaarr) {
                                             db.insert(siteid, 'content', {
                                                 status : wp_post.post_status == 'publish' ? 'published' : wp_post.post_status,
                                                 title : wp_post.post_title,

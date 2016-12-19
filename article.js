@@ -928,14 +928,6 @@ var Article = function() {
                 db.aggregate(cli._c, 'content', [
                     {
                         $match : {_id: db.mongoID(levels[0])}
-                    },
-                    {
-                        $lookup: {
-                            from: 'entities',
-                            localField: 'author',
-                            foreignField: '_id',
-                            as: 'author'
-                        }
                     }
                 ], function(arr) {
                     // Not found, lets check autosaves
@@ -976,7 +968,11 @@ var Article = function() {
                                 if (autosave && autosave.length > 0) {
                                     arr[0].recentversion = autosave[0]._id;
                                 }
-                                callback(arr);
+                                db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                    arr[0].authorname = autarr[0].displayname;
+                                    arr[0].author = autarr;
+                                    callback(arr);
+                                });
                             });
                         } else {
                             callback([])
