@@ -35,7 +35,7 @@ var Login = function() {
         require('request').get('https://graph.facebook.com/debug_token/?input_token=' + cli.postdata.data.accessToken +
             '&access_token=' + cli._c.social.facebook.token, {}, function(err, resp) {
             if (resp.statusCode == 200) {
-                db.findToArray(cli._c, 'entities', {
+                db.findToArray(_c.default(), 'entities', {
                     fbid : cli.postdata.data.userID,
                     revoked : {$ne : true}
                 }, function(err, arr) {    
