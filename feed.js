@@ -19,7 +19,7 @@ LMLFeed.prototype.registerLiveVar = function() {
     livevars.registerLiveVariable('feed', function(cli, levels, params, cb) {
         db.find(config.default(), 'feed', {}, [], function(err, cur) {
             cur.sort({_id : -1}).limit(params.limit || 30).skip(params.skip || 0).toArray(function(err, arr) {
-                cb(arr);
+                cb(arr.reverse());
             });
         });
     });
