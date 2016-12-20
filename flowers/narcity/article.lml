@@ -33,7 +33,7 @@ $}
         <div class="article-author-face-section">
             <img src="{=author.avatarURL}" class="article-author-face midvert" />
             
-            <a href="{=url}/author/{=author.slug}">  
+            <a href="{=url}/author/{=author.slug}" class="article-author-link">  
                 <span class="article-author-displayname midvert">{=author.displayname}</span>
             </a>
             <span class="midvert">&middot;</span>

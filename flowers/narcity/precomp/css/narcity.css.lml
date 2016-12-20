@@ -360,7 +360,8 @@ article #article-content > div {
     margin-bottom: 1.7em;
 }
 
-article #article-content a {
+article #article-content a,
+article #article-content a:visited {
     color: {=mc};
     text-decoration: none;
 }
@@ -425,7 +426,8 @@ article .article-signature-face {
     border-radius: 90px;
 }
 
-article .article-signature-name {
+article .article-signature-name,
+article .article-signature-name:visited {
     display: inline;
     color: {=mc};
     font-size: 18px;
@@ -434,7 +436,6 @@ article .article-signature-name {
 }
 
 article .article-signature-name a {
-    color: #FF2634;
     text-decoration: none;
 }
 
@@ -475,6 +476,7 @@ article .article-more-from-list li {
     line-height: 22px;
 }
 
+article .article-more-from-list li a, 
 article .article-more-from-list li a {
     color: {=mc};
     text-decoration: none;
@@ -621,7 +623,8 @@ footer {
     margin: 0px 8px;
 }
 
-.footerLinks li a {
+.footerLinks li a, 
+.footerLinks li a:visited {
     color: {=mc};
     text-decoration: none;
 }
@@ -852,6 +855,11 @@ article.archive-article h3 a {
     text-align: left;
 }
 
+.article-author-link:visited, 
+.article-author-link {
+    color : {=mc};
+}
+
 .archive-author-strip h2 {
     font-size: 32px;
     margin:0; padding: 0;
@@ -1079,7 +1087,7 @@ article #article-content .nm-album-wrapper img {
         font-size: 24px;
         font-weight: normal;
         text-transform: uppercase;
-        color: #ff2634;
+        color: {=mc};
         margin: 30px 0 20px 20px;
     }
 
