@@ -1,4 +1,4 @@
-{#config;extra;slug}
+{#config;extra;slug;theme}
 {$
     featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
     author = extra.article.authors.0;
