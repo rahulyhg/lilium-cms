@@ -372,7 +372,7 @@ var Core = function () {
             faicon: "fa-pencil",
             displayname: "Content",
             priority: 200,
-            rights: ["publish"],
+            rights: ["list-articles"],
             absURL: aurl + "article",
             children: []
         });

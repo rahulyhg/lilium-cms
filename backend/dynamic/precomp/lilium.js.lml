@@ -750,6 +750,14 @@ var LiliumCMS = function() {
         }
 
         this.postload = function() {
+            var garbages = document.querySelectorAll(".modal-backdrop");
+
+            for (var i = 0; i < garbages.length; i++) {
+                garbages[i].remove();
+            }
+
+            document.body.classList.remove('modal-open');
+        
             liliumcms.livevars.exec(true);
         };
 

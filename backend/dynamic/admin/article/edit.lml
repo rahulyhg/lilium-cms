@@ -10,57 +10,35 @@
 		<fieldset class="title">
 		  <legend>More Informations</legend>
 		</fieldset>
-		{*content.{?1}(template:"article-moreinfo")}
-	</div>
 
-	<lml:template id="article-moreinfo">
 			<div class="article-info-strip">
-				<span>Status : </span><b class="uppercase"><lml:tobject data-nodetype="span" data-key="status"></lml:tobject></b>
+				<span>Status : </span><span id="moreinfo-status"></span>
 			</div>
 			<div class="article-info-strip">
-				<span>URL : </span><lml:tobject data-nodetype="a" data-href="{=config.default.server.url}/" data-key="name">http:{=config.default.server.url}/<lml:tobject data-nodetype="span" data-key="name"></lml:tobject></lml:tobject>
+				<span>URL : </span><span id="moreinfo-url"></span>
 			</div>
 			<div class="article-info-strip">
-				<span>Created : </span><i class="lmldatetime"><lml:tobject data-nodetype="span" data-key="date"></lml:tobject></i>
+				<span>Last Updated : </span><span id="moreinfo-updated"></span>
 			</div>
 			<div class="article-info-strip">
-				<span>Last Updated : </span><i class="lmldatetime"><lml:tobject data-nodetype="span" data-key="date"></lml:tobject></i>
-			</div>
-			<div class="article-info-strip">
-				<span>Author : </span><lml:tobject data-nodetype="span" data-key="authorname"></lml:tobject>
+				<span>Author : </span><span id="moreinfo-author"></span>
 			</div>
 
-            <div class="article-info-strip article-delete-button-wrapper">
-                <lml:tobject data-nodetype="button"  data-bind="click"
-                    data-action="unpublishArticleModal"
-                    data-actionparamkey="_id"
-                    data-href="{=config.default.server.url}/" 
-                    data-key="id" 
-                    data-filter="canUnpublish">
+            <div class="article-info-strip article-delete-button-wrapper article-button-wrapper">
+                <button onclick="unpublishArticleModal()">
                         Unpublish
-                </lml:tobject>
+                </button>
             </div>
 
-            <div class="article-info-strip article-destroy-button-wrapper">
-                <lml:tobject data-nodetype="button"  data-bind="click"
-                    data-action="destroyAutosave"
-                    data-actionparamkey="_id"
-                    data-href="{=config.default.server.url}/" 
-                    data-key="id" 
-                    data-filter="canDestroyAutosave">
-                        Destroy autosave
-                </lml:tobject>
+            <div class="article-info-strip article-destroy-button-wrapper article-destroyautosave-button-wrapper article-button-wrapper">
+                <button onclick="destroyAutosave()">
+                        Discard Autosave
+                </button>
             </div>
             
-            <div class="article-info-strip article-destroy-button-wrapper">
-                <lml:tobject data-nodetype="button"  data-bind="click"
-                    data-action="destroyArticleModal"
-                    data-actionparamkey="_id"
-                    data-href="{=config.default.server.url}/" 
-                    data-key="id" 
-                    data-filter="canDestroy">
+            <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper">
+                <button onclick="destroyArticleModal()">
                         Destroy
-                </lml:tobject>
+                </button>
             </div>
-
-	</lml:template>
+	</div>

@@ -20,7 +20,7 @@
 
     if (!window.lmlarticlebound) {
         window.lmlarticlebound = true;
-        document.addEventListener('livevarsFetched', function(e) {
+        document.addEventListener('livevarsFetched', function(e) { 
             var content = e.detail.livevars['content.' + window.location.pathname.split('/').pop()];
     
             if (content && content.length > 0) {
@@ -69,17 +69,19 @@
                 if (content[0].status == 'autosaved' && content[0].contentid) {
                     // lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
                 }
+
+                {$
+                    postleaves = postleaf.all();
+                $}
+
+                {$ for (leaf in postleaves); $}
+                if (window.{=leaf.backendload}) {
+                    window.{=leaf.backendload}();
+                }   
+                {$ endfor; $}
+
+                updateBottomSection();
             }
-
-            {$
-                postleaves = postleaf.all();
-            $}
-
-            {$ for (leaf in postleaves); $}
-            if (window.{=leaf.backendload}) {
-                window.{=leaf.backendload}();
-            }   
-            {$ endfor; $}
         });
 
 
@@ -107,9 +109,11 @@
     };
 
     var unpublishArticle = function() {
+        var deleteID = contentid;
         $.post('{=config.default.server.url}/admin/article/delete/' + deleteID, {}, function(data) {
             if (data.success && data.redirect) {
-                window.location.replace(data.redirect);
+                $('#confirm-destroy').modal('hide');
+                liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
             } else {
                 alert('There was an error deleting this post.');
             }
@@ -118,9 +122,11 @@
 
     var destroyAutosave = function(deleteID) {
         $(".article-destroy-button-wrapper button").get(0).disabled = true;
+        var deleteID = contentid;
         $.post('{=config.default.server.url}/admin/article/delete-autosave/' + deleteID, {}, function(data) {
             if (data.success && data.redirect) {
-                window.location.replace(data.redirect);
+                $('#confirm-destroy').modal('hide');
+                liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
             } else {
                 alert('There was an error deleting this autosave.');
             }
@@ -128,26 +134,50 @@
     };
 
     var destroyArticle = function() {
+        var deleteID = contentid;
         $.post('{=config.default.server.url}/admin/article/destroy/' + deleteID, {}, function(data) {
             if (data.success && data.redirect) {
-                window.location.replace(data.redirect);
+                $('#confirm-destroy').modal('hide');
+                liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
             } else {
                 alert('There was an error destroying this post.');
             }
         });
     };
 
-    var canDestroyAutosave = function(id) {
-        return this.status === 'autosaved';
+    var updateBottomSection = function() {
+        $.get('{=config.default.server.url}/admin/article/infostrip/' + contentid + '?async=false', function(resp) {
+            document.getElementById('moreinfo-status').textContent = resp["status"];
+            document.getElementById('moreinfo-status').className = "article-status-" + resp.status;
+
+            document.getElementById('moreinfo-updated').textContent = dateFormat(resp["updated"], "d/mm/yyyy 'at' hh:MM");
+            document.getElementById('moreinfo-author').textContent = resp["author"];
+            
+            document.getElementById('moreinfo-url').innerHTML = "";
+            if (!resp.url || resp.url.indexOf('//') == -1) {
+                document.getElementById('moreinfo-url').textContent = resp.url;
+            } else {
+                var a = document.createElement('a');
+                a.href = resp.url;
+                a.textContent = resp.url;
+
+                document.getElementById('moreinfo-url').appendChild(a);
+            }
+
+            var buttons = document.querySelectorAll('.article-button-wrapper');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].style.display = "none";
+            }
+
+            if (resp.status == "published") {
+                document.querySelector('.article-delete-button-wrapper').style.display = "";
+            } else if (resp.status == "autosaved") {
+                document.querySelector('.article-destroyautosave-button-wrapper').style.display = "";
+            } else {
+                document.querySelector('.article-destroyarticle-button-wrapper').style.display = "";
+            }
+        });
     };
-
-    var canUnpublish = function(id) {
-        return this.status !== 'deleted' && this.status !== 'autosaved';
-    }
-
-    var canDestroy = function(id) {
-        return this.status === 'deleted';
-    }
 
     $(document).ready(function() {
         // Will be edit, new or an id
@@ -237,7 +267,7 @@
                 lastSave = currentSave;
 
                 if (data.success && data.redirect) {
-                    window.location.replace(data.redirect);
+                    liliumcms.pageloader.load(data.redirect);
                 }
 
                 if (data.success && data._id) {
@@ -254,6 +284,7 @@
                     type: 'success'
                 });
 
+                updateBottomSection();
                 $(".cke_bottom time.timeago").timeago("update", new Date());
             });
 
@@ -318,8 +349,10 @@
                         lastSave = form;
                         
                         if (data.redirect) {
-                            window.location.replace(data.redirect);
+                            liliumcms.pageloader.load(data.redirect);
                         }
+
+                        updateBottomSection();
                     }
                 });
             } 

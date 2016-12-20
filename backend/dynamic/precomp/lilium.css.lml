@@ -1846,6 +1846,16 @@ button.bigger {
     padding: 5px;
 }
 
+#moreinfo-status {
+    text-transform: uppercase;
+    padding: 2px 6px;
+    background-color: #333;
+    display: inline-block;
+    color: #EEE;
+    margin-left: 3px;
+    border-radius: 4px;
+}
+
 .article-delete-button-wrapper button,
 .article-destroy-button-wrapper button {
     padding: 6px 10px;

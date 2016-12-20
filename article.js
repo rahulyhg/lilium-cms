@@ -75,12 +75,12 @@ var Article = function() {
         } else {
             switch (cli.routeinfo.path[2]) {
                 case 'new':
-                    cli.hasRight('publish-articles') ?
+                    cli.hasRight('create-articles') ?
                         filelogic.serveAdminLML(cli) :
                         cli.refuse();
                     break;
                 case 'edit':
-                    if (cli.hasRight('publish-articles')) {
+                    if (cli.hasRight('create-articles')) {
                         if (cli.routeinfo.path[3] && cli.routeinfo.path[3] == 'autosave') {
                             filelogic.serveAdminLML(cli, true);
                         } else {
@@ -94,6 +94,9 @@ var Article = function() {
                 case 'list':
                     this.list(cli);
                     break;
+                case 'infostrip':
+                    this.infoStrip(cli);
+                    break;
                 default:
                     return cli.throwHTTP(404, 'Not Found');
             }
@@ -106,6 +109,24 @@ var Article = function() {
 
     this.list = function(cli) {
         filelogic.serveAdminLML(cli, false);
+    };
+
+    this.infoStrip = function(cli) {
+        db.findToArray(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3])}, function(err, arr) {
+            if (arr.length != 0) {
+                var art = arr[0];
+                db.findToArray(conf.default(), 'entities', {_id : art.author}, function(err, autarr) {
+                    cli.sendJSON({
+                        status : art.status,
+                        url : art.name ? cli._c.server.url + "/" + art.name : "This article doesn't have a URL.",
+                        updated : art.updated,
+                        author : autarr[0].displayname
+                    });
+                });
+            } else {
+                cli.sendJSON({error : "Article not found"});
+            }
+        });
     };
 
     this.deepFetch = function(conf, idOrName, cb, preview, extraconds) {
@@ -468,11 +489,8 @@ var Article = function() {
             // Check if article is edit, non-existing or published
             formData.status = 'autosaved';
             if (cli.postdata.data.contentid) {
-                formData.status = 'draft';
-
                 db.findAndModify(cli._c, 'content', {
-                    _id: db.mongoID(cli.postdata.data.contentid),
-                    status: 'draft'
+                    _id: db.mongoID(cli.postdata.data.contentid)
                 }, formData, function(err, doc) {
                     if (doc.value !== null) {
 
@@ -541,9 +559,6 @@ var Article = function() {
             }
 
         } else {
-            formData.status = 'draft';
-            formData.author = db.mongoID(cli.userinfo.userid);
-
             if (cli.postdata.data._id) {
                 // Update draft
 
@@ -553,7 +568,7 @@ var Article = function() {
                     _id: id
                 }, function(err, ress) {
                     var res = err ? undefined : ress[0];
-                    if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('edit-all-articles'))) {
+                    if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
                         db.update(cli._c, 'content', {
                             _id: id
                         }, formData, function(err, doc) {

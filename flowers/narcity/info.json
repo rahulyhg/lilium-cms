@@ -80,7 +80,12 @@
 
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
         "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"},
-        "customcss" : {"type" : "textarea", "attr" : {"displayname" : "Custom plain CSS"}, "default" : ".logo {}"}
+        "codetitle" : {"type" : "title", "attr" : {"displayname" : "Code insertion"}, "default" : "title"},
+        "customcss" : {"type" : "textarea", "attr" : {"displayname" : "Custom plain CSS"}, "default" : ".logo {}"},
+        "headprio" : {"type" : "textarea", "attr" : {"displayname" : "Top of head tag"}, "default" : "<script></script>"},
+        "headend" : {"type" : "textarea", "attr" : {"displayname" : "End of head tag"}, "default" : "<script></script>"},
+        "bodyprio" : {"type" : "textarea", "attr" : {"displayname" : "Top of body tag"}, "default" : "<script></script>"},
+        "bodyend" : {"type" : "textarea", "attr" : {"displayname" : "End of body tag"}, "default" : "<script></script>"}
     },
     "contexts" : {
         "article" : "article.lml",
