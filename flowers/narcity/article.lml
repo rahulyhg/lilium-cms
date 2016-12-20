@@ -57,6 +57,7 @@ $}
     </div>
     {$ endif; $}
 
+    {=theme.settings.beforearticle}
     <div class="article-content" id="article-content">
         {=extra.article.content}
 
@@ -64,6 +65,7 @@ $}
             {%=extra.article.feature}
         {$ endif; $}
     </div>
+    {=theme.settings.afterarticle}
 
     {$ if (?author.displayname != ""); $} 
     <div class="article-signature">

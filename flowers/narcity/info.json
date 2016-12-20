@@ -84,6 +84,8 @@
         "customcss" : {"type" : "textarea", "attr" : {"displayname" : "Custom plain CSS"}, "default" : ".logo {}"},
         "headprio" : {"type" : "textarea", "attr" : {"displayname" : "Top of head tag"}, "default" : "<script></script>"},
         "headend" : {"type" : "textarea", "attr" : {"displayname" : "End of head tag"}, "default" : "<script></script>"},
+        "beforearticle" : {"type" : "textarea", "attr" : {"displayname" : "Before content"}, "default" : "<script></script>"},
+        "afterarticle" : {"type" : "textarea", "attr" : {"displayname" : "After content"}, "default" : "<script></script>"},
         "bodyprio" : {"type" : "textarea", "attr" : {"displayname" : "Top of body tag"}, "default" : "<script></script>"},
         "bodyend" : {"type" : "textarea", "attr" : {"displayname" : "End of body tag"}, "default" : "<script></script>"}
     },
