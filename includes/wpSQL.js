@@ -1,4 +1,4 @@
-var fetchPosts = "SELECT ID, post_author, post_date, post_content, post_title, post_status, post_name, post_type FROM wp_posts WHERE post_type = 'post' OR post_type = 'qquiz' OR post_type = 'page' ORDER BY ID ASC";
+var fetchPosts = "SELECT ID, post_author, post_date, post_content, post_title, post_status, post_name, post_type FROM wp_posts WHERE post_type = 'post' OR post_type = 'qquiz' OR post_type = 'page' OR post_type = 'photos' ORDER BY ID ASC";
 var fetchAttachmentIDs = "select ID, post_date, guid from wp_posts where post_type = 'attachment'";
 var fetchAttachmentMetas = "select post_id, meta_key, meta_value from wp_postmeta m INNER JOIN wp_posts p ON p.ID = m.post_id where post_type = 'attachment' AND m.meta_value NOT LIKE '\\_%'"
 var fetchCategories = "select t.term_id, t.name, t.slug from wp_terms t INNER JOIN wp_term_taxonomy tax ON tax.term_id = t.term_id WHERE tax.taxonomy = 'category'";
