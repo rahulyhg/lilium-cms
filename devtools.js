@@ -78,7 +78,7 @@ var clearCache = function(cli, ctx) {
                     });
                 });
             }
-            cli.response.end(err || 'ok');
+            cli.response.end('1');
             break;
         case 'admin':
             var sites = configs.getAllSites();
