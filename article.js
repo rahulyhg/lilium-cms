@@ -989,7 +989,7 @@ var Article = function() {
                                     arr[0].recentversion = autosave[0]._id;
                                 }
                                 db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
-                                    arr[0].authorname = autarr ? autarr[0].displayname : "[No Author]";
+                                    arr[0].authorname = autarr[0] ? autarr[0].displayname : "[No Author]";
                                     arr[0].author = autarr || {};
                                     callback(arr);
                                 });
