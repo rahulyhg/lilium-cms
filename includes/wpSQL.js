@@ -138,7 +138,7 @@ var ftQuiz = function(siteid, mysqldb, done) {
                         done();
                     } else {
                         var featuredata = posts[wpids[curi]];
-                        db.update(siteid, 'content', {wpid : wpids[curi]}, {
+                        db.update(siteid, 'content', {"data.wp_id" : wpids[curi]}, {
                             feature : "quiz",
                             featuredata : featuredata
                         }, next);
