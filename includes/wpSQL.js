@@ -74,6 +74,7 @@ var ftQuiz = function(siteid, mysqldb, done) {
                 var posts = {};
                 for (var i = 0; i < mQuizPers.length; i++) {
                     if (!posts[mQuizPers[i].qquiz_post_id]) {
+                        posts[mQuizPers[i].qquiz_post_id] = {};
                         posts[mQuizPers[i].qquiz_post_id].personalities = [];
                         posts[mQuizPers[i].qquiz_post_id].questions = [];
                     }
