@@ -1,5 +1,5 @@
-{#config;extra}
 <!DOCTYPE html>
+{#config;extra}
 <html>
 	<head>
 		{%adminhead}

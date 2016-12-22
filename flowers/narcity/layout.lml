@@ -1,5 +1,5 @@
-{#theme;extra}
 <!DOCTYPE html>
+{#theme;extra}
 <html id="lmlhtml" data-htmltype="lml" data-generated="true" data-cachehit="true">
 <head id="lmlhead">
     {=theme.settings.headprio}

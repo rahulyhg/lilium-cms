@@ -1,9 +1,9 @@
 {#config;forms}
 		<div class="settings-form-wrapper">
+			<h1>Lilium settings and configurations</h1>
 			{*settings(template:"title_template",sourceof:"settings_form")}
 			{=forms.render("settings_form")}
 		</div>
 
 		<lml:template id="title_template">
-			<h1>Lilium settings and configurations</h1>
 		</lml:template>

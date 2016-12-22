@@ -461,10 +461,8 @@ window.LMLQuiz = function() {
         $('.quiz-add-personality').bind('click', that.addEmptyPersonality);
         $('.quiz-add-question').bind('click', that.addEmptyQuestion);
 
-        if (!isPublished) {
-            that.bindQuizAutoSave();
-        }       
- 
+        that.bindQuizAutoSave();
+
         return this;
     };
 };

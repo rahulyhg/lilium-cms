@@ -9,8 +9,6 @@ $}
     <lml:dom v="0.6" />
 
 	<main class="entities-main">
-    	{=forms.render('category_create')}
-
 		<h1>All Categories</h1>
 		<ul class="entity-list">
 	    	<lml:foreach var="cat" in="livevars.categories">
@@ -29,6 +27,7 @@ $}
 	        	</lml:wrapper>
         	</lml:foreach>
 		</ul>
+    	{=forms.render('category_create')}
 	</main>
 
 <script>

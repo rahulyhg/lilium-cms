@@ -9,6 +9,10 @@ var fetchUsers = "SELECT ID, user_login, user_nicename, user_email, user_url, us
 var fetchUsersMetas = "select user_id, meta_key, meta_value from wp_usermeta WHERE meta_key NOT LIKE '\\_%'";
 var importantUserMetas = ["first_name", "last_name", "description", "wp_capabilities", "wp_user_level", "googleplus", "twitter", "facebook", "date_of_birth", "gender"];
 
+var fetchQuizPers = "SELECT * FROM wp_qquiz_post_pers";
+var fetchQuizQuest = "SELECT * FROM wp_qquiz_post_quest";
+var fetchQuizAnswer = "SELECT * FROM wp_quiz_quest_answer";
+
 var db = require('./db.js');
 var mysql = require('mysql');
 var log = require('../log.js');
@@ -20,6 +24,156 @@ var conf = require('../config.js');
 
 // Wordpress ID => Lilium Mongo ID
 var cachedUsers = new Object();
+
+/*
+mysql> describe wp_qquiz_post_pers;
++----------------------+--------------+------+-----+---------+-------+
+| Field                | Type         | Null | Key | Default | Extra |
++----------------------+--------------+------+-----+---------+-------+
+| qquiz_post_id        | int(20)      | NO   |     | NULL    |       |
+| qquiz_pers_name      | varchar(100) | YES  |     | NULL    |       |
+| qquiz_pers_desc      | text         | YES  |     | NULL    |       |
+| qquiz_pers_attach    | text         | YES  |     | NULL    |       |
+| qquiz_pers_label     | varchar(10)  | YES  |     | NULL    |       |
+| qquiz_pers_cred_name | varchar(100) | YES  |     | NULL    |       |
+| qquiz_pers_cred_link | varchar(100) | YES  |     | NULL    |       |
++----------------------+--------------+------+-----+---------+-------+
+
+describe wp_qquiz_post_quest;
++-----------------------+--------------+------+-----+---------+----------------+
+| Field                 | Type         | Null | Key | Default | Extra          |
++-----------------------+--------------+------+-----+---------+----------------+
+| qquiz_post_quest_id   | int(20)      | NO   | PRI | NULL    | auto_increment |
+| qquiz_post_id         | int(20)      | NO   |     | NULL    |                |
+| qquiz_quest_index     | int(6)       | NO   |     | NULL    |                |
+| qquiz_quest_text      | text         | YES  |     | NULL    |                |
+| qquiz_quest_attach    | text         | YES  |     | NULL    |                |
+| qquiz_quest_cred_name | varchar(100) | YES  |     | NULL    |                |
+| qquiz_quest_cred_link | varchar(100) | YES  |     | NULL    |                |
++-----------------------+--------------+------+-----+---------+----------------+
+
+describe wp_qquiz_quest_answer;
++------------------------+--------------+------+-----+---------+-------+
+| Field                  | Type         | Null | Key | Default | Extra |
++------------------------+--------------+------+-----+---------+-------+
+| qquiz_post_id          | int(20)      | NO   |     | NULL    |       |
+| qquiz_quest_index      | int(6)       | NO   |     | NULL    |       |
+| qquiz_answer_text      | text         | YES  |     | NULL    |       |
+| qquiz_answer_attach    | text         | YES  |     | NULL    |       |
+| qquiz_answer_type      | varchar(5)   | YES  |     | NULL    |       |
+| qquiz_pers_label       | varchar(50)  | YES  |     | NULL    |       |
+| qquiz_answer_cred_name | varchar(100) | YES  |     | NULL    |       |
+| qquiz_answer_cred_link | varchar(100) | YES  |     | NULL    |       |
++------------------------+--------------+------+-----+---------+-------+
+*/
+var ftQuiz = function(siteid, mysqldb, done) {
+    mysqldb.query(fetchQuizPers, function(err, mQuizPers) {
+        mysqldb.query(fetchQuizQuest, function(err, mQuizQuest) {
+            mysqldb.query(fetchQuizAnswer, function(err, mQuizAnswer) {
+                // wpid => personalities
+                var posts = {};
+                for (var i = 0; i < mQuizPers.length; i++) {
+                    if (!posts[mQuizPers[i].qquiz_post_id]) {
+                        posts[mQuizPers[i].qquiz_post_id].personalities = [];
+                        posts[mQuizPers[i].qquiz_post_id].questions = [];
+                    }
+
+                    posts[mQuizPers[i].qquiz_post_id].personalities.push({
+                        id : "pers-" + Math.random().toString(36).substring(2),
+                        name : mQuizPers[i].qquiz_pers_name,
+                        details : mQuizPers[i].qquiz_pers_desc,
+                        wplabel : mQuizPers[i].qquiz_pers_label,
+                        photo : "",
+                        photourl : "",
+                        photocred : mQuizPers[i].qquiz_pers_cred_name,
+                        photocredlink : mQuizPers[i].qquiz_pers_cred_link,
+                        photowpid : mQuizPers[i].qquiz_pers_attach
+                    });
+                }
+
+                for (var i = 0; i < mQuizQuest.length; i++) {
+                    posts[mQuizQuest[i].qquiz_post_id].questions.push({
+                        id : "quest-" + Math.random().toString(36).substring(2),
+                        answers : [],
+                        interogation : mQuizQuest[i].qquiz_quest_text,
+                        wplabel : mQuizQuest[i].qquiz_quest_index,
+                        photo : "",
+                        photourl : "",
+                        photocred : mQuizQuest[i].qquiz_quest_cred_name,
+                        photocredlink : mQuizQuest[i].qquiz_quest_cred_link,
+                        photowpid : mQuizQuest[i].qquiz_quest_attach
+                    });
+                }
+
+                for (var i = 0; i < mQuizAnswer.length; i++) {
+                    var ans = mQuizAnswer[i];
+                    var post = posts[ans.qquiz_post_id];
+                    var quests = post.questions;
+                    var persoid;                    
+
+                    for (var j = 0; j < post.personalities.length; j++) 
+                    if (ans.qquiz_pers_label.indexOf(post.personalities[j].wplabel) != -1) {
+                        persoid = post.personalities[j].id;
+                    }
+
+                    post.answers.push({
+                        id : "ans-" + Math.random().toString(36).substring(2),
+                        photourl : "",
+                        answer : ans.qquiz_answer_text,
+                        personality : persoid,
+                        photocred : ans.qquiz_answer_cred_name,
+                        photocredlink : ans.qquiz_answer_cred_link
+                    });
+                }
+
+                var wpids = Object.keys(posts);
+                var curi = -1;
+                var next = function() {
+                    curi++;
+                    if (curi == wpids.length) {
+                        done();
+                    } else {
+                        var featuredata = posts[wpids[curi]];
+                        console.log("Would insert => " + featuredata);
+                    }
+                };
+
+                next();
+            });
+        });
+    });
+};
+/*
+            Personalities {
+                "id" : "pers-u5o5ecaa17s0q1dnsl9pb9",
+                "name" : "Personality 1",
+                "details" : "Details 1",
+                "photourl" : null,
+                "photocred" : "",
+                "photocredlink" : ""
+            }
+
+            "questions" : [
+            {
+                "id" : "quest-g2m06a9w6aua37yqb4eu3di",
+                "answers" : [
+                    {
+                        "id" : "ans-1ulwczxxsxco368mw6jj2oi529",
+                        "photourl" : null,
+                        "answer" : "Answer 1",
+                        "personality" : "pers-u5o5ecaa17s0q1dnsl9pb9",
+                        "photocred" : "",
+                        "photocredlink" : ""
+                    },
+                ],
+                "interogation" : "Question 1",
+                "photo" : "5843d5e7304c3f25b8856620",
+                "photourl" : "//localhost:8080/uploads/312e872080f17cf735863288495f43a9.jpg_970x400.jpg",
+                "photocred" : "Cred 1",
+                "photocredlink" : "Link 1"
+            }
+        ]
+*/
 
 var ftCategories = function(siteid, mysqldb, done) {
     mysqldb.query(fetchCategories, function(err, wp_cat) {
@@ -399,7 +553,7 @@ var parseWPRole = function(roleString) {
     return rr;
 };
 
-var transTasks = [ftUsers, ftCategories, ftPosts, ftUploads];
+var transTasks = [ftUsers, ftCategories, ftPosts, ftQuiz, ftUploads];
 
 var WordpressSQLToLiliumMongo = function() {
     this.transfer = function(siteid, mysqlConnInfo, callback) {
