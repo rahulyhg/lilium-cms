@@ -201,6 +201,12 @@ h4.article-section-title {
     text-align: left;
 }
 
+.taboola-wrapper  {
+    width: {=aw};
+    margin: 20px auto;
+    display: block;
+}
+
 h4.article-section-title a {
     text-decoration: none;
     color: {=mc};
@@ -426,8 +432,8 @@ article .article-signature-face {
     border-radius: 90px;
 }
 
-article .article-signature-name,
-article .article-signature-name:visited {
+article .article-signature-name a,
+article .article-signature-name a:visited {
     display: inline;
     color: {=mc};
     font-size: 18px;
@@ -858,6 +864,7 @@ article.archive-article h3 a {
 .article-author-link:visited, 
 .article-author-link {
     color : {=mc};
+    text-decoration: none;
 }
 
 .archive-author-strip h2 {
@@ -1018,6 +1025,10 @@ article #article-content .nm-album-wrapper img {
         margin: 0;
         padding: 10px;
         width: auto;
+    }
+
+    #taboola-below-article-thumbnails {
+        margin: 10px !important;
     }
 
     article #article-content > p,
