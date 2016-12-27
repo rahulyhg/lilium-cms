@@ -77,7 +77,7 @@ window.deviceIs = function(deviceArr) {
 var makeLinkTargetBlank = function() {
     _v('article a').all(function(node) { 
         if (!node.attr('target')) {
-            node.attr('target', '_blank'); 
+            // node.attr('target', '_blank'); 
         }
     });
 };
