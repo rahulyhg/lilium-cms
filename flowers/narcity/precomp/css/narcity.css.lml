@@ -375,6 +375,7 @@ article .extra-content div {
 }
 
 article #article-content a,
+article .extra-content a,
 article #article-content a:visited {
     color: {=mc};
     text-decoration: none;
@@ -1001,6 +1002,7 @@ article #article-content .nm-album-wrapper img {
     article .article-more-from-wrapper, 
     article .article-tags-wrapper, 
     article .article-comments,
+    article .extra-content,
     article .article-related-section {
         width: auto;
     }
@@ -1044,8 +1046,10 @@ article #article-content .nm-album-wrapper img {
     }
 
     article #article-content > p,
+    article .extra-content > p,
     article #article-content > address,
-    article #article-content > div {
+    article #article-content > div,
+    article .extra-content > div {
         font-family: Arial, sans-serif;
         font-size: 16px;
 
@@ -1054,6 +1058,7 @@ article #article-content .nm-album-wrapper img {
         display: block;
     }
 
+    article .extra-content img,
     article #article-content img {
         display: block;
         width: auto;
