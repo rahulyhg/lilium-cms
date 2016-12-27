@@ -182,6 +182,15 @@ var Settings = function () {
             .add('content.cdn.domain', 'text', {
                 displayname : "CDN Domain"
             })
+            .add('content.cdn.company', 'text', {
+                displayname : "Company Alias"
+            })
+            .add('content.cdn.key', 'text', {
+                displayname : "Consumer Key"
+            })
+            .add('content.cdn.secret', 'text', {
+                displayname : "Consumer Secret"
+            })
 
         .add('google-sep', 'title', {
                 displayname: "Google API"

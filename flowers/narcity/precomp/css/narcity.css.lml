@@ -357,6 +357,12 @@ article #article-content {
     display: block;
 }
 
+article .extra-content {
+    width: {=aw};
+    margin: 0px auto;
+    display: block;
+}
+
 article #article-content > p, 
 article #article-content > address, 
 article #article-content > div,
