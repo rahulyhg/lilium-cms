@@ -102,6 +102,23 @@ window.generateFeedCard_badge = function(card, ctx) {
     return wrap;
 };
 
+window.generateFeedCard_quote = function(card, ctx) {
+    var wrap = document.createElement('div');
+    var quotetext = document.createElement('span');
+    var authortext = document.createElement('span');
+    
+    wrap.appendChild(quotetext);
+    wrap.appendChild(authortext);
+
+    quotetext.textContent = card.extra.text;
+    authortext.textContent = "- " + card.extra.author;
+
+    quotetext.classList.add('card-quote-text');
+    authortext.classList.add('card-quote-author');
+
+    return wrap;
+};
+
 window.generateFeedCard_published = function(card, ctx) {
     var wrap = document.createElement('a');
     var header = document.createElement('div');
@@ -201,6 +218,37 @@ window.generateFeedCard_published = function(card, ctx) {
     overflow: hidden;
 }
 
+.real-time-card-quote {
+    background-color: #6d5c6d;
+    background-image: repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px), repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px), linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)), linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+    background-size: 70px 120px;
+
+    color: #F9F9F9;
+}
+
+.card-quote-text {
+    display: block;
+    margin: 30px;
+    color: #F9F9F9;
+    font-size: 30px;
+    font-style: italic;
+    line-height: 32px;
+}
+
+.card-quote-author {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: #CCC;
+    font-size: 22px;
+    left: 0;
+    text-align: right;
+    padding: 15px 30px;
+    background-color: rgba(0,0,0,0.2);
+}
+
+
+
 .card-ribbon {
     position: absolute;
     width: 50px;
@@ -286,15 +334,17 @@ window.generateFeedCard_published = function(card, ctx) {
 
 h2.card-details {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
-    right: 10px;
+    bottom: 0;
+    left: 0;
+    right: 0;
     font-weight: 500;
     text-transform: uppercase;
     font-family: "Oswald", sans-serif;
     color: #FFF;
     text-shadow: 0px 0px 2px #000;
     font-size: 26px;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.7);
 }
 
 main.lmladminmain {

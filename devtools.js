@@ -28,6 +28,7 @@ var handleGET = function(cli) {
         case 'lml':
         case 'endpoints':
         case 'cache':
+        case 'feed':
         case 'scripts':
         case undefined:
             filelogic.serveAdminLML(cli);
@@ -57,6 +58,9 @@ var handlePOST = function(cli) {
             break;
         case 'scripts':
             maybeExecuteScript(cli);
+            break;
+        case 'feed':
+            maybeInsertFeed(cli);
             break;
         default:
             cli.refresh();
@@ -108,6 +112,18 @@ var clearCache = function(cli, ctx) {
         default:
             cli.response.end("");
     }
+};
+
+var maybeInsertFeed = function(cli) {
+    var dat = cli.postdata.data;
+    var extra = {};
+    for (var i in dat.extra) {
+        extra[dat.extra[i].key] = dat.extra[i].value;
+    }
+
+    require('./feed.js').push(dat.extid, require('./includes/db.js').mongoID(dat.actor), dat.type, dat.site, extra, function() {
+        cli.sendJSON(dat);
+    });
 };
 
 var refreshCache = function(cli, ctx) {
@@ -350,6 +366,65 @@ DevTools.prototype.registerForms = function() {
             classes : ['btn', 'btn-default', 'btn-query']
         }
     ]})
+
+    formBuilder.createForm('devfeedinsert', {
+        async : true,
+        fieldWrapper : 'lmlform-fieldwrapper'
+    })
+    .add('type', 'select', {
+        displayname : "Type",
+        datasource : [
+            {name : "quote", displayName : "Quote"},
+            {name : "published", displayName : "Published"},
+            {name : "badge", displayName : "Badge"},
+            {name : "welcomed", displayName : "Welcomed"}
+        ]
+    })
+    .add('extid', 'text', {
+        displayname : "External ID"
+    })
+    .add('actor', 'livevar', {
+        displayname : "Actor",
+        endpoint : "entities.chat",
+            tag : "select",
+            template: "option",
+            attr: {
+                lmlselect : false,
+                header : 'Select an entity'
+            },
+            props: {
+                'value' : "_id",
+                'html' : 'displayname'
+            }            
+    })
+    .add('site', 'livevar', {
+            displayname : "Site",
+            endpoint : "sites.all.complex",
+            tag : "select",
+            template: "option",
+            attr: {
+                lmlselect : false,
+                header : 'Select a website'
+            },
+            props: {
+                'value' : "id",
+                'html' : 'website.sitetitle'
+            }            
+    })
+    .add('extra', 'stack', {
+        displayname : "Extra data",
+        scheme : {
+            columns : [
+                { fieldName : "key", dataType : "text", displayname : "Key" },
+                { fieldName : "value", dataType : "text", displayname : "Value" }
+            ]
+        }
+    })
+    .add('Insert', 'submit', {
+        type: 'button', 
+        displayname : 'Insert',
+        async : true
+    })
 };
 
 module.exports = new DevTools();

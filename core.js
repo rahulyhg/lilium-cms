@@ -50,6 +50,7 @@ var badges = undefined;
 var conversations = undefined;
 var localcast = undefined;
 var feed = undefined;
+var cdn = undefined;
 
 var log = require('./log.js');
 
@@ -106,6 +107,7 @@ var Core = function () {
         conversations = require("./conversations.js");
         localcast = require('./localcast.js');
         feed = require('./feed.js');
+        cdn = require('./cdn.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
@@ -120,6 +122,7 @@ var Core = function () {
         });
 
         persona.bindHooks();
+        cdn.bind();
         hooks.fire('hooks');
         log('Hooks', 'Loaded hooks', 'success');
     };

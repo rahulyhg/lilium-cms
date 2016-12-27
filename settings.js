@@ -152,8 +152,8 @@ var Settings = function () {
                 displayname: "POST Maximum File Size"
             })
 
-        .add('content-sep', 'title', {
-                displayname : "Content"
+        .add('content-ads-sep', 'title', {
+                displayname : "Advertising"
             })
             .add('content.adsperp', 'number', {
                 displayname : "Paragraph count between in-content ads"
@@ -174,6 +174,13 @@ var Settings = function () {
                         }
                     ]
                 }
+            })
+
+        .add('content-cdn-sep', 'title', {
+                displayname : "Content Delivery Network"
+            })
+            .add('content.cdn.domain', 'text', {
+                displayname : "CDN Domain"
             })
 
         .add('google-sep', 'title', {

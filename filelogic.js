@@ -249,18 +249,29 @@ var FileLogic = function () {
                 readPath,
                 tmpPath,
                 function () {
-                    log('FileLogic', 'Including compiled theme page to layout', 'detail');
-                    extra.contentpetal = tmpPath;
+                    require('./fileserver.js').readFile(tmpPath, function(ctn) {
+                        log('FileLogic', 'Including compiled theme page to layout', 'detail');
+                        extra.contentHTML = ctn;
 
-                    LML.executeToFile(
-                        layoutPath,
-                        savePath,
-                        function () {
-                            log('FileLogic', 'Completed Theme page compilation', 'success');
-                            callback();
-                        }, 
-                        extra
-                    );
+                        LML.executeToFile(
+                            layoutPath,
+                            savePath,
+                            function () {
+                                log('FileLogic', 'Completed Theme page compilation', 'success');
+                                FileServer.readFile(savePath, function(fHtml) {
+                                    require('./cdn.js').parse(fHtml, cli, function(cdned) { 
+                                        var handle = FileServer.getOutputFileHandle(savePath, 'w');
+                                        FileServer.writeToFile(handle, cdned, function() {
+                                            callback();
+                                        });
+                                    });
+                                });
+
+                                FileServer.deleteFile(tmpPath, function() {});
+                            }, 
+                            extra
+                        );
+                    });
                 }, 
                 extra
             );

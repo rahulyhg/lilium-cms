@@ -33,5 +33,11 @@
                 <b class="devtools-list-item-title">Scripts</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/feed">
+                <i class="devtools-list-item-icon fa fa-newspaper-o"></i>
+                <b class="devtools-list-item-title">Feed</b>
+            </a>
+        </li>
     </ul>
 </div>

@@ -1,0 +1,4 @@
+{#config;forms}
+<h1>Feed manual insertion</h1>
+
+{=forms.render("devfeedinsert")}

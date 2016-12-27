@@ -16,7 +16,7 @@
     {%petals/socialhead}
     {%petals/header}
     {%petals/beforecontent}
-    {%%extra.contentpetal}
+    {=extra.contentHTML}
     {%petals/footer}
     {=theme.settings.bodyend}
 </body>
