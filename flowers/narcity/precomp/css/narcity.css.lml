@@ -359,7 +359,9 @@ article #article-content {
 
 article #article-content > p, 
 article #article-content > address, 
-article #article-content > div {
+article #article-content > div,
+article .extra-content p,
+article .extra-content div {
     font-family: Arial, sans-serif;
     font-size: 18px;
     line-height: 1.7em;
@@ -1031,6 +1033,10 @@ article #article-content .nm-album-wrapper img {
         margin: 10px !important;
     }
 
+    .taboola-wrapper {
+        width: auto;
+    }
+
     article #article-content > p,
     article #article-content > address,
     article #article-content > div {
@@ -1099,7 +1105,7 @@ article #article-content .nm-album-wrapper img {
         font-weight: normal;
         text-transform: uppercase;
         color: {=mc};
-        margin: 30px 0 20px 20px;
+        margin: 30px 0 20px;
     }
 
     .homepage .article-thumbnail .article-thumbnail-featured-image img {
