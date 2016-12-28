@@ -1058,10 +1058,20 @@ article #article-content .nm-album-wrapper img {
         display: block;
     }
 
+    article .article-related-section .article-thumbnail {
+        width: auto;
+        border: none;
+    }
+
+    article .article-related-section .article-thumbnail-featured .article-thumbnail-title {
+        font-size: 20px;
+    }
+
     article .extra-content img,
     article #article-content img {
         display: block;
         width: auto;
+        max-width: 100%;
     }
 
     article .article-signature {
