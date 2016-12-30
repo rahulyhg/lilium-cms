@@ -38,7 +38,7 @@ var scanInstagramSingle = function(cli, err, cur, done) {
                 cur.next(function(err, obj) {
                     var ctn = obj.content.replace(/<p>(&nbsp;)?<\/p>/g, "").replace(/\r\n/g, "");
 
-                    var instaReg = /<p>https?\:\/\/www.instagram.com\/p\/[a-zA-Z0-9\-]*\/?[a-z\-\?\=0-9]*<\/p>/g;
+                    var instaReg = /<p>https?\:\/\/www.instagram.com\/p\/[a-zA-Z0-9\-\_]*\/?[a-z\-\?\=0-9]*<\/p>/g;
                     var instaStrings = [];
 
                     while (m = instaReg.exec(ctn)) {
