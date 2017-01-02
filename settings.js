@@ -80,7 +80,23 @@ var Settings = function () {
         })
 
         .trg('top')
-            .add('database-sep', 'title', {
+        .add('website-sep', 'title', {
+            displayname : "Website"
+        })
+            .add('website.sitetitle', 'text', {
+                displayname : "Public title"
+            })
+            .add('website.language', 'select', {
+                displayname : "Language",
+                datasource : [
+                    {displayName : "Canadian English", name : "en-ca"},
+                    {displayName : "American English", name : "en-us"},
+                    {displayName : "Français Canadien", name : "fr-ca"},
+                    {displayName : "Français de France", name : "fr-fr"}
+                ]
+            })
+
+        .add('database-sep', 'title', {
                 displayname: "Database"
             })
             .add('data.host', 'text', {
@@ -98,7 +114,7 @@ var Settings = function () {
             .add('data.use', 'text', {
                 displayname: "Database Name"
             })
-
+/*
         .add('paths-sep', 'title', {
                 displayname: "Paths"
             })
@@ -129,7 +145,7 @@ var Settings = function () {
             .add('paths.uploads', 'text', {
                 displayname: "Uploads"
             })
-
+*/
         .add('server-sep', 'title', {
                 displayname: "Server"
             })

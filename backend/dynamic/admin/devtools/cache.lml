@@ -18,6 +18,7 @@
 
     <h2>Content</h2>
     <a class="cache-post-link" data-postto="{=config.default.server.url}/admin/devtools/cache/refresh/insertads">Insert ads</a>
+    <a class="cache-post-link" data-postto="{=config.default.server.url}/admin/devtools/cache/refresh/unwrapimgs">Unwrap images</a>
 
     <h2>Precompiler</h2>
     <a class="cache-post-link" data-postto="{=config.default.server.url}/admin/devtools/cache/refresh/precompile">Recompile</a>

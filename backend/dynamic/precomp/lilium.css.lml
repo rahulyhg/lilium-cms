@@ -37,6 +37,8 @@
 	fontdir += "/static/fonts/font-awesome";
 $}
 
+@import url('https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700');
+
 @font-face {
   font-family: 'Raleway';
   font-weight: 100;
@@ -1827,7 +1829,8 @@ button.bigger {
 
 #post_create input[type="text"].article_base_title,
 #post_create_new input[name="title"] {
-    font-family: 'Oswald', Times New Roman, Arial, sans-serif;
+    font-family: 'PT Serif', serif;
+    font-weight: bold;
     font-size: 32px;
     width: 100%;
     color: #111;

@@ -64,6 +64,10 @@ var ftQuiz = function(siteid, mysqldb, done) {
     mysqldb.query(fetchQuizPers, function(err, mQuizPers) {
         mysqldb.query(fetchQuizQuest, function(err, mQuizQuest) {
             mysqldb.query(fetchQuizAnswer, function(err, mQuizAnswer) {
+                if (!mQuizAnswer || !mQuizAnswer.length || err) {
+                    return done();
+                }
+
                 // wpid => personalities
                 var posts = {};
                 for (var i = 0; i < mQuizPers.length; i++) {
@@ -333,6 +337,11 @@ var ftPosts = function(siteid, mysqldb, done) {
                             }
 
                             mysqldb.query(fetchPostsMetas + " AND post_id = " + wp_post.ID, function(err, wp_postmeta) {
+                                if (!wp_postmeta || !wp_postmeta.forEach || err) {
+                                    postIndex++;
+                                    nextPost();
+                                }
+
                                 var postdata = {};
                                 wp_postmeta.forEach(function(meta, i) {
                                     postdata[meta.meta_key] = meta.meta_value;
@@ -572,6 +581,11 @@ var WordpressSQLToLiliumMongo = function() {
             user:       mysqlConnInfo.wpsitedatauser,
             password:   mysqlConnInfo.wpsitedatapwd,
             database:   mysqlConnInfo.wpsitedataname
+        });
+
+        mdb.on('error', function() {
+            log('WP', 'Reconnecting to WP database');
+            mdb.connect();
         });
 
         log('WP', 'Contacting database');

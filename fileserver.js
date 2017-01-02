@@ -62,7 +62,7 @@ var FileServer = function () {
 
                 cb();
             });
-        });
+        }, false, 'utf8');
     };
 
     this.dirExists = function (fullpath, cb) {

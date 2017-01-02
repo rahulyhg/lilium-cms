@@ -140,8 +140,11 @@ window.generateFeedCard_published = function(card, ctx) {
     header.appendChild(avatar);
     header.appendChild(announce);
 
+    timespan.textContent = dateFormat(card.time, 'd mmmm, h:MMTT');
+    wrap.appendChild(timespan);
+
     wrap.appendChild(articleimg);
-    articleimg.appendChild(articletitle);
+    wrap.appendChild(articletitle);
 
     avatar.setAttribute('src', card.extra.authoravatar);
     announce.textContent = card.extra.authorname.split(' ')[0] + 
@@ -150,9 +153,6 @@ window.generateFeedCard_published = function(card, ctx) {
     articletitle.textContent = card.extra.title;
     articleimg.style.backgroundImage = "url('"+card.extra.image+"')";
     
-    timespan.textContent = dateFormat(card.time, 'd mmmm, h:MMTT');
-    articleimg.appendChild(timespan);
-
     wrap.setAttribute('href', ctx.livevars.sites.all.simple.assoc[card.site].url + '/' + card.extra.slug);
     wrap.setAttribute('target', '_blank');
 
@@ -175,6 +175,7 @@ window.generateFeedCard_published = function(card, ctx) {
     display: inline-block;
     float: left;
     height: 300px;
+    overflow: hidden;
 
     opacity: 0;
 
@@ -287,6 +288,8 @@ window.generateFeedCard_published = function(card, ctx) {
 .card-header {
     height: 60px;
     position: relative;
+    z-index: 50;
+    background-color: #FFF;
 }
 
 .card-datetime {
@@ -298,6 +301,7 @@ window.generateFeedCard_published = function(card, ctx) {
     font-weight: 700;
     background-color: rgba(255, 255, 255, 0.8);
     right: 0;
+    z-index : 10;
 }
 
 .card-avatar {
@@ -325,11 +329,27 @@ window.generateFeedCard_published = function(card, ctx) {
     font-family: "Oswald", sans-serif;
 }
 
+.real-time-card-published:hover .card-image {
+    filter : blur(0px);
+    transform: scale(1.1);
+}
+
+.real-time-card-published:hover h2.card-details {
+    background-color: rgba(0,0,0,0.7);
+}
+
 .card-image {
     position: relative;
     height: 240px;
     background-position: center center;
     background-size: cover;
+    filter: blur(20px);
+
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
 }
 
 h2.card-details {
@@ -344,7 +364,14 @@ h2.card-details {
     text-shadow: 0px 0px 2px #000;
     font-size: 26px;
     padding: 10px;
-    background-color: rgba(0,0,0,0.7);
+    background-color: rgba(0,0,0,0.2);
+    z-index: 100;
+
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
 }
 
 main.lmladminmain {

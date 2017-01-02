@@ -4,7 +4,8 @@
   "description": "Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.",
   "main": "lilium.js",
   "scripts": {
-    "test": "liliumtest"
+    "test": "liliumtest",
+    "dev": "node lilium.js"
   },
   "repository": {
     "type": "git",
@@ -95,6 +96,7 @@
     "twitter": "^1.4.0",
     "uglify": "^0.1.5",
     "uglifyjs": "^2.4.10",
+    "utf8": "^2.1.2",
     "util": "^0.10.3",
     "validator": "^4.5.0",
     "websocket": "^1.0.23"

@@ -60,8 +60,8 @@ var _config = {
 			apikey : ""
 		},
 		"MIMES" : {
-			"" : "text/html",
-			".html" : "text/html",
+			"" : "text/html; charset=utf-8",
+			".html" : "text/html; charset=utf-8",
 			".htm" : "text/html",
 			".css" : "text/css",
 			".js" : "text/javascript",
@@ -82,7 +82,7 @@ var _config = {
 		],
 		"website" : {
 			"sitetitle" : "A Lilium Website",
-			"language" : "en",
+			"language" : "en-ca",
 			"flower" : "flowerg"
 		},
 		"login" : {

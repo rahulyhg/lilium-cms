@@ -263,7 +263,7 @@ var LML = function () {
             var that = this;
             var endVal = str.trim();
             var acceptUndefined = endVal[0] === '?';
-            
+
             if (acceptUndefined) {
                 endVal = endVal.substring(1);
             }
@@ -715,9 +715,6 @@ var LML = function () {
     // Parses content, and returns partial strings through a callback
     // The value returned is undefined when everything is done
     this.parseContent = function (rootpath, content, callback, context, extra, sync, outputstream) {
-        // Per line execution, slow for minified files
-        // var lines = typeof content === 'string' ? (extra && extra.fromClient ? content.split(/\n|\\n/) : content.split('\n')) : typeof content === 'object' ? content : new Array(),
-    
         var lines = [];
         var done = false;
         var pos = -1;
@@ -773,12 +770,14 @@ var LML = function () {
             }
         }
 
+        /*
         if ((txt = lines.map(function(elem) { return elem.text}).join('')) != content) {
             var dfs = require('diff').diffTrimmedLines(txt, content);
             if (dfs.length > 1) {
                 throw new Error("Error while doing the split");
             }
         }
+        */
 
         var cLine = 0,
             lineTotal = lines.length;
@@ -902,7 +901,7 @@ var LML = function () {
             if (!dirExists) throw new Error("LMLAccessException - Could not create directory for " + compilepath);
 
             fileserver.readFile(rootpath, function (content) {
-                var fileHandle = fileserver.getOutputFileHandle(compilepath, 'w+');
+                var fileHandle = fileserver.getOutputFileHandle(compilepath, 'w+', 'utf8');
                 var context = that.parseContent(rootpath, content, function(context) {
                     context.flagEnd();
                 }, undefined, extra, false, fileHandle);

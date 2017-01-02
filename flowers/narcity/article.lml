@@ -1,4 +1,4 @@
-{#config;extra;slug;theme}
+{#config;extra;slug;theme;debug}
 {$
     featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
     author = extra.article.authors.0;
@@ -6,6 +6,14 @@
     rooturl = url.substring(2);
 $}
 <article>
+    <div class="category-top-wrapper ryksponsive-c">
+        <a href="{=config.default.server.url}/category/{=extra.article.categories.0.name}" class="category-top-link">
+            {=extra.article.categories.0.displayname}
+        </a>
+    </div>
+    <h1>{=extra.article.title}</h1>
+    <h2>{=extra.article.subtitle}</h2>   
+
     {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper" style="background-image : url('{=featimg}')">
         {$ if (?extra.article.featuredimageartist != ""); $}
@@ -16,9 +24,6 @@ $}
     </div>
     {$ endif; $}
     
-    <h1>{=extra.article.title}</h1>
-    <h2>{=extra.article.subtitle}</h2>   
-
     {$ if (?author.displayname != ""); $} 
     <div class="article-author-strip">
         <div class="article-author-share-section invisible" id="article-share-section">
@@ -38,11 +43,11 @@ $}
             </a>
             <span class="midvert">&middot;</span>
             <span class="article-published-date midvert edt-datetime" data-edtdatetime={=extra.article.date}></span>
-            <span class="midvert">&middot;</span>
+            <!--span class="midvert">&middot;</span>
             <a href="#comments" target="" style="font-weight:bold; text-decoration: none; color: #111;">
                 <img src="{=config.default.server.url}/res/images/commentbubble.png" id="commentssmallicon" title="Comments">
                 <span class="article-comment-count">0</span>
-            </a>
+            </a-->
 
             <div class="social-share-big-count">
                 <div class="social-share-big-count-text">
@@ -84,17 +89,6 @@ $}
         </div>
     </div>  
     {$ endif; $}
-
-    <div class="article-more-from-wrapper">
-        <h4 class="article-section-title">More from {=config.default.info.project}</h4>
-        <ul class="article-more-from-list">
-            {$ for (mf in extra.article.morefrom); $}
-            <li>
-                <a href="{=url}/{=mf.name}">{=mf.title}</a>
-            </li>
-            {$ endfor; $}
-        </ul>
-    </div>      
 
     <div class="article-tags-wrapper">
         {$ for (tag in ?extra.article.tags); $}

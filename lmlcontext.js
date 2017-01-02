@@ -132,7 +132,7 @@ LMLContext.prototype.write = LMLContext.prototype.w = function(str) {
 
     if (str && str.length !== 0) {
         var that = this;
-        fileserver.writeToFile(this.outputstream, str.toString(), function() {that.lineWritten(false)});
+        fileserver.writeToFile(this.outputstream, str.toString(), function() {that.lineWritten(false)}, 'utf8');
     } else {
         this.lineWritten(false);
     }

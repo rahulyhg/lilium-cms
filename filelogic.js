@@ -238,6 +238,7 @@ var FileLogic = function () {
 
         theme.fetchCurrentTheme(cli._c, function(cTheme) {
             extra.theme = cTheme;
+            extra.minify = true;
 
             var readPath = cli._c.server.base + "flowers/" + cTheme.uName + "/" + cTheme.contexts[ctxName];
             var savePath = cli._c.server.html + "/" + preferredFileName;
@@ -262,16 +263,16 @@ var FileLogic = function () {
                                     require('./cdn.js').parse(fHtml, cli, function(cdned) { 
                                         var handle = FileServer.getOutputFileHandle(savePath, 'w');
                                         FileServer.writeToFile(handle, cdned, function() {
-                                            callback();
+                                            callback(cdned);
                                         });
                                     });
-                                });
+                                }, false, 'utf8');
 
                                 FileServer.deleteFile(tmpPath, function() {});
                             }, 
                             extra
                         );
-                    });
+                    }, false, 'utf8');
                 }, 
                 extra
             );

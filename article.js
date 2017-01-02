@@ -117,10 +117,12 @@ var Article = function() {
                 var art = arr[0];
                 db.findToArray(conf.default(), 'entities', {_id : art.author}, function(err, autarr) {
                     cli.sendJSON({
-                        status : art.status,
+                        status : art.status || "Unknown",
                         url : art.name ? cli._c.server.url + "/" + art.name : "This article doesn't have a URL.",
-                        updated : art.updated,
-                        author : autarr[0].displayname
+                        siteurl : cli._c.server.url,
+                        aliases : art.aliases || [], 
+                        updated : art.updated || "This article was never updated",
+                        author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author"
                     });
                 });
             } else {
@@ -186,34 +188,37 @@ var Article = function() {
                             arr[0].related = relarr.slice(1);
                         }
 
-                        col.find({
-                            date : { $lt : arr[0].date },
-                            author : arr[0].author
-                        }).sort({date : -1}).limit(3).toArray(function(err, mfarr) {    
-                            db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
-                                arr[0].authors = autarr;
-                                arr[0].morefrom = mfarr;
-
-                                var evts = hooks.getHooksFor('article_deepfetch');
-                                var keys = Object.keys(evts);
-                                var kIndex = -1;
-
-                                var next = function() {
-                                    kIndex++;
-
-                                    if (kIndex == keys.length) {
-                                        hooks.fire('article_will_render', {
-                                            _c : conf,
-                                            article: arr[0]
-                                        });
-                                    
-                                        cb(arr[0]);
-                                    } else {
-                                        evts[keys[kIndex]].cb(conf, arr[0], next);
-                                    }
-                                };
-
-                                next();
+                        db.findToArray(conf, 'categories', {name : {$in : arr[0].categories}}, function(err, catarr) {
+                            arr[0].categories = catarr;
+                            col.find({
+                                date : { $lt : arr[0].date },
+                                author : arr[0].author
+                            }).sort({date : -1}).limit(3).toArray(function(err, mfarr) {    
+                                db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                    arr[0].authors = autarr;
+                                    arr[0].morefrom = mfarr;
+    
+                                    var evts = hooks.getHooksFor('article_deepfetch');
+                                    var keys = Object.keys(evts);
+                                    var kIndex = -1;
+    
+                                    var next = function() {
+                                        kIndex++;
+    
+                                        if (kIndex == keys.length) {
+                                            hooks.fire('article_will_render', {
+                                                _c : conf,
+                                                article: arr[0]
+                                            });
+                                        
+                                            cb(arr[0]);
+                                        } else {
+                                            evts[keys[kIndex]].cb(conf, arr[0], next);
+                                        }
+                                    };
+    
+                                    next();
+                                });
                             });
                         });
                     });
@@ -367,6 +372,7 @@ var Article = function() {
                                         {$push : {aliases : oldSlug}}, 
                                     function() {
                                         log('Article', 'Added alias for slug ' + oldSlug);
+                                        fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", function() {});
                                     }, false, true, true);
                                 }
 

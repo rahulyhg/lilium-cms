@@ -16,6 +16,7 @@ var templateBuilder = require('./templateBuilder.js');
 var category = require('./category.js');
 var badges = require('./badges.js');
 var events = require('./events.js');
+var various = require('./various.js');
 
 var _cachedSites = new Array();
 
@@ -194,6 +195,10 @@ var SiteInitializer = function (conf, siteobj) {
         }
     };
 
+    var loadVarious = function(done) {
+        various.init(conf, done);
+    };
+
     var initEvents = function(cb) {
         events.init(conf, cb);
     };
@@ -210,14 +215,16 @@ var SiteInitializer = function (conf, siteobj) {
                     initEvents(function() {
                         templateBuilder.init(conf);
     
-                        loadTheme(function() {
-                            category.preload(conf, function() {
-                                loadSessions(function() {
-                                    badges.addSite(conf, function() {
-                                        checkForWP(conf);
-                                        hooks.fire('site_initialized', conf);
-                                        log('Sites', 'Initialized site with id ' + conf.id, 'success');
-                                        done();
+                        loadVarious(function() {
+                            loadTheme(function() {
+                                category.preload(conf, function() {
+                                    loadSessions(function() {
+                                        badges.addSite(conf, function() {
+                                            checkForWP(conf);
+                                            hooks.fire('site_initialized', conf);
+                                            log('Sites', 'Initialized site with id ' + conf.id, 'success');
+                                            done();
+                                        });
                                     });
                                 });
                             });

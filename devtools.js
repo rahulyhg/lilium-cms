@@ -67,6 +67,12 @@ var handlePOST = function(cli) {
     }
 };
 
+var restartPM2 = function(cli) {
+    if (cli.hasRightOrRefuse('lilium')) {
+        require('child_process').exec('pm2 restart lilium');
+    }
+};
+
 var clearCache = function(cli, ctx) {
     var child_process = require('child_process');
 
@@ -126,6 +132,54 @@ var maybeInsertFeed = function(cli) {
     });
 };
 
+var unwrapImages = function(cli) {
+    log('Devtools', 'Unwrapping all images from <p> tags');
+    var db = require('./includes/db.js');
+    db.find(cli._c, 'content', {}, [], function(err, cur) {
+        var done = function() {
+            log('Devtools', 'Done unwrapping articles');
+        };
+
+        var next = function() {
+            cur.hasNext(function(err, hasnext) {
+                if (hasnext) {
+                    cur.next(function(err, article) {
+                        require('jsdom').env(article.content, function(err, window) {
+                            ps = window.document.querySelectorAll('p');
+                            var changed = 0;
+
+                            for (var i = 0; i < ps.length; i++) {
+                                var p = ps[i];
+                                if (p.querySelector('img')) {
+                                    var img = p.querySelector('img');
+                                    img.classList.add("lml-content-image");
+                                    p.outerHTML = '<div class="lml-image-wrapper lml-content-image-wrapper">' + 
+                                        img.outerHTML + 
+                                        "</div>";
+
+                                    changed++;
+                                }
+                            };
+
+                            log('Devtools', 'Unwrapped ' + changed + ' images for article ' + article.title);
+                            db.update(cli._c, 'content', 
+                                {_id : article._id}, 
+                                {content : window.document.documentElement.innerHTML}, 
+                            function() {
+                                next();
+                            });
+                        });
+                    });
+                } else {
+                    done();
+                }
+            });
+        };
+    
+        next();
+    });
+};
+
 var refreshCache = function(cli, ctx) {
     switch (ctx) {
         case 'tags':
@@ -168,6 +222,9 @@ var refreshCache = function(cli, ctx) {
             break;
         case 'precompile':
             recompileQueue(cli);
+            break;
+        case 'unwrapimgs':
+            unwrapImages(cli);
             break;
     }
     cli.response.end('');

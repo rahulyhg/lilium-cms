@@ -18,6 +18,9 @@
 				<span>URL : </span><span id="moreinfo-url"></span>
 			</div>
 			<div class="article-info-strip">
+				<span>Alias : </span><span id="moreinfo-alias"></span>
+			</div>
+			<div class="article-info-strip">
 				<span>Last Updated : </span><span id="moreinfo-updated"></span>
 			</div>
 			<div class="article-info-strip">

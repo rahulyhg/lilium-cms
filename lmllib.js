@@ -25,7 +25,8 @@ var registeredLibraries = {
         return JSON;
     },
     vocab: function (context) {
-        return require('./vocab.js');
+        var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
+        return require('./vocab.js').getDico(conf.website.language);
     },
     forms: function (context) {
         return require('./formBuilder.js');
@@ -58,6 +59,8 @@ var registeredLibraries = {
     debug: function (context) {
         return {
             printcontext: function () {
+                log('LML', 'Debug : ');
+                console.log(JSON.stringify(context));
                 return JSON.stringify(context);
             },
             format: "json"

@@ -51,6 +51,8 @@ var conversations = undefined;
 var localcast = undefined;
 var feed = undefined;
 var cdn = undefined;
+var vocab = undefined;
+var various = undefined;
 
 var log = require('./log.js');
 
@@ -108,6 +110,8 @@ var Core = function () {
         localcast = require('./localcast.js');
         feed = require('./feed.js');
         cdn = require('./cdn.js');
+        vocab = require('./vocab.js');
+        various = require('./various.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
@@ -792,6 +796,10 @@ var Core = function () {
         });
     };
 
+    var loadVocab = function(done) {
+        vocab.preloadDicos(done);
+    };
+
     var loadBackendSearch = function() {
         backendSearch.registerSearchFormat({
             collection : "content",
@@ -838,26 +846,28 @@ var Core = function () {
             loadLMLLibs();
             loadBackendSearch();
 
-            loadPlugins(function () {
-                loadRoles(function () {
-                    loadTools(function() {
-                        precompile(function () {
-                            redirectIfInit(resp, function () {
-                                loadAdminMenus();
-                                loadFrontend();
-                                loadForms();
-                                bindLocalCast();
-    
-                                loadCacheInvalidator();
-                                scheduleGC();
-    
-                                log('Lilium', 'Starting inbound server', 'info');
-                                Inbound.createServer();
-                                loadNotifications();
-                                Inbound.start();
-    
-                                log('Core', 'Firing initialized signal', 'info');
-                                hooks.fire('init');
+            loadVocab(function() {
+                loadPlugins(function () {
+                    loadRoles(function () {
+                        loadTools(function() {
+                            precompile(function () {
+                                redirectIfInit(resp, function () {
+                                    loadAdminMenus();
+                                    loadFrontend();
+                                    loadForms();
+                                    bindLocalCast();
+        
+                                    loadCacheInvalidator();
+                                    scheduleGC();
+        
+                                    log('Lilium', 'Starting inbound server', 'info');
+                                    Inbound.createServer();
+                                    loadNotifications();
+                                    Inbound.start();
+        
+                                    log('Core', 'Firing initialized signal', 'info');
+                                    hooks.fire('init');
+                                });
                             });
                         });
                     });
