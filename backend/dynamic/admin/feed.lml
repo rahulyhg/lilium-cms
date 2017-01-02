@@ -57,7 +57,7 @@ window.generateFeedCard_welcomed = function(card, ctx) {
     wrap.appendChild(picture);
     wrap.appendChild(welcometext);
 
-    picture.setAttribute('src', card.extra.avatarURL);
+    picture.setAttribute('src', liliumcms.cdn.ize(card.extra.avatarURL));
     welcometext.textContent = (card.actor == liliumcms.session.current._id ? "You" : card.extra.displayname) + 
         " joined the " + 
         ctx.livevars.sites.all.simple.assoc[card.site].displayName +
@@ -146,12 +146,12 @@ window.generateFeedCard_published = function(card, ctx) {
     wrap.appendChild(articleimg);
     wrap.appendChild(articletitle);
 
-    avatar.setAttribute('src', card.extra.authoravatar);
+    avatar.setAttribute('src', liliumcms.cdn.ize(card.extra.authoravatar));
     announce.textContent = card.extra.authorname.split(' ')[0] + 
         " published on " + ctx.livevars.sites.all.simple.assoc[card.site].displayName;
 
     articletitle.textContent = card.extra.title;
-    articleimg.style.backgroundImage = "url('"+card.extra.image+"')";
+    articleimg.style.backgroundImage = "url('"+liliumcms.cdn.ize(card.extra.image)+"')";
     
     wrap.setAttribute('href', ctx.livevars.sites.all.simple.assoc[card.site].url + '/' + card.extra.slug);
     wrap.setAttribute('target', '_blank');

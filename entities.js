@@ -992,6 +992,12 @@ var Entities = module.exports = new function () {
                 }, {
                     $limit : params.max || 20
                 }], function (data) {
+                    if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
+                        for (var i = 0; i < data.length; i++) if (data[i].avatarURL) {
+                            data[i].avatarURL = data[i].avatarURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
+                        }
+                    }
+
                     db.count(_c.default(), 'entities', mtch, function(err, total) {
                         callback({
                             size : total,

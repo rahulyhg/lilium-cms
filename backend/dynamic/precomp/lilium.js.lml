@@ -23,13 +23,13 @@ window.location.urlBaseStrip = "{=config.default.server.url}";
 var __indx = window.location.urlBase.indexOf('/', 2);
 window.location.lmldomain = window.location.urlBase.substring(2, __indx); 
 window.location.lmlpath = window.location.urlBase.substring(__indx);
+window.location.cdn = "{=?config.default.content.cdn.domain}";
 
 var debugMode = 'true';
 var socket = typeof io !== 'undefined' ? io("{=config.default.server.url}/{=config.default.uid}", {
     transports : ['websocket']
 }) : undefined;
 window.lmlsocket = socket;
-
 
 var LiliumCMS = function() {
     var livevarsResponse;
@@ -41,6 +41,7 @@ var LiliumCMS = function() {
     var $url = this.$url = new Array();
     var queryParams = new Object();
 
+    this.cdn;
     this.queryparams;
     this.formvalidator;
     this.formParser;
@@ -682,6 +683,12 @@ var LiliumCMS = function() {
         }
     };
 
+    var LMLCDN = function() {
+        this.cdnize = this.ize = this.parse = function(str) {
+            return str.replace("{=config.default.server.url}", window.location.cdn);
+        }
+    };
+
     var Hooks = function() {
 
     };
@@ -961,6 +968,7 @@ var LiliumCMS = function() {
     var AwesomeStrapper = function() {
         this.strap = function() {
             var lmlhtml5 = new LMLHTML5();
+            that.cdn = new LMLCDN();
             that.queryparams = new QueryParams();
             that.formvalidator = new FormValidator();
             that.formParser = new FormParser();
