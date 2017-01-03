@@ -1,4 +1,5 @@
 {#config;vocab;dashboard}
+<lml:dom v="0.6" features="fullwidth" />
 
 {$ dashpetals = dashboard.getPetals(); $}
 {$ for (petalname in dashpetals); $}

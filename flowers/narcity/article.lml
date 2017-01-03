@@ -11,8 +11,8 @@ $}
             {=extra.article.categories.0.displayname}
         </a>
     </div>
-    <h1>{=extra.article.title}</h1>
-    <h2>{=extra.article.subtitle}</h2>   
+    <h1>{=&extra.article.title}</h1>
+    <h2>{=&extra.article.subtitle}</h2>   
 
     {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper" style="background-image : url('{=featimg}')">

@@ -268,6 +268,12 @@ var LML = function () {
                 endVal = endVal.substring(1);
             }
 
+            var encodeHTML = endVal[0] === "&";
+
+            if (encodeHTML) {
+                endVal = endVal.substring(1);
+            }
+
             var isNumber = !isNaN(endVal);
             var isArray = '[' === endVal[0] && ']' === endVal.slice(-1);
             var isStringMatch = endVal.match(/^"(.*)"$|^'(.*)'$/g);
@@ -353,6 +359,10 @@ var LML = function () {
                 }
             } else {
                 endVal = parseInt(str);
+            }
+
+            if (encodeHTML && endVal && endVal.length !== 0) {
+                endVal = endVal.replace(/\>/g, "&gt;").replace(/\</g, "&lt;");
             }
 
             return endVal;

@@ -12,6 +12,14 @@ var AllowedMethods = function() {
 
 var EndPoints = function () {
     this.register = function (site, endpoint, method, callback) {
+        if (typeof endpoint == "object" && endpoint.length) {
+            for (var i = 0; i < endpoint.length; i++) {
+                this.register(site, endpoint[i], method, callback);
+            }
+
+            return;
+        }        
+
         if (site && site != '*') {
             if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
                 return new Error("[EndPointException - Already registered : " + method + "/" + endpoint + "]");

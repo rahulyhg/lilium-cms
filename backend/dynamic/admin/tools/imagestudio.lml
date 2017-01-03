@@ -1,0 +1,6 @@
+{#config}
+<lml:dom v="0.6" features="fullwidth" />
+
+<div id="lml-imagestudio">
+    
+</div>

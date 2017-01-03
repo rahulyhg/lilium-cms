@@ -9,6 +9,10 @@
 /****************************************/
 {#config}
 /*
+    -- LMLDom Header tag --
+
+    lml:dom         => features="list of features split using white spaces"
+
     -- LMLDom Tags --------
 
     - Loops & Wrappers --
@@ -430,11 +434,35 @@ var LMLDom = function() {
         }
     };
 
+    this.removeFeatures = function() {
+        document.body.classList.remove('fullwidth');
+    };
+
+    this.applyFeature = function(featurename) {
+        switch (featurename) {
+            case 'fullwidth':
+                document.body.classList.add('fullwidth');
+                break;
+        }
+    };  
+
+    this.addFeatures = function() {
+        var features = document.querySelector('lml\\:dom').getAttribute('features');
+
+        if (features) {
+            features = features.split(' ');
+            for (var i = 0; i < features.length; i++) {
+                this.applyFeature(features[i]);
+            }
+        }
+    };
+
     this.parse = function() {
         var domv = document.querySelector('lml\\:dom');
         if (domv) {
             domv = domv.getAttribute('v');
         } else {
+            this.removeFeatures();
             return;
         }
 
@@ -450,6 +478,8 @@ var LMLDom = function() {
         console.log("Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
 
         this.fillForms();
+        this.removeFeatures();
+        this.addFeatures();
 
         liliumcms.pageloader.parseDocument();
         document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {

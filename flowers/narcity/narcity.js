@@ -312,6 +312,10 @@ var serveArchive = function(cli, archType) {
 var needsHomeRefresh = true;
 var cachedTags = {};
 var loadHooks = function(_c, info) {
+    endpoints.register(_c.id, ["2012", "2013", "2014", "2015", "2016", "2017"], 'GET', function(cli) {
+        cli.redirect(_c.server.url + "/" + cli.routeinfo.path.pop());
+    });
+
     endpoints.register(_c.id, '', 'GET', function(cli) {
         if (needsHomeRefresh) {
             fetchHomepageArticles(_c, function(articles) {

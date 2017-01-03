@@ -1,3 +1,11 @@
+/*
+    Useful Mongo Query
+    use maindb;
+    var ndb = db;
+    use childdb;
+    db.content.find({date : { $gt : ISODate("2016-12-16T16:46:04Z")}}).forEach(function(art) { var wpid = art.data.wp_author; var user = ndb.entities.find({wpid : wpid})[0]; art.author = user._id; db.content.save(art);  });
+*/
+
 var fetchPosts = "SELECT ID, post_author, post_date, post_content, post_title, post_status, post_name, post_type FROM wp_posts WHERE post_type = 'post' OR post_type = 'qquiz' OR post_type = 'page' OR post_type = 'photos' OR post_type = 'tv' ORDER BY ID ASC";
 var fetchAttachmentIDs = "select ID, post_date, guid from wp_posts where post_type = 'attachment'";
 var fetchAttachmentMetas = "select post_id, meta_key, meta_value from wp_postmeta m INNER JOIN wp_posts p ON p.ID = m.post_id where post_type = 'attachment' AND m.meta_value NOT LIKE '\\_%'"

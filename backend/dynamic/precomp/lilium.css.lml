@@ -668,6 +668,10 @@ select {
 	padding-top: {=topbarheight};
 }
 
+.fullwidth .lmladmincontentwrapper {
+    padding-left: 20px;
+}
+
 .lmladminsidebardecowrapper {
     overflow: hidden;
     position: absolute;
@@ -793,6 +797,22 @@ h2.subtitlestrip, h2.subtitle {
         -ms-transition: all 0.3s;
          -o-transition: all 0.3s;
             transition: all 0.3s;
+}
+
+.fullwidth .lmladminsidebar {
+    -webkit-transform: translate3d(-180px, 0, 0);
+    -moz-transform: translate3d(-180px, 0, 0);
+    -ms-transform: translate3d(-180px, 0, 0);
+    -o-transform: translate3d(-180px, 0, 0);
+    transform: translate3d(-180px, 0, 0);
+}
+
+.fullwidth .lmladminsidebar:hover {
+    -webkit-transform: translate3d(0px, 0, 0);
+    -moz-transform: translate3d(0px, 0, 0);
+    -ms-transform: translate3d(0px, 0, 0);
+    -o-transform: translate3d(0px, 0, 0);
+    transform: translate3d(0px, 0, 0);
 }
 
 .lmladminsidebar.left {
