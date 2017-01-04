@@ -963,7 +963,7 @@ article.archive-article h3 a {
 }
 
 .category-top-link {
-    margin: 20px 0px 10px;
+    margin: 10px 0px 10px;
     display: inline-block;
     font-family: "Oswald", sans-serif;
     text-decoration: none;

@@ -273,7 +273,12 @@ var parseContentAds = function(cli) {
                 
                     var changed = false;
                     jsdom.env(content, function(err, dom) {
-                        var parags = dom.document.querySelectorAll("body > p");
+                        if (err) {
+                            log("Devtools", "Error parsing dom : " + err, "err");
+                            return next();
+                        }
+
+                        var parags = dom.document.querySelectorAll("body > p, body > h3");
                         for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
                             var adtag = dom.document.createElement('ad');
                             dom.document.body.insertBefore(adtag, parags[i]);

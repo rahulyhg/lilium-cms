@@ -1,11 +1,1 @@
 {#config;theme;extra;debug}
-<!-- Big Banner ad -->
-{$ if (extra.contextname == "home"); $}
-    <div id="topHomePageBanner" class="fwblock banner-wrapper">
-        {=theme.snip("bannerad",["desktop"],"/1020360/header-narcity",[[728|90]|[970|250]],"ad-header-narcity")}
-    </div>
-{$ endif; if (extra.contextname == "article"); $}
-    <div id="topArticleBanner" class="fwblock banner-wrapper">
-        {=theme.snip("bannerad",["desktop"],"/1020360/header-narcity",[[728|90]|[970|250]],"ad-header-narcity")}
-    </div>
-{$ endif; $}
