@@ -1,4 +1,5 @@
 {#theme;config}
+{=theme.settings.beforeheader}
 <header class="narcity-header-bar">
     <div class="narcity-header-container">
         <div class="header-menu-bar-wrapper">
@@ -47,3 +48,4 @@
         </div>
     </div>
 </header>
+{=theme.settings.afterheader}

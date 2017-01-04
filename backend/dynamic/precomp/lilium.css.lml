@@ -362,8 +362,10 @@ select {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
 
-    
+.theme-setting-field-textarea textarea {
+    height: 200px;
 }
 
 .select-wrapper:before {
