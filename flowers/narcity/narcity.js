@@ -358,6 +358,10 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
 };
 
 var parseAds = function(pkg) {
+    if (!pkg._c.contentadsnip) {
+        return;
+    }
+
     var art = pkg.article;
     var keys = Object.keys(pkg._c.contentadsnip);
     var indx = 0;

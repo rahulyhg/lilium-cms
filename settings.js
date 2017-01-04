@@ -76,7 +76,8 @@ var Settings = function () {
             cssClass: 'admin-settings-form',
             requirements : {
                 required : false
-            }
+            },
+            async : true
         })
 
         .trg('top')
