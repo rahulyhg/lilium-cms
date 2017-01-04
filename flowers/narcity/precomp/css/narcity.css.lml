@@ -91,7 +91,7 @@ html .invisible {
     display: block;
 }
 
-article #article-content > .awrapper {
+.awrapper {
     background-color: #EEE;
     padding: 10px 0px 0px;
     text-align: center;
