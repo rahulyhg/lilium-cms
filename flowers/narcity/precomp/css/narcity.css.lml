@@ -91,6 +91,14 @@ html .invisible {
     display: block;
 }
 
+.awrapper {
+    background-color: #EEE;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+}
+
 .city-selector-wrapper {
     display: inline-block;
     vertical-align: middle;
