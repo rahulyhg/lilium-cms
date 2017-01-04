@@ -362,7 +362,7 @@ var LML = function () {
             }
 
             if (encodeHTML && endVal && endVal.length !== 0) {
-                endVal = endVal.replace(/\>/g, "&gt;").replace(/\</g, "&lt;");
+                endVal = endVal.replace(/\>/g, "&gt;").replace(/\</g, "&lt;").replace(/\"/g, "&quot;");
             }
 
             return endVal;

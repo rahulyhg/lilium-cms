@@ -15,12 +15,20 @@ $}
     <h2>{=&extra.article.subtitle}</h2>   
 
     {$ if (extra.article.featuredimage.length != 0); $}
-    <div class="featured-image-wrapper" style="background-image : url('{=featimg}')">
-        {$ if (?extra.article.featuredimageartist != ""); $}
-        <div class="featured-image-credit">
-            <a href="{=extra.article.featuredimagelink}">@{=extra.article.featuredimageartist}</a>
+    <div class="featured-image-wrapper">
+        <img src='{=featimg}' class="featured-image" alt="{=&extra.article.title} featured image by {=?extra.article.featuredimageartist}" />
+        <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
+            <span class="article-share-icon">
+                <img src="{=config.default.server.url}/res/images/flame.png" />
+            </span>
+            <span class="article-share-count-mobile-num fbshare" data-url="this" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
         </div>
-        {$ endif; $}
+    </div>
+    {$ endif; $}
+
+    {$ if (?extra.article.featuredimageartist != ""); $}
+    <div class="featured-image-credit">
+        <a href="{=extra.article.featuredimagelink}">@{=extra.article.featuredimageartist}</a>
     </div>
     {$ endif; $}
     
@@ -73,7 +81,7 @@ $}
     {=theme.settings.afterarticle}
 
     {$ if (?author.displayname != ""); $} 
-    <div class="article-signature">
+    <!--div class="article-signature">
         <div class="article-signature-face-wrapper">
             <img src="{=author.avatarURL}" class="article-signature-face" />
         </div>
@@ -87,10 +95,10 @@ $}
                 {=?author.description}
             </span>
         </div>
-    </div>  
+    </div-->  
     {$ endif; $}
 
-    <div class="article-tags-wrapper">
+    <div class="article-tags-wrapper no-mobile">
         {$ for (tag in ?extra.article.tags); $}
             {$ slugtag = slug.ify(=tag); $}
             <a href="{=url}/tags/{=slugtag}">
@@ -99,7 +107,7 @@ $}
         {$ endfor; $}
     </div>
 
-    <div class="article-comments">
+    <div class="article-comments no-mobile">
         <h4 class="article-section-title">Join the discussion</h4>
         <div class="fb-comments" 
             data-href="{=rooturl}/{=extra.article.name}" data-numposts="3" 
@@ -107,7 +115,7 @@ $}
         </div>
     </div>
 
-    <div class="article-digest-sub">
+    <div class="article-digest-sub no-mobile">
         <form 
             action="//mtlblog.us6.list-manage.com/subscribe/post?u=ae98e848ab712838adcc7f456&amp;id={=theme.settings.mailchimpdigest}" 
             method="post" 
@@ -129,34 +137,6 @@ $}
             <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="events-placeholder__submit-button">
         </form>
     </div>
-
-    {$ if (extra.article.related.length > 2); $}
-    <div class="article-related-section">
-        <h4 class="article-section-title">Keep on reading</h4>
-        {$
-            relindex = 0;
-        $}
-        {$ for (ra in extra.article.related); $}
-            {$
-                mod = relindex; mod %= 3;
-                classes = "article-thumbnail";
-    
-                if (mod == 0); classes += " article-thumbnail-featured"; endif;
-            $}  
-            <a href="{=url}/{=ra.name}"> 
-            <div class="{=classes}">
-                <div class="article-thumbnail-featured-image">
-                    <img src="{=ra.featuredimage.0.sizes.thumbnaillarge.url}" />
-                </div>
-                <div class="article-thumbnail-title">
-                    {=ra.title}
-                </div>
-            </div>
-            </a>
-            {$ relindex += 1; $}
-        {$ endfor; $}
-    </div>
-    {$ endif; $}
 </article>
 
 {$ if (?config.default.social.facebook.token != ""); $}
