@@ -1091,6 +1091,7 @@ var Article = function() {
                 displayname : "Persona targeting"
             })
             .trigger('persona')
+/*
             .add('title-industry', 'title', {
                 displayname : "Industry"
             })
@@ -1115,6 +1116,7 @@ var Article = function() {
                     {name : "sponsorship", displayName : "Sponsorship"}
                 ]
             })
+*/
             .add('title-geolocation', 'title', {
                 displayname : "Geolocalisation"
             })
