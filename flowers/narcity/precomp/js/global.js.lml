@@ -82,6 +82,38 @@ var makeLinkTargetBlank = function() {
     });
 };
 
+var closeMenu = function() {
+    var overlay = document.getElementById('mcanvasoverlay');
+    document.body.classList.remove('menuopen');
+
+    setTimeout(function() {
+        overlay.style.display = "none";
+    }, 200);
+};
+
+var openMenu = function() {
+    var overlay = document.getElementById('mcanvasoverlay');
+    overlay.style.display = "block";
+
+    setTimeout(function() {
+        document.body.classList.add("menuopen");
+    }, 10);
+};
+
+var toggleMenu = function() {
+    if (document.body.classList.contains('menuopen')) {
+        closeMenu();
+    } else {
+        openMenu();
+    }
+};
+
+var closeMenuFromClick = function(e) {
+    if (e.target.id === "mcanvasoverlay") {
+        closeMenu();
+    }
+};
+
 var documentReady = function() {
     Array.prototype.forEach.call(document.querySelectorAll('.edt-datetime'), function(edtdatetime) {
         var datestr = edtdatetime.dataset.edtdatetime;
@@ -89,6 +121,9 @@ var documentReady = function() {
 
         edtdatetime.innerHTML = dateobj.toNarcityString();
     });
+
+    document.querySelector('.header-menu-bar-wrapper').addEventListener('click', toggleMenu);
+    document.querySelector('#mcanvasoverlay').addEventListener('click', closeMenuFromClick);
     
     narcityFacebook.affectAllCounters();
     makeLinkTargetBlank();

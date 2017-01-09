@@ -14,10 +14,15 @@
     {=theme.settings.bodyprio}
     {%petals/lib}
     {%petals/socialhead}
-    {%petals/header}
-    {%petals/beforecontent}
-    {=extra.contentHTML}
-    {%petals/footer}
+    {%petals/mobileslider}
+
+    <div id="mcanvas">
+        {%petals/header}
+        {%petals/beforecontent}
+        {=extra.contentHTML}
+        {%petals/footer}
+    </div>
+
     {=theme.settings.bodyend}
 </body>
 </html>

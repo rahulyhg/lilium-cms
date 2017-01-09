@@ -95,6 +95,8 @@
     "stripe": "^4.3.0",
     "twitter": "^1.4.0",
     "uglify": "^0.1.5",
+    "uglify-js": "^2.7.5",
+    "uglifycss": "0.0.25",
     "uglifyjs": "^2.4.10",
     "utf8": "^2.1.2",
     "util": "^0.10.3",

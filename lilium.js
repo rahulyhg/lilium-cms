@@ -58,7 +58,7 @@ var Lilium = function () {
         });
     };
 
-    this.cms = function () {
+    this.cms  = function () {
         init();
         return this;
     };

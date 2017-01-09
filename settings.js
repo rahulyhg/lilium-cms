@@ -410,7 +410,7 @@ var Settings = function () {
             })
 
         .add('social-sep', 'title', {
-                displayname: "Social networking"
+                displayname: "Social networking API"
             })
             .add('social.facebook.appid', 'text', {
                 displayname: "Facebook Application ID"
@@ -420,6 +420,21 @@ var Settings = function () {
             })
             .add('social.facebook.apiversion', 'text', {
                 displayname: "Facebook Graph API Version"
+            })
+        .add('social-2-sep', 'title', {
+                displayname : "Social accounts"
+            })
+            .add('social.accounts.facebook', 'text', {
+                displayname : "Facebook Username"
+            })
+            .add('social.accounts.twitter', 'text', {
+                displayname : "Twitter Username"
+            })
+            .add('social.accounts.googleplus', 'text', {
+                displayname : "Google Plus Username"
+            })
+            .add('social.accounts.instagram', 'text', {
+                displayname : "Instagram Username"
             })
 
         .add('stripe-sep', "title", {

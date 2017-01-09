@@ -43,9 +43,10 @@ var Precomp = function () {
     };
 
     var minifyFile = function (conf, inFile, outFile, filetype, callback) {
-        log('Precompiler', 'Minifying ' + filetype + ' file', 'info');
         // Only minify in prod
         if (conf.env == 'prod') {
+            log('Precompiler', 'Minifying ' + filetype + ' file', 'info');
+
             if (filetype == 'css') {
                 new compressor.minify({
                     type: 'yui-css',
@@ -73,11 +74,15 @@ var Precomp = function () {
                     }
                 });
             } else {
-                fileserver.copyFile(inFile, outFile, callback);
+                fileserver.moveFile(inFile, outFile, function() {
+                    callback(true);
+                });
             }
         } else {
-            log('Precompiler', "Copying " + inFile + " => " + outFile, 'info');
-            fileserver.copyFile(inFile, outFile, callback);
+            log('Precompiler', "Moving " + inFile + " => " + outFile, 'info');
+            fileserver.moveFile(inFile, outFile, function() {
+                callback(true);
+            });
         }
     };
 
@@ -136,7 +141,7 @@ var Precomp = function () {
                 return;
             }
 
-            require('./themes.js').fetchCurrentTheme(function(siteTheme) {
+            require('./themes.js').fetchCurrentTheme(conf, function(siteTheme) {
                 db.findToArray(conf, 'compiledfiles', {filename : lmlfile}, function(err, arr) {
                     log('Precomp', "Registered sum for " + lmlfile + " is " + (arr[0] ? arr[0].sum : "unknown") + " compared to actual " + sum, 'info');
                     if (arr.length == 0 || arr[0].sum !== sum) {
@@ -179,7 +184,7 @@ var Precomp = function () {
                 if (curFile.indexOf('.lml') !== -1 && curFile.indexOf('.swp') === -1) {
                     checksum.file(isTheme ? curFile : absReadPath + curFile, function (err, sum) {
                         var rPath = isTheme ? curFile : absReadPath + curFile;
-                        var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp";
+                        var tPath = tempPath + 'precom-' + (Math.random()).toString().substring(2) + ".tmp." + curFile.split('/').pop();
                         var wPath = isTheme ? 
                             absWritePath + curFile.slice(curFile.lastIndexOf('/') + 1, curFile.length).slice(0, -4) : 
                             absWritePath + curFile.slice(0, -4);
@@ -200,8 +205,11 @@ var Precomp = function () {
                                     tPath,
                                     function () {
                                         var beforeMinify = new Date();
-                                        minifyFile(conf, tPath, wPath, wPath.substring(wPath.lastIndexOf('.') + 1), function () {
-                                            log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms", 'success');
+                                        minifyFile(conf, tPath, wPath, wPath.substring(wPath.lastIndexOf('.') + 1), function (err, min) {
+                                            if (!err) {
+                                                log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms", 'success');
+                                            }
+
                                             db.insert(conf, 'compiledfiles', {
                                                 filename: curFile,
                                                 sum: sum,
@@ -211,7 +219,7 @@ var Precomp = function () {
                                             });
                                         });
                                     }, {
-                                        minify: false,
+                                        minify: isTheme,
                                         config: conf,
                                         theme : siteTheme
                                     }
