@@ -1,15 +1,36 @@
 {#theme}
 
 <footer>
-    <ul class="footerLinks">
-        <li><a href="http://www.narcitymedia.com/" title="Advertise with us">Advertise</a></li>
-        <li><a href="http://www.narcity.com/toronto/contact-us/" title="Contact Us">Contact Us</a></li>
-        <li><a href="http://www.narcitymedia.com/jobs" title="Jobs">Jobs</a></li>
-        <li><a href="http://www.narcity.com/privacy-policy/" title="Read our Privacy Policy">Privacy Policy</a> </li>
-        <li><a href="http://www.narcity.com/terms-conditions/" title="Terms &amp; Conditions">Terms &amp; Conditions</a> </li>
-    </ul>
+        <div class="footer-topsection">
+                <div class="responsive-wrapper">
+                        <div class="footer-social">
+                                <span class="footer-title">Follow {=config.default.info.project}</span>
+                                <a href="https://www.facebook.com/{=config.default.social.accounts.facebook}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                                <a href="https://twitter.com/{=config.default.social.accounts.twitter}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                                <a href="https://www.instagram.com/{=config.default.social.accounts.instagram}"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+                        </div>
+                </div>
+        </div>
 
-    <span class="copyright">&copy; {=?theme.settings.copyright}</span>
+        <div class="footer-bottomsection">
+                <div class="footer-container">
+                        <div class="footer-inline">
+                                <a href="https://www.narcitymedia.com">
+                                        <img src="https://www.narcitymedia.com/wp-content/themes/narcityboard/media/nm_logo.png" />
+                                </a>
+                        </div>
+                        <div class="footer-inline">
+                                <a href="https://www.narcitymedia.com">Advertise</a>
+                                <a href="https://www.narcitymedia.com#reach-us">Contact Us</a>
+                                <a href="https://www.narcitymedia.com/jobs">Jobs</a>
+                                <a href="http://www.narcity.com/terms-conditions/">Terms &amp; Conditions</a>
+                                <a href="http://www.narcity.com/privacy-policy/">Privacy Policy</a>
+                                <div class="copyright">
+                                        &copy; 2017 All rights reserved, <a href="https://www.narcitymedia.com">Narcity Media inc.</a>
+                                </div>
+                        </div>
+                </div>
+        </div>
 </footer>
 
 

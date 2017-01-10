@@ -184,9 +184,10 @@ html .invisible {
     display: block;
 }
 
-.awrapper {
+.awrapper,
+#article-content>div.awrapper {
     background-color: #EEE;
-    padding: 10px 0px 0px;
+    padding: 12px 0px;
     text-align: center;
     border-bottom: 1px solid #CCC;
     border-top: 1px solid #CCC;
@@ -508,7 +509,7 @@ article h1 {
     font-family: 'PT Serif', serif;
     line-height: 50px;
     color: #121212;
-    line-height: 36px;
+    line-height: 46px;
         
     width: {=aw};
 }
@@ -754,41 +755,6 @@ article .article-related-section .article-thumbnail-featured {
 
 article .article-related-section .article-thumbnail-featured .article-thumbnail-title {
     font-size: 38px;
-}
-
-footer {
-    margin-top: 30px;
-    padding-top: 30px;
-    border-top: 1px solid #DDD;
-    text-align: center;
-    background-color: #F6F6F6;
-    box-shadow: 0px 0px 15px rgba(0,0,0,0.05);
-
-    clear: both;
-    float: none;
-}
-
-.footerLinks {
-    list-style: none;
-    color: #DDD;
-    padding: 0px;
-    margin: 0;
-}
-
-.footerLinks li {
-    display: inline-block;
-    margin: 0px 8px;
-}
-
-.footerLinks li a, 
-.footerLinks li a:visited {
-    color: {=mc};
-    text-decoration: none;
-}
-
-.copyright {
-    padding: 30px 0px 50px 0px;
-    display: block;
 }
 
 .fwblock {
@@ -1304,6 +1270,93 @@ article #article-content .nm-album-wrapper img {
     font-weight: bold;
 }
 
+.article-width {
+    width: {=aw};
+    display: block;
+    margin: auto;
+}
+
+/* Footer */
+footer {
+        background: #333333;
+        padding: 0px 0px 0px;
+        color: #FFF;
+        font-family: Arial;
+        clear: both;
+        float: none;
+}
+
+footer .footer-topsection {
+        display: block;
+        background: #000;
+        padding: 30px 0px;
+}
+
+footer .footer-bottomsection {
+        display: block;
+        padding: 30px 0px;
+        background-color: #333333;
+}
+
+footer .footer-title {
+        font-family: "Oswald", sans-serif;
+        text-transform: uppercase;
+        font-size: 24px;
+        display: block;
+}
+
+footer .footer-container,
+footer .responsive-wrapper {
+        width: 1000px;
+        margin: auto;
+}
+
+footer .footer-inline {
+        display: inline-block;
+        vertical-align: top;
+        margin-right: 30px;
+}
+
+footer .footer-inline a {
+        color: #FFF;
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 18px;
+        margin-right: 25px;
+}
+
+footer img {
+        width: 75px;
+}
+
+footer .copyright {
+        display: block;
+        text-align: left;
+        margin-top: 12px;
+        color: #CCC;
+
+        font-size: 16px;
+}
+
+footer .copyright a {
+        color: #CCC;
+        text-decoration: none;
+        font-weight: normal;
+        font-size: 16px;
+}
+
+.footer-social .fa {
+        font-size: 24px;
+        margin: 20px 20px 0px 0px;
+}
+
+.footer-social a {
+        color: #FFF;
+}
+
+
 @media only screen and (min-width: {=fw}) {
     body .no-desktop {
         display: none !important;
@@ -1344,11 +1397,16 @@ article #article-content .nm-album-wrapper img {
     article .article-tags-wrapper, 
     article .article-comments,
     article .extra-content,
+    .article-width,
     .bottom-promotion-link,
     .title-sponsored-wrapper,
     #sponsored-box,
     article .article-related-section {
         width: auto;
+    }
+
+    .awrapper.before-article-bb {
+        margin-top: 20px;
     }
 
     #sponsored-logo {
@@ -1588,9 +1646,15 @@ article #article-content .nm-album-wrapper img {
         min-height: 0px;
     }
 
-    .footerLinks li {
+    footer .footer-container,
+    footer .responsive-wrapper {
+        width: auto;
         display: block;
-        margin: 10px;
+    }
+
+    footer .footer-container,
+    footer .responsive-wrapper {
+        padding-left: 50px;
     }
 
     .fwblock {
@@ -1599,6 +1663,44 @@ article #article-content .nm-album-wrapper img {
         float: none;
         clear: both;
     }
+}
+
+@media only screen and (max-width: 480px) {
+        footer .footer-container,
+        footer .responsive-wrapper {
+                padding-left: 20px;
+                padding-right: 20px;
+        }
+
+        footer .copyright {
+                margin-top: 30px;
+                text-align: center;
+        }
+
+        footer {
+                padding: 0px 0px 0px;
+        }
+
+        footer .footer-inline a {
+                display: block;
+        }
+
+        footer img {
+                margin-bottom: 25px;
+                margin-top: 15px;
+                width: 100px;
+        }
+
+        footer .footer-inline {
+                display: block;
+                margin-right: 0px;
+                text-align: center;
+        }
+
+        footer .footer-inline a {
+                margin-bottom: 18px;
+                margin-right: 0px;
+        }
 }
 
 {=theme.settings.customcss}
