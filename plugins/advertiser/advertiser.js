@@ -208,6 +208,17 @@
 	             }, camp.cli);
 	         });
 
+             hooks.bind("article_deepfetch", 1000, function(_c, article, done) {
+                 if (article.sponsoredBoxLogo) {
+                     db.findToArray(_c, 'uploads', {_id : db.mongoID(article.sponsoredBoxLogo)}, function(err, arr) {
+                         article.sponsoredBoxLogoURL = err || arr.length == 0 ? "" : _c.server.url + "/uploads/" + arr[0].url;
+                         done(true);
+                     });
+                 } else {
+                     done(false);
+                 }
+             });
+
 	         hooks.bind('campaignStatusChanged', 560, function(camp) {
 	             makeAdServerRequest('campaignStatusChanged', camp.new.projectid, function(resp, err) {
 	                 log("Advertiser", err ?

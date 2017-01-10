@@ -6,6 +6,14 @@
     rooturl = url.substring(2);
 $}
 <article>
+    {$ if (?extra.article.isSponsored == true); $}
+    <div class="title-sponsored-wrapper">
+        <a class="sponsored-mention" href="https://www.narcitymedia.com" target="_blank">
+            Sponsored Content
+        </a>
+    </div>
+    {$ endif; $}
+
     <div class="category-top-wrapper ryksponsive-c">
         <a href="{=config.default.server.url}/category/{=extra.article.categories.0.name}" class="category-top-link">
             {=extra.article.categories.0.displayname}
@@ -78,6 +86,27 @@ $}
             {%=extra.article.feature}
         {$ endif; $}
     </div>
+    {$ if (?extra.article.useSponsoredBox == true); $}
+    <div id="sponsored-box">
+        <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" /> 
+        <div id="sponsored-box-content">
+            <h5><a href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
+            <p>
+                {=?extra.article.sponsoredBoxContent}
+            </p>
+        </div>
+    </div>
+    {$ endif; $}    
+    
+    {$ if (?extra.article.isSponsored == true); $}
+    <div class="bottom-promotion-link">
+        This article is part of a sponsored content activation. 
+        <a href="https://www.narcitymedia.com" target="_blank">
+            Learn how we can promote your company &gt;
+        </a>
+    </div>
+    {$ endif; $}
+
     {=theme.settings.afterarticle}
 
     {$ if (?author.displayname != ""); $} 

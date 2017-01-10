@@ -525,6 +525,27 @@ article h2 {
     font-weight: normal;
 }
 
+.title-sponsored-wrapper {
+    width: {=aw};
+    display: block;
+    position: relative;
+    margin: auto;
+}
+
+.sponsored-mention {
+    color: #FFF;
+    background-color: #ff2634;
+    font-size: 14px;
+    padding: 3px 5px;
+    font-weight: bold;
+    letter-spacing: -0.3px;
+    border-radius: 4px;
+    text-decoration: none;
+    position: absolute;
+    right: 0px;
+    top: 16px;
+}
+
 article #article-content img {
     display: block;
 
@@ -1216,6 +1237,73 @@ article #article-content .nm-album-wrapper img {
     cursor: pointer;
 }
 
+/* Sponsored Box */
+#sponsored-box {
+    width: {=aw};
+    margin: 20px auto;
+    padding: 18px 0px;
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+}
+
+#sponsored-logo {
+    width: 180px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+#sponsored-logo[src=""] {
+    display: none;
+}
+
+#sponsored-box-content {
+    width: 340px;
+    vertical-align: top;
+    display: inline-block;
+    margin-left: 12px;
+}
+
+#sponsored-box #sponsored-logo[src=""] + #sponsored-box-content {
+    width: auto;
+    display: block;
+    margin-left: auto;
+}
+
+#sponsored-box-content h5 {
+    margin: 0;
+    padding:0;
+}
+
+#sponsored-box-content h5 a {
+    text-decoration: none; 
+    color: {=mc};
+    display: block;
+    font-family: Arial;
+    font-size: 20px;
+}
+
+#sponsored-box-content p {
+    padding: 0px;
+    margin: 12px 0px 0px;
+    font-size: 14px;
+    color: #999;
+    font-family: Arial, sans-serif;
+}
+
+.bottom-promotion-link {
+    width: {=aw};
+    margin: auto;
+    font-size: 16px;
+    color: #333;
+    border: 1px solid #DDD;
+    padding: 12px;
+}
+
+.bottom-promotion-link a {
+    color: {=mc};
+    font-weight: bold;
+}
+
 @media only screen and (min-width: {=fw}) {
     body .no-desktop {
         display: none !important;
@@ -1256,8 +1344,31 @@ article #article-content .nm-album-wrapper img {
     article .article-tags-wrapper, 
     article .article-comments,
     article .extra-content,
+    .bottom-promotion-link,
+    .title-sponsored-wrapper,
+    #sponsored-box,
     article .article-related-section {
         width: auto;
+    }
+
+    #sponsored-logo {
+        width: 80px;
+    }
+
+    #sponsored-box {
+        margin: 20px;
+    }
+
+    #sponsored-box-content {
+        width: calc(100% - 100px);
+    }
+
+    .bottom-promotion-link {
+        margin: 0 20px;
+    }
+
+    .sponsored-mention {
+        right: 15px;
     }
 
     article .featured-image-wrapper {
