@@ -346,7 +346,7 @@ var loadHooks = function(_c, info) {
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
-    hooks.bind('article_will_render', 2000, function(pkg) { parseAds(pkg);                        });
+    hooks.bind('article_will_render', 2000, function(pkg) { parseAds(pkg); parseInsta(pkg);       });
 };
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
@@ -355,6 +355,10 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
         case "tags": delete cachedTags[ctx][detail]; break;
         default: break;
     }
+};
+
+var parseInsta = function(pkg) {
+    pkg.article.content = pkg.article.content.replace(/\<script async\=\"\" defer\=\"\" src\=\"\/\/platform.instagram.com\/en_US\/embeds.js\"\>\<\/script\>/g, "") + '<script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>';
 };
 
 var parseAds = function(pkg) {

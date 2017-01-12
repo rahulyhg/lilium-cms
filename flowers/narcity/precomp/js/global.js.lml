@@ -139,12 +139,26 @@ var loadNext = function(url) {
     var a = new XMLHttpRequest();
     a.onreadystatechange = function() {
         4 == a.readyState && (function() {
-            document.getElementById("lmlasync").innerHTML += a.response;
+            var newContent = document.createElement('article');
+            newContent.innerHTML = a.response;
+            document.getElementById("lmlasync").appendChild(newContent);
             var src = document.querySelectorAll('script.execOnLoad');
+
             for (var i = 0; i < src.length; i++) {
                 eval(src[0].innerText);
                 src[0].classList.remove("execOnLoad");
             }
+
+            var src = newContent.querySelectorAll('script');
+
+            for (var i = 0; i < src.length; i++) if (!src[i].dataset.parentonly) {
+                // eval(src[i].innerText);
+            }
+
+            var IGsrc = document.createElement('script');
+            IGsrc.src = "//platform.instagram.com/en_US/embeds.js";
+            IGsrc.setAttribute("async", "async");
+            document.head.appendChild(IGsrc);
 
             handlingNext = false;
         })();
