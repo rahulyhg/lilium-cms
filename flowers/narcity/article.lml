@@ -104,18 +104,27 @@ $}
             </div>
         </div>
         {$ endif; $}    
-    </div>
 
-    {$ if (?extra.article.isSponsored == true); $}
-    <div class="bottom-promotion-link">
-        This article is part of a sponsored content activation. 
-        <a href="https://www.narcitymedia.com" target="_blank">
-            Learn how we can promote your company &gt;
-        </a>
-    </div>
-    {$ endif; $}
+        {$ if (?extra.article.isSponsored == true); $}
+        <div class="bottom-promotion-link">
+            This article is part of a sponsored content activation. 
+            <a href="https://www.narcitymedia.com" target="_blank">
+                Learn how we can promote your company &gt;
+            </a>
+        </div>
+        {$ endif; $}
 
-    {=theme.settings.afterarticle}
+        <div class="article-tags-wrapper no-mobile">
+            {$ for (tag in ?extra.article.tags); $}
+                {$ slugtag = slug.ify(=tag); $}
+                <a href="{=url}/tags/{=slugtag}">
+                    {=tag}
+                </a>
+            {$ endfor; $}
+        </div>
+
+        {=theme.settings.afterarticle}
+    </div>
 
     {$ if (?author.displayname != ""); $} 
     <!--div class="article-signature">
@@ -135,14 +144,6 @@ $}
     </div-->  
     {$ endif; $}
 
-    <div class="article-tags-wrapper no-mobile">
-        {$ for (tag in ?extra.article.tags); $}
-            {$ slugtag = slug.ify(=tag); $}
-            <a href="{=url}/tags/{=slugtag}">
-                {=tag}
-            </a>
-        {$ endfor; $}
-    </div>
 
     <!--div class="article-comments no-mobile">
         <h4 class="article-section-title">Join the discussion</h4>
