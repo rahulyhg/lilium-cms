@@ -1361,6 +1361,9 @@ footer .copyright a {
         color: #FFF;
 }
 
+#sovrn_beacon {
+    display: none;
+}
 
 @media only screen and (min-width: {=fw}) {
     body .no-desktop {

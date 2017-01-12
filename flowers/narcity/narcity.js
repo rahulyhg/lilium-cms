@@ -373,9 +373,12 @@ var parseAds = function(pkg) {
         indx++;
 
         if (indx == keys.length) {
+            break;
             indx = 0;
         }
     }
+
+    art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
 };
 
 var registerPrecompFiles = function(_c) {
