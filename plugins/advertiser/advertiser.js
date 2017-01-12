@@ -253,15 +253,14 @@
                  var html = config.server.html;
 
 	             log('Advertiser', 'Registered Scripts and CSS');
-	             Frontend.registerCSSFile(config.server.base + "plugins/advertiser/dynamic/style.css", 3159, 'admin', config.id);
 	             Frontend.registerCSSFile(base + "plugins/advertiser/dynamic/style.css", 5000, 'admin', config.id);
 	             Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', config.id);
 	             Frontend.registerCSSFile(html + "/compiled/lmlnaradserv.css", 6000, 'theme', config.id);
 	             Frontend.registerJSFile (html + "/compiled/lmlnaradserv.js",  6000, 'theme', config.id);
 
                  log('Advertiser', "Queuing frontend scripts for compilation");
-                 precomp.queueFile(config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.js.lml" );
-                 precomp.queueFile(config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.css.lml");
+                 // precomp.queueFile(config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.js.lml" );
+                 // precomp.queueFile(config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.css.lml");
             });
 	     };
 
