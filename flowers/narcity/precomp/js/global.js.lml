@@ -161,8 +161,14 @@ var handleAdScroll = function(e) {
         handlingScroll = true;
 
         var adinfo = window.adpos.shift();
-        googletag && googletag.display(adinfo.id);
-        console.log("Displaying : " + adinfo.id + " at " + adinfo.height + "px");
+
+        if (typeof index_headertag_lightspeed !== "undefined") {
+            index_headertag_lightspeed.slotDisplay(adinfo.id);
+            console.log("[INDEX] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
+        } else {
+            googletag && googletag.display(adinfo.id);
+            console.log("[GGTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
+        }
         document.getElementById(adinfo.id).id = "old_" + adinfo.id;
 
         handlingScroll = false;
@@ -174,6 +180,7 @@ var handleNextScroll = function(e) {
     if (window.relatedArticles.length == 1) return;
 
     if (window.scrollY + window.innerHeight > window.loadNextAfter && !handlingNext) {
+        window.loadNextAfter = 100000000;
         handlingNext = true;
 
         loadNext("{=config.default.server.url}/next/" + window.relatedArticles.shift());

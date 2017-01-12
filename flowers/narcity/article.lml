@@ -223,7 +223,7 @@ window.articlepos.push({
 });
 
 var end = document.querySelector('.article-end');
-window.loadNextAfter = end.getBoundingClientRect().top + window.scrollY - 480;
+window.loadNextAfter = end.getBoundingClientRect().top + window.scrollY - 880;
 end.remove();
 </script>
 
