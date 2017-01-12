@@ -20,6 +20,11 @@
         {%petals/header}
         {%petals/beforecontent}
         {=extra.contentHTML}
+
+        <div id="lmlasync">
+
+        </div>
+
         {%petals/footer}
     </div>
 

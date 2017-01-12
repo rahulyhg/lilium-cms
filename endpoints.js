@@ -1,6 +1,7 @@
 var pluginHelper = require('./pluginHelper.js');
 var hooks = require('./hooks.js');
 var config = require('./config.js'); 
+var log = require('./log.js');
 
 // Schema : {SITE_ID:{METHOD:{ENDPOINT:{ENDPOINTDATA}}}}
 var registeredEndpoints = new Object();
@@ -20,6 +21,7 @@ var EndPoints = function () {
             return;
         }        
 
+        log('Endpoint', "Registering endpoint " + method + "@" + endpoint + " for website with id " + site, 'info');
         if (site && site != '*') {
             if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
                 return new Error("[EndPointException - Already registered : " + method + "/" + endpoint + "]");

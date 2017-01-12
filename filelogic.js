@@ -225,7 +225,53 @@ var FileLogic = function () {
             } else {
                 serveCachedFile(cli, savePath);
             }
+        });
+    };
 
+    this.renderNextLML = function(cli, preferredFileName, extra, callback) {
+        var savePath = cli._c.server.html + "/next/" + preferredFileName;
+        var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".nexttmp";
+
+        FileServer.fileExists(savePath, function (isPresent) {
+            if (isPresent) {
+                FileServer.pipeFileToClient(cli, savePath, function() {}, true, "text/html; charset=utf8");
+            } else {
+                var theme = require('./themes.js');
+                extra = extra || new Object();
+                extra.config = cli._c;
+                extra.contextname = "next";
+                extra.siteid = cli._c.id;
+
+                theme.fetchCurrentTheme(cli._c, function(cTheme) {
+                    extra.theme = cTheme;
+                    extra.minify = true;
+
+                    var readPath = cli._c.server.base + "flowers/" + cTheme.uName + "/" + cTheme.contexts.next;
+
+                    log('FileLogic', 'Compiling context theme page for article without layout', 'info');
+                    LML.executeToFile(
+                        readPath,
+                        tmpPath,
+                        function () {
+                            require('./fileserver.js').readFile(tmpPath, function(ctn) {
+                                log('FileLogic', 'Passing content through CDN', 'detail');
+
+                                require('./cdn.js').parse(ctn, cli, function(cdned) { 
+                                    cli.response.writeHead(200);
+                                    cli.response.end(cdned);
+
+                                    var handle = FileServer.getOutputFileHandle(savePath, 'w');
+                                    FileServer.writeToFile(handle, cdned, function() {
+                                        callback && callback(cdned);
+                                    });
+                                }, true);
+                            }, false, 'utf8');
+                        }, 
+                        extra
+                    );
+                });
+
+            }
         });
     };
 

@@ -103,6 +103,11 @@ var Article = function() {
         }
     };
 
+    this.registerContentEndpoint = function() {
+        var that = this;
+        require('./endpoints.js').register('*', 'next', 'GET', function(cli) { that.handleNext(cli); });
+    };
+
     this.query = function(cli, opts, cb) {
         db.paramQuery(cli, opts, cb);
     };
@@ -166,6 +171,8 @@ var Article = function() {
                                     $exists : true,
                                     $ne : ""
                                 }
+                            }, {
+                                _id : {$ne : arr[0]._id}
                             }]
                         }
                     },{
@@ -185,7 +192,7 @@ var Article = function() {
                         }
                     }]).toArray(function(err, relarr) {
                         if (!err) {
-                            arr[0].related = relarr.slice(1);
+                            arr[0].related = relarr;
                         }
 
                         db.findToArray(conf, 'categories', {name : {$in : arr[0].categories}}, function(err, catarr) {
@@ -1182,7 +1189,29 @@ var Article = function() {
 
     });
 
-    this.generateFromName = function(cli, articleName, cb, onlyPublished) {
+    this.handleNext = function(cli) {
+        var articleName = cli.routeinfo.path[1];
+        this.deepFetch(cli._c, articleName, function(deepArticle) {
+             if (!deepArticle) {
+                db.findToArray(cli._c, 'content', {aliases : articleName}, function(err, arr) {
+                    if (err || !arr.length) {
+                        cli.throwHTTP(404);
+                    } else {
+                        cli.routeinfo.path[1] = arr[0].name;
+                        handleNext(cli);
+                    }
+                }, {name : 1});
+            } else {
+                var extra = new Object();
+                extra.ctx = "next";
+                extra.article = deepArticle;
+    
+                filelogic.renderNextLML(cli, articleName + '.html', extra);
+            }
+        }, false, {status : "published"});
+    };
+
+    this.generateFromName = function(cli, articleName, cb, onlyPublished, ctx) {
         // Check for articles in db
         this.deepFetch(cli._c, articleName, function(deepArticle) {
             if (!deepArticle) {
@@ -1200,10 +1229,10 @@ var Article = function() {
                     cb(false);
                 } else {
                     var extra = new Object();
-                    extra.ctx = "article";
+                    extra.ctx = ctx || "article";
                     extra.article = deepArticle;
     
-                    filelogic.renderThemeLML(cli, "article", articleName + '.html', extra , function(name) {
+                    filelogic.renderThemeLML(cli, ctx || "article", articleName + '.html', extra , function(name) {
                         cacheInvalidator.addFileToWatch(articleName, 'articleInvalidated', deepArticle._id, cli._c);
                         cb(true);
                     });

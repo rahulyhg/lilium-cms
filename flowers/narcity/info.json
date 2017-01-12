@@ -95,6 +95,7 @@
     },
     "contexts" : {
         "article" : "article.lml",
+        "next" : "article.lml",
         "page" : "page.lml",
         "home" : "homepage.lml",
         "search" : "archive.lml",

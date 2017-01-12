@@ -1,3 +1,5 @@
+{#config}
+
 var googletag = googletag || {};
 googletag.cmd = googletag.cmd || [];
 
@@ -133,5 +135,70 @@ var bindReady = function() {
     document.addEventListener("DOMContentLoaded", documentReady);
 };
 
+var loadNext = function(url) {
+    var a = new XMLHttpRequest();
+    a.onreadystatechange = function() {
+        4 == a.readyState && (function() {
+            document.getElementById("lmlasync").innerHTML += a.response;
+            var src = document.querySelectorAll('script.execOnLoad');
+            for (var i = 0; i < src.length; i++) {
+                eval(src[0].innerText);
+                src[0].classList.remove("execOnLoad");
+            }
+
+            handlingNext = false;
+        })();
+    };
+    a.open("GET", url);
+    a.send();
+};
+
+var handlingScroll = false;
+var handleAdScroll = function(e) {
+    if (window.adpos.length == 0) return;
+
+    if (window.scrollY + window.innerHeight > window.adpos[0].height - 450 && !handlingScroll) {
+        handlingScroll = true;
+
+        var adinfo = window.adpos.shift();
+        googletag && googletag.display(adinfo.id);
+        console.log("Displaying : " + adinfo.id + " at " + adinfo.height + "px");
+        document.getElementById(adinfo.id).id = "old_" + adinfo.id;
+
+        handlingScroll = false;
+    }
+};
+
+var handlingNext = false;
+var handleNextScroll = function(e) {
+    if (window.relatedArticles.length == 1) return;
+
+    if (window.scrollY + window.innerHeight > window.loadNextAfter && !handlingNext) {
+        handlingNext = true;
+
+        loadNext("{=config.default.server.url}/next/" + window.relatedArticles.shift());
+        if (!window.relatedArticles[0]) {
+            window.removeEventListener('scroll', handleNextScroll);
+        }
+    }
+};
+
+var bindAdsScroll = function() {
+    if (!window.adpos) return;
+    window.addEventListener('scroll', handleAdScroll);
+    handleAdScroll();
+};
+
+var bindNextScroll = function() {
+    if (!window.relatedArticles || !window.relatedArticles[0]) return;
+
+    window.addEventListener('scroll', handleNextScroll);
+    handleNextScroll();
+};
 
 bindReady();
+bindAdsScroll();
+bindNextScroll();
+
+/* Dirty fixes */
+jQuery = function() {return {is : function(){}}};

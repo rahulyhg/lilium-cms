@@ -3,3 +3,4 @@
     // Head globals
     window.lmlcontext = "{=extra.contextname}";
 </script>
+<script src="{=config.default.server.url}/compiled/theme/vaniryk.js"></script>

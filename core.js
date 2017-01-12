@@ -282,6 +282,7 @@ var Core = function () {
         tools.registerAdminEndpoint();
         conversations.registerAdminEndpoint();
         feed.registerAdminEndpoint();
+        Article.registerContentEndpoint();
 
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');
