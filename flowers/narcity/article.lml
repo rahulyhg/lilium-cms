@@ -40,64 +40,72 @@ $}
     </div>
     {$ endif; $}
     
-    {$ if (?author.displayname != ""); $} 
-    <div class="article-author-strip">
-        <div class="article-author-share-section invisible" id="article-share-section">
-            <div class="article-share-count-wrapper topvert">
-                <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
-                <span class="article-share-words">Shares</span>
-            </div>
-            <div class="article-share-arrow-wrapper topvert">
-                <img src="{=url}/res/images/whitearrowshare.png" class="article-social-upward-arrow" />
-            </div>
+    <div id="article-section">
+        <div id="article-side">
+            {=?theme.settings.sidetop}
+
+            {=?theme.settings.sidebottom}
         </div>
-        <div class="article-author-face-section">
-            <img src="{=author.avatarURL}" class="article-author-face midvert" />
+
+        {$ if (?author.displayname != ""); $} 
+        <div class="article-author-strip">
+            <div class="article-author-share-section invisible" id="article-share-section">
+                <div class="article-share-count-wrapper topvert">
+                    <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
+                    <span class="article-share-words">Shares</span>
+                </div>
+                <div class="article-share-arrow-wrapper topvert">
+                    <img src="{=url}/res/images/whitearrowshare.png" class="article-social-upward-arrow" />
+                </div>
+            </div>
+            <div class="article-author-face-section">
+                <img src="{=author.avatarURL}" class="article-author-face midvert" />
             
-            <a href="{=url}/author/{=author.slug}" class="article-author-link">  
-                <span class="article-author-displayname midvert">{=author.displayname}</span>
-            </a>
-            <span class="midvert">&middot;</span>
-            <span class="article-published-date midvert edt-datetime" data-edtdatetime={=extra.article.date}></span>
-            <!--span class="midvert">&middot;</span>
-            <a href="#comments" target="" style="font-weight:bold; text-decoration: none; color: #111;">
-                <img src="{=config.default.server.url}/res/images/commentbubble.png" id="commentssmallicon" title="Comments">
-                <span class="article-comment-count">0</span>
-            </a-->
+                <a href="{=url}/author/{=author.slug}" class="article-author-link">  
+                    <span class="article-author-displayname midvert">{=author.displayname}</span>
+                </a>
+                <span class="midvert">&middot;</span>
+                <span class="article-published-date midvert edt-datetime" data-edtdatetime={=extra.article.date}></span>
+                <!--span class="midvert">&middot;</span>
+                <a href="#comments" target="" style="font-weight:bold; text-decoration: none; color: #111;">
+                    <img src="{=config.default.server.url}/res/images/commentbubble.png" id="commentssmallicon" title="Comments">
+                    <span class="article-comment-count">0</span>
+                </a-->
 
-            <div class="social-share-big-count">
-                <div class="social-share-big-count-text">
-                    <span class="social-share-big-number narcity-facebook-self-shares">0</span>
-                    <span class="social-share-big-vocab">shares</span>
-                </div>
-                <div class="social-share-big-arrow-wrapper">
-                    <img src="{=config.default.server.url}/res/images/sharearrow.png">
+                <div class="social-share-big-count">
+                    <div class="social-share-big-count-text">
+                        <span class="social-share-big-number narcity-facebook-self-shares">0</span>
+                        <span class="social-share-big-vocab">shares</span>
+                    </div>
+                    <div class="social-share-big-arrow-wrapper">
+                        <img src="{=config.default.server.url}/res/images/sharearrow.png">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    {$ endif; $}
-
-    {=theme.settings.beforearticle}
-    <div class="article-content" id="article-content">
-        {=extra.article.content}
-
-        {$ if (?extra.article.feature != ""); $}
-            {%=extra.article.feature}
         {$ endif; $}
-    </div>
-    {$ if (?extra.article.useSponsoredBox == true); $}
-    <div id="sponsored-box">
-        <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" /> 
-        <div id="sponsored-box-content">
-            <h5><a href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
-            <p>
-                {=?extra.article.sponsoredBoxContent}
-            </p>
+
+        {=theme.settings.beforearticle}
+        <div class="article-content" id="article-content">
+            {=extra.article.content}
+
+            {$ if (?extra.article.feature != ""); $}
+                {%=extra.article.feature}
+            {$ endif; $}
         </div>
+        {$ if (?extra.article.useSponsoredBox == true); $}
+        <div id="sponsored-box">
+            <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" /> 
+            <div id="sponsored-box-content">
+                <h5><a href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
+                <p>
+                    {=?extra.article.sponsoredBoxContent}
+                </p>
+            </div>
+        </div>
+        {$ endif; $}    
     </div>
-    {$ endif; $}    
-    
+
     {$ if (?extra.article.isSponsored == true); $}
     <div class="bottom-promotion-link">
         This article is part of a sponsored content activation. 

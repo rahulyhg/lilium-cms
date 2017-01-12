@@ -316,9 +316,15 @@ h4.article-section-title a {
     color: {=mc};
 }
 
+#article-section {
+    width: {=fw};
+    margin: auto;
+    display : block;
+}
+
 article .article-author-strip {
     width: {=aw};
-    margin: 30px auto;
+    margin: 30px 0px;
 }
 
 article .article-author-face-section {
@@ -460,7 +466,7 @@ article .social-share-big-arrow-wrapper img {
 
 article #article-content {
     width: {=aw};
-    margin: 20px auto;
+    margin: 20px 0;
     display: block;
 }
 
@@ -511,12 +517,12 @@ article h1 {
     color: #121212;
     line-height: 46px;
         
-    width: {=aw};
+    width: {=fw};
 }
 
 article h2 {
     font-size: 18px;
-    width: {=aw};
+    width: {=fw};
     color : #121212;
 
     display: block;
@@ -527,7 +533,7 @@ article h2 {
 }
 
 .title-sponsored-wrapper {
-    width: {=aw};
+    width: {=fw};
     display: block;
     position: relative;
     margin: auto;
@@ -1172,7 +1178,7 @@ article.archive-article h3 a {
 }
 
 .ryksponsive-c {
-    width: {=aw};
+    width: {=fw};
     display: block;
     margin: auto;
 }
@@ -1273,7 +1279,6 @@ article #article-content .nm-album-wrapper img {
 .article-width {
     width: {=aw};
     display: block;
-    margin: auto;
 }
 
 /* Footer */

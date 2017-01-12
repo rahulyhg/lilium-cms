@@ -89,7 +89,9 @@
         "beforearticle" : {"type" : "textarea", "attr" : {"displayname" : "Before content"}, "default" : "<script></script>"},
         "afterarticle" : {"type" : "textarea", "attr" : {"displayname" : "After content"}, "default" : "<script></script>"},
         "bodyprio" : {"type" : "textarea", "attr" : {"displayname" : "Top of body tag"}, "default" : "<script></script>"},
-        "bodyend" : {"type" : "textarea", "attr" : {"displayname" : "End of body tag"}, "default" : "<script></script>"}
+        "bodyend" : {"type" : "textarea", "attr" : {"displayname" : "End of body tag"}, "default" : "<script></script>"},
+        "sidetop" : {"type" : "textarea", "attr" : {"displayname" : "Top of Sidebar"}, "default" : "<div></div>"},
+        "sidebottom" : {"type" : "textarea", "attr" : {"displayname" : "Bottom of sidebar"}, "default" : "<div></div>"}
     },
     "contexts" : {
         "article" : "article.lml",
