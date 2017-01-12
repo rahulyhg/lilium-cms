@@ -210,7 +210,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 $match : match
             }, {
                 $sort : {
-                    date : -1
+                    _id : -1
                 }
             }, {
                 $lookup : {
