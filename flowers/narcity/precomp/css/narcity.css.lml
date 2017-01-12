@@ -652,7 +652,7 @@ article .article-more-from-list li:last-child {
 
 article .article-tags-wrapper {
     width: auto;
-    margin: 0px;
+    margin: 40px 0px;
 }
 
 article .article-tags-wrapper a {
@@ -1004,6 +1004,10 @@ $}
 .subtitle-strip .subtitle-detail {
     font-size: 18px;
     display: block;
+}
+
+.archive-navigator {
+    height: 40px;
 }
 
 .archive-navigator ul {

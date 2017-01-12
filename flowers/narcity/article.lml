@@ -5,7 +5,7 @@
     url = config.default.server.url;
     rooturl = url.substring(2);
 $}
-<article id="{=extra.article.name}">
+<article id="{=extra.article.name}" data-mi={=extra.article._id}>
     {$ if (?extra.article.isSponsored == true); $}
     <div class="title-sponsored-wrapper">
         <a class="sponsored-mention" href="https://www.narcitymedia.com" target="_blank">
@@ -123,7 +123,9 @@ $}
             {$ endfor; $}
         </div>
 
-        {=theme.settings.afterarticle}
+        {$ if (?extra.contextname == "article"); $}
+            {=theme.settings.afterarticle}
+        {$ endif; $}
     </div>
 
     {$ if (?author.displayname != ""); $} 
@@ -232,4 +234,9 @@ window.relatedArticles = [
 {$ endfor; $}
 false
 ];
+
+var execOnLoad = document.querySelectorAll("script.execOnLoad");
+while (execOnLoad.length != 0) {
+     execOnLoad.remove(); 
+}
 </script>
