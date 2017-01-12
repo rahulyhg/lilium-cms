@@ -306,8 +306,8 @@ h4.article-section-title {
 }
 
 .taboola-wrapper  {
-    width: {=aw};
-    margin: 20px auto;
+    width: auto;
+    margin: 20px 0px;
     display: block;
 }
 
@@ -651,8 +651,8 @@ article .article-more-from-list li:last-child {
 }
 
 article .article-tags-wrapper {
-    width: {=aw};
-    margin: 30px auto;
+    width: auto;
+    margin: 0px;
 }
 
 article .article-tags-wrapper a {
