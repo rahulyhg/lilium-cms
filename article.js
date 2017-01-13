@@ -157,6 +157,7 @@ var Article = function() {
             } else {
                 db.rawCollection(conf, 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
+                        // Text query with title, content would be too heavy
                         $match : {
                             $text : { 
                                 $search : arr[0].title ? arr[0].title.replace(/[^a-zA-Z\s]/g, '') : arr[0].name
@@ -164,26 +165,31 @@ var Article = function() {
                         }
                     },{
                         $match : {
-                            $and : [{
-                                status : "published"
-                            }, {
-                                media : {
-                                    $exists : true,
-                                    $ne : ""
-                                }
-                            }, {
-                                _id : {$ne : arr[0]._id}
-                            }]
+                            // Must be published, have a cover picture, not be the same article as the deepfetched one, and be less than a year old
+                            status : "published",
+                            media : {
+                                $exists : true,
+                                $ne : ""
+                            },
+                            _id : {
+                                $ne : arr[0]._id
+                            }, 
+                            date : {
+                                $gte : new Date(new Date().setFullYear(new Date().getFullYear() - 1))
+                            }
                         }
                     },{
+                        // Sort content by what matches the highest
                         $sort : { 
                             score: { 
                                 $meta: "textScore" 
                             } 
                         }
                     },{
+                        // Have at most seven related
                         $limit : 7
                     },{
+                        // Get featured image 
                         $lookup : {
                             from:           "uploads",
                             localField:     "media",

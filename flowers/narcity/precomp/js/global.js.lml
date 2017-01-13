@@ -204,6 +204,47 @@ var handleNextScroll = function(e) {
     }
 };
 
+var handlingHeaderScroll = false;
+var lastYScrollClip = 0;
+var lastYScroll = 0;
+var headerHidden = false;
+var handleHeaderScroll = function() {
+    if (handlingHeaderScroll) return;
+    handlingHeaderScroll = true;
+
+    if (window.scrollY < 250) {
+        if (headerHidden) {
+            document.querySelector('header').classList.remove("drawnback");
+            headerHidden = false;
+        }
+
+        lastYScrollClip = window.scrollY;
+        handlingHeaderScroll = false;
+        return;
+    }
+
+    var diff = lastYScrollClip - window.scrollY;
+    if (headerHidden && diff > 60) {
+        document.querySelector('header').classList.remove("drawnback");
+        headerHidden = false;
+    } else if (!headerHidden && diff < 0) {
+        document.querySelector('header').classList.add("drawnback");
+        headerHidden = true;
+    }
+
+    if (lastYScroll - window.scrollY < 0) {
+        lastYScrollClip = window.scrollY;
+    }
+
+    lastYScroll = window.scrollY;
+    handlingHeaderScroll = false;
+};
+
+var bindHeaderScroll = function() {
+    window.addEventListener('scroll', handleHeaderScroll);
+    handleHeaderScroll();
+};
+
 var bindAdsScroll = function() {
     if (!window.adpos) return;
     window.addEventListener('scroll', handleAdScroll);
@@ -220,6 +261,7 @@ var bindNextScroll = function() {
 bindReady();
 bindAdsScroll();
 bindNextScroll();
+bindHeaderScroll();
 
 /* Dirty fixes */
 jQuery = function() {return {is : function(){}}};

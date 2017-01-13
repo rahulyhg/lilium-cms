@@ -181,15 +181,16 @@ $}
 </article>
 
 {$ if (?config.default.social.facebook.token != ""); $}
-<script>
+<script class="execOnLoad">
     var reqURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?id=http:{=config.default.server.url}/{=extra.article.name}/&access_token={=config.default.social.facebook.appid}|{=config.default.social.facebook.token}";
 
     _v(function() {
         _fb.runForCurrentPage(function(data) {
             var shares = data && data.share && data.share_count ? data.share.share_count : 0;
             var comments = shares > 0 ? data.share.comment_count : 0;
-            _v('.narcity-facebook-self-shares')[0].html(shares);
-            _v('.article-comment-count')[0].html(comments).attr('target', '');
+            var shares = _v('.narcity-facebook-self-shares');
+            shares[shares.length-1].html(shares);
+            // _v('.article-comment-count')[0].html(comments).attr('target', '');
 
             if (shares > 100) {
                 _v('.narcity-facebook-self-shares')[0].addClass('shown');
@@ -236,7 +237,7 @@ false
 ];
 
 var execOnLoad = document.querySelectorAll("script.execOnLoad");
-while (execOnLoad.length != 0) {
-     execOnLoad.remove(); 
+for (var i = execOnLoad.length - 1; i >= 0; i--) {
+     execOnLoad[i].remove(); 
 }
 </script>

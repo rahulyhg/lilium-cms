@@ -16,8 +16,9 @@
     {%petals/socialhead}
     {%petals/mobileslider}
 
+    {%petals/header}
+
     <div id="mcanvas">
-        {%petals/header}
         {%petals/beforecontent}
         {=extra.contentHTML}
 
