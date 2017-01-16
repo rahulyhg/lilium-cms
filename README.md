@@ -92,10 +92,6 @@ server {
 
 ## Known Issues ##
 
-### nginx ###
-The latest **nginx** setup tests reflected no issue with session constancy, but the setup is still experimental. 
-Sockets seem to be working fine unless the session gets flushed. 
-
 ### pm2 ###
 Lilium should be able to run under **pm2**, but has been showing some weird behaviours when forked into multiple threads, probably due to variables not being shared between instances.
 
