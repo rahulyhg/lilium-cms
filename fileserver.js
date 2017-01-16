@@ -60,21 +60,26 @@ var FileServer = function () {
             }
 
             log("Minifier", "Minifying file with ext : " + ext);
-            switch (ext) {
-                case "css":
-                    minifiedString = uglifycss.processString(content);
-                    break;
-                case "js":
-                    minifiedString = UglifyJS.minify(content, {fromString: true}).code;
-                    break;
-                default: 
-                    minifiedString = minify(content, {
-                        removeComments: true,
-                        removeScriptTypeAttributes: true,
-                        collapseWhitespace: true,
-                        minifyJS: true,
-                        minifyCSS: true
-                    });
+            try {
+                switch (ext) {
+                    case "css":
+                        minifiedString = uglifycss.processString(content);
+                        break;
+                    case "js":
+                        minifiedString = UglifyJS.minify(content, {fromString: true}).code;
+                        break;
+                    default: 
+                        minifiedString = minify(content, {
+                            removeComments: true,
+                            removeScriptTypeAttributes: true,
+                            collapseWhitespace: true,
+                            minifyJS: true,
+                            minifyCSS: true
+                        });
+                }
+            } catch (ex) {
+                log('Fileserver', 'Could not minify file ' + fullpath, 'err');
+                minifiedString = content
             }
 
             var handle = that.getOutputFileHandle(fullpath, 'w+');
