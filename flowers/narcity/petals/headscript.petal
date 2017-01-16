@@ -2,5 +2,9 @@
 <script>
     // Head globals
     window.lmlcontext = "{=extra.contextname}";
+    window.lmlurl = "{=config.default.server.url}";
+
+    // Dirty fix
+    cygnus_index_args = {};
 </script>
 <script src="{=config.default.server.url}/compiled/theme/vaniryk.js"></script>

@@ -1,6 +1,6 @@
 {#theme}
 
-<footer>
+<footer class="willslide">
         <div class="footer-topsection">
                 <div class="responsive-wrapper">
                         <div class="footer-social">
@@ -36,6 +36,7 @@
 
 <script src="https://use.fontawesome.com/c06218d3bc.js"></script>
 <script src="//www.googletagservices.com/tag/js/gpt.js" async=""></script>
+<script src="{=config.default.server.url}/compiled/theme/social.js"></script>
 <script src="{=config.default.server.url}/compiled/theme/facebook.js"></script>
 <script src="{=config.default.server.url}/compiled/theme/global.js"></script>
 <script src="{=config.default.server.url}/compiled/admin/js/frontendbar.js"></script>

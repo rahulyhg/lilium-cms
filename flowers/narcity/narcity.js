@@ -346,7 +346,11 @@ var loadHooks = function(_c, info) {
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
-    hooks.bind('article_will_render', 2000, function(pkg) { parseAds(pkg); parseInsta(pkg);       });
+    hooks.bind('article_will_render', 2000, function(pkg) { 
+        parseAds(pkg); 
+        parseInsta(pkg);
+        parseNSFW(pkg);
+    });
 };
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
@@ -355,6 +359,10 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
         case "tags": delete cachedTags[ctx][detail]; break;
         default: break;
     }
+};
+
+var parseNSFW = function(pkg) {
+    pkg.article.nsfw = typeof pkg.article.tags == "object" && pkg.article.tags.indexOf && (pkg.article.tags.indexOf("nsfw") !== -1 || pkg.article.tags.indexOf("NSFW") !== -1);
 };
 
 var parseInsta = function(pkg) {
@@ -395,6 +403,7 @@ var registerPrecompFiles = function(_c) {
     templateBuilder.addCSS(themePath + '/precomp/css/narcity.css.lml', _c.id);
 
     templateBuilder.addJS(themePath + '/precomp/js/vaniryk.js.lml', _c.id);
+    templateBuilder.addJS(themePath + '/precomp/js/social.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/facebook.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/global.js.lml', _c.id);
 }

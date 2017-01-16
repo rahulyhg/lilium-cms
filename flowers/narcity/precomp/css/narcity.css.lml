@@ -34,6 +34,7 @@ html, body {
 
 #mcanvas {
     top: 60px;
+    margin-bottom: 100px;
 
     position: relative;
     -webkit-transition: all 0.2s;
@@ -72,7 +73,8 @@ html, body {
     z-index: 500;
 }
 
-body.menuopen #mcanvasoverlay {
+body.menuopen #mcanvasoverlay,
+#mcanvasoverlay.shown {
     opacity: 0.5;
 }
 
@@ -163,7 +165,7 @@ html .invisible {
             transition: all 0.2s;
 }
 
-.narcity-header-bar.drawnback {
+body.slidheader .narcity-header-bar {
     -webkit-transform: translate3d(0, -80px, 0);
        -moz-transform: translate3d(0, -80px, 0);
         -ms-transform: translate3d(0, -80px, 0);
@@ -182,7 +184,7 @@ html .invisible {
 }
 
 body.menuopen .willslide,
-body.menuopen .narcity-header-bar:not(.drawnback) {
+body.menuopen .narcity-header-bar {
     -webkit-transform: translate3d(100px,0,0);
     -moz-transform: translate3d(100px,0,0);
     -ms-transform: translate3d(100px,0,0);
@@ -1341,6 +1343,9 @@ footer {
         font-family: Arial;
         clear: both;
         float: none;
+
+        position: relative;
+        z-index: 6;
 }
 
 footer .footer-topsection {
@@ -1417,6 +1422,330 @@ footer .copyright a {
     display: none;
 }
 
+#pc-sharer {
+    display: none;
+
+    z-index: 30;
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    padding: 0px;
+    background-color: {=mc};
+    border-radius: 50px;
+    height: 60px;
+    width: 60px;
+    color: #FFF;
+    font-size: 28px;
+    box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
+    font-family: Arial;
+    font-weight: bold;
+
+    -webkit-transition: all 0.2s;
+   -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+     -o-transition: all 0.2s;
+        transition: all 0.2s;
+
+    opacity: 0;
+    cursor: pointer;
+
+    -webkit-transform: translate3d(0px, 160px, 0);
+   -moz-transform: translate3d(0px, 160px, 0);
+    -ms-transform: translate3d(0px, 160px, 0);
+     -o-transform: translate3d(0px, 160px, 0);
+        transform: translate3d(0px, 160px, 0);
+
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.pc-sharer-network {
+    display: none;
+    z-index: 30;
+    position: fixed;
+    bottom: 40px;
+    right: 40px;
+    padding: 0px;
+    background-color: #999;
+    border-radius: 50px;
+    height: 60px;
+    width: 60px;
+    color: #FFF;
+    font-size: 28px;
+    box-shadow: 0px 0px 12px rgba(0,0,0,0.1);
+
+    -webkit-transition: all 0.2s;
+   -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+     -o-transition: all 0.2s;
+        transition: all 0.2s;
+
+    opacity: 0;
+    cursor: pointer;
+
+    -webkit-transform: translate3d(0px, 160px, 0);
+   -moz-transform: translate3d(0px, 160px, 0);
+    -ms-transform: translate3d(0px, 160px, 0);
+     -o-transform: translate3d(0px, 160px, 0);
+        transform: translate3d(0px, 160px, 0);
+}
+
+.pc-sharer-network i {
+    margin-top: 17px;
+    display: block;
+    text-align: center;   
+}
+
+.pc.slidheader .pc-sharer-network.shown {
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+
+    opacity: 1;
+}
+
+.pc #pc-sharer,
+.pc .pc-sharer-network {
+    display: block;
+}
+
+.slidheader.pc #pc-sharer {
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+
+    opacity: 1;
+}
+
+.pc.slidheader.pc-share-shown #pc-sharer {
+    width: 165px;
+
+    -webkit-transform: translate3d(0,-80px,0);
+   -moz-transform: translate3d(0,-80px,0);
+    -ms-transform: translate3d(0,-80px,0);
+     -o-transform: translate3d(0,-80px,0);
+        transform: translate3d(0,-80px,0);
+}
+
+.android-sharer {
+    display: none;
+
+    z-index: 5;
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    padding: 0px;
+    background-color: {=mc};
+    border-radius: 50px;
+    height: 60px;
+    width: 60px;
+    color: #FFF;
+    font-size: 28px;
+    box-shadow: 0px 0px 12px rgba(0,0,0,0.3);
+
+    -webkit-transition: all 0.2s;
+   -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+     -o-transition: all 0.2s;
+        transition: all 0.2s;
+
+    opacity: 0;
+
+    -webkit-transform: translate3d(0px, 180px, 0);
+   -moz-transform: translate3d(0px, 180px, 0);
+    -ms-transform: translate3d(0px, 180px, 0);
+     -o-transform: translate3d(0px, 180px, 0);
+        transform: translate3d(0px, 180px, 0);
+}
+
+#android-sharer-buttons {
+    position: fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background-color: #FFF;
+    color: #999;
+    font-family: "Roboto", "Droid Sans", Arial, sans-serif;
+
+    z-index: 800;
+
+    -webkit-transition: all 0.4s;
+   -moz-transition: all 0.4s;
+    -ms-transition: all 0.4s;
+     -o-transition: all 0.4s;
+        transition: all 0.4s;
+
+    -webkit-transform: translate3d(0, 100%, 0);
+   -moz-transform: translate3d(0, 100%, 0);
+    -ms-transform: translate3d(0, 100%, 0);
+     -o-transform: translate3d(0, 100%, 0);
+        transform: translate3d(0, 100%, 0);
+
+    opacity: 0;
+}
+
+#android-sharer-buttons.shown {
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+
+    opacity: 1;
+}
+
+#android-sharer-buttons h3 {
+    margin-left: 20px;   
+}
+
+#android-sharer-buttons ul {
+    list-style: none;
+    padding:0px;
+    margin:0px;
+    float: none;
+    clear:both;
+}
+
+#android-sharer-buttons ul li {
+    float: left;
+    width: 33.33%;
+    max-width: 200px;
+    text-align: center;
+    height: 50px;
+    padding: 6% 0px;
+}
+
+#android-sharer-buttons ul li i {
+    font-size: 32px;
+    display: block;
+    margin: 0 auto 6px;
+}
+
+#android-sharer-cancel {
+    display: block;
+    text-align: right;
+    color: #ff2634;
+    float: none;
+    clear:both;
+    padding: 20px;
+}
+
+body.slidheader .android-sharer {
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+
+    opacity: 1;
+}
+
+.android-sharer i,
+#pc-sharer i {
+    margin: 16px;
+}
+
+.android .android-sharer {
+    display: block;
+}
+
+.ios-sharer {
+    display: none;
+}
+
+.ios .ios-sharer {
+    display: block;
+    height: 50px;
+
+    -webkit-transform: translate3d(0, 50px, 0);
+   -moz-transform: translate3d(0, 50px, 0);
+    -ms-transform: translate3d(0, 50px, 0);
+     -o-transform: translate3d(0, 50px, 0);
+        transform: translate3d(0, 50px, 0);
+
+    -webkit-transition: all 0.2s;
+   -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+     -o-transition: all 0.2s;
+        transition: all 0.2s;
+
+    background-color: #FFF;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 500;
+    color: #FFF;
+    font-size: 20px;
+
+    font-family: "Oswald", sans-serif;
+}
+
+#ios-sharer i {
+    vertical-align: middle;
+    font-size: 28px;
+    margin-right: 6px;
+}
+
+#ios-sharer span {
+    vertical-align: middle;
+}
+
+.ios.slidheader .ios-sharer {
+    -webkit-transform: translate3d(0,0,0);
+       -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+         -o-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
+}
+
+.ios-sharer > div {
+    height: 100%;
+    width: 35%;
+    float: left;
+}
+
+#ios-share-facebook-wrap {
+    background-color: #3b5998;
+}
+
+#ios-share-twitter-wrap {
+    background-color: #55acee;
+}
+
+#ios-share-pinterest-wrap {
+    width: 30%;
+    background-color: #cb2027;
+}
+
+.ios-sharer > div > div {
+    margin: 8px 15px;
+}
+
+.ios.slidheader .mobile-float-lb {
+    -webkit-transform: translate3d(0, -50px, 0);
+   -moz-transform: translate3d(0, -50px, 0);
+    -ms-transform: translate3d(0, -50px, 0);
+     -o-transform: translate3d(0, -50px, 0);
+        transform: translate3d(0, -50px, 0);
+}
+
+.just-ios,
+.just-pc,
+.just-android {
+    display: none
+}
+
+.android .just-android,
+.ios .just-ios,
+.pc .just-pc {
+    display: initial;
+}
+
 @media only screen and (min-width: {=fw}) {
     body .no-desktop {
         display: none !important;
@@ -1444,6 +1773,20 @@ footer .copyright a {
     .narcity-header-container {
         display: block;
         width: auto;
+    }
+
+    .mobile-float-lb {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+
+        -webkit-transition: all 0.2s;
+   -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+     -o-transition: all 0.2s;
+        transition: all 0.2s;
     }
 
     .category-top-link {

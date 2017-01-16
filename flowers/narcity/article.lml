@@ -221,6 +221,8 @@ window.articlepos.push({
     endsat : rect.height + rect.top + window.scrollY,
     trueURL : "{=config.default.server.url}/{=extra.article.name}",
     fetchURL : "{=config.default.server.url}/next/{=extra.article.name}",
+    title : `{=extra.article.title}`,
+    subtitle : `{=extra.article.subtitle}`
 });
 
 var end = document.querySelector('.article-end');
@@ -229,6 +231,9 @@ end.remove();
 </script>
 
 <script>
+window.nextAt = window.articlepos[0].endsat;
+window.prevAt = -2;
+
 window.relatedArticles = [
 {$ for (nextart in extra.article.related); $}
     '{=nextart.name}',
@@ -240,4 +245,33 @@ var execOnLoad = document.querySelectorAll("script.execOnLoad");
 for (var i = execOnLoad.length - 1; i >= 0; i--) {
      execOnLoad[i].remove(); 
 }
+
+window.currentPageIndex = 0;
+var switchToNext = function() {
+    if (window.currentPageIndex + 1 == window.articlepos.length) return;
+
+    window.currentPageIndex++;
+    window.prevAt = window.nextAt;
+    var newPage = window.articlepos[window.currentPageIndex];
+    window.history.pushState(newPage, newPage.title, newPage.trueURL);
+
+    if (typeof ga != "undefined") {
+        ga('send', 'pageview');
+    }
+
+    window.nextAt = newPage.endsat;
+}
+
+var switchToPrev = function() {
+    window.currentPageIndex--;
+    window.nextAt = window.articlepos[window.currentPageIndex+1].endsat;
+    var oldPage = window.articlepos[window.currentPageIndex];
+    window.history.pushState(oldPage, oldPage.title, oldPage.trueURL);
+
+    if (typeof ga != "undefined") {
+        ga('send', 'pageview');
+    }
+
+    window.prevAt = window.currentPageIndex == 0 ? -2 : window.articlepos[window.currentPageIndex-1].endsat;
+};
 </script>

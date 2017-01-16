@@ -113,6 +113,7 @@ var toggleMenu = function() {
 var closeMenuFromClick = function(e) {
     if (e.target.id === "mcanvasoverlay") {
         closeMenu();
+        dismissAndroShare();
     }
 };
 
@@ -133,6 +134,25 @@ var documentReady = function() {
 
 var bindReady = function() {
     document.addEventListener("DOMContentLoaded", documentReady);
+};
+
+var oldScroll = window.scrollY;
+var handlingCurrentScroll = false;
+var handleCurrentScroll = function() {  
+    if (handlingCurrentScroll) return;
+    handlingCurrentScroll = true;
+
+    if (window.scrollY > window.nextAt) {
+        window.switchToNext();
+    } else if (window.scrollY < window.prevAt) {
+        window.switchToPrev();
+    }
+    
+    handlingCurrentScroll = false;
+};
+
+var bindCurrentScroll = function() {
+    window.addEventListener('scroll', handleCurrentScroll);
 };
 
 var loadNext = function(url) {
@@ -212,9 +232,9 @@ var handleHeaderScroll = function() {
     if (handlingHeaderScroll) return;
     handlingHeaderScroll = true;
 
-    if (window.scrollY < 250) {
+    if (window.scrollY < 350) {
         if (headerHidden) {
-            document.querySelector('header').classList.remove("drawnback");
+            document.body.classList.remove("slidheader");
             headerHidden = false;
         }
 
@@ -225,10 +245,10 @@ var handleHeaderScroll = function() {
 
     var diff = lastYScrollClip - window.scrollY;
     if (headerHidden && diff > 60) {
-        document.querySelector('header').classList.remove("drawnback");
+        document.body.classList.remove("slidheader");
         headerHidden = false;
     } else if (!headerHidden && diff < 0) {
-        document.querySelector('header').classList.add("drawnback");
+        document.body.classList.add("slidheader");
         headerHidden = true;
     }
 
@@ -242,7 +262,6 @@ var handleHeaderScroll = function() {
 
 var bindHeaderScroll = function() {
     window.addEventListener('scroll', handleHeaderScroll);
-    handleHeaderScroll();
 };
 
 var bindAdsScroll = function() {
@@ -258,10 +277,113 @@ var bindNextScroll = function() {
     handleNextScroll();
 };
 
+var detectMobileOS = function() {
+    if (!window.navigator || /macintosh|win|msie/.test(window.navigator.userAgent.toLowerCase())) {
+        window.device = "pc";
+        document.body.classList.add("pc");
+        document.body.dataset.device = "pc";
+    } else if (navigator.userAgent.toLowerCase().indexOf("android") != -1) {
+        document.body.classList.add("android");
+        document.body.dataset.device = "android";
+        window.device = "android";
+    } else if (/iPad|iPhone|iPod/.test(navigator.platform) || /ipad|iphone|ipod/.test(navigator.userAgent.toLowerCase()) != -1) {
+        document.body.classList.add("ios");
+        document.body.dataset.device = "ios";
+        window.device = "ios";
+    } else {
+        window.device = "unknown";
+        document.body.classList.add("unknown");
+        document.body.dataset.device = "unknown";
+    }
+};
+
+var dismissAndroShare = function() {
+    if (window.device == "android") {
+        document.getElementById("android-sharer-buttons").classList.remove('shown');
+        document.getElementById("mcanvasoverlay").classList.remove("shown");
+        setTimeout(function() {
+            document.getElementById('mcanvasoverlay').style.display = "none";
+        }, 210);
+    }
+};
+
+var androShare = function() {
+    document.getElementById("android-sharer-buttons").classList.add("shown");
+    document.getElementById("mcanvasoverlay").style.display = "block";
+
+    setTimeout(function() {
+        document.getElementById("mcanvasoverlay").classList.add("shown");
+    }, 10);
+};
+
+var bindAndroShare = function() {
+    if (window.device == "android" && window.lmlcontext === "article") {
+        var asharer = document.getElementById("android-sharer");
+        if (asharer) {
+            asharer.addEventListener('click', androShare);
+            document.getElementById("android-sharer-cancel").addEventListener("click", dismissAndroShare);
+        }
+
+        document.getElementById("android-sharer-facebook").addEventListener('click', _fb.castShareDialog);
+        document.getElementById("android-sharer-twitter").addEventListener('click', _nsocial.castTwitterShare);
+        document.getElementById("android-sharer-googleplus").addEventListener('click', _nsocial.castGooglePlusShare);
+        document.getElementById("android-sharer-pinterest").addEventListener('click', _nsocial.castPinterestShare);
+        document.getElementById("android-sharer-email").addEventListener('click', _nsocial.castEmailShare);
+    }
+};
+
+var bindIOSShare = function() {
+     if (window.device == "ios" && window.lmlcontext === "article") {
+        var isharer = document.getElementById("ios-sharer");
+
+        document.getElementById("ios-share-facebook-wrap").addEventListener('click', _fb.castShareDialog);
+        document.getElementById("ios-share-twitter-wrap").addEventListener('click', _nsocial.castTwitterShare);
+        document.getElementById("ios-share-pinterest-wrap").addEventListener('click', _nsocial.castPinterestShare);
+    }
+};
+
+var castPCShare = function() {
+    document.body.classList.add("pc-share-shown");
+    var networks = document.querySelectorAll(".pc-sharer-network");
+
+    setTimeout(function() {
+        for (var i = networks.length - 1; i >= 0; i--) {
+            (function(i) {
+                setTimeout(function() {
+                    networks[i].classList.add("shown");
+                }, 80 * i);
+            })(i);
+        }
+    }, 80);
+};
+
+var bindPCShare = function() {
+    if (window.device == "pc" && window.lmlcontext === "article") {
+        var psharer = document.getElementById("pc-sharer");
+
+        psharer.addEventListener('click', castPCShare);
+        var networks = document.querySelectorAll(".pc-sharer-network");
+
+        for (var i = 1; i < networks.length; i++) {
+            networks[i].style.right = 80 * i + 40 + "px";
+        }
+
+        document.getElementById("pc-share-facebook").addEventListener('click', _fb.castShareDialog);
+        document.getElementById("pc-share-twitter").addEventListener('click', _nsocial.castTwitterShare);
+        document.getElementById("pc-share-googleplus").addEventListener('click', _nsocial.castGooglePlusShare);
+        document.getElementById("pc-share-pinterest").addEventListener('click', _nsocial.castPinterestShare);
+    }
+};
+
 bindReady();
 bindAdsScroll();
 bindNextScroll();
+bindCurrentScroll();
 bindHeaderScroll();
+detectMobileOS();
+bindAndroShare();
+bindIOSShare();
+bindPCShare();
 
 /* Dirty fixes */
 jQuery = function() {return {is : function(){}}};

@@ -30,6 +30,13 @@ var NarcityFacebook = function() {
         });
     };
 
+    this.castShareDialog = function() {
+        FB.ui({
+            method: 'share',
+            href: document.location.href
+        }, function(response){});
+    };
+
     this.affectAllCounters = function() {
         var urls = new Object();
         var allurls = new Array();
