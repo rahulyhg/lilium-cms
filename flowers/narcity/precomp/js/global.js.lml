@@ -385,5 +385,5 @@ bindAndroShare();
 bindIOSShare();
 bindPCShare();
 
-/* Dirty fixes */
-jQuery = function() {return {is : function(){}}};
+/* Dirty fixes. We don't use jQuery, but some 3rd party does. */
+jQuery = function() {return {is : function() { return this; } } };

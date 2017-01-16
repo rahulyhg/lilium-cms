@@ -295,11 +295,11 @@ body.menuopen .narcity-header-bar {
 .header-search {
     background-color: transparent;
     border: 2px solid #FFF;
-    padding: 6px 10px;
+    padding: 10px 14px;
     color: #FFF;
     font-size: 16px;
-
     font-family: Arial;
+    margin-top: 8px;
 }
 
 .header-search::-webkit-input-placeholder { 
@@ -447,6 +447,7 @@ article .featured-image-wrapper {
     padding: 8px 20px 0px;
     width: {=fw};
     margin: 0 auto -20px;
+    text-align: right;
 }
 
 .featured-image-credit a {
@@ -587,7 +588,7 @@ article h2 {
 .sponsored-mention {
     color: #FFF;
     background-color: #ff2634;
-    font-size: 14px;
+    font-size: 15px;
     padding: 3px 5px;
     font-weight: bold;
     letter-spacing: -0.3px;
@@ -596,6 +597,7 @@ article h2 {
     position: absolute;
     right: 0px;
     top: 16px;
+    font-family: Arial, sans-serif;
 }
 
 article #article-content img {
@@ -949,6 +951,7 @@ $}
     padding: 4px 8px;
     font-size: 22px;
     font-family: "Oswald", sans-serif;
+    border : 1px solid #DDD;
 }
 
 .menuslider-container h3 {
@@ -1644,9 +1647,17 @@ body.slidheader .android-sharer {
     opacity: 1;
 }
 
-.android-sharer i,
-#pc-sharer i {
+.android-sharer i{
     margin: 16px;
+}
+
+#pc-sharer i {
+    margin: 16px 7px 16px 18px;
+    vertical-align: middle;
+}
+
+#pc-sharer span {
+    vertical-align: middle;
 }
 
 .android .android-sharer {

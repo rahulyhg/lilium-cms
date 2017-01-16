@@ -3,6 +3,7 @@
     // Head globals
     window.lmlcontext = "{=extra.contextname}";
     window.lmlurl = "{=config.default.server.url}";
+    window.nsfw = "{=?extra.article.nsfw}" == "true";
 
     // Dirty fix
     cygnus_index_args = {};

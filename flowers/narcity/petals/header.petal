@@ -40,11 +40,11 @@
                 </form>
             </div>
 
-            <div class="header-login-wrapper">
+            <!--div class="header-login-wrapper">
                 <div class="login-button">
                     Login
                 </div>
-            </div>
+            </div-->
         </div>
     </div>
 </header>

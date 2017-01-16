@@ -56,7 +56,7 @@
 </div>
 
 <div class="pc-sharer" id="pc-sharer">
-    <i class="fa fa-share-alt" aria-hidden="true"></i>
+    <i class="fa fa-share-square-o" aria-hidden="true"></i>
     <span>Share</span>
 </div>
 

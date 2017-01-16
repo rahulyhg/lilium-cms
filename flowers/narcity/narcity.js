@@ -380,13 +380,15 @@ var parseAds = function(pkg) {
     var delimiter = "<ad></ad>";    
     var pos;
     
-    while ((pos = art.content.indexOf(delimiter)) != -1) {
-        art.content = art.content.substring(0, pos) + '<div class="awrapper">' + pkg._c.contentadsnip[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
-        indx++;
+    if (art.tags.indexOf('nsfw') == -1 && art.tags.indexOf('NSFW') == -1) {
+        while ((pos = art.content.indexOf(delimiter)) != -1) {
+            art.content = art.content.substring(0, pos) + '<div class="awrapper">' + pkg._c.contentadsnip[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
+            indx++;
 
-        if (indx == keys.length) {
-            break;
-            indx = 0;
+            if (indx == keys.length) {
+                break;
+                indx = 0;
+            }
         }
     }
 
