@@ -24,6 +24,13 @@ var registeredLibraries = {
     json: function(context) {
         return JSON;
     },
+    date: function(context) {
+        return {
+            stringify : function(str) {
+                return require('dateformat')(str, 'mmmm dd, yyyy');
+            }
+        };
+    },
     vocab: function (context) {
         var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
         return require('./vocab.js').getDico(conf.website.language);

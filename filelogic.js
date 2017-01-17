@@ -257,11 +257,14 @@ var FileLogic = function () {
                                 log('FileLogic', 'Passing content through CDN', 'detail');
 
                                 require('./cdn.js').parse(ctn, cli, function(cdned) { 
-                                    cli.response.writeHead(200);
-                                    cli.response.end(cdned);
-
-                                    var handle = FileServer.getOutputFileHandle(savePath, 'w');
+                                    log('FileLogic', 'Parsed content', 'success');
+                                    var handle = FileServer.getOutputFileHandle(savePath, 'w+');
                                     FileServer.writeToFile(handle, cdned, function() {
+                                        log('FileLogic', 'Cache file was created at ' + savePath, 'success');
+                                        handle.end();
+                                        cli.response.writeHead(200);
+                                        cli.response.end(cdned);
+
                                         callback && callback(cdned);
                                     });
                                 }, true);

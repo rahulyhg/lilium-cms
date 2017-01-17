@@ -28,6 +28,12 @@
             </a>
         </li>
         <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/html">
+                <i class="devtools-list-item-icon fa fa-folder-open-o"></i>
+                <b class="devtools-list-item-title">HTML files</b>
+            </a>
+        </li>
+        <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/scripts">
                 <i class="devtools-list-item-icon fa fa-rocket"></i>
                 <b class="devtools-list-item-title">Scripts</b>

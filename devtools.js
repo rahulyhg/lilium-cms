@@ -29,6 +29,7 @@ var handleGET = function(cli) {
         case 'endpoints':
         case 'cache':
         case 'feed':
+        case 'html':
         case 'scripts':
         case undefined:
             filelogic.serveAdminLML(cli);
@@ -244,6 +245,31 @@ var maybeExecuteScript = function(cli) {
     }
 };
 
+var listAllCachedFiles = function(cli, levels, params, cb) {
+    var dirPath = cli._c.server.html;
+    require('./fileserver.js').listDirContent(dirPath, function(rootarr) {
+        require('./fileserver.js').listDirContent(dirPath + "/next", function(nextarr) {
+            require('./fileserver.js').listDirContent(dirPath + "/tags", function(tagsarr) {
+                require('./fileserver.js').listDirContent(dirPath + "/category", function(catarr) {
+                    require('./fileserver.js').listDirContent(dirPath + "/author", function(autharr) {
+                        require('./fileserver.js').listDirContent(dirPath + "/search", function(serarr) {
+                            rootarr = rootarr.filter(function(obj) { return obj.indexOf(".html") !== -1 });
+                            cb({
+                                html : rootarr,
+                                next : nextarr,
+                                tags : tagsarr,
+                                category : catarr,
+                                author : autharr,
+                                search : serarr
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
 var parseContentAds = function(cli) {
     var pcount = cli._c.content.adsperp;
     var db = require('./includes/db.js');
@@ -364,6 +390,8 @@ DevTools.prototype.registerLiveVar = function() {
             require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
                 cb(list);
             });
+        } else if (levels[0] == "htmlfiles") {
+            listAllCachedFiles(cli, levels, params, cb);
         }
     }, ["develop"]);
 };

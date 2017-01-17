@@ -2,6 +2,7 @@ node_modules/*
 html/*
 scripts/*
 sites/*
+keys/*
 !.gitkeep
 *.swp
 

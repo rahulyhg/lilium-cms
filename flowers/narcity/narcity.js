@@ -347,8 +347,13 @@ var loadHooks = function(_c, info) {
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_render', 2000, function(pkg) { 
+        // Replace ad tags with ad set
         parseAds(pkg); 
+
+        // Replace Instagram scripts
         parseInsta(pkg);
+
+        // Flag if NSFW, ad it to deepfetched object
         parseNSFW(pkg);
     });
 };

@@ -230,6 +230,9 @@ var Settings = function () {
             .add('google.refreshtoken', 'text', {
                 displayname : "Refresh Token"
             })
+            .add('google.jsonfilepath', 'text', {
+                displayname : "Backend JSON key file full path"
+            })
 
         .add('lickstats_title', 'title', {
             displayname : "Lickstats Combos"
@@ -250,81 +253,6 @@ var Settings = function () {
                         fieldName : "secret",
                         dataType : "text",
                         displayname : "Access Secret"
-                    }
-                ]
-            }
-        }).add('facebook_title', 'title', {
-            displayname : "Facebook Combos"
-        }).add('facebookcombos', 'stack', {
-            displayname : "Facebook ID / Token combos",
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "websiteurl",
-                        dataType : "text",
-                        displayname : "Website URL"
-                    }, {
-                        fieldName : "id",
-                        dataType : "text",
-                        displayname : "Account ID"
-                    }, {
-                        fieldName : "token",
-                        dataType : "text",
-                        displayname : "Access Token"
-                    }
-                ]
-            }
-        }).add('twitter_title', 'title', {
-            displayname : "Twitter Combos"
-        }).add('twittercombos', 'stack', {
-            displayname : "Twitter ID / Token combos",
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "username",
-                        dataType : "text",
-                        displayname : "Twitter username"
-                    }, {
-                        fieldName : "consumerkey",
-                        dataType : "text",
-                        displayname : "Consumer Key"
-                    }, {
-                        fieldName : "consumersecret",
-                        dataType : "text",
-                        displayname : "Consumer Secret"
-                    }, {
-                        fieldName : "tokenkey",
-                        dataType : "text",
-                        displayname : "Access Token Key"
-                    }, {
-                        fieldName : "tokensecret",
-                        dataType : "text",
-                        displayname : "Access Token Secret"
-                    }
-                ]
-            }
-        }).add('instagram_title', 'title', {
-            displayname : "Instagram Combos"
-        }).add('instagramcombos', 'stack', {
-            displayname : "Instagram ID / Token combos",
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "account",
-                        dataType : "text",
-                        displayname : "Account name"
-                    }, {
-                        fieldName : "clientid",
-                        dataType : "text",
-                        displayname : "Client ID"
-                    }, {
-                        fieldName : "clientsecret",
-                        dataType : "text",
-                        displayname : "Client Secret"
-                    }, {
-                        fieldName : "accesstoken",
-                        dataType : "text",
-                        displayname : "Access Token"
                     }
                 ]
             }

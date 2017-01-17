@@ -12,16 +12,13 @@
     #lvresp {
         white-space: pre;
         display: block;
-        height: 500px;
-        margin: 10px;
-        border: 1px solid #DDD;
-        background-color: #000;
-        color: #FFF;
+        min-height: 500px;
+        background-color: #404040;
+        color: #DDD;
         font-family: "Consolas", "monospace", monospace;
-        margin: 10px 0px;
+        margin: 0px;
         padding: 4px;
         font-size: 14px;
-        overflow-y: scroll;
     }
 </style>
 

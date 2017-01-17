@@ -1,9 +1,11 @@
-{#config;extra;slug;theme;debug}
+{#config;extra;slug;theme;debug;date}
 {$
     featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
     author = extra.article.authors.0;
     url = config.default.server.url;
     rooturl = url.substring(2);
+    postdate = extra.article.date;
+    formatdate = date.stringify(=postdate);
 $}
 <article id="{=extra.article.name}" data-mi={=extra.article._id}>
     {$ if (?extra.article.isSponsored == true); $}
@@ -65,7 +67,7 @@ $}
                     <span class="article-author-displayname midvert">{=author.displayname}</span>
                 </a>
                 <span class="midvert">&middot;</span>
-                <span class="article-published-date midvert edt-datetime" data-edtdatetime={=extra.article.date}></span>
+                <span class="article-published-date midvert" data-edtdatetime={=extra.article.date}>{=formatdate}</span>
                 <!--span class="midvert">&middot;</span>
                 <a href="#comments" target="" style="font-weight:bold; text-decoration: none; color: #111;">
                     <img src="{=config.default.server.url}/res/images/commentbubble.png" id="commentssmallicon" title="Comments">

@@ -2,10 +2,10 @@
 <div id="mcanvasoverlay"></div>
 <div id="mobileslider">
 
-<div class="menuslider-container">
-    <button>
+<div class="menuslider-container" style="padding-top: 15px;">
+    <!--button>
         Login
-    </button>
+    </button-->
     <form method="GET" action="{=config.default.server.url}/search">
         <input id="mobile-search-input" name="q" placeholder="Search..." />
     </fom>    
@@ -16,6 +16,7 @@
             <a href="{=sect.url}" class="section-link" >{=sect.linktext}</a>
         {$ endfor; $}
     </div>
+
     <hr />
 
     <div class="slider-follow">

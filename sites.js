@@ -27,17 +27,19 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadHTMLStructure = function (done) {
         fileserver.createDirIfNotExists(conf.server.html, function (valid) {
-            if (valid) {
-                log('FileServer',
-                    'HTML Directory was validated at : ' +
-                    conf.server.html,
-                    'success'
-                );
-            } else {
-                log('FileServer', 'Error validated html directory', 'err');
-            }
-
-            done();
+            fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
+                if (valid && nextvalid) {
+                    log('FileServer',
+                        'HTML Directory was validated at : ' +
+                        conf.server.html,
+                        'success'
+                    );
+                } else {
+                    log('FileServer', 'Error validated html directories', 'err');
+                }
+    
+                done();
+            }, true);
         }, true);
     };
 
