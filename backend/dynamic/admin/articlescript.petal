@@ -149,6 +149,7 @@
         $.get('{=config.default.server.url}/admin/article/infostrip/' + contentid + '?async=false', function(resp) {
             document.getElementById('moreinfo-status').textContent = resp["status"];
             document.getElementById('moreinfo-status').className = "article-status-" + resp.status;
+            document.getElementById("moreinfo-modecount").textContent = resp.modifications;
 
             try {
                 document.getElementById('moreinfo-updated').textContent = dateFormat(resp["updated"], "d/mm/yyyy 'at' hh:MM");

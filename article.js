@@ -121,13 +121,16 @@ var Article = function() {
             if (arr.length != 0) {
                 var art = arr[0];
                 db.findToArray(conf.default(), 'entities', {_id : art.author}, function(err, autarr) {
-                    cli.sendJSON({
-                        status : art.status || "Unknown",
-                        url : art.name ? cli._c.server.url + "/" + art.name : "This article doesn't have a URL.",
-                        siteurl : cli._c.server.url,
-                        aliases : art.aliases || [], 
-                        updated : art.updated || "This article was never updated",
-                        author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author"
+                    db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, function(err, modcount) {
+                        cli.sendJSON({
+                            status : art.status || "Unknown",
+                            url : art.name ? cli._c.server.url + "/" + art.name : "This article doesn't have a URL.",
+                            siteurl : cli._c.server.url,
+                            aliases : art.aliases ? Array.from(new Set(art.aliases)) : [], 
+                            updated : art.updated || "This article was never updated",
+                            author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
+                            modifications : modcount
+                        });
                     });
                 });
             } else {
@@ -356,113 +359,124 @@ var Article = function() {
                     });
                 }
 
-                // Create post
-                var params = [cli._c, dbCol[pubCtx], conds];
-
-                db.update.apply(db, [...params, formData, function(err, result) {
-                    if (!err) {
-                        var success = true;
-                        var createdArticle = false;
-                        if (result.upsertedId !== null) {
-                            // Inserted a document
-                            formData._id = result.upsertedId._id;
-                            createdArticle = true;
-                        } else if (result.modifiedCount > 0) {
-                            // Updated a document
-                            formData._id = cli.postdata.data.id;
-                        } else {
-                            // Nothing happened, failed...
-                            success = false;
-                        }
-
-                        if (success) {
-                            cli.did('content', 'published', {title : cli.postdata.data.title});
-
-                            that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
-                                if (pubCtx != "preview" && oldSlug && oldSlug != "") {
-                                    db.update(cli._c, 'content', 
-                                        {_id : db.mongoID(formData._id)}, 
-                                        {$push : {aliases : oldSlug}}, 
-                                    function() {
-                                        log('Article', 'Added alias for slug ' + oldSlug);
-                                        fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", function() {});
-                                    }, false, true, true);
+                log('Article', 'Saving published post in database', 'info');
+                db.findToArray(cli._c, 'content', conds, function(err, arr) {
+                    var nUpdate = function() {
+                        db.update(cli._c, dbCol[pubCtx], conds, formData, function(err, result) {
+                            if (!err) {
+                                var success = true;
+                                var createdArticle = false;
+                                if (result.upsertedId !== null) {
+                                    // Inserted a document
+                                    formData._id = result.upsertedId._id;
+                                    createdArticle = true;
+                                } else if (result.modifiedCount > 0) {
+                                    // Updated a document
+                                    formData._id = cli.postdata.data.id;
+                                } else {
+                                    // Nothing happened, failed...
+                                    success = false;
                                 }
 
-                                var extra = new Object();
-                                extra.ctx = "article";
-                                extra.article = deepArticle;
+                                if (success) {
+                                    log('Article', 'Saved published post to database; Creating cached file');
+                                    cli.did('content', 'published', {title : cli.postdata.data.title});
 
-                                if (pubCtx === "create") {
-                                    cli.sendJSON({
-                                        success: true,
-                                        dbdata : deepArticle
-                                    });
-
-                                    // Generate LML page
-                                    filelogic.renderThemeLML(cli, "article", deepArticle.name + '.html', extra , function(name) {
-                                        // Remove autosaves related to this article
-                                        if (cli.postdata.data.autosaveid) {
-                                            db.remove(
-                                                cli._c,
-                                                'autosave',
-                                                {
-                                                    _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
-                                                },
-                                                function() {}
-                                            );
+                                    that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
+                                        if (pubCtx != "preview" && oldSlug && oldSlug != "") {
+                                            db.update(cli._c, 'content', 
+                                                {_id : db.mongoID(formData._id)}, 
+                                                {$push : {aliases : oldSlug}}, 
+                                            function() {
+                                                log('Article', 'Added alias for slug ' + oldSlug);
+                                                fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", function() {});
+                                            }, false, true, true);
                                         }
+
+                                        var extra = new Object();
+                                        extra.ctx = "article";
+                                        extra.article = deepArticle;
         
-                                        var nlen = publishedNotificationTitles.length;
-                                        var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
-    
-                                        notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                            title: notifMessage,
-                                            url: cli._c.server.url + '/' + deepArticle.name,
-                                            msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
-                                            type: 'success'
-                                        });
-
-                                        feed.plop(deepArticle._id, function() {
-                                            feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
-                                                title : deepArticle.title,
-                                                subtitle : deepArticle.subtitle,
-                                                slug : deepArticle.name,
-                                                image : deepArticle.featuredimage[0].sizes.featured.url,
-                                                authorname : deepArticle.authors[0].displayname,
-                                                authoravatar : deepArticle.authors[0].avatarURL
+                                        if (pubCtx === "create") {
+                                            cli.sendJSON({
+                                                success: true,
+                                                dbdata : deepArticle
                                             });
-                                        });
+
+                                            // Generate LML page
+                                            filelogic.renderThemeLML(cli, "article", deepArticle.name + '.html', extra , function(name) {
+                                                // Remove autosaves related to this article
+                                                if (cli.postdata.data.autosaveid) {
+                                                    db.remove(
+                                                        cli._c,
+                                                        'autosave',
+                                                        {
+                                                            _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
+                                                        },
+                                                        function() {}
+                                                );
+                                                }
+        
+                                                var nlen = publishedNotificationTitles.length;
+                                                var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
     
-                                        badges.check(cli, 'publish', function(acquired, level) {});
-                                    });
-                                } else if (pubCtx === "preview") {
-                                    var tmpName = "static/tmp/preview" + 
-                                        Math.random().toString().slice(2) + 
-                                        Math.random().toString().slice(2) + 
-                                        ".tmp";
-                                    var absPath = cli._c.server.html + "/" + tmpName;
+                                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                                    title: notifMessage,
+                                                    url: cli._c.server.url + '/' + deepArticle.name,
+                                                    msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
+                                                    type: 'success'
+                                                });
 
-                                    filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
-                                        log('Preview', 'Sending preview file before deletion : ' + absPath);
-                                        var fileserver = require('./fileserver.js');
-                                        fileserver.pipeFileToClient(cli, absPath, function() {
-                                            fileserver.deleteFile(absPath, function() {});
-                                        }, true);
-                                    });
+                                                feed.plop(deepArticle._id, function() {
+                                                    feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
+                                                        title : deepArticle.title,
+                                                        subtitle : deepArticle.subtitle,
+                                                        slug : deepArticle.name,
+                                                        image : deepArticle.featuredimage[0].sizes.featured.url,
+                                                        authorname : deepArticle.authors[0].displayname,
+                                                        authoravatar : deepArticle.authors[0].avatarURL
+                                                    });
+                                                });
+            
+                                                badges.check(cli, 'publish', function(acquired, level) {});
+                                            });
+                                        } else if (pubCtx === "preview") {
+                                            var tmpName = "static/tmp/preview" + 
+                                                Math.random().toString().slice(2) + 
+                                                Math.random().toString().slice(2) + 
+                                                ".tmp";
+                                            var absPath = cli._c.server.html + "/" + tmpName;
+
+                                            filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
+                                                log('Preview', 'Sending preview file before deletion : ' + absPath);
+                                                var fileserver = require('./fileserver.js');
+                                                fileserver.pipeFileToClient(cli, absPath, function() {
+                                                    fileserver.deleteFile(absPath, function() {});
+                                                }, true);
+                                            });
+                                        }
+                                    }, pubCtx == "preview");
+                                } else {
+                                    cli.throwHTTP(500);
                                 }
-                            }, pubCtx == "preview");
-                        } else {
-                            cli.throwHTTP(500);
-                        }
+    
+                            } else {
+                                cli.throwHTTP(500);
+                            }
+                        }, true, true);
+                    };
 
+                    if (pubCtx == "preview") {
+                        nUpdate();
                     } else {
-                        cli.throwHTTP(500);
+                        var old = arr[0];
+                        delete old._id;
+                        old.contentid = conds._id;
+                        old.historyPushed = new Date();
+
+                        db.insert(cli._c, 'history', old, nUpdate);
                     }
-
-
-                }, true, true]);
-
+                });
             } else {
                 cli.sendJSON({
                     form: response
@@ -588,31 +602,35 @@ var Article = function() {
                 }, function(err, ress) {
                     var res = err ? undefined : ress[0];
                     if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
-                        db.update(cli._c, 'content', {
-                            _id: id
-                        }, formData, function(err, doc) {
-                            cli.sendJSON({
-                                success: true,
-                                _id: cli.postdata.data._id
+                        delete res._id;
+                        res.contentid = id;
+                        res.historyPushed = new Date();
+
+                        db.insert(cli._c, 'history', res, function(err, revision) {    
+                            db.update(cli._c, 'content', {
+                                _id: id
+                            }, formData, function(err, doc) { 
+                                cli.sendJSON({
+                                    success: true,
+                                    _id: cli.postdata.data._id,
+                                    reason : 200
+                                });
                             });
                         });
                     } else {
                         cli.sendJSON({
                             success: false,
-                            _id: cli.postdata.data._id
+                            _id: cli.postdata.data._id,
+                            reason : 403
                         });
                     }
                 });
             } else {
-                formData.date = new Date();
-                // Create draft
-                db.insert(cli._c, 'content', formData, function(err, doc) {
-                    cli.sendJSON({
-                        success: true,
-                        redirect: cli._c.server.url + '/' + cli._c.paths.admin + '/article/edit/' + doc.insertedId
-                    });
+                cli.sendJSON({
+                    success: false,
+                    reason : 404,
+                    message : "ID not found"
                 });
-
             }
         }
     };

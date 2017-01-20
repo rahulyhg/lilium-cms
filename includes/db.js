@@ -83,13 +83,14 @@ var DB = function() {
             var ins = function() {
                 if (colIndex < colMax) {
 		            _conns[conf.id || conf].createCollection(col[colIndex], {}, function(err, res) {
-                        results.err.push(err);
-                        results.res.push(res);
+                        err && results.err.push(err);
+                        res && results.res.push(res);
                         colIndex++;
                         
                         ins();
                     });
                 } else {
+                    log('Database', 'Created ' + results.res.length + ' collections with ' + results.err.length + ' errors', 'lilium');
                     callback();
                 }
             };
@@ -320,7 +321,7 @@ var DB = function() {
 			} else if (typeof docs !== "object") {
 				cb("[Database - Invalid document]");
 			} else {
-				col[typeof docs.length !== "undefined" ? "insertMany" : "insertOne"](docs, cb);
+				col[Array.isArray(docs) ? "insertMany" : "insertOne"](docs, cb);
 			}
 		});
 	};

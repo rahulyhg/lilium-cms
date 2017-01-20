@@ -85,9 +85,25 @@ var SiteInitializer = function (conf, siteobj) {
             log('Database', 'Creating indices', 'info');
             db.createIndex(conf, "content", {title : 'text', content : 'text', subtitle : 'text'}, function() {
                 db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
-                    log('Database', 'Created indices');
-                    done();
+                    log('Database', 'Created indices', 'success');
+                    createCollections();
                 });
+            });
+        };
+
+        var createCollections = function() {
+            log('Database', 'Creating collections', 'info');
+            
+        	var collectionsNames = [
+		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview",
+        		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history",
+		        "lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations",
+		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges"
+        	];
+
+            db.createCollections(conf, collectionsNames, function() {
+                log('Database', 'Database initialization finished', 'lilium');
+                done();
             });
         };
 
