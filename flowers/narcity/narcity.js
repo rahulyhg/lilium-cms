@@ -78,6 +78,7 @@ var fetchHomepageArticles = function(_c, cb) {
     var i = 0;
     var len = Object.keys(homepageSections).length;
     var sectionArr = new Array();
+    var authors = {};
 
     var nextSection = function() {
         if (i < len) {
@@ -89,7 +90,11 @@ var fetchHomepageArticles = function(_c, cb) {
                         'status' : 'published'
                     } 
                 }, {
-                    $limit : 3
+                    $sort : {
+                        date : -1
+                    }
+                }, {
+                    $limit : 6
                 }, {
                     $lookup : {
                         from:           "uploads",
@@ -105,6 +110,10 @@ var fetchHomepageArticles = function(_c, cb) {
                     "articles" : arr
                 });
 
+                for (var j = 0; j < arr.length; j++) {
+                    arr[j].author = authors[arr[j].author];
+                }
+
                 i++;
                 nextSection();
             });
@@ -119,7 +128,7 @@ var fetchHomepageArticles = function(_c, cb) {
                         date : -1
                     }
                 }, {
-                    $limit : 9
+                    $limit : 12
                 }, {
                     $lookup : {
                         from:           "uploads",
@@ -129,6 +138,10 @@ var fetchHomepageArticles = function(_c, cb) {
                     }
                 }
             ], function(latests) {
+                for (var j = 0; j < latests.length; j++) {
+                    latests[j].author = authors[latests[j].author];
+                }
+
                 cb({
                     sections : sectionArr,
                     latests : latests
@@ -137,7 +150,13 @@ var fetchHomepageArticles = function(_c, cb) {
         }
     };
 
-    nextSection();
+    db.findToArray(cc.default(), "entities", {}, function(err, arr) {
+        for (var i = 0; i < arr.length; i++) {
+            authors[arr[i]._id] = arr[i];
+        }
+
+        nextSection();
+    }, {displayname : 1, avatarURL : 1, slug : 1});
 };
 
 var registerLib = function() {

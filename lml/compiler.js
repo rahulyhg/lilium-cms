@@ -155,7 +155,7 @@ class LMLSlang {
                 });
 
                 dotIndex = virtualStart;
-            } else {
+            } else if (workStr) {
                 levels.push({
                     type : "level",
                     name : workStr
@@ -174,7 +174,7 @@ class LMLSlang {
         for (let i = 0; i < levels.length; i++) {
             curVal = curVal[levels[i].name];
 
-            if (typeof curVal == 'undefined') {
+            if (typeof curVal == 'undefined' || curVal == null) {
                 if (flags["?"]) {
                     curVal = "";
                     break;
@@ -200,6 +200,8 @@ class LMLSlang {
             curVal = curVal.trim();
             if (curVal != "" && !isNaN(curVal)) {
                 curVal = parseFloat(curVal);
+            } else if (flags["&"]) {
+                curVal = curVal.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\"/g, "&quot;"); 
             }
         } 
 
@@ -505,7 +507,7 @@ class LMLCompiler {
 
             nextBlock();
         }
-    }; w(ctx, str) { output(ctx, str) };
+    }; w(ctx, str) { this.output(ctx, str) };
 
     checkForCompletion(ctx) {
         if (ctx.flags.finished && !ctx.flags.writing && ctx.buffer.length == 0 && !ctx.flags.closed) {

@@ -26,7 +26,7 @@ $}
 
     {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper">
-        <img src='{=featimg}' class="featured-image" alt="{=&extra.article.title} featured image by {=?extra.article.featuredimageartist}" />
+        <img src='{=featimg}' class="featured-image" alt="{=&extra.article.title} featured image" />
         <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
             <span class="article-share-icon">
                 <img src="{=config.default.server.url}/res/images/flame.png" />

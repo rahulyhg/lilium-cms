@@ -1,4 +1,4 @@
-{#config;extra;theme;debug;category}
+{#config;extra;theme;debug;category;date}
 
 <main class="homepage">
     <div class="fwblock latest-content-wrapper">
@@ -37,6 +37,15 @@
                             {=la.title}
                         </a>
                     </div>
+                    <div class="article-thumbnail-subtitle">
+                        {=la.subtitle}
+                    </div>
+                    <div class="article-thumbnail-details">
+                        <img src="{=la.author.avatarURL}" />
+                        <span><a href="{=config.default.server.url}/author/{=la.author.slug}" class="article-thumbnail-author">
+                            {=la.author.displayname}
+                        </a> &middot; {=date.stringify(la.date)}</span>
+                    </div>
                 </div>
             {$ relindex += 1; $}
         {$ endfor; $}
@@ -70,6 +79,15 @@
                         </div>
                         <div class="article-thumbnail-title">
                             {=sa.title}
+                        </div>
+                        <div class="article-thumbnail-subtitle">
+                            {=sa.subtitle}
+                        </div>
+                        <div class="article-thumbnail-details">
+                            <img src="{=sa.author.avatarURL}" />
+                            <span><a href="{=config.default.server.url}/author/{=sa.author.slug}" class="article-thumbnail-author">
+                                {=sa.author.displayname}
+                            </a> &middot; {=date.stringify(sa.date)}</span>
                         </div>
                     </div>
                 </a>
