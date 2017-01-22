@@ -50,6 +50,7 @@ var NarcityFacebook = function() {
             allurls.push(u);
         }
 
+        console.log("Passing " + allurls.length + " urls to Facebook Graph");
         if (allurls.length != 0) {
             this.bulkShareRequest(allurls, function(ogobj) {
                 var htmlnode = urls[ogobj.id];

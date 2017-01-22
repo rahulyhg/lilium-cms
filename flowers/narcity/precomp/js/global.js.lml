@@ -112,7 +112,6 @@ var documentReady = function() {
     document.querySelector('.header-menu-bar-wrapper').addEventListener('click', toggleMenu);
     document.querySelector('#mcanvasoverlay').addEventListener('click', closeMenuFromClick);
     
-    narcityFacebook.affectAllCounters();
     makeLinkTargetBlank();
 };
 
