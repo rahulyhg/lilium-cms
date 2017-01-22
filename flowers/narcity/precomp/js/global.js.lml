@@ -278,7 +278,7 @@ var bindNextScroll = function() {
 };
 
 var detectMobileOS = function() {
-    if (!window.navigator || /macintosh|win|msie/.test(window.navigator.userAgent.toLowerCase())) {
+    if (!window.navigator || /macintosh|win|msie|linux/.test(window.navigator.userAgent.toLowerCase())) {
         window.device = "pc";
         document.body.classList.add("pc");
         document.body.dataset.device = "pc";
@@ -385,5 +385,5 @@ bindAndroShare();
 bindIOSShare();
 bindPCShare();
 
-/* Dirty fixes. We don't use jQuery, but some 3rd party does. */
+/* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */
 jQuery = function() {return {is : function() { return this; } } };

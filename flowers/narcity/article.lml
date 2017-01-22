@@ -116,14 +116,14 @@ $}
         </div>
         {$ endif; $}
 
-        <div class="article-tags-wrapper no-mobile">
-            {$ for (tag in ?extra.article.tags); $}
-                {$ slugtag = slug.ify(=tag); $}
-                <a href="{=url}/tags/{=slugtag}">
-                    {=tag}
+        <!--div class="article-tags-wrapper no-mobile">
+            { $ for (tag in ?extra.article.tags); $ }
+                { $ slugtag = slug.ify(=tag); $ }
+                <a href="{=url}/tags/{= slugtag}">
+                    {= tag}
                 </a>
-            {$ endfor; $}
-        </div>
+            { $ endfor; $ }
+        </div-->
 
         {$ if (?extra.contextname == "article"); $}
             {=theme.settings.afterarticle}
