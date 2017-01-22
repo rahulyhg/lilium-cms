@@ -1,9 +1,10 @@
 {#config;forms;tableBuilder}
 
 		{$
-			var root = config.default.server.url;
+			root = config.default.server.url;
 			root += "/";
-			var baseurl = root + config.default.paths.admin;
+			baseurl = root;
+            baseurl += config.default.paths.admin;
 			root += "admin/"
 		$}
 
@@ -15,7 +16,7 @@
 
             <h1>List of articles<a class='fab' href="{=root}article/new">+</a></h1>
 
-			{=tableBuilder.render('article')}
+			{=tableBuilder.render("article")}
 		</main>
 
 		<lml:tabletemplate id="imgArticle">

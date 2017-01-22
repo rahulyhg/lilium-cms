@@ -2,6 +2,7 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var filelogic = require('./filelogic.js');
 var lml = require('./lml.js');
+var LML2 = require('./lml/compiler.js');
 var notif = require('./notifications.js');
 var formBuilder = require('./formBuilder.js');
 var configs = require('./config');
@@ -10,7 +11,7 @@ var precomp = require('./precomp.js');
 var DevTools = function() {};
 
 var interpretLMLToCli = function(cli) {
-    lml.executeFromString(cli._c.server.base + "/backend/dynamic/admin/", cli.postdata.data.lml, function(html) {
+    LML.executeFromString(cli._c.server.base + "/backend/dynamic/admin/", cli.postdata.data.lml, function(html) {
         cli.sendJSON({
             html: html
         });

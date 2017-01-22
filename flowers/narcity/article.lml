@@ -5,7 +5,7 @@
     url = config.default.server.url;
     rooturl = url.substring(2);
     postdate = extra.article.date;
-    formatdate = date.stringify(=postdate);
+    formatdate = date.stringify(postdate);
 $}
 <article id="{=extra.article.name}" data-mi={=extra.article._id}>
     {$ if (?extra.article.isSponsored == true); $}

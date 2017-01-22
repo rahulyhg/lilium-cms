@@ -1,4 +1,0 @@
-
-
-library.sublib.ftc(library.variable, 10, library.getParam(true)).toString();
-

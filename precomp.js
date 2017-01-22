@@ -1,6 +1,7 @@
 var _c = require('./config.js');
 var log = require('./log.js');
 var LML = require('./lml.js');
+var LML2 = require('./lml/compiler.js');
 var db = require('./includes/db.js');
 var fileserver = require('./fileserver.js');
 var checksum = require('checksum');
@@ -148,7 +149,7 @@ var Precomp = function () {
                         log('Precomp', 'Inserting sum ' + sum + ' for file ' + lmlfile + ' of website ' + conf.id, 'info')
                         db.remove(conf, 'compiledfiles', {filename : lmlfile}, function() {
                             db.insert(conf, 'compiledfiles', {filename : lmlfile, sum : sum, style : false}, function(err, r) {
-                                LML.executeToFile(
+                                LML2.compileToFile(
                                     lmlfile,
                                     writepath,
                                     callback,
@@ -200,7 +201,7 @@ var Precomp = function () {
                                 });
                             } else {
                                 log('Precompiler', 'Precompiling static file : ' + curFile, 'info');
-                                LML.executeToFile(
+                                LML2.compileToFile(
                                     rPath,
                                     tPath,
                                     function () {

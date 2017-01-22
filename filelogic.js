@@ -7,6 +7,7 @@ var slugify = require('slug');
 var db = require('./includes/db.js');
 var artcileHelper = require('./articleHelper.js');
 var noOp = require('./noop.js');
+var LML2 = require('./lml/compiler.js');
 
 var FileLogic = function () {
     /*
@@ -111,18 +112,23 @@ var FileLogic = function () {
             if (isPresent) { 
                 serveCachedFile(cli, savePath);
             } else {
-                LML.executeToFile(
-                    adminPath,
-                    savePath,
-                    function () {
-                        FileServer.pipeFileToClient(cli, savePath, function () {
-                            log('FileLogic', 'Admin page generated and served', 'success');
-                            (cb || noOp)();
+                FileServer.readFile(adminPath, function(content) {
+                    FileServer.createDirIfNotExists(savePath, function() {
+                        var output = FileServer.getOutputFileHandle(savePath);
+                        extra = extra || {};
+                        extra.rootDir = adminPath.substring(0, adminPath.lastIndexOf('/'));
+                        extra.config = cli._c;
+    
+                        var now = new Date();
+                        log('LML2', "Compiling file from " + adminPath, 'info');
+                        LML2.compile(cli._c.id, content, output, extra, function() {
+                            FileServer.pipeFileToClient(cli, savePath, function () {
+                                log('FileLogic', 'Admin template page generated and served in ' + (new Date - now) + "ms", 'success');
+                                (cb || noOp)();
+                            });
                         });
-                    }, Object.assign(extra || {}, {
-                        config : cli._c
-                    })
-                );
+                    });
+                }, false, 'utf8');
             }
         });
     };
@@ -141,17 +147,22 @@ var FileLogic = function () {
         FileServer.fileExists(savePath, function (isPresent) {
             var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + name + ".lml";
             if (!isPresent) {
-                LML.executeToFile(
-                    readPath,
-                    savePath,
-                    function () {
-                        FileServer.pipeFileToClient(cli, savePath, function () {
-                            log('FileLogic', 'Admin page generated and served', 'success');
+                FileServer.readFile(readPath, function(content) {
+                    FileServer.createDirIfNotExists(savePath, function() {
+                        var output = FileServer.getOutputFileHandle(savePath);
+                        extra = extra || {};
+                        extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
+                        extra.config = cli._c;
+    
+                        var now = new Date();
+                        log('LML2', "Compiling file from " + readPath, 'info');
+                        LML2.compile(cli._c.id, content, output, extra, function() {
+                            FileServer.pipeFileToClient(cli, savePath, function () {
+                                log('FileLogic', 'Admin page generated and served in ' + (new Date - now) + "ms", 'success');
+                            });
                         });
-                    }, Object.assign(extra || {}, {
-                        config : cli._c
-                    })
-                );
+                    });
+                }, false, 'utf8');
             } else {
                 serveCachedFile(cli, savePath);
             }
@@ -249,7 +260,7 @@ var FileLogic = function () {
                     var readPath = cli._c.server.base + "flowers/" + cTheme.uName + "/" + cTheme.contexts.next;
 
                     log('FileLogic', 'Compiling context theme page for article without layout', 'info');
-                    LML.executeToFile(
+                    LML2.compileToFile(
                         readPath,
                         tmpPath,
                         function () {
@@ -295,7 +306,7 @@ var FileLogic = function () {
             var layoutPath = cli._c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
 
             log('FileLogic', 'Compiling context theme page', 'info');
-            LML.executeToFile(
+            LML2.compileToFile(
                 readPath,
                 tmpPath,
                 function () {
@@ -303,7 +314,7 @@ var FileLogic = function () {
                         log('FileLogic', 'Including compiled theme page to layout', 'detail');
                         extra.contentHTML = ctn;
 
-                        LML.executeToFile(
+                        LML2.compileToFile(
                             layoutPath,
                             savePath,
                             function () {
