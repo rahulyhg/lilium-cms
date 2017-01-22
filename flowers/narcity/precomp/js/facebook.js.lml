@@ -38,10 +38,10 @@ var NarcityFacebook = function() {
     };
 
     this.affectAllCounters = function() {
-        var urls = {};
-        var allurls = [];
-
-        var allNodes = document.querySelectorAll(".fbshare");
+        var urls = {}, 
+            allurls = [],
+            allNodes = document.querySelectorAll(".fbshare");
+        
         for (var i = 0; i < allNodes.length; i++) {
             var htmlnode = allNodes[i];
             var u = htmlnode.dataset.url == "this" ? document.location.href : htmlnode.dataset.url;
@@ -70,20 +70,7 @@ var NarcityFacebook = function() {
     };
 
     this.init = function() {
-        if (window.lmlcontext == "home") {
-            window.lmlhomeurls = [];
-            for (var i = 0; i < window.lmlhomelinks.length; i++) {
-                window.lmlhomeurls.push(window.lmlhomelinks[i].url);
-            }
-
-            this.bulkShareRequest(window.lmlhomeurls, function(respBlock) {
-                if (respBlock && respBlock.og_object && respBlock.og_object.share && respBlock.og_object.share.share_count > 100) {
-                    var artWrapper = document.querySelector('.homepage ogid["+respBlock.id+"]');
-                }
-            });
-        } else if (window.lmlcontext == "article") {
-            this.affectAllCounters();
-        }
+        this.affectAllCounters();
     };
 };
 
