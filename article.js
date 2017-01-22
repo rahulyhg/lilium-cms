@@ -420,7 +420,7 @@ var Article = function() {
                                                 if (cli._c.social.facebook.appid && cli._c.social.facebook.token) {
                                                     log('Facebook', 'Sending request to debug link');
                                                     require('request')({
-                                                        url : 'https://graph.facebook.com', 
+                                                        url : 'https://graph.facebook.com/' + cli._c.social.facebook.apiversion || "v2.8", 
                                                         body : {
                                                             scrape : true,
                                                             access_token : cli._c.social.facebook.token,
@@ -432,16 +432,16 @@ var Article = function() {
                                                         log('Facebook', 'Debugger responded', c.title ? "success" : "warn");
                                                         if (c.title) {
                                                             notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                                                title: notifMessage,
+                                                                title: "Facebook Graph",
                                                                 msg: '<i>'+deepArticle.title+'</i> has been debugged on Facebook Graph.',
-                                                                type: 'info'
+                                                                type: 'log'
                                                             });
                                                         } else {
                                                             notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                                                title: notifMessage,
+                                                                title: "Facebook Graph",
                                                                 url : "https://developers.facebook.com/tools/debug/og/object/",
                                                                 msg: '<i>'+deepArticle.title+'</i> was not debugged on Facebook Graph.',
-                                                                type: 'wran'
+                                                                type: 'warning'
                                                             });
                                                         }
                                                     });
