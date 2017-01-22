@@ -224,6 +224,9 @@ var SiteInitializer = function (conf, siteobj) {
     this.initialize = function (done) {
         log('Sites', 'Initializing site with id ' + conf.id, 'lilium');
 
+        var compileKey = "lml" + Math.random().toString().substring(2) + Math.random().toString().substring(2);
+        conf.compilekey = compileKey;
+
         hooks.fire('site_will_initialize', conf);
         endpoints.addSite(conf.id);
 

@@ -28,4 +28,4 @@
     // Dirty fixes /////////////////////////////////////////////////
     cygnus_index_args = {};
 </script>
-<script src="{=config.default.server.url}/compiled/theme/vaniryk.js"></script>
+<script src="{=config.default.server.url}/compiled/theme/vaniryk.js?{=config.default.compilekey}"></script>

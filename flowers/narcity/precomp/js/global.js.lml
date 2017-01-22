@@ -7,12 +7,6 @@ _b64 = {_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+
 
 var narcityFacebook = new NarcityFacebook();
 
-var dimWidths = {
-    desktop : [970],
-    tablet : [480, 970],   
-    mobile : [0, 480]
-}
-
 function scrollToItem(scrollContainer, item, mod) {
 
         //with animation
