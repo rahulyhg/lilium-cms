@@ -420,7 +420,7 @@ var Article = function() {
                                                 if (cli._c.social.facebook.appid && cli._c.social.facebook.token) {
                                                     log('Facebook', 'Sending request to debug link');
                                                     require('request')({
-                                                        url : 'https://graph.facebook.com/' + cli._c.social.facebook.apiversion || "v2.8", 
+                                                        url : 'https://graph.facebook.com/v' + cli._c.social.facebook.apiversion || "2.8",
                                                         body : {
                                                             scrape : true,
                                                             access_token : cli._c.social.facebook.token,
