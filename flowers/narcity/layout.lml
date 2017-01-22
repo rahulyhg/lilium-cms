@@ -12,7 +12,6 @@
 </head>
 <body class="context-{=extra.contextname} narcity-theme" data-device="">
     {=theme.settings.bodyprio}
-    {%petals/lib}
     {%petals/socialhead}
     {%petals/mobileslider}
 

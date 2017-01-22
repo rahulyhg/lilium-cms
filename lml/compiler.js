@@ -663,7 +663,7 @@ class LMLCompiler {
             extra.rootDir = lmlfile.substring(0, lmlfile.lastIndexOf('/'));
 
             fileserver.createDirIfNotExists(savepath, function() {
-                const stream = fileserver.getOutputFileHandle(savepath);
+                const stream = fileserver.getOutputFileHandle(savepath, 'w+');
                 log('LML2', 'Compiling file ' + lmlfile, 'info');
                 let now = new Date();
                 that.compile(extra.config.id, content, stream, extra, () => {

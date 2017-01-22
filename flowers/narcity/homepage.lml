@@ -24,7 +24,7 @@
                                 <a href="{=config.default.server.url}/category/{=la.categories.0}">
                                     {$ 
                                         slug = la.categories.0;
-                                        ccat = category.getCatName(=slug); 
+                                        ccat = category.getCatName(slug); 
                                     $}
                                     {=ccat}
                               </a>
