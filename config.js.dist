@@ -32,6 +32,7 @@ var _config = {
 			base : "YOUR_COMPLETE_PATH_TO_LILIUM/",
 			html : "YOUR_COMPLETE_PATH_TO_LILIUM/html",
 			url : "//URL:PORT_NUMBER",
+            protocol : "http:",
 			port : "PORT_NUMBER",
 			postMaxLength : 1024,
 			fileMaxSize : 3000000

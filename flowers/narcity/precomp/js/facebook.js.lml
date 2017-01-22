@@ -75,8 +75,14 @@ var NarcityFacebook = function() {
             }
 
             this.bulkShareRequest(window.lmlhomeurls, function(respBlock) {
-                
+                if (respBlock && respBlock.og_object && respBlock.og_object.share && respBlock.og_object.share.share_count > 100) {
+                    var artWrapper = document.querySelector('.homepage ogid["+respBlock.id+"]');
+                    
+                }
             });
+        } else if (window.lmlcontext == "article") {
+            var ogid = document.location.href;
+            
         }
     };
 };

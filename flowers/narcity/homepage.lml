@@ -23,13 +23,6 @@
             {$ mod = relindex; mod %= 3; if (mod == 0); $}
             </div><div class="float-clear">
             {$ endif; $}
-                <script>
-                    window.lmlhomelinks.push({
-                        url : document.location.protocol + "{=config.default.server.url}/{=la.name}",
-                        wrapper : "{=la._id}"
-                    });
-                </script>
-
                 <div class="{=classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
                         <a href="{=config.default.server.url}/{=la.name}"> 
@@ -62,6 +55,14 @@
                         </a> &middot; {=date.stringify(la.date,"short")}</span>
                     </div>
                 </div>
+                <script>
+                    var nPage = {
+                        url : document.location.protocol + "{=config.default.server.url}/{=la.name}",
+                        wrapper : "{=la._id}"
+                    };
+                    window.lmlhomelinks.push(nPage);
+                    document.getElementById(nPage.wrapper).setAttribute('ogid', nPage.url);
+                </script>
             {$ relindex += 1; $}
         {$ endfor; $}
         </div>
@@ -88,13 +89,6 @@
                         classes += " article-thumbnail-featured"; 
                     endif;
                 $}
-                <script>
-                    window.lmlhomelinks.push({
-                        url : document.location.protocol + "{=config.default.server.url}/{=sa.name}",
-                        wrapper : "{=sa._id}"
-                    });
-                </script>
-
                 <a href="{=config.default.server.url}/{=sa.name}" id="art{=sa._id}"> 
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
@@ -114,6 +108,14 @@
                         </div>
                     </div>
                 </a>
+                <script>
+                    var nPage = {
+                        url : document.location.protocol + "{=config.default.server.url}/{=sa.name}",
+                        wrapper : "{=sa._id}"
+                    };
+                    window.lmlhomelinks.push(nPage);
+                    document.getElementById(nPage.wrapper).setAttribute('ogid', nPage.url);
+                </script>
                 {$ relindex += 1; $}
             {$ endfor; $}
         </div>

@@ -414,7 +414,37 @@ var Article = function() {
                                                             _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
                                                         },
                                                         function() {}
-                                                );
+                                                    );
+                                                }
+
+                                                if (cli._c.social.facebook.appid && cli._c.social.facebook.token) {
+                                                    log('Facebook', 'Sending request to debug link');
+                                                    require('request')({
+                                                        url : 'https://graph.facebook.com', 
+                                                        body : {
+                                                            scrape : true,
+                                                            access_token : cli._c.social.facebook.token,
+                                                            id : cli._c.server.protocol + cli._c.server.url + "/" + deepArticle.name
+                                                        },
+                                                        json : true,
+                                                        method : "POST"
+                                                    }, function(a, b, c) {
+                                                        log('Facebook', 'Debugger responded', c.title ? "success" : "warn");
+                                                        if (c.title) {
+                                                            notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                                                title: notifMessage,
+                                                                msg: '<i>'+deepArticle.title+'</i> has been debugged on Facebook Graph.',
+                                                                type: 'info'
+                                                            });
+                                                        } else {
+                                                            notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                                                title: notifMessage,
+                                                                url : "https://developers.facebook.com/tools/debug/og/object/",
+                                                                msg: '<i>'+deepArticle.title+'</i> was not debugged on Facebook Graph.',
+                                                                type: 'wran'
+                                                            });
+                                                        }
+                                                    });
                                                 }
         
                                                 var nlen = publishedNotificationTitles.length;

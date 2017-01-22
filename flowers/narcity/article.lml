@@ -51,7 +51,7 @@ $}
 
         {$ if (?author.displayname != ""); $} 
         <div class="article-author-strip">
-            <div class="article-author-share-section invisible" id="article-share-section">
+            <div class="article-author-share-section invisible no-mobile" id="article-share-section">
                 <div class="article-share-count-wrapper topvert">
                     <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
                     <span class="article-share-words">Shares</span>

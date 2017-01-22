@@ -115,38 +115,7 @@ var Settings = function () {
             .add('data.use', 'text', {
                 displayname: "Database Name"
             })
-/*
-        .add('paths-sep', 'title', {
-                displayname: "Paths"
-            })
-            .add('paths.admin', 'text', {
-                displayname: "Admin"
-            })
-            .add('paths.login', 'text', {
-                displayname: "Login"
-            })
-            .add('paths.livevars', 'text', {
-                displayname: "Live Variables"
-            })
-            .add('paths.themes', 'text', {
-                displayname: "Themes"
-            })
-            .add('paths.mail', 'text', {
-                displayname: "Email"
-            })
-            .add('paths.themesInfo', 'text', {
-                displayname: "Themes info file"
-            })
-            .add('paths.plugins', 'text', {
-                displayname: "Plugins"
-            })
-            .add('paths.pluginsInfo', 'text', {
-                displayname: "Plugins info file"
-            })
-            .add('paths.uploads', 'text', {
-                displayname: "Uploads"
-            })
-*/
+
         .add('server-sep', 'title', {
                 displayname: "Server"
             })
@@ -155,6 +124,10 @@ var Settings = function () {
             })
             .add('server.html', 'text', {
                 displayname: "HTML Directory"
+            })
+            .add('server.protocol', 'text', {
+                displayname : "Protocol",
+                defaultValue : "http:"
             })
             .add('server.url', 'text', {
                 displayname: "Base URL"
