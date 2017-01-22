@@ -31,7 +31,7 @@ $}
             <span class="article-share-icon">
                 <img src="{=config.default.server.url}/res/images/flame.png" />
             </span>
-            <span class="article-share-count-mobile-num fbshare" data-url="this" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
+            <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
         </div>
     </div>
     {$ endif; $}

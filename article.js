@@ -27,7 +27,15 @@ var Article = function() {
         "Say whaaat!",
         "Annnd it's live!",
         "You're the real deal!",
-        "Guess what!"
+        "Guess what!",
+        "The MVP; that's you!",
+        "YASSSSS",
+        "💯🙌🎉",
+        "I drink to that!",
+        "Three cheers for this one!",
+        "Good news!",
+        "You. Are. Amazing.",
+        "Hooray!"
     ];
 
     this.handlePOST = function(cli) {

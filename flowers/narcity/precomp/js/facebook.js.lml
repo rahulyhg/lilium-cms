@@ -12,7 +12,7 @@ var NarcityFacebook = function() {
     this.requestForShares = function(url, callback) {
         sendRequest(graphURL + "&ids=" + url, function(graphresp) {
             var graphobj = graphresp[url];
-            callback(graphobj.share.share_count);
+            callback(graphobj);
         });
     };
 
@@ -81,8 +81,7 @@ var NarcityFacebook = function() {
                 }
             });
         } else if (window.lmlcontext == "article") {
-            var ogid = document.location.href;
-            
+            this.affectAllCounters();
         }
     };
 };

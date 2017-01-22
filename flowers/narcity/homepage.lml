@@ -35,9 +35,17 @@
                                         ccat = category.getCatName(slug); 
                                     $}
                                     {=ccat}
-                              </a>
+                                </a>
                             </div>
                             {$ endif; $}
+
+                            <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
+                                <span class="article-share-icon">
+                                    <img src="{=config.default.server.url}/res/images/flame.png" />
+                                </span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
+                            </div>
+
                         </a>
                     </div>
                     <div class="article-thumbnail-title">
@@ -93,6 +101,12 @@
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
                             <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
+                            <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
+                                <span class="article-share-icon">
+                                    <img src="{=config.default.server.url}/res/images/flame.png" />
+                                </span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
+                            </div>
                         </div>
                         <div class="article-thumbnail-title">
                             {=sa.title}
