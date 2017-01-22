@@ -66,16 +66,6 @@ Date.prototype.toNarcityString = function() {
     return this.getMonthString() + " " + this.getDate() + ", " + (this.getYear() + 1900);
 };
 
-window.deviceIs = function(deviceArr) {
-    deviceArr = typeof deviceArr === 'object' ? deviceArr : [deviceArr];
-    for (var i = 0; i < deviceArr.length; i++) {
-        var dims = dimWidths[deviceArr[i]];
-        if (window.outerWidth >= dims[0] && (dims.length === 1 || window.outerWidth <= dims[1])) {
-            return true;
-        }
-    }
-};
-
 var makeLinkTargetBlank = function() {
     _v('article a').all(function(node) { 
         if (!node.attr('target')) {

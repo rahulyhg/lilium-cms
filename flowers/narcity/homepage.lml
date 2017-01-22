@@ -1,9 +1,14 @@
 {#config;extra;theme;debug;category;date}
 
+<script>
+    window.lmlhomelinks = [];
+</script>
+
 <main class="homepage">
     <div class="fwblock latest-content-wrapper">
         <h4 class="article-section-title">Most recent</h4>
   
+        <div class="float-clear">
         {$ relindex = 0; $} 
         {$ for (la in extra.latests); $}
             {$
@@ -15,7 +20,17 @@
                     classes += " article-thumbnail-margined";
                 endif;
             $}
-                <div class="{=classes}">
+            {$ mod = relindex; mod %= 3; if (mod == 0); $}
+            </div><div class="float-clear">
+            {$ endif; $}
+                <script>
+                    window.lmlhomelinks.push({
+                        url : document.location.protocol + "{=config.default.server.url}/{=la.name}",
+                        wrapper : "{=la._id}"
+                    });
+                </script>
+
+                <div class="{=classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
                         <a href="{=config.default.server.url}/{=la.name}"> 
                             <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}" />
@@ -44,11 +59,12 @@
                         <img src="{=la.author.avatarURL}" />
                         <span><a href="{=config.default.server.url}/author/{=la.author.slug}" class="article-thumbnail-author">
                             {=la.author.displayname}
-                        </a> &middot; {=date.stringify(la.date)}</span>
+                        </a> &middot; {=date.stringify(la.date,"short")}</span>
                     </div>
                 </div>
             {$ relindex += 1; $}
         {$ endfor; $}
+        </div>
     </div>
 
     <div class="homepage-sections">
@@ -72,7 +88,14 @@
                         classes += " article-thumbnail-featured"; 
                     endif;
                 $}
-                <a href="{=config.default.server.url}/{=sa.name}"> 
+                <script>
+                    window.lmlhomelinks.push({
+                        url : document.location.protocol + "{=config.default.server.url}/{=sa.name}",
+                        wrapper : "{=sa._id}"
+                    });
+                </script>
+
+                <a href="{=config.default.server.url}/{=sa.name}" id="art{=sa._id}"> 
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
                             <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
@@ -106,7 +129,6 @@
         <h4 class="article-section-title">Trending right now</h4>
         <h6 class="dev-message">Will be added later according to traffic</h6>
     </div-->
-
 </main>
 
 <lml:template id="lmltemplate-native">

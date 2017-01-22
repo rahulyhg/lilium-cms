@@ -1,11 +1,31 @@
 {#config;theme;extra}
 <script>
-    // Head globals
+    // Head globals ////////////////////////////////////////////////
     window.lmlcontext = "{=extra.contextname}";
     window.lmlurl = "{=config.default.server.url}";
     window.nsfw = "{=?extra.article.nsfw}" == "true";
 
-    // Dirty fix
+    // Utils ///////////////////////////////////////////////////////
+    var dimWidths = {
+        desktop : [970],
+        tablet : [480, 970],   
+        mobile : [0, 480]
+    }
+
+    // Returns true if current device is part of the array
+    window.deviceIs = function(deviceArr) {
+        deviceArr = typeof deviceArr === 'object' ? deviceArr : [deviceArr];
+        for (var i = 0; i < deviceArr.length; i++) {
+            var dims = dimWidths[deviceArr[i]];
+            if (window.outerWidth >= dims[0] && (dims.length === 1 || window.outerWidth <= dims[1])) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    // Dirty fixes /////////////////////////////////////////////////
     cygnus_index_args = {};
 </script>
 <script src="{=config.default.server.url}/compiled/theme/vaniryk.js"></script>

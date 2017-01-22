@@ -26,8 +26,13 @@ var registeredLibraries = {
     },
     date: function(context) {
         return {
-            stringify : function(str) {
-                return require('dateformat')(str, 'mmmm dd, yyyy');
+            stringify : function(str, format) {
+                var formats = {
+                    short : "mmm dd, yyyy",
+                    full : "mmmm dd, yyyy",
+                    slash : "dd/mm/yyyy"
+                };
+                return require('dateformat')(str, format ? formats[format] || formats.full : formats.full);
             }
         };
     },

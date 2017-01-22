@@ -19,7 +19,7 @@ var NarcityFacebook = function() {
     this.bulkShareRequest = function(urls, loopCallback) {
         sendRequest(graphURL + "&ids=" + urls.join(','), function(graphresp) {
             for (var url in graphresp) {
-                loopCallback(graphresp[url]);
+                loopCallback(graphresp[url], url);
             }
         });
     };
@@ -47,6 +47,10 @@ var NarcityFacebook = function() {
             allurls.push(u);
         });
 
+        if (!allurls || allurls.length == 0) {
+            return;
+        }
+
         this.bulkShareRequest(allurls, function(ogobj) {
             var htmlnode = urls[ogobj.id];
             if (!htmlnode) return;
@@ -62,6 +66,20 @@ var NarcityFacebook = function() {
             }
         });
     };
+
+    this.init = function() {
+        if (window.lmlcontext == "home") {
+            window.lmlhomeurls = [];
+            for (var i = 0; i < window.lmlhomelinks.length; i++) {
+                window.lmlhomeurls.push(window.lmlhomelinks[i].url);
+            }
+
+            this.bulkShareRequest(window.lmlhomeurls, function(respBlock) {
+                
+            });
+        }
+    };
 };
 
 var _fb = new NarcityFacebook();
+_fb.init();
