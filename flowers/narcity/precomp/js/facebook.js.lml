@@ -38,33 +38,35 @@ var NarcityFacebook = function() {
     };
 
     this.affectAllCounters = function() {
-        var urls = new Object();
-        var allurls = new Array();
-        Array.prototype.forEach.call(document.querySelectorAll(".fbshare"), function(htmlnode) {
+        var urls = {};
+        var allurls = [];
+
+        var allNodes = document.querySelectorAll(".fbshare");
+        for (var i = 0; i < allNodes.length; i++) {
+            var htmlnode = allNodes[i];
             var u = htmlnode.dataset.url == "this" ? document.location.href : htmlnode.dataset.url;
 
             urls[u] = htmlnode;
             allurls.push(u);
-        });
-
-        if (!allurls || allurls.length == 0) {
-            return;
         }
 
-        this.bulkShareRequest(allurls, function(ogobj) {
-            var htmlnode = urls[ogobj.id];
-            if (!htmlnode) return;
+        if (allurls.length != 0) {
+            this.bulkShareRequest(allurls, function(ogobj) {
+                var htmlnode = urls[ogobj.id];
 
-            var min = htmlnode.dataset.min || -1;
-
-            if (ogobj.share && ogobj.share.share_count && ogobj.share.share_count > min) {
-                htmlnode.innerHTML = ogobj.share.share_count;
+                if (htmlnode) {
+                    var min = htmlnode.dataset.min || -1;
     
-                if (htmlnode.dataset.show) {
-                    document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
+                    if (ogobj.share && ogobj.share.share_count && ogobj.share.share_count > min) {
+                        htmlnode.innerHTML = ogobj.share.share_count;
+        
+                        if (htmlnode.dataset.show) {
+                            document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
+                        }
+                    }
                 }
-            }
-        });
+            });
+        }
     };
 
     this.init = function() {
@@ -77,7 +79,6 @@ var NarcityFacebook = function() {
             this.bulkShareRequest(window.lmlhomeurls, function(respBlock) {
                 if (respBlock && respBlock.og_object && respBlock.og_object.share && respBlock.og_object.share.share_count > 100) {
                     var artWrapper = document.querySelector('.homepage ogid["+respBlock.id+"]');
-                    
                 }
             });
         } else if (window.lmlcontext == "article") {
