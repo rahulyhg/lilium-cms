@@ -407,10 +407,11 @@ class LMLTagParser {
         let params = {};
 
         if (line.indexOf('(') != -1) {
-            var matches = line.substring(line.indexOf('(') + 1, line.indexOf(')')).split(',');
-            for (var i = 0; i < matches.length; i++) {
-                var param = matches[i].split(':');
-                params[param[0]] = param[1].replace(/"/g, '').replace(/'/g, '');
+            let matches = line.substring(line.indexOf('(') + 1, line.indexOf(')')).split(',');
+            for (let i = 0; i < matches.length; i++) {
+                let param = matches[i].split(':');
+                let val = param[1].replace(/"/g, '').replace(/'/g, '');
+                params[param[0]] = val[0] == "=" ? ctx.slang.getReturn(ctx, val.substring(1)) : val;
             }
 
             line = line.substring(0, line.indexOf('('));
@@ -419,7 +420,7 @@ class LMLTagParser {
         let baseString = '<lml:livevars data-varname="' + line +
                          '" data-varparam="' + JSON.stringify(params).replace(/\"/g, "&lmlquote;") + '" ';
 
-        for (var paramname in params) {
+        for (let paramname in params) {
             baseString += ' data-' + paramname + '="'+params[paramname]+'" ';
         }
 
