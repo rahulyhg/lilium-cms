@@ -2085,7 +2085,7 @@ body.slidheader .android-sharer {
 
     .homepage .article-thumbnail-title,
     .homepage .article-thumbnail-featured .article-thumbnail-title {
-        font-family: Oswald, sans-serif;
+        font-family: "PT Serif", serif;
         font-size: 22px;
         margin: 10px 0;
         line-height: 1.4;

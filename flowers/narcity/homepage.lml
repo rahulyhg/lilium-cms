@@ -69,7 +69,7 @@
                         wrapper : "{=la._id}"
                     };
                     window.lmlhomelinks.push(nPage);
-                    document.getElementById(nPage.wrapper).setAttribute('ogid', nPage.url);
+                    document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
                 </script>
             {$ relindex += 1; $}
         {$ endfor; $}
@@ -128,7 +128,7 @@
                         wrapper : "{=sa._id}"
                     };
                     window.lmlhomelinks.push(nPage);
-                    document.getElementById(nPage.wrapper).setAttribute('ogid', nPage.url);
+                    document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
                 </script>
                 {$ relindex += 1; $}
             {$ endfor; $}
