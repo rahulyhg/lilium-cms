@@ -13,7 +13,6 @@
 </lml:foreach>
 
 
-
 <script>
 var curHistoryStack = [];
 var curHistoryIndex = -1;

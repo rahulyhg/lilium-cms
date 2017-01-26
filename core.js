@@ -287,6 +287,7 @@ var Core = function () {
         history.registerEndpoints();
         Article.registerContentEndpoint();
 
+/*
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');
             api.articlesHandleGET(cli);
@@ -306,6 +307,7 @@ var Core = function () {
             cli.touch('admin.GET.search');
             api.searchArticles(cli);
         });  
+*/
 
         hooks.fire('endpoints');
         log('Endpoints', 'Loaded endpoints', 'success');
