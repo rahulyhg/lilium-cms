@@ -89,8 +89,15 @@ var Article = function() {
                     break;
                 case 'edit':
                     if (cli.hasRight('create-articles')) {
-                        if (cli.routeinfo.path[3] && cli.routeinfo.path[3] == 'autosave') {
-                            filelogic.serveAdminLML(cli, true);
+                        var action = cli.routeinfo.path[4];
+
+                        if (action) {
+                            switch(action) {
+                                case "history":
+                                    break;
+                                default:
+                                    cli.throwHTTP(404, 'Not Found');
+                            }
                         } else {
                             this.edit(cli);
                         }
@@ -347,7 +354,7 @@ var Article = function() {
                 var newSlug = formData.name;
 
                 formData.author = formData.author ? db.mongoID(formData.author) : cli.userinfo.userid;
-                formData.date = dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone);
+                formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
                 formData.media = db.mongoID(formData.media);
                 formData.updated = new Date();
                 hooks.fire('article_will_' + pubCtx, {
@@ -355,11 +362,9 @@ var Article = function() {
                     article: formData
                 });
 
-                var conds = cli.postdata.data.id ? {
-                    _id: db.mongoID(cli.postdata.data.id)
-                } : {
-                    _id: db.mongoID()
-                };
+                var conds = {
+                    _id: cli.postdata.data.id ? db.mongoID(cli.postdata.data.id) : "Will not resolve"
+                }; 
 
                 if (formData.tags.map) {
                     formData.tagslugs = formData.tags.map(function(tagname) {
@@ -507,12 +512,7 @@ var Article = function() {
                     if (pubCtx == "preview") {
                         nUpdate();
                     } else {
-                        var old = arr[0];
-                        delete old._id;
-                        old.contentid = conds._id;
-                        old.historyPushed = new Date();
-
-                        db.insert(cli._c, 'history', old, nUpdate);
+                        require('./history.js').pushModification(cli, arr[0]._id, arr[0], nUpdate);
                     }
                 });
             } else {
@@ -558,93 +558,36 @@ var Article = function() {
         // Autosave
         if (auto) {
             // Check if article is edit, non-existing or published
-            formData.status = 'autosaved';
             if (cli.postdata.data.contentid) {
-                db.findAndModify(cli._c, 'content', {
-                    _id: db.mongoID(cli.postdata.data.contentid)
-                }, formData, function(err, doc) {
-                    if (doc.value !== null) {
-
-                        var val = doc.value;
-                        // Is a draft article
-                        cli.sendJSON({
-                            success: true,
-                            _id: val._id,
-                            contentid: cli.postdata.data.contentid
-                        });
-                    } else {
-                        formData.status = 'autosaved';
-                        formData.contentid = db.mongoID(cli.postdata.data.contentid);
-                        formData.date = new Date();
-
-                        if (cli.postdata.data._id) {
-                            // Autosave an autosaved version
-                            db.update(cli._c, 'autosave', {_id: db.mongoID(cli.postdata.data._id)}, formData, function(err, doc) {
-                                cli.sendJSON({
-                                    success: true,
-                                    _id: doc.insertedId,
-                                    contentid: cli.postdata.data.contentid
-                                });
-                            });
-
-                        } else {
-                            // Is a published
-                            db.insert(cli._c, 'autosave', formData, function(err, doc) {
-                                cli.sendJSON({
-                                    success: true,
-                                    _id: doc.insertedId,
-                                    contentid: cli.postdata.data.contentid
-                                });
-                            });
-                        }
-
-                    }
-
-                })
-            } else {
-                formData.status = 'autosaved';
-
-                if (cli.postdata.data._id) {
-
-                    db.update(cli._c, 'autosave', {
-                        _id: db.mongoID(cli.postdata.data._id)
-                    }, formData, function() {
-                        // Autosave updated
-                        cli.sendJSON({
-                            success: true,
-                            _id: cli.postdata.data._id
-                        });
-                    })
-                } else {
-                    formData.date = new Date();
-
-                    db.insert(cli._c, 'autosave', formData, function(err, doc) {
-                        // Autosave created
-                        cli.sendJSON({
-                            success: true,
-                            _id: doc.insertedId
-                        });
+                db.update(cli._c, 'content', {
+                    _id: db.mongoID(cli.postdata.data.contentid),
+                    status : {$ne : "published"}
+                }, formData, function(err, docs) {
+                    // Is a draft article
+                    cli.sendJSON({
+                        success: true,
+                        _id: cli.postdata.data.contentid,
+                        contentid: cli.postdata.data.contentid
                     });
-                }
-
+                });
+            } else {
+                cli.sendJSON({
+                    success: false,
+                    contentid: cli.postdata.data.contentid
+                });
             }
-
         } else {
             if (cli.postdata.data._id) {
                 // Update draft
-
                 id = db.mongoID(cli.postdata.data._id);
+
                 // Check if user can edit this article
                 db.findToArray(cli._c, 'content', {
                     _id: id
                 }, function(err, ress) {
                     var res = err ? undefined : ress[0];
                     if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
-                        delete res._id;
-                        res.contentid = id;
-                        res.historyPushed = new Date();
-
-                        db.insert(cli._c, 'history', res, function(err, revision) {    
+                        require("./history.js").pushModification(cli._c, id, res, function(err, revision) {    
                             db.update(cli._c, 'content', {
                                 _id: id
                             }, formData, function(err, doc) { 
@@ -1317,7 +1260,7 @@ var Article = function() {
                 displayname: 'Media',
                 template: 'imgArticle',
                 sortable: false,
-                fixedWidth : 90
+                classes : "article-table-image",
             }, {
                 key: '',
                 displayname: 'Title - Subtitle',

@@ -494,7 +494,9 @@ var LMLDom = function() {
     this.init = function() {
         maindom = document.getElementById('lml-main');
 
-        HTMLUnknownElement.prototype.insertAfter = HTMLElement.prototype.insertAfter = function (newNode) { 
+        HTMLUnknownElement.prototype.insertAfter = 
+        HTMLElement.prototype.insertAfter = 
+        function (newNode) { 
             this.parentNode.insertBefore(newNode, this.nextSibling); 
         };
 

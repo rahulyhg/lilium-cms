@@ -163,6 +163,14 @@ var DB = function() {
 		});
 	};
 
+    this.findUnique = function(conf, coln, conds, stack, cb, proj) {
+        this.find(conf, coln, conds, stack, function(err, cur) {
+            cur.hasNext(function(err, hasnext) {
+                hasnext ? cur.next(cb) : cb(undefined);
+            });
+        }, proj);
+    }
+
     this.count = this.length = function(conf, coln, conds, cb) {
         _conns[conf.id || conf].collection(coln, {strict:true}, function(err, col) {
 			if (err) {

@@ -1,0 +1,33 @@
+{#config}
+<lml:dom v="0.6" />
+{*history.article.{?1}}
+
+<h1>Article history</h1>
+
+<lml:foreach var="articlehistory" in="livevars.history.article" wrapper="div">
+    <lml:foreach var="histo" in="articlehistory.modifications">
+        <lml:generate call="historyCardGenerator"></lml:generate>
+    </lml:foreach>
+
+    <lml:generate call="historyCurrentGenerator"></lml:generate>
+</lml:foreach>
+
+
+
+<script>
+var curHistoryStack = [];
+var curHistoryIndex = -1;
+
+window.historyCardGenerator = function(ldContext) {
+    var obj = ldContext.histo;
+
+    curHistoryStack.push(obj);
+    curHistoryIndex++;
+
+    
+};
+
+window.historyCurrentGenerator = function(ldContext) {
+    var current = ldContext.articlehistory.currentstate;
+}
+</script>

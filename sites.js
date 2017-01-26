@@ -84,9 +84,13 @@ var SiteInitializer = function (conf, siteobj) {
         var createIndices = function() {
             log('Database', 'Creating indices', 'info');
             db.createIndex(conf, "content", {title : 'text', content : 'text', subtitle : 'text'}, function() {
-                db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
-                    log('Database', 'Created indices', 'success');
-                    createCollections();
+                db.createIndex(conf, "content", {date : 1}, function() {
+                    db.createIndex(conf, "content", {date : -1}, function() {
+                        db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
+                            log('Database', 'Created indices', 'success');
+                            createCollections();
+                        });
+                    });
                 });
             });
         };
@@ -129,6 +133,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timer/jquery.timer.js", 1100, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery.clickout/jquery.clickout.js", 1250, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/deep-diff/releases/deep-diff-0.3.3.min.js", 1350, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify.min.js", 1500, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify-html.min.js", 1510, "admin", conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);

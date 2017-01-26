@@ -90,11 +90,19 @@
         });
 
         document.addEventListener('lmlnotification', function(event, notification) {
-            pubBtn = $('button[name="publish"]').get(0);
-            pubBtn.disabled = false;
-            pubBtn.innerHTML = publishButtonText;
+            enablePublishButton();
         });
     }
+
+    var enablePublishButton = function() {
+        pubBtn = $('button[name="publish"]').get(0);
+
+        if (pubBtn) {
+            pubBtn.classList.remove("waitingForConfirmation");
+            pubBtn.disabled = false;
+            pubBtn.innerHTML = publishButtonText;
+        }
+    };
 
     var unpublishArticleModal = function(id) {    
         deleteID = id;
@@ -151,6 +159,8 @@
             document.getElementById('moreinfo-status').className = "article-status-" + resp.status;
             document.getElementById("moreinfo-modcount").textContent = resp.modifications;
 
+            isPublished = resp.status == "published";
+
             try {
                 document.getElementById('moreinfo-updated').textContent = dateFormat(resp["updated"], "d/mm/yyyy 'at' hh:MM");
             } catch (typeex) {
@@ -201,31 +211,22 @@
             } else {
                 document.querySelector('.article-destroyarticle-button-wrapper').style.display = "";
             }
+
+            document.querySelector('.article-history-button-wrapper').style.display = "";
         });
     };
 
-    $(document).ready(function() {
-        // Will be edit, new or an id
-        // Check if we can get an id
-        timer = $.timer(function() {
-            autoSave();
-        }, 60 * 1000, true);
+    var loadArticleHistory = function() {
+        liliumcms.pageloader.load(window.location.urlBase + "admin/history/article/" + contentid);
+    };
 
-        var autoSave = function() {
+    var autoSave = function() {
             timer.pause();
             var currentSave = $('form').serialize();
 
             // Save only if content has changed
             if (lastSave != currentSave && $('.article_base_title').val().trim() != "" && $('textarea[name="content"]').val() != "") {
-                var tempSave = currentSave;
-
-                if (_id) {
-                    tempSave += '&_id=' + _id;
-                }
-
-                if (contentid) {
-                    tempSave += '&contentid=' + contentid;
-                }
+                var tempSave = currentSave + '&_id=' + _id + '&contentid=' + contentid;
 
                 $.post('{=config.default.server.url}/admin/article/autosave', tempSave, function(data) {
                     lastSave = currentSave;
@@ -244,7 +245,16 @@
             } else {
                 console.log("Skipping auto-save");
             }
-        };
+    };
+
+
+    $(document).ready(function() {
+        // Will be edit, new or an id
+        // Check if we can get an id
+        timer = $.timer(function() {
+            if (!isPublished) { autoSave(); }
+        }, 60 * 1000, true);
+
 
         window.addEventListener("beforeunload", function(e) {
             if (lastSave !== $('form').serialize()) {
@@ -334,15 +344,20 @@
         });
 
         $('form button[name=publish]').on('click', function(e) {
-            // Ask for confirmation
-            $('#confirm-publish').modal('show');
+            if (isPublished) {
+                publishCurrentArticle();
+            } else {
+                // Ask for confirmation
+                $('#confirm-publish').modal('show');
+            }
+
             return false;
         });
 
-        $('#confirm-publish button.btn-primary').on('click', function(e) {
+        var publishCurrentArticle = function(e) {
             $('#confirm-publish').modal('hide');
 
-            var valid = liliumcms.formvalidator.validate($('form'));
+            var valid = liliumcms.formvalidator.validate($('form#post_create'));
             var form = $('form#post_create').serialize();
             var tempForm = form;
 
@@ -358,6 +373,7 @@
                 pubBtn.disabled = true;
                 publishButtonText = pubBtn.innerHTML;
                 pubBtn.innerHTML = "Publishing...";
+                pubBtn.classList.add("waitingForConfirmation");
 
                 if (articleEdit.urlWillChangeWarningShown) {
                     tempForm += "&_keepURL=" + articleEdit.keepURL;
@@ -377,10 +393,23 @@
                             liliumcms.pageloader.load(data.redirect);
                         }
 
+                        pubBtn.innerHTML = "Generating article...";
                         updateBottomSection();
+
+                        setTimeout(function() {
+                            if (pubBtn.classList.contains("waitingForConfirmation")) {
+                                liliumcms.notify( {type : "warning", title : "Weird.", message : "Server could not notify you for some reason, but the article was still published successfully, and should be online."});
+                                enablePublishButton();
+                            }
+                        }, 10000);
                     }
                 });
             } 
+        };
+
+
+        $('#confirm-publish button.btn-primary').on('click', function(e) {
+            publishCurrentArticle(e);
         });
 
         $('#confirm-unpublish button.btn-danger').on('click', function() {

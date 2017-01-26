@@ -198,7 +198,7 @@ class LMLSlang {
         let type = typeof curVal;
         if (type == "string") {
             curVal = curVal.trim();
-            if (curVal != "" && !isNaN(curVal)) {
+            if (curVal != "" && !isNaN(curVal) && curVal[0] != "0") {
                 curVal = parseFloat(curVal);
             } else if (flags["&"]) {
                 curVal = curVal.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\"/g, "&quot;"); 
