@@ -362,8 +362,10 @@ select {
     -webkit-box-sizing: border-box;
     -moz-box-sizing: border-box;
     box-sizing: border-box;
+}
 
-    
+.theme-setting-field-textarea textarea {
+    height: 200px;
 }
 
 .select-wrapper:before {
@@ -1889,7 +1891,16 @@ button.bigger {
     border-radius: 6px;
 }
 
+.article-history-button-wrapper button {
+    padding: 6px 10px;
+    background-color: #9b59b6;
+    color: #FFF;
+    font-size: 14px;
+    border-radius: 6px;
+}
+
 .article-delete-button-wrapper button::before,
+.article-history-button-wrapper button::before,
 .article-destroy-button-wrapper button::before {
     display: inline-block;
     font: normal normal normal 14px/1 FontAwesome;
@@ -1898,6 +1909,10 @@ button.bigger {
 
     font-size: 16px;
     margin-right: 2px;
+}
+
+.article-history-button-wrapper button::before {
+    content : '\f1da';
 }
 
 .article-delete-button-wrapper button::before {

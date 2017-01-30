@@ -1,0 +1,8 @@
+{#config;extra}
+{*devtools.htmlfiles}
+<lml:dom v="0.6" features="fullwidth" />
+
+<h1>
+    Generated HTML Files
+</h1>
+

@@ -84,7 +84,9 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
     color: #999;
 }
 .lmltablebuilder tbody td img {
-    max-height: 70px;
+    height: 70px;
+    width: 90px;
+    object-fit: cover;
 }
 .lmltablebuilder .navbuttons button {
     background: #fff;

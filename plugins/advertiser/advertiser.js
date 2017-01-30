@@ -16,6 +16,7 @@
      var production = require('./production.js');
      var backendsearch = undefined;
      var precomp = undefined;
+     var Frontend = undefined;
 
     var noop = noOp = function() {};    
 
@@ -29,6 +30,7 @@
 	         entities = require(abspath + "entities.js");
 	         Admin = require(abspath + 'backend/admin.js');
 	         fileLogic = require(abspath + 'filelogic.js');
+             Frontend = require(abspath + 'frontend.js');
 
 	         formBuilder = require(abspath + 'formBuilder.js');
 	         livevars = require(abspath + 'livevars.js');
@@ -206,6 +208,17 @@
 	             }, camp.cli);
 	         });
 
+             hooks.bind("article_deepfetch", 1000, function(_c, article, done) {
+                 if (article.sponsoredBoxLogo) {
+                     db.findToArray(_c, 'uploads', {_id : db.mongoID(article.sponsoredBoxLogo)}, function(err, arr) {
+                         article.sponsoredBoxLogoURL = err || arr.length == 0 ? "" : _c.server.url + "/uploads/" + arr[0].url;
+                         done(true);
+                     });
+                 } else {
+                     done(false);
+                 }
+             });
+
 	         hooks.bind('campaignStatusChanged', 560, function(camp) {
 	             makeAdServerRequest('campaignStatusChanged', camp.new.projectid, function(resp, err) {
 	                 log("Advertiser", err ?
@@ -233,26 +246,22 @@
 	             }, pkg.cli);
 	         });
 
-	         hooks.bind('frontend_will_precompile', 5000, function(pkg) {
+            // Foreach site
+            conf.eachSync(function(config) {
 	             log('Advertiser', 'Registering Scripts and CSS');
-	             var base = pkg.config.server.base;
-                 var html = pkg.config.server.html;
-
-	             pkg.Frontend.registerCSSFile(base + "plugins/advertiser/dynamic/style.css", 5000, 'admin', pkg.config.id);
-	             pkg.Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', pkg.config.id);
-	             pkg.Frontend.registerCSSFile(html + "/compiled/lmlnaradserv.css", 6000, 'theme', pkg.config.id);
-	             pkg.Frontend.registerJSFile (html + "/compiled/lmlnaradserv.js",  6000, 'theme', pkg.config.id);
+	             var base = config.server.base;
+                 var html = config.server.html;
 
 	             log('Advertiser', 'Registered Scripts and CSS');
-	         });
+	             Frontend.registerCSSFile(base + "plugins/advertiser/dynamic/style.css", 5000, 'admin', config.id);
+	             Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', config.id);
+	             Frontend.registerCSSFile(html + "/compiled/lmlnaradserv.css", 6000, 'theme', config.id);
+	             Frontend.registerJSFile (html + "/compiled/lmlnaradserv.js",  6000, 'theme', config.id);
 
-             hooks.bind('queue_will_compile', 5000, function(pkg) {
                  log('Advertiser', "Queuing frontend scripts for compilation");
-
-	             var base = pkg.config.server.base;
-                 precomp.queueFile(pkg.config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.js.lml" );
-                 precomp.queueFile(pkg.config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.css.lml");
-             });
+                 // precomp.queueFile(config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.js.lml" );
+                 // precomp.queueFile(config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.css.lml");
+            });
 	     };
 
 	     var createAdServerHandshake = function(cb) {
@@ -462,18 +471,6 @@
 	         }, true);
 	     }
 
-
-	     var registerScriptAndStyles = function() {
-	         hooks.bind('frontend_will_precompile', 3159, function(pkg) {
-	             pkg.Frontend.registerCSSFile(
-	                 pkg.config.server.base + "plugins/advertiser/dynamic/style.css",
-	                 3159,
-	                 'admin',
-	                 pkg.config.id
-	             );
-	         });
-	     };
-
 	     this.unregister = function(callback) {
 	         log("Advertiser", "Plugin disabled");
 	         endpoints.unregister('advertiser', 'GET');
@@ -486,16 +483,13 @@
 	         try {
 	             conf = _c;
 	             initRequires(_c.default().server.base);
-	             log("Advertiser", "Initalizing plugin");
+	             log("Advertiser", "Initalizing plugin", "lilium");
 
 	             log('Advertiser', 'Registering Endpoints');
 	             registerEndpoint();
 
 	             log('Advertiser', 'Hooking on events');
 	             registerHooks();
-
-	             log('Advertiser', 'Hooking script and stylesheets');
-	             registerScriptAndStyles();
 
 	             log('Advertiser', 'Adding advertiser role');
 	             registerRoles();

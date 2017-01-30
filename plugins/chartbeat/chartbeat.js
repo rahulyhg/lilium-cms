@@ -247,10 +247,10 @@ var Chartbeat = function() {
                         setTimeout(function() {
                             scheduler.schedule(scheduleFetchID + conf.id, {
                                 every: {
-                                    secondCount: 6
+                                    secondCount: 8
                                 }
                             }, scCall).start();
-                        }, 6000);
+                        }, 8000);
                     }
                 });
 
@@ -262,7 +262,7 @@ var Chartbeat = function() {
             scheduler.remove(scheduleFetchID + conf.id);
             scheduler.schedule(scheduleFetchID + conf.id, {
                 every: {
-                    secondCount: 6
+                    secondCount: 8
                 }
             }, scCall).start();
 

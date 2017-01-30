@@ -10,14 +10,24 @@
     {%petals/title}
     {=theme.settings.headend}
 </head>
-<body>
+<body class="context-{=extra.contextname} narcity-theme" data-device="">
     {=theme.settings.bodyprio}
-    {%petals/lib}
     {%petals/socialhead}
+    {%petals/mobileslider}
+
     {%petals/header}
-    {%petals/beforecontent}
-    {=extra.contentHTML}
+    {%petals/sharer}
+
+    <div id="mcanvas">
+        {%petals/beforecontent}
+        {=extra.contentHTML}
+
+        <div id="lmlasync">
+
+        </div>
+    </div>
     {%petals/footer}
+
     {=theme.settings.bodyend}
 </body>
 </html>

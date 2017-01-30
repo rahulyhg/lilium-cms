@@ -4,7 +4,7 @@
 {*chartbeat.dashboard.latest}
 <div class="dash-cb-wrapper">
 	{$
-		if (config.default.chartbeat.api_key != "");
+		if (?config.default.chartbeat.api_key != "");
 	$}
 	<div class="dash-cb-realtime-header">
 		<div class="col-xs-6 col-md-3">

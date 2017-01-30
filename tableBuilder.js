@@ -3,8 +3,10 @@ var hooks = require('./hooks.js');
 var pluginHelper = require('./pluginHelper.js');
 
 var TableBuilder = function () {
+    var that = this;
+
     lmllib.registerContextLibrary('tableBuilder', function () {
-        return require('./tableBuilder');
+        return that;
     });
 
     var tables = {};

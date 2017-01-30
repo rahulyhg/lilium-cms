@@ -74,7 +74,7 @@
             },
             "default": [{
                 "linktext": "",
-                "url": "http://"
+                "url": "//"
             }]
         },
 
@@ -84,13 +84,19 @@
         "customcss" : {"type" : "textarea", "attr" : {"displayname" : "Custom plain CSS"}, "default" : ".logo {}"},
         "headprio" : {"type" : "textarea", "attr" : {"displayname" : "Top of head tag"}, "default" : "<script></script>"},
         "headend" : {"type" : "textarea", "attr" : {"displayname" : "End of head tag"}, "default" : "<script></script>"},
+        "beforeheader" : {"type" : "textarea", "attr" : {"displayname" : "Before top header"}, "default" : "<script></script>"},
+        "afterheader" : {"type" : "textarea", "attr" : {"displayname" : "After top header"}, "default" : "<script></script>"},
         "beforearticle" : {"type" : "textarea", "attr" : {"displayname" : "Before content"}, "default" : "<script></script>"},
         "afterarticle" : {"type" : "textarea", "attr" : {"displayname" : "After content"}, "default" : "<script></script>"},
         "bodyprio" : {"type" : "textarea", "attr" : {"displayname" : "Top of body tag"}, "default" : "<script></script>"},
-        "bodyend" : {"type" : "textarea", "attr" : {"displayname" : "End of body tag"}, "default" : "<script></script>"}
+        "bodyend" : {"type" : "textarea", "attr" : {"displayname" : "End of body tag"}, "default" : "<script></script>"},
+        "sidetop" : {"type" : "textarea", "attr" : {"displayname" : "Top of Sidebar"}, "default" : "<div></div>"},
+        "sidebottom" : {"type" : "textarea", "attr" : {"displayname" : "Bottom of sidebar"}, "default" : "<div></div>"}
     },
     "contexts" : {
         "article" : "article.lml",
+        "next" : "article.lml",
+        "page" : "page.lml",
         "home" : "homepage.lml",
         "search" : "archive.lml",
         "archive" : "archive.lml",

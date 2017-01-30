@@ -20,17 +20,18 @@
 {#config}
 window.location.urlBase = "{=config.default.server.url}/";
 window.location.urlBaseStrip = "{=config.default.server.url}";
+window.location.uid = "{=config.default.uid}"
 var __indx = window.location.urlBase.indexOf('/', 2);
 window.location.lmldomain = window.location.urlBase.substring(2, __indx); 
 window.location.lmlpath = window.location.urlBase.substring(__indx);
 window.location.cdn = "{=?config.default.content.cdn.domain}";
 
 var debugMode = 'true';
-var socket = typeof io !== 'undefined' ? io("{=config.default.server.url}/{=config.default.uid}", {
+var socket = typeof io !== 'undefined' ? io(window.location.urlBase + window.location.uid, {
     transports : ['websocket']
 }) : undefined;
 window.lmlsocket = socket;
-
+ 
 var LiliumCMS = function() {
     var livevarsResponse;
     var urlParams;

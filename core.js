@@ -53,6 +53,7 @@ var feed = undefined;
 var cdn = undefined;
 var vocab = undefined;
 var various = undefined;
+var history = undefined;
 
 var log = require('./log.js');
 
@@ -112,6 +113,7 @@ var Core = function () {
         cdn = require('./cdn.js');
         vocab = require('./vocab.js');
         various = require('./various.js');
+        history = require('./history.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
@@ -282,7 +284,10 @@ var Core = function () {
         tools.registerAdminEndpoint();
         conversations.registerAdminEndpoint();
         feed.registerAdminEndpoint();
+        history.registerEndpoints();
+        Article.registerContentEndpoint();
 
+/*
         api.registerApiEndpoint('articles', 'GET', function (cli) {
             cli.touch('admin.GET.articles');
             api.articlesHandleGET(cli);
@@ -302,6 +307,7 @@ var Core = function () {
             cli.touch('admin.GET.search');
             api.searchArticles(cli);
         });  
+*/
 
         hooks.fire('endpoints');
         log('Endpoints', 'Loaded endpoints', 'success');
@@ -655,6 +661,7 @@ var Core = function () {
         notification.registerLiveVar();
         conversations.registerLiveVar();
         feed.registerLiveVar();
+        history.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
         log('Core', 'Loaded live variables', 'success');

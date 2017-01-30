@@ -1,9 +1,79 @@
-{#config;extra;theme;debug;category}
+{#config;extra;theme;debug;category;date}
+
+<script>
+    window.lmlhomelinks = [];
+</script>
 
 <main class="homepage">
-    <div class="fwblock trending-now-wrapper">
-        <h4 class="article-section-title">Trending right now</h4>
-        <h6 class="dev-message">Will be added later according to traffic</h6>
+    <div class="fwblock latest-content-wrapper">
+        <h4 class="article-section-title">Most recent</h4>
+  
+        <div class="float-clear">
+        {$ relindex = 0; $} 
+        {$ for (la in extra.latests); $}
+            {$
+                classes = "article-thumbnail";
+                if (relindex == 0); 
+                    classes += " article-thumbnail-featured"; 
+                endif;
+                if (relindex > 2);
+                    classes += " article-thumbnail-margined";
+                endif;
+            $}
+            {$ mod = relindex; mod %= 3; if (mod == 0); $}
+            </div><div class="float-clear">
+            {$ endif; $}
+                <div class="{=classes}" id="art{=la._id}">
+                    <div class="article-thumbnail-featured-image">
+                        <a href="{=config.default.server.url}/{=la.name}"> 
+                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}" />
+                            {$ if (?la.categories.0 != "") $}
+                            <div class="article-cat-name">
+                                <a href="{=config.default.server.url}/category/{=la.categories.0}">
+                                    {$ 
+                                        slug = la.categories.0;
+                                        ccat = category.getCatName(slug); 
+                                    $}
+                                    {=ccat}
+                                </a>
+                            </div>
+                            {$ endif; $}
+
+                            <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
+                                <span class="article-share-icon">
+                                    <img src="{=config.default.server.url}/res/images/flame.png" />
+                                </span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
+                            </div>
+
+                        </a>
+                    </div>
+                    <div class="article-thumbnail-title">
+                        <a href="{=config.default.server.url}/{=la.name}"> 
+                            {=la.title}
+                        </a>
+                    </div>
+                    <div class="article-thumbnail-subtitle">
+                        {=la.subtitle}
+                    </div>
+                    <div class="article-thumbnail-details">
+                        <img src="{=la.author.avatarURL}" />
+                        <span><a href="{=config.default.server.url}/author/{=la.author.slug}" class="article-thumbnail-author">
+                            {=la.author.displayname}
+                        </a> &middot; {=date.stringify(la.date,"short")}</span>
+                    </div>
+                </div>
+                <script>
+                    var nPage = {
+                        url : document.location.protocol + "{=config.default.server.url}/{=la.name}",
+                        wrapper : "{=la._id}"
+                    };
+                    window.lmlhomelinks.push(nPage);
+                    document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
+                </script>
+            {$ relindex += 1; $}
+        {$ endfor; $}
+        </div>
     </div>
 
     <div class="homepage-sections">
@@ -27,16 +97,39 @@
                         classes += " article-thumbnail-featured"; 
                     endif;
                 $}
-                <a href="{=config.default.server.url}/{=sa.name}"> 
+                <a href="{=config.default.server.url}/{=sa.name}" id="art{=sa._id}"> 
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
                             <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
+                            <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
+                                <span class="article-share-icon">
+                                    <img src="{=config.default.server.url}/res/images/flame.png" />
+                                </span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
+                            </div>
                         </div>
                         <div class="article-thumbnail-title">
                             {=sa.title}
                         </div>
+                        <div class="article-thumbnail-subtitle">
+                            {=sa.subtitle}
+                        </div>
+                        <div class="article-thumbnail-details">
+                            <img src="{=sa.author.avatarURL}" />
+                            <span><a href="{=config.default.server.url}/author/{=sa.author.slug}" class="article-thumbnail-author">
+                                {=sa.author.displayname}
+                            </a> &middot; {=date.stringify(sa.date)}</span>
+                        </div>
                     </div>
                 </a>
+                <script>
+                    var nPage = {
+                        url : document.location.protocol + "{=config.default.server.url}/{=sa.name}",
+                        wrapper : "{=sa._id}"
+                    };
+                    window.lmlhomelinks.push(nPage);
+                    document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
+                </script>
                 {$ relindex += 1; $}
             {$ endfor; $}
         </div>
@@ -48,47 +141,10 @@
         {=theme.snip("bannerad",["desktop"],"/1020360/homepage-middle-narcity",[[728|90]|[970|250]],"ad-homepage-middle-narcity")}
     </div>
 
-    <div class="fwblock latest-content-wrapper">
-        <h4 class="article-section-title">Most recent</h4>
-  
-        {$ relindex = 0; $} 
-        {$ for (la in extra.latests); $}
-            {$
-                classes = "article-thumbnail";
-                if (relindex == 0); 
-                    classes += " article-thumbnail-featured"; 
-                endif;
-                if (relindex > 2);
-                    classes += " article-thumbnail-margined";
-                endif;
-            $}
-                <div class="{=classes}">
-                    <div class="article-thumbnail-featured-image">
-                        <a href="{=config.default.server.url}/{=la.name}"> 
-                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}" />
-                            {$ if (?la.categories.0 != "") $}
-                            <div class="article-cat-name">
-                                <a href="{=config.default.server.url}/category/{=la.categories.0}">
-                                    {$ 
-                                        slug = la.categories.0;
-                                        ccat = category.getCatName(=slug); 
-                                    $}
-                                    {=ccat}
-                              </a>
-                            </div>
-                            {$ endif; $}
-                        </a>
-                    </div>
-                    <div class="article-thumbnail-title">
-                        <a href="{=config.default.server.url}/{=la.name}"> 
-                            {=la.title}
-                        </a>
-                    </div>
-                </div>
-            {$ relindex += 1; $}
-        {$ endfor; $}
-    </div>
-
+    <!--div class="fwblock trending-now-wrapper">
+        <h4 class="article-section-title">Trending right now</h4>
+        <h6 class="dev-message">Will be added later according to traffic</h6>
+    </div-->
 </main>
 
 <lml:template id="lmltemplate-native">

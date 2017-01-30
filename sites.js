@@ -27,17 +27,19 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadHTMLStructure = function (done) {
         fileserver.createDirIfNotExists(conf.server.html, function (valid) {
-            if (valid) {
-                log('FileServer',
-                    'HTML Directory was validated at : ' +
-                    conf.server.html,
-                    'success'
-                );
-            } else {
-                log('FileServer', 'Error validated html directory', 'err');
-            }
-
-            done();
+            fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
+                if (valid && nextvalid) {
+                    log('FileServer',
+                        'HTML Directory was validated at : ' +
+                        conf.server.html,
+                        'success'
+                    );
+                } else {
+                    log('FileServer', 'Error validated html directories', 'err');
+                }
+    
+                done();
+            }, true);
         }, true);
     };
 
@@ -82,10 +84,30 @@ var SiteInitializer = function (conf, siteobj) {
         var createIndices = function() {
             log('Database', 'Creating indices', 'info');
             db.createIndex(conf, "content", {title : 'text', content : 'text', subtitle : 'text'}, function() {
-                db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
-                    log('Database', 'Created indices');
-                    done();
+                db.createIndex(conf, "content", {date : 1}, function() {
+                    db.createIndex(conf, "content", {date : -1}, function() {
+                        db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
+                            log('Database', 'Created indices', 'success');
+                            createCollections();
+                        });
+                    });
                 });
+            });
+        };
+
+        var createCollections = function() {
+            log('Database', 'Creating collections', 'info');
+            
+        	var collectionsNames = [
+		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview",
+        		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history",
+		        "lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations",
+		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges"
+        	];
+
+            db.createCollections(conf, collectionsNames, function() {
+                log('Database', 'Database initialization finished', 'lilium');
+                done();
             });
         };
 
@@ -111,6 +133,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timer/jquery.timer.js", 1100, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery.clickout/jquery.clickout.js", 1250, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/deep-diff/releases/deep-diff-0.3.3.min.js", 1350, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify.min.js", 1500, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify-html.min.js", 1510, "admin", conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
@@ -205,6 +228,9 @@ var SiteInitializer = function (conf, siteobj) {
 
     this.initialize = function (done) {
         log('Sites', 'Initializing site with id ' + conf.id, 'lilium');
+
+        var compileKey = "lml" + Math.random().toString().substring(2) + Math.random().toString().substring(2);
+        conf.compilekey = compileKey;
 
         hooks.fire('site_will_initialize', conf);
         endpoints.addSite(conf.id);

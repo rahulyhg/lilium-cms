@@ -324,7 +324,7 @@ var Notification = function () {
             that.createGroup('lmlsite_' + conf.id);
             var url = conf.server.url + "/";
             var path = url.substring(url.indexOf('/', 2));
-            log('Socket', 'Created connection for channel : ' + path + conf.uid, 'live');
+            log('Socket', 'Created connection for namespace : ' + path + conf.uid, 'live');
             io.of(path + conf.uid).on('connection', onSocketConnection);
             namespaces.push(path + conf.uid);
             idToNamespace[conf.id] = path + conf.uid

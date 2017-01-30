@@ -4,6 +4,8 @@ var path = require('path');
 var _c = require('./config.js');
 var log = require('./log.js');
 var minify = require('html-minifier').minify;
+var uglifycss = require('uglifycss');
+var UglifyJS = require("uglify-js");
 var Canvas = require('canvas');
 var crypto = require('crypto');
 var dateFormat = require('dateformat');
@@ -49,14 +51,39 @@ var FileServer = function () {
         var timeStamp = new Date();
 
         this.readFile(fullpath, function (content) {
+            var minifiedString = "";
+            var splitdot = fullpath.split('.');
+            var ext = splitdot.pop();
+    
+            if (ext == "lml") {
+                ext = splitdot.pop();
+            }
+
+            log("Minifier", "Minifying file with ext : " + ext);
+            try {
+                switch (ext) {
+                    case "css":
+                        minifiedString = uglifycss.processString(content);
+                        break;
+                    case "js":
+                        minifiedString = UglifyJS.minify(content, {fromString: true}).code;
+                        break;
+                    default: 
+                        minifiedString = minify(content, {
+                            removeComments: true,
+                            removeScriptTypeAttributes: true,
+                            collapseWhitespace: true,
+                            minifyJS: true,
+                            minifyCSS: true
+                        });
+                }
+            } catch (ex) {
+                log('Fileserver', 'Could not minify file ' + fullpath, 'err');
+                minifiedString = content
+            }
+
             var handle = that.getOutputFileHandle(fullpath, 'w+');
-            that.writeToFile(handle, minify(content, {
-                removeComments: true,
-                removeScriptTypeAttributes: true,
-                collapseWhitespace: true,
-                minifyJS: true,
-                minifyCSS: true
-            }), function () {
+            that.writeToFile(handle, minifiedString, function () {
                 that.closeFileHandle(handle);
                 log('FileServer', 'Minified file ' + fullpath + ' in ' + (new Date() - timeStamp) + 'ms');
 
@@ -184,7 +211,6 @@ var FileServer = function () {
         folders.pop();
         var pathToFile = folders.join('/');
 
-
         mkdirp(pathToFile, function () {
             var rs = fs.createReadStream(source);
             var ws = fs.createWriteStream(dest);
@@ -192,7 +218,12 @@ var FileServer = function () {
             rs.on('close', callback);
             rs.pipe(ws);
         });
+    };
 
+    this.moveFile = function(source, dest, callback) {
+        this.copyFile(source, dest, function() {
+            fs.unlink(source, callback);
+        });
     };
 
     this.pipeFileToClient = function (cli, filename, callback, abs, mime) {

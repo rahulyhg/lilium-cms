@@ -2,6 +2,7 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var filelogic = require('./filelogic.js');
 var lml = require('./lml.js');
+var LML2 = require('./lml/compiler.js');
 var notif = require('./notifications.js');
 var formBuilder = require('./formBuilder.js');
 var configs = require('./config');
@@ -10,7 +11,7 @@ var precomp = require('./precomp.js');
 var DevTools = function() {};
 
 var interpretLMLToCli = function(cli) {
-    lml.executeFromString(cli._c.server.base + "/backend/dynamic/admin/", cli.postdata.data.lml, function(html) {
+    LML.executeFromString(cli._c.server.base + "/backend/dynamic/admin/", cli.postdata.data.lml, function(html) {
         cli.sendJSON({
             html: html
         });
@@ -29,6 +30,7 @@ var handleGET = function(cli) {
         case 'endpoints':
         case 'cache':
         case 'feed':
+        case 'html':
         case 'scripts':
         case undefined:
             filelogic.serveAdminLML(cli);
@@ -244,6 +246,31 @@ var maybeExecuteScript = function(cli) {
     }
 };
 
+var listAllCachedFiles = function(cli, levels, params, cb) {
+    var dirPath = cli._c.server.html;
+    require('./fileserver.js').listDirContent(dirPath, function(rootarr) {
+        require('./fileserver.js').listDirContent(dirPath + "/next", function(nextarr) {
+            require('./fileserver.js').listDirContent(dirPath + "/tags", function(tagsarr) {
+                require('./fileserver.js').listDirContent(dirPath + "/category", function(catarr) {
+                    require('./fileserver.js').listDirContent(dirPath + "/author", function(autharr) {
+                        require('./fileserver.js').listDirContent(dirPath + "/search", function(serarr) {
+                            rootarr = rootarr.filter(function(obj) { return obj.indexOf(".html") !== -1 });
+                            cb({
+                                html : rootarr,
+                                next : nextarr,
+                                tags : tagsarr,
+                                category : catarr,
+                                author : autharr,
+                                search : serarr
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    });
+};
+
 var parseContentAds = function(cli) {
     var pcount = cli._c.content.adsperp;
     var db = require('./includes/db.js');
@@ -273,7 +300,12 @@ var parseContentAds = function(cli) {
                 
                     var changed = false;
                     jsdom.env(content, function(err, dom) {
-                        var parags = dom.document.querySelectorAll("body > p");
+                        if (err) {
+                            log("Devtools", "Error parsing dom : " + err, "err");
+                            return next();
+                        }
+
+                        var parags = dom.document.querySelectorAll("body > p, body > h3");
                         for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
                             var adtag = dom.document.createElement('ad');
                             dom.document.body.insertBefore(adtag, parags[i]);
@@ -359,6 +391,8 @@ DevTools.prototype.registerLiveVar = function() {
             require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
                 cb(list);
             });
+        } else if (levels[0] == "htmlfiles") {
+            listAllCachedFiles(cli, levels, params, cb);
         }
     }, ["develop"]);
 };

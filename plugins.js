@@ -148,7 +148,7 @@ var Plugins = module.exports = new function () {
                         active: true
                     }, function () {
                         if (typeof pluginInstance.register !== 'function') {
-                            log("Plugins", 'Plugin has no method "register"');
+                            log("Plugins", 'Plugin has no method "register"', 'warn');
                             hooks.fire('pluginregistered', identifier);
 
                             callback();
@@ -157,17 +157,18 @@ var Plugins = module.exports = new function () {
                             try {
                                 pluginInstance.register(_c, info, function () {
                                     cli.cacheClear(undefined, function(err) {;
+                                        log('Plugins', 'Registered ' + identifier, 'success');
                                         hooks.fire('pluginregistered', identifier);
                                         callback();
                                     });
                                 });
                             } catch (e) {
-                                log("Plugins", "Error while registering plugin " + identifier + ": " + e.message);
+                                log("Plugins", "Error while registering plugin " + identifier + ": " + e.message, 'err');
                             }
                         }
                     }, true, true);
                 } catch (ex) {
-                    log("Plugins", "Could not register plugin [" + identifier + "] because of an exception : " + ex);
+                    log("Plugins", "Could not register plugin [" + identifier + "] because of an exception : " + ex, 'err');
                     log("Plugins", ex.stack);
                     callback();
                 }
@@ -312,11 +313,14 @@ var Plugins = module.exports = new function () {
                     }
                 }
             });
+            cb();
+            /*
             db.remove(_c.default(), 'plugins', {}, function () {
                 db.insert(_c.default(), 'plugins', plugins, function (err) {
                     cb();
                 });
             }, false);
+            */
         });
 
     };

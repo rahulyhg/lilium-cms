@@ -1,6 +1,6 @@
 {#config;forms;theme}
 {$
-	var baseurl = config.default.server.url;
+	baseurl = config.default.server.url;
 $}
 
 var CKEditor = function() {

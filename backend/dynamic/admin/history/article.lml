@@ -1,0 +1,285 @@
+{#config}
+<lml:dom v="0.6" />
+{*history.article.{?1}}
+
+<h1>Article history</h1>
+
+<div class="timeline-page-wrapper">
+    <div class="timeline-vertline"></div>
+
+    <lml:foreach var="articlehistory" in="livevars.history.article" wrapper="div">
+        <lml:generate call="historyCurrentGenerator"></lml:generate>
+
+        <lml:foreach var="histo" in="articlehistory.modifications">
+            <lml:generate call="historyCardGenerator"></lml:generate>
+        </lml:foreach>
+
+        <lml:generate call="historyCreatedGenerator"></lml:generate>
+    </lml:foreach>
+</div>
+
+
+<script>
+var curHistoryStack = [];
+var curHistoryIndex = -1;
+
+liliumcms.lmldom.bind(function() {
+    var cards = document.querySelectorAll('.timeline-infowrapper');
+    for (var i = 0; i < cards.length; i++) {
+        (function(i) {
+            setTimeout(function() {
+                cards[i].classList.add("shown");
+            }, i * 150);
+        })(i);
+    }
+});
+
+window.historyCardGenerator = function(ldContext) {
+    var obj = ldContext.histo;
+    var cUsers = liliumcms.conversations.getCachedUsers();
+    var actorobj = cUsers[obj.modifiedBy];
+
+    curHistoryStack.push(obj);
+    curHistoryIndex++;
+
+    var cardWrapper = document.createElement('div');
+    cardWrapper.className = "history-bigwrap";
+
+    var bigdot = document.createElement('div');
+    bigdot.className = "timeline-bigdot";
+
+    var datewrap = document.createElement('i');
+    datewrap.className = "timeline-datetime";
+    datewrap.textContent = dateFormat(new Date(obj.modifiedOn), "mmmm dd, yyyy - hh:MM:ss");
+
+    var actorwrap = document.createElement('b');
+    var actoravatar = document.createElement('img');
+
+    actorwrap.className = "timeline-actorwrap";
+    actoravatar.className = "timeline-actoravatar";
+
+    if (actorobj) {
+        actorwrap.textContent = "Action by " + actorobj.displayname;
+        actoravatar.setAttribute('src', actorobj.avatarURL);
+    }
+
+    var stateWrapper = document.createElement('div');
+    stateWrapper.className = "timeline-statewrapper";
+    if (obj.statusChange) {
+        var newStatusStrip = document.createElement('div');
+        newStatusStrip.className = "timeline-newstatusstrip";
+
+        newStatusStrip.textContent = histoStatusVocab[obj.statusChange];
+        newStatusStrip.classList.add("status-" + obj.statusChange);
+        
+        cardWrapper.classList.add("newstatus");
+        cardWrapper.classList.add("newstatus-" + obj.statusChange);
+        stateWrapper.appendChild(newStatusStrip);
+        stateWrapper.classList.add("newstatus");
+        stateWrapper.classList.add("newstatus-" + obj.statusChange);
+    };
+
+    var modlist = document.createElement('ul');
+    modlist.className = "timeline-modlist";
+    for (var i = 0; i < obj.diffs.length; i++) {
+        var listitem = document.createElement('li');
+        listitem.textContent = histoActionDico[obj.diffs[i].change] + 
+            " " + (
+                histoFieldsDico[obj.diffs[i].field.join('.')] || obj.diffs[i].field
+            );
+
+        modlist.appendChild(listitem);
+    };
+
+    var infoWrapper = document.createElement('div');
+    infoWrapper.className = "timeline-infowrapper";
+
+    // Merge
+    infoWrapper.appendChild(datewrap);
+    infoWrapper.appendChild(actorwrap);
+    infoWrapper.appendChild(modlist);
+    infoWrapper.appendChild(stateWrapper);
+
+    cardWrapper.appendChild(bigdot);
+    cardWrapper.appendChild(infoWrapper);
+
+    return cardWrapper;
+};
+
+window.historyCreatedGenerator = function(ldContext) {
+    var obj = ldContext.articlehistory.currentstate;
+
+    var cardWrapper = document.createElement('div');
+    cardWrapper.className = "history-bigwrap";
+
+    var bigdot = document.createElement('div');
+    bigdot.className = "timeline-bigdot";
+
+    var infoWrapper = document.createElement('div');
+    infoWrapper.className = "timeline-infowrapper";
+
+    var createString = "Article was created";
+
+    if (obj.createdOn) {
+        createString += " on " + dateFormat(new Date(obj.createdOn), "mmmm dd, yyyy - hh:MM:ss");
+    }
+
+    if (obj.createdBy) {
+        var actorobj = liliumcms.conversations.getCachedUser(obj.createdBy);
+        createString += " by " + actorobj.displayname;
+    }
+
+    var dateWrap = document.createElement('div');
+    dateWrap.textContent = createString;
+
+    infoWrapper.appendChild(dateWrap);
+
+    cardWrapper.appendChild(bigdot);
+    cardWrapper.appendChild(infoWrapper);
+
+    return cardWrapper;
+}
+
+window.historyCurrentGenerator = function(ldContext) {
+    var current = ldContext.articlehistory.currentstate;
+}
+
+var histoStatusVocab = {
+    suggested : "Article was suggested",
+    published : "Article was published live",
+    draft : "Article was set to draft",
+    deleted : "Article was unpublished from the website",
+    destroyed : "Article was permanently destroyed"
+};
+
+var histoActionDico = {
+    added : "Added",
+    removed : "Removed",
+    modified : "Modified",
+    array : "Arranged"
+};
+
+var histoFieldsDico = {
+    "content" : "Content",
+    "title" : "Title",
+    "name" : "Slug",
+    "aliases" : "Aliases",
+    "author" : "Author",
+    "categories" : "Category",
+    "categories.0" : "Category",
+    "date" : "Publication date",
+    "featuredimageartist" : "Featured Image Credit",
+    "featuredimagelink" : "Featured Image Link",
+    "geolocationdisplay" : "Geo tagging",
+    "media" : "Featured Image",
+    "persona-select" : "Persona",
+    "status" : "Status",
+    "tags" : "Tags"
+};
+</script>
+
+<style>
+.timeline-bigdot {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    background-color: #9b59b6;
+    border-radius: 30px;
+    vertical-align: top;
+    border: 5px solid #DDD;
+}
+
+.timeline-infowrapper {
+    display: inline-block;
+    vertical-align: top;
+    width: calc(100% - 100px);
+    margin-left: 20px;
+    padding: 15px;
+    background: #F6F6F6;
+    border: 1px solid #DDD;
+    max-width: 600px;
+
+    -webkit-transition: all 0.2s;
+   -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+     -o-transition: all 0.2s;
+        transition: all 0.2s;
+
+    -webkit-transform: translate3d(0, 120px, 0);
+   -moz-transform: translate3d(0, 120px, 0);
+    -ms-transform: translate3d(0, 120px, 0);
+     -o-transform: translate3d(0, 120px, 0);
+        transform: translate3d(0, 120px, 0);
+
+    opacity: 0;
+}
+
+.timeline-infowrapper.shown {
+    -webkit-transform: translate3d(0,0,0);
+   -moz-transform: translate3d(0,0,0);
+    -ms-transform: translate3d(0,0,0);
+     -o-transform: translate3d(0,0,0);
+        transform: translate3d(0,0,0);
+
+    opacity: 1;
+}
+
+.history-bigwrap {
+    margin: 50px 20px;
+    z-index: 100;
+    position: relative;
+}
+
+.timeline-datetime {
+    display: block;
+    font-size: 20px;
+    color: #999;
+    font-style: normal;
+    font-weight: 300;
+}
+
+.timeline-actorwrap {
+    display: block;
+    color: #777;
+    margin-top: -1px;
+}
+
+.timeline-statewrapper {
+    margin: 15px -15px -15px;
+    background: #333;
+    color: #F6F6F6;
+    padding: 10px 15px;
+    font-size: 18px;
+    display: none;
+}
+
+.timeline-statewrapper.newstatus {
+    display: block;
+}   
+
+.timeline-statewrapper.newstatus.newstatus-published {
+    background: #67b659;
+}
+
+.timeline-statewrapper.newstatus.newstatus-deleted {
+    background: #b5712b;
+}
+
+.timeline-vertline {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 42px;
+    width: 5px;
+    background-color: #DDD;
+}
+
+.timeline-page-wrapper {
+    position: relative;
+}
+
+.timeline-modlist {
+    margin-top: 12px;
+}
+
+</style>

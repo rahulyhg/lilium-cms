@@ -40,8 +40,6 @@ var LML = function () {
     const condClosures = ["endif", "else", "endwhile", "endfor", "endblock"];
     const lmlOperators = ["+=", "-=", "*=", "/=", "=", "%="];
 
-    var proceedWhenCompleted;
-
     // {=toplevellib.level1.level2}
     // {=toplevellib.func(paras:"value")}
     var execVariableTag = function (context, code, callback) {
@@ -150,7 +148,7 @@ var LML = function () {
 
                 if (executeLML) {
                     that.executeToContext(fullpath, context, function (pContent) {
-                        context.merge();
+                        // context.merge();
                         currentIndex++;
 
                         next();
@@ -362,7 +360,7 @@ var LML = function () {
             }
 
             if (encodeHTML && endVal && endVal.length !== 0) {
-                endVal = endVal.replace(/\>/g, "&gt;").replace(/\</g, "&lt;");
+                endVal = endVal.replace(/\>/g, "&gt;").replace(/\</g, "&lt;").replace(/\"/g, "&quot;");
             }
 
             return endVal;
@@ -469,10 +467,11 @@ var LML = function () {
         };
     })();
 
+    // REALLY, REALLY FREAKING SLOW, MUST FIND ALTERNATIVE TO HUGE REGEX OMG SERIOUSLY :'(
     var execLMLTag = function (context, code, callback) {
         // LML parsing
-        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=|\?=)[\s]*([^\n]*)[\s]*\)|(block)[\s]*\([\s]*([^\s]+)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(endblock|else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\%|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'\[][^\n]+["|'\]])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
-        var closureSelector = /(else|endif|endfor|endwhile|endblock)/g;
+        var selector = /(if|while)[\s]*\([\s]*([^\s]+)[\s]*(==|<=?|>=?|!=|\?=)[\s]*([^\n]*)[\s]*\)|(for)[\s]*\([\s]*([^\s]+)[\s]+(in)[\s]+([^\s]+)[\s]*\)|(else|endif|endfor|endwhile)|([a-zA-Z0-9\.]+)[\s]*([\+|\-|\*|\%|\/]=?|=)[\s]*([a-zA-Z0-9\.]+[\s]*(\(.*\))?|["|'\[][^\n]+["|'\]])|\/\/([^\n]+)|([a-zA-Z0-9\.]+)[\s]*\((.*)\)/g;
+        var closureSelector = /(else|endif|endfor|endwhile)/g;
 
         // Split in lines array, all commands have
         var lines = typeof code === 'string' ? code.split(/\n|;/g) : code;
@@ -667,6 +666,7 @@ var LML = function () {
         var nextWorkPos = 0;
 
         // Needs to be precompiled every line
+        // ALSO FREAKING SLOW OMG PLEASE LET'S CHANGE THIS REGEX TO SOMETHING ELSE HUHHH
         var lmlDetectRegex = /{(#|%|=)([^\n\s\}]*)}|({\$|\$})|{(\*)([^\n\s\(]*)\(?(([^\n\s]*\s*:\s*"?[A-Za-z0-9À-ÿ\_\#\>\<\/\=\+\-.\s\']*"?,?\s*)*)\)?}/g;
         var seekLML = function () {
             if (nextWorkPos >= line.length) {
@@ -714,7 +714,7 @@ var LML = function () {
                     setTimeout(seekLML, 0);
                 }
             } else {
-                context.w(line.substring(nextWorkPos) + "\n");
+                context.w(line.substring(nextWorkPos));
                 lineCallback(context.lineFeedback);
             }
         };
@@ -800,9 +800,7 @@ var LML = function () {
             context.setStream(outputstream);
 
             delete extra.config;
-        } else if (!context.isParent) {
-            context.stash();
-        }
+        } 
 
         if (typeof extra !== 'undefined') {
             context.extra = extra;
@@ -811,14 +809,6 @@ var LML = function () {
         }
 
         if (lineTotal != 0) {
-            var fin = function() {
-                if (typeof proceedWhenCompleted == 'function') {
-                    proceedWhenCompleted(context, extra, callback);
-                } else {
-                    callback(context);
-                }
-            };
-
             var cont = function () {
                 setTimeout(function () {
                     parseLine(lines[cLine].text, context, function (feedback) {
@@ -833,7 +823,7 @@ var LML = function () {
                         cLine++;
 
                         if (cLine == lineTotal) {
-                            fin();
+                            callback(context);
                         } else {
                             cont();
                         }

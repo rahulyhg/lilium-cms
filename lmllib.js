@@ -24,6 +24,18 @@ var registeredLibraries = {
     json: function(context) {
         return JSON;
     },
+    date: function(context) {
+        return {
+            stringify : function(str, format) {
+                var formats = {
+                    short : "mmm dd, yyyy",
+                    full : "mmmm dd, yyyy",
+                    slash : "dd/mm/yyyy"
+                };
+                return require('dateformat')(str, format ? formats[format] || formats.full : formats.full);
+            }
+        };
+    },
     vocab: function (context) {
         var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
         return require('./vocab.js').getDico(conf.website.language);

@@ -9,7 +9,7 @@ $}
     {=tableBuilder.render('theme')}
     
     {*themesettings(sourceof:=formname)}
-    {=forms.render(=formname)}
+    {=forms.render(formname)}
 </main>
 
 <lml:tabletemplate id="table-themes-actions">

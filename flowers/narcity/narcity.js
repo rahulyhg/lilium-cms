@@ -78,6 +78,7 @@ var fetchHomepageArticles = function(_c, cb) {
     var i = 0;
     var len = Object.keys(homepageSections).length;
     var sectionArr = new Array();
+    var authors = {};
 
     var nextSection = function() {
         if (i < len) {
@@ -89,7 +90,11 @@ var fetchHomepageArticles = function(_c, cb) {
                         'status' : 'published'
                     } 
                 }, {
-                    $limit : 3
+                    $sort : {
+                        date : -1
+                    }
+                }, {
+                    $limit : 6
                 }, {
                     $lookup : {
                         from:           "uploads",
@@ -105,6 +110,10 @@ var fetchHomepageArticles = function(_c, cb) {
                     "articles" : arr
                 });
 
+                for (var j = 0; j < arr.length; j++) {
+                    arr[j].author = authors[arr[j].author];
+                }
+
                 i++;
                 nextSection();
             });
@@ -119,7 +128,7 @@ var fetchHomepageArticles = function(_c, cb) {
                         date : -1
                     }
                 }, {
-                    $limit : 9
+                    $limit : 12
                 }, {
                     $lookup : {
                         from:           "uploads",
@@ -129,6 +138,10 @@ var fetchHomepageArticles = function(_c, cb) {
                     }
                 }
             ], function(latests) {
+                for (var j = 0; j < latests.length; j++) {
+                    latests[j].author = authors[latests[j].author];
+                }
+
                 cb({
                     sections : sectionArr,
                     latests : latests
@@ -137,7 +150,13 @@ var fetchHomepageArticles = function(_c, cb) {
         }
     };
 
-    nextSection();
+    db.findToArray(cc.default(), "entities", {}, function(err, arr) {
+        for (var i = 0; i < arr.length; i++) {
+            authors[arr[i]._id] = arr[i];
+        }
+
+        nextSection();
+    }, {displayname : 1, avatarURL : 1, slug : 1});
 };
 
 var registerLib = function() {
@@ -210,7 +229,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 $match : match
             }, {
                 $sort : {
-                    date : -1
+                    _id : -1
                 }
             }, {
                 $lookup : {
@@ -346,7 +365,16 @@ var loadHooks = function(_c, info) {
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
-    hooks.bind('article_will_render', 2000, function(pkg) { parseAds(pkg);                        });
+    hooks.bind('article_will_render', 2000, function(pkg) { 
+        // Replace ad tags with ad set
+        parseAds(pkg); 
+
+        // Replace Instagram scripts
+        parseInsta(pkg);
+
+        // Flag if NSFW, ad it to deepfetched object
+        parseNSFW(pkg);
+    });
 };
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
@@ -357,21 +385,38 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
     }
 };
 
+var parseNSFW = function(pkg) {
+    pkg.article.nsfw = typeof pkg.article.tags == "object" && pkg.article.tags.indexOf && (pkg.article.tags.indexOf("nsfw") !== -1 || pkg.article.tags.indexOf("NSFW") !== -1);
+};
+
+var parseInsta = function(pkg) {
+    pkg.article.content = pkg.article.content.replace(/\<script async\=\"\" defer\=\"\" src\=\"\/\/platform.instagram.com\/en_US\/embeds.js\"\>\<\/script\>/g, "") + '<script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>';
+};
+
 var parseAds = function(pkg) {
+    if (!pkg._c.contentadsnip) {
+        return;
+    }
+
     var art = pkg.article;
     var keys = Object.keys(pkg._c.contentadsnip);
     var indx = 0;
     var delimiter = "<ad></ad>";    
     var pos;
     
-    while ((pos = art.content.indexOf(delimiter)) != -1) {
-        art.content = art.content.substring(0, pos) + pkg._c.contentadsnip[keys[indx]].code + art.content.substring(pos+delimiter.length);
-        indx++;
+    if (art.tags.indexOf('nsfw') == -1 && art.tags.indexOf('NSFW') == -1) {
+        while ((pos = art.content.indexOf(delimiter)) != -1) {
+            art.content = art.content.substring(0, pos) + '<div class="awrapper">' + pkg._c.contentadsnip[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
+            indx++;
 
-        if (indx == keys.length) {
-            indx = 0;
+            if (indx == keys.length) {
+                break;
+                indx = 0;
+            }
         }
     }
+
+    art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
 };
 
 var registerPrecompFiles = function(_c) {
@@ -384,6 +429,7 @@ var registerPrecompFiles = function(_c) {
     templateBuilder.addCSS(themePath + '/precomp/css/narcity.css.lml', _c.id);
 
     templateBuilder.addJS(themePath + '/precomp/js/vaniryk.js.lml', _c.id);
+    templateBuilder.addJS(themePath + '/precomp/js/social.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/facebook.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/global.js.lml', _c.id);
 }

@@ -1,4 +1,4 @@
-{#config;session;vocab;forms}
+{#config;vocab;forms}
 {%../articlescript}
 
 	<h1>Edit a post</h1>
@@ -26,7 +26,16 @@
 			<div class="article-info-strip">
 				<span>Author : </span><span id="moreinfo-author"></span>
 			</div>
+			<div class="article-info-strip modcount-info-strip">
+				<span>Modification count : </span><span id="moreinfo-modcount">0</span>
+			</div>
 
+            <div class="article-info-strip article-history-button-wrapper article-button-wrapper">
+                <button onclick="loadArticleHistory();">
+                    View history
+                </button>
+            </div>
+    
             <div class="article-info-strip article-delete-button-wrapper article-button-wrapper">
                 <button onclick="unpublishArticleModal()">
                         Unpublish

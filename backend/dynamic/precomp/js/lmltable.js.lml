@@ -244,6 +244,10 @@ var LmlTable = function(table) {
 							td.appendChild(document.createTextNode(trdata[keys[j].key]));
 						}
 
+                        if (keys[j].classes) {
+                            td.className = keys[j].classes;
+                        }
+
 						tr.replaceChild(td, tr.children[j]);
 					}
 				} else { // Create a new tr

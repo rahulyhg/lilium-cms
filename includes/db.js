@@ -83,13 +83,14 @@ var DB = function() {
             var ins = function() {
                 if (colIndex < colMax) {
 		            _conns[conf.id || conf].createCollection(col[colIndex], {}, function(err, res) {
-                        results.err.push(err);
-                        results.res.push(res);
+                        err && results.err.push(err);
+                        res && results.res.push(res);
                         colIndex++;
                         
                         ins();
                     });
                 } else {
+                    log('Database', 'Created ' + results.res.length + ' collections with ' + results.err.length + ' errors', 'lilium');
                     callback();
                 }
             };
@@ -162,6 +163,14 @@ var DB = function() {
 		});
 	};
 
+    this.findUnique = function(conf, coln, conds, cb, proj) {
+        this.find(conf, coln, conds, undefined, function(err, cur) {
+            cur.hasNext(function(err, hasnext) {
+                hasnext ? cur.next(cb) : cb(new Error("Could not find item in collection " + coln), undefined);
+            });
+        }, proj);
+    }
+
     this.count = this.length = function(conf, coln, conds, cb) {
         _conns[conf.id || conf].collection(coln, {strict:true}, function(err, col) {
 			if (err) {
@@ -184,7 +193,7 @@ var DB = function() {
 		}
 	};
 
-	this.findToArray = function(conf, coln, conds, cb, projection, skip, max) {
+	this.findToArray = function(conf, coln, conds, cb, projection, skip, max, fromLastToFirst) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -193,6 +202,10 @@ var DB = function() {
 			} else {
 				conds = typeof conds === 'undefined' ? {} : conds;
 				var stk = col.find(conds);
+
+                if (fromLastToFirst) {
+                    stk = stk.sort({_id : -1});
+                }
 
                 if (projection) {
                     stk = stk.project(projection);
@@ -320,7 +333,7 @@ var DB = function() {
 			} else if (typeof docs !== "object") {
 				cb("[Database - Invalid document]");
 			} else {
-				col[typeof docs.length !== "undefined" ? "insertMany" : "insertOne"](docs, cb);
+				col[Array.isArray(docs) ? "insertMany" : "insertOne"](docs, cb);
 			}
 		});
 	};

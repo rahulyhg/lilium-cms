@@ -1,0 +1,79 @@
+{#config;extra}
+{$ if (extra.contextname == "article"); $}
+
+<div class="android-sharer" id="android-sharer">
+    <i class="fa fa-share-alt" aria-hidden="true"></i>
+</div>
+
+<div class="ios-sharer" id="ios-sharer">
+    <div id="ios-share-facebook-wrap">
+        <div style="background-color: #3b5998;" id="ios-share-facebook">
+            <i class="fa fa-facebook-official" aria-hidden="true"></i>
+            <span>Share</span>
+        </div>
+    </div>
+    <div id="ios-share-twitter-wrap">
+        <div style="background-color: #55acee;" id="ios-share-twitter">
+            <i class="fa fa-twitter" aria-hidden="true"></i>
+           <span>Tweet</span>
+        </div>
+    </div>
+    <div id="ios-share-pinterest-wrap">
+        <div style="background-color: #cb2027;" id="ios-share-pinterest">
+            <i class="fa fa-pinterest-p" aria-hidden="true"></i>
+            <span>Pin</span>
+        </div>
+    </div>
+</div>
+
+<div id="android-sharer-buttons">
+    <h3>Share</h3>
+    <ul id="android-sharer-list">
+        <li id="android-sharer-facebook">
+            <i class="fa fa-facebook-official" aria-hidden="true" style="color:#3b5998; "></i>
+            Facebook
+        </li>
+        <li id="android-sharer-twitter">
+            <i class="fa fa-twitter" aria-hidden="true" style="color: #55acee;"></i>
+            Twitter
+        </li>
+        <li id="android-sharer-googleplus">
+            <i class="fa fa-google-plus" aria-hidden="true" style="color: #dd4b39;"></i>
+            Google Plus
+        </li>
+        <li id="android-sharer-pinterest">
+            <i class="fa fa-pinterest-p" aria-hidden="true" style="color: #cb2027;"></i>
+            Pinterest
+        </li>
+        <li id="android-sharer-email">
+            <i class="fa fa-envelope-o" aria-hidden="true" ></i>
+            Email
+        </li>
+    </ul>
+    <div id="android-sharer-cancel">
+        Cancel
+    </div>
+</div>
+
+<div class="pc-sharer" id="pc-sharer">
+    <i class="fa fa-share-square-o" aria-hidden="true"></i>
+    <span>Share</span>
+</div>
+
+<div class="pc-sharer-network" id="pc-share-facebook" style="background-color: #3b5998;"> 
+    <i class="fa fa-facebook-official" aria-hidden="true"></i>
+</div>
+
+<div class="pc-sharer-network" id="pc-share-twitter" style="background-color: #55acee;"> 
+    <i class="fa fa-twitter" aria-hidden="true"></i>
+</div>
+
+<div class="pc-sharer-network" id="pc-share-googleplus" style="background-color: #dd4b39;"> 
+    <i class="fa fa-google-plus" aria-hidden="true"></i>
+</div>
+
+<div class="pc-sharer-network" id="pc-share-pinterest" style="background-color: #cb2027;"> 
+    <i class="fa fa-pinterest-p" aria-hidden="true"></i>
+</div>
+
+{$ endif; $}

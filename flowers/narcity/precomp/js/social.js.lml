@@ -1,0 +1,33 @@
+{#config}
+
+var NarcitySocial = function() {
+    this.castTwitterShare = function() {
+        var title;
+        if (window.articlepos) {
+            title = encodeURI(window.articlepos[window.currentPageIndex].title);
+        }
+        window.open("https://twitter.com/intent/tweet?url=" + window.location.href + "&via={=?config.default.social.accounts.twitter}" + (title ? "&text=" + title : ""), '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=480,width=640');
+    };
+
+    this.castGooglePlusShare = function() {
+        window.open("https://plus.google.com/share?url=" + document.location.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');
+    };
+
+    this.castPinterestShare = function() {
+        var title;
+        if (window.articlepos) {
+            title = encodeURI(window.articlepos[window.currentPageIndex].title);
+        }
+        window.open("https://www.pinterest.com/pin/create/button/?url="+document.location.href+(title ? "&description=" + title : ""), "", "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,width=640,height=480")
+    };
+
+    this.castEmailShare = function() {
+        var title;
+        if (window.articlepos) {
+            title = encodeURI(window.articlepos[window.currentPageIndex].title);
+        }
+        window.open('mailto:?subject='+title+'&body=' + encodeURI("You gotta see this : ") + document.location.href);
+    };
+};
+
+var _nsocial = new NarcitySocial;

@@ -76,7 +76,8 @@ var Settings = function () {
             cssClass: 'admin-settings-form',
             requirements : {
                 required : false
-            }
+            },
+            async : true
         })
 
         .trg('top')
@@ -114,38 +115,7 @@ var Settings = function () {
             .add('data.use', 'text', {
                 displayname: "Database Name"
             })
-/*
-        .add('paths-sep', 'title', {
-                displayname: "Paths"
-            })
-            .add('paths.admin', 'text', {
-                displayname: "Admin"
-            })
-            .add('paths.login', 'text', {
-                displayname: "Login"
-            })
-            .add('paths.livevars', 'text', {
-                displayname: "Live Variables"
-            })
-            .add('paths.themes', 'text', {
-                displayname: "Themes"
-            })
-            .add('paths.mail', 'text', {
-                displayname: "Email"
-            })
-            .add('paths.themesInfo', 'text', {
-                displayname: "Themes info file"
-            })
-            .add('paths.plugins', 'text', {
-                displayname: "Plugins"
-            })
-            .add('paths.pluginsInfo', 'text', {
-                displayname: "Plugins info file"
-            })
-            .add('paths.uploads', 'text', {
-                displayname: "Uploads"
-            })
-*/
+
         .add('server-sep', 'title', {
                 displayname: "Server"
             })
@@ -154,6 +124,10 @@ var Settings = function () {
             })
             .add('server.html', 'text', {
                 displayname: "HTML Directory"
+            })
+            .add('server.protocol', 'text', {
+                displayname : "Protocol",
+                defaultValue : "http:"
             })
             .add('server.url', 'text', {
                 displayname: "Base URL"
@@ -229,6 +203,9 @@ var Settings = function () {
             .add('google.refreshtoken', 'text', {
                 displayname : "Refresh Token"
             })
+            .add('google.jsonfilepath', 'text', {
+                displayname : "Backend JSON key file full path"
+            })
 
         .add('lickstats_title', 'title', {
             displayname : "Lickstats Combos"
@@ -249,81 +226,6 @@ var Settings = function () {
                         fieldName : "secret",
                         dataType : "text",
                         displayname : "Access Secret"
-                    }
-                ]
-            }
-        }).add('facebook_title', 'title', {
-            displayname : "Facebook Combos"
-        }).add('facebookcombos', 'stack', {
-            displayname : "Facebook ID / Token combos",
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "websiteurl",
-                        dataType : "text",
-                        displayname : "Website URL"
-                    }, {
-                        fieldName : "id",
-                        dataType : "text",
-                        displayname : "Account ID"
-                    }, {
-                        fieldName : "token",
-                        dataType : "text",
-                        displayname : "Access Token"
-                    }
-                ]
-            }
-        }).add('twitter_title', 'title', {
-            displayname : "Twitter Combos"
-        }).add('twittercombos', 'stack', {
-            displayname : "Twitter ID / Token combos",
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "username",
-                        dataType : "text",
-                        displayname : "Twitter username"
-                    }, {
-                        fieldName : "consumerkey",
-                        dataType : "text",
-                        displayname : "Consumer Key"
-                    }, {
-                        fieldName : "consumersecret",
-                        dataType : "text",
-                        displayname : "Consumer Secret"
-                    }, {
-                        fieldName : "tokenkey",
-                        dataType : "text",
-                        displayname : "Access Token Key"
-                    }, {
-                        fieldName : "tokensecret",
-                        dataType : "text",
-                        displayname : "Access Token Secret"
-                    }
-                ]
-            }
-        }).add('instagram_title', 'title', {
-            displayname : "Instagram Combos"
-        }).add('instagramcombos', 'stack', {
-            displayname : "Instagram ID / Token combos",
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "account",
-                        dataType : "text",
-                        displayname : "Account name"
-                    }, {
-                        fieldName : "clientid",
-                        dataType : "text",
-                        displayname : "Client ID"
-                    }, {
-                        fieldName : "clientsecret",
-                        dataType : "text",
-                        displayname : "Client Secret"
-                    }, {
-                        fieldName : "accesstoken",
-                        dataType : "text",
-                        displayname : "Access Token"
                     }
                 ]
             }
@@ -409,7 +311,7 @@ var Settings = function () {
             })
 
         .add('social-sep', 'title', {
-                displayname: "Social networking"
+                displayname: "Social networking API"
             })
             .add('social.facebook.appid', 'text', {
                 displayname: "Facebook Application ID"
@@ -419,6 +321,21 @@ var Settings = function () {
             })
             .add('social.facebook.apiversion', 'text', {
                 displayname: "Facebook Graph API Version"
+            })
+        .add('social-2-sep', 'title', {
+                displayname : "Social accounts"
+            })
+            .add('social.accounts.facebook', 'text', {
+                displayname : "Facebook Username"
+            })
+            .add('social.accounts.twitter', 'text', {
+                displayname : "Twitter Username"
+            })
+            .add('social.accounts.googleplus', 'text', {
+                displayname : "Google Plus Username"
+            })
+            .add('social.accounts.instagram', 'text', {
+                displayname : "Instagram Username"
             })
 
         .add('stripe-sep', "title", {
