@@ -7,7 +7,7 @@ var utils = require('./utils.js');
 
 class History {
     constructor() {
-        this.ignoredFields = ["modified", "_id", "updated", "status", "tagslugs"];
+        this.ignoredFields = ["modified", "_id", "updated", "status", "tagslugs", "author", "date"];
     };
 
     pushModification(cli, oldState, _id, cb) {
@@ -40,6 +40,15 @@ class History {
                     lmldiffs.push(diffobj);
                 }
             });
+
+            if (newArticle.author.toString() != oldState.author.toString()) {
+                lmldiffs.push({ change : "modified", field : ["author"] })
+            }
+
+            if (new Date(newArticle.date).getTime() != new Date(oldState.date).getTime()) {
+                console.log(new Date(newArticle.date).getTime() + " != " + new Date(oldState.date).getTime())
+                lmldiffs.push({ change : "modified", field : ["date"] })
+            }
 
             if (newArticle.status != oldState.status) {
                 newStatus = newArticle.status;
