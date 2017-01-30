@@ -30,6 +30,10 @@ var LMLConversations = function() {
         return cachedusers;
     };
 
+    this.getCachedUser = function(userid) {
+        this.getCachedUsers()[userid];
+    };
+
     this.updateState = function(user) {
         if (user.status == "online") {
             var ctn = document.getElementById("chat-list-online");

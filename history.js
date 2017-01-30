@@ -1,18 +1,66 @@
-var diff = require('diff');
+var diff = require('deep-diff').diff;
 var log = require('./log.js');
 var db = require('./includes/db.js');
 var Admin = require('./backend/admin.js');
 var filelogic = require('./filelogic.js');
+var utils = require('./utils.js');
 
 class History {
-    pushModification(cli, id, oldArticle, cb) {
-        delete oldArticle._id;
-        oldArticle.contentid = id;
-        oldArticle.historyPushed = new Date();
-        oldArticle.modifiedBy = cli.userinfo.userid;
-        oldArticle.historytype = "modification";
+    constructor() {
+        this.ignoredFields = ["modified", "_id", "updated", "status", "tagslugs"];
+    };
 
-        db.insert(cli._c, 'history', oldArticle, cb);
+    pushModification(cli, oldState, _id, cb) {
+        log('History', 'Fetching older state of article with mongo id : ' + _id, 'info');
+        let history = this;
+
+        db.findUnique(cli._c, 'content', {_id : _id}, (err, newArticle) => {
+            let diffs = diff(oldState, newArticle);
+            let lmldiffs = [];
+            let newStatus = false;
+
+            diffs.forEach((diff) => {
+                if (history.ignoredFields.indexOf(diff.path[0]) == -1) {
+                    let diffobj = {};
+                    switch (diff.kind) {
+                        case "N": diffobj.change = "added";     break;
+                        case "D": diffobj.change = "removed";   break;
+                        case "E": diffobj.change = "modified";  break;
+                        case "A": diffobj.change = "array";     break;
+                        default : diffobj.change = "unknown";   
+                    }
+
+                    if (diffobj.change == "modified" && !utils.pulloutProp(oldState, diff.path)) {
+                        diffobj.change = "added";
+                    } else if (diffobj.change == "modified" && !utils.pulloutProp(newArticle, diff.path)) {
+                        diffobj.change = "removed";
+                    }
+
+                    diffobj.field = diff.path;
+                    lmldiffs.push(diffobj);
+                }
+            });
+
+            if (newArticle.status != oldState.status) {
+                newStatus = newArticle.status;
+            }
+
+            if (lmldiffs.length != 0 || newStatus) {
+                log('History', 'Pushing old state into history', 'info');
+                db.insert(cli._c, 'history', {
+                    state : oldState,
+                    diffs : lmldiffs,
+                    statusChange : newStatus,
+                    modifiedBy : cli.userinfo.userid,
+                    historytype : "mod",
+                    modifiedOn : new Date(),
+                    contentid : _id
+                }, cb);
+            } else {
+                log('History', 'No diff detected; not pushing into history', 'info');
+                cb();
+            }
+        });
     };
 
     pushStatus(cli, id, type, cb) {
@@ -32,7 +80,7 @@ class History {
     };
 
     fetchHistoryOne(cli, contentid, send) {
-        db.findUnique(cli._c, 'content', {_id : db.mongoID(contentid)}, [], function(err, article) {
+        db.findUnique(cli._c, 'content', {_id : db.mongoID(contentid)}, function(err, article) {
             let author = article.author;
             if (cli.hasRight('editor') || author == cli.userinfo.userid) {
                 db.findToArray(cli._c, 'history', {contentid : db.mongoID(contentid)}, function(err, arr) {
@@ -40,7 +88,7 @@ class History {
                         currentstate : article,
                         modifications : arr
                     });
-                });
+                }, {state : 0});
             } else {
                 send(new Error("Missing right to edit, or article is not owned by current user."));
             }

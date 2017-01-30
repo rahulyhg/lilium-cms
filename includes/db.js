@@ -163,10 +163,10 @@ var DB = function() {
 		});
 	};
 
-    this.findUnique = function(conf, coln, conds, stack, cb, proj) {
-        this.find(conf, coln, conds, stack, function(err, cur) {
+    this.findUnique = function(conf, coln, conds, cb, proj) {
+        this.find(conf, coln, conds, undefined, function(err, cur) {
             cur.hasNext(function(err, hasnext) {
-                hasnext ? cur.next(cb) : cb(undefined);
+                hasnext ? cur.next(cb) : cb(new Error("Could not find item in collection " + coln), undefined);
             });
         }, proj);
     }
@@ -193,7 +193,7 @@ var DB = function() {
 		}
 	};
 
-	this.findToArray = function(conf, coln, conds, cb, projection, skip, max) {
+	this.findToArray = function(conf, coln, conds, cb, projection, skip, max, fromLastToFirst) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -202,6 +202,10 @@ var DB = function() {
 			} else {
 				conds = typeof conds === 'undefined' ? {} : conds;
 				var stk = col.find(conds);
+
+                if (fromLastToFirst) {
+                    stk = stk.sort({_id : -1});
+                }
 
                 if (projection) {
                     stk = stk.project(projection);

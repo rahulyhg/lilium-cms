@@ -312,8 +312,10 @@ var Article = function() {
         articleObject.title = cli.postdata.data.title;
         articleObject.author = db.mongoID(cli.userinfo.userid);
         articleObject.updated = new Date();
+        articleObject.createdOn = new Date();
         articleObject.status = "draft";
         articleObject.type = "post";
+        articleObject.createdBy = db.mongoID(cli.userinfo.userid);
 
         db.insert(cli._c, 'content', articleObject, function(err, result) {
             var id = articleObject._id;
@@ -377,143 +379,148 @@ var Article = function() {
                     var nUpdate = function() {
                         db.update(cli._c, dbCol[pubCtx], conds, formData, function(err, result) {
                             if (!err) {
-                                var success = true;
-                                var createdArticle = false;
-                                if (result.upsertedId !== null) {
-                                    // Inserted a document
-                                    formData._id = result.upsertedId._id;
-                                    createdArticle = true;
-                                } else if (result.modifiedCount > 0) {
-                                    // Updated a document
-                                    formData._id = cli.postdata.data.id;
-                                } else {
-                                    // Nothing happened, failed...
-                                    success = false;
-                                }
 
-                                if (success) {
-                                    log('Article', 'Saved published post to database; Creating cached file');
-                                    cli.did('content', 'published', {title : cli.postdata.data.title});
+                                var postUpdate = function() {
+                                    var success = true;
+                                    var createdArticle = false;
+                                    if (result.upsertedId !== null) {
+                                        // Inserted a document
+                                        formData._id = result.upsertedId._id;
+                                        createdArticle = true;
+                                    } else if (result.modifiedCount > 0) {
+                                        // Updated a document
+                                        formData._id = cli.postdata.data.id;
+                                    } else {
+                                        // Nothing happened, failed...
+                                        success = false;
+                                    }
 
-                                    that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
-                                        if (pubCtx != "preview" && oldSlug && oldSlug != "") {
-                                            db.update(cli._c, 'content', 
-                                                {_id : db.mongoID(formData._id)}, 
-                                                {$push : {aliases : oldSlug}}, 
-                                            function() {
-                                                log('Article', 'Added alias for slug ' + oldSlug);
-                                                fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", function() {});
-                                            }, false, true, true);
-                                        }
+                                    if (success) {
+                                        log('Article', 'Saved published post to database; Creating cached file');
+                                        cli.did('content', 'published', {title : cli.postdata.data.title});
 
-                                        var extra = new Object();
-                                        extra.ctx = "article";
-                                        extra.article = deepArticle;
-        
-                                        if (pubCtx === "create") {
-                                            cli.sendJSON({
-                                                success: true,
-                                                dbdata : deepArticle
-                                            });
+                                        that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
+                                            if (pubCtx != "preview" && oldSlug) {
+                                                db.update(cli._c, 'content', 
+                                                    {_id : db.mongoID(formData._id)}, 
+                                                    {$push : {aliases : oldSlug}}, 
+                                                function() {
+                                                    log('Article', 'Added alias for slug ' + oldSlug);
+                                                    fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", function() {});
+                                                }, false, true, true);
+                                            }
 
-                                            // Generate LML page
-                                            filelogic.renderThemeLML(cli, "article", deepArticle.name + '.html', extra , function(name) {
-                                                // Remove autosaves related to this article
-                                                if (cli.postdata.data.autosaveid) {
-                                                    db.remove(
-                                                        cli._c,
-                                                        'autosave',
-                                                        {
-                                                            _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
-                                                        },
-                                                        function() {}
-                                                    );
-                                                }
-
-                                                if (cli._c.social.facebook.appid && cli._c.social.facebook.token) {
-                                                    log('Facebook', 'Sending request to debug link');
-                                                    require('request')({
-                                                        url : 'https://graph.facebook.com/v' + cli._c.social.facebook.apiversion || "2.8",
-                                                        body : {
-                                                            scrape : true,
-                                                            access_token : cli._c.social.facebook.token,
-                                                            id : cli._c.server.protocol + cli._c.server.url + "/" + deepArticle.name
-                                                        },
-                                                        json : true,
-                                                        method : "POST"
-                                                    }, function(a, b, c) {
-                                                        log('Facebook', 'Debugger responded', c.title ? "success" : "warn");
-                                                        if (c.title) {
-                                                            notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                                                title: "Facebook Graph",
-                                                                msg: '<i>'+deepArticle.title+'</i> has been debugged on Facebook Graph.',
-                                                                type: 'log'
-                                                            });
-                                                        } else {
-                                                            notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                                                title: "Facebook Graph",
-                                                                url : "https://developers.facebook.com/tools/debug/og/object/",
-                                                                msg: '<i>'+deepArticle.title+'</i> was not debugged on Facebook Graph.',
-                                                                type: 'warning'
-                                                            });
-                                                        }
-                                                    });
-                                                }
-        
-                                                var nlen = publishedNotificationTitles.length;
-                                                var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
-    
-                                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                                    title: notifMessage,
-                                                    url: cli._c.server.url + '/' + deepArticle.name,
-                                                    msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
-                                                    type: 'success'
-                                                });
-
-                                                feed.plop(deepArticle._id, function() {
-                                                    feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
-                                                        title : deepArticle.title,
-                                                        subtitle : deepArticle.subtitle,
-                                                        slug : deepArticle.name,
-                                                        image : deepArticle.featuredimage[0].sizes.featured.url,
-                                                        authorname : deepArticle.authors[0].displayname,
-                                                        authoravatar : deepArticle.authors[0].avatarURL
-                                                    });
-                                                });
+                                            var extra = new Object();
+                                            extra.ctx = "article";
+                                            extra.article = deepArticle;
             
-                                                badges.check(cli, 'publish', function(acquired, level) {});
-                                            });
-                                        } else if (pubCtx === "preview") {
-                                            var tmpName = "static/tmp/preview" + 
-                                                Math.random().toString().slice(2) + 
-                                                Math.random().toString().slice(2) + 
-                                                ".tmp";
-                                            var absPath = cli._c.server.html + "/" + tmpName;
+                                            if (pubCtx === "create") {
+                                                cli.sendJSON({
+                                                    success: true,
+                                                    dbdata : deepArticle
+                                                });
 
-                                            filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
-                                                log('Preview', 'Sending preview file before deletion : ' + absPath);
-                                                var fileserver = require('./fileserver.js');
-                                                fileserver.pipeFileToClient(cli, absPath, function() {
-                                                    fileserver.deleteFile(absPath, function() {});
-                                                }, true);
-                                            });
-                                        }
-                                    }, pubCtx == "preview");
-                                } else {
-                                    cli.throwHTTP(500);
-                                }
+                                                // Generate LML page
+                                                filelogic.renderThemeLML(cli, "article", deepArticle.name + '.html', extra , function(name) {
+                                                    // Remove autosaves related to this article
+                                                    if (cli.postdata.data.autosaveid) {
+                                                        db.remove(
+                                                            cli._c,
+                                                            'autosave',
+                                                            {
+                                                                _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
+                                                            },
+                                                            function() {}
+                                                        );
+                                                    }
+
+                                                    if (cli._c.social.facebook.appid && cli._c.social.facebook.token) {
+                                                        log('Facebook', 'Sending request to debug link');
+                                                        require('request')({
+                                                            url : 'https://graph.facebook.com/v' + cli._c.social.facebook.apiversion || "2.8",
+                                                            body : {
+                                                                scrape : true,
+                                                                access_token : cli._c.social.facebook.token,
+                                                                id : cli._c.server.protocol + cli._c.server.url + "/" + deepArticle.name
+                                                            },
+                                                            json : true,
+                                                            method : "POST"
+                                                        }, function(a, b, c) {
+                                                            if (c.title) {
+                                                                log('Facebook', 'Debugger responded with title', "success");
+                                                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                                                    title: "Facebook Graph",
+                                                                    msg: '<i>'+deepArticle.title+'</i> has been debugged on Facebook Graph.',
+                                                                    type: 'log'
+                                                                });
+                                                            } else {
+                                                                log('Facebook', 'Debugger responded with error', "warn");
+                                                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                                                    title: "Facebook Graph",
+                                                                    url : "https://developers.facebook.com/tools/debug/og/object/",
+                                                                    msg: '<i>'+deepArticle.title+'</i> was not debugged on Facebook Graph.',
+                                                                    type: 'warning'
+                                                                });
+                                                            }
+                                                        });
+                                                    }
+            
+                                                    var nlen = publishedNotificationTitles.length;
+                                                    var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
+        
+                                                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                                        title: notifMessage,
+                                                        url: cli._c.server.url + '/' + deepArticle.name,
+                                                        msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
+                                                        type: 'success'
+                                                    });
+
+                                                    feed.plop(deepArticle._id, function() {
+                                                        feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
+                                                            title : deepArticle.title,
+                                                            subtitle : deepArticle.subtitle,
+                                                            slug : deepArticle.name,
+                                                            image : deepArticle.featuredimage[0].sizes.featured.url,
+                                                            authorname : deepArticle.authors[0].displayname,
+                                                            authoravatar : deepArticle.authors[0].avatarURL
+                                                        });
+                                                    });
+                
+                                                    badges.check(cli, 'publish', function(acquired, level) {});
+                                                });
+                                            } else if (pubCtx === "preview") {
+                                                var tmpName = "static/tmp/preview" + 
+                                                    Math.random().toString().slice(2) + 
+                                                    Math.random().toString().slice(2) + 
+                                                    ".tmp";
+                                                var absPath = cli._c.server.html + "/" + tmpName;
+
+                                                filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
+                                                    log('Preview', 'Sending preview file before deletion : ' + absPath);
+                                                    var fileserver = require('./fileserver.js');
+                                                    fileserver.pipeFileToClient(cli, absPath, function() {
+                                                        fileserver.deleteFile(absPath, function() {});
+                                                    }, true);
+                                                });
+                                            }
+                                        }, pubCtx == "preview");
+                                    } else {
+                                        cli.throwHTTP(500);
+                                    }
+                                };
     
+                                if (pubCtx == "preview") {
+                                    postUpdate();
+                                } else {
+                                    require('./history.js').pushModification(cli, arr[0], arr[0]._id, postUpdate);
+                                }
                             } else {
                                 cli.throwHTTP(500);
                             }
                         }, true, true);
                     };
 
-                    if (pubCtx == "preview") {
-                        nUpdate();
-                    } else {
-                        require('./history.js').pushModification(cli, arr[0]._id, arr[0], nUpdate);
-                    }
+                    nUpdate();
                 });
             } else {
                 cli.sendJSON({
@@ -548,6 +555,7 @@ var Article = function() {
         formData.author = db.mongoID(cli.userinfo.userid);
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
+        formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
 
         if (formData.tags.map) {
             formData.tagslugs = formData.tags.map(function(tagname) {
@@ -587,10 +595,10 @@ var Article = function() {
                 }, function(err, ress) {
                     var res = err ? undefined : ress[0];
                     if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
-                        require("./history.js").pushModification(cli._c, id, res, function(err, revision) {    
-                            db.update(cli._c, 'content', {
-                                _id: id
-                            }, formData, function(err, doc) { 
+                        db.update(cli._c, 'content', {
+                            _id: id
+                        }, formData, function(err, doc) { 
+                            require("./history.js").pushModification(cli, res, res._id, function(err, revision) {    
                                 cli.sendJSON({
                                     success: true,
                                     _id: cli.postdata.data._id,
@@ -743,7 +751,6 @@ var Article = function() {
                 if (result) {
                     if (cli.hasRight('editor') || result.author.toString() == cli.userinfo.userid.toString()) {
                         // Can delete the current article
-
                         hooks.fire('article_will_delete', id);
 
                         db.update(cli._c, 'content', {
@@ -751,7 +758,6 @@ var Article = function() {
                         }, {
                             status: destroy ? 'destroyed' : 'deleted'
                         }, function(err, r) {
-
                             cli.did('content', destroy ? 'destroyed' : 'deleted', {id : id});
                             
                             var filename = cli._c.server.html + "/" + result.name + '.html';
@@ -764,9 +770,11 @@ var Article = function() {
                             db.remove(cli._c, 'autosave', {
                                 contentid: id
                             }, function() {
-                                return cli.sendJSON({
-                                    redirect: cli._c.server.url + '/admin/article/list',
-                                    success: true
+                                require('./history.js').pushModification(cli, result, id, function() {
+                                    return cli.sendJSON({
+                                        redirect: cli._c.server.url + '/admin/article/list',
+                                        success: true
+                                    });
                                 });
                             }, false);
 

@@ -44,6 +44,7 @@ var LMLDom = function() {
     var currentSiteURL = "{=config.default.server.url}";
     var adminEndpoint = currentSiteURL + "/admin";
     var edgeVersion = 0.6;
+    var domhooks = [];
 
     var ldContext = {};
 
@@ -489,6 +490,14 @@ var LMLDom = function() {
                 timetoparse : (new Date() - now)
             }
         }));
+
+        while (domhooks.length) {
+            domhooks.pop()();
+        }
+    };
+
+    this.bind = function(cb) {
+        domhooks.push(cb);
     };
 
     this.init = function() {
