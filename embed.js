@@ -5,6 +5,12 @@ var db = require('./includes/db.js');
 
 var Embed = function() {};
 
+var createDivFromResponse = function(data) {
+    return '<div class="lml-instagram-embed-wrapper"><img src="'+data.thumbnail_url+                  
+        '" class="lml-instagram-embed" /><a class="lml-instagram-op" href="'+                                                       
+        data.author_url +'">Via Instagram @'+data.author_name+'</a></div><p>&nbsp;</p>';
+}
+
 var handleRequest = function(cli) {
     var url = cli.routeinfo.params.url;
     var type = cli.routeinfo.params.type;
@@ -12,7 +18,7 @@ var handleRequest = function(cli) {
     switch (type) {
         case "instagram":
             request.get({url:"https://api.instagram.com/oembed?url=" + url, json:true}, function(err, r, data) {
-                cli.response.end(data.html);
+                cli.response.end(createDivFromResponse(data));
             })
             break;
     }
@@ -60,9 +66,9 @@ var scanInstagramSingle = function(cli, err, cur, done) {
                             } else {
                                 var url = instaStrings[instaindex];
                                 request.get({url:"https://api.instagram.com/oembed?url=" + url, json:true}, function(err, r, data) {
-                                    ctn = ctn.replace(url, data.html);
-                                    instaindex++;
-                                    nextInsta();
+                                    ctn = ctn.replace(url, createDivFromResponse(data));                                                                     
+                                    instaindex++;                                                                                          
+                                    nextInsta();   
                                 });
                             }
                         }

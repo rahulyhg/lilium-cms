@@ -3,10 +3,21 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="template" content="Narcity 3.0">
+<meta name="template" content="Narcity 3.1">
 
-{$ if (?extra.article.wptype != ""); $}
-<link rel="canonical" href="{=config.default.wordpress.originalurl}/{=extra.article.name}/" />
-{$ endif; $}
+{$
+    if (?extra.article.wptype != ""); 
+$}
+    <link rel="canonical" href="{=config.default.wordpress.originalurl}/{=extra.article.name}/" />
+{$ 
+    endif;
+
+    socialfilename = "petals/tags-";
+    socialfilename += extra.contextname;
+$} 
 
 
+<meta property="fb:app_id" content="369886419698055" />
+<meta property="fb:pages" content="254768477928383" />
+
+{%=socialfilename}

@@ -35,7 +35,7 @@ var ContentDeliveryNetwork = function() {
         } else {
             cb(txt);
         }
-    }
+    };
 
     this.bind = function() {
         hooks.bind('themeLML_compiled', 100, function(pkg) {

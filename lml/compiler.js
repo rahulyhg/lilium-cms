@@ -102,6 +102,14 @@ class LMLSlang {
         let startIndex = 0;
         let seeking = dotIndex != -1;
         let willClose = false;
+        let undefinedReplacement = "";
+
+        if (flags['?']) {
+            let cSplit = line.split(':');
+            line = line[0];
+            undefinedReplacement = line[1];
+        }
+        
         while(seeking || !willClose) {
             if (!seeking) {
                 dotIndex = line.length;
@@ -176,7 +184,7 @@ class LMLSlang {
 
             if (typeof curVal == 'undefined' || curVal == null) {
                 if (flags["?"]) {
-                    curVal = "";
+                    curVal = undefinedReplacement ? this.getReturn(undefinedReplacement, flags) : "";
                     break;
                 } else {
                     curVal = new Error("[LMLSlangException] Undefined branch {" + levels[i].name + "} in line {" + line + "}");
@@ -363,10 +371,16 @@ class LMLExecutor {
         }
     };
 
+    isDeepLML(line) {
+        let fChar = line[0];
+        return fChar == "%" || fChar == "=";
+    };
+
     execute(ctx, line) {
-        let condStack   = this.isCondStack(line);
+        let isDeepLML   = this.isDeepLML(line);
+        let condStack   = !isDeepLML && this.isCondStack(line);
         let condClosure = !condStack && this.stackCl.indexOf(line) != -1;
-        let affectation = !ctx.flags.skipping && this.isAffectation(line);
+        let affectation = !ctx.flags.skipping && !condClosure && this.isAffectation(line);
 
         if (condStack) {
             this.runCondStack(line, condStack, ctx);
@@ -475,9 +489,7 @@ class LMLTagParser {
                 } else {
                     fullpath = ctx.slang.getReturn(ctx, petalname);
                     fileserver.readFile(fullpath, (ctn) => {
-                        ctx.stream.write(ctn || new Error("[LMLPetalException] Undefined content for file " + fullpath), 'utf8', () => {
-                            nextPetal();
-                        });
+                        ctx.stream.write(typeof ctn == "undefined" ? new Error("[LMLPetalException] Undefined content for file " + fullpath) : ctn, 'utf8', nextPetal);
                     }, false, 'utf8');
                 }
             }
@@ -507,7 +519,7 @@ class LMLCompiler {
 
             nextBlock();
         }
-    }; w(ctx, str) { this.output(ctx, str) };
+    }; 
 
     checkForCompletion(ctx) {
         if (ctx.flags.finished && !ctx.flags.writing && ctx.buffer.length == 0 && !ctx.flags.closed) {
