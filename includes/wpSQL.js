@@ -447,7 +447,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                         if (!isLocal || retry == "download") {
                             uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
                             log('WP', 'Downloading image ' + uUrl);
-                            request({url : encoreURI(uUrl), encoding : "binary"}, function(error, response, body) {
+                            request({url : encodeURI(uUrl), encoding : "binary"}, function(error, response, body) {
                                 try {
                                     var filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + "." + uUrl.split('.').pop();
                                     if (filename.indexOf('.com') != -1) {
