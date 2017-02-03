@@ -332,17 +332,7 @@ var ftPosts = function(siteid, mysqldb, done) {
                         nextPost();
                     } else {
                         db.findToArray(siteid, 'content', {"data.wp_id" : wp_post.ID}, function(err, arr) {
-                            if (arr.length != 0) {
-                                postIndex++;
-                                db.findToArray(conf.default(), 'entities', {wpid : arr[0].data.wp_author}, function(err, earr) {
-                                    if (earr.length == 0) {
-                                        nextPost();
-                                    } else {
-                                        db.update(siteid, 'content', {_id : arr[0]._id}, {author : earr[0]._id}, nextPost);
-                                    }
-                                });
-                                return;
-                            }
+                            var exists = arr.length != 0;
 
                             mysqldb.query(fetchPostsMetas + " AND post_id = " + wp_post.ID, function(err, wp_postmeta) {
                                 if (!wp_postmeta || !wp_postmeta.forEach || err) {
@@ -360,27 +350,38 @@ var ftPosts = function(siteid, mysqldb, done) {
                                 var contentRegex = /^(.+)$/gm;
                                 mysqldb.query(fetchTagsForPosts + " WHERE ID = " + wp_post.ID, function(err, wp_tags) {
                                     mysqldb.query(fetchCatsForPosts + " WHERE p.ID = " + wp_post.ID, function(err, wp_cats) {
-                                        db.findToArray(siteid, 'uploads', {wpid : postdata._thumbnail_id ? parseInt(postdata._thumbnail_id) : "---"}, function(err, wpmediaarr) {
-                                            db.insert(siteid, 'content', {
-                                                status : wp_post.post_status == 'publish' ? 'published' : wp_post.post_status,
-                                                title : wp_post.post_title,
-                                                subtitle : postdata.subtitle,
-                                                data : postdata,
-                                                name : wp_post.post_name,
-                                                date : new Date(wp_post.post_date),
-                                                content : wp_post.post_content.replace(contentRegex, "<p>$1</p>"),
-                                                type : wp_post.post_type,
-                                                wptype : wp_post.post_type,
-                                                categories : wp_cats.length ? [wp_cats[0].slug] : [],
-                                                tags : wp_tags.map(function(wptag) { return wptag.name }),
-                                                author : db.mongoID(cachedUsers[siteid][wp_post.post_author]),
-                                                featuredimageartist : postdata.featured_image_credits_name,
-                                                featuredimagelink : postdata.featured_image_credits_url,
-                                                media : wpmediaarr.length == 0 ? "" : db.mongoID(wpmediaarr[0]._id)
-                                            }, function() {
-                                                postIndex++;
-                                                setTimeout(nextPost, 0);
-                                            });
+                                        db.findToArray(siteid, 'uploads', {
+                                            wpid : postdata._thumbnail_id ? parseInt(postdata._thumbnail_id) : "---"
+                                        }, function(err, wpmediaarr) {
+                                            var newObj = {
+                                                    status : wp_post.post_status == 'publish' ? 'published' : wp_post.post_status,
+                                                    title : wp_post.post_title,
+                                                    subtitle : postdata.subtitle,
+                                                    data : postdata,
+                                                    name : wp_post.post_name,
+                                                    date : new Date(wp_post.post_date),
+                                                    content : wp_post.post_content.replace(contentRegex, "<p>$1</p>"),
+                                                    type : wp_post.post_type,
+                                                    wptype : wp_post.post_type,
+                                                    categories : wp_cats.length ? [wp_cats[0].slug] : [],
+                                                    tags : wp_tags.map(function(wptag) { return wptag.name }),
+                                                    author : db.mongoID(cachedUsers[siteid][wp_post.post_author]),
+                                                    featuredimageartist : postdata.featured_image_credits_name,
+                                                    featuredimagelink : postdata.featured_image_credits_url,
+                                                    media : wpmediaarr.length == 0 ? "" : db.mongoID(wpmediaarr[0]._id)
+                                            };
+
+                                            if (exists) {
+                                                db.update(siteid, 'content', {"data.wp_id" : wp_post.ID}, newObj, function() {
+                                                    postIndex++;
+                                                    setTimeout(nextPost, 0);
+                                                });
+                                            } else {
+                                                db.insert(siteid, 'content', newObj, function() {
+                                                    postIndex++;
+                                                    setTimeout(nextPost, 0);
+                                                });
+                                            }
                                         });
                                     });
                                 });
@@ -446,32 +447,32 @@ var ftUploads = function(siteid, mysqldb, done) {
                         if (!isLocal || retry == "download") {
                             uUrl = oUrl + uUrl.substring(uUrl.indexOf('/uploads'));
                             log('WP', 'Downloading image ' + uUrl);
-                            request({url : uUrl, encoding : "binary"}, function(error, response, body) {
-                            try {
-                                var filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + "." + uUrl.split('.').pop();
-                                if (filename.indexOf('.com') != -1) {
-                                        filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + ".jpg";
-                                }
+                            request({url : encoreURI(uUrl), encoding : "binary"}, function(error, response, body) {
+                                try {
+                                    var filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + "." + uUrl.split('.').pop();
+                                    if (filename.indexOf('.com') != -1) {
+                                            filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + ".jpg";
+                                    }
 
-                                var handle = fu.getOutputFileHandle(filename, 'a+', 'binary');
-                                handle.write(body, 'binary', function(err) {
-                                    handle.end(undefined, undefined, function() {
-                                        fu.fileExists(filename, function(exx) {
-                                            if (exx) {
-                                                fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid,
-                                                    function(valid) {
-                                                        if (valid) {
-                                                            fu.deleteFile(filename, function() {});
-                                                        }
+                                    var handle = fu.getOutputFileHandle(filename, 'a+', 'binary');
+                                    handle.write(body, 'binary', function(err) {
+                                        handle.end(undefined, undefined, function() {
+                                            fu.fileExists(filename, function(exx) {
+                                                if (exx) {
+                                                    fu.readFile(filename, function(file, err) {handleSingle(err, file, upload, threadid,
+                                                        function(valid) {
+                                                            if (valid) {
+                                                                fu.deleteFile(filename, function() {});
+                                                            }
+                                                        });
                                                     });
-                                                });
-                                            } else {
-                                                threadIndices[threadid] += threadNumbers; nextUpload(threadid);
-                                            }
+                                                } else {
+                                                    threadIndices[threadid] += threadNumbers; nextUpload(threadid);
+                                                }
+                                            });
                                         });
                                     });
-                                });
-                            } catch (ex) { threadIndices[threadid] += threadNumbers; nextUpload(threadid); }
+                                } catch (ex) { threadIndices[threadid] += threadNumbers; nextUpload(threadid); }
                             });
                         } else {
                             var filename = localUploadDir + uUrl.substring(uUrl.indexOf('/uploads') + 8);
@@ -510,31 +511,31 @@ var ftUploads = function(siteid, mysqldb, done) {
             var saveTo = cconf.server.base + "backend/static/uploads/" + filename;
 
             if (!error) {
-                        fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
-                            require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
-                                if (err) {
-                                    log('WP', 'Invalid image download');
-                                    threadIndices[threadid]+=threadNumbers;
-                                    cb(false);
-                                    nextUpload(threadid);
-                                } else {
-                                    var objid = result.insertedId;
-                                    log('WP', 'Inserted media with mongo ID ' + objid);
-                                    db.update(cconf, 'content',
-                                        {"data._thumbnail_id" : upload.ID.toString()},
-                                        {"media" : (typeof objid == "string" ? db.mongoID(objid) : objid) },
-                                    function(ue, r) {
-                                        if (r.modifiedCount != 0) {
-                                            log('WP', "Affected featured image for a found article", 'info');
-                                        }
-
-                                        threadIndices[threadid]+=threadNumbers;
-                                        cb(true);
-                                        nextUpload(threadid);
-                                    });
+                fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
+                    require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
+                        if (err) {
+                            log('WP', 'Invalid image download');
+                            threadIndices[threadid]+=threadNumbers;
+                            cb(false);
+                            nextUpload(threadid);
+                        } else {
+                            var objid = result.insertedId;
+                            log('WP', 'Inserted media with mongo ID ' + objid);
+                            db.update(cconf, 'content',
+                                {"data._thumbnail_id" : upload.ID.toString()},
+                                {"media" : (typeof objid == "string" ? db.mongoID(objid) : objid) },
+                            function(ue, r) {
+                                if (r.modifiedCount != 0) {
+                                    log('WP', "Affected featured image for a found article", 'info');
                                 }
-                            }, true, {wpid : upload.ID, wpguid : upload.guid});
-                        });
+
+                                threadIndices[threadid]+=threadNumbers;
+                                cb(true);
+                                nextUpload(threadid);
+                            });
+                        }
+                    }, true, {wpid : upload.ID, wpguid : upload.guid});
+                });
             } else {
                 log('WP', 'Download error : ' + error, 'error');
                 threadIndices[threadid]+=threadNumbers;
@@ -612,7 +613,6 @@ var WordpressSQLToLiliumMongo = function() {
                     var siteConf = Configs.fetchConfig(siteid);
                     siteConf.wptransferring = false;
                     siteConf.wptransfer = true;
-                    siteConf.wpdb = undefined;
 
                     Configs.saveConfigs(siteConf, function() {
                         log('Sites', 'Site configuration was saved');

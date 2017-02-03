@@ -220,7 +220,7 @@ class LMLSlang {
 class LMLExecutor {
     constructor() {
         this.affectors = ["+=", "-=", "/=", "*=", "%=", "="];
-        this.comparors = ["==", "!=", " in ", "<", ">", "<=", ">="];
+        this.comparors = ["==", "!=", " in ", "<", ">", "<=", ">=", "?"];
         this.stackOp = ["if", "for", "while"];
         this.stackCl = ["end", "endif", "else", "endfor", "endwhile"];
     };
@@ -237,14 +237,18 @@ class LMLExecutor {
         for (let i = 0; i < this.stackOp.length; i++) if (line.indexOf(this.stackOp[i]) == 0) {
             let condition = line.substring(this.stackOp[i].length, line.length-1).trim().substring(1);
             let comparees = [];
-            let operator = "";
+            let operator = "??";
 
             for (let j = 0; j < this.comparors.length; j++) if (condition.indexOf(this.comparors[j]) != -1) {
                 operator = this.comparors[j];
                 comparees = condition.split(operator);
             }
 
-            return operator ? { stacktag : this.stackOp[i], comparees : comparees, operator : operator } : false;
+            if (comparees.length == 0) {
+                comparees = [condition, undefined];
+            }
+
+            return { stacktag : this.stackOp[i], comparees : comparees, operator : operator };
         }
 
         return false;
@@ -290,6 +294,7 @@ class LMLExecutor {
                         case "<" : truthfulness = rightVal <  leftVal; break;
                         case ">=": truthfulness = rightVal >= leftVal; break;
                         case "<=": truthfulness = rightVal <= leftVal; break;
+                        case "??": truthfulness = rightVal;
                     }
 
                     if (!truthfulness) {
