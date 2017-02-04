@@ -483,7 +483,7 @@ class LMLTagParser {
 
                 if (toCompile) {
                     fileserver.readFile(fullpath, (ctn) => {
-                        if (!ctn) {
+                        if (typeof ctn == "undefined") {
                             ctx.stream.write(new Error("[LMLPetalExceltion] Undefined content for file " + fullpath).toString());
                             return nextPetal();
                         }
