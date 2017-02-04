@@ -220,7 +220,7 @@ class LMLSlang {
 class LMLExecutor {
     constructor() {
         this.affectors = ["+=", "-=", "/=", "*=", "%=", "="];
-        this.comparors = ["==", "!=", " in ", "<", ">", "<=", ">=", "?"];
+        this.comparors = ["==", "!=", " in ", "<", ">", "<=", ">=", "??"];
         this.stackOp = ["if", "for", "while"];
         this.stackCl = ["end", "endif", "else", "endfor", "endwhile"];
     };
@@ -238,6 +238,11 @@ class LMLExecutor {
             let condition = line.substring(this.stackOp[i].length, line.length-1).trim().substring(1);
             let comparees = [];
             let operator = "??";
+
+            let charValidator = line[this.stackOp[i].length];
+            if (charValidator != " " && charValidator != "(") {
+                return false;
+            }
 
             for (let j = 0; j < this.comparors.length; j++) if (condition.indexOf(this.comparors[j]) != -1) {
                 operator = this.comparors[j];
