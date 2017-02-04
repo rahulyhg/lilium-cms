@@ -49,9 +49,9 @@ $}
     
     <div id="article-section">
         <div id="article-side">
-            {=?theme.settings.sidetop}
+            {=theme.settings.sidetop}
 
-            {=?theme.settings.sidebottom}
+            {=theme.settings.sidebottom}
         </div>
 
         {$ if (?author.displayname != ""); $} 

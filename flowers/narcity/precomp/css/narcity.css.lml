@@ -368,6 +368,7 @@ h4.article-section-title a {
     width: {=fw};
     margin: auto;
     display : block;
+    margin-top: 30px;
 }
 
 article .article-author-strip {
@@ -558,7 +559,7 @@ article #article-content a:visited {
     text-decoration: none;
 }
 
-article h1 {
+article > h1 {
     font-size: 40px;
     font-weight: bold;
     margin: 5px auto 15px;
@@ -571,7 +572,7 @@ article h1 {
     width: {=fw};
 }
 
-article h2 {
+article > h2 {
     font-size: 18px;
     width: {=fw};
     color : #121212;
@@ -974,6 +975,35 @@ $}
 
     text-transform: uppercase;
     font-family: Arial;
+}
+
+/* Native Ads - Sharethrough */
+.str-adunit.str-card-exp {
+    padding: 0 !important;
+    margin: 0 !important;
+}   
+
+.str-adunit.str-card-exp h2 {
+    text-align: left;
+    margin-left: 15px;
+    margin-top: 0px;
+}   
+
+.str-adunit.str-card-exp .thumbnail-wrapper {
+    margin-left: 15px !important;
+}
+
+.str-adunit.str-mid-post .str-opt-out {
+    bottom: 0 !important;
+}
+
+h1.article__title.str-title {
+    margin: 0px !important;
+}
+
+.str-mid-post .str-text {
+    width: 48% !important;
+    text-align: left;
 }
 
 /* Slider */
@@ -1818,6 +1848,7 @@ body.slidheader .android-sharer {
 
     #article-section {
         width: auto;
+        margin-top: 10px;
     }
 
     #article-side {
@@ -1859,8 +1890,8 @@ body.slidheader .android-sharer {
         display: none;
     }
 
-    article h1, 
-    article h2, 
+    article > h1, 
+    article > h2, 
     article #article-content, 
     article .article-more-from-wrapper, 
     article .article-tags-wrapper, 
@@ -1937,14 +1968,14 @@ body.slidheader .android-sharer {
         width: calc(100% - 40px) !important;
     }
 
-    article h1 {
+    article > h1 {
         margin: 0px;
         padding: 10px 20px 10px;
         display: block;
         line-height: 46px;
     }
 
-    article h2 {
+    article > h2 {
         padding: 0px 20px 0px;
         margin-bottom: 20px;
     }
