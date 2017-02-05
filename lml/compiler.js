@@ -106,8 +106,8 @@ class LMLSlang {
 
         if (flags['?']) {
             let cSplit = line.split(':');
-            line = line[0];
-            undefinedReplacement = line[1];
+            line = cSplit[0];
+            undefinedReplacement = cSplit[1];
         }
         
         while(seeking || !willClose) {
@@ -184,7 +184,7 @@ class LMLSlang {
 
             if (typeof curVal == 'undefined' || curVal == null) {
                 if (flags["?"]) {
-                    curVal = undefinedReplacement ? this.getReturn(undefinedReplacement, flags) : "";
+                    curVal = undefinedReplacement ? this.getReturn(undefinedReplacement, flags) : undefined;
                     break;
                 } else {
                     curVal = new Error("[LMLSlangException] Undefined branch {" + levels[i].name + "} in line {" + line + "}");
@@ -290,7 +290,7 @@ class LMLExecutor {
                 case "while":
                     let truthfulness = false;
                     let rightVal = ctx.slang.getReturn(ctx, condObj.comparees[0]);
-                    let leftVal  = ctx.slang.getReturn(ctx, condObj.comparees[1]);
+                    let leftVal  = condObj.comparees[1] && ctx.slang.getReturn(ctx, condObj.comparees[1]);
 
                     switch (condObj.operator) {
                         case "==": truthfulness = rightVal == leftVal; break;
@@ -299,7 +299,7 @@ class LMLExecutor {
                         case "<" : truthfulness = rightVal <  leftVal; break;
                         case ">=": truthfulness = rightVal >= leftVal; break;
                         case "<=": truthfulness = rightVal <= leftVal; break;
-                        case "??": truthfulness = rightVal;
+                        case "??": truthfulness = !!rightVal;
                     }
 
                     if (!truthfulness) {
@@ -319,11 +319,11 @@ class LMLExecutor {
 
                 case "for":
                     let varname = condObj.comparees[0];
-                    let loopee  = ctx.slang.getReturn(ctx, condObj.comparees[1]);
+                    let loopee = ctx.slang.getReturn(ctx, condObj.comparees[1]);
                     let loopObject = {
                         at : ctx.blockIndex,
-                        loopee : loopee,
-                        keys : Object.keys(loopee),
+                        loopee : loopee || {},
+                        keys : loopee ? Object.keys(loopee) : [],
                         affect : varname,
                         index : -1
                     }
@@ -515,6 +515,8 @@ class LMLCompiler {
     };
 
     output(ctx, str) {
+        if (!str) { return; }
+
         ctx.buffer.push(str.toString());
         if (!ctx.flags.writing) {
             ctx.flags.writing = true;

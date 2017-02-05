@@ -1,5 +1,9 @@
 {#config}
 
+var narsettings = {
+
+};
+
 var googletag = googletag || {};
 googletag.cmd = googletag.cmd || [];
 

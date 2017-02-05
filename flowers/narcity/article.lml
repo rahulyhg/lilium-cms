@@ -8,7 +8,7 @@
     formatdate = date.stringify(postdate);
 $}
 <article id="{=extra.article.name}" data-mi={=extra.article._id}>
-    {$ if (?extra.article.isSponsored == true); $}
+    {$ if (?extra.article.isSponsored ??); $}
     <div class="title-sponsored-wrapper">
         <a class="sponsored-mention" href="https://www.narcitymedia.com" target="_blank">
             Sponsored Content
@@ -54,7 +54,7 @@ $}
             {=theme.settings.sidebottom}
         </div>
 
-        {$ if (?author.displayname != ""); $} 
+        {$ if (?author.displayname); $} 
         <div class="article-author-strip">
             <div class="article-author-share-section invisible no-mobile" id="article-share-section">
                 <div class="article-share-count-wrapper topvert">
@@ -96,15 +96,15 @@ $}
         <div class="article-content" id="article-content">
             {=extra.article.content}
 
-            {$ if (?extra.article.feature != ""); $}
+            {$ if (?extra.article.feature); $}
                 {%=extra.article.feature}
             {$ endif; $}
         </div>
-        {$ if (?extra.article.useSponsoredBox == true); $}
+        {$ if (extra.article.useSponsoredBox == true); $}
         <div id="sponsored-box">
             <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" /> 
             <div id="sponsored-box-content">
-                <h5><a href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
+                <h5><a target="_blank" href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
                 <p>
                     {=?extra.article.sponsoredBoxContent}
                 </p>
@@ -112,7 +112,7 @@ $}
         </div>
         {$ endif; $}    
 
-        {$ if (?extra.article.isSponsored == true); $}
+        {$ if (extra.article.isSponsored == true); $}
         <div class="bottom-promotion-link">
             This article is part of a sponsored content activation. 
             <a href="https://www.narcitymedia.com" target="_blank">
@@ -126,7 +126,7 @@ $}
         {$ endif; $}
     </div>
 
-    {$ if (?author.displayname != ""); $} 
+    {$ if (?author.displayname); $} 
     <!--div class="article-signature">
         <div class="article-signature-face-wrapper">
             <img src="{=author.avatarURL}" class="article-signature-face" />
@@ -178,7 +178,7 @@ $}
     <div class="article-end"></div>
 </article>
 
-{$ if (?config.default.social.facebook.token != ""); $}
+{$ if (?config.default.social.facebook.token); $}
 <script class="execOnLoad">
     var reqURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?id=http:{=config.default.server.url}/{=extra.article.name}/&access_token={=config.default.social.facebook.appid}|{=config.default.social.facebook.token}";
 
