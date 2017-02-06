@@ -129,6 +129,35 @@ body.menuopen #mobileslider {
     opacity: 1;
 }
 
+#container .narcity-header-bar {
+    position: relative;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin-top: -144px;
+    margin-bottom: 120px;
+}
+
+#mcanvas {
+    position: relative;
+    z-index: 2;
+}
+
+.lbtop {
+    margin-top: -24px;
+    top: 245px;
+    z-index: 5;
+    position: relative;
+    text-align: center;
+}
+
+header ~ .lbtop.willslide {
+    margin: 28px 0px 0px;
+    text-align: center;
+    position: relative;
+    top: 60px;
+}
+
 .midvert {
     display: inline-block;
     vertical-align: middle;
