@@ -188,7 +188,6 @@
             }
 
             document.getElementById('moreinfo-author').textContent = resp["author"];
-            
             document.getElementById('moreinfo-url').innerHTML = "";
             if (!resp.url || resp.url.indexOf('//') == -1) {
                 document.getElementById('moreinfo-url').textContent = resp.url;
