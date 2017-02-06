@@ -36,8 +36,11 @@ googletag.cmd.push(function() {
     googletag.pubads()
         {$ if (extra.contextname == "article"); $}
         .setTargeting("category", ["{=extra.article.categories.0.displayname}", "ROS"])
-        .setTargeting("post", parseInt("{=?extra.article.data.wp_id}"))
-        .setTargeting("contentid", "{=?extra.article._id}")
+        {$ endif; $}
+        {$ if (?extra.article.data.wp_id); $}
+        .setTargeting("post", "{=?extra.article.data.wp_id}")
+        {$ else; $}
+        .setTargeting("contentid", "{=extra.article._id}")
         {$ endif; $}
         {$ if (extra.contextname == "home"); $}
         .setTargeting("category", ["homepage"])
