@@ -643,6 +643,10 @@ article #article-content img {
     height: auto;
 }
 
+article #article-content img.image-asis {
+    display: none;
+}
+
 article .article-signature {
     width: {=aw};
     margin: 20px auto;
@@ -654,6 +658,7 @@ article .article-signature {
 article .article-signature-face-wrapper {
     width: 15%;
     display: inline-block;
+    margin-right: 15px;
 
     vertical-align: top;
 }
@@ -661,6 +666,7 @@ article .article-signature-face-wrapper {
 article .article-signature-details-wrapper {
     width: 80%;
     display: inline-block;
+    margin-top: -5px;
 
     vertical-align: top;
 }
@@ -1369,7 +1375,7 @@ article #article-content .nm-album-wrapper img {
 }
 
 /* Sponsored Box */
-#sponsored-box {
+article #article-content #sponsored-box {
     width: {=aw};
     margin: 20px auto;
     padding: 18px 0px;
@@ -1377,35 +1383,35 @@ article #article-content .nm-album-wrapper img {
     border-bottom: 1px solid #ddd;
 }
 
-#sponsored-logo {
+article #article-content #sponsored-logo {
     width: 180px;
     display: inline-block;
     vertical-align: top;
 }
 
-#sponsored-logo[src=""] {
+article #article-content #sponsored-logo[src=""] {
     display: none;
 }
 
-#sponsored-box-content {
+article #article-content #sponsored-box-content {
     width: 340px;
     vertical-align: top;
     display: inline-block;
     margin-left: 12px;
 }
 
-#sponsored-box #sponsored-logo[src=""] + #sponsored-box-content {
+article #article-content #sponsored-box #sponsored-logo[src=""] + #sponsored-box-content {
     width: auto;
     display: block;
     margin-left: auto;
 }
 
-#sponsored-box-content h5 {
+article #article-content #sponsored-box-content h5 {
     margin: 0;
     padding:0;
 }
 
-#sponsored-box-content h5 a {
+article #article-content #sponsored-box-content h5 a {
     text-decoration: none; 
     color: {=mc};
     display: block;
@@ -1413,7 +1419,7 @@ article #article-content .nm-album-wrapper img {
     font-size: 20px;
 }
 
-#sponsored-box-content p {
+article #article-content #sponsored-box-content p {
     padding: 0px;
     margin: 12px 0px 0px;
     font-size: 14px;
@@ -1421,16 +1427,18 @@ article #article-content .nm-album-wrapper img {
     font-family: Arial, sans-serif;
 }
 
-.bottom-promotion-link {
+article #article-content .bottom-promotion-link {
     width: {=aw};
     margin: auto;
     font-size: 16px;
     color: #333;
     border: 1px solid #DDD;
     padding: 12px;
+
+    line-height: 20px;
 }
 
-.bottom-promotion-link a {
+article #article-content .bottom-promotion-link a {
     color: {=mc};
     font-weight: bold;
 }

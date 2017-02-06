@@ -99,50 +99,51 @@ $}
             {$ if (?extra.article.feature); $}
                 {%=extra.article.feature}
             {$ endif; $}
-        </div>
-        {$ if (extra.article.useSponsoredBox == true); $}
-        <div id="sponsored-box">
-            <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" /> 
-            <div id="sponsored-box-content">
-                <h5><a target="_blank" href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
-                <p>
-                    {=?extra.article.sponsoredBoxContent}
-                </p>
+
+            {$ if (extra.article.useSponsoredBox == true); $}
+            <div id="sponsored-box">
+                <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" /> 
+                <div id="sponsored-box-content">
+                    <h5><a target="_blank" href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
+                    <p>
+                        {=?extra.article.sponsoredBoxContent}
+                    </p>
+                </div>
             </div>
-        </div>
-        {$ endif; $}    
+            {$ endif; $}    
 
-        {$ if (extra.article.isSponsored == true); $}
-        <div class="bottom-promotion-link">
-            This article is part of a sponsored content activation. 
-            <a href="https://www.narcitymedia.com" target="_blank">
-                Learn how we can promote your company &gt;
-            </a>
-        </div>
-        {$ endif; $}
-
-        {$ if (?extra.contextname == "article"); $}
-            {=theme.settings.afterarticle}
-        {$ endif; $}
-    </div>
-
-    {$ if (?author.displayname); $} 
-    <!--div class="article-signature">
-        <div class="article-signature-face-wrapper">
-            <img src="{=author.avatarURL}" class="article-signature-face" />
-        </div>
-        <div class="article-signature-details-wrapper">
-            <span class="article-signature-name">
-                <a href="{=url}/author/{=author.slug}">  
-                    {=author.displayname}
+            {$ if (extra.article.isSponsored == true); $}
+            <div class="bottom-promotion-link">
+                This article is part of a sponsored content activation. 
+                <a href="https://www.narcitymedia.com" target="_blank">
+                    Learn how we can promote your company &gt;
                 </a>
-            </span>
-            <span class="article-signature-bio">
-                {=?author.description}
-            </span>
+            </div>
+            {$ endif; $}
+
+            {$ if (?extra.contextname == "article"); $}
+                {=theme.settings.afterarticle}
+            {$ endif; $}
+
+            {$ if (?author.displayname); $} 
+            <div class="article-signature">
+                <div class="article-signature-face-wrapper">
+                    <img src="{=author.avatarURL}" class="article-signature-face" />
+                </div>
+                <div class="article-signature-details-wrapper">
+                    <span class="article-signature-name">
+                        <a href="{=url}/author/{=author.slug}">  
+                            {=author.displayname}
+                        </a>
+                    </span>
+                    <span class="article-signature-bio">
+                        {=?author.description}
+                    </span>
+                </div>
+            </div>  
+            {$ endif; $}
         </div>
-    </div-->  
-    {$ endif; $}
+    </div>
 
 
     <!--div class="article-comments no-mobile">
