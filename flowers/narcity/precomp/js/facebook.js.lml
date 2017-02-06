@@ -59,7 +59,7 @@ var NarcityFacebook = function() {
                     var min = htmlnode.dataset.min || -1;
     
                     if (ogobj.share && ogobj.share.share_count && ogobj.share.share_count > min) {
-                        htmlnode.contentText = ogobj.share.share_count;
+                        htmlnode.innerHTML = ogobj.share.share_count;
         
                         if (htmlnode.dataset.show) {
                             document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
