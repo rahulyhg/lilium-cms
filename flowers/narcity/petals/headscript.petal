@@ -29,3 +29,26 @@
     cygnus_index_args = {};
 </script>
 <script src="{=config.default.server.url}/compiled/theme/vaniryk.js?{=config.default.compilekey}"></script>
+
+<script>
+// AD TARGETING
+googletag.cmd.push(function() {
+    googletag.pubads()
+        {$ if (extra.contextname == "article"); $}
+        .setTargeting("category", ["{=extra.article.categories.0.displayname}", "ROS"])
+        .setTargeting("post", parseInt("{=?extra.article.data.wp_id}"))
+        .setTargeting("contentid", "{=?extra.article._id}")
+        {$ endif; $}
+        {$ if (extra.contextname == "home"); $}
+        .setTargeting("category", ["homepage"])
+        {$ endif; $}
+        .setTargeting('strnativekey', 'G6X4zbWEuSdvaWYd9F2QwDEi')
+    ;
+
+    // Run the whole thing    
+    googletag.pubads().enableAsyncRendering();
+    googletag.enableServices();
+});
+
+
+</script>
