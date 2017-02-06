@@ -173,7 +173,7 @@ var Article = function() {
             if (arr.length === 0) {
                 cb(false, new Error("No article found"));
             } else {
-                db.rawCollection(conf, 'content', {"strict":true}, function(err, col) {
+                db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
                         // Text query with title, content would be too heavy
                         $match : {
@@ -485,7 +485,7 @@ var Article = function() {
                                                             authoravatar : deepArticle.authors[0].avatarURL
                                                         });
                                                     });
-                
+ 
                                                     badges.check(cli, 'publish', function(acquired, level) {});
                                                 });
                                             } else if (pubCtx === "preview") {
@@ -495,7 +495,8 @@ var Article = function() {
                                                     ".tmp";
                                                 var absPath = cli._c.server.html + "/" + tmpName;
 
-                                                filelogic.renderThemeLML(cli, "article", tmpName, extra , function() {
+                                                extra.preview = true;
+                                                filelogic.renderThemeLML(cli, "article", tmpName, extra, function() {
                                                     log('Preview', 'Sending preview file before deletion : ' + absPath);
                                                     var fileserver = require('./fileserver.js');
                                                     fileserver.pipeFileToClient(cli, absPath, function() {

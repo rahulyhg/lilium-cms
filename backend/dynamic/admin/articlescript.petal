@@ -337,7 +337,9 @@
             document.dispatchEvent(new CustomEvent("articleWillPreview"));
 
             liliumcms.previewer.cast(document.querySelector("input[name=title]").value);
-            $.post('{=config.default.server.url}/admin/article/preview', $('form#post_create').serialize(), function(html) {
+            var formdat = $('form#post_create').serialize() + "&id=" + contentid;
+
+            $.post('{=config.default.server.url}/admin/article/preview', formdat, function(html) {
                 liliumcms.previewer.setContent(html);
                 btn.disabled = false;
                 btn.innerHTML = textinside;

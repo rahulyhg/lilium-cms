@@ -409,9 +409,19 @@ var LMLDom = function() {
     };
 
     this.fillField = function(field, values) {
-        var fieldname = field.name;
-        if (fieldname && values[fieldname]) {
-            field.value = values[fieldname];
+        var fieldname = field.name.split('.');
+        var finalval = values;
+        var willAffect = true;
+
+        if (fieldname) {
+            for (var i = 0; i < fieldname.length && willAffect; i++) {
+                finalval = finalval[fieldname[i]];
+                willAffect = typeof finalval != "undefined";
+            }
+
+            if (willAffect) {
+                field.value = finalval;
+            }
         }
     };
 

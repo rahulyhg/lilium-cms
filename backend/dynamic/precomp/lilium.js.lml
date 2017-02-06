@@ -807,6 +807,24 @@ var LiliumCMS = function() {
         };
     };
 
+    var LMLUsers = function() {
+        this.users = {};
+
+        this.cacheUsers = function() {
+            var liveUsers = liliumcms.livevars.livevars()["entities.cached"];
+
+            if (liveUsers) {
+                for (var i = 0; i < liveUsers.length; i++) {
+                    this.users[liveUsers[i]._id] = liveUsers[i];
+                }
+            }
+        };
+
+        this.get = function(id) {
+            return this.users[id];
+        };
+    };
+
     var LMLModals = function() {
         _modals = {};
 
@@ -982,6 +1000,7 @@ var LiliumCMS = function() {
             that.lmldom = new LMLDom();
             that.modals = new LMLModals();
             that.session = new LMLSession();
+            that.users = new LMLUsers();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -1076,6 +1095,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.imagepicker.seek();
         liliumcms.imagepicker.refresh();
         liliumcms.queryparams.parseURL();
+        liliumcms.users.cacheUsers();
         liliumcms.modals.find(true);
         liliumcms.ckeditor ? liliumcms.ckeditor.parseDocument() : false;
         liliumcms.formbeautifier.beautify();

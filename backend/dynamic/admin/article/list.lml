@@ -1,20 +1,6 @@
 {#config;forms;tableBuilder}
-
-		{$
-			root = config.default.server.url;
-			root += "/";
-			baseurl = root;
-            baseurl += config.default.paths.admin;
-			root += "admin/"
-		$}
-
 		<main class="entities-main">
-            <div class="continue-working-wrapper">
-                <h1>Continue Working on :</h1>
-                {*content.lastEdited(template:"article-continue-working")}
-            </div>
-
-            <h1>List of articles<a class='fab' href="{=root}article/new">+</a></h1>
+            <h1>List of articles<a class='fab' href="{=config.default.server.url}/admin/article/new">+</a></h1>
 
 			{=tableBuilder.render("article")}
 		</main>
@@ -40,7 +26,7 @@
 
         <lml:tabletemplate id="table-article-actions">
             <lml:tobject data-nodetype="a"
-                         data-href="{=root}article/edit/"
+                         data-href="{=config.default.server.url}/admin/article/edit/"
                      data-key="_id">
                     Edit
             </lml:tobject>
@@ -56,7 +42,7 @@
 		<lml:template id="article-continue-working">
         <div class='continue-working'>
             <lml:tobject data-nodetype="a"
-                         data-href="{=root}article/edit/"
+                         data-href="{=config.default.server.url}/admin/article/edit/"
                      data-key="_id">
             <lml:tobject data-nodetype="h4" data-key="title"></lml:tobject>
             <h4>Last updated : <lml:tobject data-nodetype="span" data-key="updated"></lml:tobject></h4>
@@ -65,18 +51,12 @@
 
 		</lml:template>
 <script>
-    document.addEventListener('livevarsFetched', function(e) {
-        if(e.detail.livevars['content.lastEdited'].length == 0) {
-            $('.continue-working-wrapper').remove();
-        }
-    });
-
     var isViewable = function (){
         return (this.title !=='' && this.status == 'published');
     }
 
     window.articleTableGenAuthor = function(dat, td) {
-        var writer = liliumcms.conversations.getCachedUsers()[dat.author];
+        var writer = liliumcms.users.get(dat.author);
         td.textContent = writer ? writer.displayname : "[Inactive author]";
     };
 </script>
