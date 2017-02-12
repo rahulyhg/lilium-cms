@@ -307,20 +307,24 @@ var ftUsers = function(siteid, mysqldb, done) {
 var ftPosts = function(siteid, mysqldb, done) {
     mysqldb.query(fetchPosts, function(err, wp_posts) {
         var totalRows = wp_posts.length;
-        var postIndex = 0;
         var postTotal = wp_posts.length;
+        var threadIndices = [];
+        var threadCount = 4;
+        var threadDone = 0;
 
         log('WP', 'Transferring around ' + postTotal + " posts");
         var wpPostStartAt = new Date();
-        var nextPost = function() {
-            setTimeout(function() {
-                if (postIndex < postTotal) {
-                    var wp_post = wp_posts[postIndex];
+        var nextPost = function(threadIndex) {
+            threadIndices[threadIndex] += threadCount;
 
-                    if (postIndex > 0 && postIndex % 250 == 0) {
+            setTimeout(function() {
+                if (threadIndices[threadIndex] < postTotal) {
+                    var wp_post = wp_posts[threadIndices[threadIndex]];
+
+                    if (threadIndices[threadIndex] > 0 && threadIndices[threadIndex] % 250 == 0) {
                         var postPerSec = parseFloat(250 / ((new Date() - wpPostStartAt) / 1000.00)).toFixed(2);
                         log('WP', 'Created ' +
-                            postIndex + ' / ' + postTotal + ' posts at ' +
+                            threadIndices[threadIndex] + ' / ' + postTotal + ' posts at ' +
                             postPerSec + ' posts per second');
 
                         wpPostStartAt = new Date();
@@ -328,16 +332,14 @@ var ftPosts = function(siteid, mysqldb, done) {
 
 
                     if (wp_post.post_status == 'inherit' || wp_post.post_status == 'auto-draft' || wp_post.post_title == "") {
-                        postIndex++;
-                        nextPost();
+                        nextPost(threadIndex);
                     } else {
                         db.findToArray(siteid, 'content', {"data.wp_id" : wp_post.ID}, function(err, arr) {
                             var exists = arr.length != 0;
 
                             mysqldb.query(fetchPostsMetas + " AND post_id = " + wp_post.ID, function(err, wp_postmeta) {
                                 if (!wp_postmeta || !wp_postmeta.forEach || err) {
-                                    postIndex++;
-                                    nextPost();
+                                    nextPost(threadIndex);
                                 }
 
                                 var postdata = {};
@@ -373,13 +375,11 @@ var ftPosts = function(siteid, mysqldb, done) {
 
                                             if (exists) {
                                                 db.update(siteid, 'content', {"data.wp_id" : wp_post.ID}, newObj, function() {
-                                                    postIndex++;
-                                                    setTimeout(nextPost, 0);
+                                                    setTimeout(function() {nextPost(threadIndex);}, 0);
                                                 });
                                             } else {
                                                 db.insert(siteid, 'content', newObj, function() {
-                                                    postIndex++;
-                                                    setTimeout(nextPost, 0);
+                                                    setTimeout(function() {nextPost(threadIndex);}, 0);
                                                 });
                                             }
                                         });
@@ -389,14 +389,22 @@ var ftPosts = function(siteid, mysqldb, done) {
                         });
                     }
                 } else {
-                    wp_posts = undefined;
-                    log('WP', 'Done creating posts. Total : ' + postTotal);
-                    done();
+                    threadDone++;
+
+                    log('WP', 'Post thread #'+threadIndex+' done.');
+                    if (threadDone == threadCount) {
+                        log('WP', 'Post thread #'+threadIndex+' done.', 'lilium');
+                        wp_posts = undefined;
+                        done();
+                    }
                 }
             }, 1);
         };
 
-        nextPost();
+        for (var i = 0; i < threadCount; i++) {
+            threadIndices[i] = i - threadCount;
+            nextPost(i);
+        }
     });
 };
 
