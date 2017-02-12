@@ -83,6 +83,10 @@ var scanInstagramSingle = function(cli, err, cur, done) {
     }
 };
 
+var scanImgur = function(cli, er, cur, done) {
+
+};
+
 Embed.prototype.scanInstagram = function(cli) {
     db.find(cli._c, "content", {}, [], function(err, cur) {
         if (err) {
