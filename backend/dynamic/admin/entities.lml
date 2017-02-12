@@ -3,7 +3,7 @@
 
 		<h1>
             All entities
-            <a class='fab' href="{=root}entities/new">+</a>
+            <a class='fab' href="{=config.default.server.url}/admin/entities/new">+</a>
         </h1>
 
 		<main class="entities-main">

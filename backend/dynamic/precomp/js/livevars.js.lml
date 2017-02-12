@@ -526,7 +526,7 @@ var LiveVars = function() {
         var templateObj = $('#' + templateID);
 
         if (templateObj.data('classes')) {
-            node.classList.add(templateObj.data("classes"));
+            node.className = (templateObj.data("classes"));
         }
 
         if (templateObj.length != 0) {

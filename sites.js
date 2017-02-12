@@ -165,6 +165,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/mobile.css", 2005, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/badges.css", 2105, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/preview.css", 2110, 'admin', conf.id);
@@ -226,6 +227,10 @@ var SiteInitializer = function (conf, siteobj) {
         events.init(conf, cb);
     };
 
+    var loadRobots = function(cb) {
+        fileserver.createSymlink(conf.server.base + "backend/static/robots.txt", conf.server.html + "/robots.txt", cb);
+    };
+
     this.initialize = function (done) {
         log('Sites', 'Initializing site with id ' + conf.id, 'lilium');
 
@@ -246,10 +251,12 @@ var SiteInitializer = function (conf, siteobj) {
                                 category.preload(conf, function() {
                                     loadSessions(function() {
                                         badges.addSite(conf, function() {
-                                            checkForWP(conf);
-                                            hooks.fire('site_initialized', conf);
-                                            log('Sites', 'Initialized site with id ' + conf.id, 'success');
-                                            done();
+                                            loadRobots(function() {
+                                                checkForWP(conf);
+                                                hooks.fire('site_initialized', conf);
+                                                log('Sites', 'Initialized site with id ' + conf.id, 'success');
+                                                done();
+                                            });
                                         });
                                     });
                                 });

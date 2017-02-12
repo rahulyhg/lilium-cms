@@ -304,6 +304,8 @@ var ftUsers = function(siteid, mysqldb, done) {
     });
 };
 
+// For a really faster parsing, create mongo index on content.data.wp_id and uploads.wpid
+// db.content.createIndex({"data.wp_id" : 1}); db.uploads.createIndex({wpid : 1});
 var ftPosts = function(siteid, mysqldb, done) {
     mysqldb.query(fetchPosts, function(err, wp_posts) {
         var totalRows = wp_posts.length;
@@ -448,7 +450,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                 }
 
                     if (wpids.indexOf(upload.ID) != -1) {
-                        log('WP', 'Skipping eisting file', 'detail');
+                        // log('WP', 'Skipping eisting file', 'detail');
                         threadIndices[threadid] += threadNumbers;
                         setTimeout(function() { nextUpload(threadid) }, 0);
                     } else {

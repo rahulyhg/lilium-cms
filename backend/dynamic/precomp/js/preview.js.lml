@@ -40,6 +40,12 @@ var LMLPreviewer = function() {
         window.open().document.write(frameContent);
     };
 
+    this.maybeDismiss = function(e) {
+        if (e.target == ePreview) {
+            that.dismiss();
+        }
+    };
+
     this.init = function() {
         if (!ePreview) return;
 
@@ -48,5 +54,7 @@ var LMLPreviewer = function() {
         ePreview.querySelector('.toggle-mobile').addEventListener('click', that.setMobileView);
         ePreview.querySelector('.toggle-desktop').addEventListener('click', that.setDesktopView);
         ePreview.querySelector('.refresh-preview').addEventListener('click', that.refresh);
+        document.getElementById('lmlpreviewer').addEventListener('click', that.maybeDismiss);
+
     };
 };

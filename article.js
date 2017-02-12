@@ -1269,7 +1269,7 @@ var Article = function() {
                 displayname: 'Media',
                 template: 'imgArticle',
                 sortable: false,
-                classes : "article-table-image",
+                classes : "article-table-image nomobile",
             }, {
                 key: '',
                 displayname: 'Title - Subtitle',
@@ -1280,16 +1280,19 @@ var Article = function() {
                 key: 'status',
                 displayname: 'Status',
                 template: 'table-article-status',
-                sortable: true
+                sortable: true,
+                classes : "nomobile"
             }, {
                 key: 'date',
                 displayname: 'Publish date',
                 template: 'table-article-date',
+                classes : "nomobile",
                 sortable: true
             }, {
                 key: 'author',
                 displayname: 'Author',
                 generator : "articleTableGenAuthor",
+                classes : "nomobile",
                 sortable: true
             }, {
                 key: '',

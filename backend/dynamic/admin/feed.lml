@@ -44,7 +44,7 @@ window.generateFeedCard = function(ctx) {
 
     setTimeout(function() {
         wrapper.classList.add('shown');
-    }, 50);
+    }, 10);
 
     return wrapper;
 }
@@ -349,11 +349,11 @@ window.generateFeedCard_published = function(card, ctx) {
     background-size: cover;
     filter: blur(20px);
 
-    -webkit-transition: all 0.2s;
-    -moz-transition: all 0.2s;
-    -ms-transition: all 0.2s;
-    -o-transition: all 0.2s;
-    transition: all 0.2s;
+    -webkit-transition: all 0.1s;
+    -moz-transition: all 0.1s;
+    -ms-transition: all 0.1s;
+    -o-transition: all 0.1s;
+    transition: all 0.1s;
 }
 
 h2.card-details {
