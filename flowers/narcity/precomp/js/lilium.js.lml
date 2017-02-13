@@ -90,8 +90,6 @@ var LiliumBackend = function(context) {
     };
 
     this.downloadSlider = function() {
-        if (context != "article") return;
-    
         var gotSlider = function() {
             var markup = this.responseText;
             document.getElementsByTagName('lmlslider')[0].innerHTML = markup;
