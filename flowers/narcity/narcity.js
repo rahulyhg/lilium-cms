@@ -380,7 +380,7 @@ var loadHooks = function(_c, info) {
     var backendFEscriptFirstRequest = false;
     endpoints.register(_c.id, 'lilium', 'GET', function(cli) {
         if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
-            var path = cli._c.server.base + "backend/static/narcitylilium.js";
+            var path = cli._c.server.base + "backend/static/gen/narcitylilium.js";
             fileserver.fileExists(path, function(exists) {
                 if (exists && backendFEscriptFirstRequest) {
                     fileserver.pipeFileToClient(cli, path, noOp, true, "text/javascript");
@@ -399,7 +399,7 @@ var loadHooks = function(_c, info) {
     var backendFEstyleFirstRequest = false;
     endpoints.register(_c.id, 'liliumstyle', 'GET', function(cli) {
         if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
-            var path = cli._c.server.base + "backend/static/narcitylilium.css";
+            var path = cli._c.server.base + "backend/static/gen/narcitylilium.css";
             fileserver.fileExists(path, function(exists) {
                 if (exists && backendFEstyleFirstRequest) {
                     fileserver.pipeFileToClient(cli, path, noOp, true, "text/css");
