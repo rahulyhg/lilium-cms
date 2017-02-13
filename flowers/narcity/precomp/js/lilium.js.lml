@@ -47,6 +47,7 @@ var LiliumBackend = function(context) {
         var logoWrapper = document.createElement('div');
         logoWrapper.classList.add("lmlsliderbutton");
         logoWrapper.addEventListener('click', that.showmenu);
+        logoWrapper.id = "lmlsliderbutton";
 
         var lmlLogo = document.createElement('img');
         lmlLogo.src = "{=config.default.server.url}/static/media/lmllogo.png";
@@ -89,12 +90,20 @@ var LiliumBackend = function(context) {
         this.getRealTime();
     };
 
+    this.goToDashboard = function() {
+        document.location.href = "{=config.default.server.url}/admin";
+    };
+
     this.downloadSlider = function() {
         var gotSlider = function() {
             var markup = this.responseText;
-            document.getElementsByTagName('lmlslider')[0].innerHTML = markup;
 
-            document.getElementById('lmlsliderclose').addEventListener('click', that.dismissmenu);
+            if (markup) {
+                document.getElementsByTagName('lmlslider')[0].innerHTML = markup;
+                document.getElementById('lmlsliderclose').addEventListener('click', that.dismissmenu);
+            } else {
+                document.getElementById("lmlsliderbutton").addEventListener('click', that.goToDashboard);
+            }
         }
 
         var oReq = new XMLHttpRequest();
