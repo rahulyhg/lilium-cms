@@ -63,6 +63,8 @@ var LiliumBackend = function(context) {
         var url = "{=config.default.server.url}/chartbeatbridge?url=" + document.location.href;
 
         var gotStats = function() {
+            if (!document.getElementById('lmlrealtime')) return;
+
             var lastRt = this.responseText;
             if (typeof lastRt == "string") {
                 lastRt = JSON.parse(lastRt);
