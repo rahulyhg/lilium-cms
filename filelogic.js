@@ -1,13 +1,9 @@
 var FileServer = require('./fileserver.js');
-var LML = require('./lml.js');
 var _c = require('./config.js');
-var log = require('./log.js');
-var fs = require('fs');
-var slugify = require('slug');
-var db = require('./includes/db.js');
-var artcileHelper = require('./articleHelper.js');
-var noOp = require('./noop.js');
+var LML = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
+var log = require('./log.js');
+var db = require('./includes/db.js');
 
 var FileLogic = function () {
     /*
@@ -64,31 +60,6 @@ var FileLogic = function () {
         return false;
     };
 
-    /**
-     * Serves an lml page, if lastIsParam is true,
-     * it will not check for last path[] as the folder name.
-     */
-    this.serveLmlPage = function (cli, lastIsParam, extra) {
-        lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
-        var name = "";
-
-        if (lastIsParam) {
-            name = cli.routeinfo.relsitepath.replace('/' + cli.routeinfo.path.pop(), '');
-        } else {
-            name = cli.routeinfo.relsitepath;
-        }
-
-        var savePath = cli._c.server.html + name + '/index.html';
-        FileServer.fileExists(savePath, function (isPresent) {
-            var readPath = cli._c.server.base + "backend/dynamic" + name + ".lml";
-            if (!isPresent) {
-                saveLmlPage(cli, readPath, savePath, extra);
-            } else {
-                serveCachedFile(cli, savePath);
-            }
-        });
-    };
-
     this.serveErrorPage = function(cli, code) {
         this.serveRelativeLML(cli, 'http/' + code, {});
     };
@@ -124,7 +95,7 @@ var FileLogic = function () {
                         LML2.compile(cli._c.id, content, output, extra, function() {
                             FileServer.pipeFileToClient(cli, savePath, function () {
                                 log('FileLogic', 'Admin template page generated and served in ' + (new Date - now) + "ms", 'success');
-                                (cb || noOp)();
+                                cb && cb();
                             });
                         });
                     });
@@ -291,19 +262,21 @@ var FileLogic = function () {
 
     this.renderThemeLML = function(cli, ctxName, preferredFileName, extra, callback) {
         var theme = require('./themes.js');
-        extra = extra || new Object();
-        extra.config = cli._c;
-        extra.contextname = ctxName;
-        extra.siteid = cli._c.id;
+        var _c = cli._c || cli;
 
-        theme.fetchCurrentTheme(cli._c, function(cTheme) {
+        extra = extra || new Object();
+        extra.config = _c;
+        extra.contextname = ctxName;
+        extra.siteid = _c.id;
+
+        theme.fetchCurrentTheme(_c, function(cTheme) {
             extra.theme = cTheme;
             extra.minify = true;
 
-            var readPath = cli._c.server.base + "flowers/" + cTheme.uName + "/" + cTheme.contexts[ctxName];
-            var savePath = cli._c.server.html + "/" + preferredFileName;
-            var tmpPath = cli._c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
-            var layoutPath = cli._c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
+            var readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + cTheme.contexts[ctxName];
+            var savePath = _c.server.html + "/" + preferredFileName;
+            var tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+            var layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
 
             log('FileLogic', 'Compiling context theme page', 'info');
             LML2.compileToFile(
@@ -320,7 +293,7 @@ var FileLogic = function () {
                             function () {
                                 log('FileLogic', 'Completed Theme page compilation', 'success');
                                 FileServer.readFile(savePath, function(fHtml) {
-                                    require('./cdn.js').parse(fHtml, cli, function(cdned) { 
+                                    require('./cdn.js').parse(fHtml, _c, function(cdned) { 
                                         var handle = FileServer.getOutputFileHandle(savePath, 'w');
                                         FileServer.writeToFile(handle, cdned, function() {
                                             callback(cdned);
@@ -339,54 +312,24 @@ var FileLogic = function () {
         });
     };
 
-    this.renderLmlPostPage = function (cli, postType, extra, cb) {
-        var theme = require('./themes.js');
-        extra = extra || new Object();
-        extra.config = cli._c;
-        extra.siteid = cli._c.id;
-        extra.theme = theme.getSettings(cli._c);
+    this.runLogic = function (cli) {
+        cli.touch('filelogic.runlogic');
+        var fullpath = cli._c.server.html + cli.routeinfo.relsitepath;
 
-        artcileHelper.getPostElements(cli, extra, function(extra) {
-            // Check for the post type
-            var title = extra.name;
-            var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
-            var savePath = cli._c.server.html + "/" + title + ".html";
-            LML.executeToFile(
-                readPath,
-                savePath,
-                function () {
-                    cli.responseinfo.filecreated = true;
-                    cb && cb(title + ".html");
-                },
-                extra
-            );
-        })
-
-    };
-
-    this.compileLmlPostPage = function (cli, postType, extra, cb) {
-        var theme = require('./themes.js');
-
-        var readPath = cli._c.server.base + "flowers/" + theme.getEnabledTheme(cli._c).info.path + "/" + postType + ".lml";
-        artcileHelper.getPostElements(cli, extra, function(extra) {
-            LML.executeToHtml(readPath, cb, extra);
-        });
-    };
-
-    this.serveAbsoluteLml = function (readPath, savePath, cli, extra) {
-        FileServer.fileExists(savePath, function (isPresent) {
+        // Check for static file
+        FileServer.fileExists(fullpath, function (isPresent) {
             if (isPresent) {
-                serveCachedFile(cli, savePath);
+                serveCachedFile(cli, fullpath);
+            } else if (cli.routeinfo.isStatic) {
+                // Static file not found; hard 404
+                cli.debug();
+            } else if (checkForSpecialPage(cli)) {
+                serveSpecialPage(cli, fullpath);
+            } else if (checkForRedirection(cli)) {
+                redirectUserTo(cli);
             } else {
-                log("FileLogic", "Interpreting LML from absolute path : " + readPath, 'info');
-                extra = extra || new Object();
-                extra.config = cli._c;
-                extra.siteid = cli._c.id;
-
-                LML.executeToFile(readPath, savePath, function () {
-                    cli.responseinfo.filecreated = true;
-                    serveCachedFile(cli, savePath);
-                }, extra);
+                cli.debug();
+                throw 404;
             }
         });
     };
@@ -413,34 +356,6 @@ var FileLogic = function () {
         var tmpname = cli._c.server.html + "/static/tmp/" + Math.random().toString(36).slice(-12) + ".html";
         saveLmlPage(cli, readPath, tmpname, extra);
     };
-
-    this.runLogic = function (cli) {
-        cli.touch('filelogic.runlogic');
-        var fullpath = cli._c.server.html + cli.routeinfo.relsitepath;
-
-        // Check for static file
-        FileServer.fileExists(fullpath, function (isPresent) {
-            if (isPresent) {
-                serveCachedFile(cli, fullpath);
-            } else if (cli.routeinfo.isStatic) {
-                // Static file not found; hard 404
-                cli.debug();
-            } else if (checkForSpecialPage(cli)) {
-                serveSpecialPage(cli, fullpath);
-            } else if (checkForRedirection(cli)) {
-                redirectUserTo(cli);
-            } else {
-                cli.debug();
-                throw 404;
-            }
-        });
-    };
-
-    var init = function () {
-
-    };
-
-    init();
 };
 
 module.exports = new FileLogic();

@@ -11,6 +11,9 @@ var db = undefined;
 var hooks = undefined;
 var lmllib = undefined;
 var cc = undefined;
+var entities = undefined;
+var LML2 = undefined;
+var Article = undefined;
 
 var themePath;
 var noOp = function() {};
@@ -36,7 +39,10 @@ var initRequires = function(abspath) {
     hooks = require(abspath + 'hooks.js');
     db = require(abspath + 'includes/db.js');
     lmllib = require(abspath + 'lmllib.js');
+    entities = require(abspath + 'entities.js');
+    LML2 = require(abspath + 'lml/compiler.js');
     cc = require(abspath + "config.js");
+    Article = require(abspath + "article.js");
 };
 
 var registerPictureSizes = function() {
@@ -277,30 +283,32 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
 };
 
 var serveArchive = function(cli, archType) {
-        var _c = cli._c;
-        var tagName = cli.routeinfo.path[1];
-        var tagIndex = cli.routeinfo.path[2] || 1;
+    var _c = cli._c;
+    var tagName = cli.routeinfo.path[1];
+    var tagIndex = cli.routeinfo.path[2] || 1;
 
-        if (archType === "search" && !tagName) {
-            tagName = cli.routeinfo.params.q;
-            if (!tagName || tagName == "") {
-                return cli.throwHTTP(404, 'NOT FOUND');
-            }
-        }
-
-        if (isNaN(tagIndex)) {
+    if (archType === "search" && !tagName) {
+        tagName = cli.routeinfo.params.q;
+        if (!tagName || tagName == "") {
             return cli.throwHTTP(404, 'NOT FOUND');
         }
+    }
 
-        if (typeof cachedTags[archType] === 'undefined') {
-            cachedTags[archType] = {};
-        }
+    if (isNaN(tagIndex)) {
+        return cli.throwHTTP(404, 'NOT FOUND');
+    }
 
-        if (typeof cachedTags[archType][tagName] === 'undefined') {
-            cachedTags[archType][tagName] = [];
-        }
+    if (typeof cachedTags[archType] === 'undefined') {
+        cachedTags[archType] = {};
+    }
 
-        if (typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
+    if (typeof cachedTags[archType][tagName] === 'undefined') {
+        cachedTags[archType][tagName] = [];
+    }
+
+    var file = _c.server.html + '/' + archType + '/' + tagName + '/' + tagIndex + "/index.html";
+    fileserver.fileExists(file, function(exists) { 
+        if (!exists || typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
             fetchArchiveArticles(_c, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices) {
                 if (typeof archDetails === "number") {
                     return cli.throwHTTP(404, 'NOT FOUND');
@@ -316,52 +324,151 @@ var serveArchive = function(cli, archType) {
                 extra.archivedetails = archDetails;
                 
                 filelogic.renderThemeLML(cli, archType, archType + "/" + tagName + '/' + tagIndex + '/index.html', extra, function() {
-                    fileserver.pipeFileToClient(cli, _c.server.html + '/' + archType +'/' + tagName + '/' + tagIndex + '/index.html', function() {
+                    fileserver.pipeFileToClient(cli, file, function() {
                         cachedTags[archType][tagName][tagIndex] = true;
                         log('Narcity', 'Generated tag archive for type ' + archType + ' : ' + tagName);
                     });
                 });
             });
         } else {
-            fileserver.pipeFileToClient(cli, _c.server.html + '/' + archType + '/' + tagName + '/' + tagIndex + "/index.html", noOp, true);
+            fileserver.pipeFileToClient(cli, file, noOp, true);
         }
-
+    });
 }
+
+var objToURIParams = function(params) {
+    var str = "?";
+    for (var key in params) {
+        str += key + "=" + params[key] + "&";
+    }
+
+    return str + "lmlredir=true";
+};
 
 var needsHomeRefresh = true;
 var cachedTags = {};
 var loadHooks = function(_c, info) {
     endpoints.register(_c.id, ["2012", "2013", "2014", "2015", "2016", "2017"], 'GET', function(cli) {
-        cli.redirect(_c.server.url + "/" + cli.routeinfo.path.pop());
+        cli.redirect(_c.server.url + "/" + cli.routeinfo.path.pop() + (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : ""));
     });
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
-        if (needsHomeRefresh) {
-            fetchHomepageArticles(_c, function(articles) {
-                var extra = new Object();
-                extra.sections = articles.sections;
-                extra.latests = articles.latests;
-    
-                filelogic.renderThemeLML(cli, 'home', 'index.html', extra, function() {
-                    fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
-                        needsHomeRefresh = false;
-                        log('Narcity', 'Recreated and served homepage');
-                    }, true);
+        fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
+            if (needsHomeRefresh || !exists) {
+                fetchHomepageArticles(_c, function(articles) {
+                    var extra = new Object();
+                    extra.sections = articles.sections;
+                    extra.latests = articles.latests;
+        
+                    filelogic.renderThemeLML(cli, 'home', 'index.html', extra, function() {
+                        fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
+                            needsHomeRefresh = false;
+                            log('Narcity', 'Recreated and served homepage');
+                        }, true);
+                    });
                 });
-            });
-
-            setTimeout(function() {
-                needsHomeRefresh = true;
-            }, 1000 * 60 * 5);
-        } else {
-            fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
-        }
+            } else {
+                fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
+            }
+        });
     });
 
     ["tags", "author", "category", "search"].forEach(function(archType) {
         endpoints.register(_c.id, archType, 'GET', function(cli) { serveArchive(cli, archType); }); 
     });
 
+    var backendFEscriptFirstRequest = false;
+    endpoints.register(_c.id, 'lilium', 'GET', function(cli) {
+        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
+            var path = cli._c.server.base + "backend/static/narcitylilium.js";
+            fileserver.fileExists(path, function(exists) {
+                if (exists && backendFEscriptFirstRequest) {
+                    fileserver.pipeFileToClient(cli, path, noOp, true, "text/javascript");
+                } else {
+                    backendFEscriptFirstRequest = true;
+                    LML2.compileToFile(cli._c.server.base + "/flowers/narcity/precomp/js/lilium.js.lml", path, function() {
+                        fileserver.pipeFileToClient(cli, path, noOp, true, "text/javascript");
+                    }, {config : cli._c, minify : true});
+                }
+            });
+        } else {
+            cli.throwHTTP(204, "", true);
+        }
+    });
+
+    var backendFEstyleFirstRequest = false;
+    endpoints.register(_c.id, 'liliumstyle', 'GET', function(cli) {
+        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
+            var path = cli._c.server.base + "backend/static/narcitylilium.css";
+            fileserver.fileExists(path, function(exists) {
+                if (exists && backendFEstyleFirstRequest) {
+                    fileserver.pipeFileToClient(cli, path, noOp, true, "text/css");
+                } else {
+                    backendFEstyleFirstRequest = true;
+                    LML2.compileToFile(cli._c.server.base + "/flowers/narcity/precomp/css/lilium.css.lml", path, function() {
+                        fileserver.pipeFileToClient(cli, path, noOp, true, "text/css");
+                    }, {config : cli._c, minify : false});
+                }
+            });
+        } else {
+            cli.throwHTTP(204, "", true);
+        }
+    });
+
+    endpoints.register(_c.id, 'articlestats', 'GET', function(cli) {
+        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
+            var articleid = cli.routeinfo.path[1];
+            if (articleid) {
+                articleid = db.mongoID(articleid);
+                Article.deepFetch(cli._c, articleid, function(da) {
+                    var extra = {
+                        article : da, 
+                        config : cli._c, 
+                        user : cli.userinfo,
+                        context : cli.routeinfo.params.context
+                    };
+
+                    var path = cli._c.server.base + "flowers/narcity/precomp/lml/slider.lml";
+                    fileserver.readFile(path, function(lmlcontent) {
+                        LML2.compile(cli._c.id, lmlcontent, cli.response, extra, function() {
+                            cli.response.end();
+                        });
+                    }, false, 'utf8');
+                });
+            } else {
+                cli.throwHTTP(204, "", true);
+            }
+        } else {
+            cli.throwHTTP(204, "", true);
+        }
+    });
+
+    var cachedStats = {};
+    var chartbeaturl = "http://api.chartbeat.com/live/quickstats/v4/?apikey=[key]&host=[host]&path=";
+    endpoints.register(_c.id, 'chartbeatbridge', 'GET', function(cli) {
+        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash') && cli._c.chartbeat && cli._c.chartbeat.api_key) {
+            var requrl = chartbeaturl.replace('[key]', cli._c.chartbeat.api_key).replace('[host]', cli._c.chartbeat.host) +
+                cli.routeinfo.params.url + 
+                (cli._c.chartbeat.section ? "&section=" + cli._c.chartbeat.section : "");
+            
+            if (cachedStats[requrl] && new Date() - cachedStats[requrl].at < 5000) {
+                cli.sendJSON(cachedStats[requrl].body);
+            } else {
+                require('request')(requrl, function(err, resp, bod) {
+                    cachedStats[requrl] = {
+                        body : bod,
+                        at : new Date()
+                    };
+    
+                    cli.sendJSON(bod);
+                });
+            }
+        } else {
+            cli.throwHTTP(204, "", true);
+        }
+    });
+
+    hooks.bind('homepage_needs_refresh', 1, function(pkg) { needsHomeRefresh = true; });
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });

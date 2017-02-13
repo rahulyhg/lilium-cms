@@ -1,0 +1,124 @@
+{#config}
+var LiliumBackend = function(context) {
+    var that = this;
+    var context = context;
+    var adminpath = "{=config.default.server.url}/admin";
+    var articleid = "";
+    var urls = {};
+    var rtTimer;
+    var lastRt;
+    var currentRt = "Calculating...";
+
+    this.showmenu = function() {
+        document.body.classList.add('blur');
+        var slider = document.getElementsByTagName('lmlslider')[0];
+
+        slider.classList.add('block');
+        setTimeout(function() {
+            slider.classList.add('displayed');
+        }, 50);
+    };
+
+    this.dismissmenu = function() {
+        document.body.classList.remove('blur');
+        var slider = document.getElementsByTagName('lmlslider')[0];
+
+        slider.classList.remove('displayed');
+        setTimeout(function() {
+            slider.classList.remove('block');
+        }, 200);
+
+    }
+
+    this.addStyle = function() {
+        var ss = document.createElement('link');
+        ss.type = "text/css";
+        ss.rel = "stylesheet"
+        ss.href = "{=config.default.server.url}/liliumstyle";
+        document.head.appendChild(ss);
+    };
+
+    this.createLinks = function() {
+        document.body.classList.add("lilium");
+
+        var slider = document.createElement("lmlslider");
+        document.documentElement.appendChild(slider);
+
+        var logoWrapper = document.createElement('div');
+        logoWrapper.classList.add("lmlsliderbutton");
+        logoWrapper.addEventListener('click', that.showmenu);
+
+        var lmlLogo = document.createElement('img');
+        lmlLogo.src = "{=config.default.server.url}/static/media/lmllogo.png";
+
+        logoWrapper.appendChild(lmlLogo);
+        document.body.appendChild(logoWrapper);
+
+        setTimeout(function() {
+            logoWrapper.classList.add('shown');
+        }, 100);
+    };
+
+    this.getRealTime = function() {
+        var url = "{=config.default.server.url}/chartbeatbridge?url=" + document.location.href;
+
+        var gotStats = function() {
+            var lastRt = this.responseText;
+            if (typeof lastRt == "string") {
+                lastRt = JSON.parse(lastRt);
+            }
+
+            if (lastRt.data && lastRt.data.stats && lastRt.data.stats.people) {
+                currentRt = lastRt.data.stats.people;
+                document.getElementById('lmlrealtime').textContent = currentRt;
+            } else {
+                document.getElementById('lmlrealtime').textContent = "Unknown";
+            }
+        }
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", gotStats);
+        oReq.open("GET", url);
+        oReq.send();
+    };
+
+    this.scheduleRealTime = function() {
+        rtTimer = setInterval(this.getRealTime, 5000);
+        this.getRealTime();
+    };
+
+    this.downloadSlider = function() {
+        if (context != "article") return;
+    
+        var gotSlider = function() {
+            var markup = this.responseText;
+            document.getElementsByTagName('lmlslider')[0].innerHTML = markup;
+
+            document.getElementById('lmlsliderclose').addEventListener('click', that.dismissmenu);
+        }
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", gotSlider);
+        oReq.open("GET", "{=config.default.server.url}/articlestats/" + articleid + "?context=" + context);
+        oReq.send();
+    };
+
+    this.init = function() {
+        urls.dashboard = adminpath;
+        urls.publish = adminpath + "/article/new";
+
+        if (context == "article") {
+            articleid = document.getElementsByTagName('article')[0].dataset.mi;
+            urls.edit = adminpath + "/article/edit/" + articleid;
+        }
+
+        this.addStyle();
+        this.createLinks();
+        this.scheduleRealTime();
+        this.downloadSlider();
+    };
+
+    this.init();
+};
+
+window.liliumbackend = new LiliumBackend(window.lmlcontext);

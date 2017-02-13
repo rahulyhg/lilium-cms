@@ -615,10 +615,6 @@ var Core = function () {
     };
 
     var loadCacheInvalidator = function () {
-        if (_c.default().env == 'dev') {
-            log("CacheInvalidator", 'Clearing old cached files in db', 'info');
-            db.remove(_c.default(), 'cachedFiles', {}, function () {}, false);
-        }
         log("CacheInvalidator", 'Initializing cacheInvalidator', 'info');
         cacheInvalidator.init(function () {
             log("CacheInvalidator", 'Ready to invalidate cached files', 'success');

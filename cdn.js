@@ -30,8 +30,9 @@ var ContentDeliveryNetwork = function() {
     };
 
     this.parse = function(txt, cli, cb, ignoreHTML) {
-        if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain) {
-            parseText(txt, cli._c.server.url, cli._c.content.cdn.domain, cb, ignoreHTML);
+        var _c = cli._c || cli;
+        if (_c.content && _c.content.cdn && _c.content.cdn.domain) {
+            parseText(txt, _c.server.url, _c.content.cdn.domain, cb, ignoreHTML);
         } else {
             cb(txt);
         }
