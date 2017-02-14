@@ -3,7 +3,7 @@
     <div class="lmlpreviewer-wrapper">
         <div class="lmlpreview-tools">
             <h1>Preview</h1>
-            <div class="lmlpreview-tools-right">
+            <div class="lmlpreview-tools-right nomobile">
                 <i class="fa fa-refresh refresh-preview" aria-hidden="true"></i>
                 <i class="fa fa-desktop toggle-desktop" aria-hidden="true"></i>
                 <i class="fa fa-mobile toggle-mobile" aria-hidden="true"></i>

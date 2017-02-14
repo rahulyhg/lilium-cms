@@ -10,10 +10,11 @@ var Canvas = require('canvas');
 var crypto = require('crypto');
 var dateFormat = require('dateformat');
 var dir = require('node-dir');
-
+var readdirp = require('readdirp');
 
 var FileServer = function () {
     var defaultCT = 'text/html; charset=utf-8';
+    var that = this;
 
     this.workDir = function () {
         return __dirname;
@@ -131,6 +132,36 @@ var FileServer = function () {
 
     this.dirname = function (fullpath) {
         return path.dirname(fullpath);
+    };
+
+    this.emptyDirectory = this.rmrf = function(path, opt, cb) {
+        opt = opt || {};
+        opt.root = path;
+        opt.fileFilter = opt.fileFilter || "*";
+
+        log('Fileserver', 'Emptying directory ' + opt.root);
+        readdirp(opt, function(err, content) { 
+            if (err) {
+               return cb(err);
+            }
+
+            var files = content.files;
+            if (files.length > 500) {
+                cb(new Error("Found more than 500 files. Might be insecure."));
+            } else {
+                var index = -1;
+                var nextFile = function() {
+                    index++;
+
+                    if (index == files.length) {
+                        cb && cb();
+                    } else {
+                        that.deleteFile(files[index].fullPath, nextFile);
+                    }
+                };
+                nextFile();
+            }
+        });
     };
 
     this.deleteFile = function (path, cb) {

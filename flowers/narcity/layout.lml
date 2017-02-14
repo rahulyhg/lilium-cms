@@ -19,11 +19,13 @@
     {%petals/sharer}
 
     <div id="mcanvas">
-        {%petals/beforecontent}
-        {=extra.contentHTML}
+        <div id="container">
+            {%petals/beforecontent}
+            {=extra.contentHTML}
 
-        <div id="lmlasync">
+            <div id="lmlasync">
 
+            </div>
         </div>
     </div>
     {%petals/footer}

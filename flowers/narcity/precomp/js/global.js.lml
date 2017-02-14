@@ -1,5 +1,9 @@
 {#config}
 
+var narsettings = {
+    infiniteScroll : false
+};
+
 var googletag = googletag || {};
 googletag.cmd = googletag.cmd || [];
 
@@ -254,7 +258,7 @@ var bindAdsScroll = function() {
 };
 
 var bindNextScroll = function() {
-    if (!window.relatedArticles || !window.relatedArticles[0]) return;
+    if (!window.relatedArticles || !window.relatedArticles[0] || !narsettings.infiniteScroll) return;
 
     window.addEventListener('scroll', handleNextScroll);
     handleNextScroll();
@@ -358,6 +362,16 @@ var bindPCShare = function() {
     }
 };
 
+var rearrangeImages = function() {
+    var asis = document.querySelectorAll('.image-asis');
+    for (var i = 0; i < asis.length; i++) {
+        var w = asis[0].getAttribute('width');
+        asis[i].style.width = w + "px";
+        asis[i].style.display = "inline-block";
+        asis[i].style.verticalAlign = "middle";
+    }
+};
+
 bindReady();
 bindAdsScroll();
 bindNextScroll();
@@ -367,6 +381,7 @@ detectMobileOS();
 bindAndroShare();
 bindIOSShare();
 bindPCShare();
+rearrangeImages();
 
 /* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */
 jQuery = function() {return {is : function() { return this; } } };

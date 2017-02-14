@@ -23,8 +23,15 @@ var Hooks = function () {
         return events[eventName] || {};
     }
 
-    this.bind = this.register = function (eventName, priority, callback) {
-        var registerFilename = __caller;
+    this.bind = this.register = function (eventName, priority, callback, registerFilename) {
+        var registerFilename = registerFilename || __caller;
+
+        if (typeof eventName == "object") {
+            for (var i = 0; i < eventName.length; i++) {
+                this.bind(eventName[i], priority, callback, registerFilename);
+            }
+            return;
+        }
         pluginHelper.getPluginIdentifierFromFilename(registerFilename, function (pluginIdentifier) {
 
             if (typeof events[eventName] === 'undefined') {
@@ -67,9 +74,12 @@ var Hooks = function () {
     this.trigger = this.fire = function (eventName, params) {
         if (typeof events[eventName] !== 'undefined') {
             var keys = Object.keys(events[eventName]);
+            params = params || {};
+            params.eventName = eventName;
+
             for (var i = keys.length - 1; i >= 0; i--) {
                 if (events[eventName][keys[i]].cb(
-                        typeof params === 'undefined' ? undefined : params,
+                        params,
                         eventName
                     )) {
                     break;

@@ -7,7 +7,7 @@ var CKEditor = function() {
 	var picture_id_url = {};
 	var selectedPicture;
 	var pictures = [];
-    var supportedEmbed = ["instagram", "facebook", "youtube", "soundcloud"];    
+    var supportedEmbed = ["instagram", "facebook", "youtube", "soundcloud", "imgur"];    
     var that = this;
 
     var ckIsUrl = function(s) {
@@ -50,6 +50,22 @@ var CKEditor = function() {
                                     evt.data.dataValue = '<iframe allowfullscreen="" frameborder="0" src="'+
                                         vdata.replace("watch?v=", 'embed/') +
                                         '" class="ck-embed-video"></iframe>';
+                                    break;
+
+                                case "imgur":
+                                    var imgid = "";
+                                    var dotsplit = vdata.split('.');
+                                    var idcont = dotsplit[dotsplit.length - 2];
+
+                                    if (idcont.indexOf("imgur") != -1) {
+                                        imgid = vdata.split('/').pop();
+                                    } else {
+                                        imgid = idcont.split('/').pop();
+                                    }
+
+                                    evt.data.type = "html";
+                                    evt.data.dataValue = '<blockquote class="imgur-embed-pub" lang="en" data-id="'+imgid+'"><a href="//imgur.com/'+imgid+'">'+vdata+'</a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>';
+
                                     break;
     
                                 case "facebook":

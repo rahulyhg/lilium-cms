@@ -173,6 +173,7 @@
                     var a = document.createElement('a');
                     a.textContent = resp.siteurl + "/" + resp.aliases[i] + " ";
                     a.href = resp.siteurl + "/" + resp.aliases[i];
+                    a.setAttribute('target', '_blank');
 
                     document.getElementById("moreinfo-alias").appendChild(a);
 
@@ -187,7 +188,6 @@
             }
 
             document.getElementById('moreinfo-author').textContent = resp["author"];
-            
             document.getElementById('moreinfo-url').innerHTML = "";
             if (!resp.url || resp.url.indexOf('//') == -1) {
                 document.getElementById('moreinfo-url').textContent = resp.url;
@@ -195,6 +195,7 @@
                 var a = document.createElement('a');
                 a.href = resp.url;
                 a.textContent = resp.url;
+                a.setAttribute('target', '_blank');
 
                 document.getElementById('moreinfo-url').appendChild(a);
             }
@@ -336,7 +337,9 @@
             document.dispatchEvent(new CustomEvent("articleWillPreview"));
 
             liliumcms.previewer.cast(document.querySelector("input[name=title]").value);
-            $.post('{=config.default.server.url}/admin/article/preview', $('form#post_create').serialize(), function(html) {
+            var formdat = $('form#post_create').serialize() + "&id=" + contentid;
+
+            $.post('{=config.default.server.url}/admin/article/preview', formdat, function(html) {
                 liliumcms.previewer.setContent(html);
                 btn.disabled = false;
                 btn.innerHTML = textinside;

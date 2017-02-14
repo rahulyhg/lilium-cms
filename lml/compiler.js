@@ -102,6 +102,14 @@ class LMLSlang {
         let startIndex = 0;
         let seeking = dotIndex != -1;
         let willClose = false;
+        let undefinedReplacement = "";
+
+        if (flags['?']) {
+            let cSplit = line.split(':');
+            line = cSplit[0];
+            undefinedReplacement = cSplit[1];
+        }
+        
         while(seeking || !willClose) {
             if (!seeking) {
                 dotIndex = line.length;
@@ -176,7 +184,7 @@ class LMLSlang {
 
             if (typeof curVal == 'undefined' || curVal == null) {
                 if (flags["?"]) {
-                    curVal = "";
+                    curVal = undefinedReplacement ? this.getReturn(undefinedReplacement, flags) : undefined;
                     break;
                 } else {
                     curVal = new Error("[LMLSlangException] Undefined branch {" + levels[i].name + "} in line {" + line + "}");
@@ -212,7 +220,7 @@ class LMLSlang {
 class LMLExecutor {
     constructor() {
         this.affectors = ["+=", "-=", "/=", "*=", "%=", "="];
-        this.comparors = ["==", "!=", " in ", "<", ">", "<=", ">="];
+        this.comparors = ["==", "!=", " in ", "<", ">", "<=", ">=", "??"];
         this.stackOp = ["if", "for", "while"];
         this.stackCl = ["end", "endif", "else", "endfor", "endwhile"];
     };
@@ -229,14 +237,23 @@ class LMLExecutor {
         for (let i = 0; i < this.stackOp.length; i++) if (line.indexOf(this.stackOp[i]) == 0) {
             let condition = line.substring(this.stackOp[i].length, line.length-1).trim().substring(1);
             let comparees = [];
-            let operator = "";
+            let operator = "??";
+
+            let charValidator = line[this.stackOp[i].length];
+            if (charValidator != " " && charValidator != "(") {
+                return false;
+            }
 
             for (let j = 0; j < this.comparors.length; j++) if (condition.indexOf(this.comparors[j]) != -1) {
                 operator = this.comparors[j];
                 comparees = condition.split(operator);
             }
 
-            return operator ? { stacktag : this.stackOp[i], comparees : comparees, operator : operator } : false;
+            if (comparees.length == 0) {
+                comparees = [condition, undefined];
+            }
+
+            return { stacktag : this.stackOp[i], comparees : comparees, operator : operator };
         }
 
         return false;
@@ -273,7 +290,7 @@ class LMLExecutor {
                 case "while":
                     let truthfulness = false;
                     let rightVal = ctx.slang.getReturn(ctx, condObj.comparees[0]);
-                    let leftVal  = ctx.slang.getReturn(ctx, condObj.comparees[1]);
+                    let leftVal  = condObj.comparees[1] && ctx.slang.getReturn(ctx, condObj.comparees[1]);
 
                     switch (condObj.operator) {
                         case "==": truthfulness = rightVal == leftVal; break;
@@ -282,6 +299,7 @@ class LMLExecutor {
                         case "<" : truthfulness = rightVal <  leftVal; break;
                         case ">=": truthfulness = rightVal >= leftVal; break;
                         case "<=": truthfulness = rightVal <= leftVal; break;
+                        case "??": truthfulness = !!rightVal;
                     }
 
                     if (!truthfulness) {
@@ -301,11 +319,11 @@ class LMLExecutor {
 
                 case "for":
                     let varname = condObj.comparees[0];
-                    let loopee  = ctx.slang.getReturn(ctx, condObj.comparees[1]);
+                    let loopee = ctx.slang.getReturn(ctx, condObj.comparees[1]);
                     let loopObject = {
                         at : ctx.blockIndex,
-                        loopee : loopee,
-                        keys : Object.keys(loopee),
+                        loopee : loopee || {},
+                        keys : loopee ? Object.keys(loopee) : [],
                         affect : varname,
                         index : -1
                     }
@@ -363,10 +381,16 @@ class LMLExecutor {
         }
     };
 
+    isDeepLML(line) {
+        let fChar = line[0];
+        return fChar == "%" || fChar == "=";
+    };
+
     execute(ctx, line) {
-        let condStack   = this.isCondStack(line);
+        let isDeepLML   = this.isDeepLML(line);
+        let condStack   = !isDeepLML && this.isCondStack(line);
         let condClosure = !condStack && this.stackCl.indexOf(line) != -1;
-        let affectation = !ctx.flags.skipping && this.isAffectation(line);
+        let affectation = !ctx.flags.skipping && !condClosure && this.isAffectation(line);
 
         if (condStack) {
             this.runCondStack(line, condStack, ctx);
@@ -459,7 +483,7 @@ class LMLTagParser {
 
                 if (toCompile) {
                     fileserver.readFile(fullpath, (ctn) => {
-                        if (!ctn) {
+                        if (typeof ctn == "undefined") {
                             ctx.stream.write(new Error("[LMLPetalExceltion] Undefined content for file " + fullpath).toString());
                             return nextPetal();
                         }
@@ -475,9 +499,7 @@ class LMLTagParser {
                 } else {
                     fullpath = ctx.slang.getReturn(ctx, petalname);
                     fileserver.readFile(fullpath, (ctn) => {
-                        ctx.stream.write(ctn || new Error("[LMLPetalException] Undefined content for file " + fullpath), 'utf8', () => {
-                            nextPetal();
-                        });
+                        ctx.stream.write(typeof ctn == "undefined" ? new Error("[LMLPetalException] Undefined content for file " + fullpath) : ctn, 'utf8', nextPetal);
                     }, false, 'utf8');
                 }
             }
@@ -493,6 +515,8 @@ class LMLCompiler {
     };
 
     output(ctx, str) {
+        if (!str) { return; }
+
         ctx.buffer.push(str.toString());
         if (!ctx.flags.writing) {
             ctx.flags.writing = true;
@@ -507,7 +531,7 @@ class LMLCompiler {
 
             nextBlock();
         }
-    }; w(ctx, str) { this.output(ctx, str) };
+    }; 
 
     checkForCompletion(ctx) {
         if (ctx.flags.finished && !ctx.flags.writing && ctx.buffer.length == 0 && !ctx.flags.closed) {

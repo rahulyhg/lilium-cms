@@ -12,10 +12,11 @@
 
         <div class="me-decoration-wrapper">
             <h2>Decorations</h2>
+            <h5>Badges will be introduced soon! ;)</h5>
             <div class="me-decorations">
-                <lml:foreach var="deco" in="livevars.me.0.badges" wrapper="div">
+                <!--lml:foreach var="deco" in="livevars.me.0.badges" wrapper="div">
                     <lml:generate call="generatedeco" />
-                </lml:foreach>
+                </lml:foreach-->
             </div>
         </div>
     </form>

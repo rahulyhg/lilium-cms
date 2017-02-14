@@ -3,9 +3,6 @@
 {*chartbeat.dashboard.top}
 {*chartbeat.dashboard.latest}
 <div class="dash-cb-wrapper">
-	{$
-		if (?config.default.chartbeat.api_key != "");
-	$}
 	<div class="dash-cb-realtime-header">
 		<div class="col-xs-6 col-md-3">
 			<span class="cb-header-title">Active visitors</span>
@@ -47,10 +44,5 @@
 		<div class="col-xs-6 col-md-4">
 			other stats
 	</div>
-	{$
-		endif;
-	$}
-
 </div>
-
 {%dashboardChartbeatJS}

@@ -44,7 +44,7 @@ window.generateFeedCard = function(ctx) {
 
     setTimeout(function() {
         wrapper.classList.add('shown');
-    }, 50);
+    }, 10);
 
     return wrapper;
 }
@@ -71,7 +71,7 @@ window.generateFeedCard_welcomed = function(card, ctx) {
 };
 
 window.generateFeedCard_badge = function(card, ctx) {
-    var user = liliumcms.conversations.getCachedUsers()[card.actor];
+    var user = liliumcms.users.get(card.actor);
     
     var wrap = document.createElement('div');
     var picture = document.createElement('img');
@@ -148,7 +148,11 @@ window.generateFeedCard_published = function(card, ctx) {
 
     avatar.setAttribute('src', liliumcms.cdn.ize(card.extra.authoravatar));
     announce.textContent = card.extra.authorname.split(' ')[0] + 
-        " published on " + ctx.livevars.sites.all.simple.assoc[card.site].displayName;
+        " published on " + (
+            ctx.livevars.sites.all.simple.assoc[card.site] ?
+            ctx.livevars.sites.all.simple.assoc[card.site].displayName :
+            "the network"
+        );
 
     articletitle.textContent = card.extra.title;
     articleimg.style.backgroundImage = "url('"+liliumcms.cdn.ize(card.extra.image)+"')";
@@ -345,11 +349,11 @@ window.generateFeedCard_published = function(card, ctx) {
     background-size: cover;
     filter: blur(20px);
 
-    -webkit-transition: all 0.2s;
-    -moz-transition: all 0.2s;
-    -ms-transition: all 0.2s;
-    -o-transition: all 0.2s;
-    transition: all 0.2s;
+    -webkit-transition: all 0.1s;
+    -moz-transition: all 0.1s;
+    -ms-transition: all 0.1s;
+    -o-transition: all 0.1s;
+    transition: all 0.1s;
 }
 
 h2.card-details {

@@ -3,14 +3,13 @@
 <header class="admin-bar">
 
     <nav class="navbar navbar-default">
-        <div class="container-fluid">
+        <div class="header-burger">
+            <i></i>
+            <i></i>
+            <i></i>
+        </div>
+        <div class="">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
                 <div class="lilium-logo-link">
                     <a href="{=config.default.server.url}/admin">
                         <img src="{=config.default.server.url}/static/media/lmllogo.png" id="lilium-logo" class="lilium-logo" />
@@ -21,11 +20,6 @@
                 </div>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li id="adminquickaction">
-                        
-                    </li>
-                </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li id="topbar-search-icon" class="link">
                         <span class="fa fa-search"></span>

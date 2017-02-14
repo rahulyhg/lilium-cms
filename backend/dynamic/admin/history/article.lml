@@ -50,17 +50,14 @@ window.historyCardGenerator = function(ldContext) {
 
     var datewrap = document.createElement('i');
     datewrap.className = "timeline-datetime";
-    datewrap.textContent = dateFormat(new Date(obj.modifiedOn), "mmmm dd, yyyy - hh:MM:ss");
+    datewrap.textContent = obj.modifiedOn ? dateFormat(new Date(obj.modifiedOn), "mmmm dd, yyyy - hh:MM:ss") : obj.modifiedOn;
 
     var actorwrap = document.createElement('b');
-    var actoravatar = document.createElement('img');
-
     actorwrap.className = "timeline-actorwrap";
-    actoravatar.className = "timeline-actoravatar";
 
     if (actorobj) {
         actorwrap.textContent = "Action by " + actorobj.displayname;
-        actoravatar.setAttribute('src', actorobj.avatarURL);
+        bigdot.style.backgroundImage = "url('"+actorobj.avatarURL+"')";
     }
 
     var stateWrapper = document.createElement('div');
@@ -81,12 +78,19 @@ window.historyCardGenerator = function(ldContext) {
 
     var modlist = document.createElement('ul');
     modlist.className = "timeline-modlist";
-    for (var i = 0; i < obj.diffs.length; i++) {
+    for (var i = 0; i < obj.diffs.length; i++) 
+    if (obj.diffs[i].field[0].indexOf("title-") != 0) 
+    if (obj.diffs[i].field[0].indexOf("lmlsection") != 0) 
+    if (obj.diffs[i].field[0].indexOf("lmlclosure") != 0) {
         var listitem = document.createElement('li');
+        var cuteTitle = histoFieldsDico[obj.diffs[i].field.join('.')];
+
         listitem.textContent = histoActionDico[obj.diffs[i].change] + 
-            " " + (
-                histoFieldsDico[obj.diffs[i].field.join('.')] || obj.diffs[i].field
-            );
+            " " + (cuteTitle || "foreign field " + obj.diffs[i].field);
+
+        if (!cuteTitle) {
+            listitem.classList.add("listitem-semi");
+        }
 
         modlist.appendChild(listitem);
     };
@@ -110,7 +114,7 @@ window.historyCreatedGenerator = function(ldContext) {
     var obj = ldContext.articlehistory.currentstate;
 
     var cardWrapper = document.createElement('div');
-    cardWrapper.className = "history-bigwrap";
+    cardWrapper.className = "history-bigwrap history-bigwrap-created";
 
     var bigdot = document.createElement('div');
     bigdot.className = "timeline-bigdot";
@@ -121,12 +125,12 @@ window.historyCreatedGenerator = function(ldContext) {
     var createString = "Article was created";
 
     if (obj.createdOn) {
-        createString += " on " + dateFormat(new Date(obj.createdOn), "mmmm dd, yyyy - hh:MM:ss");
+        createString += " on " + dateFormat(new Date(obj.createdOn), "mmmm dd, yyyy @ hh:MM:ss");
     }
 
     if (obj.createdBy) {
-        var actorobj = liliumcms.conversations.getCachedUser(obj.createdBy);
-        createString += " by " + actorobj.displayname;
+        var actorobj = liliumcms.conversations.getCachedUsers()[obj.createdBy];
+        createString += actorobj ? (" by " + actorobj.displayname) : "";
     }
 
     var dateWrap = document.createElement('div');
@@ -162,6 +166,9 @@ var histoActionDico = {
 var histoFieldsDico = {
     "content" : "Content",
     "title" : "Title",
+    "subtitle" : "Subtitle",
+    "geolocation" : "Geo Tagging Positions",
+    "isSponsored" : "Sponsored Flag",
     "name" : "Slug",
     "aliases" : "Aliases",
     "author" : "Author",
@@ -170,7 +177,7 @@ var histoFieldsDico = {
     "date" : "Publication date",
     "featuredimageartist" : "Featured Image Credit",
     "featuredimagelink" : "Featured Image Link",
-    "geolocationdisplay" : "Geo tagging",
+    "geolocationdisplay" : "Geo Tagging Name",
     "media" : "Featured Image",
     "persona-select" : "Persona",
     "status" : "Status",
@@ -187,6 +194,9 @@ var histoFieldsDico = {
     border-radius: 30px;
     vertical-align: top;
     border: 5px solid #DDD;
+
+    background-size: cover;
+    background-position: center center;
 }
 
 .timeline-infowrapper {
@@ -198,6 +208,7 @@ var histoFieldsDico = {
     background: #F6F6F6;
     border: 1px solid #DDD;
     max-width: 600px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
 
     -webkit-transition: all 0.2s;
    -moz-transition: all 0.2s;
@@ -212,6 +223,14 @@ var histoFieldsDico = {
         transform: translate3d(0, 120px, 0);
 
     opacity: 0;
+}
+
+.history-bigwrap-created .timeline-infowrapper {
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px);
+    background-color: #9b59b6;
+    color: #eee;
+    font-weight: 500;
+    font-size: 16px;
 }
 
 .timeline-infowrapper.shown {
@@ -246,11 +265,13 @@ var histoFieldsDico = {
 
 .timeline-statewrapper {
     margin: 15px -15px -15px;
-    background: #333;
+    background-color: #333;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.1) 35px, rgba(255,255,255,.1) 70px);
     color: #F6F6F6;
     padding: 10px 15px;
     font-size: 18px;
     display: none;
+    font-weight: 500;
 }
 
 .timeline-statewrapper.newstatus {
@@ -258,11 +279,19 @@ var histoFieldsDico = {
 }   
 
 .timeline-statewrapper.newstatus.newstatus-published {
-    background: #67b659;
+    background-color: #67b659;
+}
+
+.newstatus-published .timeline-infowrapper {
+    border-color: #a8d4a0;
+}
+
+.newstatus-deleted .timeline-infowrapper {
+    border-color: #cea57c;
 }
 
 .timeline-statewrapper.newstatus.newstatus-deleted {
-    background: #b5712b;
+    background-color: #b5712b;
 }
 
 .timeline-vertline {
@@ -280,6 +309,10 @@ var histoFieldsDico = {
 
 .timeline-modlist {
     margin-top: 12px;
+}
+
+.listitem-semi {
+    color : #999;
 }
 
 </style>

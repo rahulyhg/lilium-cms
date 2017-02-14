@@ -163,7 +163,7 @@ var DB = function() {
 		});
 	};
 
-    this.findUnique = function(conf, coln, conds, cb, proj) {
+    this.findUnique = this.findSingle = function(conf, coln, conds, cb, proj) {
         this.find(conf, coln, conds, undefined, function(err, cur) {
             cur.hasNext(function(err, hasnext) {
                 hasnext ? cur.next(cb) : cb(new Error("Could not find item in collection " + coln), undefined);

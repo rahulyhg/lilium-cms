@@ -9,9 +9,10 @@
         <h4 class="article-section-title">Most recent</h4>
   
         <div class="float-clear">
-        {$ relindex = 0; $} 
-        {$ for (la in extra.latests); $}
-            {$
+        {$ 
+            relindex = 0;
+            for (la in extra.latests); 
+            
                 classes = "article-thumbnail";
                 if (relindex == 0); 
                     classes += " article-thumbnail-featured"; 
@@ -19,9 +20,12 @@
                 if (relindex > 2);
                     classes += " article-thumbnail-margined";
                 endif;
+            
+                mod = relindex; 
+                mod %= 3; 
+                if (mod == 0); 
             $}
-            {$ mod = relindex; mod %= 3; if (mod == 0); $}
-            </div><div class="float-clear">
+                </div><div class="float-clear">
             {$ endif; $}
                 <div class="{=classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
@@ -71,8 +75,8 @@
                     window.lmlhomelinks.push(nPage);
                     document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
                 </script>
-            {$ relindex += 1; $}
-        {$ endfor; $}
+            {$ relindex += 1; 
+        endfor; $}
         </div>
     </div>
 
@@ -89,6 +93,7 @@
             <h4 class="article-section-title">
                 <a href="{=config.default.server.url}/category/{=section.catname}">{=section.cattitle}</a>
             </h4>
+            <div class="float-clear">
             {$ relindex = 0; $}
             {$ for (sa in section.articles); $}
                 {$
@@ -96,7 +101,17 @@
                     if (relindex == 0); 
                         classes += " article-thumbnail-featured"; 
                     endif;
+                    if (relindex > 2);
+                        classes += " article-thumbnail-margined";
+                    endif;
+
+                    mod = relindex; 
+                    mod %= 3; 
+
+                    if (mod == 0); 
                 $}
+                    </div><div class="float-clear">
+                {$ endif; $}
                 <a href="{=config.default.server.url}/{=sa.name}" id="art{=sa._id}"> 
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
@@ -130,11 +145,12 @@
                     window.lmlhomelinks.push(nPage);
                     document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
                 </script>
-                {$ relindex += 1; $}
-            {$ endfor; $}
+                {$ relindex += 1; 
+            endfor; $}
+            </div>
         </div>
-        {$ endif; $}
-    {$ endfor; $}
+        {$ endif;
+    endfor; $}
     </div>
 
     <div class="fwblock banner-wrapper" id="middleHomePageBanner">

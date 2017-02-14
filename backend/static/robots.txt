@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /login/
+Disallow: /next/
+Disallow: /plugins/
+Disallow: /http/

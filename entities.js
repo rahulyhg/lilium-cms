@@ -931,6 +931,8 @@ var Entities = module.exports = new function () {
                     displayname : 1, 
                     avatarURL : 1
                 });
+            } else if (levels[0] == "cached") {
+                db.findToArray(_c.default(), 'entities', {}, function(e, a) {callback(a);}, {displayname : 1, avatarURL : 1});
             } else if (levels[0] == "simple") {
                 var simpProj = {
                     displayname : 1,

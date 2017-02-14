@@ -32,7 +32,11 @@ var registeredLibraries = {
                     full : "mmmm dd, yyyy",
                     slash : "dd/mm/yyyy"
                 };
-                return require('dateformat')(str, format ? formats[format] || formats.full : formats.full);
+                try {
+                    return require('dateformat')(str, format ? formats[format] || formats.full : formats.full);
+                } catch (ex) {
+                    return str;
+                }
             }
         };
     },

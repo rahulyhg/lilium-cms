@@ -4,3 +4,4 @@
 
 <title>Lilium 🌺  Login</title>
 <link rel="icon" type="image/png" href="{=config.default.server.url}/static/media/favicon.png" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">

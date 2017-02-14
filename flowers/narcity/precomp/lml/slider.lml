@@ -1,0 +1,40 @@
+{#config;extra}
+<div id="lmlslider">
+    <h1>{=extra.article.title}</h1>
+    <div id="lmldatacontainer">
+        <h2>People on this page</h2>
+        <b id="lmlrealtime">Calculating...</b>
+    </div>
+    <div id="lmlactionslist">
+        <div class="lmlaction">
+            <a href="{=config.default.server.url}/admin">
+                <i class="fa fa-tachometer" aria-hidden="true"></i>
+                <b>Lilium Dashboard</b>
+            </a>
+        </div>
+        {$ if (extra.context == "article"); $}
+        <div class="lmlaction">
+            <a href="{=config.default.server.url}/admin/article/edit/{=extra.article._id}">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+                <b>Edit post</b>
+            </a>
+        </div>
+        {$ endif; $}
+        <div class="lmlaction">
+            <a href="{=config.default.server.url}/admin/article/new">
+                <i class="fa fa-paper-plane-o" aria-hidden="true"></i>
+                <b>New post</b>
+            </a>
+        </div>
+    </div>
+
+    <div id="lmlsliderclose">
+        <i class="fa fa-times" aria-hidden="true"></i>
+    </div>
+
+    <div id="lmlwatermark">
+        Logged in as <b><a href="{=config.default.server.url}/admin/me">
+            {=extra.user.displayname}
+        </a></b> on Lilium v{=config.default.vendor.version}
+    </div>
+</div>

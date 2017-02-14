@@ -765,6 +765,7 @@ var LiliumCMS = function() {
             }
 
             document.body.classList.remove('modal-open');
+            document.querySelector('.lmladminsidebar').classList.remove("mobile-shown");
         
             liliumcms.livevars.exec(true);
         };
@@ -804,6 +805,24 @@ var LiliumCMS = function() {
                     });
                 }
             });
+        };
+    };
+
+    var LMLUsers = function() {
+        this.users = {};
+
+        this.cacheUsers = function() {
+            var liveUsers = liliumcms.livevars.livevars()["entities.cached"];
+
+            if (liveUsers) {
+                for (var i = 0; i < liveUsers.length; i++) {
+                    this.users[liveUsers[i]._id] = liveUsers[i];
+                }
+            }
+        };
+
+        this.get = function(id) {
+            return this.users[id];
         };
     };
 
@@ -919,6 +938,16 @@ var LiliumCMS = function() {
         }
     };
 
+    var LMLResponsive = function() {
+        this.init = function() {
+            document.querySelector('.header-burger').addEventListener('click', liliumcms.responsive.toggleSlideMenu);
+        };
+
+        this.toggleSlideMenu = function() {
+            document.querySelector('.lmladminsidebar').classList.toggle("mobile-shown");
+        };
+    };
+
     var Animator = function() {
         var that = this;
         this.slide = function() {
@@ -972,6 +1001,7 @@ var LiliumCMS = function() {
             that.cdn = new LMLCDN();
             that.queryparams = new QueryParams();
             that.formvalidator = new FormValidator();
+            that.responsive = new LMLResponsive();
             that.formParser = new FormParser();
             that.pageloader = new PageLoader();
             that.imagepicker = new LMLImagePicker();
@@ -982,6 +1012,7 @@ var LiliumCMS = function() {
             that.lmldom = new LMLDom();
             that.modals = new LMLModals();
             that.session = new LMLSession();
+            that.users = new LMLUsers();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
@@ -1054,6 +1085,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.admininit = true;
 
         liliumcms.queryparams.parseURL();
+        liliumcms.responsive.init();
         liliumcms.session.init();
         liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false;
         liliumcms.adminmenu.init();
@@ -1076,6 +1108,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.imagepicker.seek();
         liliumcms.imagepicker.refresh();
         liliumcms.queryparams.parseURL();
+        liliumcms.users.cacheUsers();
         liliumcms.modals.find(true);
         liliumcms.ckeditor ? liliumcms.ckeditor.parseDocument() : false;
         liliumcms.formbeautifier.beautify();
