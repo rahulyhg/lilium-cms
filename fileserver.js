@@ -141,6 +141,10 @@ var FileServer = function () {
 
         log('Fileserver', 'Emptying directory ' + opt.root);
         readdirp(opt, function(err, content) { 
+            if (err) {
+               return cb(err);
+            }
+
             var files = content.files;
             if (files.length > 500) {
                 cb(new Error("Found more than 500 files. Might be insecure."));

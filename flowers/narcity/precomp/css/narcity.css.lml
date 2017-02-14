@@ -597,11 +597,11 @@ article #article-content a:visited {
 
 article > h1 {
     font-size: 40px;
-    font-weight: bold;
+    font-weight: normal;
     margin: 5px auto 15px;
     padding: 0 0 10px;
-    font-family: 'PT Serif', serif;
-    line-height: 50px;
+    font-family: 'Oswald', sans-serif;
+    line-height: 1.3em;
     color: #121212;
     line-height: 46px;
         
@@ -922,6 +922,7 @@ $}
     margin-top: 10px;
     color: #777;
     font-family: Arial, sans-serif;
+    font-size: 14px;
 }
 
 .article-thumbnail-featured .article-thumbnail-details {
@@ -963,11 +964,11 @@ $}
 }
 
 .homepage .article-thumbnail-title {
-    font-family: "PT Serif", serif;
+    font-family: "Oswald",sans-serif;
     font-size: 20px;
     padding: 5px 0px;
     text-align: left;
-    font-weight: bold;
+    font-weight: normal;
 }
 
 .homepage .article-thumbnail-featured .article-thumbnail-title {
@@ -1018,7 +1019,7 @@ $}
     background-color: #fff;
     color: {=mc};
 
-    text-transform: uppercase;
+    text-transform: capitalize;
     font-family: Arial;
 }
 
@@ -2164,7 +2165,6 @@ body.slidheader .android-sharer {
 
     .homepage .article-thumbnail-title,
     .homepage .article-thumbnail-featured .article-thumbnail-title {
-        font-family: "PT Serif", serif;
         font-size: 22px;
         margin: 10px 0;
         line-height: 1.4;
