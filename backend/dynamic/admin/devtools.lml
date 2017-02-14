@@ -45,5 +45,11 @@
                 <b class="devtools-list-item-title">Feed</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/server">
+                <i class="devtools-list-item-icon fa fa-power-off"></i>
+                <b class="devtools-list-item-title">Server</b>
+            </a>
+        </li>
     </ul>
 </div>

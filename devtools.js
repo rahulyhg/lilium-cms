@@ -31,6 +31,7 @@ var handleGET = function(cli) {
         case 'cache':
         case 'feed':
         case 'html':
+        case 'server':
         case 'scripts':
         case undefined:
             filelogic.serveAdminLML(cli);
@@ -64,6 +65,8 @@ var handlePOST = function(cli) {
         case 'feed':
             maybeInsertFeed(cli);
             break;
+        case 'restart':
+            maybeRestart(cli);
         default:
             cli.refresh();
     }
@@ -237,6 +240,19 @@ var runScript = function(cli, name) {
 
     delete require.cache[require.resolve('./scripts/' + name)];
     require('./scripts/' + name)(cli);
+}
+
+var maybeRestart = function(cli) {
+    if (cli.hasRight('develop')) {
+        restartLilium(cli);
+    } else {
+        cli.sendJSON({ok : false, message : "nope"});
+    }
+};
+
+var restartLilium = function(cli) {
+    require.cache = {};
+    require('./lilium.js');
 }
 
 var maybeExecuteScript = function(cli) {
