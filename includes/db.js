@@ -163,6 +163,30 @@ var DB = function() {
 		});
 	};
 
+    this.all = function(cur, looper, done) {
+        var handleNext = function() {
+            cur.hasNext(function(err, hasnext) {
+                if (hasnext) {
+                    cur.next(function(err, obj) {
+                        if (err) {
+                            done(iterations, err);
+                        } else {
+                            iterations++;
+                            looper(obj, handleNext);
+                        }
+                    });
+                } else if (err) {
+                    done(iterations, err);
+                } else {
+                    done(iterations);
+                }
+            });
+        };
+
+        iterations = 0;
+        handleNext();
+    };
+
     this.findUnique = this.findSingle = function(conf, coln, conds, cb, proj) {
         this.find(conf, coln, conds, undefined, function(err, cur) {
             cur.hasNext(function(err, hasnext) {

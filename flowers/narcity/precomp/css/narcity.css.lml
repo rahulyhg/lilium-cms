@@ -159,7 +159,7 @@ body.menuopen #mobileslider {
 }
 
 header ~ .lbtop.willslide {
-    margin: 28px 0px 0px;
+    margin: 15px 0px;
     text-align: center;
     position: relative;
     top: 60px;
@@ -460,6 +460,22 @@ article .article-share-arrow-wrapper {
 
 article .article-share-arrow-wrapper .article-social-upward-arrow {
     width: 34px;
+}
+
+/* Instagram embed */
+.lml-instagram-embed-wrapper {
+    position: relative;
+}
+
+article #article-content a.lml-instagram-op {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 2px 10px;
+    color: #FFF;
+    text-shadow: 0px 0px 5px #000;
+    background-color: rgba(0,0,0,0.4);
+    font-family: Arial;
 }
 
 article .featured-image {
@@ -1925,6 +1941,8 @@ body.slidheader .android-sharer {
     -ms-transition: all 0.2s;
      -o-transition: all 0.2s;
         transition: all 0.2s;
+
+        z-index: 5;
     }
 
     .category-top-link {
