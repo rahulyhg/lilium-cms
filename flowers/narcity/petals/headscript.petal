@@ -25,6 +25,57 @@
         return false;
     };
 
+    // Website glob ////////////////////////////////////////////////
+    window.lmlsite = {
+        property : "{=theme.settings.networkname}"
+    };
+
+    {$ if (extra.contextname == "article"); $}
+    // Article glob ////////////////////////////////////////////////
+    var url = document.location.href;
+    var splt = url.split("/");
+    if (!splt[splt.length-1]) {
+        splt.pop();
+    }
+    var maybePage = splt.pop();
+    if (!isNaN(maybePage)) {
+        maybePage = parseInt(maybePage);
+    } else {
+        maybePage = 1;
+    }
+
+    window.lmlarticle = {
+        identifier : "{=extra.article._id}",
+        title : "{=&extra.article.title}",
+        subtitle : "{=&extra.article.subtitle}",
+        category : "{=extra.article.categories.0.displayname}",
+        author : "{=?extra.article.authors.0.displayname}",
+        tags : {=#extra.article.tags},
+        page : maybePage,
+    };
+    {$ endif; $}
+
+    // Local tracking //////////////////////////////////////////////
+    var sesh = window.sessionStorage.getItem('narcitySession');
+    if (!sesh) {
+        sesh = {
+            createdAt : new Date(),
+            pageViewed : 0
+        };
+    } else {
+        sesh = JSON.parse(sesh);
+    }
+
+    if (new Date() - new Date(sesh.createdAt) > 1000 * 60 * 60) {
+        sesh.pageViewed = 0;
+        sesh.createdAt = new Date();
+    }
+
+    sesh.pageViewed++;
+    
+    window.narcitySession = sesh;
+    window.sessionStorage.setItem('narcitySession', JSON.stringify(sesh));
+
     // Dirty fixes /////////////////////////////////////////////////
     cygnus_index_args = {};
 </script>
@@ -32,26 +83,28 @@
 
 <script>
 // AD TARGETING
-googletag.cmd.push(function() {
-    googletag.pubads()
-        {$ if (extra.contextname == "article"); $}
-        .setTargeting("category", ["{=extra.article.categories.0.displayname}", "ROS"])
-        {$ endif; $}
-        {$ if (?extra.article.data.wp_id); $}
-        .setTargeting("post", "{=?extra.article.data.wp_id}")
-        {$ else; $}
-        .setTargeting("contentid", "{=extra.article._id}")
-        {$ endif; $}
-        {$ if (extra.contextname == "home"); $}
-        .setTargeting("category", ["homepage"])
-        {$ endif; $}
-        .setTargeting('strnativekey', 'G6X4zbWEuSdvaWYd9F2QwDEi')
-    ;
+if (typeof googletag != "undefined") {
+        googletag.cmd.push(function() {
+            googletag.pubads()
+                {$ if (extra.contextname == "article"); $}
+                .setTargeting("category", ["{=extra.article.categories.0.displayname}", "ROS"])
+                {$ endif; $}
+                {$ if (?extra.article.data.wp_id); $}
+                .setTargeting("post", "{=?extra.article.data.wp_id}")
+                {$ else; $}
+                .setTargeting("contentid", "{=extra.article._id}")
+                {$ endif; $}
+                {$ if (extra.contextname == "home"); $}
+                .setTargeting("category", ["homepage"])
+                {$ endif; $}
+                .setTargeting('strnativekey', 'G6X4zbWEuSdvaWYd9F2QwDEi')
+            ;
 
-    // Run the whole thing    
-    googletag.pubads().enableAsyncRendering();
-    googletag.enableServices();
-});
+            // Run the whole thing    
+            googletag.pubads().enableAsyncRendering();
+            googletag.enableServices();
+        });
+}
 
 
 </script>

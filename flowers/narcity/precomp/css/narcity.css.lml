@@ -1911,6 +1911,10 @@ body.slidheader .android-sharer {
         display: none !important;
     }
 
+    article #article-content .lml-instagram-embed-wrapper {
+        padding: 0;
+    }
+
     #article-section {
         width: auto;
         margin-top: 10px;
