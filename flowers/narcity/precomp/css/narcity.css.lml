@@ -2051,6 +2051,10 @@ body.slidheader .android-sharer {
         display: none !important;
     }
 
+    .homepage {
+        margin: 0 10px;
+    }
+
     article #article-content .lml-instagram-embed-wrapper {
         padding: 0;
     }
