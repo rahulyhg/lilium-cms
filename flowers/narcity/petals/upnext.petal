@@ -1,0 +1,14 @@
+{#config;extra}
+
+{$ if (extra.article.related.length > 0); $}
+<div id="upnext-wrapper">
+    <h3>
+        <i class="fa fa-angle-up" aria-hidden="true"></i>
+        Up next
+        <i class="fa fa-angle-up" aria-hidden="true"></i>
+
+    </h3>
+    <h4>{=extra.article.related.0.title}</h4>
+</div>
+<div id="upnext-blank"></div>
+{$ endif; $}
