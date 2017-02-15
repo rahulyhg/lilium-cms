@@ -102,6 +102,7 @@
         "archive" : "archive.lml",
         "author" : "archive.lml",
         "category" : "archive.lml",
-        "tags" : "archive.lml"
+        "tags" : "archive.lml",
+        "404" : "404.lml"
     }
 }

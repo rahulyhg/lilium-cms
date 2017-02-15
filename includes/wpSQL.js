@@ -464,7 +464,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                                             filename = cconf.server.base + "backend/static/tmp/up" + upload.ID + ".jpg";
                                     }
 
-                                    var handle = fu.getOutputFileHandle(filename, 'a+', 'binary');
+                                    var handle = fu.getOutputFileHandle(filename, 'w+', 'binary');
                                     handle.write(body, 'binary', function(err) {
                                         handle.end(undefined, undefined, function() {
                                             fu.fileExists(filename, function(exx) {
@@ -524,7 +524,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                 fs.writeFile(saveTo, body, {encoding : 'binary'}, function() {
                     require('../media.js').handleUploadedFile(cconf, filename, function(err, result) {
                         if (err) {
-                            log('WP', 'Invalid image download');
+                            log('WP', 'Invalid image download', 'err');
                             threadIndices[threadid]+=threadNumbers;
                             cb(false);
                             nextUpload(threadid);
@@ -547,7 +547,7 @@ var ftUploads = function(siteid, mysqldb, done) {
                     }, true, {wpid : upload.ID, wpguid : upload.guid});
                 });
             } else {
-                log('WP', 'Download error : ' + error, 'error');
+                log('WP', 'Download error : ' + error, 'err');
                 threadIndices[threadid]+=threadNumbers;
                 cb(true);
                 nextUpload(threadid);

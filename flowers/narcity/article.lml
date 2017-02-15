@@ -41,9 +41,9 @@ $}
     </div>
     {$ endif; $}
 
-    {$ if (?extra.article.featuredimageartist != ""); $}
+    {$ if (?extra.article.featuredimageartist); $}
     <div class="featured-image-credit">
-        <a href="{=extra.article.featuredimagelink}">@{=extra.article.featuredimageartist}</a>
+        <a href="{=extra.article.featuredimagelink}">@{=?extra.article.featuredimageartist}</a>
     </div>
     {$ endif; $}
     

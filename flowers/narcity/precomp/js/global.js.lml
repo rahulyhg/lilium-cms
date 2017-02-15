@@ -505,6 +505,20 @@ var maybeFadeIn = function() {
     document.body.classList.remove('willfadein');
 };
 
+var parseEmbeds = function() {
+    var parags = document.querySelectorAll(".article-content p"); 
+    for (var i = 0; i < parags.length; i++) { 
+        var p = parags[i]; 
+        var txt = p.textContent; 
+
+        if (txt.indexOf("https://youtu") != -1) {
+            var splt = txt.split('/');
+            var ytid = splt.pop() || splt.pop();
+            p.innerHTML = '<iframe class="lml-youtube" src="https://www.youtube.com/embed/'+ytid+'" frameborder="0" allowfullscreen></iframe>';
+        } 
+    }
+}
+
 var rearrangeImages = function() {
     var asis = document.querySelectorAll('.image-asis');
     for (var i = 0; i < asis.length; i++) {
@@ -526,6 +540,7 @@ bindAndroShare();
 bindIOSShare();
 bindPCShare();
 maybeFadeIn();
+parseEmbeds();
 rearrangeImages();
 
 /* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */

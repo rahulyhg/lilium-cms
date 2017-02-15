@@ -103,7 +103,6 @@ var Chartbeat = function() {
         });
 
         hooks.bind('settings_saved', 10, function(cli) {
-            cacheInvalidator.deleteCachedFile(cli._c, "admin/dashboard/index.html");
         });
     };
 

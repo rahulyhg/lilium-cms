@@ -51,12 +51,16 @@ var HTMLServer = function() {
                                     cli.redirect(cli._c.server.url + "/" + details.realName, true);
                                 } else {
 			    					cli.routeinfo.isStatic = true;
-		    						fileserver.pipeFileToClient(cli, filename + '.html', function (){
+		    						fileserver.pipeFileToClient(cli, filename + '.html', function () {
 	    								cli.touch('htmlserver.serveClient.callback');
     								});
                                 }
 							} else {
-                                filelogic.serveErrorPage(cli, 404);
+                                filelogic.renderThemeLML(cli, '404', '404.html', {
+                                    
+                                }, function() {
+                                    fileserver.pipeFileToClient(cli, cli._c.server.html + "/404.html", function() {}, true, 'text/html');
+                                });
 							}
 						}, true)
 					}

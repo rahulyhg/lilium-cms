@@ -342,7 +342,7 @@ var objToURIParams = function(params) {
         str += key + "=" + params[key] + "&";
     }
 
-    return str + "lmlredir=true";
+    return str;
 };
 
 var needsHomeRefresh = true;
