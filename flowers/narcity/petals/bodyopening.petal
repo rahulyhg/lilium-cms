@@ -10,4 +10,10 @@
             property : window.lmlsite.property
         });
     }
+
+    if (document.location.hash.indexOf('next') != -1) {
+        window.lmlMustFade = true;
+        document.body.classList.add("opacitytrans");
+        document.body.classList.add("willfadein");
+    }
 </script>
