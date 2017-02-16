@@ -37,6 +37,9 @@ var registeredLibraries = {
                 } catch (ex) {
                     return str;
                 }
+            },
+            now : function() {
+                return new Date();
             }
         };
     },
