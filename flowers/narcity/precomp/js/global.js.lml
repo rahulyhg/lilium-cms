@@ -362,6 +362,163 @@ var bindPCShare = function() {
     }
 };
 
+var moveUpNext = function(e) {
+    if (!e.y && !e.touches[0]) return;
+
+    upNextDeltaY = (e.y || e.touches[0].clientY) - upNextStartY;
+
+    if (upNextDeltaY > 0) {
+        upNextElem.style.transform = "translate3d(0px, 0px, 0px)";
+        upNextBlank.style.transform = "translate3d(0, 100%, 0)";
+    } else {
+        upNextElem.style.transform = "translate3d(0px, "+upNextDeltaY+"px, 0px)";
+        upNextBlank.style.transform = "translate3d(0px, "+(100 - (-upNextDeltaY / window.innerHeight * 100))+"%, 0px)";
+
+        upNextPositions.elem = upNextDeltaY;
+        upNextPositions.blank = (100 - (-upNextDeltaY / window.innerHeight) * 100);
+    }
+};
+
+var upNextSlid = false;
+var upNextSlideCheck = function() {
+    var ratio = document.body.scrollTop / document.body.offsetHeight * 100;
+    if (!upNextSlid && ratio > 50) {
+        upNextSlid = true;
+        upNextElem.classList.add("slid");
+        document.body.classList.add("upnext-slid");
+    } else if (upNextSlid && ratio < 50) {
+        upNextSlid = false;
+        upNextElem.classList.remove("slid");
+        document.body.classList.remove("upnext-slid");
+    }
+}
+
+var upNextThrow = function() {
+    setTimeout(function() {
+        upNextElem.style.transform  = "";
+        upNextBlank.style.transform = "";
+
+        upNextElem.classList.add('trans');
+        upNextBlank.classList.add('trans');
+
+        setTimeout(function() {
+            upNextElem.classList.add('thrown');
+            upNextBlank.classList.add('thrown');
+
+            setTimeout(function() {
+                window.location.href = "{=config.default.server.url}/" + window.relatedArticles[0] + "#next";
+            }, 400);
+        }, 1);
+    }, 0);
+
+    return;
+    /////////////
+
+    var remainingElem = window.innerHeight + upNextPositions.elem;
+    var remainingBlank = upNextPositions.blank;
+    var frameRate = 100;
+
+    var elemJump = remainingElem / frameRate;
+    var blankJump= remainingBlank / frameRate;
+
+    var doJump = function(i) {
+        upNextElem.style.transform  = "translate3d(0px, "+ (upNextPositions.elem  - (elemJump * i) ) +"px, 0px)";
+        upNextBlank.style.transform = "translate3d(0px, "+ (upNextPositions.blank - (blankJump * i)) +"%, 0px)";
+    };
+
+    for (var i = 0; i < frameRate; i++) {
+        (function(i) {
+            setTimeout(function() {
+                doJump(i);
+            }, 5 * i);
+        })(i);
+    }
+};
+
+var maybeMoveUpThrow = function() {
+    if (upNextDeltaY < -50) {
+        upNextThrow();
+        return true;
+    } 
+
+    return false;
+};
+
+var upNextPositions = {
+    elem : 0,
+    blank : 100
+};
+
+var upNextGrab = false;
+var upNextVelocity = 0;
+var upNextStartY = NaN;
+var upNextDeltaY = NaN;
+var upNextElem;
+var upNextBlank;
+
+var bindUpNext = function() {
+    var upnextWrap = document.getElementById('upnext-wrapper');
+    upNextBlank = document.getElementById("upnext-blank");
+    upNextElem = upnextWrap;    
+
+    if (upnextWrap) {
+        document.querySelector('footer').style.marginBottom = "100px";
+    }
+
+    var downEv = ["touchstart"];
+    for (var i = 0; i < downEv.length; i++) {
+        upnextWrap && upnextWrap.addEventListener(downEv[i], function(e) {
+            upNextGrab = true;
+            upNextStartY = e.y || e.touches[0].clientY;
+            document.body.classList.add("locked");
+
+            window.addEventListener('mousemove', moveUpNext);
+            window.addEventListener('touchmove', moveUpNext);
+        });
+    }
+
+    var upEv = ["touchend", "touchcancel"];
+    for (var i = 0; i < upEv.length; i++) {
+        upnextWrap && upnextWrap.addEventListener(upEv[i], function(e) {
+            moveUpNext(e);
+            upNextGrab = false;
+            window.removeEventListener('mousemove', moveUpNext);
+            window.removeEventListener('touchmove', moveUpNext);
+            document.body.classList.remove("locked");
+
+            if (!maybeMoveUpThrow()) {
+                upNextElem.style.transform = "translate3d(0px, 0px, 0px)";
+                upNextBlank.style.transform = "translate3d(0, 100%, 0)";
+            }
+
+            e.preventDefault();
+        });
+    }
+
+    upnextWrap && window.addEventListener('scroll', upNextSlideCheck);
+
+    upnextWrap && upnextWrap.querySelector('h3').addEventListener('click', upNextThrow);
+    upnextWrap && upnextWrap.querySelector('h3').addEventListener('tap', upNextThrow);
+};
+
+var maybeFadeIn = function() {
+    document.body.classList.remove('willfadein');
+};
+
+var parseEmbeds = function() {
+    var parags = document.querySelectorAll(".article-content p"); 
+    for (var i = 0; i < parags.length; i++) { 
+        var p = parags[i]; 
+        var txt = p.textContent; 
+
+        if (txt.indexOf("https://youtu") != -1) {
+            var splt = txt.split('/');
+            var ytid = splt.pop() || splt.pop();
+            p.innerHTML = '<iframe class="lml-youtube" src="https://www.youtube.com/embed/'+ytid+'" frameborder="0" allowfullscreen></iframe>';
+        } 
+    }
+}
+
 var rearrangeImages = function() {
     var asis = document.querySelectorAll('.image-asis');
     for (var i = 0; i < asis.length; i++) {
@@ -375,12 +532,15 @@ var rearrangeImages = function() {
 bindReady();
 bindAdsScroll();
 bindNextScroll();
+bindUpNext();
 bindCurrentScroll();
 bindHeaderScroll();
 detectMobileOS();
 bindAndroShare();
 bindIOSShare();
 bindPCShare();
+maybeFadeIn();
+parseEmbeds();
 rearrangeImages();
 
 /* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */

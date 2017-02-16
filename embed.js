@@ -8,7 +8,7 @@ var Embed = function() {};
 var createDivFromResponse = function(data) {
     return '<div class="lml-instagram-embed-wrapper"><img src="'+data.thumbnail_url+                  
         '" class="lml-instagram-embed" /><a class="lml-instagram-op" href="'+                                                       
-        data.author_url +'">Via Instagram @'+data.author_name+'</a></div><p></p>';
+        data.author_url +'">via @'+data.author_name+'</a></div><p></p>';
 }
 
 var handleRequest = function(cli) {

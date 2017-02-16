@@ -67,6 +67,7 @@ var handlePOST = function(cli) {
             break;
         case 'restart':
             maybeRestart(cli);
+            break;
         default:
             cli.refresh();
     }
@@ -251,8 +252,9 @@ var maybeRestart = function(cli) {
 };
 
 var restartLilium = function(cli) {
+    cli.sendJSON({ok : true, message : "restart"});
     require.cache = {};
-    require('./lilium.js');
+    // require('./lilium.js').cms();
 }
 
 var maybeExecuteScript = function(cli) {

@@ -41,9 +41,9 @@ $}
     </div>
     {$ endif; $}
 
-    {$ if (?extra.article.featuredimageartist != ""); $}
+    {$ if (?extra.article.featuredimageartist); $}
     <div class="featured-image-credit">
-        <a href="{=extra.article.featuredimagelink}">@{=extra.article.featuredimageartist}</a>
+        <a href="{=extra.article.featuredimagelink}">@{=?extra.article.featuredimageartist}</a>
     </div>
     {$ endif; $}
     
@@ -111,6 +111,14 @@ $}
                 </div>
             </div>
             {$ endif; $}    
+
+            {$ if (extra.article.categories.0.name == "best-of-mtl"); $}
+            <div class="bottom-promotion-link">
+                <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's 
+                <a href="{=config.default.server.url}/category/best-of-mtl" target="_blank">&quot;Best Of&quot; lists</a>;
+                furthermore, this list represents a showcase of great spots, and is not a numbered ranking.
+            </div>
+            {$ endif; $}
 
             {$ if (extra.article.isSponsored == true); $}
             <div class="bottom-promotion-link">

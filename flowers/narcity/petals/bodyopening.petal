@@ -1,0 +1,19 @@
+<script>
+    if (window.lmlcontext == "article" && typeof fbq != "undefined") {
+        fbq('trackCustom', 'ContentTracking', {
+            content_id: window.lmlarticle.identifier,
+            content_type: window.lmlarticle.category,
+            content_name: window.lmlarticle.title,
+            pps : window.narcitySession.pageViewed,
+            content_page: window.lmlarticle.page,
+            tags: window.lmlarticle.tags,
+            property : window.lmlsite.property
+        });
+    }
+
+    if (document.location.hash.indexOf('next') != -1) {
+        window.lmlMustFade = true;
+        document.body.classList.add("opacitytrans");
+        document.body.classList.add("willfadein");
+    }
+</script>
