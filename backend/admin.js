@@ -8,6 +8,7 @@ var AdminMenus = new Array();
 var filelogic = require('../filelogic.js');
 var formBuilder = require('../formBuilder');
 var pluginHelper = require('../pluginHelper.js');
+var LML2 = require('../lml/compiler.js');
 var hooks = require('../hooks.js');
 
 var AdminMenu = function() {
@@ -42,7 +43,16 @@ var Admin = function() {
 
     this.welcome = function(cli, method) {
         if (method == 'GET') {
-            filelogic.serveLmlPage(cli, false);
+
+            LML2.compileToFile(cli._c.server.base + "/backend/dynamic/admin/welcome.lml",
+                cli._c.server.html + "/static/tmp/welcome.html",
+                function() {
+                    require('../fileserver.js').pipeFileToClient(cli, cli._c.server.html + "/static/tmp/welcome.html", function() {}, true);
+                }, {
+                    config : cli._c
+                }
+            );
+
         } else if (method == 'POST') {
             switch (cli.routeinfo.path[2]) {
                 case "upload": require('../entities.js').uploadFirstAvatar(cli); break;

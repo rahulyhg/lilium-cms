@@ -251,7 +251,7 @@ var CKEditor = function() {
             name : imgobj.artistname,
             url : imgobj.artisturl
         };
-        img.setAttribute('src', imgobj.sizes.content ? imgobj.sizes.content.url : "{=config.default.server.url}/uploads/" + imgobj.url);
+        img.setAttribute('src', "{=config.default.server.url}/uploads/" + imgobj.url);
         img.classList.add("lml-content-image");
 
         creditname.innerHTML = "Via ";
