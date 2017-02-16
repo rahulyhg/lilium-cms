@@ -25,6 +25,7 @@ var CKEditor = function() {
 
                 if (ckIsUrl(vdata)) {
                     // Look for embed
+                    var ffound = false;
                     for (var domainid in supportedEmbed) {
                         var domain = supportedEmbed[domainid];
     
@@ -43,6 +44,7 @@ var CKEditor = function() {
                                             evt.editor.document.$.querySelector('.ck-temp-spacer').outerHTML = "";
                                         });
                                     })(rand, evt);
+                                    ffound = true;
                                     break;
     
                                 case "youtube":
@@ -50,6 +52,7 @@ var CKEditor = function() {
                                     evt.data.dataValue = '<iframe allowfullscreen="" frameborder="0" src="'+
                                         vdata.replace("watch?v=", 'embed/') +
                                         '" class="ck-embed-video"></iframe>';
+                                    ffound = true;
                                     break;
 
                                 case "imgur":
@@ -66,6 +69,7 @@ var CKEditor = function() {
                                     evt.data.type = "html";
                                     evt.data.dataValue = '<blockquote class="imgur-embed-pub" lang="en" data-id="'+imgid+'"><a href="//imgur.com/'+imgid+'">'+vdata+'</a></blockquote><script async src="//s.imgur.com/min/embed.js" charset="utf-8"></script>';
 
+                                    ffound = true;
                                     break;
     
                                 case "facebook":
@@ -76,10 +80,22 @@ var CKEditor = function() {
                                             '&show_text=0" style="border:none;overflow:hidden" scrolling="no" frameborder="0" allowTransparency="true" allowFullScreen="true" class="ck-embed-video"></iframe>';
                                     break;
                                     }
+                                    ffound = true;
+                                    break;
+
+                                default:
                             }
     
                             embedFound = true;
                             break;
+                        }
+
+                        if (!embedFound) {
+                            var selection = this.getSelection().getSelectedText();
+                            var markup = '<a href="'+vdata+'">'+(selection == "" ? vdata : selection)+'</a>';
+
+                            evt.data.type = 'html';
+                            evt.data.dataValue = markup;
                         }
                     }
                 } else if (vdata.indexOf("<iframe")) {
@@ -109,7 +125,7 @@ var CKEditor = function() {
         CKEDITOR.config.entities_greek = false;
         CKEDITOR.config.entities_latin = false;
         CKEDITOR.config.removeButtons = 'image';
-        CKEDITOR.config.removePlugins = 'image';    
+        CKEDITOR.config.removePlugins = 'image,liststyle,tabletools,scayt,menubutton,contextmenu';
         CKEDITOR.config.allowedContent = true;
         CKEDITOR.config.contentsCss = '/compiled/theme/ckeditor.css';
         CKEDITOR.config.skin = "BootstrapCK4,/bower/BootstrapCK4-Skin/skins/bootstrapck/";
@@ -227,6 +243,18 @@ var CKEditor = function() {
             }
           }
         });
+
+    var validUrlRegex = /^(https?|ftp):\/\/(-\.)?([^\s\/?\.#-]+\.?)+(\/[^\s]*)?[^\s\.,]$/ig,
+        doubleQuoteRegex = /"/g;
+
+    CKEDITOR.plugins.add( 'autolink', {
+        requires: 'clipboard',
+
+        init: function( editor ) {
+            editor.on( 'paste', function( evt ) {
+                            } );
+        }
+    } );
 
         CKEDITOR.plugins.add("image-finder", {
             init: function(editor) {
