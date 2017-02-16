@@ -1277,6 +1277,27 @@ var Article = function() {
             searchable: true,
             max_results: 25,
             sortby : 'date',
+            filters : {
+                status : {
+                    datasource : [{
+                        value : "published",
+                        displayname : "Published"
+                    }, {
+                        value : "draft",
+                        displayname : "Draft"
+                    }, {
+                        value : "deleted",
+                        displayname : "Deleted"
+                    }],
+                }, 
+                author : {
+                    livevar : {
+                        endpoint : "entities.simple",
+                        value : "_id",
+                        displayname : "displayname"
+                    }
+                }
+            },
             sortorder : -1,
             fields: [{
                 key: 'media',

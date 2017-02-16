@@ -277,7 +277,7 @@ var CKEditor = function() {
             if (!imgobj.artistname || !imgobj.artisturl || imgobj.artistname.trim() == "" || imgobj.artisturl.trim() == "") {
                 that.validateImageWithoutCredit(imgobj);
             } else {
-                var url = imgobj.sizes.content ? imgobj.sizes.content.url : ("{=config.default.server.url}/uploads/" + imgobj.url);
+                var url = ("{=config.default.server.url}/uploads/" + imgobj.url);
                 e.insertElement(CKEDITOR.dom.element.get(that.generateImageWrapper(imgobj)));
             }
         } else if (imgobj === -1) {
