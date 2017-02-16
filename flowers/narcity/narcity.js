@@ -283,17 +283,30 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
 };
 
 var serveFeed = function(cli) {
-    db.findToArray(cli._c, 'content', {status : "published"}, function(err, arr) {
-        var extra = {
-            config : cli._c, 
-            minify : false, 
-            articles : arr
-        };
+    fileserver.fileExists(cli._c.server.html + "/feed.rss", function(ex) {
+        if (ex) {
+            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+        } else {
+            db.findToArray(cli._c, 'content', {status : "published"}, function(err, arr) {
+                var extra = {
+                    config : cli._c, 
+                    minify : false, 
+                    articles : arr
+                };
 
-        LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.xml", function() {
-            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.xml", function() {}, true, 'text/xml');
-        }, extra);
-    }, undefined, 0, 10);
+                LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.rss", function() {
+                    log('RSS', 'Generated cached RSS feed for 1 hour');
+                    fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+    
+                    setTimeout(function() {
+                        fileserver.deleteFile(cli._c.server.html + "/feed.rss", function() {
+                            log("RSS", "Deleted cached RSS", 'info');
+                        });
+                    }, 1000 * 60 * 60);
+                }, extra);
+            }, undefined, 0, 10);
+        }
+    });
 };
 
 var serveArchive = function(cli, archType) {

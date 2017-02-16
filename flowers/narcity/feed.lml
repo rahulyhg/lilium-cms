@@ -30,6 +30,5 @@
         <slash:comments>0</slash:comments>
     </item>
     {$ endfor; $}
-        
 </channel>
 </rss>
