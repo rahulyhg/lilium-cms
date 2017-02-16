@@ -1,4 +1,4 @@
-{#theme;extra}
+{#theme;extra;config}
 
 <footer class="willslide">
         <div class="footer-topsection">
@@ -33,9 +33,32 @@
         </div>
 </footer>
 
-{$ if (extra.contextname); $}
+{$ if (extra.contextname == "article"); $}
     {%petals/upnext}
 {$ endif; $}
+
+{$
+    domain = config.default.server.url.replace('//','');
+$}
+
+<script type='text/javascript'>
+    var _sf_async_config={};
+    /** CONFIGURATION START **/
+    _sf_async_config.uid = 57714;
+    _sf_async_config.domain = '{=domain}';
+    _sf_async_config.useCanonical = true;
+    _sf_async_config.sections = "{=domain},{=?extra.article.categories.0.displayname}";
+    _sf_async_config.authors = "{=?extra.article.authors.0.displayname}"; 
+    /** CONFIGURATION END **/
+    $(function(){
+        window._sf_endpt=(new Date()).getTime();
+        var e = document.createElement('script');
+        e.setAttribute('language', 'javascript');
+        e.setAttribute('type', 'text/javascript');
+        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
+        document.body.appendChild(e);
+    });
+</script>
 
 <script src="https://use.fontawesome.com/c06218d3bc.js"></script>
 <script src="//www.googletagservices.com/tag/js/gpt.js" async=""></script>
