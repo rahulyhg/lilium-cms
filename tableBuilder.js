@@ -54,11 +54,30 @@ var TableBuilder = function () {
         });
         html += '<div class="lmltablebuilder tablewrapper">';
         html += '<div class="lmltablebuilder header">';
-        html += '<div class="max-per-pages">Show <select>';
-        for (var i in pages) {
-            html += '<option value="' + pages[i] + '" ' + (typeof table.max_results !== 'undefined' && table.max_results == pages[i] ? 'selected' : '') + '>' + pages[i] + '</option>';
+        html += '<div class="lmltablefilters">';
+        if (table.filters) {
+            for (var filtername in table.filters) {
+                var filter = table.filters[filtername];
+                html += '<div class="lmltablefilter"><b>' + filter.displayname || filtername + '</b> : ';
+                html += '<select name="'+filtername+'" ';
+                if (filter.livevar) {
+                    html += ' class="lmlfilterlivevar" ' +
+                            ' data-livevar="'+filter.livevar.endpoint+'" ' +
+                            ' data-livevarkey="'+filter.livevar.value+'"' +
+                            ' data-livevardisplay="'+filter.livevar.displayname+'"'; 
+                }
+                html += '><option value="">All</option>';
+
+                if (filter.datasource) {
+                    for (var i = 0; i < filter.datasource.length; i++) {
+                        html += '<option value="'+filter.datasource[i].value+'">'+filter.datasource[i].displayname+'</option>';
+                    }
+                } 
+                html += '</select>';
+                html += '</div>';
+            }
         }
-        html += '</select> entries</div>';
+        html += '</div>';
         html += '<div class="search pull-right"><label>Search : </label><input type="text" name="search-table" class="search-table"></div>';
         html += '</div>';
         html += '<table class="lmltablebuilder lmlfullwidthtable" id=' + table.name + ' data-endpoint="' + table.endpoint + '" data-max="' + (table.max_results || 20) + '" data-page="1" data-sort-order="'+sortOrder+'" data-sortby="' + sortbyKey + '">';
