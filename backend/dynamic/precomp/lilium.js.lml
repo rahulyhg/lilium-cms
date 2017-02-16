@@ -438,15 +438,10 @@ var LiliumCMS = function() {
                     if (section.dataset.if) {
                         var ifstr = JSON.parse(section.dataset['if'].replace(/\&lmlquote\;/g, '"'));
                         var cshow = true;
-    
-                        for (var k in ifstr) {
-                            var lval = liliumcms.livevars.pulloutLiveVar(k);
-                            if (typeof lval === 'object' && typeof lval.indexOf === 'function') {
-                                if (lval.indexOf(ifstr[k] === -1)) {
-                                    cshow = false;
-                                    break;
-                                }
-                            } else if (lval !== ifstr[k]) {
+                        var userRoles = liliumcms.session.current.roles;    
+
+                        for (var field in ifstr) {
+                            if (field == "role" && userRoles.indexOf(ifstr[field]) == -1) {
                                 cshow = false;
                                 break;
                             }

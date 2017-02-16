@@ -1178,7 +1178,9 @@ var Article = function() {
                 required : false
             })
             .beginSection('authorbox', {
-                "session.rights" : "edit-all-articles"
+                show : {
+                    "role" : "edit-all-articles"
+                }
             })
             .add('author', 'livevar', {
                 displayname : "Author",

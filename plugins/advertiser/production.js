@@ -121,7 +121,7 @@ var Production = function () {
             pkg.form
             .beginSection('sponsoredArticle', {
                 show : {
-                    "session.roles" : 'production'
+                    "role" : 'production'
                 }
             })
             .add('spons-title', 'title', {
