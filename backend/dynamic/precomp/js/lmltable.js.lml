@@ -9,6 +9,7 @@ var LmlTable = function(table) {
 	var numberOfCols = table.find('thead th').size();
 	var cachedData = {};
     var currentFilter = "";
+    var filters = {};
 
 	var timeInitial;
 	var timeRendering;
@@ -22,11 +23,10 @@ var LmlTable = function(table) {
 
 		});
 		table.parent().find('.header select').change(function() {
-            currentPage = 1;
-            table.data('page', 1);
+			var filtername = this.name;
+            var filtervalue = this.value;
 
-			maxEntries = $(this).val();
-            table.data('max', $(this).val());
+            filters[filtername] = filtervalue || undefined;
 			cachedData = {};
 			updateTable();
 		});
@@ -192,7 +192,8 @@ var LmlTable = function(table) {
 				order: fieldOrder,
 				max: parseInt(maxEntries),
 				skip: (currentPage - 1) * maxEntries,
-				search: (searchTerm ? searchTerm : undefined)
+				search: (searchTerm ? searchTerm : undefined),
+                filters : filters
 			}, function(data) {
 				cachedData[currentPage] = cachedData[currentPage] ? cachedData[currentPage] : {};
 				cachedData[currentPage][fieldSort] = cachedData[currentPage][fieldSort] ? cachedData[currentPage][fieldSort] : {};

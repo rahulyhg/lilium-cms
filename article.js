@@ -874,7 +874,10 @@ var Article = function() {
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (typeof params.order == "undefined" ? -1 : params.order);
                 // sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (typeof params.order == "undefined" ? -1 : params.order);
 
-                var match = [{status : {$ne : "destroyed"}}];
+                var match = [{status : params.filters.status || {$ne : "destroyed"}}];
+                if (params.filters.author) {
+                    match.push({author : params.filters.author});
+                }
                 if (!cli.hasRight('editor')) {
                     match.push({author: db.mongoID(cli.userinfo.userid)});
                 }
@@ -1175,7 +1178,9 @@ var Article = function() {
                 required : false
             })
             .beginSection('authorbox', {
-                "session.rights" : "edit-all-articles"
+                show : {
+                    "role" : "edit-all-articles"
+                }
             })
             .add('author', 'livevar', {
                 displayname : "Author",
@@ -1277,6 +1282,29 @@ var Article = function() {
             searchable: true,
             max_results: 25,
             sortby : 'date',
+            filters : {
+                status : {
+                    displayname : "Status",
+                    datasource : [{
+                        value : "published",
+                        displayname : "Published"
+                    }, {
+                        value : "draft",
+                        displayname : "Draft"
+                    }, {
+                        value : "deleted",
+                        displayname : "Deleted"
+                    }],
+                }, 
+                author : {
+                    displayname : "Author",
+                    livevar : {
+                        endpoint : "entities.simple",
+                        value : "_id",
+                        displayname : "displayname"
+                    }
+                }
+            },
             sortorder : -1,
             fields: [{
                 key: 'media',

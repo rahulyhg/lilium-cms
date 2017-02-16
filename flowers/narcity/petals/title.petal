@@ -2,5 +2,5 @@
 {$ if (extra.contextname == "home"); $}
 <title>{=config.default.info.project}</title>
 {$ endif; if (extra.contextname == "article"); $}
-<title>{=extra.article.title} - {=config.default.info.project}</title>
+<title>{=extra.article.title} - {=config.default.website.sitetitle}</title>
 {$ endif; $}

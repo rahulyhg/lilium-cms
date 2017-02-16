@@ -939,17 +939,9 @@ var Entities = module.exports = new function () {
                     _id : 1
                 };
             
-                if (cli.hasRight('list-entities')) {
-                    db.findToArray(_c.default(), 'entities', {}, function(err, arr) {
-                        callback(arr);
-                    }, simpProj);
-                } else {
-                    db.findToArray(_c.default(), 'entities', {
-                        _id : db.mongoID(cli.session.data._id)
-                    }, function(err, arr) {
-                        callback(arr);
-                    }, simpProj);
-                }
+                db.findToArray(_c.default(), 'entities', {}, function(err, arr) {
+                    callback(arr);
+                }, simpProj);
             } else if (levels[0] == 'query') {
                 var queryInfo = params.query || new Object();
                 var qObj = new Object();

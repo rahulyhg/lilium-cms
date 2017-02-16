@@ -15,6 +15,13 @@ table.lmlfullwidthtable thead tr th {
     font-weight: 400;
 
 }
+.lmltablefilter select {
+    margin-left: 6px;
+}
+.lmltablefilter {
+    display: inline-block;
+    margin-left: 10px;
+}
 table.lmlfullwidthtable thead tr {
     border: 1px solid #EEE;
     background-color: #fafafa;
