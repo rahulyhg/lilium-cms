@@ -307,6 +307,10 @@ var Article = function() {
     };
 
     this.insertAds = function(_c, article, done) {
+        if (article.isSponsored) {
+            return done();
+        }
+
         var pcount = _c.content.adsperp;
         var jsdom = require('jsdom');
         var content = article.content ? article.content
