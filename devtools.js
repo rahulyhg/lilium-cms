@@ -296,7 +296,7 @@ var parseContentAds = function(cli) {
     log('Devtools', 'Parsing ads for all articles', 'info');
     if (pcount) {
         var adtag = "<ad></ad>";
-        db.findToArray(cli._c, 'content', {}, function(err, arr) {
+        db.findToArray(cli._c, 'content', {hasads : {$ne : true}}, function(err, arr) {
             var index = -1;
             var next = function() {
                 index++;
@@ -308,37 +308,7 @@ var parseContentAds = function(cli) {
                         type : "success"
                     });
                 } else {
-                    var content = arr[index].content ? arr[index].content
-                        .replace(/\<ad\>\<?\/?a?d?\>?/g, "")
-                        .replace(/\<lml\:ad\>/g, "")
-                        .replace(/\<\/lml\:ad\>/g, "")
-                        .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
-                        .replace(/\n/g, "").replace(/\r/g, "")
-                        .replace(/\<p\>\<\/p\>/g, "") : "";
-                
-                    var changed = false;
-                    jsdom.env(content, function(err, dom) {
-                        if (err) {
-                            log("Devtools", "Error parsing dom : " + err, "err");
-                            return next();
-                        }
-
-                        var parags = dom.document.querySelectorAll("body > p, body > h3");
-                        for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
-                            var adtag = dom.document.createElement('ad');
-                            dom.document.body.insertBefore(adtag, parags[i]);
-                            changed = true;
-                        }
-
-                        if (changed) {
-                            var perc = (index / arr.length * 100).toFixed(2);
-                            log('Devtools', "["+perc+"%] Insert ads inside article with title " + arr[index].title, 'success');
-                            content = dom.document.body.innerHTML;
-                            db.update(cli._c, 'content', {_id : arr[index]._id}, {content : content}, next);
-                        } else {
-                            next();
-                        }
-                    });
+                    require('./article.js').insertAds(cli._c, arr[index], next);
                 }
             };
 
