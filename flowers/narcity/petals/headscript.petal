@@ -52,6 +52,7 @@
         author : "{=?extra.article.authors.0.displayname}",
         tags : {=#extra.article.tags},
         page : maybePage,
+        sponsored : "{=?extra.article.isSponsored}" == "true"
     };
     {$ endif; $}
 

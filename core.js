@@ -54,6 +54,7 @@ var cdn = undefined;
 var vocab = undefined;
 var various = undefined;
 var history = undefined;
+var amp = undefined;
 
 var log = require('./log.js');
 
@@ -114,6 +115,7 @@ var Core = function () {
         vocab = require('./vocab.js');
         various = require('./various.js');
         history = require('./history.js');
+        amp = require('./amp.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
@@ -149,6 +151,11 @@ var Core = function () {
         endpoints.register('*', 'logout', 'GET', function (cli) {
             cli.touch("endpoints.POST.logout");
             sessions.logout(cli);
+        });
+
+        endpoints.register('*', 'amp', 'GET', function(cli) {
+            cli.touch("endpoints.GET.amp");
+            amp.GET(cli);
         });
 
         admin.registerAdminEndpoint('welcome', 'GET', function(cli) {

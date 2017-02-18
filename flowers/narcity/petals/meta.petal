@@ -1,4 +1,4 @@
-{#config;article;extra}
+{#config;article;extra;theme}
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
@@ -16,7 +16,7 @@ $}
     socialfilename += extra.contextname;
 $} 
 
-
+<link rel="icon" type="image/png" href="{=config.default.server.url}{=theme.settings.logo}" />
 <meta property="fb:app_id" content="369886419698055" />
 <meta property="fb:pages" content="254768477928383" />
 
