@@ -34,31 +34,36 @@ var ImageResizer = function () {
                 var key = sizeKeys[i]
                 var width = imageSizes[key][0];
                 var height = imageSizes[key][1];
-                var resizedEndName = "_" + width + "x" + height + "." + extension
-                var resizedFilename = currentFilename + resizedEndName;
 
                 //Give a number to the * dimentions, aspect ratio is taken care of in the gm resize crop function after
                 if (imageSizes[key][0] == "*") {
-                    width = imageSizes[key][1] 
+                    width = null 
                 } else if (imageSizes[key][1] == "*") {
-                    height = imageSizes[key][0]
+                    height = null
                 } 
 
-                gm(buffer, currentFilename)
+                var resizedEndName = "_" + (width||"rel") + "x" + (height||"rel") + "." + extension
+                var resizedFilename = currentFilename + resizedEndName;
+
+                var queue = gm(buffer, currentFilename)
                 .resize(width, height, "^")
                 .gravity('Center')
-                .crop(width, height,"!")
-                .quality(75)
-                .write(resizedFilename, function (err) {
-                  if (err) {
-                    console.log(err);
-                  }
+                .quality(80);
+
+                if (width && height) {
+                    queue.crop(width, height, '!')
+                }
+
+                queue.write(resizedFilename, function (err) {
+                    if (err) {
+                      console.log(err);
+                    }
 
                     images[key] = {};
                     images[key].path = resizedFilename;
                     images[key].url = _c.server.url + '/uploads/' + fileName + resizedEndName;
-                    images[key].width = width;
-                    images[key].height = height;
+                    images[key].width = width || "relative";
+                    images[key].height = height || "relative";
 
                   execute(buffer, i - 1, _c, cb, extension, sizeKeys, imageSizes, images, currentFilename, fileName);
                 });
