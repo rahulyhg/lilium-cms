@@ -46,16 +46,8 @@ var initRequires = function(abspath) {
 };
 
 var registerPictureSizes = function() {
-    if (!imageSize.exists("thumbnailsmall")) {
-        imageSize.add("thumbnailsmall", 308, 150);
-    }
-
     if (!imageSize.exists("thumbnaillarge")) {
         imageSize.add("thumbnaillarge", 638, 340);
-    }
-
-    if (!imageSize.exists("thumbnailmedium")) {
-        imageSize.add("thumbnailmedium", 638, 340);
     }
 
     if (!imageSize.exists("narcityfeatured")) {
@@ -250,7 +242,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             var totalPages = Math.ceil(latests.length / limit);
             var smallest = 1;
             var highest = totalPages;
-            var indices = [];
+            var indices = {pagenumbers : []};
         
             if (totalPages > 5) {
                 var cPage = parseInt(skp);
@@ -265,7 +257,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             }
 
             for (var i = smallest; i <= highest; i++) {
-                indices.push(i);
+                indices.pagenumbers.push(i);
             }
 
             indices.totalpages = totalPages;
@@ -364,6 +356,8 @@ var serveArchive = function(cli, archType) {
 }
 
 var objToURIParams = function(params) {
+    if (!Object.keys(params).length) return "";
+
     var str = "?";
     for (var key in params) {
         str += key + "=" + params[key] + "&";

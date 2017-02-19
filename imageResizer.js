@@ -48,6 +48,7 @@ var ImageResizer = function () {
                 .resize(width, height, "^")
                 .gravity('Center')
                 .crop(width, height,"!")
+                .quality(75)
                 .write(resizedFilename, function (err) {
                   if (err) {
                     console.log(err);

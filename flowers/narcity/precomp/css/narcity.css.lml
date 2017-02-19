@@ -56,6 +56,13 @@ body.willfadein {
     top: 40px;   
 }
 
+.context-category #container, 
+.context-author #container, 
+.context-tags #container, 
+.context-search #container {
+    margin-bottom: -40px;
+}
+
 #mcanvas {
     top: 60px;
     margin-bottom: 100px;
@@ -532,6 +539,16 @@ article .featured-image-wrapper {
     font-size: 14px;
 }
 
+article #article-content .lml-image-wrapper span, 
+article #article-content .lml-image-wrapper a {
+    color: #AAA;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+    position: relative;
+    top: -5px;
+}
+
 article .social-share-big-count {
     float : right;
     display: none;
@@ -969,7 +986,7 @@ $}
 }
 
 .homepage .article-thumbnail .article-thumbnail-author {
-    font-weight: bold;
+    font-weight: normal;
     color: #555;
 }
 

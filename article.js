@@ -925,9 +925,16 @@ var Article = function() {
                 if (params.filters.author) {
                     match.push({author : params.filters.author});
                 }
+
+                if (params.filters.isSponsored) {
+                    var spons = params.filters.isSponsored == "true";
+                    match.push(spons ? {isSponsored : true} : {isSponsored : {$ne : true}});
+                }
+
                 if (!cli.hasRight('editor')) {
                     match.push({author: db.mongoID(cli.userinfo.userid)});
                 }
+
                 if (params.search) {
                     match.push({
                         $text : { $search: params.search }
@@ -1350,6 +1357,16 @@ var Article = function() {
                         value : "_id",
                         displayname : "displayname"
                     }
+                },
+                isSponsored : {
+                    displayname : "Sponsored Posts",
+                    datasource : [{
+                        value : false,
+                        displayname : "Hide all"
+                    }, {
+                        value : true,
+                        displayname : "Show only"
+                    }]
                 }
             },
             sortorder : -1,
