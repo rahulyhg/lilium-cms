@@ -519,6 +519,13 @@ class LMLCompiler {
     output(ctx, str) {
         if (!str) { return; }
 
+        ctx.flags.writing = true;
+        ctx.stream.write(str.toString());
+        ctx.flags.writing = false;
+
+        this.checkForCompletion(ctx, 'utf8');
+
+        /*
         ctx.buffer.push(str.toString());
         if (!ctx.flags.writing) {
             ctx.flags.writing = true;
@@ -533,6 +540,7 @@ class LMLCompiler {
 
             nextBlock();
         }
+        */
     }; 
 
     checkForCompletion(ctx) {
@@ -581,10 +589,10 @@ class LMLCompiler {
                 ctx.flags.finished = true;
                 this.checkForCompletion(ctx);
             } else {
-                let cBlock = ctx.blocks[ctx.blockIndex];
-                let diff = new Date() - now;
-
+                // let diff = new Date() - now;
                 now = new Date(); 
+
+                let cBlock = ctx.blocks[ctx.blockIndex];
                 setTimeout(() => {
                     this.parseSingle(cBlock, ctx, nextBlock);
                 }, 0);

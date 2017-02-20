@@ -36,6 +36,7 @@
     "jquery.clickout": "^0.0.1",
     "ckeditor-youtube-plugin": "^2.1.0",
     "linkifyjs": "^2.1.3",
-    "deep-diff": "^0.3.4"
+    "deep-diff": "^0.3.4",
+    "ContentTools": "^1.3.1"
   }
 }
