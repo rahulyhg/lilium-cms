@@ -112,6 +112,23 @@ var LiliumBackend = function(context) {
         oReq.send();
     };
 
+    this.loadLiveEdit = function() {
+        var jslib = "{=config.default.server.url}/bower/ContentTools/build/content-tools.min.js";
+        var scr = document.createElement('script');
+        scr.src = jslib;
+        
+        var csslib = "{=config.default.server.url}/bower/ContentTools/build/content-tools.min.css";
+        var link = document.createElement('link');
+        link.rel = "stylesheet";
+        link.type = "text/css";
+        link.href = csslib;
+
+        /* LIVE EDIT : DUE SOMEWHEN
+        document.body.appendChild(scr);
+        document.head.appendChild(link);
+        */
+    };
+
     this.init = function() {
         urls.dashboard = adminpath;
         urls.publish = adminpath + "/article/new";
@@ -121,6 +138,7 @@ var LiliumBackend = function(context) {
             urls.edit = adminpath + "/article/edit/" + articleid;
         }
 
+        this.loadLiveEdit();
         this.addStyle();
         this.createLinks();
         this.scheduleRealTime();

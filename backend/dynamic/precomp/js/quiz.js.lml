@@ -216,7 +216,7 @@ window.LMLQuiz = function() {
         var wrapper = ce('div', ["quiz-answer-wrapper"], {id:genID});
 
         var answerimg = ce('img', ["quiz-answer-photo"], answer && answer.photo ? {src:answer.photourl, "data-photoid" : answer.photo} : undefined, wrapper);
-        answerimg.dataset.size = "medium";
+        answerimg.dataset.size = "square";
         liliumcms.imagepicker.bind(answerimg);
 
         var answername = ce('input', ["quiz-answer-answer"], {

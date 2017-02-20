@@ -1,0 +1,6 @@
+{#config;extra}
+<!-- 
+    Your article will be contained inside the extra.article variable 
+    Remove this comment before sending in production :) 
+-->
+{=extra.article.content}

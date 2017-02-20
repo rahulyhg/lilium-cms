@@ -83,10 +83,11 @@ ClientObject.prototype.debug = function () {
 };
 
 ClientObject.prototype.hasEnoughPower = function (power, cb) {
+    var conf = require('./config.js');
     var cli = this;
     // Check if role or number given
     if (typeof power === 'string') {
-        db.findToArray(this._c, 'roles', {
+        db.findToArray(conf.default(), 'roles', {
             name: power
         }, function (err, arr) {
             if (arr[0] && this.userinfo.power <= arr[0].power) {
@@ -98,7 +99,7 @@ ClientObject.prototype.hasEnoughPower = function (power, cb) {
     } else if (!isNaN(power)) {
         cb(cli.userinfo.power <= power);
     } else {
-        db.findToArray(this._c, 'roles', {
+        db.findToArray(conf.default(), 'roles', {
             name: {
                 '$in': power
             }

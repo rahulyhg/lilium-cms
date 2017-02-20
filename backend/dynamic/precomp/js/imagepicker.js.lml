@@ -7,6 +7,7 @@ var LMLImagePicker = function() {
     var imgpickercache = {};
     var currentCaller = undefined;
     var selectedImage = undefined;
+    var focusedID = undefined;
     var state = "hidden";
     var sessionInfo = {};
 
@@ -26,10 +27,10 @@ var LMLImagePicker = function() {
                     elem.dataset.photoid = img._id;
                     elem.dataset.photo = img;
 
-                    if (elem.dataset.size) {
+                    if (elem.dataset.size && img.sizes[elem.dataset.size]) {
                         elem.src = img.sizes[elem.dataset.size].url;
                     } else if (elem.width > 150 || elem.height > 150) {
-                        elem.src = img.sizes.thumbnailmedium.url;
+                        elem.src = img.sizes.square.url;
                     } else {
                         elem.src = img.sizes.thumbnail.url;
                     }
@@ -74,7 +75,7 @@ var LMLImagePicker = function() {
 
                 if (img) {
                     if (elem.width > 150 || elem.height > 150) {
-                        elem.src = img.sizes.thumbnailmedium.url;
+                        elem.src = img.sizes.square.url;
                     } else if (elem.dataset.size) {
                         elem.src = img.sizes[elem.dataset.size];
                     } else {
@@ -178,13 +179,29 @@ var LMLImagePicker = function() {
 
     this.displayinfo = function(imgid) {
         var imginfo = imgpickercache[imgid];
+        focusedID = imgid;
     
-        ePicker.querySelector(".image-details-bigger").setAttribute('src', imginfo.sizes.medium.url);
+        ePicker.querySelector(".image-details-bigger").setAttribute('src', "{=config.default.server.url}/uploads/" + imginfo.url);
         ePicker.querySelector(".image-details-size span").innerHTML = imginfo.size.width + " x " + imginfo.size.height;
         ePicker.querySelector(".image-details-filename span").innerHTML = imginfo.url;
         ePicker.querySelector(".image-details-view-original a").setAttribute('href', "{=config.default.server.url}/uploads/" + imginfo.url);
-        ePicker.querySelector(".image-details-artist-input").value = imginfo.artistname || "";
-        ePicker.querySelector(".image-details-artist-url-input").value = imginfo.artisturl || "";
+
+        if (sessionInfo.multiple && Object.keys(selectedImage).length > 1) {
+            var ids = Object.keys(selectedImage);
+            var artist = imginfo.artistname || "";
+            var arturl = imginfo.artisturl || "";
+
+            for (var i = 0; i < ids.length; i++) {
+                if (artist != (selectedImage[ids[i]].artistname || "")) { artist = "[Multiple values]" }
+                if (arturl != (selectedImage[ids[i]].artisturl || "") ) { arturl = "[Multiple values]" }
+            }
+
+            ePicker.querySelector(".image-details-artist-input").value = artist;
+            ePicker.querySelector(".image-details-artist-url-input").value = arturl;
+        } else {
+            ePicker.querySelector(".image-details-artist-input").value = imginfo.artistname || "";
+            ePicker.querySelector(".image-details-artist-url-input").value = imginfo.artisturl || "";
+        }
 
         ePicker.querySelector(".lmlimagepicker-details").classList.add("with-details");
     };
@@ -217,24 +234,29 @@ var LMLImagePicker = function() {
         return false;
     };
 
-    this.setCredits = function(name, url) {
-        if (selectedImage) {
-            selectedImage.artistname = ePicker.querySelector(".image-details-artist-input").value = name;
-            selectedImage.artisturl = ePicker.querySelector(".image-details-artist-url-input").value = url;
-
-            that.saveCredits();
-        }
-    };
-
     this.saveCredits = function() {
-        selectedImage.artistname = ePicker.querySelector(".image-details-artist-input").value;
-        selectedImage.artisturl = ePicker.querySelector(".image-details-artist-url-input").value;
+        var iarr = [];
 
-        $.post('{=config.default.server.url}/admin/media/updatecredit', {
-            id : selectedImage._id, 
-            name : selectedImage.artistname,
-            url : selectedImage.artisturl
-        });
+        if (sessionInfo.multiple) {
+            var ids = Object.keys(selectedImage);
+            for (var i = 0; i < ids.length; i++) {
+                iarr.push(selectedImage[ids[i]]);
+            }
+        } else {
+            iarr = [selectedImage];
+        }
+
+        for (var i = 0; i < iarr.length; i++) {
+            var sel = iarr[i];
+            sel.artistname = ePicker.querySelector(".image-details-artist-input").value;
+            sel.artisturl = ePicker.querySelector(".image-details-artist-url-input").value;
+
+            $.post('{=config.default.server.url}/admin/media/updatecredit', {
+                id : sel._id, 
+                name : sel.artistname,
+                url : sel.artisturl
+            });
+        }
     };      
 
     this.cast = function(cb, imageid, extra) {
@@ -282,10 +304,10 @@ var LMLImagePicker = function() {
     };
 
     this.accept = function() {
-        if (sessionInfo.withcredit && (!selectedImage.artistname || !selectedImage.artisturl || selectedImage.artistname.trim() == "" || selectedImage.artisturl.trim() == "")) {
-            var artistname = ePicker.querySelector(".image-details-artist-input");
-            var artisturl = ePicker.querySelector(".image-details-artist-url-input");
+        var artistname = ePicker.querySelector(".image-details-artist-input");
+        var artisturl = ePicker.querySelector(".image-details-artist-url-input");
 
+        if (sessionInfo.withcredit && (!artistname.value.trim() || !artisturl.value.trim())) {
             artistname.classList[artistname.value.trim() == "" ? "add" : "remove"]("invalid");
             artisturl.classList[artisturl.value.trim() == "" ? "add" : "remove"]("invalid");
         } else {
@@ -339,8 +361,8 @@ var LMLImagePicker = function() {
                 } else {
                     alert("Upload failed");
                 }
-            }
-    
+            };
+
             req.send(formData); 
         }
     };

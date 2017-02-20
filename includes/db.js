@@ -163,7 +163,9 @@ var DB = function() {
 		});
 	};
 
-    this.all = function(cur, looper, done) {
+    this.all = function(cur, looper, done, threadCount) {
+        threadCount = threadCount || 1;
+
         var handleNext = function() {
             cur.hasNext(function(err, hasnext) {
                 if (hasnext) {
@@ -184,7 +186,10 @@ var DB = function() {
         };
 
         iterations = 0;
-        handleNext();
+
+        for (var i = 0; i < threadCount; i++) {
+            handleNext();
+        }
     };
 
     this.findUnique = this.findSingle = function(conf, coln, conds, cb, proj) {

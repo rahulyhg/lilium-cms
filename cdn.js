@@ -9,7 +9,7 @@ var ContentDeliveryNetwork = function() {
             var imgs = dom.document.body.querySelectorAll('img');
             var links = dom.document.head.querySelectorAll('link');
 
-            for (var i = 0; i < scripts.length; i++) if (scripts[i].src) {
+            for (var i = 0; i < scripts.length; i++) if (scripts[i].src && !scripts[i].classList.contains("lilium")) {
                 scripts[i].src = scripts[i].src.replace(domain, cdndomain);
             }
 
@@ -17,7 +17,7 @@ var ContentDeliveryNetwork = function() {
                 imgs[i].src = imgs[i].src.replace(domain, cdndomain);
             }
 
-            for (var i = 0; i < links.length; i++) if (links[i].href) {
+            for (var i = 0; i < links.length; i++) if (links[i].href && links[i].rel != "canonical") {
                 links[i].href = links[i].href.replace(domain, cdndomain);
             }
 

@@ -94,7 +94,9 @@ $}
 
         {=theme.settings.beforearticle}
         <div class="article-content" id="article-content">
-            {=extra.article.content}
+            <div id="article-text">
+                {=extra.article.content}
+            </div>
 
             {$ if (?extra.article.feature); $}
                 {%=extra.article.feature}

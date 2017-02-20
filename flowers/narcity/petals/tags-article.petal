@@ -16,10 +16,10 @@
 <meta property="article:author" content="{=?extra.article.authors.0.socialnetworks.facebook}" />
 <link rel="author" href="{=?extra.article.authors.0.socialnetworks.facebook}" />
 
-<meta property="og:url" content="{=config.default.server.url}/{=extra.article.name}"/>
+<meta property="og:url" content="http:{=config.default.server.url}/{=extra.article.name}"/>
 <meta property="og:title" content="{=extra.article.title}" />
 <meta property="og:description" content="{=extra.article.subtitle}" />
 
 <meta property="og:type" content="article" />
 <meta property="wptype" content="post" />
-<meta property="og:image" content="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" />
+<meta property="og:image" content="http:{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" />

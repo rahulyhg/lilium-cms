@@ -1,82 +1,82 @@
 {#config;extra;slug}
 {$
     tagname = extra.searchname;
-    tagslug = slug.ify(=tagname);
+    tagslug = slug.ify(tagname);
 
     details = extra.archivedetails;
 $}
 
 {$ if (extra.archivename != "author"); $}
-<div class="subtitle-strip">
-    <span class="subtitle-headline">Posts archive</span>
-    <span class="subtitle-detail">{=tagname}</span>
-</div>
+    <div class="subtitle-strip">
+        <span class="subtitle-headline">Posts archive</span>
+        <span class="subtitle-detail">{=tagname}</span>
+    </div>
 {$ else; $}
-<div class="subtitle-strip">
-    <div class="ryksponsive">
-        <div class="archive-author-strip">
-            {$ if (?details.avatarURL != ""); $}
-            <div class="archive-author-avatar-wrapper">
-                <div class="archive-author-avatar" style="background-image: url('{=details.avatarURL}');" >
+    <div class="subtitle-strip">
+        <div class="ryksponsive">
+            <div class="archive-author-strip">
+                {$ if (?details.avatarURL != ""); $}
+                <div class="archive-author-avatar-wrapper">
+                    <div class="archive-author-avatar" style="background-image: url('{=details.avatarURL}');" >
+                    </div>
                 </div>
-            </div>
-            {$ endif; $}
-
-            <div class="archive-author-details-wrapper">
-                {$ 
-                    if (?details.displayname == "");
-                        details.displayname = details.username;
-                    endif;
-                $}
-                <h2>{=details.displayname}</h2>
-
-                {$ if (?details.jobtitle); $}
-                    <h3>{=details.jobtitle}</h3>
                 {$ endif; $}
 
-                {$ if (?details.description); $}
-                    <div class="author-description">{=details.description}</div>
-                {$ endif; $}
+                <div class="archive-author-details-wrapper">
+                    {$ 
+                        if (?details.displayname == "");
+                            details.displayname = details.username;
+                        endif;
+                    $}
+                    <h2>{=details.displayname}</h2>
+
+                    {$ if (?details.jobtitle); $}
+                        <h3>{=details.jobtitle}</h3>
+                    {$ endif; $}
+
+                    {$ if (?details.description); $}
+                        <div class="author-description">{=details.description}</div>
+                    {$ endif; $}
+                </div>
             </div>
         </div>
     </div>
-</div>
 {$ endif; $}
 
 {$ if (extra.articles.length != 0); $}
-<div class="archive-current-page">
-    <h4>Showing {=extra.articles.length} of {=extra.indices.totalarticles} entries</h4>
-    <h5>Page {=extra.currentpage} of {=extra.indices.totalpages}</h5>
-</div>
+    <div class="archive-current-page">
+        <h4>Showing {=extra.articles.length} of {=extra.indices.totalarticles} entries</h4>
+        <h5>Page {=extra.currentpage} of {=extra.indices.totalpages}</h5>
+    </div>
 
-<div class="archive-article-list float-wrapper">
-{$ for (article in extra.articles); $}
-    <article class="archive-article">
-        <div class="artpad">
-            <div class="archive-article-thumb" style="background-image: url('{=article.featuredimage.0.sizes.thumbnaillarge.url}')">
-                <a href="{=config.default.server.url}/{=article.name}"></a>
+    <div class="archive-article-list float-wrapper">
+    {$ for (article in extra.articles); $}
+        <article class="archive-article">
+            <div class="artpad">
+                <div class="archive-article-thumb" style="background-image: url('{=article.featuredimage.0.sizes.thumbnaillarge.url}')">
+                    <a href="{=config.default.server.url}/{=article.name}"></a>
+                </div>
+                <h3><a href="{=config.default.server.url}/{=article.name}">{=article.title}</a></h3>
             </div>
-            <h3><a href="{=config.default.server.url}/{=article.name}">{=article.title}</a></h3>
-        </div>
-    </article>
-{$ endfor; $}
-</div>
+        </article>
+    {$ endfor; $}
+    </div>
 
-<div class="archive-navigator float-wrapper">
-    <ul>
-        {$ for (arindex in extra.indices); $}
-            <li {$ if (arindex == extra.currentpage); $} class="currentpage" {$ endif; $} >
-                <a href="{=config.default.server.url}/{=extra.archivename}/{=tagslug}/{=arindex}">
-                    {=arindex}
-                </a>
-            </li>
-        {$ endfor; $}
-    </ul>
-</div>
-{$ else; $}
-<div class="archive-article-list float-wrapper">
-    <p class="empty-result-message">
-        Looks like your query did not return anything.
-    </p>
-</div>
+    <div class="archive-navigator float-wrapper">
+        <ul>
+            {$ for (arindex in extra.indices.pagenumbers); $}
+                <li {$ if (arindex == extra.currentpage); $} class="currentpage" {$ endif; $} >
+                    <a href="{=config.default.server.url}/{=extra.archivename}/{=tagslug}/{=arindex}">
+                        {=arindex}
+                    </a>
+                </li>
+            {$ endfor; $}
+        </ul>
+    </div>
+    {$ else; $}
+    <div class="archive-article-list float-wrapper">
+        <p class="empty-result-message">
+            Looks like your query did not return anything.
+        </p>
+    </div>
 {$ endif; $}

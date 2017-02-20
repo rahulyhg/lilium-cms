@@ -260,7 +260,7 @@ var FileLogic = function () {
         });
     };
 
-    this.renderThemeLML = function(cli, ctxName, preferredFileName, extra, callback) {
+    this.renderThemeLML = function(cli, ctxName, preferredFileName, extra, callback, skipLayout) {
         var theme = require('./themes.js');
         var _c = cli._c || cli;
 
@@ -278,6 +278,10 @@ var FileLogic = function () {
             var tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
             var layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
 
+            if (skipLayout) {
+                tmpPath = savePath;
+            }
+
             log('FileLogic', 'Compiling context theme page', 'info');
             LML2.compileToFile(
                 readPath,
@@ -286,6 +290,10 @@ var FileLogic = function () {
                     require('./fileserver.js').readFile(tmpPath, function(ctn) {
                         log('FileLogic', 'Including compiled theme page to layout', 'detail');
                         extra.contentHTML = ctn;
+
+                        if (skipLayout) {
+                            return callback(ctn);
+                        }
 
                         LML2.compileToFile(
                             layoutPath,

@@ -306,6 +306,45 @@ var Article = function() {
         });
     };
 
+    this.insertAds = function(_c, article, done) {
+        if (article.isSponsored) {
+            return done();
+        }
+
+        var pcount = _c.content.adsperp;
+        var jsdom = require('jsdom');
+        var content = article.content ? article.content
+            .replace(/\<ad\>\<?\/?a?d?\>?/g, "")
+            .replace(/\<lml\:ad\>/g, "")
+            .replace(/\<\/lml\:ad\>/g, "")
+            .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
+            .replace(/\n/g, "").replace(/\r/g, "")
+            .replace(/\<p\>\<\/p\>/g, "") : "";
+
+        var changed = false;
+        jsdom.env(content, function(err, dom) {
+            if (err) {
+                log("Article", "Error parsing dom : " + err, "err");
+                return done();
+            }
+
+            var parags = dom.document.querySelectorAll("body > p, body > h3");
+            for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
+                var adtag = dom.document.createElement('ad');
+                dom.document.body.insertBefore(adtag, parags[i]);
+                changed = true;
+            }
+
+            if (changed) {
+                log('Article', "Inserted ads inside article with title " + article.title, 'success');
+                content = dom.document.body.innerHTML;
+                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, done);
+            } else {
+                done();
+            }
+        });
+    };
+
     this.create = function(cli) {
         cli.touch('article.create');
         var articleObject = {};
@@ -331,17 +370,25 @@ var Article = function() {
 
     this.generateArticle = function(_c, aid, cb) {
         that.deepFetch(_c, db.mongoID(aid), function(deepArticle) {
-            var extra = new Object();
-            extra.ctx = "article";
-            extra.article = deepArticle;
+            var gen = function() {
+                var extra = new Object();
+                extra.ctx = "article";
+                extra.article = deepArticle;
 
-            // Generate LML page
-            filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
-                cb && cb({
-                    success: true,
-                    dbdata : deepArticle
+                // Generate LML page
+                filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
+                    cb && cb({
+                        success: true,
+                        dbdata : deepArticle
+                    });
                 });
-            });
+            };
+
+            if (deepArticle.hasads) {
+                gen();
+            } else {
+                that.insertAds(_c, deepArticle, gen);
+            }
         });
     };
 
@@ -431,7 +478,7 @@ var Article = function() {
                                                 }, false, true, true);
                                             }
 
-                                           that.generateArticle(cli._c, db.mongoID(formData._id), function(resp) {
+                                            that.generateArticle(cli._c, db.mongoID(formData._id), function(resp) {
                                                 cli.sendJSON(resp);
                                                 var deepArticle = resp.dbdata;
 
@@ -878,9 +925,16 @@ var Article = function() {
                 if (params.filters.author) {
                     match.push({author : params.filters.author});
                 }
+
+                if (params.filters.isSponsored) {
+                    var spons = params.filters.isSponsored == "true";
+                    match.push(spons ? {isSponsored : true} : {isSponsored : {$ne : true}});
+                }
+
                 if (!cli.hasRight('editor')) {
                     match.push({author: db.mongoID(cli.userinfo.userid)});
                 }
+
                 if (params.search) {
                     match.push({
                         $text : { $search: params.search }
@@ -1179,7 +1233,7 @@ var Article = function() {
             })
             .beginSection('authorbox', {
                 show : {
-                    "role" : "edit-all-articles"
+                    "role" : "editor"
                 }
             })
             .add('author', 'livevar', {
@@ -1303,6 +1357,16 @@ var Article = function() {
                         value : "_id",
                         displayname : "displayname"
                     }
+                },
+                isSponsored : {
+                    displayname : "Sponsored Posts",
+                    datasource : [{
+                        value : false,
+                        displayname : "Hide all"
+                    }, {
+                        value : true,
+                        displayname : "Show only"
+                    }]
                 }
             },
             sortorder : -1,

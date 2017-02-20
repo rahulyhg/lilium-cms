@@ -6,7 +6,7 @@
     <form data-context="noctx" class="lmlform" name="upload_profile_picture" id="upload_profile_picture" method="POST" enctype="multipart/form-data">
         <div class="profile-photo-form">
             <h1 class="data-livevar" data-livevar='"html":"session.displayname"'></h1>
-            <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="medium" />
+            <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="square" />
             <h2>( This is you! )</h2>
         </div>
 
@@ -104,7 +104,7 @@
 
     window.profile_photo_image_selected = function(elem, img) {
         var imgid = elem.dataset.photoid;
-        var imgurl = imgid ? img.sizes.medium.url : undefined;
+        var imgurl = imgid ? img.sizes.square.url : undefined;
 
         var dat = {
             form_name : "upload_profile_picture",
