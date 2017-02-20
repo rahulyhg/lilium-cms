@@ -1233,7 +1233,7 @@ var Article = function() {
             })
             .beginSection('authorbox', {
                 show : {
-                    "role" : "edit-all-articles"
+                    "role" : "editor"
                 }
             })
             .add('author', 'livevar', {
