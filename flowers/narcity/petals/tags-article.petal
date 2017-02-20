@@ -22,4 +22,4 @@
 
 <meta property="og:type" content="article" />
 <meta property="wptype" content="post" />
-<meta property="og:image" content="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" />
+<meta property="og:image" content="http:{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" />
