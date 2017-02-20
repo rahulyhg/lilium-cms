@@ -623,7 +623,6 @@ var Entities = module.exports = new function () {
         var newEnt = this.initialiseBaseEntity(entData);
 
         this.registerEntity(cli, newEnt, function () {
-
             hooks.fire('entity_created', {
                 cli: cli
             });
@@ -663,8 +662,9 @@ var Entities = module.exports = new function () {
     };
 
     this.validateEntityObject = function (e, cli, cb) {
+    console.log(e);
         var valid = true;
-        valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.role;
+        valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.roles;
         cli.hasEnoughPower(e.roles, function (hasEnoughPower) {
             valid = hasEnoughPower;
             cb(valid);
@@ -678,7 +678,6 @@ var Entities = module.exports = new function () {
                 db.insert(_c.default(), 'entities', entity, callback, true);
             } else {
                 callback("[EntityValidationException] Entity object misses required fields.", undefined);
-
             }
         });
     };
