@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="template" content="Narcity 3.1">
 
-{$
-    if (?extra.article.wptype != ""); 
-$}
+{$ if (?extra.article.wptype != ""); $}
     <link rel="canonical" href="{=config.default.wordpress.originalurl}/{=extra.article.name}/" />
-{$ 
+{$ else; $}
+    <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}/" />
+{$
     endif;
 
     socialfilename = "petals/tags-";

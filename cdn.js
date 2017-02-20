@@ -17,7 +17,7 @@ var ContentDeliveryNetwork = function() {
                 imgs[i].src = imgs[i].src.replace(domain, cdndomain);
             }
 
-            for (var i = 0; i < links.length; i++) if (links[i].href) {
+            for (var i = 0; i < links.length; i++) if (links[i].href && links[i].rel != "canonical") {
                 links[i].href = links[i].href.replace(domain, cdndomain);
             }
 
