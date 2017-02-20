@@ -4,7 +4,7 @@
 
 Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.
 
-Interpreting its own simple language, Lilium used LML (Lilium Markup Language) to create the templates and generate the served files. LML is user friendly, ressemble HTML and makes it easy for new developers or web designers to customize their very own themes.
+Interpreting its own simple language, Lilium uses LML (Lilium Markup Language) to create the templates and generate the served files. LML is user friendly, ressemble HTML and makes it easy for new developers or web designers to customize their very own themes.
 
 The platform has its own framework and unique API. Lilium makes it easy to create a mobile app for a website, and is network based. It can hold multiple domains for a single instance, can use multiple different databases, and is compatible with content delivery network services. 
 
@@ -92,10 +92,6 @@ server {
 
 ## Known Issues ##
 
-### nginx ###
-The latest **nginx** setup tests reflected no issue with session constancy, but the setup is still experimental. 
-Sockets seem to be working fine unless the session gets flushed. 
-
 ### pm2 ###
 Lilium should be able to run under **pm2**, but has been showing some weird behaviours when forked into multiple threads, probably due to variables not being shared between instances.
 
@@ -113,4 +109,4 @@ The forked version requires Redis installed. Not stable yet since messages are n
 This software does not come with a license. 
 
 ## Copyright ##
-© Erik Desjardins, 2016
+© Erik Desjardins, 2017
