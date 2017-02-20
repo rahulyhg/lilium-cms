@@ -390,7 +390,7 @@ var upNextSlideCheck = function() {
         upNextSlid = false;
         upNextElem.classList.remove("slid");
         document.body.classList.remove("upnext-slid");
-    }
+    } 
 }
 
 var upNextThrow = function() {
@@ -519,6 +519,13 @@ var parseEmbeds = function() {
     }
 }
 
+var parseContentLinks = function() {
+    var links = document.querySelectorAll('#article-text a');
+    for (var i = 0; i < links.length; i++) {
+        links[i].target = "_blank";
+    }
+}
+
 var rearrangeImages = function() {
     var asis = document.querySelectorAll('.image-asis');
     for (var i = 0; i < asis.length; i++) {
@@ -541,6 +548,7 @@ bindIOSShare();
 bindPCShare();
 maybeFadeIn();
 parseEmbeds();
+parseContentLinks();
 rearrangeImages();
 
 /* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */
