@@ -27,10 +27,10 @@ var LMLImagePicker = function() {
                     elem.dataset.photoid = img._id;
                     elem.dataset.photo = img;
 
-                    if (elem.dataset.size) {
+                    if (elem.dataset.size && img.sizes[elem.dataset.size]) {
                         elem.src = img.sizes[elem.dataset.size].url;
                     } else if (elem.width > 150 || elem.height > 150) {
-                        elem.src = img.sizes.thumbnailmedium.url;
+                        elem.src = img.sizes.square.url;
                     } else {
                         elem.src = img.sizes.thumbnail.url;
                     }
@@ -75,7 +75,7 @@ var LMLImagePicker = function() {
 
                 if (img) {
                     if (elem.width > 150 || elem.height > 150) {
-                        elem.src = img.sizes.thumbnailmedium.url;
+                        elem.src = img.sizes.square.url;
                     } else if (elem.dataset.size) {
                         elem.src = img.sizes[elem.dataset.size];
                     } else {
@@ -181,7 +181,7 @@ var LMLImagePicker = function() {
         var imginfo = imgpickercache[imgid];
         focusedID = imgid;
     
-        ePicker.querySelector(".image-details-bigger").setAttribute('src', imginfo.sizes.medium.url);
+        ePicker.querySelector(".image-details-bigger").setAttribute('src', "{=config.default.server.url}/uploads/" + imginfo.url);
         ePicker.querySelector(".image-details-size span").innerHTML = imginfo.size.width + " x " + imginfo.size.height;
         ePicker.querySelector(".image-details-filename span").innerHTML = imginfo.url;
         ePicker.querySelector(".image-details-view-original a").setAttribute('href', "{=config.default.server.url}/uploads/" + imginfo.url);
