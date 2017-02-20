@@ -9,7 +9,7 @@ var ContentDeliveryNetwork = function() {
             var imgs = dom.document.body.querySelectorAll('img');
             var links = dom.document.head.querySelectorAll('link');
 
-            for (var i = 0; i < scripts.length; i++) if (scripts[i].src) {
+            for (var i = 0; i < scripts.length; i++) if (scripts[i].src && !scripts[i].classList.contains("lilium")) {
                 scripts[i].src = scripts[i].src.replace(domain, cdndomain);
             }
 

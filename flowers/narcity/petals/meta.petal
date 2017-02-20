@@ -16,7 +16,7 @@
     socialfilename += extra.contextname;
 $} 
 
-<link rel="icon" type="image/png" href="{=config.default.server.url}{=theme.settings.logo}" />
+<link rel="icon" href="{=config.default.server.url}/uploads/favicon.ico" />
 <meta property="fb:app_id" content="369886419698055" />
 <meta property="fb:pages" content="254768477928383" />
 
