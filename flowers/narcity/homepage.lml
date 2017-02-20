@@ -30,7 +30,10 @@
                 <div class="{=classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
                         <a href="{=config.default.server.url}/{=la.name}"> 
-                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}" />
+                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
+                                srcset="{=la.featuredimage.0.sizes.thumbnaillarge.url} 600w, {=la.featuredimage.0.sizes.thumbnailarchive.url} 380w"
+                                alt="{=&la.title}"
+                             />
                             {$ if (?la.categories.0 != "") $}
                             <div class="article-cat-name">
                                 <a href="{=config.default.server.url}/category/{=la.categories.0}">

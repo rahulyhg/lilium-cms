@@ -347,7 +347,8 @@ var Core = function () {
 
     var loadImageSizes = function () {
         imageSize.add("thumbnail", 150, 150);
-        imageSize.add("content", 1024, '*');
+        imageSize.add("square", 320, 320);
+        imageSize.add("content", 640, '*');
 
         hooks.fire('image_sized_loaded');
     };

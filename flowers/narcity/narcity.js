@@ -53,6 +53,10 @@ var registerPictureSizes = function() {
     if (!imageSize.exists("narcityfeatured")) {
         imageSize.add("narcityfeatured", 970, 400);
     }
+
+    if (!imageSize.exists("thumbnailarchive")) {
+        imageSize.add("thumbnailarchive", 380, 200);
+    }
 };
 
 var registerSnips = function(_c, cb) {

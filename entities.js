@@ -308,7 +308,7 @@ var Entities = module.exports = new function () {
 
         imageResizer.resize(cli._c.server.base + "backend/static/uploads/" + filename, filename, ext, cli._c, function(images) {
             var userid = cli.userinfo.userid;
-            var avatarURL = images.medium.url;
+            var avatarURL = images.square.url;
             var avatarID = filename.substring(0, filename.lastIndexOf('.'));
 
             cli.did("entity", "picupload");
@@ -347,7 +347,7 @@ var Entities = module.exports = new function () {
             if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
 
                 imageResizer.resize(saveTo, image.picture, mime, cli._c, function (images) {
-                    var avatarURL = images.medium.url;
+                    var avatarURL = images.square.url;
                     var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
                     var id = isProfile ? cli.userinfo.userid : cli.routeinfo.path[3];
                     var sessionManager = require('./session.js');
