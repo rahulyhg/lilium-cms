@@ -193,6 +193,11 @@ ClientObject.prototype.redirect = function (path, perm) {
 ClientObject.prototype.crash = function (ex) {
     log('ClientObject', 'Crash handled with error : ' + ex);
 
+    if (this._c && this._c.env == "prod") {
+        log('ClientObject', 'Sending 500');
+        this.throwHTTP(500, 'Lilium Internal Server Error', true);
+    }
+
     try {
         var errFilePath = this._c.server.base + "/backend/dynamic/error.lml";
         this.routeinfo.isStatic = true;

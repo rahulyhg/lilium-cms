@@ -237,6 +237,10 @@ var SiteInitializer = function (conf, siteobj) {
         var compileKey = "lml" + Math.random().toString().substring(2) + Math.random().toString().substring(2);
         conf.compilekey = compileKey;
 
+        if (conf.env == "prod") {
+            log.setLevels(["err", "warn", "lilium"]);
+        }
+
         hooks.fire('site_will_initialize', conf);
         endpoints.addSite(conf.id);
 
