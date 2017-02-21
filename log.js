@@ -17,8 +17,11 @@ var levels = {
     lilium : "\x1b[35m"
 }
 
-module.exports = function (sender, message, level) {
-    var color = level ? levels[level] : levels.none;
+var Log = function (sender, message, level) {
+    level = level || "none";
+    if (Log.levels.indexOf(level) == -1) return;
+
+    var color = levels[level];
     if (typeof message !== 'undefined') {
         var spacing = nameMaxLength - sender.length;
         console.log("\x1b[2m["+pid+"]\x1b[0m"+color+"[" + new Date() + " - \x1b[1m" + sender + "\x1b[0m" + color + "]" + (spacing > 0 ? separator.substr(0, spacing) : '') + message + levels.none);
@@ -26,3 +29,11 @@ module.exports = function (sender, message, level) {
         console.log('');
     }
 }
+
+Log.levels = ["none", "err", "success", "warn", "info", "detail", "live", "lilium", undefined];
+
+Log.setLevels = function(lvls) {
+    Log.levels = lvls;
+}
+
+module.exports = Log;
