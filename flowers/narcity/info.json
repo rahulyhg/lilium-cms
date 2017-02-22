@@ -95,6 +95,7 @@
     },
     "contexts" : {
         "article" : "article.lml",
+        "styledpage" : "page.lml",
         "amp" : "amp.lml",
         "next" : "article.lml",
         "page" : "page.lml",

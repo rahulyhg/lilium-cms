@@ -427,8 +427,8 @@ var LMLDom = function() {
     };
 
     this.fillForm = function(domForm) {
-        var livevarsource = domForm.dataset.livevarsource;
-        var livevardata = liliumcms.livevars.pulloutLiveVar(livevarsource);
+        var livevarsource = domForm.dataset.livevarsource.replace('?', liliumcms.pageloader.lastLevel);
+        var livevardata = liliumcms.livevars.pulloutLiveVar(livevarsource, true);
 
         var fields = domForm.querySelectorAll('input, select, textarea');
         for (var i = 0; i < fields.length; i++) {
@@ -467,6 +467,48 @@ var LMLDom = function() {
                 this.applyFeature(features[i]);
             }
         }
+    };
+
+    this.getFormData = function(form) {
+        var forms = form ? [form] : document.querySelectorAll('#lml-main form');
+        var data = {};
+
+        for (var f = 0; f < forms.length; f++) {
+            var ff = {
+                values : {},
+                form : forms[f]
+            }
+
+            for (var i = 0; i < ff.form.length; i++) {
+                if (CKEDITOR.instances[ff.form[i].name]) {
+                    ff.values[ff.form[i].name] = CKEDITOR.instances[ff.form[i].name].getData();
+                } else {
+                    ff.values[ff.form[i].name] = ff.form[i].value;
+                }
+            }
+
+            data[ff.form.name] = ff;
+        }
+
+        return data;
+    };
+
+    this.sendForm = function(data, url, callback) {
+        var maybeParseJson = function(str) {
+            try {
+                return JSON.parse(str);
+            } catch (ex) {
+                return str;
+            }
+        }
+
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.addEventListener('load', function(a, b, c) {
+            callback(maybeParseJson(xmlhttp.responseText), a, b, c);
+        });
+        xmlhttp.open("POST", url);
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send(JSON.stringify(data));
     };
 
     this.parse = function() {

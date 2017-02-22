@@ -1,5 +1,6 @@
 var fileserver = require('../fileserver.js');
 var filelogic = require('../filelogic.js');
+var styledpages = require('../styledpages.js');
 var _conf = require('../config.js');
 var article = require('../article.js');
 var noop = function() {};
@@ -45,25 +46,27 @@ var HTMLServer = function() {
 							});
 						}
 					} else {
-						article.generateFromName(cli, cli.routeinfo.relsitepath.substring(1), function(success, details) {
-							if (success) {
-                                if (details && details.realName) {
-                                    cli.redirect(cli._c.server.url + "/" + details.realName, true);
+                        styledpages.serveOrFallback(cli, function() {
+                            article.generateFromName(cli, cli.routeinfo.relsitepath.substring(1), function(success, details) {
+                                if (success) {
+                                    if (details && details.realName) {
+                                        cli.redirect(cli._c.server.url + "/" + details.realName, true);
+                                    } else {
+                                        cli.routeinfo.isStatic = true;
+                                        fileserver.pipeFileToClient(cli, filename + '.html', function () {
+                                            cli.touch('htmlserver.serveClient.callback');
+                                        });
+                                    }
                                 } else {
-			    					cli.routeinfo.isStatic = true;
-		    						fileserver.pipeFileToClient(cli, filename + '.html', function () {
-	    								cli.touch('htmlserver.serveClient.callback');
-    								});
+                                    log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath, 'warn');
+                                    filelogic.renderThemeLML(cli, '404', '404.html', {
+                                        
+                                    }, function() {
+                                        fileserver.pipeFileToClient(cli, cli._c.server.html + "/404.html", function() {}, true, 'text/html');
+                                    });
                                 }
-							} else {
-                                log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath, 'warn');
-                                filelogic.renderThemeLML(cli, '404', '404.html', {
-                                    
-                                }, function() {
-                                    fileserver.pipeFileToClient(cli, cli._c.server.html + "/404.html", function() {}, true, 'text/html');
-                                });
-							}
-						}, true)
+                            }, true)
+                        });
 					}
 				});
 			}

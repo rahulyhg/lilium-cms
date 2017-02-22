@@ -431,6 +431,10 @@ h4.article-section-title a {
     margin-top: 30px;
 }
 
+.styled-page-container #article-section {
+    margin-top: 0;
+}
+
 article .article-author-strip {
     width: {=aw};
     margin: 30px 0px;
@@ -607,6 +611,11 @@ article #article-content {
     display: block;
 }
 
+article.styled-page-container #article-content.styledpage-content {
+    width: {=fw};
+    float: none;
+}
+
 article .extra-content {
     width: {=aw};
     margin: 0px auto;
@@ -660,6 +669,11 @@ article > h1 {
     line-height: 46px;
         
     width: {=fw};
+}
+
+article.styled-page-container > h1 {
+    margin-top: 50px;
+    margin-bottom: 0;
 }
 
 article > h2 {
@@ -2147,6 +2161,7 @@ body.slidheader .android-sharer {
     article #article-content #sponsored-box,
     article #article-content .bottom-promotion-link,
     article #article-content #sponsored-box-content,
+    article.styled-page-container #article-content.styledpage-content,
     article .article-related-section {
         width: auto;
     }
