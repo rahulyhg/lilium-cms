@@ -50,10 +50,10 @@
 
     <div class="slider-links">
         <a class="section-link" href="https://www.narcitymedia.com">Advertise</a>
-        <a class="section-link" href="https://www.narcitymedia.com/#reach-us">Contact</a>
+        <a class="section-link" href="{=config.default.server.url}/contact-us">Contact</a>
         <a class="section-link" href="https://www.narcitymedia.com/jobs">Jobs</a>
-        <a class="section-link" href="https://www.narcity.com/terms-conditions/">Terms &amp; Conditions</a>
-        <a class="section-link" href="https://www.narcity.com/privacy-policy/">Privacy Policy</a>
+        <a class="section-link" href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
+        <a class="section-link" href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
     </div>
 
     <div class="copyright-wrapper">
