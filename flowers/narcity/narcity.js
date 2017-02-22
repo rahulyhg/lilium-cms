@@ -377,6 +377,10 @@ var loadHooks = function(_c, info) {
         cli.redirect(_c.server.url + "/" + cli.routeinfo.path.pop() + (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : ""));
     });
 
+    endpoints.register(_c.id, 'tag', 'GET', function(cli) {
+        cli.redirect(_c.server.url + '/tags/' + cli.routeinfo.path[1] + (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : ""));
+    });
+
     endpoints.register(_c.id, '', 'GET', function(cli) {
         fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
             if (needsHomeRefresh || !exists) {
