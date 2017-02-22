@@ -21,7 +21,7 @@
                         </div>
                         <div class="footer-inline">
                                 <a href="https://www.narcitymedia.com">Advertise</a>
-                                <a href="https://www.narcitymedia.com#reach-us">Contact Us</a>
+                                <a href="{=config.default.server.url}/contact-us">Contact Us</a>
                                 <a href="https://www.narcitymedia.com/jobs">Jobs</a>
                                 <a href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
                                 <a href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
