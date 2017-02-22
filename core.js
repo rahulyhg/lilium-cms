@@ -411,7 +411,7 @@ var Core = function () {
             faicon: "fa-paragraph",
             displayname: "Styled Pages",
             priority: 250,
-            rights: ["styled-pages"],
+            rights: ["styledpages"],
             absURL: aurl + "styledpages/list",
             children: []
         });

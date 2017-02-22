@@ -729,6 +729,10 @@ var LiliumCMS = function() {
                 this.pushHistory(url);
             }
 
+            this.levels = document.location.href.split('/');
+            if (!this.levels[this.levels.length - 1]) { this.levels.pop(); }
+            this.lastLevel = this.levels[this.levels.length - 1];
+
             liliumcms.adminmenu.highlight();
             liliumcms.conversations.closeChat();
 
@@ -742,10 +746,27 @@ var LiliumCMS = function() {
 
             document.location.lmladminpath = adminpath;
 
-            $.get(formattedUrl, function(html) {
-                $('main.lmladminmain').html(html);
+            var req = function() {
+                var pageContent = (this.responseText);
+                document.querySelector('main.lmladminmain').innerHTML = pageContent;
+
+                var scripts = document.querySelectorAll('main.lmladminmain script');
+                for (var i = 0; i < scripts.length; i++) {
+                    eval.call(window, scripts[i].textContent);
+                }
+
+                if (this.responseURL.indexOf('rewrite') != -1) {
+                    var url = this.responseURL.substring(0, this.responseURL.indexOf('?'));
+                    that.pushHistory(url)
+                }
+
                 that.postload();
-            });
+            }
+
+            var oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", req);
+            oReq.open("GET", formattedUrl);
+            oReq.send();
         };  
 
         this.loadCurrentURL = function() {

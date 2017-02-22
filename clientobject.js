@@ -178,10 +178,14 @@ ClientObject.prototype.isLoggedIn = function () {
     return this.userinfo.loggedin;
 }
 
-ClientObject.prototype.redirect = function (path, perm) {
+ClientObject.prototype.redirect = function (path, perm, hash) {
     if (this.routeinfo.params.async) {
         path += (path.indexOf('?') === -1 ? "?" : "&") + "async=*";
         log('ClientObject', "Redirecting with async param : " + path);
+    }
+
+    if (hash) {
+        path += (path.indexOf('?') === -1 ? "?" : "&") + hash;
     }
 
     this.response.writeHead(perm ? 301 : 302, {

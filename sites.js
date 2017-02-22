@@ -84,11 +84,13 @@ var SiteInitializer = function (conf, siteobj) {
         var createIndices = function() {
             log('Database', 'Creating indices', 'info');
             db.createIndex(conf, "content", {title : 'text', content : 'text', subtitle : 'text'}, function() {
-                db.createIndex(conf, "content", {date : 1}, function() {
-                    db.createIndex(conf, "content", {date : -1}, function() {
-                        db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
-                            log('Database', 'Created indices', 'success');
-                            createCollections();
+                db.createIndex(conf, "styledpages", {slug : 1}, function() {
+                    db.createIndex(conf, "content", {date : 1}, function() {
+                        db.createIndex(conf, "content", {date : -1}, function() {
+                            db.createIndex(conf, 'entities', {username : "text", displayname : "text", email : "text"}, function() {
+                                log('Database', 'Created indices', 'success');
+                                createCollections();
+                            });
                         });
                     });
                 });
@@ -102,7 +104,7 @@ var SiteInitializer = function (conf, siteobj) {
 		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview",
         		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history",
 		        "lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations",
-		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges"
+		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges", "styledpages"
         	];
 
             db.createCollections(conf, collectionsNames, function() {

@@ -29,9 +29,9 @@ var LiveVars = function() {
         return livevars[name];
     };
 
-    this.pulloutLiveVar = function(levelStr) {
+    this.pulloutLiveVar = function(levelStr, deep) {
         var split = levelStr.split('.');
-        var curLevel = livevars[split[0]];
+        var curLevel = deep ? this.deepLivevars()[split[0]] : livevars[split[0]];
 
         for (var i = 1; i < split.length; i++) {
             curLevel = curLevel[split[i]];

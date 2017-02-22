@@ -1,0 +1,13 @@
+{#config;extra}
+
+<article id="{=extra.page.slug}" data-mi="{=extra.page._id}" class="styled-page-container">
+    <h1>{=&extra.page.title}</h1>
+    
+    <div id="article-section">
+        <div class="article-content styledpage-content" id="article-content">
+            <div id="article-text">
+                {=extra.page.content}
+            </div>
+        </div>
+    </div>
+</article>

@@ -3,5 +3,42 @@
 <lml:dom v="0.8" />
 
 <h1>Styled Page</h1>
-{=forms.render("styledpage_edit","edit","")}
+{=forms.render("styledpage_edit","edit","styledpages/get/?")}
 
+<script>
+    var styledPageID = liliumcms.pageloader.lastLevel;
+
+    var saveStyledPage = function() {
+        liliumcms.lmldom.sendForm(
+            liliumcms.lmldom.getFormData()["styledpage_edit"].values, 
+            "{=config.default.server.url}/admin/styledpages/edit/" + styledPageID, 
+            function(resp) {
+                if (resp.success) {
+                    liliumcms.notify({
+                        type : "success",
+                        title : "Styled page saved",
+                        message : ""
+                    });
+                } else {
+                    liliumcms.notify({
+                        type : "error",
+                        title : "Error saving styled page",
+                        message : resp.error
+                    });
+                }
+            }
+        );
+    };
+
+    var openStyledPage = function() {
+        var curObject = liliumcms.livevars.deepLivevars().styledpages.get[styledPageID]; 
+        var magiclink = curObject.magiclink;
+        var visibility = document.querySelector('select[name="status"]').value;
+        var slug = document.querySelector('input[name="slug"]').value;
+        
+        window.open("{=config.default.server.url}/" + slug + (visibility == "magiclink" ? ("?accesskey=" + magiclink) : ""));
+    };
+
+    document.querySelector('.btn-save').addEventListener('click', saveStyledPage);
+    document.querySelector('.btn-preview').addEventListener('click', openStyledPage);
+</script>
