@@ -156,7 +156,7 @@ var Handler = function () {
     };
 
     var notSupported = function (cli) {
-        cli.throwHTTP(405, 'Method Not Allowed');
+        cli.throwHTTP(405, 'Method Not Allowed : ' + cli.method, true);
     };
 
     var parseMethod = function (cli) {

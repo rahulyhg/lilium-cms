@@ -613,6 +613,10 @@ article .extra-content {
     display: block;
 }
 
+#article-content {
+    float: left;
+}
+
 article #article-content,
 article #article-content > p, 
 article #article-content > address, 
@@ -2108,6 +2112,10 @@ body.slidheader .android-sharer {
         transition: all 0.2s;
 
         z-index: 5;
+
+        background-color: #EEE;
+        padding: 5px 0;
+        border-top: 1px solid #CCC;
     }
 
     .category-top-link {
@@ -2120,6 +2128,10 @@ body.slidheader .android-sharer {
     .city-selector-wrapper,
     article .article-tags-wrapper {
         display: none;
+    }
+
+    #article-content {
+        float: none;
     }
 
     article > h1, 
