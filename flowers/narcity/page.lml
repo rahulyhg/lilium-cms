@@ -1,5 +1,7 @@
 {#config;extra}
 
+<style>{=extra.page.customcss}</style>
+
 <article id="{=extra.page.slug}" data-mi="{=extra.page._id}" class="styled-page-container">
     <h1>{=&extra.page.title}</h1>
     
@@ -11,3 +13,5 @@
         </div>
     </div>
 </article>
+
+<script>{=extra.page.customjs}</script>
