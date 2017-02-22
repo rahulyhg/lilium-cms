@@ -11,6 +11,7 @@ var fileserver = undefined;
 var cli = undefined;
 var admin = undefined;
 var Article = undefined;
+var styledpages = undefined;
 var Media = undefined;
 var imageSize = undefined;
 var themes = undefined;
@@ -76,6 +77,7 @@ var Core = function () {
         cli = require('./cli.js');
         admin = require('./backend/admin.js').init();
         Article = require('./article.js');
+        styledpages = require('./styledpages.js');
         Media = require('./media.js');
         imageSize = require('./imageSize.js');
         themes = require('./themes.js');
@@ -291,6 +293,7 @@ var Core = function () {
         tools.registerAdminEndpoint();
         conversations.registerAdminEndpoint();
         feed.registerAdminEndpoint();
+        styledpages.registerAdminEndpoint();
         history.registerEndpoints();
         Article.registerContentEndpoint();
 
@@ -401,6 +404,15 @@ var Core = function () {
             priority: 200,
             rights: ["manage-categories"],
             absURL: aurl + "categories",
+            children: []
+        });
+        admin.registerAdminMenu({
+            id: "styledpages",
+            faicon: "fa-paragraph",
+            displayname: "Styled Pages",
+            priority: 250,
+            rights: ["styled-pages"],
+            absURL: aurl + "styledpages/list",
             children: []
         });
         admin.registerAdminMenu({
@@ -642,6 +654,7 @@ var Core = function () {
     var loadLiveVars = function () {
         admin.registerLiveVar();
         Article.registerContentLiveVar();
+        styledpages.registerLiveVar();
         Media.registerMediaLiveVar();
         entities.registerLiveVars();
         plugins.registerLiveVar();
@@ -673,6 +686,7 @@ var Core = function () {
     };
 
     var initTables = function () {
+        styledpages.registerTable();
         require('./tableBuilder.js').init();
     }
 
@@ -689,6 +703,7 @@ var Core = function () {
         entities.init().registerCreationForm();
         LoginLib.registerLoginForm();
         Article.registerForms();
+        styledpages.registerForm();
         themes.registerForm();
         settings.registerForm();
         sites.registerForms();

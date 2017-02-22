@@ -1,0 +1,3 @@
+{#config;tableBuilder}
+<h1>Styled Pages</h1>
+{=tableBuilder.render("styledpages")}

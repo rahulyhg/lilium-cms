@@ -1,0 +1,7 @@
+{#config;forms}
+{*styledpages.get.{?1}}
+<lml:dom v="0.8" />
+
+<h1>Styled Page</h1>
+{=forms.render("styledpage_edit","edit","")}
+
