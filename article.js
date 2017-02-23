@@ -238,7 +238,7 @@ var Article = function() {
                                         kIndex++;
     
                                         if (kIndex == keys.length) {
-                                            hooks.fire('article_will_render', {
+                                            hooks.fire('article_will_fetch', {
                                                 _c : conf,
                                                 article: arr[0]
                                             });
@@ -308,7 +308,7 @@ var Article = function() {
 
     this.insertAds = function(_c, article, done, force) {
         if (article.isSponsored && !force) {
-            return done();
+            return done(article.content);
         }
 
         var pcount = _c.content.adsperp;
@@ -325,10 +325,10 @@ var Article = function() {
         jsdom.env(content, function(err, dom) {
             if (err) {
                 log("Article", "Error parsing dom : " + err, "err");
-                return done();
+                return done(content);
             }
 
-            var parags = dom.document.querySelectorAll("body > p, body > h3");
+            var parags = dom.document.querySelectorAll("body > p, body > h3, body > .lml-instagram-embed-wrapper, body > .lml-image-wrapper");
             for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
                 var adtag = dom.document.createElement('ad');
                 dom.document.body.insertBefore(adtag, parags[i]);
@@ -336,9 +336,12 @@ var Article = function() {
             }
 
             if (changed) {
-                log('Article', "Inserted ads inside article with title " + article.title, 'success');
                 content = dom.document.body.innerHTML;
-                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, done);
+                article.content = content;
+                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
+                    log('Article', "Inserted ads inside article with title " + article.title, 'success');
+                    done(content);
+                });
             } else {
                 done();
             }
@@ -375,7 +378,13 @@ var Article = function() {
                 extra.ctx = "article";
                 extra.article = deepArticle;
 
+                hooks.fire('article_will_render', {
+                    _c : _c,
+                    article: deepArticle
+                });
+
                 // Generate LML page
+console.log(extra.article.content);
                 filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
                     cb && cb({
                         success: true,
@@ -387,7 +396,10 @@ var Article = function() {
             if (deepArticle.hasads) {
                 gen();
             } else {
-                that.insertAds(_c, deepArticle, gen);
+                that.insertAds(_c, deepArticle, function(content) {
+                    deepArticle.content = content;
+                    gen();
+                });
             }
         });
     };
