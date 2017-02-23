@@ -283,24 +283,44 @@ var serveFeed = function(cli) {
         if (ex) {
             fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
         } else {
-            db.findToArray(cli._c, 'content', {status : "published"}, function(err, arr) {
-                var extra = {
-                    config : cli._c, 
-                    minify : false, 
-                    articles : arr
-                };
-
-                LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.rss", function() {
-                    log('RSS', 'Generated cached RSS feed for 1 hour');
-                    fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+            db.find(cli._c, 'content', {status : "published"}, [], function(err, cur) {
+                cur.project({date : 1, _id : 1}).sort({date : -1}).limit(10).toArray(function(err, arr) {
+                    var extra = {
+                        config : cli._c, 
+                        minify : false, 
+                        articles : []
+                    };
     
-                    setTimeout(function() {
-                        fileserver.deleteFile(cli._c.server.html + "/feed.rss", function() {
-                            log("RSS", "Deleted cached RSS", 'info');
-                        });
-                    }, 1000 * 60 * 60);
-                }, extra);
-            }, undefined, 0, 10);
+                    var index = 0;
+
+                    var getNext = function() {
+                        if (index == arr.length) {
+                            compile();
+                        } else {
+                            Article.deepFetch(cli._c, db.mongoID(arr[index]._id), function(fullart) {
+                                index ++;
+                                extra.articles.push(fullart);
+                                getNext();
+                            });
+                        }
+                    };
+
+                    var compile = function() {
+                        LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.rss", function() {
+                            log('RSS', 'Generated cached RSS feed for 1 hour');
+                            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+        
+                            setTimeout(function() {
+                                fileserver.deleteFile(cli._c.server.html + "/feed.rss", function() {
+                                    log("RSS", "Deleted cached RSS", 'info');
+                                });
+                            }, 1000 * 60 * 60);
+                        }, extra);
+                    };
+
+                    getNext();
+                });
+            });
         }
     });
 };

@@ -24,9 +24,11 @@
         <link>http:{=config.default.server.url}/{=art.name}</link>
         <pubDate>{=art.date}</pubDate>
 
-        <category><![CDATA[{=art.categories.0}]]></category>
+        <category>{=art.categories.0.displayname}</category>
+        <media:content url="{=art.featuredimage.0.sizes.thumbnaillarge.url}" medium="image">
+        <media:content url="{=art.featuredimage.0.sizes.thumbnaillarge.url}" type="image/jpg">
 
-        <description><![CDATA[{=art.subtitle}]]></description>
+        <description>{=art.subtitle}</description>
         <slash:comments>0</slash:comments>
     </item>
     {$ endfor; $}

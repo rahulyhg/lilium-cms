@@ -384,7 +384,6 @@ var Article = function() {
                 });
 
                 // Generate LML page
-console.log(extra.article.content);
                 filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
                     cb && cb({
                         success: true,
