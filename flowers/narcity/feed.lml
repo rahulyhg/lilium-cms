@@ -24,9 +24,7 @@
         <pubDate>{=art.date}</pubDate>
 
         <category>{=art.categories.0.displayname}</category>
-        <media:content url="{=config.default.server.protocol}{=art.featuredimage.0.sizes.thumbnaillarge.url}" medium="image" />
-
-        <description>{=art.subtitle}</description>
+        <description>{=config.default.server.protocol}{=art.featuredimage.0.sizes.thumbnaillarge.url}</description>
         <slash:comments>0</slash:comments>
     </item>
     {$ endfor; $}
