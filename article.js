@@ -620,7 +620,7 @@ var Article = function() {
             }, function() {});
         }
 
-        formData.author = db.mongoID(cli.userinfo.userid);
+        formData.author = formData.author ? db.mongoID(formData.author) : db.mongoID(cli.userinfo.userid);
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
         formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
