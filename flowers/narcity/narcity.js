@@ -497,8 +497,10 @@ var loadHooks = function(_c, info) {
         }
     });
 
-    endpoints.register(_c.id, 'feed', 'GET', function(cli) {
-        serveFeed(cli);
+    fileserver.deleteFile(_c.server.html + "/feed.rss", function() {
+        endpoints.register(_c.id, 'feed', 'GET', function(cli) {
+            serveFeed(cli);
+        });
     });
 
     hooks.bind('homepage_needs_refresh', 1, function(pkg) { needsHomeRefresh = true; });
