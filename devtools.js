@@ -11,13 +11,10 @@ var precomp = require('./precomp.js');
 var DevTools = function() {};
 
 var interpretLMLToCli = function(cli) {
-    LML.executeFromString(cli._c.server.base + "/backend/dynamic/admin/", cli.postdata.data.lml, function(html) {
+    LML2.compileToString(cli._c.id, cli.postdata.data.lml, {config : cli._c, fromClient : true}, function(html) {
         cli.sendJSON({
             html: html
         });
-    }, {
-        config : cli._c,
-        fromClient : true
     });
 };
 

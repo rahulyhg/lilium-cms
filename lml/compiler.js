@@ -724,6 +724,18 @@ class LMLCompiler {
 
         this.deal(ctx);
     };
+
+    compileToString(siteid, string, extra, cb) {
+        let streamSpoof = new (function() {
+            let strbuffer = "";
+            this.write = ((str) => { strbuffer += str; });
+            this.getBuffer = () => { return strbuffer; };
+        })();
+
+        this.compile(siteid, string, streamSpoof, extra, () => {
+            cb(streamSpoof.getBuffer());
+        });
+    };
 };
 
 module.exports = new LMLCompiler();
