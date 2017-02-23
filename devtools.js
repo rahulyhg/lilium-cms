@@ -295,8 +295,7 @@ var parseContentAds = function(cli) {
     var jsdom = require("jsdom");
     log('Devtools', 'Parsing ads for all articles', 'info');
     if (pcount) {
-        var adtag = "<ad></ad>";
-        db.findToArray(cli._c, 'content', {hasads : {$ne : true}}, function(err, arr) {
+        db.findToArray(cli._c, 'content', {}, function(err, arr) {
             var index = -1;
             var next = function() {
                 index++;

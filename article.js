@@ -306,8 +306,8 @@ var Article = function() {
         });
     };
 
-    this.insertAds = function(_c, article, done) {
-        if (article.isSponsored) {
+    this.insertAds = function(_c, article, done, force) {
+        if (article.isSponsored && !force) {
             return done();
         }
 
@@ -629,6 +629,11 @@ var Article = function() {
             formData.tagslugs = formData.tags.map(function(tagname) {
                 return slugify(tagname).toLowerCase();
             });
+        }
+
+        var maybecat = formData.categories;
+        if (maybecat && maybecat[0]) {
+            db.update(cli._c, 'categories', {name : maybecat[0]}, {lastused : new Date()}, function() {});
         }
 
         // Autosave
