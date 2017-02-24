@@ -183,7 +183,7 @@ body.menuopen #mobileslider {
 }
 
 header ~ .lbtop.willslide {
-    margin: 15px 0px;
+    margin: 30px 0px 15px;
     text-align: center;
     position: relative;
     top: 60px;
