@@ -183,7 +183,7 @@ body.menuopen #mobileslider {
 }
 
 header ~ .lbtop.willslide {
-    margin: 15px 0px;
+    margin: 30px 0px 15px;
     text-align: center;
     position: relative;
     top: 60px;
@@ -299,6 +299,7 @@ body.menuopen .narcity-header-bar {
     text-align: center;
     border-bottom: 1px solid #CCC;
     border-top: 1px solid #CCC;
+    margin-bottom: 5px;
 }
 
 .city-selector-wrapper {
@@ -493,6 +494,7 @@ article .article-share-arrow-wrapper .article-social-upward-arrow {
 /* Instagram embed */
 .lml-instagram-embed-wrapper {
     position: relative;
+    margin: 10px 0px;
 }
 
 article #article-content a.lml-instagram-op {

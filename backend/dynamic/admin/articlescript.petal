@@ -56,18 +56,24 @@
                 }
 
                 // You can't have a draft if article is published
-                if (content[0].status == 'published' || isAutoSave) {
+                if (content[0].status == 'published') {
                     $('form button[name=save]').hide();
-                    // $('form button[name=preview]').parent().removeClass('col-md-4').addClass('col-md-6');
-                    // $('form button[name=publish]').parent().removeClass('col-md-4').addClass('col-md-6');
                 }
 
-                if (content[0].recentversion) {
-                    lmlAlert('There is an autosaved version of this article <a href="{=config.default.server.url}/admin/article/edit/' + content[0].recentversion + '">here</a>', 'info', 'pencil');
+                if (content[0].status != "reviewing") {
+                    $('form button[name=refuse]').hide();
                 }
 
-                if (content[0].status == 'autosaved' && content[0].contentid) {
-                    // lmlAlert('You are editing an autosaved version of <a href="{=config.default.server.url}/admin/article/edit/' + content[0].contentid + '">this article</a>');
+                if (content[0].status == "published" || content[0].status == "reviewing") {
+                    $('form button[name=send]').hide();
+
+                    if (liliumcms.rights.hasRole('contributor')) {
+                        $('form button[name=save]').hide();
+                    }
+                }
+
+                if (!liliumcms.rights.hasRole('contributor')) {
+                    $('form button[name=send]').hide();
                 }
 
                 {$
@@ -150,6 +156,20 @@
             } else {
                 alert('There was an error destroying this post.');
             }
+        });
+    };
+
+    var sendForReview = function() {
+        $("#confirm-send-for-review .btn-primary").get(0).disabled = true;
+        $.post('{=config.default.server.url}/admin/article/sendforreview/' + contentid, {}, function() {
+            $('#confirm-send-for-review').modal('hide');
+            liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
+        });
+    };
+
+    var refuseReview = function() {
+        $.post('{=config.default.server.url}/admin/article/refusereview/' + contentid, {}, function() {
+            liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
         });
     };
 
@@ -357,6 +377,10 @@
             return false;
         });
 
+        $('.btn-send-for-review').bind('click', function() {
+            $('#confirm-send-for-review').modal('show');
+        });
+
         var publishCurrentArticle = function(e) {
             $('#confirm-publish').modal('hide');
 
@@ -422,6 +446,10 @@
         $('#confirm-destroy button.btn-danger').on('click', function() {
             destroyArticle();
         });
+
+        $('#confirm-send-for-review button.btn-primary').bind('click', sendForReview);
+        
+        $('.btn-refuse-review').bind('click', refuseReview);
     });
 </script>
 
@@ -447,6 +475,30 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+
+<div id="confirm-send-for-review" class="modal fade announcement" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">Send article for review</h4>
+            </div>
+            <div class="modal-body">
+                <p>Once your article is sent for review, you won't be able to modify it anymore. Proceed?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary">Send it!</button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
 
 <div id="confirm-unpublish" class="modal fade announcement" tabindex="-1" role="dialog">
     <div class="modal-dialog">
