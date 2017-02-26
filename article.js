@@ -60,8 +60,14 @@ var Article = function() {
             case 'save':
                 if (cli.hasRightOrRefuse("create-articles")) this.save(cli);
                 break;
+            case 'sendforreview':
+                if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli);
+                break;
+            case 'refusereview':
+                if (cli.hasRightOrRefuse("production")) this.refuseReview(cli);
+                break;
             case 'preview':
-                if (cli.hasRightOrRefuse("create-articles")) this.publish(cli, "preview");
+                if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview");
                 break;
             case 'destroy':
                 if (cli.hasRightOrRefuse("destroy-articles")) this.delete(cli, true);
@@ -281,6 +287,29 @@ var Article = function() {
         });
     };
 
+    this.sendForReview = function(cli) {
+        var cid = cli.routeinfo.path[3];
+        var conds = {
+            _id : db.mongoID(cid)
+        };
+
+        db.findUnique(cli._c, 'content', conds, function(err, article) {
+            if (cli.hasRight('editor') || cli.userinfo.userid == article.author.toString()) {
+                db.update(cli._c, 'content', conds, {status : "reviewing"}, function() {
+                    cli.sendJSON({changed : true});
+                });
+            } else {
+                cli.throwHTTP(401, true);
+            }
+        });
+    };
+
+    this.refuseReview = function(cli) {
+        db.update(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3]), status : "reviewing"}, {status : "draft"}, function() {
+            cli.sendJSON({success : true});
+        });
+    };
+
     this.addFeature = function(cli) {
         var featurename = cli.postdata.data.feature;
         var conds = {
@@ -325,7 +354,7 @@ var Article = function() {
         jsdom.env(content, function(err, dom) {
             if (err) {
                 log("Article", "Error parsing dom : " + err, "err");
-                return done(content);
+                return done(article.content);
             }
 
             var parags = dom.document.querySelectorAll("body > p, body > h3, body > .lml-instagram-embed-wrapper, body > .lml-image-wrapper");
@@ -396,7 +425,7 @@ var Article = function() {
                 gen();
             } else {
                 that.insertAds(_c, deepArticle, function(content) {
-                    deepArticle.content = content;
+                    deepArticle.content = content || deepArticle.content;
                     gen();
                 });
             }
@@ -412,8 +441,12 @@ var Article = function() {
             "preview" : "preview"
         }
 
+        if (pubCtx == "publish" && !cli.hasRight('publish-articles')) {
+            return cli.throwHTTP(403, true);
+        }
+
         var that = this;
-        if (cli.hasRight('publish-articles')) {
+        if (cli.hasRight('list-articles')) {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
             var oldSlug = "";
@@ -480,8 +513,8 @@ var Article = function() {
 
                                         if (pubCtx === "create") {
                                              if (oldSlug) {
-                                                db.update(_c, 'content', 
-                                                    {_id : db.mongoID(aid)}, 
+                                                db.update(cli._c, 'content', 
+                                                    {_id : db.mongoID(formData._id)}, 
                                                     {$push : {aliases : oldSlug}}, 
                                                 function() {
                                                     log('Article', 'Added alias for slug ' + oldSlug);
@@ -551,7 +584,7 @@ var Article = function() {
                                                         title : deepArticle.title,
                                                         subtitle : deepArticle.subtitle,
                                                         slug : deepArticle.name,
-                                                        image : deepArticle.featuredimage[0].sizes.featured.url,
+                                                        image : deepArticle.featuredimage[0].sizes.square.url,
                                                         authorname : deepArticle.authors[0].displayname,
                                                         authoravatar : deepArticle.authors[0].avatarURL
                                                     });
@@ -1126,7 +1159,7 @@ var Article = function() {
                     }
                 });
             }
-        }, ["publish"]);
+        });
 
         livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
             if (cli.hasRight("list-articles")) {
@@ -1275,19 +1308,29 @@ var Article = function() {
             })
             .add('publish-set', 'buttonset', { buttons : [{
                     'name' : 'save',
-                    'displayname': 'Save draft',
+                    'displayname': 'Save article',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default, btn-save']
+                    'classes': ['btn', 'btn-default', 'btn-save']
                 }, {
                     'name' : 'preview',
                     'displayname': 'Preview',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default, btn-preview']
+                    'classes': ['btn', 'btn-default', 'btn-preview']
                 }, {
                     'name' : 'publish', 
                     'displayname': 'Save and <b>Publish</b>',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default, btn-publish']
+                    'classes': ['btn', 'btn-default', 'btn-publish', 'role-author']
+                }, {
+                    'name' : 'send',
+                    'displayname' : 'Send for review',
+                    'type' : 'button',
+                    'classes': ["btn", "btn-default", "btn-send-for-review", "role-contributor"]
+                }, {
+                    'name' : 'refuse',
+                    'displayname' : 'Refuse review',
+                    'type' : 'button',
+                    'classes': ["btn", "btn-default", "btn-refuse-review", "role-production"]
                 }
             ]}
         );
@@ -1361,6 +1404,9 @@ var Article = function() {
                     }, {
                         value : "draft",
                         displayname : "Draft"
+                    }, {
+                        value : "reviewing",
+                        displayname : "Pending review"
                     }, {
                         value : "deleted",
                         displayname : "Deleted"

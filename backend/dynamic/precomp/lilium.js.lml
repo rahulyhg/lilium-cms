@@ -964,6 +964,25 @@ var LiliumCMS = function() {
         };
     };
 
+    var LMLRights = function() {
+        var roles;
+        
+        this.init = function() {
+            roles = liliumcms.session.current.roles;
+            this.createCSS();
+        };
+
+        this.createCSS = function() {
+            for (var i = 0; i < roles.length; i++) {
+                document.body.classList.add("role-" + roles[i]);
+            }
+        };
+
+        this.hasRole = function(role) {
+            return roles.indexOf(role) != -1;
+        };
+    };
+
     var Animator = function() {
         var that = this;
         this.slide = function() {
@@ -1028,6 +1047,7 @@ var LiliumCMS = function() {
             that.lmldom = new LMLDom();
             that.modals = new LMLModals();
             that.session = new LMLSession();
+            that.rights = new LMLRights();
             that.users = new LMLUsers();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
@@ -1113,6 +1133,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.conversations.fillChat();
         liliumcms.conversations.fillForms();
         liliumcms.lmldom.init();
+        liliumcms.rights.init();
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.multiselects.forEach(function(select) {

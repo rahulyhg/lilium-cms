@@ -16,20 +16,26 @@
  * Contributors : Samuel Rondeau-Millaire                                                                *
  * Description : Global styling for admin section of Lilium.                                             *
  * Documentation : http://liliumcms.com/docs                                                             *
+ *                                                                                                       *
  *********************************************************************************************************/
 {#config;debug}
 {$ 
-	actioncolor = "#9B59B6";
+    liliumcolor = "#9B59B6";
+
+	actioncolor = liliumcolor;
 	hovercolor =  "#A869C6";
 	activecolor = "#8B49A6";
 	siteurl = config.default.server.url;
+
 	fontcolor = "#111";
 	barcolor = "rgba(0,0,0,0.75)";
 	barcolorhover = "#656565";
+
 	infocolor = "#2980b9";
 	dangercolor = "#c0392b";
 	warningcolor = "#f1c40f";
 	successcolor = "#27af61";
+
 	topbarheight = "50px";
 	sidebarwidth = "200px";
 
@@ -206,7 +212,7 @@ html, body {
 	margin:0;
 
 	font-family: 'Raleway', sans-serif;
-	color: {=font-color};
+	color: {=fontcolor};
 }
 
 body {
@@ -247,10 +253,10 @@ body.lmlrendered {
   transition: all 0.2s;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #9B59B6;
+  background: {=liliumcolor};
 }
 ::-webkit-scrollbar-thumb:active {
-  background: #9B59B6;
+  background: {=liliumcolor};
 }
 ::-webkit-scrollbar-track {
   background: #ffffff;
@@ -1433,7 +1439,7 @@ header.admin-bar .navbar-default .navbar-nav  .notifications {
 }
 
 .btn-accept {
-    background-color: #9B59B6;
+    background-color: {=liliumcolor};
 }
 
 /* Leaflet */
@@ -1630,7 +1636,7 @@ fieldset.title legend {
     background: #fff;
 }
 .v_invalid_msg {
-    background: #A869C6;
+    background: {=hovercolor};
     color: #fff;
     width: fit-content;
     padding: 2px;
@@ -1878,7 +1884,7 @@ button.bigger {
 .post-create-back {
     margin-top: 10px;
     font-size: 18px;
-    color: #9B59B6;
+    color: {=liliumcolor};
     font-weight: 500;
     cursor: pointer;
 }
@@ -1886,7 +1892,7 @@ button.bigger {
 .post-create-back .fa {
     font-size: 16px;
     display: inline-block;
-    color: #9B59B6
+    color: {=liliumcolor};
 }
 
 
@@ -1934,7 +1940,7 @@ button.bigger {
 
 .article-history-button-wrapper button {
     padding: 6px 10px;
-    background-color: #9b59b6;
+    background-color: {=liliumcolor};
     color: #FFF;
     font-size: 14px;
     border-radius: 6px;
@@ -1998,7 +2004,12 @@ button.bigger {
     content: '\f06e';
 }
 
-.btn-publish::before {
+.btn-refuse-review::before {
+    content: '\f048';
+}
+
+.btn-publish::before,
+.btn-send-for-review::before {
     content: '\f1d9';
 }
 
@@ -2023,7 +2034,8 @@ button.bigger {
     margin: 30px;
 }
 
-#confirm-publish .modal-body::before {
+#confirm-publish .modal-body::before,
+#confirm-send-for-review .modal-body::before {
     content: '\f1d9';
     -webkit-animation: slowfloat 8s ease-in-out 2s infinite;
     -moz-animation: slowfloat 8s ease-in-out 2s infinite;
@@ -2082,6 +2094,15 @@ button.bigger {
 
     opacity: 1;
 }
+
+/* Roles */
+.lmladmin:not(.role-author):not(.role-lilium) .role-author { display: none; }
+.lmladmin:not(.role-editor):not(.role-lilium) .role-editor { display: none; }
+.lmladmin:not(.role-contributor):not(.role-lilium) .role-contributor { display: none; }
+.lmladmin:not(.role-production):not(.role-lilium) .role-production { display: none; }
+.lmladmin:not(.role-developer):not(.role-lilium) .role-developer { display: none; }
+.lmladmin:not(.role-admin):not(.role-lilium) .role-admin { display: none; }
+.lmladmin:not(.role-lilium) .role-lilium { display: none; }
 
 @-webkit-keyframes slowfloat {
     0%   { -webkit-transform: translate3d(0, 0px,  0); }
