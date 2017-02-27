@@ -6,3 +6,5 @@
 
 <meta property="og:url" content="{=config.default.server.url}/author/{=extra.archivedetails.slug}"/>
 <meta property="og:title" content="{=extra.archivedetails.displayname}" />
+
+<title>{=extra.archivedetails.displayname} - {=config.default.info.project}</title>
