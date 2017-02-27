@@ -572,7 +572,6 @@ var parseAds = function(pkg) {
     var indx = 0;
     var delimiter = "<ad></ad>";    
     var pos;
-    
     if (art.tags.indexOf('nsfw') == -1 && art.tags.indexOf('NSFW') == -1) {
         while ((pos = art.content.indexOf(delimiter)) != -1) {
             art.content = art.content.substring(0, pos) + '<div class="awrapper">' + pkg._c.contentadsnip[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);

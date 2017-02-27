@@ -30,13 +30,13 @@
 				<span>Modification count : </span><span id="moreinfo-modcount">0</span>
 			</div>
 
-            <div class="article-info-strip article-history-button-wrapper article-button-wrapper">
+            <div class="article-info-strip article-history-button-wrapper article-button-wrapper role-author">
                 <button onclick="loadArticleHistory();">
                     View history
                 </button>
             </div>
     
-            <div class="article-info-strip article-delete-button-wrapper article-button-wrapper">
+            <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
                 <button onclick="unpublishArticleModal()">
                         Unpublish
                 </button>
@@ -48,7 +48,7 @@
                 </button>
             </div>
             
-            <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper">
+            <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper role-author">
                 <button onclick="destroyArticleModal()">
                         Destroy
                 </button>
