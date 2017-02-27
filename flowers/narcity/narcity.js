@@ -211,6 +211,8 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 $search : mtc
             }
             break;      
+        case 'latests':
+            break;
         default:
             match['NONE'] = '$';
     }
@@ -337,6 +339,11 @@ var serveArchive = function(cli, archType) {
         }
     }
 
+    if (archType === "latests") {
+        tagName = "latests";
+        tagIndex = cli.routeinfo.path[1] || 1;
+    }
+
     if (isNaN(tagIndex)) {
         return cli.throwHTTP(404, 'NOT FOUND');
     }
@@ -360,7 +367,7 @@ var serveArchive = function(cli, archType) {
                 var extra = new Object();
                 extra.articles = articles;
                 extra.totalarticles = total;
-                extra.searchname = tagName;
+                extra.searchname = tagName || archType;
                 extra.indices = indices;
                 extra.currentpage = tagIndex;
                 extra.archivename = archType;
@@ -422,7 +429,7 @@ var loadHooks = function(_c, info) {
         });
     });
 
-    ["tags", "author", "category", "search"].forEach(function(archType) {
+    ["tags", "author", "category", "search", "latests"].forEach(function(archType) {
         endpoints.register(_c.id, archType, 'GET', function(cli) { serveArchive(cli, archType); }); 
     });
 

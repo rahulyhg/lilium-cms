@@ -965,6 +965,22 @@ $}
     margin-right: 10px;
 }
 
+.older-button-wrapper {
+    text-align: right;
+}
+
+.homepage .older-button-wrapper a {
+    display: inline-block;
+    padding: 8px 12px;
+    background-color: {=mc};
+    color: #fff;
+    font-family: "Oswald", sans-serif;
+    font-size: 16px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    text-align: center;
+}
+
 .article-thumbnail-details img {
     height: 32px;
     vertical-align: middle;
@@ -2090,6 +2106,10 @@ body.slidheader .android-sharer {
 
     .homepage {
         margin: 0 10px;
+    }
+
+    .homepage .older-button-wrapper a {
+        display: block;
     }
 
     article #article-content .lml-instagram-embed-wrapper {
