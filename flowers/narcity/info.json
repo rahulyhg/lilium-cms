@@ -101,6 +101,7 @@
         "page" : "page.lml",
         "home" : "homepage.lml",
         "search" : "archive.lml",
+        "latests" : "archive.lml",
         "archive" : "archive.lml",
         "author" : "archive.lml",
         "category" : "archive.lml",

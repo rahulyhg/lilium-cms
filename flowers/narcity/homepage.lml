@@ -6,7 +6,7 @@
 
 <main class="homepage">
     <div class="fwblock latest-content-wrapper">
-        <h4 class="article-section-title">Most recent</h4>
+        <h4 class="article-section-title"><a href="{=config.default.server.url}/latests">Most recent</a></h4>
   
         <div class="float-clear">
         {$ 
@@ -33,8 +33,8 @@
                             <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
                                 srcset="{=la.featuredimage.0.sizes.thumbnaillarge.url} 600w, {=la.featuredimage.0.sizes.thumbnailarchive.url} 380w"
                                 alt="{=&la.title}"
-                             />
-                            {$ if (?la.categories.0 != "") $}
+                            />
+                            {$ if (?la.categories.0 != ""); $}
                             <div class="article-cat-name">
                                 <a href="{=config.default.server.url}/category/{=la.categories.0}">
                                     {$ 
@@ -80,6 +80,9 @@
                 </script>
             {$ relindex += 1; 
         endfor; $}
+            <div style="float: none; clear: both;" class="older-button-wrapper">
+                <a href="{=config.default.server.url}/latests/2">Older articles</a>
+            </div>
         </div>
     </div>
 

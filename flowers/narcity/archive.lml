@@ -63,10 +63,18 @@ $}
     </div>
 
     <div class="archive-navigator float-wrapper">
+        {$
+            archiveport = "/";
+            archiveport += extra.archivename;
+
+            if (extra.archivename == "latests");
+                archiveport = "";
+            endif;
+        $}
         <ul>
             {$ for (arindex in extra.indices.pagenumbers); $}
                 <li {$ if (arindex == extra.currentpage); $} class="currentpage" {$ endif; $} >
-                    <a href="{=config.default.server.url}/{=extra.archivename}/{=tagslug}/{=arindex}">
+                    <a href="{=config.default.server.url}{=archiveport}/{=tagslug}/{=arindex}">
                         {=arindex}
                     </a>
                 </li>
