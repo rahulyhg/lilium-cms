@@ -12,6 +12,17 @@ var registeredLibraries = {
             context.writeToBuffer(str);
         };
     },
+    encodec : function(context) {
+        var entities = require('entities');
+        return {
+            encodeURI  : function(str) { return encodeURI(str); },
+            decodeURI  : function(str) { return decodeURI(str); },
+            encodeXML  : function(str) { return require('entities').encodeXML (str); },
+            encodeHTML : function(str) { return require('entities').encodeHTML(str); },
+            decodeXML  : function(str) { return require('entities').decodeXML (str); },
+            decodeHTML : function(str) { return require('entities').decodeHTML(str); } 
+        };
+    },
     badges : function(context) {
         var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
         return {
