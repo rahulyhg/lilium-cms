@@ -53,12 +53,12 @@ body.willfadein {
 .context-author #mcanvas ,
 .context-tags #mcanvas ,
 .context-search #mcanvas {
-    top: 40px;   
+    top: 40px;
 }
 
-.context-category #container, 
-.context-author #container, 
-.context-tags #container, 
+.context-category #container,
+.context-author #container,
+.context-tags #container,
 .context-search #container {
     margin-bottom: -40px;
 }
@@ -128,7 +128,7 @@ body.menuopen #mcanvas {
     overflow-y: auto;
 
     background-color: #FFF;
-    
+
     -webkit-transform: translate3d(-280px, 0, 0);
    -moz-transform: translate3d(-280px, 0, 0);
     -ms-transform: translate3d(-280px, 0, 0);
@@ -142,7 +142,7 @@ body.menuopen #mcanvas {
         transition: all 0.2s;
 
     opacity: 0;
-    
+
     padding-bottom: 15px;
 }
 
@@ -367,19 +367,19 @@ body.menuopen .narcity-header-bar {
     margin-top: 8px;
 }
 
-.header-search::-webkit-input-placeholder { 
+.header-search::-webkit-input-placeholder {
     color: #FFF;
     opacity: 1;
 }
-.header-search:-moz-placeholder { 
+.header-search:-moz-placeholder {
     color: #FFF;
     opacity: 1;
 }
-.header-search::-moz-placeholder { 
+.header-search::-moz-placeholder {
     color: #FFF;
     opacity: 1;
 }
-.header-search:-ms-input-placeholder { 
+.header-search:-ms-input-placeholder {
     color: #FFF;
     opacity: 1;
 }
@@ -452,7 +452,7 @@ article .article-published-date {
 article .article-author-strip .article-author-face {
     width: 50px;
     height: 50px;
-    
+
     border-radius: 50px;
     margin-right: 6px;
 }
@@ -543,7 +543,7 @@ article .featured-image-wrapper {
     font-size: 14px;
 }
 
-article #article-content .lml-image-wrapper span, 
+article #article-content .lml-image-wrapper span,
 article #article-content .lml-image-wrapper a {
     color: #AAA;
     font-weight: bold;
@@ -627,8 +627,8 @@ article .extra-content {
 }
 
 article #article-content,
-article #article-content > p, 
-article #article-content > address, 
+article #article-content > p,
+article #article-content > address,
 article #article-content > div,
 article .extra-content p,
 article .extra-content div {
@@ -667,7 +667,7 @@ article > h1 {
     line-height: 1.3em;
     color: #121212;
     line-height: 46px;
-        
+
     width: {=fw};
 }
 
@@ -696,7 +696,7 @@ article > h2 {
 }
 
 .sponsored-mention {
-    color: #FFF;
+    color: #FFF !important;
     background-color: #ff2634;
     font-size: 15px;
     padding: 3px 5px;
@@ -704,10 +704,20 @@ article > h2 {
     letter-spacing: -0.3px;
     border-radius: 4px;
     text-decoration: none;
+    font-family: Arial, sans-serif;
+}
+
+.sponsored-mention-article{
     position: absolute;
     right: 0px;
     top: 16px;
-    font-family: Arial, sans-serif;
+}
+
+.sponsored-mention-archive, .sponsored-mention-hp{
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    border-top-right-radius: 0px;
 }
 
 article #article-content img {
@@ -773,7 +783,7 @@ article .article-signature-bio {
     font-family: Arial,sans-serif;
     margin-top: 6px;
     text-align: justify;
-    line-height: 1.7;    
+    line-height: 1.7;
     font-size: 14px;
 }
 
@@ -781,11 +791,11 @@ article #article-content .article-signature-bio h3 {
     font-size: 15px;
     margin-top: -12px;
     padding-top: 0;
-    font-family: Arial;    
+    font-family: Arial;
     display: block;
     color: #999;
     font-weight: 700;
-}   
+}
 
 article .article-more-from-wrapper {
     width: {=aw};
@@ -806,7 +816,7 @@ article .article-more-from-list li {
     line-height: 22px;
 }
 
-article .article-more-from-list li a, 
+article .article-more-from-list li a,
 article .article-more-from-list li a {
     color: {=mc};
     text-decoration: none;
@@ -899,7 +909,7 @@ article .article-related-section {
 article .article-related-section a {
     color: #111;
     text-decoration: none;
-}   
+}
 
 article .article-related-section .article-thumbnail {
     border: 1px solid #D9D9D9;
@@ -982,7 +992,7 @@ $}
     display: none;
 }
 
-.article-thumbnail-featured .article-thumbnail-subtitle {  
+.article-thumbnail-featured .article-thumbnail-subtitle {
     display: block;
 }
 
@@ -1060,7 +1070,7 @@ $}
 .homepage .suggestions-wrapper {
     padding: 10px 0 10px 10px;
     background-color: #F2F2F2;
-    
+
     border-top: 1px solid #D9D9D9;
     border-bottom: 1px solid #D9D9D9;
     margin: 10px auto 20px auto;
@@ -1075,12 +1085,12 @@ $}
     text-align: center;
     text-transform: uppercase;
     font-weight: normal;
-    
+
     display : inline-block;
 }
 
 .homepage .article-thumbnail-featured-image {
-    position : relative; 
+    position : relative;
 }
 
 .homepage .article-thumbnail .article-cat-name a {
@@ -1103,13 +1113,13 @@ $}
 .str-adunit.str-card-exp {
     padding: 0 !important;
     margin: 0 !important;
-}   
+}
 
 .str-adunit.str-card-exp h2 {
     text-align: left;
     margin-left: 15px;
     margin-top: 0px;
-}   
+}
 
 .str-adunit.str-card-exp .thumbnail-wrapper {
     margin-left: 15px !important;
@@ -1183,7 +1193,7 @@ h1.article__title.str-title {
 
 .slider-follow a {
     display: block;
-    text-decoration: none;   
+    text-decoration: none;
     margin: 10px 15px;
 }
 
@@ -1264,7 +1274,7 @@ h1.article__title.str-title {
     display: block;
     text-align: center;
     border-top: 1px solid #DDD;
-    background-color: #EEE;    
+    background-color: #EEE;
 }
 
 .archive-navigator ul li {
@@ -1302,6 +1312,7 @@ article.archive-article .archive-article-thumb {
     height: 250px;
     width: 100%;
     display: block;
+    position:relative;
 
     background-position: center center;
     background-size: cover;
@@ -1309,7 +1320,6 @@ article.archive-article .archive-article-thumb {
 
 article.archive-article .archive-article-thumb a {
     display: block;
-    height: 100%;
     cursor: pointer;
 }
 
@@ -1336,7 +1346,7 @@ article.archive-article h3 a {
     text-align: left;
 }
 
-.article-author-link:visited, 
+.article-author-link:visited,
 .article-author-link {
     color : {=mc};
     text-decoration: none;
@@ -1361,7 +1371,7 @@ article.archive-article h3 a {
 
     border-bottom: 1px solid #E6E6E6;
     box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
-}   
+}
 
 .archive-article-list .empty-result-message {
     font-size: 28px;
@@ -1396,7 +1406,7 @@ article.archive-article h3 a {
 .archive-author-avatar-wrapper {
     display: inline-block;
     vertical-align: top;
-}   
+}
 
 .archive-author-avatar-wrapper .archive-author-avatar {
     background-size: cover;
@@ -1499,7 +1509,7 @@ article #article-content #sponsored-box-content h5 {
 }
 
 article #article-content #sponsored-box-content h5 a {
-    text-decoration: none; 
+    text-decoration: none;
     color: {=mc};
     display: block;
     font-family: Arial;
@@ -1801,7 +1811,7 @@ footer .copyright a {
 .pc-sharer-network i {
     margin-top: 17px;
     display: block;
-    text-align: center;   
+    text-align: center;
 }
 
 .pc.slidheader.upnext-slid .pc-sharer-network.shown {
@@ -1919,7 +1929,7 @@ footer .copyright a {
 }
 
 #android-sharer-buttons h3 {
-    margin-left: 20px;   
+    margin-left: 20px;
 }
 
 #android-sharer-buttons ul {
@@ -2148,11 +2158,11 @@ body.slidheader .android-sharer {
         float: none;
     }
 
-    article > h1, 
-    article > h2, 
-    article #article-content, 
-    article .article-more-from-wrapper, 
-    article .article-tags-wrapper, 
+    article > h1,
+    article > h2,
+    article #article-content,
+    article .article-more-from-wrapper,
+    article .article-tags-wrapper,
     article .article-comments,
     article .extra-content,
     .article-width,
@@ -2176,7 +2186,7 @@ body.slidheader .android-sharer {
     }
 
     .bottom-promotion-link {
-        border-left: none;  
+        border-left: none;
         border-right: none;
     }
 
@@ -2209,7 +2219,7 @@ body.slidheader .android-sharer {
         width: auto;
         display: block;
         overflow: hidden;
-    }   
+    }
 
     .article-share-count-mobile {
         display: none; /* Will appear if shares are higher than 100 */
@@ -2254,7 +2264,7 @@ body.slidheader .android-sharer {
         padding: 0px 20px 0px;
         margin-bottom: 20px;
     }
-    
+
     article h3, article h4, article h5, article h6 {
         padding: 0px 20px;
     }
@@ -2343,7 +2353,7 @@ body.slidheader .android-sharer {
         font-size: 14px;
         margin-bottom: 20px;
     }
-    
+
     article .article-digest-sub .events-placeholder__email-input {
         display: block;
         margin: auto;
@@ -2352,7 +2362,7 @@ body.slidheader .android-sharer {
     article .article-digest-sub .events-placeholder__submit-button {
         margin-top: 10px;
         font-size: 14px;
-    }  
+    }
 
     h4.article-section-title {
         font-family: Oswald, sans-serif;

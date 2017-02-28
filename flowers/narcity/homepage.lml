@@ -1,5 +1,6 @@
 {#config;extra;theme;debug;category;date}
 
+<script src="//localhost:8080/bower/timeago.js/dist/timeago.js"></script>
 <script>
     window.lmlhomelinks = [];
 </script>
@@ -7,39 +8,44 @@
 <main class="homepage">
     <div class="fwblock latest-content-wrapper">
         <h4 class="article-section-title">Most recent</h4>
-  
+
         <div class="float-clear">
-        {$ 
+        {$
             relindex = 0;
-            for (la in extra.latests); 
-            
+            for (la in extra.latests);
+
                 classes = "article-thumbnail";
-                if (relindex == 0); 
-                    classes += " article-thumbnail-featured"; 
+                if (relindex == 0);
+                    classes += " article-thumbnail-featured";
                 endif;
                 if (relindex > 2);
                     classes += " article-thumbnail-margined";
                 endif;
-            
-                mod = relindex; 
-                mod %= 3; 
-                if (mod == 0); 
+
+                mod = relindex;
+                mod %= 3;
+                if (mod == 0);
             $}
                 </div><div class="float-clear">
             {$ endif; $}
                 <div class="{=classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
-                        <a href="{=config.default.server.url}/{=la.name}"> 
+                        <a href="{=config.default.server.url}/{=la.name}">
                             <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
                                 srcset="{=la.featuredimage.0.sizes.thumbnaillarge.url} 600w, {=la.featuredimage.0.sizes.thumbnailarchive.url} 380w"
                                 alt="{=&la.title}"
                              />
+                            {$ if (?la.isSponsored ??); $}
+                            <a class="sponsored-mention sponsored-mention-hp" href="https://www.narcitymedia.com" target="_blank">
+                                Sponsored Content
+                            </a>
+                            {$ endif; $}
                             {$ if (?la.categories.0 != "") $}
                             <div class="article-cat-name">
                                 <a href="{=config.default.server.url}/category/{=la.categories.0}">
-                                    {$ 
+                                    {$
                                         slug = la.categories.0;
-                                        ccat = category.getCatName(slug); 
+                                        ccat = category.getCatName(slug);
                                     $}
                                     {=ccat}
                                 </a>
@@ -56,7 +62,7 @@
                         </a>
                     </div>
                     <div class="article-thumbnail-title">
-                        <a href="{=config.default.server.url}/{=la.name}"> 
+                        <a href="{=config.default.server.url}/{=la.name}">
                             {=la.title}
                         </a>
                     </div>
@@ -67,7 +73,8 @@
                         <img src="{=la.author.avatarURL}" />
                         <span><a href="{=config.default.server.url}/author/{=la.author.slug}" class="article-thumbnail-author">
                             {=la.author.displayname}
-                        </a> &middot; {=date.stringify(la.date,"short")}</span>
+                          </a> &middot; <span class="need_to_be_rendered" datetime="{= la.date }">{= date.stringify(la.date, "short")}</span>
+                        </span>
                     </div>
                 </div>
                 <script>
@@ -78,7 +85,7 @@
                     window.lmlhomelinks.push(nPage);
                     document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
                 </script>
-            {$ relindex += 1; 
+            {$ relindex += 1;
         endfor; $}
         </div>
     </div>
@@ -101,21 +108,21 @@
             {$ for (sa in section.articles); $}
                 {$
                     classes = "article-thumbnail";
-                    if (relindex == 0); 
-                        classes += " article-thumbnail-featured"; 
+                    if (relindex == 0);
+                        classes += " article-thumbnail-featured";
                     endif;
                     if (relindex > 2);
                         classes += " article-thumbnail-margined";
                     endif;
 
-                    mod = relindex; 
-                    mod %= 3; 
+                    mod = relindex;
+                    mod %= 3;
 
-                    if (mod == 0); 
+                    if (mod == 0);
                 $}
                     </div><div class="float-clear">
                 {$ endif; $}
-                <a href="{=config.default.server.url}/{=sa.name}" id="art{=sa._id}"> 
+                <a href="{=config.default.server.url}/{=sa.name}" id="art{=sa._id}">
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
                             <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
@@ -127,8 +134,8 @@
                             </div>
                         </div>
                         <div class="article-thumbnail-title">
-                            {=sa.title}
                         </div>
+                        {=sa.title}
                         <div class="article-thumbnail-subtitle">
                             {=sa.subtitle}
                         </div>
@@ -136,7 +143,8 @@
                             <img src="{=sa.author.avatarURL}" />
                             <span><a href="{=config.default.server.url}/author/{=sa.author.slug}" class="article-thumbnail-author">
                                 {=sa.author.displayname}
-                            </a> &middot; {=date.stringify(sa.date)}</span>
+                              </a> &middot; <span class="need_to_be_rendered" datetime="{= sa.date }">{= date.stringify(sa.date, "short")}</span>
+                          </span>
                         </div>
                     </div>
                 </a>
@@ -148,7 +156,7 @@
                     window.lmlhomelinks.push(nPage);
                     document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
                 </script>
-                {$ relindex += 1; 
+                {$ relindex += 1;
             endfor; $}
             </div>
         </div>
@@ -166,6 +174,10 @@
     </div-->
 </main>
 
+<script>
+    new timeago().render(document.querySelectorAll('.need_to_be_rendered'));
+</script>
+
 <lml:template id="lmltemplate-native">
-    
+
 </lml:template>

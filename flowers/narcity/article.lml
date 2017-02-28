@@ -10,7 +10,7 @@ $}
 <article id="{=extra.article.name}" data-mi={=extra.article._id}>
     {$ if (?extra.article.isSponsored ??); $}
     <div class="title-sponsored-wrapper">
-        <a class="sponsored-mention" href="https://www.narcitymedia.com" target="_blank">
+        <a class="sponsored-mention sponsored-mention-article" href="https://www.narcitymedia.com" target="_blank">
             Sponsored Content
         </a>
     </div>
@@ -22,7 +22,7 @@ $}
         </a>
     </div>
     <h1>{=&extra.article.title}</h1>
-    <h2>{=&extra.article.subtitle}</h2>   
+    <h2>{=&extra.article.subtitle}</h2>
 
     {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper">
@@ -31,9 +31,9 @@ $}
             <span class="article-share-icon">
                 <img src="{=config.default.server.url}/res/images/flame.png" />
             </span>
-            <span class="article-share-count-mobile-num fbshare" 
-                  data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" 
-                  data-min="100" 
+            <span class="article-share-count-mobile-num fbshare"
+                  data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}"
+                  data-min="100"
                   data-show="article-share-count-mobile" data-showas="block">
                       0
             </span>
@@ -46,7 +46,7 @@ $}
         <a href="{=extra.article.featuredimagelink}">@{=?extra.article.featuredimageartist}</a>
     </div>
     {$ endif; $}
-    
+
     <div id="article-section">
         <div id="article-side">
             {=theme.settings.sidetop}
@@ -54,7 +54,7 @@ $}
             {=theme.settings.sidebottom}
         </div>
 
-        {$ if (?author.displayname); $} 
+        {$ if (?author.displayname); $}
         <div class="article-author-strip">
             <div class="article-author-share-section invisible no-mobile" id="article-share-section">
                 <div class="article-share-count-wrapper topvert">
@@ -67,8 +67,8 @@ $}
             </div>
             <div class="article-author-face-section">
                 <img src="{=author.avatarURL}" class="article-author-face midvert" />
-            
-                <a href="{=url}/author/{=author.slug}" class="article-author-link">  
+
+                <a href="{=url}/author/{=author.slug}" class="article-author-link">
                     <span class="article-author-displayname midvert">{=author.displayname}</span>
                 </a>
                 <span class="midvert">&middot;</span>
@@ -104,19 +104,20 @@ $}
 
             {$ if (extra.article.useSponsoredBox == true); $}
             <div id="sponsored-box">
-                <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" /> 
+                <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" />
                 <div id="sponsored-box-content">
+                    <p><strong>Presented by</strong></p>
                     <h5><a target="_blank" href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
                     <p>
                         {=?extra.article.sponsoredBoxContent}
                     </p>
                 </div>
             </div>
-            {$ endif; $}    
+            {$ endif; $}
 
             {$ if (extra.article.categories.0.name == "best-of-mtl"); $}
             <div class="bottom-promotion-link">
-                <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's 
+                <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's
                 <a href="{=config.default.server.url}/category/best-of-mtl" target="_blank">&quot;Best Of&quot; lists</a>;
                 furthermore, this list represents a showcase of great spots, and is not a numbered ranking.
             </div>
@@ -124,7 +125,7 @@ $}
 
             {$ if (extra.article.isSponsored == true); $}
             <div class="bottom-promotion-link">
-                This article is part of a sponsored content activation. 
+                This article is part of a sponsored content activation.
                 <a href="https://www.narcitymedia.com" target="_blank">
                     Learn how we can promote your company &gt;
                 </a>
@@ -135,14 +136,14 @@ $}
                 {=theme.settings.afterarticle}
             {$ endif; $}
 
-            {$ if (?author.displayname); $} 
+            {$ if (?author.displayname); $}
             <div class="article-signature">
                 <div class="article-signature-face-wrapper">
                     <img src="{=author.avatarURL}" class="article-signature-face" />
                 </div>
                 <div class="article-signature-details-wrapper">
                     <span class="article-signature-name">
-                        <a href="{=url}/author/{=author.slug}">  
+                        <a href="{=url}/author/{=author.slug}">
                             {=author.displayname}
                         </a>
                     </span>
@@ -150,7 +151,7 @@ $}
                         {=?author.description}
                     </span>
                 </div>
-            </div>  
+            </div>
             {$ endif; $}
         </div>
     </div>
@@ -158,26 +159,26 @@ $}
 
     <!--div class="article-comments no-mobile">
         <h4 class="article-section-title">Join the discussion</h4>
-        <div class="fb-comments" 
-            data-href="{=rooturl}/{=extra.article.name}" data-numposts="3" 
+        <div class="fb-comments"
+            data-href="{=rooturl}/{=extra.article.name}" data-numposts="3"
             style="width:100%;" data-width="100%">
         </div>
     </div-->
 
     <!--div class="article-digest-sub no-mobile">
-        <form 
-            action="//mtlblog.us6.list-manage.com/subscribe/post?u=ae98e848ab712838adcc7f456&amp;id={=theme.settings.mailchimpdigest}" 
-            method="post" 
-            id="mc-embedded-subscribe-form" 
-            name="mc-embedded-subscribe-form" 
-            class="events-placeholder" 
-            target="_blank" 
+        <form
+            action="//mtlblog.us6.list-manage.com/subscribe/post?u=ae98e848ab712838adcc7f456&amp;id={=theme.settings.mailchimpdigest}"
+            method="post"
+            id="mc-embedded-subscribe-form"
+            name="mc-embedded-subscribe-form"
+            class="events-placeholder"
+            target="_blank"
             novalidate>
 
             <label for="events-placeholder__email-input" class="events-placeholder__title">
                 {=config.default.website.sitetitle} daily, in your inbox
             </label>
-            <input type="email" value="" name="EMAIL" class="events-placeholder__email-input" id="mce-EMAIL" 
+            <input type="email" value="" name="EMAIL" class="events-placeholder__email-input" id="mce-EMAIL"
                 placeholder="email address" required>
                 <div style="position: absolute; left: -5000px;">
                 <input type="text" name="b_ae98e848ab712838adcc7f456_851c62c913" tabindex="-1" value="">
@@ -252,7 +253,7 @@ false
 
 var execOnLoad = document.querySelectorAll("script.execOnLoad");
 for (var i = execOnLoad.length - 1; i >= 0; i--) {
-     execOnLoad[i].remove(); 
+     execOnLoad[i].remove();
 }
 
 window.currentPageIndex = 0;
