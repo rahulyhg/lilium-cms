@@ -426,6 +426,17 @@ var LMLDom = function() {
         }
     };
 
+    this.fillStackTable = function(stacktable, data) {
+        var sInfo = stacktable.getInfo();
+        var fieldname = sInfo.fieldname;
+        var fullData = data[fieldname];
+
+        if (fullData) {
+            var keys = Object.keys(fullData);
+            stacktable.appendRow(data);
+        }
+    };
+
     this.fillForm = function(domForm) {
         var livevarsource = domForm.dataset.livevarsource.replace('?', liliumcms.pageloader.lastLevel);
         var livevardata = liliumcms.livevars.pulloutLiveVar(livevarsource, true);
@@ -433,6 +444,11 @@ var LMLDom = function() {
         var fields = domForm.querySelectorAll('input, select, textarea');
         for (var i = 0; i < fields.length; i++) {
             this.fillField(fields[i], livevardata);
+        }
+
+        var stacktables = liliumcms.getStacktables();
+        for (var i = 0; i < stacktables.length; i++) {
+            this.fillStackTable(stacktables[i], livevardata);
         }
 
         domForm.dataset.filled = true;
@@ -471,6 +487,7 @@ var LMLDom = function() {
 
     this.getFormData = function(form) {
         var forms = form ? [form] : document.querySelectorAll('#lml-main form');
+        var stacktables = liliumcms.getStacktables();
         var data = {};
 
         for (var f = 0; f < forms.length; f++) {
@@ -479,11 +496,41 @@ var LMLDom = function() {
                 form : forms[f]
             }
 
+            // Normal fields loop
             for (var i = 0; i < ff.form.length; i++) {
-                if (CKEDITOR.instances[ff.form[i].name]) {
+                if (ff.form[i].classList.contains("stacktable-field")) {
+                    continue;
+                } else if (CKEDITOR.instances[ff.form[i].name]) {
                     ff.values[ff.form[i].name] = CKEDITOR.instances[ff.form[i].name].getData();
                 } else {
                     ff.values[ff.form[i].name] = ff.form[i].value;
+                }
+            }
+
+            // Stack tables
+            for (var i = 0; i < stacktables.length; i++) {
+                ff.values[stacktables[i].getInfo().fieldname] = stacktables[i].getData();
+            }
+
+            // Deep JSONing
+            var fieldnames = Object.keys(ff.values);
+            for (var i = 0; i < fieldnames.length; i++) {
+                var n = fieldnames[i];
+
+                if (!n || n == "form_name") {
+                    delete ff.values[n];
+                } else if (n.indexOf('.') != -1) {
+                    var levels = n.split('.');
+                    var finalvalue = ff.values[n];
+                    var values = ff.values;
+                    
+                    for (var j = 0; j < levels.length - 1; j++) {
+                        values[levels[j]] = values[levels[j]] || {};
+                        values = values[levels[j]];
+                    }
+
+                    values[levels[levels.length-1]] = finalvalue;
+                    delete ff.values[n];
                 }
             }
 
