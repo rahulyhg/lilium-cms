@@ -136,8 +136,8 @@
                             </div>
                         </div>
                         <div class="article-thumbnail-title">
+                            {=sa.title}
                         </div>
-                        {=sa.title}
                         <div class="article-thumbnail-subtitle">
                             {=sa.subtitle}
                         </div>
