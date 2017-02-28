@@ -28,6 +28,10 @@
     box-shadow: 3px 0px 0px rgba(0,0,0,0.08);
 }
 
+#chat-participants-list::-webkit-scrollbar {
+    display: none;
+}
+
 #chat-slider.left {
     -webkit-transform: translate3d(0, 0, 0);
        -moz-transform: translate3d(0, 0, 0);

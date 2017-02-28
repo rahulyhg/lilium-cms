@@ -1,0 +1,18 @@
+{#config}
+<div id="lml-imagestudio">
+    <div id="lmlis-canvas">
+        
+    </div>
+
+    <div id="lmlis-toolbar">
+        <div id="lmlis-preview-wrapper">
+            <img id="lmlis-preview-thumb" src />
+        </div>
+
+        <div id="lmlis-sizes-list">
+            <ul>
+                
+            </ul>
+        </div>
+    </div>
+</div>
