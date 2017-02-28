@@ -23,7 +23,7 @@ $}
                 {$ endif; $}
 
                 <div class="archive-author-details-wrapper">
-                    {$ 
+                    {$
                         if (?details.displayname == "");
                             details.displayname = details.username;
                         endif;
@@ -55,6 +55,12 @@ $}
             <div class="artpad">
                 <div class="archive-article-thumb" style="background-image: url('{=article.featuredimage.0.sizes.thumbnaillarge.url}')">
                     <a href="{=config.default.server.url}/{=article.name}"></a>
+                    {$ if (?article.isSponsored ??); $}
+                    <a class="sponsored-mention sponsored-mention-archive" href="https://www.narcitymedia.com" target="_blank">
+                        Sponsored Content
+                    </a>
+                    {$ endif; $}
+
                 </div>
                 <h3><a href="{=config.default.server.url}/{=article.name}">{=article.title}</a></h3>
             </div>
