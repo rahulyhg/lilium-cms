@@ -60,8 +60,14 @@ var Article = function() {
             case 'save':
                 if (cli.hasRightOrRefuse("create-articles")) this.save(cli);
                 break;
+            case 'sendforreview':
+                if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli);
+                break;
+            case 'refusereview':
+                if (cli.hasRightOrRefuse("production")) this.refuseReview(cli);
+                break;
             case 'preview':
-                if (cli.hasRightOrRefuse("create-articles")) this.publish(cli, "preview");
+                if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview");
                 break;
             case 'destroy':
                 if (cli.hasRightOrRefuse("destroy-articles")) this.delete(cli, true);
@@ -238,7 +244,7 @@ var Article = function() {
                                         kIndex++;
     
                                         if (kIndex == keys.length) {
-                                            hooks.fire('article_will_render', {
+                                            hooks.fire('article_will_fetch', {
                                                 _c : conf,
                                                 article: arr[0]
                                             });
@@ -281,6 +287,29 @@ var Article = function() {
         });
     };
 
+    this.sendForReview = function(cli) {
+        var cid = cli.routeinfo.path[3];
+        var conds = {
+            _id : db.mongoID(cid)
+        };
+
+        db.findUnique(cli._c, 'content', conds, function(err, article) {
+            if (cli.hasRight('editor') || cli.userinfo.userid == article.author.toString()) {
+                db.update(cli._c, 'content', conds, {status : "reviewing"}, function() {
+                    cli.sendJSON({changed : true});
+                });
+            } else {
+                cli.throwHTTP(401, true);
+            }
+        });
+    };
+
+    this.refuseReview = function(cli) {
+        db.update(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3]), status : "reviewing"}, {status : "draft"}, function() {
+            cli.sendJSON({success : true});
+        });
+    };
+
     this.addFeature = function(cli) {
         var featurename = cli.postdata.data.feature;
         var conds = {
@@ -306,9 +335,9 @@ var Article = function() {
         });
     };
 
-    this.insertAds = function(_c, article, done) {
-        if (article.isSponsored) {
-            return done();
+    this.insertAds = function(_c, article, done, force) {
+        if (article.isSponsored && !force) {
+            return done(article.content);
         }
 
         var pcount = _c.content.adsperp;
@@ -325,10 +354,10 @@ var Article = function() {
         jsdom.env(content, function(err, dom) {
             if (err) {
                 log("Article", "Error parsing dom : " + err, "err");
-                return done();
+                return done(article.content);
             }
 
-            var parags = dom.document.querySelectorAll("body > p, body > h3");
+            var parags = dom.document.querySelectorAll("body > p, body > h3, body > .lml-instagram-embed-wrapper, body > .lml-image-wrapper");
             for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
                 var adtag = dom.document.createElement('ad');
                 dom.document.body.insertBefore(adtag, parags[i]);
@@ -336,9 +365,12 @@ var Article = function() {
             }
 
             if (changed) {
-                log('Article', "Inserted ads inside article with title " + article.title, 'success');
                 content = dom.document.body.innerHTML;
-                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, done);
+                article.content = content;
+                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
+                    log('Article', "Inserted ads inside article with title " + article.title, 'success');
+                    done(content);
+                });
             } else {
                 done();
             }
@@ -368,30 +400,7 @@ var Article = function() {
         });
     };
 
-    this.generateArticle = function(_c, aid, cb) {
-        that.deepFetch(_c, db.mongoID(aid), function(deepArticle) {
-            var gen = function() {
-                var extra = new Object();
-                extra.ctx = "article";
-                extra.article = deepArticle;
-
-                // Generate LML page
-                filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
-                    cb && cb({
-                        success: true,
-                        dbdata : deepArticle
-                    });
-                });
-            };
-
-            if (deepArticle.hasads) {
-                gen();
-            } else {
-                that.insertAds(_c, deepArticle, gen);
-            }
-        });
-    };
-
+    
     this.publish = function(cli, pubCtx) {
         cli.touch('article.new');
         pubCtx = pubCtx || "create";
@@ -401,8 +410,12 @@ var Article = function() {
             "preview" : "preview"
         }
 
+        if (pubCtx == "publish" && !cli.hasRight('publish-articles')) {
+            return cli.throwHTTP(403, true);
+        }
+
         var that = this;
-        if (cli.hasRight('publish-articles')) {
+        if (cli.hasRight('list-articles')) {
             var form = formBuilder.handleRequest(cli);
             var response = formBuilder.validate(form, true);
             var oldSlug = "";
@@ -469,8 +482,8 @@ var Article = function() {
 
                                         if (pubCtx === "create") {
                                              if (oldSlug) {
-                                                db.update(_c, 'content', 
-                                                    {_id : db.mongoID(aid)}, 
+                                                db.update(cli._c, 'content', 
+                                                    {_id : db.mongoID(formData._id)}, 
                                                     {$push : {aliases : oldSlug}}, 
                                                 function() {
                                                     log('Article', 'Added alias for slug ' + oldSlug);
@@ -540,7 +553,7 @@ var Article = function() {
                                                         title : deepArticle.title,
                                                         subtitle : deepArticle.subtitle,
                                                         slug : deepArticle.name,
-                                                        image : deepArticle.featuredimage[0].sizes.featured.url,
+                                                        image : deepArticle.featuredimage[0].sizes.square.url,
                                                         authorname : deepArticle.authors[0].displayname,
                                                         authoravatar : deepArticle.authors[0].avatarURL
                                                     });
@@ -620,7 +633,7 @@ var Article = function() {
             }, function() {});
         }
 
-        formData.author = db.mongoID(cli.userinfo.userid);
+        formData.author = formData.author ? db.mongoID(formData.author) : db.mongoID(cli.userinfo.userid);
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
         formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
@@ -629,6 +642,11 @@ var Article = function() {
             formData.tagslugs = formData.tags.map(function(tagname) {
                 return slugify(tagname).toLowerCase();
             });
+        }
+
+        var maybecat = formData.categories;
+        if (maybecat && maybecat[0]) {
+            db.update(cli._c, 'categories', {name : maybecat[0]}, {lastused : new Date()}, function() {});
         }
 
         // Autosave
@@ -1110,7 +1128,7 @@ var Article = function() {
                     }
                 });
             }
-        }, ["publish"]);
+        });
 
         livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
             if (cli.hasRight("list-articles")) {
@@ -1259,19 +1277,29 @@ var Article = function() {
             })
             .add('publish-set', 'buttonset', { buttons : [{
                     'name' : 'save',
-                    'displayname': 'Save draft',
+                    'displayname': 'Save article',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default, btn-save']
+                    'classes': ['btn', 'btn-default', 'btn-save']
                 }, {
                     'name' : 'preview',
                     'displayname': 'Preview',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default, btn-preview']
+                    'classes': ['btn', 'btn-default', 'btn-preview']
                 }, {
                     'name' : 'publish', 
                     'displayname': 'Save and <b>Publish</b>',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default, btn-publish']
+                    'classes': ['btn', 'btn-default', 'btn-publish', 'role-author']
+                }, {
+                    'name' : 'send',
+                    'displayname' : 'Send for review',
+                    'type' : 'button',
+                    'classes': ["btn", "btn-default", "btn-send-for-review", "role-contributor"]
+                }, {
+                    'name' : 'refuse',
+                    'displayname' : 'Refuse review',
+                    'type' : 'button',
+                    'classes': ["btn", "btn-default", "btn-refuse-review", "role-production"]
                 }
             ]}
         );
@@ -1299,6 +1327,45 @@ var Article = function() {
         }, false, {status : "published"});
     };
 
+    this.generateArticle = function(_c, aid, cb, alreadyFetched) {
+        var workArticle = function(deepArticle) {
+            var gen = function() {
+                var extra = new Object();
+                extra.ctx = "article";
+                extra.article = deepArticle;
+
+                hooks.fire('article_will_render', {
+                    _c : _c,
+                    article: deepArticle
+                });
+
+                // Generate LML page
+                filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
+                    cb && cb({
+                        success: true,
+                        dbdata : deepArticle
+                    });
+                });
+            };
+
+            if (deepArticle.hasads) {
+                gen();
+            } else {
+                that.insertAds(_c, deepArticle, function(content) {
+                    deepArticle.content = content || deepArticle.content;
+                    gen();
+                });
+            }
+        };
+
+        if (alreadyFetched && typeof aid == "object") {
+            workArticle(aid);
+        } else {
+            that.deepFetch(_c, db.mongoID(aid), workArticle);
+        }
+    };
+
+
     this.generateFromName = function(cli, articleName, cb, onlyPublished, ctx) {
         // Check for articles in db
         this.deepFetch(cli._c, articleName, function(deepArticle) {
@@ -1316,13 +1383,9 @@ var Article = function() {
                 if (onlyPublished && deepArticle.status !== "published") {
                     cb(false);
                 } else {
-                    var extra = new Object();
-                    extra.ctx = ctx || "article";
-                    extra.article = deepArticle;
-    
-                    filelogic.renderThemeLML(cli, ctx || "article", articleName + '.html', extra , function(name) {
+                    that.generateArticle(cli._c, deepArticle, function() {
                         cb(true);
-                    });
+                    }, true);
                 }
             }
         }, false, onlyPublished ? {status : "published"} : {});
@@ -1345,6 +1408,9 @@ var Article = function() {
                     }, {
                         value : "draft",
                         displayname : "Draft"
+                    }, {
+                        value : "reviewing",
+                        displayname : "Pending review"
                     }, {
                         value : "deleted",
                         displayname : "Deleted"

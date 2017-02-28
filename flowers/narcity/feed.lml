@@ -4,14 +4,13 @@
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     xmlns:atom="http://www.w3.org/2005/Atom"
     xmlns:sy="http://purl.org/rss/1.0/modules/syndication/"
-    xmlns:slash="http://purl.org/rss/1.0/modules/slash/"
-    >
+    xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
 
-{#config;extra;date}
+{#config;extra;date;encodec}
 <channel>
     <title>{=config.default.website.sitetitle}</title>
-    <atom:link href="{=config.default.server.url}/feed/" rel="self" type="application/rss+xml" />
-    <link>{=config.default.server.url}</link>
+    <atom:link href="{=config.default.server.protocol}{=config.default.server.url}/feed/" rel="self" type="application/rss+xml" />
+    <link>{=config.default.server.protocol}{=config.default.server.url}</link>
     <description>Look at your city</description>
     <lastBuildDate>{=date.now()}</lastBuildDate>
     <language>en-CA</language>
@@ -20,13 +19,12 @@
     <generator>Lilium</generator>
     {$ for (art in extra.articles); $}
     <item>
-        <title>{=art.title}</title>
-        <link>http:{=config.default.server.url}/{=art.name}</link>
+        <title>{=encodec.encodeXML(art.title)}</title>
+        <link>{=config.default.server.protocol}{=config.default.server.url}/{=art.name}</link>
         <pubDate>{=art.date}</pubDate>
 
-        <category><![CDATA[{=art.categories.0}]]></category>
-
-        <description><![CDATA[{=art.subtitle}]]></description>
+        <category>{=art.categories.0.displayname}</category>
+        <description>{=config.default.server.protocol}{=art.featuredimage.0.sizes.thumbnaillarge.url}</description>
         <slash:comments>0</slash:comments>
     </item>
     {$ endfor; $}

@@ -10,3 +10,5 @@
 <meta property="og:description" content="{=?&extra.archivedetails.jobtitle}" />
 
 <meta property="og:image" content="{=?extra.archivedetails.avatarURL}" />
+
+<title>{=extra.archivedetails.displayname} - {=config.default.info.project}</title>

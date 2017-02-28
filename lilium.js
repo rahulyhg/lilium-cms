@@ -16,15 +16,15 @@
  * Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and         *
  * database access.                                                                                      *
  *                                                                                                       *
- * Interpreting its own simple language, Lilium used LML (Lilium Markup Language) to create the          *
- * templates and generate the served files. PML is user friendly, ressemble HTML and makes it easy for   *
+ * Interpreting its own simple language, Lilium uses LML (Lilium Markup Language) to create the          *
+ * templates and generate the served files. LML is user friendly, ressemble HTML and makes it easy for   *
  * new developers or web designers to customize their very own themes                                    *
  *                                                                                                       *
  *----- Dependencies ----------------------------------------------------------------------------------- *
  *                                                                                                       *
  * Lilium needs bower installed, a Mongo database, and Node JS. That's it!                               *
  * The user running node must have write access to the root directory of Lilium.                         *
- * We recommend the node package "forever" for running Lilium.                                           *
+ * We recommend the node package "pm2" for running Lilium.                                               *
  *                                                                                                       *
  *----- The people behind Lilium ----------------------------------------------------------------------- *
  *                                                                                                       *

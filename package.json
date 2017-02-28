@@ -38,6 +38,7 @@
   "homepage": "https://bitbucket.org/RykDesjardins/lilium-cms#readme",
   "dependencies": {
     "JSONStream": "^1.1.1",
+    "admin-mongo": "0.0.22",
     "binaryjs": "^0.2.1",
     "bower": "^1.7.2",
     "buffertools": "^2.1.4",
@@ -48,6 +49,7 @@
     "dateformat": "^1.0.12",
     "deep-diff": "^0.3.4",
     "diff": "^2.2.3",
+    "entities": "^1.1.1",
     "exec": "^0.2.1",
     "eyes": "^0.1.8",
     "facebook-ads-sdk": "0.0.1",

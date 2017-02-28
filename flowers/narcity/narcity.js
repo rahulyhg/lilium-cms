@@ -211,6 +211,8 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 $search : mtc
             }
             break;      
+        case 'latests':
+            break;
         default:
             match['NONE'] = '$';
     }
@@ -283,24 +285,44 @@ var serveFeed = function(cli) {
         if (ex) {
             fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
         } else {
-            db.findToArray(cli._c, 'content', {status : "published"}, function(err, arr) {
-                var extra = {
-                    config : cli._c, 
-                    minify : false, 
-                    articles : arr
-                };
-
-                LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.rss", function() {
-                    log('RSS', 'Generated cached RSS feed for 1 hour');
-                    fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+            db.find(cli._c, 'content', {status : "published"}, [], function(err, cur) {
+                cur.project({date : 1, _id : 1}).sort({date : -1}).limit(10).toArray(function(err, arr) {
+                    var extra = {
+                        config : cli._c, 
+                        minify : false, 
+                        articles : []
+                    };
     
-                    setTimeout(function() {
-                        fileserver.deleteFile(cli._c.server.html + "/feed.rss", function() {
-                            log("RSS", "Deleted cached RSS", 'info');
-                        });
-                    }, 1000 * 60 * 60);
-                }, extra);
-            }, undefined, 0, 10);
+                    var index = 0;
+
+                    var getNext = function() {
+                        if (index == arr.length) {
+                            compile();
+                        } else {
+                            Article.deepFetch(cli._c, db.mongoID(arr[index]._id), function(fullart) {
+                                index ++;
+                                extra.articles.push(fullart);
+                                getNext();
+                            });
+                        }
+                    };
+
+                    var compile = function() {
+                        LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.rss", function() {
+                            log('RSS', 'Generated cached RSS feed for 1 hour');
+                            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+        
+                            setTimeout(function() {
+                                fileserver.deleteFile(cli._c.server.html + "/feed.rss", function() {
+                                    log("RSS", "Deleted cached RSS", 'info');
+                                });
+                            }, 1000 * 60 * 60);
+                        }, extra);
+                    };
+
+                    getNext();
+                });
+            });
         }
     });
 };
@@ -315,6 +337,11 @@ var serveArchive = function(cli, archType) {
         if (!tagName || tagName == "") {
             return cli.throwHTTP(404, 'NOT FOUND');
         }
+    }
+
+    if (archType === "latests") {
+        tagName = "latests";
+        tagIndex = cli.routeinfo.path[1] || 1;
     }
 
     if (isNaN(tagIndex)) {
@@ -340,7 +367,7 @@ var serveArchive = function(cli, archType) {
                 var extra = new Object();
                 extra.articles = articles;
                 extra.totalarticles = total;
-                extra.searchname = tagName;
+                extra.searchname = tagName || archType;
                 extra.indices = indices;
                 extra.currentpage = tagIndex;
                 extra.archivename = archType;
@@ -402,7 +429,7 @@ var loadHooks = function(_c, info) {
         });
     });
 
-    ["tags", "author", "category", "search"].forEach(function(archType) {
+    ["tags", "author", "category", "search", "latests"].forEach(function(archType) {
         endpoints.register(_c.id, archType, 'GET', function(cli) { serveArchive(cli, archType); }); 
     });
 
@@ -497,8 +524,10 @@ var loadHooks = function(_c, info) {
         }
     });
 
-    endpoints.register(_c.id, 'feed', 'GET', function(cli) {
-        serveFeed(cli);
+    fileserver.deleteFile(_c.server.html + "/feed.rss", function() {
+        endpoints.register(_c.id, 'feed', 'GET', function(cli) {
+            serveFeed(cli);
+        });
     });
 
     hooks.bind('homepage_needs_refresh', 1, function(pkg) { needsHomeRefresh = true; });
@@ -543,7 +572,6 @@ var parseAds = function(pkg) {
     var indx = 0;
     var delimiter = "<ad></ad>";    
     var pos;
-    
     if (art.tags.indexOf('nsfw') == -1 && art.tags.indexOf('NSFW') == -1) {
         while ((pos = art.content.indexOf(delimiter)) != -1) {
             art.content = art.content.substring(0, pos) + '<div class="awrapper">' + pkg._c.contentadsnip[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);

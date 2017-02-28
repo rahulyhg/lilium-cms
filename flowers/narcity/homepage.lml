@@ -7,8 +7,7 @@
 
 <main class="homepage">
     <div class="fwblock latest-content-wrapper">
-        <h4 class="article-section-title">Most recent</h4>
-
+        <h4 class="article-section-title"><a href="{=config.default.server.url}/latests">Most recent</a></h4>
         <div class="float-clear">
         {$
             relindex = 0;
@@ -52,11 +51,11 @@
                             </div>
                             {$ endif; $}
 
-                            <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
+                            <div class="article-share-count-mobile" id="article-share-count-mobile-{=la._id}">
                                 <span class="article-share-icon">
                                     <img src="{=config.default.server.url}/res/images/flame.png" />
                                 </span>
-                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=la.name}" data-min="100" data-show="article-share-count-mobile-{=la._id}" data-showas="block">0000</span>
                             </div>
 
                         </a>
@@ -87,6 +86,9 @@
                 </script>
             {$ relindex += 1;
         endfor; $}
+            <div style="float: none; clear: both;" class="older-button-wrapper">
+                <a href="{=config.default.server.url}/latests/2">Older articles</a>
+            </div>
         </div>
     </div>
 
@@ -126,11 +128,11 @@
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
                             <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
-                            <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
+                            <div class="article-share-count-mobile" id="article-share-count-mobile-{=sa._id}">
                                 <span class="article-share-icon">
                                     <img src="{=config.default.server.url}/res/images/flame.png" />
                                 </span>
-                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}" data-min="100" data-show="article-share-count-mobile" data-showas="block">0000</span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=sa.name}" data-min="100" data-show="article-share-count-mobile-{=sa._id}" data-showas="block">0000</span>
                             </div>
                         </div>
                         <div class="article-thumbnail-title">

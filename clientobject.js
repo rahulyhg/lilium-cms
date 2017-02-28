@@ -199,7 +199,7 @@ ClientObject.prototype.crash = function (ex) {
 
     if (this._c && this._c.env == "prod") {
         log('ClientObject', 'Sending 500');
-        this.throwHTTP(500, 'Lilium Internal Server Error', true);
+        return this.throwHTTP(500, 'Lilium Internal Server Error', true);
     }
 
     try {

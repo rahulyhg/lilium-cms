@@ -21,7 +21,7 @@
                         </div>
                         <div class="footer-inline">
                                 <a href="https://www.narcitymedia.com">Advertise</a>
-                                <a href="https://www.narcitymedia.com#reach-us">Contact Us</a>
+                                <a href="{=config.default.server.url}/contact-us">Contact Us</a>
                                 <a href="https://www.narcitymedia.com/jobs">Jobs</a>
                                 <a href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
                                 <a href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
@@ -47,7 +47,7 @@ $}
     _sf_async_config.uid = 57714;
     _sf_async_config.domain = '{=domain}';
     _sf_async_config.useCanonical = true;
-    _sf_async_config.sections = "{=domain},{=?extra.article.categories.0.displayname}";
+    _sf_async_config.sections = "{=?extra.article.categories.0.displayname}";
     _sf_async_config.authors = "{=?extra.article.authors.0.displayname}"; 
     /** CONFIGURATION END **/
     (function(){

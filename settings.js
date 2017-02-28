@@ -10,19 +10,25 @@ var log = require('./log.js');
 var Settings = function () {
     this.handleGET = function (cli) {
         cli.touch('settings.handleGET');        
-        if (!cli.hasRightOrRefuse("site-admin")) { return; }
+        if (!cli.hasRightOrRefuse("admin")) { return; }
 
         filelogic.serveAdminLML(cli);
     };
 
     this.handlePOST = function(cli) {
         cli.touch('settings.handlePOST');
-        if (cli.hasRight('site-admin')) {
+        if (cli.hasRight('admin')) {
             var dat = cli.postdata.data;
             delete dat.form_name;
+            delete dat[""];
 
+            /*
             for (var key in dat) {
+                if (!key) { continue; }
+
                 var val = dat[key];
+                key = key.replace(/\[/g, ".").replace(/\]/g, "");
+
                 var keyLevel = key.split('.');
                 var nextLevel = cli._c;
 
@@ -35,6 +41,11 @@ var Settings = function () {
                 }
 
                 nextLevel[keyLevel[keyLevel.length - 1]] = val;
+            }
+            */
+
+            for (var field in dat) {
+                cli._c[field] = dat[field];
             }
 
             var saveSetts = function() {
@@ -77,7 +88,8 @@ var Settings = function () {
             requirements : {
                 required : false
             },
-            async : true
+            async : true,
+            json : true
         })
 
         .trg('top')

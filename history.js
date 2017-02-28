@@ -108,7 +108,7 @@ class History {
         if (levels[0] == "article") {
             let contentid = levels[1];
 
-            if (cli.hasRight('publish')) {
+            if (cli.hasRight('list-articles')) {
                 this.fetchHistoryOne(cli, contentid, callback);
             } else {
                 callback({err : new Error("Missing publication rights.")});

@@ -1,12 +1,6 @@
 {#config;forms}
 		{%../mediascript}
-		{$
-			var baseurl = config.default.server.url;
-			baseurl += "/";
-			baseurl += config.default.paths.admin;
-			baseurl += "/";
-		$}
-		<h1>List of medias <a class='fab' href='{=baseurl}media/upload'>+</a></h1>
+		<h1>List of medias <a class='fab' href='{=config.default.server.url}/admin/media/upload'>+</a></h1>
 		<main class="medias-main">
 			<ul class="medias-list">
 				{*uploads(template:"medias-list-item")}
@@ -22,15 +16,8 @@
 							 data-actionparamkey="_id">
 							Copy Link
 					</lml:tobject>
-					<lml:tobject data-nodetype="button"
-							 data-bind="click"
-							 data-action="hideMedia"
-							 data-actionparamkey="_id">
-							Copy Link
-					</lml:tobject>
 				</div>
 				<lml:tobject data-nodetype="img" data-key="sizes.thumbnail.url"></lml:tobject>
-
 			</li>
 		</lml:template>
 		<input type=text id='copyLink' style='position: fixed; top : 9999999px; left: 999999px;'>

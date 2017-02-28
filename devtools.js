@@ -11,13 +11,10 @@ var precomp = require('./precomp.js');
 var DevTools = function() {};
 
 var interpretLMLToCli = function(cli) {
-    LML.executeFromString(cli._c.server.base + "/backend/dynamic/admin/", cli.postdata.data.lml, function(html) {
+    LML2.compileToString(cli._c.id, cli.postdata.data.lml, {config : cli._c, fromClient : true}, function(html) {
         cli.sendJSON({
             html: html
         });
-    }, {
-        config : cli._c,
-        fromClient : true
     });
 };
 
@@ -295,8 +292,7 @@ var parseContentAds = function(cli) {
     var jsdom = require("jsdom");
     log('Devtools', 'Parsing ads for all articles', 'info');
     if (pcount) {
-        var adtag = "<ad></ad>";
-        db.findToArray(cli._c, 'content', {hasads : {$ne : true}}, function(err, arr) {
+        db.findToArray(cli._c, 'content', {}, function(err, arr) {
             var index = -1;
             var next = function() {
                 index++;

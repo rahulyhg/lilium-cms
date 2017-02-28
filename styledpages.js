@@ -136,6 +136,21 @@ class StyledPages {
             endpoint: 'styledpages.table',    
             paginate: true,     
             searchable: true, 
+            filters : {
+                status : {
+                    displayname : "Visibility",
+                    datasource : [{
+                        value : "invisible",
+                        displayname : "Invisible"
+                    }, {
+                        value : "magiclink",
+                        displayname : "Magic Link"
+                    }, {
+                        value : "Public",
+                        displayname : "Public"
+                    }]
+                }
+            },
             fields : [{
                 key: 'title',
                 displayname: 'Title'
@@ -217,6 +232,10 @@ class StyledPages {
     sendTable(cli, levels, params, send) {
         let response = {size : 0, data : [], code : 204};
         let filter = {status : {$ne : "destroyed"}};
+
+        if (params.filters.status) {
+            filter.status = params.filters.status;
+        }
 
         db.findToArray(cli._c, 'styledpages', filter, function(err, arr) {
             for (let i = 0; i < arr.length; i++) {

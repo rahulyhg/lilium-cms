@@ -146,18 +146,24 @@ var Category = function () {
         livevars.registerLiveVariable('categories', function (cli, levels, params, callback) {
             var allContent = levels.length === 0;
             if (allContent) {
-                db.singleLevelFind(cli._c, 'categories', callback);
+                db.find(cli._c, 'categories', {}, [], function (err, cur) {
+                    cur.sort({lastused : -1}).toArray(function(err, arr) {
+                        callback(arr);
+                    });
+                });
             } else if (levels[0] == "all") {
                 var sentArr = new Array();
-                db.findToArray(cli._c, 'categories', {}, function (err, arr) {
-                    for (var i = 0; i < arr.length; i++) {
-                        sentArr.push({
-                            articleid: arr[i]._id,
-                            title: arr[i].title
-                        });
-                    };
+                db.find(cli._c, 'categories', {}, [], function (err, cur) {
+                    cur.sort({lastused : -1}).toArray(function(err, arr) {
+                        for (var i = 0; i < arr.length; i++) {
+                            sentArr.push({
+                                articleid: arr[i]._id,
+                                title: arr[i].title
+                            });
+                        };
 
-                    callback(sentArr);
+                        callback(sentArr);
+                    });
                 });
             } else {
                 db.multiLevelFind(cli._c, 'categories', levels, {

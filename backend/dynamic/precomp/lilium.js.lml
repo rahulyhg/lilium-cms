@@ -101,6 +101,10 @@ var LiliumCMS = function() {
         }
     };
 
+    this.getStacktables = function() {
+        return stacktables;
+    }
+
     var FormBeautifier = function() {
         var createCheckboxWrapper = function(oObj) {
             var obj = document.createElement('div');
@@ -542,8 +546,7 @@ var LiliumCMS = function() {
 
                 var check = hasCheck ? $('<i class="fa fa-check async-form-check-icon" aria-hidden="true"></i>') : "";
 
-                $.post($(this).attr('action') || window.location.href, $(this).serialize()
-                ).success(function(a) {
+                var onSuccess = function(a) {
                     if (hasCheck) {
                         btn.style.display = "";
                         $(loading).remove();
@@ -561,14 +564,29 @@ var LiliumCMS = function() {
                     }
 
                     cb(a, $(this));
-                }).fail(function(msg) {
+                };
+
+                var onFail = function(msg) {
                     btn.style.display = "";
                     $(loading).remove();
 
                     if (msg && msg.responseText) {
                         liliumcms.modals.error("Failed", msg.responseText);
                     }
-                }); 
+                };
+
+
+                if (this.getAttribute('json')) {
+                    liliumcms.lmldom.sendForm(
+                        liliumcms.lmldom.getFormData()[this.name].values,
+                        this.getAttribute('action') || window.location.href,
+                        onSuccess
+                    );
+                } else {
+                    $.post($(this).attr('action') || window.location.href, $(this).serialize())
+                        .success(onSuccess)
+                        .fail(onFail); 
+                }
 
                 var onclick = window[$(this).attr("name") + "_submit"];
                 onclick && onclick($(this));
@@ -964,6 +982,25 @@ var LiliumCMS = function() {
         };
     };
 
+    var LMLRights = function() {
+        var roles;
+        
+        this.init = function() {
+            roles = liliumcms.session.current.roles;
+            this.createCSS();
+        };
+
+        this.createCSS = function() {
+            for (var i = 0; i < roles.length; i++) {
+                document.body.classList.add("role-" + roles[i]);
+            }
+        };
+
+        this.hasRole = function(role) {
+            return roles.indexOf(role) != -1;
+        };
+    };
+
     var Animator = function() {
         var that = this;
         this.slide = function() {
@@ -1028,6 +1065,7 @@ var LiliumCMS = function() {
             that.lmldom = new LMLDom();
             that.modals = new LMLModals();
             that.session = new LMLSession();
+            that.rights = new LMLRights();
             that.users = new LMLUsers();
             that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
             that.parseURL();        
@@ -1113,6 +1151,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.conversations.fillChat();
         liliumcms.conversations.fillForms();
         liliumcms.lmldom.init();
+        liliumcms.rights.init();
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.multiselects.forEach(function(select) {

@@ -31,6 +31,10 @@ var HtmlParser = function () {
             htmlForm += ' data-context="' + formContext + '" ';
         }
 
+        if (form.attr.json) {
+            htmlForm += ' json="true" ';
+        }
+
         // LMLDom v.0.6+
         if (livevarSource) {
             htmlForm += ' data-livevarsource="'+livevarSource.replace(/\//g, '.')+'" ';
