@@ -19,7 +19,7 @@
     <generator>Lilium</generator>
     {$ for (art in extra.articles); $}
     <item>
-        <title>{=art.title}</title>
+        <title>{=&art.title}</title>
         <link>{=config.default.server.protocol}{=config.default.server.url}/{=art.name}</link>
         <pubDate>{=art.date}</pubDate>
 
