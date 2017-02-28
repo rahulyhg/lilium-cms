@@ -717,8 +717,8 @@ article > h2 {
 
 .sponsored-mention-archive, .sponsored-mention-hp{
     position: absolute;
-    right: 0px;
-    top: 0px;
+    right: 5px;
+    top: 5px;
     border-top-right-radius: 0px;
 }
 
