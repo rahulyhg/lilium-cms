@@ -400,38 +400,7 @@ var Article = function() {
         });
     };
 
-    this.generateArticle = function(_c, aid, cb) {
-        that.deepFetch(_c, db.mongoID(aid), function(deepArticle) {
-            var gen = function() {
-                var extra = new Object();
-                extra.ctx = "article";
-                extra.article = deepArticle;
-
-                hooks.fire('article_will_render', {
-                    _c : _c,
-                    article: deepArticle
-                });
-
-                // Generate LML page
-                filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
-                    cb && cb({
-                        success: true,
-                        dbdata : deepArticle
-                    });
-                });
-            };
-
-            if (deepArticle.hasads) {
-                gen();
-            } else {
-                that.insertAds(_c, deepArticle, function(content) {
-                    deepArticle.content = content || deepArticle.content;
-                    gen();
-                });
-            }
-        });
-    };
-
+    
     this.publish = function(cli, pubCtx) {
         cli.touch('article.new');
         pubCtx = pubCtx || "create";
@@ -1358,6 +1327,45 @@ var Article = function() {
         }, false, {status : "published"});
     };
 
+    this.generateArticle = function(_c, aid, cb, alreadyFetched) {
+        var workArticle = function(deepArticle) {
+            var gen = function() {
+                var extra = new Object();
+                extra.ctx = "article";
+                extra.article = deepArticle;
+
+                hooks.fire('article_will_render', {
+                    _c : _c,
+                    article: deepArticle
+                });
+
+                // Generate LML page
+                filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
+                    cb && cb({
+                        success: true,
+                        dbdata : deepArticle
+                    });
+                });
+            };
+
+            if (deepArticle.hasads) {
+                gen();
+            } else {
+                that.insertAds(_c, deepArticle, function(content) {
+                    deepArticle.content = content || deepArticle.content;
+                    gen();
+                });
+            }
+        };
+
+        if (alreadyFetched && typeof aid == "object") {
+            workArticle(aid);
+        } else {
+            that.deepFetch(_c, db.mongoID(aid), workArticle);
+        }
+    };
+
+
     this.generateFromName = function(cli, articleName, cb, onlyPublished, ctx) {
         // Check for articles in db
         this.deepFetch(cli._c, articleName, function(deepArticle) {
@@ -1375,13 +1383,9 @@ var Article = function() {
                 if (onlyPublished && deepArticle.status !== "published") {
                     cb(false);
                 } else {
-                    var extra = new Object();
-                    extra.ctx = ctx || "article";
-                    extra.article = deepArticle;
-    
-                    filelogic.renderThemeLML(cli, ctx || "article", articleName + '.html', extra , function(name) {
+                    that.generateArticle(cli._c, deepArticle, function() {
                         cb(true);
-                    });
+                    }, true);
                 }
             }
         }, false, onlyPublished ? {status : "published"} : {});
