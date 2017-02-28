@@ -44,6 +44,8 @@
     right: 0px; width: 220px;
 
     border-left: 1px dashed #aaa;
+
+    overflow-y : auto;
 }
 
 #lmlis-preview-wrapper {
@@ -64,6 +66,31 @@
     height: auto;
     border-radius: 5px;
     background-color: #999;
+}
+
+#lmlis-sizes-list {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+#lmlis-sizes-list li {
+    color: #DDD;
+    margin: 0;
+    padding: 5px 10px;
+    border-bottom: 1px solid #555;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-transform: capitalize;
+}
+
+#lmlis-sizes-list li.selected {
+    background-color: #555;
+}
+
+#lmlis-sizes-list li:hover {
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 /* Opener */
