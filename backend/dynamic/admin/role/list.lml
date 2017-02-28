@@ -1,9 +1,7 @@
 {#config;forms}
 {$
 	var baseurl = config.default.server.url;
-	baseurl += "/";
-	baseurl += config.default.paths.admin;
-	baseurl += "/";
+	baseurl += "/admin/";
 $}
 		<h1>All roles</h1>
 
@@ -13,7 +11,7 @@ $}
 			</ul>
 
 			<h1>Add new role</h1>
-    			{=forms.render('role_create')}
+    		{=forms.render('role_create')}
 		</main>
 
 		<lml:template id="entity-list-item">

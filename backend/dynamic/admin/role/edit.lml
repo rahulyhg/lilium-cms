@@ -1,15 +1,14 @@
 {#config;forms}
 {$
 	var baseurl = config.default.server.url;
-	baseurl += "/";
-	baseurl += config.default.paths.admin;
-	baseurl += "/";
+	baseurl += "/admin/";
 $}
 		<main class="entities-main">
-        <div id="campwrapper">
-        {*roles.{?1}(sourceof:"role_create")}
-        </div>
-    			{=forms.render('role_create')}
+            <div id="campwrapper">
+                {*roles.{?1}(sourceof:"role_create")}
+            </div>
+    			
+            {=forms.render('role_create')}
 		</main>
 
         <lml:template id="roletemp" data-wrapper="div">
@@ -18,7 +17,7 @@ $}
 
 		<script>
 		var deleteUser = function(id) {
-			$.post('/{=config.default.paths.admin}/role/delete', {_id: id}, function(data){
+			$.post('{=config.default.server.url}/admin/role/delete', {_id: id}, function(data){
 				if (data.success) {
 					document.location.href = '{=baseurl}role';
 				}

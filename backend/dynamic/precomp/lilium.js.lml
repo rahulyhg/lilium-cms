@@ -101,6 +101,10 @@ var LiliumCMS = function() {
         }
     };
 
+    this.getStacktables = function() {
+        return stacktables;
+    }
+
     var FormBeautifier = function() {
         var createCheckboxWrapper = function(oObj) {
             var obj = document.createElement('div');
@@ -542,8 +546,7 @@ var LiliumCMS = function() {
 
                 var check = hasCheck ? $('<i class="fa fa-check async-form-check-icon" aria-hidden="true"></i>') : "";
 
-                $.post($(this).attr('action') || window.location.href, $(this).serialize()
-                ).success(function(a) {
+                var onSuccess = function(a) {
                     if (hasCheck) {
                         btn.style.display = "";
                         $(loading).remove();
@@ -561,14 +564,29 @@ var LiliumCMS = function() {
                     }
 
                     cb(a, $(this));
-                }).fail(function(msg) {
+                };
+
+                var onFail = function(msg) {
                     btn.style.display = "";
                     $(loading).remove();
 
                     if (msg && msg.responseText) {
                         liliumcms.modals.error("Failed", msg.responseText);
                     }
-                }); 
+                };
+
+
+                if (this.getAttribute('json')) {
+                    liliumcms.lmldom.sendForm(
+                        liliumcms.lmldom.getFormData()[this.name].values,
+                        this.getAttribute('action') || window.location.href,
+                        onSuccess
+                    );
+                } else {
+                    $.post($(this).attr('action') || window.location.href, $(this).serialize())
+                        .success(onSuccess)
+                        .fail(onFail); 
+                }
 
                 var onclick = window[$(this).attr("name") + "_submit"];
                 onclick && onclick($(this));

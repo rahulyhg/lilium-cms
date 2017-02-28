@@ -11,6 +11,16 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         // Check for livevars
     };
 
+    this.getInfo = function() {
+        return {
+            fieldname : fieldname,
+            object : this, 
+            scheme : scheme, 
+            title : title, 
+            identifier : htmlIdentifier
+        };
+    };
+
     $('#' + htmlIdentifier).find('.lmlstacktableappendbutton:not(.bound)').addClass("bound").bind('click', function() {
         that.appendRowFromButton();
         return false;
@@ -23,10 +33,10 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         
         switch (scheme.columns[index].dataType) {
             case "text":
-                row += "<input type='text' name='" +
+                row += "<textarea type='text' class='stacktable-field' name='" +
                     $('#' + htmlIdentifier).data('fieldname') + 
-                    "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' value='" + val + 
-                    "'></input>";
+                    "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' >" + val + 
+                    "</textarea>";
 
                 break;
             case "select":
@@ -34,12 +44,13 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
                 nSelect.find('option[value="'+val+'"]').prop('selected', true).attr('selected', 'selected');
                 nSelect.attr('name', $('#' + htmlIdentifier).data('fieldname') + 
                     "[" + linenumber + "][" + scheme.columns[index].fieldName + "]");
+                nSelect.attr('class', "stacktable-field");
 
                 row += nSelect.prop('outerHTML');
 
                 break;
             default:
-                row += "<input type='hidden' name='" +
+                row += "<input type='hidden' class='stacktable-field' name='" +
                     $('#' + htmlIdentifier).data('fieldname') + 
                     "[" + linenumber + "][" + scheme.columns[index].fieldName + "]' value='" + val + 
                     "'></input>";
@@ -53,7 +64,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         var selector = "#" + htmlIdentifier + ' th input, #' + htmlIdentifier + ' th select';    
 
         $(selector).each(function(index) {
-            row += append($(this).val(), index, $(this));
+            row += append($(this).get(0).value, index, $(this));
             $(this).val('');
         });
 
@@ -66,6 +77,35 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         });
 
         linenumber++;
+    };
+
+    this.getData = function() {
+        var elVal = document.getElementById(htmlIdentifier).querySelectorAll('input, select, textarea');
+        var indexes = {};
+        var values = [];
+
+        for (var i = 0; i < elVal.length; i++) {
+            var field = elVal[i];
+            var name = field.name;
+
+            if (!name) {
+                continue;
+            }
+
+            var levels = name.split('[');
+            var index = levels[1].replace("]", "");
+            var atname = levels[2].replace("]", "");
+
+            indexes[index] = indexes[index] || {};
+            indexes[index][atname] = field.value;
+        }
+
+        var keys = Object.keys(indexes);
+        for (var i = 0; i < keys.length; i++) {
+            values.push(indexes[keys[i]]);
+        }
+
+        return values;
     };
 
     this.appendRow = function(livevar) {
