@@ -62,7 +62,7 @@ var NarcityFacebook = function() {
                         htmlnode.innerHTML = ogobj.share.share_count;
         
                         if (htmlnode.dataset.show && htmlnode.innerHTML != "0000") {
-                            document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
+                            // document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
                         }
                     }
                 }
