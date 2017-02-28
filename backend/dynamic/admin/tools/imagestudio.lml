@@ -1,6 +1,19 @@
 {#config}
-<lml:dom v="0.6" features="fullwidth" />
+<lml:dom v="0.8" features="fullwidth" />
 
-<div id="lml-imagestudio">
-    
+<div id="lml-imagestudio-open-wrapper">
+    <button id="lml-imagestudio-open">
+        Open image
+    </button>
 </div>
+
+
+
+<script>
+document.getElementById('lml-imagestudio-open').addEventListener('click', function() {
+    liliumcms.imagepicker.cast(function(image) {
+        var studio = new LMLImageStudio(image);
+        studio.cast();
+    });
+});
+</script>
