@@ -1816,6 +1816,34 @@ footer .copyright a {
     overflow: hidden;
 }
 
+.article-share-count-mobile {
+    display: none; /* Will appear if shares are higher than 100 */
+    background-color: {=mc};
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    padding: 3px 10px 2px 38px;
+    color: #FFF;
+    font-size: 18px;
+    font-family: "Oswald", sans-serif;
+}
+
+.article-share-count-mobile-num {
+    display: inline-block;
+    vertical-align: baseline;
+}
+
+.homepage .article-thumbnail .article-share-icon img,
+.article-share-icon img {
+    display: inline-block;
+    vertical-align: baseline;
+    position: absolute;
+    left: 7px;
+    bottom: 6px;
+    width: 25px;
+}
+
+
 .pc-sharer-network i {
     margin-top: 17px;
     display: block;
@@ -2233,32 +2261,7 @@ body.slidheader .android-sharer {
         overflow: hidden;
     }   
 
-    .article-share-count-mobile {
-        display: none; /* Will appear if shares are higher than 100 */
-        background-color: {=mc};
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        padding: 3px 10px 2px 38px;
-        color: #FFF;
-        font-size: 18px;
-        font-family: "Oswald", sans-serif;
-    }
-
-    .article-share-count-mobile-num {
-        display: inline-block;
-        vertical-align: baseline;
-    }
-
-    .article-share-icon img {
-        display: inline-block;
-        vertical-align: baseline;
-        position: absolute;
-        left: 7px;
-        bottom: 6px;
-        width: 25px;
-    }
-
+    
     /* Instagram IFrame */
     .instagram-media {
         margin: 0px 20px !important;
