@@ -17,6 +17,7 @@ var category = require('./category.js');
 var badges = require('./badges.js');
 var events = require('./events.js');
 var various = require('./various.js');
+var mail = require('./mail.js');
 
 var _cachedSites = new Array();
 
@@ -253,7 +254,15 @@ var SiteInitializer = function (conf, siteobj) {
                 loadDatabase(function () {
                     initEvents(function() {
                         templateBuilder.init(conf);
-    
+
+                        if (conf.emails) {
+                            mail.setSender(conf.id, {
+                                user : conf.emails.senderemail,
+                                pass : conf.emails.senderpass,
+                                from : conf.emails.senderfrom
+                            });
+                        }
+
                         loadVarious(function() {
                             loadTheme(function() {
                                 category.preload(conf, function() {

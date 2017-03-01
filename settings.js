@@ -367,10 +367,20 @@ var Settings = function () {
         .add('email-sep', 'title', {
                 displayname: "Email System"
             })
-            .add('emails.default', 'text', {
-                displayname: "Sender"
+            .add('emails.senderemail', 'text', {
+                displayname: "Sender Email"
             }, {
                 required: false
+            })
+            .add('emails.senderpass', 'password', {
+                displayname : "Sender Password"
+            }, {
+                required : false
+            })
+            .add('emails.senderfrom', 'text', {
+                displayname : "Sender Name"
+            }, {
+                required : false
             })
         .add('login-sep', 'title', {
                 displayname: "Login screen"

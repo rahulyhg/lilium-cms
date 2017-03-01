@@ -57,6 +57,8 @@
     "fs": "0.0.2",
     "globe": "^0.3.0",
     "gm": "^1.23.0",
+    "gmail-send": "^1.2.7",
+    "gmail-sender": "^0.1.2",
     "googleapis": "^2.1.7",
     "html-entities": "^1.2.0",
     "html-minifier": "^1.2.0",
