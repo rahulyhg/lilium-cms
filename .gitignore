@@ -47,6 +47,7 @@ bower_components
 backend/static/tmp
 backend/static/uploads/*
 backend/static/gen/*
+backend/static/lib
 
 # Optional REPL history
 .node_repl_history
