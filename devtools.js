@@ -30,6 +30,7 @@ var handleGET = function(cli) {
         case 'html':
         case 'server':
         case 'scripts':
+        case 'mail':
         case undefined:
             filelogic.serveAdminLML(cli);
             break;
@@ -66,6 +67,9 @@ var handlePOST = function(cli) {
         case 'restart':
             maybeRestart(cli);
             break;
+        case 'mail':
+            maybeSendMail(cli);
+            break;
         default:
             cli.refresh();
     }
@@ -79,7 +83,22 @@ var restartPM2 = function(cli) {
 
 var preloadCache = function(cli) {
     require('./cacheInvalidator.js').preloadLatests(cli._c);
-}
+};
+
+var maybeSendMail = function(cli) {
+    var mailer = require('./mail.js');
+    var data = cli.postdata.data;
+
+    log('Devtools', 'Testing email with data ' + JSON.stringify(data));
+    if (data.to && data.subject && data.content) {
+        var email = mailer.createEmail(cli._c, data.to, data.subject, data.content);
+        mailer.send(email, function(err) {
+            cli.sendJSON({success : !err, error : err});
+        });
+    } else {
+        cli.sendJSON({success : false, error : "Missing fields"});
+    }
+};
 
 var clearCache = function(cli, ctx) {
     var child_process = require('child_process');
@@ -445,7 +464,28 @@ DevTools.prototype.registerForms = function() {
             displayname : 'Query', 
             classes : ['btn', 'btn-default', 'btn-query']
         }
-    ]})
+    ]});
+
+    formBuilder.createForm('devmail', {
+        async : true,
+        fieldWrapper : 'lmlform-fieldwrapper'
+    })
+    .add('to', 'text', {
+        displayname : "To"
+    })
+    .add('subject', 'text', {
+        displayname : "Subject"
+    })
+    .add('content', 'textarea', {
+        displayname : "Content"
+    })
+    .add('send-set', 'buttonset', { buttons: [{
+            name : 'sendmail', 
+            displayname : 'Send Mail', 
+            classes : ['btn', 'btn-default', 'btn-sendmail']
+        }
+    ]});
+
 
     formBuilder.createForm('devfeedinsert', {
         async : true,

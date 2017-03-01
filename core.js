@@ -11,13 +11,13 @@ var fileserver = undefined;
 var cli = undefined;
 var admin = undefined;
 var Article = undefined;
+var mail = undefined;
 var styledpages = undefined;
 var Media = undefined;
 var imageSize = undefined;
 var themes = undefined;
 var entities = undefined;
 var cacheInvalidator = undefined;
-var postman = undefined;
 var Frontend = undefined;
 var notification = undefined;
 var Forms = undefined;
@@ -75,6 +75,7 @@ var Core = function () {
         fs = require('fs');
         fileserver = require('./fileserver.js');
         cli = require('./cli.js');
+        mail = require('./mail.js');
         admin = require('./backend/admin.js').init();
         Article = require('./article.js');
         styledpages = require('./styledpages.js');
@@ -83,7 +84,6 @@ var Core = function () {
         themes = require('./themes.js');
         entities = require('./entities.js');
         cacheInvalidator = require('./cacheInvalidator.js');
-        postman = require('./postman.js');
         Frontend = require('./frontend.js');
         notification = require('./notifications.js');
         sessions = require('./session.js');
@@ -133,6 +133,7 @@ var Core = function () {
 
         persona.bindHooks();
         cdn.bind();
+        mail.bind();
         hooks.fire('hooks');
         log('Hooks', 'Loaded hooks', 'success');
     };
@@ -697,10 +698,6 @@ var Core = function () {
 
         Livevars.registerDebugEndpoint();
         log('Core', 'Loaded live variables', 'success');
-    };
-
-    var loadPostman = function () {
-        postman.createTransporter();
     };
 
     var initTables = function () {
