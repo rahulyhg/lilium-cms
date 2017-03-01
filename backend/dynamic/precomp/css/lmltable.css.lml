@@ -31,6 +31,10 @@ table.lmlfullwidthtable tfoot.lmlactionfooter tr td {
 	background-color: #FAFAFA;
 	padding: 15px;
 }
+table.lmlfullwidthtable td h4, table.lmlfullwidthtable td h6 {
+    font-weight: 400;
+    color: #333;
+}
 .lmltablebuilder .footer {
     border: 1px solid #EEE;
     padding: 10px;
