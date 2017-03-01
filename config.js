@@ -86,7 +86,7 @@ Config.prototype.each = function (loopFtc, end) {
 
     var nextItem = function () {
         if (siteIndex == sites.length) {
-            end();
+            end && end();
         } else if (sites[siteIndex] == 'default') {
             siteIndex++;
             nextItem();

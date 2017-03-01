@@ -848,7 +848,7 @@ var Article = function() {
                             
                             var filename = cli._c.server.html + "/" + result.name + '.html';
                             fs.deleteFile(filename, function() {
-                                hooks.fire('article_deleted', id);
+                                hooks.fire('article_deleted', {id : id, cli : cli, _c : cli._c});
                             });
 
                             // Remove autosave pointing to article deleted

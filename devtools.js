@@ -52,8 +52,9 @@ var handlePOST = function(cli) {
             break;
         case 'cache':
             switch (cli.routeinfo.path[3]) {
-                case 'refresh': refreshCache(cli, cli.routeinfo.path[4]);
-                case 'clear': clearCache(cli, cli.routeinfo.path[4]);
+                case 'refresh': refreshCache(cli, cli.routeinfo.path[4]); break;
+                case 'clear': clearCache(cli, cli.routeinfo.path[4]); break;
+                case 'preload' : preloadCache(cli); break;
             }
             break;
         case 'scripts':
@@ -75,6 +76,10 @@ var restartPM2 = function(cli) {
         require('child_process').exec('pm2 restart lilium');
     }
 };
+
+var preloadCache = function(cli) {
+    require('./cacheInvalidator.js').preloadLatests(cli._c);
+}
 
 var clearCache = function(cli, ctx) {
     var child_process = require('child_process');

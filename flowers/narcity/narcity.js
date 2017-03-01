@@ -397,6 +397,18 @@ var objToURIParams = function(params) {
     return str;
 };
 
+var generateHomepage = function(_c, cb) {
+    fetchHomepageArticles(_c, function(articles) {
+        var extra = new Object();
+        extra.sections = articles.sections;
+        extra.latests = articles.latests;
+
+        filelogic.renderThemeLML(_c, 'home', 'index.html', extra, function() {
+            cb && cb();
+        });
+    });
+}
+
 var needsHomeRefresh = true;
 var cachedTags = {};
 var loadHooks = function(_c, info) {
@@ -411,17 +423,11 @@ var loadHooks = function(_c, info) {
     endpoints.register(_c.id, '', 'GET', function(cli) {
         fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
             if (needsHomeRefresh || !exists) {
-                fetchHomepageArticles(_c, function(articles) {
-                    var extra = new Object();
-                    extra.sections = articles.sections;
-                    extra.latests = articles.latests;
-        
-                    filelogic.renderThemeLML(cli, 'home', 'index.html', extra, function() {
-                        fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
-                            needsHomeRefresh = false;
-                            log('Narcity', 'Recreated and served homepage');
-                        }, true);
-                    });
+                generateHomepage(cli._c, function() {
+                    fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
+                        needsHomeRefresh = false;
+                        log('Narcity', 'Recreated and served homepage');
+                    }, true);
                 });
             } else {
                 fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
@@ -530,7 +536,10 @@ var loadHooks = function(_c, info) {
         });
     });
 
-    hooks.bind('homepage_needs_refresh', 1, function(pkg) { needsHomeRefresh = true; });
+    hooks.bind('homepage_needs_refresh', 1, function(pkg) { 
+        generateHomepage(pkg._c || pkg.cli._c);
+    });
+
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
