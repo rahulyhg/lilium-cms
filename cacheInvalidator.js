@@ -10,6 +10,27 @@ var readdirp = require('readdirp');
 var CacheInvalidator = function () {
     var that = this;
 
+    this.preloadLatests = function(_c, max, skip, cb) {
+        const DEFAULT_MAX_PRELOAD = 50;
+        const DEFAULT_SKIP = 0;
+
+        db.find(_c, 'content', {status : "published"}, [], function(err, cur) {
+            cur = cur
+                .project({_id : 1, date : 1, title : 1})
+                .sort({date : -1})
+                .limit(max || DEFAULT_MAX_PRELOAD)
+                .skip(skip || DEFAULT_SKIP);
+
+            db.all(cur, function(obj, next) {
+                log('Cache', 'Preloading article with title ' + obj.title);
+                require('./article.js').generateArticle(_c, obj._id, next);
+            }, function(total, err) {
+                log('Cache', 'Done preloading ' + total + ' articles');
+                cb && cb(total, err);
+            });
+        });
+    };
+
     this.init = function (cb) {
         hooks.bind(['article_published', 'article_updated', 'article_deleted', 'article_unpublished'], 1, function(data) {
             // Update profile page
@@ -42,10 +63,6 @@ var CacheInvalidator = function () {
                     fileserver.emptyDirectory(path, deleteOpt, function() {});
                 }
             }
-        });
-
-        hooks.bind('profile_picture_updated', 1, function(data) {
-            that.deleteContentByAuthor(data.cli.userinfo.userid, data.cli._c);
         });
     };
 };
