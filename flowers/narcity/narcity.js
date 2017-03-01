@@ -535,6 +535,9 @@ var loadHooks = function(_c, info) {
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_render', 2000, function(pkg) { 
+        // Fix fields
+        parseArticleFields(pkg);
+
         // Replace ad tags with ad set
         parseAds(pkg); 
 
@@ -586,6 +589,14 @@ var parseAds = function(pkg) {
 
     art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
 };
+
+var parseArticleFields = function(pkg) {
+    var art = pkg.article;
+    art.tags = art.tags || [];
+    art.title = art.title || "";
+    art.subtitle = art.subtitle || "";
+    art.categories = art.categories || [{name : "uncategorized", displayname : ""}];
+}
 
 var registerPrecompFiles = function(_c) {
     // templateBuilder.addJS(path + '/precomp/js/');
