@@ -252,10 +252,18 @@ var Precomp = function () {
         log('Precompiler', 'Merging ' + fileTotal + ' Javascript files of '+ (theme? 'theme' : 'admin') +' context', 'info');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
-                fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
-                    log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
-                    fileIndex++;
-                    nextFile();
+                fileserver.fileExists(files[fileIndex], function(exists) {
+                    if (exists) {
+                        fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
+                            log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
+                            fileIndex++;
+                            nextFile();
+                        });
+                    } else {
+                        log('Precompiler', 'Skipped ' + files[fileIndex], 'warn');
+                        fileIndex++;
+                        nextFile();
+                    }
                 });
             } else {
                 fileserver.closeFileHandle(fHandle);
@@ -276,10 +284,18 @@ var Precomp = function () {
         log('Precompiler', 'Merging ' + fileTotal + ' CSS files of '+ (theme? 'Theme' : 'Admin') +' context', 'info');
         var nextFile = function () {
             if (fileIndex != fileTotal) {
-                fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
-                    log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
-                    fileIndex++;
-                    nextFile();
+                fileserver.fileExists(files[fileIndex], function(exists) {
+                    if (exists) {
+                        fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
+                            log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
+                            fileIndex++;
+                            nextFile();
+                        });
+                    } else {
+                        log('Precompiler', 'Skipped ' + files[fileIndex], 'warn');
+                        fileIndex++;
+                        nextFile();
+                    }
                 });
             } else {
                 fileserver.closeFileHandle(fHandle);
