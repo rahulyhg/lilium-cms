@@ -1,0 +1,11 @@
+{#config}
+<article>
+    <h1>Oops! There seems to be a problem with this request.</h1>
+    <div id="article-section">
+        <div class="article-content" id="article-content">
+            <p>
+                Try reloading this page. It will most likely solve the issue. If not, you can always <a href="{=config.default.server.url}/contact-us">contact us</a> and report the problem.
+            </p>
+        </div>
+    </div>
+</article>

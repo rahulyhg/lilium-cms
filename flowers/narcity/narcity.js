@@ -361,7 +361,7 @@ var serveArchive = function(cli, archType) {
         if (!exists || typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
             fetchArchiveArticles(_c, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices) {
                 if (typeof archDetails === "number") {
-                    return cli.throwHTTP(404, 'NOT FOUND');
+                    return cli.throwHTTP(404);
                 }
 
                 var extra = new Object();
