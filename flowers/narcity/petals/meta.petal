@@ -20,4 +20,4 @@ $}
 <meta property="fb:app_id" content="369886419698055" />
 <meta property="fb:pages" content="254768477928383" />
 
-{%=socialfilename}
+{%?=socialfilename}

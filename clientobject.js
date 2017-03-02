@@ -51,14 +51,19 @@ ClientObject.prototype.reloadSession = function(cb) {
 };
 
 ClientObject.prototype.throwHTTP = function (code, message, hard) {
+    var that = this;
     this.responseinfo.httpcode = code;
     this.responseinfo.httpmessage = message;
    
     if (hard) {
         this.response.writeHead(code);
         this.response.end(message || undefined);
-    } else if (code >= 400 && code < 500) {
+    } else if (code >= 400 && code < 500 && this.routeinfo.admin) {
         require('./filelogic.js').serveErrorPage(this, code);
+    } else if (!this.routeinfo.admin) {
+        require('./filelogic.js').renderThemeLML(that, code, code + '.html', {}, function(html) {
+            that.response.end(html);
+        });
     } else {
         this.debug();
     }
@@ -206,7 +211,11 @@ ClientObject.prototype.crash = function (ex) {
         var errFilePath = this._c.server.base + "/backend/dynamic/error.lml";
         this.routeinfo.isStatic = true;
 
-        require('./filelogic.js').executeLMLNoCache(this, errFilePath, ex);
+        if (this.routeinfo && this.routeinfo.admin) {
+            require('./filelogic.js').executeLMLNoCache(this, errFilePath, ex);
+        } else {
+            this.throwHTTP(500);
+        }
     } catch (ex) {
         log('ClientObject', 'Could not handle crash : ' + ex);
         this.response.end();
