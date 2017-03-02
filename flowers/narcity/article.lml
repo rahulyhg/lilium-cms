@@ -288,4 +288,8 @@ var switchToPrev = function() {
 
     window.prevAt = window.currentPageIndex == 0 ? -2 : window.articlepos[window.currentPageIndex-1].endsat;
 };
+
+document.querySelector('.keep-on-reading').addEventListener('click', function() {
+    typeof ga != "undefined" && ga('send', 'event', 'Recirculation', 'Keep on reading', '{=extra.article.name}');
+});
 </script>
