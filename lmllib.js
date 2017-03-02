@@ -41,7 +41,8 @@ var registeredLibraries = {
                 var formats = {
                     short : "mmm dd, yyyy",
                     full : "mmmm dd, yyyy",
-                    slash : "dd/mm/yyyy"
+                    slash : "dd/mm/yyyy",
+                    timeondate : "hh:mm:ss 'on' mmmm, dd 'year' yyyy"
                 };
                 try {
                     return require('dateformat')(str, format ? formats[format] || formats.full : formats.full);

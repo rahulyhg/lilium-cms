@@ -1,0 +1,20 @@
+{#config}
+{*mailtemplates.all}
+<lml:dom v="0.8"></lml:dom>
+
+<h1>
+    Email templates
+    <a class="fab" href="{=config.default.server.url}/admin/mailtemplates/new">+</a>
+</h1>
+<div id="mail-templates-list">
+    <lml:foreach var="template" in="livevars.mailtemplates.all">
+        <lml:link href="{=config.default.server.url}/admin/mailtemplates/edit/{template._id}">
+            <h2>
+                <lml:text var="template.displayname" />
+            </h2>
+            <p>
+                <lml:text var="template.description" />
+            </p>
+        </lml:link>
+    </lml:foreach>
+</div>

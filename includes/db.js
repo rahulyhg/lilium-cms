@@ -91,7 +91,7 @@ var DB = function() {
                     });
                 } else {
                     log('Database', 'Created ' + results.res.length + ' collections with ' + results.err.length + ' errors', 'lilium');
-                    callback();
+                    callback && callback();
                 }
             };
 

@@ -554,10 +554,10 @@ var LiveVars = function() {
             for (var k in livevars) {
                 var levels = k.split('.');
                 if (levels.length !== 1) {
-                    var curLevel = dlv[levels[0]] = new Object();
+                    var curLevel = dlv[levels[0]] = dlv[levels[0]] || {};
 
                     for (var i = 1; i < levels.length - 1; i++) {
-                        curLevel = curLevel[levels[i]] = new Object();
+                        curLevel = curLevel[levels[i]] = curLevel[levels[i]] || {};
                     }
 
                     curLevel[levels[levels.length-1]] = livevars[k];

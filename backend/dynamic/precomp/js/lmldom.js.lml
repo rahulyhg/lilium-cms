@@ -1,6 +1,6 @@
 /****************************************/
 // Lilium Document Object Model         //
-// v.0.6                                //
+// v.0.8                                //
 // ------------------------------------ //
 // Author : Erik Desjardins             //
 // End : Frontend                       //
@@ -37,6 +37,9 @@
     lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
     lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
     lml:link        => href="//domain.com/admin/{variableName}" class=""
+
+    - Livevar fed fields --
+    select.lmldom-liveselect  => data-filledby="livevar.endpoint" name="fieldname"
 */
 var LMLDom = function() {
     var maindom;
@@ -558,6 +561,26 @@ var LMLDom = function() {
         xmlhttp.send(JSON.stringify(data));
     };
 
+    this.parseLiveFields = function(maindom) {
+        // Live Select : select.lmldom-liveselect
+        var liveselects = maindom.querySelectorAll(".lmldom-liveselect");
+        for (var i = 0; i < liveselects.length; i++) {
+            var select = liveselects[i];
+            var endpoint = select.dataset.filledby;
+            var valuekey = select.dataset.selectvalue;
+            var displaykey = select.dataset.selectdisplayname;
+            var filling = liliumcms.livevars.pulloutLiveVar(endpoint, true);
+            
+            if (filling) for (var j = 0; j < filling.length; j++) {
+                var elOpt = document.createElement('option');
+                elOpt.textContent = filling[j][displaykey];
+                elOpt.value = filling[j][valuekey];
+
+                select.appendChild(elOpt);
+            }
+        }
+    };
+
     this.parse = function() {
         var domv = document.querySelector('lml\\:dom');
         if (domv) {
@@ -570,6 +593,7 @@ var LMLDom = function() {
         ldContext.livevars = liliumcms.livevars.deepLivevars(true);
 
         var now = new Date();
+        this.parseLiveFields(maindom);
         this.parseNode(maindom);
         var lvs = maindom.querySelectorAll("lml\\:livevars");
         for (var i = 0; i < lvs.length; i++) {
