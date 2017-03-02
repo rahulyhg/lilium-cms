@@ -297,6 +297,7 @@ var Core = function () {
         styledpages.registerAdminEndpoint();
         history.registerEndpoints();
         Article.registerContentEndpoint();
+        mail.setupController();
 
 /*
         api.registerApiEndpoint('articles', 'GET', function (cli) {
@@ -414,6 +415,15 @@ var Core = function () {
             priority: 250,
             rights: ["styledpages"],
             absURL: aurl + "styledpages/list",
+            children: []
+        });
+        admin.registerAdminMenu({
+            id: "mailtemplates",
+            faicon: "fa-envelope-o",
+            displayname: "Email Templates",
+            priority: 250,
+            rights: ["edit-emails"],
+            absURL: aurl + "mailtemplates/list",
             children: []
         });
         admin.registerAdminMenu({

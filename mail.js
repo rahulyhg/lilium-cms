@@ -1,7 +1,9 @@
 const log = require('./log.js');
 const google = require('googleapis');
 const fileserver = require('./fileserver.js');
+const filelogic = require('./filelogic.js');
 const nodemailer = require('nodemailer');
+const db = require('./includes/db.js');
 
 let senderInfo = {
     default : {
@@ -11,6 +13,12 @@ let senderInfo = {
         handler : "gmail",
         transporter : {}
     }
+};
+
+let mailHooks = {
+    to_new_user : {displayname : "New user was created. Send to new user."},
+    lilium_restarted : {displayname : "Lilium restarted. Send to admins."},
+    to_production_contractor_send_for_revision : {displayname : "Contractor submits article for revision. Send to production."}
 };
 
 class EMail {
@@ -33,9 +41,157 @@ class EMail {
     }
 };
 
-class MailController {
-    bind() {
+class MailTemplate {
+    constructor() {
+        this.displayname = "New Email template";
+        this.subject = "";
+        this.hooks = "";
+        this.description = "";
+        this.template = "";
+        this.stylesheet = "a { \n\tcolor : #9B59B6; \n\tfont-weight: bold; \n}";
+        this.active = true;
+        this._id;
+    }
 
+    static save(_c, templateid, template, cb) {
+        db.update(_c, 'mailtemplates', {_id : db.mongoID(templateid)}, template, (err) => {
+            cb && cb(err);
+        });
+    }
+}
+
+class MailController {
+    constructor() {
+        require('./config.js').eachSync((conf) => {
+            db.createCollection(conf, 'mailtemplates');
+        });
+
+        this.createForm();
+    }
+
+    createForm() {
+        require('./formBuilder.js').createForm('mailtemplate_edit', {
+            formWrapper: {
+                'tag': 'div',
+                'class': 'row',
+                'id': 'article_new',
+                'inner': true
+            },
+            fieldWrapper : "lmlform-fieldwrapper"
+        })
+        .add('displayname', 'text', {
+            displayname : "Template name"
+        })
+        .add('subject', 'text', {
+            displayname : "Subject"
+        })
+        .add('template', 'ckeditor', {
+            nolabel : true
+        })
+        .add('description', 'text', {
+            displayname : "Short description"
+        })
+        .add('stylesheet', 'textarea', {
+            displayname : "Stylesheet"
+        })
+        .add('hooks', 'liveselect', {
+            endpoint: 'mailtemplates.hooks',
+            select : {
+                value : 'name',
+                displayname : 'displayname'
+            },
+            empty : {
+                displayname : "No automation"
+            },
+            displayname: "Automatically send when"
+        })
+        .add('publish-set', 'buttonset', { buttons : [{
+                'name' : 'save',
+                'displayname': 'Save',
+                'type' : 'button',
+                'classes': ['btn', 'btn-default', 'btn-save']
+            }
+        ]});
+    }
+
+    handleLivevar(cli, levels, params, send) {
+        if (cli.hasRight('edit-emails')) {
+            if (levels[0] == "all") {
+                db.findToArray(cli._c, 'mailtemplates', {active : true}, (err, arr) => {
+                    send(arr);
+                });
+            } else if (levels[0] == "hooks") {
+                let arr = [];
+                for (var name in mailHooks) {
+                    arr.push(Object.assign(mailHooks[name], {name : name}));
+                }
+
+                send(arr);
+            } else if (levels[0] == "simple") {
+                db.find(cli.c, 'mailtemplates', {active : true}, [], (err, cur) => {
+                    cur.project({_id : 1, displayname : 1}).toArray((err, arr) => {
+                        send(arr);
+                    });
+                });
+            } else if (levels[0]) {
+                db.findUnique(cli._c, 'mailtemplates', {_id : db.mongoID(levels[0]), active : true}, (err, obj) => {
+                    send(obj);
+                });
+            } else {
+                send(new Error("Undefined level " + levels[0]));
+            }
+        } else {
+            send(new Error("Get outta here"));
+        }
+    }
+
+    handleGET(cli) {
+        if (!cli.hasRight('edit-emails')) {
+            return cli.throwHTTP(403);
+        }
+
+        switch (cli.routeinfo.path[2]) {
+            case undefined:
+            case "list":
+                filelogic.serveAdminLML(cli);
+                break;
+
+            case "edit":
+                filelogic.serveAdminLML(cli, true);
+                break;
+
+            case 'new':
+                db.insert(cli._c, 'mailtemplates', new MailTemplate(), (err, r) => {
+                    cli.redirect(cli._c.server.url + "/admin/mailtemplates/edit/" + r.insertedId.toString(), false, 'rewrite');
+                });
+                break;
+
+            default:
+                cli.throwHTTP(404);
+        }
+    }
+
+    handlePOST(cli) {
+        if (!cli.hasRight('edit-emails')) {
+            return cli.throwHTTP(403);
+        }
+
+        switch (cli.routeinfo.path[2]) {
+            case 'edit':
+                MailTemplate.save(cli._c, cli.routeinfo.path[3], cli.postdata.data, (err) => {
+                    cli.sendJSON({success : !err, error : err});
+                });
+                break;
+
+            default:
+                cli.throwHTTP(404);
+        }
+    }
+
+    bind() {
+        require('./livevars.js').registerLiveVariable('mailtemplates', this.handleLivevar);
+        require('./backend/admin.js').registerAdminEndpoint('mailtemplates', 'GET', this.handleGET);
+        require('./backend/admin.js').registerAdminEndpoint('mailtemplates', 'POST', this.handlePOST);
     }
 };
 
@@ -62,6 +218,13 @@ class LMLMail {
                 }
             });
         }
+    }
+
+    addHook(_c, hookname, displayname) {
+        mailHooks[hookname] = {
+            name : hookname,
+            displayname : displayname
+        };
     }
 
     createEmail(_c, to, subject, content) {

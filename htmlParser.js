@@ -160,6 +160,10 @@ var HtmlParser = function () {
                 case "lmlclosure":
                     htmlForm += parseClosure(field);
                     break;
+                // LMLDom 0.8+
+                case "liveselect":
+                    htmlForm += parseLiveSelect(field);
+                    break;
                 default:
                     htmlForm += this.checkRegisteredTypes(field);
                 }
@@ -387,6 +391,21 @@ var HtmlParser = function () {
         }
 
         return input + "</select>";
+    };
+
+    var parseLiveSelect = function(field) {
+        var attr = field.attr;
+        var output = '<lml:livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml:livevars>' +
+            '<label for="'+field.name+'">'+attr.displayname+'</label>' +
+            '<select name="'+field.name+'" class="lmldom-liveselect" data-filledby="'+attr.endpoint+'" ' + 
+                'data-selectvalue="'+attr.select.value+'" '+
+                'data-selectdisplayname="'+attr.select.displayname+'" >';
+        
+        if (attr.empty) {
+            output += '<option value="">'+attr.empty.displayname+'</option>';
+        }
+
+        return output + "</select>";
     };
 
     var parseHiddenType = function (field) {
