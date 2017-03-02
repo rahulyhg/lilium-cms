@@ -31,9 +31,20 @@ class EMail {
     attach(filepath) {
         this.files.push(filepath)
     }
-}
+};
+
+class MailController {
+    bind() {
+
+    }
+};
 
 class LMLMail {
+    setupController() {
+        this.controller = new MailController();
+        this.controller.bind();
+    }
+
     setSender(siteid, sender) {
         if (sender && sender.user && sender.pass) {
             senderInfo[siteid] = senderInfo[siteid] || {};
@@ -151,6 +162,6 @@ class LMLMail {
             that.setSender(pkg._c.id, newSender);
         });
     }
-}
+};
 
 module.exports = new LMLMail();
