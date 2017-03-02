@@ -78,7 +78,7 @@ var fetchHomepageArticles = function(_c, cb) {
     var sett = themes.getEnabledTheme(_c).settings;
     var homepageSections = sett.homepagesections;
     var i = 0;
-    var len = Object.keys(homepageSections).length;
+    var len = Object.keys(homepageSections || {}).length;
     var sectionArr = new Array();
     var authors = {};
 
