@@ -491,6 +491,26 @@ article .article-share-arrow-wrapper .article-social-upward-arrow {
     width: 34px;
 }
 
+article #article-content .keep-on-reading-wrapper a.keep-on-reading {
+    color: #FFF;
+    background-color: #777;
+    border-radius: 3px;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    display: block;
+    font-family: "Oswald", sans-serif;
+    margin-top: 20px;
+    font-size: 26px;
+    font-weight: 500;
+    text-transform: uppercase;
+}   
+
+article #article-content .keep-on-reading-wrapper .fa-chevron-right {
+    font-size: 28px;
+    margin-left: 10px;
+}
+
 /* Instagram embed */
 .lml-instagram-embed-wrapper {
     position: relative;
