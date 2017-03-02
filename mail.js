@@ -48,7 +48,7 @@ class MailTemplate {
         this.hooks = "";
         this.description = "";
         this.template = "";
-        this.stylesheet = "a { \n\tcolor : #9B59B6; \n\tfont-weight: bold; \n}";
+        this.stylesheet = "a {\n    color : #9B59B6;\n    font-weight: bold;\n}";
         this.active = true;
         this._id;
     }
@@ -92,7 +92,8 @@ class MailController {
             displayname : "Short description"
         })
         .add('stylesheet', 'textarea', {
-            displayname : "Stylesheet"
+            displayname : "Stylesheet",
+            rows : 10
         })
         .add('hooks', 'liveselect', {
             endpoint: 'mailtemplates.hooks',

@@ -402,7 +402,7 @@ var HtmlParser = function () {
                 'data-selectdisplayname="'+attr.select.displayname+'" >';
         
         if (attr.empty) {
-            output += '<option value="">'+attr.empty.displayname+'</option>';
+            output += '<option value="" class="lmldom-liveselect-opt-none">'+attr.empty.displayname+'</option>';
         }
 
         return output + "</select>";
