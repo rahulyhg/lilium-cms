@@ -4,6 +4,7 @@ const fileserver = require('./fileserver.js');
 const filelogic = require('./filelogic.js');
 const nodemailer = require('nodemailer');
 const db = require('./includes/db.js');
+const LML2 = require('./lml/compiler.js');
 
 let senderInfo = {
     default : {
@@ -228,12 +229,41 @@ class LMLMail {
         };
     }
 
+    // Extra must contain "to : [strings]"
+    triggerHook(_c, hookname, to, extra, cb) {
+        const that = this;
+
+        log('Mail', 'Triggering email hook ' + hookname + ' for ' + to);
+        db.findToArray(_c, 'mailtemplates', { hooks : hookname }, (err, templates) => {
+            for (let i = 0; i < templates.length; i++) {
+                let template = templates[i];
+                let lmllibs = extra.lmllibs ? ("{#"+ extra.lmllibs.join(';') +"}") : "{#config;extra;date}";
+                let body = lmllibs + '<html><head><style>' + 
+                    template.stylesheet + '</style></head><body>' + 
+                    template.template + '</body></html>';
+
+                extra = extra || {};
+                extra.config = _c;
+
+                LML2.compileToString(_c.id, body, extra, (compiledPage) => {
+                    log('Mail', 'Preparing to send LML email to ' + to);
+                    const email = that.createEmail(_c, to, template.subject);
+                    email.setHTML(compiledPage);
+                    that.send(email, () => {
+                        log('Mail', 'Sent email to ' + to + ' from hook ' + hookname);
+                        cb && cb();
+                    });
+                });
+            }
+        });
+    }
+
     createEmail(_c, to, subject, content) {
         return new EMail(_c.id, to, subject, content);
     }
 
     sendGMail(email, callback) {
-        if (!email.to || !email.subject || !email.content) {
+        if (!email.to || !email.subject || (!email.content && !email.html)) {
             log('Gmail', 'Could not send email due to missing fields', 'warn');
             callback && callback(new Error("Could not send email : missing fields"));
         } else {

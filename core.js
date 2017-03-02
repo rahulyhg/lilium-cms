@@ -754,6 +754,20 @@ var Core = function () {
         notification.init();
     }
 
+    var notifyAdminsViaEmail = function() {
+        db.findToArray(_c.default(), "entities", {roles : "lilium"}, function(err, users) {
+            users.forEach(function(user) {
+                if (user.email) {
+                    mail.triggerHook(_c.default(), 'lilium_restarted', user.email, {
+                        sigsha : require("crypto-js").SHA256(new Date()).toString(require("crypto-js").enc.Hex),
+                        user : user,
+                        lmllibs : ["config", "extra", "date"]
+                    });
+                }
+            });
+        });
+    };
+
     var loadFrontend = function () {
         log('Frontend', 'Registering default values from core', 'info');
         Frontend.registerFromCore();
@@ -912,6 +926,7 @@ var Core = function () {
                                     log('Lilium', 'Starting inbound server', 'info');
                                     Inbound.createServer();
                                     loadNotifications();
+                                    notifyAdminsViaEmail();
                                     Inbound.start();
         
                                     log('Core', 'Firing initialized signal', 'info');

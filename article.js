@@ -181,38 +181,38 @@ var Article = function() {
             if (arr.length === 0) {
                 cb(false, new Error("No article found"));
             } else {
+                var titlekeywords = (arr[0].title || art[0].name).replace(/[^a-zA-Z\s]/g, '').split( ' ' ).filter(function ( str ) {
+                    var word = str.match(/(\w+)/);
+                    return word && word[0].length > 3;
+                }).join( ' ' );
+
                 db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
                         // Text query with title, content would be too heavy
                         $match : {
-                            $text : { 
-                                $search : arr[0].title ? arr[0].title.replace(/[^a-zA-Z\s]/g, '') : arr[0].name
-                            }
-                        }
-                    },{
-                        $match : {
-                            status : "published",
-                            media : {
-                                $exists : true,
-                                $ne : ""
-                            },
                             _id : {
-                                $ne : arr[0]._id
+                                $lt : arr[0]._id
                             }, 
-                            date : {
-                                $gte : new Date(new Date().setFullYear(new Date().getFullYear() - 1))
-                            }
+                            $text : { 
+                                $search : titlekeywords
+                            },
+                            $and : [
+                                {date : {$gt : new Date(new Date(arr[0].date).getTime() - (1000 * 60 * 60 * 24 * 31 * 6) )}},
+                                {date : {$lt : new Date(arr[0].date)}}
+                            ],
+                            status : "published",
                         }
                     },{
                         // Sort content by what matches the highest
                         $sort : { 
                             score: { 
                                 $meta: "textScore" 
-                            } 
+                            },
+                            date : -1 
                         }
                     },{
                         // Have at most seven related
-                        $limit : 7
+                        $limit : 5
                     },{
                         // Get featured image 
                         $lookup : {
@@ -226,23 +226,19 @@ var Article = function() {
                             arr[0].related = relarr;
                         }
 
-                        db.findToArray(conf, 'categories', {name : {$in : arr[0].categories}}, function(err, catarr) {
-                            arr[0].categories = catarr;
-                            col.find({
-                                date : { $lt : arr[0].date },
-                                author : arr[0].author
-                            }).sort({date : -1}).limit(3).toArray(function(err, mfarr) {    
+                        var continueWorking = function() {
+                            db.findToArray(conf, 'categories', {name : {$in : arr[0].categories}}, function(err, catarr) {
+                                arr[0].categories = catarr;
                                 db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
                                     arr[0].authors = autarr;
-                                    arr[0].morefrom = mfarr;
-    
+
                                     var evts = hooks.getHooksFor('article_deepfetch');
                                     var keys = Object.keys(evts);
                                     var kIndex = -1;
-    
+
                                     var next = function() {
                                         kIndex++;
-    
+
                                         if (kIndex == keys.length) {
                                             hooks.fire('article_will_fetch', {
                                                 _c : conf,
@@ -254,11 +250,28 @@ var Article = function() {
                                             evts[keys[kIndex]].cb(conf, arr[0], next);
                                         }
                                     };
-    
+
                                     next();
                                 });
                             });
-                        });
+                        };
+
+                        if (!relarr || relarr.length == 0) {
+                            col.find({_id : {$lt : arr[0]._id}}).sort({_id : -1}).limit(1).next(function(err, rel) {
+                                if (!err && rel) {
+                                    db.findUnique(conf, 'uploads', {_id : db.mongoID(rel.media)}, function(err, featuredimage) {
+                                        rel.featuredimage = featuredimage;
+                                        arr[0].related = [rel];
+                                    
+                                        continueWorking();
+                                    });
+                                } else {
+                                    continueWorking();
+                                }
+                            });
+                        } else {
+                            continueWorking();
+                        }
                     });
                 });
             }

@@ -539,7 +539,6 @@ var rearrangeImages = function() {
 bindReady();
 bindAdsScroll();
 bindNextScroll();
-bindUpNext();
 bindCurrentScroll();
 bindHeaderScroll();
 detectMobileOS();
