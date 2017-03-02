@@ -92,6 +92,8 @@ var maybeSendMail = function(cli) {
     log('Devtools', 'Testing email with data ' + JSON.stringify(data));
     if (data.to && data.subject && data.content) {
         var email = mailer.createEmail(cli._c, data.to, data.subject, data.content);
+        email.setHTML(data.content);
+
         mailer.send(email, function(err) {
             cli.sendJSON({success : !err, error : err});
         });
