@@ -1,6 +1,7 @@
 var _c = require('./config.js');
 
 var _petals = new Object();
+var LML2 = require('./lml/compiler.js');
 
 var Petals = function () {
     this.isRegistered = function (id) {
@@ -36,7 +37,15 @@ var Petals = function () {
         } else {
             return new Error("Tried to compile unregistered petal with id " + id);
         }
-    }
+    };
+
+    this.compileString = function(_c, petal, extra, cb) {
+        require('./fileserver.js').readFile(this.get(petal), function(lml) {
+            extra = extra || {};
+            extra.config = _c;
+            LML2.compileToString(_c.id, lml, extra, cb);
+        });
+    };
 };
 
 module.exports = new Petals();
