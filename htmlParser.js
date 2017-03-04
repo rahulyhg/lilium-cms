@@ -164,6 +164,9 @@ var HtmlParser = function () {
                 case "liveselect":
                     htmlForm += parseLiveSelect(field);
                     break;
+                case "snip":
+                    htmlForm += parseSnipField(field);
+                    break;
                 default:
                     htmlForm += this.checkRegisteredTypes(field);
                 }
@@ -254,6 +257,21 @@ var HtmlParser = function () {
                 }
                 return str + '</select>';
         }
+    };
+
+    var parsePetalField = function(field) {
+        var petalname = field.attr.petal;
+        if (!petalname) {
+            return "";
+        } else {
+            require('./petal.js').compileString
+        }
+    };
+
+    var parseSnipField = function(field) {
+        var path = require('./config.js').default.server.base + "backend/dynamic/snip/" + field.attr.snip;
+        
+        return "";
     };
 
     var parseSection = function(field) {
