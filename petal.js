@@ -1,7 +1,6 @@
 var _c = require('./config.js');
 
 var _petals = new Object();
-var LML2 = require('./lml/compiler.js');
 
 var Petals = function () {
     this.isRegistered = function (id) {
@@ -43,7 +42,7 @@ var Petals = function () {
         require('./fileserver.js').readFile(this.get(petal), function(lml) {
             extra = extra || {};
             extra.config = _c;
-            LML2.compileToString(_c.id, lml, extra, cb);
+            require("./lml/compiler.js").compileToString(_c.id, lml, extra, cb);
         });
     };
 };
