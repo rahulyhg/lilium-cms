@@ -442,12 +442,12 @@ var getWhatsHot = function(_c, cb) {
                                 _id : article._id, 
                                 fullurl : _c.server.url + "/" + article.name,
                                 featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,
-                                authorname : article.author.displayname,
-                                authorpage : _c.server.url + "/author/" + article.author.slug,
-                                authorface : article.author.avatarURL,
+                                authorname : article.authors[0].displayname,
+                                authorpage : _c.server.url + "/author/" + article.authors[0].slug,
+                                authorface : article.authors[0].avatarURL,
                                 date : article.date, 
                                 category : Category.getCatName(_c, article.categories[0]),
-                                categorylink : _c.server.url + "/category/" + article.category,
+                                categorylink : _c.server.url + "/category/" + article.categories[0],
                                 sponsored : article.isSponsored
                             });
                         }
