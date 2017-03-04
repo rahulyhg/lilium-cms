@@ -441,6 +441,8 @@ var getWhatsHot = function(_c, cb) {
                             articleArray.push({
                                 _id : article._id, 
                                 fullurl : _c.server.url + "/" + article.name,
+                                title : article.title, 
+                                subtitle : article.subtitle,
                                 featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,
                                 authorname : article.authors[0].displayname,
                                 authorpage : _c.server.url + "/author/" + article.authors[0].slug,
