@@ -14,6 +14,7 @@ var cc = undefined;
 var entities = undefined;
 var LML2 = undefined;
 var Article = undefined;
+var Category = undefined;
 
 var themePath;
 var noOp = function() {};
@@ -43,6 +44,7 @@ var initRequires = function(abspath) {
     LML2 = require(abspath + 'lml/compiler.js');
     cc = require(abspath + "config.js");
     Article = require(abspath + "article.js");
+    Category = require(abspath + "category.js");
 };
 
 var registerPictureSizes = function() {
@@ -409,6 +411,54 @@ var generateHomepage = function(_c, cb) {
     });
 }
 
+var getWhatsHot = function(_c, cb) {
+    var toppagesURL = "http://api.chartbeat.com/live/toppages/v3/?apikey="+
+        _c.chartbeat.api_key + "&host="+
+        _c.chartbeat.host + "&section="+
+        _c.chartbeat.section + "&types=1";
+
+    require('request').get(toppagesURL, {}, function(err, resp, body) {
+        var pages = [];
+        try {
+            var respobj = JSON.parse(body);
+            for (var i = 0; i < 12 && i < respobj.pages.length; i++) {
+                var split = respobj[i].path.split('/');
+                pages.push(split[split.length - 2]);
+            }
+
+            var index = 0;
+            var articleArray = [];
+            var nextURL = function() {
+                if (index == pages.length) {
+                    cb(articleArray);
+                } else {
+                    Article.deepFetch(_c, pages[index], function(article) {
+                        articleArray.push({
+                            _id : article._id, 
+                            fullurl : _c.server.url + "/" + article.name,
+                            featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,
+                            authorname : article.author.displayname,
+                            authorpage : _c.server.url + "/author/" + article.author.slug,
+                            authorface : article.author.avatarURL,
+                            date : article.date, 
+                            category : Category.getCatName(article.categories[0]),
+                            categorylink : _c.server.url + "/category/" + article.category,
+                            sponsored : article.isSponsored
+                        });
+
+                        index++;
+                        nextURL();
+                    });
+                }
+            };
+            nextURL();
+
+        } catch (ex) {
+            cb([]);
+        }
+    }); 
+}
+
 var needsHomeRefresh = true;
 var cachedTags = {};
 var loadHooks = function(_c, info) {
@@ -433,6 +483,23 @@ var loadHooks = function(_c, info) {
                 fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
             }
         });
+    });
+
+    var cachedHot = [];
+    var hotRefreshNeeded = true;
+    endpoints.register(_c.id, 'whatshot', 'GET', function(cli) {
+        if (hotRefreshNeeded) {
+            getWhatsHot(cli._c, function(hotArr) {
+                cachedHot = hotArr || [];
+                cli.sendJSON(cachedHot);
+            });
+
+            setTimeout(function() {
+                hotRefreshNeeded = true;
+            }, 1000 * 60 * 5);
+        } else {
+            cli.sendJSON(cachedHot);
+        }
     });
 
     ["tags", "author", "category", "search", "latests"].forEach(function(archType) {
