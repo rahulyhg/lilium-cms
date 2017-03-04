@@ -446,7 +446,7 @@ var getWhatsHot = function(_c, cb) {
                                 authorpage : _c.server.url + "/author/" + article.author.slug,
                                 authorface : article.author.avatarURL,
                                 date : article.date, 
-                                category : Category.getCatName(article.categories[0]),
+                                category : Category.getCatName(_c, article.categories[0]),
                                 categorylink : _c.server.url + "/category/" + article.category,
                                 sponsored : article.isSponsored
                             });
