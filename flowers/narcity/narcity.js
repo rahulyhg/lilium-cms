@@ -499,11 +499,13 @@ var loadHooks = function(_c, info) {
             getWhatsHot(cli._c, function(hotArr) {
                 cachedHot = hotArr || [];
                 cli.sendJSON(cachedHot);
+
+                !hotRefreshNeeded && setTimeout(function() {
+                    hotRefreshNeeded = true;
+                }, 1000 * 60 * 5);
+                hotRefreshNeeded = false;
             });
 
-            setTimeout(function() {
-                hotRefreshNeeded = true;
-            }, 1000 * 60 * 5);
         } else {
             cli.sendJSON(cachedHot);
         }
