@@ -417,34 +417,40 @@ var getWhatsHot = function(_c, cb) {
         _c.chartbeat.host + "&section="+
         _c.chartbeat.section + "&types=1";
 
+    log('Narcity', 'Requesting popular pages');
     require('request').get(toppagesURL, {}, function(err, resp, body) {
         var pages = [];
         try {
             var respobj = JSON.parse(body);
             for (var i = 0; i < 12 && i < respobj.pages.length; i++) {
-                var split = respobj[i].path.split('/');
+                var split = respobj.pages[i].path.split('/');
                 pages.push(split[split.length - 2]);
             }
 
             var index = 0;
             var articleArray = [];
+        
+            log('Narcity', 'Deep fetching ' + pages.length + ' articles');
             var nextURL = function() {
                 if (index == pages.length) {
                     cb(articleArray);
                 } else {
                     Article.deepFetch(_c, pages[index], function(article) {
-                        articleArray.push({
-                            _id : article._id, 
-                            fullurl : _c.server.url + "/" + article.name,
-                            featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,
-                            authorname : article.author.displayname,
-                            authorpage : _c.server.url + "/author/" + article.author.slug,
-                            authorface : article.author.avatarURL,
-                            date : article.date, 
-                            category : Category.getCatName(article.categories[0]),
-                            categorylink : _c.server.url + "/category/" + article.category,
-                            sponsored : article.isSponsored
-                        });
+                        
+                        if (article) {
+                            articleArray.push({
+                                _id : article._id, 
+                                fullurl : _c.server.url + "/" + article.name,
+                                featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,
+                                authorname : article.author.displayname,
+                                authorpage : _c.server.url + "/author/" + article.author.slug,
+                                authorface : article.author.avatarURL,
+                                date : article.date, 
+                                category : Category.getCatName(article.categories[0]),
+                                categorylink : _c.server.url + "/category/" + article.category,
+                                sponsored : article.isSponsored
+                            });
+                        }
 
                         index++;
                         nextURL();
@@ -454,6 +460,7 @@ var getWhatsHot = function(_c, cb) {
             nextURL();
 
         } catch (ex) {
+            log('Narcity', 'Failed because of ' + ex, 'warn');
             cb([]);
         }
     }); 
