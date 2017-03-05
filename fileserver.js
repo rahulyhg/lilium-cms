@@ -223,7 +223,7 @@ var FileServer = function () {
 
     this.listDirContent = function (dirname, callback) {
         fs.readdir(dirname, function (err, content) {
-            callback(err || content);
+            callback(content || [], err);
         });
     };
 
