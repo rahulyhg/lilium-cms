@@ -43,7 +43,7 @@ var Petals = function () {
         require('./fileserver.js').readFile(this.get(petal), function(lml) {
             extra = extra || {};
             extra.config = _c;
-            LML2.compileToString(_c.id, lml, extra, cb);
+            require("./lml/compiler.js").compileToString(_c.id, lml, extra, cb);
         });
     };
 };

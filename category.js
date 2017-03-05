@@ -129,6 +129,8 @@ var Category = function () {
         return catAssoc[_c.id][slug] || slug;
     };
 
+    this.getCatName = getCatName;
+
     this.getRawAssoc = function() {
         return catAssoc;
     };
