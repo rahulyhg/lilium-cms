@@ -53,29 +53,15 @@ var Forms = function () {
             .add('username', 'text', {
                 displayname: "Username"
             })
-            .add('password', 'password', {
-                displayname: "Password"
-            }, {required:false})
             .add('public-info-title', 'title', {
                 displayname : "User information"
             })
-            .add('firstname', 'text', {
-                displayname: "First name"
-            }, {required:false})
-            .add('lastname', 'text', {
-                displayname: "Last name"
-            }, {required:false})
             .add('email', 'text', {
                 displayname: "Email"
             })
-            .add('phone', 'text', {
-                displayname: "Phone"
-            })
             .add('displayname', 'text', {
-                displayname: "Display name"
+                displayname: "Full name"
             })
-            .add('jobtitle', 'text', {displayname : "Job title"}, {required:false})
-            .add('description', 'textarea', {displayname: 'BIO'}, {required:false})
             .add('create', 'submit');
 
         formBuilder.registerFormTemplate('entity_social')

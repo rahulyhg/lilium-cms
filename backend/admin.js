@@ -43,11 +43,15 @@ var Admin = function() {
 
     this.welcome = function(cli, method) {
         if (method == 'GET') {
-
             LML2.compileToFile(cli._c.server.base + "/backend/dynamic/admin/welcome.lml",
                 cli._c.server.html + "/static/tmp/welcome.html",
                 function() {
-                    require('../fileserver.js').pipeFileToClient(cli, cli._c.server.html + "/static/tmp/welcome.html", function() {}, true);
+                    require('../fileserver.js').pipeFileToClient(
+                        cli, 
+                        cli._c.server.html + "/static/tmp/welcome.html", 
+                        function() {}, 
+                        true
+                    );
                 }, {
                     config : cli._c
                 }

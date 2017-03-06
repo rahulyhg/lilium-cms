@@ -150,6 +150,11 @@ var Core = function () {
             LoginLib.authUser(cli);
         });
 
+        endpoints.register('*', 'magiclink', 'GET', function (cli) {
+            cli.touch("endpoints.POST.login");
+            LoginLib.magiclink(cli);
+        });
+
         endpoints.register('*', 'admin', 'POST', function (cli) {
             cli.touch("endpoints.POST.admin");
             admin.handleAdminEndpoint(cli);

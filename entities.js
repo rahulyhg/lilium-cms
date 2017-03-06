@@ -86,6 +86,7 @@ var Entities = module.exports = new function () {
     this.welcome = function(cli) {
         var dat = {
             welcomed : true,
+            magiclink : Math.random() + "/" + Math.random() + "/*/" + Math.random(),
             firstname : cli.postdata.data.firstname,
             lastname : cli.postdata.data.lastname,
             jobtitle : cli.postdata.data.jobtitle,
@@ -627,16 +628,6 @@ var Entities = module.exports = new function () {
             });
 
             cli.touch('entities.registerEntity.callback');
-            /*
-            mailer.createEmail({
-            	to: [newEnt.email],
-            	from: _c.default.emails.default,
-            	subject: "Your account has been Created",
-            	html: 'welcome.lml'
-            },true, function() {
-
-            }, {name:newEnt.firstname + " " + newEnt.lastname});
-            */
             cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath);
         });
     };
@@ -661,7 +652,6 @@ var Entities = module.exports = new function () {
     };
 
     this.validateEntityObject = function (e, cli, cb) {
-    console.log(e);
         var valid = true;
         valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.roles;
         cli.hasEnoughPower(e.roles, function (hasEnoughPower) {
@@ -674,7 +664,21 @@ var Entities = module.exports = new function () {
         this.validateEntityObject(entity, cli, function (valid) {
             if (valid) {
                 cli.did("entity", "createduser", {username : entity.username});
+                
+                // Create Magic Link
+                var magiclink = "lml_" + 
+                    Math.random().toString().substring(3) + "_ml_" + 
+                    Math.random().toString().substring(3) + "_" + new Date().getTime();
+
+                entity.magiclink = magiclink;
                 db.insert(_c.default(), 'entities', entity, callback, true);
+
+                if (entity.email && entity.displayname) {
+                    entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
+                    require('./mail.js').triggerHook(cli._c, 'to_new_user', entity.email, {
+                        entity : entity
+                    });
+                }
             } else {
                 callback("[EntityValidationException] Entity object misses required fields.", undefined);
             }
