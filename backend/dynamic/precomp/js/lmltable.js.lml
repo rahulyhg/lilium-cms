@@ -19,7 +19,7 @@ var LmlTable = function(table) {
 		timeInitial = new Date();
 		this.getData(function() {
 			var now = new Date();
-			console.log('Table Initialized in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+			log('Table', 'Table Initialized in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
 
 		});
 		table.parent().find('.header select').change(function() {
@@ -183,7 +183,7 @@ var LmlTable = function(table) {
 			renderRows();
             updateNav();
 			var now = new Date();
-			console.log('Table updated from cache in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+			log('Table', 'Table updated from cache in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
             liliumcms.pageloader.present();
             fireUpdated();
 		} else {
@@ -203,7 +203,7 @@ var LmlTable = function(table) {
 				renderRows();
                 updateNav();
 				var now = new Date();
-				console.log('Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
+				log('Table', 'Table updated in ' + (now.getTime() - timeRendering.getTime()) + 'ms (' + (now.getTime() - timeInitial) + ' ms with livevar fetching)');
                 liliumcms.pageloader.present();
 
                 fireUpdated();

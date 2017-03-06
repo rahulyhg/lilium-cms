@@ -132,9 +132,11 @@ $}
             </div>
             {$ endif; $}
 
+            {$ if (?extra.article.related.0.name ??) $}
             <div class="keep-on-reading-wrapper">
                 <a class="keep-on-reading" href="{=config.default.server.url}/{=extra.article.related.0.name}">Keep on reading <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
             </div>
+            {$ endif; $}
 
             {$ if (?extra.contextname == "article"); $}
                 {=theme.settings.afterarticle}

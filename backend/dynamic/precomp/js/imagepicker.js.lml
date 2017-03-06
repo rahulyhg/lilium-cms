@@ -18,6 +18,7 @@ var LMLImagePicker = function() {
                 window[elem.id + "_picker_cast"](elem);
             }
 
+            log('ImagePicker', 'Casting image picker');
             that.cast(callback || function(img) {
                 if (img === -1) {
                     elem.dataset.photoid = undefined;
@@ -54,15 +55,21 @@ var LMLImagePicker = function() {
     };
 
     this.seek = function() {
-        $('main.lmladminmain img.pickable').not(".lml-pickable").each(function(index, elem) {
-            that.bind(elem);
-        });
+        var pickers = document.querySelectorAll("main.lmladminmain img.pickable:not(.lml-pickable)");
+        log('ImagePicker', 'Looking for pickable images to bind click; found ' + pickers.length);
+        
+        for (var i = 0; i < pickers.length; i++) {
+            that.bind(pickers[i]);
+        };
     };
 
     this.addPlaceholder = function() {
         var ph = document.createElement('div');
         ph.classList.add("placeholder");
-        ph.innerHTML = '<i class="fa fa-circle-o-notch fa-spin fa-3x fa-fw"></i>';
+
+        var anim = document.createElement('i');
+        anim.className = "fa fa-circle-o-notch fa-spin fa-3x fa-fw";
+        ph.appendChild(anim);
 
         listelem.insertBefore(ph, listelem.querySelector(".lmlimagepicker-image"));
         return ph;
@@ -137,6 +144,7 @@ var LMLImagePicker = function() {
     }
 
     this.fillWithLatests = this.refresh = function() {
+        log('ImagePicker', 'Refreshing cached images');
         document.querySelector(".lmlimagepicker-list").innerHTML = "";
         currentLoadIndex = -1;
         imgpickercache = {};

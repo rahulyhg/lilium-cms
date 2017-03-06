@@ -43,7 +43,7 @@ var Tags = function(tagForm, data) {
 		var input = $(tagsInput).find('input[type=text]');
 
 		var html = '<span class="tag">' + (data || input.val()) +
-			'<input type="hidden" name="' + $(tagsInput).closest('.lmltagswrapper').data('fieldname') + '[]" value="' + (data || input.val()) + '">' +
+			'<input type="hidden" class="tag-val"  value="' + (data || input.val()) + '">' +
 			'<i class="fa fa-times"></i>' +
 			'</span>';
 

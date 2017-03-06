@@ -414,6 +414,61 @@ var LMLDom = function() {
         return elem;
     };
 
+    this.setValueToField = function(field, val) {
+        if (field.dataset.editor == "ckeditor") {
+            field.value = val;
+            CKEDITOR.replace(field);
+
+            log('LMLDOM', 'Filled ckeditor with name ' + field.name);
+        } else if (field.classList.contains('media-input')) { 
+            field.value = val;
+            liliumcms.imagepicker.setImageToElement(field.previousSibling, val);
+        } else if (field.dataset.type == "leaflet") {
+            var locSplit = val.split('_');
+            liliumcms.formParser.setLeafletLocation(field.name, undefined, locSplit[1], locSplit[0]);
+        } else if (field.type == "checkbox") {
+            field.checked = val === true;
+        } else if (field.classList.contains('lmldom-liveselect')) {
+            var rk = field.dataset.selectreadkey;
+
+            if (rk) {
+                var rkLvl = rk.split('.');
+                for (var i = 0; i < rkLvl.length; i++) {
+                    val = val[rkLvl[i]] || "";
+                }
+            }
+
+            field.dataset.initvalue = val;
+            field.value = val;
+        } else if (field.classList.contains('lmldom-multibox-value')) {
+            var rk = field.dataset.selectreadkey;
+
+            if (rk) {
+                var rkLvl = rk.split('.');
+                for (var i = 0; i < rkLvl.length; i++) {
+                    val = val[rkLvl[i]] || "";
+                }
+            }
+
+            var finalval = val;
+            if (typeof val == "object" && val.length) {
+                finalval = val.join(',');
+            }
+            field.value = finalval;
+
+            var valArr = finalval.split(',');
+            var wrapper = field.nextSibling;
+
+            for (var i = 0; i < valArr.length; i++) {
+                wrapper.querySelector("[data-value="+valArr[i]+"]").classList.add('selected');
+            }
+        } else if (field.type == "datetime-local") {
+            field.value = html5datetime(val);
+        } else {
+            field.value = val;
+        }
+    };
+
     this.fillField = function(field, values) {
         var fieldname = field.name.split('.');
         var finalval = values;
@@ -426,7 +481,7 @@ var LMLDom = function() {
             }
 
             if (willAffect) {
-                field.value = finalval;
+                this.setValueToField(field, finalval);
             }
         }
     };
@@ -447,21 +502,45 @@ var LMLDom = function() {
         var livevardata = liliumcms.livevars.pulloutLiveVar(livevarsource, true);
 
         var fields = domForm.querySelectorAll('input, select, textarea');
+        log('LMLDOM', 'Looking for values to fill ' + fields.length + " fields");
         for (var i = 0; i < fields.length; i++) {
             this.fillField(fields[i], livevardata);
         }
 
         var stacktables = liliumcms.getStacktables();
+        log('LMLDOM', 'Working with ' + stacktables.length + ' Stack Tables');
         for (var i = 0; i < stacktables.length; i++) {
             this.fillStackTable(stacktables[i], livevardata);
         }
 
+        var ms = liliumcms.multiselects || [];
+        log('LMLDOM', 'Working with ' + ms.length + ' Multiselects');
+        for (var i = 0; i < ms.length; i++) {
+            ms[i].fillFromData(livevardata);
+        }
+
+        var tags = domForm.querySelectorAll('.tags-input');
+        log('LMLDOM', 'Working with ' + tags.length + ' Tag boxes');
+        for (var i = 0; i < tags.length; i++) {
+            var tag = new Tags(
+                tags[i],
+                livevardata
+            );
+
+            lTags = liliumcms._priv('tags');
+            lTags.push(tag);
+            tags[i].dataset.tagsindex = lTags.length - 1;
+        }
+
+        log('LMLDOM', 'Done filling fields');
         domForm.dataset.filled = true;
         domForm.classList.add('lmldom-filled');
     };
 
     this.fillForms = function() {
         var forms = document.querySelectorAll('.lmldom-filled-form');
+
+        log('LMLDOM', "Working with " + forms.length + " forms");
         for (var i = 0; i < forms.length; i++) {
             this.fillForm(forms[i]);
         }
@@ -503,13 +582,32 @@ var LMLDom = function() {
 
             // Normal fields loop
             for (var i = 0; i < ff.form.length; i++) {
-                if (ff.form[i].classList.contains("stacktable-field")) {
+                if (
+                    ff.form[i].type == "button" ||
+                    ff.form[i].classList.contains("stacktable-field")
+                ) {
                     continue;
+                } else if (ff.form[i].classList.contains('lmldom-multibox-value')) {
+                    ff.values[ff.form[i].name] = ff.form[i].value.split(',');
                 } else if (CKEDITOR.instances[ff.form[i].name]) {
                     ff.values[ff.form[i].name] = CKEDITOR.instances[ff.form[i].name].getData();
+                } else if (ff.form[i].type == "checkbox") {
+                    ff.values[ff.form[i].name] = ff.form[i].checked;
                 } else {
                     ff.values[ff.form[i].name] = ff.form[i].value;
                 }
+            }
+
+            // Tags
+            var aTags = ff.form.querySelectorAll('.tags-input');
+            for (var i = 0; i < aTags.length; i++) {
+                var hTags = aTags[i].querySelectorAll('.tag-val');
+                var arr = [];
+                for (var j = 0; j < hTags.length; j++) {
+                    arr.push(hTags[j].value);
+                }
+
+                ff.values[aTags[i].parentElement.dataset.fieldname] = arr;
             }
 
             // Stack tables
@@ -566,6 +664,7 @@ var LMLDom = function() {
     this.parseLiveFields = function(maindom) {
         // Live Select : select.lmldom-liveselect
         var liveselects = maindom.querySelectorAll(".lmldom-liveselect");
+        log('LMLDOM', 'Working with ' + liveselects.length + ' live select fields');
         for (var i = 0; i < liveselects.length; i++) {
             var select = liveselects[i];
             var endpoint = select.dataset.filledby;
@@ -580,53 +679,159 @@ var LMLDom = function() {
 
                 select.appendChild(elOpt);
             }
+
+            select.value = select.dataset.initvalue || select.value;
+        }
+
+        // Multibox : *.lmldom-multibox
+        var multiboxes = maindom.querySelectorAll(".lmldom-multibox");
+        log('LMLDOM', 'Working with ' + multiboxes.length + ' live multibox fields');
+
+        var multiboxClickCallback = function() {
+            var hField = document.getElementsByName(this.dataset.fieldname)[0];
+            var wrapper = hField.nextSibling;
+            var selecteds = wrapper.querySelectorAll('.selected');
+            var values = [];
+
+            if (!wrapper.dataset.multiple) {
+                if (selecteds.length != 0) {
+                    selecteds[0].classList.remove('selected');
+                }
+
+                this.classList.add('selected');
+                values = [this.dataset.value];
+            } else {
+                this.classList.toggle('selected');
+                
+                for (var i = 0; i < selecteds.length; i++) {
+                    values.push(selecteds[i].dataset.value);
+                }
+
+                values.push(this.dataset.value);
+            }
+
+            hField.value = values;
+        }
+
+        for (var i = 0; i < multiboxes.length; i++) {
+            var multibox = multiboxes[i];
+            var endpoint = multibox.dataset.filledby;
+            var valuekey = multibox.dataset.selectvalue;
+            var displaykey = multibox.dataset.selectdisplayname;
+            var boxfilling = liliumcms.livevars.pulloutLiveVar(endpoint, true);
+            var hField = document.getElementsByName(multibox.dataset.fieldname)[0];
+            var arrValue = hField.value.split(',');
+
+            if (boxfilling) for (var j = 0; j < boxfilling.length; j++) {
+                var ss = document.createElement('span');
+                ss.textContent = boxfilling[j][displaykey];
+                ss.dataset.value = boxfilling[j][valuekey];
+                ss.dataset.fieldname = multibox.dataset.fieldname;
+                ss.addEventListener('click', multiboxClickCallback);
+
+                if (arrValue.indexOf(ss.dataset.value) != -1) {
+                    ss.classList.add('selected');
+                }
+
+                multibox.appendChild(ss);
+            }
+
         }
     };
 
-    this.parse = function() {
+    this.parseSnips = function(maindom, cb) {
+        var allSnips = maindom.querySelectorAll('.lmldom-snip');
+        var total = allSnips.length;
+        var currentIndex = 0;
+
+        log('LMLDOM', 'Working with ' + total + ' snips');
+        var nextSnip = function() {
+            if (currentIndex == total) {
+                cb();
+            } else {
+                var gotSnip = function() {
+                    snipMarkup = this.responseText;
+                    allSnips[currentIndex].innerHTML = snipMarkup;
+                    var inlineJS = allSnips[currentIndex].querySelectorAll('script');
+
+                    for (var i = 0; i < inlineJS.length; i++) {
+                        var injs = inlineJS[i].textContent;
+                        eval.call(window, injs || "");
+                        inlineJS[i].dataset.executedby = "lmldom";
+                    }
+
+                    currentIndex++;
+                    nextSnip();
+                }
+
+                var oReq = new XMLHttpRequest();
+                oReq.addEventListener("load", gotSnip);
+                oReq.open("GET", "{=config.default.server.url}/admin/snips/" + allSnips[currentIndex].dataset.snip + "?async=true");
+                oReq.send();
+            }
+        };
+
+        nextSnip();
+    };
+
+    this.parse = function(lmldomReady) {
         var domv = document.querySelector('lml\\:dom');
+        var lmldom = this;
         if (domv) {
             domv = domv.getAttribute('v');
         } else {
-            this.removeFeatures();
-            return;
+            lmldom.removeFeatures();
+            return lmldomReady && lmldomReady();
         }
 
         ldContext.livevars = liliumcms.livevars.deepLivevars(true);
 
+        log('LMLDOM', 'Parsing Lilium Document Object Model v' + domv);
         var now = new Date();
-        this.parseLiveFields(maindom);
-        this.parseNode(maindom);
-        var lvs = maindom.querySelectorAll("lml\\:livevars");
-        for (var i = 0; i < lvs.length; i++) {
-            lvs[i].remove();
-        }
-
-        console.log("Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
-
-        this.fillForms();
-        this.removeFeatures();
-        this.addFeatures();
-
-        liliumcms.pageloader.parseDocument();
-        document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
-            detail : {
-                version : domv,
-                protocol : "lmldom",
-                timetoparse : (new Date() - now)
+        lmldom.parseLiveFields(maindom);
+        lmldom.parseSnips(maindom, function() {
+            log('LMLDOM', 'Working with LMLDOM markup');
+            lmldom.parseNode(maindom);
+            var lvs = maindom.querySelectorAll("lml\\:livevars");
+            for (var i = 0; i < lvs.length; i++) {
+                lvs[i].remove();
             }
-        }));
 
-        while (domhooks.length) {
-            domhooks.pop()();
-        }
+            lmldom.fillForms();
+
+            log('LMLDOM', 'Applying page features');
+            lmldom.removeFeatures();
+            lmldom.addFeatures();
+
+            log("LMLDOM", "Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
+            liliumcms.pageloader.parseDocument();
+
+            log('LMLDOM', 'Dispatching lmlDOMLoaded event');
+            document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
+                detail : {
+                    version : domv,
+                    protocol : "lmldom",
+                    timetoparse : (new Date() - now)
+                }
+            }));
+
+            log('LMLDOM', 'Firing ' + domhooks.length + " LMLDOM hooks");
+            while (domhooks.length) {
+                domhooks.pop()();
+            }
+
+            log('LMLDOM', 'Parsing done!');
+            lmldomReady && lmldomReady(lmldom);
+        });
     };
 
     this.bind = function(cb) {
+        log('LMLDOM', 'Registered hook');
         domhooks.push(cb);
     };
 
     this.init = function() {
+        log('LMLDOM', 'Initializing Lilium Document Object Model');
         maindom = document.getElementById('lml-main');
 
         HTMLUnknownElement.prototype.insertAfter = 
@@ -638,5 +843,7 @@ var LMLDom = function() {
         HTMLElement.prototype.getElementsByName = function(name) {
             return this.querySelectorAll('[name="'+name+'"]');
         };
+
+        log('LMLDOM', 'Done initializing');
     };
 };

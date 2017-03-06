@@ -23,7 +23,10 @@ class LMLContext {
 
         this.lib = {
             config : config,
-            extra : extra,
+            extra : extra
+        };
+
+        this.consts = {
             "false" : false,
             "true" : true,
             "undefined" : undefined,
@@ -186,6 +189,8 @@ class LMLSlang {
                 if (flags["?"]) {
                     curVal = undefinedReplacement ? this.getReturn(undefinedReplacement, flags) : undefined;
                     break;
+                } else if (typeof ctx.consts[levels[i].name] != "undefined") {
+                    curVal = ctx.consts[levels[i].name];
                 } else {
                     curVal = new Error("[LMLSlangException] Undefined branch {" + levels[i].name + "} in line {" + line + "}");
                 }
@@ -210,6 +215,8 @@ class LMLSlang {
                 curVal = parseFloat(curVal);
             } else if (flags["&"]) {
                 curVal = curVal.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\"/g, "&quot;"); 
+            } else if (typeof ctx.consts[curVal] != "undefined"){
+                curVal = ctx.consts[curVal];
             }
         } else if (type == "object" && flags["#"]) {
             curVal = JSON.stringify(curVal);

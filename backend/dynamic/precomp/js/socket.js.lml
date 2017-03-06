@@ -103,22 +103,22 @@ $(document).ready(function() {
 
         socket.on('group', function(data) {
             if (debugMode) {
-                console.log('[Notification] Message from group "' + data.group + '" : ' + data.msg);
+                log('Notification', 'Message from group "' + data.group + '" : ' + data.msg);
             }
         });
 
         socket.on('debug', function(data) {
             if (debugMode) {
-                console.log('[Notification] ' + data.msg);
+                log('Notification', data.msg);
             }
         })
 
         socket.on('err', function(data) {
-            console.error('[Notification] ' + data.msg);
+            log('Notification', data.msg, 'err');
         });
 
         socket.on('disconnect', function(err) {
-            console.warn("[Lilium] Lost connection with server.");
+            log("Lilium", "Lost connection with server.", "warn");
             $('body').addClass('offline');
             liliumcms.notify({
                 title : "You are now offline",
@@ -129,7 +129,7 @@ $(document).ready(function() {
         });
 
         socket.on('reconnect', function(rec) {
-            console.log('[Lilium] Reconnected with server after ' + rec + ' tries.');
+            log("Lilium", 'Reconnected with server after ' + rec + ' tries.', "info");
             $('body').removeClass('offline');
             liliumcms.notify({
                 title : "And we're back online!",

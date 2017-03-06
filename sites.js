@@ -104,7 +104,7 @@ var SiteInitializer = function (conf, siteobj) {
         	var collectionsNames = [
 		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview",
         		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history",
-		        "lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations",
+		        "lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations", "communications",
 		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges", "styledpages"
         	];
 

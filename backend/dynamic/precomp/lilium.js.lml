@@ -32,7 +32,21 @@ var socket = typeof io !== 'undefined' ? io(window.location.urlBase + window.loc
 }) : undefined;
 window.lmlsocket = socket;
  
+var log = window.log = function(sender, msg, type, style) {
+    var output = new Date().toLocaleTimeString() + ' [' + sender + "] " + msg;
+    switch (type) {
+        case "warn"  : console.warn(output); break;
+        case "err"   : console.error(output); break;
+        case "info"  : console.info(output); break;
+        case "lilium": console.log("%c" + output, "color: #9B59B6; font-weight: bold; font-size: 12px;"); break;
+        case "style" : console.log('%c' + output, style); break;
+        default      : console.log(output);
+    };
+};
+
 var LiliumCMS = function() {
+    // console.log("%cLilium CMS", "font-size: 48px; color: #9B59B6; text-shadow: 0px 0px 10px rgba(200,110,220,0.3); font-family : Arial;");
+    console.log("%c", "font-size: 1px; line-height: 100px; background-image: url({=config.default.server.protocol}{=config.default.server.url}/static/media/masthead.png); background-size: 340px 100px; padding: 50px 170px;");
     var livevarsResponse;
     var urlParams;
     var pushtables = this.pushtables = new Array();
@@ -191,6 +205,8 @@ var LiliumCMS = function() {
                         validField = false;
                     }
                 }
+
+                
                 $('[ckeditor]').val($('[ckeditor]').ckeditor().val());
 
                 if (!validField) {
@@ -624,6 +640,7 @@ var LiliumCMS = function() {
             });
         
             this.highlight();
+            log('AdminMenu', 'Initialized admin menu panel');
         };
 
         this.highlight = function() {
@@ -667,6 +684,8 @@ var LiliumCMS = function() {
 
                 liliumcms.queryparams.parseHTML();
             }
+
+            log('QueryParams', 'Parsed URL query parameters');
         };
 
         this.parseHTML = function() {
@@ -719,6 +738,7 @@ var LiliumCMS = function() {
         var that = this;
 
         this.present = function() {
+            log('PageLoader', 'Presenting current page');
             $("#lilium-logo").removeClass('quickrotate');
             $('undefined, lml\\:livevars').remove();
         };
@@ -742,6 +762,7 @@ var LiliumCMS = function() {
         };
 
         this.load = function(url, ignoreHistory) {
+            log('PageLoader', 'Loading URL : ' + url + (ignoreHistory ? " without " : " with ") + "history support");
             this.tidy();
             if (!ignoreHistory) {
                 this.pushHistory(url);
@@ -771,6 +792,7 @@ var LiliumCMS = function() {
                 var scripts = document.querySelectorAll('main.lmladminmain script');
                 for (var i = 0; i < scripts.length; i++) {
                     eval.call(window, scripts[i].textContent);
+                    scripts[i].dataset.executedby = "pageloader";
                 }
 
                 if (this.responseURL.indexOf('rewrite') != -1) {
@@ -778,6 +800,7 @@ var LiliumCMS = function() {
                     that.pushHistory(url)
                 }
 
+                log('PageLoader', 'Done loading page, calling post load');
                 that.postload();
             }
 
@@ -788,6 +811,7 @@ var LiliumCMS = function() {
         };  
 
         this.loadCurrentURL = function() {
+            log('PageLoader', 'Loading Current URL into view');
             this.load(location.href, true);
         }
 
@@ -801,13 +825,15 @@ var LiliumCMS = function() {
             document.body.classList.remove('modal-open');
             document.querySelector('.lmladminsidebar').classList.remove("mobile-shown");
         
+            log('PageLoader', 'Passing request to Livevars');
             liliumcms.livevars.exec(true);
         };
 
         this.parseDocument = function(wrapper) {
+            log('PageLoader', 'Seeking links, transform them into async links');
             $(wrapper || 'main.lmladminmain a').each(function(index, a) {
                 a = $(a);
-                var href = a.attr('href');
+                var href = a.attr('href') || "";
                 if (
                     !a.data('async') &&
                     !a.data("replace") && 
@@ -827,6 +853,7 @@ var LiliumCMS = function() {
         };
 
         this.parseAdminPanel = function() {
+            log('PageLoader', 'Binding links to load inside page async');
             $('a').each(function(index, a) {
                 a = $(a);
                 var href = a.attr('href');
@@ -948,6 +975,7 @@ var LiliumCMS = function() {
                 _modals[mod.id] = new LMLModal(mod);
             }
 
+            log('Modals', 'Found ' + allmodals.length + ' Lilium Modals in page');
             _modals["lml-error-modal"] = new LMLModal(document.getElementById('lml-error-modal'));
         };
 
@@ -968,6 +996,7 @@ var LiliumCMS = function() {
         this.current = {};
 
         this.init = function() {
+            log('Session', 'Recrieving session');
             this.current = liliumcms.livevars.retrieveVar('session');
         }
     };
@@ -975,6 +1004,7 @@ var LiliumCMS = function() {
     var LMLResponsive = function() {
         this.init = function() {
             document.querySelector('.header-burger').addEventListener('click', liliumcms.responsive.toggleSlideMenu);
+            log('Responsive', 'Bound click on burger icon for mobile support');
         };
 
         this.toggleSlideMenu = function() {
@@ -1039,11 +1069,13 @@ var LiliumCMS = function() {
     };
 
     this.everythingIsAwesome = function() {
+        log('Lilium', 'Everything is awesome! Cleaning up...', 'lilium');
         $('.dropdown-menu #avatar img').attr('src', that.livevars.livevars().session.avatarURL);
         $('body').addClass('lmlrendered');
         $('undefined, lml\\:livevars').remove();
 
         if (Notification.permission !== "granted") {
+            log('Lilium', 'Requesting permission to push desktop notifications');
             Notification.requestPermission();
         }
     };
@@ -1138,40 +1170,41 @@ document.addEventListener('livevarsRendered', function(e) {
     if (!liliumcms.admininit) {
         liliumcms.admininit = true;
 
+        log('Lilium', 'Awesomestrapping some amazingness', 'lilium');
+
         liliumcms.queryparams.parseURL();
         liliumcms.responsive.init();
         liliumcms.session.init();
-        liliumcms.ckeditor ? liliumcms.ckeditor.initEditor() : false;
+        liliumcms.ckeditor && liliumcms.ckeditor.initEditor();
         liliumcms.adminmenu.init();
         liliumcms.modals.find();
         liliumcms.pageloader.parseAdminPanel();
         liliumcms.pageloader.loadCurrentURL();
         liliumcms.pageloader.bindHistory();
-        liliumcms.badges.createCache();
         liliumcms.conversations.fillChat();
         liliumcms.conversations.fillForms();
         liliumcms.lmldom.init();
         liliumcms.rights.init();
         liliumcms.everythingIsAwesome();
     } else {
-        liliumcms.multiselects.forEach(function(select) {
-            if (!select.isRendered) {
-                select.render();
-            }
-        });
-
-        liliumcms.imagepicker.seek();
-        liliumcms.imagepicker.refresh();
         liliumcms.queryparams.parseURL();
         liliumcms.users.cacheUsers();
-        liliumcms.modals.find(true);
-        liliumcms.ckeditor ? liliumcms.ckeditor.parseDocument() : false;
-        liliumcms.formbeautifier.beautify();
-        liliumcms.formParser.init();
-        liliumcms.pageloader.parseDocument();
-        liliumcms.livevars.parseDataLivevars();
-        liliumcms.lmldom.parse();
-        liliumcms.pageloader.present();
-        liliumcms.animator.present();
+        liliumcms.users.cacheUsers();
+        liliumcms.lmldom.parse(function() {
+            liliumcms.imagepicker.seek();
+            liliumcms.imagepicker.refresh();
+            liliumcms.modals.find(true);
+            liliumcms.formParser.init();
+            liliumcms.formbeautifier.beautify();
+            liliumcms.pageloader.parseDocument();
+            liliumcms.livevars.parseDataLivevars();
+            liliumcms.multiselects.forEach(function(select) {
+                if (!select.isRendered) {
+                    select.render();
+                }
+            });
+            liliumcms.pageloader.present();
+            liliumcms.animator.present();
+        });
     }
 });

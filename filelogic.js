@@ -273,7 +273,7 @@ var FileLogic = function () {
             extra.theme = cTheme;
             extra.minify = true;
 
-            var readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + cTheme.contexts[ctxName];
+            var readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml");
             var savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
             var tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
             var layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml";

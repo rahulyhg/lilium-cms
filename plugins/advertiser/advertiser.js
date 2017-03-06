@@ -253,10 +253,10 @@
                  var html = config.server.html;
 
 	             log('Advertiser', 'Registered Scripts and CSS');
-	             Frontend.registerCSSFile(base + "plugins/advertiser/dynamic/style.css", 5000, 'admin', config.id);
-	             Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', config.id);
-	             Frontend.registerCSSFile(html + "/compiled/lmlnaradserv.css", 6000, 'theme', config.id);
-	             Frontend.registerJSFile (html + "/compiled/lmlnaradserv.js",  6000, 'theme', config.id);
+	             // Frontend.registerCSSFile(base + "plugins/advertiser/dynamic/style.css", 5000, 'admin', config.id);
+	             // Frontend.registerJSFile(base + "plugins/advertiser/dynamic/stripe.js", 995, 'admin', config.id);
+	             // Frontend.registerCSSFile(html + "/compiled/lmlnaradserv.css", 6000, 'theme', config.id);
+	             // Frontend.registerJSFile (html + "/compiled/lmlnaradserv.js",  6000, 'theme', config.id);
 
                  log('Advertiser', "Queuing frontend scripts for compilation");
                  // precomp.queueFile(config, base + "plugins/advertiser/dynamic/precomp/lmlnaradserv.js.lml" );
@@ -269,6 +269,10 @@
 	         var split = cconf.adserver.privateaddr.split(':');
 	         var privAddr = split[0].replace(/\/\//g, '');
 	         var privPort = split[1] || 5141;
+
+             if (!cconf.adserver || !cconf.adserver.keyone || !cconf.adserver.keytwo) {
+                 return cb(undefined, new Error("Missing required configuration"));
+             }
 
 	         var req = http.request({
 	             host: privAddr,

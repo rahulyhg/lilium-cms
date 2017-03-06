@@ -1,0 +1,5 @@
+{#config;extra}
+{*communications.get.article.{?1}}
+<div class="communication-wrapper">
+    
+</div>

@@ -112,19 +112,16 @@ Personas.prototype.registerForms = function() {
 
 Personas.prototype.bindHooks = function() {
     require('./hooks.js').bind('post_create_persona', 15, function(pkg) {
-        pkg.form.add('persona-select', 'livevar', {
+        pkg.form.add('persona-select', 'liveselect', {
             displayname : "Persona",
             endpoint: 'personas.list', 
-            tag : 'select',
-            template: 'option',
-            title: 'persona',
-            props : {
+            select : {
                 value : '_id',
-                html : 'fullname',
-                header : 'Select One'
+                displayname : 'fullname'
             },
-            allowempty : true,
-            emptytext : "- No persona -"
+            empty : {
+                displayname : "- No persona -"
+            }
         });
     });
 };
