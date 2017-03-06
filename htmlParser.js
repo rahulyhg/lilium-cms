@@ -274,7 +274,12 @@ var HtmlParser = function () {
     };
 
     var parseSnipField = function(field) {
-        return '<div class="lmldom-snip" data-snip="' + field.attr.snip + '" data-snipname="'+field.name+'" ></div>';
+        var lvs = "";
+        if (field.attr.livevars) for (var i = 0; i < field.attr.livevars.length; i++) {
+            lvs += '<lml:livevars data-varname="'+field.attr.livevars[i]+'" data-param="{}"></lml:livevars>';
+        }
+
+        return lvs + '<div class="lmldom-snip" data-snip="' + field.attr.snip + '" data-snipname="'+field.name+'" ></div>';
     };
 
     var parseSection = function(field) {

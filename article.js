@@ -1326,7 +1326,8 @@ var Article = function() {
                 displayname : "Communication"
             })
             .add('communication', 'snip', {
-                snip : "communication"
+                snip : "communication",
+                livevars : ["communications.get.article.{?1}"]
             })
             .add('title-action', 'title', {
                 displayname: "Publish"

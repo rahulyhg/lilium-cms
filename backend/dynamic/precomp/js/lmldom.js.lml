@@ -141,7 +141,11 @@ var LMLDom = function() {
             var itt = ldContext;
             
             for (var i = 0; i < ittlevels.length; i++) {
-                itt = itt[ittlevels[i]];
+                var kk = ittlevels[i];
+                if (kk == "?") {
+                    kk = liliumcms.pageloader.lastLevel;
+                }
+                itt = itt[kk];
             }
         }
 
@@ -396,13 +400,14 @@ var LMLDom = function() {
             }
 
             var elementtype = tn.getAttribute('wrapper');
+            var maybeDateFormat = tn.getAttribute('date');
             
             var spann;
             if (elementtype) {
                 spann = document.createElement('span');
-                spann.innerHTML = txt;
+                spann.textContent = maybeDateFormat ? dateFormat(new Date(txt), maybeDateFormat) : txt;
             } else {
-                spann = document.createTextNode(txt);
+                spann = document.createTextNode(maybeDateFormat ? dateFormat(new Date(txt), maybeDateFormat) : txt);
             }
 
             tn.insertAfter(spann);

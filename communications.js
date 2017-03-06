@@ -27,7 +27,7 @@ class LMLCommunications {
 
             next();
         });
-    }
+    };
 
     handleLivevar(cli, levels, params, send) {
         const action = levels[0];
@@ -44,19 +44,22 @@ class LMLCommunications {
         }
     };
 
-    dispatchEmails(_c, comm, users, senderid) {
-        for (var i = 0; i < users.length; i++) if (users[i].toString() != senderid.toString()) {
+    dispatchEmails(_c, comm, article, senderid) {
+        let users = article.subscribers;
+        log('Communications', 'Dispatching emails to ' + users.length + " users");
+        for (let i = 0; i < users.length; i++) if (users[i].toString() != senderid.toString()) {
             db.findUnique(require('./config.js').default(), 'entities', {_id : users[i]}, (err, to) => {
-                require('./mail.js').triggerHook(_c, 'article_communication', to.email, {
+                require('./mail.js').triggerHook(_c, 'communication_on_article', to.email, {
                     to : to,
-                    comm
+                    communication : comm,
+                    article : article
                 });
             });
         }
     }
 
     insertArticleComm(_c, comm, done) {
-        db.insert(_c, 'communication', comm, done);
+        db.insert(_c, 'communications', comm, done);
     };
 
     handlePostArticle(cli, articleid) {
@@ -74,9 +77,11 @@ class LMLCommunications {
                         active : true
                     };
 
-                    insertArticleComm(cli._c, comm, () => {
-                        that.dispatchEmails(cli._c, article.subscribers, cli.userinfo.userid);
-                        cli.sendJSON({success : true});
+                    that.insertArticleComm(cli._c, comm, () => {
+                        that.deepFetch(cli._c, comm, () => {
+                            that.dispatchEmails(cli._c, comm, article, cli.userinfo.userid);
+                            cli.sendJSON({success : true});
+                        });
                     });
                 } else {
                     cli.sendJSON({error : "Missing rights"});
