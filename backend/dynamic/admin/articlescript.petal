@@ -18,20 +18,20 @@
         urlWillChangeWarningShown : false
     };
 
-    if (!window.lmlarticlebound) {
+    if (true || !window.lmlarticlebound) {
         window.lmlarticlebound = true;
-        document.addEventListener('livevarsFetched', function(e) { 
-            var content = e.detail.livevars['content.' + window.location.pathname.split('/').pop()];
+        liliumcms.lmldom.bind(function() { 
+            var content = liliumcms.livevars.livevars()['content.' + liliumcms.pageloader.lastLevel];
     
-            if (content && content.length > 0) {
-                isAutoSave    = content[0].status == 'autosaved';
-                isPublished   = content[0].status == 'published';
-                originalTitle = content[0].title;
-                currentSlug   = content[0].name;
+            if (content) {
+                isAutoSave    = content.status == 'autosaved';
+                isPublished   = content.status == 'published';
+                originalTitle = content.title;
+                currentSlug   = content.name;
 
                 if (isAutoSave) {
                     _id = lastParamUrl;
-                    contentid = content[0].contentid;
+                    contentid = content.contentid;
                 } else {
                     contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
                 }
@@ -56,15 +56,15 @@
                 }
 
                 // You can't have a draft if article is published
-                if (content[0].status == 'published') {
+                if (content.status == 'published') {
                     $('form button[name=save]').hide();
                 }
 
-                if (content[0].status != "reviewing") {
+                if (content.status != "reviewing") {
                     $('form button[name=refuse]').hide();
                 }
 
-                if (content[0].status == "published" || content[0].status == "reviewing") {
+                if (content.status == "published" || content.status == "reviewing") {
                     $('form button[name=send]').hide();
 
                     if (liliumcms.rights.hasRole('contributor')) {
@@ -89,7 +89,6 @@
                 updateBottomSection();
             }
         });
-
 
         document.addEventListener('livevarsRendered', function(e) {
             lastSave = $('form').serialize();
@@ -311,15 +310,15 @@
             document.dispatchEvent(new CustomEvent("articleWillSave"));
 
             // Save and give notification
-            var currentSave = $('form').serialize();
+            var currentSave = liliumcms.lmldom.getFormData().post_create.values;
             var url;
             var tempsave = currentSave;
 
             url = '/save';
-            tempsave += contentid ? '&_id=' + contentid : '';
-            tempsave += _id ? '&autosaveid= ' + _id : '';
+            tempsave._id = contentid;
+            tempsave.autosaveid = _id;
 
-            $.post('{=config.default.server.url}/admin/article' + url, tempsave, function(data) {
+            liliumcms.lmldom.sendForm(tempsave, '{=config.default.server.url}/admin/article' + url, function(data) {
                 lastSave = currentSave;
 
                 if (data.success && data.redirect) {
@@ -357,7 +356,8 @@
             document.dispatchEvent(new CustomEvent("articleWillPreview"));
 
             liliumcms.previewer.cast(document.querySelector("input[name=title]").value);
-            var formdat = $('form#post_create').serialize() + "&id=" + contentid;
+            var formdat = liliumcms.lmldom.getFormData().post_create.values; 
+            formdat.id = contentid;
 
             $.post('{=config.default.server.url}/admin/article/preview', formdat, function(html) {
                 liliumcms.previewer.setContent(html);
@@ -384,12 +384,12 @@
         var publishCurrentArticle = function(e) {
             $('#confirm-publish').modal('hide');
 
-            var valid = liliumcms.formvalidator.validate($('form#post_create'));
-            var form = $('form#post_create').serialize();
+            var valid = true || liliumcms.formvalidator.validate($('form#post_create'));
+            var form = liliumcms.lmldom.getFormData().post_create;
             var tempForm = form;
 
-            tempForm += contentid ? '&id=' + contentid : '';
-            tempForm += _id ? '&autosaveid= ' + _id : '';
+            tempForm.values.id = contentid;
+            tempForm.values.autosaveid = _id;
 
             if (valid) {
                 $('.alert-wrapper').remove();
@@ -403,16 +403,16 @@
                 pubBtn.classList.add("waitingForConfirmation");
 
                 if (articleEdit.urlWillChangeWarningShown) {
-                    tempForm += "&_keepURL=" + articleEdit.keepURL;
+                    tempForm.values._keepURL = articleEdit.keepURL;
                 } else if (isPublished) {
-                    tempForm += "&_keepURL=true"; 
+                    tempForm.values._keepURL = true; 
                 }
 
                 if (currentSlug) {
-                    tempForm += "&currentSlug=" + currentSlug;
+                    tempForm.values.currentSlug = currentSlug;
                 }
     
-                $.post('{=config.default.server.url}/admin/article/edit', tempForm, function(data) {
+                liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/edit', function(data) {
                     if (data.success) {
                         lastSave = form;
                         

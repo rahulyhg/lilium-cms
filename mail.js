@@ -19,7 +19,8 @@ let senderInfo = {
 let mailHooks = {
     to_new_user : {displayname : "New user was created. Send to new user."},
     lilium_restarted : {displayname : "Lilium restarted. Send to admins."},
-    to_production_contractor_send_for_revision : {displayname : "Contractor submits article for revision. Send to production."}
+    article_sent_for_review : {displayname : "An article has been sent for review. Send to production."},
+    communication_on_article : {displayname : "A new communication is added to an article. Send to subscribers."}
 };
 
 class EMail {

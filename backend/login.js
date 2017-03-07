@@ -12,23 +12,24 @@ var log = require('../log.js');
 var Login = function() {
 	var loginSuccess = function(cli, userObj, cb) {
 		cli.touch('login.loginsuccess');
-		sessions.createSessionInCli(cli, userObj);
-        cli.did("auth", "login");
+		sessions.createSessionInCli(cli, userObj, function() {
+            cli.did("auth", "login");
 
-        if (!userObj.welcomed) {
-            log('Login', 'Logged in user ' + userObj.username + " for the first time");
-            handleFirstLogin(cli, userObj);
-        } else {
-		    entities.registerLogin(cli, userObj, function() {
-                log('Login', 'Logged in user ' + userObj.username);
+            if (!userObj.welcomed) {
+                log('Login', 'Logged in user ' + userObj.username + " for the first time");
+                handleFirstLogin(cli, userObj);
+            } else {
+                entities.registerLogin(cli, userObj, function() {
+                    log('Login', 'Logged in user ' + userObj.username);
 
-                if (cb) {
-                    cb();
-                } else {
-                    hooks.fire('user_loggedin', cli);
-                }
-            });
-        }
+                    if (cb) {
+                        cb();
+                    } else {
+                        hooks.fire('user_loggedin', cli);
+                    }
+                });
+            }
+        });
 	};
 
     this.fbAuth = function(cli) {
@@ -69,6 +70,21 @@ var Login = function() {
         });
     };
 
+    this.magiclink = function(cli) {
+        db.findUnique(require('../config.js').default(), 
+            'entities', 
+            {_id : db.mongoID(cli.routeinfo.path[1]), magiclink : cli.routeinfo.path[2]}, 
+        function(err, user) {
+            if (err || !user) {
+                cli.redirect(cli._c.server.url + "/login?magiclink=failed");
+            } else {
+                entities.fetchFromDB(cli._c, user.username, function(userObj) {
+                    loginSuccess(cli, userObj);
+                });
+            }
+        });
+    };
+
 	this.authUser = function(cli) {
 		cli.touch('login.authUser');
         if (cli.routeinfo.path[1] == "fb") {
@@ -97,8 +113,8 @@ var Login = function() {
 
             cli.touch("login.authUser@networkcheck");
             db.match(_c.default(), 'entities', conds, function(found) {
-    			    if (found) {
-        				entities.fetchFromDB(cli._c, usr, function(userObj) {
+    			if (found) {
+            		entities.fetchFromDB(cli._c, usr, function(userObj) {
 	        			loginSuccess(cli, userObj);
 		        	});
 			    } else {

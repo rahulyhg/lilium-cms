@@ -2371,6 +2371,15 @@ body.slidheader .android-sharer {
         display: block;
     }
 
+    article .article-related-section .article-thumbnail {
+        width: auto;
+        border: none;
+    }
+
+    article .article-related-section .article-thumbnail-featured .article-thumbnail-title {
+        font-size: 20px;
+    }
+
     article .article-signature-face-wrapper {
         margin-right: 10px;
     }

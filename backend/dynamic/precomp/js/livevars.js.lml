@@ -62,6 +62,7 @@ var LiveVars = function() {
             pageendpoints = [];
         }
 
+        log('Livevars', 'Preparing Live Variable request');
         $((local ? "main.lmladminmain " : "") + "lml\\:livevars").each(function() {
             var elem = this;
             if (endpoints.indexOf($(this).data('varname')) == -1) {
@@ -84,10 +85,10 @@ var LiveVars = function() {
                     'varname': variableName,
                     'params': typeof params === "string" ? JSON.parse(params.replace(/&lmlquote;/g, '"')) : {}
                 });
-
             }
         });
 
+        log('Livevars', "Sending request for " + Object.keys(local ? pageendpoints : endpoints).length + " live variables");
         $.get("{=config.default.server.url}/livevars", {
             vars: JSON.stringify(local ? pageendpoints : endpoints)
         }, function(data) {
@@ -97,6 +98,7 @@ var LiveVars = function() {
             }            
 
             livevarsResponse = data.response;
+            log('Livevars', 'Dispatching event livevarsFetched');
             document.dispatchEvent(new CustomEvent('livevarsFetched', {
                 'detail': {
                     'livevars': livevars
@@ -380,6 +382,7 @@ var LiveVars = function() {
      */
     this.parseTextToView = function(local) {
         if (!document.querySelector('lml\\:dom')) {
+            log('Livevars', 'Rendering livevars to view inside non-lmldom markup');
             $((local ? "main.lmladminmain " : "") + "lml\\:livevars").each(function() {
                 var lmlTag = $(this);
 
@@ -507,14 +510,19 @@ var LiveVars = function() {
                 node.html(content || ("[TObjectException - Undefined live variable key " + $(tobj).data('key') + "]"));
                 $(tobj).after(node).remove();
             });
+
+            liliumcms.ckeditor && liliumcms.ckeditor.parseDocument();
         }
 
         // Fire ready event
+        log('Livevars', 'Dispatching event livevarsPrerendered [DEPRECATED]');
         document.dispatchEvent(new CustomEvent('livevarsPrerendered', {
             'detail': {
                 'livevars': livevars
             }
         }));
+
+        log('Livevars', 'Dispatching event livevarsRendered');
         document.dispatchEvent(new CustomEvent('livevarsRendered', {
             'detail': {
                 'livevars': livevars

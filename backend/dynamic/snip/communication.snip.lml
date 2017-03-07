@@ -1,0 +1,113 @@
+{#config;extra}
+<div class="communication-wrapper">
+    <div>
+        <div class="communication-post">
+            <textarea placeholder="Say something about this article..."></textarea>
+            <div class="communication-actions">
+                <button type="button" class="communication-button-post">Comment</button>
+            </div>
+        </div>
+
+        <div class="communications-list">
+            <lml:foreach var="comm" in="livevars.communications.get.article.?">
+                <div class="communication-single">
+                    <div class="communication-author">
+                        <lml:image src="{comm.posterobj.avatarURL}" ></lml:image>
+                        <span><b><lml:text var="comm.posterobj.displayname" /></b></span>
+                        <span>&middot;</span>
+                        <span><lml:text var="comm.date" date="HH:MM, dd/mm/yyyy" /></span>
+                    </div>
+                    <p class="communication-content">
+                        <lml:text var="comm.content" />
+                    </p>
+                </div>
+            </lml:foreach>
+        </div>
+    </div>    
+</div>
+
+<style>
+.communication-wrapper {
+    margin: -10px;
+}
+
+.communication-author img {
+    width: 42px;
+    border-radius: 25px;
+    margin-right: 6px;
+}
+
+.communication-single {
+    padding: 10px;
+    background-color: #FFF;
+    color: #333;
+    margin: 10px 10px 20px;
+    font-size: 14px;
+}
+
+.communications-list {
+    margin-top: 10px;
+    background-color: #DDD;
+    padding: 10px 10px 1px;
+}
+
+.communication-content {
+    color: #333;
+    font-weight:400;
+    font-size: 18px;
+    margin-top: 12px;
+    margin-bottom: 0px;
+}
+
+#post_create .communication-post textarea,
+.communication-post textarea {
+    display: block;
+    width: 100%;
+    height: 140px;
+    border: none;
+    resize: none;
+}
+
+.communication-actions {
+    text-align: right;
+    padding: 10px;
+    background-color: #fff;
+}
+
+.communication-actions button.communication-button-post {
+    background: none;
+    color: #7B3996;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0px 10px;
+}
+</style>
+
+<script>
+liliumcms.lmldom.bind(function() {
+    var lmlpostcommart = function(e) {
+        var data = {
+            content : document.querySelector('.communication-post textarea').value
+        };
+
+        var url = "{=config.default.server.url}/admin/communications/article/" + liliumcms.pageloader.lastLevel;
+        var xmlhttp = new XMLHttpRequest();
+        xmlhttp.addEventListener('load', function(a, b, c) {
+            var resp = xmlhttp.responseText;
+            if (typeof resp == "string") {
+                resp = JSON.parse(resp);
+            }
+        });
+        xmlhttp.open("POST", url);
+        xmlhttp.setRequestHeader("Content-Type", "application/json");
+        xmlhttp.send(JSON.stringify(data));
+    };
+
+    document.querySelector('.communication-button-post').addEventListener('click', lmlpostcommart);
+});
+</script>
+
+
+
+

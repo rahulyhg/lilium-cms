@@ -164,6 +164,9 @@ var HtmlParser = function () {
                 case "liveselect":
                     htmlForm += parseLiveSelect(field);
                     break;
+                case 'multibox':
+                    htmlForm += parseMultiBox(field);
+                    break;
                 case "snip":
                     htmlForm += parseSnipField(field);
                     break;
@@ -259,19 +262,24 @@ var HtmlParser = function () {
         }
     };
 
+    // Undone
     var parsePetalField = function(field) {
         var petalname = field.attr.petal;
         if (!petalname) {
             return "";
         } else {
-            require('./petal.js').compileString
+            require('./petal.js').compileString;
+            return "";
         }
     };
 
     var parseSnipField = function(field) {
-        var path = require('./config.js').default.server.base + "backend/dynamic/snip/" + field.attr.snip;
-        
-        return "";
+        var lvs = "";
+        if (field.attr.livevars) for (var i = 0; i < field.attr.livevars.length; i++) {
+            lvs += '<lml:livevars data-varname="'+field.attr.livevars[i]+'" data-param="{}"></lml:livevars>';
+        }
+
+        return lvs + '<div class="lmldom-snip" data-snip="' + field.attr.snip + '" data-snipname="'+field.name+'" ></div>';
     };
 
     var parseSection = function(field) {
@@ -281,7 +289,7 @@ var HtmlParser = function () {
     };
 
     var parseClosure = function(field) {
-        return '<input type="hidden" class="lmlsection-ignore" name="lmlsection-'+field.attr.sectionname+'-ignore" value="0" /></section>';
+        return '<input type="hidden" class="lmlsection-ignore" name="lmlsection-'+field.attr.sectionname+'-ignore" value="0"/></section>';
     };
 
     var parseMap = function(field) {
@@ -416,6 +424,7 @@ var HtmlParser = function () {
         var output = '<lml:livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml:livevars>' +
             '<label for="'+field.name+'">'+attr.displayname+'</label>' +
             '<select name="'+field.name+'" class="lmldom-liveselect" data-filledby="'+attr.endpoint+'" ' + 
+                (attr.select.readkey ? 'data-selectreadkey="'+attr.select.readkey+'" ' : "") + 
                 'data-selectvalue="'+attr.select.value+'" '+
                 'data-selectdisplayname="'+attr.select.displayname+'" >';
         
@@ -424,6 +433,26 @@ var HtmlParser = function () {
         }
 
         return output + "</select>";
+    };
+
+    var parseMultiBox = function(field) {
+        var attr = field.attr;
+        var output = '<lml:livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml:livevars>' +
+            '<label for="'+field.name+'">'+attr.displayname+'</label>' +
+            '<input type="hidden" name="'+field.name+'" class="lmldom-multibox-value" />' + 
+            '<div class="lmlmultiselect multiselect lmldom-multibox" data-fieldname="'+field.name+'" data-filledby="'+attr.endpoint+'" '+ 
+                (attr.select.readkey ? 'data-selectreadkey="'+attr.select.readkey+'" ' : "") + 
+                'data-selectmultiple="'+(attr.select.multiple||false)+'" '+
+                'data-selectvalue="'+attr.select.value+'" '+
+                'data-selectdisplayname="'+attr.select.displayname+'" id="lml-multibox-'+field.name+'" >' +
+            '</div>';
+
+        if (field.wrapper) {
+            var tagname = field.wrapper.tag || "div";
+            output = '<'+tagname+' class="'+(field.wrapper.class || "")+'">' + output + '</'+tagname+'>';
+        }
+
+        return output;
     };
 
     var parseHiddenType = function (field) {
@@ -477,7 +506,7 @@ var HtmlParser = function () {
         var input = generateLabel(field, hasPlaceholder);
         input += '<textarea ';
         input += parseBasicFieldAttributes(field);
-        input += field.type == "ckeditor" ? ' ckeditor ' : '';
+        input += field.type == "ckeditor" ? ' ckeditor data-editor="ckeditor" ' : ''; 
 
         // Rows
         input += field.attr.rows ? 'rows="' + field.attr.rows + '"' : '';

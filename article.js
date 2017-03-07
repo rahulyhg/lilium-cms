@@ -311,6 +311,20 @@ var Article = function() {
                 db.update(cli._c, 'content', conds, {status : "reviewing"}, function() {
                     cli.sendJSON({changed : true});
                 });
+
+                db.findToArray(require('./config.js').default(), 'entities', {roles : "production"}, function(err, produser)  {
+                    db.findUnique(require('./config.js').default(), 'entities', 
+                        {_id : db.mongoID(cli.userinfo.userid)}, 
+                        function(err, contractor) {
+                        for (var i = 0; i < produser.length; i++) {
+                            require('./mail.js').triggerHook(cli._c, 'article_sent_for_review', produser[i].email, {
+                                to : produser[i],
+                                article : article,
+                                contractor : contractor
+                            });
+                        }
+                    });
+                });
             } else {
                 cli.throwHTTP(401, true);
             }
@@ -349,7 +363,7 @@ var Article = function() {
     };
 
     this.insertAds = function(_c, article, done, force) {
-        if (article.isSponsored && !force) {
+        if ((article.isSponsored && !force) || (!_c.content || !_c.content.adsperp)) {
             return done(article.content);
         }
 
@@ -400,17 +414,33 @@ var Article = function() {
         articleObject.createdOn = new Date();
         articleObject.status = "draft";
         articleObject.type = "post";
+        articleObject.content = "";
         articleObject.createdBy = db.mongoID(cli.userinfo.userid);
+        articleObject.subscribers = [articleObject.createdBy];
 
-        db.insert(cli._c, 'content', articleObject, function(err, result) {
-            var id = articleObject._id;
-            cli.sendJSON({
-                articleid : id,
-                editurl : cli._c.server.url + "/admin/article/edit/" + id,
-                error : err,
-                valid : !err
+        var commitToCreate = function() {
+            db.insert(cli._c, 'content', articleObject, function(err, result) {
+                var id = articleObject._id;
+                cli.sendJSON({
+                    articleid : id,
+                    editurl : cli._c.server.url + "/admin/article/edit/" + id,
+                    error : err,
+                    valid : !err
+                });
             });
-        });
+        };
+
+        if (cli.userinfo.roles.indexOf('contributor') != -1) {
+            db.findToArray(conf.default(), 'entities', {roles : "production"}, function(err, arr) {
+                for (var i = 0; i < arr.length; i++) {
+                    articleObject.subscribers.push(arr[i]._id);
+                }
+
+                commitToCreate();
+            }, {_id : 1});
+        } else {
+            commitToCreate();
+        }
     };
 
     
@@ -429,13 +459,13 @@ var Article = function() {
 
         var that = this;
         if (cli.hasRight('list-articles')) {
-            var form = formBuilder.handleRequest(cli);
-            var response = formBuilder.validate(form, true);
+            //var form = formBuilder.handleRequest(cli);
+            //var response = formBuilder.validate(form, true);
             var oldSlug = "";
 
             var redirect = '';
-            if (response.success) {
-                var formData = formBuilder.serializeForm(form);
+            if (true || response.success) {
+                var formData = cli.postdata.data; //formBuilder.serializeForm(form);
                 formData.status = 'published';
 
                 if (!cli.postdata.data._keepURL || cli.postdata.data._keepURL == "false") {
@@ -458,10 +488,13 @@ var Article = function() {
                     _id: cli.postdata.data.id ? db.mongoID(cli.postdata.data.id) : "Will not resolve"
                 }; 
 
-                if (formData.tags.map) {
+                if (formData.tags && formData.tags.map) {
                     formData.tagslugs = formData.tags.map(function(tagname) {
                         return slugify(tagname).toLowerCase();
                     });
+                } else {
+                    formData.tags = [];
+                    formData.tagslugs = [];
                 }
 
                 log('Article', 'Saving published post in database', 'info');
@@ -503,6 +536,15 @@ var Article = function() {
                                                     fileserver.deleteFile(_c.server.html + "/" + oldSlug + ".html", function() {});
                                                 }, false, true, true);
                                             }
+
+                                            db.update(cli._c, 'content', 
+                                                {_id : db.mongoID(formData._id)}, 
+                                                {$addToSet : {subscribers : {$each : [
+                                                    db.mongoID(cli.userinfo.userid),
+                                                    formData.author
+                                                ]}}}, 
+                                                function() {}, false, true, true
+                                            );
 
                                             that.generateArticle(cli._c, db.mongoID(formData._id), function(resp) {
                                                 cli.sendJSON(resp);
@@ -636,8 +678,8 @@ var Article = function() {
         // Article already exists
         cli.postdata.data.form_name = "post_create";
 
-        var form = formBuilder.handleRequest(cli);
-        var formData = formBuilder.serializeForm(form);
+        //var form = formBuilder.handleRequest(cli);
+        var formData = cli.postdata.data; // formBuilder.serializeForm(form);
         var id;
 
         if (cli.postdata.data.autosaveid) {
@@ -651,7 +693,7 @@ var Article = function() {
         formData.updated = new Date();
         formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
 
-        if (formData.tags.map) {
+        if (formData.tags && formData.tags.map) {
             formData.tagslugs = formData.tags.map(function(tagname) {
                 return slugify(tagname).toLowerCase();
             });
@@ -662,6 +704,7 @@ var Article = function() {
             db.update(cli._c, 'categories', {name : maybecat[0]}, {lastused : new Date()}, function() {});
         }
 
+        log('Article', 'Preparing to save article ' + formData.title);
         // Autosave
         if (auto) {
             // Check if article is edit, non-existing or published
@@ -694,6 +737,8 @@ var Article = function() {
                 }, function(err, ress) {
                     var res = err ? undefined : ress[0];
                     if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
+                        log('Article', 'Updating content for article ' + formData.title);
+                        delete formData._id;
                         db.update(cli._c, 'content', {
                             _id: id
                         }, formData, function(err, doc) { 
@@ -704,6 +749,10 @@ var Article = function() {
                                     reason : 200
                                 });
                             });
+                            db.update(cli._c, 'content', 
+                                {_id : id}, {$addToSet : {subscribers : db.mongoID(cli.userinfo.userid)}}, 
+                                function() {}, false, true, true
+                            );
                         });
                     } else {
                         cli.sendJSON({
@@ -1105,7 +1154,7 @@ var Article = function() {
                                     db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
                                         arr[0].authorname = autarr[0].displayname;
                                         arr[0].author = autarr;
-                                        callback(arr);
+                                        callback(arr[0]);
                                     });
                                 });
                             } else {
@@ -1131,7 +1180,7 @@ var Article = function() {
                                 db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
                                     arr[0].authorname = autarr[0] ? autarr[0].displayname : "[No Author]";
                                     arr[0].author = autarr || {};
-                                    callback(arr);
+                                    callback(arr[0]);
                                 });
                             });
                         } else {
@@ -1177,21 +1226,16 @@ var Article = function() {
                     'class': 'col-md-4'
                 }
             })
-            .add('categories', 'livevar', {
+            .add('categories', 'multibox', {
                 wrapper: {
                     'class': 'col-md-4'
                 },
                 endpoint: 'categories',
-                tag: 'select',
-                template: 'option',
-                title: 'role',
-                attr: {
-                    'lmlselect' : true
-                },
-                props: {
+                select: {
                     'value': 'name',
-                    'html': 'displayname',
-                    'header': 'Select One'
+                    'displayname': 'displayname',
+                    'readkey' : '0',
+                    'multiple' : false
                 },
                 displayname: "Categories"
             })
@@ -1267,24 +1311,24 @@ var Article = function() {
                     "role" : "editor"
                 }
             })
-            .add('author', 'livevar', {
-                displayname : "Author",
+            .add('author', 'liveselect', {
                 endpoint : "entities.simple",
-                tag : "select",
-                template: "option",
-                title : "author",
-                readkey : "author.0._id",
-                attr: {
-                    lmlselect : false
-                },
-                props: {
-                    'value' : "_id",
-                    'html' : 'displayname',
-                    'header' : 'Select One'
+                displayname : "Author",
+                select : {
+                    value : "_id",
+                    displayname : "displayname",
+                    readkey : "0._id"
                 }
             })
             .closeSection('authorbox')
             .trigger('bottom')
+            .add('commtitle', 'title', {
+                displayname : "Communication"
+            })
+            .add('communication', 'snip', {
+                snip : "communication",
+                livevars : ["communications.get.article.{?1}"]
+            })
             .add('title-action', 'title', {
                 displayname: "Publish"
             })

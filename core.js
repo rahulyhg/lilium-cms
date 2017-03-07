@@ -11,6 +11,7 @@ var fileserver = undefined;
 var cli = undefined;
 var admin = undefined;
 var Article = undefined;
+var Communications = undefined;
 var mail = undefined;
 var styledpages = undefined;
 var Media = undefined;
@@ -46,6 +47,7 @@ var api = undefined;
 var album = undefined;
 var secrets = undefined;
 var oembed = undefined;
+var snips = undefined;
 var tools = undefined;
 var badges = undefined;
 var conversations = undefined;
@@ -78,6 +80,8 @@ var Core = function () {
         mail = require('./mail.js');
         admin = require('./backend/admin.js').init();
         Article = require('./article.js');
+        Communications = require('./communications.js');
+        snips = require('./snip.js');
         styledpages = require('./styledpages.js');
         Media = require('./media.js');
         imageSize = require('./imageSize.js');
@@ -144,6 +148,11 @@ var Core = function () {
         endpoints.register('*', 'login', 'POST', function (cli) {
             cli.touch("endpoints.POST.login");
             LoginLib.authUser(cli);
+        });
+
+        endpoints.register('*', 'magiclink', 'GET', function (cli) {
+            cli.touch("endpoints.POST.login");
+            LoginLib.magiclink(cli);
         });
 
         endpoints.register('*', 'admin', 'POST', function (cli) {
@@ -297,7 +306,9 @@ var Core = function () {
         styledpages.registerAdminEndpoint();
         history.registerEndpoints();
         Article.registerContentEndpoint();
+        Communications.setupController();
         mail.setupController();
+        snips.setupController();
 
 /*
         api.registerApiEndpoint('articles', 'GET', function (cli) {

@@ -198,12 +198,14 @@ var LMLConversations = function() {
         var users = liliumcms.livevars.retrieveVar("entities.chat");
         var container = document.getElementById("chat-list-everyone");
 
+        log('Chat', 'Initializing chat bar with ' + users.length + ' users');
         for (var i = 0; i < users.length; i++) {
             this.addUser(users[i], container);
         }
 
         var conversations = liliumcms.livevars.retrieveVar("conversations.list");
         container = document.getElementById("chat-list-group");
+        log('Chat', 'Added ' + conversations.length + ' conversations');
         for (var i = 0; i < conversations.length; i++) if (conversations[i].type == "group") {
             this.addGroup(conversations[i], container);
         }

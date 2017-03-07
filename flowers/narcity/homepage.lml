@@ -6,6 +6,10 @@
 </script>
 
 <main class="homepage">
+    <div class="fwblock trending-content-wrapper">
+        <div class="trending-wrapper" data-generator="generateHomepageTrending"></div>
+    </div>
+
     <div class="fwblock latest-content-wrapper">
         <h4 class="article-section-title"><a href="{=config.default.server.url}/latests">Most recent</a></h4>
         <div class="float-clear">
@@ -183,3 +187,133 @@
 <lml:template id="lmltemplate-native">
 
 </lml:template>
+
+<script>
+var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
+    var h4 = document.createElement('h4');
+    h4.textContent = "Trending";
+    this.appendChild(h4);
+
+    var floatclear = document.createElement('div');
+    floatclear.className = "float-clear";
+
+    for (var i = 0; i < tArr.length; i++) {
+        var article = tArr[i];
+
+        if (i % 3 == 0) {
+            this.appendChild(floatclear);
+            floatclear = document.createElement('div');
+            floatclear.className = "float-clear";
+        }
+        
+        var wrapper = document.createElement('div');
+        wrapper.id = "art" + article._id;
+        wrapper.setAttribute('ogid', document.location.protocol + article.fullurl);
+        wrapper.className = "article-thumbnail";
+        if (i == 0) { wrapper.className += " article-thumbnail-featured"; }
+        if (i >  2) { wrapper.className += " article-thumbnail-margined"; }
+
+        // Featured image
+        var featimg = document.createElement('div');
+        featimg.className = "article-thumbnail-featured-iamge";
+        
+        var featlink = document.createElement('a');
+        featlink.href= article.fullurl;
+        featimg.appendChild(featlink);
+        
+        var fimage = document.createElement('img');
+        fimage.src= article.featuredimage;
+        featlink.appendChild(fimage);
+
+        if (article.sponsored) {
+            var sponsmen = document.createElement('a');
+            a.className = "sponsored-mention sponsored-mention-hp";
+            a.href="https://narcitymedia.com";
+            a.target = "_blank";
+            featlink.appendChild(sponsmen);
+        }
+
+        var catwrap = document.createElement('div');
+        catwrap.className = "article-cat-name";
+        featlink.appendChild(catwrap);
+
+        var catlink = document.createElement('a');
+        catlink.href = "{=config.default.server.url}/category/" + article.category.name;
+        catlink.textContent = article.category.displayname;
+        catwrap.appendChild(catlink);
+        
+        var sharecountwrap = document.createElement('div');
+        sharecountwrap.className='article-share-count-mobile';
+        sharecountwrap.id = 'article-share-count-mobile-' + article._id;
+        wfeatimg.appendChild(sharecountwrap);
+
+        var shareicon = document.createElement('span');
+        shareicon.className = "article-share-icon";
+        sharecountwrap.appendChild(shareicon);
+
+        var flameimg = document.createElement('img');
+        flameimg.src = "{=config.default.server.url}/res/images/flame.png";
+        shareicon.appendChild(flameimg);
+
+        var sharecount = document.createElement('span');
+        sharecount.className = "article-share-count-mobile-num fbshare";
+        sharecount.dataset.url = "{=config.default.server.protocol}" + article.fullurl;
+        sharecount.dataset.min = "100";
+        sharecount.dataset.showas = "block";
+        sharecount.textContent = "0000";
+        sharecountwrap.appendChild(sharecount);
+        
+    
+        // Title
+        var titlewrap = document.createElement('div');
+        titlewrap.className = "article-thumbnail-title";
+        wrapper.appendChild(titlewrap);
+
+        var titlelink = document.createElement('a');
+        titlelink.href = article.fullurl;
+        titlelink.textContent = article.title;
+        titlewrap.appendChild(titlelink);
+
+        // Subtitle
+        var subtitlewrap = document.createElement('div');
+        subtitlewrap.className = "article-thumbnail-subtitle";
+        subtitlewrap.textContent = article.subtitle;
+
+        // Details
+        var detailswrap = document.createElement('div');
+        detailswrap.className = "article-thumbnail-details";
+        wrapper.appendChild(detailswrap);
+
+        var avatar = document.createElement('img');
+        avatar.src = article.authorface;
+        detailswrap.appendChild(avatar);
+
+        var namespan = document.createElement('span');
+        detailswrap.appendChild(namespan);
+
+        var authorlink = document.createElement('a');
+        authorlink.href = article.authorpage;
+        authorlink.textContent = article.authorname;
+        namespan.appendChild(authorlink);
+        namespan.appendChild(document.createTextNode("&nbsp;&middot;&nbsp;"));
+        
+        var datewrap = document.createElement('span');
+        datewrap.className = "need_to_be_rendered";
+        datewrap.setAttribute('datetime', article.date);
+        datewrap.textContent = "";
+        namespan.appendChild(datewrap);
+
+        // Insert wrap in floatclear
+        floatclear.appendChild(wrapper);
+
+        window.lmlhomelinks.push({
+            url : document.location.protocol + article.fullurl,
+            wrapper : article._id
+        });
+    }
+
+    this.appendChild(floatclear);
+}};
+window.generators.generateHomepageTrending = generateHomepageTrending;
+</script>
+

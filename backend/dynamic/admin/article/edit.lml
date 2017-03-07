@@ -1,56 +1,57 @@
 {#config;vocab;forms}
+<lml:dom v="0.8"></lml:dom>
+{*content.{?1}} 
 {%../articlescript}
 
-	<h1>Edit a post</h1>
-	{*content.{?1}(sourceof:"post_create")} 
-    {=forms.render('post_create')}
+<h1>Edit a post</h1>
+{=forms.render('post_create',"edit","content/?")}
 
-	<div id="editor"></div>
-	<div class="col-md-12 article-more-info-wrapper">
-		<fieldset class="title">
-		  <legend>More Informations</legend>
-		</fieldset>
+<div id="editor"></div>
+<div class="col-md-12 article-more-info-wrapper">
+	<fieldset class="title">
+	  <legend>More Informations</legend>
+	</fieldset>
 
-			<div class="article-info-strip">
-				<span>Status : </span><span id="moreinfo-status"></span>
-			</div>
-			<div class="article-info-strip">
-				<span>URL : </span><span id="moreinfo-url"></span>
-			</div>
-			<div class="article-info-strip">
-				<span>Alias : </span><span id="moreinfo-alias"></span>
-			</div>
-			<div class="article-info-strip">
-				<span>Last Updated : </span><span id="moreinfo-updated"></span>
-			</div>
-			<div class="article-info-strip">
-				<span>Author : </span><span id="moreinfo-author"></span>
-			</div>
-			<div class="article-info-strip modcount-info-strip">
-				<span>Modification count : </span><span id="moreinfo-modcount">0</span>
-			</div>
+		<div class="article-info-strip">
+			<span>Status : </span><span id="moreinfo-status"></span>
+		</div>
+		<div class="article-info-strip">
+			<span>URL : </span><span id="moreinfo-url"></span>
+		</div>
+		<div class="article-info-strip">
+			<span>Alias : </span><span id="moreinfo-alias"></span>
+		</div>
+		<div class="article-info-strip">
+			<span>Last Updated : </span><span id="moreinfo-updated"></span>
+		</div>
+		<div class="article-info-strip">
+			<span>Author : </span><span id="moreinfo-author"></span>
+		</div>
+		<div class="article-info-strip modcount-info-strip">
+			<span>Modification count : </span><span id="moreinfo-modcount">0</span>
+		</div>
 
-            <div class="article-info-strip article-history-button-wrapper article-button-wrapper role-author">
-                <button onclick="loadArticleHistory();">
-                    View history
-                </button>
-            </div>
-    
-            <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
-                <button onclick="unpublishArticleModal()">
-                        Unpublish
-                </button>
-            </div>
+        <div class="article-info-strip article-history-button-wrapper article-button-wrapper role-author">
+            <button onclick="loadArticleHistory();">
+                View history
+            </button>
+        </div>
 
-            <div class="article-info-strip article-destroy-button-wrapper article-destroyautosave-button-wrapper article-button-wrapper">
-                <button onclick="destroyAutosave()">
-                        Discard Autosave
-                </button>
-            </div>
-            
-            <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper role-author">
-                <button onclick="destroyArticleModal()">
-                        Destroy
-                </button>
-            </div>
-	</div>
+        <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
+            <button onclick="unpublishArticleModal()">
+                    Unpublish
+            </button>
+        </div>
+
+        <div class="article-info-strip article-destroy-button-wrapper article-destroyautosave-button-wrapper article-button-wrapper">
+            <button onclick="destroyAutosave()">
+                    Discard Autosave
+            </button>
+        </div>
+        
+        <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper role-author">
+            <button onclick="destroyArticleModal()">
+                    Destroy
+            </button>
+        </div>
+</div>
