@@ -11,8 +11,6 @@ module.exports = function(BadgeWrapper) {
     log('Badges', 'Defining badge checks');
 
     BadgeWrapper.prototype.checkFor_publish = function(cli, site, user, cb) {
-        return cb(false);
-
         var that = this;
         user.badges = user.badges || {};
 
