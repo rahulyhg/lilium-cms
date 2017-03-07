@@ -183,14 +183,10 @@ var handleAdScroll = function(e) {
 
         var adinfo = window.adpos.shift();
 
-        if (typeof index_headertag_lightspeed !== "undefined") {
-            index_headertag_lightspeed.slotDisplay(adinfo.id);
-            console.log("[INDEX] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
-        } else {
-            googletag && googletag.display(adinfo.id);
-            console.log("[GGTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
-        }
-        document.getElementById(adinfo.id).id = "old_" + adinfo.id;
+        googletag && googletag.display(adinfo.id);
+        console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
+        
+        // document.getElementById(adinfo.id).id = "old_" + adinfo.id;
 
         handlingScroll = false;
     }
