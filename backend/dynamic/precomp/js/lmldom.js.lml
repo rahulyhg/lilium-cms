@@ -36,7 +36,7 @@
     lml:image /     => src="//domain.com/uploads/{variableName}" 
     lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
     lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
-    lml:link        => href="//domain.com/admin/{variableName}" class=""
+    lml:link        => href="//domain.com/admin/{variableName}" class="" target=""
 
     - Livevar fed fields --
     select.lmldom-liveselect  => data-filledby="livevar.endpoint" name="fieldname"
@@ -381,6 +381,7 @@ var LMLDom = function() {
             }
 
             a.setAttribute('href', paramstr);
+            a.setAttribute('target', lnk.getAttribute('target') || "");
             a.className = lnk.className;
             a.innerHTML = lnk.innerHTML;
 
@@ -404,7 +405,7 @@ var LMLDom = function() {
             
             var spann;
             if (elementtype) {
-                spann = document.createElement('span');
+                spann = document.createElement(elementtype);
                 spann.textContent = maybeDateFormat ? dateFormat(new Date(txt), maybeDateFormat) : txt;
             } else {
                 spann = document.createTextNode(maybeDateFormat ? dateFormat(new Date(txt), maybeDateFormat) : txt);

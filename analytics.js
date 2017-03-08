@@ -8,6 +8,19 @@ const googleapis = require('googleapis');
 const JWT = googleapis.auth.JWT;
 const analytics = googleapis.analytics('v3');
 
+// Sites config
+let GASites = {};
+
+// Default request metrics and dimensions
+const defaultMetrics = ["ga:users", "ga:pageviews", "ga:organicSearches", "ga:sessions"].join(',');
+const defaultDimensions = "ga:pagePath";
+
+// Month days
+const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+// Cached Analytics Responses
+const cachedAnalytics = {};
+
 // Authentication items
 class GoogleAnalyticsInfo {
     constructor(email, keyfile) {
@@ -17,30 +30,84 @@ class GoogleAnalyticsInfo {
     }
 }
 
-// Sites config
-let GASites = {};
-
-// Default request metrics and dimensions
-const defaultMetrics = ["ga:users", "ga:pageviews", "ga:organicSearches"].join(',');
-const defaultDimensions = "ga:deviceCategory";
-
-// Month days
-const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
 class GoogleAnalyticsRequest {
     static yesterday(_c, gAnalytics, send) {
         gAnalytics.getData(_c, {
             "start-date" : "yesterday",
             "end-date" : "yesterday",
             "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions
+            "dimensions" : defaultDimensions,
+            "max-results" : 10,
+            "sort" : "-ga:pageviews"
         }, send);
+    }
+
+    static dashboard(_c, gAnalytics, send) {
+        GoogleAnalyticsRequest.yesterday(_c, gAnalytics, (err, data) => {
+            if (err) {
+                return send(err);
+            }
+
+            var total = {
+                metrics : {
+                    unique : data.totalsForAllResults["ga:users"],
+                    views : data.totalsForAllResults["ga:pageviews"],
+                    searchs : data.totalsForAllResults["ga:organicSearches"],
+                    sessions : data.totalsForAllResults["ga:sessions"]
+                },
+                ratio : {
+                    pagepersession : parseFloat(data.totalsForAllResults["ga:pageviews"] / data.totalsForAllResults["ga:sessions"]).toFixed(2),
+                    search : Math.round(data.totalsForAllResults["ga:organicSearches"] / data.totalsForAllResults["ga:pageviews"] * 100),
+                    devices : {
+                        desktop : 0,
+                        mobile : 0,
+                        tablet : 0
+                    },
+                    pages : []
+                }
+            };
+
+            for (var i = 0; i < data.rows.length; i++) {
+                total.ratio.pages.push({
+                    page : data.rows[i][0],
+                    unique : data.rows[i][1],
+                    views : data.rows[i][2]
+                });
+            }
+
+            var topPagePath = total.ratio.pages[0] && total.ratio.pages[0].page.substring(1);
+
+            require('./article.js').deepFetch(_c, topPagePath, (article) => {
+                total.toppage = {
+                    article : article || {title : topPagePath},
+                    path : topPagePath,
+                    url : _c.server.url + total.ratio.pages[0].page,
+                    hits : total.ratio.pages[0].views
+                };
+
+                var today = new Date(); 
+                today.setHours(0,0,0,0);
+        
+                var yesterday = new Date(new Date() - 1000 * 60 * 60 * 24);
+                yesterday.setHours(0,0,0,0);
+
+                db.findToArray(_c, 'content', {
+                    date : {
+                        $gte : yesterday,
+                        $lt : today
+                    }
+                }, (err, arr) => {
+                    total.published = arr;
+                    send(undefined, total);
+                }, {title : 1, name : 1});
+            });
+        });
     }
 
     static lastmonth(_c, gAnalytics, send) {
         var monthNumber = new Date().getMonth();
         var lastDay = monthDays[monthNumber];
-        var year = new Date().getYear();
+        var year = new Date().getFullYear().toString();
         if (year % 4 == 0) {
             lastDay++;
         }
@@ -57,8 +124,6 @@ class GoogleAnalyticsRequest {
             "dimensions" : defaultDimensions
         }, send);
     }
-
-
 };
 
 class GoogleAnalytics {
@@ -132,8 +197,19 @@ class GoogleAnalytics {
 
     handleLiveVar(cli, levels, params, send) {
         var topLevel = levels[0] || "lastmonth";
-        if (typeof GoogleAnalyticsRequest[topLevel] == "function") {
+
+        if (cachedAnalytics[topLevel] && new Date() - cachedAnalytics[topLevel].cachedAt < (1000 * 60 * 60)) {
+            send(cachedAnalytics[topLevel].data);
+        } else if (typeof GoogleAnalyticsRequest[topLevel] == "function") {
             GoogleAnalyticsRequest[topLevel](cli._c, that, (err, data) => {
+                if (data) {
+                    data.cachehit = true;
+                    cachedAnalytics[topLevel] = {
+                        cachedAt : new Date(),
+                        data : data
+                    };
+                }
+
                 send(err ? {error : err.toString()} : data);
             });
         } else {
@@ -147,10 +223,20 @@ class GoogleAnalytics {
         });
     }
 
+    prepareDashboard() {
+        require('./petal.js').register(
+            'dashboardAnalytics', 
+            require('./config.js').default().server.base + "backend/dynamic/dashanalytics.petal"
+        );
+
+        require('./dashboard.js').registerDashPetal("dashboardAnalytics", 200);
+    }
+
     setupController() {
         log('Analytics', "Analytics controller setup");
         livevars.registerLiveVariable('googleanalytics', that.handleLiveVar);
         that.bindHooks();
+        that.prepareDashboard();
     }
 }
 

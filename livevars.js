@@ -101,7 +101,7 @@ var LiveVariables = function() {
     };
 
     var startLoop = function(cli, varNames, assoc, callback) {
-        var index = 0;
+        var index = -1;
         var max = varNames.length;
         var response = {
             code: 200,
@@ -109,23 +109,19 @@ var LiveVariables = function() {
             message: "OK"
         };
 
-        var checkLoop = function() {
-            if (index >= max) {
+        var checkForCompletion = function() {
+            if (++index == max) {
                 callback(response);
-            } else {
-                setTimeout(function() {
-                    handleOneVar(cli, varNames[index], assoc, response, function(valid) {
-                        index++;
-                        checkLoop();
-                    });
-                }, 0);
             }
         };
 
-        if (max > 0) {
-            checkLoop();
-        } else {
-            callback(response);
+        checkForCompletion();
+        for (var i = 0; i < max; i++) {
+            (function(i) {
+                setTimeout(function() {
+                    handleOneVar(cli, varNames[i], assoc, response, checkForCompletion);
+                }, 0);
+            })(i)
         }
     };
 

@@ -1,0 +1,173 @@
+{#config}
+{*googleanalytics.dashboard}
+<div id="dashboard-ga-yesterday">
+    <h2 class="dashboard-ga-head-title">Yesterday</h2>
+
+    <div class="col-xs-4 col-md-4 dashboard-card">
+        <div class="dashboard-ga-yesterday-rect">
+            <h3>Unique visitors</h3>
+            <div class="dashboard-ga-total-unique">
+                <lml:text var="livevars.googleanalytics.dashboard.metrics.unique"></lml:text>
+            </div>
+            <small>
+                Average of <lml:text var="livevars.googleanalytics.dashboard.ratio.pagepersession"></lml:text> pages per session
+            </small>
+        </div>
+        <div class="dashboard-ga-yesterday-rect">
+            <h3>Page views</h3>
+            <div class="dashboard-ga-total-unique">
+                <lml:text var="livevars.googleanalytics.dashboard.metrics.views"></lml:text>
+            </div>
+        </div>
+    </div>
+    <div class="col-xs-4 col-md-4 dashboard-card">
+        <div class="dashboard-ga-yesterday-rect dashboard-ga-publication-list">
+            <h3><lml:text var="livevars.googleanalytics.dashboard.published.length"></lml:text> articles published</h3>
+            <lml:foreach var="publication" in="livevars.googleanalytics.dashboard.published">
+                <lml:link href="{=config.default.server.url}/{publication.name}" target="_blank">
+                    <lml:text var="publication.title"></lml:text>
+                </lml:link>
+            </lml:foreach>
+        </div>
+    </div>
+    <div class="col-xs-4 col-md-4 dashboard-card">
+        <div class="dashboard-ga-yesterday-rect">
+            <h3>Top article</h3>
+            <div>
+                <lml:link href="{livevars.googleanalytics.dashboard.toppage.url}" target="_blank">
+                    <lml:text var="livevars.googleanalytics.dashboard.toppage.article.title" wrapper="h4" /></lml:text>
+                </lml:link>
+                <lml:text var="livevars.googleanalytics.dashboard.toppage.article.subtitle" wrapper="h5" /></lml:text>
+
+                <div class="dashboard-ga-toppage-image-wrapper">
+                <lml:image src="{livevars.googleanalytics.dashboard.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml:image>
+                </div>
+
+                <div class="dashboard-ga-toppage-author">
+                    <lml:image src="{livevars.googleanalytics.dashboard.toppage.article.authors.0.avatarURL}"></lml:image> 
+                    <span>
+                        Written by 
+                        <lml:text var="livevars.googleanalytics.dashboard.toppage.article.authors.0.displayname"></lml:text>
+                    </span>
+                </div>
+                <small class="centered">
+                    With a total of <lml:text var="livevars.googleanalytics.dashboard.toppage.hits"></lml:text> hits
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div style="float: none; clear: both; height: 1px;"></div>
+</div>
+
+<style>
+.dashboard-ga-yesterday-rect {
+    background-color: #FFF;
+    margin: 5px 5px 40px;
+    border: 1px solid #EEE;
+    box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.1);
+}
+
+.dashboard-ga-yesterday-rect h3 {
+    padding: 13px 16px;
+    background-color: #FBFBFB;
+    color: #000;
+    font-weight: 300;
+    font-size: 18px;
+    border-bottom: 1px solid #EEE;
+}
+
+.dashboard-ga-yesterday-rect h4 {
+    padding: 15px 14px 0px;
+    font-size: 28px;
+    font-weight: 300;
+    color: #111;
+}
+
+.dashboard-ga-yesterday-rect h5 {
+    font-size: 18px;
+    padding: 0px 14px 15px;
+    font-weight: 300;
+    color: #999;
+}
+
+.dashboard-ga-toppage-author img {
+    width: 42px;
+    height: auto;
+
+    border-radius: 32px;
+    display : inline-block;
+    vertical-align: middle;
+    margin: 0px 5px 5px 15px;
+}
+
+.dashboard-ga-toppage-author span {
+    display : inline-block;
+    vertical-align: middle;
+}
+
+.dashboard-ga-toppage-image-wrapper img {
+    object-fit: cover;
+    width: 100%;
+    margin-bottom: 15px
+}
+
+.dashboard-ga-total-unique {
+    padding: 20px;
+    font-size: 44px;
+    text-align: center;
+    color: #777;
+    font-weight: 300;
+}
+
+.dashboard-ga-yesterday-rect small {
+    display: block;
+    font-weight: 500;
+    text-align: center;
+    padding: 5px 5px;
+    font-size: 13px;
+    color: #888;
+    background-color: #f3f3f3;
+    margin-top: 10px;
+    border-top: 1px solid #d9d9d9;
+}
+
+.dashboard-ga-head-title {
+    display: block;
+    font-weight: 300;
+    color: #cc88e6;
+    padding: 15px 0px 55px;
+    text-align: center;
+    font-size: 50px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+}
+
+#dashboard-ga-yesterday {
+    background-color: #F6F6F6;
+    background: linear-gradient(#efd0ff 50%, rgba(255,255,255,0) 0) 0 0,
+        radial-gradient(circle closest-side, #efd0ff 53%, rgba(255,255,255,0) 0) 0 0,
+        radial-gradient(circle closest-side, #efd0ff 50%, rgba(255,255,255,0) 0) 55px 0 #fbf3ff;
+
+    background-size:110px 150px;
+    background-repeat:repeat-x;
+
+    display: block;
+    min-height: 320px;
+
+    float: none;
+    clear: both;
+}
+
+.dashboard-ga-publication-list div a {
+    display: block;
+    padding: 5px 10px;
+    border-bottom: 1px dashed #ddd;
+    font-size: 13px;
+}
+
+.dashboard-ga-publication-list div:last-child a {
+    border-bottom: none;
+}
+
+</style>

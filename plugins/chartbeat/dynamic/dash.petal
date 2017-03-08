@@ -33,16 +33,5 @@
 		<ul class="cb-top-list">
 		</ul>
 	</div>
-
-	<div class="dash-cb-realtime-stats">
-		<div class="col-xs-6 col-md-4">
-			devices
-		</div>
-		<div class="col-xs-6 col-md-4">
-			geo
-		</div>
-		<div class="col-xs-6 col-md-4">
-			other stats
-	</div>
 </div>
 {%dashboardChartbeatJS}
