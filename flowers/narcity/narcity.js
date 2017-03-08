@@ -18,6 +18,7 @@ var Category = undefined;
 
 var themePath;
 var noOp = function() {};
+var homepageFileContent = "";
 
 // TODO : Receive context site
 var NarcityTheme = function () {
@@ -405,8 +406,9 @@ var generateHomepage = function(_c, cb) {
         extra.sections = articles.sections;
         extra.latests = articles.latests;
 
-        filelogic.renderThemeLML(_c, 'home', 'index.html', extra, function() {
-            cb && cb();
+        filelogic.renderThemeLML(_c, 'home', 'index.html', extra, function(pContent) {
+            homepageFileContent = pContent;
+            cb && cb(pContent);
         });
     });
 }
@@ -483,6 +485,11 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
+        if (homepageFileContent) {
+            cli.response.writeHead(200, {CacheType : "RAM", CacheSection : "homepage"});
+            return cli.response.end(homepageFileContent);
+        }
+
         rQueue.homepage.push(cli);
         if (rQueue.homepage.length == 1) {
             fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
@@ -650,7 +657,7 @@ var loadHooks = function(_c, info) {
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
     switch (ctx) {
-        case "home": needsHomeRefresh = true; break;
+        case "home": needsHomeRefresh = true; homepageFileContent = ""; break;
         case "tags": delete cachedTags[ctx][detail]; break;
         default: break;
     }
