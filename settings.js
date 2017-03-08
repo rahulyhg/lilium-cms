@@ -219,6 +219,19 @@ var Settings = function () {
                 displayname : "Backend JSON key file full path"
             })
 
+        .add('analytics-api-title', 'title', {
+                displayname: "Analytics API"
+            })
+            .add('analytics.serviceaccount', 'text', {
+                displayname: "Service account email"
+            })
+            .add('analytics.jsonkeypath', 'text', {
+                displayname: "JSON key file root path"
+            })
+            .add('analytics.siteviewid', 'text', {
+                displayname: "Site view ID"
+            })
+
         .add('lickstats_title', 'title', {
             displayname : "Lickstats Combos"
         })

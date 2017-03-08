@@ -672,7 +672,7 @@ var parseInsta = function(pkg) {
 };
 
 var parseAds = function(pkg) {
-    if (!pkg._c.contentadsnip) {
+    if (!pkg._c.contentadsnip || !pkg._c.contentadsnip.length) {
         return;
     }
 

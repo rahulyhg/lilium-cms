@@ -16,6 +16,7 @@ var mail = undefined;
 var styledpages = undefined;
 var Media = undefined;
 var imageSize = undefined;
+var analytics = undefined;
 var themes = undefined;
 var entities = undefined;
 var cacheInvalidator = undefined;
@@ -83,6 +84,7 @@ var Core = function () {
         Communications = require('./communications.js');
         snips = require('./snip.js');
         styledpages = require('./styledpages.js');
+        analytics = require('./analytics.js');
         Media = require('./media.js');
         imageSize = require('./imageSize.js');
         themes = require('./themes.js');
@@ -307,6 +309,7 @@ var Core = function () {
         history.registerEndpoints();
         Article.registerContentEndpoint();
         Communications.setupController();
+        analytics.setupController();
         mail.setupController();
         snips.setupController();
 

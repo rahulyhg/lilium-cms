@@ -33,7 +33,7 @@
         var lvendpoint = $('select[name="endvar"]').val();
         var params = {};
 
-        $('#lmlstacktable-levels td input').each(function() {
+        $('#lmlstacktable-levels td textarea').each(function() {
             lvendpoint += '.' + $(this).val();
         });
 

@@ -3,6 +3,7 @@ var log = require('./log.js');
 var livevars = require('./livevars.js');
 var fileserver = require('./fileserver.js');
 var filelogic = require('./filelogic.js');
+var analytics = require('./analytics.js');
 var formbuilder = require('./formBuilder.js');
 var db = require('./includes/db.js');
 var fs = require('fs');
@@ -248,6 +249,7 @@ var SiteInitializer = function (conf, siteobj) {
 
         hooks.fire('site_will_initialize', conf);
         endpoints.addSite(conf.id);
+        analytics.addSite(conf);
 
         loadHTMLStructure(function () {
             loadStaticSymlinks(function () {
