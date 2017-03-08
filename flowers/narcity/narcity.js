@@ -469,6 +469,9 @@ var getWhatsHot = function(_c, cb) {
 }
 
 var needsHomeRefresh = true;
+var rQueue = {
+    homepage : []
+};
 var cachedTags = {};
 var loadHooks = function(_c, info) {
     endpoints.register(_c.id, ["2012", "2013", "2014", "2015", "2016", "2017"], 'GET', function(cli) {
@@ -480,18 +483,27 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
-        fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
-            if (needsHomeRefresh || !exists) {
-                generateHomepage(cli._c, function() {
-                    fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', function() {
-                        needsHomeRefresh = false;
-                        log('Narcity', 'Recreated and served homepage');
-                    }, true);
-                });
-            } else {
-                fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
-            }
-        });
+        rQueue.homepage.push(cli);
+        if (rQueue.homepage.length == 1) {
+            fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
+                if (needsHomeRefresh || !exists) {
+                    generateHomepage(cli._c, function() {
+                        rQueue.homepage.forEach(function(cli) {
+                            fileserver.pipeFileToClient(cli, cli._c.server.html + '/index.html', function() {
+                                needsHomeRefresh = false;
+                                log('Narcity', 'Recreated and served homepage');
+                            }, true);
+                        });
+                        rQueue.homepage = [];
+                    });
+                } else {
+                    rQueue.homepage.forEach(function(cli) {
+                        fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
+                    });
+                    rQueue.homepage = [];
+                }
+            });
+        }
     });
 
     var cachedHot = [];
