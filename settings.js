@@ -363,6 +363,9 @@ var Settings = function () {
             .add('social.accounts.instagram', 'text', {
                 displayname : "Instagram Username"
             })
+            .add('social.accounts.youtube', 'text', {
+                displayname : "Youtube Username"
+            })
 
         .add('stripe-sep', "title", {
                 displayname: "Stripe"
