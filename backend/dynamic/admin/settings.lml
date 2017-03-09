@@ -2,6 +2,15 @@
 {*settings}
 <lml:dom v="1.0" />
 
+<p style="
+    padding: 8px 12px;
+    background-color: #F00;
+    color: #fff;
+    font-weight: bold;
+">
+    Please, do not modify the settings unless you're a developer. There is a known bug that will erase all content of the stacktables. Those include the ads inserted inside the content.
+</p>
+
 <div class="settings-form-wrapper">
 	<h1>Lilium settings and configurations</h1>
 	{=forms.render("settings_form","edit","settings")}
