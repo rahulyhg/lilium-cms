@@ -1,6 +1,6 @@
 {#config;forms}
 {*settings}
-<lml:dom v="0.8" />
+<lml:dom v="1.0" />
 
 <div class="settings-form-wrapper">
 	<h1>Lilium settings and configurations</h1>

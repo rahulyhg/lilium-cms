@@ -516,7 +516,7 @@ var LMLDom = function() {
 
         if (fullData) {
             var keys = Object.keys(fullData);
-            stacktable.appendRow(data);
+            stacktable.appendRow(fullData);
         }
     };
 
