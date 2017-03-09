@@ -176,6 +176,23 @@ var LMLDom = function() {
         return nodes;
     };
 
+    this.createEditors = function(maindom, done) {
+        var editorTemplates = maindom.querySelectorAll('lml\\:editor');
+        var total = editorTemplates.length;
+        var index = -1;
+
+        var next = function() {
+            if (++index == total) {
+                done();
+            } else {
+                log('LMLDom', 'Creating LMLEditor with name ' + editorTemplates[index].dataset.name);
+                LMLEditor.create(editorTemplates[index].dataset.name, editorTemplates[index], next);
+            }
+        };
+
+        next();
+    }
+
     this.parseNode = function(elem) {
         var fe = elem.querySelector('lml\\:foreach');
         while (fe) {
@@ -538,6 +555,11 @@ var LMLDom = function() {
             tags[i].dataset.tagsindex = lTags.length - 1;
         }
 
+        var quills = liliumcms.quill.getEditors();
+        for (var i = 0; i < quills.length; i++) {
+            liliumcms.quill.fill(quills[i], livevardata[quills[i]] || "", 'api');
+        }
+
         log('LMLDOM', 'Done filling fields');
         domForm.dataset.filled = true;
         domForm.classList.add('lmldom-filled');
@@ -770,9 +792,17 @@ var LMLDom = function() {
                     nextSnip();
                 }
 
+                var data = allSnips[currentIndex].dataset;
+                var keys = Object.keys(data);
+                var dataString = "?async=true";
+
+                for (var i = 0; i < keys.length; i++) {
+                    dataString += "&" + keys[i] + "=" + data[keys[i]];
+                }
+
                 var oReq = new XMLHttpRequest();
                 oReq.addEventListener("load", gotSnip);
-                oReq.open("GET", "{=config.default.server.url}/admin/snips/" + allSnips[currentIndex].dataset.snip + "?async=true");
+                oReq.open("GET", "{=config.default.server.url}/admin/snips/" + allSnips[currentIndex].dataset.snip + dataString);
                 oReq.send();
             }
         };
@@ -803,31 +833,33 @@ var LMLDom = function() {
                 lvs[i].remove();
             }
 
-            lmldom.fillForms();
+            lmldom.createEditors(maindom, function() {
+                lmldom.fillForms();
 
-            log('LMLDOM', 'Applying page features');
-            lmldom.removeFeatures();
-            lmldom.addFeatures();
+                log('LMLDOM', 'Applying page features');
+                lmldom.removeFeatures();
+                lmldom.addFeatures();
 
-            log("LMLDOM", "Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
-            liliumcms.pageloader.parseDocument();
+                log("LMLDOM", "Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
+                liliumcms.pageloader.parseDocument();
 
-            log('LMLDOM', 'Dispatching lmlDOMLoaded event');
-            document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
-                detail : {
-                    version : domv,
-                    protocol : "lmldom",
-                    timetoparse : (new Date() - now)
+                log('LMLDOM', 'Dispatching lmlDOMLoaded event');
+                document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
+                    detail : {
+                        version : domv,
+                        protocol : "lmldom",
+                        timetoparse : (new Date() - now)
+                    }
+                }));
+
+                log('LMLDOM', 'Firing ' + domhooks.length + " LMLDOM hooks");
+                while (domhooks.length) {
+                    domhooks.pop()();
                 }
-            }));
 
-            log('LMLDOM', 'Firing ' + domhooks.length + " LMLDOM hooks");
-            while (domhooks.length) {
-                domhooks.pop()();
-            }
-
-            log('LMLDOM', 'Parsing done!');
-            lmldomReady && lmldomReady(lmldom);
+                log('LMLDOM', 'Parsing done!');
+                lmldomReady && lmldomReady(lmldom);
+            });
         });
     };
 

@@ -1,0 +1,28 @@
+{#config;extra}
+<div id="quill-{=extra.name}"><p></p></div>
+<div id="quill-{=extra.name}-source" class="quill-source">
+    <div class="quill-source-title">
+        Geek editor
+    </div>
+    <textarea>
+        <p></p>
+    </textarea>
+    <div class="bottom-bar">
+        <button type="button">Cancel</button>
+        <button type="button">Apply</button>
+    </div>
+</div>
+
+<script>
+    liliumcms.quill.addEditor("{=extra.name}", new Quill('#quill-{=extra.name}', {
+        modules: { toolbar: true },
+        theme: 'snow',
+        name : "{=extra.name}"
+    }));
+</script>
+
+<style>
+    #quill-{=extra.name} .ql-editor {
+        height: 400px;
+    }
+</style>

@@ -161,6 +161,12 @@ var HtmlParser = function () {
                     htmlForm += parseClosure(field);
                     break;
                 // LMLDom 0.8+
+                case "quill":
+                    htmlForm += parseQuillEditor(field);
+                    break;
+                case "lmleditor":
+                    htmlForm += parseLMLEditor(field);
+                    break;
                 case "liveselect":
                     htmlForm += parseLiveSelect(field);
                     break;
@@ -273,6 +279,10 @@ var HtmlParser = function () {
         }
     };
 
+    var parseQuillEditor = function(field) {
+        return '<div class="lmldom-snip quill-template" data-snip="quill" data-snipname="'+field.name+'" data-name="'+field.name+'" ></div>';
+    };
+
     var parseSnipField = function(field) {
         var lvs = "";
         if (field.attr.livevars) for (var i = 0; i < field.attr.livevars.length; i++) {
@@ -345,6 +355,10 @@ var HtmlParser = function () {
 
         html += '<th><button class="lmlstacktableappendbutton">Append</button></th></tr></thead></tbody></tbody></table></div>';
         return html;
+    };
+
+    var parseLMLEditor = function(field) {
+        return '<lml:editor data-name="'+field.name+'"></lml:editor>';
     };
 
     var parseTagsType = function (field, hasPlaceholder) {

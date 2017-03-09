@@ -255,9 +255,11 @@ var Precomp = function () {
                 fileserver.fileExists(files[fileIndex], function(exists) {
                     if (exists) {
                         fileserver.pipeFileToHandle(fHandle, files[fileIndex], function () {
-                            log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
-                            fileIndex++;
-                            nextFile();
+                            fileserver.writeToFile(fHandle, '\n', function() {
+                                log('Precompiler', 'Appended ' + files[fileIndex], 'detail');
+                                fileIndex++;
+                                nextFile();
+                            });
                         });
                     } else {
                         log('Precompiler', 'Skipped ' + files[fileIndex], 'warn');

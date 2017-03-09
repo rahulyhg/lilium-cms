@@ -33,3 +33,6 @@ body .cke_maximized {
     z-index: 21000 !important;
 }
 
+.cke_source {
+    white-space: pre-wrap !important;
+}

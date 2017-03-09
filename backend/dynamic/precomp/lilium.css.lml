@@ -1707,6 +1707,64 @@ input[disabled] {
     color: #999;
 }
 
+/* Quill Source */
+.quill-source {
+    display: none;
+    position:fixed;
+    top: 0px; bottom: 0px;
+    left: 0px; right: 0px;
+
+    background-color: #333;
+    z-index: 100000;
+}
+
+.quill-source-title {
+    position: absolute;
+    top:0; left:0; right:0;
+    height: 50px;
+
+    font-size: 22px;
+    color: #9b59b6;
+    border-bottom: 1px solid #9b59b6;
+
+    padding: 10px;
+}
+
+.quill-source textarea {
+    position:absolute;
+    top:50px; left:0; right:0;
+    bottom: 50px;
+
+    background: none;
+    color: #CCC;
+    border: none;
+    padding: 20px;
+
+    width: 100% !important;
+}
+
+.quill-source textarea:active {
+    border: none !important;
+}
+
+.quill-source .bottom-bar {
+    padding: 5px;
+    text-align: right;
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right:0;
+
+    height: 50px;
+    border-top: 1px solid #9b59b6;
+}
+
+.quill-source .bottom-bar button {
+    margin-top: 3px;
+    margin-left: 0px;
+}
+
 /* Backend search */
 .backendsearch-wrapper {
     position: fixed;

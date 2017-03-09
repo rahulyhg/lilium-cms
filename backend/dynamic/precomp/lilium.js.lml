@@ -62,6 +62,7 @@ var LiliumCMS = function() {
     this.formParser;
     this.livevars;
     this.ckeditor;
+    this.quill;
     this.adminmenu;
     this.formbeautifier;
     this.multiselect;
@@ -887,6 +888,54 @@ var LiliumCMS = function() {
         };
     };
 
+    var LMLQuill = function() {
+        var editors = {};
+
+        this.addEditor = function(name, quill) {
+            quill.fieldName = name;
+            if (!editors[name]) {
+                log('Quill', "Added an editor with name " + name);
+                editors[name] = quill;
+            } else {
+                log('Quill', 'Tried to initialize already existing editor with name ' + name, 'warn');
+            }
+        };
+
+        this.getEditor = function(name) {
+            return editors[name] || false;
+        };
+
+        this.fill = function(name, content) {
+            var editor = document.getElementById("quill-" + name);
+            if (editor && content) {
+                editor.querySelector('.ql-editor').innerHTML = content;
+            }
+        };
+
+        this.showSource = function(name) {
+            var sourcewrap = document.getElementById("quill-" + name + "-source");
+            if (sourcewrap) {
+                var textarea = sourcewrap.querySelector('textarea');
+                textarea.value = this.getHTML(name).replace(/\<\/p\>/g, '</p>\n\n').replace(/\<\/div\>/g, '</div>\n\n');
+        
+                sourcewrap.style.display = "block";
+            }
+        };
+
+        this.getHTML = function(name) {
+            var editor = document.getElementById("quill-" + name);
+            return editor && editor.querySelector('.ql-editor').innerHTML;
+        }
+
+        this.getEditors = function() {
+            return Object.keys(editors);
+        };  
+
+        this.reset = function() {
+            editors = {};
+        }
+    };
+
     var LMLModals = function() {
         _modals = {};
 
@@ -1093,6 +1142,7 @@ var LiliumCMS = function() {
             that.previewer = new LMLPreviewer();
             that.conversations = new LMLConversations();
             that.animator = new Animator();
+            that.quill = new LMLQuill();
             that.facebook = new LMLFacebook();
             that.lmldom = new LMLDom();
             that.modals = new LMLModals();
@@ -1188,6 +1238,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.queryparams.parseURL();
+        liliumcms.quill.reset();
         liliumcms.users.cacheUsers();
         liliumcms.users.cacheUsers();
         liliumcms.lmldom.parse(function() {

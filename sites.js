@@ -132,7 +132,9 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/leaflet/leaflet.js", 410, "admin", conf.id);
         Frontend.registerJSFile(base + "/backend/static/dateformat.js", 600, 'admin', conf.id);
-        Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 800, "admin", conf.id);
+        Frontend.registerJSFile(base + "node_modules/quill/dist/quill.min.js", 802, "admin", conf.id);
+        Frontend.registerJSFile(base + "node_modules/quill/dist/core.min.js", 804, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 808, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timer/jquery.timer.js", 1100, "admin", conf.id);
@@ -146,6 +148,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmldom.js", 2110, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/badges.js", 2130, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/preview.js", 2150, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmleditor.js", 2170, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/pushtable.js", 2200, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/imagepicker.js", 2220, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/imagestudio.js", 2225, 'admin', conf.id);
@@ -169,6 +172,9 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "node_modules/quill/dist/quill.snow.css", 1200, "admin", conf.id);
+        Frontend.registerCSSFile(base + "node_modules/quill/dist/quill.bubble.css", 1202, "admin", conf.id);
+        Frontend.registerCSSFile(base + "node_modules/quill/dist/quill.core.css", 1204, "admin", conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/mobile.css", 2005, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
