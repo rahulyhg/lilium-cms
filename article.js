@@ -1325,10 +1325,10 @@ var Article = function() {
             .add('commtitle', 'title', {
                 displayname : "Communication"
             })
-            .add('communication', 'snip', {
+            /*.add('communication', 'snip', {
                 snip : "communication",
                 livevars : ["communications.get.article.{?1}"]
-            })
+            })*/
             .add('title-action', 'title', {
                 displayname: "Publish"
             })
