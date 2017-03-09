@@ -84,6 +84,8 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         var indexes = {};
         var values = [];
 
+        var colCount = this.getInfo().scheme.columns.length;
+
         for (var i = 0; i < elVal.length; i++) {
             var field = elVal[i];
             var name = field.name;
@@ -93,7 +95,7 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
             }
 
             var levels = name.split('[');
-            var index = levels[1].replace("]", "");
+            var index = Math.floor(i / colCount);
             var atname = levels[2].replace("]", "");
 
             indexes[index] = indexes[index] || {};
