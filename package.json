@@ -83,6 +83,7 @@
     "node-readability": "^2.2.0",
     "node-rsync": "^1.0.3",
     "nodemailer": "^2.7.2",
+    "parchment": "^1.0.8",
     "path": "^0.12.7",
     "process": "^0.11.2",
     "quill": "^1.2.2",

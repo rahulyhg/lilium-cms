@@ -1,5 +1,5 @@
 {#config;extra}
-<div id="quill-{=extra.name}"><p></p></div>
+<div id="quill-{=extra.name}" class="lml-quill"><p></p></div>
 <div id="quill-{=extra.name}-source" class="quill-source">
     <div class="quill-source-title">
         Geek editor
@@ -46,3 +46,5 @@
         
     }
 </style>
+
+<link href="{=config.default.server.url}/compiled/theme/quill.css" type="text/css" rel="stylesheet" />

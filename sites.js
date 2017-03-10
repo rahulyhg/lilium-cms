@@ -129,6 +129,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/mousetrap.js", 250, "admin", conf.id);
+        Frontend.registerJSFile(base + "backend/static/highlight.js", 290, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/leaflet/leaflet.js", 410, "admin", conf.id);
         Frontend.registerJSFile(base + "/backend/static/dateformat.js", 600, 'admin', conf.id);
@@ -172,6 +173,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "backend/static/hightlight.agate.css", 1120, 'admin', conf.id);
         Frontend.registerCSSFile(base + "node_modules/quill/dist/quill.snow.css", 1200, "admin", conf.id);
         Frontend.registerCSSFile(base + "node_modules/quill/dist/quill.bubble.css", 1202, "admin", conf.id);
         Frontend.registerCSSFile(base + "node_modules/quill/dist/quill.core.css", 1204, "admin", conf.id);
