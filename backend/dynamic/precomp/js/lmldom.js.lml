@@ -483,7 +483,7 @@ var LMLDom = function() {
             var wrapper = field.nextSibling;
 
             for (var i = 0; i < valArr.length; i++) {
-                wrapper.querySelector("[data-value="+valArr[i]+"]").classList.add('selected');
+                valArr[i] && wrapper.querySelector("[data-value="+valArr[i]+"]").classList.add('selected');
             }
         } else if (field.type == "datetime-local") {
             field.value = html5datetime(val);
