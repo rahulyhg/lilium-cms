@@ -890,12 +890,47 @@ var LiliumCMS = function() {
 
     var LMLQuill = function() {
         var editors = {};
+        var that = this;
+
+        this.createImageWrapper = function(imgobj) {
+            var url = ("{=config.default.server.url}/uploads/" + imgobj.url);
+            var creditname = imgobj.artistname;
+            var crediturl = imgobj.artisturl;
+
+            var markup = '<p class="lml-image-wrapper lml-content-image-wrapper"><img class="lml-content-image" data-iid="'+imgobj._id+'" src="'+url+'"><span>Via </span><a href="'+crediturl+'" target="_blank">'+creditname+'</a></p>';
+            return markup; 
+        };
+
+        this.maybeInsertImage = function(quill, imgs, selection) {
+            if (imgs) {
+                var keys = Object.keys(imgs);
+
+                for (var i = 0; i < keys.length; i++) {
+                    var imgobj = imgs[keys[i]];
+                    var markup = that.createImageWrapper(imgobj);
+
+                    quill.getModule('clipboard').dangerouslyPasteHTML(selection.index, markup);
+                }
+            }
+        }
+
+        this.initEditor = function(name, quill) {
+            quill.getModule('toolbar').addHandler('image', function() {
+                var savedSelection = quill.getSelection();
+                liliumcms.imagepicker.cast(function(imgs) { that.maybeInsertImage(quill, imgs, savedSelection) }, undefined, {withcredit : true, multiple : true});
+            });
+
+            quill.getModule('toolbar').addHandler('code', function() {
+                that.showSource(name);
+            });
+        }
 
         this.addEditor = function(name, quill) {
             quill.fieldName = name;
             if (!editors[name]) {
-                log('Quill', "Added an editor with name " + name);
+                this.initEditor(name, quill)
                 editors[name] = quill;
+                log('Quill', "Added an editor with name " + name);
             } else {
                 log('Quill', 'Tried to initialize already existing editor with name ' + name, 'warn');
             }
@@ -921,6 +956,21 @@ var LiliumCMS = function() {
                 sourcewrap.style.display = "block";
             }
         };
+
+        this.applySource = function(name) {
+            var sourcewrap = document.getElementById("quill-" + name + "-source");
+            if (sourcewrap) {
+                var textarea = sourcewrap.querySelector('textarea');
+                var markup = textarea.value.replace(/\n/g, '');
+                that.fill(name, markup);        
+                that.dismissSource(name);
+            }
+        };
+
+        this.dismissSource = function(name) {
+            var sourcewrap = document.getElementById("quill-" + name + "-source");
+            sourcewrap.style.display = "none";
+        }   
 
         this.getHTML = function(name) {
             var editor = document.getElementById("quill-" + name);

@@ -198,7 +198,7 @@ var Forms = function () {
                 minLenght: 3,
                 maxLenght: 200
             })
-            .add('content', 'ckeditor', {
+            .add('content', 'quill', {
                 nolabel: true
             });
 

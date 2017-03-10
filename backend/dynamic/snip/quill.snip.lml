@@ -8,14 +8,27 @@
         <p></p>
     </textarea>
     <div class="bottom-bar">
-        <button type="button">Cancel</button>
-        <button type="button">Apply</button>
+        <button type="button" onclick="liliumcms.quill.dismissSource('{=extra.name}');">Cancel</button>
+        <button type="button" onclick="liliumcms.quill.applySource('{=extra.name}')">Apply</button>
     </div>
 </div>
 
 <script>
     liliumcms.quill.addEditor("{=extra.name}", new Quill('#quill-{=extra.name}', {
-        modules: { toolbar: true },
+        bounds: '#quill-{=extra.name}',
+        modules: {
+            // 'syntax': true,
+            'toolbar': [
+                [ 'bold', 'italic', 'underline', 'strike' ],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'script': 'super' }, { 'script': 'sub' }],
+                [ { 'header': [false,1,2,3,4,5,6]} ],
+                [{ 'list': 'ordered' }, { 'list': 'bullet'}, { 'indent': '-1' }, { 'indent': '+1' }],
+                [ 'link', 'image', 'video' ],
+                [ 'code' ],
+                [ 'clean' ]
+            ],
+        },
         theme: 'snow',
         name : "{=extra.name}"
     }));
@@ -24,5 +37,12 @@
 <style>
     #quill-{=extra.name} .ql-editor {
         height: 400px;
+    }
+
+    .lmlform .ql-toolbar button,
+    .ql-toolbar button {
+        margin: 0;
+        box-shadow : none;
+        
     }
 </style>
