@@ -62,8 +62,9 @@ var LocalClip = function() {
     this.save = function() {
         var keys = Object.keys(clips);
         for (var i = keys.length - 1; i >= 0; i--) {
+            var clip = clips[keys[i]];
             if (
-                clips[keys[i]].value.trim() == "" || 
+                clip.value.trim() == "" || 
                 (new Date(clip.lastTouched).getTime() < new Date().getTime() - (1000 * 60 * 60 * 2))
             ) {
                 that.remove(keys[i]);
