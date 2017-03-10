@@ -66,6 +66,7 @@ var LiliumCMS = function() {
     this.adminmenu;
     this.formbeautifier;
     this.multiselect;
+    this.localclip;
     this.previewer;
     this.imagepicker;
     this.conversations;
@@ -1192,6 +1193,7 @@ var LiliumCMS = function() {
             that.previewer = new LMLPreviewer();
             that.conversations = new LMLConversations();
             that.animator = new Animator();
+            that.localclip = new LocalClip();
             that.quill = new LMLQuill();
             that.facebook = new LMLFacebook();
             that.lmldom = new LMLDom();

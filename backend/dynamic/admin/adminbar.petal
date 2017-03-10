@@ -21,6 +21,9 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
+                    <li id="topbar-localclip" class="link">
+                        <span class="fa fa-clipboard"></span>
+                    </li>
                     <li id="topbar-search-icon" class="link">
                         <span class="fa fa-search"></span>
                     </li>

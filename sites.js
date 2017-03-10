@@ -156,6 +156,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/backendsearch.js", 2250, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/conversations.js", 2280, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/stacktable.js", 2300, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/localclip.js", 2350, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/socket.js", 2400, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/multi-select.js", 2500, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/ckeditor-lilium.js", 1320, 'admin', conf.id);
@@ -181,6 +182,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/mobile.css", 2005, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/badges.css", 2105, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/localclip.css", 2108, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/preview.css", 2110, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lys.css", 2120, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/imagepicker.css", 2150, 'admin', conf.id);
