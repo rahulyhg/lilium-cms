@@ -46,7 +46,6 @@ class History {
             }
 
             if (new Date(newArticle.date).getTime() != new Date(oldState.date).getTime()) {
-                console.log(new Date(newArticle.date).getTime() + " != " + new Date(oldState.date).getTime())
                 lmldiffs.push({ change : "modified", field : ["date"] })
             }
 

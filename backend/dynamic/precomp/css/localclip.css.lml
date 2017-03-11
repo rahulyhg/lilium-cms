@@ -1,0 +1,92 @@
+
+#localclip-overlay {
+    display: none;
+
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right:0;
+    top:0;
+
+    z-index: 200000;
+    overflow-y: auto;
+
+    background-color: #fff; 
+    background-image: 
+        linear-gradient(90deg, transparent 79px, #abced4 79px, #abced4 81px, transparent 81px), 
+        linear-gradient(#eee .1em, transparent .1em);   
+        background-size: 100% 1.2em;
+}
+
+#localclip-wrapper {
+    padding-left: 100px;
+    padding-top: 40px;
+    padding-right: 100px;
+
+    position: relative;
+}
+
+#localclip-wrapper h1 {
+    font-family: 'Gloria Hallelujah', cursive;
+    font-size: 42px;
+    font-weight: normal;
+    color: #5c22ff;
+}
+
+#localclip-wrapper .description {
+    margin: 10px 0px;
+    font-weight: 500;
+    color: #333;
+    font-size: 16px;
+}
+
+#localclip-list {
+    
+}
+
+.localclip-sheet {
+    width: 380px;
+    background-color: #fff0cf;
+    margin-right: 20px;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.localclip-sheet h2 {
+    background-color: #debf4c;
+    color: #FFF;
+    font-weight: 500;
+    padding: 8px;
+    font-size: 18px;
+}
+
+.localclip-sheet h3 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #847749;
+    padding: 8px;
+}
+
+.localclip-content {
+    width: 100%;
+    height: 200px;
+    padding: 8px;
+    background: transparent;
+    font-size: 14px;
+    resize: none;
+    font-weight: 500;
+    line-height: 24px;
+}
+
+.localclip-content::-webkit-scrollbar { 
+    display: none; 
+}
+
+#localclip-dismiss {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 32px;
+    color: #F99;
+    cursor: pointer;
+}

@@ -711,6 +711,7 @@ var registerPrecompFiles = function(_c) {
     templateBuilder.addCSS(themePath + '/precomp/css/CoverPop.css.lml', _c.id);
     templateBuilder.addCSS(themePath + '/precomp/css/ads.css.lml', _c.id);
     templateBuilder.addCSS(themePath + '/precomp/css/ckeditor.css.lml', _c.id);
+    templateBuilder.addCSS(themePath + '/precomp/css/quill.css.lml', _c.id);
     templateBuilder.addCSS(themePath + '/precomp/css/narcity.css.lml', _c.id);
 
     templateBuilder.addJS(themePath + '/precomp/js/vaniryk.js.lml', _c.id);

@@ -1,0 +1,115 @@
+var LocalClip = function() {
+    var that = this;
+    var store = window.localStorage;
+    var clips;
+    var CACHE_KEY = "LMLlocalclip";
+
+    var localclipshown = false;
+
+    var Clip = function(name, value, date) {
+        this.lastTouched = date || new Date();
+        this.name = name;
+        this.value = value;
+    }
+
+    this.init = function() {
+        try {
+            log('LocalClip', "Preloading local cached data");
+            clips = JSON.parse(store.getItem(CACHE_KEY) || "{}");
+        } catch (ex) {
+            clips = {};
+        }
+
+        this.save();
+        this.bindHeader();
+        document.addEventListener('copy', this.handleCopy);
+    };
+
+    this.present = function() {
+        var list = document.getElementById('localclip-list');
+        list.innerHTML = "";
+
+        var keys = Object.keys(clips);
+        for (var i = keys.length - 1; i >= 0; i--) {
+            list.appendChild(that.generateOne(clips[keys[i]]));
+        }
+    };
+
+    this.handleCopy = function(e, doc) {
+        doc = doc || document;
+        var data = doc.getSelection && doc.getSelection().toString();
+        !localclipshown && data && that.push("Browser Clipboard - " + dateFormat(new Date, "HH:MM:ss"), data);
+    };
+
+    this.cast = function() {
+        that.present();
+        document.getElementById('localclip-overlay').style.display = "block";
+        document.body.classList.add('block-scroll');
+        localclipshown = true;
+    };
+
+    this.dismiss = function() {
+        document.getElementById('localclip-overlay').style.display = "none";
+        document.body.classList.remove('block-scroll');
+        localclipshown = false;
+    };
+
+    this.bindHeader = function() {
+        document.getElementById('topbar-localclip').addEventListener('click', that.cast);
+        document.getElementById('localclip-dismiss').addEventListener('click', that.dismiss);
+    };
+
+    this.save = function() {
+        var keys = Object.keys(clips);
+        for (var i = keys.length - 1; i >= 0; i--) {
+            var clip = clips[keys[i]];
+            if (
+                clip.value.trim() == "" || 
+                (new Date(clip.lastTouched).getTime() < new Date().getTime() - (1000 * 60 * 60 * 2))
+            ) {
+                that.remove(keys[i]);
+            }
+        }
+
+        store.setItem(CACHE_KEY, JSON.stringify(clips));
+    }
+
+    this.push = function(name, value) {
+        var clip = new Clip(name, value);
+        clips[name] = clip;
+        that.save();
+    }
+
+    this.remove = function(name, skipSave) {
+        delete clips[name];
+        !skipSave && that.save();
+    }
+
+    this.generateOne = function(clip) {
+        var sheet = document.createElement('div');
+        sheet.className = "localclip-sheet";
+
+        var title = document.createElement('h2');
+        title.textContent = clip.name;
+
+        var moddate = document.createElement('h3');
+        moddate.textContent = "Modified on " + dateFormat(clip.lastTouched, 'dd/mm/yyyy @ HH:MM');
+
+        var content = document.createElement('textarea');
+        content.dataset.name = clip.name;
+        content.className = "localclip-content";
+        content.value = clip.value;
+        content.addEventListener('change', function() {
+            clips[this.dataset.name].value = this.value;
+            that.save();
+        });
+
+        sheet.appendChild(title);
+        sheet.appendChild(moddate);
+        sheet.appendChild(content);
+
+        return sheet;
+    };
+
+    this.init();
+};

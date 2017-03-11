@@ -262,7 +262,7 @@ var Precomp = function () {
                             });
                         });
                     } else {
-                        log('Precompiler', 'Skipped ' + files[fileIndex], 'warn');
+                        log('Precompiler', 'Skipped  ' + files[fileIndex], 'warn');
                         fileIndex++;
                         nextFile();
                     }
@@ -294,7 +294,7 @@ var Precomp = function () {
                             nextFile();
                         });
                     } else {
-                        log('Precompiler', 'Skipped ' + files[fileIndex], 'warn');
+                        log('Precompiler', 'Skipped  ' + files[fileIndex], 'warn');
                         fileIndex++;
                         nextFile();
                     }

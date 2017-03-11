@@ -5,7 +5,7 @@
     <ul class="devtools-list">
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/livevars">
-                <i class="devtools-list-item-icon fa fa-database"></i>
+                <i class="devtools-list-item-icon fa fa-asterisk"></i>
                 <b class="devtools-list-item-title">Livevars</b>
             </a>
         </li>
@@ -55,6 +55,12 @@
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/mail">
                 <i class="devtools-list-item-icon fa fa-envelope-o"></i>
                 <b class="devtools-list-item-title">Email</b>
+            </a>
+        </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/mongoadmin" target="_blank">
+                <i class="devtools-list-item-icon fa fa-database"></i>
+                <b class="devtools-list-item-title">Mongo Admin</b>
             </a>
         </li>
     </ul>

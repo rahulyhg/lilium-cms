@@ -117,6 +117,19 @@ var CKEditor = function() {
             // Output paragraphs as <p>Text</p>.
             this.document.appendStyleSheet('/compiled/admin.css');
             ckBindEmbedPaste(ev);
+
+            var blurLastSaved = ev.editor.getData();
+            ev.editor.on('blur', function(e) {
+                var data = e.editor.getData();
+                if (blurLastSaved != data) {
+                    blurLastSaved = data;
+                    liliumcms.localclip.push("Autosave @ " + dateFormat(new Date(), 'HH:MM:ss'), data);
+                }
+            });
+
+            ev.editor.document.on('copy', function(e) {
+                liliumcms.localclip.handleCopy(e, this.$);
+            });
         });
         CKEDITOR.config.entities = false;
         CKEDITOR.config.height = 360;
