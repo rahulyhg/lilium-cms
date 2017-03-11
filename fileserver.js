@@ -276,7 +276,7 @@ var FileServer = function () {
 
         stream.on('close', function () {
             cli.response.end();
-            if (callback) callback();
+            callback && callback();
         });
     };
 
@@ -310,6 +310,16 @@ var FileServer = function () {
         rs.pipe(handle, {
             end: false
         });
+    };
+
+    this.dumpToFile = function(filename, content, callback, encoding) {
+        var handle = fs.createWriteStream(filename, {
+            flags: 'w+',
+            defaultEncoding: encoding || 'utf8',
+            mode: '0644'
+        });
+
+        handle.write(content, encoding || 'utf8', callback);
     };
 
     this.writeToFile = function (handle, content, callback, encoding) {

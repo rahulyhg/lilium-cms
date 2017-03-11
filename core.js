@@ -16,6 +16,7 @@ var mail = undefined;
 var styledpages = undefined;
 var Media = undefined;
 var imageSize = undefined;
+var docs = undefined;
 var analytics = undefined;
 var themes = undefined;
 var entities = undefined;
@@ -87,6 +88,7 @@ var Core = function () {
         analytics = require('./analytics.js');
         Media = require('./media.js');
         imageSize = require('./imageSize.js');
+        docs = require('./docs.js');
         themes = require('./themes.js');
         entities = require('./entities.js');
         cacheInvalidator = require('./cacheInvalidator.js');
@@ -310,6 +312,7 @@ var Core = function () {
         Article.registerContentEndpoint();
         Communications.setupController();
         analytics.setupController();
+        docs.setupController();
         mail.setupController();
         snips.setupController();
 
@@ -872,6 +875,12 @@ var Core = function () {
         });
     };
 
+    var loadDocs = function(cb) {
+        docs.compileDirectory(function() {
+            docs.compileIndex(cb);
+        });
+    };
+
     var loadVocab = function(done) {
         vocab.preloadDicos(done);
     };
@@ -927,24 +936,26 @@ var Core = function () {
                     loadRoles(function () {
                         loadTools(function() {
                             precompile(function () {
-                                redirectIfInit(resp, function () {
-                                    loadAdminMenus();
-                                    loadFrontend();
-                                    loadForms();
-                                    bindLocalCast();
-        
-                                    loadCacheInvalidator();
-                                    scheduleGC();
-                                    schedulePreload();
-        
-                                    log('Lilium', 'Starting inbound server', 'info');
-                                    Inbound.createServer();
-                                    loadNotifications();
-                                    notifyAdminsViaEmail();
-                                    Inbound.start();
-        
-                                    log('Core', 'Firing initialized signal', 'info');
-                                    hooks.fire('init');
+                                loadDocs(function() {
+                                    redirectIfInit(resp, function () {
+                                        loadAdminMenus();
+                                        loadFrontend();
+                                        loadForms();
+                                        bindLocalCast();
+            
+                                        loadCacheInvalidator();
+                                        scheduleGC();
+                                        schedulePreload();
+            
+                                        log('Lilium', 'Starting inbound server', 'info');
+                                        Inbound.createServer();
+                                        loadNotifications();
+                                        notifyAdminsViaEmail();
+                                        Inbound.start();
+            
+                                        log('Core', 'Firing initialized signal', 'info');
+                                        hooks.fire('init');
+                                    });
                                 });
                             });
                         });

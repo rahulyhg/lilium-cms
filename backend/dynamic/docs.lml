@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+{#config;extra}
+<html>
+    <head>
+        {%docstyle}
+    </head>
+    <body id="lml-docs" data-async="true">
+        <div id="lml-docs-sidebar">
+            <div id="lml-docs-sidebar-title">
+                <span>Lilium API</span>
+                <img src="//localhost:8080/static/media/lmllogo.png" class="slowrotate">
+            </div>
+            <ul id="lml-docs-sidebar-menu">
+                {$ for (lib in extra.libs); $}
+                <li data-lib="{=lib}" id="link-{=lib}">{=lib}</li>
+                {$ endfor; $}
+            </ul>
+        </div>
+
+        <main>
+
+        </main>
+
+        {%%doclibs}
+        {%docscript}
+    </body>
+</html>

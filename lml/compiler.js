@@ -483,8 +483,9 @@ class LMLTagParser {
 
                 if (flags["%"]) {
                     toCompile = false;
-                    fullpath = petalname;
-                } else if (Petals.isRegistered(petalname)) {
+                } 
+
+                if (Petals.isRegistered(petalname)) {
                     fullpath = Petals.get(petalname).filepath;
                 } else {
                     fullpath = ctx.extra.rootDir + "/" + petalname + ".petal";
@@ -506,9 +507,9 @@ class LMLTagParser {
                         compiler.deal(ctx);
                     }, false, 'utf8');
                 } else {
-                    fullpath = ctx.slang.getReturn(ctx, petalname);
                     fileserver.readFile(fullpath, (ctn) => {
-                        ctx.stream.write(typeof ctn == "undefined" ? new Error("[LMLPetalException] Undefined content for file " + fullpath) : ctn, 'utf8', nextPetal);
+                        ctx.stream.write(typeof ctn == "undefined" ? new Error("[LMLPetalException] Undefined content for file " + fullpath) : ctn, 'utf8');
+                        nextPetal();
                     }, false, 'utf8');
                 }
             }
