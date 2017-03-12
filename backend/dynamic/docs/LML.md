@@ -19,7 +19,7 @@
 
 > Everything passed using the *extra* parameter will be accessible inside the markup while compiling. For instance, when compiling an article, it will be contained in extra.article
 
-<h3>Inside the markup</h3>
+### Inside the markup
 Let the following be executed
 ```javascript
 const LML2 = require("./lml/compiler.js");

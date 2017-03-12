@@ -3,6 +3,7 @@
 <html>
     <head>
         {%docstyle}
+        <title>Lilium API | Documentation</title>
     </head>
     <body id="lml-docs" data-async="true">
         <div id="lml-docs-sidebar">

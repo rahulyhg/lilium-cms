@@ -36,6 +36,8 @@ Will send a 500 page to the current client
 * **message** Text or document to be sent; ignored if *hard* parameter is true
 * **hard** A boolean; a hard response does not contain any message
 
+### Properties
+
 ``ClientObject.request``
 Request object created by NodeJS HTTP module
 
