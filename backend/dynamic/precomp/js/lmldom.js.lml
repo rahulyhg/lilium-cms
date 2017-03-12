@@ -360,21 +360,31 @@ var LMLDom = function() {
             var paramName = lim.getAttribute('src') || "";
             
             paramstr = paramName;
+            var missingInfo = false;
             while (-1 != paramstr.indexOf('{')) {
                 var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
                 var newval = ldContext;
+
                 for (var i = 0; i < varlevels.length; i++) {
+                    if (!newval) {
+                        missingInfo = true;
+                        break;
+                    }
+
                     newval = newval[varlevels[i]];
                 }
 
                 paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
             }
 
-            img.setAttribute('src', paramstr);
-            img.className = lim.className;
-            img.innerHTML = lim.innerHTML;
+            if (!missingInfo) {
+                img.setAttribute('src', paramstr);
+                img.className = lim.className;
+                img.innerHTML = lim.innerHTML;
 
-            lim.insertAfter(img);
+                lim.insertAfter(img);
+            }
+
             lim.remove();
 
             lim = elem.querySelector('lml\\:image');
@@ -387,22 +397,32 @@ var LMLDom = function() {
             var paramName = lnk.getAttribute('href') || "";
             
             paramstr = paramName;
+            var missingInfo = false;
             while (-1 != paramstr.indexOf('{')) {
                 var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
                 var newval = ldContext;
+
                 for (var i = 0; i < varlevels.length; i++) {
+                    if (!newval) {
+                        missingInfo = true;
+                        break;
+                    }
+
                     newval = newval[varlevels[i]];
                 }
 
                 paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
             }
 
-            a.setAttribute('href', paramstr);
-            a.setAttribute('target', lnk.getAttribute('target') || "");
-            a.className = lnk.className;
-            a.innerHTML = lnk.innerHTML;
+            if (!missingInfo) {
+                a.setAttribute('href', paramstr);
+                a.setAttribute('target', lnk.getAttribute('target') || "");
+                a.className = lnk.className;
+                a.innerHTML = lnk.innerHTML;
 
-            lnk.insertAfter(a);
+                lnk.insertAfter(a);
+            }
+
             lnk.remove();
 
             lnk = elem.querySelector('lml\\:link');
