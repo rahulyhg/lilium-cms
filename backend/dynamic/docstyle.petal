@@ -220,6 +220,44 @@ main blockquote {
     color: #EEE;
 }
 
+#home-title {
+    padding: 20px;
+    text-align: center;
+}
+
+#home-title small {
+    display: block;
+    font-size: 20px;
+}
+
+#big-logo-wrapper {
+    text-align: center;
+}
+
+#home-top-wrapper {
+    padding-bottom: 30px;
+    border-bottom: 3px solid #291438;
+    -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  border: none;
+  font: normal 0.5px/normal Arial, Helvetica, sans-serif;
+  color: rgba(255,255,255,1);
+  -o-text-overflow: clip;
+  text-overflow: clip;
+  background: -webkit-linear-gradient(135deg, rgba(0,0,0,0) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 75%, rgba(255,255,255,0.1) 75%), -webkit-linear-gradient(45deg, rgba(0,0,0,0) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 75%, rgba(255,255,255,0.1) 75%), rgba(84,9,135,1);
+  background: -moz-linear-gradient(-45deg, rgba(0,0,0,0) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 75%, rgba(255,255,255,0.1) 75%), -moz-linear-gradient(45deg, rgba(0,0,0,0) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 75%, rgba(255,255,255,0.1) 75%), rgba(84,9,135,1);
+  background: linear-gradient(-45deg, rgba(0,0,0,0) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 75%, rgba(255,255,255,0.1) 75%), linear-gradient(45deg, rgba(0,0,0,0) 25%, rgba(255,255,255,0.1) 25%, rgba(255,255,255,0.1) 50%, rgba(0,0,0,0) 50%, rgba(0,0,0,0) 75%, rgba(255,255,255,0.1) 75%), rgba(41,20,56,1);
+  background-position: auto auto;
+  -webkit-background-origin: padding-box;
+  background-origin: padding-box;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  -webkit-background-size: 200em 200em;
+  background-size: 200em 200em;
+}
+
+
 @-webkit-keyframes  slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
 @-moz-keyframes     slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
 @-ms-keyframes      slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
