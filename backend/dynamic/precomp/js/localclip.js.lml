@@ -111,5 +111,7 @@ var LocalClip = function() {
         return sheet;
     };
 
-    this.init();
+    if (document.location.pathname != "/admin/welcome") {
+        this.init();
+    }
 };
