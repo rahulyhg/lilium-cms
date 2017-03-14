@@ -5,6 +5,9 @@ const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
 const log = require('./log.js');
 
+const setupHtmlToAmp  = require('html-to-amp');
+const htmlToAmp = setupHtmlToAmp();
+
 class Amp {
     // Called inside core.js
     GET(cli) {
@@ -23,29 +26,38 @@ class Amp {
 
         let articleContent = article.content;
 
+        log('AMP', 'before parsing');
         /* Modify content according to AMP guidelines */
-        article.content = this.parseAMPContent(articleContent);
+        this.parseAMPContent(articleContent, (err, amp) => {
+            log('AMP', 'Done parsing HTML to AMP: ', err);
+            if (err) {
+              throw err;
+            }
 
-        /* TODO : Modify amp.lml so that it creates an AMP page */
-        // String parsing can be heavy on CPU usage. Make sure it's optimized! 
+            article.content = amp;
+            /* TODO : Modify amp.lml so that it creates an AMP page */
+            // String parsing can be heavy on CPU usage. Make sure it's optimized!
 
-        log('AMP', "Generating AMP page for article : " + article.title);
-        filelogic.renderThemeLML(cli, 'amp', 'amp/' + article.name + '.html', {
-            config : cli._c,
-            article : article
-        }, () => {
-            fileserver.pipeFileToClient(cli, cli._c.server.html + "/amp/" + article.name + '.html', () => {
-                log("AMP", "Generated AMP page for article : " + article.title);
-            }, true, 'text/html');
-        }, true);
+            log('AMP', "Generating AMP page for article : " + article.title);
+            filelogic.renderThemeLML(cli, 'amp', 'amp/' + article.name + '.html', {
+                config : cli._c,
+                article : article
+            }, () => {
+                fileserver.pipeFileToClient(cli, cli._c.server.html + "/amp/" + article.name + '.html', () => {
+                    log("AMP", "Generated AMP page for article : " + article.title);
+                }, true, 'text/html');
+            }, true);
+          });
     };
 
-    parseAMPContent(articleContent) {
-        // TODO : Do that parsing, yay! 
-        articleContent = articleContent;
+    parseAMPContent(cli, articleContent, cb) {
+      articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1http://');
+      htmlToAmp(articleContent, cb);
+        // TODO : Do that parsing, yay!
+        //articleContent = articleContent;
 
         // Return the whole thing
-        return articleContent;
+        //return articleContent;
     }
 }
 

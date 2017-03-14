@@ -1,6 +1,58 @@
-{#config;extra}
-<!-- 
-    Your article will be contained inside the extra.article variable 
-    Remove this comment before sending in production :) 
--->
-{=extra.article.content}
+{#config;extra;theme;date}
+
+<!doctype html>
+<html amp lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>{=extra.article.title} - MTL Blog</title>
+        <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}" />
+        <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+        <script type="application/ld+json">
+            {
+              "@context": "http://schema.org",
+              "@type": "Article",
+              "headline": "{=extra.article.title}",
+              "datePublished": "{=extra.article.date}",
+              "image": [
+                "{=extra.article.featuredimage}"
+              ]
+            }
+        </script>
+        <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+        <script async src="https://cdn.ampproject.org/v0.js"></script>
+        <script async custom-element="amp-sidebar" src="https://cdn.ampproject.org/v0/amp-sidebar-0.1.js"></script>
+
+        <style amp-custom>
+          body {
+            background-color: white;
+          }
+          header {
+            background-color: black;
+          }
+        </style>
+    </head>
+    <body>
+
+      <amp-img src="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" width="480" height="200" layout="responsive">
+        <noscript>
+          <img src="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" width="480" height="200" />
+        </noscript>
+      </amp-img>
+
+      <h1 style="margin:10px;">{=extra.article.title}</h1>
+
+      <amp-img src="{=extra.article.authors.0.avatarURL}" width="50px" height="50px" layout="fixed" style="border-radius: 50px; margin: 6px; vertical-align: middle; margin-bottom: 0.25em">
+        <noscript>
+          <img src="{=extra.article.authors.0.avatarURL}" width="50px" height="50px" />
+        </noscript>
+      </amp-img>
+
+      <a href="{=config.default.server.url}/{extra.article.authors.0}}/{=extra.article.authors.0.slug}" class="article-author-link">
+          <span class="article-author-displayname midvert">{=extra.article.authors.0.displayname}</span>
+      </a>
+      <span class="midvert">&middot;</span>
+      <span class="article-published-date midvert" data-edtdatetime={=extra.article.date}>{=formatdate}</span>
+
+      {=extra.article.content}
+    </body>
+</html>
