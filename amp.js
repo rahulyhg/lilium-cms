@@ -50,9 +50,9 @@ class Amp {
           });
     };
 
-    parseAMPContent(cli, articleContent, cb) {
+    parseAMPContent(articleContent, cb) {
       articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1http://');
-      htmlToAmp(articleContent, cb);
+      return htmlToAmp(articleContent, cb);
         // TODO : Do that parsing, yay!
         //articleContent = articleContent;
 
