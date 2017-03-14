@@ -1,140 +1,170 @@
 {#config;extra;theme;date}
-<!--
-    Your article will be contained inside the extra.article variable
-    Remove this comment before sending in production :)
--->
+{$
+    featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
+    author = extra.article.authors.0;
+    url = config.default.server.url;
+    rooturl = url.substring(2);
+    postdate = extra.article.date;
+    formatdate = date.stringify(postdate);
+$}
 <!doctype html>
 <html amp lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>{=extra.article.title} - MTL Blog</title>
-    <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}" />
-    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-    <script type="application/ld+json">
-      {
-        "@context": "http://schema.org",
-        //Article, NewsArticle, BlogPosting, VideoObject
-        "@type": "Article",
-        "headline": "{=extra.article.title}",
-        "datePublished": "{=extra.article.date}",
-        "image": [
-          "{=extra.article.featuredimage}"
-        ]
-      }
-    </script>
-    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-    <script async src="https://cdn.ampproject.org/v0.js"></script>
-    <script async custom-element="amp-sidebar" src="https://cdn.ampproject.org/v0/amp-sidebar-0.1.js"></script>
+    <head>
+        <meta charset="utf-8">
+        <title>{=extra.article.title} - MTL Blog</title>
+        <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}" />
+        <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+        <script type="application/ld+json">
+          {
+            "@context": "http://schema.org",
+            "@type": "Article",
+            "headline": "{=extra.article.title}",
+            "datePublished": "{=extra.article.date}",
+            "image": [
+              "{=extra.article.featuredimage}"
+            ]
+          }
+        </script>
+        <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+        <script async src="https://cdn.ampproject.org/v0.js"></script>
+        <script async custom-element="amp-sidebar" src="https://cdn.ampproject.org/v0/amp-sidebar-0.1.js"></script>
 
-    <!--feuille de style-->
-    <style amp-custom>
-      body {
-        background-color: white;
-      }
-      header {
-        background-color: black;
-      }
-    </style>
+        <style amp-custom>
+            body {
+              background-color: white;
+            }
+            #sidebar h3{
+              margin: 15px 15px 10px;
+              color: #ff4200;
+              font-family: "Oswald",sans-serif;
+              font-size: 16px;
+              font-weight: normal;
+              text-transform: uppercase;
+            }
+            #sidebar a {
+              display: block;
+              text-decoration: none;
+              color: #000;
+              margin: 6px 15px;
+              font-family: "Oswald",sans-serif;
+              font-size: 22px;
+              text-transform: uppercase;
+            }
+            header {
+              background-color: black;
+            }
+            .header-menu-bar-wrapper{
+              display: inline-block;
+              height: 26px;
+              padding: 17px;
+              vertical-align: middle;
+              float: left;
+            }
+            .header-menu-bar{
+              background-color: #FFF;
+              width: 30px;
+              height: 5px;
+              margin-bottom: 5px;
+            }
+        </style>
+    </head>
+    <body>
+        <amp-sidebar id="sidebar" layout="nodisplay" side="right">
+            <!--<form method="GET" action="{=config.default.server.url}/search">
+                <input id="mobile-search-input" name="q" placeholder="Search..." />
+            </fom>-->
 
-  </head>
-  <body>
-    <amp-sidebar id="sidebar"
-      layout="nodisplay"
-      side="right">
-      <!--<form method="GET" action="{=config.default.server.url}/search">
-          <input id="mobile-search-input" name="q" placeholder="Search..." />
-      </fom>-->
+            <div>
+                <h3>Browse</h3>
+                {$ for (sect in theme.settings.headerlinks); $}
+                    <a href="{=sect.url}" class="section-link" >{=sect.linktext}</a>
+                {$ endfor; $}
+            </div>
 
-      <div>
-          <h3>Browse</h3>
-          {$ for (sect in theme.settings.headerlinks); $}
-              <a href="{=sect.url}" class="section-link" >{=sect.linktext}</a>
-          {$ endfor; $}
-      </div>
+            <hr />
 
-      <hr />
+            <div class="slider-follow">
+                <h3>Follow</h3>
+                {$ if (?config.default.social.accounts.facebook != "") $}
+                    <a href="https://facebook.com/{=config.default.social.accounts.facebook}" target="_blank">
+                        <i class="fa fa-facebook-official" aria-hidden="true"></i>
+                        <span>Facebook</span>
+                    </a>
+                {$ endif; $}
+                {$ if (?config.default.social.accounts.twitter != "") $}
+                    <a href="https://twitter.com/{=config.default.social.accounts.twitter}" target="_blank">
+                        <i class="fa fa-twitter" aria-hidden="true"></i>
+                        <span>Twitter</span>
+                    </a>
+                {$ endif; $}
+                {$ if (?config.default.social.accounts.instagram != "") $}
+                    <a href="https://instagram.com/{=config.default.social.accounts.instagram}" target="_blank">
+                        <i class="fa fa-instagram" aria-hidden="true"></i>
+                        <span>Instagram</span>
+                    </a>
+                {$ endif; $}
+                {$ if (?config.default.social.accounts.googleplus != "") $}
+                    <a href="https://plus.google.com/+{=config.default.social.accounts.googleplus}" target="_blank">
+                        <i class="fa fa-google-plus" aria-hidden="true"></i>
+                        <span>Google Plus</span>
+                    </a>
+                {$ endif; $}
+            </div>
+            <hr />
 
-      <div class="slider-follow">
-          <h3>Follow</h3>
-          {$ if (?config.default.social.accounts.facebook != "") $}
-              <a href="https://facebook.com/{=config.default.social.accounts.facebook}" target="_blank">
-                  <i class="fa fa-facebook-official" aria-hidden="true"></i>
-                  <span>Facebook</span>
-              </a>
-          {$ endif; $}
-          {$ if (?config.default.social.accounts.twitter != "") $}
-              <a href="https://twitter.com/{=config.default.social.accounts.twitter}" target="_blank">
-                  <i class="fa fa-twitter" aria-hidden="true"></i>
-                  <span>Twitter</span>
-              </a>
-          {$ endif; $}
-          {$ if (?config.default.social.accounts.instagram != "") $}
-              <a href="https://instagram.com/{=config.default.social.accounts.instagram}" target="_blank">
-                  <i class="fa fa-instagram" aria-hidden="true"></i>
-                  <span>Instagram</span>
-              </a>
-          {$ endif; $}
-          {$ if (?config.default.social.accounts.googleplus != "") $}
-              <a href="https://plus.google.com/+{=config.default.social.accounts.googleplus}" target="_blank">
-                  <i class="fa fa-google-plus" aria-hidden="true"></i>
-                  <span>Google Plus</span>
-              </a>
-          {$ endif; $}
-      </div>
-      <hr />
+            <div class="slider-links">
+                <a class="section-link" href="https://www.narcitymedia.com">Advertise</a>
+                <a class="section-link" href="{=config.default.server.url}/contact-us">Contact</a>
+                <a class="section-link" href="https://www.narcitymedia.com/jobs">Jobs</a>
+                <a class="section-link" href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
+                <a class="section-link" href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
+            </div>
 
-      <div class="slider-links">
-          <a class="section-link" href="https://www.narcitymedia.com">Advertise</a>
-          <a class="section-link" href="{=config.default.server.url}/contact-us">Contact</a>
-          <a class="section-link" href="https://www.narcitymedia.com/jobs">Jobs</a>
-          <a class="section-link" href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
-          <a class="section-link" href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
-      </div>
+            <div class="copyright-wrapper">
+                <a href="https://www.narcitymedia.com">
+                    &copy; 2017 All rights reserved, Narcity Media inc.
+                </a>
+            </div>
+        </amp-sidebar>
 
-      <div class="copyright-wrapper">
-          <a href="https://www.narcitymedia.com">
-              &copy; 2017 All rights reserved, Narcity Media inc.
-          </a>
-      </div>
-    </amp-sidebar>
+        <header style="width:100%; height:60px">
+            <div on="tap:sidebar.toggle" class="narcity-header-container ampstart-btn caps ml1">
+                <div class="header-menu-bar-wrapper">
+                    <div class="header-menu-bar"></div>
+                    <div class="header-menu-bar"></div>
+                    <div class="header-menu-bar"></div>
+                </div>
 
-    <header style="width:100%; height:60px">
-      <div class="header-menu-bar-wrapper">
-          <div class="header-menu-bar"></div>
-          <div class="header-menu-bar"></div>
-          <div class="header-menu-bar"></div>
-      </div>
-      <!--<button on="tap:sidebar.toggle"
-  class="ampstart-btn caps ml1">Toggle sidebar</button>-->
-      <div class="narcity-logo-wrapper">
-        <a href="={config.default.server.url}">
-          <amp-img src="{=config.default.server.url}{=theme.settings.logo}"
-                layout="fixed" width="105px" height="85px" style="z-index:1; margin:5px;">
-          </amp-img>
+                <div class="narcity-logo-wrapper">
+                    <a href="={config.default.server.url}">
+                        <amp-img src="{=config.default.server.url}{=theme.settings.logo}"
+                          layout="fixed" width="105px" height="85px" style="z-index:1;">
+                        </amp-img>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <amp-img src="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" width="480" height="200" layout="responsive">
+            <noscript>
+                <img src="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" width="480" height="200" />
+            </noscript>
+        </amp-img>
+
+        <h1 style="margin:10px;">{=extra.article.title}</h1>
+
+        <amp-img src="{=extra.article.authors.0.avatarURL}" width="50px" height="50px" layout="fixed" style="border-radius: 50px; margin: 6px; vertical-align: middle; margin-bottom: 0.25em">
+            <noscript>
+                <img src="{=extra.article.authors.0.avatarURL}" width="50px" height="50px" />
+            </noscript>
+        </amp-img>
+
+        <a href="{=config.default.server.url}/{extra.article.authors.0}}/{=extra.article.authors.0.slug}" class="article-author-link">
+            <span class="article-author-displayname midvert">{=extra.article.authors.0.displayname}</span>
         </a>
-      </div>
-    </header>
+        <span class="midvert">&middot;</span>
+        <span class="article-published-date midvert" data-edtdatetime={=extra.article.date}>{=formatdate}</span>
 
-    <amp-img src="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" width="480" height="200" layout="responsive">
-      <noscript>
-        <img src="{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" width="480" height="200" />
-      </noscript>
-    </amp-img>
-
-    <h1 style="margin:10px;">{=extra.article.title}</h1>
-
-    <amp-img src="{=extra.article.authors.0.avatarURL}" width="50px" height="50px" layout="fixed" style="border-radius: 50px; margin: 6px; vertical-align: middle; margin-bottom: 0.25em">
-      <noscript>
-        <img src="{=extra.article.authors.0.avatarURL}" width="50px" height="50px" />
-      </noscript>
-    </amp-img>
-
-    <a href="{=config.default.server.url}/{extra.article.authors.0}}/{=extra.article.authors.0.slug}" class="article-author-link">
-        <span class="article-author-displayname midvert">{=extra.article.authors.0.displayname}</span>
-    </a>
-    <span class="midvert">&middot;</span>
-    <span class="article-published-date midvert" data-edtdatetime={=extra.article.date}>{=formatdate}</span>
-
-    {=extra.article.content}
-  </body>
+        {=extra.article.content}
+    </body>
 </html>
