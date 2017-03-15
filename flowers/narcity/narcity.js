@@ -535,7 +535,7 @@ var loadHooks = function(_c, info) {
     var backendFEscriptFirstRequest = false;
     endpoints.register(_c.id, 'lilium', 'GET', function(cli) {
         if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
-            var path = cli._c.server.base + "backend/static/gen/narcitylilium_" + cli._c.id;
+            var path = cli._c.server.base + "backend/static/gen/narcitylilium_" + cli._c.id + ".js";
 
             fileserver.fileExists(path, function(exists) {
                 if (exists && backendFEscriptFirstRequest) {

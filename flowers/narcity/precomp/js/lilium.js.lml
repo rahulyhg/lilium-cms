@@ -27,8 +27,7 @@ var LiliumBackend = function(context) {
         setTimeout(function() {
             slider.classList.remove('block');
         }, 200);
-
-    }
+    };
 
     this.addStyle = function() {
         var ss = document.createElement('link');
