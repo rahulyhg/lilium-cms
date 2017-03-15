@@ -18,14 +18,10 @@ var Category = undefined;
 
 var themePath;
 var noOp = function() {};
-var homepageFileContent = "";
+var homepageFileContent = {};
 
 // TODO : Receive context site
-var NarcityTheme = function () {
-    var initLivevars = function() {
-
-    };
-}
+var NarcityTheme = function () {}
 
 var initRequires = function(abspath) {
     log = require(abspath + 'log.js');
@@ -407,7 +403,7 @@ var generateHomepage = function(_c, cb) {
         extra.latests = articles.latests;
 
         filelogic.renderThemeLML(_c, 'home', 'index.html', extra, function(pContent) {
-            homepageFileContent = pContent;
+            homepageFileContent[_c.id] = pContent;
             cb && cb(pContent);
         });
     });
@@ -485,9 +481,9 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
-        if (homepageFileContent) {
+        if (homepageFileContent[cli._c.id]) {
             cli.response.writeHead(200, {CacheType : "RAM", CacheSection : "homepage"});
-            return cli.response.end(homepageFileContent);
+            return cli.response.end(homepageFileContent[cli._c.id]);
         }
 
         rQueue.homepage.push(cli);
@@ -657,7 +653,7 @@ var loadHooks = function(_c, info) {
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
     switch (ctx) {
-        case "home": needsHomeRefresh = true; homepageFileContent = ""; break;
+        case "home": needsHomeRefresh = true; homepageFileContent = {}; break;
         case "tags": delete cachedTags[ctx][detail]; break;
         default: break;
     }
@@ -759,4 +755,4 @@ NarcityTheme.prototype.disable = function (callback) {
     return callback();
 }
 
-module.exports = new NarcityTheme();
+module.exports = NarcityTheme;

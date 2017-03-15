@@ -8,4 +8,4 @@ var Garden = function() {
   }
 }
 
-module.exports = new Garden();
+module.exports = Garden;

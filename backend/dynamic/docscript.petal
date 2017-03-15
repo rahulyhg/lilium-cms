@@ -31,4 +31,7 @@ for (var i = 0; i < sidelinks.length; i++) {
     sidelinks[i].addEventListener('click', linkClicked);
 };
 
+document.getElementById('lml-docs-sidebar-title').addEventListener('click', function() {
+    document.location.reload();
+});
 </script>

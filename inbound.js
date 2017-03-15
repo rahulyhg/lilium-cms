@@ -3,6 +3,8 @@ var _c = require('./config.js').default(),
     _https = require('https'),
     hooks = require('./hooks.js'),
     log = require('./log.js'),
+    ClientObject = require('./clientobject.js'),
+    Handler = require('./handler.js'),
     fs = require('fs'),
     reqCount = 0,
     totalReqCount = 0,
@@ -22,13 +24,8 @@ var _c = require('./config.js').default(),
                 req: req,
                 resp: resp
             });
-        };
-
-        var handleConn = function (req, resp) {
-            hooks.trigger('conn', {
-                req: req,
-                resp: resp
-            });
+            
+            Handler.handle(new ClientObject(req, resp));
         };
 
         this.bind = function (hook, cb) {
@@ -41,9 +38,8 @@ var _c = require('./config.js').default(),
             _c = require('./config.js').default();
 
             hooks.fire("server_will_start", {server : server});
-            server.listen(_c.server.port, handleConn);
+            server.listen(_c.server.port);
             hooks.fire("server_did_start",  {server : server});
-            // secureServer.listen(8000, handleConn);
         };
 
         this.io = function () {
@@ -58,12 +54,8 @@ var _c = require('./config.js').default(),
                 redis = require('socket.io-redis');
                 io.adapter(redis());
             }
-            /*
-            secureServer = _https.createServer({
-            	key : fs.readFileSync("/Users/ryk/Desktop/server-key.pem"),
-            	cert : fs.readFileSync("/Users/ryk/Desktop/server-crt.pem")
-            }, handleReq);
-            */
+
+            return this;
         };
 
         this.getServer = function() {

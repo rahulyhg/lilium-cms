@@ -1,10 +1,9 @@
 var fileserver = require('./fileserver.js');
-var _c = require('./config.js');
 
 var PluginHelper = function () {
 
     this.getPluginIdentifierFromFilename = function (filename, cb, sync) {
-        var conf = _c.default();
+        var conf = require('./config.js').default();
         //Remove base path
         var tempname = filename.replace(conf.server.base, '');
         if (tempname.startsWith(conf.paths.plugins + '/')) {
@@ -14,7 +13,7 @@ var PluginHelper = function () {
             var pluginBaseFolder = tempname.replace(conf.paths.plugins + '/', '');
             pluginBaseFolder = pluginBaseFolder.substring(0, pluginBaseFolder.indexOf('/'));
 
-            var infoPath = conf.server.base + conf.paths.plugins + '/' + pluginBaseFolder + "/" + _c.default().paths.pluginsInfo;
+            var infoPath = conf.server.base + conf.paths.plugins + '/' + pluginBaseFolder + "/" + conf.paths.pluginsInfo;
             if (sync) {
                 var exists = fileserver.fileExists(infoPath, undefined, true);
                 if (exists) {

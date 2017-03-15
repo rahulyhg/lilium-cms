@@ -1,4 +1,3 @@
-var inbound = require('./inbound.js');
 var _c = require('./config.js');
 var log = require('./log.js');
 var cli = require('./clientobject.js');
@@ -317,7 +316,7 @@ var Notification = function () {
     };
 
     this.init = function () {
-        io = inbound.io();
+        io = require('./inbound.js').io();
 
         log('Notifications', 'Creating site groups', 'live');
         _c.eachSync(function (conf) {

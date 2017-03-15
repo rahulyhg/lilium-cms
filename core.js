@@ -28,7 +28,6 @@ var sessions = undefined;
 var sites = undefined;
 var Handler = undefined;
 var ClientObject = undefined;
-var Inbound = undefined;
 var Livevars = undefined;
 var Precompiler = undefined;
 var Petals = undefined;
@@ -97,7 +96,6 @@ var Core = function () {
         sessions = require('./session.js');
         Handler = require('./handler.js');
         ClientObject = require('./clientobject.js');
-        Inbound = require('./inbound.js');
         Livevars = require('./livevars.js').init();
         Precompiler = require('./precomp.js');
         persona = require('./personas.js');
@@ -795,14 +793,6 @@ var Core = function () {
         tools.preloadTools(cb);
     };
 
-    var loadRequestHandler = function () {
-        hooks.bind('request', 1000, function (params) {
-            // Run main modules
-            var clientObject = new ClientObject(params.req, params.resp);
-            Handler.handle(clientObject);
-        });
-    };
-
     var prepareDefaultSiteCreation = function (cb) {
         require('./init.js')(cb);
     };
@@ -927,7 +917,6 @@ var Core = function () {
             loadImageSizes();
             loadLiveVars();
             loadGlobalPetals();
-            loadRequestHandler();
             loadLMLLibs();
             loadBackendSearch();
 
@@ -948,10 +937,9 @@ var Core = function () {
                                         schedulePreload();
             
                                         log('Lilium', 'Starting inbound server', 'info');
-                                        Inbound.createServer();
+                                        require('./inbound.js').createServer().start();
                                         loadNotifications();
                                         notifyAdminsViaEmail();
-                                        Inbound.start();
             
                                         log('Core', 'Firing initialized signal', 'info');
                                         hooks.fire('init');

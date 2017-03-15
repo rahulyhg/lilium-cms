@@ -145,7 +145,9 @@ var Themes = function () {
                 }
 
                 var themedir = config.server.base + config.paths.themes + "/";
-                var ThemeInstance = require(themedir + info.dirName + "/" + info.entry);
+                var ThemeClass = require(themedir + info.dirName + "/" + info.entry);
+                var ThemeInstance = new ThemeClass();
+
                 if (typeof ActiveTheme[config.id] !== 'undefined') {
                     db.update(config, 'themes', {
                         uName: ActiveTheme[config.id].uName
