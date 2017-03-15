@@ -222,17 +222,15 @@ var refreshCache = function(cli, ctx) {
             break;
 
         case 'hp':
-            var entryfile = require('./themes.js').getEnabledThemeEntry(cli._c);
-            var themeFtc = require(entryfile);
+            require('./hooks.js').fire('homepage_needs_refresh', {
+                cli : cli
+            });
 
-            if (themeFtc.clearCache) {
-                themeFtc.clearCache('home');
-                notif.notifyUser(cli.userinfo.userid, cli._c.id, {
-                    title: "Caching",
-                    msg : "Homepage was flagged as needing to be refreshed.",
-                    type: "success"
-                });
-            }
+            notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                title: "Caching",
+                msg : "Homepage was flagged as needing to be refreshed.",
+                type: "success"
+            });
             break;
         case 'entityslug':
             require('./entities.js').refreshSlugs(cli, function(updated) {
