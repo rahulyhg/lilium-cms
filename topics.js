@@ -88,6 +88,23 @@ class LMLTopics {
                     reason : "Missing fields"
                 });
             }
+        } else if (cli.routeinfo.path[2] == "edit") {
+            let updatedTopic = cli.postdata.data;
+            let topicID = db.mongoID(cli.routeinfo.path[3]);
+            
+            if (updatedTopic && updatedTopic.displayname && updatedTopic.slug && topicID) {
+                db.update(cli._c, 'topics', {_id : topicID}, updatedTopic, () => {
+                    cli.sendJSON({
+                        updated : true,
+                        reason : "Valid form"
+                    });
+                });
+            } else {
+                cli.sendJSON({
+                    created : false,
+                    reason : "Missing fields"
+                });
+            }
         } else {
             cli.throwHTTP(404);
         }

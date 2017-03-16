@@ -58,6 +58,16 @@
 
 
 <script>
+document.querySelector('#topic-edit-form .btn-save').addEventListener('click', function() {
+    liliumcms.lmldom.sendForm(
+        liliumcms.lmldom.getFormData().topicedit.values, 
+        '{=config.default.server.url}/admin/topics/edit/' + liliumcms.pageloader.lastLevel, 
+        function() {
+        
+        }
+    );
+});
+
 window.topicHasChildren = function(topic) {
     return topic.children && topic.children.length > 0;
 };
