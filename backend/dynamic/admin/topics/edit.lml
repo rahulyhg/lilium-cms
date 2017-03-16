@@ -62,8 +62,12 @@ document.querySelector('#topic-edit-form .btn-save').addEventListener('click', f
     liliumcms.lmldom.sendForm(
         liliumcms.lmldom.getFormData().topicedit.values, 
         '{=config.default.server.url}/admin/topics/edit/' + liliumcms.pageloader.lastLevel, 
-        function() {
-        
+        function(resp) {
+            if (resp.updated) {
+                liliumcms.notify({ type : "success", message : "Topic successfully updated." })
+            } else {
+                liliumcms.notify({ type : "danger", title : "Topic was not updated", message : resp.reason })
+            }
         }
     );
 });

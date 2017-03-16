@@ -1226,18 +1226,17 @@ var Article = function() {
                     'class': 'col-md-4'
                 }
             })
-            .add('categories', 'multibox', {
+            .add('topic', 'treeselect', {
                 wrapper: {
                     'class': 'col-md-4'
                 },
-                endpoint: 'categories',
+                endpoint: 'topics',
                 select: {
-                    'value': 'name',
+                    'value': '_id',
                     'displayname': 'displayname',
-                    'readkey' : '0',
-                    'multiple' : false
+                    'childrenkey' : 'children'
                 },
-                displayname: "Categories"
+                displayname: "Topic"
             })
             .add('tags', 'tags', {
                 displayname: 'Tags',

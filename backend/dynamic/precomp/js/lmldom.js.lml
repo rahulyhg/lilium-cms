@@ -740,7 +740,32 @@ var LMLDom = function() {
 
                 multibox.appendChild(ss);
             }
+        }
 
+        // Treeview select : .lmldom-treeselect
+        /*
+            Layout : {
+                _id : ObjectId,       // data-selectvalue
+                displayname : "",     // data-selectdisplayname
+                children : [Layout] 
+            }
+        */
+        var treeselects = maindom.querySelectorAll(".lmldom-treeselect");
+        for (var i = 0; i < treeselects.length; i++) {
+            var ts = treeselects[i];
+            var endpoint = ts.dataset.filledby;
+            var valuekey = ts.dataset.selectvalue;
+            var displaykey = ts.dataset.selectdisplayname;
+            var boxfilling = liliumcms.livevars.pulloutLiveVar(endpoint, true);
+            var hField = document.getElementsByName(multibox.dataset.fieldname)[0];
+            var arrValue = hField.value.split(',');
+            
+            var sitename = "{=config.default.website.sitetitle}";
+            ts.querySelector('.lml-treeselect-breadcrumb').textContent = sitename;
+
+            if (boxfilling) for (var j = 0; j < boxfilling.length; j++) {
+                
+            }
         }
     };
 
