@@ -105,7 +105,7 @@ var SiteInitializer = function (conf, siteobj) {
             log('Database', 'Creating collections', 'info');
             
         	var collectionsNames = [
-		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview",
+		        "entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview", "topics",
         		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "history",
 		        "lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations", "communications",
 		        "messages", "notifications", "categories", "autosave", "userbadges", "teambadges", "styledpages"

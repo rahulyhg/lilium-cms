@@ -1,0 +1,78 @@
+{#config;forms}
+<lml:dom v="1.0"></lml:dom>
+{*topics.get.{?1}}
+
+<h1>
+    <i class="fa fa-tags" aria-hidden="true"></i>
+    Topic - <lml:text var="livevars.topics.get.?.displayname"></lml:text>
+    <a class='fab' id="topics-add-button">+</a>
+</h1>
+
+<div id="topic-edit-form">
+    {=forms.render("topicedit","edit","topics/get/?")}
+</div>
+
+<lml:filter if="topicHasChildren" pass="livevars.topics.get.?">
+<div id="topics-list">
+    <lml:foreach var="topic" in="livevars.topics.get.?.children" wrapper="span">
+        <div class="topic-wrapper">
+            <h2>
+                <lml:link href="{=config.default.server.url}/admin/topics/edit/{topic._id}">
+                    <lml:text var="topic.displayname"></lml:text>
+                </lml:link>
+            </h2>
+            <div class="topic-description">
+                <p>
+                    <lml:text var="topic.description"></lml:text>
+                </p>
+            </div>
+
+            <div class="topic-action-wrapper">
+            </div>
+        </div>
+    </lml:foreach>
+
+    <div class="float-none"></div>
+</div>
+</lml:filter>
+
+<div id="create-topic-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Create a new topic
+    </div>
+    <div class="lml-modal-body">
+        <span>Topic Display Name</span>
+        <input id="new-topic-displayname" placeholder="This name will appear on the website" name="displayname" />
+
+        <span>Topic Slug</span>
+        <input id="new-topic-slug" placeholder="The URL representation of the topic, without blank spaces" name="slug" />
+
+        <span>Topic Description</span>
+        <input id="new-topic-description" placeholder="Public description of the topic, displayed on the archive page" name="description" />
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Create Topic</button>
+    </div>
+</div>
+
+
+<script>
+window.topicHasChildren = function(topic) {
+    return topic.children && topic.children.length > 0;
+};
+
+window["create-topic-modal_accept"] = function(modal) {
+    var formData = modal.getFormData();
+    formData.parent = liliumcms.pageloader.lastLevel;
+    
+    liliumcms.lmldom.sendForm(formData, "{=config.default.server.url}/admin/topics/add", function() {
+        liliumcms.modals.get('create-topic-modal').dismiss();
+        liliumcms.pageloader.loadCurrentURL();
+    });
+}
+
+document.getElementById('topics-add-button').addEventListener('click', function(e) {
+    liliumcms.modals.get('create-topic-modal').show();
+});
+</script>

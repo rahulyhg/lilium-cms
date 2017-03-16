@@ -1012,6 +1012,18 @@ var LiliumCMS = function() {
                 }, 10);
             };
 
+            this.getFormData = function() {
+                var values = that.wrapper.querySelectorAll('input, textarea, select');
+                var formData = {};
+
+                for (var i = 0; i < values.length; i++) {
+                    var el = values[i];
+                    formData[el.name || el.id || ("field-" + i)] = el.value;
+                }
+
+                return formData;
+            }
+
             this.fire = function(event) {
                 for (var i = 0; i < that.events[event].length; i++) {
                     var cb = that.events[event][i];
@@ -1044,7 +1056,7 @@ var LiliumCMS = function() {
                 if (accept) {
                     accept.addEventListener('click', function() {
                         var explicitCallback = window[that.elem.id + "_accept"];
-                        explicitCallback && explicitCallback();
+                        explicitCallback && explicitCallback(that);
                         that.fire.apply(that, ['accept']);
                     });
                 }

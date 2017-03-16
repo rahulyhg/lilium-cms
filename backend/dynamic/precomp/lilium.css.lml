@@ -1765,6 +1765,47 @@ input[disabled] {
     margin-left: 0px;
 }
 
+/* Topics */
+#topics-list {
+    padding: 5px;
+}
+
+.topic-wrapper h2 {
+    font-weight: 300;
+    font-size: 24px;
+    margin: -10px -10px 8px -10px;
+    padding: 8px 12px;
+    background-color: #333;
+    color: #fff;
+}
+
+.topic-wrapper h2 a {
+    color: #FFF;
+}
+
+.topic-wrapper {
+    margin: 5px;
+    padding: 10px;
+    background: #FBFBFB;
+    border: 1px solid #EEE;
+}
+
+.topic-wrapper .topic-description {
+    font-size: 16px;
+}
+
+.topic-archive {
+    font-size: 12px;
+    color: #AAA;
+
+    margin-bottom : 12px;
+}
+
+.topic-archive a {
+    color: #777;
+}
+
+
 /* Backend search */
 .backendsearch-wrapper {
     position: fixed;

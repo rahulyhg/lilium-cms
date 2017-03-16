@@ -20,6 +20,7 @@ var docs = undefined;
 var analytics = undefined;
 var themes = undefined;
 var entities = undefined;
+var Topics = undefined;
 var cacheInvalidator = undefined;
 var Frontend = undefined;
 var notification = undefined;
@@ -35,7 +36,6 @@ var GC = undefined;
 var scheduler = undefined;
 var Role = undefined;
 var filelogic = undefined;
-var category = undefined;
 var dashboard = undefined;
 var templateBuilder = undefined;
 var persona = undefined;
@@ -86,6 +86,7 @@ var Core = function () {
         styledpages = require('./styledpages.js');
         analytics = require('./analytics.js');
         Media = require('./media.js');
+        Topics = require('./topics.js');
         imageSize = require('./imageSize.js');
         docs = require('./docs.js');
         themes = require('./themes.js');
@@ -105,7 +106,6 @@ var Core = function () {
         scheduler = require('./scheduler.js');
         Role = require('./role.js');
         filelogic = require('./filelogic.js');
-        category = require('./category.js');
         dashboard = require('./dashboard.js');
         templateBuilder = require('./templateBuilder.js');
         backendSearch = require('./backend/search.js');
@@ -289,16 +289,6 @@ var Core = function () {
             preferences.handlePOST(cli);
         });
 
-        admin.registerAdminEndpoint('categories', 'POST', function (cli) {
-            cli.touch('admin.POST.me');
-            category.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('categories', 'GET', function (cli) {
-            cli.touch('admin.GET.me');
-            category.handleGET(cli, false);
-        });
-
         secrets.registerAdminEndpoint();
         devtools.registerAdminEndpoint();
         oembed.registerAdminEndpoint();
@@ -309,6 +299,7 @@ var Core = function () {
         history.registerEndpoints();
         Article.registerContentEndpoint();
         Communications.setupController();
+        Topics.setupController();
         analytics.setupController();
         docs.setupController();
         mail.setupController();
@@ -415,12 +406,12 @@ var Core = function () {
             children: []
         });
         admin.registerAdminSubMenu('articles', {
-            id: "articles-category",
-            faicon: "fa-cubes",
-            displayname: "Categories",
+            id: "articles-topics",
+            faicon: "fa-tags",
+            displayname: "Topics",
             priority: 200,
-            rights: ["manage-categories"],
-            absURL: aurl + "categories",
+            rights: ["manage-topics"],
+            absURL: aurl + "topics",
             children: []
         });
         admin.registerAdminMenu({
@@ -708,7 +699,6 @@ var Core = function () {
         lys.registerLiveVar();
         backendSearch.registerLiveVar();
         preferences.registerLiveVar();
-        category.registerLiveVar();
         postleaf.registerLiveVar();
         persona.registerLiveVar();
         secrets.registerLiveVar();
@@ -822,7 +812,6 @@ var Core = function () {
     var loadLMLLibs = function () {
         hooks.trigger('will_load_core_lml_libs');
         dashboard.registerLMLLib();
-        category.registerLMLLib();
         hooks.trigger('loaded_core_lml_libs');
     };
 
