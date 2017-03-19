@@ -2,16 +2,6 @@
 <lml:dom v="1.0"></lml:dom>
 {*topics.all}
 
-<p style="
-    padding: 8px 12px;
-    background-color: #FF8D00;
-    color: #fff;
-    font-weight: bold;
-    margin-bottom: 0px;
-">
-    Topics are in development. This page shouldn't be used by a non-developer.
-</p>
-
 <h1>
     <i class="fa fa-tags" aria-hidden="true"></i>
     Topics

@@ -1230,7 +1230,7 @@ var Article = function() {
                 wrapper: {
                     'class': 'col-md-4'
                 },
-                endpoint: 'topics',
+                endpoint: 'topics.all',
                 select: {
                     'value': '_id',
                     'displayname': 'displayname',

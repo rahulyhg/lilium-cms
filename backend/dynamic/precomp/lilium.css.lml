@@ -416,6 +416,75 @@ select {
     color: #333;
 }
 
+.lmldom-treeselect {
+    height: 200px;
+    background-color: #FFF;
+    border: 1px solid #EEE;
+    overflow-y: auto;
+}
+
+.lmldom-treeselect-pane {
+    display: none;
+}
+
+.lmldom-treeselect-pane.visible {
+    display: block;
+}
+
+.lmldom-treeselect-pane.treeview-pane-selection-child {
+    margin-left: 20px;
+}
+
+.treeview-pane-selection {
+    padding: 4px 6px;
+    border-bottom: 1px solid #EEE;
+    cursor: pointer;
+
+    position: relative;
+}
+
+.treeview-pane-selection.selected {
+    background-color: #9b59b6;
+    color: #FFF;
+    font-weight: 700;
+}
+
+.treeview-pane-selection:not(.selected):hover {
+    background-color: #F6F6F6;
+}
+
+.treeview-pane-selection.treeview-pane-selection-has-children::after {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+
+    content: "\f105";
+
+    position: absolute;
+    right: 8px;
+    top: 5px;
+    font-size: 18px;
+
+    color: #999;
+
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+}
+
+.treeview-pane-selection.treeview-pane-selection-has-children.selected::after {
+    color: #FFF;
+    -webkit-transform: rotateZ(90deg);
+       -moz-transform: rotateZ(90deg);
+        -ms-transform: rotateZ(90deg);
+         -o-transform: rotateZ(90deg);
+            transform: rotateZ(90deg);
+}
+
 .theme-setting-field-textarea textarea {
     height: 200px;
 }
@@ -1273,12 +1342,15 @@ header.admin-bar > * {
 
 header.admin-bar .lilium-logo-link {
     width: 200px;
-    height: 100%;
+    height: 50px;
     display: inline-block;
     background-color: rgba(0,0,0, 0.2);
     padding: 2px 6px 3px 5px;
 
     cursor: pointer;
+
+    overflow: hidden;
+    position: relative;
 }
 
 header.admin-bar .lilium-logo-link:hover {
@@ -1290,7 +1362,10 @@ header.admin-bar .lilium-logo-link:hover span.product-text {
 }
 
 header.admin-bar .lilium-logo-link img {
-    height: 45px;
+    position: absolute;
+    top: -5px;
+    left: -36px;
+    height: 90px;
     width: auto;
 }
 
@@ -1301,11 +1376,12 @@ header.admin-bar .lilium-logo-link a {
 }
 
 header.admin-bar .lilium-logo-link span.product-text {
-    font-weight: 300;
-    font-size: 26px;
+    font-weight: 500;
+    font-size: 24px;
     vertical-align: middle;
-    padding-top: 3px;
+    padding-top: 7px;
     display: inline-block;
+    margin-left: 55px;
 }
 
 header.admin-bar .navbar-default .navbar-header {
@@ -1324,6 +1400,7 @@ header.admin-bar .navbar-default .navbar-header {
 	white-space: nowrap;
 	overflow: hidden;
 	text-align: center;
+    position: relative;
 }
 
 #profile-dropdown {
@@ -1441,7 +1518,6 @@ header.admin-bar .navbar-default .navbar-nav>li>* {
 
 header.admin-bar .link:hover {
 	background-color: rgba(255, 255, 255, 0.1);
-
 }
 
 header.admin-bar .navbar-default .navbar-nav .admin-publish-button:hover {
@@ -1459,10 +1535,17 @@ header.admin-bar .navbar-default .navbar-nav  .loggedin-user-box {
 }
 
 header.admin-bar .loggedin-user-box > img {
-    height: 26px;
-    border-radius: 30px;
+    height: 80px;
+    border-radius: 60px;
     margin-right: 5px;
     border: 2px solid rgba(255, 255, 255, 0.1);
+
+    position: absolute;
+    left: -20px;
+    bottom: -22px;
+
+    box-shadow: 0px 0px 30px 10px rgba(0, 0, 0, 0.5);
+    opacity: 0.4;
 }
 
 header.admin-bar .loggedin-user-box > * {
@@ -1470,9 +1553,16 @@ header.admin-bar .loggedin-user-box > * {
     display: inline-block;
 }
 
+header.admin-bar .lmladminbardisplayname {
+    position: relative;
+    z-index: 5;
+    text-shadow: 0px 0px 10px rgb(0,0,0);
+}
+
 header.admin-bar .loggedin-user-box:hover {
 	background-color: rgba(255, 255, 255, 0.1);
 	color: #EEE;
+    position: relative;
 }
 
 header.admin-bar .navbar-default .navbar-nav  .user-actions > div {

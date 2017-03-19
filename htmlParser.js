@@ -406,7 +406,6 @@ var HtmlParser = function () {
                 'data-selectreadkey="'+(attr.select.readkey||field.name)+'" ' + 
                 'data-selectvalue="'+attr.select.value+'" '+
                 'data-selectdisplayname="'+attr.select.displayname+'" id="lml-treeselect-'+field.name+'" >' +
-                    '<div class="lml-treeselect-breadcrumb"></div>' +
                     '<div class="lml-treeselect-choices"></div>' +
             '</div>';
 
