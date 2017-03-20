@@ -245,6 +245,13 @@ $}
               </div>
               {$ endif; $}
 
+              <div class="ad-section">
+                  <amp-ad width=300 height=250
+                          type="doubleclick"
+                          data-slot=" /1020360/amp-bb-before-content ">
+                  </amp-ad>
+              </div>
+
               {=theme.settings.beforearticle}
               <div class="article-content" id="article-content">
                   <div id="article-text">
@@ -292,6 +299,18 @@ $}
                   {$ if (?extra.contextname == "article"); $}
                       {=theme.settings.afterarticle}
                   {$ endif; $}
+
+                  <div id="taboola-below-article-thumbnails" style="overflow:hidden">
+                      <amp-embed width=100 height=100
+                          type=taboola
+                          layout=responsive
+                          heights="(min-width:780px) 64%, (min-width:480px) 98%, (min-width:460px) 167%, 196%"
+                          data-publisher="narcitymedia-mtlblog"
+                          data-mode="alternating-thumbnails-a"
+                          data-placement="Hybrid Below Article Thumbnails"
+                          data-article="auto">
+                      </amp-embed>
+                  </div>
 
                   {$ if (?author.displayname); $}
                   <div class="article-signature">
@@ -351,7 +370,6 @@ $}
           <div class="article-end"></div>
         </article>
     <body>
-
 
 <footer class="willslide">
         <div class="footer-topsection">
