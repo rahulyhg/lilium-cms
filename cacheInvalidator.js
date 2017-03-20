@@ -57,7 +57,7 @@ var CacheInvalidator = function () {
                 }
 
                 var cats = data.article.categories;
-                for (var i = 0; i < cats.length; i++) {
+                if (cats) for (var i = 0; i < cats.length; i++) {
                     var path = html + '/category/' + cats[i];
                     log('Cache', 'Emptying category cache : ' + cats[i]);
                     fileserver.emptyDirectory(path, deleteOpt, function() {});

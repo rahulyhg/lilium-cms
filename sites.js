@@ -153,6 +153,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/preview.js", 2150, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmleditor.js", 2170, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/pushtable.js", 2200, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/treeselect.js", 2210, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/imagepicker.js", 2220, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/imagestudio.js", 2225, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/backendsearch.js", 2250, 'admin', conf.id);

@@ -227,8 +227,8 @@ var Article = function() {
                         }
 
                         var continueWorking = function() {
-                            db.findToArray(conf, 'categories', {name : {$in : arr[0].categories}}, function(err, catarr) {
-                                arr[0].categories = catarr;
+                            db.findUnique(conf, 'topics', {_id : arr[0].topic}, function(err, topic) {
+                                arr[0].topic = topic;
                                 db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
                                     arr[0].authors = autarr;
 
@@ -478,11 +478,16 @@ var Article = function() {
                 formData.author = formData.author ? db.mongoID(formData.author) : cli.userinfo.userid;
                 formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
                 formData.media = db.mongoID(formData.media);
+                formData.topic = formData.topic ? db.mongoID(formData.topic) : undefined;
                 formData.updated = new Date();
                 hooks.fire('article_will_' + pubCtx, {
                     cli: cli,
                     article: formData
                 });
+
+                if (formData.topic) {
+                    db.update(cli._c, "topics", {_id : formData.topic}, {lastUsed : new Date()});
+                }
 
                 var conds = {
                     _id: cli.postdata.data.id ? db.mongoID(cli.postdata.data.id) : "Will not resolve"
@@ -692,16 +697,12 @@ var Article = function() {
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
         formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
+        formData.topic = formData.topic ? db.mongoID(formData.topic) : undefined;
 
         if (formData.tags && formData.tags.map) {
             formData.tagslugs = formData.tags.map(function(tagname) {
                 return slugify(tagname).toLowerCase();
             });
-        }
-
-        var maybecat = formData.categories;
-        if (maybecat && maybecat[0]) {
-            db.update(cli._c, 'categories', {name : maybecat[0]}, {lastused : new Date()}, function() {});
         }
 
         log('Article', 'Preparing to save article ' + formData.title);

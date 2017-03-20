@@ -66,6 +66,7 @@ var LiliumCMS = function() {
     this.adminmenu;
     this.formbeautifier;
     this.multiselect;
+    this.treeselect;
     this.localclip;
     this.previewer;
     this.imagepicker;

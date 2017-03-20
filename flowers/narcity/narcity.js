@@ -41,7 +41,6 @@ var initRequires = function(abspath) {
     LML2 = require(abspath + 'lml/compiler.js');
     cc = require(abspath + "config.js");
     Article = require(abspath + "article.js");
-    Category = require(abspath + "category.js");
 };
 
 var registerPictureSizes = function() {
@@ -87,7 +86,7 @@ var fetchHomepageArticles = function(_c, cb) {
             db.join(_c, 'content', [
                 {
                     $match : {
-                        'categories' : csec.catname,
+                        'topic' : csec.catname,
                         'status' : 'published'
                     } 
                 }, {
@@ -185,15 +184,6 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             match['tagslugs'] = mtc;
             typeCollection = "tags";
             typeMatch.name = mtc;
-            break;
-        case 'category':
-            match['categories'] = mtc;
-            typeCollection = "categories";
-            typeMatch = [
-                { 
-                    $match : { name : mtc } 
-                }
-            ];
             break;
         case 'author':
             typeCollection = "entities";
@@ -446,8 +436,7 @@ var getWhatsHot = function(_c, cb) {
                                 authorpage : _c.server.url + "/author/" + article.authors[0].slug,
                                 authorface : article.authors[0].avatarURL,
                                 date : article.date, 
-                                category : Category.getCatName(_c, article.categories[0]),
-                                categorylink : _c.server.url + "/category/" + article.categories[0],
+                                topic : article.topic,
                                 sponsored : article.isSponsored
                             });
                         }
@@ -528,7 +517,7 @@ var loadHooks = function(_c, info) {
         }
     });
 
-    ["tags", "author", "category", "search", "latests"].forEach(function(archType) {
+    ["tags", "author", "topic", "search", "latests"].forEach(function(archType) {
         endpoints.register(_c.id, archType, 'GET', function(cli) { serveArchive(cli, archType); }); 
     });
 
@@ -698,7 +687,7 @@ var parseArticleFields = function(pkg) {
     art.tags = art.tags || [];
     art.title = art.title || "";
     art.subtitle = art.subtitle || "";
-    art.categories = art.categories || [{name : "uncategorized", displayname : ""}];
+    art.topic = art.topic || {slug : "", displayname : ""};
 }
 
 var registerPrecompFiles = function(_c) {
@@ -743,8 +732,10 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
             fileserver.createDirIfNotExists(_c.server.html + "/tags", function() {
                 fileserver.createDirIfNotExists(_c.server.html + "/authors", function() {
                     fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
-                        log('Narcity', 'Created symlink and content directories. Ready to callback');
-                        callback();
+                        fileserver.createDirIfNotExists(_c.server.html + "/topic", function() {
+                            log('Narcity', 'Created symlink and content directories. Ready to callback');
+                            callback();
+                        }, true);
                     }, true);
                 }, true);
             }, true);
