@@ -21,6 +21,7 @@ $}
         <meta charset="utf-8">
         <title>{=extra.article.title} - MTL Blog</title>
         <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}" />
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
         <script type="application/ld+json">
           {
@@ -37,6 +38,8 @@ $}
         <script async src="https://cdn.ampproject.org/v0.js"></script>
         <script async custom-element="amp-sidebar" src="https://cdn.ampproject.org/v0/amp-sidebar-0.1.js"></script>
         <script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script>
+        <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+        <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
 
         <style amp-custom>
             {%petals/amp-style}
@@ -160,7 +163,6 @@ $}
                 -->
             </div>
         </header>
-        {=theme.settings.afterheader}
 
         <article class="article-amp" id="{=extra.article.name}" data-mi={=extra.article._id}>
           {$ if (?extra.article.isSponsored ??); $}
@@ -197,9 +199,9 @@ $}
 
           <div id="article-section">
               <div id="article-side">
-                  {=theme.settings.sidetop}
+                  <!--{=theme.settings.sidetop}-->
 
-                  {=theme.settings.sidebottom}
+                  <!--{=theme.settings.sidebottom}-->
               </div>
 
               {$ if (?author.displayname); $}
@@ -248,11 +250,10 @@ $}
               <div class="ad-section">
                   <amp-ad width=300 height=250
                           type="doubleclick"
-                          data-slot=" /1020360/amp-bb-before-content ">
+                          data-slot="/1020360/amp-bb-before-content">
                   </amp-ad>
               </div>
 
-              {=theme.settings.beforearticle}
               <div class="article-content" id="article-content">
                   <div id="article-text">
                       {=extra.article.content}
@@ -296,10 +297,7 @@ $}
                   </div>
                   {$ endif; $}
 
-                  {$ if (?extra.contextname == "article"); $}
-                      {=theme.settings.afterarticle}
-                  {$ endif; $}
-
+                  {$ if (?extra.article.isSponsored ??); else; $}
                   <div id="taboola-below-article-thumbnails" style="overflow:hidden">
                       <amp-embed width=100 height=100
                           type=taboola
@@ -311,6 +309,7 @@ $}
                           data-article="auto">
                       </amp-embed>
                   </div>
+                  {$ endif; $}
 
                   {$ if (?author.displayname); $}
                   <div class="article-signature">
@@ -408,6 +407,22 @@ $}
         </div>
 </footer>
 
+<amp-analytics type="googleanalytics">
+<script type="application/json">
+{
+  "vars": {
+    "account": "UA-29129013-1"
+  },
+  "triggers": {
+    "trackPageview": {
+      "on": "visible",
+      "request": "pageview"
+    }
+  }
+}
+</script>
+</amp-analytics>
+
 {$ if (extra.contextname == "article"); $}
     {%petals/upnext}
 {$ endif; $}
@@ -415,31 +430,3 @@ $}
 {$
     domain = config.default.server.url.replace('//','');
 $}
-
-<script type='text/javascript'>
-    var _sf_async_config={};
-    /** CONFIGURATION START **/
-    _sf_async_config.uid = 57714;
-    _sf_async_config.domain = '{=domain}';
-    _sf_async_config.useCanonical = true;
-    _sf_async_config.sections = "{=?extra.article.categories.0.displayname}";
-    _sf_async_config.authors = "{=?extra.article.authors.0.displayname}";
-    /** CONFIGURATION END **/
-    (function(){
-        window._sf_endpt=(new Date()).getTime();
-        var e = document.createElement('script');
-        e.setAttribute('language', 'javascript');
-        e.setAttribute('type', 'text/javascript');
-        e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
-        document.body.appendChild(e);
-    })();
-</script>
-
-<script src="https://use.fontawesome.com/c06218d3bc.js"></script>
-<script src="//www.googletagservices.com/tag/js/gpt.js" async=""></script>
-<script src="{=config.default.server.url}/compiled/theme/social.js?{=config.default.compilekey}"></script>
-<script src="{=config.default.server.url}/compiled/theme/facebook.js?{=config.default.compilekey}"></script>
-<script src="{=config.default.server.url}/compiled/theme/global.js?{=config.default.compilekey}"></script>
-<script src="{=config.default.server.url}/compiled/admin/js/frontendbar.js?{=config.default.compilekey}"></script>
-<script src="{=config.default.server.url}/lilium" class="lilium"></script>
-<!-- script src="{=config.default.server.url}/compiled/lmlnaradserv.js?{=config.default.compilekey}"></script-->

@@ -28,16 +28,14 @@ class Amp {
 
         log('AMP', 'before parsing');
         /* Modify content according to AMP guidelines */
-        this.parseAMPContent(articleContent, (err, amp) => {
+        this.parseAMPContent(cli, articleContent, (err, amp) => {
             log('AMP', 'Done parsing HTML to AMP: ', err);
             if (err) {
               throw err;
             }
 
             article.content = amp;
-            /* TODO : Modify amp.lml so that it creates an AMP page */
-            // String parsing can be heavy on CPU usage. Make sure it's optimized!
-
+            /* Modify amp.lml so that it creates an AMP page */
             log('AMP', "Generating AMP page for article : " + article.title);
             filelogic.renderThemeLML(cli, 'amp', 'amp/' + article.name + '.html', {
                 config : cli._c,
@@ -48,18 +46,25 @@ class Amp {
                 }, true, 'text/html');
             }, true);
           });
+
     };
 
-    parseAMPContent(articleContent, cb) {
-      //'$1' + cli._c.server.protocol + '//'
-      articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1http://');
-      return htmlToAmp(articleContent, cb);
-        // TODO : Do that parsing, yay!
-        //articleContent = articleContent;
-
-        // Return the whole thing
-        //return articleContent;
+    parseAMPContent(cli, articleContent, cb) {
+      articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
+      articleContent = articleContent.replace(/<ad><\/ad>/g, '<p>{ad}</p>');
+      
+      return htmlToAmp(articleContent, (err, amp) => {
+                          if(!err) {
+                              amp = amp.replace(/<p>\{ad\}<\/p>/g,
+                                                '<div class="ad-section">'+
+                                                    '<amp-ad width=300 height=250 ' +
+                                                            'type="doubleclick" ' +
+                                                            'data-slot="/1020360/amp-bb-before-content">' +
+                                                    '</amp-ad>' +
+                                                '</div>');
+                            } cb(err, amp);
+                          }
+                        );
     }
 }
-
 module.exports = new Amp();
