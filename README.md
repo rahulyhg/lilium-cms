@@ -103,6 +103,7 @@ The forked version requires Redis installed. Not stable yet since messages are n
 * Erik Desjardins
 * Samuel Rondeau-Millaire
 * Daniel McAuley
+* Era Sinbandith
 * Narcity Media inc.
 
 ## License ##
