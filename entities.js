@@ -941,8 +941,10 @@ var Entities = module.exports = new function () {
                     _id : 1
                 };
             
-                db.findToArray(_c.default(), 'entities', {}, function(err, arr) {
-                    callback(arr);
+                db.find(_c.default(), 'entities', {}, [], function(err, cur) {
+                    cur.sort({displayname : 1}).toArray(function(err, arr) {
+                        callback(arr);
+                    });
                 }, simpProj);
             } else if (levels[0] == 'query') {
                 var queryInfo = params.query || new Object();

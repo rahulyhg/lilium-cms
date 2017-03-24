@@ -133,6 +133,29 @@ class LMLTopics {
             displayname : "Description"
         })
         .trg('top')
+        .add('frontend-title', 'title', { displayname : "Templates" })
+        .add('articletemplate', 'liveselect', {
+            endpoint : "theme.templates.article",
+            select : {
+                value : 'file',
+                displayname : 'displayname'
+            },
+            empty : {
+                displayname : " - Default template - "
+            },
+            displayname : "Article template"
+        })
+        .add('archivetemplate', 'liveselect', {
+            endpoint : "theme.templates.archive",
+            select : {
+                value : 'file',
+                displayname : 'displayname'
+            },
+            empty : {
+                displayname : " - Default template - "
+            },
+            displayname : "Archive template"
+        })
         .add('topic-social-title', 'title', { displayname : "Social Networks" })
         .add('facebook', 'text', { displayname : "Facebook Username" }, { required : false })
         .add('twitter', 'text', { displayname : "Twitter Username" }, { required : false })

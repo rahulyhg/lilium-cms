@@ -175,6 +175,7 @@ var histoFieldsDico = {
     "categories" : "Category",
     "categories.0" : "Category",
     "topic" : "Topic",
+    "templatename" : "Article template",
     "date" : "Publication date",
     "featuredimageartist" : "Featured Image Credit",
     "featuredimagelink" : "Featured Image Link",

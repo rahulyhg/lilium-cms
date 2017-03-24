@@ -1263,32 +1263,6 @@ var Article = function() {
                 displayname : "Persona targeting"
             })
             .trigger('persona')
-/*
-            .add('title-industry', 'title', {
-                displayname : "Industry"
-            })
-            .add('industry', 'select', {
-                displayname : "Industry Tag",
-                datasource: [
-                    {name : "realestate", displayName : "Real Estate"},
-                    {name : "employment", displayName : "Employment"},
-                    {name : "foodresto", displayName : "Food + Restaurants"},
-                    {name : "nightlife", displayName : "Nightlife"},
-                    {name : "hnf", displayName : "Health + Fitness"},
-                    {name : "travel", displayName : "Travel"},
-                    {name : "lodging", displayName : "Lodging"},
-                    {name : "transportation", displayName : "Transportation"},
-                    {name : "fashion", displayName : "Fashion"},
-                    {name : "technology", displayName : "Technology"},
-                    {name : "education", displayName : "Education"},
-                    {name : "finance", displayName : "Finance"},
-                    {name : "relationships", displayName : "Relationships + Sex"},
-                    {name : "entertainment", displayName : "Entertainment + Tourism"},
-                    {name : "info", displayName : "Info"},
-                    {name : "sponsorship", displayName : "Sponsorship"}
-                ]
-            })
-*/
             .add('title-geolocation', 'title', {
                 displayname : "Geolocalisation"
             })
@@ -1297,7 +1271,18 @@ var Article = function() {
                 format : 'array'
             })
             .add('title-author', 'title', {
-                displayname : "Redaction"
+                displayname : "Appearance"
+            })
+            .add('templatename', 'liveselect', {
+                endpoint : "theme.templates.article",
+                select : {
+                    value : 'file',
+                    displayname : 'displayname'
+                },
+                empty : {
+                    displayname : " - Use selected topic template - "
+                },
+                displayname : "Article template"
             })
             .add('date', 'date', {
                 displayname : "Publish date",
@@ -1396,8 +1381,10 @@ var Article = function() {
                     article: deepArticle
                 });
 
+                var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
+
                 // Generate LML page
-                filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
+                filelogic.renderThemeLML(_c, ctx, deepArticle.name + '.html', extra , function(name) {
                     cb && cb({
                         success: true,
                         dbdata : deepArticle

@@ -275,6 +275,18 @@ var Themes = function () {
             var allThemes = levels.length === 0;
             if (allThemes) {
                 db.singleLevelFind(cli._c, 'themes', callback);
+            } else if (levels[0] == 'current') {
+                var cTheme = that.getEnabledTheme(cli._c.id);
+                callback({
+                    info : cTheme.info,
+                    settings : cTheme.settings
+                }); 
+            } else if (levels[0] == 'templates') {
+                if (levels[1]) {
+                    callback(that.getEnabledTheme(cli._c.id).info.templates[levels[1]]);
+                } else {
+                    callback(that.getEnabledTheme(cli._c.id).info.templates);
+                }
             } else if (levels[0] == 'table') {
                 var sort = {};
                 sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
