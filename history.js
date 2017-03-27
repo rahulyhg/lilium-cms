@@ -33,9 +33,9 @@ class History extends RFExtender {
                         default : diffobj.change = "unknown";   
                     }
 
-                    if (diffobj.change == "modified" && !utils.pulloutProp(oldState, diff.path)) {
+                    if (diffobj.change == "modified" && !utils.objects.pulloutProp(oldState, diff.path)) {
                         diffobj.change = "added";
-                    } else if (diffobj.change == "modified" && !utils.pulloutProp(newArticle, diff.path)) {
+                    } else if (diffobj.change == "modified" && !utils.objects.pulloutProp(newArticle, diff.path)) {
                         diffobj.change = "removed";
                     }
 
