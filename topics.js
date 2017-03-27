@@ -7,7 +7,7 @@ const filelogic = require('./filelogic.js');
 const Admin = require('./backend/admin.js');
 
 class LMLTopics {
-    handleLiveVariable(cli, levels, params, send) {
+    livevar(cli, levels, params, send) {
         if (levels[0] == "all") {
             db.findToArray(cli._c, 'topics', {active : true}, (err, topicsArray) => {
                 let assoc = {};
@@ -45,7 +45,7 @@ class LMLTopics {
         }
     }
 
-    handleAdminEndpoint(cli) {
+    adminGET(cli) {
         if (!cli.hasRight('manage-topics')) {
             return cli.throwHTTP(401);
         }
@@ -60,7 +60,7 @@ class LMLTopics {
         }
     }
 
-    handleAdminPOST(cli) {
+    adminPOST(cli) {
         if (!cli.hasRight('manage-topics')) {
             return cli.throwHTTP(401);
         }
@@ -110,7 +110,7 @@ class LMLTopics {
         }
     }
 
-    createForm() {
+    form() {
         require('./formBuilder.js').createForm('topicedit', {
             formWrapper: {
                 'tag': 'div',
@@ -174,13 +174,6 @@ class LMLTopics {
         .add('children-title', 'title', {
             displayname : "Children"
         })
-    }
-
-    setupController() {
-        Admin.registerAdminEndpoint('topics', 'GET', this.handleAdminEndpoint);
-        Admin.registerAdminEndpoint('topics', 'POST', this.handleAdminPOST);
-        livevars.registerLiveVariable('topics', this.handleLiveVariable);
-        this.createForm();
     }
 }
 

@@ -5,6 +5,62 @@
             "endpoint" : "history",
             "support" : ["admin_get", "admin_post", "livevar"]
         }, {
+            "module" : "lys.js",
+            "endpoint" : "lys",
+            "support" : ["livevar"]
+        }, {
+            "module" : "topics.js",
+            "endpoint" : "topics",
+            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "admin_menu" : {
+                "id": "articles-topics",
+                "faicon": "fa-tags",
+                "displayname": "Topics",
+                "priority": 210,
+                "rights": ["manage-topics"],
+                "absURL": "admin/topics",
+                "children": []
+            }
+        }, {
+            "module" : "plugins.js",
+            "endpoint" : "plugins",
+            "support" : ["admin_get", "admin_post", "livevar", "table"],
+            "admin_menu" : {
+                "id": "plugins",
+                "faicon": "fa-plug",
+                "displayname": "Plugins",
+                "priority": 700,
+                "rights": ["manage-plugins"],
+                "absURL": "admin/plugins",
+                "children": []
+            }
+        }, {
+            "module" : "themes.js",
+            "endpoint" : "themes",
+            "support" : ["admin_get", "admin_post", "table", "livevar"],
+            "admin_menu" : {
+                "id": "themes",
+                "faicon": "fa-paint-brush",
+                "displayname": "Themes",
+                "priority": 600,
+                "rights": ["manage-themes"],
+                "absURL": "admin/themes",
+                "children": []
+            }
+        }, {
+            "module" : "dashboard.js",
+            "endpoint" : "dashboard",
+            "support" : ["admin_get"],
+            "admin_menu" : {
+                "id": "dashboard",
+                "faicon": "fa-tachometer",
+                "displayname": "Dashboard",
+                "priority": 100,
+                "rights": ["dash"],
+                "absURL": "admin/dashboard",
+                "children": []
+            }
+        }, {
             "module" : "analytics.js",
             "endpoint" : "googleanalytics",
             "support" : ["livevar", "setup"],
@@ -113,13 +169,124 @@
             "endpoint" : "docs",
             "support" : ["get"]
         }, {
+            "module" : "cdn.js",
+            "endpoint" : "cdn",
+            "support" : [],
+            "hooks" : [
+                { "name" : "themeLML_compiled", "priority" : 100, "callback" : "themeLMLCompiled" }
+            ]
+        }, {
+            "module" : "postleaf.js",
+            "endpoint" : "postleaf",
+            "support" : ["livevar"],
+            "hooks" : [
+                { "name" : "post_create_postleaf", "priority" : 10, "callback" : "postCreatePostleaf" }
+            ]
+        }, {
             "module" : "article.js",
             "endpoint" : "article",
-            "support" : ["admin_get", "admin_post", "form", "table"]
+            "support" : ["admin_get", "admin_post", "form", "table"],
+            "admin_menu" : {
+                "id": "articles",
+                "faicon": "fa-pencil",
+                "displayname": "Content",
+                "priority": 200,
+                "rights": ["list-articles"],
+                "absURL": "admin/article",
+                "children": []
+            }
         }, {
             "module" : "article.js",
             "endpoint" : "content",
             "support" : ["livevar"]
+        }, {
+            "module" : "album.js",
+            "endpoint" : "album",
+            "support" : ["admin_post", "livevar"],
+            "post_leaf" : {
+                "name" : "album", 
+                "displayname" : "Album",
+                "script" : {
+                    "add" : "addAlbumToPost",
+                    "edit" : "editAlbumToPost",
+                    "show" : "renderAlbum"
+                }
+            },
+            "hooks" : [
+                { "name" : "article_deepfetch", "priority" : 50, "callback" : "articleDeepFetch" }
+            ]
+        }, {
+            "module" : "quiz.js",
+            "endpoint" : "quiz",
+            "support" : ["admin_post"],
+            "post_leaf" : {
+                "name" : "quiz", 
+                "displayname" : "Quiz",
+                "script" : {
+                    "add" : "addQuizToPost",
+                    "edit" : "editQuizToPost",
+                    "show" : "renderQuiz"
+                }
+            }
+        }, {
+            "module" : "entities.js",
+            "endpoint" : "entities",
+            "support" : ["admin_get", "admin_post", "livevar", "setup", "table", "form"],
+            "admin_menu" : {
+                "id": "entities",
+                "faicon": "fa-users",
+                "displayname": "Entities",
+                "priority": 500,
+                "rights": ["list-entities"],
+                "absURL": "admin/entities",
+                "children": []
+            }
+        }, {
+            "module" : "personas.js",
+            "endpoint" : "persona",
+            "support" : ["admin_get", "admin_post", "form", "livevar"],
+            "hooks" : [
+                { "name" : "post_create_persona", "priority" : 15, "callback" : "postCreatePersona" }
+            ], 
+            "admin_menu" : {
+                "id": "entities-personas",
+                "faicon": "fa-users",
+                "displayname": "Personas",
+                "priority": 520,
+                "rights": ["manage-personas"],
+                "absURL": "admin/persona/list",
+                "children": []
+            }
+        }, {
+            "module" : "role.js",
+            "endpoint" : "role",
+            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"],
+            "admin_menu" : {
+                "id": "entities-rights",
+                "faicon": "fa-minus-circle",
+                "displayname": "Roles",
+                "priority": 510,
+                "rights": ["manage-roles"],
+                "absURL": "admin/role/list",
+                "children": []
+            }
+        }, {
+            "module" : "preferences.js",
+            "endpoint" : "preferences",
+            "support" : ["admin_get", "admin_post", "livevar", "form"]
+        }, {
+            "module" : "media.js",
+            "endpoint" : "media",
+            "support" : ["admin_get", "admin_post", "setup"],
+            "admin_menu" : {
+                "id": "media",
+                "faicon": "fa-picture-o",
+                "displayname": "Media",
+                "priority": 400,
+                "rights": ["list-uploads"],
+                "absURL": "admin/media/list",
+                "children": []
+            }
         }, {
             "module" : "amp.js",
             "endpoint" : "amp",
@@ -137,6 +304,23 @@
                 "absURL": "admin/sites",
                 "children": []
             }
-        }
+        }, {
+            "module" : "session.js",
+            "endpoint" : "session",
+            "support" : ["livevar"]
+        }, {
+            "module" : "settings.js",
+            "endpoint" : "settings",
+            "support" : ["admin_get", "admin_post", "form", "livevar"],
+            "admin_menu" : {
+                "id": "settings",
+                "faicon": "fa-cogs",
+                "displayname": "Settings",
+                "priority": 1000,
+                "rights": ["manage-settings"],
+                "absURL": "admin/settings",
+                "children": []
+            }
+        }       
     ]   
 }

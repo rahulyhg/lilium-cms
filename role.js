@@ -10,7 +10,7 @@ var notification = require('./notifications.js');
 var sites = require('./sites.js');
 
 var Role = function () {
-    this.handlePOST = function (cli) {
+    this.adminPOST = function (cli) {
         if (!cli.hasRight('edit-roles')) {
             cli.refuse();
             return;
@@ -34,7 +34,7 @@ var Role = function () {
         }
     };
 
-    this.handleGET = function (cli) {
+    this.adminGET = function (cli) {
         cli.touch('role.handleGET');
         if (!cli.hasRight('edit-roles')) {
             cli.refuse();
@@ -174,36 +174,33 @@ var Role = function () {
         };
     }
 
-    var registerContentLiveVar = function () {
-        livevars.registerLiveVariable('roles', function (cli, levels, params, callback) {
-            var allContent = levels.length === 0;
+    this.livevar = function (cli, levels, params, callback) {
+        var allContent = levels.length === 0;
 
-            var maxpower = 100000000000;
-            var Roles = require('./entities.js').getCachedRoles();
-            for (var i in cli.session.data.roles) {
-                var role = cli.session.data.roles[i];
+        var maxpower = 100000000000;
+        var Roles = require('./entities.js').getCachedRoles();
+        for (var i in cli.session.data.roles) {
+            var role = cli.session.data.roles[i];
 
-                if (Roles[role] && Roles[role].power < maxpower) {
-                    maxpower = Roles[role].power;
-                }
+            if (Roles[role] && Roles[role].power < maxpower) {
+                maxpower = Roles[role].power;
             }
+        }
 
-            if (allContent || levels[0] == "all") {
-                db.findToArray(conf.default(), 'roles', { power : {$gt : maxpower} }, function (err, arr) {
-                    callback(arr);
-                });
-            } else {
-                db.multiLevelFind(conf.default(), 'roles', levels, {
-                    _id: db.mongoID(levels[0])
-                }, {
-                    limit: [1]
-                }, callback);
-            }
-        });
-
+        if (allContent || levels[0] == "all") {
+            db.findToArray(conf.default(), 'roles', { power : {$gt : maxpower} }, function (err, arr) {
+                callback(arr);
+            });
+        } else {
+            db.multiLevelFind(conf.default(), 'roles', levels, {
+                _id: db.mongoID(levels[0])
+            }, {
+                limit: [1]
+            }, callback);
+        }
     }
 
-    var registerForms = function () {
+    this.form = function () {
         formBuilder.createForm('role_create', {
                 fieldWrapper: {
                     tag: 'div',
@@ -238,8 +235,8 @@ var Role = function () {
     }
 
     var initNotificationGroups = function() {
-        config.eachSync(function(site) {
-            db.findToArray(conf.default(), 'roles', {}, function(err, roles) {
+        db.findToArray(conf.default(), 'roles', {}, function(err, roles) {
+            config.eachSync(function(site) {
                 for (var j in roles) {
                     notification.createGroup(roles[j].name, roles[j].name, site.id);
                 }
@@ -247,14 +244,9 @@ var Role = function () {
         });
     }
 
-
-    var init = function () {
-        registerContentLiveVar();
-        registerForms();
+    this.setup = function() {
         initNotificationGroups();
-    };
-
-    init();
+    }
 };
 
 module.exports = new Role();

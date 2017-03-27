@@ -178,6 +178,36 @@ var Sessions = function () {
         return _sesh;
     };
 
+    this.livevar = function(cli, levels, params, callback) {
+        var dat = cli.session.data;
+        var rights = [];
+        var roles = dat.roles || [];
+    
+        db.findToArray(require('./config.js').default(), "roles", {name : {$in : roles}}, function(err, arr) {
+            for (var i = 0; i < arr.length; i++) {
+                rights.push(...arr[i].rights);
+            }
+
+            dat = {
+                _id: dat._id,
+                admin: dat.admin,
+                avatarURL: dat.avatarURL,
+                displayname: dat.displayname,
+                roles: dat.roles,
+                rights : rights,
+                power: dat.power,
+                username: dat.username,
+                site : dat.site,
+                badges : dat.badges,
+                preferences : dat.preferences || preferences.getDefault(cli._c),
+                newNotifications: dat.newNotifications || 0,
+                data : (params.withdata ? dat.data : undefined)
+            }
+
+            callback(dat);
+        });
+    };
+
     this.initSessionsFromDatabase = function (conf, cb) {
         var seshCount = 0;
         db.find(conf.id, 'sessions', {}, {}, function (err, data) {

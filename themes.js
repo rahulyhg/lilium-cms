@@ -42,13 +42,17 @@ var Themes = function () {
         }
     };
 
-    this.serveAdminList = function (cli) {
-        cli.touch("themes.serveAdminList");
+    this.adminPOST = function(cli) {
+        if (cli.hasRightOrRefuse("manage-themes")) {
+            this.updateThemeSettings(cli);
+        } 
+    };
+
+    this.adminGET = function (cli) {
+        cli.touch("themes.adminGET");
         
         if (cli.hasRightOrRefuse("manage-themes")) {
-            if (cli.routeinfo.path.length == 2 && cli.method == 'POST') {
-                that.updateThemeSettings(cli);
-            } else if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
+            if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
                 that.enableTheme(cli._c, cli.postdata.data.uName, function () {
                     cli.sendJSON({
                         success: true
@@ -265,82 +269,73 @@ var Themes = function () {
         console.log(ActiveTheme);
     };
 
-    this.bindEndpoints = function (conf) {
-        Admin.registerAdminEndpoint('themes', 'GET', this.serveAdminList);
-        Admin.registerAdminEndpoint('themes', 'POST', this.serveAdminList);
-    };
-
-    this.registerLiveVar = function () {
-        livevars.registerLiveVariable('theme', function (cli, levels, params, callback) {
-            var allThemes = levels.length === 0;
-            if (allThemes) {
-                db.singleLevelFind(cli._c, 'themes', callback);
-            } else if (levels[0] == 'current') {
-                var cTheme = that.getEnabledTheme(cli._c.id);
-                callback({
-                    info : cTheme.info,
-                    settings : cTheme.settings
-                }); 
-            } else if (levels[0] == 'templates') {
-                if (levels[1]) {
-                    callback(that.getEnabledTheme(cli._c.id).info.templates[levels[1]]);
-                } else {
-                    callback(that.getEnabledTheme(cli._c.id).info.templates);
-                }
-            } else if (levels[0] == 'table') {
-                var sort = {};
-                sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
-                db.aggregate(cli._c, 'themes', [{
-                    $match:
-                        (params.search ? {
-                            $text: {
-                                $search: params.search
-                            }
-                        } : {})
-
-                }, {
-                    $sort: sort
-                }, {
-                    $skip: (params.skip || 0)
-                }, {
-                    $limit: (params.max || 20)
-                }], function (data) {
-                    db.find(cli._c, 'themes', (params.search ? {
-                        $text: {
-                            $search: params.search
-                        }
-                    } : {}), [], function (err, cursor) {
-
-                        cursor.count(function (err, size) {
-                            results = {
-                                size: size,
-                                data: data
-                            }
-                            callback(err || results);
-
-                        });
-                    });
-                });
+    this.livevar = function (cli, levels, params, callback) {
+        var allThemes = levels.length === 0;
+        if (allThemes) {
+            db.singleLevelFind(cli._c, 'themes', callback);
+        } else if (levels[0] == 'current') {
+            var cTheme = that.getEnabledTheme(cli._c.id);
+            callback({
+                info : cTheme.info,
+                settings : cTheme.settings
+            }); 
+        } else if (levels[0] == 'templates') {
+            if (levels[1]) {
+                callback(that.getEnabledTheme(cli._c.id).info.templates[levels[1]]);
             } else {
-                db.multiLevelFind(cli._c, 'themes', levels, {
-                    uName: (levels[0])
-                }, {
-                    limit: [1]
-                }, callback);
+                callback(that.getEnabledTheme(cli._c.id).info.templates);
             }
-        }, ["themes"]);
-
-        livevars.registerLiveVariable('themesettings', function (cli, levels, params, callback) {
+        } else if (levels[0] == "settings"){
             db.findToArray(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, function(err, arr) {
                 callback(err || arr[0].settings);
             });
-        });
+        } else if (levels[0] == 'table') {
+            var sort = {};
+            sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+            db.aggregate(cli._c, 'themes', [{
+                $match:
+                    (params.search ? {
+                        $text: {
+                            $search: params.search
+                        }
+                    } : {})
+
+            }, {
+                $sort: sort
+            }, {
+                $skip: (params.skip || 0)
+            }, {
+                $limit: (params.max || 20)
+            }], function (data) {
+                db.find(cli._c, 'themes', (params.search ? {
+                    $text: {
+                        $search: params.search
+                    }
+                } : {}), [], function (err, cursor) {
+
+                    cursor.count(function (err, size) {
+                        results = {
+                            size: size,
+                            data: data
+                        }
+                        callback(err || results);
+
+                    });
+                });
+            });
+        } else {
+            db.multiLevelFind(cli._c, 'themes', levels, {
+                uName: (levels[0])
+            }, {
+                limit: [1]
+            }, callback);
+        }
     };
 
-    this.registerForm = function () {
+    this.table = function () {
         tableBuilder.createTable({
             name: 'theme',
-            endpoint: 'theme.table',
+            endpoint: 'themes.table',
             paginate: true,
             searchable: true,
             max_results: 10,
@@ -362,7 +357,7 @@ var Themes = function () {
         });
     };
 
-    this.init = function (conf, cb) {
+    this.initializeSite = function (conf, cb) {
         that.getThemesDirList(conf, function (themes) {
             db.findToArray(conf.id, 'themes', {
                 'active': true

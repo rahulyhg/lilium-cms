@@ -5,6 +5,7 @@ const Admin = require('../backend/admin.js');
 const Livevar = require('../livevars.js');
 const Endpoints = require('../endpoints.js');
 const Hooks = require('../hooks.js');
+const Postleaf = require('../postleaf.js');
 
 class FlowHandle {
     constructor(river, flow) {
@@ -55,6 +56,13 @@ class Riverflow {
 
         if (flow.admin_menu) {
             Admin.registerAdminMenu(flow.admin_menu);
+        } else if (flow.admin_sub_menu) {
+            Admin.registerAdminSubMenu(flow.admin_sub_menu.parent, flow.admin_sub_menu);
+        }
+
+        if (flow.post_leaf) {
+            let leaf = flow.post_leaf;
+            Postleaf.registerLeaf(leaf.name, leaf.displayname, leaf.script.add, leaf.script.edit, leaf.script.show);
         }
 
         river.origin = flow.origin || "Riverflow";

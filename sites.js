@@ -221,8 +221,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var loadTheme = function(cb) {
-        themes.init(conf, function() {
-            themes.bindEndpoints(conf);
+        themes.initializeSite(conf, function() {
             templateBuilder.precompThemeFiles(conf, cb);
         });
     };
