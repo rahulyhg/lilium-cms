@@ -29,7 +29,7 @@ class LMLCommunications {
         });
     };
 
-    handleLivevar(cli, levels, params, send) {
+    livevar(cli, levels, params, send) {
         const action = levels[0];
         const type = levels[1];
         const id = levels[2];
@@ -90,7 +90,7 @@ class LMLCommunications {
         });
     };
 
-    handlePost(cli) {
+    adminPOST(cli) {
         if (cli.routeinfo.path < 4) {
             return cli.sendJSON({error : "Wrong route."});
         }
@@ -105,10 +105,6 @@ class LMLCommunications {
         }
     };
 
-    setupController() {
-        livevars.registerLiveVariable('communications', this.handleLivevar);
-        Admin.registerAdminEndpoint('communications', 'POST', this.handlePost);
-    };
 };
 
 const that = new LMLCommunications();

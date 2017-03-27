@@ -1,0 +1,142 @@
+{
+    "rivers" : [
+        {
+            "module" : "history.js",
+            "endpoint" : "history",
+            "support" : ["admin_get", "admin_post", "livevar"]
+        }, {
+            "module" : "analytics.js",
+            "endpoint" : "googleanalytics",
+            "support" : ["livevar", "setup"],
+            "hooks" : [
+                {"name" : "settings_saved", "priority" : 1000, "callback" : "settingsSaved"}
+            ]
+        }, {
+            "module" : "communications.js",
+            "endpoint" : "communications",
+            "support" : ["admin_post", "livevar"]
+        }, {
+            "module" : "mail.js",
+            "endpoint" : "mailtemplates",
+            "support" : ["setup", "admin_post", "admin_get", "livevar"],
+            "hooks" : [
+                {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
+            ],
+            "admin_menu" : {
+                "id": "mailtemplates",
+                "faicon": "fa-envelope-o",
+                "displayname": "Email Templates",
+                "priority": 250,
+                "rights": ["edit-emails"],
+                "absURL": "admin/mailtemplates/list",
+                "children": []
+            }
+        }, {
+            "module" : "snip.js",
+            "endpoint" : "snips",
+            "support" : ["admin_get"]
+        }, {
+            "module" : "secrets.js",
+            "endpoint" : "secrets",
+            "support" : ["admin_get", "admin_post", "livevar"],
+            "admin_menu" : {
+                "id": "secrets",
+                "faicon": "fa-key",
+                "displayname": "Secrets",
+                "priority": 540,
+                "rights": ["list-secrets"],
+                "absURL": "admin/secrets",
+                "children": []
+            }
+        }, {
+            "module" : "devtools.js",
+            "endpoint" : "devtools",
+            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "admin_menu" : {
+                "id": "devtools",
+                "faicon": "fa-hashtag",
+                "displayname": "Dev Tools",
+                "priority": 2000,
+                "rights": ["develop"],
+                "absURL": "admin/devtools",
+                "children": []
+            }
+        }, {
+            "module" : "embed.js",
+            "endpoint" : "embed",
+            "support" : ["admin_get"]
+        }, {
+            "module" : "tools.js",
+            "endpoint" : "tools",
+            "support" : ["admin_get", "admin_post", "livevar", "setup"],
+            "admin_menu" : {
+                "id": "tools",
+                "faicon": "fa-wrench",
+                "displayname": "Tools",
+                "priority": 800,
+                "rights": [],
+                "absURL": "admin/tools",
+                "children": []
+            }
+        }, {
+            "module" : "conversations.js",
+            "endpoint" : "conversations",
+            "support" : ["admin_get", "admin_post", "livevar"]
+        }, {
+            "module" : "feed.js",
+            "endpoint" : "feed",
+            "support" : ["setup", "admin_get", "livevar"],
+            "admin_menu" : {
+                "id": "feed",
+                "faicon": "fa-newspaper-o",
+                "displayname": "What's up",
+                "priority": 80,
+                "rights": ["dash"],
+                "absURL": "admin/feed",
+                "children": []
+            }
+        }, {
+            "module" : "styledpages.js",
+            "endpoint" : "styledpages",
+            "support" : ["admin_get", "admin_post", "form", "table", "livevar"],
+            "admin_menu" : {
+                "id": "styledpages",
+                "faicon": "fa-paragraph",
+                "displayname": "Styled Pages",
+                "priority": 250,
+                "rights": ["styledpages"],
+                "absURL": "admin/styledpages/list",
+                "children": []
+            }
+        }, {
+            "module" : "docs.js",
+            "endpoint" : "docs",
+            "support" : ["get"]
+        }, {
+            "module" : "article.js",
+            "endpoint" : "article",
+            "support" : ["admin_get", "admin_post", "form", "table"]
+        }, {
+            "module" : "article.js",
+            "endpoint" : "content",
+            "support" : ["livevar"]
+        }, {
+            "module" : "amp.js",
+            "endpoint" : "amp",
+            "support" : ["get"]
+        }, {
+            "module" : "sites.js",
+            "endpoint" : "sites",
+            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "admin_menu" : {
+                "id": "sites",
+                "faicon": "fa-sitemap",
+                "displayname": "Network",
+                "priority": 50,
+                "rights": ["manage-sites"],
+                "absURL": "admin/sites",
+                "children": []
+            }
+        }
+    ]   
+}

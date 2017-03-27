@@ -1,12 +1,15 @@
-var diff = require('deep-diff').diff;
-var log = require('./log.js');
-var db = require('./includes/db.js');
-var Admin = require('./backend/admin.js');
-var filelogic = require('./filelogic.js');
-var utils = require('./utils.js');
+const diff = require('deep-diff').diff;
+const log = require('./log.js');
+const db = require('./includes/db.js');
+const Admin = require('./backend/admin.js');
+const filelogic = require('./filelogic.js');
+const utils = require('./utils.js');
 
-class History {
+const RFExtender = require('./riverflow/extender.js');
+
+class History extends RFExtender {
     constructor() {
+        super();
         this.ignoredFields = ["modified", "_id", "updated", "status", "tagslugs", "author", "date"];
     };
 
@@ -79,11 +82,11 @@ class History {
         
     };
 
-    GET(cli) {
+    adminGET(cli) {
         filelogic.serveAdminLML(cli, true);
     };
 
-    POST(cli) {
+    adminPOST(cli) {
 
     };
 
@@ -113,18 +116,6 @@ class History {
                 callback({err : new Error("Missing publication rights.")});
             }
         }
-    };
-
-    registerLiveVar() {
-        let that = this;
-        require('./livevars.js').registerLiveVariable('history', (cli, levels, params, callback) => {
-            that.livevar(cli, levels, params, callback);
-        });
-    };
-
-    registerEndpoints() {
-        Admin.registerAdminEndpoint('history', 'GET', this.GET);
-        Admin.registerAdminEndpoint('history', 'POST', this.POST);
     };
 };
 
