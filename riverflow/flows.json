@@ -1,4 +1,20 @@
 {
+    "version" : 1.1,
+
+    "supported" : [
+        "admin_get", "admin_post",
+        "get", "post",
+        "form", "table",
+        "livevar", "setup"
+    ],
+
+    "extensions" : [
+        "admin_menu",
+        "admin_sub_menu",
+        "hooks",
+        "post_leaf"
+    ],
+
     "rivers" : [
         {
             "module" : "history.js",
