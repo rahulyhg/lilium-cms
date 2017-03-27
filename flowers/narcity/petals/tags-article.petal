@@ -28,6 +28,6 @@
     <link rel="canonical" href="{=config.default.wordpress.originalurl}/{=extra.article.name}/" />
 {$ else; $}
     <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}/" />
-{$ endif; $} 
+{$ endif; $}
 
-
+<link rel="amphtml" href="{=config.default.server.url}/amp/{=extra.article.name}" />
