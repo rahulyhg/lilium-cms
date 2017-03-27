@@ -50,9 +50,10 @@ class Amp {
     };
 
     parseAMPContent(cli, articleContent, cb) {
+      console.log(JSON.stringify(cli._c));
       articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
       articleContent = articleContent.replace(/<ad><\/ad>/g, '<p>{ad}</p>');
-      
+
       return htmlToAmp(articleContent, (err, amp) => {
                           if(!err) {
                               amp = amp.replace(/<p>\{ad\}<\/p>/g,

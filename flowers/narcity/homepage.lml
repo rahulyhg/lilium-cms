@@ -59,7 +59,11 @@
                                 <span class="article-share-icon">
                                     <img src="{=config.default.server.url}/res/images/flame.png" />
                                 </span>
-                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=la.name}" data-min="100" data-show="article-share-count-mobile-{=la._id}" data-showas="block">0000</span>
+                                <span class="article-share-count-mobile-num fbshare"
+                                  data-url="{=config.default.server.protocol}{=config.default.server.url}/{=la.name}"
+                                  data-min="0"
+                                  data-show="article-share-count-mobile-{=la._id}"
+                                  data-showas="block">0000</span>
                             </div>
 
                         </a>
@@ -205,7 +209,7 @@ var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
             floatclear = document.createElement('div');
             floatclear.className = "float-clear";
         }
-        
+
         var wrapper = document.createElement('div');
         wrapper.id = "art" + article._id;
         wrapper.setAttribute('ogid', document.location.protocol + article.fullurl);
@@ -216,11 +220,11 @@ var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
         // Featured image
         var featimg = document.createElement('div');
         featimg.className = "article-thumbnail-featured-iamge";
-        
+
         var featlink = document.createElement('a');
         featlink.href= article.fullurl;
         featimg.appendChild(featlink);
-        
+
         var fimage = document.createElement('img');
         fimage.src= article.featuredimage;
         featlink.appendChild(fimage);
@@ -241,7 +245,7 @@ var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
         catlink.href = "{=config.default.server.url}/category/" + article.category.name;
         catlink.textContent = article.category.displayname;
         catwrap.appendChild(catlink);
-        
+
         var sharecountwrap = document.createElement('div');
         sharecountwrap.className='article-share-count-mobile';
         sharecountwrap.id = 'article-share-count-mobile-' + article._id;
@@ -262,8 +266,8 @@ var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
         sharecount.dataset.showas = "block";
         sharecount.textContent = "0000";
         sharecountwrap.appendChild(sharecount);
-        
-    
+
+
         // Title
         var titlewrap = document.createElement('div');
         titlewrap.className = "article-thumbnail-title";
@@ -296,7 +300,7 @@ var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
         authorlink.textContent = article.authorname;
         namespan.appendChild(authorlink);
         namespan.appendChild(document.createTextNode("&nbsp;&middot;&nbsp;"));
-        
+
         var datewrap = document.createElement('span');
         datewrap.className = "need_to_be_rendered";
         datewrap.setAttribute('datetime', article.date);
@@ -316,4 +320,3 @@ var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
 }};
 window.generators.generateHomepageTrending = generateHomepageTrending;
 </script>
-

@@ -148,7 +148,7 @@ var Article = function() {
                             status : art.status || "Unknown",
                             url : art.name ? cli._c.server.url + "/" + art.name : "This article doesn't have a URL.",
                             siteurl : cli._c.server.url,
-                            aliases : art.aliases ? Array.from(new Set(art.aliases)) : [], 
+                            aliases : art.aliases ? Array.from(new Set(art.aliases)) : [],
                             updated : art.updated || "This article was never updated",
                             author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
                             modifications : modcount
@@ -192,8 +192,8 @@ var Article = function() {
                         $match : {
                             _id : {
                                 $lt : arr[0]._id
-                            }, 
-                            $text : { 
+                            },
+                            $text : {
                                 $search : titlekeywords
                             },
                             $and : [
@@ -204,17 +204,17 @@ var Article = function() {
                         }
                     },{
                         // Sort content by what matches the highest
-                        $sort : { 
-                            score: { 
-                                $meta: "textScore" 
+                        $sort : {
+                            score: {
+                                $meta: "textScore"
                             },
-                            date : -1 
+                            date : -1
                         }
                     },{
                         // Have at most seven related
                         $limit : 5
                     },{
-                        // Get featured image 
+                        // Get featured image
                         $lookup : {
                             from:           "uploads",
                             localField:     "media",
@@ -244,7 +244,7 @@ var Article = function() {
                                                 _c : conf,
                                                 article: arr[0]
                                             });
-                                        
+
                                             cb(arr[0]);
                                         } else {
                                             evts[keys[kIndex]].cb(conf, arr[0], next);
@@ -262,7 +262,7 @@ var Article = function() {
                                     db.findUnique(conf, 'uploads', {_id : db.mongoID(rel.media)}, function(err, featuredimage) {
                                         rel.featuredimage = featuredimage;
                                         arr[0].related = [rel];
-                                    
+
                                         continueWorking();
                                     });
                                 } else {
@@ -313,8 +313,8 @@ var Article = function() {
                 });
 
                 db.findToArray(require('./config.js').default(), 'entities', {roles : "production"}, function(err, produser)  {
-                    db.findUnique(require('./config.js').default(), 'entities', 
-                        {_id : db.mongoID(cli.userinfo.userid)}, 
+                    db.findUnique(require('./config.js').default(), 'entities',
+                        {_id : db.mongoID(cli.userinfo.userid)},
                         function(err, contractor) {
                         for (var i = 0; i < produser.length; i++) {
                             require('./mail.js').triggerHook(cli._c, 'article_sent_for_review', produser[i].email, {
@@ -341,7 +341,7 @@ var Article = function() {
         var featurename = cli.postdata.data.feature;
         var conds = {
             _id : db.mongoID(cli.routeinfo.path[3])
-        };        
+        };
 
         if (!cli.hasRight("editor")) {
             conds.author = db.mongoID(cli.userinfo.userid);
@@ -443,7 +443,7 @@ var Article = function() {
         }
     };
 
-    
+
     this.publish = function(cli, pubCtx) {
         cli.touch('article.new');
         pubCtx = pubCtx || "create";
@@ -486,7 +486,7 @@ var Article = function() {
 
                 var conds = {
                     _id: cli.postdata.data.id ? db.mongoID(cli.postdata.data.id) : "Will not resolve"
-                }; 
+                };
 
                 if (formData.tags && formData.tags.map) {
                     formData.tagslugs = formData.tags.map(function(tagname) {
@@ -528,21 +528,21 @@ var Article = function() {
 
                                         if (pubCtx === "create") {
                                              if (oldSlug) {
-                                                db.update(cli._c, 'content', 
-                                                    {_id : db.mongoID(formData._id)}, 
-                                                    {$push : {aliases : oldSlug}}, 
+                                                db.update(cli._c, 'content',
+                                                    {_id : db.mongoID(formData._id)},
+                                                    {$push : {aliases : oldSlug}},
                                                 function() {
                                                     log('Article', 'Added alias for slug ' + oldSlug);
                                                     fileserver.deleteFile(_c.server.html + "/" + oldSlug + ".html", function() {});
                                                 }, false, true, true);
                                             }
 
-                                            db.update(cli._c, 'content', 
-                                                {_id : db.mongoID(formData._id)}, 
+                                            db.update(cli._c, 'content',
+                                                {_id : db.mongoID(formData._id)},
                                                 {$addToSet : {subscribers : {$each : [
                                                     db.mongoID(cli.userinfo.userid),
                                                     formData.author
-                                                ]}}}, 
+                                                ]}}},
                                                 function() {}, false, true, true
                                             );
 
@@ -592,10 +592,10 @@ var Article = function() {
                                                         }
                                                     });
                                                 }
-            
+
                                                 var nlen = publishedNotificationTitles.length;
                                                 var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
-        
+
                                                 notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                                     title: notifMessage,
                                                     url: cli._c.server.url + '/' + deepArticle.name,
@@ -613,13 +613,13 @@ var Article = function() {
                                                         authoravatar : deepArticle.authors[0].avatarURL
                                                     });
                                                 });
- 
+
                                                 badges.check(cli, 'publish', function(acquired, level) {});
                                             });
                                         } else if (pubCtx === "preview") {
-                                            var tmpName = "static/tmp/preview" + 
-                                                Math.random().toString().slice(2) + 
-                                                Math.random().toString().slice(2) + 
+                                            var tmpName = "static/tmp/preview" +
+                                                Math.random().toString().slice(2) +
+                                                Math.random().toString().slice(2) +
                                                 ".tmp";
                                             var absPath = cli._c.server.html + "/" + tmpName;
 
@@ -629,6 +629,7 @@ var Article = function() {
                                                 extra.ctx = "article";
                                                 extra.article = deepArticle;
                                                 extra.preview = true;
+                                                extra.amphtml = cli._c.server.url + "/amp/" + deepArticle.name;
 
                                                 log('Preview', 'Rendering HTML for previewed post');
                                                 filelogic.renderThemeLML(cli._c, "article", tmpName, extra, function() {
@@ -644,7 +645,7 @@ var Article = function() {
                                         cli.throwHTTP(500);
                                     }
                                 };
-    
+
                                 if (pubCtx == "preview") {
                                     postUpdate();
                                 } else {
@@ -741,16 +742,16 @@ var Article = function() {
                         delete formData._id;
                         db.update(cli._c, 'content', {
                             _id: id
-                        }, formData, function(err, doc) { 
-                            require("./history.js").pushModification(cli, res, res._id, function(err, revision) {    
+                        }, formData, function(err, doc) {
+                            require("./history.js").pushModification(cli, res, res._id, function(err, revision) {
                                 cli.sendJSON({
                                     success: true,
                                     _id: cli.postdata.data._id,
                                     reason : 200
                                 });
                             });
-                            db.update(cli._c, 'content', 
-                                {_id : id}, {$addToSet : {subscribers : db.mongoID(cli.userinfo.userid)}}, 
+                            db.update(cli._c, 'content',
+                                {_id : id}, {$addToSet : {subscribers : db.mongoID(cli.userinfo.userid)}},
                                 function() {}, false, true, true
                             );
                         });
@@ -833,16 +834,17 @@ var Article = function() {
                         }, formData, function(err, r) {
                             that.deepFetch(cli._c, id, function(deepArticle) {
                                 cli.did('content', 'edited', {title : cli.postdata.data.title});
-                                
+
                                 hooks.fire('article_edited', {
                                     cli: cli,
                                     article: r.value
                                 });
-   
+
                                 var extra = new Object();
                                 extra.article = deepArticle;
                                 extra.ctx = "article";
- 
+                                extra.amphtml = cli._c.server.url + "/amp/" + deepArticle.name;
+
                                 filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
                                     notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                         title: "Article is updated!",
@@ -851,7 +853,7 @@ var Article = function() {
                                         type: 'success'
                                     });
                                 });
-    
+
                                 cli.sendJSON({
                                     success: true
                                 });
@@ -907,7 +909,7 @@ var Article = function() {
                             status: destroy ? 'destroyed' : 'deleted'
                         }, function(err, r) {
                             cli.did('content', destroy ? 'destroyed' : 'deleted', {id : id});
-                            
+
                             var filename = cli._c.server.html + "/" + result.name + '.html';
                             fs.deleteFile(filename, function() {
                                 hooks.fire('article_deleted', {id : id, cli : cli, _c : cli._c});
@@ -986,7 +988,7 @@ var Article = function() {
                                 title: arr[i].title
                             });
                         };
-    
+
                         callback(sentArr);
                     });
                 } else {
@@ -1020,7 +1022,7 @@ var Article = function() {
                         $text : { $search: params.search }
                     });
                 }
-    
+
                 db.aggregate(cli._c, 'content', [{
                     $match: {$and : match}
                 }, {
@@ -1343,7 +1345,7 @@ var Article = function() {
                     'type' : 'button',
                     'classes': ['btn', 'btn-default', 'btn-preview']
                 }, {
-                    'name' : 'publish', 
+                    'name' : 'publish',
                     'displayname': 'Save and <b>Publish</b>',
                     'type' : 'button',
                     'classes': ['btn', 'btn-default', 'btn-publish', 'role-author']
@@ -1378,7 +1380,7 @@ var Article = function() {
                 var extra = new Object();
                 extra.ctx = "next";
                 extra.article = deepArticle;
-    
+
                 filelogic.renderNextLML(cli, articleName + '.html', extra);
             }
         }, false, {status : "published"});
@@ -1390,7 +1392,8 @@ var Article = function() {
                 var extra = new Object();
                 extra.ctx = "article";
                 extra.article = deepArticle;
-
+                extra.amphtml = _c.server.url + "/amp/" + deepArticle.name;
+                
                 hooks.fire('article_will_render', {
                     _c : _c,
                     article: deepArticle
@@ -1472,7 +1475,7 @@ var Article = function() {
                         value : "deleted",
                         displayname : "Deleted"
                     }],
-                }, 
+                },
                 author : {
                     displayname : "Author",
                     livevar : {
