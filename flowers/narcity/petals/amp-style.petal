@@ -2061,9 +2061,9 @@ article .article-signature-face {
     text-align:center;
 }
 .ad-section amp-ad{
-    padding-top:18px
+    padding-top:18px;
 }
 
 #taboola-below-article-thumbnails{
-    overflow:hidden"
+    overflow:hidden;
 }
