@@ -2063,3 +2063,7 @@ article .article-signature-face {
 .ad-section amp-ad{
     padding-top:18px
 }
+
+#taboola-below-article-thumbnails{
+    overflow:hidden"
+}
