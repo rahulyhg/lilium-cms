@@ -2067,3 +2067,6 @@ article .article-signature-face {
 #taboola-below-article-thumbnails{
     overflow:hidden;
 }
+article figure{
+    margin:0px;
+}
