@@ -270,7 +270,7 @@ body.menuopen .narcity-header-bar {
     display: block;
 }
 .awrapper,
-#article-content>div.awrapper {
+#article-content>div.awrapper, .ad-section {
     background-color: #EEE;
     padding: 12px 0px;
     text-align: center;
@@ -2057,10 +2057,10 @@ article .article-signature-face {
 .narcity-logo-wrapper{
     z-index:1;
 }
-.ad-section{
+.ad-section, .ad-before-content{
     text-align:center;
 }
-.ad-section amp-ad{
+.ad-section amp-ad, .ad-before-content amp-ad{
     padding-top:18px;
 }
 
@@ -2069,12 +2069,4 @@ article .article-signature-face {
 }
 article figure{
     margin:0px;
-}
-.ad-section{
-    background-color: #EEE;
-    padding: 12px 0;
-    text-align: center;
-    border-bottom: 1px solid #CCC;
-    border-top: 1px solid #CCC;
-    margin-bottom: 5px;
 }
