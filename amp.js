@@ -50,6 +50,11 @@ class Amp {
     };
 
     parseAMPContent(cli, articleContent, cb) {
+      if (cli._c.content.cdn && cli._c.content.cdn.domain) {
+        articleContent = articleContent.replace(
+              new RegExp('(src=")' + cli._c.server.url, "g"), 
+              '$1' + cli._c.content.cdn.domain);
+      }
       articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
       articleContent = articleContent.replace(/<ad><\/ad>/g, '<p>{ad}</p>');
       
