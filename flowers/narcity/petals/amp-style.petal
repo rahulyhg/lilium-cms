@@ -2070,3 +2070,11 @@ article .article-signature-face {
 article figure{
     margin:0px;
 }
+.ad-section{
+    background-color: #EEE;
+    padding: 12px 0;
+    text-align: center;
+    border-bottom: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+    margin-bottom: 5px;
+}
