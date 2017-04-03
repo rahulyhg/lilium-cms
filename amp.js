@@ -33,8 +33,10 @@ class Amp {
                 cli._c.server.url, cli._c.content.cdn.domain);
         article.authors[0].avatarURL = 
             article.authors[0].avatarURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
-        article.sponsoredBoxLogoURL =
-            article.sponsoredBoxLogoURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
+        if(article.sponsoredBoxLogoURL){
+            article.sponsoredBoxLogoURL =
+                article.sponsoredBoxLogoURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
+        }
 
         this.parseAMPContent(cli, articleContent, (err, amp) => {
             log('AMP', 'Done parsing HTML to AMP: ', err);
