@@ -22,7 +22,7 @@ var Dashboard = function () {
         _dashpetals[prio] = petalID;
     };
 
-    this.handleGET = function (cli) {
+    this.adminGET = function (cli) {
         if (cli.hasRightOrRefuse("dashboard")) {
             filelogic.serveAdminLML(cli);
         }

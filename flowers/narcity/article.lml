@@ -18,7 +18,7 @@ $}
     {$ endif; $}
 
     <div class="category-top-wrapper ryksponsive-c">
-        <a href="{=config.default.server.url}/topic/{=topic.slug}" class="category-top-link">
+        <a href="{=config.default.server.url}/{=topic.completeSlug}" class="category-top-link">
             {=topic.displayname}
         </a>
     </div>

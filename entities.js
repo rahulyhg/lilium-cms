@@ -125,7 +125,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.handleGET = function (cli) {
+    this.adminGET = function (cli) {
         cli.touch('entities.handleGET');
         if (!cli.hasRightOrRefuse("list-entities")) {return;}
 
@@ -151,7 +151,7 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.handlePOST = function (cli) {
+    this.adminPOST = function (cli) {
         cli.touch('entities.handlePOST');
         if (cli.routeinfo.path[1] == 'me') {
             switch (cli.postdata.data.form_name) {
@@ -790,7 +790,7 @@ var Entities = module.exports = new function () {
         return allowed;
     };
 
-    var registerTables = function () {
+    this.table = function () {
         tableBuilder.createTable({
             name: 'entities',
             endpoint: 'entities.table',
@@ -828,7 +828,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.registerCreationForm = function () {
+    this.form = function () {
         formbuilder.createForm('entity_create', {
                fieldWrapper : "lmlform-fieldwrapper"
             })
@@ -914,159 +914,122 @@ var Entities = module.exports = new function () {
             });
     };
 
-    this.registerLiveVars = function () {
-        livevars.registerLiveVariable('entities', function (cli, levels, params, callback) {
-            var allEntities = levels.length === 0;
+    this.livevar = function (cli, levels, params, callback) {
+        var allEntities = levels.length === 0;
 
-            if (allEntities) {
-                db.findToArray(_c.default(), 'entities', cli.hasRight('list-entities') ? {} : {
-                    _id : db.mongoID(cli.session.data._id)
-                }, function(err, arr) { 
-                    callback(arr); 
-                });
-            } else if (levels[0] == "chat") {
-                db.find(_c.default(), 'entities', {revoked : {$ne : true}}, [], function(err, cur) {
-                    cur.sort({fullname : 1}).toArray(function(err, arr) {
-                        callback(err || arr);
-                    });
-                }, {
-                    displayname : 1, 
-                    avatarURL : 1
-                });
-            } else if (levels[0] == "cached") {
-                db.findToArray(_c.default(), 'entities', {}, function(e, a) {callback(a);}, {displayname : 1, avatarURL : 1});
-            } else if (levels[0] == "simple") {
-                var simpProj = {
-                    displayname : 1,
-                    _id : 1
-                };
-            
-                db.find(_c.default(), 'entities', {}, [], function(err, cur) {
-                    cur.sort({displayname : 1}).toArray(function(err, arr) {
-                        callback(arr);
-                    });
-                }, simpProj);
-            } else if (levels[0] == 'query') {
-                var queryInfo = params.query || new Object();
-                var qObj = new Object();
-
-                qObj._id = queryInfo._id;
-                qObj.displayname = queryInfo.displayname;
-                qObj.email = queryInfo.email;
-                qObj.roles = queryInfo.roles ? {
-                    $in: queryInfo.roles
-                } : undefined;
-                qObj.username = queryInfo.username;
-
-                if (!cli.hasRight('list-entities')) {
-                    qObj._id = cli.session.data._id;
-                }
-
-                db.findToArray(_c.default(), 'entities', queryInfo, function (err, arr) {
+        if (allEntities) {
+            db.findToArray(_c.default(), 'entities', cli.hasRight('list-entities') ? {} : {
+                _id : db.mongoID(cli.session.data._id)
+            }, function(err, arr) { 
+                callback(arr); 
+            });
+        } else if (levels[0] == "chat") {
+            db.find(_c.default(), 'entities', {revoked : {$ne : true}}, [], function(err, cur) {
+                cur.sort({fullname : 1}).toArray(function(err, arr) {
                     callback(err || arr);
                 });
-            } else if (levels[0] == 'table') {
-                if (!cli.hasRight('list-entities')) {
-                    callback({size:0,data:[]});
-                    return;
+            }, {
+                displayname : 1, 
+                avatarURL : 1
+            });
+        } else if (levels[0] == "cached") {
+            db.findToArray(_c.default(), 'entities', {}, function(e, a) {callback(a);}, {displayname : 1, avatarURL : 1});
+        } else if (levels[0] == "simple") {
+            var simpProj = {
+                displayname : 1,
+                _id : 1
+            };
+        
+            db.find(_c.default(), 'entities', {}, [], function(err, cur) {
+                cur.sort({displayname : 1}).toArray(function(err, arr) {
+                    callback(arr);
+                });
+            }, simpProj);
+        } else if (levels[0] == 'query') {
+            var queryInfo = params.query || new Object();
+            var qObj = new Object();
+
+            qObj._id = queryInfo._id;
+            qObj.displayname = queryInfo.displayname;
+            qObj.email = queryInfo.email;
+            qObj.roles = queryInfo.roles ? {
+                $in: queryInfo.roles
+            } : undefined;
+            qObj.username = queryInfo.username;
+
+            if (!cli.hasRight('list-entities')) {
+                qObj._id = cli.session.data._id;
+            }
+
+            db.findToArray(_c.default(), 'entities', queryInfo, function (err, arr) {
+                callback(err || arr);
+            });
+        } else if (levels[0] == 'table') {
+            if (!cli.hasRight('list-entities')) {
+                callback({size:0,data:[]});
+                return;
+            }
+
+            var sort = {};
+            sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+
+            var mtch = (params.search ? {
+                $text: {
+                    $search: params.search
+                }
+            } : {});
+            mtch.revoked = {$ne : true};
+
+            db.aggregate(_c.default(), 'entities', [{
+                $match: mtch
+            }, {
+                $sort: sort
+            }, {
+                $skip : params.skip || 0
+            }, {
+                $limit : params.max || 20
+            }], function (data) {
+                if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
+                    for (var i = 0; i < data.length; i++) if (data[i].avatarURL) {
+                        data[i].avatarURL = data[i].avatarURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
+                    }
                 }
 
-                var sort = {};
-                sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
-
-                var mtch = (params.search ? {
-                    $text: {
-                        $search: params.search
-                    }
-                } : {});
-                mtch.revoked = {$ne : true};
-
-                db.aggregate(_c.default(), 'entities', [{
-                    $match: mtch
-                }, {
-                    $sort: sort
-                }, {
-                    $skip : params.skip || 0
-                }, {
-                    $limit : params.max || 20
-                }], function (data) {
-                    if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
-                        for (var i = 0; i < data.length; i++) if (data[i].avatarURL) {
-                            data[i].avatarURL = data[i].avatarURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
-                        }
-                    }
-
-                    db.count(_c.default(), 'entities', mtch, function(err, total) {
-                        callback({
-                            size : total,
-                            data : data
-                        });
+                db.count(_c.default(), 'entities', mtch, function(err, total) {
+                    callback({
+                        size : total,
+                        data : data
                     });
                 });
-            } else if (levels[0] == 'single' && levels[1]) {
-                if (!cli.hasRight('list-entities') && levels[1] !== cli.session.data._id) {
-                    callback([]);
-                } else {
-                    db.findToArray(_c.default(), 'entities', {_id: db.mongoID(levels[1])}, function(err, res) {
-                        callback(err || res)
-                    });
-                }
+            });
+        } else if (levels[0] == 'single' && levels[1]) {
+            if (!cli.hasRight('list-entities') && levels[1] !== cli.session.data._id) {
+                callback([]);
             } else {
-                if (!cli.hasRight('list-entities') && levels[0] !== cli.session.data.username) {
-                    callback([]);
-                } else {
-                    db.multiLevelFind(_c.default(), 'entities', levels, {
-                        username: levels[0]
-                    }, {
-                        limit: [1]
-                    }, callback);
-                }
+                db.findToArray(_c.default(), 'entities', {_id: db.mongoID(levels[1])}, function(err, res) {
+                    callback(err || res)
+                });
             }
-        }, ["dash"]);
+        } else {
+            if (!cli.hasRight('list-entities') && levels[0] !== cli.session.data.username) {
+                callback([]);
+            } else {
+                db.multiLevelFind(_c.default(), 'entities', levels, {
+                    username: levels[0]
+                }, {
+                    limit: [1]
+                }, callback);
+            }
+        }
+    };
 
+    this.setup = function() {
         livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
             db.findToArray(_c.default(), 'entities', {
                 _id: db.mongoID(cli.session.data._id)
             }, function (err, arr) {
                 callback(err || arr);
             });
-        }, []);
-
-        livevars.registerLiveVariable('session', function (cli, levels, params, callback) {
-            var dat = cli.session.data;
-            var rights = [];
-            for (var k in dat.roles) {
-                rights.push(...(Roles[k] || []));
-            }
-
-            if (levels.length) {
-                for (var i = 0; i < levels.length; i++) {
-                    if (levels[i] == "shhh") {
-                        dat = "[SessionLiveVarException] Tried to fetch entity's secret";
-                        break;
-                    } else {
-                        dat = dat[levels[i]];
-                    }
-                }
-            } else {
-                dat = {
-                    _id: dat._id,
-                    admin: dat.admin,
-                    avatarURL: dat.avatarURL,
-                    displayname: dat.displayname,
-                    roles: dat.roles,
-                    rights : rights,
-                    power: dat.power,
-                    username: dat.username,
-                    site : dat.site,
-                    badges : dat.badges,
-                    preferences : dat.preferences || preferences.getDefault(cli._c),
-                    newNotifications: dat.newNotifications || 0,
-                    data : (params.withdata ? dat.data : undefined)
-                }
-            }
-
-            callback(dat);
         }, []);
     };
 
@@ -1104,19 +1067,5 @@ var Entities = module.exports = new function () {
                 })
             }
         }
-    };
-
-    var registerHooks = function () {
-        hooks.bind('plugindisabled', 2, function(identifier) {
-            // Check if plugin changed some forms
-            deletePluginRole(identifier);
-        });
-    };
-
-    this.init = function () {
-        registerTables();
-        registerHooks();
-
-        return this;
     };
 };

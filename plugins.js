@@ -15,14 +15,14 @@ var CachedPlugins = new Array();
 var Plugins = module.exports = new function () {
     var that = this;
 
-    this.serveAdminList = function (cli) {
+    this.adminGET = function (cli) {
         cli.touch("plugins.serveAdminList");
         if (!cli.hasRightOrRefuse("site-admin")) {return;} 
 
         filelogic.serveAdminLML(cli)
     };
 
-    this.handlePOST = function (cli) {
+    this.adminPOST = function (cli) {
         cli.touch("plugins.handlePOST");
         if (!cli.hasRightOrRefuse("site-admin")) {return;} 
 
@@ -217,66 +217,59 @@ var Plugins = module.exports = new function () {
         }
     };
 
-    this.bindEndpoints = function () {
-        Admin.registerAdminEndpoint('plugins', 'GET', this.serveAdminList);
-        Admin.registerAdminEndpoint('plugins', 'POST', this.handlePOST);
-    };
+    this.livevar = function (cli, levels, params, callback) {
+        var allPlugins = levels.length === 0;
+        if (!cli.hasRightOrRefuse("site-admin")) {return callback([]);} 
 
-    this.registerLiveVar = function () {
-        livevars.registerLiveVariable("plugin", function (cli, levels, params, callback) {
-            var allPlugins = levels.length === 0;
-            if (!cli.hasRightOrRefuse("site-admin")) {return callback([]);} 
-
-            if (allPlugins) {
-                db.singleLevelFind(_c.default(), 'plugins', callback);
-            } else if (levels[0] == 'table') {
-                var sort = {};
-                sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
-                db.aggregate(cli._c, 'plugins', [{
-                    $match:
-                        (params.search ? {
-                            $text: {
-                                $search: params.search
-                            }
-                        } : {})
-
-                }, {
-                    $sort: sort
-                }, {
-                    $skip: (params.skip || 0)
-                }, {
-                    $limit: (params.max || 20)
-                }], function (data) {
-                    db.find(cli._c, 'plugins', (params.search ? {
+        if (allPlugins) {
+            db.singleLevelFind(_c.default(), 'plugins', callback);
+        } else if (levels[0] == 'table') {
+            var sort = {};
+            sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
+            db.aggregate(cli._c, 'plugins', [{
+                $match:
+                    (params.search ? {
                         $text: {
                             $search: params.search
                         }
-                    } : {}), [], function (err, cursor) {
+                    } : {})
 
-                        cursor.count(function (err, size) {
-                            results = {
-                                size: size,
-                                data: data
-                            }
-                            callback(err || results);
+            }, {
+                $sort: sort
+            }, {
+                $skip: (params.skip || 0)
+            }, {
+                $limit: (params.max || 20)
+            }], function (data) {
+                db.find(cli._c, 'plugins', (params.search ? {
+                    $text: {
+                        $search: params.search
+                    }
+                } : {}), [], function (err, cursor) {
 
-                        });
+                    cursor.count(function (err, size) {
+                        results = {
+                            size: size,
+                            data: data
+                        }
+                        callback(err || results);
+
                     });
                 });
-            } else {
-                db.multiLevelFind(_c.default(), 'plugins', levels, {
-                    identifier: (levels[0])
-                }, {
-                    limit: [1]
-                }, callback);
-            }
-        }, ['plugins']);
+            });
+        } else {
+            db.multiLevelFind(_c.default(), 'plugins', levels, {
+                identifier: (levels[0])
+            }, {
+                limit: [1]
+            }, callback);
+        }
     };
 
-    this.registerForm = function () {
+    this.table = function () {
         tableBuilder.createTable({
             name: 'plugin',
-            endpoint: 'plugin.table',
+            endpoint: 'plugins.table',
             paginate: true,
             searchable: true,
             max_results: 10,
@@ -299,7 +292,6 @@ var Plugins = module.exports = new function () {
     }
 
     this.init = function (cb) {
-        this.registerForm();
         that.getPluginsDirList(function (plugins) {
             db.findToArray(_c.default(), 'plugins', {
                 'active': true
@@ -314,13 +306,6 @@ var Plugins = module.exports = new function () {
                 }
             });
             cb();
-            /*
-            db.remove(_c.default(), 'plugins', {}, function () {
-                db.insert(_c.default(), 'plugins', plugins, function (err) {
-                    cb();
-                });
-            }, false);
-            */
         });
 
     };

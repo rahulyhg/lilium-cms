@@ -117,7 +117,7 @@ class MailController {
         ]});
     }
 
-    handleLivevar(cli, levels, params, send) {
+    livevar(cli, levels, params, send) {
         if (cli.hasRight('edit-emails')) {
             if (levels[0] == "all") {
                 db.findToArray(cli._c, 'mailtemplates', {active : true}, (err, arr) => {
@@ -148,7 +148,7 @@ class MailController {
         }
     }
 
-    handleGET(cli) {
+    adminGET(cli) {
         if (!cli.hasRight('edit-emails')) {
             return cli.throwHTTP(403);
         }
@@ -174,7 +174,7 @@ class MailController {
         }
     }
 
-    handlePOST(cli) {
+    adminPOST(cli) {
         if (!cli.hasRight('edit-emails')) {
             return cli.throwHTTP(403);
         }
@@ -190,19 +190,24 @@ class MailController {
                 cli.throwHTTP(404);
         }
     }
-
-    bind() {
-        require('./livevars.js').registerLiveVariable('mailtemplates', this.handleLivevar);
-        require('./backend/admin.js').registerAdminEndpoint('mailtemplates', 'GET', this.handleGET);
-        require('./backend/admin.js').registerAdminEndpoint('mailtemplates', 'POST', this.handlePOST);
-    }
 };
 
 class LMLMail {
-    setupController() {
+    setup() {
         this.controller = new MailController();
-        this.controller.bind();
     }
+
+    adminPOST(cli) {
+        this.controller.adminPOST(cli);
+    }
+
+    adminGET(cli) {
+        this.controller.adminGET(cli);
+    }
+
+    livevar(cli, levels, params, send) {
+        this.controller.livevar(cli, levels, params, send);
+    };
 
     setSender(siteid, sender) {
         if (sender && sender.user && sender.pass) {
@@ -344,18 +349,15 @@ class LMLMail {
         }
     }
 
-    bind() {
-        const that = this;
-        require('./hooks').bind('settings_will_save', 50, (pkg) => {
-            let conf = pkg._c;
-            let newSender = {
-                user : conf.emails.senderemail,
-                pass : conf.emails.senderpass,
-                from : conf.emails.senderfrom
-            }
+    settingsWillSave(pkg) {
+        let conf = pkg._c;
+        let newSender = {
+            user : conf.emails.senderemail,
+            pass : conf.emails.senderpass,
+            from : conf.emails.senderfrom
+        }
 
-            that.setSender(pkg._c.id, newSender);
-        });
+        this.setSender(pkg._c.id, newSender);
     }
 };
 

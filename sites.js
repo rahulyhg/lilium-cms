@@ -221,8 +221,7 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var loadTheme = function(cb) {
-        themes.init(conf, function() {
-            themes.bindEndpoints(conf);
+        themes.initializeSite(conf, function() {
             templateBuilder.precompThemeFiles(conf, cb);
         });
     };
@@ -302,74 +301,72 @@ var SiteInitializer = function (conf, siteobj) {
 };
 
 var Sites = function () {
-    this.registerLiveVar = function () {
-        livevars.registerLiveVariable('sites', function (cli, levels, params, cb) {
-            var len = levels.length;
-            if (len > 0 && levels[0] == 'all') {
-                db.findToArray(config.default(), 'entities', {_id : cli.userinfo.userid}, function(err, arr) {
-                    var sites = arr[0].sites;
-                    var ignore = arr[0].roles.indexOf('admin') !== -1 || arr[0].roles.indexOf('lilium') !== -1;
+    this.livevar = function (cli, levels, params, cb) {
+        var len = levels.length;
+        if (len > 0 && levels[0] == 'all') {
+            db.findToArray(config.default(), 'entities', {_id : cli.userinfo.userid}, function(err, arr) {
+                var sites = arr[0].sites;
+                var ignore = arr[0].roles.indexOf('admin') !== -1 || arr[0].roles.indexOf('lilium') !== -1;
 
-                    if (len < 2 || levels[1] == "simple") {
-                        if (levels[2] == "assoc") {
-                            var assoc = config.getSimpleSitesAssoc();
-
-                            if (ignore) {
-                                cb(assoc);
-                            } else {
-                                var newarr = {};
-                                for (var sid in assoc) {
-                                    if (sites.indexOf(sid) != -1) {
-                                        newarr[sid] = assoc[sid];
-                                    }
-                                }
-
-                                cb(newarr);
-                            }
-                        } else {
-                            var sitearr = config.getSimpleSites();
-
-                            if (ignore) {
-                                cb(sitearr);
-                            } else {
-                                var newarr = [];
-                                for (var i = 0; i < sitearr.length; i++) {
-                                    if (sites.indexOf(sitearr[i].id) != -1) {
-                                        newarr.push(sitearr[i]);
-                                    }
-                                }
-
-                                cb(newarr);
-                            }
-                        }
-                    } else if (levels[1] == "complex") {
-                        var allsites = config.getAllSites();
+                if (len < 2 || levels[1] == "simple") {
+                    if (levels[2] == "assoc") {
+                        var assoc = config.getSimpleSitesAssoc();
 
                         if (ignore) {
-                            cb(allsites); 
+                            cb(assoc);
                         } else {
-                            var newarr = [];
-                            for (var i = 0; i < allsites.length; i++) {
-                                if (sites.indexOf(allsites[i].id) != -1) {
-                                    newarr.push(allsites[i]);
+                            var newarr = {};
+                            for (var sid in assoc) {
+                                if (sites.indexOf(sid) != -1) {
+                                    newarr[sid] = assoc[sid];
                                 }
                             }
 
                             cb(newarr);
                         }
                     } else {
-                        cb([]);
+                        var sitearr = config.getSimpleSites();
+
+                        if (ignore) {
+                            cb(sitearr);
+                        } else {
+                            var newarr = [];
+                            for (var i = 0; i < sitearr.length; i++) {
+                                if (sites.indexOf(sitearr[i].id) != -1) {
+                                    newarr.push(sitearr[i]);
+                                }
+                            }
+
+                            cb(newarr);
+                        }
                     }
-                });
-            } else if (len > 0) {
-                cb("[SitesException] Cannot find sites under : " + levels[0]);
-            } else {
-                cb("[SitesException] Cannot use top level of Live Variable : Sites");
-            }
-        });
+                } else if (levels[1] == "complex") {
+                    var allsites = config.getAllSites();
+
+                    if (ignore) {
+                        cb(allsites); 
+                    } else {
+                        var newarr = [];
+                        for (var i = 0; i < allsites.length; i++) {
+                            if (sites.indexOf(allsites[i].id) != -1) {
+                                newarr.push(allsites[i]);
+                            }
+                        }
+
+                        cb(newarr);
+                    }
+                } else {
+                    cb([]);
+                }
+            });
+        } else if (len > 0) {
+            cb("[SitesException] Cannot find sites under : " + levels[0]);
+        } else {
+            cb("[SitesException] Cannot use top level of Live Variable : Sites");
+        }
     };
 
-    this.handleGET = function (cli) {
+    this.adminGET = function (cli) {
         if (cli.hasRightOrRefuse("list-websites")) {
             var param = cli.routeinfo.path[2];
 
@@ -388,7 +385,7 @@ var Sites = function () {
         }
     };
 
-    this.handlePOST = function (cli) {
+    this.adminPOST = function (cli) {
         if (!cli.hasRightOrRefuse("launch-websites")) { return; }
 
         var dat = cli.postdata.data;
@@ -626,7 +623,7 @@ var Sites = function () {
             return _cachedSites;
     };
 
-    this.registerForms = function () {
+    this.form = function () {
         formbuilder.registerFormTemplate('lilium_website_info')
         .add('title-info', 'title', {
                 displayname: "Website information"

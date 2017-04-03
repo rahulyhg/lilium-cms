@@ -1,4 +1,4 @@
-{#config;extra;theme;debug;category;date}
+{#config;extra;theme;debug;date}
 
 <script src="{=config.default.server.url}/bower/timeago.js/dist/timeago.js"></script>
 <script>
@@ -33,7 +33,7 @@
             {$ endif; $}
                 <div class="{=classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
-                        <a href="{=config.default.server.url}/{=la.name}">
+                        <a href="{=la.url}">
                             <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
                                 srcset="{=la.featuredimage.0.sizes.thumbnaillarge.url} 600w, {=la.featuredimage.0.sizes.thumbnailarchive.url} 380w"
                                 alt="{=&la.title}"
@@ -43,14 +43,10 @@
                                 Sponsored Content
                             </a>
                             {$ endif; $}
-                            {$ if (?la.categories.0 != "") $}
+                            {$ if (?la.topic ??) $}
                             <div class="article-cat-name">
-                                <a href="{=config.default.server.url}/category/{=la.categories.0}">
-                                    {$
-                                        slug = la.categories.0;
-                                        ccat = category.getCatName(slug);
-                                    $}
-                                    {=ccat}
+                                <a href="{=config.default.server.url}/{=la.topic.completeSlug}">
+                                    {=la.topic.displayname}
                                 </a>
                             </div>
                             {$ endif; $}
@@ -59,13 +55,13 @@
                                 <span class="article-share-icon">
                                     <img src="{=config.default.server.url}/res/images/flame.png" />
                                 </span>
-                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=la.name}" data-min="100" data-show="article-share-count-mobile-{=la._id}" data-showas="block">0000</span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=la.url}" data-min="100" data-show="article-share-count-mobile-{=la._id}" data-showas="block">0000</span>
                             </div>
 
                         </a>
                     </div>
                     <div class="article-thumbnail-title">
-                        <a href="{=config.default.server.url}/{=la.name}">
+                        <a href="{=la.url}">
                             {=la.title}
                         </a>
                     </div>
@@ -82,7 +78,7 @@
                 </div>
                 <script>
                     var nPage = {
-                        url : document.location.protocol + "{=config.default.server.url}/{=la.name}",
+                        url : document.location.protocol + "{=la.url}",
                         wrapper : "{=la._id}"
                     };
                     window.lmlhomelinks.push(nPage);
@@ -107,7 +103,7 @@
 
         <div class="fwblock homepage-section-container">
             <h4 class="article-section-title">
-                <a href="{=config.default.server.url}/category/{=section.catname}">{=section.cattitle}</a>
+                <a href="{=config.default.server.url}/{=section.topic.completeSlug}">{=section.topic.displayname}</a>
             </h4>
             <div class="float-clear">
             {$ relindex = 0; $}
@@ -128,7 +124,7 @@
                 $}
                     </div><div class="float-clear">
                 {$ endif; $}
-                <a href="{=config.default.server.url}/{=sa.name}" id="art{=sa._id}">
+                <a href="{=sa.url}" id="art{=sa._id}">
                     <div class="{=classes}">
                         <div class="article-thumbnail-featured-image">
                             <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
@@ -136,7 +132,7 @@
                                 <span class="article-share-icon">
                                     <img src="{=config.default.server.url}/res/images/flame.png" />
                                 </span>
-                                <span class="article-share-count-mobile-num fbshare" data-url="{=config.default.server.protocol}{=config.default.server.url}/{=sa.name}" data-min="100" data-show="article-share-count-mobile-{=sa._id}" data-showas="block">0000</span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=sa.url}" data-min="100" data-show="article-share-count-mobile-{=sa._id}" data-showas="block">0000</span>
                             </div>
                         </div>
                         <div class="article-thumbnail-title">
@@ -156,7 +152,7 @@
                 </a>
                 <script>
                     var nPage = {
-                        url : document.location.protocol + "{=config.default.server.url}/{=sa.name}",
+                        url : document.location.protocol + "{=sa.url}",
                         wrapper : "{=sa._id}"
                     };
                     window.lmlhomelinks.push(nPage);
@@ -238,8 +234,8 @@ var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {
         featlink.appendChild(catwrap);
 
         var catlink = document.createElement('a');
-        catlink.href = "{=config.default.server.url}/category/" + article.category.name;
-        catlink.textContent = article.category.displayname;
+        catlink.href = "{=config.default.server.url}/" + article.topic.completeSlug;
+        catlink.textContent = article.topic.displayname;
         catwrap.appendChild(catlink);
         
         var sharecountwrap = document.createElement('div');

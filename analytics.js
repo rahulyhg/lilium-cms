@@ -195,7 +195,7 @@ class GoogleAnalytics {
         });
     }
 
-    handleLiveVar(cli, levels, params, send) {
+    livevar(cli, levels, params, send) {
         var topLevel = levels[0] || "lastmonth";
 
         if (cachedAnalytics[topLevel] && new Date() - cachedAnalytics[topLevel].cachedAt < (1000 * 60 * 60)) {
@@ -217,10 +217,8 @@ class GoogleAnalytics {
         }
     }
 
-    bindHooks() {
-        require('./hooks.js').register('settings_saved', 1000, (cli) => {
-            that.addSite(cli._c);
-        });
+    settingsSaved(cli) {
+        that.addSite(cli._c);
     }
 
     prepareDashboard() {
@@ -232,10 +230,8 @@ class GoogleAnalytics {
         require('./dashboard.js').registerDashPetal("dashboardAnalytics", 200);
     }
 
-    setupController() {
+    setup() {
         log('Analytics', "Analytics controller setup");
-        livevars.registerLiveVariable('googleanalytics', that.handleLiveVar);
-        that.bindHooks();
         that.prepareDashboard();
     }
 }

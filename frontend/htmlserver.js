@@ -3,6 +3,7 @@ var filelogic = require('../filelogic.js');
 var styledpages = require('../styledpages.js');
 var _conf = require('../config.js');
 var article = require('../article.js');
+var topics = require('../topics.js');
 var noop = function() {};
 
 var HTMLServer = function() {
@@ -47,26 +48,34 @@ var HTMLServer = function() {
 						}
 					} else {
                         styledpages.serveOrFallback(cli, function() {
-                            var name = cli.routeinfo.path[cli.routeinfo.path.length -1];
-                            article.generateFromName(cli, name, function(success, details) {
-                                if (success) {
-                                    if (details && details.realName) {
-                                        cli.redirect(cli._c.server.url + "/" + details.realName, true);
+                            topics.serveOrFallback(cli, function() {
+                                var name = cli.routeinfo.path[cli.routeinfo.path.length -1];
+                                article.generateFromName(cli, name, function(success, details) {
+                                    if (success) {
+                                        if (details) {
+                                            if (details.realName) {
+                                                cli.redirect(cli._c.server.url + "/" + details.realName, true);
+                                            } else if (details.realURL) {
+                                                cli.redirect(details.realURL, true);
+                                            } else {
+                                                cli.throwHTTP(500, "Error in HTMLServer");
+                                            }
+                                        } else {
+                                            cli.routeinfo.isStatic = true;
+                                            fileserver.pipeFileToClient(cli, filename + '.html', function () {
+                                                cli.touch('htmlserver.serveClient.callback');
+                                            });
+                                        }
                                     } else {
-                                        cli.routeinfo.isStatic = true;
-                                        fileserver.pipeFileToClient(cli, filename + '.html', function () {
-                                            cli.touch('htmlserver.serveClient.callback');
+                                        log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath, 'warn');
+                                        filelogic.renderThemeLML(cli, '404', '404.html', {
+                                            
+                                        }, function() {
+                                            fileserver.pipeFileToClient(cli, cli._c.server.html + "/404.html", function() {}, true, 'text/html');
                                         });
                                     }
-                                } else {
-                                    log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath, 'warn');
-                                    filelogic.renderThemeLML(cli, '404', '404.html', {
-                                        
-                                    }, function() {
-                                        fileserver.pipeFileToClient(cli, cli._c.server.html + "/404.html", function() {}, true, 'text/html');
-                                    });
-                                }
-                            }, true)
+                                }, true)
+                            });
                         });
 					}
 				});

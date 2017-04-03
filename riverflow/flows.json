@@ -1,0 +1,342 @@
+{
+    "version" : 1.1,
+
+    "supported" : [
+        "admin_get", "admin_post",
+        "get", "post",
+        "form", "table",
+        "livevar", "setup"
+    ],
+
+    "extensions" : [
+        "admin_menu",
+        "admin_sub_menu",
+        "hooks",
+        "post_leaf"
+    ],
+
+    "rivers" : [
+        {
+            "module" : "history.js",
+            "endpoint" : "history",
+            "support" : ["admin_get", "admin_post", "livevar"]
+        }, {
+            "module" : "lys.js",
+            "endpoint" : "lys",
+            "support" : ["livevar"]
+        }, {
+            "module" : "topics.js",
+            "endpoint" : "topics",
+            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "admin_menu" : {
+                "id": "articles-topics",
+                "faicon": "fa-tags",
+                "displayname": "Topics",
+                "priority": 210,
+                "rights": ["manage-topics"],
+                "absURL": "admin/topics",
+                "children": []
+            }
+        }, {
+            "module" : "plugins.js",
+            "endpoint" : "plugins",
+            "support" : ["admin_get", "admin_post", "livevar", "table"],
+            "admin_menu" : {
+                "id": "plugins",
+                "faicon": "fa-plug",
+                "displayname": "Plugins",
+                "priority": 700,
+                "rights": ["manage-plugins"],
+                "absURL": "admin/plugins",
+                "children": []
+            }
+        }, {
+            "module" : "themes.js",
+            "endpoint" : "themes",
+            "support" : ["admin_get", "admin_post", "table", "livevar"],
+            "admin_menu" : {
+                "id": "themes",
+                "faicon": "fa-paint-brush",
+                "displayname": "Themes",
+                "priority": 600,
+                "rights": ["manage-themes"],
+                "absURL": "admin/themes",
+                "children": []
+            }
+        }, {
+            "module" : "dashboard.js",
+            "endpoint" : "dashboard",
+            "support" : ["admin_get"],
+            "admin_menu" : {
+                "id": "dashboard",
+                "faicon": "fa-tachometer",
+                "displayname": "Dashboard",
+                "priority": 100,
+                "rights": ["dash"],
+                "absURL": "admin/dashboard",
+                "children": []
+            }
+        }, {
+            "module" : "analytics.js",
+            "endpoint" : "googleanalytics",
+            "support" : ["livevar", "setup"],
+            "hooks" : [
+                {"name" : "settings_saved", "priority" : 1000, "callback" : "settingsSaved"}
+            ]
+        }, {
+            "module" : "communications.js",
+            "endpoint" : "communications",
+            "support" : ["admin_post", "livevar"]
+        }, {
+            "module" : "mail.js",
+            "endpoint" : "mailtemplates",
+            "support" : ["setup", "admin_post", "admin_get", "livevar"],
+            "hooks" : [
+                {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
+            ],
+            "admin_menu" : {
+                "id": "mailtemplates",
+                "faicon": "fa-envelope-o",
+                "displayname": "Email Templates",
+                "priority": 250,
+                "rights": ["edit-emails"],
+                "absURL": "admin/mailtemplates/list",
+                "children": []
+            }
+        }, {
+            "module" : "snip.js",
+            "endpoint" : "snips",
+            "support" : ["admin_get"]
+        }, {
+            "module" : "secrets.js",
+            "endpoint" : "secrets",
+            "support" : ["admin_get", "admin_post", "livevar"],
+            "admin_menu" : {
+                "id": "secrets",
+                "faicon": "fa-key",
+                "displayname": "Secrets",
+                "priority": 540,
+                "rights": ["list-secrets"],
+                "absURL": "admin/secrets",
+                "children": []
+            }
+        }, {
+            "module" : "devtools.js",
+            "endpoint" : "devtools",
+            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "admin_menu" : {
+                "id": "devtools",
+                "faicon": "fa-hashtag",
+                "displayname": "Dev Tools",
+                "priority": 2000,
+                "rights": ["develop"],
+                "absURL": "admin/devtools",
+                "children": []
+            }
+        }, {
+            "module" : "embed.js",
+            "endpoint" : "embed",
+            "support" : ["admin_get"]
+        }, {
+            "module" : "tools.js",
+            "endpoint" : "tools",
+            "support" : ["admin_get", "admin_post", "livevar", "setup"],
+            "admin_menu" : {
+                "id": "tools",
+                "faicon": "fa-wrench",
+                "displayname": "Tools",
+                "priority": 800,
+                "rights": [],
+                "absURL": "admin/tools",
+                "children": []
+            }
+        }, {
+            "module" : "conversations.js",
+            "endpoint" : "conversations",
+            "support" : ["admin_get", "admin_post", "livevar"]
+        }, {
+            "module" : "feed.js",
+            "endpoint" : "feed",
+            "support" : ["setup", "admin_get", "livevar"],
+            "admin_menu" : {
+                "id": "feed",
+                "faicon": "fa-newspaper-o",
+                "displayname": "What's up",
+                "priority": 80,
+                "rights": ["dash"],
+                "absURL": "admin/feed",
+                "children": []
+            }
+        }, {
+            "module" : "styledpages.js",
+            "endpoint" : "styledpages",
+            "support" : ["admin_get", "admin_post", "form", "table", "livevar"],
+            "admin_menu" : {
+                "id": "styledpages",
+                "faicon": "fa-paragraph",
+                "displayname": "Styled Pages",
+                "priority": 250,
+                "rights": ["styledpages"],
+                "absURL": "admin/styledpages/list",
+                "children": []
+            }
+        }, {
+            "module" : "docs.js",
+            "endpoint" : "docs",
+            "support" : ["get"]
+        }, {
+            "module" : "cdn.js",
+            "endpoint" : "cdn",
+            "support" : [],
+            "hooks" : [
+                { "name" : "themeLML_compiled", "priority" : 100, "callback" : "themeLMLCompiled" }
+            ]
+        }, {
+            "module" : "postleaf.js",
+            "endpoint" : "postleaf",
+            "support" : ["livevar"],
+            "hooks" : [
+                { "name" : "post_create_postleaf", "priority" : 10, "callback" : "postCreatePostleaf" }
+            ]
+        }, {
+            "module" : "article.js",
+            "endpoint" : "article",
+            "support" : ["admin_get", "admin_post", "form", "table"],
+            "admin_menu" : {
+                "id": "articles",
+                "faicon": "fa-pencil",
+                "displayname": "Content",
+                "priority": 200,
+                "rights": ["list-articles"],
+                "absURL": "admin/article",
+                "children": []
+            }
+        }, {
+            "module" : "article.js",
+            "endpoint" : "content",
+            "support" : ["livevar"]
+        }, {
+            "module" : "album.js",
+            "endpoint" : "album",
+            "support" : ["admin_post", "livevar"],
+            "post_leaf" : {
+                "name" : "album", 
+                "displayname" : "Album",
+                "script" : {
+                    "add" : "addAlbumToPost",
+                    "edit" : "editAlbumToPost",
+                    "show" : "renderAlbum"
+                }
+            },
+            "hooks" : [
+                { "name" : "article_deepfetch", "priority" : 50, "callback" : "articleDeepFetch" }
+            ]
+        }, {
+            "module" : "quiz.js",
+            "endpoint" : "quiz",
+            "support" : ["admin_post"],
+            "post_leaf" : {
+                "name" : "quiz", 
+                "displayname" : "Quiz",
+                "script" : {
+                    "add" : "addQuizToPost",
+                    "edit" : "editQuizToPost",
+                    "show" : "renderQuiz"
+                }
+            }
+        }, {
+            "module" : "entities.js",
+            "endpoint" : "entities",
+            "support" : ["admin_get", "admin_post", "livevar", "setup", "table", "form"],
+            "admin_menu" : {
+                "id": "entities",
+                "faicon": "fa-users",
+                "displayname": "Entities",
+                "priority": 500,
+                "rights": ["list-entities"],
+                "absURL": "admin/entities",
+                "children": []
+            }
+        }, {
+            "module" : "personas.js",
+            "endpoint" : "persona",
+            "support" : ["admin_get", "admin_post", "form", "livevar"],
+            "hooks" : [
+                { "name" : "post_create_persona", "priority" : 15, "callback" : "postCreatePersona" }
+            ], 
+            "admin_menu" : {
+                "id": "entities-personas",
+                "faicon": "fa-users",
+                "displayname": "Personas",
+                "priority": 520,
+                "rights": ["manage-personas"],
+                "absURL": "admin/persona/list",
+                "children": []
+            }
+        }, {
+            "module" : "role.js",
+            "endpoint" : "role",
+            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"],
+            "admin_menu" : {
+                "id": "entities-rights",
+                "faicon": "fa-minus-circle",
+                "displayname": "Roles",
+                "priority": 510,
+                "rights": ["manage-roles"],
+                "absURL": "admin/role/list",
+                "children": []
+            }
+        }, {
+            "module" : "preferences.js",
+            "endpoint" : "preferences",
+            "support" : ["admin_get", "admin_post", "livevar", "form"]
+        }, {
+            "module" : "media.js",
+            "endpoint" : "media",
+            "support" : ["admin_get", "admin_post", "setup"],
+            "admin_menu" : {
+                "id": "media",
+                "faicon": "fa-picture-o",
+                "displayname": "Media",
+                "priority": 400,
+                "rights": ["list-uploads"],
+                "absURL": "admin/media/list",
+                "children": []
+            }
+        }, {
+            "module" : "amp.js",
+            "endpoint" : "amp",
+            "support" : ["get"]
+        }, {
+            "module" : "sites.js",
+            "endpoint" : "sites",
+            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "admin_menu" : {
+                "id": "sites",
+                "faicon": "fa-sitemap",
+                "displayname": "Network",
+                "priority": 50,
+                "rights": ["manage-sites"],
+                "absURL": "admin/sites",
+                "children": []
+            }
+        }, {
+            "module" : "session.js",
+            "endpoint" : "session",
+            "support" : ["livevar"]
+        }, {
+            "module" : "settings.js",
+            "endpoint" : "settings",
+            "support" : ["admin_get", "admin_post", "form", "livevar"],
+            "admin_menu" : {
+                "id": "settings",
+                "faicon": "fa-cogs",
+                "displayname": "Settings",
+                "priority": 1000,
+                "rights": ["manage-settings"],
+                "absURL": "admin/settings",
+                "children": []
+            }
+        }       
+    ]   
+}
