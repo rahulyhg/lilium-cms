@@ -28,6 +28,14 @@ class Amp {
 
         log('AMP', 'before parsing');
         /* Modify content according to AMP guidelines */
+        article.featuredimage[0].sizes.narcityfeatured.url = 
+            article.featuredimage[0].sizes.narcityfeatured.url.replace(
+                cli._c.server.url, cli._c.content.cdn.domain);
+        article.authors[0].avatarURL = 
+            article.authors[0].avatarURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
+        article.sponsoredBoxLogoURL =
+            article.sponsoredBoxLogoURL.replace(cli._c.server.url, cli._c.content.cdn.domain);
+
         this.parseAMPContent(cli, articleContent, (err, amp) => {
             log('AMP', 'Done parsing HTML to AMP: ', err);
             if (err) {
@@ -50,6 +58,11 @@ class Amp {
     };
 
     parseAMPContent(cli, articleContent, cb) {
+      if (cli._c.content.cdn && cli._c.content.cdn.domain) {
+        articleContent = articleContent.replace(
+              new RegExp('(src=")' + cli._c.server.url, "g"), 
+              '$1' + cli._c.content.cdn.domain);
+      }
       articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
       articleContent = articleContent.replace(/<ad><\/ad>/g, '<p>{ad}</p>');
       
