@@ -30,7 +30,7 @@ $}
             "headline": "{=extra.article.title}",
             "datePublished": "{=extra.article.date}",
             "image": [
-              "{=extra.article.featuredimage[0]}"
+              "{=featimg}"
             ]
           }
         </script>
