@@ -10,6 +10,7 @@ var themes = undefined;
 var db = undefined;
 var hooks = undefined;
 var lmllib = undefined;
+var topics = undefined;
 var cc = undefined;
 var entities = undefined;
 var LML2 = undefined;
@@ -34,6 +35,7 @@ var initRequires = function(abspath) {
     articleHelper = require(abspath + 'articleHelper.js');
     fileserver = require(abspath + 'fileserver.js');
     themes = require(abspath + 'themes.js');
+    topics = require(abspath + "topics.js");
     hooks = require(abspath + 'hooks.js');
     db = require(abspath + 'includes/db.js');
     lmllib = require(abspath + 'lmllib.js');
@@ -358,11 +360,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
     }
 
     var limit = 18;
-    var skip = index * 18;
-    var match = {
-        topic : topic._id,
-        status : "published"
-    };
+    var skip = index * limit;
     
     db.findToArray(cc.default(), 'entities', {}, function(err, entities) {
         var eCache = {};
@@ -370,28 +368,44 @@ var fetchTopicArticles = function(conf, topic, index, send) {
             eCache[entities[i].id] = entities[i];
         }
 
-        db.join(conf, 'content', [
-            {
-                $match : match
-            }, {
-                $skip : skip
-            }, {
-                $limit : limit
-            }, {
-                $lookup : {
-                    from:           "uploads",
-                    localField:     "media",
-                    foreignField:   "_id",
-                    as:             "featuredimage"
-                }
-            }
-        ], function(arr) {
-            for (var i = 0; i < arr.length; i++) {
-                arr[i].author = eCache[arr[i].author];
-                arr[i].topic = topic;
+        topics.getFamilyIDs(conf, topic._id, function(ids) {
+            console.log(ids);
+            var match = {
+                status : "published",
+                topic : {$in : ids}
             }
 
-            send(arr);
+            db.find(conf, 'content', match, [], function(err, cur) {
+                cur.count(function(err, total) {
+                    db.join(conf, 'content', [
+                        {
+                            $match : match
+                        }, {
+                            $skip : skip
+                        }, {
+                            $limit : limit
+                        }, {
+                            $lookup : {
+                                from:           "uploads",
+                                localField:     "media",
+                                foreignField:   "_id",
+                                as:             "featuredimage"
+                            }
+                        }
+                    ], function(arr) {
+                        for (var i = 0; i < arr.length; i++) {
+                            arr[i].author = eCache[arr[i].author];
+                            arr[i].topic = topic;
+                        }
+
+                        var details = {
+                            totalLength : total,
+                            totalPages : Math.ceil(total / limit)
+                        };
+                        send(arr, details);
+                    });
+                });
+            });
 	    });
     });
 };
@@ -403,13 +417,18 @@ var serveTopic = function(cli, extra) {
 
     fileserver.fileExists(file, function(exists) {
         if (!exists) {
-            fetchTopicArticles(cli._c, topic, index, function(articles) {
+            fetchTopicArticles(cli._c, topic, index, function(articles, details) {
                 var xextra = {
                     articles : articles,
                     topic : extra.topic,
-                    index : index,
+                    index : index || 1,
                     searchname : extra.topic.displayname,
-                    context : 'topic'
+                    context : 'topic',
+                    indices : {
+                        totalarticles : details.totalLength,
+                        totalpages : details.totalPages
+                    },
+                    currentpage : index || 1,
                 };
                 
                 var context = topic.archivetemplate || "topic";

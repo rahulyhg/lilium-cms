@@ -1275,7 +1275,7 @@ var Article = function() {
             .add('featuredimagelink', 'text', {
                 displayname : "Artist link"
             })
-            .add('title-postleaf', 'title', {
+/*            .add('title-postleaf', 'title', {
                 displayname : "Interactive features"
             })
             .trigger('postleaf')
@@ -1283,7 +1283,7 @@ var Article = function() {
                 displayname : "Persona targeting"
             })
             .trigger('persona')
-            .add('title-geolocation', 'title', {
+*/          .add('title-geolocation', 'title', {
                 displayname : "Geolocalisation"
             })
             .add('geolocation', 'map', {
@@ -1300,7 +1300,7 @@ var Article = function() {
                     displayname : 'displayname'
                 },
                 empty : {
-                    displayname : " - Use selected topic template - "
+                    displayname : " - Use selected topic's template - "
                 },
                 displayname : "Article template"
             })

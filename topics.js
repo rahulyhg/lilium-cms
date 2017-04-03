@@ -117,6 +117,10 @@ class LMLTopics {
     serveOrFallback(cli, fallback) {
         const that = this;
         let completeSlug = cli.routeinfo.fullpath;
+        if (completeSlug[0] == "/") {
+            completeSlug = completeSlug.substring(1);
+        }
+
         let maybeIndex = completeSlug.split('/');
         if (!isNaN(maybeIndex[maybeIndex.length - 1])) {
             let realIndex = maybeIndex.pop();
@@ -163,6 +167,32 @@ class LMLTopics {
         }, {_id : 1, slug : 1});
     }
 
+    getFamilyIDs(conf, _id, sendback) {
+        if (typeof _id !== "object") {
+            throw new Error("Topics.getFamilyIds id parameter must be a Mongo Identifier object");
+        }
+
+        let family = [_id];
+        let getChildrenOf = (_id, finished) => {
+            db.findToArray(conf, 'topics', { parent : _id }, (err, children) => {
+                let index = -1;
+                let workOne = () => {
+                    index++;
+                    if (index == children.length) {
+                        finished(family);
+                    } else {
+                        family.push(children[index]._id);
+                        getChildrenOf(children[index]._id, workOne);
+                    }
+                };
+
+                workOne();
+            });
+        };
+
+        getChildrenOf(_id, sendback);
+    }
+
     updateFamily(conf, _id, newSlug, callback) {
         const getParentArray = (parentobject, done) => {
             let pArray = [];
@@ -184,7 +214,7 @@ class LMLTopics {
 
         const affectChildren = (childid, parentSlug, done) => {
             db.findUnique(conf, 'topics', {_id : childid}, (err, topic) => {
-                parentSlug = parentSlug + "/" + topic.slug;
+                parentSlug = (parentSlug ? parentSlug + "/" : "") + topic.slug;
                 db.update(conf, 'topics', {_id : childid}, {completeSlug : parentSlug}, () => {
                     // Find children, recur
                     db.findToArray(conf, 'topics', {parent : childid}, (err, array) => {
@@ -245,7 +275,7 @@ class LMLTopics {
                 displayname : 'displayname'
             },
             empty : {
-                displayname : " - Default template - "
+                displayname : " - Default theme's article template - "
             },
             displayname : "Article template"
         })
@@ -256,7 +286,7 @@ class LMLTopics {
                 displayname : 'displayname'
             },
             empty : {
-                displayname : " - Default template - "
+                displayname : " - Default theme's archive template - "
             },
             displayname : "Archive template"
         })
