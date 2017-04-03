@@ -138,15 +138,17 @@ var Article = function() {
             if (arr.length != 0) {
                 var art = arr[0];
                 db.findToArray(conf.default(), 'entities', {_id : art.author}, function(err, autarr) {
-                    db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, function(err, modcount) {
-                        cli.sendJSON({
-                            status : art.status || "Unknown",
-                            url : art.name ? cli._c.server.url + "/" + art.name : "This article doesn't have a URL.",
-                            siteurl : cli._c.server.url,
-                            aliases : art.aliases ? Array.from(new Set(art.aliases)) : [], 
-                            updated : art.updated || "This article was never updated",
-                            author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
-                            modifications : modcount
+                    db.findUnique(cli._c, 'topics', {_id : art.topic}, function(err, topic) {
+                        db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, function(err, modcount) {
+                            cli.sendJSON({
+                                status : art.status || "Unknown",
+                                url : art.name ? cli._c.server.url + "/" + (art.topic ? topic.completeSlug : "") + "/" + art.name : "This article doesn't have a URL.",
+                                siteurl : cli._c.server.url,
+                                aliases : art.aliases ? Array.from(new Set(art.aliases)) : [], 
+                                updated : art.updated || "This article was never updated",
+                                author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
+                                modifications : modcount
+                            });
                         });
                     });
                 });
@@ -206,8 +208,8 @@ var Article = function() {
                             date : -1 
                         }
                     },{
-                        // Have at most seven related
-                        $limit : 5
+                        // Have at three seven related
+                        $limit : 3
                     },{
                         // Get featured image 
                         $lookup : {
@@ -224,30 +226,56 @@ var Article = function() {
                         var continueWorking = function() {
                             db.findUnique(conf, 'topics', {_id : arr[0].topic}, function(err, topic) {
                                 arr[0].topic = topic;
-                                db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
-                                    arr[0].authors = autarr;
 
-                                    var evts = hooks.getHooksFor('article_deepfetch');
-                                    var keys = Object.keys(evts);
-                                    var kIndex = -1;
+                                var continueWithAuthor = function() {
+                                    db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                        arr[0].authors = autarr;
 
-                                    var next = function() {
-                                        kIndex++;
+                                        var evts = hooks.getHooksFor('article_deepfetch');
+                                        var keys = Object.keys(evts);
+                                        var kIndex = -1;
 
-                                        if (kIndex == keys.length) {
-                                            hooks.fire('article_will_fetch', {
-                                                _c : conf,
-                                                article: arr[0]
-                                            });
-                                        
-                                            cb(arr[0]);
-                                        } else {
-                                            evts[keys[kIndex]].cb(conf, arr[0], next);
-                                        }
-                                    };
+                                        var next = function() {
+                                            kIndex++;
 
-                                    next();
-                                });
+                                            if (kIndex == keys.length) {
+                                                hooks.fire('article_will_fetch', {
+                                                    _c : conf,
+                                                    article: arr[0]
+                                                });
+                                            
+                                                cb(arr[0]);
+                                            } else {
+                                                evts[keys[kIndex]].cb(conf, arr[0], next);
+                                            }
+                                        };
+
+                                        next();
+                                    });
+                                };
+                                
+                                arr[0].topics = [topic];
+                                var curTopic = topic;
+                                var nextParentTopic = function() {
+                                    if (curTopic && curTopic.parent) {
+                                        db.findUnique(conf, 'topics', {_id : curTopic.parent}, function(err, nexttopic) {
+                                            curTopic = nexttopic;
+                                            arr[0].topics.push(curTopic);
+                                            nextParentTopic();
+                                        });
+                                    } else {
+                                        var topicSlug = "/";
+                                        for (var i = arr[0].topics.length - 1; i >= 0; i--) {
+                                            topicSlug += arr[0].topics[i].slug + "/";
+                                        } 
+                                    
+                                        arr[0].topicslug = topicSlug;
+                                        arr[0].url = conf.server.protocol + conf.server.url + topicSlug + arr[0].name;
+                                        continueWithAuthor();
+                                    }
+                                };
+
+                                nextParentTopic();
                             });
                         };
 
@@ -969,6 +997,21 @@ var Article = function() {
                     callback(arr);
                 });
             }
+        } else if (levels[0] == "deep") {
+            var id = levels[1] && db.mongoID(levels[1]);
+
+            if (id) {
+                var match = {_id : id};
+                if (!cli.hasRight('editor')) {
+                    match.author = db.mongoID(cli.userinfo.userid);
+                }
+
+                this.deepFetch(cli._c, id, function(article) {
+                    callback(article);
+                }, false, match);
+            } else {
+                callback();
+            }
         } else if (levels[0] == "all") {
             var sentArr = new Array();
 
@@ -1251,7 +1294,7 @@ var Article = function() {
                 displayname : "Appearance"
             })
             .add('templatename', 'liveselect', {
-                endpoint : "theme.templates.article",
+                endpoint : "themes.templates.article",
                 select : {
                     value : 'file',
                     displayname : 'displayname'
@@ -1361,7 +1404,7 @@ var Article = function() {
                 var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
 
                 // Generate LML page
-                filelogic.renderThemeLML(_c, ctx, deepArticle.name + '.html', extra , function(name) {
+                filelogic.renderThemeLML(_c, ctx, deepArticle.topicslug.substring(1) + deepArticle.name + '.html', extra , function(name) {
                     cb && cb({
                         success: true,
                         dbdata : deepArticle
@@ -1405,7 +1448,13 @@ var Article = function() {
                     cb(false);
                 } else {
                     that.generateArticle(cli._c, deepArticle, function() {
-                        cb(true);
+                        if (deepArticle.url != cli.routeinfo.url) {
+                            cb(true, {
+                                realURL : deepArticle.url
+                            });
+                        } else {
+                            cb(true);
+                        }
                     }, true);
                 }
             }

@@ -1,0 +1,2 @@
+{#config;extra}
+<h1>{=extra.topic.displayname}</h1>

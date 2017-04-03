@@ -301,8 +301,11 @@ var FileLogic = function () {
                             function () {
                                 log('FileLogic', 'Completed Theme page compilation', 'success');
                                 FileServer.readFile(savePath, function(fHtml) {
+                                    log('FileLogic', "Sending markup to CDN parser");
                                     require('./cdn.js').parse(fHtml, _c, function(cdned) { 
                                         var handle = FileServer.getOutputFileHandle(savePath, 'w');
+
+                                        log('FileLogic', "Writing theme final file");
                                         FileServer.writeToFile(handle, cdned, function() {
                                             callback(cdned);
                                         });

@@ -102,6 +102,13 @@ var fetchHomepageArticles = function(_c, cb) {
                         foreignField:   "_id",
                         as:             "featuredimage"
                     }
+                }, {
+                    $lookup : {
+                        from:           "topics",
+                        localField:     "topic",
+                        foreignField:   "_id",
+                        as:             "topic"
+                    }
                 }
             ], function(arr) {
                 sectionArr.push({
@@ -112,6 +119,8 @@ var fetchHomepageArticles = function(_c, cb) {
 
                 for (var j = 0; j < arr.length; j++) {
                     arr[j].author = authors[arr[j].author];
+                    arr[j].topic = arr[j].topic[0];
+                    arr[j].url = _c.server.protocol + _c.server.url + arr[j].topic.completeSlug + "/" + arr[j].name;
                 }
 
                 i++;
@@ -136,10 +145,19 @@ var fetchHomepageArticles = function(_c, cb) {
                         foreignField:   "_id",
                         as:             "featuredimage"
                     }
+                }, {
+                    $lookup : {
+                        from:           "topics",
+                        localField:     "topic",
+                        foreignField:   "_id",
+                        as:             "topic"
+                    }
                 }
             ], function(latests) {
                 for (var j = 0; j < latests.length; j++) {
                     latests[j].author = authors[latests[j].author];
+                    latests[j].topic = latests[j].topic[0];
+                    latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? latests[j].topic.completeSlug : "") + "/" + latests[j].name;
                 }
 
                 cb({
@@ -200,6 +218,8 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 $search : mtc
             }
             break;      
+        case 'topic':
+            match.topic = cli.extra.topic._id;
         case 'latests':
             break;
         default:
@@ -231,6 +251,13 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                     foreignField:   "_id",
                     as:             "featuredimage"
                 }
+            }, {
+                $lookup : {
+                    from:           "topics",
+                    localField:     "topic",
+                    foreignField:   "_id",
+                    as:             "topic"
+                }
             }
         ], function(latests) {
             var totalArticles = latests.length;
@@ -258,12 +285,21 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             indices.totalpages = totalPages;
             indices.totalarticles = totalArticles;
 
-            cb(err || archTypeRes[0], latests.splice(skip, limit), totalArticles, indices);
+            var arrList = latests.splice(skip, limit);
+
+            for (var i = 0; i < arrList.length; i++) {
+                arrList[i].topic = arrList[i].topic[0];
+                arrList[i].url = cli._c.server.protocol + cli._c.server.url + arrList[i].topic.completeSlug + "/" + arrList[i].name;
+            }
+
+            cb(err || archTypeRes[0], arrList, totalArticles, indices);
         });
     }
 
     if (section == "tags" || section == "search") {
         matchCallback([{tag : mtc}]);
+    } else if (section == "topic") {
+        matchCallback([{topic : cli.extra.topic}]);
     } else {
         db.join(typeCollection == "entities" ? cc.default() : cli._c || cli, typeCollection, typeMatch, matchCallback);
     }
@@ -316,6 +352,80 @@ var serveFeed = function(cli) {
     });
 };
 
+var fetchTopicArticles = function(conf, topic, index, send) {
+    if (index != 0) {
+        index--;
+    }
+
+    var limit = 18;
+    var skip = index * 18;
+    var match = {
+        topic : topic._id,
+        status : "published"
+    };
+    
+    db.findToArray(cc.default(), 'entities', {}, function(err, entities) {
+        var eCache = {};
+        for (var i = 0; i < entities.length; i++) {
+            eCache[entities[i].id] = entities[i];
+        }
+
+        db.join(conf, 'content', [
+            {
+                $match : match
+            }, {
+                $skip : skip
+            }, {
+                $limit : limit
+            }, {
+                $lookup : {
+                    from:           "uploads",
+                    localField:     "media",
+                    foreignField:   "_id",
+                    as:             "featuredimage"
+                }
+            }
+        ], function(arr) {
+            for (var i = 0; i < arr.length; i++) {
+                arr[i].author = eCache[arr[i].author];
+                arr[i].topic = topic;
+            }
+
+            send(arr);
+	    });
+    });
+};
+
+var serveTopic = function(cli, extra) {
+    var file = cli._c.server.html + "/" + extra.topic.completeSlug + (extra.index ? ("/" + extra.index-1) : "") + ".html";
+    var topic = extra.topic;
+    var index = extra.index;
+
+    fileserver.fileExists(file, function(exists) {
+        if (!exists) {
+            fetchTopicArticles(cli._c, topic, index, function(articles) {
+                var xextra = {
+                    articles : articles,
+                    topic : extra.topic,
+                    index : index,
+                    searchname : extra.topic.displayname,
+                    context : 'topic'
+                };
+                
+                var context = topic.archivetemplate || "topic";
+
+                filelogic.renderThemeLML(cli, context, file, xextra, function(content) {
+                    cli.response.writeHead(200);
+                    cli.response.end(content);
+                    log('Narcity', 'Generated tag archive for topic ' + topic.displayname);
+                });
+            });
+        } else {
+            fileserver.pipeFileToClient(cli, file, noOp, true);
+        }
+    });
+};
+
 var serveArchive = function(cli, archType) {
     var _c = cli._c;
     var tagName = cli.routeinfo.path[1];
@@ -346,14 +456,15 @@ var serveArchive = function(cli, archType) {
     }
 
     var file = _c.server.html + '/' + archType + '/' + tagName + '/' + tagIndex + "/index.html";
+
     fileserver.fileExists(file, function(exists) { 
         if (!exists || typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
-            fetchArchiveArticles(_c, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices) {
+            fetchArchiveArticles(cli, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices) {
                 if (typeof archDetails === "number") {
                     return cli.throwHTTP(404, 'NOT FOUND');
                 }
 
-                var extra = new Object();
+                var extra = {};
                 extra.articles = articles;
                 extra.totalarticles = total;
                 extra.searchname = tagName || archType;
@@ -428,7 +539,7 @@ var getWhatsHot = function(_c, cb) {
                         if (article) {
                             articleArray.push({
                                 _id : article._id, 
-                                fullurl : _c.server.url + "/" + article.name,
+                                fullurl : _c.server.url + article.topic.completeSlug + "/" + article.name,
                                 title : article.title, 
                                 subtitle : article.subtitle,
                                 featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,
@@ -468,6 +579,8 @@ var loadHooks = function(_c, info) {
     endpoints.register(_c.id, 'tag', 'GET', function(cli) {
         cli.redirect(_c.server.url + '/tags/' + cli.routeinfo.path[1] + (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : ""));
     });
+
+    endpoints.registerContextual(_c.id, 'topic', 'GET', serveTopic);
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
         if (homepageFileContent[cli._c.id]) {
@@ -732,10 +845,8 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
             fileserver.createDirIfNotExists(_c.server.html + "/tags", function() {
                 fileserver.createDirIfNotExists(_c.server.html + "/authors", function() {
                     fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
-                        fileserver.createDirIfNotExists(_c.server.html + "/topic", function() {
-                            log('Narcity', 'Created symlink and content directories. Ready to callback');
-                            callback();
-                        }, true);
+                        log('Narcity', 'Created symlink and content directories. Ready to callback');
+                        callback();
                     }, true);
                 }, true);
             }, true);
