@@ -4,7 +4,7 @@
 
 		<main class="entities-main">
 			<ul class="entity-list">
-				{*roles(template:"entity-list-item")}
+				{*role(template:"entity-list-item")}
 			</ul>
 
 			<h2>Add new role</h2>
@@ -15,7 +15,7 @@
 			<li class="entity-item-list">
 				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
 				<h6>
-					Roles : <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
+					Roles : <lml:tobject data-nodetype="span" data-key="role" data-arrayseparator=", "></lml:tobject>
 				</h6>
 				<div class="entity-actions">
 					<lml:tobject data-nodetype="button"

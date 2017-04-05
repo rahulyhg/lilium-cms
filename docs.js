@@ -74,11 +74,6 @@ class LMLDocs {
             fileserver.pipeFileToClient(cli, writeDir + docIndex + ".md.doc", undefined, true, 'text/html');
         }
     };
-
-    setupController() {
-        log('Docs', "Controller setup");
-        endpoint.register('*', 'doc', 'GET', that.GET)
-    };
 }
 
 const that = new LMLDocs();

@@ -18,7 +18,7 @@ var interpretLMLToCli = function(cli) {
     });
 };
 
-var handleGET = function(cli) {
+DevTools.prototype.adminGET = function(cli) {
     if (!cli.hasRightOrRefuse("develop")) {return;} 
 
     switch (cli.routeinfo.path[2]) {
@@ -40,7 +40,7 @@ var handleGET = function(cli) {
     }
 };
 
-var handlePOST = function(cli) {
+DevTools.prototype.adminPOST = function(cli) {
     if (!cli.hasRight('develop')) {
         return cli.throwHTTP(401, "401 GET OUT OF MY FACE");
     }
@@ -358,54 +358,49 @@ var recompileQueue = function(cli) {
     }, function() {}, undefined, true);
 };
 
-DevTools.prototype.registerAdminEndpoint = function() {
-    Admin.registerAdminEndpoint('devtools', 'GET', handleGET);
-    Admin.registerAdminEndpoint('devtools', 'POST', handlePOST);
-};
 
-DevTools.prototype.registerLiveVar = function() {
-    require('./livevars.js').registerLiveVariable("devtools", function(cli, levels, params, cb) {
-        cli.touch("devtools.livevar");
+DevTools.prototype.livevar = function(cli, levels, params, cb) {
+    cli.touch("devtools.livevar");
+    if (!cli.hasRight('develop')) { return cb(); }
 
-        if (levels[0] == "endpoints") { 
-            var endpoints = require("./backend/admin.js").getEndpoints();
-            var formattedOutput = {};
+    if (levels[0] == "endpoints") { 
+        var endpoints = require("./backend/admin.js").getEndpoints();
+        var formattedOutput = {};
 
-            for (var method in endpoints) {
-                formattedOutput[method] = [];
-            
-                var curMethod = endpoints[method];
-                for (var func in curMethod) {
-                    formattedOutput[method].push({
-                        endpoint : func,
-                        pluginid : curMethod[func].pluginID
-                    });
-                }
+        for (var method in endpoints) {
+            formattedOutput[method] = [];
+        
+            var curMethod = endpoints[method];
+            for (var func in curMethod) {
+                formattedOutput[method].push({
+                    endpoint : func,
+                    pluginid : curMethod[func].pluginID
+                });
             }
-
-            cb(formattedOutput);
-        } else if (levels[0] == "livevars") {
-            var allLV = require('./livevars.js').getAll();
-            var arr = [];
-
-            for (var ep in allLV) {
-                arr.push(
-                    Object.assign(allLV[ep], {name : ep})
-                );
-            }
-
-            cb(arr); 
-        } else if (levels[0] == "scripts") {
-            require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
-                cb(list);
-            });
-        } else if (levels[0] == "htmlfiles") {
-            listAllCachedFiles(cli, levels, params, cb);
         }
-    }, ["develop"]);
+
+        cb(formattedOutput);
+    } else if (levels[0] == "livevars") {
+        var allLV = require('./livevars.js').getAll();
+        var arr = [];
+
+        for (var ep in allLV) {
+            arr.push(
+                Object.assign(allLV[ep], {name : ep})
+            );
+        }
+
+        cb(arr); 
+    } else if (levels[0] == "scripts") {
+        require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
+            cb(list);
+        });
+    } else if (levels[0] == "htmlfiles") {
+        listAllCachedFiles(cli, levels, params, cb);
+    }
 };
 
-DevTools.prototype.registerForms = function() {
+DevTools.prototype.form = function() {
     formBuilder.createForm('devtools_livevar', {
         formWrapper: {
             'tag': 'div',

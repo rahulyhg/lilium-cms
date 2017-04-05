@@ -1,0 +1,114 @@
+var LMLTreeSelect = function(ts) {
+    var that = this;
+    var ts = ts;
+
+    this.fill = function(dat) {
+        var name = ts.dataset.fieldname.split('.');
+        var value = dat;
+        for (var i = 0; i < name.length; i++) {
+            value = value[name[i]] || "";
+        }
+
+        that.setValue(value);
+    }
+
+    this.setValue = function(val) {
+        if (!val) return;
+
+        var selecteds = ts.querySelectorAll('.selected');
+        var stripe = document.getElementById(ts.id + "_" + val);
+        var ds = stripe.dataset;
+
+        for (var i = 0; i < selecteds.length; i++) {
+            selecteds[i].classList.remove('selected');
+        }
+
+        stripe.classList.add("selected");
+
+        var pWrap = ts.querySelectorAll('.treeview-pane-selection-child.visible');
+        for (var i = 0; i < pWrap.length; i++) {
+            pWrap[i].classList.remove('visible');
+        }
+
+        var parent = ds.parent;
+        while(parent) {
+            var pel = document.getElementById(ts.id + "_" + parent);
+            pel.classList.add('selected');
+            pel.parentElement.querySelector(".parent-" + parent).classList.add('visible');
+
+            parent = pel.dataset.parent;
+        }
+
+        if (ds.hasChildren) {
+            stripe.parentElement.querySelector('.parent-' + ds.id).classList.add('visible');
+        }
+
+        document.querySelector('.lmldom-treeselect-value[name="'+ts.dataset.fieldname+'"]').value = ds.id;
+    };
+
+    var treePanelClickCallback = function(e) {
+        var ds = this.dataset;
+        var value = ds.id;
+        that.setValue(value);
+    };
+
+
+    var createTreePane = function(data, ts) {
+        var listview = document.createElement('div');
+        var childrenPanes = [];
+        listview.classList.add('lmldom-treeselect-pane');
+
+        for (var i = 0; i < data.length; i++) {
+            var dat = data[i];
+
+            var textpanel = document.createElement('div');
+            textpanel.id = ts.id + "_" + dat[ts.dataset.selectvalue];
+            textpanel.className = "treeview-pane-selection ";
+            textpanel.textContent = dat[ts.dataset.selectdisplayname];
+            textpanel.dataset.id = dat[ts.dataset.selectvalue];
+            textpanel.dataset.parent = dat.parent || "";
+            textpanel.dataset.hasChildren = dat.children && dat.children.length != 0 ? "true" : "";
+            textpanel.dataset.treeviewid = ts.id;
+
+            textpanel.addEventListener('click', treePanelClickCallback);
+            listview.appendChild(textpanel);
+
+            if (textpanel.dataset.hasChildren) {
+                textpanel.className += "treeview-pane-selection-has-children ";
+
+                var underLevel = createTreePane(dat.children, ts);
+                underLevel.dataset.childof = dat[ts.dataset.selectvalue];
+                underLevel.className += " treeview-pane-selection-child unslid parent-" + dat[ts.dataset.selectvalue];
+                listview.appendChild(underLevel);
+            }
+        }
+
+        return listview;
+    };
+
+
+    
+    this.init = function() {
+        var endpoint = ts.dataset.filledby;
+        var valuekey = ts.dataset.selectvalue;
+        var displaykey = ts.dataset.selectdisplayname;
+        var boxfilling = liliumcms.livevars.pulloutLiveVar(endpoint, true);
+        var hField = document.getElementsByName(ts.dataset.fieldname)[0];
+        var arrValue = hField.value.split(',');
+        
+        var sitename = "{=config.default.website.sitetitle}";
+
+        if (boxfilling) {
+            var wrappers = createTreePane(boxfilling, ts);
+            wrappers.classList.add('visible');
+
+            treechoices = ts.querySelector(".lml-treeselect-choices");
+            treechoices.appendChild(wrappers);
+        }
+
+    };
+
+    this.init();
+};
+
+

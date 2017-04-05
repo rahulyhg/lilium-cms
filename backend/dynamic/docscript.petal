@@ -18,7 +18,7 @@ var loadArticle = function(libname) {
 
     var oReq = new XMLHttpRequest();
     oReq.addEventListener("load", receivedDocument);
-    oReq.open("GET", "/doc/" + libname);
+    oReq.open("GET", "/docs/" + libname);
     oReq.send();
 };
 

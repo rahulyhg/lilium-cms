@@ -65,7 +65,7 @@ class StyledPages {
         });
     }
 
-    registerForm() {
+    form() {
         formBuilder.createForm('styledpage_edit', {
             formWrapper: {
                 'tag': 'div',
@@ -130,7 +130,7 @@ class StyledPages {
         ;
     }
 
-    registerTable() {
+    table() {
         tableBuilder.createTable({
             name: 'styledpages',
             endpoint: 'styledpages.table',    
@@ -189,7 +189,7 @@ class StyledPages {
         });
     }
 
-    handleGet(cli) {
+    adminGET(cli) {
         if (!cli.hasRight("styledpages")) { return cli.refuse(); }
 
         const level = cli.routeinfo.path[2];
@@ -214,7 +214,7 @@ class StyledPages {
         }
     }
 
-    handlePost(cli) {
+    adminPOST(cli) {
         if (!cli.hasRight("styledpages")) { return cli.refuse(); }
 
         const level = cli.routeinfo.path[2];
@@ -259,7 +259,7 @@ class StyledPages {
         });
     }
 
-    handleLivevar(cli, levels, params, send) {
+    livevar(cli, levels, params, send) {
         if (!cli.hasRight("styledpages")) { return send(); }
 
         switch (levels[0]) {
@@ -267,15 +267,6 @@ class StyledPages {
             case 'get'  : that.getSingle(cli._c, levels[1], send); break;
             default: send([]);
         }
-    }
-
-    registerAdminEndpoint() {
-        Admin.registerAdminEndpoint('styledpages', 'GET',  this.handleGet);
-        Admin.registerAdminEndpoint('styledpages', 'POST', this.handlePost);
-    }
-
-    registerLiveVar() {
-        livevars.registerLiveVariable('styledpages', this.handleLivevar);
     }
 };
 

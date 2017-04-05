@@ -47,7 +47,8 @@ var HTMLServer = function() {
 						}
 					} else {
                         styledpages.serveOrFallback(cli, function() {
-                            article.generateFromName(cli, cli.routeinfo.relsitepath.substring(1), function(success, details) {
+                            var name = cli.routeinfo.path[cli.routeinfo.path.length -1];
+                            article.generateFromName(cli, name, function(success, details) {
                                 if (success) {
                                     if (details && details.realName) {
                                         cli.redirect(cli._c.server.url + "/" + details.realName, true);

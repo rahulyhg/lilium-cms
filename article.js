@@ -39,7 +39,7 @@ var Article = function() {
         "Hooray!"
     ];
 
-    this.handlePOST = function(cli) {
+    this.adminPOST = function(cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case 'new':
@@ -84,7 +84,7 @@ var Article = function() {
         }
     };
 
-    this.handleGET = function(cli) {
+    this.adminGET = function(cli) {
         cli.touch('article.handleGET');
         if (!cli.hasRightOrRefuse("list-articles")) { return; }
 
@@ -126,11 +126,6 @@ var Article = function() {
                     return cli.throwHTTP(404, 'Not Found');
             }
         }
-    };
-
-    this.registerContentEndpoint = function() {
-        var that = this;
-        require('./endpoints.js').register('*', 'next', 'GET', function(cli) { that.handleNext(cli); });
     };
 
     this.query = function(cli, opts, cb) {
@@ -231,8 +226,8 @@ var Article = function() {
                         }
 
                         var continueWorking = function() {
-                            db.findToArray(conf, 'categories', {name : {$in : arr[0].categories}}, function(err, catarr) {
-                                arr[0].categories = catarr;
+                            db.findUnique(conf, 'topics', {_id : arr[0].topic}, function(err, topic) {
+                                arr[0].topic = topic;
                                 db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
                                     arr[0].authors = autarr;
 
@@ -482,11 +477,16 @@ var Article = function() {
                 formData.author = formData.author ? db.mongoID(formData.author) : cli.userinfo.userid;
                 formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
                 formData.media = db.mongoID(formData.media);
+                formData.topic = formData.topic ? db.mongoID(formData.topic) : undefined;
                 formData.updated = new Date();
                 hooks.fire('article_will_' + pubCtx, {
                     cli: cli,
                     article: formData
                 });
+
+                if (formData.topic) {
+                    db.update(cli._c, "topics", {_id : formData.topic}, {lastUsed : new Date()});
+                }
 
                 var conds = {
                     _id: cli.postdata.data.id ? db.mongoID(cli.postdata.data.id) : "Will not resolve"
@@ -696,16 +696,12 @@ var Article = function() {
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
         formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
+        formData.topic = formData.topic ? db.mongoID(formData.topic) : undefined;
 
         if (formData.tags && formData.tags.map) {
             formData.tagslugs = formData.tags.map(function(tagname) {
                 return slugify(tagname).toLowerCase();
             });
-        }
-
-        var maybecat = formData.categories;
-        if (maybecat && maybecat[0]) {
-            db.update(cli._c, 'categories', {name : maybecat[0]}, {lastused : new Date()}, function() {});
         }
 
         log('Article', 'Preparing to save article ' + formData.title);
@@ -995,253 +991,235 @@ var Article = function() {
     };
 
 
-    this.registerContentLiveVar = function() {
-        livevars.registerLiveVariable('content', function(cli, levels, params, callback) {
-            var allContent = levels.length === 0;
-            if (allContent) {
-                if (cli.hasRight('editor')) {
-                    db.singleLevelFind(cli._c, 'content', callback);
-                } else {
-                    db.findToArray(cli._c, 'content', {author : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
-                        callback(arr);
-                    });
-                }
-            } else if (levels[0] == "all") {
-                var sentArr = new Array();
-
-                if (cli.hasRight("list-articles")) {
-                    db.findToArray(cli._c, 'content', {}, function(err, arr) {
-                        for (var i = 0; i < arr.length; i++) {
-                            sentArr.push({
-                                articleid: arr[i]._id,
-                                name: arr[i].name,
-                                title: arr[i].title
-                            });
-                        };
-    
-                        callback(sentArr);
-                    });
-                } else {
-                    callback([]);
-                }
-            } else if (levels[0] == 'table') {
-                if (!cli.hasRight("list-articles")) {
-                    return callback({size:0,data:[],code:403});
-                }
-
-                var sort = {};
-                sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (typeof params.order == "undefined" ? -1 : params.order);
-                // sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (typeof params.order == "undefined" ? -1 : params.order);
-
-                var match = [{status : params.filters.status || {$ne : "destroyed"}}];
-                if (params.filters.author) {
-                    match.push({author : params.filters.author});
-                }
-
-                if (params.filters.isSponsored) {
-                    var spons = params.filters.isSponsored == "true";
-                    match.push(spons ? {isSponsored : true} : {isSponsored : {$ne : true}});
-                }
-
-                if (!cli.hasRight('editor')) {
-                    match.push({author: db.mongoID(cli.userinfo.userid)});
-                }
-
-                if (params.search) {
-                    match.push({
-                        $text : { $search: params.search }
-                    });
-                }
-    
-                db.aggregate(cli._c, 'content', [{
-                    $match: {$and : match}
-                }, {
-                    $sort: sort
-                }, {
-                    $skip : (params.skip || 0)
-                }, {
-                    $limit : (params.max || 20)
-                }, {
-                    $lookup: {
-                        from: 'uploads',
-                        localField: 'media',
-                        foreignField: '_id',
-                        as: 'media'
-                    }
-                }, {
-                    $unwind: {
-                        path: "$media",
-                        preserveNullAndEmptyArrays: true
-                    }
-                }, {
-                    $unwind: {
-                        path: "$author",
-                        preserveNullAndEmptyArrays: true
-                    }
-                }, {
-                    $project: {
-                        author: 1,
-                        title: 1,
-                        status: 1,
-                        subtitle: 1,
-                        name: 1,
-                        date: 1,
-                        media: "$media.sizes.thumbnail.url"
-                    }
-                }], function(data) {
-                    if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
-                        for (var i = 0; i < data.length; i++) if (data[i].media) {
-                            data[i].media = data[i].media.replace(cli._c.server.url, cli._c.content.cdn.domain);
-                        }
-                    }
-
-                    db.count(cli._c, 'content', {$and : match}, function(err, total) {
-                        callback({
-                            size: total,
-                            data: data
-                        });
-                    });
+    this.livevar = function(cli, levels, params, callback) {
+        var allContent = levels.length === 0;
+        if (allContent) {
+            if (cli.hasRight('editor')) {
+                db.singleLevelFind(cli._c, 'content', callback);
+            } else {
+                db.findToArray(cli._c, 'content', {author : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+                    callback(arr);
                 });
+            }
+        } else if (levels[0] == "all") {
+            var sentArr = new Array();
 
-            } else if (levels[0] == 'lastEdited') {
-                if (!cli.hasRight("list-articles")) {
-                    return callback({size:0,data:[],code:403});
-                }
+            if (cli.hasRight("list-articles")) {
+                db.findToArray(cli._c, 'content', {}, function(err, arr) {
+                    for (var i = 0; i < arr.length; i++) {
+                        sentArr.push({
+                            articleid: arr[i]._id,
+                            name: arr[i].name,
+                            title: arr[i].title
+                        });
+                    };
 
-                db.aggregate(cli._c, 'autosave', [{
-                    $lookup: {
-                        from: 'content',
-                        localField: 'contentid',
-                        foreignField: '_id',
-                        as: 'contentid'
-                    }
-                }, {
-                    $unwind: {
-                        path: '$contentid',
-                        preserveNullAndEmptyArrays: true
-                    }
-                }, {
-                    $project: {
-                        title: 1,
-                        media: 1,
-                        updated: 1,
-                        contentid: 1,
-                        author: 1,
-                        newer: {
-                            $cmp: ['$contentid.updated', '$updated']
-                        }
-                    }
-                }, {
-                    $match: {
-                        $or: [{
-                            contentid: null
-                        }, {
-                            $and: [{
-                                author: db.mongoID(cli.userinfo.userid)
-                            }, {
-                                newer: {
-                                    $lt: 0
-                                }
-                            }]
-                        }]
-                    }
-                }, {
-                    $sort: {
-                        date: -1
-                    }
-                }, {
-                    $limit: 5
-                }], function(res) {
-                    callback(res);
-
+                    callback(sentArr);
                 });
             } else {
-                if (!cli.hasRight("list-articles")) {
-                    return callback({size:0,data:[],code:403});
+                callback([]);
+            }
+        } else if (levels[0] == 'table') {
+            if (!cli.hasRight("list-articles")) {
+                return callback({size:0,data:[],code:403});
+            }
+
+            var sort = {};
+            sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (typeof params.order == "undefined" ? -1 : params.order);
+            // sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (typeof params.order == "undefined" ? -1 : params.order);
+
+            var match = [{status : params.filters.status || {$ne : "destroyed"}}];
+            if (params.filters.author) {
+                match.push({author : params.filters.author});
+            }
+
+            if (params.filters.isSponsored) {
+                var spons = params.filters.isSponsored == "true";
+                match.push(spons ? {isSponsored : true} : {isSponsored : {$ne : true}});
+            }
+
+            if (!cli.hasRight('editor')) {
+                match.push({author: db.mongoID(cli.userinfo.userid)});
+            }
+
+            if (params.search) {
+                match.push({
+                    $text : { $search: params.search }
+                });
+            }
+
+            db.aggregate(cli._c, 'content', [{
+                $match: {$and : match}
+            }, {
+                $sort: sort
+            }, {
+                $skip : (params.skip || 0)
+            }, {
+                $limit : (params.max || 20)
+            }, {
+                $lookup: {
+                    from: 'uploads',
+                    localField: 'media',
+                    foreignField: '_id',
+                    as: 'media'
+                }
+            }, {
+                $unwind: {
+                    path: "$media",
+                    preserveNullAndEmptyArrays: true
+                }
+            }, {
+                $unwind: {
+                    path: "$author",
+                    preserveNullAndEmptyArrays: true
+                }
+            }, {
+                $project: {
+                    author: 1,
+                    title: 1,
+                    status: 1,
+                    subtitle: 1,
+                    name: 1,
+                    date: 1,
+                    media: "$media.sizes.thumbnail.url"
+                }
+            }], function(data) {
+                if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
+                    for (var i = 0; i < data.length; i++) if (data[i].media) {
+                        data[i].media = data[i].media.replace(cli._c.server.url, cli._c.content.cdn.domain);
+                    }
                 }
 
-                // First, check for saved content
-                db.aggregate(cli._c, 'content', [
-                    {
-                        $match : {_id: db.mongoID(levels[0])}
+                db.count(cli._c, 'content', {$and : match}, function(err, total) {
+                    callback({
+                        size: total,
+                        data: data
+                    });
+                });
+            });
+
+        } else if (levels[0] == 'lastEdited') {
+            if (!cli.hasRight("list-articles")) {
+                return callback({size:0,data:[],code:403});
+            }
+
+            db.aggregate(cli._c, 'autosave', [{
+                $lookup: {
+                    from: 'content',
+                    localField: 'contentid',
+                    foreignField: '_id',
+                    as: 'contentid'
+                }
+            }, {
+                $unwind: {
+                    path: '$contentid',
+                    preserveNullAndEmptyArrays: true
+                }
+            }, {
+                $project: {
+                    title: 1,
+                    media: 1,
+                    updated: 1,
+                    contentid: 1,
+                    author: 1,
+                    newer: {
+                        $cmp: ['$contentid.updated', '$updated']
                     }
-                ], function(arr) {
-                    // Not found, lets check autosaves
-                    if (arr && arr.length == 0) {
-                        db.findToArray(cli._c, 'autosave', {
-                            _id: db.mongoID(levels[0])
-                        }, function(err, arr) {
-                            // Check if there is a newer version than this autosave
-                            if (arr && arr.length > 0) {
-                                db.findToArray(cli._c, 'content', {
-                                    _id: db.mongoID(arr[0].contentid),
-                                    date: {
-                                        "$gte": arr[0].date
-                                    }
-                                }, function(err, content) {
-                                    if (content && content.length > 0) {
-                                        arr[0].recentversion = content[0]._id;
-                                    }
-
-                                    db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
-                                        arr[0].authorname = autarr[0].displayname;
-                                        arr[0].author = autarr;
-                                        callback(arr[0]);
-                                    });
-                                });
-                            } else {
-                                callback(arr);
+                }
+            }, {
+                $match: {
+                    $or: [{
+                        contentid: null
+                    }, {
+                        $and: [{
+                            author: db.mongoID(cli.userinfo.userid)
+                        }, {
+                            newer: {
+                                $lt: 0
                             }
+                        }]
+                    }]
+                }
+            }, {
+                $sort: {
+                    date: -1
+                }
+            }, {
+                $limit: 5
+            }], function(res) {
+                callback(res);
 
-                        });
-                    } else {
+            });
+        } else {
+            if (!cli.hasRight("list-articles")) {
+                return callback({size:0,data:[],code:403});
+            }
 
-                        // Found a content
+            // First, check for saved content
+            db.aggregate(cli._c, 'content', [
+                {
+                    $match : {_id: db.mongoID(levels[0])}
+                }
+            ], function(arr) {
+                // Not found, lets check autosaves
+                if (arr && arr.length == 0) {
+                    db.findToArray(cli._c, 'autosave', {
+                        _id: db.mongoID(levels[0])
+                    }, function(err, arr) {
+                        // Check if there is a newer version than this autosave
                         if (arr && arr.length > 0) {
-                            arr[0].authorname = arr[0].author[0] ? arr[0].author[0].displayname : "[NO AUTHOR]";
-                            // Check if there is a newer autosaved version
-                            db.findToArray(cli._c, 'autosave', {
-                                contentid: db.mongoID(arr[0]._id),
-                                updated: {
-                                    "$gte": arr[0].updated
+                            db.findToArray(cli._c, 'content', {
+                                _id: db.mongoID(arr[0].contentid),
+                                date: {
+                                    "$gte": arr[0].date
                                 }
-                            }, function(err, autosave) {
-                                if (autosave && autosave.length > 0) {
-                                    arr[0].recentversion = autosave[0]._id;
+                            }, function(err, content) {
+                                if (content && content.length > 0) {
+                                    arr[0].recentversion = content[0]._id;
                                 }
+
                                 db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
-                                    arr[0].authorname = autarr[0] ? autarr[0].displayname : "[No Author]";
-                                    arr[0].author = autarr || {};
+                                    arr[0].authorname = autarr[0].displayname;
+                                    arr[0].author = autarr;
                                     callback(arr[0]);
                                 });
                             });
                         } else {
-                            callback([])
+                            callback(arr);
                         }
 
+                    });
+                } else {
+
+                    // Found a content
+                    if (arr && arr.length > 0) {
+                        arr[0].authorname = arr[0].author[0] ? arr[0].author[0].displayname : "[NO AUTHOR]";
+                        // Check if there is a newer autosaved version
+                        db.findToArray(cli._c, 'autosave', {
+                            contentid: db.mongoID(arr[0]._id),
+                            updated: {
+                                "$gte": arr[0].updated
+                            }
+                        }, function(err, autosave) {
+                            if (autosave && autosave.length > 0) {
+                                arr[0].recentversion = autosave[0]._id;
+                            }
+                            db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                arr[0].authorname = autarr[0] ? autarr[0].displayname : "[No Author]";
+                                arr[0].author = autarr || {};
+                                callback(arr[0]);
+                            });
+                        });
+                    } else {
+                        callback([])
                     }
-                });
-            }
-        });
 
-        livevars.registerLiveVariable('types', function(cli, levels, params, callback) {
-            if (cli.hasRight("list-articles")) {
-                return callback({size:0,data:[],code:403});
-            }
+                }
+            });
+        };
+    };
 
-            var allTypes = levels.length === 0;
-
-            if (allTypes) {
-                db.singleLevelFind(cli._c, 'types', callback);
-            } else {
-                db.multiLevelFind(cli._c, 'types', levels, {
-                    name: levels[0]
-                }, {}, callback);
-            }
-        }, ["types"]);
-    }
-
-    this.registerForms = function() {
+    this.form = function() {
         formBuilder.createForm('post_create', {
                 formWrapper: {
                     'tag': 'div',
@@ -1258,18 +1236,17 @@ var Article = function() {
                     'class': 'col-md-4'
                 }
             })
-            .add('categories', 'multibox', {
+            .add('topic', 'treeselect', {
                 wrapper: {
                     'class': 'col-md-4'
                 },
-                endpoint: 'categories',
+                endpoint: 'topics.all',
                 select: {
-                    'value': 'name',
+                    'value': '_id',
                     'displayname': 'displayname',
-                    'readkey' : '0',
-                    'multiple' : false
+                    'childrenkey' : 'children'
                 },
-                displayname: "Categories"
+                displayname: "Topic"
             })
             .add('tags', 'tags', {
                 displayname: 'Tags',
@@ -1295,32 +1272,6 @@ var Article = function() {
                 displayname : "Persona targeting"
             })
             .trigger('persona')
-/*
-            .add('title-industry', 'title', {
-                displayname : "Industry"
-            })
-            .add('industry', 'select', {
-                displayname : "Industry Tag",
-                datasource: [
-                    {name : "realestate", displayName : "Real Estate"},
-                    {name : "employment", displayName : "Employment"},
-                    {name : "foodresto", displayName : "Food + Restaurants"},
-                    {name : "nightlife", displayName : "Nightlife"},
-                    {name : "hnf", displayName : "Health + Fitness"},
-                    {name : "travel", displayName : "Travel"},
-                    {name : "lodging", displayName : "Lodging"},
-                    {name : "transportation", displayName : "Transportation"},
-                    {name : "fashion", displayName : "Fashion"},
-                    {name : "technology", displayName : "Technology"},
-                    {name : "education", displayName : "Education"},
-                    {name : "finance", displayName : "Finance"},
-                    {name : "relationships", displayName : "Relationships + Sex"},
-                    {name : "entertainment", displayName : "Entertainment + Tourism"},
-                    {name : "info", displayName : "Info"},
-                    {name : "sponsorship", displayName : "Sponsorship"}
-                ]
-            })
-*/
             .add('title-geolocation', 'title', {
                 displayname : "Geolocalisation"
             })
@@ -1329,7 +1280,18 @@ var Article = function() {
                 format : 'array'
             })
             .add('title-author', 'title', {
-                displayname : "Redaction"
+                displayname : "Appearance"
+            })
+            .add('templatename', 'liveselect', {
+                endpoint : "theme.templates.article",
+                select : {
+                    value : 'file',
+                    displayname : 'displayname'
+                },
+                empty : {
+                    displayname : " - Use selected topic template - "
+                },
+                displayname : "Article template"
             })
             .add('date', 'date', {
                 displayname : "Publish date",
@@ -1428,8 +1390,10 @@ var Article = function() {
                     article: deepArticle
                 });
 
+                var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
+
                 // Generate LML page
-                filelogic.renderThemeLML(_c, "article", deepArticle.name + '.html', extra , function(name) {
+                filelogic.renderThemeLML(_c, ctx, deepArticle.name + '.html', extra , function(name) {
                     cb && cb({
                         success: true,
                         dbdata : deepArticle
@@ -1480,7 +1444,7 @@ var Article = function() {
         }, false, onlyPublished ? {status : "published"} : {});
     }
 
-    var init = function() {
+    this.table = function() {
         tableBuilder.createTable({
             name: 'article',
             endpoint: 'content.table',
@@ -1564,8 +1528,6 @@ var Article = function() {
         });
 
     };
-
-    init();
 }
 
 module.exports = new Article();

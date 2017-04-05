@@ -12,7 +12,7 @@ var nURL = require('url');
 var nHTTP = require('http');
 
 var Media = function () {
-    this.handlePOST = function (cli) {
+    this.adminPOST = function (cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
         case 'upload':
@@ -38,7 +38,7 @@ var Media = function () {
         }
     };
 
-    this.handleGET = function (cli) {
+    this.adminGET = function (cli) {
         cli.touch('article.handleGET');
 
         if (cli.hasRightOrRefuse("list-uploads")) {
@@ -293,7 +293,7 @@ var Media = function () {
 
     }
 
-    this.registerMediaLiveVar = function () {
+    this.setup = function () {
         livevars.registerLiveVariable('media', function (cli, levels, params, callback) {
             var wholeDico = levels.length === 0;
             if (wholeDico) {

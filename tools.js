@@ -72,39 +72,36 @@ Tools.prototype.listAllTools = function(cli, cb) {
     cb(pkg);
 };
 
-Tools.prototype.registerLiveVar = function() {
-    var that = this;
-    require('./livevars.js').registerLiveVariable('tools', function(cli, levels, params, callback) {
-        switch (levels[0]) {
-            case undefined:
-            case "list":
-                that.listAllTools(cli, callback);
-                break;
+Tools.prototype.livevar = function(cli, levels, params, callback) {
+    switch (levels[0]) {
+        case undefined:
+        case "list":
+            this.listAllTools(cli, callback);
+            break;
 
-            default: 
-                if (!that.callToolLivevar(cli, levels, params, callback)) {
-                    callback(new Error("[LiveVariableException] Undefined level for tools live variable : " + levels[0]));
-                }
-        }
-    });
+        default: 
+            if (!this.callToolLivevar(cli, levels, params, callback)) {
+                callback(new Error("[LiveVariableException] Undefined level for tools live variable : " + levels[0]));
+            }
+    }
 };
 
-Tools.prototype.registerAdminEndpoint = function() {
-    var that = this;
+Tools.prototype.adminGET = function(cli) {
+    cli.touch("tools.GET");
+    if (!this.handleGET(cli)) {
+        filelogic.serveAdminLML(cli);
+    }
+}
 
-    Admin.registerAdminEndpoint('tools', 'GET', function(cli) {
-        cli.touch("tools.GET");
-        if (!that.handleGET(cli)) {
-            filelogic.serveAdminLML(cli);
-        }
-    });
+Tools.prototype.adminPOST = function(cli) {
+    cli.touch("tools.POST");
+    if (!this.handlePOST(cli)) {
+        cli.throwHTTP(404, "Not Found");
+    }
+}
 
-    Admin.registerAdminEndpoint('tools', 'POST', function(cli) {
-        cli.touch("tools.POST");
-        if (!that.handlePOST(cli)) {
-            cli.throwHTTP(404, "Not Found");
-        }
-    });
+Tools.prototype.setup = function() {
+    this.preloadTools(function() {});
 };
 
 Tools.prototype.preloadTools = function(cb) {

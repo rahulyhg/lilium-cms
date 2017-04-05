@@ -52,7 +52,7 @@
         <div>
             <input id="lml-participants-add" placeholder="Search for a beautiful face..." />
             <div class="lml-participants-suggestion">
-                    
+                
             </div>
         </div>
     </div>
