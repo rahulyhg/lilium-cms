@@ -11,5 +11,10 @@
             "Lilium now has an updater",
             "Categories are now topics"
         ]
+    }, 
+    "1.0.3" : {
+        "codename" : "Gaia",
+        "script" : "1.0.3.js",
+        "features" : ["Created basic reporting system"]
     }
 }

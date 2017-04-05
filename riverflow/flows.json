@@ -26,8 +26,8 @@
             "support" : ["livevar"]
         }, {
             "module" : "reporting.js",
-            "endpoint" : "reporting",
-            "support" : ["livevar"]
+            "endpoint" : "r",
+            "support" : ["livevar", "get", "setup"]
         }, {
             "module" : "topics.js",
             "endpoint" : "topics",

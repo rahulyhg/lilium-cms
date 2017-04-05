@@ -833,6 +833,7 @@ var registerPrecompFiles = function(_c) {
     templateBuilder.addCSS(themePath + '/precomp/css/narcity.css.lml', _c.id);
 
     templateBuilder.addJS(themePath + '/precomp/js/vaniryk.js.lml', _c.id);
+    templateBuilder.addJS(themePath + '/precomp/js/r.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/social.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/facebook.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/global.js.lml', _c.id);
