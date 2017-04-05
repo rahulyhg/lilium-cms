@@ -486,16 +486,16 @@ var loadHooks = function(_c, info) {
             return cli.response.end(homepageFileContent[cli._c.id]);
         }
 
-        rQueue.homepage.push(cli);
-        if (rQueue.homepage.length == 1) {
+        if (rQueue.homepage.push(cli) == 1) {
             fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
                 if (needsHomeRefresh || !exists) {
-                    generateHomepage(cli._c, function() {
-                        rQueue.homepage.forEach(function(cli) {
-                            fileserver.pipeFileToClient(cli, cli._c.server.html + '/index.html', function() {
-                                needsHomeRefresh = false;
-                                log('Narcity', 'Recreated and served homepage');
-                            }, true);
+                    generateHomepage(cli._c, function(content) {
+                        console.log(content);
+                        needsHomeRefresh = false;
+                        rQueue.homepage.forEach(function(qcli) {
+                            qcli.response.writeHead(200, {CacheType : "Generated", CacheSection : "homepage"});
+                            qcli.response.end(content);
+                            log('Narcity', 'Recreated and served homepage');
                         });
                         rQueue.homepage = [];
                     });

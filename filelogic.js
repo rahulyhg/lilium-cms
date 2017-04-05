@@ -1,4 +1,4 @@
-var FileServer = require('./fileserver.js');
+var FileServer = fileserver = require('./fileserver.js');
 var _c = require('./config.js');
 var LML = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
@@ -275,19 +275,21 @@ var FileLogic = function () {
 
             var readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml");
             var savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
-            var tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".admintmp";
+            var tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".themetmp";
             var layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
-
+            
             if (skipLayout) {
                 tmpPath = savePath;
             }
 
             log('FileLogic', 'Compiling context theme page', 'info');
-            LML2.compileToFile(
-                readPath,
-                tmpPath,
-                function () {
-                    require('./fileserver.js').readFile(tmpPath, function(ctn) {
+            fileserver.readFile(readPath, function(lml) {
+                extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
+                LML2.compileToString(
+                    extra.siteid, 
+                    lml, 
+                    extra,
+                    function (ctn) {
                         log('FileLogic', 'Including compiled theme page to layout', 'detail');
                         extra.contentHTML = ctn;
 
@@ -295,28 +297,32 @@ var FileLogic = function () {
                             return callback(ctn);
                         }
 
-                        LML2.compileToFile(
-                            layoutPath,
-                            savePath,
-                            function () {
-                                log('FileLogic', 'Completed Theme page compilation', 'success');
-                                FileServer.readFile(savePath, function(fHtml) {
-                                    require('./cdn.js').parse(fHtml, _c, function(cdned) { 
-                                        var handle = FileServer.getOutputFileHandle(savePath, 'w');
-                                        FileServer.writeToFile(handle, cdned, function() {
-                                            callback(cdned);
-                                        });
-                                    });
-                                }, false, 'utf8');
+                        extra.rootDir = layoutPath.substring(0, layoutPath.lastIndexOf('/'));
+                        fileserver.readFile(layoutPath, function(layoutLML) {
+                            LML2.compileToString(
+                                extra.siteid,
+                                layoutLML,
+                                extra,
+                                function (fHtml) {
+                                    log('FileLogic', 'Completed Theme page compilation', 'success');
+                                    require('./cdn.js').parse(fileserver.minifyString(fHtml), _c, function(cdned) { 
+                                        log("FileLogic", "Minifier and CDN called back to Filelogic", 'detail');
 
-                                FileServer.deleteFile(tmpPath, function() {});
-                            }, 
-                            extra
-                        );
-                    }, false, 'utf8');
-                }, 
-                extra
-            );
+                                        fileserver.createDirIfNotExists(savePath, function() {
+                                            var handle = FileServer.getOutputFileHandle(savePath, 'w+');
+                                            FileServer.writeToFile(handle, cdned, function() {
+                                                callback(cdned);
+                                            });
+                                        }, false);
+                                    });
+
+                                    FileServer.deleteFile(tmpPath, function() {});
+                                }
+                            );
+                        }, false, 'utf8');
+                    }
+                );
+            }, false, 'utf8');
         });
     };
 

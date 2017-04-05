@@ -47,6 +47,16 @@ var FileServer = function () {
 
     };
 
+    this.minifyString = function(content) {
+        return minify(content, {
+            removeComments: true,
+            removeScriptTypeAttributes: true,
+            collapseWhitespace: true,
+            minifyJS: true,
+            minifyCSS: true
+        });
+    }
+
     this.minifyHTML = function (fullpath, cb) {
         var that = this;
         var timeStamp = new Date();
@@ -70,14 +80,8 @@ var FileServer = function () {
                         minifiedString = UglifyJS.minify(content, {fromString: true}).code;
                         break;
                     default: 
-                        minifiedString = minify(content, {
-                            removeComments: true,
-                            removeScriptTypeAttributes: true,
-                            collapseWhitespace: true,
-                            minifyJS: true,
-                            minifyCSS: true
-                        });
-                }
+                        minifiedString = that.minifyString(content);
+                }            
             } catch (ex) {
                 log('Fileserver', 'Could not minify file ' + fullpath, 'err');
                 minifiedString = content
