@@ -370,7 +370,6 @@ var fetchTopicArticles = function(conf, topic, index, send) {
         }
 
         topics.getFamilyIDs(conf, topic._id, function(ids) {
-            console.log(ids);
             var match = {
                 status : "published",
                 topic : {$in : ids}
@@ -397,6 +396,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                         for (var i = 0; i < arr.length; i++) {
                             arr[i].author = eCache[arr[i].author];
                             arr[i].topic = topic;
+                            arr[i].url = conf.server.protocol + conf.server.url + "/" + topic.completeSlug + "/" + arr[i].name;
                         }
 
                         var details = {
@@ -612,7 +612,6 @@ var loadHooks = function(_c, info) {
             fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
                 if (needsHomeRefresh || !exists) {
                     generateHomepage(cli._c, function(content) {
-                        console.log(content);
                         needsHomeRefresh = false;
                         rQueue.homepage.forEach(function(qcli) {
                             qcli.response.writeHead(200, {CacheType : "Generated", CacheSection : "homepage"});

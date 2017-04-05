@@ -193,6 +193,30 @@ class LMLTopics {
         getChildrenOf(_id, sendback);
     }
 
+    portCategories(conf, done) {
+        log("Topics", "Porting categories to topics");
+        db.find(conf, 'categories', {}, [], (err, cur) => {
+            db.all(cur, (cat, next) => {
+                log("Topics", "Porting category : " + cat.displayname);
+                db.insert(conf, 'topics', {
+                    slug : cat.name, 
+                    completeSlug : cat.name,
+                    displayname : cat.displayname,
+                    description : cat.displayname, 
+                    active : true
+                }, (err, r) => {
+                    let tID = r.insertedID;
+                    db.update(conf, 'content', {categories : [cat.name]}, {topics : tID}, () => {
+                        next();
+                    });
+                });
+            }, (total) => {
+                log("Topics", "Done porting categories, total of : " + total, "success");
+                done();
+            });
+        });
+    }
+
     updateFamily(conf, _id, newSlug, callback) {
         const getParentArray = (parentobject, done) => {
             let pArray = [];
