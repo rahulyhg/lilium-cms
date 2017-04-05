@@ -7,20 +7,18 @@ var filelogic = require('./filelogic.js');
 
 var LMLFeed = function() {};
 
-LMLFeed.prototype.registerAdminEndpoint = function() {
+LMLFeed.prototype.setup = function() {
     db.createCollection(config.default(), 'feed', function() {});
+}
 
-    admin.registerAdminEndpoint('feed', 'GET', function(cli) {
-        filelogic.serveAdminLML(cli);
-    });
+LMLFeed.prototype.adminGET = function(cli) {
+    filelogic.serveAdminLML(cli);
 };
 
-LMLFeed.prototype.registerLiveVar = function() {
-    livevars.registerLiveVariable('feed', function(cli, levels, params, cb) {
-        db.find(config.default(), 'feed', {}, [], function(err, cur) {
-            cur.sort({_id : -1}).limit(params.limit || 50).skip(params.skip || 0).toArray(function(err, arr) {
-                cb(arr.reverse());
-            });
+LMLFeed.prototype.livevar = function(cli, levels, params, cb) {
+    db.find(config.default(), 'feed', {}, [], function(err, cur) {
+        cur.sort({_id : -1}).limit(params.limit || 50).skip(params.skip || 0).toArray(function(err, arr) {
+            cb(arr.reverse());
         });
     });
 };

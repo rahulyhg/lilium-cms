@@ -3,9 +3,10 @@
 	var baseurl = config.default.server.url;
 	baseurl += "/admin/";
 $}
+<h1>Edit Role</h1>
 		<main class="entities-main">
             <div id="campwrapper">
-                {*roles.{?1}(sourceof:"role_create")}
+                {*role.{?1}(sourceof:"role_create")}
             </div>
     			
             {=forms.render('role_create')}

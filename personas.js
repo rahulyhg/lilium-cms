@@ -8,7 +8,7 @@ var imageResizer = require('./imageResizer.js');
 
 var Personas = function() {};
 
-Personas.prototype.handleGET = function(cli) {
+Personas.prototype.adminGET = function(cli) {
     if (cli.routeinfo.path.length < 3) {
         cli.redirect(cli._c.server.url + cli.routeinfo.fullpath + "/list", true);
     } else {
@@ -26,7 +26,7 @@ Personas.prototype.handleGET = function(cli) {
     }
 };
 
-Personas.prototype.handlePOST = function(cli) {
+Personas.prototype.adminPOST = function(cli) {
     switch (cli.routeinfo.path[2]) {
         case "new":
             handleSave(cli);
@@ -38,22 +38,20 @@ Personas.prototype.handlePOST = function(cli) {
     }
 };
 
-Personas.prototype.registerLiveVar = function() {
-    livevars.registerLiveVariable('personas', function(cli, levels, params, cb) {
-        if (levels[0] === "list") {
-            db.findToArray(cli._c, 'personas', {}, function(err, arr) {
-                cb(err || arr);
-            });
-        } else if (levels[0] == "get") {
-            var id = levels[1];
-            db.findToArray(cli._c, 'personas', {_id : db.mongoID(id)}, function(err, arr) {
-                cb(err || arr[0]);
-            });
-        }
-    });
+Personas.prototype.livevar = function(cli, levels, params, cb) {
+    if (levels[0] === "list") {
+        db.findToArray(cli._c, 'personas', {}, function(err, arr) {
+            cb(err || arr);
+        });
+    } else if (levels[0] == "get") {
+        var id = levels[1];
+        db.findToArray(cli._c, 'personas', {_id : db.mongoID(id)}, function(err, arr) {
+            cb(err || arr[0]);
+        });
+    }
 };
 
-Personas.prototype.registerForms = function() {
+Personas.prototype.form = function() {
     forms.createForm('persona_create', {
         fieldWrapper : "lmlform-fieldwrapper"
     })
@@ -110,19 +108,17 @@ Personas.prototype.registerForms = function() {
     });
 };
 
-Personas.prototype.bindHooks = function() {
-    require('./hooks.js').bind('post_create_persona', 15, function(pkg) {
-        pkg.form.add('persona-select', 'liveselect', {
-            displayname : "Persona",
-            endpoint: 'personas.list', 
-            select : {
-                value : '_id',
-                displayname : 'fullname'
-            },
-            empty : {
-                displayname : "- No persona -"
-            }
-        });
+Personas.prototype.postCreatePersona = function(pkg) {
+    pkg.form.add('persona-select', 'liveselect', {
+        displayname : "Persona",
+        endpoint: 'personas.list', 
+        select : {
+            value : '_id',
+            displayname : 'fullname'
+        },
+        empty : {
+            displayname : "- No persona -"
+        }
     });
 };
 

@@ -1,31 +1,21 @@
 var _c = undefined;
-var settings = undefined;
+var Riverflow = undefined;
 var hooks = undefined;
 var endpoints = undefined;
 var plugins = undefined;
 var LML = undefined;
 var LoginLib = undefined;
 var db = undefined;
-var fs = undefined;
 var fileserver = undefined;
 var cli = undefined;
 var admin = undefined;
-var Article = undefined;
-var Communications = undefined;
-var mail = undefined;
-var styledpages = undefined;
-var Media = undefined;
 var imageSize = undefined;
-var docs = undefined;
-var analytics = undefined;
-var themes = undefined;
 var entities = undefined;
 var cacheInvalidator = undefined;
 var Frontend = undefined;
 var notification = undefined;
 var Forms = undefined;
 var sessions = undefined;
-var sites = undefined;
 var Handler = undefined;
 var ClientObject = undefined;
 var Livevars = undefined;
@@ -33,32 +23,18 @@ var Precompiler = undefined;
 var Petals = undefined;
 var GC = undefined;
 var scheduler = undefined;
-var Role = undefined;
 var filelogic = undefined;
-var category = undefined;
 var dashboard = undefined;
 var templateBuilder = undefined;
 var persona = undefined;
-var lys = undefined;
 var backendSearch = undefined;
-var devtools = undefined;
-var postleaf = undefined;
-var preferences = undefined;
 var api = undefined;
 var album = undefined;
-var secrets = undefined;
-var oembed = undefined;
-var snips = undefined;
-var tools = undefined;
 var badges = undefined;
-var conversations = undefined;
 var localcast = undefined;
-var feed = undefined;
 var cdn = undefined;
 var vocab = undefined;
 var various = undefined;
-var history = undefined;
-var amp = undefined;
 
 var log = require('./log.js');
 
@@ -68,27 +44,17 @@ var Core = function () {
         album = require('./album.js');
         api = require('./api.js');
         _c = require('./config.js');
-        settings = require('./settings.js');
+        Riverflow = require('./riverflow/riverflow.js');
         hooks = require('./hooks.js');
         endpoints = require('./endpoints.js');
         plugins = require('./plugins.js');
         LML = require('./lml.js');
         LoginLib = require('./backend/login.js');
         db = require('./includes/db.js');
-        fs = require('fs');
         fileserver = require('./fileserver.js');
         cli = require('./cli.js');
-        mail = require('./mail.js');
         admin = require('./backend/admin.js').init();
-        Article = require('./article.js');
-        Communications = require('./communications.js');
-        snips = require('./snip.js');
-        styledpages = require('./styledpages.js');
-        analytics = require('./analytics.js');
-        Media = require('./media.js');
         imageSize = require('./imageSize.js');
-        docs = require('./docs.js');
-        themes = require('./themes.js');
         entities = require('./entities.js');
         cacheInvalidator = require('./cacheInvalidator.js');
         Frontend = require('./frontend.js');
@@ -99,31 +65,18 @@ var Core = function () {
         Livevars = require('./livevars.js').init();
         Precompiler = require('./precomp.js');
         persona = require('./personas.js');
-        lys = require('./lys.js');
         Petals = require('./petal.js');
         GC = require('./gc.js');
         scheduler = require('./scheduler.js');
-        Role = require('./role.js');
         filelogic = require('./filelogic.js');
-        category = require('./category.js');
         dashboard = require('./dashboard.js');
         templateBuilder = require('./templateBuilder.js');
         backendSearch = require('./backend/search.js');
-        postleaf = require('./postleaf.js');
-        devtools = require('./devtools.js');
-        preferences = require('./preferences.js');
-        tools = require('./tools.js');
-        secrets = require('./secrets.js');
         badges = require('./badges.js');
-        oembed = require('./embed.js');
-        conversations = require("./conversations.js");
         localcast = require('./localcast.js');
-        feed = require('./feed.js');
         cdn = require('./cdn.js');
         vocab = require('./vocab.js');
         various = require('./various.js');
-        history = require('./history.js');
-        amp = require('./amp.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
@@ -137,9 +90,6 @@ var Core = function () {
             return true;
         });
 
-        persona.bindHooks();
-        cdn.bind();
-        mail.bind();
         hooks.fire('hooks');
         log('Hooks', 'Loaded hooks', 'success');
     };
@@ -167,11 +117,6 @@ var Core = function () {
             sessions.logout(cli);
         });
 
-        endpoints.register('*', 'amp', 'GET', function(cli) {
-            cli.touch("endpoints.GET.amp");
-            amp.GET(cli);
-        });
-
         admin.registerAdminEndpoint('welcome', 'GET', function(cli) {
             cli.touch('admin.GET.welcome');
             admin.welcome(cli, 'GET');
@@ -182,91 +127,11 @@ var Core = function () {
             admin.welcome(cli, 'POST');
         });
 
-        admin.registerAdminEndpoint('sites', 'GET', function (cli) {
-            cli.touch('admin.GET.sites');
-            sites.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('sites', 'POST', function (cli) {
-            cli.touch('admin.GET.sites');
-            sites.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('dashboard', 'GET', function (cli) {
-            cli.touch("admin.GET.dashboard");
-            dashboard.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('article', 'GET', function (cli) {
-            cli.touch("admin.GET.article");
-            Article.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('entities', 'GET', function (cli) {
-            cli.touch("admin.GET.entities");
-            entities.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('entities', 'POST', function (cli) {
-            cli.touch("admin.POST.entities");
-            entities.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('persona', 'GET', function(cli) {
-            cli.touch('admin.GET.persona');
-            persona.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('persona', 'POST', function(cli) {
-            cli.touch('admin.POST.persona');
-            persona.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('article', 'POST', function (cli) {
-            cli.touch("admin.POST.article");
-            Article.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('media', 'GET', function (cli) {
-            cli.touch("admin.GET.media");
-            Media.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('media', 'POST', function (cli) {
-            cli.touch("admin.POST.media");
-            Media.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('settings', 'GET', function (cli) {
-            cli.touch('admin.GET.settings');
-            settings.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('settings', 'POST', function (cli) {
-            cli.touch('admin.POST.settings');
-            settings.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('role', 'GET', function (cli) {
-            cli.touch('admin.GET.role');
-            Role.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('role', 'POST', function (cli) {
-            cli.touch('admin.POST.role');
-            Role.handlePOST(cli);
-        });
-
         admin.registerAdminEndpoint('activities', 'GET', function (cli) {
             cli.touch('admin.GET.activities');
             if (cli.hasRightOrRefuse("entities-act")) {
                 filelogic.serveAdminLML(cli, false);
             }
-        });
-
-        admin.registerAdminEndpoint('album', 'POST', function (cli) {
-            cli.touch('admin.POST.albums');
-            album.handlePOST(cli);
         });
 
         admin.registerAdminEndpoint('me', 'POST', function (cli) {
@@ -278,41 +143,6 @@ var Core = function () {
             cli.touch('admin.GET.me');
             filelogic.serveAdminLML(cli, false);
         });
-
-        admin.registerAdminEndpoint('preferences', 'GET', function(cli) {
-            cli.touch('admin.GET.preferences');
-            preferences.handleGET(cli);
-        });
-
-        admin.registerAdminEndpoint('preferences', 'POST', function(cli) {
-            cli.touch('admin.POST.preferences');
-            preferences.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('categories', 'POST', function (cli) {
-            cli.touch('admin.POST.me');
-            category.handlePOST(cli);
-        });
-
-        admin.registerAdminEndpoint('categories', 'GET', function (cli) {
-            cli.touch('admin.GET.me');
-            category.handleGET(cli, false);
-        });
-
-        secrets.registerAdminEndpoint();
-        devtools.registerAdminEndpoint();
-        oembed.registerAdminEndpoint();
-        tools.registerAdminEndpoint();
-        conversations.registerAdminEndpoint();
-        feed.registerAdminEndpoint();
-        styledpages.registerAdminEndpoint();
-        history.registerEndpoints();
-        Article.registerContentEndpoint();
-        Communications.setupController();
-        analytics.setupController();
-        docs.setupController();
-        mail.setupController();
-        snips.setupController();
 
 /*
         api.registerApiEndpoint('articles', 'GET', function (cli) {
@@ -373,174 +203,9 @@ var Core = function () {
         hooks.fire('image_sized_loaded');
     };
 
-    var loadAdminMenus = function () {
-        var aurl = "admin/"; //_c.default().server.url + "/admin/";
-
-        admin.registerAdminMenu({
-            id: "sites",
-            faicon: "fa-sitemap",
-            displayname: "Network",
-            priority: 50,
-            rights: ["manage-sites"],
-            absURL: aurl + "sites",
-            children: []
-        });
-
-        admin.registerAdminMenu({
-            id: "feed",
-            faicon: "fa-newspaper-o",
-            displayname: "What's up",
-            priority: 80,
-            rights: ["dash"],
-            absURL: aurl + "feed",
-            children: []
-        });
- 
-        admin.registerAdminMenu({
-            id: "dashboard",
-            faicon: "fa-tachometer",
-            displayname: "Dashboard",
-            priority: 100,
-            rights: ["dash"],
-            absURL: aurl + "dashboard",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "articles",
-            faicon: "fa-pencil",
-            displayname: "Content",
-            priority: 200,
-            rights: ["list-articles"],
-            absURL: aurl + "article",
-            children: []
-        });
-        admin.registerAdminSubMenu('articles', {
-            id: "articles-category",
-            faicon: "fa-cubes",
-            displayname: "Categories",
-            priority: 200,
-            rights: ["manage-categories"],
-            absURL: aurl + "categories",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "styledpages",
-            faicon: "fa-paragraph",
-            displayname: "Styled Pages",
-            priority: 250,
-            rights: ["styledpages"],
-            absURL: aurl + "styledpages/list",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "mailtemplates",
-            faicon: "fa-envelope-o",
-            displayname: "Email Templates",
-            priority: 250,
-            rights: ["edit-emails"],
-            absURL: aurl + "mailtemplates/list",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "media",
-            faicon: "fa-picture-o",
-            displayname: "Media",
-            priority: 400,
-            rights: ["list-uploads"],
-            absURL: aurl + "media/list",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "entities",
-            faicon: "fa-users",
-            displayname: "Entities",
-            priority: 500,
-            rights: ["list-entities"],
-            absURL: aurl + "entities",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "secrets",
-            faicon: "fa-key",
-            displayname: "Secrets",
-            priority: 540,
-            rights: ["list-secrets"],
-            absURL: aurl + "secrets",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "themes",
-            faicon: "fa-paint-brush",
-            displayname: "Themes",
-            priority: 600,
-            rights: ["manage-themes"],
-            absURL: aurl + "themes",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "plugins",
-            faicon: "fa-plug",
-            displayname: "Plugins",
-            priority: 700,
-            rights: ["manage-plugins"],
-            absURL: aurl + "plugins",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "tools",
-            faicon: "fa-wrench",
-            displayname: "Tools",
-            priority: 800,
-            rights: [],
-            absURL: aurl + "tools",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "settings",
-            faicon: "fa-cogs",
-            displayname: "Settings",
-            priority: 1000,
-            rights: ["manage-settings"],
-            absURL: aurl + "settings",
-            children: []
-        });
-        admin.registerAdminMenu({
-            id: "devtools",
-            faicon: "fa-hashtag",
-            displayname: "Dev Tools",
-            priority: 2000,
-            rights: ["develop"],
-            absURL: aurl + "devtools",
-            children: []
-        });
-        admin.registerAdminSubMenu('entities', {
-            id: "entities-rights",
-            faicon: "fa-minus-circle",
-            displayname: "Roles",
-            priority: 100,
-            rights: ["manage-roles"],
-            absURL: aurl + "role/list",
-            children: []
-        });
-        admin.registerAdminSubMenu('entities', {
-            id: "entities-personas",
-            faicon: "fa-users",
-            displayname: "Personas",
-            priority: 120,
-            rights: ["manage-personas"],
-            absURL: aurl + "persona/list",
-            children: []
-        });
-
-        hooks.fire('adminmenus_created');
-        log('Core', 'Registered Default Admin menus', 'success');
-    };
-
     var loadPlugins = function (cb) {
         plugins.init(function () {
             log('Plugins', 'Loading plugins');
-
-            plugins.bindEndpoints();
 
             var fireEvent = function () {
                 log('Plugins', 'Loaded plugins');
@@ -697,36 +362,15 @@ var Core = function () {
 
     var loadLiveVars = function () {
         admin.registerLiveVar();
-        Article.registerContentLiveVar();
-        styledpages.registerLiveVar();
-        Media.registerMediaLiveVar();
-        entities.registerLiveVars();
-        plugins.registerLiveVar();
-        themes.registerLiveVar();
-        sites.registerLiveVar();
-        settings.registerLiveVar();
-        lys.registerLiveVar();
         backendSearch.registerLiveVar();
-        preferences.registerLiveVar();
-        category.registerLiveVar();
-        postleaf.registerLiveVar();
-        persona.registerLiveVar();
-        secrets.registerLiveVar();
-        tools.registerLiveVar();
         badges.registerLiveVar();
-        devtools.registerLiveVar();
-        album.registerLiveVar();
         notification.registerLiveVar();
-        conversations.registerLiveVar();
-        feed.registerLiveVar();
-        history.registerLiveVar();
 
         Livevars.registerDebugEndpoint();
         log('Core', 'Loaded live variables', 'success');
     };
 
     var initTables = function () {
-        styledpages.registerTable();
         require('./tableBuilder.js').init();
     }
 
@@ -740,29 +384,10 @@ var Core = function () {
     var loadForms = function () {
         log('Core', 'Loading multiple forms', 'info');
 
-        entities.init().registerCreationForm();
         LoginLib.registerLoginForm();
-        Article.registerForms();
-        styledpages.registerForm();
-        themes.registerForm();
-        settings.registerForm();
-        sites.registerForms();
-        preferences.registerForm();
-        persona.registerForms();
-        devtools.registerForms();
 
         hooks.fire('forms_init');
         log('Core', 'Forms were loaded', 'success');
-    };
-
-    var loadPostLeaves = function() {
-        hooks.fire('post_leaves_will_register');
-
-        require('./quiz.js').registerPostLeaf();
-        require('./album.js').registerPostLeaf();
-        postleaf.loadHooks();
-
-        hooks.fire('post_leaves_registered');
     };
 
     var loadNotifications = function () {
@@ -773,7 +398,7 @@ var Core = function () {
         db.findToArray(_c.default(), "entities", {roles : "lilium"}, function(err, users) {
             users.forEach(function(user) {
                 if (user.email) {
-                    mail.triggerHook(_c.default(), 'lilium_restarted', user.email, {
+                    require('./mail.js').triggerHook(_c.default(), 'lilium_restarted', user.email, {
                         sigsha : require("crypto-js").SHA256(new Date()).toString(require("crypto-js").enc.Hex),
                         user : user,
                         lmllibs : ["config", "extra", "date"]
@@ -787,10 +412,6 @@ var Core = function () {
         log('Frontend', 'Registering default values from core', 'info');
         Frontend.registerFromCore();
         hooks.fire('frontend_registered');
-    };
-
-    var loadTools = function(cb) {
-        tools.preloadTools(cb);
     };
 
     var prepareDefaultSiteCreation = function (cb) {
@@ -822,7 +443,6 @@ var Core = function () {
     var loadLMLLibs = function () {
         hooks.trigger('will_load_core_lml_libs');
         dashboard.registerLMLLib();
-        category.registerLMLLib();
         hooks.trigger('loaded_core_lml_libs');
     };
 
@@ -866,6 +486,7 @@ var Core = function () {
     };
 
     var loadDocs = function(cb) {
+        var docs = require('./docs.js');
         docs.compileDirectory(function() {
             docs.compileIndex(cb);
         });
@@ -909,7 +530,7 @@ var Core = function () {
         loadWebsites(function (resp) {
             loadRequires();
             loadHooks(readyToRock);
-            loadPostLeaves();
+            
             initForms();
             initTables();
             loadEndpoints();
@@ -919,31 +540,30 @@ var Core = function () {
             loadGlobalPetals();
             loadLMLLibs();
             loadBackendSearch();
-
+            
             loadVocab(function() {
                 loadPlugins(function () {
                     loadRoles(function () {
-                        loadTools(function() {
-                            precompile(function () {
-                                loadDocs(function() {
-                                    redirectIfInit(resp, function () {
-                                        loadAdminMenus();
-                                        loadFrontend();
-                                        loadForms();
-                                        bindLocalCast();
+                        precompile(function () {
+                            loadDocs(function() {
+                                redirectIfInit(resp, function () {
+                                    loadFrontend();
+                                    loadForms();
+                                    bindLocalCast();
             
-                                        loadCacheInvalidator();
-                                        scheduleGC();
-                                        schedulePreload();
+                                    Riverflow.loadFlows();
             
-                                        log('Lilium', 'Starting inbound server', 'info');
-                                        require('./inbound.js').createServer().start();
-                                        loadNotifications();
-                                        notifyAdminsViaEmail();
+                                    loadCacheInvalidator();
+                                    scheduleGC();
+                                    schedulePreload();
             
-                                        log('Core', 'Firing initialized signal', 'info');
-                                        hooks.fire('init');
-                                    });
+                                    log('Lilium', 'Starting inbound server', 'info');
+                                    require('./inbound.js').createServer().start();
+                                    loadNotifications();
+                                    notifyAdminsViaEmail();
+            
+                                    log('Core', 'Firing initialized signal', 'info');
+                                    hooks.fire('init');
                                 });
                             });
                         });

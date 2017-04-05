@@ -1,5 +1,5 @@
 {#config}
-{*personas.list}
+{*persona.list}
 <lml:dom v="0.6" />
 <h1>
     Personas
@@ -8,7 +8,7 @@
 
 <div class="persona-list-wrapper">
     <ul class="persona-list">
-        <lml:foreach var="persona" in="livevars.personas.list" wrapper="li">
+        <lml:foreach var="persona" in="livevars.persona.list" wrapper="li">
             <div class="persona-image-wrapper">
                 <lml:link href="{=config.default.server.url}/admin/persona/edit/{persona._id}">
                     <lml:image src="{persona.pictureurl}" />

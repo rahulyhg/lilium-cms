@@ -60,9 +60,9 @@ $}
                     </a>
                     {$ endif; $}
 
-                    <a href="{=config.default.server.url}/{=article.name}" class="archive-image-link"> </a>
+                    <a href="{=article.url}" class="archive-image-link"> </a>
                 </div>
-                <h3><a href="{=config.default.server.url}/{=article.name}">{=article.title}</a></h3>
+                <h3><a href="{=article.url}">{=article.title}</a></h3>
             </div>
         </article>
     {$ endfor; $}

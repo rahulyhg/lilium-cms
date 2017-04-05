@@ -14,8 +14,23 @@
         "archive" : "archive.lml",
         "author" : "archive.lml",
         "category" : "archive.lml",
+        "topic" : "archive.lml",
         "tags" : "archive.lml",
         "404" : "404.lml"
+    },
+    "templates" : {
+        "article" : [
+            {"displayname" : "Narcity Canada", "file" : "article"},
+            {"displayname" : "Netflix And Code", "file" : "nnc-article"}
+        ],
+        "archive" : [
+            {"displayname" : "Narcity Canada", "file" : "archive"},
+            {"displayname" : "Technology Archive Page", "file" : "archive-tech"}
+        ],
+        "home" : [
+            {"displayname" : "Narcity City", "file" : "homepage"},
+            {"displayname" : "Brand", "file" : "homepage"}
+        ]
     },
     "settingForm" : {
         "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},

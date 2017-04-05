@@ -8,14 +8,14 @@ var dates = require('./dates.js');
 var log = require('./log.js');
 
 var Settings = function () {
-    this.handleGET = function (cli) {
+    this.adminGET = function (cli) {
         cli.touch('settings.handleGET');        
         if (!cli.hasRightOrRefuse("admin")) { return; }
 
         filelogic.serveAdminLML(cli);
     };
 
-    this.handlePOST = function(cli) {
+    this.adminPOST = function(cli) {
         cli.touch('settings.handlePOST');
         if (cli.hasRight('admin')) {
             var dat = cli.postdata.data;
@@ -79,7 +79,7 @@ var Settings = function () {
         }
     };
 
-    this.registerForm = function () {
+    this.form = function () {
         forms.createForm('settings_form', {
             fieldWrapper: {
                 tag: 'div',
@@ -454,11 +454,9 @@ var Settings = function () {
             });
     };
 
-    this.registerLiveVar = function () {
-        require('./livevars.js').registerLiveVariable('settings', function (cli, levels, params, callback) {
-            callback(cli._c);
-        }, ["site-admin"]);
-    };
+    this.livevar = function(cli, levels, params, callback) {
+        callback(cli._c);
+    }
 };
 
 module.exports = new Settings();

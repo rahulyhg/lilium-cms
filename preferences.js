@@ -21,7 +21,7 @@ Preferences.prototype.getDefault = function(conf) {
     return getDefault(conf);
 };
 
-Preferences.prototype.handleGET = function(cli) {
+Preferences.prototype.adminGET = function(cli) {
     if (cli.routeinfo.path.length == 2) {
         filelogic.serveAdminLML(cli, false);
     } else {
@@ -33,7 +33,7 @@ Preferences.prototype.handleGET = function(cli) {
     }
 };
 
-Preferences.prototype.handlePOST = function(cli) {
+Preferences.prototype.adminPOST = function(cli) {
     savePreferences(cli, cli.postdata.data, function() {
         cli.refresh();
     });
@@ -56,24 +56,22 @@ var savePreferences = function(cli, prefs, callback) {
     }, callback, false, true);
 };
 
-Preferences.prototype.registerLiveVar = function() {
-    livevars.registerLiveVariable('preferences', function(cli, levels, params, callback) {
-        if (levels.length == 0) {
-            callback(new Error("Cannot access Preferences Live Variable root level."));
-        }
+Preferences.prototype.livevar = function(cli, levels, params, callback) {
+    if (levels.length == 0) {
+        callback(new Error("Cannot access Preferences Live Variable root level."));
+    }
 
-        switch (levels[0]) {
-            case "mine" : 
-                serveMyPreferences(cli, callback);             
-                break;
-            default :
-                callback(new Error("Undefined first-level " + levels[0] + " for Live Variable Preferences"));
-                break;
-        }
-    });
+    switch (levels[0]) {
+        case "mine" : 
+            serveMyPreferences(cli, callback);             
+            break;
+        default :
+            callback(new Error("Undefined first-level " + levels[0] + " for Live Variable Preferences"));
+            break;
+    }
 };
 
-Preferences.prototype.registerForm = function() {
+Preferences.prototype.form = function() {
     formBuilder.createForm('preferences', {
         fieldWrapper : "lmlform-fieldwrapper"
     })

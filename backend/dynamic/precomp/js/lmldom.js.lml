@@ -1,6 +1,6 @@
 /****************************************/
 // Lilium Document Object Model         //
-// v.0.8                                //
+// v.1.0                                //
 // ------------------------------------ //
 // Author : Erik Desjardins             //
 // End : Frontend                       //
@@ -26,7 +26,7 @@
     lml:tfooter     => id="string_{variableName}" class=""
 
     - Filters --
-    lml:filter      => id="functionName" pass="variableName"
+    lml:filter      => if="functionName" pass="variableName"
 
     - Generators --
     lml:generate    => call="functionName"
@@ -40,6 +40,7 @@
 
     - Livevar fed fields --
     select.lmldom-liveselect  => data-filledby="livevar.endpoint" name="fieldname"
+    div.lmldom-treeselect     => data-filledby="livevar.endpoint" name="fieldname"
 */
 var LMLDom = function() {
     var maindom;
@@ -72,6 +73,22 @@ var LMLDom = function() {
         }
 
         return newparent;
+    };
+
+    var getReturn = function(context, str, fallback) {
+        var levels = str.replace("?", liliumcms.pageloader.lastLevel).split('.');
+        var values = context;
+
+        for (var i = 0; i < levels.length; i++) {
+            if (typeof values == "undefined") {
+                values = fallback || "";
+                break;
+            }
+
+            values = values[levels[i]];
+        }
+        
+        return values;
     };
 
     this.table = function(tab) {
@@ -132,26 +149,10 @@ var LMLDom = function() {
     this.foreach = function(elem, virtual) {
         var nodes = [];
 
-        var itt = ldContext[elem.getAttribute('in')];
         var varname = elem.getAttribute('var') || elem.getAttribute('for');
-
-        if (typeof itt == "undefined") {
-            // Try deep variable
-            var ittlevels = elem.getAttribute('in').split('.');
-            var itt = ldContext;
-            
-            for (var i = 0; i < ittlevels.length; i++) {
-                var kk = ittlevels[i];
-                if (kk == "?") {
-                    kk = liliumcms.pageloader.lastLevel;
-                }
-                itt = itt[kk];
-            }
-        }
-
+        var itt = getReturn(ldContext, elem.getAttribute('in'), {})
         var keys = Object.keys(itt);
         for (var i = 0; i < keys.length; i++) {
-
             ldContext[varname] = itt[keys[i]];
             ldContext[varname].foreachkey = keys[i];
             ldContext.foreachkey = keys[i];
@@ -207,13 +208,9 @@ var LMLDom = function() {
             var newid = idstr;
 
             while (-1 != newid.indexOf('{')) {
-                var varlevels = newid.slice(newid.indexOf('{') + 1, newid.indexOf('}')).split('.');
-                var newval = ldContext;
-                for (var i = 0; i < varlevels.length; i++) {
-                    newval = newval[varlevels[i]];
-                }
-
-                newid = newid.replace("{" + varlevels.join('.') + "}", newval);
+                var varlevels = newid.slice(newid.indexOf('{') + 1, newid.indexOf('}'));
+                var newval = getReturn(ldContext, varlevels, "");
+                newid = newid.replace("{" + varlevels + "}", newval);
             }
 
             var wrap = document.createElement(tagname);
@@ -257,17 +254,10 @@ var LMLDom = function() {
             var paramobj;
 
             if (paramname) {
-                paramobj = ldContext[paramname];
-                if (!paramobj) {
-                    var levels = paramname.split('.');
-                    paramobj = ldContext;
-                    for (var i = 0; i < levels.length; i++) {
-                        paramobj = paramobj[levels[i]];
-                    }
-                }
+                paramobj = getReturn(ldContext, paramname, {});
             }
 
-            var truthfulness = window[cbname](paramobj);
+            var truthfulness = window[cbname](paramobj, ldContext);
             if (truthfulness) {
                 while (iftag.children.length != 0) {
                     iftag.insertAfter(iftag.children[0]);
@@ -301,13 +291,9 @@ var LMLDom = function() {
             
             paramstr = paramName;
             while (-1 != paramstr.indexOf('{')) {
-                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
-                var newval = ldContext;
-                for (var i = 0; i < varlevels.length; i++) {
-                    newval = newval[varlevels[i]];
-                }
-
-                paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
+                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}'));
+                var newval = getReturn(ldContext, varlevels, "");
+                paramstr = paramstr.replace("{" + varlevels + "}", newval);
             }
 
             cbname = cbname.split('.');
@@ -333,12 +319,8 @@ var LMLDom = function() {
 
         var ed = elem.querySelector('lml\\:editable');
         while (ed) {
-            var varlevels = ed.getAttribute('value').split('.');
-            var txt = ldContext;
-            
-            for (var k = 0; k < varlevels.length; k++) {
-                txt = txt[varlevels[k]];
-            }
+            var varlevels = ed.getAttribute('value');
+            var txt = getReturn(ldContext, varlevels, "");
 
             var inp = document.createElement('input');
             inp.setAttribute('type', 'text');
@@ -362,22 +344,12 @@ var LMLDom = function() {
             paramstr = paramName;
             var missingInfo = false;
             while (-1 != paramstr.indexOf('{')) {
-                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
-                var newval = ldContext;
-
-                for (var i = 0; i < varlevels.length; i++) {
-                    if (!newval) {
-                        missingInfo = true;
-                        break;
-                    }
-
-                    newval = newval[varlevels[i]];
-                }
-
-                paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
+                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}'));
+                var newval = getReturn(ldContext, varlevels, "");
+                paramstr = paramstr.replace("{" + varlevels + "}", newval);
             }
 
-            if (!missingInfo) {
+            if (paramstr) {
                 img.setAttribute('src', paramstr);
                 img.className = lim.className;
                 img.innerHTML = lim.innerHTML;
@@ -399,22 +371,12 @@ var LMLDom = function() {
             paramstr = paramName;
             var missingInfo = false;
             while (-1 != paramstr.indexOf('{')) {
-                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}')).split('.');
-                var newval = ldContext;
-
-                for (var i = 0; i < varlevels.length; i++) {
-                    if (!newval) {
-                        missingInfo = true;
-                        break;
-                    }
-
-                    newval = newval[varlevels[i]];
-                }
-
-                paramstr = paramstr.replace("{" + varlevels.join('.') + "}", newval);
+                var varlevels = paramstr.slice(paramstr.indexOf('{') + 1, paramstr.indexOf('}'));
+                var newval = getReturn(ldContext, varlevels, "");
+                paramstr = paramstr.replace("{" + varlevels + "}", newval);
             }
 
-            if (!missingInfo) {
+            if (paramstr) {
                 a.setAttribute('href', paramstr);
                 a.setAttribute('target', lnk.getAttribute('target') || "");
                 a.className = lnk.className;
@@ -430,12 +392,8 @@ var LMLDom = function() {
 
         var tn = elem.querySelector('lml\\:text');
         while (tn) {
-            var varlevels = tn.getAttribute('var').split('.');
-            var txt = ldContext;
-            
-            for (var k = 0; k < varlevels.length; k++) {
-                txt = txt[varlevels[k]];
-            }
+            var varlevels = tn.getAttribute('var');
+            var txt = getReturn(ldContext, varlevels, "");
 
             var elementtype = tn.getAttribute('wrapper');
             var maybeDateFormat = tn.getAttribute('date');
@@ -578,6 +536,11 @@ var LMLDom = function() {
         var quills = liliumcms.quill.getEditors();
         for (var i = 0; i < quills.length; i++) {
             liliumcms.quill.fill(quills[i], livevardata[quills[i]] || "", 'api');
+        }
+
+        log('LMLDOM', 'Working with ' + liliumcms.treeselect.length + ' Tree View Selections');
+        for (var i = 0; i < liliumcms.treeselect.length; i++) {
+            liliumcms.treeselect[i].fill(livevardata);
         }
 
         log('LMLDOM', 'Done filling fields');
@@ -783,7 +746,21 @@ var LMLDom = function() {
 
                 multibox.appendChild(ss);
             }
+        }
 
+        // Treeview select : .lmldom-treeselect
+        /*
+            Layout : {
+                _id : ObjectId,       // data-selectvalue
+                displayname : "",     // data-selectdisplayname
+                children : [Layout] 
+            }
+        */
+
+        liliumcms.treeselect = [];
+        var treeselects = maindom.querySelectorAll(".lmldom-treeselect");
+        for (var i = 0; i < treeselects.length; i++) {
+            liliumcms.treeselect.push(new LMLTreeSelect(treeselects[i]));
         }
     };
 

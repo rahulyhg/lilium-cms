@@ -38,10 +38,8 @@ var ContentDeliveryNetwork = function() {
         }
     };
 
-    this.bind = function() {
-        hooks.bind('themeLML_compiled', 100, function(pkg) {
-            
-        });
+    this.themeLMLCompiled = function(pkg) {
+
     };
 };
 

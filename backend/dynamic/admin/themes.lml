@@ -8,7 +8,7 @@ $}
 <main class="entities-main">
     {=tableBuilder.render('theme')}
     
-    {*themesettings(sourceof:=formname)}
+    {*themes.settings(sourceof:=formname)}
     {=forms.render(formname)}
 </main>
 

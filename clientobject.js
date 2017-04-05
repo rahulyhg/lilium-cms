@@ -40,6 +40,7 @@ var ClientObject = function (req, resp) {
     this.parseCookie();
     this.setID();
     this.createdAt = new Date();
+    this.extra = {};
 };
 
 ClientObject.prototype.did = function(cat, type, extra, cb) {

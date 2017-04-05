@@ -21,7 +21,7 @@ class LMLSnip {
         });
     }
 
-    GET(cli) {
+    adminGET(cli) {
         let snipname = cli.routeinfo.path[2];
         let extra = cli.routeinfo.params;
 
@@ -36,10 +36,6 @@ class LMLSnip {
                 cli.response.end();
             }
         });
-    }
-
-    setupController() {
-        Admin.registerAdminEndpoint('snips', 'GET', this.GET);
     }
 };
 

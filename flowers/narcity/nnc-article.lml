@@ -1,0 +1,80 @@
+{#config;slug;theme;extra;date}
+{$
+    featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
+    author = extra.article.authors.0;
+    url = config.default.server.url;
+    rooturl = url.substring(2);
+    postdate = extra.article.date;
+    formatdate = date.stringify(postdate);
+    topic = extra.article.topic;
+$}
+<article id="{=extra.article.name}" data-mi={=extra.article._id} class="theme-article-nnc">
+    {$ if (extra.article.featuredimage.length != 0); $}
+    <div class="featured-image-wrapper">
+        <img src='{=featimg}' class="featured-image" alt="{=&extra.article.title} featured image" />
+    </div>
+    {$ endif; $}
+
+    <h1>{=&extra.article.title}</h1>
+    <h2>{=&extra.article.subtitle}</h2>
+
+    <div id="article-section">
+        <div id="article-side">
+            {=theme.settings.sidetop}
+
+            {=theme.settings.sidebottom}
+        </div>
+
+        {$ if (?author.displayname); $}
+        <div class="article-author-strip">
+            <div class="article-author-face-section">
+                <a href="{=url}/author/{=author.slug}" class="article-author-link">
+                    <span class="article-author-displayname midvert">{=author.displayname}</span>
+                </a>
+                <span class="midvert">&middot;</span>
+                <span class="article-published-date midvert" data-edtdatetime={=extra.article.date}>{=formatdate}</span>
+            </div>
+        </div>
+        {$ endif; $}
+
+        {=theme.settings.beforearticle}
+        <div class="article-content" id="article-content">
+            <div id="article-text">
+                {=extra.article.content}
+            </div>
+
+            {$ if (?extra.article.feature); $}
+                {%=extra.article.feature}
+            {$ endif; $}
+
+            {$ if (?extra.article.related.0.name ??) $}
+            <div class="keep-on-reading-wrapper">
+                <a class="keep-on-reading" href="{=config.default.server.url}/{=extra.article.related.0.name}">Keep on reading <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+            </div>
+            {$ endif; $}
+
+            {$ if (?extra.contextname == "article"); $}
+                {=theme.settings.afterarticle}
+            {$ endif; $}
+
+            {$ if (?author.displayname); $}
+            <div class="article-signature">
+                <div class="article-signature-face-wrapper">
+                    <img src="{=author.avatarURL}" class="article-signature-face" />
+                </div>
+                <div class="article-signature-details-wrapper">
+                    <span class="article-signature-name">
+                        <a href="{=url}/author/{=author.slug}">
+                            {=author.displayname}
+                        </a>
+                    </span>
+                    <span class="article-signature-bio">
+                        {=?author.description}
+                    </span>
+                </div>
+            </div>
+            {$ endif; $}
+        </div>
+    </div>
+
+</article>

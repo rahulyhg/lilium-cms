@@ -18,15 +18,13 @@ Lys.prototype.registerLys = function(index, presentationName, icon, ftc) {
     }
 };
 
-Lys.prototype.registerLiveVar = function() {
-    require('./livevars.js').registerLiveVariable('lys', function(cli, levels, params, cb) {
-        var arr = [];
-        for (var k in cachedLys) {
-            arr.push(cachedLys[k]);
-        }
+Lys.prototype.livevar = function(cli, levels, params, cb) {
+    var arr = [];
+    for (var k in cachedLys) {
+        arr.push(cachedLys[k]);
+    }
 
-        cb(arr);
-    });
+    cb(arr);
 };
 
 module.exports = new Lys();
