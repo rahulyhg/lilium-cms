@@ -76,6 +76,10 @@
                     $('form button[name=send]').hide();
                 }
 
+                document.getElementById("article-edit-slug-button").addEventListener('click', function() {
+                    liliumcms.modals.get("article-slug-edit").cast();
+                });
+
                 {$
                     postleaves = postleaf.all();
                 $}
@@ -208,6 +212,7 @@
 
             document.getElementById('moreinfo-author').textContent = resp["author"];
             document.getElementById('moreinfo-url').innerHTML = "";
+            document.getElementById('article-slug-edit-value').value = resp.name;
             if (!resp.url || resp.url.indexOf('//') == -1) {
                 document.getElementById('moreinfo-url').textContent = resp.url;
             } else {
@@ -451,6 +456,19 @@
         
         $('.btn-refuse-review').bind('click', refuseReview);
     });
+
+    window["article-slug-edit_accept"] = function() {
+        var newSlug = document.getElementById('article-slug-edit-value').value;
+        liliumcms.lmldom.sendForm({slug : newSlug}, '{=config.default.server.url}/admin/article/editslug/' + contentid, function(resp) {
+            if (resp.success) {
+                liliumcms.notify({type : "success", message : "Slug updated"});
+                liliumcms.modals.get("article-slug-edit").dismiss();
+                updateBottomSection();
+            } else {
+                liliumcms.notify({type : "danger", message : resp.error});
+            }
+        });
+    }
 </script>
 
 <div id="confirm-publish" class="modal fade announcement" tabindex="-1" role="dialog">

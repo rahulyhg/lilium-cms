@@ -10,3 +10,19 @@
         <button class="lml-modal-cancel" type="button">Got it</button>
     </div>
 </div>
+
+<div class="lml-modal-wrapper"><div id="article-slug-edit" class="lml-modal">
+    <div class="lml-modal-title">
+        Edit article URL slug
+    </div>    
+    <div class="lml-modal-body">
+        <p>The URL slug is the portion at the end of the URL which represents a string of keywords from the title, split by hyphens. It cannot contain special characters aside from hyphens.</p>
+        <p>Modifying the URL slug will add the old one as an alias.</p>
+        <span>New URL slug</span>
+        <input id="article-slug-edit-value" placeholder="my-new-url-slug">
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Set URL</button>
+    </div>
+</div></div>

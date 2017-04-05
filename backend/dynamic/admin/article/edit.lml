@@ -17,6 +17,9 @@
 		</div>
 		<div class="article-info-strip">
 			<span>URL : </span><span id="moreinfo-url"></span>
+            <span id="article-edit-slug-button">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+            </span>
 		</div>
 		<div class="article-info-strip">
 			<span>Alias : </span><span id="moreinfo-alias"></span>
@@ -55,3 +58,4 @@
             </button>
         </div>
 </div>
+

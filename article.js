@@ -75,6 +75,9 @@ var Article = function() {
             case 'addfeature':
                 if (cli.hasRightOrRefuse("create-articles")) this.addFeature(cli);
                 break;
+            case 'editslug':
+                if (cli.hasRightOrRefuse("create-articles")) this.editSlug(cli);
+                break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -147,6 +150,7 @@ var Article = function() {
                         cli.sendJSON({
                             status : art.status || "Unknown",
                             url : art.name ? cli._c.server.url + "/" + art.name : "This article doesn't have a URL.",
+                            name : art.name || "",
                             siteurl : cli._c.server.url,
                             aliases : art.aliases ? Array.from(new Set(art.aliases)) : [], 
                             updated : art.updated || "This article was never updated",
@@ -874,6 +878,34 @@ var Article = function() {
             cli.throwHTTP(404, 'Article Not Found');
         }
     }
+
+    this.editSlug = function(cli) {
+        if (cli.routeinfo.path[3]) {
+            var newslug = cli.postdata.data.slug;
+            if (!newslug) {
+                cli.sendJSON({error : "Missing slug", success : false});
+            } else {
+                if (/^[a-z0-9\-]+$/.test(newslug)) {
+                    var id = db.mongoID(cli.routeinfo.path[3]);
+                    db.findUnique(cli._c, 'content', {_id : id}, function(err, article) {
+                        if (cli.hasRight('editor') || article.author.toString() == cli.userinfo.userid.toString()) {
+                            var aliases = article.aliases || [];
+                            aliases.push(article.name);
+                            db.update(cli._c, 'content', {_id : id}, {name : newslug, aliases : aliases}, function() {
+                                cli.sendJSON({success : true});
+                            });
+                        } else {
+                            cli.sendJSON({error : "Missing rights", success : false});
+                        }
+                    });
+                } else {
+                    cli.sendJSON({error : "Bad slug format", success : false});
+                }
+            }
+        } else {
+            cli.sendJSON({error : "Missing content ID", success : false})
+        }
+    };
 
     this.deleteAutosave = function(cli) {
         if (cli.routeinfo.path[3]) {
