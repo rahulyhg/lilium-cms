@@ -144,7 +144,7 @@ class Reporting {
             } else {
                 db.findUnique(conf, 'userclients', {userid : userid}, (err, client) => {
                     if (err || !client) {
-                        that.getUserClient(conf, undefined, sendback);
+                        that.getUserClient(conf, undefined, sendback, requestdata);
                     } else {
                         that.cache.userclients[userid] = client;
                         sendback(client);
@@ -178,7 +178,7 @@ class Reporting {
             } else {
                 db.findUnique(conf, 'usersessions', {sessionid : sessionid}, (err, session) => {
                     if (err || !session) {
-                        that.getUserSession(conf, userclient, undefined, sendback);
+                        that.getUserSession(conf, userclient, undefined, sendback, requestdata);
                     } else {
                         that.cache.usersessions[sessionid] = session;
                         sendback(session);
