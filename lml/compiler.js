@@ -1,3 +1,4 @@
+const Stream = require("stream");
 const log = require('../log.js');
 const configs = require('../config.js');
 const lmllib = require('../lmllib.js');
@@ -6,12 +7,46 @@ const fileserver = require('../fileserver.js');
 const opChar = '{';
 const clChar = '}';
 
+class LMLReadableStream extends Stream.Readable {
+    constructor(options) {
+        super(options);
+    }
+
+    _read(n) { }
+
+    push(str) {
+        super.push(str);
+    }
+
+    finish() {
+        this.push(null);
+    }
+}
+
+class LMLWritableStream extends Stream.Writable {
+    constructor(options) {
+        super(options);
+        this.lmlbuffer = "";
+    }
+
+    write(str, enc, cb) {
+        this.lmlbuffer += str;
+        cb && cb();
+    }
+
+    getData() {
+        return this.lmlbuffer;
+    }
+}
+
 class LMLContext {
     constructor(config, string, stream, extra, cb) {
         this.s = string;
+        this.readable = new LMLReadableStream({objectMode : true});
         this.stream = stream;
         this.extra = extra;
         this.config = config;
+        this.directOutput = extra.directOutput || false;
         this.buffer = [];
         this.flags = this.makeFlags();
 
@@ -494,21 +529,25 @@ class LMLTagParser {
                 if (toCompile) {
                     fileserver.readFile(fullpath, (ctn) => {
                         if (typeof ctn == "undefined") {
-                            ctx.stream.write(new Error("[LMLPetalExceltion] Undefined content for file " + fullpath).toString());
+                            ctx.readable.push(new Error("[LMLPetalExceltion] Undefined content for file " + fullpath).toString());
                             return nextPetal();
                         }
 
                         const compiler = new LMLCompiler();
-                        ctx.store(ctn, {}, () => {
-                            ctx.restore();
+                        compiler.compileFromContext(ctx, ctn, (content) => {
+                            ctx.readable.push(content);
                             nextPetal();
-                        });
-    
-                        compiler.deal(ctx);
+                        }) 
                     }, false, 'utf8');
                 } else {
                     fileserver.readFile(fullpath, (ctn) => {
-                        ctx.stream.write(typeof ctn == "undefined" ? new Error("[LMLPetalException] Undefined content for file " + fullpath) : ctn, 'utf8');
+                        ctx.readable.push(
+                            typeof ctn == "undefined" ? 
+                                new Error("[LMLPetalException] Undefined content for file " + fullpath) : 
+                                ctn, 
+                            'utf8'
+                        );
+
                         nextPetal();
                     }, false, 'utf8');
                 }
@@ -527,32 +566,34 @@ class LMLCompiler {
     output(ctx, str) {
         if (!str) { return; }
 
-        ctx.flags.writing = true;
-        ctx.stream.write(str.toString());
-        ctx.flags.writing = false;
-
-        this.checkForCompletion(ctx, 'utf8');
-
-        /*
-        ctx.buffer.push(str.toString());
-        if (!ctx.flags.writing) {
+        if (true || ctx.directOutput) {
             ctx.flags.writing = true;
-            let nextBlock = () => {
-                if (ctx.buffer.length != 0) {
-                    ctx.stream.write(ctx.buffer.shift(), 'utf8', nextBlock);
-                } else {
-                    ctx.flags.writing = false;
-                    this.checkForCompletion(ctx);
-                }
-            }
+            ctx.readable.push(str.toString());
+            ctx.flags.writing = false;
 
-            nextBlock();
+            this.checkForCompletion(ctx, 'utf8');
+        } else {
+            let that = this;
+            ctx.buffer.push(str.toString());
+            if (!ctx.flags.writing) {
+                ctx.flags.writing = true;
+                let nextBlock = () => {
+                    if (ctx.buffer.length != 0) {
+                        ctx.readable.push(ctx.buffer.shift(), 'utf8', nextBlock);
+                    } else {
+                        ctx.flags.writing = false;
+                        that.checkForCompletion(ctx);
+                    }
+                }
+
+                nextBlock();
+            }
         }
-        */
     }; 
 
     checkForCompletion(ctx) {
         if (ctx.flags.finished && !ctx.flags.writing && ctx.buffer.length == 0 && !ctx.flags.closed) {
+            ctx.readable.finish();
             ctx.flags.closed = true;
             ctx.done && ctx.done(ctx);
         }
@@ -696,9 +737,21 @@ class LMLCompiler {
         })
     };
 
+    pipeStreams(ctx) {
+        ctx.readable.pipe(ctx.stream);
+    };
+
     deal(ctx) {
         this.findOpenings(ctx);
+        this.pipeStreams(ctx);
         this.parseBlocks(ctx);
+    };
+
+    compileFromContext(ctx, string, cb) {
+        let writable = new LMLWritableStream();
+        this.compile(ctx.config.id, string, writable, ctx.extra, () => {
+            cb(writable.getData());
+        }); 
     };
 
     compileToFile(lmlfile, savepath, cb, extra) {
@@ -734,14 +787,12 @@ class LMLCompiler {
     };
 
     compileToString(siteid, string, extra, cb) {
-        let streamSpoof = new (function() {
-            let strbuffer = "";
-            this.write = ((str) => { strbuffer += str; });
-            this.getBuffer = () => { return strbuffer; };
-        })();
+        let streamSpoof = new LMLWritableStream();
 
+        extra = extra || {};
+        extra.directOutput = true;
         this.compile(siteid, string, streamSpoof, extra, () => {
-            cb(streamSpoof.getBuffer());
+            cb(streamSpoof.getData());
         });
     };
 };
