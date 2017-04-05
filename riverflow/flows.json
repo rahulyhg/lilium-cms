@@ -25,6 +25,10 @@
             "endpoint" : "lys",
             "support" : ["livevar"]
         }, {
+            "module" : "reporting.js",
+            "endpoint" : "reporting",
+            "support" : ["livevar"]
+        }, {
             "module" : "topics.js",
             "endpoint" : "topics",
             "support" : ["admin_get", "admin_post", "livevar", "form"],
