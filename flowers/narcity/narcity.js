@@ -159,7 +159,7 @@ var fetchHomepageArticles = function(_c, cb) {
                 for (var j = 0; j < latests.length; j++) {
                     latests[j].author = authors[latests[j].author];
                     latests[j].topic = latests[j].topic[0];
-                    latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? latests[j].topic.completeSlug : "") + "/" + latests[j].name;
+                    latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? "/" + latests[j].topic.completeSlug : "") + "/" + latests[j].name;
                 }
 
                 cb({
@@ -290,8 +290,9 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             var arrList = latests.splice(skip, limit);
 
             for (var i = 0; i < arrList.length; i++) {
-                arrList[i].topic = arrList[i].topic[0];
-                arrList[i].url = cli._c.server.protocol + cli._c.server.url + arrList[i].topic.completeSlug + "/" + arrList[i].name;
+                var topic = arrList[i].topic[0];
+                arrList[i].topic = topic;
+                arrList[i].url = cli._c.server.protocol + cli._c.server.url + (topic ? "/" + topic.completeSlug : "") + "/" + arrList[i].name;
             }
 
             cb(err || archTypeRes[0], arrList, totalArticles, indices);
