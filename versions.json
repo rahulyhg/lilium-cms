@@ -1,0 +1,15 @@
+{
+    "1.0.1" : {
+        "codename" : "Neptune",
+        "script" : "1.0.1.js",
+        "features" : ["It is now possible to create static pages"]
+    },
+    "1.0.2" : {
+        "codename" : "Gaia",
+        "script" : "1.0.2.js",
+        "features" : [
+            "Lilium now has an updater",
+            "Categories are now topics"
+        ]
+    }
+}

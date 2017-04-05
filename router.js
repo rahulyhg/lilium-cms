@@ -40,6 +40,8 @@ var Router = function () {
         cli.routeinfo.root = cli.routeinfo.relsitepath.relsitepath == "/";
         cli.routeinfo.async = cli.routeinfo.params.async || false;
 
+        cli.routeinfo.url = cli._c.server.protocol + "//" + cli.request.headers.host + pObj.pathname;
+
         cli.response.setHeader("Backend", "Lilium");
 
         if (!cli.routeinfo.isStatic) {

@@ -76,10 +76,12 @@ class LMLTopics {
                 }
 
                 newTopic.active = true;
-                db.insert(cli._c, 'topics', newTopic, () => {
-                    cli.sendJSON({
-                        created : true,
-                        reason : "Valid form"
+                db.insert(cli._c, 'topics', newTopic, (err, r) => {
+                    this.updateFamily(cli._c, newTopic._id, newTopic.slug, () => {
+                        cli.sendJSON({
+                            created : true,
+                            reason : "Valid form"
+                        });
                     });
                 });
             } else {
@@ -93,12 +95,14 @@ class LMLTopics {
             let topicID = db.mongoID(cli.routeinfo.path[3]);
             
             if (updatedTopic && updatedTopic.displayname && updatedTopic.slug && topicID) {
-                db.update(cli._c, 'topics', {_id : topicID}, updatedTopic, () => {
-                    cli.sendJSON({
-                        updated : true,
-                        reason : "Valid form"
+                db.update(cli._c, 'topics', {_id : topicID}, updatedTopic, (() => {
+                    this.updateFamily(cli._c, topicID, updatedTopic.slug, () => {
+                        cli.sendJSON({
+                            updated : true,
+                            reason : "Valid form"
+                        });
                     });
-                });
+                }).bind(this));
             } else {
                 cli.sendJSON({
                     created : false,
@@ -108,6 +112,160 @@ class LMLTopics {
         } else {
             cli.throwHTTP(404);
         }
+    }
+
+    serveOrFallback(cli, fallback) {
+        const that = this;
+        let completeSlug = cli.routeinfo.fullpath;
+        if (completeSlug[0] == "/") {
+            completeSlug = completeSlug.substring(1);
+        }
+
+        let maybeIndex = completeSlug.split('/');
+        if (!isNaN(maybeIndex[maybeIndex.length - 1])) {
+            let realIndex = maybeIndex.pop();
+            completeSlug = maybeIndex.join('/');
+            
+            maybeIndex = realIndex;
+        } else {
+            maybeIndex = 0;
+        }
+
+        db.findUnique(cli._c, 'topics', {completeSlug : completeSlug}, (err, topic) => {
+            if (err || !topic) {
+                fallback();
+            } else {
+                if (require('./endpoints.js').contextualIsRegistered(cli._c.id, 'topic', 'GET')) {
+                    require('./endpoints.js').executeContextual('topic', 'GET', cli, {
+                        topic : topic, 
+                        index : maybeIndex
+                    });
+                } else {
+                    let template = topic.archivetemplate || "topic";
+                    require('./filelogic.js').renderThemeLML(cli, template, completeSlug + ".html", {}, (content) => {
+                        cli.response.writeHead(200);
+                        cli.response.end(content);
+                    });
+                }
+            }
+        });
+    }
+
+    refreshTopicsSlugs(conf, done) {
+        const that = this;
+        db.findToArray(conf, 'topics', {}, (err, arr) => {
+            let index = -1;
+            const next = () => {
+                index++;
+                if (index == arr.length) {
+                    done();
+                } else {
+                    that.updateFamily(conf, arr[index]._id, arr[index].slug, next);
+                }
+            };      
+            next();
+        }, {_id : 1, slug : 1});
+    }
+
+    getFamilyIDs(conf, _id, sendback) {
+        if (typeof _id !== "object") {
+            throw new Error("Topics.getFamilyIds id parameter must be a Mongo Identifier object");
+        }
+
+        let family = [_id];
+        let getChildrenOf = (_id, finished) => {
+            db.findToArray(conf, 'topics', { parent : _id }, (err, children) => {
+                let index = -1;
+                let workOne = () => {
+                    index++;
+                    if (index == children.length) {
+                        finished(family);
+                    } else {
+                        family.push(children[index]._id);
+                        getChildrenOf(children[index]._id, workOne);
+                    }
+                };
+
+                workOne();
+            });
+        };
+
+        getChildrenOf(_id, sendback);
+    }
+
+    portCategories(conf, done) {
+        log("Topics", "Porting categories to topics");
+        db.find(conf, 'categories', {}, [], (err, cur) => {
+            db.all(cur, (cat, next) => {
+                log("Topics", "Porting category : " + cat.displayname);
+                db.insert(conf, 'topics', {
+                    slug : cat.name, 
+                    completeSlug : cat.name,
+                    displayname : cat.displayname,
+                    description : cat.displayname, 
+                    active : true
+                }, (err, r) => {
+                    let tID = r.insertedID;
+                    db.update(conf, 'content', {categories : [cat.name]}, {topics : tID}, () => {
+                        next();
+                    });
+                });
+            }, (total) => {
+                log("Topics", "Done porting categories, total of : " + total, "success");
+                done();
+            });
+        });
+    }
+
+    updateFamily(conf, _id, newSlug, callback) {
+        const getParentArray = (parentobject, done) => {
+            let pArray = [];
+            
+            const request = () => {
+                if (parentobject.parent) {
+                    db.findUnique(conf, 'topics', {_id : parentobject.parent}, (err, par) => {
+                        pArray.push(par.slug);
+                        parentobject = par;
+                        request();
+                    });
+                } else {
+                    done(pArray);
+                }
+            };
+            
+            request();
+        };
+
+        const affectChildren = (childid, parentSlug, done) => {
+            db.findUnique(conf, 'topics', {_id : childid}, (err, topic) => {
+                parentSlug = (parentSlug ? parentSlug + "/" : "") + topic.slug;
+                db.update(conf, 'topics', {_id : childid}, {completeSlug : parentSlug}, () => {
+                    // Find children, recur
+                    db.findToArray(conf, 'topics', {parent : childid}, (err, array) => {
+                        let childIndex = -1;
+                        const nextChild = () => {
+                            childIndex++;
+                            if (array.length == childIndex) {
+                                done();
+                            } else {
+                                affectChildren(array[childIndex]._id, parentSlug, nextChild);
+                            }
+                        };
+
+                        nextChild();
+                    });
+                });
+            });
+        };
+
+        db.findUnique(conf, 'topics', {_id : _id}, (err, topic) => {
+            getParentArray(topic, (parentArray) => {
+                let parentSlug = parentArray.reverse().join('/');
+                affectChildren(_id, parentSlug, () => {
+                    callback();
+                });
+            });
+        });
     }
 
     form() {
@@ -135,24 +293,24 @@ class LMLTopics {
         .trg('top')
         .add('frontend-title', 'title', { displayname : "Templates" })
         .add('articletemplate', 'liveselect', {
-            endpoint : "theme.templates.article",
+            endpoint : "themes.templates.article",
             select : {
                 value : 'file',
                 displayname : 'displayname'
             },
             empty : {
-                displayname : " - Default template - "
+                displayname : " - Default theme's article template - "
             },
             displayname : "Article template"
         })
         .add('archivetemplate', 'liveselect', {
-            endpoint : "theme.templates.archive",
+            endpoint : "themes.templates.archive",
             select : {
                 value : 'file',
                 displayname : 'displayname'
             },
             empty : {
-                displayname : " - Default template - "
+                displayname : " - Default theme's archive template - "
             },
             displayname : "Archive template"
         })

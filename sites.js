@@ -220,6 +220,42 @@ var SiteInitializer = function (conf, siteobj) {
         });
     };
 
+    var update = function(conf, done) {
+        var versions = require('./versions.json');
+        db.findToArray(conf, 'lilium', {}, function(err, dbv) {
+            var vIndex = -1;
+            var dbvo = {};
+            for (var i = 0; i < dbv.length; i++) {
+                dbvo[dbv[i].v] = dbv[i];
+            }
+
+            var allVersions = Object.keys(versions);
+            var checkNextVersion = function() {
+                vIndex++;
+                if (vIndex == allVersions.length) {
+                    log("Sites", "Done updating Lilium", "lilium");
+                    done();
+                } else {
+                    var databaseVersion = allVersions[vIndex];
+                    if (dbvo[databaseVersion]) {
+                        checkNextVersion();
+                    } else {
+                        var vinfo = versions[allVersions[vIndex]];
+                        vinfo.v = allVersions[vIndex];
+
+                        log("Sites", "Firing update script for version " + vinfo.v, "info");
+                        require('./updates/' + vinfo.script)(conf, function() {
+                            log("Sites", "Updated to version " + vinfo.v, "success");
+                            db.insert(conf, 'lilium', vinfo, checkNextVersion);
+                        });
+                    }
+                }
+            };
+
+            checkNextVersion();
+        });
+    };
+
     var loadTheme = function(cb) {
         themes.initializeSite(conf, function() {
             templateBuilder.precompThemeFiles(conf, cb);
@@ -283,10 +319,12 @@ var SiteInitializer = function (conf, siteobj) {
                                     loadSessions(function() {
                                         badges.addSite(conf, function() {
                                             loadRobots(function() {
-                                                checkForWP(conf);
-                                                hooks.fire('site_initialized', conf);
-                                                log('Sites', 'Initialized site with id ' + conf.id, 'success');
-                                                done();
+                                                update(conf, function() {
+                                                    checkForWP(conf);
+                                                    hooks.fire('site_initialized', conf);
+                                                    log('Sites', 'Initialized site with id ' + conf.id, 'success');
+                                                    done();
+                                                });
                                             });
                                         });
                                     });
