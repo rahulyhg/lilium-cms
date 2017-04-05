@@ -11,7 +11,7 @@ var HtmlParser = function () {
     }
 
     this.parseForm = function (form, formContext, livevarSource) {
-        log('HTMLParser', 'Parding form ' + form.name);
+        log('HTMLParser', 'Parsing form ' + form.name);
         var htmlForm = '';
         var submitButton = '';
         if (typeof form == 'undefined') {
