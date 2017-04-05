@@ -294,7 +294,9 @@ var FileLogic = function () {
                         extra.contentHTML = ctn;
 
                         if (skipLayout) {
-                            return callback(ctn);
+                            return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, function(cdned) {
+                                callback(cdned);
+                            });
                         }
 
                         extra.rootDir = layoutPath.substring(0, layoutPath.lastIndexOf('/'));

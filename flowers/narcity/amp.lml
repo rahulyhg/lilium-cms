@@ -6,13 +6,6 @@
     rooturl = url.substring(2);
     postdate = extra.article.date;
     formatdate = date.stringify(postdate);
-
-    siteurl = config.default.server.url;
-    fw = theme.settings.fullwidthsize;
-    fw += "px";
-    aw = theme.settings.articlewidthsize;
-    aw += "px";
-    mc = theme.settings.maincolor;
 $}
 
 <!doctype html>
@@ -40,6 +33,7 @@ $}
         <script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script>
         <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+        <script async custom-element="amp-instagram" src="https://cdn.ampproject.org/v0/amp-instagram-0.1.js"></script>
 
         <style amp-custom>
             {%petals/amp-style}

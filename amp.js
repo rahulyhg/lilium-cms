@@ -50,10 +50,14 @@ class Amp {
             filelogic.renderThemeLML(cli, 'amp', 'amp/' + article.name + '.html', {
                 config : cli._c,
                 article : article
-            }, () => {
-                fileserver.pipeFileToClient(cli, cli._c.server.html + "/amp/" + article.name + '.html', () => {
-                    log("AMP", "Generated AMP page for article : " + article.title);
-                }, true, 'text/html');
+            }, (filecontent) => {
+                log("AMP", "Generated AMP page for article : " + article.title);
+                cli.response.writeHead(200);
+                cli.response.end(filecontent);
+
+                fileserver.dumpToFile(cli._c.server.html + "/amp/" + article.name + ".html", filecontent, () => {
+                    log("AMP", "Cached file written");
+                }, 'utf8');
             }, true);
           });
 

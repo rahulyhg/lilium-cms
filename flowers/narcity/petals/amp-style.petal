@@ -1,3 +1,16 @@
+{#config;theme;extra}
+{$
+    url = config.default.content.cdn.domain;
+    rooturl = url.substring(2);
+
+    fw = theme.settings.fullwidthsize;
+    fw += "px";
+    aw = theme.settings.articlewidthsize;
+    aw += "px";
+    mc = theme.settings.maincolor;
+$}
+
+
 /* latin-ext */
 @font-face {
   font-family: 'Oswald';
