@@ -88,7 +88,7 @@ var fetchHomepageArticles = function(_c, cb) {
             db.join(_c, 'content', [
                 {
                     $match : {
-                        'topic' : csec.catname,
+                        'topic.completeSlug' : csec.catname,
                         'status' : 'published'
                     } 
                 }, {
@@ -244,7 +244,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 $match : match
             }, {
                 $sort : {
-                    _id : -1
+                    date : -1
                 }
             }, {
                 $lookup : {
@@ -381,6 +381,10 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                         {
                             $match : match
                         }, {
+                            $sort : {
+                                date : -1
+                            }
+                        }, {
                             $skip : skip
                         }, {
                             $limit : limit
@@ -403,6 +407,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                             totalLength : total,
                             totalPages : Math.ceil(total / limit)
                         };
+
                         send(arr, details);
                     });
                 });
