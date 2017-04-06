@@ -18,7 +18,6 @@ var Router = function () {
         _c.fetchConfigFromCli(cli);
         if (!cli._c) {
             cli.throwHTTP(404, "Not Found : " + cli.routeinfo.fullpath, true);
-            cb(false);
             return false;
         }
 

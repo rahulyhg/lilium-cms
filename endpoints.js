@@ -63,7 +63,7 @@ var EndPoints = function () {
     };
 
     this.isRegistered = function (site, endpoint, method) {
-        return typeof registeredEndpoints[site][method][endpoint] !== 'undefined';
+        return registeredEndpoints[site] && typeof registeredEndpoints[site][method][endpoint] !== 'undefined';
     };
 
     this.execute = function (endpoint, method, cli) {
