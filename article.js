@@ -564,7 +564,7 @@ var Article = function() {
                                                     {$push : {aliases : oldSlug}}, 
                                                 function() {
                                                     log('Article', 'Added alias for slug ' + oldSlug);
-                                                    fileserver.deleteFile(_c.server.html + "/" + oldSlug + ".html", function() {});
+                                                    fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", function() {});
                                                 }, false, true, true);
                                             }
 
