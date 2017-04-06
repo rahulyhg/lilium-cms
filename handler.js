@@ -108,7 +108,9 @@ var Handler = function () {
                     }
                 }
             } else {
-                cli.throwHTTP(401, "Unauthorized");
+                log('Handler', "Blocked POST at " + cli.routeinfo.fullpath + " from " + cli.request.connection.remoteAddress, 'detail');
+                log('Handler', "User-Agent is : " + cli.request.headers["user-agent"], 'detail');
+                cli.throwHTTP(401, undefined, true);
                 return;
             }
         });

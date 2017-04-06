@@ -273,19 +273,19 @@ var Core = function () {
     var gracefullyCrash = function(err) {
         var stack = err.stack.split('\n');
 
-        log('Core', '------------------------------------------------', 'err');
+        log('Core', '------------------------------------------------', 'detail');
         log('Core', 'Exception made its way to core process', 'err');
-        log('Core', '------------------------------------------------', 'err');
+        log('Core', '------------------------------------------------', 'detail');
         log('Core', 'Error stack : ' + err, 'err');
         for (var i = 1; i < stack.length; i++) {
             log('Stack', stack[i], 'err');
         }
-        log('Core', '------------------------------------------------', 'err');
-        log('Core', 'Gracefully firing crash event to all modules', 'err');
+        log('Core', '------------------------------------------------', 'detail');
+        log('Core', 'Gracefully firing crash event to all modules', 'info');
         hooks.fire('crash', err);
 
-        log('Core', 'Contacting handler to request a crash to all handles', 'err');
-        require('./handler.js').crash(err);
+        log('Core', 'Contacting handler to request a crash to all handles', 'info');
+        // require('./handler.js').crash(err);
 
         // log('Lilium', 'Shutting down');
         // process.exit();

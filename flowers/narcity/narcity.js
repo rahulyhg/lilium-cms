@@ -75,7 +75,7 @@ var registerSnips = function(_c, cb) {
 };
 
 var fetchHomepageArticles = function(_c, cb) {
-    var sett = themes.getEnabledTheme(_c).settings;
+    var sett = themes.getEnabledTheme(_c).settings || {};
     var homepageSections = sett.homepagesections;
     var i = 0;
     var len = Object.keys(homepageSections || {}).length;
@@ -592,7 +592,7 @@ var rQueue = {
 };
 var cachedTags = {};
 var loadHooks = function(_c, info) {
-    endpoints.register(_c.id, ["2012", "2013", "2014", "2015", "2016", "2017"], 'GET', function(cli) {
+    endpoints.register(_c.id, ["2012", "2013", "2014", "2015", "2016", "2017", "category"], 'GET', function(cli) {
         cli.redirect(_c.server.url + "/" + cli.routeinfo.path.pop() + (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : ""));
     });
 

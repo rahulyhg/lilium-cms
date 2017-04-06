@@ -542,7 +542,7 @@ var Notification = function () {
     };
 
     this.emitToWebsite = function (siteid, data, type) {
-        io.of(idToNamespace[siteid]).emit(type || 'notification', data);
+        io && io.of(idToNamespace[siteid]).emit(type || 'notification', data);
     };
 
     this.messageNotif = function(user, msg, type) {

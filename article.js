@@ -257,7 +257,7 @@ var Article = function() {
                                     });
                                 };
                                 
-                                arr[0].topics = [topic];
+                                arr[0].topics = topic ? [topic] : [];
                                 var curTopic = topic;
                                 var nextParentTopic = function() {
                                     if (curTopic && curTopic.parent) {
