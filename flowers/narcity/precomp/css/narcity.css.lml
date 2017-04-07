@@ -1859,7 +1859,7 @@ footer .copyright a {
     position: absolute;
     bottom: 8px;
     right: 8px;
-    padding: 3px 10px 2px 38px;
+    padding: 3px 10px 2px 30px;
     color: #FFF;
     font-size: 18px;
     font-family: "Oswald", sans-serif;
@@ -1877,7 +1877,7 @@ footer .copyright a {
     position: absolute;
     left: 7px;
     bottom: 6px;
-    width: 25px;
+    width: 15px;
 }
 
 
