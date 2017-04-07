@@ -28,13 +28,11 @@ var canRequest = function(cli) {
     return cli.hasRightOrRefuse('create-articles');
 };
 
-Embed.prototype.registerAdminEndpoint = function() {
-    Admin.registerAdminEndpoint('embed', 'GET', function(cli) {
-        cli.touch("embed.GET");
-        if (canRequest(cli)) {
-            handleRequest(cli);
-        }
-    });
+Embed.prototype.adminGET = function(cli) {
+    cli.touch("embed.GET");
+    if (canRequest(cli)) {
+        handleRequest(cli);
+    }
 };
 
 var scanInstagramSingle = function(cli, err, cur, done) {

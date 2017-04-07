@@ -4,8 +4,10 @@
   "description": "Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.",
   "main": "lilium.js",
   "scripts": {
-    "test": "liliumtest",
-    "dev": "node lilium.js"
+    "test": "node lilium.js crash-on-error",
+    "dev": "node lilium.js dev",
+    "start": "node lilium.js prod",
+    "setup" : "npm install && sudo npm install bower -g && bower install"
   },
   "repository": {
     "type": "git",

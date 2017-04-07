@@ -18,7 +18,6 @@ var Router = function () {
         _c.fetchConfigFromCli(cli);
         if (!cli._c) {
             cli.throwHTTP(404, "Not Found : " + cli.routeinfo.fullpath, true);
-            cb(false);
             return false;
         }
 
@@ -39,6 +38,8 @@ var Router = function () {
         cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.livevars;
         cli.routeinfo.root = cli.routeinfo.relsitepath.relsitepath == "/";
         cli.routeinfo.async = cli.routeinfo.params.async || false;
+
+        cli.routeinfo.url = cli._c.server.protocol + "//" + cli.request.headers.host + pObj.pathname;
 
         cli.response.setHeader("Backend", "Lilium");
 

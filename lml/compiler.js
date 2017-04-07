@@ -249,7 +249,7 @@ class LMLSlang {
             if (curVal != "" && !isNaN(curVal) && curVal[0] != "0") {
                 curVal = parseFloat(curVal);
             } else if (flags["&"]) {
-                curVal = curVal.replace(/\</g, "&lt;").replace(/\>/g, "&gt;").replace(/\"/g, "&quot;"); 
+                curVal = curVal.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;"); 
             } else if (typeof ctx.consts[curVal] != "undefined"){
                 curVal = ctx.consts[curVal];
             }

@@ -18,7 +18,7 @@ var Dispatcher = function () {
                 if (cli._c.usability.admin.loginIfNotAuth) {
                     cli.redirect(cli._c.server.url + "/login?cause=401", false);
                 } else {
-                    cli.throwHTTP(401, "Unauthorized");
+                    cli.throwHTTP(401, "Unauthorized", true);
                 }
             }
         } else if (cli.routeinfo.login) {
@@ -42,7 +42,7 @@ var Dispatcher = function () {
                 if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
                     Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);
                 } else {
-                    cli.throwHTTP(401, "Unauthorized");
+                    cli.throwHTTP(401, "Unauthorized", true);
                 }
             } else {
                 Endpoints.execute(cli.routeinfo.path[0], 'POST', cli);

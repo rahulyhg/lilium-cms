@@ -11,7 +11,7 @@ var HtmlParser = function () {
     }
 
     this.parseForm = function (form, formContext, livevarSource) {
-        log('HTMLParser', 'Parding form ' + form.name);
+        log('HTMLParser', 'Parsing form ' + form.name);
         var htmlForm = '';
         var submitButton = '';
         if (typeof form == 'undefined') {
@@ -166,6 +166,9 @@ var HtmlParser = function () {
                     break;
                 case "lmleditor":
                     htmlForm += parseLMLEditor(field);
+                    break;
+                case "treeselect":
+                    htmlForm += parseTreeViewSelect(field);
                     break;
                 case "liveselect":
                     htmlForm += parseLiveSelect(field);
@@ -392,6 +395,26 @@ var HtmlParser = function () {
         input += ' />'
 
         return input;
+    };
+
+    var parseTreeViewSelect = function(field) {
+        var attr = field.attr;
+        var output = '<lml:livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml:livevars>' +
+            '<label for="'+field.name+'">'+attr.displayname+'</label>' +
+            '<input type="hidden" name="'+field.name+'" class="lmldom-treeselect-value" />' + 
+            '<div class="lmldom-treeselect" data-fieldname="'+field.name+'" data-filledby="'+attr.endpoint+'" '+ 
+                'data-selectreadkey="'+(attr.select.readkey||field.name)+'" ' + 
+                'data-selectvalue="'+attr.select.value+'" '+
+                'data-selectdisplayname="'+attr.select.displayname+'" id="lml-treeselect-'+field.name+'" >' +
+                    '<div class="lml-treeselect-choices"></div>' +
+            '</div>';
+
+        if (field.wrapper) {
+            var tagname = field.wrapper.tag || "div";
+            output = '<'+tagname+' class="'+(field.wrapper.class || "")+'">' + output + '</'+tagname+'>';
+        }
+
+        return output;
     };
 
     var parseButtonType = function (field) {

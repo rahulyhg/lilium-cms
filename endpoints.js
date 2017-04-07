@@ -5,6 +5,7 @@ var log = require('./log.js');
 
 // Schema : {SITE_ID:{METHOD:{ENDPOINT:{ENDPOINTDATA}}}}
 var registeredEndpoints = new Object();
+var contextualEndpoints = new Object();
 
 var AllowedMethods = function() {
     this.GET  = new Object();
@@ -42,6 +43,19 @@ var EndPoints = function () {
         }
     };
 
+    this.registerContextual = function(site, endpoint, method, callback) {
+        contextualEndpoints[site][method][endpoint] = callback;
+    };
+
+    this.executeContextual = function(endpoint, method, cli, extra) {
+        var ed = contextualEndpoints[cli._c.id][method][endpoint];
+        ed && ed(cli, extra);
+    };
+
+    this.contextualIsRegistered = function(site, endpoint, method) {
+        return !!contextualEndpoints[site][method][endpoint];
+    };
+
     this.unregister = function (site, endpoint, method) {
         if (typeof registeredEndpoints[site][method][endpoint] !== 'undefined') {
             delete registeredEndpoints[site][method][endpoint];
@@ -49,7 +63,7 @@ var EndPoints = function () {
     };
 
     this.isRegistered = function (site, endpoint, method) {
-        return typeof registeredEndpoints[site][method][endpoint] !== 'undefined';
+        return registeredEndpoints[site] && typeof registeredEndpoints[site][method][endpoint] !== 'undefined';
     };
 
     this.execute = function (endpoint, method, cli) {
@@ -64,6 +78,7 @@ var EndPoints = function () {
     this.addSite = function(site) {
         if (typeof registeredEndpoints[site] === 'undefined') {
             registeredEndpoints[site] = new AllowedMethods();
+            contextualEndpoints[site] = new AllowedMethods();
         } else {
             log("Endpoint", "Tried to add existing site " + site);
             return new Error("[EndPointException - Tried to add existing site " + site + "]");

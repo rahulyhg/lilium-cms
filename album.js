@@ -7,16 +7,12 @@ var hooks = require('./hooks.js');
 var Album = function() {
     var that = this;
 
-    this.registerPostLeaf = function() {
-        postleaf.registerLeaf('album', 'Album', 'addAlbumToPost', 'editAlbumToPost', 'renderAlbum');
+    this.articleDeepFetch = function(conf, article, cb) {
+        if (article.feature !== "album" || !article.featuredata || article.featuredata.length == 0) { return cb() };
 
-        hooks.bind('article_deepfetch', 50, function(conf, article, cb) {
-            if (article.feature !== "album" || !article.featuredata || article.featuredata.length == 0) { return cb() };
-
-            that.getArticleImages(conf, article._id, function(arr) {
-                article.featuredata.fullpics = arr;
-                cb();
-            });
+        that.getArticleImages(conf, article._id, function(arr) {
+            article.featuredata.fullpics = arr;
+            cb();
         });
     };
 
@@ -33,20 +29,18 @@ var Album = function() {
                 }, {featuredata : 1});
     }
 
-    this.registerLiveVar = function() {
-        livevars.registerLiveVariable('album', function(cli, levels, params, cb) {
-            if (levels.length == 0) {
-                cb("[AlbumLivevarException] Need at least one level");
-            } else if (levels[0] == "images") {
-                var postid = levels[1];
-                that.getArticleImages(cli._c, postid, cb);
-            } else {
-                cb("[AlbumLivevarException] Unknown level " + levels[0]);
-            }
-        });
+    this.livevar = function(cli, levels, params, cb) {
+        if (levels.length == 0) {
+            cb("[AlbumLivevarException] Need at least one level");
+        } else if (levels[0] == "images") {
+            var postid = levels[1];
+            that.getArticleImages(cli._c, postid, cb);
+        } else {
+            cb("[AlbumLivevarException] Unknown level " + levels[0]);
+        }
     };
 
-    this.handlePOST = function(cli){
+    this.adminPOST = function(cli){
         // URL : domain/admin/album
         if (cli.hasRightOrRefuse('create-articles')) {
             var postid = cli.routeinfo.path[3];

@@ -44,7 +44,7 @@ $}
     _sf_async_config.uid = 57714;
     _sf_async_config.domain = '{=domain}';
     _sf_async_config.useCanonical = true;
-    _sf_async_config.sections = "{=?extra.article.categories.0.displayname}";
+    _sf_async_config.sections = "{=?extra.article.topic.displayname}";
     _sf_async_config.authors = "{=?extra.article.authors.0.displayname}"; 
     /** CONFIGURATION END **/
     (function(){
@@ -59,6 +59,7 @@ $}
 
 <script src="https://use.fontawesome.com/c06218d3bc.js"></script>
 <script src="//www.googletagservices.com/tag/js/gpt.js" async=""></script>
+<script src="{=config.default.server.url}/compiled/theme/r.js?{=config.default.compilekey}"></script>
 <script src="{=config.default.server.url}/compiled/theme/social.js?{=config.default.compilekey}"></script>
 <script src="{=config.default.server.url}/compiled/theme/facebook.js?{=config.default.compilekey}"></script>
 <script src="{=config.default.server.url}/compiled/theme/global.js?{=config.default.compilekey}"></script>

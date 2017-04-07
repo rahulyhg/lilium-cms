@@ -16,7 +16,7 @@
 <meta property="article:author" content="{=?extra.article.authors.0.socialnetworks.facebook}" />
 <link rel="author" href="{=?extra.article.authors.0.socialnetworks.facebook}" />
 
-<meta property="og:url" content="https:{=config.default.server.url}/{=extra.article.name}"/>
+<meta property="og:url" content="{=extra.article.url}"/>
 <meta property="og:title" content="{=&extra.article.title}" />
 <meta property="og:description" content="{=&extra.article.subtitle}" />
 
@@ -27,7 +27,7 @@
 {$ if (?extra.article.wptype ??); $}
     <link rel="canonical" href="{=config.default.wordpress.originalurl}/{=extra.article.name}/" />
 {$ else; $}
-    <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}/" />
+    <link rel="canonical" href="{=extra.article.url}" />
 {$ endif; $}
 
 <link rel="amphtml" href="{=config.default.server.url}/amp/{=extra.article.name}" />

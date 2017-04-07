@@ -48,13 +48,18 @@ var FileServer = function () {
     };
 
     this.minifyString = function(content) {
-        return minify(content, {
-            removeComments: true,
-            removeScriptTypeAttributes: true,
-            collapseWhitespace: true,
-            minifyJS: true,
-            minifyCSS: true
-        });
+        try {
+            return minify(content, {
+                removeComments: true,
+                removeScriptTypeAttributes: true,
+                collapseWhitespace: true,
+                minifyJS: true,
+                minifyCSS: true
+            });
+        } catch (ex) {
+            log("FileServer", "Failed to minify string", "warn");
+            return content;
+        }
     }
 
     this.minifyHTML = function (fullpath, cb) {

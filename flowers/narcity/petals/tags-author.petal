@@ -11,4 +11,4 @@
 
 <meta property="og:image" content="{=?extra.archivedetails.avatarURL}" />
 
-<title>{=extra.archivedetails.displayname} - {=config.default.info.project}</title>
+<title>{=extra.archivedetails.displayname} - {=config.default.website.sitetitle}</title>

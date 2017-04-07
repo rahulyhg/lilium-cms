@@ -142,6 +142,7 @@ var DB = function() {
 	this.find = this.query = function(conf, coln, conds, stack, cb, proj) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
+                log('Database', 'Error querying collection ' + coln + ' : ' + err, 'err');
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
 				cb("[Database - Invalid document]");
@@ -312,7 +313,7 @@ var DB = function() {
 							'upsert' : upsert ? upsert : false
 						}
 					).then(function(r) {
-						cb(undefined, r);
+						cb && cb(undefined, r);
 					});
 				}
 			}
