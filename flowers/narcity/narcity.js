@@ -139,7 +139,7 @@ var fetchHomepageArticles = function(_c, cb) {
                         date : -1
                     }
                 }, {
-                    $limit : 12
+                    $limit : 18
                 }, {
                     $lookup : {
                         from:           "uploads",
