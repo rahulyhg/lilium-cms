@@ -1857,12 +1857,12 @@ footer .copyright a {
     display: none; /* Will appear if shares are higher than 100 */
     background-color: {=mc};
     position: absolute;
-    bottom: 8px;
+    bottom: 3px;
     right: 8px;
     padding: 3px 5px 2px 25px;
     color: #FFF;
-    font-size: 18px;
-    font-family: "Oswald", sans-serif;
+    font-size: 16px;
+    font-family: "Arial";
 }
 
 .article-share-count-mobile-num {
@@ -1876,10 +1876,15 @@ footer .copyright a {
     vertical-align: baseline;
     position: absolute;
     left: 7px;
-    bottom: 6px;
+    bottom: 3px;
     width: 15px;
 }
 
+.homepage .article-thumbnail .article-thumbnail-featured-image .article-share-icon img {
+    display: inline-block;
+    width: 13px;
+    height:auto;
+}
 
 .pc-sharer-network i {
     margin-top: 17px;
@@ -2507,21 +2512,6 @@ body.slidheader .android-sharer {
         margin: auto;
         float: none;
         clear: both;
-    }
-
-    .homepage .article-thumbnail .article-share-icon img, .article-share-icon img {
-        bottom: 3px;
-    }
-
-    .homepage .article-thumbnail .article-thumbnail-featured-image .article-share-icon img {
-        display: inline-block;
-        width: 13px;
-        height:auto;
-    }
-
-    .article-share-count-mobile {
-        font-size: 16px;
-        font-family: Arial;
     }
 }
 
