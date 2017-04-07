@@ -1859,7 +1859,7 @@ footer .copyright a {
     position: absolute;
     bottom: 8px;
     right: 8px;
-    padding: 3px 10px 2px 30px;
+    padding: 3px 5px 2px 25px;
     color: #FFF;
     font-size: 18px;
     font-family: "Oswald", sans-serif;
@@ -2507,6 +2507,21 @@ body.slidheader .android-sharer {
         margin: auto;
         float: none;
         clear: both;
+    }
+
+    .homepage .article-thumbnail .article-share-icon img, .article-share-icon img {
+        bottom: 3px;
+    }
+
+    .homepage .article-thumbnail .article-thumbnail-featured-image .article-share-icon img {
+        display: inline-block;
+        width: 13px;
+        height:auto;
+    }
+
+    .article-share-count-mobile {
+        font-size: 16px;
+        font-family: Arial;
     }
 }
 
