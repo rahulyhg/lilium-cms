@@ -56,12 +56,13 @@ var CacheInvalidator = function () {
                     fileserver.emptyDirectory(path, deleteOpt, function() {});
                 }
 
-                var cats = data.article.categories;
-                if (cats) for (var i = 0; i < cats.length; i++) {
-                    var path = html + '/category/' + cats[i];
-                    log('Cache', 'Emptying category cache : ' + cats[i]);
-                    fileserver.emptyDirectory(path, deleteOpt, function() {});
-                }
+                fileserver.emptyDirectory(html + "/latests", deleteOpt, function() {
+                    db.findUnique(data._c, 'topics', { _id : db.mongoID(data.article.topic) }, function(err, topic) {
+                        topic && topic.completeSlug && fileserver.emptyDirectory(html + "/" + topic.completeSlug, deleteOpt, function() {
+                            fileserver.deleteFile(html + "/" + topic.completeSlug + ".html", function() {});
+                        })
+                    });
+                });
             }
         });
     };

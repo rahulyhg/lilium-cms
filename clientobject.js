@@ -198,7 +198,7 @@ ClientObject.prototype.redirect = function (path, perm, hash) {
 ClientObject.prototype.crash = function (ex) {
     log('ClientObject', 'Crash handled with error : ' + ex);
 
-    if (this._c && this._c.env == "prod") {
+    if (false && this._c && this._c.env == "prod") {
         log('ClientObject', 'Sending 500');
         return this.throwHTTP(500, 'Lilium Internal Server Error', true);
     }
