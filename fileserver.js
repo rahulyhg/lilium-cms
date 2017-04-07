@@ -155,7 +155,7 @@ var FileServer = function () {
             }
 
             var files = content.files;
-            if (files.length > 500) {
+            if (files.length > 500 && !opt.acceptLargeDirectory) {
                 cb(new Error("Found more than 500 files. Might be insecure."));
             } else {
                 var index = -1;
