@@ -70,25 +70,25 @@ $}
 
     <div class="archive-navigator float-wrapper">
         {$
-            archiveport = "/";
-            archiveport += extra.archivename;
-
             tagpart = tagslug;
             tagpart += "/";
 
-            if (extra.archivename == "latests");
-                archiveport = "";
-            endif; if (extra.archivename == "topic");
+            if (?extra.archivename ??);
+                archivepart = "/";
+                archivepart += extra.archivename;
+            endif; if (extra.archivename == "latests");
+                archivepart = ?"";
+            endif; if (?extra.context == "topic");
                 archivepart = "/";
                 archivepart += extra.topic.completeSlug;
 
-                tagpart = "";
+                tagpart = ?"";
             endif;
         $}
         <ul>
             {$ for (arindex in extra.indices.pagenumbers); $}
                 <li {$ if (arindex == extra.currentpage); $} class="currentpage" {$ endif; $} >
-                    <a href="{=config.default.server.url}{=archiveport}/{=tagpart}{=arindex}">
+                    <a href="{=config.default.server.url}{=?archivepart}/{=?tagpart}{=arindex}">
                         {=arindex}
                     </a>
                 </li>

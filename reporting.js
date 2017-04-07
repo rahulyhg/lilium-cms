@@ -203,7 +203,7 @@ class Reporting {
         let userid = cli.cookies.lmlcli;
         let sessionid = cli.routeinfo.params.sessionid || cli.cookies.lmlusersesh;
 
-        if (this.cache.ping[userid] && new Date() - this.cache.ping[userid].time < POKE_TIMEOUT) {
+        if (cli.routeinfo.path[1] && this.cache.ping[userid] && new Date() - this.cache.ping[userid].time < POKE_TIMEOUT) {
             return cli.sendJSON({message : ":/"});
         } 
 
