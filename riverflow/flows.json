@@ -310,7 +310,7 @@
         }, {
             "module" : "amp.js",
             "endpoint" : "amp",
-            "support" : []
+            "support" : ["get"]
         }, {
             "module" : "sites.js",
             "endpoint" : "sites",

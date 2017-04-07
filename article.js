@@ -274,6 +274,7 @@ var Article = function() {
                                     
                                         arr[0].topicslug = topicSlug;
                                         arr[0].url = conf.server.protocol + conf.server.url + topicSlug + arr[0].name;
+                                        arr[0].amp = conf.server.protocol + conf.server.url + "/amp" + topicSlug + arr[0].name;
                                         continueWithAuthor();
                                     }
                                 };
