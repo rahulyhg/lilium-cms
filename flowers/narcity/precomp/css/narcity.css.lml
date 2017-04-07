@@ -1857,9 +1857,9 @@ footer .copyright a {
     display: none; /* Will appear if shares are higher than 100 */
     background-color: {=mc};
     position: absolute;
-    bottom: 3px;
-    right: 8px;
-    padding: 3px 5px 2px 25px;
+    bottom: 6px;
+    right: 6px;
+    padding: 3px 4px 3px 25px;
     color: #FFF;
     font-size: 16px;
     font-family: "Arial";
