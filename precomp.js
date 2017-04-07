@@ -45,7 +45,7 @@ var Precomp = function () {
 
     var minifyFile = function (conf, inFile, outFile, filetype, callback) {
         // Only minify in prod
-        if (conf.env == 'prod') {
+        if (false && conf.env == 'prod') {
             log('Precompiler', 'Minifying ' + filetype + ' file', 'info');
 
             if (filetype == 'css') {
