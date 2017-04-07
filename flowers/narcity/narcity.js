@@ -405,8 +405,27 @@ var fetchTopicArticles = function(conf, topic, index, send) {
 
                         var details = {
                             totalLength : total,
-                            totalPages : Math.ceil(total / limit)
+                            totalPages : Math.ceil(total / limit),
+                            pagenumbers : []
                         };
+
+                        index ++;
+                        if (index < 4) {
+                            for (var i = 1; i <= details.totalPages && i <= 5; i++) {
+                                details.pagenumbers.push(i);
+                            }
+                        } else if (index > details.totalPages - 2) {
+                            for (var i = details.totalPages - 4; i <= details.totalPages; i++) {
+                                details.pagenumbers.push(i);
+                            }
+                        } else {
+                            var firstPage = index - 2;
+                            var lastPage = index + 2;
+                            for (var i = firstPage; i <= lastPage; i++) {
+                                details.pagenumbers.push(i);
+                            }
+                        }
+                        
 
                         send(arr, details);
                     });
@@ -432,7 +451,8 @@ var serveTopic = function(cli, extra) {
                     context : 'topic',
                     indices : {
                         totalarticles : details.totalLength,
-                        totalpages : details.totalPages
+                        totalpages : details.totalPages,
+                        pagenumbers : details.pagenumbers
                     },
                     currentpage : index || 1,
                 };
