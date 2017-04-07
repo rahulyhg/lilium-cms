@@ -624,14 +624,16 @@ var Article = function() {
                                                     });
                                                 }
             
-                                                var nlen = publishedNotificationTitles.length;
-                                                var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
-        
-                                                notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
-                                                    title: notifMessage,
-                                                    url: cli._c.server.url + '/' + deepArticle.name,
-                                                    msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
-                                                    type: 'success'
+                                                var maybeTopic = formData.topic && db.mongoID(formData.topic);
+                                                db.findUnique(cli._c, 'topics', { _id : maybeTopic  }, function(err, tObject) {
+                                                    var nlen = publishedNotificationTitles.length;
+                                                    var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
+                                                    notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                                                        title: notifMessage,
+                                                        url: cli._c.server.url + (tObject ? ("/" + tObject.completeSlug) : "") + '/' + deepArticle.name,
+                                                        msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
+                                                        type: 'success'
+                                                    });
                                                 });
 
                                                 feed.plop(deepArticle._id, function() {
