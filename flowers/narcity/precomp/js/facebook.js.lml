@@ -54,15 +54,16 @@ var NarcityFacebook = function() {
         if (allurls.length != 0) {
             this.bulkShareRequest(allurls, function(ogobj) {
                 var htmlnode = urls[ogobj.id];
+                //ogobj.share = {share_count: 7200};
 
                 if (htmlnode) {
-                    var min = htmlnode.dataset.min || 10000;
-    
+                    var min = htmlnode.dataset.min || 100;
+                    
                     if (ogobj.share && ogobj.share.share_count && ogobj.share.share_count > parseInt(min)) {
                         htmlnode.innerHTML = ogobj.share.share_count;
         
                         if (htmlnode.dataset.show && htmlnode.innerHTML != "0000") {
-                            // document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
+                             document.getElementById(htmlnode.dataset.show).style.display = htmlnode.dataset.showas || "block";
                         }
                     }
                 }
