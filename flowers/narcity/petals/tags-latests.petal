@@ -1,1 +1,2 @@
-<title>Latests - {=config.default.info.project}</title>
+{#config}
+<title>Latests - {=config.default.website.sitetitle}</title>

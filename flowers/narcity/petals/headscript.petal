@@ -49,7 +49,7 @@
         identifier : "{=extra.article._id}",
         title : "{=&extra.article.title}",
         subtitle : "{=&extra.article.subtitle}",
-        category : "{=extra.article.categories.0.displayname}",
+        category : "{=extra.article.topic.displayname}",
         author : "{=?extra.article.authors.0.displayname}",
         tags : {=#extra.article.tags},
         page : maybePage,
@@ -89,7 +89,7 @@ if (typeof googletag != "undefined") {
         googletag.cmd.push(function() {
             googletag.pubads()
                 {$ if (extra.contextname == "article"); $}
-                .setTargeting("category", ["{=extra.article.categories.0.displayname}", "ROS"])
+                .setTargeting("category", ["{=extra.article.topic.displayname}", "ROS"])
                     {$ if (?extra.article.data.wp_id); $}
                     .setTargeting("post", "{=?extra.article.data.wp_id}")
                     {$ else; $}

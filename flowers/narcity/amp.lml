@@ -12,7 +12,7 @@ $}
 <html amp lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{=extra.article.title} - MTL Blog</title>
+        <title>{=extra.article.title} - {=config.default.website.sitetitle}</title>
         <link rel="canonical" href="{=config.default.server.url}/{=extra.article.name}" />
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
         <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
@@ -168,8 +168,8 @@ $}
           {$ endif; $}
 
           <div class="category-top-wrapper ryksponsive-c">
-              <a href="{=config.default.server.url}/category/{=extra.article.categories.0.name}" class="category-top-link">
-                  {=extra.article.categories.0.displayname}
+              <a href="{=config.default.server.url}/category/{=extra.article.topic.completeSlug}" class="category-top-link">
+                  {=extra.article.topic.displayname}
               </a>
           </div>
           <h1>{=&extra.article.title}</h1>
@@ -274,7 +274,7 @@ $}
                   </div>
                   {$ endif; $}
 
-                  {$ if (extra.article.categories.0.name == "best-of-mtl"); $}
+                  {$ if (extra.article.topic.slug == "best-of-mtl"); $}
                   <div class="bottom-promotion-link">
                       <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's
                       <a href="{=config.default.server.url}/category/best-of-mtl" target="_blank">&quot;Best Of&quot; lists</a>;

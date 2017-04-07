@@ -9,7 +9,7 @@ $}
 {$ if (extra.archivename != "author"); $}
     <div class="subtitle-strip">
         <span class="subtitle-headline">Posts archive</span>
-        <span class="subtitle-detail">{=tagname}</span>
+        <span class="subtitle-detail">{=&tagname}</span>
     </div>
 {$ else; $}
     <div class="subtitle-strip">
@@ -35,7 +35,7 @@ $}
                     {$ endif; $}
 
                     {$ if (?details.description); $}
-                        <div class="author-description">{=details.description}</div>
+                        <div class="author-description">{=&details.description}</div>
                     {$ endif; $}
                 </div>
             </div>
@@ -73,14 +73,22 @@ $}
             archiveport = "/";
             archiveport += extra.archivename;
 
+            tagpart = tagslug;
+            tagpart += "/";
+
             if (extra.archivename == "latests");
                 archiveport = "";
+            endif; if (extra.archivename == "topic");
+                archivepart = "/";
+                archivepart += extra.topic.completeSlug;
+
+                tagpart = "";
             endif;
         $}
         <ul>
             {$ for (arindex in extra.indices.pagenumbers); $}
                 <li {$ if (arindex == extra.currentpage); $} class="currentpage" {$ endif; $} >
-                    <a href="{=config.default.server.url}{=archiveport}/{=tagslug}/{=arindex}">
+                    <a href="{=config.default.server.url}{=archiveport}/{=tagpart}{=arindex}">
                         {=arindex}
                     </a>
                 </li>
