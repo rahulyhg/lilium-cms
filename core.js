@@ -136,7 +136,7 @@ var Core = function () {
 
         admin.registerAdminEndpoint('me', 'POST', function (cli) {
             cli.touch('admin.POST.me');
-            entities.handlePOST(cli);
+            entities.adminPOST(cli);
         });
 
         admin.registerAdminEndpoint('me', 'GET', function (cli) {
