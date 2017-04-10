@@ -28,6 +28,32 @@ class LMLTopics {
 
                 send(respArray);
             });
+        } else if (levels[0] == "treename") {
+            db.findToArray(cli._c, 'topics', {active : true}, (err, topicsArray) => {
+                let assoc = {};
+                let resp = [];
+                for (var i = 0; i < topicsArray.length; i++) {
+                    assoc[topicsArray[i]._id] = topicsArray[i];
+                    topicsArray[i].children = [];
+                }
+
+                for (let i = 0; i < topicsArray.length; i++) {
+                    let treename = topicsArray[i].displayname;
+                    let par = assoc[topicsArray[i].parent];
+
+                    while(par) {
+                        treename = par.displayname + " > " + treename;
+                        par = assoc[par.parent];
+                    }
+
+                    resp.push({
+                        _id : topicsArray[i]._id,
+                        treename : treename
+                    });
+                }
+
+                send(resp);
+            });
         } else if (levels[0] == "get") {
             let topicID = levels[1];
             db.findUnique(cli._c, 'topics', {_id : db.mongoID(topicID), active : true}, (err, single) => {

@@ -37,6 +37,7 @@
         "headercolor" : {"type" : "text", "attr" : {"displayname" : "Header Color"}, "default" : "#FF2634"},
         "buttoncolor" : {"type" : "text", "attr" : {"displayname" : "Button Color"}, "default" : "#DDD"},
         "buttontextcolor" : {"type" : "text", "attr" : {"displayname" : "Button Text Color"}, "default" : "#FF2634"},
+        "archivearticlecount" : {"type" : "number", "attr" : {"displayname" : "Number of article max per archive page"}, "default" : 18},
         "fullwidthsize" : {"type" : "number", "attr" : {"displayname" : "Full width size (px)"}, "default" : 1024},
         "articlewidthsize" : {"type" : "number", "attr" : {"displayname" : "Article width size (px)"}, "default" : 640},
         "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"},

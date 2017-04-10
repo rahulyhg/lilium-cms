@@ -98,6 +98,11 @@ liliumcms.lmldom.bind(function() {
             if (typeof resp == "string") {
                 resp = JSON.parse(resp);
             }
+
+            if (resp.success) {
+                document.querySelector('.communication-post textarea').value = "";
+                liliumcms.modals.alert('Communication', "Your comment was successfully added, and everyone subscribed to this article will receive an email.")
+            }
         });
         xmlhttp.open("POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json");

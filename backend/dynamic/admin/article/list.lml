@@ -1,4 +1,5 @@
 {#config;forms;tableBuilder}
+<lml:dom v="0.8"></lml:dom>
 		<main class="entities-main">
             <h1>List of articles<a class='fab' href="{=config.default.server.url}/admin/article/new">+</a></h1>
 			{=tableBuilder.render("article")}

@@ -61,10 +61,10 @@ var TableBuilder = function () {
                 html += '<div class="lmltablefilter"><b>' + filter.displayname || filtername + '</b> : ';
                 html += '<select name="'+filtername+'" ';
                 if (filter.livevar) {
-                    html += ' class="lmlfilterlivevar" ' +
-                            ' data-livevar="'+filter.livevar.endpoint+'" ' +
-                            ' data-livevarkey="'+filter.livevar.value+'"' +
-                            ' data-livevardisplay="'+filter.livevar.displayname+'"'; 
+                    html += ' class="lmlfilterlivevar lmldom-liveselect" ' +
+                            ' data-filledby="'+filter.livevar.endpoint+'" ' +
+                            ' data-selectvalue="'+filter.livevar.value+'"' +
+                            ' data-selectdisplayname="'+filter.livevar.displayname+'"'; 
                 }
                 html += '><option value="">All</option>';
 
@@ -72,9 +72,13 @@ var TableBuilder = function () {
                     for (var i = 0; i < filter.datasource.length; i++) {
                         html += '<option value="'+filter.datasource[i].value+'">'+filter.datasource[i].displayname+'</option>';
                     }
-                } 
+                }
                 html += '</select>';
                 html += '</div>';
+
+                if (filter.livevar) {
+                    html += '<lml:livevars data-varname="'+filter.livevar.endpoint+'" data-varparam="{}"></lml:livevars>';
+                }
             }
         }
         html += '</div>';

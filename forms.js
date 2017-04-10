@@ -83,7 +83,7 @@ var Forms = function () {
 
         formBuilder.registerFormTemplate('entity_rights')            
             .add('roles', 'livevar', {
-                endpoint: 'roles',
+                endpoint: 'role',
                 tag: 'select',
                 template: 'option',
                 title: 'role',

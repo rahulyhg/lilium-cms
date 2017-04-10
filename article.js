@@ -690,6 +690,10 @@ var Article = function() {
                         }, true, true);
                     };
 
+                    if (arr && arr[0] && arr[0].status != "published") {
+                        formData.date = new Date(dates.toTimezone(new Date(), cli._c.timezone));
+                    }
+
                     nUpdate();
                 });
             } else {
@@ -1075,7 +1079,11 @@ var Article = function() {
 
             var match = [{status : params.filters.status || {$ne : "destroyed"}}];
             if (params.filters.author) {
-                match.push({author : params.filters.author});
+                match.push({author : db.mongoID(params.filters.author)});
+            }
+
+            if (params.filters.topic) {
+                match.push({topic : db.mongoID(params.filters.topic)});
             }
 
             if (params.filters.isSponsored) {
@@ -1364,10 +1372,10 @@ var Article = function() {
             .add('commtitle', 'title', {
                 displayname : "Communication"
             })
-            /*.add('communication', 'snip', {
+            .add('communication', 'snip', {
                 snip : "communication",
                 livevars : ["communications.get.article.{?1}"]
-            })*/
+            })
             .add('title-action', 'title', {
                 displayname: "Publish"
             })
@@ -1523,9 +1531,17 @@ var Article = function() {
                 author : {
                     displayname : "Author",
                     livevar : {
-                        endpoint : "entities.simple",
+                        endpoint : "entities.simple.active",
                         value : "_id",
                         displayname : "displayname"
+                    }
+                },
+                topic : {
+                    displayname : "Topic",
+                    livevar : {
+                        endpoint : "topics.treename",
+                        value : "_id",
+                        displayname : "treename"
                     }
                 },
                 isSponsored : {

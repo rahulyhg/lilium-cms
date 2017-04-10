@@ -940,7 +940,13 @@ var Entities = module.exports = new function () {
                 _id : 1
             };
         
-            db.find(_c.default(), 'entities', {}, [], function(err, cur) {
+            var match = {};
+
+            if (levels[1] == "active") {
+                match.revoked = {$ne : true};
+            }
+
+            db.find(_c.default(), 'entities', match, [], function(err, cur) {
                 cur.sort({displayname : 1}).toArray(function(err, arr) {
                     callback(arr);
                 });
