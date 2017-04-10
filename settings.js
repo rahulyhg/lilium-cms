@@ -100,6 +100,9 @@ var Settings = function () {
             .add('website.sitetitle', 'text', {
                 displayname : "Public title"
             })
+            .add('website.catchline', 'text', {
+                displayname : "Catch line"
+            })
             .add('website.language', 'select', {
                 displayname : "Language",
                 datasource : [
