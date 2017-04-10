@@ -45,7 +45,7 @@ class LMLCommunications {
     };
 
     dispatchEmails(_c, comm, article, senderid) {
-        let users = article.subscribers;
+        let users = article.subscribers || [];
         log('Communications', 'Dispatching emails to ' + users.length + " users");
         for (let i = 0; i < users.length; i++) if (users[i].toString() != senderid.toString()) {
             db.findUnique(require('./config.js').default(), 'entities', {_id : users[i]}, (err, to) => {
