@@ -632,7 +632,8 @@ var LiliumCMS = function() {
         this.init = function() {
             var currentHref = window.location.href;
 
-            $('.lmladminsidebaritems li').each(function(index, li) {
+            var listitems = $('.lmladminsidebaritems li')
+            listitems.each(function(index, li) {
                 li = $(li);
                 var href = li.find('a').attr('href');
                 // Check if menu as submenus
@@ -643,7 +644,30 @@ var LiliumCMS = function() {
             });
         
             this.highlight();
+            this.createWebsiteButton();
             log('AdminMenu', 'Initialized admin menu panel');
+        };
+
+        this.createWebsiteButton = function() {
+            var listitem = document.createElement('li');
+            var linkitem = document.createElement('a');
+            var icon = document.createElement('i');
+            var span = document.createElement('span');
+
+            linkitem.appendChild(icon);
+            linkitem.appendChild(span);
+            listitem.appendChild(linkitem);
+
+            span.textContent = "{=config.default.website.sitetitle} homepage";
+            icon.className = "fa fa-globe go-to-site";
+
+            linkitem.href = "{=config.default.server.url}";
+            linkitem.target = "_blank";
+            linkitem.dataset.async = "true";
+            linkitem.id = "go-to-site-link";
+
+            listitem.className = "go-to-site-listitem";
+            document.querySelector('.lmladminsidebaritems').appendChild(listitem);
         };
 
         this.highlight = function() {
@@ -840,12 +864,13 @@ var LiliumCMS = function() {
                 if (
                     !a.data('async') &&
                     !a.data("replace") && 
+                    !a.hasClass("direct-link") &&
                     href.indexOf('#') === -1 && 
                     href.indexOf("{=config.default.server.url}") !== -1 && 
                     href.indexOf('*') === -1 &&
                     a.attr('target') !== "_blank"
                 ) {
-                    a.data("async", true).attr("href", href).on('click', function(ev) {
+                    a.data("async", true).data("parser", "pageloader").attr("href", href).bind('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
                         that.load(href);
@@ -859,9 +884,17 @@ var LiliumCMS = function() {
             log('PageLoader', 'Binding links to load inside page async');
             $('a').each(function(index, a) {
                 a = $(a);
-                var href = a.attr('href');
-                if (href && href.indexOf("#") === -1 && href.indexOf("{=config.default.server.url}") !== -1 && !a.data("replace")) {
-                    a.attr("href", href).on('click', function(ev) {
+                var href = a.attr('href') || "";
+                if (
+                    !a.data('async') &&
+                    !a.data("replace") && 
+                    !a.hasClass("direct-link") &&
+                    href.indexOf('#') === -1 && 
+                    href.indexOf("{=config.default.server.url}") !== -1 && 
+                    href.indexOf('*') === -1 &&
+                    a.attr('target') !== "_blank"
+                ) {
+                    a.attr("href", href).data("parser", "admininit").on('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
                         that.load(href);

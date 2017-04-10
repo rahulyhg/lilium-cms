@@ -150,9 +150,7 @@ var Admin = function() {
                     }
                     menus[index].children = subMenu;
                     sortedMenus.push(menus[index]);
-
                 }
-
 			}
 
 			callback(sortedMenus);
