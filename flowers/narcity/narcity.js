@@ -82,14 +82,14 @@ var fetchHomepageArticles = function(_c, cb) {
     var sectionArr = new Array();
     var authors = {};
     var limit = sett.archivearticlecount ? parseInt(sett.archivearticlecount) : 12
+    var sectionTopics = [];
 
     var nextSection = function() {
         if (i < len) {
-            var csec = homepageSections[i];
             db.join(_c, 'content', [
                 {
                     $match : {
-                        'topic.completeSlug' : csec.catname,
+                        'topic' : sectionTopics[i]._id,
                         'status' : 'published'
                     } 
                 }, {
@@ -97,7 +97,7 @@ var fetchHomepageArticles = function(_c, cb) {
                         date : -1
                     }
                 }, {
-                    $limit : limit
+                    $limit : 6 || limit
                 }, {
                     $lookup : {
                         from:           "uploads",
@@ -105,25 +105,19 @@ var fetchHomepageArticles = function(_c, cb) {
                         foreignField:   "_id",
                         as:             "featuredimage"
                     }
-                }, {
-                    $lookup : {
-                        from:           "topics",
-                        localField:     "topic",
-                        foreignField:   "_id",
-                        as:             "topic"
-                    }
                 }
             ], function(arr) {
                 sectionArr.push({
-                    "catname" : csec.catname,
-                    "cattitle" : csec.cattitle,
+                    "topic" : sectionTopics[i],
+                    "catname" : sectionTopics[i].completeSlug,
+                    "cattitle" : sectionTopics[i].displayname,
                     "articles" : arr
                 });
 
                 for (var j = 0; j < arr.length; j++) {
                     arr[j].author = authors[arr[j].author];
-                    arr[j].topic = arr[j].topic[0];
-                    arr[j].url = _c.server.protocol + _c.server.url + arr[j].topic.completeSlug + "/" + arr[j].name;
+                    arr[j].topic = sectionTopics[i];
+                    arr[j].url = _c.server.protocol + _c.server.url + sectionTopics[i].completeSlug + "/" + arr[j].name;
                 }
 
                 i++;
@@ -171,12 +165,29 @@ var fetchHomepageArticles = function(_c, cb) {
         }
     };
 
+    var cacheNextTopic = function(done) {
+        var tIndex = 0;
+        var next = function() {
+            if (tIndex == len) {
+                done();
+            } else {
+                db.findUnique(_c, 'topics', { completeSlug : homepageSections[i].catname }, function(err, topic) {
+                    sectionTopics.push(topic);
+                    tIndex++;
+                    next();
+                });
+            }
+        };
+
+        next();
+    }
+
     db.findToArray(cc.default(), "entities", {}, function(err, arr) {
         for (var i = 0; i < arr.length; i++) {
             authors[arr[i]._id] = arr[i];
         }
-
-        nextSection();
+        
+        cacheNextTopic(nextSection);
     }, {displayname : 1, avatarURL : 1, slug : 1});
 };
 
