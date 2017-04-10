@@ -1,4 +1,9 @@
 {
+    "1.0.0" : {
+        "codename" : "Neptune",
+        "script" : "1.0.0.js",
+        "features" : ["Plugins"]
+    },
     "1.0.1" : {
         "codename" : "Neptune",
         "script" : "1.0.1.js",

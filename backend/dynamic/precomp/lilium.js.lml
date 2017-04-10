@@ -673,7 +673,7 @@ var LiliumCMS = function() {
         this.highlight = function() {
             var currentHref = window.location.href;
             var found = false;
-            $('.lmladminsidebaritems li').each(function(index, li) {
+            $('.lmladminsidebaritems li:not(.go-to-site-listitem)').each(function(index, li) {
                 li = $(li);
                 var href = li.find('a').attr('href');
                 if (currentHref.indexOf(href) !== -1) {

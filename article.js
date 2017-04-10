@@ -1075,7 +1075,11 @@ var Article = function() {
 
             var match = [{status : params.filters.status || {$ne : "destroyed"}}];
             if (params.filters.author) {
-                match.push({author : params.filters.author});
+                match.push({author : db.mongoID(params.filters.author)});
+            }
+
+            if (params.filters.topic) {
+                match.push({topic : db.mongoID(params.filters.topic)});
             }
 
             if (params.filters.isSponsored) {
@@ -1523,9 +1527,17 @@ var Article = function() {
                 author : {
                     displayname : "Author",
                     livevar : {
-                        endpoint : "entities.simple",
+                        endpoint : "entities.simple.active",
                         value : "_id",
                         displayname : "displayname"
+                    }
+                },
+                topic : {
+                    displayname : "Topic",
+                    livevar : {
+                        endpoint : "topics.treename",
+                        value : "_id",
+                        displayname : "treename"
                     }
                 },
                 isSponsored : {
