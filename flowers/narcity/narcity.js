@@ -81,6 +81,7 @@ var fetchHomepageArticles = function(_c, cb) {
     var len = Object.keys(homepageSections || {}).length;
     var sectionArr = new Array();
     var authors = {};
+    var limit = sett.archivearticlecount ? parseInt(sett.archivearticlecount) : 12
 
     var nextSection = function() {
         if (i < len) {
@@ -96,7 +97,7 @@ var fetchHomepageArticles = function(_c, cb) {
                         date : -1
                     }
                 }, {
-                    $limit : 6
+                    $limit : limit
                 }, {
                     $lookup : {
                         from:           "uploads",
@@ -139,7 +140,7 @@ var fetchHomepageArticles = function(_c, cb) {
                         date : -1
                     }
                 }, {
-                    $limit : 12
+                    $limit : limit
                 }, {
                     $lookup : {
                         from:           "uploads",
@@ -192,6 +193,7 @@ var articleChanged = function(cli, article) {
 };
 
 var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
+    var sett = themes.getEnabledTheme(cli._c || cli).settings || {};
     var match = {
         status : 'published'
     };
@@ -228,7 +230,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             match['NONE'] = '$';
     }
 
-    var limit = 18;
+    var limit = sett.archivearticlecount ? parseInt(sett.archivearticlecount) : 12
     var skip = skp * limit;
     var matchCallback = function(archTypeRes, err) { 
         if (err || archTypeRes.length == 0) {
@@ -360,7 +362,8 @@ var fetchTopicArticles = function(conf, topic, index, send) {
         index--;
     }
 
-    var limit = 18;
+    var sett = themes.getEnabledTheme(conf).settings || {};
+    var limit = sett.archivearticlecount ? parseInt(sett.archivearticlecount) : 12
     var skip = index * limit;
     
     db.findToArray(cc.default(), 'entities', {}, function(err, entities) {
