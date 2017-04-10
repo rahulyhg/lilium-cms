@@ -690,6 +690,10 @@ var Article = function() {
                         }, true, true);
                     };
 
+                    if (arr && arr[0] && arr[0].status != "published") {
+                        formData.date = new Date(dates.toTimezone(new Date(), cli._c.timezone));
+                    }
+
                     nUpdate();
                 });
             } else {
