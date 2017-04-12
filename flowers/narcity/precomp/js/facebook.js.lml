@@ -57,7 +57,7 @@ var NarcityFacebook = function() {
         if (allurls.length != 0) {
             this.bulkShareRequest(allurls, function(ogobj) {
                 var htmlnodes = urls[ogobj.id];
-                //ogobj.share = {share_count: 7236};
+                ogobj.share = {share_count: 7236};
 
                 for (var i=0; i < htmlnodes.length; i++) {
                     var htmlnode = htmlnodes[i];

@@ -1,6 +1,6 @@
 {#theme;extra;config}
 
-<footer class="willslide">
+<footer class="willslide no-small-mobile">
         <div class="footer-topsection">
                 <div class="responsive-wrapper">
                         <div class="footer-social">

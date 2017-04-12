@@ -2187,7 +2187,7 @@ body.slidheader .android-sharer {
 
 /* Mobile */
 @media only screen and (max-width: {=fw}) {
-    body .no-mobile {
+    body .no-mobile, {
         display: none !important;
     }
 
@@ -2567,7 +2567,8 @@ body.slidheader .android-sharer {
                 margin-bottom: 18px;
                 margin-right: 0px;
         }
-        body .no-small-mobile {
+        body .no-small-mobile,
+        footer.no-small-mobile {
                 display: none !important;
         }
         .featured-image-credit {
