@@ -2526,9 +2526,7 @@ body.slidheader .android-sharer {
         clear: both;
     }
 }
-@media only screen and (max-width: 480px) {
 
-}
 @media only screen and (max-width: 480px) {
         footer .footer-container,
         footer .responsive-wrapper {
@@ -2595,6 +2593,22 @@ body.slidheader .android-sharer {
             float: right;
             margin: 5px 5px 0;
             color: #ff4200;
+        }
+        label.events-placeholder__title{
+            text-align:center;
+            margin-bottom:7px;
+        }
+        footer .footer-digest-sub form {
+            font-size: 20px;
+        }
+        .email-input { display: flex; }
+        .email-input div.input-email { flex: 1; }
+        .email-input div.button-email { flex: 0; margin: 0 0 0 1rem; }
+        .email-input input.events-placeholder__email-input {width: 100%; }
+        .email-input input.events-placeholder__submit-button {white-space: nowrap; }
+        
+        footer .footer-digest-sub .events-placeholder__submit-button{
+            padding-bottom:6px;
         }
 }
 
