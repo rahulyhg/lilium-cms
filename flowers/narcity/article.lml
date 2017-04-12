@@ -35,6 +35,7 @@ $}
     <div class="article-author-share-section no-tablet">
         <div class="article-share-count-wrapper topvert">
             <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
+            <span class="article-share-words">shares</span>
         </div>
         <div class="article-share-arrow-wrapper topvert">
             <img src="{=url}/res/images/whitearrowshare.png" class="article-social-upward-arrow" />
@@ -59,7 +60,7 @@ $}
             <div class="article-author-share-section invisible no-small-mobile" id="article-share-section">
                 <div class="article-share-count-wrapper topvert">
                     <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
-                    <span class="article-share-words">Shares</span>
+                    <span class="article-share-words">shares</span>
                 </div>
                 <div class="article-share-arrow-wrapper topvert">
                     <img src="{=url}/res/images/whitearrowshare.png" class="article-social-upward-arrow" />
