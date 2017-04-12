@@ -27,20 +27,19 @@ $}
     {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper">
         <img src='{=featimg}' class="featured-image" alt="{=&extra.article.title} featured image" />
-        <div class="article-share-count-mobile no-desktop" id="article-share-count-mobile">
-            <span class="article-share-icon">
-                <img src="{=config.default.server.url}/res/images/flame.png" />
-            </span>
-            <span class="article-share-count-mobile-num fbshare"
-                  data-url="{=config.default.server.protocol}{=config.default.server.url}/{=extra.article.name}"
-                  data-min="100"
-                  data-show="article-share-count-mobile" data-showas="block">
-                      0
-            </span>
-        </div>
+        
     </div>
     {$ endif; $}
 
+    <div class="article-author-share-section no-tablet">
+        <div class="article-share-count-wrapper topvert">
+            <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
+        </div>
+        <div class="article-share-arrow-wrapper topvert">
+            <img src="{=url}/res/images/whitearrowshare.png" class="article-social-upward-arrow" />
+        </div>
+    </div>
+    
     {$ if (?extra.article.featuredimageartist); $}
     <div class="featured-image-credit">
         <a href="{=extra.article.featuredimagelink}">@{=?extra.article.featuredimageartist}</a>
@@ -56,7 +55,7 @@ $}
 
         {$ if (?author.displayname); $}
         <div class="article-author-strip">
-            <div class="article-author-share-section invisible no-mobile" id="article-share-section">
+            <div class="article-author-share-section invisible no-small-mobile" id="article-share-section">
                 <div class="article-share-count-wrapper topvert">
                     <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
                     <span class="article-share-words">Shares</span>

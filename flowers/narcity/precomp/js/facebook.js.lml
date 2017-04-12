@@ -46,17 +46,21 @@ var NarcityFacebook = function() {
             var htmlnode = allNodes[i];
             var u = htmlnode.dataset.url == "this" ? document.location.href : htmlnode.dataset.url;
 
-            urls[u] = htmlnode;
+            if(!(u in urls)) {
+                urls[u] = [];
+            }
+            urls[u].push(htmlnode);
             allurls.push(u);
         }
 
         console.log("Passing " + allurls.length + " urls to Facebook Graph");
         if (allurls.length != 0) {
             this.bulkShareRequest(allurls, function(ogobj) {
-                var htmlnode = urls[ogobj.id];
+                var htmlnodes = urls[ogobj.id];
                 //ogobj.share = {share_count: 7236};
 
-                if (htmlnode) {
+                for (var i=0; i < htmlnodes.length; i++) {
+                    var htmlnode = htmlnodes[i];
                     var min = htmlnode.dataset.min || 100;
                     
                     if (ogobj.share && ogobj.share.share_count && ogobj.share.share_count > parseInt(min)) {
@@ -65,9 +69,9 @@ var NarcityFacebook = function() {
                             htmlnode.innerHTML = ogobj.share.share_count;
                         }
                         else {
-                            ogobj.share.share_count = ogobj.share.share_count/1000;
-                            ogobj.share.share_count = ogobj.share.share_count.toFixed(1)
-                            htmlnode.innerHTML = ogobj.share.share_count + "K";
+                            var share_count = ogobj.share.share_count/1000;
+                            share_count = share_count.toFixed(1);
+                            htmlnode.innerHTML = share_count + "K";
                         }
 
                         if (htmlnode.dataset.show && htmlnode.innerHTML != "0000") {

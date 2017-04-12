@@ -2168,6 +2168,12 @@ body.slidheader .android-sharer {
     }
 }
 
+@media only screen and (min-width: 480px) {
+    body .no-tablet {
+        display: none !important;
+    }
+}
+
 /* Mobile */
 @media only screen and (max-width: {=fw}) {
     body .no-mobile {
@@ -2550,6 +2556,26 @@ body.slidheader .android-sharer {
         footer .footer-inline a {
                 margin-bottom: 18px;
                 margin-right: 0px;
+        }
+        body .no-small-mobile {
+                display: none !important;
+        }
+        .featured-image-credit {
+            text-align: left;
+        }
+        article .article-share-count-wrapper .article-share-count {
+            font-size: 25px;
+        }
+        article .article-share-arrow-wrapper .article-social-upward-arrow {
+            width: 25px;
+        }
+        article .article-share-arrow-wrapper {
+            padding: 7px 5px;
+            height: 17px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            margin-left: 6px;
+            margin-right:2px;
         }
 }
 
