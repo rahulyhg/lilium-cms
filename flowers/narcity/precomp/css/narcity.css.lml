@@ -917,6 +917,7 @@ footer .footer-digest-sub .events-placeholder__submit-button {
     color: #FFF;
     border: none;
     font-size: 18px;
+    overflow:hidden;
 }
 
 footer .footer-digest-sub .events-placeholder__email-input {
@@ -926,6 +927,7 @@ footer .footer-digest-sub .events-placeholder__email-input {
     background-color: #FFF;
     color: #888;
     margin-right: -4px;
+    float:left;
 }
 
 article .article-related-section {
@@ -2438,12 +2440,6 @@ body.slidheader .android-sharer {
 
     footer .footer-digest-sub .events-placeholder__email-input {
         display: block;
-        margin: auto;
-    }
-
-    footer .footer-digest-sub .events-placeholder__submit-button {
-        margin-top: 10px;
-        font-size: 14px;
     }
 
     h4.article-section-title {
@@ -2530,7 +2526,9 @@ body.slidheader .android-sharer {
         clear: both;
     }
 }
+@media only screen and (max-width: 480px) {
 
+}
 @media only screen and (max-width: 480px) {
         footer .footer-container,
         footer .responsive-wrapper {
