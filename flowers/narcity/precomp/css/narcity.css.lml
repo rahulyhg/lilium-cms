@@ -892,26 +892,25 @@ article .article-comments {
     margin: 20px auto;
 }
 
-article .article-digest-sub {
+footer .footer-digest-sub {
     width: {=aw};
-    margin: 20px auto;
 }
 
-article .article-digest-sub form {
-    margin:20px 0px;
-    text-align: center;
-    background-color: #EEE;
-    color: #777;
-    font-size: 16px;
-    padding: 20px;
+footer .footer-digest-sub form {
+    font-family: "Oswald",sans-serif;
+    text-transform: uppercase;
+    color: white;
+    font-size: 23px;
+    display: block;
 }
 
-article .article-digest-sub form input {
+footer .footer-digest-sub form input {
     display: inline-block;
 }
 
-article .article-digest-sub .events-placeholder__submit-button {
-    padding: 10px 15px;
+footer .footer-digest-sub .events-placeholder__submit-button {
+    padding: 12px 15px 9px 15px;
+    margin-left: 20px;
     background-color: {=mc};
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
@@ -920,8 +919,8 @@ article .article-digest-sub .events-placeholder__submit-button {
     font-size: 18px;
 }
 
-article .article-digest-sub .events-placeholder__email-input {
-    padding: 11px;
+footer .footer-digest-sub .events-placeholder__email-input {
+    padding: 7px;
     font-size: 1em;
     border: 1px solid #ddd;
     background-color: #FFF;
@@ -1631,6 +1630,7 @@ footer .footer-container,
 footer .responsive-wrapper {
         width: 1000px;
         margin: auto;
+        display: flex;
 }
 
 footer .footer-inline {
@@ -1669,6 +1669,10 @@ footer .copyright a {
         font-size: 16px;
 }
 
+.footer-social{
+    flex:1;
+}
+
 .footer-social .fa {
         font-size: 24px;
         margin: 20px 20px 0px 0px;
@@ -1676,6 +1680,13 @@ footer .copyright a {
 
 .footer-social a {
         color: #FFF;
+}
+footer .footer-digest-sub{
+        width:450px;
+}
+
+.label-placeholder-title{
+        margin-bottom: 5px;
 }
 
 #sovrn_beacon {
@@ -2415,23 +2426,22 @@ body.slidheader .android-sharer {
         padding: 10px 20px;
     }
 
-    article .article-digest-sub {
+    article .footer-digest-sub {
         display: block;
         width: auto;
     }
 
-    article .article-digest-sub form .events-placeholder__title {
+    footer .footer-digest-sub form .events-placeholder__title {
         display: block;
-        font-size: 14px;
         margin-bottom: 20px;
     }
 
-    article .article-digest-sub .events-placeholder__email-input {
+    footer .footer-digest-sub .events-placeholder__email-input {
         display: block;
         margin: auto;
     }
 
-    article .article-digest-sub .events-placeholder__submit-button {
+    footer .footer-digest-sub .events-placeholder__submit-button {
         margin-top: 10px;
         font-size: 14px;
     }
@@ -2505,7 +2515,7 @@ body.slidheader .android-sharer {
     footer .footer-container,
     footer .responsive-wrapper {
         width: auto;
-        display: block;
+        display: flex;
     }
 
     footer .footer-container,

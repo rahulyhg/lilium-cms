@@ -10,6 +10,29 @@
                                 <a target="_blank" href="https://www.instagram.com/{=config.default.social.accounts.instagram}"><i class="fa fa-instagram" aria-hidden="true"></i></a>
                                 <a target="_blank" href="https://www.youtube.com/user/{=config.default.social.accounts.youtube}"><i class="fa fa-youtube" aria-hidden="true"></i></a>
                         </div>
+                        <div class="footer-digest-sub no-mobile">
+                                <form
+                                action="//mtlblog.us6.list-manage.com/subscribe/post?u=ae98e848ab712838adcc7f456&amp;id={=theme.settings.mailchimpdigest}"
+                                method="post"
+                                id="mc-embedded-subscribe-form"
+                                name="mc-embedded-subscribe-form"
+                                class="events-placeholder"
+                                target="_blank"
+                                novalidate>
+
+                                <div class="label-placeholder-title">
+                                        <label for="events-placeholder__email-input" class="events-placeholder__title">
+                                                Sign up for our Newsletter
+                                        </label>
+                                </div>
+                                <input type="email" value="" name="EMAIL" class="events-placeholder__email-input" id="mce-EMAIL"
+                                        placeholder="email address" required>
+                                        <div style="position: absolute; left: -5000px;">
+                                        <input type="text" name="b_ae98e848ab712838adcc7f456_851c62c913" tabindex="-1" value="">
+                                </div>
+                                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="events-placeholder__submit-button">
+                                </form>
+                        </div>
                 </div>
         </div>
 
@@ -30,6 +53,7 @@
                                         &copy; 2017 All rights reserved, <a href="https://www.narcitymedia.com">Narcity Media inc.</a>
                                 </div>
                         </div>
+
                 </div>
         </div>
 </footer>
