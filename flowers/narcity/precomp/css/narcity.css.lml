@@ -922,6 +922,7 @@ footer .footer-digest-sub .events-placeholder__submit-button {
     color: #FFF;
     border: none;
     font-size: 18px;
+    overflow:hidden;
 }
 
 footer .footer-digest-sub .events-placeholder__email-input {
@@ -931,6 +932,7 @@ footer .footer-digest-sub .events-placeholder__email-input {
     background-color: #FFF;
     color: #888;
     margin-right: -4px;
+    float:left;
 }
 
 article .article-related-section {
@@ -2184,7 +2186,7 @@ body.slidheader .android-sharer {
     }
 }
 
-@media only screen and (min-width: 480px) {
+@media only screen and (min-width: 676px) {
     body .no-tablet {
         display: none !important;
     }
@@ -2192,7 +2194,7 @@ body.slidheader .android-sharer {
 
 /* Mobile */
 @media only screen and (max-width: {=fw}) {
-    body .no-mobile {
+    body .no-mobile, {
         display: none !important;
     }
 
@@ -2443,12 +2445,6 @@ body.slidheader .android-sharer {
 
     footer .footer-digest-sub .events-placeholder__email-input {
         display: block;
-        margin: auto;
-    }
-
-    footer .footer-digest-sub .events-placeholder__submit-button {
-        margin-top: 10px;
-        font-size: 14px;
     }
 
     h4.article-section-title {
@@ -2536,7 +2532,7 @@ body.slidheader .android-sharer {
     }
 }
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 675px) {
         footer .footer-container,
         footer .responsive-wrapper {
                 padding-left: 20px;
@@ -2572,7 +2568,8 @@ body.slidheader .android-sharer {
                 margin-bottom: 18px;
                 margin-right: 0px;
         }
-        body .no-small-mobile {
+        body .no-small-mobile,
+        footer.no-small-mobile {
                 display: none !important;
         }
         .featured-image-credit {
@@ -2601,6 +2598,26 @@ body.slidheader .android-sharer {
             float: right;
             margin: 5px 5px 0;
             color: #ff4200;
+        }
+        label.events-placeholder__title{
+            text-align:center;
+            margin-bottom:7px;
+        }
+        footer .footer-digest-sub form {
+            font-size: 20px;
+        }
+        .email-input { display: flex; }
+        .email-input div.input-email { flex: 1; }
+        .email-input div.button-email { flex: 0; margin: 0 0 0 1rem; }
+        .email-input input.events-placeholder__email-input {width: 100%; }
+        .email-input input.events-placeholder__submit-button {white-space: nowrap; }
+        
+        footer .footer-digest-sub .events-placeholder__submit-button{
+            padding-bottom:6px;
+        }
+
+        footer .footer-digest-sub{
+            margin:auto;
         }
 }
 

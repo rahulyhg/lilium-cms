@@ -3,14 +3,14 @@
 <footer class="willslide">
         <div class="footer-topsection">
                 <div class="responsive-wrapper">
-                        <div class="footer-social">
+                        <div class="footer-social no-small-mobile">
                                 <span class="footer-title">Follow {=config.default.website.sitetitle}</span>
                                 <a target="_blank" href="https://www.facebook.com/{=config.default.social.accounts.facebook}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
                                 <a target="_blank" href="https://twitter.com/{=config.default.social.accounts.twitter}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
                                 <a target="_blank" href="https://www.instagram.com/{=config.default.social.accounts.instagram}"><i class="fa fa-instagram" aria-hidden="true"></i></a>
                                 <a target="_blank" href="https://www.youtube.com/user/{=config.default.social.accounts.youtube}"><i class="fa fa-youtube" aria-hidden="true"></i></a>
                         </div>
-                        <div class="footer-digest-sub no-mobile">
+                        <div class="footer-digest-sub">
                                 <form
                                 action="//mtlblog.us6.list-manage.com/subscribe/post?u=ae98e848ab712838adcc7f456&amp;id={=theme.settings.mailchimpdigest}"
                                 method="post"
@@ -25,18 +25,24 @@
                                                 Sign up for our Newsletter
                                         </label>
                                 </div>
-                                <input type="email" value="" name="EMAIL" class="events-placeholder__email-input" id="mce-EMAIL"
-                                        placeholder="email address" required>
-                                        <div style="position: absolute; left: -5000px;">
-                                        <input type="text" name="b_ae98e848ab712838adcc7f456_851c62c913" tabindex="-1" value="">
+                                <div class="email-input">
+                                        <div class="input-email">
+                                                <input type="email" value="" name="EMAIL" class="events-placeholder__email-input" id="mce-EMAIL"
+                                                        placeholder="email address" required>
+                                                        <div style="position: absolute; left: -5000px;">
+                                                                <input type="text" name="b_ae98e848ab712838adcc7f456_851c62c913" tabindex="-1" value="">
+                                                        </div>
+                                        </div>
+                                        <div class="button-email">
+                                                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="events-placeholder__submit-button">
+                                        </div>
                                 </div>
-                                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="events-placeholder__submit-button">
                                 </form>
                         </div>
                 </div>
         </div>
 
-        <div class="footer-bottomsection">
+        <div class="footer-bottomsection no-small-mobile">
                 <div class="footer-container">
                         <div class="footer-inline">
                                 <a href="https://www.narcitymedia.com">
