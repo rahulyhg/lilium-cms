@@ -2181,7 +2181,7 @@ body.slidheader .android-sharer {
     }
 }
 
-@media only screen and (min-width: 480px) {
+@media only screen and (min-width: 676px) {
     body .no-tablet {
         display: none !important;
     }
@@ -2527,7 +2527,7 @@ body.slidheader .android-sharer {
     }
 }
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 675px) {
         footer .footer-container,
         footer .responsive-wrapper {
                 padding-left: 20px;
@@ -2609,6 +2609,10 @@ body.slidheader .android-sharer {
         
         footer .footer-digest-sub .events-placeholder__submit-button{
             padding-bottom:6px;
+        }
+
+        footer .footer-digest-sub{
+            margin:auto;
         }
 }
 
