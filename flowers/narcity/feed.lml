@@ -23,7 +23,7 @@
         <link>{=config.default.server.protocol}{=config.default.server.url}/{=art.name}</link>
         <pubDate>{=art.date}</pubDate>
 
-        <category>{=art.categories.0.displayname}</category>
+        <category>{=art.topic.displayname}</category>
         <description>{=config.default.server.protocol}{=art.featuredimage.0.sizes.thumbnaillarge.url}</description>
         <slash:comments>0</slash:comments>
     </item>
