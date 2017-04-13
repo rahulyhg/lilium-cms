@@ -48,8 +48,18 @@ var HTMLServer = function() {
 						}
 					} else {
                         styledpages.serveOrFallback(cli, function() {
+                            log('HTMLServer', "Styledpages fellback", 'details');
+
                             topics.serveOrFallback(cli, function() {
-                                var name = cli.routeinfo.path[cli.routeinfo.path.length -1];
+                                log('HTMLServer', "Topics fellback", 'details');
+
+                                var name = cli.routeinfo.path[cli.routeinfo.path.length - 1];
+                                var pageIndex = -1;
+                                if (!isNaN(name)) {
+                                    pageIndex = parseInt(name);
+                                    name = cli.routeinfo.path[cli.routeinfo.path.length - 2];
+                                }
+
                                 article.generateFromName(cli, name, function(success, details) {
                                     if (success) {
                                         if (details) {
@@ -74,7 +84,7 @@ var HTMLServer = function() {
                                             fileserver.pipeFileToClient(cli, cli._c.server.html + "/404.html", function() {}, true, 'text/html');
                                         });
                                     }
-                                }, true)
+                                }, true, pageIndex)
                             });
                         });
 					}

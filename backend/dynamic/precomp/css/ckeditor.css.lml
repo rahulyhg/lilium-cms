@@ -36,3 +36,4 @@ body .cke_maximized {
 .cke_source {
     white-space: pre-wrap !important;
 }
+

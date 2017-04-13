@@ -506,6 +506,11 @@ article #article-content .keep-on-reading-wrapper a.keep-on-reading {
     text-transform: uppercase;
 }   
 
+article #article-content .keep-on-reading-wrapper a.keep-on-reading.keep-on-reading-next {
+    background-color: {=mc};
+    
+}
+
 article #article-content .keep-on-reading-wrapper .fa-chevron-right {
     font-size: 28px;
     margin-left: 10px;

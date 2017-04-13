@@ -69,3 +69,25 @@ ad:after {
     font-size: 14px;
     font-weight: bold;
 }
+
+lml-page {
+    display: block;
+    border: 1px dashed #CCC;
+    text-align: center;
+    font-size: 18px;
+    color: #BBB;
+    text-transform: uppercase;
+    padding: 12px;
+    font-weight: 100;
+    font-family: "Arial";
+}
+
+lml-page::before {
+    content: 'Page separator';
+}
+
+lml-page::after {
+    content: 'A "next" button will appear underneath the previous paragraph';
+    display: block;
+    font-size: 12px;
+}

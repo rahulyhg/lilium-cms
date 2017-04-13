@@ -105,6 +105,11 @@ var CKEditor = function() {
         });
     };
 
+    this.insertPage = function(e) {
+        var lmlpage = e.document.createElement('lml-page');
+        e.insertElement(lmlpage);
+    };
+
     this.initEditor = function() {
         log('CKEditor', 'Initializing CKEditor global object');
         if (typeof CKEDITOR === 'undefined') {
@@ -133,21 +138,34 @@ var CKEditor = function() {
         });
         CKEDITOR.config.entities = false;
         CKEDITOR.config.height = 360;
-        CKEDITOR.config.extraPlugins = 'image-finder';
+        CKEDITOR.config.extraPlugins = 'lml-image-finder,lml-insert-page';
         CKEDITOR.config.fillEmptyBlocks = false;
         CKEDITOR.config.autoParagraph = false;
         CKEDITOR.config.entities_greek = false;
         CKEDITOR.config.entities_latin = false;
-        CKEDITOR.config.removeButtons = 'image';
-        CKEDITOR.config.removePlugins = 'image,liststyle,tabletools,scayt,menubutton,contextmenu';
+        CKEDITOR.config.removeButtons = 'image,SpecialChar,Table';
+        CKEDITOR.config.removePlugins = 'image,liststyle,tabletools,scayt,menubutton,contextmenu,table,specialchar';
         CKEDITOR.config.allowedContent = true;
+        CKEDITOR.config.extraAllowedContent = 'ad,lml-page,lml-ad';
         CKEDITOR.config.contentsCss = '/compiled/theme/ckeditor.css';
         CKEDITOR.config.skin = "BootstrapCK4,/bower/BootstrapCK4-Skin/skins/bootstrapck/";
 
         var validUrlRegex = /^(https?|ftp):\/\/(-\.)?([^\s\/?\.#-]+\.?)+(\/[^\s]*)?[^\s\.,]$/ig,
             doubleQuoteRegex = /"/g;
 
-        CKEDITOR.plugins.add("image-finder", {
+        CKEDITOR.plugins.add( 'lml-insert-page', {
+            init: function(editor) {
+                editor.addCommand('insertpage', { exec : that.insertPage });
+                editor.ui.addButton('insertpage', {
+                    label: 'Insert Page',
+                    command: 'insertpage',
+                    toolbar: 'insert',
+                    icon: '{=config.default.server.url}/static/media/ck-panel-icon.png'
+                });
+            }
+        });
+
+        CKEDITOR.plugins.add("lml-image-finder", {
             init: function(editor) {
                 editor.addCommand('imagebrowser', { exec : that.castImageSelector });
                 editor.ui.addButton('imgbrowser', {
