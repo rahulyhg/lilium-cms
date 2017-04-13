@@ -32,7 +32,7 @@ $}
     </div>
     {$ endif; $}
 
-    {$ if (extra.article.pageIndex === 1); $}
+    {$ if (extra.article.pageIndex == 1); $}
     <div class="article-author-share-section no-tablet">
         <div class="article-share-count-wrapper topvert">
             <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
@@ -57,7 +57,7 @@ $}
             {=theme.settings.sidebottom}
         </div>
 
-        {$ if (?author.displayname); if (extra.article.pageIndex === 1); $}
+        {$ if (?author.displayname); if (extra.article.pageIndex == 1); $}
         <div class="article-author-strip">
             <div class="article-author-share-section invisible no-small-mobile" id="article-share-section">
                 <div class="article-share-count-wrapper topvert">
