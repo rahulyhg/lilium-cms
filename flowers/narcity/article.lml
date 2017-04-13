@@ -32,6 +32,7 @@ $}
     </div>
     {$ endif; $}
 
+    {$ if (extra.article.pageIndex === 1); $}
     <div class="article-author-share-section no-tablet">
         <div class="article-share-count-wrapper topvert">
             <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
@@ -41,6 +42,7 @@ $}
             <img src="{=url}/res/images/whitearrowshare.png" class="article-social-upward-arrow" />
         </div>
     </div>
+    {$ endif; $}
     
     {$ if (?extra.article.featuredimageartist); $}
     <div class="featured-image-credit">
@@ -55,7 +57,7 @@ $}
             {=theme.settings.sidebottom}
         </div>
 
-        {$ if (?author.displayname); $}
+        {$ if (?author.displayname); if (extra.article.pageIndex === 1); $}
         <div class="article-author-strip">
             <div class="article-author-share-section invisible no-small-mobile" id="article-share-section">
                 <div class="article-share-count-wrapper topvert">
@@ -91,7 +93,7 @@ $}
                 </div>
             </div>
         </div>
-        {$ endif; $}
+        {$ endif; endif; $}
 
         {=theme.settings.beforearticle}
         <div class="article-content" id="article-content">
@@ -133,7 +135,11 @@ $}
             </div>
             {$ endif; $}
 
-            {$ if (?extra.article.related.0.name ??) $}
+            {$ if (?extra.article.nextURL ??); $}
+            <div class="keep-on-reading-wrapper">
+                <a class="keep-on-reading keep-on-reading-next" href="{=extra.article.nextURL}">Next <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+            </div>
+            {$ endif; if (?extra.article.related.0.name ??); $}
             <div class="keep-on-reading-wrapper">
                 <a class="keep-on-reading" href="{=config.default.server.url}/{=extra.article.related.0.name}">Keep on reading <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
             </div>

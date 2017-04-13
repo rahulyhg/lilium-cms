@@ -163,7 +163,7 @@ var Article = function() {
 
     this.deepFetch = function(conf, idOrName, cb, preview, extraconds) {
         conf = conf._c || conf;
-        var cond = extraconds || new Object();
+        var cond = extraconds || {};
         cond[typeof idOrName === "string" ? "name" : "_id"] = idOrName;
 
         db.join(conf, preview ? 'preview' : 'content', [
@@ -580,7 +580,7 @@ var Article = function() {
 
                                             that.generateArticle(cli._c, db.mongoID(formData._id), function(resp) {
                                                 cli.sendJSON(resp);
-                                                var deepArticle = resp.dbdata;
+                                                var deepArticle = resp.deepArticle;
 
                                                 // Remove autosaves related to this article
                                                 if (cli.postdata.data.autosaveid) {
@@ -632,7 +632,7 @@ var Article = function() {
                                                     notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                                         title: notifMessage,
                                                         url: cli._c.server.url + (tObject ? ("/" + tObject.completeSlug) : "") + '/' + deepArticle.name,
-                                                        msg: '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
+                                                        msg: (deepArticle.isPaginated ? "Paginated article " : "Article ") + '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
                                                         type: 'success'
                                                     });
                                                 });
@@ -649,7 +649,7 @@ var Article = function() {
                                                 });
  
                                                 badges.check(cli, 'publish', function(acquired, level) {});
-                                            });
+                                            }, false, "all");
                                         } else if (pubCtx === "preview") {
                                             var tmpName = "static/tmp/preview" + 
                                                 Math.random().toString().slice(2) + 
@@ -873,7 +873,7 @@ var Article = function() {
                                     article: r.value
                                 });
    
-                                var extra = new Object();
+                                var extra = {};
                                 extra.article = deepArticle;
                                 extra.ctx = "article";
  
@@ -1370,7 +1370,7 @@ var Article = function() {
             .closeSection('authorbox')
             .trigger('bottom')
             .add('commtitle', 'title', {
-                displayname : "Communication"
+                displayname : "Internal communication"
             })
             .add('communication', 'snip', {
                 snip : "communication",
@@ -1422,7 +1422,7 @@ var Article = function() {
                     }
                 }, {name : 1});
             } else {
-                var extra = new Object();
+                var extra = {};
                 extra.ctx = "next";
                 extra.article = deepArticle;
     
@@ -1431,10 +1431,14 @@ var Article = function() {
         }, false, {status : "published"});
     };
 
-    this.generateArticle = function(_c, aid, cb, alreadyFetched) {
+    this.articleIsPaginated = function(article) {
+        return article && article.content && article.content.indexOf("<lml-page>") != -1;
+    };
+
+    this.generateArticle = function(_c, aid, cb, alreadyFetched, pageIndex) {
         var workArticle = function(deepArticle) {
             var gen = function() {
-                var extra = new Object();
+                var extra = {};
                 extra.ctx = "article";
                 extra.article = deepArticle;
 
@@ -1444,12 +1448,67 @@ var Article = function() {
                 });
 
                 var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
+                var filename = deepArticle.topicslug.substring(1) + deepArticle.name;
+
+                if (that.articleIsPaginated(deepArticle)) {
+                    var pages = deepArticle.content.split("<lml-page></lml-page>");
+
+                    if (pageIndex === "all") {
+                        log('Article', "Generated paginated article from admin panel : " + deepArticle.title);
+                        cIndex = pages.length;
+
+                        var nextPage = function(resp) {
+                            if (cIndex == 0) {
+                                cb({
+                                    success : true, 
+                                    deepArticle : deepArticle,
+                                    pages : pages.length
+                                });
+                            } else {
+                                that.generateArticle(_c, deepArticle._id, function(resp) {
+                                    cIndex--;
+                                    nextPage(resp);
+                                }, false, cIndex);
+                            }
+                        };
+                        return nextPage();
+                    }
+
+                    if (!pageIndex || pageIndex <= 0) {
+                        pageIndex = 1;
+                    } else if (pageIndex > pages.length) {
+                        pageIndex = pages.length;
+                    }
+
+                    if (pageIndex != pages.length) {
+                        deepArticle.nextURL = deepArticle.url + "/" + (pageIndex + 1);
+                        deepArticle.related = [];
+                    } 
+
+                    filename += "/" + pageIndex;
+                    deepArticle.content = pages[pageIndex - 1];
+                    deepArticle.isPaginated = true;
+                    deepArticle.totalPages = pages.length;
+                    deepArticle.pageIndex = pageIndex;
+
+                    deepArticle.url += "/" + pageIndex;
+
+                    if (pageIndex != 1) {
+                        deepArticle.featuredimage = [];
+                        deepArticle.featuredimageartist = undefined;
+                        deepArticle.title += " - Page " + pageIndex;
+                    }
+
+                    log('Article', "Generated page " + pageIndex + " of paginated article " + deepArticle.title);
+                } else {
+                    deepArticle.pageIndex = 1;
+                }
 
                 // Generate LML page
-                filelogic.renderThemeLML(_c, ctx, deepArticle.topicslug.substring(1) + deepArticle.name + '.html', extra , function(name) {
+                filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , function(name) {
                     cb && cb({
                         success: true,
-                        dbdata : deepArticle
+                        deepArticle : deepArticle
                     });
                 });
             };
@@ -1471,8 +1530,7 @@ var Article = function() {
         }
     };
 
-
-    this.generateFromName = function(cli, articleName, cb, onlyPublished, ctx) {
+    this.generateFromName = function(cli, articleName, cb, onlyPublished, pageIndex) {
         // Check for articles in db
         this.deepFetch(cli._c, articleName, function(deepArticle) {
             if (!deepArticle) {
@@ -1489,15 +1547,15 @@ var Article = function() {
                 if (onlyPublished && deepArticle.status !== "published") {
                     cb(false);
                 } else {
-                    that.generateArticle(cli._c, deepArticle, function() {
-                        if (deepArticle.url != cli.routeinfo.url) {
+                    that.generateArticle(cli._c, deepArticle, function(resp) {
+                        if (resp.deepArticle.url != cli.routeinfo.url) {
                             cb(true, {
-                                realURL : deepArticle.url
+                                realURL : resp.deepArticle.url
                             });
                         } else {
                             cb(true);
                         }
-                    }, true);
+                    }, true, pageIndex);
                 }
             }
         }, false, onlyPublished ? {status : "published"} : {});
