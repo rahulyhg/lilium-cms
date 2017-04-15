@@ -339,14 +339,17 @@ var Settings = function () {
                 required: false
             })
 
-        .add('social-sep', 'title', {
-                displayname: "Social networking API"
+        .add('social-facebook-sep', 'title', {
+                displayname: "Facebook API"
             })
             .add('social.facebook.appid', 'text', {
                 displayname: "Facebook Application ID"
             })
             .add('social.facebook.token', 'text', {
                 displayname: "Facebook Public Access Token"
+            })
+            .add('social.facebook.privtoken', 'text', {
+                displayname: "Facebook Private Token"
             })
             .add('social.facebook.apiversion', 'text', {
                 displayname: "Facebook Graph API Version"
