@@ -31,9 +31,9 @@ $}
     </div>
     {$ endif; $}
 
-    <div class="article-author-share-section no-tablet">
+    <div class="article-author-share-section invisible no-tablet" id="article-share-section-mobile">
         <div class="article-share-count-wrapper topvert">
-            <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section" data-showas="block">0000</span>
+            <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section-mobile" data-showas="block">0000</span>
             <span class="article-share-words">shares</span>
         </div>
         <div class="article-share-arrow-wrapper topvert">
