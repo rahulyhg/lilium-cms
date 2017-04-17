@@ -2,12 +2,12 @@
   "name": "LiliumCMS",
   "version": "0.0.1",
   "description": "Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.",
-  "main": "lilium.js",
+  "main": "index.prod.js",
   "scripts": {
-    "test": "node lilium.js crash-on-error",
-    "dev": "node lilium.js dev",
-    "start": "node lilium.js prod",
-    "setup" : "npm install && sudo npm install bower -g && bower install"
+    "test": "node gardener.js crash-on-error",
+    "dev": "node gardener.js dev",
+    "start": "node index.prod.js",
+    "setup": "npm install && sudo npm install bower -g && bower install"
   },
   "repository": {
     "type": "git",
@@ -91,6 +91,7 @@
     "nodemailer": "^2.7.2",
     "parchment": "^1.0.8",
     "path": "^0.12.7",
+    "pmx": "^1.1.0",
     "process": "^0.11.2",
     "quill": "^1.2.2",
     "readability-checker": "^0.2.1",

@@ -63,5 +63,11 @@
                 <b class="devtools-list-item-title">Mongo Admin</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/sharedobject" >
+                <i class="devtools-list-item-icon fa fa-server"></i>
+                <b class="devtools-list-item-title">Shared objects</b>
+            </a>
+        </li>
     </ul>
 </div>

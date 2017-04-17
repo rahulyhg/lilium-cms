@@ -5,6 +5,7 @@ var _conf = require('../config.js');
 var article = require('../article.js');
 var topics = require('../topics.js');
 var noop = function() {};
+var log = require('../log.js');
 
 var HTMLServer = function() {
     this.serveStatic = function(cli) {

@@ -2,8 +2,7 @@ var _c = require('./config.js');
 var entities = require('./entities.js');
 var db = require('./includes/db.js');
 var log = require('./log.js');
-
-var _sesh = new Object();
+var sharedcache = require('./sharedcache.js');
 
 var UserSesh = function (token) {
     this.data = new Object();
@@ -43,20 +42,21 @@ var Sessions = function () {
     this.logout = function (cli) {
         this.removeSession(cli, function () {
             cli.did('auth', 'logout');
-            cli.response.setHeader('Set-Cookie', 'lmlsid=""; ' + getFormattedPath(cli));
+            cli.response.setHeader('Set-Cookie', 'lmlsid'+cli._c.uid+'=""; ' + getFormattedPath(cli));
             cli.redirect(cli._c.server.url + '/admin');
         })
     }
 
     this.setCookieToCli = function (cli) {
-        cli.response.setHeader('Set-Cookie', 'lmlsid=' + cli.session.token + ';' + getFormattedPath(cli));
+        cli.response.setHeader('Set-Cookie', 'lmlsid'+cli._c.uid+'=' + cli.session.token + ';' + getFormattedPath(cli));
     };
 
     var seshToUserInfo = function(cli) {
         cli.userinfo = {
             loggedin: cli.session.loggedin,
             roles: cli.session.data.roles,
-            userid: cli.session.data._id,
+            rights : cli.session.data.rights,
+            userid: db.mongoID(cli.session.data._id),
             logintime: cli.session.data.logintime,
             displayname: cli.session.data.displayname,
             admin: cli.session.data.admin,
@@ -69,45 +69,38 @@ var Sessions = function () {
     }
 
     this.injectSessionInCli = function (cli, cb) {
-        var ids = cli.cookies.lmlsid;
+        var id = cli.cookies["lmlsid" + cli._c.uid];
         var injected = false;
 
-        if (typeof ids !== 'object') {
-            ids = [ids || ""];
-        }
-
-        for (var i = 0; i < ids.length; i++) {
-            var curSesh = _sesh[ids[i]];
-
+        sharedcache.getSession(id, function(curSesh) {
             if (curSesh && cli.routeinfo.configname == curSesh.data.site) {
                 cli.session = curSesh;
                 seshToUserInfo(cli);
 
                 injected = true;
-                break;
             }
-        }
 
-        if (injected) {
-            cb(true);
-        } else {
-            db.findToArray(cli._c, "sessions", {token : ids[0]}, function(err, arr) {
-                if (arr.length == 0) {
-                    cli.session = new UserSesh();   
-                    cb(false);
-                } else {
-                    if (arr[0].data.site == cli.routeinfo.configname) {
-                        cli.session = arr[0];
-                        seshToUserInfo(cli);
-                        _sesh[cli.session.token] = arr[0];
-
-                        cb(true);
-                    } else {
+            if (injected) {
+                cb(true);
+            } else {
+                db.findUnique(cli._c, "sessions", {token : id}, function(err, sesh) {
+                    if (!sesh) {
+                        cli.session = new UserSesh();   
                         cb(false);
+                    } else {
+                        if (sesh.data.site == cli.routeinfo.configname) {
+                            cli.session = sesh;
+                            seshToUserInfo(cli);
+                            sharedcache.session(id, 'add', sesh);
+
+                            cb(true);
+                        } else {
+                            cb(false);
+                        }
                     }
-                }
-            });
-        }
+                });
+            }
+        });
     };
 
     this.reloadSession = function(cli, cb) {
@@ -123,7 +116,6 @@ var Sessions = function () {
 
     this.createSessionInCli = function (cli, userObj, cb) {
         cli.session = this.createSession();
-        _sesh[cli.session.token] = cli.session;
         cli.session.loggedin = true;
 
         for (var k in userObj) {
@@ -143,12 +135,15 @@ var Sessions = function () {
         entities.maxPower(cli, function (maxUserPower) {
             cli.session.data.power = maxUserPower;
             cli.session.lastupdate = new Date();
+
             // No need for callback
             db.insert(cli._c, 'sessions', cli.session, function () {});
         });
 
-        this.setCookieToCli(cli);
-        cb && cb();
+        sharedcache.session(cli.session.token, 'add', cli.session, function() {
+            that.setCookieToCli(cli);
+            cb && cb();
+        });
     };
 
     this.removeSession = function (cli, callback) {
@@ -158,7 +153,7 @@ var Sessions = function () {
             token: cli.session.token
         }, function () {
             // Remove from memory
-            delete _sesh[cli.session.token];
+            sharedcache.session(cli.session.token, 'remove');
             callback();
         });
     }
@@ -170,12 +165,10 @@ var Sessions = function () {
         }, cli.session, callback);
     };
 
-    this.getSessionFromSID = function (sid) {
-        return _sesh[sid];
-    };
-
-    this.getSessions = function () {
-        return _sesh;
+    this.getSessionFromSID = function (sid, send) {
+        sharedcache.getSession(sid, function(resp) {
+            send(resp);
+        });
     };
 
     this.livevar = function(cli, levels, params, callback) {
@@ -217,8 +210,9 @@ var Sessions = function () {
                         if (hasNext) {
                             seshCount++;
                             data.next(function (err, sesh) {
-                                _sesh[sesh.token] = sesh;
-                                fetchNext();
+                                sharedcache.session(sesh.token, 'add', sesh, function() {
+                                    fetchNext();
+                                });
                             });
                         } else {
                             log("Session", "Loaded " + seshCount + " sessions from databse");

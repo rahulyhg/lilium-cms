@@ -19,6 +19,10 @@ var badges = require('./badges.js');
 var events = require('./events.js');
 var various = require('./various.js');
 var mail = require('./mail.js');
+var sharedcache = require('./sharedcache.js');
+
+var networkInfo = require('./network/info.js');
+var isElder = networkInfo.isElderChild();
 
 var _cachedSites = new Array();
 
@@ -28,6 +32,8 @@ var SiteInitializer = function (conf, siteobj) {
     var siteobj = siteobj;
 
     var loadHTMLStructure = function (done) {
+        if (!isElder) { return done(); }
+
         fileserver.createDirIfNotExists(conf.server.html, function (valid) {
             fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
                 fileserver.createDirIfNotExists(conf.server.html + "/lmldoc", function(nextvalid) {
@@ -48,6 +54,8 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var loadStaticSymlinks = function (done) {
+        if (!isElder) { return done(); }
+
         log('Sites', 'Initializing symlinks');
         var to = conf.server.html + '/static';
         var rootDir = conf.server.base + 'backend/static/';
@@ -81,6 +89,8 @@ var SiteInitializer = function (conf, siteobj) {
             log('Database', 'Requesting dynamic connection object', 'info');
             db.createPool(conf, function () {
                 log('Database', 'Firing Database connection signal', 'success');
+                if (!isElder) { return done(); }
+
                 createIndices();
             });
         };
@@ -124,6 +134,8 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     this.precompile = function (done) {
+        if (!isElder) { return done(); }
+
         var base = conf.server.base;
         var htmlbase = conf.server.html;
 
@@ -221,6 +233,8 @@ var SiteInitializer = function (conf, siteobj) {
     };
 
     var update = function(conf, done) {
+        if (!isElder) { return done(); }
+
         var versions = require('./versions.json');
         db.findToArray(conf, 'lilium', {}, function(err, dbv) {
             var vIndex = -1;
@@ -258,30 +272,35 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadTheme = function(cb) {
         themes.initializeSite(conf, function() {
+            if (!isElder) { return cb(); }
             templateBuilder.precompThemeFiles(conf, cb);
         });
     };
 
     var loadSessions = function(cb) {
+        if (!isElder) { return cb(); }
         sessions.initSessionsFromDatabase(conf, cb);
     };
 
     var checkForWP = function(conf) {
-        if (conf.wptransferring) {
+        if (isElder && conf.wptransferring) {
             log('Sites', 'Resuming Wordpress transfer for site ' + conf.id);
             siteobj.wptransfer(undefined, conf.wpdb, true);
         }
     };
 
     var loadVarious = function(done) {
+        if (!isElder) { return done(); }
         various.init(conf, done);
     };
 
     var initEvents = function(cb) {
+        if (!isElder) { return cb(); }
         events.init(conf, cb);
     };
 
     var loadRobots = function(cb) {
+        if (!isElder) { return cb(); }
         fileserver.createSymlink(conf.server.base + "backend/static/robots.txt", conf.server.html + "/robots.txt", cb);
     };
 
@@ -305,7 +324,7 @@ var SiteInitializer = function (conf, siteobj) {
                     initEvents(function() {
                         templateBuilder.init(conf);
 
-                        if (conf.emails) {
+                        if (isElder && conf.emails) {
                             mail.setSender(conf.id, {
                                 user : conf.emails.senderemail,
                                 pass : conf.emails.senderpass,
@@ -320,6 +339,7 @@ var SiteInitializer = function (conf, siteobj) {
                                         badges.addSite(conf, function() {
                                             loadRobots(function() {
                                                 update(conf, function() {
+                                                    sharedcache.hi();
                                                     checkForWP(conf);
                                                     hooks.fire('site_initialized', conf);
                                                     log('Sites', 'Initialized site with id ' + conf.id, 'success');
@@ -606,6 +626,8 @@ var Sites = function () {
     };
 
     this.loopPrecomp = function (done) {
+        if (!isElder) { return done(); }
+
         var s = _cachedSites;
         var len = s.length;
         var index = 0;

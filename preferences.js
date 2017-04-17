@@ -42,7 +42,7 @@ Preferences.prototype.adminPOST = function(cli) {
 var serveMyPreferences = function(cli, callback) {
     db.find(config.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, [], function(err, cur) {
         cur.next(function(err, obj) {
-            callback(err || obj ? (obj.preferences.form_name ? obj.preferences : getDefault(cli._c)) : {});
+            callback(err || obj && obj.preferences ? (obj.preferences.form_name ? obj.preferences : getDefault(cli._c)) : {});
         });
     });
 };

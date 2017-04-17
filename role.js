@@ -8,6 +8,7 @@ var livevars = require('./livevars.js');
 var fs = require('./fileserver.js');
 var notification = require('./notifications.js');
 var sites = require('./sites.js');
+var sharedcache = require('./sharedcache.js');
 
 var Role = function () {
     this.adminPOST = function (cli) {
@@ -76,12 +77,11 @@ var Role = function () {
             if (cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
                 db.insert(conf.default(), 'roles', prepareRoleForDB(cli), function (err, result) {
-                    require('./entities').cacheRoles(function() {
-                        // Create a new notification group
-                        notification.createGroup(cli.postdata.data.name, cli.postdata.data.name, cli._c.id);
-                        // Generate LML page
-                        cli.refresh();
-                    });
+                    // Create a new notification group
+                    notification.createGroup(cli.postdata.data.name, cli.postdata.data.name, cli._c.id);
+
+                    // Generate LML page
+                    cli.refresh();
                 });
             } else {
                 cli.sendJSON({
@@ -178,26 +178,32 @@ var Role = function () {
         var allContent = levels.length === 0;
 
         var maxpower = 100000000000;
-        var Roles = require('./entities.js').getCachedRoles();
-        for (var i in cli.session.data.roles) {
-            var role = cli.session.data.roles[i];
-
-            if (Roles[role] && Roles[role].power < maxpower) {
-                maxpower = Roles[role].power;
+        db.findToArray(conf.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
+            var Roles = {};
+            for (var i = 0; i < roles.length; i++) {
+                Roles[roles[i].name] = roles[i];
             }
-        }
 
-        if (allContent || levels[0] == "all") {
-            db.findToArray(conf.default(), 'roles', { power : {$gt : maxpower} }, function (err, arr) {
-                callback(arr);
-            });
-        } else {
-            db.multiLevelFind(conf.default(), 'roles', levels, {
-                _id: db.mongoID(levels[0])
-            }, {
-                limit: [1]
-            }, callback);
-        }
+            for (var i in cli.session.data.roles) {
+                var role = cli.session.data.roles[i];
+
+                if (Roles[role] && Roles[role].power < maxpower) {
+                    maxpower = Roles[role].power;
+                }
+            }
+
+            if (allContent || levels[0] == "all") {
+                db.findToArray(conf.default(), 'roles', { power : {$gt : maxpower} }, function (err, arr) {
+                    callback(arr);
+                });
+            } else {
+                db.multiLevelFind(conf.default(), 'roles', levels, {
+                    _id: db.mongoID(levels[0])
+                }, {
+                    limit: [1]
+                }, callback);
+            }
+        });
     }
 
     this.form = function () {

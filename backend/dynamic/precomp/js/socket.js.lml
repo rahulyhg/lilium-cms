@@ -82,19 +82,6 @@ $(document).ready(function() {
             this.emit('join', groupName);
         };
 
-        io.Socket.prototype.emitToGroup = function(groupName, data) {
-            this.emit('emittogroup', {
-                group: groupName,
-                data: data
-            });
-        };
-
-        io.Socket.prototype.notifyURL = function(groupName, data) {
-            this.emit('urlChanged', window.location.href);
-        };
-
-        socket.notifyURL();
-
         socket.on('join', function(data) {
             if (!data.success) {
                 console.error('[Notifications] ' + data.group + ' : ' + data.msg);

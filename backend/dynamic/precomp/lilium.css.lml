@@ -20,15 +20,15 @@
  *********************************************************************************************************/
 {#config;debug}
 {$ 
-    liliumcolor = "#9B59B6";
+    liliumcolor = "#af57e4";
 
 	actioncolor = liliumcolor;
-	hovercolor =  "#A869C6";
+	hovercolor =  "#c678ff";
 	activecolor = "#8B49A6";
 	siteurl = config.default.server.url;
 
 	fontcolor = "#111";
-	barcolor = "rgba(0,0,0,0.75)";
+	barcolor = "rgba(0,0,0,0.80)";
 	barcolorhover = "#656565";
 
 	infocolor = "#2980b9";
@@ -444,7 +444,7 @@ select {
 }
 
 .treeview-pane-selection.selected {
-    background-color: #9b59b6;
+    background-color: {=liliumcolor};
     color: #FFF;
     font-weight: 700;
 }
@@ -1049,11 +1049,11 @@ h2.subtitlestrip, h2.subtitle {
 
 .lmladminsidebar .lmladminsidebaritems li.go-to-site-listitem a {
     font-weight: bold;
-    color: #9B59B6;
+    color: {=liliumcolor};
 }
 
 .lmladminsidebar .lmladminsidebaritems li.go-to-site-listitem:hover {
-    background-color: #9B59B6;
+    background-color: {=liliumcolor};
     color: #FFF;
 }
 
@@ -1828,8 +1828,8 @@ input[disabled] {
     height: 50px;
 
     font-size: 22px;
-    color: #9b59b6;
-    border-bottom: 1px solid #9b59b6;
+    color: {=liliumcolor};
+    border-bottom: 1px solid {=liliumcolor};
 
     padding: 10px;
 }
@@ -1861,7 +1861,7 @@ input[disabled] {
     right:0;
 
     height: 50px;
-    border-top: 1px solid #9b59b6;
+    border-top: 1px solid {=liliumcolor};
 }
 
 .quill-source .bottom-bar button {

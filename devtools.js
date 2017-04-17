@@ -28,6 +28,7 @@ DevTools.prototype.adminGET = function(cli) {
         case 'cache':
         case 'feed':
         case 'html':
+        case 'sharedobject':
         case 'server':
         case 'scripts':
         case 'mail':

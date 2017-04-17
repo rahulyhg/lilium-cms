@@ -68,21 +68,26 @@ class LMLCommunications {
                 cli.sendJSON({error : "Content not found", message : err});
             } else {
                 if (cli.hasRight('editor') || article.author.toString() == cli.userinfo.userid.toString()) {
-                    let comm = {
-                        type : "article",
-                        objectid : articleid,
-                        poster : db.mongoID(cli.userinfo.userid),
-                        content : cli.postdata.data.content,
-                        date : new Date(),
-                        active : true
-                    };
+                    db.update(
+                        cli._c, 'content', {_id : articleid}, 
+                        {$addToSet : {subscribers : db.mongoID(cli.userinfo.userid)}}, 
+                    function() {
+                        let comm = {
+                            type : "article",
+                            objectid : articleid,
+                            poster : db.mongoID(cli.userinfo.userid),
+                            content : cli.postdata.data.content,
+                            date : new Date(),
+                            active : true
+                        };
 
-                    that.insertArticleComm(cli._c, comm, () => {
-                        that.deepFetch(cli._c, comm, () => {
-                            that.dispatchEmails(cli._c, comm, article, cli.userinfo.userid);
-                            cli.sendJSON({success : true});
+                        that.insertArticleComm(cli._c, comm, () => {
+                            that.deepFetch(cli._c, comm, () => {
+                                that.dispatchEmails(cli._c, comm, article, cli.userinfo.userid);
+                                cli.sendJSON({success : true});
+                            });
                         });
-                    });
+                    }, false, true, true);
                 } else {
                     cli.sendJSON({error : "Missing rights"});
                 }

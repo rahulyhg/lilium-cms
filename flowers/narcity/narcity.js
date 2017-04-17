@@ -16,10 +16,10 @@ var entities = undefined;
 var LML2 = undefined;
 var Article = undefined;
 var Category = undefined;
+var sharedcache = undefined;
 
 var themePath;
 var noOp = function() {};
-var homepageFileContent = {};
 
 // TODO : Receive context site
 var NarcityTheme = function () {}
@@ -43,6 +43,7 @@ var initRequires = function(abspath) {
     LML2 = require(abspath + 'lml/compiler.js');
     cc = require(abspath + "config.js");
     Article = require(abspath + "article.js");
+    sharedcache = require(abspath + "sharedcache.js");
 };
 
 var registerPictureSizes = function() {
@@ -563,7 +564,10 @@ var generateHomepage = function(_c, cb) {
         extra.latests = articles.latests;
 
         filelogic.renderThemeLML(_c, 'home', 'index.html', extra, function(pContent) {
-            homepageFileContent[_c.id] = pContent;
+            var setObj = {};
+            setObj["narcityhomepage_" + _c.id] = pContent
+            sharedcache.set(setObj);
+
             cb && cb(pContent);
         });
     });
@@ -642,31 +646,33 @@ var loadHooks = function(_c, info) {
     endpoints.registerContextual(_c.id, 'topic', 'GET', serveTopic);
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
-        if (homepageFileContent[cli._c.id]) {
-            cli.response.writeHead(200, {CacheType : "RAM", CacheSection : "homepage"});
-            return cli.response.end(homepageFileContent[cli._c.id]);
-        }
+        sharedcache.get("narcityhomepage_" + _c.id, function(resp) {
+            if (resp) {
+                cli.response.writeHead(200, {CacheType : "RAM", CacheSection : "homepage"});
+                return cli.response.end(resp);
+            }
 
-        if (rQueue.homepage.push(cli) == 1) {
-            fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
-                if (needsHomeRefresh || !exists) {
-                    generateHomepage(cli._c, function(content) {
-                        needsHomeRefresh = false;
-                        rQueue.homepage.forEach(function(qcli) {
-                            qcli.response.writeHead(200, {CacheType : "Generated", CacheSection : "homepage"});
-                            qcli.response.end(content);
-                            log('Narcity', 'Recreated and served homepage');
+            if (rQueue.homepage.push(cli) == 1) {
+                fileserver.fileExists(_c.server.html + "/index.html", function(exists) {
+                    if (needsHomeRefresh || !exists) {
+                        generateHomepage(cli._c, function(content) {
+                            needsHomeRefresh = false;
+                            rQueue.homepage.forEach(function(qcli) {
+                                qcli.response.writeHead(200, {CacheType : "Generated", CacheSection : "homepage"});
+                                qcli.response.end(content);
+                                log('Narcity', 'Recreated and served homepage');
+                            });
+                            rQueue.homepage = [];
+                        });
+                    } else {
+                        rQueue.homepage.forEach(function(cli) {
+                            fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
                         });
                         rQueue.homepage = [];
-                    });
-                } else {
-                    rQueue.homepage.forEach(function(cli) {
-                        fileserver.pipeFileToClient(cli, _c.server.html + '/index.html', noOp, true);
-                    });
-                    rQueue.homepage = [];
-                }
-            });
-        }
+                    }
+                });
+            }
+        });
     });
 
     var cachedHot = [];
@@ -814,7 +820,7 @@ var loadHooks = function(_c, info) {
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
     switch (ctx) {
-        case "home": needsHomeRefresh = true; homepageFileContent = {}; break;
+        case "home": needsHomeRefresh = true; break;
         case "tags": delete cachedTags[ctx][detail]; break;
         default: break;
     }

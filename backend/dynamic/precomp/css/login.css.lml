@@ -9,11 +9,13 @@ $}
 
 /* @/login */
 .lmllogin-wrapper form.dashboard-login-form {
-    background-color: rgba(0,0,0,0.3);
+    background-color: rgba(0,0,0,0.5);
 }
 
 .lmllogin-wrapper header h1 {
     text-align: center;
+    color: #f1e5f9;
+    font-weight: 300;
 }
 
 .lmllogin-wrapper button.fbloginbutton {
@@ -64,7 +66,10 @@ html.lmllogin {
 }
 
 .lmllogin-wrapper header {
-	padding: 10px;
+    padding: 10px;
+    background: rgba(0,0,0,0.5);
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
 }
 
 .lmllogin-wrapper form {
@@ -78,24 +83,25 @@ html.lmllogin {
 	border: 0px solid rgba(255, 255, 255, 0.1);
 }
 
-.lmllogin-wrapper form input {
-	width: 100%;
-
- 	box-sizing: border-box;
- 	-moz-box-sizing: border-box;
- 	-webkit-box-sizing: border-box;
-
-	padding: 10px;
-	font-size: 16px;
-
-	color: #333;
-	background-color: #EEE;
-
-	-webkit-transition: all 0.2s;
-   	   -moz-transition: all 0.2s;
-	    -ms-transition: all 0.2s;
-	     -o-transition: all 0.2s;
-		transition: all 0.2s;
+.lmllogin-wrapper form.lmlform input:not([type="file"]) {
+    width: 100%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    padding: 10px;
+    font-size: 16px;
+    color: #333;
+    background-color: #EEE;
+    -webkit-transition: all 0.2s;
+    -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
+    border-right: none;
+    border: none;
+    border-radius: 0px;
+    background-color: rgba(255,255,255,0.8);
+    border-bottom: 1px solid #CCC;
 }
 
 .lmllogin-wrapper form input:hover {
