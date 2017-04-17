@@ -142,6 +142,10 @@
             "endpoint" : "embed",
             "support" : ["admin_get"]
         }, {
+            "module" : "sharedcache.js",
+            "endpoint" : "sharedcache",
+            "support" : ["livevar"]
+        }, {
             "module" : "tools.js",
             "endpoint" : "tools",
             "support" : ["admin_get", "admin_post", "livevar", "setup"],

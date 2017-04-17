@@ -1,1 +1,14 @@
-{"proxy":{"listento":9090,"speakto":8080},"localcast":{"port":5514},"loaded":true,"familysize":false}
+{
+    "proxy" : {
+        "listento":9090,
+        "speakto":8080
+    },
+    "localcast" : {
+        "port":5514
+    },
+    "loaded":true,
+    "familysize":false,
+    "cacheport" : 17209,
+    "realtimeport" : 17210,
+    "useUDS" : true
+}

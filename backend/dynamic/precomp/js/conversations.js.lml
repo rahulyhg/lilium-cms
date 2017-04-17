@@ -63,9 +63,12 @@ var LMLConversations = function() {
             if (cconv.uptodate.indexOf(myid) == -1) {
                 if (cconv.type == "private") {
                     var usr = cconv.users[Math.abs(cconv.users.indexOf(myid) - 1)];
-                    document.getElementById("user" + usr).classList.add("unread");
-                    document.getElementById('nav-conversations').querySelector('b').classList.add('shown');
-                    unreadConv[cconv._id] = usr;
+                    var pane = document.getElementById("user" + usr);
+                    if (pane) {
+                        pane.classList.add("unread");
+                        document.getElementById('nav-conversations').querySelector('b').classList.add('shown');
+                        unreadConv[cconv._id] = usr;
+                    }
                 } else {
 
                 }

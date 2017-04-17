@@ -12,8 +12,6 @@ var pluginHelper = require('./pluginHelper.js');
 var preferences = require('./preferences.js');
 var feed = require('./feed.js');
 
-var Roles = new Object();
-
 var Entity = function () {
     this._id = undefined;
     this.username = "";
@@ -49,10 +47,6 @@ var Entities = module.exports = new function () {
         callback(entity);
     };
 
-    this.getCachedRoles = function() {
-        return Object.assign({}, Roles);
-    }
-
     this.firstLogin = function(cli, userObj, cb) {
         db.update(_c.default(), 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : 1}, cb);
     };
@@ -76,7 +70,21 @@ var Entities = module.exports = new function () {
 
         db.findToArray(_c.default(), 'entities', condition, function(err, user) {
             if (!err && user.length == 1) {
-                entityWithData(user[0], callback);
+                entityWithData(user[0], function(entity) {
+                    db.findToArray(_c.default(), 'roles', { name : {$in : entity.roles} }, function(err, roles) {
+                        var rights = [];
+                        if (entity.roles.indexOf('lilium') != -1 || entity.roles.indexOf('admin') != -1) {
+                            rights.push("*")
+                        }
+
+                        for (var i = 0; i < roles.length; i++) {
+                            rights.push(...roles[i].rights);
+                        }
+
+                        entity.rights = rights;
+                        callback(entity);
+                    });
+                });
             } else {
                 callback(undefined);
             }
@@ -364,50 +372,50 @@ var Entities = module.exports = new function () {
                         // Update session
                         if (isProfile) {
                             var sessToken = cli.session.token;
-                            var session = sessionManager.getSessionFromSID(sessToken);
+                            sessionManager.getSessionFromSID(sessToken, function(session) {
+                                session.data.avatarID = avatarID;
+                                session.data.avatarURL = avatarURL;
 
-                            session.data.avatarID = avatarID;
-                            session.data.avatarURL = avatarURL;
+                                cli.session.data.avatarURL = avatarURL;
+                                cli.session.data.avatarID = avatarID;
 
-                            cli.session.data.avatarURL = avatarURL;
-                            cli.session.data.avatarID = avatarID;
+                                hooks.fire('profile_picture_updated', {
+                                    cli: cli
+                                });
 
-                            hooks.fire('profile_picture_updated', {
-                                cli: cli
-                            });
-
-                            sessionManager.saveSession(cli, function () {
-                                cli.sendJSON({
-                                    success: true
+                                sessionManager.saveSession(cli, function () {
+                                    cli.sendJSON({
+                                        success: true
+                                    });
                                 });
                             });
                         } else {
                             db.findToArray(cli._c, 'sessions', {"data._id" : db.mongoID(id)}, function(err, arr){
                                 if (arr[0] && arr[0].token) {
 
-                                    var session = sessionManager.getSessionFromSID(arr[0].token);
+                                    sessionManager.getSessionFromSID(arr[0].token, function(session) {
+                                        if (session) {
+                                            session.data.avatarID = avatarID;
+                                            session.data.avatarURL = avatarURL;
 
-                                    if (session) {
-                                        session.data.avatarID = avatarID;
-                                        session.data.avatarURL = avatarURL;
+                                            cli.session.data.avatarURL = avatarURL;
+                                            cli.session.data.avatarID = avatarID;
 
-                                        cli.session.data.avatarURL = avatarURL;
-                                        cli.session.data.avatarID = avatarID;
+                                            // Bypass session manager taking only a cli
+                                            var dummycli = {};
+                                            dummycli.session = session;
+                                            dummycli._c = {};
+                                            dummycli._c.id = cli._c.id;
 
-                                        // Bypass session manager taking only a cli
-                                        var dummycli = {};
-                                        dummycli.session = session;
-                                        dummycli._c = {};
-                                        dummycli._c.id = cli._c.id;
-
-                                        // Save it
-                                        sessionManager.saveSession(dummycli, function () {
-                                            cli.sendJSON({
-                                                redirect: '',
-                                                success: true
+                                            // Save it
+                                            sessionManager.saveSession(dummycli, function () {
+                                                cli.sendJSON({
+                                                    redirect: '',
+                                                    success: true
+                                                });
                                             });
-                                        });
-                                    }
+                                        }
+                                    });
                                 } else {
                                     cli.sendJSON({
                                         redirect: '',
@@ -521,16 +529,18 @@ var Entities = module.exports = new function () {
         
                         if (arr[0].sites) {
                             var loggeduser = uarr[0];
-        
                             var currentsites = arr[0].sites;
                             var newsites = entity.sites;
         
-                            for (var i = 0; i < currentsites.length; i++) if (loggeduser.sites.indexOf(currentsites[i]) == -1) {
+                            for (var i = 0; i < currentsites.length; i++) if (
+                                loggeduser.roles.indexOf('lilium') != -1 || loggeduser.roles.indexOf('admin') != -1 ||
+                                loggeduser.sites.indexOf(currentsites[i]) == -1
+                            ) {
                                 newsites.push(currentsites[i]);
                             }
     
                             entity.sites = newsites;
-                        }    
+                        }
                     
                         that.updateEntity(entity, cli._c.id, function(err, res) {
                             if (!err){
@@ -699,94 +709,45 @@ var Entities = module.exports = new function () {
         db.update(_c.default(), 'entities', {_id : id}, valObject, cb);
     };
 
-    this.cacheRoles = function (callback) {
-        log('Roles', 'Caching roles from Database');
-        var sites = _c.getAllSites();
-        for (var i in sites) {
-            db.findToArray(_c.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
-                if (!err) {
-                    for (var i = 0, len = roles.length; i < len; i++) {
-                        Roles[roles[i].name] = roles[i];
-                    }
-
-                    log('Roles', 'Cached ' + roles.length + ' roles');
-                } else {
-                    log('Roles', 'Could not cache roles from database');
-                }
-
-            });
-        }
-        callback();
-    };
-
     this.registerRole = function (rObj, rights, callback, updateIfExists, allsites) {
-        if (typeof Roles[rObj.name] !== 'undefined') {
-            log('Roles', new Error("[RolesException] Tried to register already registered role " + rObj.name));
-        } else {
-            rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
-            rObj.rights = rights;
-            if (allsites) {
-                var sites = _c.getAllSites();
-                for (var i in sites) {
-                    db.update(_c.default(), 'roles', {
-                        name: rObj.name
-                    }, rObj, function (err, result) {
-                        Roles[rObj.name] = rObj;
-                        callback(rObj);
-                    }, updateIfExists);
-                }
-            } else {
+        rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
+        rObj.rights = rights;
+
+        if (allsites) {
+            var sites = _c.getAllSites();
+            for (var i in sites) {
                 db.update(_c.default(), 'roles', {
                     name: rObj.name
                 }, rObj, function (err, result) {
-                    Roles[rObj.name] = rObj;
                     callback(rObj);
                 }, updateIfExists);
             }
-
+        } else {
+            db.update(_c.default(), 'roles', {
+                name: rObj.name
+            }, rObj, function (err, result) {
+                callback(rObj);
+            }, updateIfExists);
         }
     };
 
     this.isAllowed = function (entity, right) {
-        var allowed = false;
+        var allowed = true;
         var that = this;
 
-        if (!entity.loggedin && (right === "" || right.length === 0)) {
-            allowed = true;
-        } else if (typeof right === "object" && typeof right.length !== 'undefined') {
-            var rights = right;
-            if (right.length === 0) {
-                allowed = true;
-            } else {
-                for (var i = 0; i < rights.length; i++) {
-                    allowed = that.isAllowed(entity, rights[i]);
-
-                    if (!allowed) break;
-                }
-            }
-        } else if (typeof right === "string" && typeof entity.roles !== 'undefined') {
-            allowed = entity.roles.indexOf('lilium') !== -1;
-            if (!allowed) {
-                for (var i = 0, len = entity.roles.length; i < len; i++) {
-                    if (typeof Roles[entity.roles[i]] !== 'undefined') {
-                        var rights = Roles[entity.roles[i]].rights;
-                        if (typeof rights !== 'undefined') {
-                            for (var j = 0, jLen = rights.length; j < jLen; j++) {
-                                if (rights[j] == right) {
-                                    allowed = true;
-                                    break;
-                                };
-                            }
-
-                        }
-                        if (allowed) break;
-                    }
-
-                }
-
+        if (entity.loggedin && right != "" && right.length !== 0 && entity.rights[0] != "*") {
+            if (typeof right === "string") {
+                right = [right];
             }
 
-        }
+            for (var i = 0; i < right.length; i++) {
+                if (entity.rights.indexOf(right[i]) == -1) {
+                    allowed = false;
+                    break;
+                }
+            }
+        } 
+
         return allowed;
     };
 
@@ -933,7 +894,7 @@ var Entities = module.exports = new function () {
                 avatarURL : 1
             });
         } else if (levels[0] == "cached") {
-            db.findToArray(_c.default(), 'entities', {}, function(e, a) {callback(a);}, {displayname : 1, avatarURL : 1});
+            db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, function(e, a) {callback(a);}, {displayname : 1, avatarURL : 1});
         } else if (levels[0] == "simple") {
             var simpProj = {
                 displayname : 1,
@@ -1039,39 +1000,7 @@ var Entities = module.exports = new function () {
         }, []);
     };
 
-    // Not working properly
-    this.getRights = function(cli, entityid, cb) {
-        db.find(cli._c, 'entities', {_id : db.mongoID(entityid)}, [], function(err, cur) {
-            cur.hasNext(function(err, hasnext) {
-                if (hasnext) {
-                    cur.next(function(err, usrr) {
-                        var rls = usrr.roles;
-                        if (rls.indexOf('lilium') != -1 || rls.indexOf('admin') != -1) {
-                            cb(["*"]);
-                        } else {
-                            var urights = [];
-                            for (var i = 0; i < rls.length; i++) {
-                                urights.push(...Roles[rls[i]]);
-                            }
-
-                            cb(urights);
-                        }
-                    });
-                } else {
-                    cb([]);
-                }
-            });
-        }, {roles : 1})
-    };
-
     var deletePluginRole = function (identifier) {
-        for (var i in Roles) {
-            if (Roles[i].pluginID == identifier) {
-                db.remove(_c.default(), 'roles', {name : Roles[i].name}, function(err, res) {
-                    Roles[i] = undefined;
-                    delete Roles[i];
-                })
-            }
-        }
+
     };
 };

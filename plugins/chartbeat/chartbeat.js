@@ -10,6 +10,7 @@ var request = undefined;
 var notifications = undefined;
 var livevars = undefined;
 var localcast = undefined;
+var cache = undefined;
 
 var _toppages = new Array();
 var _latestHisto = new Object();

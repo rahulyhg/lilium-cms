@@ -2,6 +2,7 @@ var config = require('./config.js');
 var fileserver = require('./fileserver.js');
 var cluster = require('cluster');
 var RedisServer = require('redis-server');
+var SharedMemory = require('./network/sharedmemory.js');
 var log = require('./log.js');
 
 var networkConfig = {loaded:false};
@@ -20,9 +21,12 @@ var Gardener = function() {
             log('Network', 'Network configuration loaded', 'success');
             log('Network', 'Spawning redis server', 'lilium');
             var redisserver = new RedisServer(6379);
-            redisserver.open(function() {
+            redisserver.open(function(a, b) {
                 log('Network', 'Redis server spawned', 'success');
                 var lmlinstances = networkConfig.familysize || require('os').cpus().length;
+
+                log('Network', 'Starting up Shared Memory module', 'lilium');
+                SharedMemory.bind();
 
                 var server = require('http').createServer();
                 var io = require('socket.io').listen(server);
@@ -47,7 +51,7 @@ var Gardener = function() {
                     log('Network', 'Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal, 'err');
                     log('Network', 'Starting a new worker', 'info');
                     var dyingChld = garden[worker.process.pid];
-                    var chld = cluster.fork({instancenum : dyingChld.instancenum});
+                    var chld = cluster.fork({instancenum : dyingChld.instancenum, parent : "gardener"});
                     chld.on('message', that.broadcast);
 
                     delete garden[worker.process.pid];
@@ -58,8 +62,9 @@ var Gardener = function() {
             });       
         });
     } else {
-        var lilium = require('./lilium.js');
-        garden[process.id] = lilium;
+        var Lilium = require('./lilium.js');
+        var lilium = new Lilium();
+        garden[process.id] = lilium.cms();
     } 
 };
 

@@ -37,6 +37,8 @@ var vocab = undefined;
 var various = undefined;
 
 var log = require('./log.js');
+var networkinfo = require('./network/info.js');
+var isElder = networkinfo.isElderChild();
 
 var Core = function () {
     var loadRequires = function () {
@@ -267,7 +269,7 @@ var Core = function () {
             return;
         }, true, true);
 
-        entities.cacheRoles(cb);
+        cb();
     };
 
     var gracefullyCrash = function(err) {
@@ -343,6 +345,8 @@ var Core = function () {
     };
 
     var schedulePreload = function() {
+        if (!isElder) { return; }
+
         var preloadSites = function() {
             _c.each(function(conf, next) {
                 log('Schedule', 'Running Scheduled cache preloading for website ' + conf.website.sitetitle)
@@ -395,6 +399,8 @@ var Core = function () {
     }
 
     var notifyAdminsViaEmail = function() {
+        if (!isElder) { return; }
+
         db.findToArray(_c.default(), "entities", {roles : "lilium"}, function(err, users) {
             users.forEach(function(user) {
                 if (user.email) {

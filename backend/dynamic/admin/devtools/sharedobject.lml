@@ -1,0 +1,54 @@
+{#config;extra}
+{*sharedcache.dump}
+<lml:dom v="0.8"></lml:dom>
+
+<script>
+    var showSharedCacheValue = function(a) {
+        a.parentElement.querySelector('div').style.display = "block";
+        a.style.display = "none"
+        return false;
+    }
+</script>
+
+<h1>Shared objects</h1>
+<div>
+    <lml:foreach var="obj" in="livevars.sharedcache.dump.cache">
+        <div style="margin: 5px; padding: 5px; background-color: #F9F9F9; border: 1px solid #EEE;">
+            <h4><lml:text var="foreachkey"></lml:text></h4> 
+            <div>
+                <a onclick="showSharedCacheValue(this);" style="cursor: pointer;">Show value</a>
+                <div style="display: none;">
+                    <lml:text var="obj"></lml:text>
+                </div>
+            </div>
+        </div>
+    </lml:foreach>
+</div>
+
+<h1>Sessions</h1>
+<div>
+    <lml:foreach var="obj" in="livevars.sharedcache.dump.sessions">
+        <div style="margin: 5px; padding: 5px; background-color: #F9F9F9; border: 1px solid #EEE;">
+            <h4><lml:text var="foreachkey"></lml:text></h4> 
+            <div>
+                <lml:text var="obj.data.displayname"></lml:text>, on <lml:text var="obj.data.site"></lml:text>
+            </div>
+        </div>
+    </lml:foreach>
+</div>
+
+<h1>Sockets</h1>
+<div>
+    <lml:foreach var="obj" in="livevars.sharedcache.dump.sockets">
+        <div style="margin: 5px; padding: 5px; background-color: #F9F9F9; border: 1px solid #EEE;">
+            <h4><lml:text var="foreachkey"></lml:text></h4> 
+            <div>
+                <lml:text var="obj"></lml:text>
+            </div>
+        </div>
+    </lml:foreach>
+</div>
+
+
+
+
