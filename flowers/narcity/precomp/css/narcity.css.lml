@@ -1490,6 +1490,11 @@ article.archive-article h3 a {
     margin: auto;
 }
 
+.google-tag-manager-hidden{
+    display:none;
+    visibility:hidden;
+}
+
 /* Small browser */
 @media only screen and (max-width: {=fw}) {
     article.archive-article {
