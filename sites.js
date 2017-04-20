@@ -324,7 +324,7 @@ var SiteInitializer = function (conf, siteobj) {
                     initEvents(function() {
                         templateBuilder.init(conf);
 
-                        if (isElder && conf.emails) {
+                        if (/*isElder &&*/ conf.emails) {
                             mail.setSender(conf.id, {
                                 user : conf.emails.senderemail,
                                 pass : conf.emails.senderpass,

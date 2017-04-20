@@ -74,7 +74,7 @@ var Role = function () {
             var redirect = '';
 
             // Check if current user has sufficient role power
-            if (cli.userinfo.power < cli.postdata.data.power) {
+            if (cli.userinfo.roles.indexOf("lilium") != -1 || cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
                 db.insert(conf.default(), 'roles', prepareRoleForDB(cli), function (err, result) {
                     // Create a new notification group
@@ -145,7 +145,6 @@ var Role = function () {
                 _id: id
             }, function (err, r) {
                 // Remove notification group
-                notification.deleteGroup('');
                 return cli.sendJSON({
                     success: true
                 });

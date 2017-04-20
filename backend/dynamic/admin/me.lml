@@ -39,8 +39,8 @@
                 <p>This won't give Lilium access to your Facebook password and private information.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" id="button-confirm-facebook-auth">Let's do it</button>
-                <button type="button" class="btn btn-default" id="button-deny-facebook-auth">Nevermind</button>
+                <button type="button" class="btn-primary" id="button-confirm-facebook-auth">Let's do it</button>
+                <button type="button" class="" id="button-deny-facebook-auth">Nevermind</button>
             </div>
         </div>
         <!-- /.modal-content -->

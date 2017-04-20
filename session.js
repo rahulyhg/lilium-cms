@@ -105,11 +105,11 @@ var Sessions = function () {
 
     this.reloadSession = function(cli, cb) {
         log('Session', 'Reloading session for token ' + cli.userinfo.userid);
-        db.findToArray(_c.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+        entities.fetchFromDB(cli._c, db.mongoID(cli.userinfo.userid), function(user) {
             log('Session', 'Removing session from client object');
             that.removeSession(cli, function() {
                 log('Session', 'Recreating session');
-                that.createSessionInCli(cli, arr[0], cb);
+                that.createSessionInCli(cli, user, cb);
             });
         });
     };
@@ -160,6 +160,7 @@ var Sessions = function () {
 
     this.saveSession = function (cli, callback) {
         cli.session.lastUpdate = new Date();
+        delete cli.session._id;
         db.update(cli._c, 'sessions', {
             token: cli.session.token,
         }, cli.session, callback);

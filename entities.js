@@ -235,7 +235,7 @@ var Entities = module.exports = new function () {
         var that = this;
         that.maxPower(undefined, function(actorpower) {
             that.maxPower(undefined, function(subpower) {
-                cb(actorpower < subpower);
+                cb(actorpower == -1 || actorpower < subpower);
             }, subject);
         }, actor);
     }
@@ -266,6 +266,10 @@ var Entities = module.exports = new function () {
         delete entity.roles;
         delete entity.sites;
         delete entity.badges;
+
+        var split = entity.displayname.split(' ');
+        entity.firstname = split.shift();
+        entity.lastname = split.join(' ');
 
         this.updateEntity(entity, cli._c.id, function(err, res) {
             cli.did("entity", "update");
@@ -486,14 +490,16 @@ var Entities = module.exports = new function () {
                 _id: '$_id',
                 power: {
                     $push: "$rights.power"
-                }
+                },
+                roles : 1
             }
         }, {
             $project: {
                 _id: 0,
                 power: {
                     $min: '$power'
-                }
+                },
+                roles : 1
             }
         }], function (result) {
             // Make sure there is a result
@@ -515,9 +521,13 @@ var Entities = module.exports = new function () {
             var entity = this.initialiseBaseEntity(entData);
             entity._id = cli.routeinfo.path[3];
 
+            var split = entity.displayname.split(' ');
+            entity.firstname = split.shift();
+            entity.lastname = split.join(' ');
+
             log("Entities", "User " + cli.userinfo.displayname + " validates its right to update user with id " + entity._id, "info");
             that.canActOn(db.mongoID(cli.userinfo.userid), db.mongoID(entity._id), function(allowed) {
-                if (!allowed) {
+                if (!allowed && cli.userinfo.roles.indexOf("lilium") == -1) {
                     return cli.throwHTTP(401, "I'm so sorry... I simply can't let you edit this user. Contact your admin!", true);
                 }
 

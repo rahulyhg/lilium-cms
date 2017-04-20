@@ -882,3 +882,25 @@ var LMLDom = function() {
         log('LMLDOM', 'Done initializing');
     };
 };
+
+// Vanilla utilities
+window.ce = function(elemtype, props, parentNode) {
+    var elem = document.createElement(elemtype);
+    var pname = Object.keys(props || {});
+
+    for (var i = 0; i < pname.length; i++) {
+        elem.setAttribute(pname[i], props[pname[i]]);
+    }
+    
+    parentNode && ac(parentNode, elem);
+
+    return elem;
+}
+
+window.ac = function(parentNode, childNode) {
+    parentNode.appendChild(childNode);
+}
+
+window.ctnode = function(text) {
+    return document.createTextNode(text);
+}

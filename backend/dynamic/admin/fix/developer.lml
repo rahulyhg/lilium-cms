@@ -1,0 +1,44 @@
+{#config;forms}
+{*fix.deep.{?1}}
+<lml:dom v="0.8" feature="fullwidth" />
+
+<h1>
+    Ticket
+</h1>
+
+{=forms.render("editticket","edit","fix/deep/?")}
+
+
+<script>
+    var updateTicket = function(newstatus) {
+        var formdata = liliumcms.lmldom.getFormData()["editticket"].values;
+        formdata.status = newstatus;
+
+        liliumcms.lmldom.sendForm(
+            formdata,
+            "{=config.default.server.url}/admin/fix/update/" + liliumcms.pageloader.lastLevel, 
+            function(resp) {
+                if (resp.success) {
+                    liliumcms.notify({
+                        type : "success",
+                        title : "Ticket successfully updated",
+                        message : ""
+                    });
+
+                    liliumcms.pageloader.load("{=config.default.server.url}/admin/fix");
+                } else {
+                    liliumcms.notify({
+                        type : "danger",
+                        title : "Error updating ticket",
+                        message : resp.error
+                    });
+                }
+            }
+        );
+    };
+
+    document.querySelector('.btn-save').addEventListener('click', updateTicket.bind(this));
+    document.querySelector('.btn-set-active').addEventListener('click', updateTicket.bind(this, "active"));
+    document.querySelector('.btn-close').addEventListener('click', updateTicket.bind(this, "closed"));
+
+</script>

@@ -20,7 +20,9 @@ let mailHooks = {
     to_new_user : {displayname : "New user was created. Send to new user."},
     lilium_restarted : {displayname : "Lilium restarted. Send to admins."},
     article_sent_for_review : {displayname : "An article has been sent for review. Send to production."},
-    communication_on_article : {displayname : "A new communication is added to an article. Send to subscribers."}
+    communication_on_article : {displayname : "A new communication is added to an article. Send to subscribers."},
+    ticket_submitted : {displayname : "A support ticket was submitted. Send to developers."},
+    ticket_status_update : {displayname : "A support ticket was updated. Send to original poster."}
 };
 
 class EMail {
@@ -112,7 +114,7 @@ class MailController {
                 'name' : 'save',
                 'displayname': 'Save',
                 'type' : 'button',
-                'classes': ['btn', 'btn-default', 'btn-save']
+                'classes': ['btn-save']
             }
         ]});
     }

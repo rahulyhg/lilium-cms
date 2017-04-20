@@ -531,7 +531,7 @@ select {
 	display: inline-block;
 }
 
-.lmlform input:not([type="file"]), .lmlform select, .lmlform textarea {
+.lmlform input:not([type="file"]):not([type="submit"]), .lmlform select, .lmlform textarea {
 	padding: 10px;
 	font-size: 14px;
 	width: 100%;
@@ -576,8 +576,7 @@ select {
 .lmlform button.green {
     background-color: #45ad2b;
     color: #FFF;
-    border: 1px solid #1f861f;
-    box-shadow: 0px 0px 3px 0px rgba(89, 182, 100, 0.59);
+    border-bottom-color: #1f861f;
 }
 
 .lmlform button.green:hover {
@@ -681,6 +680,10 @@ select {
     color: #333;
 }
 
+.btn-default {
+    
+}
+
 .modal-header .close {
     margin-top: -2px;
     font-size: 36px;
@@ -734,22 +737,94 @@ select {
     margin: 0px -10px -10px -10px;
 }
 
-.lmlform input[type="submit"], .lmlform button {
-    width: auto;
-    margin: 10px;
-    border-radius: 6px;
-    padding: 6px 9px;
-    font-size: 14px;
-    border: 1px solid #7B3996;
-	background-color: {=actioncolor};
-    color: #EEE;
-    box-shadow: 0px 0px 3px 0px rgba(155, 89, 182, 0.59);
-    text-transform: uppercase;
-    font-family: "Open Sans", sans-serif;
-    text-shadow: 0px 0px 1px rgba(0,0,0,0.2);
-    letter-spacing: 0px;
+input[type="submit"], .btn, button {
     display: inline-block;
-    vertical-align: middle;
+    padding: 12px;
+    background-color: #Af57E4;
+    color: #FFF;
+    text-transform: uppercase;                                                                                                          
+    font-weight: bold;
+    border-bottom: 3px solid #793b9e;                                                                                                   
+    cursor: pointer;
+       
+    -webkit-touch-callout: none; 
+      -webkit-user-select: none;
+       -khtml-user-select: none;
+         -moz-user-select: none;
+          -ms-user-select: none;
+              user-select: none
+
+    border-radius: 2px;
+    margin-right: 6px;
+}
+
+input[type="submit"] .fa, .btn .fa, button .fa {
+    margin-right: 4px;
+}
+
+input[type="submit"].small, .btn.small, button.small {
+    font-size: 14px;
+    padding: 8px 10px;
+}
+
+input[type="submit"]::before, .btn::before, button::before {
+    display: inline-block;
+    font: normal normal normal 14px/1 FontAwesome;
+    font-size: inherit;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;    
+    margin-right: 8px;
+}
+
+input[type="submit"]:hover, .btn:hover, button:hover, 
+input[type="submit"]:focus, .btn:focus, button:focus {
+    background-color: #Bf67F4;
+    text-decoration: none;
+    box-shadow : 0px 0px 10px rgba(255, 255, 255, 0.3) inset;
+    color: #FFF;
+}
+
+input[type="submit"]:active, .btn:active, button:active {
+    border-bottom-width: 1px;
+    background-color: #995bBe;
+    box-shadow : 0px 0px 10px rgba(0, 0, 0, 0.2) inset;
+    color: #FFF;
+
+    margin-bottom: 2px;
+
+    -webkit-transform: translate3d(0, 2px, 0);
+       -moz-transform: translate3d(0, 2px, 0);
+        -ms-transform: translate3d(0, 2px, 0);
+         -o-transform: translate3d(0, 2px, 0);
+            transform: translate3d(0, 2px, 0);
+}
+
+input[type="submit"].red, .btn.red, button.red {
+    background-color: #e04646;
+    bottom-border-color: #9e3b3b;
+}
+
+input[type="submit"].red:hover, .btn.red:hover, button.red:hover, 
+input[type="submit"].red:focus, .btn.red:focus, button.red:focus {
+    background-color: #f46767;
+}
+
+input[type="submit"].red:active, .btn.red:active, button.red:active {
+    background-color: #c02626;
+}
+
+input[type="submit"].blue, .btn.blue, button.blue { 
+    background-color: #337ab7;
+    border-color: #2e6da4;
+}
+
+input[type="submit"].blue:hover, .btn.blue:hover, button.blue:hover, 
+input[type="submit"].blue:focus, .btn.blue:focus, button.blue:focus {
+    background-color: #438ac7;
+}
+
+input[type="submit"].blue:active, .btn.blue:active, button.blue:active {
+    background-color: #236aa7;
 }
 
 .lmlform .async-form-check-icon {
@@ -798,16 +873,6 @@ select {
 
 .lmlform button.red:active {
     background-color: #DF0614;
-}
-
-.lmlform input[type="submit"]:hover, .lmlform button:hover {
-	background-color: {=hovercolor};
-    color: #EEE;
-}
-
-.lmlform input[type="submit"]:active, .lmlform button:active {
-	background-color: {=activecolor};
-    color: #EEE;
 }
 
 .lmlform input:focus, .lmlform select:focus,
@@ -1605,15 +1670,6 @@ header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
 header.admin-bar .navbar-default .navbar-nav  .notifications {
 }
 
-.btn {
-    padding: 6px 10px;
-    color: #FFF;
-    font-size: 14px;
-    border-radius: 6px;
-    margin-right: 10px;
-    display: inline-block;
-}
-
 .btn-remove {
     background-color: #FF2634;
 }
@@ -2215,35 +2271,6 @@ button.bigger {
     color: #EEE;
     margin-left: 3px;
     border-radius: 4px;
-}
-
-.article-delete-button-wrapper button,
-.article-destroy-button-wrapper button {
-    padding: 6px 10px;
-    background-color: #FF2634;
-    color: #FFF;
-    font-size: 14px;
-    border-radius: 6px;
-}
-
-.article-history-button-wrapper button {
-    padding: 6px 10px;
-    background-color: {=liliumcolor};
-    color: #FFF;
-    font-size: 14px;
-    border-radius: 6px;
-}
-
-.article-delete-button-wrapper button::before,
-.article-history-button-wrapper button::before,
-.article-destroy-button-wrapper button::before {
-    display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
-
-    font-size: 16px;
-    margin-right: 2px;
 }
 
 .article-history-button-wrapper button::before {

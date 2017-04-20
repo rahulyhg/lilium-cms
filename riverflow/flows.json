@@ -31,12 +31,12 @@
         }, {
             "module" : "fix.js",
             "endpoint" : "fix",
-            "support" : ["livevar", "admin_get", "admin_post"],
+            "support" : ["livevar", "admin_get", "admin_post", "form"],
             "admin_menu" : {
                 "id": "articles-topics",
                 "faicon": "fa-life-ring",
-                "displayname": "Requests",
-                "priority": 15555500,
+                "displayname": "Support",
+                "priority": 2500,
                 "rights": ["dash"],
                 "absURL": "admin/fix",
                 "children": []

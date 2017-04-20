@@ -458,7 +458,7 @@ DevTools.prototype.form = function() {
     .add('query-set', 'buttonset', { buttons: [{
             name : 'query', 
             displayname : 'Query', 
-            classes : ['btn', 'btn-default', 'btn-query']
+            classes : ['btn-query']
         }
     ]});
 
@@ -478,7 +478,7 @@ DevTools.prototype.form = function() {
     .add('send-set', 'buttonset', { buttons: [{
             name : 'sendmail', 
             displayname : 'Send Mail', 
-            classes : ['btn', 'btn-default', 'btn-sendmail']
+            classes : ['btn-sendmail']
         }
     ]});
 

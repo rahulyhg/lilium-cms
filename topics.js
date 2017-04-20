@@ -352,7 +352,7 @@ class LMLTopics {
                 'name' : 'save',
                 'displayname': 'Save',
                 'type' : 'button',
-                'classes': ['btn', 'btn-default', 'btn-save']
+                'classes': ['btn-save']
             }        
         ]})
         .add('children-title', 'title', {

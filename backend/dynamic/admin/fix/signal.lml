@@ -1,0 +1,37 @@
+{#config;forms}
+<lml:dom v="0.8" features="fullwidth"></lml:dom>
+
+<h1>Signal emergency</h1>
+<span class="pad10">
+    Urgent problems are issues which prevent the team from operating normally, or from users to use the website. Make sure your description is as accurate as possible. Your emergency ticket will be visible for other Lilium users to prevent duplicate entries.
+</span>
+{=forms.render("signalurgent")}
+
+<script>
+    var signalEmergency = function() {
+        liliumcms.lmldom.sendForm(
+            liliumcms.lmldom.getFormData()["signalurgent"].values, 
+            "{=config.default.server.url}/admin/fix/open/emergency", 
+            function(resp) {
+                if (resp.success) {
+                    liliumcms.notify({
+                        type : "success",
+                        title : "Ticket successfully submitted",
+                        message : "Developers were notified and should begin working on a fix as soon as possible."
+                    });
+
+                    liliumcms.pageloader.load("{=config.default.server.url}/admin/fix");
+                } else {
+                    liliumcms.notify({
+                        type : "danger",
+                        title : "Error reporting urgent fix request",
+                        message : resp.error
+                    });
+                }
+            }
+        );
+
+    };
+
+    document.querySelector('.btn-save').addEventListener('click', signalEmergency);
+</script>

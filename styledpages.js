@@ -119,12 +119,12 @@ class StyledPages {
                 'name' : 'save',
                 'displayname': 'Save',
                 'type' : 'button',
-                'classes': ['btn', 'btn-default', 'btn-save']
+                'classes': ['btn-save']
             }, {
                 'name' : 'view',
                 'displayname': 'View page',
                 'type' : 'button',
-                'classes': ['btn', 'btn-default', 'btn-preview']
+                'classes': ['btn-preview']
             }        
         ]})
         ;

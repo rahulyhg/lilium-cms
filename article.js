@@ -1383,27 +1383,27 @@ var Article = function() {
                     'name' : 'save',
                     'displayname': 'Save article',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default', 'btn-save']
+                    'classes': ['btn-save']
                 }, {
                     'name' : 'preview',
                     'displayname': 'Preview',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default', 'btn-preview']
+                    'classes': ['btn-preview']
                 }, {
                     'name' : 'publish', 
                     'displayname': 'Save and <b>Publish</b>',
                     'type' : 'button',
-                    'classes': ['btn', 'btn-default', 'btn-publish', 'role-author']
+                    'classes': ['btn-publish', 'role-author']
                 }, {
                     'name' : 'send',
                     'displayname' : 'Send for review',
                     'type' : 'button',
-                    'classes': ["btn", "btn-default", "btn-send-for-review", "role-contributor"]
+                    'classes': ["btn-send-for-review", "role-contributor"]
                 }, {
                     'name' : 'refuse',
                     'displayname' : 'Refuse review',
                     'type' : 'button',
-                    'classes': ["btn", "btn-default", "btn-refuse-review", "role-production"]
+                    'classes': ["btn-refuse-review", "role-production"]
                 }
             ]}
         );
