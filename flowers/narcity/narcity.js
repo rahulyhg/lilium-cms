@@ -91,7 +91,8 @@ var fetchHomepageArticles = function(_c, cb) {
                 {
                     $match : {
                         'topic' : sectionTopics[i]._id,
-                        'status' : 'published'
+                        'status' : 'published',
+                        'nsfw' : {$ne : true}
                     } 
                 }, {
                     $sort : {
@@ -128,7 +129,8 @@ var fetchHomepageArticles = function(_c, cb) {
             db.join(_c, 'content', [
                 {
                     $match : {
-                        'status' : 'published'
+                        'status' : 'published',
+                        'nsfw' : {$ne : true}
                     } 
                 }, {
                     $sort : {

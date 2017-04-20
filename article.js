@@ -1368,6 +1368,9 @@ var Article = function() {
                 }
             })
             .closeSection('authorbox')
+            .add('nsfw', 'checkbox', {
+                displayname : "Not safe for work (NSFW)"
+            })
             .trigger('bottom')
             .add('commtitle', 'title', {
                 displayname : "Internal communication"
