@@ -1,0 +1,71 @@
+{#config;extra}
+{*fix}
+<lml:dom v="0.8" features="fullwidth"></lml:dom>
+
+<span class="admin-title">
+    Bugs and feature requests
+</span>
+
+<div id="bnf-stats">
+    <div class="bnf-stat-slide">
+        <lml:text var="livevars.fix.issues.length"></lml:text>
+        <div>
+            open issues
+        </div>
+        <a>Report a problem</a>
+    </div>
+
+    <div class="bnf-stat-slide">
+        <lml:text var="livevars.fix.featurerequests.length"></lml:text>
+        <div>
+            feature requests
+        </div>
+        <a>Request a feature</a>
+    </div>
+
+    <div class="bnf-stat-slide">
+        <lml:text var="livevars.fix.emergencies.length"></lml:text>
+        <div>
+            emergencies
+        </div>
+        <a>Signal urgent problem</a>
+    </div>
+</div>
+
+<div id="bnf-wrapper">
+    <h2>Reported issues</h2>
+
+    <div class="ticket-wrapper">
+
+    </div>
+
+    <h2>Feature requests</h2>
+</div>
+
+
+<style>
+main.lmladminmain {
+    background: linear-gradient(#ffffff 50%, rgba(255,255,255,0) 0) 0 0, radial-gradient(circle closest-side, #FFFFFF 53%, rgba(255,255,255,0) 0) 0 0, radial-gradient(circle closest-side, #FFFFFF 50%, rgba(255,255,255,0) 0) 55px 0 #c282fb;
+    background-size: 110px 900px;
+    background-repeat: repeat-x;
+
+    min-height: 1000px;
+}
+
+#bnf-wrapper {
+    margin-top: 335px;
+}
+
+#bnf-wrapper h2 {
+    font-weight: 500;
+    padding: 12px 16px;
+    color: #FFF;
+    margin: 0px 0px 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 4px solid rgba(0,0,0,0.1);
+    font-size: 28px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+</style>

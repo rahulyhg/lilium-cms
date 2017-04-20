@@ -29,6 +29,19 @@
             "endpoint" : "r",
             "support" : ["livevar", "get", "setup"]
         }, {
+            "module" : "fix.js",
+            "endpoint" : "fix",
+            "support" : ["livevar", "admin_get", "admin_post"],
+            "admin_menu" : {
+                "id": "articles-topics",
+                "faicon": "fa-life-ring",
+                "displayname": "Requests",
+                "priority": 15555500,
+                "rights": ["dash"],
+                "absURL": "admin/fix",
+                "children": []
+            }
+        }, {
             "module" : "topics.js",
             "endpoint" : "topics",
             "support" : ["admin_get", "admin_post", "livevar", "form"],

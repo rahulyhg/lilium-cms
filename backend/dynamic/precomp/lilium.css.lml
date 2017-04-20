@@ -840,6 +840,23 @@ select {
 	border: none;
 }
 
+.admin-title {
+    font-size: 46px;
+    font-weight: 300;
+    color: #9B59B6;
+    display: block;
+    margin: 50px 15px 0px;
+    text-align: center;
+}
+
+.admin-title small {
+    display: block;
+    font-size: 16px;
+    color: #BBB;
+    margin-top: -10px;
+}
+
+
 .lmladmincontentwrapper {
 	padding-left: {=sidebarwidth};
 	padding-top: {=topbarheight};

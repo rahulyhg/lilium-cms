@@ -119,20 +119,24 @@ var FileLogic = function () {
             var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + name + ".lml";
             if (!isPresent) {
                 FileServer.readFile(readPath, function(content) {
-                    FileServer.createDirIfNotExists(savePath, function() {
-                        var output = FileServer.getOutputFileHandle(savePath);
-                        extra = extra || {};
-                        extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
-                        extra.config = cli._c;
-    
-                        var now = new Date();
-                        log('LML2', "Compiling file from " + readPath, 'info');
-                        LML2.compile(cli._c.id, content, output, extra, function() {
-                            FileServer.pipeFileToClient(cli, savePath, function () {
-                                log('FileLogic', 'Admin page generated and served in ' + (new Date - now) + "ms", 'success');
+                    if (!content) {
+                        cli.throwHTTP(404);
+                    } else {
+                        FileServer.createDirIfNotExists(savePath, function() {
+                            var output = FileServer.getOutputFileHandle(savePath);
+                            extra = extra || {};
+                            extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
+                            extra.config = cli._c;
+        
+                            var now = new Date();
+                            log('LML2', "Compiling file from " + readPath, 'info');
+                            LML2.compile(cli._c.id, content, output, extra, function() {
+                                FileServer.pipeFileToClient(cli, savePath, function () {
+                                    log('FileLogic', 'Admin page generated and served in ' + (new Date - now) + "ms", 'success');
+                                });
                             });
                         });
-                    });
+                    }
                 }, false, 'utf8');
             } else {
                 serveCachedFile(cli, savePath);
