@@ -246,7 +246,7 @@ var Entities = module.exports = new function () {
 
         this.maxPower(cli, function(userpower) {
             that.maxPower(cli, function(entitypower) {
-                if (userpower < entitypower) {
+                if (userpower < entitypower || (cli.userinfo.roles && cli.userinfo.roles.indexOf("lilium") != -1)) {
                     db.update(_c.default(), 'entities', {_id : db.mongoID(userid)}, {revoked : true}, function() {
                         cli.sendJSON({revoked : true});
                     });
