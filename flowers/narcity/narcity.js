@@ -586,7 +586,13 @@ var getWhatsHot = function(_c, cb) {
             var respobj = JSON.parse(body);
             for (var i = 0; i < 12 && i < respobj.pages.length; i++) {
                 var split = respobj.pages[i].path.split('/');
-                pages.push(split[split.length - 2]);
+                var name = split.pop();
+                if (!name) {
+                    name = split.pop();
+                }
+                pages.push(name);
+
+                log('Narcity', "Using What's Hot Article slug : " + pages[i]);
             }
 
             var index = 0;
@@ -598,11 +604,10 @@ var getWhatsHot = function(_c, cb) {
                     cb(articleArray);
                 } else {
                     Article.deepFetch(_c, pages[index], function(article) {
-                        
                         if (article) {
                             articleArray.push({
                                 _id : article._id, 
-                                fullurl : _c.server.url + article.topic.completeSlug + "/" + article.name,
+                                fullurl : article.url,
                                 title : article.title, 
                                 subtitle : article.subtitle,
                                 featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,
@@ -678,20 +683,26 @@ var loadHooks = function(_c, info) {
     var cachedHot = [];
     var hotRefreshNeeded = true;
     endpoints.register(_c.id, 'whatshot', 'GET', function(cli) {
-        if (hotRefreshNeeded) {
-            getWhatsHot(cli._c, function(hotArr) {
-                cachedHot = hotArr || [];
-                cli.sendJSON(cachedHot);
+        var whatshotObjectName = "whatshot_" + _c.id;
+        sharedcache.get(whatshotObjectName, function(data) {
+            if (!data || (new Date().getTime() - data.at > 1000 * 60 * 5)) {
+                getWhatsHot(cli._c, function(hotArr) {
+                    cachedHot = hotArr || [];
+                    cli.sendJSON(cachedHot);
 
-                !hotRefreshNeeded && setTimeout(function() {
-                    hotRefreshNeeded = true;
-                }, 1000 * 60 * 5);
-                hotRefreshNeeded = false;
-            });
+                    var setobj = {};
+                    setobj[whatshotObjectName] = {
+                        articles : cachedHot,
+                        at : new Date().getTime(),
+                        at_human_readable : new Date()
+                    };
 
-        } else {
-            cli.sendJSON(cachedHot);
-        }
+                    sharedcache.set(setobj);
+                });
+            } else {
+                cli.sendJSON(data.articles);
+            }
+        });
     });
 
     ["tags", "author", "topic", "search", "latests"].forEach(function(archType) {

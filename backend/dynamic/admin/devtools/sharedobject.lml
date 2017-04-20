@@ -8,6 +8,17 @@
         a.style.display = "none"
         return false;
     }
+
+    window.generateSharedCacheValue = function(ldContext) {
+        var maybeObject = ldContext.obj;
+        var textNode = document.createElement('pre');
+
+        textNode.textContent = typeof maybeObject == "object" ?
+            "Object : " + JSON.stringify(maybeObject, undefined, 4) :
+            "String : " + maybeObject;
+
+        return textNode;
+    }
 </script>
 
 <h1>Shared objects</h1>
@@ -18,7 +29,7 @@
             <div>
                 <a onclick="showSharedCacheValue(this);" style="cursor: pointer;">Show value</a>
                 <div style="display: none;">
-                    <lml:text var="obj"></lml:text>
+                    <lml:generate call="generateSharedCacheValue" />
                 </div>
             </div>
         </div>
