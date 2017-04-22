@@ -2,7 +2,7 @@ const mongo = require('mongodb');
 const MongoClient = mongo.MongoClient;
 const dbconf = require('./config/database.json');
 const entities = require('./entities/entities.json');
-const mongourl = "mongodb://" + dbconf.mongo.host + ":" + dbconf.mongo.port + "/" + dbconf.mongo.name;
+const mongourl = "mongodb://" + dbconf.mongo.host + ":" + dbconf.mongo.port + "/" + dbconf.mongo.networkname;
 
 const assess = (conn, done) => {
     console.log("Assessing insertion");

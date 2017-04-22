@@ -72,23 +72,41 @@ const mgc = () => {
     }
 };
 
-const getCityParentTopic = (cityslug) => {
+const cachedProvTopics = {
+};
 
+const _cityprov = {
+    "montreal" : "qc",
+    "toronto" : "on",
+    "ottawa" : "on",
+    "vancouver" : "bc",
+    "quebec" : "qc",
+    "halifax" : "ns",
+    "calgary" : "al",
+    "edmonton" : "al",
+    "winnipeg" : "ma",
+    "regina" : "sk",
+    "stjohns" : "nl",
+    "boston" : "ma"
+};
+
+const getCityParentTopic = (cityslug) => {
+    let provslug = _cityprov[cityslug];
+    if (provslug) {
+        return cachedProvTopics[provslug];
+    } 
 };
 
 const cityTopicObjects = {};
-const linkThirdLevelWithParent = (col, done) => {
-    console.log("Linking third level topics with second level, only if they're cities");
-    done();
-};
 
-const createThirdLevel = (col, done) => {
+const createThirdLevel = (col, conn, done) => {
     console.log(" > CREATING THIRD LEVEL TOPICS");
     console.log("     Reading topic files ; should take a while");
     console.log("     Memory will be freed as posts are inserted");
 
     let thirdlevelindex = -1;
     let currentSite = {};
+    let contentCol;
     let nextThirdLevel = () => {
         if (++thirdlevelindex == topicFiles.length) {
             done();
@@ -100,14 +118,64 @@ const createThirdLevel = (col, done) => {
                 "Current memory usage : " + (process.memoryUsage().heapTotal / 1024 / 1024).toFixed(2) + " Mb"
             );
 
-            delete currentSite.data;
-            mgc();
+            let parentid = getCityParentTopic(currentSite.data.topic.slug);
+            currentSite.data.topic.parent = parentid;
 
-            nextThirdLevel();
+            if (parentid) {
+                currentSite.data.topic.completeSlug = 
+                    (currentSite.data.topic.slug == "boston" ? "us/" : "ca/") + 
+                    _cityprov[currentSite.data.topic.slug] + "/" + currentSite.data.topic.slug;
+            } else {
+                currentSite.data.topic.completeSlug = currentSite.data.topic.slug;
+            }
+
+            console.log("      + /" + currentSite.data.topic.slug);
+            col.insert(currentSite.data.topic, () => {
+                let newid = currentSite.data.topic._id;
+                let bottomLevelTopics = [];
+                let wpid_assoc = {};
+                for (var catwpid in currentSite.data.categories) {
+                    let cat = currentSite.data.categories[catwpid];
+                    bottomLevelTopics.push({
+                        wp_id : catwpid,
+                        displayname : cat.name,
+                        slug : cat.slug,
+                        completeSlug : currentSite.data.topic.completeSlug + "/" + cat.slug,
+                        parent : newid
+                    });
+
+                    console.log("        + /" + cat.slug);
+                }
+
+                col.insertMany(bottomLevelTopics, () => {
+                    console.log("      > HANDLING POSTS");
+                    bottomLevelTopics.forEach((to) => {
+                        wpid_assoc[to.wp_id] = to._id;
+                    });
+
+                    let posts = currentSite.data.posts;        
+                    posts.forEach((post) => {
+                        post.topic = wpid_assoc[post.wp_category.term_id];
+                    });
+
+                    contentCol.insertMany(posts, () => {
+                        delete currentSite.data;
+                        mgc();
+
+                        nextThirdLevel();
+                    });
+                });
+            });
+
         }
     };
     
-    nextThirdLevel();
+    conn.collection('content', (err, contentcol) => {
+        contentCol = contentcol;
+        contentcol.remove({}, () => {
+            nextThirdLevel();
+        });
+    });
 };
 
 const createSecondLevel = (col, done) => {
@@ -129,7 +197,10 @@ const createSecondLevel = (col, done) => {
                     provObject.parent = currentCountry.topic._id;
 
                     console.log("      + " + provObject.displayname + " under /" + provObject.completeSlug);
-                    col.insert(provObject, nextProvince);
+                    col.insert(provObject, () => {
+                        cachedProvTopics[provObject.slug] = provObject._id;
+                        nextProvince();
+                    });
                 }
             };
 
@@ -158,11 +229,9 @@ const receivedConnection = (err, conn) => {
         col.remove({fromscript : 1}, () => {
             createTopLevel(col, () => {
                 createSecondLevel(col, () => {
-                    createThirdLevel(col, () => {
-                        linkThirdLevelWithParent(col, () => {
-                            conn.close();
-                            console.log(' > Done.');
-                        });
+                    createThirdLevel(col, conn, () => {
+                        conn.close();
+                        console.log(' > Done.');
                     });
                 });
             });

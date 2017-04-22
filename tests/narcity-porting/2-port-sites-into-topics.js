@@ -12,6 +12,8 @@ if (startat == 1) {
     skip = false;
 }
 
+const allUploads = [];
+
 const handleSite = (site, id, done) => {
     if (id == startat) skip = false;
     if (skip) return done();
@@ -81,17 +83,33 @@ const handleSite = (site, id, done) => {
                         let postobj = {
                             title : p.post_title,
                             subtitle : p.data.subtitle,
-                            status : p.status,
+                            status : p.post_status,
                             name : p.post_name,
                             date : new Date(p.post_date),
                             content : p.post_content,
                             data : p.data,
                             tags : [],
+                            wp_author : p.post_author,
                             wp_category : -1
                         }
 
-                        context.newPosts.push(postobj);
+                        if (postobj.status == "publish") {
+                            postobj.status = "published";
+                        }
+
+                        if (postobj.status != "inherit" && (p.post_type == "post" || p.post_type == "quiz")) {
+                            context.newPosts.push(postobj);
+                        }
+
                         context.postAssoc[p.ID] = postobj;
+                    } else if (p.post_type == "attachment") {
+                        allUploads.push({
+                            url : p.guid,
+                            fullfilename : p.guid.split('/').pop(),
+                            inpost : p.post_parent,
+                            filename : p.post_name,
+                            wpid : p.ID
+                        });
                     }
                 });
 
@@ -158,6 +176,13 @@ const handleSite = (site, id, done) => {
     });
 }
 
+const handleUploads = () => {
+    console.log("Dumping " + allUploads.length + " upload file data");
+    require('fs').createWriteStream('./output/uploads.json', {encoding : "utf8", flag : "w+"}).end(JSON.stringify(allUploads), 'utf8', () => {
+        console.log("All done.");
+    });
+};
+
 let siteIndex = 0;
 const CONTEXT = {};
 const nextSite = () => {
@@ -172,6 +197,7 @@ const nextSite = () => {
         nextSite();
     } else {
         console.log("Done creating sites.");
+        handleUploads();
     }
 };
 

@@ -13,7 +13,7 @@ readSplitJSON("wp_users").then(users => {
             if (usersAssoc[m.user_id] && m.meta_key.charAt(0) != "_") {
                 usersAssoc[m.user_id].data[m.meta_key] = m.meta_value;
 
-                if (m.meta_key.indexOf("capab") != -1 && m.meta_value.indexOf("subscriber") != -1) {
+                if (m.meta_key == "description" && !m.meta_value && m.user_id != 9317477) {
                     usersAssoc[m.user_id].ignore = true;
                 }
             }

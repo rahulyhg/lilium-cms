@@ -107,6 +107,17 @@ const saveDataToFile = () => {
     process.exit();
 };
 
+const createDirs = (done) => {
+    const mkdirp = require('mkdirp');
+    mkdirp('./output', () => {
+        mkdirp('./entities', () => {
+            mkdirp('./topics', () => {
+                done();
+            });
+        });
+    });
+};
+
 watchMemory();
 GLOB.connection = getHandle();
 getTableList(GLOB.connection, () => {
@@ -121,5 +132,5 @@ getTableList(GLOB.connection, () => {
         }
     };
 
-    nextTable();
+    createDirs(nextTable);
 });
