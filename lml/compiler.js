@@ -120,7 +120,7 @@ class LMLSlang {
 
         if (!flags) {
             flags = {};
-            while (line[0] == "?" || line[0] == "&" || line[0] == "#") {
+            while (line[0] == "?" || line[0] == "&" || line[0] == "#" || line[0] == "=") {
                 flags[line[0]] = true;
                 line = line.substring(1);
             }
@@ -686,7 +686,13 @@ class LMLCompiler {
             switch (ftc) {
                 case "=": case "%": case "#": case "*": case ":": 
                     cPos++;
-                    while (ctx.s[cPos] == "?" || ctx.s[cPos] == "&" || ctx.s[cPos] == "%" || ctx.s[cPos] == "=" || ctx.s[cPos] == "#") {
+                    while (
+                        ctx.s[cPos] == "?" || 
+                        ctx.s[cPos] == "&" || 
+                        ctx.s[cPos] == "%" || 
+                        ctx.s[cPos] == "=" || 
+                        ctx.s[cPos] == "#" 
+                    ) {
                         xFlags[ctx.s[cPos]] = true;
                         cPos++;
                     }
