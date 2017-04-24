@@ -45,6 +45,13 @@
                 <span>Google Plus</span>
             </a>
         {$ endif; $}
+        {$ if (?config.default.social.accounts.youtube != "") $}
+            <a href="https://www.youtube.com/user/{=config.default.social.accounts.youtube}" target="_blank">
+                <i class="fa fa-youtube" aria-hidden="true"></i>
+                <span>Youtube</span>
+            </a>
+        {$ endif; $}
+
     </div>
     <hr />
 
