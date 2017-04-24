@@ -257,29 +257,21 @@ var Article = function() {
                                     });
                                 };
                                 
-                                arr[0].topics = topic ? [topic] : [];
-                                var curTopic = topic;
-                                var nextParentTopic = function() {
-                                    if (curTopic && curTopic.parent) {
-                                        db.findUnique(conf, 'topics', {_id : curTopic.parent}, function(err, nexttopic) {
-                                            curTopic = nexttopic;
-                                            arr[0].topics.push(curTopic);
-                                            nextParentTopic();
-                                        });
+                                require('./topics.js').deepFetch(conf, arr[0].topic, function(deepTopic, family) {
+                                    if (deepTopic) {
+                                        arr[0].topics = family;
+                                        arr[0].topicslug = "/" + deepTopic.completeSlug + "/";
                                     } else {
-                                        var topicSlug = "/";
-                                        for (var i = arr[0].topics.length - 1; i >= 0; i--) {
-                                            topicSlug += arr[0].topics[i].slug + "/";
-                                        } 
-                                    
-                                        arr[0].topicslug = topicSlug;
-                                        arr[0].url = conf.server.protocol + conf.server.url + topicSlug + arr[0].name;
-                                        arr[0].amp = conf.server.protocol + conf.server.url + "/amp" + topicSlug + arr[0].name;
-                                        continueWithAuthor();
+                                        arr[0].topics = [];
+                                        arr[0].topicslug = "";
                                     }
-                                };
 
-                                nextParentTopic();
+                                    arr[0].topic = deepTopic;
+                                    arr[0].url = conf.server.protocol + conf.server.url + arr[0].topicSlug + arr[0].name;
+                                    arr[0].amp = conf.server.protocol + conf.server.url + "/amp" + arr[0].topicSlug + arr[0].name;
+
+                                    continueWithAuthor();
+                                });
                             });
                         };
 
