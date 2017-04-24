@@ -9,7 +9,7 @@ Vocab.prototype.preloadDicos = function(done) {
     log("Vocab", "Preloading dictionaries", "info");
     fileserver.listDirContent('./vocab/', function(files) {
         for (var i = 0; i < files.length; i++) {
-            if (files[i].indexOf('.js') != -1) {
+            if (files[i].indexOf('.json') != -1) {
                 dicos[files[i].substring(0, files[i].length - 3)] = require("./vocab/" + files[i]);
                 log("Vocab", "Loading dico : " + files[i], "detail");
             }

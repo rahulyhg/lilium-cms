@@ -277,6 +277,13 @@ var FileLogic = function () {
             extra.theme = cTheme;
             extra.minify = true;
 
+            if (extra.language) {
+                extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
+            } else {
+                extra.language = _c.website.language;
+                extra.vocab = require(_c.server.base + "vocab/" + extra.language + ".json");
+            }
+
             var readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml");
             var savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
             var tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".themetmp";
