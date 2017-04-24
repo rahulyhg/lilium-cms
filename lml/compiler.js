@@ -497,8 +497,8 @@ class LMLTagParser {
         return baseString + "></lml:livevars>"; 
     };
 
-    parseVocab(ctx, block) {
-        
+    parseVocab(ctx, block, done) {
+        done();
     };
 
     // Async

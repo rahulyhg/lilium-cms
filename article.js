@@ -227,51 +227,47 @@ var Article = function() {
                         }
 
                         var continueWorking = function() {
-                            db.findUnique(conf, 'topics', {_id : arr[0].topic}, function(err, topic) {
-                                arr[0].topic = topic;
+                            var continueWithAuthor = function() {
+                                db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                    arr[0].authors = autarr;
 
-                                var continueWithAuthor = function() {
-                                    db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
-                                        arr[0].authors = autarr;
+                                    var evts = hooks.getHooksFor('article_deepfetch');
+                                    var keys = Object.keys(evts);
+                                    var kIndex = -1;
 
-                                        var evts = hooks.getHooksFor('article_deepfetch');
-                                        var keys = Object.keys(evts);
-                                        var kIndex = -1;
+                                    var next = function() {
+                                        kIndex++;
 
-                                        var next = function() {
-                                            kIndex++;
+                                        if (kIndex == keys.length) {
+                                            hooks.fire('article_will_fetch', {
+                                                _c : conf,
+                                                article: arr[0]
+                                            });
+                                        
+                                            cb(arr[0]);
+                                        } else {
+                                            evts[keys[kIndex]].cb(conf, arr[0], next);
+                                        }
+                                    };
 
-                                            if (kIndex == keys.length) {
-                                                hooks.fire('article_will_fetch', {
-                                                    _c : conf,
-                                                    article: arr[0]
-                                                });
-                                            
-                                                cb(arr[0]);
-                                            } else {
-                                                evts[keys[kIndex]].cb(conf, arr[0], next);
-                                            }
-                                        };
-
-                                        next();
-                                    });
-                                };
-                                
-                                require('./topics.js').deepFetch(conf, arr[0].topic, function(deepTopic, family) {
-                                    if (deepTopic) {
-                                        arr[0].topics = family;
-                                        arr[0].topicslug = "/" + deepTopic.completeSlug + "/";
-                                    } else {
-                                        arr[0].topics = [];
-                                        arr[0].topicslug = "";
-                                    }
-
-                                    arr[0].topic = deepTopic;
-                                    arr[0].url = conf.server.protocol + conf.server.url + arr[0].topicSlug + arr[0].name;
-                                    arr[0].amp = conf.server.protocol + conf.server.url + "/amp" + arr[0].topicSlug + arr[0].name;
-
-                                    continueWithAuthor();
+                                    next();
                                 });
+                            };
+                            
+                            require('./topics.js').deepFetch(conf, arr[0].topic, function(deepTopic, family) {
+                                if (deepTopic) {
+                                    arr[0].topics = family;
+                                    arr[0].topicslug = "/" + deepTopic.completeSlug + "/";
+                                } else {
+                                    arr[0].topics = [];
+                                    arr[0].topicslug = "/";
+                                }
+
+                                arr[0].topic = deepTopic;
+                                arr[0].url = conf.server.protocol + conf.server.url + arr[0].topicslug + arr[0].name;
+                                arr[0].amp = conf.server.protocol + conf.server.url + "/amp" + arr[0].topicslug + arr[0].name;
+
+                                continueWithAuthor();
                             });
                         };
 
