@@ -497,6 +497,10 @@ class LMLTagParser {
         return baseString + "></lml:livevars>"; 
     };
 
+    parseVocab(ctx, block) {
+        
+    };
+
     // Async
     parseInclude(ctx, block, done) {
         let petals = block.text.trim().split(';');
@@ -606,6 +610,9 @@ class LMLCompiler {
                     this.output(ctx, block.text);
                     return done();
 
+                case ":":
+                    this.output(ctx, this.tagparser.parseVocab(ctx, block));
+
                 case "=":
                     this.output(ctx, ctx.slang.getReturn(ctx, block.text, block.flags));
                     return done();
@@ -676,7 +683,7 @@ class LMLCompiler {
 
             let ftc = ctx.s[cPos];
             switch (ftc) {
-                case "=": case "%": case "#": case "*": 
+                case "=": case "%": case "#": case "*": case ":": 
                     cPos++;
                     while (ctx.s[cPos] == "?" || ctx.s[cPos] == "&" || ctx.s[cPos] == "%" || ctx.s[cPos] == "=" || ctx.s[cPos] == "#") {
                         xFlags[ctx.s[cPos]] = true;
@@ -737,12 +744,22 @@ class LMLCompiler {
         })
     };
 
+    loadVocab(ctx) {
+        ctx.vocab = ctx.extra.vocab;
+
+        if (!ctx.vocab) {
+            let langCode = ctx.extra.lang || ctx.extra.language || ctx.config.website.language;
+            ctx.vocab = require('../vocab/' + langCode + ".js");
+        }
+    };
+
     pipeStreams(ctx) {
         ctx.readable.pipe(ctx.stream);
     };
 
     deal(ctx) {
         this.findOpenings(ctx);
+        this.loadVocab(ctx);
         this.pipeStreams(ctx);
         this.parseBlocks(ctx);
     };

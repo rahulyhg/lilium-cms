@@ -219,6 +219,47 @@ class LMLTopics {
         getChildrenOf(_id, sendback);
     }
 
+    deepFetch(conf, slugOrId, send) {
+        let conds = {};
+        if (typeof slugOrId == "object") {
+            conds._id = slugOrId;
+        } else {
+            conds.slug = slugOrId;
+        }
+
+        let parents = [];
+        let getParents = (done) => {
+            db.findUnique(conf, 'topics', conds, (err, tobj) => {
+                if (!tobj) {
+                    done();
+                } else {
+                    parents.push(tobj);
+                    if (tobj.parent) {
+                        conds = {_id : tobj.parent};
+                        getParents(done);
+                    } else  {
+                        done();
+                    }
+                }
+            });
+        };
+
+        // Get arbo, then merge settings from children to parent
+        getParents(() => {
+            let finalTopic = {};
+            for (let i = 0; i < parents.length; i++) {
+                let curt = parents[i];
+                for (let k in curt) {
+                    if (!finalTopic[k]) {
+                        finalTopic[k] = curt[k];
+                    }
+                }
+            }
+
+            send(finalTopic, parents);
+        });
+    }
+
     portCategories(conf, done) {
         log("Topics", "Porting categories to topics");
         db.find(conf, 'categories', {}, [], (err, cur) => {
@@ -339,6 +380,15 @@ class LMLTopics {
                 displayname : " - Default theme's archive template - "
             },
             displayname : "Archive template"
+        })
+        .add('language', 'select', {
+            displayname : "Language",
+            datasource : [
+                {displayName : "Canadian English", name : "en-ca"},
+                {displayName : "American English", name : "en-us"},
+                {displayName : "Français Canadien", name : "fr-ca"},
+                {displayName : "Français de France", name : "fr-fr"}
+            ]
         })
         .add('topic-social-title', 'title', { displayname : "Social Networks" })
         .add('facebook', 'text', { displayname : "Facebook Username" }, { required : false })
