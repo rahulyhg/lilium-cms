@@ -97,6 +97,11 @@ var Core = function () {
     };
 
     var loadEndpoints = function () {
+        if (global.liliumenv.mode == "script") {
+            return;
+        }
+
+
         log('Endpoints', 'Loading endpoints', 'info');
         endpoints.init();
         endpoints.register('*', 'login', 'POST', function (cli) {
@@ -345,7 +350,7 @@ var Core = function () {
     };
 
     var schedulePreload = function() {
-        if (!isElder) { return; }
+        if (!isElder || global.liliumenv.mode == "script") { return; }
 
         var preloadSites = function() {
             _c.each(function(conf, next) {
@@ -453,6 +458,10 @@ var Core = function () {
     };
 
     var precompile = function (done) {
+        if (global.liliumenv.mode == "script") {
+            return done();
+        }
+
         log('Core', 'Staring precompilation', 'info');
         hooks.fire("will_precompile");
         sites.loopPrecomp(function() {
@@ -492,6 +501,10 @@ var Core = function () {
     };
 
     var loadDocs = function(cb) {
+        if (global.liliumenv.mode == "script") {
+            return cb();
+        }
+
         var docs = require('./docs.js');
         docs.compileDirectory(function() {
             docs.compileIndex(cb);
@@ -500,6 +513,26 @@ var Core = function () {
 
     var loadVocab = function(done) {
         vocab.preloadDicos(done);
+    };
+
+    var loadScriptMode = function() {
+        if (global.liliumenv.mode == "script") {
+            var scriptpath = global.liliumenv.script;
+            if (scriptpath) {
+                require(scriptpath);
+            }
+        }
+    };
+
+    var loadEnv = function() {
+        log("Core", "Loading Lilium environment variables", "info");
+        global.liliumenv = {};
+
+        var argv = process.argv.splice(2);
+        for (var i = 0; i < argv.length; i++) {
+            var split = argv[i].split("=");
+            global.liliumenv[split[0]] = split[1];
+        }
     };
 
     var loadBackendSearch = function() {
@@ -530,6 +563,7 @@ var Core = function () {
     this.makeEverythingSuperAwesome = function (readyToRock) {
         log('Core', 'Initializing Lilium', 'lilium');
         bindCrash();
+        loadEnv();
 
         require('./includes/caller.js')
         log('Core', 'Loading all websites', 'info');
@@ -541,6 +575,7 @@ var Core = function () {
             initTables();
             loadEndpoints();
             loadStandardInput();
+            loadScriptMode();
             loadImageSizes();
             loadLiveVars();
             loadGlobalPetals();

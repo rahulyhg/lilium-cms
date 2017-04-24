@@ -34,12 +34,14 @@ var _c = require('./config.js').default(),
         };
 
         this.start = function () {
-            log('Inbound', 'Ready to receive requests', 'success');
-            _c = require('./config.js').default();
+            if (global.liliumenv.mode != "script") {
+                log('Inbound', 'Ready to receive requests', 'success');
+                _c = require('./config.js').default();
 
-            hooks.fire("server_will_start", {server : server});
-            server.listen(_c.server.port);
-            hooks.fire("server_did_start",  {server : server});
+                hooks.fire("server_will_start", {server : server});
+                server.listen(_c.server.port);
+                hooks.fire("server_did_start",  {server : server});
+            }
         };
 
         this.io = function () {
@@ -47,12 +49,14 @@ var _c = require('./config.js').default(),
         };
 
         this.createServer = function () {
-            server = _http.createServer(handleReq);
-            io = require('socket.io')(server);
+            if (global.liliumenv.mode != "script") {
+                server = _http.createServer(handleReq);
+                io = require('socket.io')(server);
 
-            if (require('./localcast').clustered) {
-                redis = require('socket.io-redis');
-                io.adapter(redis());
+                if (require('./localcast').clustered) {
+                    redis = require('socket.io-redis');
+                    io.adapter(redis());
+                }
             }
 
             return this;

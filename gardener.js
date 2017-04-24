@@ -15,7 +15,8 @@ var Gardener = function() {
 
     if (cluster.isMaster) {
         var that = this;
-        
+
+        require('./masthead.js');
         log('Network', 'Loading network config', 'lilium');
         this.loadConfig(function() {
             log('Network', 'Network configuration loaded', 'success');
@@ -23,7 +24,9 @@ var Gardener = function() {
             var redisserver = new RedisServer(6379);
             redisserver.open(function(a, b) {
                 log('Network', 'Redis server spawned', 'success');
-                var lmlinstances = networkConfig.familysize || require('os').cpus().length;
+                var lmlinstances = 
+                    networkConfig.familysize || 
+                    require('os').cpus().length;
 
                 log('Network', 'Starting up Shared Memory module', 'lilium');
                 SharedMemory.bind();

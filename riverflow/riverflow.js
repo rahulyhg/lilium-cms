@@ -78,6 +78,10 @@ class Riverflow {
     }
 
     loadFlows() {
+        if (global.liliumenv.mode == "script") {
+            return;
+        }
+
         let flowsPath = config.default().server.base + "riverflow/flows.json";
         const Modules = require(flowsPath);
         

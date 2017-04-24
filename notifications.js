@@ -160,24 +160,26 @@ var Notification = function () {
     };
 
     this.init = function () {
-        io = require('./inbound.js').io();
+        if (global.liliumenv.mode != "script") {
+            io = require('./inbound.js').io();
 
-        log('Notifications', 'Creating site groups', 'live');
-        _c.eachSync(function (conf) {
-            var url = conf.server.url + "/";
-            var path = url.substring(url.indexOf('/', 2));
-            log('Socket', 'Created connection for namespace : ' + path + conf.uid, 'live');
-            (function (uid) { 
-                io.of(path + uid).on('connection', function(socket) {
-                    onSocketConnection(socket, uid);
-                });
-            })(conf.uid);
-            
-            namespaces.push(path + conf.uid);
-            idToNamespace[conf.id] = path + conf.uid
-        });
+            log('Notifications', 'Creating site groups', 'live');
+            _c.eachSync(function (conf) {
+                var url = conf.server.url + "/";
+                var path = url.substring(url.indexOf('/', 2));
+                log('Socket', 'Created connection for namespace : ' + path + conf.uid, 'live');
+                (function (uid) { 
+                    io.of(path + uid).on('connection', function(socket) {
+                        onSocketConnection(socket, uid);
+                    });
+                })(conf.uid);
+                
+                namespaces.push(path + conf.uid);
+                idToNamespace[conf.id] = path + conf.uid
+            });
 
-        log('Notifications', 'Sockets ready', 'live');
+            log('Notifications', 'Sockets ready', 'live');
+        }
     };
 
     this.notifyUser = function (userID, dbId, notification, difftype) {
