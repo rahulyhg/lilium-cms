@@ -533,6 +533,20 @@ article #article-content a.lml-instagram-op {
     font-family: Arial;
 }
 
+article #article-content a.lml-instagram-op-2 {
+    position: relative;
+    bottom: 34px;
+    left: 0;
+    padding: 0 10px;
+    color: #FFF;
+    text-shadow: 0 0 5px #000;
+    background-color: rgba(0,0,0,0.4);
+    font-family: Arial;
+    display: block;
+    margin-bottom: -32px;
+    font-size: 16px;
+}
+
 article .featured-image {
     image-rendering: auto;
     object-fit: cover;

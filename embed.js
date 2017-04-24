@@ -6,9 +6,9 @@ var db = require('./includes/db.js');
 var Embed = function() {};
 
 var createDivFromResponse = function(data) {
-    return '<div class="lml-instagram-embed-wrapper"><img src="'+data.thumbnail_url+                  
-        '" class="lml-instagram-embed" /><a class="lml-instagram-op" href="'+                                                       
-        data.author_url +'">via @'+data.author_name+'</a></div><p></p>';
+    return '<img src="'+data.thumbnail_url+                  
+        '" class="lml-instagram-embed-2" /><a class="lml-instagram-op-2" href="'+                                                       
+        data.author_url +'">via @'+data.author_name+'</a>';
 }
 
 var handleRequest = function(cli) {
@@ -19,7 +19,7 @@ var handleRequest = function(cli) {
         case "instagram":
             request.get({url:"https://api.instagram.com/oembed?url=" + url, json:true}, function(err, r, data) {
                 cli.response.end(createDivFromResponse(data));
-            })
+            });
             break;
     }
 };

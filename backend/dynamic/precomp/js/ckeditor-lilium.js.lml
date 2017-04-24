@@ -37,7 +37,7 @@ var CKEditor = function() {
                                         evt.data.type = "html";
                                         evt.data.dataValue = '<div class="ck-temp-spacer"></div><div id="instagramEmbed'+
                                             rand+
-                                            '" class="ck-embed-placeholder mediaInsertPlaceholder">[Loading Instagram embed]</div>';
+                                            '" class="ck-embed-placeholder mediaInsertPlaceholder">[Loading Instagram embed]</div><p></p>';
 
                                         $.get('{=config.default.server.url}/admin/embed?async=*&type=instagram&url=' + vdata, function(html) {
                                             evt.editor.document.$.querySelector('#instagramEmbed' + rand).outerHTML = html;
