@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {#config;theme;extra;debug}
-<html id="lmlhtml" data-htmltype="lml" data-generated="true" data-cachehit="true" lang="{=config.default.website.language}">
+<html id="lmlhtml" data-htmltype="lml" data-generated="true" data-cachehit="true" lang="{=extra.language}">
 <head id="lmlhead">
     {=theme.settings.headprio}
     {%petals/meta}

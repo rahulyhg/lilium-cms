@@ -12,7 +12,7 @@ $}
     {$ if (?extra.article.isSponsored ??); $}
     <div class="title-sponsored-wrapper">
         <a class="sponsored-mention sponsored-mention-article" href="https://www.narcitymedia.com" target="_blank">
-            Sponsored Content
+            {:sponsoredcontent}
         </a>
     </div>
     {$ endif; $}

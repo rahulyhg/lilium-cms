@@ -1,4 +1,4 @@
-module.exports = {
+{
 	"logintitle" : "Login",
 	"username" : "Username",
 	"password" : "Password",
@@ -6,4 +6,4 @@ module.exports = {
 	"admintitle" : "Admin",
 	"plugins" : "Plugins",
 	"themes" : "Themes"
-};
+}

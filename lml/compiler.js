@@ -497,8 +497,8 @@ class LMLTagParser {
         return baseString + "></lml:livevars>"; 
     };
 
-    parseVocab(ctx, block, done) {
-        done();
+    parseVocab(ctx, block) {
+        return ctx.vocab[block.text] || block.text;
     };
 
     // Async
@@ -612,6 +612,7 @@ class LMLCompiler {
 
                 case ":":
                     this.output(ctx, this.tagparser.parseVocab(ctx, block));
+                    return done();
 
                 case "=":
                     this.output(ctx, ctx.slang.getReturn(ctx, block.text, block.flags));
@@ -749,7 +750,7 @@ class LMLCompiler {
 
         if (!ctx.vocab) {
             let langCode = ctx.extra.lang || ctx.extra.language || ctx.config.website.language;
-            ctx.vocab = require('../vocab/' + langCode + ".js");
+            ctx.vocab = require('../vocab/' + langCode + ".json");
         }
     };
 

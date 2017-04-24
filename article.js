@@ -1433,6 +1433,10 @@ var Article = function() {
                 extra.ctx = "article";
                 extra.article = deepArticle;
 
+                if (deepArticle.topic.language) {
+                    extra.language = deepArticle.topic.language;
+                }
+
                 hooks.fire('article_will_render', {
                     _c : _c,
                     article: deepArticle
