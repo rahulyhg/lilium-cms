@@ -2,6 +2,7 @@
     "mongo" : {
         "host" : "localhost",
         "port" : 27017,
-        "name" : "narcity"
+        "name" : "narcity",
+        "networkname" : "liliumnarcity"
     }
 }

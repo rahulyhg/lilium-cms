@@ -5,7 +5,7 @@ const p = (str) => {
 
 // Settings
 const statsRefreshInterval = 1000 * 10;
-const threadTotal = 8;
+const threadTotal = 4;
 
 // Script data and libs
 const cluster           = require('cluster');
@@ -36,7 +36,9 @@ let dbFiles;
 // Cluster stats
 const clusterData = {
     workers : [],
+    done : 0,
     downloadsHandled : 0,
+    errors : 0,
     startedat : new Date(),
     totalEntries : require('./output/uploads.json').length
 };
@@ -53,9 +55,10 @@ const outputStats = () => {
     let eta = new Date(new Date().getTime() + timeremain);
 
     console.log();
-    p(" # STATS : Handled " + clusterData.downloadsHandled + " / " + clusterData.totalEntries + " downloads ("+ratio+"%)");
+    p(" # STATS : Handled " + clusterData.downloadsHandled + " / " + clusterData.totalEntries + " downloads ("+ratio+"%) with " + clusterData.errors + " errors");
     p(" # STATS : Time elapsed " + minutes + ":" + seconds + (seconds < 10 ? "0" : ""));
     p(" # STATS : ETA " + eta.toLocaleString());
+    p(" # STATS : " + clusterData.done + " / " + clusterData.workers.length + " threads done");
     console.log();
 };
 
@@ -65,12 +68,13 @@ const finishUp = () => {
     nconn.close();
 
     p(" ! Done.");
+    process.send({message : "done"});
     process.exit();
 };
 
 // Download files, skipping n files where n is the threadID
 const download = () => {
-    let i = threadID;
+    let i = threadID + 67000;
     let max = dbFiles.length;
 
     const handleNext = () => {
@@ -89,16 +93,19 @@ const download = () => {
         p("   + Downloading file at " + filepath + " with index ( " + i + " / " + max + " )");
     
         mkdirp(dirpath, () => {
-            request.get(url).on("error", (err) => {
+            request.get(encodeURI(url)).on("error", (err) => {
                 p("   ? Error : " + err);
+                process.send({message : "error"});
             }).on("response", (response) => {
                 if (response.statusCode != 200) {
                     p("   ? Non-200 Status Code " + response.statusCode + " for image " + url);
-                }
+                    process.send({message : "error"});
+                } 
 
                 i += threadTotal;
                 process.send({message : "downloaded"});
                 setTimeout(handleNext);
+                
             }).pipe(fs.createWriteStream(filepath));
         });
     };
@@ -139,6 +146,16 @@ if (cluster.isMaster) {
         worker.on('message', (m) => {
             if (m.message == "downloaded") {
                 clusterData.downloadsHandled++;
+            } else if (m.message == "error") {
+                clusterData.errors++;
+            } else if (m.message == "done") {
+                clusterData.done++;
+                p(" ! Received exit message");
+
+                if (clusterData.done == clusterData.workers.length) {
+                    p(" ! Sending exit signal.");
+                    process.exit();
+                }
             }
         });
     });

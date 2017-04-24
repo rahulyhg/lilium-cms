@@ -11,10 +11,12 @@
   "dependencies": {
     "bfj": "^2.1.2",
     "canada": "^0.1.0",
+    "mkdirp": "^0.5.1",
     "mongo": "^0.1.0",
     "mongodb": "^2.2.25",
     "mysql": "^2.13.0",
     "provinces": "^1.11.0",
+    "request": "^2.81.0",
     "us": "^2.0.0",
     "us-cities": "0.0.1"
   }
