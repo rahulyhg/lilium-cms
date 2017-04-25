@@ -1,4 +1,10 @@
-{#config;extra}
+{#config;extra;theme}
+
+{$
+    featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
+    author = extra.article.authors.0;
+$}
+
 <!-- Single metas -->
 <meta name="description" content="{=&extra.article.subtitle}">
 <meta itemprop="name" content="{=&extra.article.title}">
@@ -30,3 +36,34 @@
 {$ endif; $}
 
 <link rel="amphtml" href="{=config.default.server.url}/amp/{=extra.article.name}" />
+
+<script type="application/ld+json">
+{
+    "@context": "http://schema.org",
+    "@type": "Article",
+    "headline": "{=extra.article.title}",
+    "mainEntityOfPage": "{=config.default.server.url}/{=extra.article.name}",
+    "datePublished": "{=extra.article.date}",
+    "dateModified": "{=extra.article.date}",
+    "image": {
+        "@type": "ImageObject",
+        "url": "{=featimg}",
+        "width": 970,
+        "height": 400
+    },
+    "author":{
+        "@type": "Person",
+        "name": "{=author.displayname}"
+    },
+    "publisher":{
+        "@type": "Organization",
+        "name": "{=config.default.website.sitetitle}",
+        "logo": {
+            "@type": "ImageObject",
+            "url": "{=config.default.content.cdn.domain}{=theme.settings.logo}",
+            "height": 60,
+            "width": 75
+        }
+    }
+}
+</script>
