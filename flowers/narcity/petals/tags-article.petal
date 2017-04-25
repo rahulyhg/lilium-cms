@@ -47,7 +47,7 @@ $}
     "dateModified": "{=extra.article.date}",
     "image": {
         "@type": "ImageObject",
-        "url": "{=featimg}",
+        "url": "{=config.default.server.protocol}{=featimg}",
         "width": 970,
         "height": 400
     },
@@ -60,7 +60,7 @@ $}
         "name": "{=config.default.website.sitetitle}",
         "logo": {
             "@type": "ImageObject",
-            "url": "{=config.default.content.cdn.domain}{=theme.settings.logo}",
+            "url": "{=config.default.server.protocol}{=config.default.content.cdn.domain}{=theme.settings.logo}",
             "height": 60,
             "width": 75
         }
