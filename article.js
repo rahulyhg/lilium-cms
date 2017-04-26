@@ -399,7 +399,7 @@ var Article = function() {
                 return done(article.content);
             }
 
-            var parags = dom.document.querySelectorAll("body > p, body > h3, body > .lml-instagram-embed-wrapper, body > .lml-image-wrapper");
+            var parags = dom.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
             for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
                 var adtag = dom.document.createElement('ad');
                 dom.document.body.insertBefore(adtag, parags[i]);
