@@ -120,7 +120,7 @@ const createThirdLevel = (col, conn, done) => {
 
             let parentid = getCityParentTopic(currentSite.data.topic.slug);
             currentSite.data.topic.parent = parentid;
-
+            currentSite.data.topic.active = true;
             if (parentid) {
                 currentSite.data.topic.completeSlug = 
                     (currentSite.data.topic.slug == "boston" ? "us/" : "ca/") + 
@@ -129,7 +129,7 @@ const createThirdLevel = (col, conn, done) => {
                 currentSite.data.topic.completeSlug = currentSite.data.topic.slug;
             }
 
-            console.log("      + /" + currentSite.data.topic.slug);
+            console.log("      + /" + currentSite.data.topic.completeSlug);
             col.insert(currentSite.data.topic, () => {
                 let newid = currentSite.data.topic._id;
                 let bottomLevelTopics = [];
@@ -137,11 +137,13 @@ const createThirdLevel = (col, conn, done) => {
                 for (var catwpid in currentSite.data.categories) {
                     let cat = currentSite.data.categories[catwpid];
                     bottomLevelTopics.push({
+                        fromscript : 1,
                         wp_id : catwpid,
                         displayname : cat.name,
                         slug : cat.slug,
                         completeSlug : currentSite.data.topic.completeSlug + "/" + cat.slug,
-                        parent : newid
+                        parent : newid,
+                        active : true
                     });
 
                     console.log("        + /" + cat.slug);
@@ -226,7 +228,7 @@ const receivedConnection = (err, conn) => {
 
     console.log(" > Connection established.");
     conn.collection('topics', (err, col) => {
-        col.remove({fromscript : 1}, () => {
+        col.remove({}, () => {
             createTopLevel(col, () => {
                 createSecondLevel(col, () => {
                     createThirdLevel(col, conn, () => {
