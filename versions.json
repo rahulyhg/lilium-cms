@@ -31,5 +31,10 @@
         "codename" : "Gaia",
         "script" : "1.0.5.js",
         "features" : ["NSFW hidden from home page", "NSFW is now a checkbox on the article edit page"]
+    },
+    "1.0.6" : {
+        "codename" : "Gaia",
+        "script" : "1.0.6.js",
+        "features" : ["Instagram backend"]
     }
 }

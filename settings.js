@@ -354,6 +354,13 @@ var Settings = function () {
             .add('social.facebook.apiversion', 'text', {
                 displayname: "Facebook Graph API Version"
             })
+        .add('social-instagram-sep', 'title', {
+            displayname : "Instagram API"
+        })
+            .add('social.instagram.accounts', 'text', {
+                displayname : "Instagram accounts"
+            })
+
         .add('social-2-sep', 'title', {
                 displayname : "Social accounts"
             })
