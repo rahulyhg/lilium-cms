@@ -75,7 +75,7 @@ class GoogleAnalyticsRequest {
                 });
             }
 
-            var topPagePath = total.ratio.pages[0] && total.ratio.pages[0].page.substring(1);
+            var topPagePath = total.ratio.pages[0] && total.ratio.pages[0].page.substring(total.ratio.pages[0].page.lastIndexOf("/") + 1);
 
             require('./article.js').deepFetch(_c, topPagePath, (article) => {
                 total.toppage = {
