@@ -36,7 +36,7 @@ class Sitemap {
     getSitemapString(url) {
         return "<sitemap>" +
                 "<loc>"+url+"</loc>" +
-                "<lastmod>"+new Date()+"</lastmod>" +
+                "<lastmod>"+dateformat(new Date(), "yyyy-mm-dd")+"</lastmod>" +
             "</sitemap>"
     }
 
