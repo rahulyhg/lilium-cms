@@ -2,6 +2,7 @@ const log           = require('./log.js');
 const db            = require('./includes/db.js');
 const fileserver    = require('./fileserver.js');
 const scheduler     = require('./scheduler.js');
+const dateformat    = require('dateformat');
 
 const XMLSitemap = {
     header : '<?xml version="1.0" encoding="UTF-8"?>',
@@ -22,6 +23,8 @@ const cachedTopicAssoc = {};
 
 class Sitemap {
     getEntryString(url, date, freq, prio) {
+        date = dateformat(new Date(date || new Date()), "yyyy-mm-dd");
+
         return "<url>" + 
                 "<loc>"+url+"</loc>" +
                 "<lastmod>"+date+"</lastmod>" +
