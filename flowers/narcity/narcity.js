@@ -325,50 +325,90 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
 };
 
 var serveFeed = function(cli) {
-    fileserver.fileExists(cli._c.server.html + "/feed.rss", function(ex) {
-        if (ex) {
-            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
-        } else {
-            db.find(cli._c, 'content', {status : "published"}, [], function(err, cur) {
-                cur.project({date : 1, _id : 1}).sort({date : -1}).limit(10).toArray(function(err, arr) {
-                    var extra = {
-                        config : cli._c, 
-                        minify : false, 
-                        articles : []
-                    };
-    
-                    var index = 0;
+    var cpath = cli.routeinfo.path.join('/');
+    cpath = cpath.substring(5);
 
-                    var getNext = function() {
-                        if (index == arr.length) {
-                            compile();
-                        } else {
-                            Article.deepFetch(cli._c, db.mongoID(arr[index]._id), function(fullart) {
-                                index ++;
-                                extra.articles.push(fullart);
-                                getNext();
-                            });
-                        }
-                    };
+    var conditions = {
+        status : "published"
+    };
+    var rsspath = cli._c.server.html + "/feed.rss";
+    var topicobj;
+    var archpath = cli._c.server.protocol + cli._c.server.url;
+    var feedpath = archpath + "/feed";
 
-                    var compile = function() {
-                        LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.rss", function() {
-                            log('RSS', 'Generated cached RSS feed for 1 hour');
-                            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+    var createFeed = function() {
+        fileserver.fileExists(rsspath, function(ex) {
+            if (ex) {
+                fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
+            } else {
+                db.find(cli._c, 'content', conditions, [], function(err, cur) {
+                    cur.project({date : 1, _id : 1}).sort({date : -1}).limit(10).toArray(function(err, arr) {
+                        var extra = {
+                            config : cli._c, 
+                            minify : false, 
+                            articles : [],
+                            cpath : cpath,
+                            archivepath : archpath,
+                            feedpath : feedpath,
+                            title : cli._c.website.sitetitle + (topicobj ? (" " + topicobj.displayname) : "")
+                        };
         
-                            setTimeout(function() {
-                                fileserver.deleteFile(cli._c.server.html + "/feed.rss", function() {
-                                    log("RSS", "Deleted cached RSS", 'info');
+                        var index = 0;
+
+                        var getNext = function() {
+                            if (index == arr.length) {
+                                compile();
+                            } else {
+                                Article.deepFetch(cli._c, db.mongoID(arr[index]._id), function(fullart) {
+                                    index ++;
+                                    extra.articles.push(fullart);
+                                    getNext();
                                 });
-                            }, 1000 * 60 * 60);
-                        }, extra);
+                            }
+                        };
+
+                        var compile = function() {
+                            LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", rsspath, function() {
+                                log('RSS', 'Generated cached RSS feed for 1 hour');
+                                fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
+            
+                                setTimeout(function() {
+                                    fileserver.deleteFile(rsspath, function() {
+                                        log("RSS", "Deleted cached RSS", 'info');
+                                    });
+                                }, 1000 * 60 * 60);
+                            }, extra);
+                        };
+
+                        getNext();
+                    });
+                });
+            }
+        });
+    };
+
+    if (cpath) {
+        rsspath = cli._c.server.html + "/" + cpath + "/feed.rss";
+        db.findUnique(cli._c, 'topics', {completeSlug : cpath}, function(err, topic) {
+            if (topic) {
+                topics.getFamilyIDs(cli._c, topic._id, function(ids) {
+                    topicobj = topic;
+                    conditions.topic = {
+                        "$in" : ids
                     };
 
-                    getNext();
+                    archpath += "/" + cpath;
+                    feedpath += "/" + cpath;
+                    createFeed();
                 });
-            });
-        }
-    });
+            } else {
+                log("RSS", "Requested feed for unexisting topic : " + cpath, "warn");
+                cli.throwHTTP(404);
+            }
+        });
+    } else {
+        createFeed();
+    }
 };
 
 var fetchTopicArticles = function(conf, topic, index, send) {

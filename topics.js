@@ -223,8 +223,10 @@ class LMLTopics {
         let conds = {};
         if (typeof slugOrId == "object") {
             conds._id = slugOrId;
-        } else {
+        } else if (slugOrId.indexOf("/") == -1) {
             conds.slug = slugOrId;
+        } else {
+            conds.completeSlug = slugOrId;
         }
 
         let parents = [];
