@@ -20,6 +20,7 @@ var events = require('./events.js');
 var various = require('./various.js');
 var mail = require('./mail.js');
 var sharedcache = require('./sharedcache.js');
+var sitemap = require('./sitemap.js');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -330,6 +331,10 @@ var SiteInitializer = function (conf, siteobj) {
                                 pass : conf.emails.senderpass,
                                 from : conf.emails.senderfrom
                             });
+                        }
+
+                        if (isElder) {
+                            sitemap.scheduleCreation(conf, true);
                         }
 
                         loadVarious(function() {

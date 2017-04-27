@@ -36,5 +36,10 @@
         "codename" : "Gaia",
         "script" : "1.0.6.js",
         "features" : ["Instagram backend"]
+    },
+    "1.0.7" : {
+        "codename" : "Gaia",
+        "script" : "1.0.7.js",
+        "features" : ["XML Sitemaps"]
     }
 }
