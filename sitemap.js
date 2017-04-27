@@ -101,8 +101,6 @@ class Sitemap {
                 cachedTopicAssoc[topic._id] = topic.completeSlug;
             }
 
-            content += "</urlset>";
-
             fileserver.dumpToFile(
                 conf.server.html + XMLSitemap.files.topic, 
                 content + "</urlset>",
