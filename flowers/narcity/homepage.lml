@@ -11,7 +11,7 @@
     </div>
 
     <div class="fwblock latest-content-wrapper">
-        <h4 class="article-section-title"><a href="{=config.default.server.url}/latests">Most recent</a></h4>
+        <h4 class="article-section-title"><a href="{=config.default.server.url}/latests">{:most-recent}</a></h4>
         <div class="float-clear">
         {$
             relindex = 0;
@@ -87,7 +87,7 @@
             {$ relindex += 1;
         endfor; $}
             <div style="float: none; clear: both;" class="older-button-wrapper">
-                <a href="{=config.default.server.url}/latests/2">Older articles</a>
+                <a href="{=config.default.server.url}/latests/2">{:older-articles}</a>
             </div>
         </div>
     </div>

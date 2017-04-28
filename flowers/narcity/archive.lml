@@ -8,7 +8,7 @@ $}
 
 {$ if (extra.archivename != "author"); $}
     <div class="subtitle-strip">
-        <span class="subtitle-headline">Posts archive</span>
+        <span class="subtitle-headline">{:posts-archive}</span>
         <span class="subtitle-detail">{=&tagname}</span>
     </div>
 {$ else; $}
@@ -45,8 +45,8 @@ $}
 
 {$ if (extra.articles.length != 0); $}
     <div class="archive-current-page">
-        <h4>Showing {=extra.articles.length} of {=extra.indices.totalarticles} entries</h4>
-        <h5>Page {=extra.currentpage} of {=extra.indices.totalpages}</h5>
+        <h4>{:showing} {=extra.articles.length} {:of} {=extra.indices.totalarticles} {:entries}</h4>
+        <h5>{:page} {=extra.currentpage} {:of} {=extra.indices.totalpages}</h5>
     </div>
 
     <div class="archive-article-list float-wrapper">

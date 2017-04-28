@@ -4,7 +4,7 @@
         <div class="footer-topsection">
                 <div class="responsive-wrapper">
                         <div class="footer-social no-small-mobile">
-                                <span class="footer-title">Follow {=config.default.website.sitetitle}</span>
+                                <span class="footer-title">{:follow} {=config.default.website.sitetitle}</span>
                                 <a target="_blank" href="https://www.facebook.com/{=config.default.social.accounts.facebook}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
                                 <a target="_blank" href="https://twitter.com/{=config.default.social.accounts.twitter}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
                                 <a target="_blank" href="https://www.instagram.com/{=config.default.social.accounts.instagram}"><i class="fa fa-instagram" aria-hidden="true"></i></a>
@@ -22,19 +22,19 @@
 
                                 <div class="label-placeholder-title">
                                         <label for="events-placeholder__email-input" class="events-placeholder__title">
-                                                Sign up for our Newsletter
+                                                {:sign-up-for-our-newsletter}
                                         </label>
                                 </div>
                                 <div class="email-input">
                                         <div class="input-email">
                                                 <input type="email" value="" name="EMAIL" class="events-placeholder__email-input" id="mce-EMAIL"
-                                                        placeholder="email address" required>
+                                                        placeholder="{:email-address}" required>
                                                         <div style="position: absolute; left: -5000px;">
                                                                 <input type="text" name="b_ae98e848ab712838adcc7f456_851c62c913" tabindex="-1" value="">
                                                         </div>
                                         </div>
                                         <div class="button-email">
-                                                <input type="submit" value="Subscribe" name="subscribe" id="mc-embedded-subscribe" class="events-placeholder__submit-button">
+                                                <input type="submit" value="{:subscribe}" name="subscribe" id="mc-embedded-subscribe" class="events-placeholder__submit-button">
                                         </div>
                                 </div>
                                 </form>
@@ -50,13 +50,13 @@
                                 </a>
                         </div>
                         <div class="footer-inline">
-                                <a href="https://www.narcitymedia.com">Advertise</a>
-                                <a href="{=config.default.server.url}/contact-us">Contact Us</a>
-                                <a href="https://www.narcitymedia.com/jobs">Jobs</a>
-                                <a href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
-                                <a href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
+                                <a href="https://www.narcitymedia.com">{:advertise}</a>
+                                <a href="{=config.default.server.url}/contact-us">{:contact-us}</a>
+                                <a href="https://www.narcitymedia.com/jobs">{:jobs}</a>
+                                <a href="{=config.default.server.url}/terms-conditions/">{:terms-and-conditions}</a>
+                                <a href="{=config.default.server.url}/privacy-policy/">{:privacy-policy}</a>
                                 <div class="copyright">
-                                        &copy; 2017 All rights reserved, <a href="https://www.narcitymedia.com">Narcity Media inc.</a>
+                                        &copy; 2017 {:all-rights-reserved}, <a href="https://www.narcitymedia.com">Narcity Media inc.</a>
                                 </div>
                         </div>
 

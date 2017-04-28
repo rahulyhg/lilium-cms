@@ -59,6 +59,7 @@ class LMLTopics {
             db.findUnique(cli._c, 'topics', {_id : db.mongoID(topicID), active : true}, (err, single) => {
                 single ? db.findToArray(cli._c, 'topics', {parent : single._id, active : true}, (cErr, children) => {
                     single.children = children;
+                    single.override = single.override || {};
 
                     single.parent ? db.findUnique(cli._c, 'topics', {_id : single.parent}, (err, par) => {
                         single.parent = par;
@@ -135,6 +136,29 @@ class LMLTopics {
                     reason : "Missing fields"
                 });
             }
+        } else if (cli.routeinfo.path[2] == "editoverride") {
+            let inputdata = cli.postdata.data;
+            let topicID = db.mongoID(cli.routeinfo.path[3]);
+            
+            let realdata = {};
+            for (let k in inputdata) if (inputdata[k] && (inputdata[k].length != 0 || typeof inputdata[k] != "object")) {
+                realdata[k] = inputdata[k];
+            }
+
+            if (topicID) {
+                db.update(cli._c, 'topics', {_id : topicID}, {override : realdata}, (() => {
+                    cli.sendJSON({
+                        updated : true,
+                        reason : "Valid form",
+                        fields : Object.keys(realdata).length
+                    });
+                }).bind(this));
+            } else {
+                cli.sendJSON({
+                    created : false,
+                    reason : "Missing fields"
+                });
+            }
         } else {
             cli.throwHTTP(404);
         }
@@ -157,24 +181,26 @@ class LMLTopics {
             maybeIndex = 0;
         }
 
-        db.findUnique(cli._c, 'topics', {completeSlug : completeSlug}, (err, topic) => {
+        db.findUnique(cli._c, 'topics', {completeSlug : completeSlug}, ((err, topic) => {
             if (err || !topic) {
                 fallback();
             } else {
-                if (require('./endpoints.js').contextualIsRegistered(cli._c.id, 'topic', 'GET')) {
-                    require('./endpoints.js').executeContextual('topic', 'GET', cli, {
-                        topic : topic, 
-                        index : maybeIndex
-                    });
-                } else {
-                    let template = topic.archivetemplate || "topic";
-                    require('./filelogic.js').renderThemeLML(cli, template, completeSlug + ".html", {}, (content) => {
-                        cli.response.writeHead(200);
-                        cli.response.end(content);
-                    });
-                }
+                this.deepFetch(cli._c, topic._id, ((topic) => {
+                    if (require('./endpoints.js').contextualIsRegistered(cli._c.id, 'topic', 'GET')) {
+                        require('./endpoints.js').executeContextual('topic', 'GET', cli, {
+                            topic : topic, 
+                            index : maybeIndex
+                        });
+                    } else {
+                        let template = topic.archivetemplate || "topic";
+                        require('./filelogic.js').renderThemeLML(cli, template, completeSlug + ".html", {topic : topic}, (content) => {
+                            cli.response.writeHead(200);
+                            cli.response.end(content);
+                        });
+                    }
+                }).bind(this));
             }
-        });
+        }).bind(this), {_id : 1});
     }
 
     refreshTopicsSlugs(conf, done) {
@@ -252,7 +278,12 @@ class LMLTopics {
             for (let i = 0; i < parents.length; i++) {
                 let curt = parents[i];
                 for (let k in curt) {
-                    if (!finalTopic[k]) {
+                    if (k == "override") {
+                        finalTopic.override = finalTopic.override || {};
+                        for (let ok in curt.override) {
+                            finalTopic.override[ok] = curt.override[ok];
+                        }
+                    } else if (!finalTopic[k]) {
                         finalTopic[k] = curt[k];
                     }
                 }
@@ -386,6 +417,7 @@ class LMLTopics {
         .add('language', 'select', {
             displayname : "Language",
             datasource : [
+                {displayName : " - Default parent's language -", name : ""},
                 {displayName : "Canadian English", name : "en-ca"},
                 {displayName : "American English", name : "en-us"},
                 {displayName : "Français Canadien", name : "fr-ca"},

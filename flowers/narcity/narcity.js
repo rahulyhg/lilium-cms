@@ -506,6 +506,7 @@ var serveTopic = function(cli, extra) {
                     index : index || 1,
                     searchname : extra.topic.displayname,
                     context : 'topic',
+                    language : extra.topic.language,
                     indices : {
                         totalarticles : details.totalLength,
                         totalpages : details.totalPages,

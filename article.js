@@ -650,6 +650,7 @@ var Article = function() {
                                                 var extra = {};
                                                 extra.ctx = "article";
                                                 extra.article = deepArticle;
+                                                extra.topic = deepArticle.topic;
                                                 extra.preview = true;
 
                                                 log('Preview', 'Rendering HTML for previewed post');
@@ -863,6 +864,7 @@ var Article = function() {
    
                                 var extra = {};
                                 extra.article = deepArticle;
+                                extra.topic = deepArticle.topic;
                                 extra.ctx = "article";
  
                                 filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
@@ -1432,6 +1434,7 @@ var Article = function() {
                 var extra = {};
                 extra.ctx = "article";
                 extra.article = deepArticle;
+                extra.topic = deepArticle.topic;
 
                 if (deepArticle.topic.language) {
                     extra.language = deepArticle.topic.language;

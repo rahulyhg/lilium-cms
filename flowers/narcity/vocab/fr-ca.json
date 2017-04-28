@@ -1,3 +1,27 @@
 {
-    "sponsoredcontent" : "Contenu sponsorisé"
+    "sponsoredcontent" : "Contenu sponsorisé",
+    "search" : "Rechercher",
+    "browse" : "Naviguer",
+    "follow" : "Suivre",
+    "advertise" : "Publiciser",
+    "contact-us" : "Contactez-nous",
+    "jobs" : "Carrière",
+    "terms-and-conditions" : "Termes &amp; conditions",
+    "privacy-policy" : "Politique de confidentialité",
+    "all-rights-reserved" : "Tous droits réservés",
+    "recommended-video" : "À voir absolument",
+    "sign-up-for-our-newsletter" : "Narcity dans ta boîte de réception",
+    "email-address" : "courriel",
+    "subscribe" : "S'inscrire",
+    "share" : "Partage",
+    "posts-archive" : "Archive",
+    "showing" : "Affiche",
+    "of" : "des",
+    "entries" : "articles",
+    "page" : "Page",
+    "most-recent" : "Dernières publications",
+    "older-articles" : "Afficher plus",
+    "keep-on-reading" : "Poursuis ta lecture",
+    "article-part-of-sponsored" : "Cet article fait partie d'une activation de contenu sponsorisé.",
+    "learn-how-promote" : "Voir comment nous pouvons vous aider"
 }

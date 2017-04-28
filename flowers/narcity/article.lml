@@ -131,9 +131,9 @@ $}
 
             {$ if (extra.article.isSponsored == true); $}
             <div class="bottom-promotion-link">
-                This article is part of a sponsored content activation.
+                {:article-part-of-sponsored}
                 <a href="https://www.narcitymedia.com" target="_blank">
-                    Learn how we can promote your company &gt;
+                    {:learn-how-promote} &gt;
                 </a>
             </div>
             {$ endif; $}
@@ -144,7 +144,7 @@ $}
             </div>
             {$ endif; if (?extra.article.related.0.name ??); $}
             <div class="keep-on-reading-wrapper">
-                <a class="keep-on-reading" href="{=config.default.server.url}/{=extra.article.related.0.name}">Keep on reading <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+                <a class="keep-on-reading" href="{=config.default.server.url}/{=extra.article.related.0.name}">{:keep-on-reading} <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
             </div>
             {$ endif; $}
 
@@ -171,7 +171,7 @@ $}
             {$ endif; $}    
 
             {$ if (?theme.settings.featuredyoutubeid??); $}
-                <h4 class="article-section-title">Recommended Video</h4>
+                <h4 class="article-section-title">{:recommended-video}</h4>
                 <iframe style="width: 100%; height: 360px; margin-bottom: 60px;" class="recommended-video" src="https://www.youtube.com/embed/{=theme.settings.featuredyoutubeid}" frameborder="0" allowfullscreen></iframe>
             {$ endif; $}
         </div>

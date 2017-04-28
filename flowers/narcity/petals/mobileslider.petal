@@ -7,11 +7,11 @@
         Login
     </button-->
     <form method="GET" action="{=config.default.server.url}/search">
-        <input id="mobile-search-input" name="q" placeholder="Search..." />
+        <input id="mobile-search-input" name="q" placeholder="{:search}" />
     </fom>    
 
     <div>
-        <h3>Browse</h3>
+        <h3>{:browse}</h3>
         {$ for (sect in theme.settings.headerlinks); $}
             <a href="{=sect.url}" class="section-link" >{=sect.linktext}</a>
         {$ endfor; $}
@@ -20,7 +20,7 @@
     <hr />
 
     <div class="slider-follow">
-        <h3>Follow</h3>
+        <h3>{:follow}</h3>
         {$ if (?config.default.social.accounts.facebook != "") $}
             <a href="https://facebook.com/{=config.default.social.accounts.facebook}" target="_blank">
                 <i class="fa fa-facebook-official" aria-hidden="true"></i>
@@ -56,16 +56,16 @@
     <hr />
 
     <div class="slider-links">
-        <a class="section-link" href="https://www.narcitymedia.com">Advertise</a>
-        <a class="section-link" href="{=config.default.server.url}/contact-us">Contact</a>
-        <a class="section-link" href="https://www.narcitymedia.com/jobs">Jobs</a>
-        <a class="section-link" href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
-        <a class="section-link" href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
+        <a class="section-link" href="https://www.narcitymedia.com">{:advertise}</a>
+        <a class="section-link" href="{=config.default.server.url}/contact-us">{:contact-us}</a>
+        <a class="section-link" href="https://www.narcitymedia.com/jobs">{:jobs}</a>
+        <a class="section-link" href="{=config.default.server.url}/terms-conditions/">{:terms-and-conditions}</a>
+        <a class="section-link" href="{=config.default.server.url}/privacy-policy/">{:privacy-policy}</a>
     </div>
 
     <div class="copyright-wrapper">
         <a href="https://www.narcitymedia.com">
-            &copy; 2017 All rights reserved, Narcity Media inc.
+            &copy; 2017 {:all-rights-reserved}, Narcity Media inc.
         </a>
     </div>
 </div>

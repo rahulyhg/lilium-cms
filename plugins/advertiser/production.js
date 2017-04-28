@@ -176,7 +176,6 @@ var Production = function () {
     };
 
     var registerNotificationGroups = function() {
-        notifications.createGroup('production', 'production');
     };
 
     var unregisterHooks = function() {
