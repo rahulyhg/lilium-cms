@@ -68,27 +68,6 @@
                 "cattitle" : "Best of"
             }]
         },
-        "othernetworkwebsites" : {"type" : "stack",
-            "attr" : {"displayname" : "Other Network Websites",
-                "scheme": {
-                    "columns": [
-                        {
-                            "fieldName": "sitename",
-                            "dataType": "text",
-                            "displayname": "Site Name"
-                        }, {
-                            "fieldName": "url",
-                            "dataType": "text",
-                            "displayname": "Url"
-                        }
-                    ]
-                }
-            },
-            "default": [{
-                "sitename": "Toronto",
-                "url": "http://narcity.com/toronto"
-            }]
-        },
         "headerlinks" : {"type" : "stack",
             "attr" : {"displayname" : "Header links",
                 "scheme": {
@@ -110,7 +89,28 @@
                 "url": "//"
             }]
         },
-
+        "adtags" : {"type" : "stack",
+            "attr" : {"displayname" : "Ad tags, as HTML",
+                "scheme": {
+                    "columns": [
+                        {
+                            "fieldName": "identifier",
+                            "dataType": "text",
+                            "displayname": "Description"
+                        }, {
+                            "fieldName": "code",
+                            "dataType": "text",
+                            "displayname": "Markup"
+                        }
+                    ]
+                }
+            },
+            "default": [{
+                "identifier": "Advertising",
+                "code": "<script></script>"
+            }]
+        },
+        "pperads" : {"type" : "number", "attr" : {"displayname" : "Paragraphs per ads"}, "default" : 5},
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
         "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"},
         "codetitle" : {"type" : "title", "attr" : {"displayname" : "Code insertion"}, "default" : "title"},

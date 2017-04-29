@@ -378,45 +378,26 @@ var Article = function() {
     };
 
     this.insertAds = function(_c, article, done, force) {
-        if ((article.isSponsored && !force) || (!_c.content || !_c.content.adsperp)) {
+        if ((article.isSponsored || article.nsfw && !force) || !_c.content) {
             return done(article.content);
         }
 
-        var pcount = _c.content.adsperp;
-        var jsdom = require('jsdom');
-        var content = article.content ? article.content
-            .replace(/\<ad\>\<?\/?a?d?\>?/g, "")
-            .replace(/\<lml\:ad\>/g, "")
-            .replace(/\<\/lml\:ad\>/g, "")
-            .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
-            .replace(/\n/g, "").replace(/\r/g, "")
-            .replace(/\<p\>\<\/p\>/g, "") : "";
+        var asyncHooks = hooks.getHooksFor('insert_ads_' + _c.uid);
+        var aKeys = Object.keys(asyncHooks);
+        var aIndex = -1;
 
-        var changed = false;
-        jsdom.env(content, function(err, dom) {
-            if (err) {
-                log("Article", "Error parsing dom : " + err, "err");
-                return done(article.content);
-            }
-
-            var parags = dom.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
-            for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
-                var adtag = dom.document.createElement('ad');
-                dom.document.body.insertBefore(adtag, parags[i]);
-                changed = true;
-            }
-
-            if (changed) {
-                content = dom.document.body.innerHTML;
-                article.content = content;
-                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
-                    log('Article', "Inserted ads inside article with title " + article.title, 'success');
-                    done(content);
-                });
+        var nextHook = function() {
+            if (++aIndex == aKeys.length) {
+                done(article.content);
             } else {
-                done();
+                asyncHooks[aKeys[aIndex]].cb({
+                    _c : _c,
+                    article : article,
+                    done : nextHook
+                }, 'insert_ads_' + _c.uid);
             }
-        });
+        };
+        nextHook();
     };
 
     this.create = function(cli) {
@@ -1502,13 +1483,31 @@ var Article = function() {
                     deepArticle.pageIndex = 1;
                 }
 
-                // Generate LML page
-                filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , function(name) {
-                    cb && cb({
-                        success: true,
-                        deepArticle : deepArticle
-                    });
-                });
+                var asyncHooks = hooks.getHooksFor('article_async_render_' + _c.uid);
+                var aKeys = Object.keys(asyncHooks);
+    
+                var hookIndex = -1;
+                var nextHook = function() {
+                    if (++hookIndex != aKeys.length) {
+                        var hk = asyncHooks[aKeys[hookIndex]];
+                        console.log(hk);
+                        hk.cb({
+                            _c : _c,
+                            done : nextHook,
+                            article : deepArticle
+                        }, 'article_async_render_' + _c.uid)
+                    } else {
+                        // Generate LML page
+                        filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , function(name) {
+                            cb && cb({
+                                success: true,
+                                deepArticle : deepArticle
+                            });
+                        });
+                    }
+                };
+
+                nextHook();
             };
 
             if (deepArticle.hasads) {

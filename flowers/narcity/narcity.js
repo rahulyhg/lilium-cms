@@ -617,6 +617,15 @@ var generateHomepage = function(_c, cb) {
     });
 }
 
+var parseArticleAds = function(pkg) {
+    var _c = pkg._c;
+    var article = pkg.article;
+    var done = pkg.done;
+    var force = pkg.force;
+
+    
+}
+
 var getWhatsHot = function(_c, cb) {
     var toppagesURL = "http://api.chartbeat.com/live/toppages/v3/?apikey="+
         _c.chartbeat.api_key + "&host="+
@@ -855,6 +864,10 @@ var loadHooks = function(_c, info) {
         generateHomepage(pkg._c || pkg.cli._c);
     });
 
+    hooks.bind('article_ads_will_parse', 10, function(pkg) {
+        parseArticleAds(pkg);
+    });
+
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
@@ -862,15 +875,12 @@ var loadHooks = function(_c, info) {
         // Fix fields
         parseArticleFields(pkg);
 
-        // Replace ad tags with ad set
-        parseAds(pkg); 
-
         // Replace Instagram scripts
         parseInsta(pkg);
-
-        // Flag if NSFW, ad it to deepfetched object
-        parseNSFW(pkg);
     });
+
+    hooks.bind('article_async_render_' + _c.uid, 1000, parseAds);
+    hooks.bind('insert_ads_' + _c.uid, 1000, insertAds);
 };
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
@@ -881,37 +891,81 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
     }
 };
 
-var parseNSFW = function(pkg) {
-    pkg.article.nsfw = typeof pkg.article.tags == "object" && pkg.article.tags.indexOf && (pkg.article.tags.indexOf("nsfw") !== -1 || pkg.article.tags.indexOf("NSFW") !== -1);
-};
-
 var parseInsta = function(pkg) {
     pkg.article.content = pkg.article.content.replace(/\<script async\=\"\" defer\=\"\" src\=\"\/\/platform.instagram.com\/en_US\/embeds.js\"\>\<\/script\>/g, "") + '<script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>';
 };
 
+var insertAds = function(pkg) {
+    var _c = pkg._c;
+    var article = pkg.article;
+    var done = pkg.done;
+
+    themes.fetchCurrentTheme(_c, function(cTheme) {
+        var pcount = cTheme.settings.pperad || 5;
+        var jsdom = require('jsdom');
+        var content = article.content ? article.content
+            .replace(/\<ad\>\<?\/?a?d?\>?/g, "")
+            .replace(/\<lml\:ad\>/g, "")
+            .replace(/\<\/lml\:ad\>/g, "")
+            .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
+            .replace(/\n/g, "").replace(/\r/g, "")
+            .replace(/\<p\>\<\/p\>/g, "") : "";
+
+        var changed = false;
+        jsdom.env(content, function(err, dom) {
+            if (err) {
+                log("Article", "Error parsing dom : " + err, "err");
+                return done(article.content);
+            }
+
+            var parags = dom.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
+            for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
+                var adtag = dom.document.createElement('ad');
+                dom.document.body.insertBefore(adtag, parags[i]);
+                changed = true;
+            }
+
+            if (changed) {
+                content = dom.document.body.innerHTML;
+                article.content = content;
+                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
+                    log('Article', "Inserted ads inside article with title " + article.title, 'success');
+                    done(content);
+                });
+            } else {
+                done();
+            }
+        });
+    });
+}
+
 var parseAds = function(pkg) {
-    if (!pkg._c.contentadsnip || !pkg._c.contentadsnip.length) {
-        return;
-    }
-
+    var _c = pkg._c;
+    var done = pkg.done;
     var art = pkg.article;
-    var keys = Object.keys(pkg._c.contentadsnip);
-    var indx = 0;
-    var delimiter = "<ad></ad>";    
-    var pos;
-    if (art.tags.indexOf('nsfw') == -1 && art.tags.indexOf('NSFW') == -1) {
-        while ((pos = art.content.indexOf(delimiter)) != -1) {
-            art.content = art.content.substring(0, pos) + '<div class="awrapper">' + pkg._c.contentadsnip[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
-            indx++;
 
-            if (indx == keys.length) {
-                break;
-                indx = 0;
+    themes.fetchCurrentTheme(_c, function(cTheme) {
+        var keys = Object.keys(cTheme.settings.adtags || {});
+
+        var indx = 0;
+        var delimiter = "<ad></ad>"; 
+        var pos;
+
+        if (!art.nsfw && keys.length != 0) {
+            while ((pos = art.content.indexOf(delimiter)) != -1) {
+                art.content = art.content.substring(0, pos) + '<div class="awrapper">' + cTheme.settings.adtags[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
+                indx++;
+
+                if (indx == keys.length) {
+                    break;
+                    indx = 0;
+                }
             }
         }
-    }
 
-    art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
+        art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
+        done();
+    });
 };
 
 var parseArticleFields = function(pkg) {
