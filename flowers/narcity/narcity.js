@@ -965,7 +965,8 @@ var parseAds = function(pkg) {
     var art = pkg.article;
 
     themes.fetchCurrentTheme(_c, function(cTheme) {
-        var keys = Object.keys(cTheme.settings.adtags || {});
+        var adtags = pkg.article.topic && pkg.article.topic.override.adtags || cTheme.settings.adtags || {};
+        var keys = Object.keys(adtags);
 
         var indx = 0;
         var delimiter = "<ad></ad>"; 
@@ -973,7 +974,7 @@ var parseAds = function(pkg) {
 
         if (!art.nsfw && keys.length != 0) {
             while ((pos = art.content.indexOf(delimiter)) != -1) {
-                art.content = art.content.substring(0, pos) + '<div class="awrapper">' + cTheme.settings.adtags[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
+                art.content = art.content.substring(0, pos) + '<div class="awrapper">' + adtags[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
                 indx++;
 
                 if (indx == keys.length) {
