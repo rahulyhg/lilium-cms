@@ -1087,7 +1087,7 @@ var Article = function() {
 
             if (params.search) {
                 match.push({
-                    $text : { $search: params.search }
+                    $text : { $search: '"' + params.search + '"' }
                 });
             }
 

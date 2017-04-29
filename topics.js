@@ -176,9 +176,13 @@ class LMLTopics {
             let realIndex = maybeIndex.pop();
             completeSlug = maybeIndex.join('/');
             
-            maybeIndex = realIndex;
+            maybeIndex = parseInt(realIndex);
         } else {
-            maybeIndex = 0;
+            maybeIndex = 1;
+        }
+
+        if (isNaN(maybeIndex)) {
+            maybeIndex = 1;
         }
 
         db.findUnique(cli._c, 'topics', {completeSlug : completeSlug}, ((err, topic) => {

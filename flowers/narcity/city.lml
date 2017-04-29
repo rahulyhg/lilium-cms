@@ -1,0 +1,100 @@
+{#config;extra;theme;date}
+
+<script src="{=config.default.server.url}/bower/timeago.js/dist/timeago.js"></script>
+<script>
+    window.lmlhomelinks = [];
+</script>
+
+<main class="homepage">
+    <div class="fwblock latest-content-wrapper">
+        <h4 class="article-section-title">
+            <a href="{=config.default.server.url}/{=extra.topic.completeSlug}/2">
+                {:most-recent}
+            </a>
+        </h4>
+
+        <div class="float-clear">
+        {$
+            relindex = 0;
+            for (la in extra.articles);
+
+                classes = "article-thumbnail";
+                if (relindex == 0);
+                    classes += " article-thumbnail-featured";
+                endif;
+                if (relindex > 2);
+                    classes += " article-thumbnail-margined";
+                endif;
+
+                mod = relindex;
+                mod %= 3;
+                if (mod == 0);
+            $}
+                </div><div class="float-clear">
+            {$ endif; $}
+                <div class="{=classes}" id="art{=la._id}">
+                    <div class="article-thumbnail-featured-image">
+                        <a href="{=la.url}">
+                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
+                                srcset="{=la.featuredimage.0.sizes.thumbnaillarge.url} 600w, {=la.featuredimage.0.sizes.thumbnailarchive.url} 380w"
+                                alt="{=&la.title}"
+                             />
+                            {$ if (?la.isSponsored ??); $}
+                            <a class="sponsored-mention sponsored-mention-hp" href="https://www.narcitymedia.com" target="_blank">
+                                Sponsored Content
+                            </a>
+                            {$ endif; $}
+                            {$ if (?la.topic ??) $}
+                            <div class="article-cat-name">
+                                <a href="{=config.default.server.url}/{=la.topic.completeSlug}">
+                                    {=la.topic.displayname}
+                                </a>
+                            </div>
+                            {$ endif; $}
+
+                            <div class="article-share-count-mobile" id="article-share-count-mobile-{=la._id}">
+                                <span class="article-share-icon">
+                                    <img src="{=config.default.server.url}/res/images/flame.png" />
+                                </span>
+                                <span class="article-share-count-mobile-num fbshare" data-url="{=la.url}" data-min="100" data-show="article-share-count-mobile-{=la._id}" data-showas="block">0000</span>
+                            </div>
+
+                        </a>
+                    </div>
+                    <div class="article-thumbnail-title">
+                        <a href="{=la.url}">
+                            {=la.title}
+                        </a>
+                    </div>
+                    <div class="article-thumbnail-subtitle">
+                        {=la.subtitle}
+                    </div>
+                    <div class="article-thumbnail-details">
+                        <img src="{=la.author.avatarURL}" />
+                        <span><a href="{=config.default.server.url}/author/{=la.author.slug}" class="article-thumbnail-author">
+                            {=la.author.displayname}
+                          </a> &middot; <span class="need_to_be_rendered" datetime="{= la.date }">{= date.stringify(la.date, "short")}</span>
+                        </span>
+                    </div>
+                </div>
+                <script>
+                    var nPage = {
+                        url : document.location.protocol + "{=la.url}",
+                        wrapper : "{=la._id}"
+                    };
+                    window.lmlhomelinks.push(nPage);
+                    document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
+                </script>
+            {$ relindex += 1;
+        endfor; $}
+            <div style="float: none; clear: both;" class="older-button-wrapper">
+                <a href="{=config.default.server.url}/{=extra.topic.completeSlug}/2">{:older-articles}</a>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    new timeago().render(document.querySelectorAll('.need_to_be_rendered'));
+</script>
+

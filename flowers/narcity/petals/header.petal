@@ -9,7 +9,7 @@
         </div>
 
         <div class="narcity-logo-wrapper">
-            <a href="{=config.default.server.url}">
+            <a href="{=theme.settings.logolink}">
                 <img src="{=config.default.server.url}{=theme.settings.logo}" />
             </a>
         </div>

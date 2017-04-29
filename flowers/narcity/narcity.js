@@ -423,7 +423,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
     db.findToArray(cc.default(), 'entities', {}, function(err, entities) {
         var eCache = {};
         for (var i = 0; i < entities.length; i++) {
-            eCache[entities[i].id] = entities[i];
+            eCache[entities[i]._id.toString()] = entities[i];
         }
 
         topics.getFamilyIDs(conf, topic._id, function(ids) {
@@ -455,7 +455,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                         }
                     ], function(arr) {
                         for (var i = 0; i < arr.length; i++) {
-                            arr[i].author = eCache[arr[i].author];
+                            arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
                             arr[i].topic = topic;
                             arr[i].url = conf.server.protocol + conf.server.url + "/" + topic.completeSlug + "/" + arr[i].name;
                         }
@@ -493,10 +493,11 @@ var fetchTopicArticles = function(conf, topic, index, send) {
 };
 
 var serveTopic = function(cli, extra) {
-    var file = cli._c.server.html + "/" + extra.topic.completeSlug + (extra.index ? ("/" + extra.index-1) : "") + ".html";
     var topic = extra.topic;
-    var index = extra.index;
+    var index = extra.index ? parseInt(extra.index) : 1;
+    var file = cli._c.server.html + "/" + extra.topic.completeSlug + (index != 1 ? ("/" + index) : "") + ".html";
 
+    console.log(file);
     fileserver.fileExists(file, function(exists) {
         if (!exists) {
             fetchTopicArticles(cli._c, topic, index, function(articles, details) {
@@ -515,7 +516,7 @@ var serveTopic = function(cli, extra) {
                     currentpage : index || 1,
                 };
                 
-                var context = topic.archivetemplate || "topic";
+                var context = xextra.currentpage != 1 ? "topic" : (topic.archivetemplate || "topic");
 
                 filelogic.renderThemeLML(cli, context, file, xextra, function(content) {
                     cli.response.writeHead(200);

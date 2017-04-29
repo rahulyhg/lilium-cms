@@ -354,9 +354,11 @@ var Core = function () {
 
         var preloadSites = function() {
             _c.each(function(conf, next) {
-                log('Schedule', 'Running Scheduled cache preloading for website ' + conf.website.sitetitle)
-                hooks.fire('homepage_needs_refresh', {_c : conf});
-                require('./cacheInvalidator.js').preloadLatests(conf, 50, 0, next);
+                if (conf.env != "dev") {
+                    log('Schedule', 'Running Scheduled cache preloading for website ' + conf.website.sitetitle)
+                    hooks.fire('homepage_needs_refresh', {_c : conf});
+                    require('./cacheInvalidator.js').preloadLatests(conf, 50, 0, next);
+                }
             });
         }
 
