@@ -965,7 +965,7 @@ var parseAds = function(pkg) {
     var art = pkg.article;
 
     themes.fetchCurrentTheme(_c, function(cTheme) {
-        var adtags = pkg.article.topic && pkg.article.topic.override.adtags || cTheme.settings.adtags || {};
+        var adtags = (pkg.article.topic && pkg.article.topic.override && pkg.article.topic.override.adtags) || cTheme.settings.adtags || {};
         var keys = Object.keys(adtags);
 
         var indx = 0;
