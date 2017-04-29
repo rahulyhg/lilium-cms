@@ -89,6 +89,28 @@
                 "url": "//"
             }]
         },
+        "sidebarbrowselinks" : {"type" : "stack",
+            "attr" : {"displayname" : "Sidebar browse links",
+                "scheme": {
+                    "columns": [
+                        {
+                            "fieldName": "linktext",
+                            "dataType": "text",
+                            "displayname": "Link Text"
+                        }, {
+                            "fieldName": "url",
+                            "dataType": "text",
+                            "displayname": "Url"
+                        }
+                    ]
+                }
+            },
+            "default": [{
+                "linktext": "",
+                "url": "//"
+            }]
+        },
+
         "adtags" : {"type" : "stack",
             "attr" : {"displayname" : "Ad tags, as HTML",
                 "scheme": {

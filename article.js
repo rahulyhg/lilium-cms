@@ -1490,7 +1490,6 @@ var Article = function() {
                 var nextHook = function() {
                     if (++hookIndex != aKeys.length) {
                         var hk = asyncHooks[aKeys[hookIndex]];
-                        console.log(hk);
                         hk.cb({
                             _c : _c,
                             done : nextHook,

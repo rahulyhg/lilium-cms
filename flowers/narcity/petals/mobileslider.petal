@@ -1,6 +1,14 @@
-{#config;theme}
+{#config;theme;extra}
 <div id="mcanvasoverlay"></div>
 <div id="mobileslider">
+
+{$
+    if (?extra.contextname == "home");
+        sidebarlinks = ?theme.settings.sidebarbrowselinks;
+    else;
+        sidebarlinks = ?theme.settings.headerlinks;
+    endif;
+$}
 
 <div class="menuslider-container" style="padding-top: 15px;">
     <!--button>
@@ -12,8 +20,8 @@
 
     <div>
         <h3>{:browse}</h3>
-        {$ for (sect in theme.settings.headerlinks); $}
-            <a href="{=sect.url}" class="section-link" >{=sect.linktext}</a>
+        {$ for (secti in sidebarlinks); $}
+            <a href="{=secti.url}" class="section-link" >{=secti.linktext}</a>
         {$ endfor; $}
     </div>
 

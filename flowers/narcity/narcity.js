@@ -497,7 +497,6 @@ var serveTopic = function(cli, extra) {
     var index = extra.index ? parseInt(extra.index) : 1;
     var file = cli._c.server.html + "/" + extra.topic.completeSlug + (index != 1 ? ("/" + index) : "") + ".html";
 
-    console.log(file);
     fileserver.fileExists(file, function(exists) {
         if (!exists) {
             fetchTopicArticles(cli._c, topic, index, function(articles, details) {

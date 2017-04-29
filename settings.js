@@ -158,30 +158,6 @@ var Settings = function () {
                 displayname: "POST Maximum File Size"
             })
 
-        .add('content-ads-sep', 'title', {
-                displayname : "Advertising"
-            })
-            .add('content.adsperp', 'number', {
-                displayname : "Paragraph count between in-content ads"
-            })
-            .add('contentadsnip', 'stack', {
-                displayname : "Ad Code",
-                scheme : {
-                    columns : [
-                        {
-                            fieldName : "id",
-                            dataType : "text",
-                            displayname : "Identifier"
-                        }, 
-                        {
-                            fieldName : "code",
-                            dataType : "text",
-                            displayname : "Javascript Code"
-                        }
-                    ]
-                }
-            })
-
         .add('content-cdn-sep', 'title', {
                 displayname : "Content Delivery Network"
             })
