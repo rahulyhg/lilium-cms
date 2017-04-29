@@ -17,22 +17,13 @@
         {$
             relindex = 0;
             for (la in extra.articles);
-
-                classes = "article-thumbnail";
-                if (relindex == 0);
-                    classes += " article-thumbnail-featured";
-                endif;
-                if (relindex > 2);
-                    classes += " article-thumbnail-margined";
-                endif;
-
                 mod = relindex;
                 mod %= 3;
                 if (mod == 0);
             $}
                 </div><div class="float-clear">
             {$ endif; $}
-                <div class="{=classes}" id="art{=la._id}">
+                <div class="{=la.classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
                         <a href="{=la.url}">
                             <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"

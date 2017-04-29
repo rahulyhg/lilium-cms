@@ -120,6 +120,13 @@ var fetchHomepageArticles = function(_c, cb) {
                     arr[j].author = authors[arr[j].author];
                     arr[j].topic = sectionTopics[i];
                     arr[j].url = _c.server.protocol + _c.server.url + sectionTopics[i].completeSlug + "/" + arr[j].name;
+
+                    arr[j].classes = "article-thumbnail";
+                    if ((9 - j) % 9 == 0) {
+                        arr[j].classes += " article-thumbnail-featured"
+                    } else if ((j + 1) % 9 > 3) {
+                        arr[j].classes += " article-thumbnail-margined"
+                    }
                 }
 
                 i++;
@@ -158,6 +165,13 @@ var fetchHomepageArticles = function(_c, cb) {
                     latests[j].author = authors[latests[j].author];
                     latests[j].topic = latests[j].topic[0];
                     latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? "/" + latests[j].topic.completeSlug : "") + "/" + latests[j].name;
+
+                    latests[j].classes = "article-thumbnail";
+                    if ((9 - j) % 9 == 0) {
+                        latests[j].classes += " article-thumbnail-featured"
+                    } else if ((j + 1) % 9 > 3) {
+                        latests[j].classes += " article-thumbnail-margined"
+                    }
                 }
 
                 cb({
@@ -458,6 +472,13 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                             arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
                             arr[i].topic = topic;
                             arr[i].url = conf.server.protocol + conf.server.url + "/" + topic.completeSlug + "/" + arr[i].name;
+
+                            arr[i].classes = "article-thumbnail";
+                            if ((9 - i) % 9 == 0) {
+                                arr[i].classes += " article-thumbnail-featured"
+                            } else if ((i + 1) % 9 > 3) {
+                                arr[i].classes += " article-thumbnail-margined"
+                            }
                         }
 
                         var details = {

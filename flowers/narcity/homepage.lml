@@ -16,22 +16,13 @@
         {$
             relindex = 0;
             for (la in extra.latests);
-
-                classes = "article-thumbnail";
-                if (relindex == 0);
-                    classes += " article-thumbnail-featured";
-                endif;
-                if (relindex > 2);
-                    classes += " article-thumbnail-margined";
-                endif;
-
                 mod = relindex;
                 mod %= 3;
                 if (mod == 0);
             $}
                 </div><div class="float-clear">
             {$ endif; $}
-                <div class="{=classes}" id="art{=la._id}">
+                <div class="{=la.classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
                         <a href="{=la.url}">
                             <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
@@ -109,14 +100,6 @@
             {$ relindex = 0; $}
             {$ for (sa in section.articles); $}
                 {$
-                    classes = "article-thumbnail";
-                    if (relindex == 0);
-                        classes += " article-thumbnail-featured";
-                    endif;
-                    if (relindex > 2);
-                        classes += " article-thumbnail-margined";
-                    endif;
-
                     mod = relindex;
                     mod %= 3;
 
@@ -125,7 +108,7 @@
                     </div><div class="float-clear">
                 {$ endif; $}
                 <a href="{=sa.url}" id="art{=sa._id}">
-                    <div class="{=classes}">
+                    <div class="{=sa.classes}">
                         <div class="article-thumbnail-featured-image">
                             <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
                             <div class="article-share-count-mobile" id="article-share-count-mobile-{=sa._id}">
