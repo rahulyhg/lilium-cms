@@ -344,7 +344,14 @@ var SiteInitializer = function (conf, siteobj) {
                                         badges.addSite(conf, function() {
                                             loadRobots(function() {
                                                 update(conf, function() {
-                                                    sharedcache.hi();
+                                                    if (global.liliumenv.mode == "script") {
+                                                        if (isElder) {
+                                                            require('./network/sharedmemory.js').bind();
+                                                        }
+                                                    } else {
+                                                        sharedcache.hi();
+                                                    }
+
                                                     checkForWP(conf);
                                                     hooks.fire('site_initialized', conf);
                                                     log('Sites', 'Initialized site with id ' + conf.id, 'success');

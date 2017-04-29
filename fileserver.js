@@ -354,12 +354,12 @@ var FileServer = function () {
 
     };
 
-    this.genRandomNameFile = function (filename) {
+    this.genRandomNameFile = function (filename, prefix) {
         filename = crypto.randomBytes(10).toString('hex') + 
             filename + dateFormat(new Date(), "isoDateTime") + 
             crypto.randomBytes(10).toString('hex');
 
-        return crypto.createHash('sha1').update(filename).digest('hex');
+        return (prefix || "") + crypto.createHash('sha1').update(filename).digest('hex');
     }
 
     /**
