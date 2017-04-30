@@ -35,7 +35,7 @@
                                 Sponsored Content
                             </a>
                             {$ endif; $}
-                            {$ if (?la.topic ??) $}
+                            {$ if (?la.topic ??); $}
                             <div class="article-cat-name">
                                 <a href="{=config.default.server.url}/{=la.topic.completeSlug}">
                                     {=la.topic.displayname}

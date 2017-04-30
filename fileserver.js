@@ -285,6 +285,7 @@ var FileServer = function () {
 
         stream.on('close', function () {
             cli.response.end();
+            stream.destroy();
             callback && callback();
         });
     };
@@ -317,7 +318,7 @@ var FileServer = function () {
         var rs = fs.createReadStream(filename);
         rs.on('close', callback);
         rs.pipe(handle, {
-            end: false
+            end : false   
         });
     };
 
@@ -328,7 +329,11 @@ var FileServer = function () {
             mode: '0644'
         });
 
-        handle.write(content, encoding || 'utf8', callback);
+        handle.write(content, encoding || 'utf8', function() {
+            handle.close();
+            handle.destroy();
+            callback && callback();
+        });
     };
 
     this.writeToFile = function (handle, content, callback, encoding) {

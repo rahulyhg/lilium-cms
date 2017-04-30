@@ -43,7 +43,7 @@ $}
     "@context": "http://schema.org",
     "@type": "Article",
     "headline": "{=extra.article.title}",
-    "mainEntityOfPage": "{=config.default.server.url}/{=extra.article.name}",
+    "mainEntityOfPage": "{=extra.article.url}",
     "datePublished": "{=extra.article.date}",
     "dateModified": "{=extra.article.date}",
     "image": {

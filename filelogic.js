@@ -326,6 +326,9 @@ var FileLogic = function () {
                                         fileserver.createDirIfNotExists(savePath, function() {
                                             var handle = FileServer.getOutputFileHandle(savePath, 'w+');
                                             FileServer.writeToFile(handle, cdned, function() {
+                                                handle.close();
+                                                handle.destroy();
+
                                                 callback(cdned);
                                             });
                                         }, false);
