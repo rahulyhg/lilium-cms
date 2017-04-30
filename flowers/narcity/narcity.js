@@ -446,66 +446,73 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                 topic : {$in : ids}
             }
 
-            db.find(conf, 'content', match, [], function(err, cur) {
-                cur.count(function(err, total) {
-                    db.join(conf, 'content', [
-                        {
-                            $match : match
-                        }, {
-                            $sort : {
-                                date : -1
-                            }
-                        }, {
-                            $skip : skip
-                        }, {
-                            $limit : limit
-                        }, {
-                            $lookup : {
-                                from:           "uploads",
-                                localField:     "media",
-                                foreignField:   "_id",
-                                as:             "featuredimage"
-                            }
-                        }
-                    ], function(arr) {
-                        for (var i = 0; i < arr.length; i++) {
-                            arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
-                            arr[i].topic = topic;
-                            arr[i].url = conf.server.protocol + conf.server.url + "/" + topic.completeSlug + "/" + arr[i].name;
+            db.findToArray(conf, 'topics', {_id : {$in : ids}}, function(err, topicCache) {
+                var topicObjects = {}
+                topicCache.forEach(function(t) {
+                    topicObjects[t._id] = t;
+                });
 
-                            arr[i].classes = "article-thumbnail";
-                            if ((9 - i) % 9 == 0) {
-                                arr[i].classes += " article-thumbnail-featured"
-                            } else if ((i + 1) % 9 > 3) {
-                                arr[i].classes += " article-thumbnail-margined"
+                db.find(conf, 'content', match, [], function(err, cur) {
+                    cur.count(function(err, total) {
+                        db.join(conf, 'content', [
+                            {
+                                $match : match
+                            }, {
+                                $sort : {
+                                    date : -1
+                                }
+                            }, {
+                                $skip : skip
+                            }, {
+                                $limit : limit
+                            }, {
+                                $lookup : {
+                                    from:           "uploads",
+                                    localField:     "media",
+                                    foreignField:   "_id",
+                                    as:             "featuredimage"
+                                }
                             }
-                        }
+                        ], function(arr) {
+                            for (var i = 0; i < arr.length; i++) {
+                                arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
+                                arr[i].topic = topicObjects[arr[i].topic];
+                                arr[i].url = conf.server.protocol + conf.server.url + "/" + topic.completeSlug + "/" + arr[i].name;
 
-                        var details = {
-                            totalLength : total,
-                            totalPages : Math.ceil(total / limit),
-                            pagenumbers : []
-                        };
+                                arr[i].classes = "article-thumbnail";
+                                if ((9 - i) % 9 == 0) {
+                                    arr[i].classes += " article-thumbnail-featured"
+                                } else if ((i + 1) % 9 > 3) {
+                                    arr[i].classes += " article-thumbnail-margined"
+                                }
+                            }
 
-                        index ++;
-                        if (index < 4) {
-                            for (var i = 1; i <= details.totalPages && i <= 5; i++) {
-                                details.pagenumbers.push(i);
-                            }
-                        } else if (index > details.totalPages - 2) {
-                            for (var i = details.totalPages - 4; i <= details.totalPages; i++) {
-                                details.pagenumbers.push(i);
-                            }
-                        } else {
-                            var firstPage = index - 2;
-                            var lastPage = index + 2;
-                            for (var i = firstPage; i <= lastPage; i++) {
-                                details.pagenumbers.push(i);
-                            }
-                        }
-                        
+                            var details = {
+                                totalLength : total,
+                                totalPages : Math.ceil(total / limit),
+                                pagenumbers : []
+                            };
 
-                        send(arr, details);
+                            index ++;
+                            if (index < 4) {
+                                for (var i = 1; i <= details.totalPages && i <= 5; i++) {
+                                    details.pagenumbers.push(i);
+                                }
+                            } else if (index > details.totalPages - 2) {
+                                for (var i = details.totalPages - 4; i <= details.totalPages; i++) {
+                                    details.pagenumbers.push(i);
+                                }
+                            } else {
+                                var firstPage = index - 2;
+                                var lastPage = index + 2;
+                                for (var i = firstPage; i <= lastPage; i++) {
+                                    details.pagenumbers.push(i);
+                                }
+                            }
+                            
+
+                            send(arr, details);
+                        });
                     });
                 });
             });
