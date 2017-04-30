@@ -29,32 +29,32 @@ $}
 
     <div class="slider-follow">
         <h3>{:follow}</h3>
-        {$ if (?theme.facebook != "") $}
-            <a href="https://facebook.com/{=theme.facebook}" target="_blank">
+        {$ if (?theme.settings.facebook ??) $}
+            <a href="https://facebook.com/{=theme.settings.facebook}" target="_blank">
                 <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 <span>Facebook</span>
             </a>
         {$ endif; $}
-        {$ if (?theme.twitter != "") $}
-            <a href="https://twitter.com/{=theme.twitter}" target="_blank">
+        {$ if (?theme.settings.twitter ??) $}
+            <a href="https://twitter.com/{=theme.settings.twitter}" target="_blank">
                 <i class="fa fa-twitter" aria-hidden="true"></i>
                 <span>Twitter</span>
             </a>
         {$ endif; $}
-        {$ if (?theme.instagram != "") $}
-            <a href="https://instagram.com/{=theme.instagram}" target="_blank">
+        {$ if (?theme.settings.instagram ??) $}
+            <a href="https://instagram.com/{=theme.settings.instagram}" target="_blank">
                 <i class="fa fa-instagram" aria-hidden="true"></i>
                 <span>Instagram</span>
             </a>
         {$ endif; $}
-        {$ if (?theme.googleplus != "") $}
-            <a href="https://plus.google.com/+{=theme.googleplus}" target="_blank">
+        {$ if (?theme.settings.googleplus ??) $}
+            <a href="https://plus.google.com/+{=theme.settings.googleplus}" target="_blank">
                 <i class="fa fa-google-plus" aria-hidden="true"></i>
                 <span>Google Plus</span>
             </a>
         {$ endif; $}
-        {$ if (?theme.youtube != "") $}
-            <a href="https://www.youtube.com/user/{=theme.youtube}" target="_blank">
+        {$ if (?theme.settings.youtube ??) $}
+            <a href="https://www.youtube.com/user/{=theme.settings.youtube}" target="_blank">
                 <i class="fa fa-youtube" aria-hidden="true"></i>
                 <span>Youtube</span>
             </a>
