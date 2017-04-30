@@ -42,6 +42,7 @@
         "fullwidthsize" : {"type" : "number", "attr" : {"displayname" : "Full width size (px)"}, "default" : 1024},
         "articlewidthsize" : {"type" : "number", "attr" : {"displayname" : "Article width size (px)"}, "default" : 640},
         "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"},
+        "favicon" : {"type" : "text", "attr" : {"displayname" : "Fav Icon"}, "default" : "/static/media/lmllogo.png"},
         "networkname" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montreal"},
         "cityname" : {"type" : "text", "attr" : {"displayname" : "City name"}, "default" : "Montreal"},
         "featuredyoutubeid" : {"type" : "text", "attr" : {"displayname" : "Featured YouTube video ID"}, "validations" : {"required" : false}, "default" : "none"},
