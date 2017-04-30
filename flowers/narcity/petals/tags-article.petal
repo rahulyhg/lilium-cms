@@ -22,7 +22,6 @@ $}
 <meta property="article:author" content="{=?extra.article.authors.0.socialnetworks.facebook}" />
 <link rel="author" href="{=?extra.article.authors.0.socialnetworks.facebook}" />
 
-<meta property="og:url" content="{=extra.article.url}"/>
 <meta property="og:title" content="{=&extra.article.title}" />
 <meta property="og:description" content="{=&extra.article.subtitle}" />
 
@@ -31,8 +30,10 @@ $}
 
 {$ if (?extra.article.canonical ??); $}
     <link rel="canonical" href="{=extra.article.canonical}" />
+    <meta property="og:url" content="{=extra.article.canonical}"/>
 {$ else; $}
     <link rel="canonical" href="{=extra.article.url}" />
+    <meta property="og:url" content="{=extra.article.url}"/>
 {$ endif; $}
 
 <link rel="amphtml" href="{=config.default.server.url}/amp/{=extra.article.name}" />
