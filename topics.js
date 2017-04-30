@@ -429,11 +429,6 @@ class LMLTopics {
             ]
         })
         .add('topic-social-title', 'title', { displayname : "Social Networks" })
-        .add('facebook', 'text', { displayname : "Facebook Username" }, { required : false })
-        .add('twitter', 'text', { displayname : "Twitter Username" }, { required : false })
-        .add('googleplus', 'text', { displayname : "Google Plus Username" }, { required : false })
-        .add('instagram', 'text', { displayname : "Instagram Username" }, { required : false })
-        .add('youtube', 'text', { displayname : "Youtube Channel Name" }, { required : false })
         .trg('bottom')
         .add('topic-action-title', 'title', { displayname : "Actions" })
         .add('publish-set', 'buttonset', { buttons : [{
