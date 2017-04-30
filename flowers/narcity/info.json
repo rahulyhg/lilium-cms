@@ -133,6 +133,13 @@
             }]
         },
         "pperads" : {"type" : "number", "attr" : {"displayname" : "Paragraphs per ads"}, "default" : 5},
+
+        "facebook" : {"type" : "text", "attr" : {"displayname" : "Facebook Username"}, "default" : "Narcity"},
+        "twitter" : {"type" : "text", "attr" : {"displayname" : "Twitter Username"}, "default" : "Narcity"},
+        "googleplus" : {"type" : "text", "attr" : {"displayname" : "Google Plus Username"}, "default" : "Narcity"},
+        "youtube" : {"type" : "text", "attr" : {"displayname" : "YouTube Username"}, "default" : "Narcity"},
+        "instagram" : {"type" : "text", "attr" : {"displayname" : "Instagram Username"}, "default" : "Narcity"},
+
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
         "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"},
         "codetitle" : {"type" : "title", "attr" : {"displayname" : "Code insertion"}, "default" : "title"},

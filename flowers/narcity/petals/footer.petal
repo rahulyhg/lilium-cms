@@ -5,10 +5,10 @@
                 <div class="responsive-wrapper">
                         <div class="footer-social no-small-mobile">
                                 <span class="footer-title">{:follow} {=config.default.website.sitetitle}</span>
-                                <a target="_blank" href="https://www.facebook.com/{=config.default.social.accounts.facebook}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
-                                <a target="_blank" href="https://twitter.com/{=config.default.social.accounts.twitter}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
-                                <a target="_blank" href="https://www.instagram.com/{=config.default.social.accounts.instagram}"><i class="fa fa-instagram" aria-hidden="true"></i></a>
-                                <a target="_blank" href="https://www.youtube.com/user/{=config.default.social.accounts.youtube}"><i class="fa fa-youtube" aria-hidden="true"></i></a>
+                                <a target="_blank" href="https://www.facebook.com/{=theme.facebook}"><i class="fa fa-facebook" aria-hidden="true"></i></a>
+                                <a target="_blank" href="https://twitter.com/{=theme.twitter}"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                                <a target="_blank" href="https://www.instagram.com/{=theme.instagram}"><i class="fa fa-instagram" aria-hidden="true"></i></a>
+                                <a target="_blank" href="https://www.youtube.com/user/{=theme.youtube}"><i class="fa fa-youtube" aria-hidden="true"></i></a>
                         </div>
                         <div class="footer-digest-sub">
                                 <form

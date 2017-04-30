@@ -337,25 +337,6 @@ var Settings = function () {
                 displayname : "Instagram accounts"
             })
 
-        .add('social-2-sep', 'title', {
-                displayname : "Social accounts"
-            })
-            .add('social.accounts.facebook', 'text', {
-                displayname : "Facebook Username"
-            })
-            .add('social.accounts.twitter', 'text', {
-                displayname : "Twitter Username"
-            })
-            .add('social.accounts.googleplus', 'text', {
-                displayname : "Google Plus Username"
-            })
-            .add('social.accounts.instagram', 'text', {
-                displayname : "Instagram Username"
-            })
-            .add('social.accounts.youtube', 'text', {
-                displayname : "Youtube Username"
-            })
-
         .add('stripe-sep', "title", {
                 displayname: "Stripe"
             })
