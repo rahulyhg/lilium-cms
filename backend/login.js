@@ -73,7 +73,7 @@ var Login = function() {
     this.magiclink = function(cli) {
         db.findUnique(require('../config.js').default(), 
             'entities', 
-            {_id : db.mongoID(cli.routeinfo.path[1]), magiclink : cli.routeinfo.path[2]}, 
+            {_id : db.mongoID(cli.routeinfo.path[1]), magiclink : cli.routeinfo.path[2], revoked : {$ne : true}}, 
         function(err, user) {
             if (err || !user) {
                 cli.redirect(cli._c.server.url + "/login?magiclink=failed");
