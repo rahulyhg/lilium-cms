@@ -2084,3 +2084,5 @@ article .article-signature-face {
 article figure{
     margin:0px;
 }
+
+{=theme.settings.customcss}
