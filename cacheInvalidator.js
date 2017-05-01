@@ -41,19 +41,22 @@ var CacheInvalidator = function () {
                     fileFilter : "*.html"
                 };
 
+                if (data.article.topic) {
+                    require('./topics.js').deepFetch(data._c, data.article.topic, function(topic, parents) {
+                        for (var i = 0; i < parents.length; i++) {
+                            var topicfile = html + "/" + parents[i].completeSlug + ".html";
+                            log('Cache', 'Removing archive cached page : ' + topicfile);
+                            fileserver.deleteFile(topicfile, function() {});
+                        }
+                    });
+                }
+
                 if (data.article.author) {
                     db.findUnique(conf.default(), 'entities', {_id : db.mongoID(data.article.author)}, function(err, entity) {
                         var path = html + "/author/" + entity.slug;
                         log('Cache', 'Emptying author cache : ' + entity.displayname);
                         fileserver.emptyDirectory(path, deleteOpt, function() {});
                     });
-                }
-
-                var tags = data.article.tags;
-                for (var i = 0; i < tags.length; i++) {
-                    var path = html + '/tags/' + tags[i];
-                    log('Cache', 'Emptying tags cache : ' + tags[i]);
-                    fileserver.emptyDirectory(path, deleteOpt, function() {});
                 }
 
                 fileserver.emptyDirectory(html + "/latests", deleteOpt, function() {
