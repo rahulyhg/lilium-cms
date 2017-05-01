@@ -274,15 +274,13 @@ var FileLogic = function () {
         extra.siteid = _c.id;
 
         theme.fetchCurrentTheme(_c, function(cTheme) {
+            if (!extra.language) {
+                extra.language = _c.website.language;
+            }
+
             extra.theme = cTheme;
             extra.minify = true;
-
-            if (extra.language) {
-                extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
-            } else {
-                extra.language = _c.website.language;
-                extra.vocab = require(_c.server.base + "vocab/" + extra.language + ".json");
-            }
+            extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
 
             var readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml");
             var savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
@@ -291,6 +289,10 @@ var FileLogic = function () {
             
             if (skipLayout) {
                 tmpPath = savePath;
+            }
+
+            if (extra.topic && extra.topic.override) {
+                extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
             }
 
             log('FileLogic', 'Compiling context theme page', 'info');
@@ -324,6 +326,9 @@ var FileLogic = function () {
                                         fileserver.createDirIfNotExists(savePath, function() {
                                             var handle = FileServer.getOutputFileHandle(savePath, 'w+');
                                             FileServer.writeToFile(handle, cdned, function() {
+                                                handle.close();
+                                                handle.destroy();
+
                                                 callback(cdned);
                                             });
                                         }, false);

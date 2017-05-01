@@ -9,7 +9,7 @@
     <div id="ios-share-facebook-wrap">
         <div style="background-color: #3b5998;" id="ios-share-facebook">
             <i class="fa fa-facebook-official" aria-hidden="true"></i>
-            <span>Share</span>
+            <span>{:share}</span>
         </div>
     </div>
     <div id="ios-share-twitter-wrap">

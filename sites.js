@@ -20,6 +20,7 @@ var events = require('./events.js');
 var various = require('./various.js');
 var mail = require('./mail.js');
 var sharedcache = require('./sharedcache.js');
+var sitemap = require('./sitemap.js');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -332,6 +333,10 @@ var SiteInitializer = function (conf, siteobj) {
                             });
                         }
 
+                        if (isElder) {
+                            sitemap.scheduleCreation(conf, true);
+                        }
+
                         loadVarious(function() {
                             loadTheme(function() {
                                 category.preload(conf, function() {
@@ -339,7 +344,14 @@ var SiteInitializer = function (conf, siteobj) {
                                         badges.addSite(conf, function() {
                                             loadRobots(function() {
                                                 update(conf, function() {
-                                                    sharedcache.hi();
+                                                    if (global.liliumenv.mode == "script") {
+                                                        if (isElder) {
+                                                            require('./network/sharedmemory.js').bind();
+                                                        }
+                                                    } else {
+                                                        sharedcache.hi();
+                                                    }
+
                                                     checkForWP(conf);
                                                     hooks.fire('site_initialized', conf);
                                                     log('Sites', 'Initialized site with id ' + conf.id, 'success');

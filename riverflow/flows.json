@@ -29,6 +29,10 @@
             "endpoint" : "r",
             "support" : ["livevar", "get", "setup"]
         }, {
+            "module" : "instagram.js",
+            "endpoint" : "instagram",
+            "support" : ["livevar", "setup"]
+        }, {
             "module" : "fix.js",
             "endpoint" : "fix",
             "support" : ["livevar", "admin_get", "admin_post", "form"],

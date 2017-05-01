@@ -1,3 +1,27 @@
 {
-    "sponsoredcontent" : "Sponsored Content"
+    "sponsoredcontent" : "Sponsored Content",
+    "search" : "Search",
+    "browse" : "Browse",
+    "follow" : "Follow",
+    "advertise" : "Advertise",
+    "contact-us" : "Contact us",
+    "jobs" : "Jobs",
+    "terms-and-conditions" : "Terms &amp; conditions",
+    "privacy-policy" : "Privacy policy",
+    "all-rights-reserved" : "All rights reserved",
+    "recommended-video" : "Recommended video",
+    "sign-up-for-our-newsletter" : "Sign up for our newsletter",
+    "email-address" : "email address",
+    "subscribe" : "Subscribe",
+    "share" : "Share",
+    "posts-archive" : "Post archive",
+    "showing" : "Showing",
+    "of" : "of",
+    "entries" : "entries",
+    "page" : "Page",
+    "most-recent" : "Most recent",
+    "older-articles" : "Older articles",
+    "keep-on-reading" : "Keep on reading",
+    "article-part-of-sponsored" : "This article is part of a sponsored content activation.",
+    "learn-how-promote" : "Learn how we can promote your company"
 }

@@ -8,9 +8,9 @@
 
 {#config;extra;date;encodec}
 <channel>
-    <title>{=config.default.website.sitetitle}</title>
-    <atom:link href="{=config.default.server.protocol}{=config.default.server.url}/feed/" rel="self" type="application/rss+xml" />
-    <link>{=config.default.server.protocol}{=config.default.server.url}</link>
+    <title>{=extra.title}</title>
+    <atom:link href="{=extra.feedpath}" rel="self" type="application/rss+xml" />
+    <link>{=extra.archivepath}</link>
     <description>Look at your city</description>
     <lastBuildDate>{=date.now()}</lastBuildDate>
     <language>en-CA</language>
@@ -20,7 +20,7 @@
     {$ for (art in extra.articles); $}
     <item>
         <title>{=encodec.encodeXML(art.title)}</title>
-        <link>{=config.default.server.protocol}{=config.default.server.url}/{=art.name}</link>
+        <link>{=art.url}</link>
         <pubDate>{=art.date}</pubDate>
 
         <category>{=art.topic.displayname}</category>

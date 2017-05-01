@@ -74,7 +74,7 @@ const finishUp = () => {
 
 // Download files, skipping n files where n is the threadID
 const download = () => {
-    let i = threadID + 67000;
+    let i = threadID + 0;
     let max = dbFiles.length;
 
     const handleNext = () => {

@@ -234,7 +234,11 @@ var Handler = function () {
         clients[cli.id] = cli;
         cli.bindEnd(handleEnd);
 
-        parseMethod(cli);
+        if (false && cli.request.url[cli.request.url.length - 1] == "/") {
+            cli.redirect(cli.request.url.slice(0, -1), true);
+        } else {
+            parseMethod(cli);
+        }
     };
 
     var init = function () {

@@ -158,30 +158,6 @@ var Settings = function () {
                 displayname: "POST Maximum File Size"
             })
 
-        .add('content-ads-sep', 'title', {
-                displayname : "Advertising"
-            })
-            .add('content.adsperp', 'number', {
-                displayname : "Paragraph count between in-content ads"
-            })
-            .add('contentadsnip', 'stack', {
-                displayname : "Ad Code",
-                scheme : {
-                    columns : [
-                        {
-                            fieldName : "id",
-                            dataType : "text",
-                            displayname : "Identifier"
-                        }, 
-                        {
-                            fieldName : "code",
-                            dataType : "text",
-                            displayname : "Javascript Code"
-                        }
-                    ]
-                }
-            })
-
         .add('content-cdn-sep', 'title', {
                 displayname : "Content Delivery Network"
             })
@@ -354,23 +330,11 @@ var Settings = function () {
             .add('social.facebook.apiversion', 'text', {
                 displayname: "Facebook Graph API Version"
             })
-        .add('social-2-sep', 'title', {
-                displayname : "Social accounts"
-            })
-            .add('social.accounts.facebook', 'text', {
-                displayname : "Facebook Username"
-            })
-            .add('social.accounts.twitter', 'text', {
-                displayname : "Twitter Username"
-            })
-            .add('social.accounts.googleplus', 'text', {
-                displayname : "Google Plus Username"
-            })
-            .add('social.accounts.instagram', 'text', {
-                displayname : "Instagram Username"
-            })
-            .add('social.accounts.youtube', 'text', {
-                displayname : "Youtube Username"
+        .add('social-instagram-sep', 'title', {
+            displayname : "Instagram API"
+        })
+            .add('social.instagram.accounts', 'text', {
+                displayname : "Instagram accounts"
             })
 
         .add('stripe-sep', "title", {

@@ -1,71 +1,79 @@
-{#config;theme}
+{#config;theme;extra}
 <div id="mcanvasoverlay"></div>
 <div id="mobileslider">
+
+{$
+    if (?extra.contextname == "home");
+        sidebarlinks = ?theme.settings.sidebarbrowselinks;
+    else;
+        sidebarlinks = ?theme.settings.headerlinks;
+    endif;
+$}
 
 <div class="menuslider-container" style="padding-top: 15px;">
     <!--button>
         Login
     </button-->
     <form method="GET" action="{=config.default.server.url}/search">
-        <input id="mobile-search-input" name="q" placeholder="Search..." />
+        <input id="mobile-search-input" name="q" placeholder="{:search}" />
     </fom>    
 
     <div>
-        <h3>Browse</h3>
-        {$ for (sect in theme.settings.headerlinks); $}
-            <a href="{=sect.url}" class="section-link" >{=sect.linktext}</a>
+        <h3>{:browse}</h3>
+        {$ for (secti in sidebarlinks); $}
+            <a href="{=secti.url}" class="section-link" >{=secti.linktext}</a>
         {$ endfor; $}
     </div>
 
     <hr />
 
     <div class="slider-follow">
-        <h3>Follow</h3>
-        {$ if (?config.default.social.accounts.facebook != "") $}
-            <a href="https://facebook.com/{=config.default.social.accounts.facebook}" target="_blank">
+        <h3>{:follow}</h3>
+        {$ if (?theme.settings.facebook ??) $}
+            <a href="https://facebook.com/{=theme.settings.facebook}" target="_blank">
                 <i class="fa fa-facebook-official" aria-hidden="true"></i>
                 <span>Facebook</span>
             </a>
         {$ endif; $}
-        {$ if (?config.default.social.accounts.twitter != "") $}
-            <a href="https://twitter.com/{=config.default.social.accounts.twitter}" target="_blank">
+        {$ if (?theme.settings.twitter ??) $}
+            <a href="https://twitter.com/{=theme.settings.twitter}" target="_blank">
                 <i class="fa fa-twitter" aria-hidden="true"></i>
                 <span>Twitter</span>
             </a>
         {$ endif; $}
-        {$ if (?config.default.social.accounts.instagram != "") $}
-            <a href="https://instagram.com/{=config.default.social.accounts.instagram}" target="_blank">
+        {$ if (?theme.settings.instagram ??) $}
+            <a href="https://instagram.com/{=theme.settings.instagram}" target="_blank">
                 <i class="fa fa-instagram" aria-hidden="true"></i>
                 <span>Instagram</span>
             </a>
         {$ endif; $}
-        {$ if (?config.default.social.accounts.googleplus != "") $}
-            <a href="https://plus.google.com/+{=config.default.social.accounts.googleplus}" target="_blank">
+        {$ if (?theme.settings.googleplus ??) $}
+            <a href="https://plus.google.com/+{=theme.settings.googleplus}" target="_blank">
                 <i class="fa fa-google-plus" aria-hidden="true"></i>
                 <span>Google Plus</span>
             </a>
         {$ endif; $}
-        {$ if (?config.default.social.accounts.youtube != "") $}
-            <a href="https://www.youtube.com/user/{=config.default.social.accounts.youtube}" target="_blank">
+        {$ if (?theme.settings.youtube ??) $}
+            <a href="https://www.youtube.com/user/{=theme.settings.youtube}" target="_blank">
                 <i class="fa fa-youtube" aria-hidden="true"></i>
                 <span>Youtube</span>
             </a>
         {$ endif; $}
-
     </div>
+
     <hr />
 
     <div class="slider-links">
-        <a class="section-link" href="https://www.narcitymedia.com">Advertise</a>
-        <a class="section-link" href="{=config.default.server.url}/contact-us">Contact</a>
-        <a class="section-link" href="https://www.narcitymedia.com/jobs">Jobs</a>
-        <a class="section-link" href="{=config.default.server.url}/terms-conditions/">Terms &amp; Conditions</a>
-        <a class="section-link" href="{=config.default.server.url}/privacy-policy/">Privacy Policy</a>
+        <a class="section-link" href="https://www.narcitymedia.com">{:advertise}</a>
+        <a class="section-link" href="{=config.default.server.url}/contact-us">{:contact-us}</a>
+        <a class="section-link" href="https://www.narcitymedia.com/jobs">{:jobs}</a>
+        <a class="section-link" href="{=config.default.server.url}/terms-conditions/">{:terms-and-conditions}</a>
+        <a class="section-link" href="{=config.default.server.url}/privacy-policy/">{:privacy-policy}</a>
     </div>
 
     <div class="copyright-wrapper">
         <a href="https://www.narcitymedia.com">
-            &copy; 2017 All rights reserved, Narcity Media inc.
+            &copy; 2017 {:all-rights-reserved}, Narcity Media inc.
         </a>
     </div>
 </div>

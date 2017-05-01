@@ -46,6 +46,11 @@ var Forms = function () {
                 required: false
             });
 
+        formBuilder.registerFormTemplate('me_edit')
+            .add('description', 'textarea', {
+                displayname : "Bio"
+            })
+
         formBuilder.registerFormTemplate('entity_create')
             .add('creds-info-title', 'title', {
                 displayname : "Credentials"
@@ -70,16 +75,16 @@ var Forms = function () {
             })
             .add('socialnetworks.facebook', 'text', {
                 displayname: "Facebook"
-            })
+            }, {required : false})
             .add('socialnetworks.twitter', 'text', {
                 displayname: "Twitter"
-            })
+            }, {required : false})
             .add('socialnetworks.googleplus', 'text', {
                 displayname: "Google Plus"
-            })
+            }, {required : false})
             .add('socialnetworks.instagram', 'text', {
                 displayname: "Instagram"
-            })
+            }, {required : false})
 
         formBuilder.registerFormTemplate('entity_rights')            
             .add('roles', 'livevar', {

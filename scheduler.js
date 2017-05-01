@@ -36,6 +36,7 @@ BGJob.prototype.abort = function () {
 BGJob.prototype.getTimeUntilRun = function () {
     var now = new Date();
     var later = new Date();
+    var at;
 
     // hours, minutes, seconds, day, month, day of week
     var nowArr = {
@@ -53,7 +54,22 @@ BGJob.prototype.getTimeUntilRun = function () {
     };
 
     // Verify nearest date
-    if (typeof this.dayToRun.weekday !== "undefined") {
+    if (typeof this.dayToRun == "string") {
+        var every = this.dayToRun;
+        var time = now.getTime();
+        var gap;
+
+        switch (every) {
+            case "day":             gap = 1000 * 60 * 60 * 24; break;
+            case "hour":            gap = 1000 * 60 * 60;      break;
+            case "minute": default: gap = 1000 * 60;           break;
+        }
+
+        at = gap - (time % gap);
+        if (at == 0) {
+            at = gap;
+        }
+    } else if (typeof this.dayToRun.weekday !== "undefined") {
         var nextDay = -1;
 
         if (nowArr.dayofweek == this.dayToRun.weekday &&
@@ -96,7 +112,7 @@ BGJob.prototype.getTimeUntilRun = function () {
         }
     }
 
-    return later - now;
+    return at || (later - now);
 };
 
 BGJob.prototype.applyFtc = function (that) {
@@ -114,7 +130,7 @@ var Scheduler = function () {
     			secondCount : int
     			day : 0-31,
     			weekday : 0-6 (0 is Sunday)
-    		}
+    		} || "minute", "hour", "day"
     	}
     */
     var validateTimeStr = function (timeStr) {

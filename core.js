@@ -354,9 +354,11 @@ var Core = function () {
 
         var preloadSites = function() {
             _c.each(function(conf, next) {
-                log('Schedule', 'Running Scheduled cache preloading for website ' + conf.website.sitetitle)
-                hooks.fire('homepage_needs_refresh', {_c : conf});
-                require('./cacheInvalidator.js').preloadLatests(conf, 50, 0, next);
+                if (conf.env != "dev") {
+                    log('Schedule', 'Running Scheduled cache preloading for website ' + conf.website.sitetitle)
+                    hooks.fire('homepage_needs_refresh', {_c : conf});
+                    require('./cacheInvalidator.js').preloadLatests(conf, 50, 0, next);
+                }
             });
         }
 
@@ -526,7 +528,7 @@ var Core = function () {
 
     var loadEnv = function() {
         log("Core", "Loading Lilium environment variables", "info");
-        global.liliumenv = {};
+        global.liliumenv = global.liliumenv || {};
 
         var argv = process.argv.splice(2);
         for (var i = 0; i < argv.length; i++) {
@@ -534,6 +536,12 @@ var Core = function () {
             global.liliumenv[split[0]] = split[1];
         }
     };
+
+    var executeRunScript = function() {
+        if (global.liliumenv.mode == "script") {
+            global.liliumenv.run && global.liliumenv.run.apply(require('./config.js'), [__dirname]);
+        }
+    }
 
     var loadBackendSearch = function() {
         backendSearch.registerSearchFormat({
@@ -602,6 +610,7 @@ var Core = function () {
                                     require('./inbound.js').createServer().start();
                                     loadNotifications();
                                     notifyAdminsViaEmail();
+                                    executeRunScript();
             
                                     log('Core', 'Firing initialized signal', 'info');
                                     hooks.fire('init');

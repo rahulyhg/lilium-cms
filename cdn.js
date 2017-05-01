@@ -15,6 +15,15 @@ var ContentDeliveryNetwork = function() {
 
             for (var i = 0; i < imgs.length; i++) if (imgs[i].src) {
                 imgs[i].src = imgs[i].src.replace(domain, cdndomain);
+
+                var max = 10;
+                var ctn = 0;
+                while (imgs[i].srcset.indexOf(domain) != -1) {
+                    imgs[i].srcset = imgs[i].srcset.replace(domain, cdndomain);
+                    ctn++;
+
+                    if (ctn == max) { break; }
+                }
             }
 
             for (var i = 0; i < links.length; i++) if (links[i].href && links[i].rel != "canonical" && links[i].rel != "amphtml") {

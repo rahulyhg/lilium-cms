@@ -120,6 +120,13 @@ var fetchHomepageArticles = function(_c, cb) {
                     arr[j].author = authors[arr[j].author];
                     arr[j].topic = sectionTopics[i];
                     arr[j].url = _c.server.protocol + _c.server.url + sectionTopics[i].completeSlug + "/" + arr[j].name;
+
+                    arr[j].classes = "article-thumbnail";
+                    if ((9 - j) % 9 == 0) {
+                        arr[j].classes += " article-thumbnail-featured"
+                    } else if ((j + 1) % 9 > 3) {
+                        arr[j].classes += " article-thumbnail-margined"
+                    }
                 }
 
                 i++;
@@ -158,6 +165,13 @@ var fetchHomepageArticles = function(_c, cb) {
                     latests[j].author = authors[latests[j].author];
                     latests[j].topic = latests[j].topic[0];
                     latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? "/" + latests[j].topic.completeSlug : "") + "/" + latests[j].name;
+
+                    latests[j].classes = "article-thumbnail";
+                    if ((9 - j) % 9 == 0) {
+                        latests[j].classes += " article-thumbnail-featured"
+                    } else if ((j + 1) % 9 > 3) {
+                        latests[j].classes += " article-thumbnail-margined"
+                    }
                 }
 
                 cb({
@@ -325,50 +339,90 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
 };
 
 var serveFeed = function(cli) {
-    fileserver.fileExists(cli._c.server.html + "/feed.rss", function(ex) {
-        if (ex) {
-            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
-        } else {
-            db.find(cli._c, 'content', {status : "published"}, [], function(err, cur) {
-                cur.project({date : 1, _id : 1}).sort({date : -1}).limit(10).toArray(function(err, arr) {
-                    var extra = {
-                        config : cli._c, 
-                        minify : false, 
-                        articles : []
-                    };
-    
-                    var index = 0;
+    var cpath = cli.routeinfo.path.join('/');
+    cpath = cpath.substring(5);
 
-                    var getNext = function() {
-                        if (index == arr.length) {
-                            compile();
-                        } else {
-                            Article.deepFetch(cli._c, db.mongoID(arr[index]._id), function(fullart) {
-                                index ++;
-                                extra.articles.push(fullart);
-                                getNext();
-                            });
-                        }
-                    };
+    var conditions = {
+        status : "published"
+    };
+    var rsspath = cli._c.server.html + "/feed.rss";
+    var topicobj;
+    var archpath = cli._c.server.protocol + cli._c.server.url;
+    var feedpath = archpath + "/feed";
 
-                    var compile = function() {
-                        LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", cli._c.server.html + "/feed.rss", function() {
-                            log('RSS', 'Generated cached RSS feed for 1 hour');
-                            fileserver.pipeFileToClient(cli, cli._c.server.html + "/feed.rss", function() {}, true, 'application/rss+xml');
+    var createFeed = function() {
+        fileserver.fileExists(rsspath, function(ex) {
+            if (ex) {
+                fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
+            } else {
+                db.find(cli._c, 'content', conditions, [], function(err, cur) {
+                    cur.project({date : 1, _id : 1}).sort({date : -1}).limit(10).toArray(function(err, arr) {
+                        var extra = {
+                            config : cli._c, 
+                            minify : false, 
+                            articles : [],
+                            cpath : cpath,
+                            archivepath : archpath,
+                            feedpath : feedpath,
+                            title : cli._c.website.sitetitle + (topicobj ? (" " + topicobj.displayname) : "")
+                        };
         
-                            setTimeout(function() {
-                                fileserver.deleteFile(cli._c.server.html + "/feed.rss", function() {
-                                    log("RSS", "Deleted cached RSS", 'info');
+                        var index = 0;
+
+                        var getNext = function() {
+                            if (index == arr.length) {
+                                compile();
+                            } else {
+                                Article.deepFetch(cli._c, db.mongoID(arr[index]._id), function(fullart) {
+                                    index ++;
+                                    extra.articles.push(fullart);
+                                    getNext();
                                 });
-                            }, 1000 * 60 * 60);
-                        }, extra);
+                            }
+                        };
+
+                        var compile = function() {
+                            LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", rsspath, function() {
+                                log('RSS', 'Generated cached RSS feed for 1 hour');
+                                fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
+            
+                                setTimeout(function() {
+                                    fileserver.deleteFile(rsspath, function() {
+                                        log("RSS", "Deleted cached RSS", 'info');
+                                    });
+                                }, 1000 * 60 * 60);
+                            }, extra);
+                        };
+
+                        getNext();
+                    });
+                });
+            }
+        });
+    };
+
+    if (cpath) {
+        rsspath = cli._c.server.html + "/" + cpath + "/feed.rss";
+        db.findUnique(cli._c, 'topics', {completeSlug : cpath}, function(err, topic) {
+            if (topic) {
+                topics.getFamilyIDs(cli._c, topic._id, function(ids) {
+                    topicobj = topic;
+                    conditions.topic = {
+                        "$in" : ids
                     };
 
-                    getNext();
+                    archpath += "/" + cpath;
+                    feedpath += "/" + cpath;
+                    createFeed();
                 });
-            });
-        }
-    });
+            } else {
+                log("RSS", "Requested feed for unexisting topic : " + cpath, "warn");
+                cli.throwHTTP(404);
+            }
+        });
+    } else {
+        createFeed();
+    }
 };
 
 var fetchTopicArticles = function(conf, topic, index, send) {
@@ -383,7 +437,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
     db.findToArray(cc.default(), 'entities', {}, function(err, entities) {
         var eCache = {};
         for (var i = 0; i < entities.length; i++) {
-            eCache[entities[i].id] = entities[i];
+            eCache[entities[i]._id.toString()] = entities[i];
         }
 
         topics.getFamilyIDs(conf, topic._id, function(ids) {
@@ -392,59 +446,73 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                 topic : {$in : ids}
             }
 
-            db.find(conf, 'content', match, [], function(err, cur) {
-                cur.count(function(err, total) {
-                    db.join(conf, 'content', [
-                        {
-                            $match : match
-                        }, {
-                            $sort : {
-                                date : -1
-                            }
-                        }, {
-                            $skip : skip
-                        }, {
-                            $limit : limit
-                        }, {
-                            $lookup : {
-                                from:           "uploads",
-                                localField:     "media",
-                                foreignField:   "_id",
-                                as:             "featuredimage"
-                            }
-                        }
-                    ], function(arr) {
-                        for (var i = 0; i < arr.length; i++) {
-                            arr[i].author = eCache[arr[i].author];
-                            arr[i].topic = topic;
-                            arr[i].url = conf.server.protocol + conf.server.url + "/" + topic.completeSlug + "/" + arr[i].name;
-                        }
+            db.findToArray(conf, 'topics', {_id : {$in : ids}}, function(err, topicCache) {
+                var topicObjects = {}
+                topicCache.forEach(function(t) {
+                    topicObjects[t._id] = t;
+                });
 
-                        var details = {
-                            totalLength : total,
-                            totalPages : Math.ceil(total / limit),
-                            pagenumbers : []
-                        };
+                db.find(conf, 'content', match, [], function(err, cur) {
+                    cur.count(function(err, total) {
+                        db.join(conf, 'content', [
+                            {
+                                $match : match
+                            }, {
+                                $sort : {
+                                    date : -1
+                                }
+                            }, {
+                                $skip : skip
+                            }, {
+                                $limit : limit
+                            }, {
+                                $lookup : {
+                                    from:           "uploads",
+                                    localField:     "media",
+                                    foreignField:   "_id",
+                                    as:             "featuredimage"
+                                }
+                            }
+                        ], function(arr) {
+                            for (var i = 0; i < arr.length; i++) {
+                                arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
+                                arr[i].topic = topicObjects[arr[i].topic];
+                                arr[i].url = conf.server.protocol + conf.server.url + "/" + arr[i].topic.completeSlug + "/" + arr[i].name;
 
-                        index ++;
-                        if (index < 4) {
-                            for (var i = 1; i <= details.totalPages && i <= 5; i++) {
-                                details.pagenumbers.push(i);
+                                arr[i].classes = "article-thumbnail";
+                                if ((9 - i) % 9 == 0) {
+                                    arr[i].classes += " article-thumbnail-featured"
+                                } else if ((i + 1) % 9 > 3) {
+                                    arr[i].classes += " article-thumbnail-margined"
+                                }
                             }
-                        } else if (index > details.totalPages - 2) {
-                            for (var i = details.totalPages - 4; i <= details.totalPages; i++) {
-                                details.pagenumbers.push(i);
-                            }
-                        } else {
-                            var firstPage = index - 2;
-                            var lastPage = index + 2;
-                            for (var i = firstPage; i <= lastPage; i++) {
-                                details.pagenumbers.push(i);
-                            }
-                        }
-                        
 
-                        send(arr, details);
+                            var details = {
+                                totalLength : total,
+                                totalPages : Math.ceil(total / limit),
+                                pagenumbers : []
+                            };
+
+                            index ++;
+                            if (index < 4) {
+                                for (var i = 1; i <= details.totalPages && i <= 5; i++) {
+                                    details.pagenumbers.push(i);
+                                }
+                            } else if (index > details.totalPages - 2) {
+                                for (var i = details.totalPages - 4; i <= details.totalPages; i++) {
+                                    details.pagenumbers.push(i);
+                                }
+                            } else {
+                                var firstPage = index - 2;
+                                var lastPage = index + 2;
+                                for (var i = firstPage; i <= lastPage; i++) {
+                                    details.pagenumbers.push(i);
+                                }
+                            }
+                            
+
+                            send(arr, details);
+                        });
                     });
                 });
             });
@@ -453,9 +521,9 @@ var fetchTopicArticles = function(conf, topic, index, send) {
 };
 
 var serveTopic = function(cli, extra) {
-    var file = cli._c.server.html + "/" + extra.topic.completeSlug + (extra.index ? ("/" + extra.index-1) : "") + ".html";
     var topic = extra.topic;
-    var index = extra.index;
+    var index = extra.index ? parseInt(extra.index) : 1;
+    var file = cli._c.server.html + "/" + extra.topic.completeSlug + (index != 1 ? ("/" + index) : "") + ".html";
 
     fileserver.fileExists(file, function(exists) {
         if (!exists) {
@@ -466,6 +534,7 @@ var serveTopic = function(cli, extra) {
                     index : index || 1,
                     searchname : extra.topic.displayname,
                     context : 'topic',
+                    language : extra.topic.language,
                     indices : {
                         totalarticles : details.totalLength,
                         totalpages : details.totalPages,
@@ -474,7 +543,7 @@ var serveTopic = function(cli, extra) {
                     currentpage : index || 1,
                 };
                 
-                var context = topic.archivetemplate || "topic";
+                var context = xextra.currentpage != 1 ? "topic" : (topic.archivetemplate || "topic");
 
                 filelogic.renderThemeLML(cli, context, file, xextra, function(content) {
                     cli.response.writeHead(200);
@@ -573,6 +642,15 @@ var generateHomepage = function(_c, cb) {
             cb && cb(pContent);
         });
     });
+}
+
+var parseArticleAds = function(pkg) {
+    var _c = pkg._c;
+    var article = pkg.article;
+    var done = pkg.done;
+    var force = pkg.force;
+
+    
 }
 
 var getWhatsHot = function(_c, cb) {
@@ -813,6 +891,10 @@ var loadHooks = function(_c, info) {
         generateHomepage(pkg._c || pkg.cli._c);
     });
 
+    hooks.bind('article_ads_will_parse', 10, function(pkg) {
+        parseArticleAds(pkg);
+    });
+
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_edit',   2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
     hooks.bind('article_will_delete', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });
@@ -820,15 +902,12 @@ var loadHooks = function(_c, info) {
         // Fix fields
         parseArticleFields(pkg);
 
-        // Replace ad tags with ad set
-        parseAds(pkg); 
-
         // Replace Instagram scripts
         parseInsta(pkg);
-
-        // Flag if NSFW, ad it to deepfetched object
-        parseNSFW(pkg);
     });
+
+    hooks.bind('article_async_render_' + _c.uid, 1000, parseAds);
+    hooks.bind('insert_ads_' + _c.uid, 1000, insertAds);
 };
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
@@ -839,37 +918,82 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
     }
 };
 
-var parseNSFW = function(pkg) {
-    pkg.article.nsfw = typeof pkg.article.tags == "object" && pkg.article.tags.indexOf && (pkg.article.tags.indexOf("nsfw") !== -1 || pkg.article.tags.indexOf("NSFW") !== -1);
-};
-
 var parseInsta = function(pkg) {
     pkg.article.content = pkg.article.content.replace(/\<script async\=\"\" defer\=\"\" src\=\"\/\/platform.instagram.com\/en_US\/embeds.js\"\>\<\/script\>/g, "") + '<script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>';
 };
 
+var insertAds = function(pkg) {
+    var _c = pkg._c;
+    var article = pkg.article;
+    var done = pkg.done;
+
+    themes.fetchCurrentTheme(_c, function(cTheme) {
+        var pcount = cTheme.settings.pperad || 5;
+        var jsdom = require('jsdom');
+        var content = article.content ? article.content
+            .replace(/\<ad\>\<?\/?a?d?\>?/g, "")
+            .replace(/\<lml\:ad\>/g, "")
+            .replace(/\<\/lml\:ad\>/g, "")
+            .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
+            .replace(/\n/g, "").replace(/\r/g, "")
+            .replace(/\<p\>\<\/p\>/g, "") : "";
+
+        var changed = false;
+        jsdom.env(content, function(err, dom) {
+            if (err) {
+                log("Article", "Error parsing dom : " + err, "err");
+                return done(article.content);
+            }
+
+            var parags = dom.document.querySelectorAll("body > p:not(:empty), body > h3, body > twitterwidget");
+            for (var i = 1; i < parags.length; i++) if (i % pcount == 0) {
+                var adtag = dom.document.createElement('ad');
+                dom.document.body.insertBefore(adtag, parags[i]);
+                changed = true;
+            }
+
+            if (changed) {
+                content = dom.document.body.innerHTML;
+                article.content = content;
+                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
+                    log('Article', "Inserted ads inside article with title " + article.title, 'success');
+                    done(content);
+                });
+            } else {
+                done();
+            }
+        });
+    });
+}
+
 var parseAds = function(pkg) {
-    if (!pkg._c.contentadsnip || !pkg._c.contentadsnip.length) {
-        return;
-    }
-
+    var _c = pkg._c;
+    var done = pkg.done;
     var art = pkg.article;
-    var keys = Object.keys(pkg._c.contentadsnip);
-    var indx = 0;
-    var delimiter = "<ad></ad>";    
-    var pos;
-    if (art.tags.indexOf('nsfw') == -1 && art.tags.indexOf('NSFW') == -1) {
-        while ((pos = art.content.indexOf(delimiter)) != -1) {
-            art.content = art.content.substring(0, pos) + '<div class="awrapper">' + pkg._c.contentadsnip[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
-            indx++;
 
-            if (indx == keys.length) {
-                break;
-                indx = 0;
+    themes.fetchCurrentTheme(_c, function(cTheme) {
+        var adtags = (pkg.article.topic && pkg.article.topic.override && pkg.article.topic.override.adtags) || cTheme.settings.adtags || {};
+        var keys = Object.keys(adtags);
+
+        var indx = 0;
+        var delimiter = "<ad></ad>"; 
+        var pos;
+
+        if (!art.nsfw && keys.length != 0) {
+            while ((pos = art.content.indexOf(delimiter)) != -1) {
+                art.content = art.content.substring(0, pos) + '<div class="awrapper">' + adtags[keys[indx]].code + "</div>" + art.content.substring(pos+delimiter.length);
+                indx++;
+
+                if (indx == keys.length) {
+                    break;
+                    indx = 0;
+                }
             }
         }
-    }
 
-    art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
+        art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
+        done();
+    });
 };
 
 var parseArticleFields = function(pkg) {

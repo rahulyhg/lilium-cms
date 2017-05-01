@@ -9,6 +9,7 @@
         "next" : "article.lml",
         "page" : "page.lml",
         "home" : "homepage.lml",
+        "city" : "city.lml",
         "search" : "archive.lml",
         "latests" : "archive.lml",
         "archive" : "archive.lml",
@@ -20,12 +21,11 @@
     },
     "templates" : {
         "article" : [
-            {"displayname" : "Narcity Canada", "file" : "article"},
-            {"displayname" : "Netflix And Code", "file" : "nnc-article"}
+            {"displayname" : "Narcity Article", "file" : "article"}
         ],
         "archive" : [
-            {"displayname" : "Narcity Canada", "file" : "archive"},
-            {"displayname" : "Technology Archive Page", "file" : "archive-tech"}
+            {"displayname" : "Narcity Topic Archive", "file" : "archive"},
+            {"displayname" : "Narcity City Archive", "file" : "city"}
         ],
         "home" : [
             {"displayname" : "Narcity City", "file" : "homepage"},
@@ -33,6 +33,7 @@
         ]
     },
     "settingForm" : {
+        "logolink" : {"type" : "text", "attr" : {"displayname" : "Topbar logo link"}, "default" : "/"},
         "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},
         "headercolor" : {"type" : "text", "attr" : {"displayname" : "Header Color"}, "default" : "#FF2634"},
         "buttoncolor" : {"type" : "text", "attr" : {"displayname" : "Button Color"}, "default" : "#DDD"},
@@ -41,6 +42,7 @@
         "fullwidthsize" : {"type" : "number", "attr" : {"displayname" : "Full width size (px)"}, "default" : 1024},
         "articlewidthsize" : {"type" : "number", "attr" : {"displayname" : "Article width size (px)"}, "default" : 640},
         "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"},
+        "favicon" : {"type" : "text", "attr" : {"displayname" : "Fav Icon"}, "default" : "/static/media/lmllogo.png"},
         "networkname" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montreal"},
         "cityname" : {"type" : "text", "attr" : {"displayname" : "City name"}, "default" : "Montreal"},
         "featuredyoutubeid" : {"type" : "text", "attr" : {"displayname" : "Featured YouTube video ID"}, "validations" : {"required" : false}, "default" : "none"},
@@ -67,27 +69,6 @@
                 "cattitle" : "Best of"
             }]
         },
-        "othernetworkwebsites" : {"type" : "stack",
-            "attr" : {"displayname" : "Other Network Websites",
-                "scheme": {
-                    "columns": [
-                        {
-                            "fieldName": "sitename",
-                            "dataType": "text",
-                            "displayname": "Site Name"
-                        }, {
-                            "fieldName": "url",
-                            "dataType": "text",
-                            "displayname": "Url"
-                        }
-                    ]
-                }
-            },
-            "default": [{
-                "sitename": "Toronto",
-                "url": "http://narcity.com/toronto"
-            }]
-        },
         "headerlinks" : {"type" : "stack",
             "attr" : {"displayname" : "Header links",
                 "scheme": {
@@ -109,6 +90,56 @@
                 "url": "//"
             }]
         },
+        "sidebarbrowselinks" : {"type" : "stack",
+            "attr" : {"displayname" : "Sidebar browse links",
+                "scheme": {
+                    "columns": [
+                        {
+                            "fieldName": "linktext",
+                            "dataType": "text",
+                            "displayname": "Link Text"
+                        }, {
+                            "fieldName": "url",
+                            "dataType": "text",
+                            "displayname": "Url"
+                        }
+                    ]
+                }
+            },
+            "default": [{
+                "linktext": "",
+                "url": "//"
+            }]
+        },
+
+        "adtags" : {"type" : "stack",
+            "attr" : {"displayname" : "Ad tags, as HTML",
+                "scheme": {
+                    "columns": [
+                        {
+                            "fieldName": "identifier",
+                            "dataType": "text",
+                            "displayname": "Description"
+                        }, {
+                            "fieldName": "code",
+                            "dataType": "text",
+                            "displayname": "Markup"
+                        }
+                    ]
+                }
+            },
+            "default": [{
+                "identifier": "Advertising",
+                "code": "<script></script>"
+            }]
+        },
+        "pperads" : {"type" : "number", "attr" : {"displayname" : "Paragraphs per ads"}, "default" : 5},
+
+        "facebook" : {"type" : "text", "attr" : {"displayname" : "Facebook Username"}, "default" : "Narcity"},
+        "twitter" : {"type" : "text", "attr" : {"displayname" : "Twitter Username"}, "default" : "Narcity"},
+        "googleplus" : {"type" : "text", "attr" : {"displayname" : "Google Plus Username"}, "default" : "Narcity"},
+        "youtube" : {"type" : "text", "attr" : {"displayname" : "YouTube Username"}, "default" : "Narcity"},
+        "instagram" : {"type" : "text", "attr" : {"displayname" : "Instagram Username"}, "default" : "Narcity"},
 
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
         "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"},

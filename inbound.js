@@ -13,6 +13,18 @@ var _c = require('./config.js').default(),
         var secureServer;
         var io;
 
+        var validate = function(req, resp) {
+            if (req.url.split('/').length > 2 && req.url.charAt(req.url.length-1) == "/") {
+                var newurl = req.url.slice(0, -1);
+                log('Inbound', "Removing trailing from " + req.url, 'detail');
+                resp.writeHead(301, {Location : newurl})
+                resp.end();
+                return false;
+            }
+
+            return true; 
+        };
+
         var handleReq = function (req, resp) {
             reqCount++;
             totalReqCount++;
@@ -24,8 +36,10 @@ var _c = require('./config.js').default(),
                 req: req,
                 resp: resp
             });
-            
-            Handler.handle(new ClientObject(req, resp));
+
+            if (validate(req, resp)) {
+                Handler.handle(new ClientObject(req, resp));
+            }
         };
 
         this.bind = function (hook, cb) {

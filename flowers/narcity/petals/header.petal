@@ -9,7 +9,7 @@
         </div>
 
         <div class="narcity-logo-wrapper">
-            <a href="{=config.default.server.url}">
+            <a href="{=theme.settings.logolink}">
                 <img src="{=config.default.server.url}{=theme.settings.logo}" />
             </a>
         </div>
@@ -36,7 +36,7 @@
         <div class="header-float-right">
             <div class="header-search-wrapper">
                 <form method="GET" action="{=config.default.server.url}/search">
-                    <input class="header-search" name="q" type="text" placeholder="Search" required />
+                    <input class="header-search" name="q" type="text" placeholder="{:search}" required />
                 </form>
             </div>
 

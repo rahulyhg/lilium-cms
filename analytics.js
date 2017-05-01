@@ -2,6 +2,7 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
+const sharedcache = require('./sharedcache.js');
 
 // Google API
 const googleapis = require('googleapis');
@@ -75,7 +76,7 @@ class GoogleAnalyticsRequest {
                 });
             }
 
-            var topPagePath = total.ratio.pages[0] && total.ratio.pages[0].page.substring(1);
+            var topPagePath = total.ratio.pages[0] && total.ratio.pages[0].page.substring(total.ratio.pages[0].page.lastIndexOf("/") + 1);
 
             require('./article.js').deepFetch(_c, topPagePath, (article) => {
                 total.toppage = {
@@ -198,23 +199,28 @@ class GoogleAnalytics {
     livevar(cli, levels, params, send) {
         var topLevel = levels[0] || "lastmonth";
 
-        if (cachedAnalytics[topLevel] && new Date() - cachedAnalytics[topLevel].cachedAt < (1000 * 60 * 60)) {
-            send(cachedAnalytics[topLevel].data);
-        } else if (typeof GoogleAnalyticsRequest[topLevel] == "function") {
-            GoogleAnalyticsRequest[topLevel](cli._c, that, (err, data) => {
-                if (data) {
-                    data.cachehit = true;
-                    cachedAnalytics[topLevel] = {
-                        cachedAt : new Date(),
-                        data : data
-                    };
-                }
+        sharedcache.get('analytics_cache_' + topLevel + "_" + cli._c.uid, (cachedAnalytics) => {
+            if (cachedAnalytics && new Date().getTime() - cachedAnalytics.cachedAt < (1000 * 60 * 60)) {
+                send(cachedAnalytics.data);
+            } else if (typeof GoogleAnalyticsRequest[topLevel] == "function") {
+                GoogleAnalyticsRequest[topLevel](cli._c, that, (err, data) => {
+                    if (data) {
+                        let cached = {}
+                        cached['analytics_cache_' + topLevel + "_" + cli._c.uid] = {
+                            cachedAt : new Date().getTime(),
+                            data : data
+                        };
 
-                send(err ? {error : err.toString()} : data);
-            });
-        } else {
-            send({error : "Undefined level : " + topLevel});
-        }
+                        data.cachehit = true;
+                        sharedcache.set(cached); 
+                    }
+
+                    send(err ? {error : err.toString()} : data);
+                });
+            } else {
+                send({error : "Undefined level : " + topLevel});
+            }
+        });
     }
 
     settingsSaved(cli) {

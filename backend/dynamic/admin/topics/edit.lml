@@ -2,6 +2,11 @@
 <lml:dom v="1.0"></lml:dom>
 {*topics.get.{?1}}
 
+{$
+    formname = "theme_settings_";
+    formname += config.default.uid;
+$}
+
 <h1>
     <i class="fa fa-tags" aria-hidden="true"></i>
     Topic - <lml:text var="livevars.topics.get.?.displayname"></lml:text>
@@ -35,6 +40,11 @@
     <div class="float-none"></div>
 </div>
 </lml:filter>
+
+<div id="topic-theme-override">
+    <h1>Theme settings override</h1>
+    {=forms.render(formname,"edit","topics/get/?/override")}
+</div>
 
 <div id="create-topic-modal" class="lml-modal">
     <div class="lml-modal-title">
@@ -70,6 +80,23 @@ document.querySelector('#topic-edit-form .btn-save').addEventListener('click', f
             }
         }
     );
+});
+
+document.querySelector('.theme-settings-form').addEventListener('submit', function(e) {
+    var values = liliumcms.lmldom.getFormData()["theme_settings_{=config.default.uid}"].values;
+
+    liliumcms.lmldom.sendForm(values, '{=config.default.server.url}/admin/topics/editoverride/' + liliumcms.pageloader.lastLevel,
+        function(resp) {
+            if (resp.updated) {
+                liliumcms.notify({ type : "success", message : "Topic successfully updated." })
+            } else {
+                liliumcms.notify({ type : "danger", title : "Topic was not updated", message : resp.reason })
+            }
+        }
+    );
+
+    e.preventDefault();
+    return false;
 });
 
 window.topicHasChildren = function(topic) {

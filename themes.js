@@ -232,7 +232,7 @@ var Themes = function () {
                 throw new Error('[Themes] - The field "' + name + '" has no default value.');
             }
             defaults[name] = property.default;
-            form.add(name, property.type, property.attr || {}, property.validations || {} );
+            form.add(name, property.type, property.attr || {}, property.validations || {required : false} );
         }
 
         form.add('Submit', 'submit', {displayname : 'Update Settings'} );

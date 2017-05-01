@@ -77,9 +77,6 @@ var Role = function () {
             if (cli.userinfo.roles.indexOf("lilium") != -1 || cli.userinfo.power < cli.postdata.data.power) {
                 // Create post
                 db.insert(conf.default(), 'roles', prepareRoleForDB(cli), function (err, result) {
-                    // Create a new notification group
-                    notification.createGroup(cli.postdata.data.name, cli.postdata.data.name, cli._c.id);
-
                     // Generate LML page
                     cli.refresh();
                 });
@@ -239,18 +236,8 @@ var Role = function () {
             });
     }
 
-    var initNotificationGroups = function() {
-        db.findToArray(conf.default(), 'roles', {}, function(err, roles) {
-            config.eachSync(function(site) {
-                for (var j in roles) {
-                    notification.createGroup(roles[j].name, roles[j].name, site.id);
-                }
-            });
-        });
-    }
-
     this.setup = function() {
-        initNotificationGroups();
+
     }
 };
 
