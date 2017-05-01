@@ -41,7 +41,7 @@ window["lock-user-modal_accept"] = function() {
 };
 
 window.sendMagicLink = function() {
-    $.post('{=config.default.server.url}/admin/entities/sendmagiclink', {userid : document.location.href.split('/').pop(), form_name : "sendmagiclink"}, function(resp) {
+    $.post('{=config.default.server.url}/admin/entities/edit/sendmagiclink', {userid : document.location.href.split('/').pop(), form_name : "sendmagiclink"}, function(resp) {
         liliumcms.notify({title : resp.message});
     });
 };
