@@ -2630,7 +2630,7 @@ body.slidheader .android-sharer {
         article .article-author-share-section {
             float: right;
             margin: 5px 5px 0;
-            color: #ff4200;
+            color: {=mc};
         }
         label.events-placeholder__title{
             text-align:center;
