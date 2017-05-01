@@ -57,6 +57,7 @@ DevTools.prototype.adminPOST = function(cli) {
                 case 'refresh': refreshCache(cli, cli.routeinfo.path[4]); break;
                 case 'clear': clearCache(cli, cli.routeinfo.path[4]); break;
                 case 'preload' : preloadCache(cli); break;
+                case 'entitymagiclink' : dispatchMagicLink(cli); break;
             }
             break;
         case 'scripts':
@@ -85,6 +86,12 @@ var restartPM2 = function(cli) {
 var preloadCache = function(cli) {
     require('./cacheInvalidator.js').preloadLatests(cli._c);
 };
+
+var dispatchMagicLink = function(cli) {
+    require('./entities.js').sendMagicLinkToEveryone(cli, function() {
+        cli.sendJSON({success : true});
+    });
+}
 
 var maybeSendMail = function(cli) {
     var mailer = require('./mail.js');

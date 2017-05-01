@@ -3,6 +3,7 @@
 {*entities.single.{?1}(sourceof:"update_entitiy")}
 {=forms.render('update_entitiy')}
 {=forms.render('update_password')}
+{=forms.render('send_magiclink')}
 {=forms.render('disable_entity')}
 
 <div id="lock-user-modal" class="lml-modal">
@@ -36,6 +37,12 @@ window["lock-user-modal_accept"] = function() {
         } else {
             liliumcms.notify({type : "error", title : "Revoke Access Denied", message : 'You tried to revoke access from an entity with a higher power level'});
         }
+    });
+};
+
+window.sendMagicLink = function() {
+    $.post('{=config.default.server.url}/admin/entities/sendmagiclink', {userid : document.location.href.split('/').pop(), form_name : "sendmagiclink"}, function(resp) {
+        liliumcms.notify({title : resp.message});
     });
 };
 </script>

@@ -187,6 +187,9 @@ var Entities = module.exports = new function () {
                 case "update_entitiy":
                     this.update(cli);
                     break;
+                case "sendmagiclink":
+                    this.sendNewMagicEmail(cli, cli.postdata.data.userid);
+                    break;
                 case "update_password":
                     this.changePassword(cli, false);
                     break;
@@ -705,6 +708,42 @@ var Entities = module.exports = new function () {
         });
     };
 
+    this.sendMagicLinkToEveryone = function(cli, done) {
+        var that = this;
+        db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, function(arr, users) {
+            users.forEach(function(user) {
+                that.sendNewMagicEmail(cli, user._id);
+            });
+
+            done();
+        });
+    };
+
+    this.sendNewMagicEmail = function (cli, entityid, callback) {
+        db.findUnique(_c.default(), 'entities', {_id : db.mongoID(entityid)}, function(err, entity) {
+            if (entity) {
+                log('Entity', "Sending magic link to " + entity.email);
+
+                var magiclink = "lml_" + 
+                    Math.random().toString().substring(3) + "_ml_" + 
+                    Math.random().toString().substring(3) + "_" + new Date().getTime();
+
+                db.update(_c.default(), 'entities', {_id : entity._id}, {magiclink : magiclink}, function() {
+                    callback && callback(true);   
+                });
+
+                entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
+                entity.magiclink = magiclink;
+                require('./mail.js').triggerHook(cli._c, 'to_new_user', entity.email, {
+                    entity : entity
+                });
+            } else {
+                log('Entity', "Could not find entity with id : " + entityid)
+                callback && callback(false);
+            }
+        });
+    };
+
     this.updateEntity = function (valObject, siteid, cb) {
         var id = typeof valObject._id !== "object" ? db.mongoID(valObject._id) : valObject._id;
         // Removing properties we don't want to edit
@@ -806,6 +845,19 @@ var Entities = module.exports = new function () {
             .addTemplate('entity_create')
             .addTemplate('entity_rights')
             .add('Create', 'submit');
+
+        formbuilder.createForm('send_magiclink', {
+               fieldWrapper : "lmlform-fieldwrapper"
+            })
+            .add('title', 'magic-link-title', {
+                displayname : "Magic link"
+            })
+            .add('send-magic-link-button', 'button', {
+                type : "button",
+                displayname : "Send user magiclink",
+                classes : [""],
+                callback : "sendMagicLink"
+            })
 
         formbuilder.createForm('update_entitiy', {
                 fieldWrapper : "lmlform-fieldwrapper",
