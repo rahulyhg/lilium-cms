@@ -105,7 +105,8 @@ var Sessions = function () {
 
     this.reloadSession = function(cli, cb) {
         log('Session', 'Reloading session for token ' + cli.userinfo.userid);
-        entities.fetchFromDB(cli._c, db.mongoID(cli.userinfo.userid), function(user) {
+        console.log(db.mongoID(cli.userinfo.userid));
+        entities.fetchFromDB(require('./config.js').default(), db.mongoID(cli.userinfo.userid), function(user) {
             log('Session', 'Removing session from client object');
             that.removeSession(cli, function() {
                 log('Session', 'Recreating session');

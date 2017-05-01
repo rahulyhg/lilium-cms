@@ -784,7 +784,7 @@ var Entities = module.exports = new function () {
         var allowed = true;
         var that = this;
 
-        if (entity.loggedin && right != "" && right.length !== 0 && entity.rights[0] != "*") {
+        if (entity && entity.loggedin && right != "" && right.length !== 0 && entity.rights[0] != "*") {
             if (typeof right === "string") {
                 right = [right];
             }
@@ -892,6 +892,7 @@ var Entities = module.exports = new function () {
             async : true
         })
             .addTemplate('entity_create')
+            .addTemplate('me_edit')
             .addTemplate('entity_social')
             .remove('password')
             .edit('username', '', {
