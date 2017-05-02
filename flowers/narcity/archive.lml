@@ -8,8 +8,8 @@ $}
 
 {$ if (extra.archivename != "author"); $}
     <div class="subtitle-strip">
-        <span class="subtitle-headline">{:posts-archive}</span>
         <span class="subtitle-detail">{=&tagname}</span>
+        <span class="subtitle-headline">{:posts-archive}</span>
     </div>
 {$ else; $}
     <div class="subtitle-strip">
@@ -59,6 +59,13 @@ $}
                         Sponsored Content
                     </a>
                     {$ endif; $}
+
+                    <div class="article-share-count-mobile" id="article-share-count-mobile-{=article._id}">
+                            <span class="article-share-icon">
+                                <img src="{=config.default.server.url}/res/images/flame.png" />
+                            </span>
+                        <span class="article-share-count-mobile-num fbshare" data-url="{=article.url}" data-min="100" data-show="article-share-count-mobile-{=article._id}" data-showas="block">0000</span>
+                    </div>
 
                     <a href="{=article.url}" class="archive-image-link"> </a>
                 </div>
