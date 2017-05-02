@@ -94,12 +94,7 @@ var Login = function() {
 		var usr = cli.postdata.data.usr;
 		var psw = cli.postdata.data.psw;
 
-		if (
-			typeof usr !== 'undefined' && 
-            typeof psw !== 'undefined' && 
-            usr !== '' && 
-            psw !== ''
-		) {
+		if (usr && pwd) {
             var conds = {
                 revoked : {$ne : true},
 				username : usr,

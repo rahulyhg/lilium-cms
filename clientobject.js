@@ -26,11 +26,6 @@ var ClientObject = function (req, resp) {
         fullpath: "",
         fileExt: ""
     };
-    this.userinfo.dashaccess =
-        this.userinfo.loggedin &&
-        this.userinfo.admin ||
-        this.userinfo.god ||
-        entities.isAllowed(this.userinfo, 'dash');
 
     this.responseinfo = {
         filecreated: false,
@@ -127,7 +122,6 @@ ClientObject.prototype.refresh = function () {
 };
 
 ClientObject.prototype.refuse = function() {
-    // this.redirect("//" + this.routeinfo.rootdomain + "/admin/401?from=" + this.routeinfo.relsitepath, false);
     this.throwHTTP(403);
 };
 

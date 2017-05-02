@@ -17,14 +17,16 @@ var Router = function () {
 
         _c.fetchConfigFromCli(cli);
         if (!cli._c) {
-            cli.throwHTTP(404, "Not Found : " + cli.routeinfo.fullpath, true);
+            cli.throwHTTP(404, "", true);
             return false;
         }
 
         cli.routeinfo.path = pObj.pathname.replace(/^\/?|\/?$/g, "").split('/');
+        /*
         for (var i = 0; i < (cli.routeinfo.rootdomain.match(/\//g) || []).length; i++) {
             cli.routeinfo.path.shift();
         }
+        */
 
         if (cli.routeinfo.path.length == 0) {
             cli.routeinfo.path = [""];
@@ -32,10 +34,10 @@ var Router = function () {
 
         cli.routeinfo.relsitepath = "/" + cli.routeinfo.path.join('/');
         cli.routeinfo.params = pObj.query;
-        cli.routeinfo.admin = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.admin;
-        cli.routeinfo.login = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.login;
-        cli.routeinfo.api = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === "api";
-        cli.routeinfo.livevars = cli.routeinfo.path.length != 0 && cli.routeinfo.path[0] === cli._c.paths.livevars;
+        cli.routeinfo.admin = cli.routeinfo.path[0] === cli._c.paths.admin;
+        cli.routeinfo.login = cli.routeinfo.path[0] === cli._c.paths.login;
+        cli.routeinfo.api = cli.routeinfo.path[0] === "api";
+        cli.routeinfo.livevars = cli.routeinfo.path[0] === cli._c.paths.livevars;
         cli.routeinfo.root = cli.routeinfo.relsitepath.relsitepath == "/";
         cli.routeinfo.async = cli.routeinfo.params.async || false;
 

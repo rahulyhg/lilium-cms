@@ -59,12 +59,14 @@ Config.prototype.fetchConfig = function (site) {
 }
 
 Config.prototype.fetchConfigFromCli = function (cli) {
-    var rootdomain = cli.request.headers.host.replace(this.httpRegex, "") + cli.request.url;
+    var rootdomain = cli.request.headers.host;// .replace(this.httpRegex, ""); // + cli.request.url;
 
-    while (rootdomain && !_configs.hasOwnProperty(rootdomain)) {
+    /*
+    while (rootdomain && !_configs[rootdomain]) {
         var index = rootdomain.lastIndexOf('/');
         rootdomain = index == -1 ? undefined : rootdomain.substring(0, index);
     }
+    */
     cli.routeinfo.configname = rootdomain;
     cli.routeinfo.rootdomain = rootdomain;
     cli._c = _configs[rootdomain];
