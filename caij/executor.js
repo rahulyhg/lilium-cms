@@ -3,6 +3,7 @@ const localcast = require('../localcast.js');
 
 const sites = require('../sites.js');
 const config = require('../config.js');
+const hooks = require('../hooks.js');
 const db = require('../includes/db.js');
 const topicLib = require('../topics.js');
 const articleLib = require('../article.js');
@@ -25,8 +26,54 @@ class RunningTask {
         this.stats = janitorStats[this._c.uid];
     }
 
+    refreshHomepage(sendback) {
+        let trigger = hooks.getHooksFor('homepage_needs_refresh');
+        let firstKey = Object.keys(trigger).shift();
+        if (firstKey) {
+            trigger[firstKey].cb({
+                _c : this._c,
+                callback : sendback
+            });
+        } else {
+            sendback();
+        }
+    }
+
     cacheTopic(sendback) {
-        sendback();
+        let trigger = hooks.getHooksFor('topic_needs_refresh');
+        let firstKey = Object.keys(trigger).shift();
+        if (!firstKey) {
+            return sendback();
+        }
+
+        let stats = janitorStats[this._c.uid].cacheArticle;
+        stats.skip = (stats.skip || 0) + 1;
+
+        db.rawCollection(this._c, 'topics', {}, (err, collection) => {
+            collection.find({lastUsed : {$exists : 1}})
+                .project({_id : 1, displayname : 1, completeSlug : 1})
+                .sort({_id : -1})
+                .skip(stats.skip)
+                .next(
+            (err, topic) => {
+                 if (err) {
+                    log('RunningTask', 'Database error in task cacheTopic : ' + err);
+                    sendback();
+                } else if (topic) {
+                    log('RunningTask', "Generating topic : " + topic.displayname + " @ " + topic.completeSlug, 'info');
+                    trigger[firstKey].cb({
+                        _c : this._c,
+                        callback : sendback,
+                        topic : topic,
+                        index : 1
+                    });
+                } else {
+                    log('RunningTask', 'No article topic at index ' + stats.skip);
+                    stats.skip = 0;
+                    sendback();
+                }
+            });
+        });
     }
 
     cacheArticle(sendback) {

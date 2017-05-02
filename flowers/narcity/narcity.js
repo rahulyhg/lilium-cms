@@ -895,7 +895,11 @@ var loadHooks = function(_c, info) {
     });
 
     hooks.bind('homepage_needs_refresh', 1, function(pkg) { 
-        generateHomepage(pkg._c || pkg.cli._c);
+        generateHomepage(pkg._c || pkg.cli._c, pkg.callback);
+    });
+
+    hooks.bind('topic_needs_refresh', 1, function(pkg) {
+        renderTopicArchive(pkg._c, pkg.topic, pkg.index || 1, pkg.callback || function() {}); 
     });
 
     hooks.bind('article_ads_will_parse', 10, function(pkg) {

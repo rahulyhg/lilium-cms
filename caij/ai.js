@@ -44,6 +44,23 @@ class AI {
         setTimeout(ai.decide, Knowledge.cooldown);
     }
 
+    createTaskInserter() {
+        let createHomepageTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "refreshHomepage",
+                    extra : {
+                        origin : "AI",
+                        _c : _c
+                    }
+                });
+            });
+        };
+
+        ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
+        createHomepageTask();
+    }
+
     error(err) {
         log('CAIJ', "Caught an error at process level", 'warn');
         log('CAIJ', err, 'err');
@@ -60,6 +77,7 @@ class AI {
         } else {
             log('CAIJ', "Starting CAIJ with " + Knowledge.janitorSites.length + " websites");
             ai.createInterval();
+            ai.createTaskInserter();
         }
 
         process.on('uncaughtException', ai.error);

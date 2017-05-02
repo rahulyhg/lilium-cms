@@ -177,24 +177,6 @@ var Core = function () {
         log('Endpoints', 'Loaded endpoints', 'success');
     };
 
-    /**
-     * Calls a function based on the path of the cli
-     * @param  {ClientObject} cli    the ClientObject
-     * @param  {class} _class the class where you want to call the function
-     */
-    var callFunction = function (cli, _class) {
-        if (typeof _class[cli.routeinfo.path[1]] ==
-            'function' && typeof cli.routeinfo.path[2] !==
-            'undefined') {
-            _class[cli.routeinfo.path[1]](cli, cli.routeinfo.path[2]);
-        }
-        if (typeof _class[cli.routeinfo.path[1]] == 'function') {
-            _class[cli.routeinfo.path[1]](cli);
-        } else {
-            cli.throwHTTP(404, 'Page not found.');
-        }
-    }
-
     var loadGlobalPetals = function () {
         Petals.register('adminbar', _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
         Petals.register('adminhead', _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
