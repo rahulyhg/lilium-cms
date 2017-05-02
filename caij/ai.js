@@ -9,7 +9,8 @@ const Knowledge = {
     janitorJobs : executor.getJanitorJobs(),
     janitorSites : executor.getJanitorSites(),
     cpuCap : 80,
-    cooldown : 1000
+    cooldown : 1000,
+    homepageDelai : 1000 * 60 * 30
 };
 
 class AI {
@@ -22,12 +23,10 @@ class AI {
     }
 
     decide() {
-        let task;
+        let task = taskscheduler.next();
 
-        if (taskscheduler.workload > Knowledge.queueMaxSize) {
-            task = taskscheduler.next();
-        } else {
-            let jobindex = ++ai.indices.cursor % Knowledge.janitorJobs.length ;
+        if (!task) {
+            let jobindex = ++ai.indices.cursor % Knowledge.janitorJobs.length;
             !jobindex && ai.indices.sitecursor++;
             task = {
                 taskname : Knowledge.janitorJobs[jobindex],
@@ -45,6 +44,14 @@ class AI {
         setTimeout(ai.decide, Knowledge.cooldown);
     }
 
+    error(err) {
+        log('CAIJ', "Caught an error at process level", 'warn');
+        log('CAIJ', err, 'err');
+        log("CAIJ", "AI is most likely in a fail state, but won't shutdown until done manually", "warn");
+
+        ai.createInterval();
+    }
+
     bringToLife() {
         log('CAIJ', 'Brought to life', 'lilium');
 
@@ -54,6 +61,8 @@ class AI {
             log('CAIJ', "Starting CAIJ with " + Knowledge.janitorSites.length + " websites");
             ai.createInterval();
         }
+
+        process.on('uncaughtException', ai.error);
     }
 }
 

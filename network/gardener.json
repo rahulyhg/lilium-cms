@@ -7,7 +7,7 @@
         "port":5514
     },
     "loaded":true,
-    "familysize":false,
+    "familysize":2,
     "cacheport" : 17209,
     "realtimeport" : 17210,
     "useUDS" : true

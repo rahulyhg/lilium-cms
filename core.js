@@ -299,7 +299,9 @@ var Core = function () {
     };
 
     var bindCrash = function() {
-        process.on('uncaughtException', gracefullyCrash);
+        if ( process.env.handleError != "crash" ) {
+            process.on('uncaughtException', gracefullyCrash);
+        }
     };
 
     var loadStandardInput = function () {
@@ -577,8 +579,8 @@ var Core = function () {
 
     this.makeEverythingSuperAwesome = function (readyToRock) {
         log('Core', 'Initializing Lilium', 'lilium');
-        bindCrash();
         loadEnv();
+        bindCrash();
 
         require('./includes/caller.js')
         log('Core', 'Loading all websites', 'info');

@@ -39,7 +39,7 @@ var Gardener = function() {
                 io.adapter(redis());
     
                 log('Network', "Starting CAIJ", 'lilium');
-                caijProc = cluster.fork({parent : "gardener", mode : "script", job : "caij"})
+                caijProc = cluster.fork({parent : "gardener", mode : "script", job : "caij", handleError : "crash"})
                 caijProc.on('message', that.broadcast);
 
                 log('Network', 'Starting ' + lmlinstances + ' processes', 'lilium');

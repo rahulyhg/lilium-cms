@@ -520,36 +520,43 @@ var fetchTopicArticles = function(conf, topic, index, send) {
     });
 };
 
+var renderTopicArchive = function(_c, topic, index, done) {
+    fetchTopicArticles(_c, topic, index, function(articles, details) {
+        var xextra = {
+            articles : articles,
+            topic : topic,
+            index : index || 1,
+            searchname : topic.displayname,
+            context : 'topic',
+            language : topic.language,
+            indices : {
+                totalarticles : details.totalLength,
+                totalpages : details.totalPages,
+                pagenumbers : details.pagenumbers
+            },
+            currentpage : index || 1,
+        };
+        
+        var context = xextra.currentpage != 1 ? "topic" : (topic.archivetemplate || "topic");
+        var file = _c.server.html + "/" + topic.completeSlug + (index != 1 ? ("/" + index) : "") + ".html";
+
+        filelogic.renderThemeLML(_c, context, file, xextra, function(content) {
+            done && done(content);
+        });
+    });
+}
+
 var serveTopic = function(cli, extra) {
     var topic = extra.topic;
     var index = extra.index ? parseInt(extra.index) : 1;
-    var file = cli._c.server.html + "/" + extra.topic.completeSlug + (index != 1 ? ("/" + index) : "") + ".html";
+    var file = cli._c.server.html + "/" + topic.completeSlug + (index != 1 ? ("/" + index) : "") + ".html";
 
     fileserver.fileExists(file, function(exists) {
         if (!exists) {
-            fetchTopicArticles(cli._c, topic, index, function(articles, details) {
-                var xextra = {
-                    articles : articles,
-                    topic : extra.topic,
-                    index : index || 1,
-                    searchname : extra.topic.displayname,
-                    context : 'topic',
-                    language : extra.topic.language,
-                    indices : {
-                        totalarticles : details.totalLength,
-                        totalpages : details.totalPages,
-                        pagenumbers : details.pagenumbers
-                    },
-                    currentpage : index || 1,
-                };
-                
-                var context = xextra.currentpage != 1 ? "topic" : (topic.archivetemplate || "topic");
-
-                filelogic.renderThemeLML(cli, context, file, xextra, function(content) {
-                    cli.response.writeHead(200);
-                    cli.response.end(content);
-                    log('Narcity', 'Generated tag archive for topic ' + topic.displayname);
-                });
+            renderTopicArchive(cli._c, topic, index, function(content) {
+                cli.response.writeHead(200);
+                cli.response.end(content);
+                log('Narcity', 'Generated tag archive for topic ' + topic.displayname);
             });
         } else {
             fileserver.pipeFileToClient(cli, file, noOp, true);
