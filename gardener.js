@@ -7,6 +7,7 @@ var log = require('./log.js');
 
 var networkConfig = {loaded:false};
 var garden = {};
+var caijProc;
 var bootCount = 0;
 
 var Gardener = function() {
@@ -37,6 +38,10 @@ var Gardener = function() {
     
                 io.adapter(redis());
     
+                log('Network', "Starting CAIJ", 'lilium');
+                caijProc = cluster.fork({parent : "gardener", mode : "script", job : "caij"})
+                caijProc.on('message', that.broadcast);
+
                 log('Network', 'Starting ' + lmlinstances + ' processes', 'lilium');
                 for (var i = 0; i < lmlinstances; i++) {
                     var chld = cluster.fork({instancenum : i, parent : "gardener"});

@@ -568,6 +568,13 @@ var Core = function () {
         });
     };
 
+    var maybeRunCAIJ = function() {
+        if (process.env.job == "caij") {
+            log('Core', 'Creating CAIJ server');
+            require('./caij/caij.js').createServer();
+        }
+    }
+
     this.makeEverythingSuperAwesome = function (readyToRock) {
         log('Core', 'Initializing Lilium', 'lilium');
         bindCrash();
@@ -611,6 +618,7 @@ var Core = function () {
                                     loadNotifications();
                                     notifyAdminsViaEmail();
                                     executeRunScript();
+                                    maybeRunCAIJ();
             
                                     log('Core', 'Firing initialized signal', 'info');
                                     hooks.fire('init');
