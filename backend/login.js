@@ -94,7 +94,7 @@ var Login = function() {
 		var usr = cli.postdata.data.usr;
 		var psw = cli.postdata.data.psw;
 
-		if (usr && pwd) {
+		if (usr && psw) {
             var conds = {
                 revoked : {$ne : true},
 				username : usr,
@@ -117,7 +117,9 @@ var Login = function() {
     			    cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
                 }
             });
-		}
+		} else {
+            cli.throwHTTP(404, undefined, true);
+        }
 	};
 
 	this.registerLoginForm = function() {
