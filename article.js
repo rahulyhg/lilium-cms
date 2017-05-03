@@ -188,11 +188,12 @@ var Article = function() {
 
                 db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
-                        // Text query with title, content would be too heavy
+                        // Text query with title ; content would be too heavy
                         $match : {
                             _id : {
                                 $lt : arr[0]._id
                             }, 
+                            topic : arr[0].topic,
                             $text : { 
                                 $search : titlekeywords
                             },

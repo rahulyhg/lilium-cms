@@ -18,16 +18,21 @@ var CKEditor = function() {
     var embedCurIndex = 0;
 
     var ckBindEmbedPaste = function(ev) {
+        log('CKEditor', "Binding paste event");
         ev.editor.on('paste', function (evt) {
-            if(evt.data.type == "text") {
+            log('CKEditor', "Paste event caught with data type : " + evt.data.type);
+            if (true || evt.data.type == "text") {
                 var vdata = evt.data.dataValue;
                 var embedFound = false;
 
+                log('CKEditor', "Pasted content is text; looking for URLs");
                 if (ckIsUrl(vdata)) {
+                    log('CKEditor', "Paste : URL detected");
                     // Look for embed
                     var ffound = false;
                     for (var domainid in supportedEmbed) {
                         var domain = supportedEmbed[domainid];
+                        log('CKEditor', "Found domain in pasted text : " + domain);
     
                         if (vdata.indexOf(domain) !== -1) {
                             switch (domain) {
