@@ -98,7 +98,7 @@ var HTMLServer = function() {
                                                 });
                                             }
 
-                                            ipevents.push(cli._c, cli.ip, 404, {agent : cli.request.headers["user-agent"]}, cli.request.url);
+                                            ipevents.push(cli._c, cli.ip, 404, cli.request.url, {agent : cli.request.headers["user-agent"]});
                                         });
                                     }
                                 }, true, pageIndex)
