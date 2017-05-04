@@ -5,6 +5,7 @@ var styledpages = require('../styledpages.js');
 var _conf = require('../config.js');
 var article = require('../article.js');
 var topics = require('../topics.js');
+var ipevents = require('../ipevents.js');
 var noop = function() {};
 var log = require('../log.js');
 
@@ -96,6 +97,8 @@ var HTMLServer = function() {
                                                     sharedcache.set(setobj);
                                                 });
                                             }
+
+                                            ipevents.push(cli._c, cli.ip, 404);
                                         });
                                     }
                                 }, true, pageIndex)

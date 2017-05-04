@@ -333,6 +333,10 @@
             "endpoint" : "amp",
             "support" : ["get"]
         }, {
+            "module" : "ipevents.js",
+            "endpoint" : "ipevents",
+            "support" : ["livevar"]
+        }, {
             "module" : "sites.js",
             "endpoint" : "sites",
             "support" : ["admin_get", "admin_post", "livevar", "form"],

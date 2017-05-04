@@ -36,10 +36,15 @@
         "codename" : "Gaia",
         "script" : "1.0.6.js",
         "features" : ["Instagram backend"]
-    },
+    }, 
     "1.0.7" : {
         "codename" : "Gaia",
         "script" : "1.0.7.js",
         "features" : ["XML Sitemaps"]
+    },
+    "1.0.8" : {
+        "codename" : "Cybel",
+        "script" : "1.0.8.js",
+        "features" : ["Extreme caching"]
     }
 }
