@@ -98,7 +98,7 @@ var HTMLServer = function() {
                                                 });
                                             }
 
-                                            ipevents.push(cli._c, cli.ip, 404);
+                                            ipevents.push(cli._c, cli.ip, 404, cli.request.url);
                                         });
                                     }
                                 }, true, pageIndex)

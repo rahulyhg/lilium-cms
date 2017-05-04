@@ -4,14 +4,14 @@ const db = require('./includes/db.js');
 const noop = () => {};
 
 class IPEvents {
-    push(_c, ip, ev, xtra, cb) {
+    push(_c, ip, ev, url, cb) {
         db.rawCollection(_c, 'ipevents', {}, (err, collection) => {
             collection.updateOne({
                 ip : ip,
                 ev : ev
             }, {
                 $inc : {count : 1},
-                $set : {extra : xtra}
+                $addToSet : {urls : url}
             }, {
                 upsert : true
             }, cb || noop)
