@@ -796,26 +796,33 @@ var loadHooks = function(_c, info) {
         endpoints.register(_c.id, archType, 'GET', function(cli) { serveArchive(cli, archType); }); 
     });
 
-    var backendFEscriptFirstRequest = false;
     endpoints.register(_c.id, 'lilium', 'GET', function(cli) {
-        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
+        if (cli.userinfo.loggedin && cli.hasRight('dash')) {
             cli.redirect(cli._c.server.url + "/liliumflower");
         } else {
             cli.throwHTTP(204, "", true);
         }
     });
-    endpoints.register(_c.id, 'liliumflower', 'GET', function(cli) {
-        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
-            var path = cli._c.server.base + "backend/static/gen/narcitylilium_" + cli._c.id + ".js";
 
-            fileserver.fileExists(path, function(exists) {
-                if (exists && backendFEscriptFirstRequest) {
-                    fileserver.pipeFileToClient(cli, path, noOp, true, "text/javascript");
+    endpoints.register(_c.id, 'liliumflower', 'GET', function(cli) {
+        if (cli.userinfo.loggedin && cli.hasRight('dash')) {
+            var key = "lilium_flower_script_" + cli._c.uid;
+            sharedcache.get(key, function(js) {
+                if (js) {
+                    cli.response.writeHead(200, {"Content-Type" : "text/javascript"});
+                    cli.response.end(js);
                 } else {
-                    backendFEscriptFirstRequest = true;
-                    LML2.compileToFile(cli._c.server.base + "/flowers/narcity/precomp/js/lilium.js.lml", path, function() {
-                        fileserver.pipeFileToClient(cli, path, noOp, true, "text/javascript");
-                    }, {config : cli._c, minify : true});
+                    var lmlfile = cli._c.server.base + "/flowers/narcity/precomp/js/lilium.js.lml";
+                    fileserver.readFile(lmlfile, function(lmlstring) {
+                        LML2.compileToString(cli._c.id, lmlstring, {config : cli._c, minify : true}, function(js) {
+                            cli.response.writeHead(200, {"Content-Type" : "text/javascript"});
+                            cli.response.end(js);
+
+                            var setobj = {};
+                            setobj[key] = js;
+                            sharedcache.set(setobj);
+                        });
+                    }, false, 'utf8');
                 }
             });
         } else {
@@ -823,18 +830,25 @@ var loadHooks = function(_c, info) {
         }
     });
 
-    var backendFEstyleFirstRequest = false;
     endpoints.register(_c.id, 'liliumstyle', 'GET', function(cli) {
-        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
-            var path = cli._c.server.base + "backend/static/gen/narcitylilium.css";
-            fileserver.fileExists(path, function(exists) {
-                if (exists && backendFEstyleFirstRequest) {
-                    fileserver.pipeFileToClient(cli, path, noOp, true, "text/css");
+        if (cli.userinfo.loggedin && cli.hasRight('dash')) {
+            var key = "lilium_flower_style_" + cli._c.uid;
+            sharedcache.get(key, function(css) {
+                if (css) {
+                    cli.response.writeHead(200, {"Content-Type" : "text/css"});
+                    cli.response.end(css);
                 } else {
-                    backendFEstyleFirstRequest = true;
-                    LML2.compileToFile(cli._c.server.base + "/flowers/narcity/precomp/css/lilium.css.lml", path, function() {
-                        fileserver.pipeFileToClient(cli, path, noOp, true, "text/css");
-                    }, {config : cli._c, minify : false});
+                    var lmlfile = cli._c.server.base + "/flowers/narcity/precomp/css/lilium.css.lml";
+                    fileserver.readFile(lmlfile, function(lmlstring) {
+                        LML2.compileToString(cli._c.id, lmlstring, {config : cli._c, minify : true}, function(css) {
+                            cli.response.writeHead(200, {"Content-Type" : "text/css"});
+                            cli.response.end(css);
+
+                            var setobj = {};
+                            setobj[key] = css;
+                            sharedcache.set(setobj);
+                        });
+                    }, false, 'utf8');
                 }
             });
         } else {
@@ -843,7 +857,7 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.register(_c.id, 'articlestats', 'GET', function(cli) {
-        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
+        if (cli.userinfo.loggedin && cli.hasRight('dash')) {
             var articleid = cli.routeinfo.path[1];
             if (articleid) {
                 articleid = db.mongoID(articleid);
@@ -873,23 +887,28 @@ var loadHooks = function(_c, info) {
     var cachedStats = {};
     var chartbeaturl = "http://api.chartbeat.com/live/quickstats/v4/?apikey=[key]&host=[host]&path=";
     endpoints.register(_c.id, 'chartbeatbridge', 'GET', function(cli) {
-        if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash') && cli._c.chartbeat && cli._c.chartbeat.api_key) {
+        if (cli.userinfo.loggedin && cli.hasRight('dash') && cli._c.chartbeat && cli._c.chartbeat.api_key) {
             var requrl = chartbeaturl.replace('[key]', cli._c.chartbeat.api_key).replace('[host]', cli._c.chartbeat.host) +
                 cli.routeinfo.params.url + 
                 (cli._c.chartbeat.section ? "&section=" + cli._c.chartbeat.section : "");
             
-            if (cachedStats[requrl] && new Date() - cachedStats[requrl].at < 5000) {
-                cli.sendJSON(cachedStats[requrl].body);
-            } else {
-                require('request')(requrl, function(err, resp, bod) {
-                    cachedStats[requrl] = {
-                        body : bod,
-                        at : new Date()
-                    };
-    
-                    cli.sendJSON(bod);
-                });
-            }
+            var key = "chartbeat_url_cache_" + cli.routeinfo.params.url;
+            sharedcache.get(key, function(obj) {
+                if (obj && new Date().getTime() - obj.at < 6000) {
+                    cli.sendJSON(obj.body);
+                } else {
+                    require('request')(requrl, function(err, resp, bod) {
+                        var setobj = {}
+                        setobj[key] = {
+                            body : bod,
+                            at : new Date().getTime()
+                        };
+
+                        cli.sendJSON(bod);
+                        sharedcache.set(setobj);
+                    });
+                }
+            });
         } else {
             cli.throwHTTP(204, "", true);
         }

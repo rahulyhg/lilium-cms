@@ -85,7 +85,7 @@ var LiliumBackend = function(context) {
     };
 
     this.scheduleRealTime = function() {
-        rtTimer = setInterval(this.getRealTime, 5000);
+        rtTimer = setInterval(this.getRealTime, 6000);
         this.getRealTime();
     };
 
