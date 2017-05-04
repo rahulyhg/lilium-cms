@@ -7,7 +7,7 @@ var ClientObject = function (req, resp) {
     this.createdAt = this.createdon = new Date();
     this.request = req;
     this.response = resp;
-    this.ip = req.headers["X-Real-IP"] || req.connection.remoteAddress;
+    this.ip = req.headers["x-real-ip"] || req.connection.remoteAddress;
     this.method = req.method;
     this.nodes = ['clientobject.new'];
     this.cookies = {};
