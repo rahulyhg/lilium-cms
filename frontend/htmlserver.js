@@ -1,5 +1,6 @@
 var fileserver = require('../fileserver.js');
 var filelogic = require('../filelogic.js');
+var sharedcache = require("../sharedcache.js");
 var styledpages = require('../styledpages.js');
 var _conf = require('../config.js');
 var article = require('../article.js');
@@ -79,10 +80,22 @@ var HTMLServer = function() {
                                         }
                                     } else {
                                         log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath + " from " + cli.ip, 'warn');
-                                        filelogic.renderThemeLML(cli, '404', '404.html', {
-                                            
-                                        }, function() {
-                                            fileserver.pipeFileToClient(cli, cli._c.server.html + "/404.html", function() {}, true, 'text/html');
+                                        var cachekey = "404_html_" + cli._c.uid;
+
+                                        sharedcache.get(cachekey, function(html) {
+                                            if (html) {
+                                                cli.response.writeHead(200, {"content-type" : "text/html"});
+                                                cli.response.end(html);
+                                            } else {
+                                                filelogic.renderThemeLML(cli, '404', '404.html', {}, function(content) {
+                                                    cli.response.writeHead(200, {"content-type" : "text/html"});
+                                                    cli.response.end(content);
+        
+                                                    var setobj = {};
+                                                    setobj[cachekey] = content;
+                                                    sharedcache.set(setobj);
+                                                });
+                                            }
                                         });
                                     }
                                 }, true, pageIndex)
