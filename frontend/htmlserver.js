@@ -78,7 +78,7 @@ var HTMLServer = function() {
                                             });
                                         }
                                     } else {
-                                        log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath, 'warn');
+                                        log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath + " from " + cli.ip, 'warn');
                                         filelogic.renderThemeLML(cli, '404', '404.html', {
                                             
                                         }, function() {

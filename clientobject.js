@@ -4,16 +4,16 @@ var db = require('./includes/db.js');
 var events = require('./events.js');
 
 var ClientObject = function (req, resp) {
+    this.createdAt = this.createdon = new Date();
     this.request = req;
     this.response = resp;
+    this.ip = req.headers["X-Real-IP"] || req.connection.remoteAddress;
     this.method = req.method;
-    this.createdon = new Date();
-    this.postdata = undefined;
     this.nodes = ['clientobject.new'];
-    this.cookies = new Object();
-    this.session = new Object();
-    this.userinfo = new Object();
-    this._c = undefined;
+    this.cookies = {};
+    this.session = {};
+    this.userinfo = {};
+    this.extra = {};
 
     this.routeinfo = {
         admin: false,
@@ -34,8 +34,6 @@ var ClientObject = function (req, resp) {
 
     this.parseCookie();
     this.setID();
-    this.createdAt = new Date();
-    this.extra = {};
 };
 
 ClientObject.prototype.did = function(cat, type, extra, cb) {
