@@ -333,28 +333,6 @@ var Core = function () {
         });
     };
 
-    var schedulePreload = function() {
-        if (!isElder || global.liliumenv.mode == "script") { return; }
-
-        var preloadSites = function() {
-            _c.each(function(conf, next) {
-                if (conf.env != "dev") {
-                    log('Schedule', 'Running Scheduled cache preloading for website ' + conf.website.sitetitle)
-                    hooks.fire('homepage_needs_refresh', {_c : conf});
-                    require('./cacheInvalidator.js').preloadLatests(conf, 50, 0, next);
-                }
-            });
-        }
-
-        scheduler.schedule('cachePreloading', {
-            every : {
-                secondCount: 1000 * 60 * 5
-            }
-        }, preloadSites);
-
-        preloadSites();
-    };
-
     var loadLiveVars = function () {
         admin.registerLiveVar();
         backendSearch.registerLiveVar();
@@ -595,7 +573,6 @@ var Core = function () {
             
                                     loadCacheInvalidator();
                                     scheduleGC();
-                                    schedulePreload();
             
                                     log('Lilium', 'Starting inbound server', 'info');
                                     require('./inbound.js').createServer().start();

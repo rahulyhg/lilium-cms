@@ -418,16 +418,6 @@ class LMLTopics {
             },
             displayname : "Archive template"
         })
-        .add('language', 'select', {
-            displayname : "Language",
-            datasource : [
-                {displayName : " - Default parent's language -", name : ""},
-                {displayName : "Canadian English", name : "en-ca"},
-                {displayName : "American English", name : "en-us"},
-                {displayName : "Français Canadien", name : "fr-ca"},
-                {displayName : "Français de France", name : "fr-fr"}
-            ]
-        })
         .add('topic-social-title', 'title', { displayname : "Social Networks" })
         .trg('bottom')
         .add('topic-action-title', 'title', { displayname : "Actions" })

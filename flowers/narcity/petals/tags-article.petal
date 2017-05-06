@@ -10,23 +10,32 @@ $}
 <meta itemprop="name" content="{=&extra.article.title}">
 
 <meta name="robots" content="noodp"/>
-<link rel="publisher" href="https://plus.google.com/+{=config.default.social.accounts.googleplus}"/>
+<link rel="publisher" href="https://plus.google.com/+{=?theme.settings.googleplus}"/>
+<link rel="author" href="{=?extra.article.authors.0.socialnetworks.facebook}" />
+
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:description" content="{=&extra.article.subtitle}" />
 <meta name="twitter:title" content="{=&extra.article.title}" />
-<meta name="twitter:site" content="@{=config.default.social.accounts.twitter}" />
+<meta name="twitter:site" content="@{=?theme.settings.twitter}" />
 <meta name="twitter:image" content="{=config.default.server.protocol}{=extra.article.featuredimage.0.sizes.narcityfeatured.url}" />
-<meta name="twitter:creator" content="@{=config.default.social.accounts.twitter}" />
+<meta name="twitter:creator" content="@{=?config.default.social.accounts.twitter}" />
 
-<meta property='author' content="{=extra.article.authors.0.displayname}" />
+<meta property="author" content="{=extra.article.authors.0.displayname}" />
+<meta property="article:published_time" content="{=extra.article.date}" />
+<meta property="article:section" content="{=?extra.article.topic.displayname}" />
+<meta property="article:publisher" content="{=?theme.settings.facebook}" />
 <meta property="article:author" content="{=?extra.article.authors.0.socialnetworks.facebook}" />
-<link rel="author" href="{=?extra.article.authors.0.socialnetworks.facebook}" />
 
 <meta property="og:title" content="{=&extra.article.title}" />
 <meta property="og:description" content="{=&extra.article.subtitle}" />
-
 <meta property="og:type" content="article" />
 <meta property="og:image" content="{=config.default.server.protocol}{=config.default.server.url}/uploads/{=extra.article.featuredimage.0.url}" />
+<meta property="og:image:width" content="{=?extra.article.featuredimage.0.width}" />
+<meta property="og:image:height" content="{=?extra.article.featuredimage.0.height}" />
+<meta property="og:locale" content="{=theme.settings.language}" />
+
+<meta property="fb:pages" content="{=?theme.settings.facebookpageid}" />
+<meta property="fb:app_id" content="{=?theme.settings.facebookappid}" />
 
 {$ if (?extra.article.canonical ??); $}
     <link rel="canonical" href="{=extra.article.canonical}" />

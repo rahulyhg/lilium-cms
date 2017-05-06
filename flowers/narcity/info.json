@@ -33,6 +33,20 @@
         ]
     },
     "settingForm" : {
+        "language" : {
+            "type" : "select",
+            "attr" : {
+                "displayname" : "Language",
+                "datasource" : [
+                    {"displayName" : " - Default parent's language -", "name" : ""},
+                    {"displayName" : "Canadian English", "name" : "en-ca"},
+                    {"displayName" : "American English", "name" : "en-us"},
+                    {"displayName" : "Français Canadien", "name" : "fr-ca"},
+                    {"displayName" : "Français de France", "name" : "fr-fr"}
+                ]
+            },
+            "default" : "en-ca"
+        },
         "logolink" : {"type" : "text", "attr" : {"displayname" : "Topbar logo link"}, "default" : "/"},
         "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},
         "headercolor" : {"type" : "text", "attr" : {"displayname" : "Header Color"}, "default" : "#FF2634"},
@@ -140,6 +154,9 @@
         "googleplus" : {"type" : "text", "attr" : {"displayname" : "Google Plus Username"}, "default" : "Narcity"},
         "youtube" : {"type" : "text", "attr" : {"displayname" : "YouTube Username"}, "default" : "Narcity"},
         "instagram" : {"type" : "text", "attr" : {"displayname" : "Instagram Username"}, "default" : "Narcity"},
+
+        "facebookpageid" : {"type" : "text", "attr" : {"displayname" : "Facebook Page ID"}, "default" : "Narcity"},
+        "facebookappid" : {"type" : "text", "attr" : {"displayname" : "Facebook App ID"}, "default" : "Narcity"},
 
         "copyright" : {"type" : "text", "attr" : {"displayname" : "Copyright"}, "default" : "Narcity Media inc."},
         "abbreviation" : {"type" : "text", "attr" : {"displayname" : "abbreviation"}, "default" : "MTL"},

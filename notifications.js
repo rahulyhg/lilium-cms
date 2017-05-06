@@ -104,7 +104,7 @@ LiliumSocket.prototype.disconnect = function () {
             io.of(namespaces[i]).emit('userstatus', {
                 id: ls.clientId,
                 displayname: ls.session.data.displayname,
-                status : sessionCount == 0 ? 'offline' : 'online',
+                status : !sessionCount ? 'offline' : 'online',
                 seshCount : sessionCount
             });
         }

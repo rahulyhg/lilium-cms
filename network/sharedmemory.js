@@ -116,7 +116,11 @@ class SharedMemory {
                                     mem.sockets[uid].splice(index, 1);
                                 }
 
-                                resp = JSON.stringify(mem.sockets[uid]);
+                                if (mem.sockets[uid].length == 0) {
+                                    delete mem.sockets[uid];
+                                }
+
+                                resp = JSON.stringify(mem.sockets[uid] || "[]");
                             } else {
                                 resp = "[]";
                             }
