@@ -78,6 +78,9 @@ var Article = function() {
             case 'editslug':
                 if (cli.hasRightOrRefuse("create-articles")) this.editSlug(cli);
                 break;
+            case 'removealias':
+                if (cli.hasRightOrRefuse("publish-articles")) this.maybeRemoveAlias(cli);
+                break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -157,6 +160,37 @@ var Article = function() {
                 });
             } else {
                 cli.sendJSON({error : "Article not found"});
+            }
+        });
+    };
+
+    this.removeAlias = function(conf, article, alias, cb) {
+        var aliases = article.aliases || [];
+        var index = aliases.indexOf(alias);
+        if (index != -1) {
+            aliases.splice(index, 1);
+        }
+        
+        log('Content', "Removing alias " + alias + " from article " + article.title + " at index " + index);
+        db.update(conf, 'content', {_id : article._id}, {aliases : aliases}, cb || function() {});
+    };
+
+    this.maybeRemoveAlias = function(cli) {
+        var cond = {
+            _id : db.mongoID(cli.postdata.data.articleid)
+        };
+
+        if (!cli.hasRight('editor')) {
+            cond.author = db.mongoID(cli.userdata.userid);
+        }
+
+        db.findUnique(cli._c, 'content', cond, function(err, article) {
+            if (err || !article) {
+                cli.sendJSON({error : "Missing rights or article not found"});
+            } else {
+                that.removeAlias(cli._c, article, cli.postdata.data.alias, function() {
+                    cli.sendJSON({error : false, success : true});
+                });
             }
         });
     };
@@ -700,13 +734,17 @@ var Article = function() {
         formData.author = formData.author ? db.mongoID(formData.author) : db.mongoID(cli.userinfo.userid);
         formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
-        formData.date = new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone));
+        formData.date = formData.date ? new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone)) : undefined;
         formData.topic = formData.topic ? db.mongoID(formData.topic) : undefined;
 
         if (formData.tags && formData.tags.map) {
             formData.tagslugs = formData.tags.map(function(tagname) {
                 return slugify(tagname).toLowerCase();
             });
+        }
+
+        if (!formData.date) {
+            delete formData.date;
         }
 
         log('Article', 'Preparing to save article ' + formData.title);

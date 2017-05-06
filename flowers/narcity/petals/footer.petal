@@ -69,14 +69,14 @@
 $}
 
 <script type='text/javascript'>
-    var _sf_async_config={};
-    /** CONFIGURATION START **/
-    _sf_async_config.uid = 57714;
-    _sf_async_config.domain = '{=domain}';
-    _sf_async_config.useCanonical = true;
-    _sf_async_config.sections = "{=?extra.article.topic.displayname}";
-    _sf_async_config.authors = "{=?extra.article.authors.0.displayname}"; 
-    /** CONFIGURATION END **/
+    var _sf_async_config = {
+        uid : 57714,
+        domain : "{=domain}",
+        useCanonical : true,
+        sections : "{=?theme.settings.chartbeatsection}",
+        authors : "{=?extra.article.authors.0.displayname}"
+    };
+    
     (function(){
         window._sf_endpt=(new Date()).getTime();
         var e = document.createElement('script');

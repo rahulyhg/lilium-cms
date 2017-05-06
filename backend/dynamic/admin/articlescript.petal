@@ -197,8 +197,37 @@
                     a.textContent = resp.siteurl + "/" + resp.aliases[i] + " ";
                     a.href = resp.siteurl + "/" + resp.aliases[i];
                     a.setAttribute('target', '_blank');
+                    a.dataset.alias = resp.aliases[i];
 
                     document.getElementById("moreinfo-alias").appendChild(a);
+
+                    var rem = document.createElement('i');
+                    rem.className = "fa fa-times remove-alias-ex";
+                    rem.setAttribute('aria-hidden', "true");
+
+                    (function(a) {
+                        rem.addEventListener('click', function() {
+                            liliumcms.lmldom.sendForm(
+                                {articleid : liliumcms.pageloader.lastLevel, alias : a.dataset.alias}, 
+                                "{=config.default.server.url}/admin/article/removealias",
+                            function(resp) {
+                                log("Article", "Removed alias from article");
+        
+                                if (resp && resp.success) { 
+                                    a.parentElement.removeChild(a);
+                                    liliumcms.notify({title : "Alias", message : "Removed alias successfully", type : "success"})
+                                } else {
+                                    liliumcms.notify({title : "Alias", message : "Missing rights", type : "danger"});
+                                }
+                            });
+
+
+                            this.parentElement.removeChild(this);
+
+                        });
+                    })(a);
+
+                    document.getElementById("moreinfo-alias").appendChild(rem);
 
                     if (i != resp.aliases.length - 1) {
                         var sep = document.createElement('span');

@@ -1,6 +1,7 @@
 {#config;theme;extra}
 <script>
     // Head globals ////////////////////////////////////////////////
+    window.lmlarticle = {};
     window.lmlcontext = "{=extra.contextname}";
     window.lmlurl = "{=config.default.server.url}";
     window.nsfw = "{=?extra.article.nsfw}" == "true";
