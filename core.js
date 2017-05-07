@@ -497,6 +497,11 @@ var Core = function () {
             var split = argv[i].split("=");
             global.liliumenv[split[0]] = split[1];
         }
+
+        var env = process.env;
+        for (var k in env) {
+            global.liliumenv[k] = env[k];
+        }
     };
 
     var executeRunScript = function() {

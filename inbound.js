@@ -48,7 +48,7 @@ var _c = require('./config.js').default(),
         };
 
         this.start = function () {
-            if (global.liliumenv.mode != "script") {
+            if (global.liliumenv.mode != "script" && process.env.mode != "script") {
                 log('Inbound', 'Ready to receive requests', 'success');
                 _c = require('./config.js').default();
 

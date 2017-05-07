@@ -38,5 +38,4 @@ if (typeof process.env.parent != "undefined") {
     module.exports = LiliumCMS
 } else {
     require('./log.js')('Lilium', "Lilium started from main class. Please use npm start.", "warn");
-    require('./index.prod.js');
 }
