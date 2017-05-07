@@ -251,7 +251,9 @@ class LMLTopics {
 
     deepFetch(conf, slugOrId, send) {
         let conds = {};
-        if (typeof slugOrId == "object") {
+        if (!slugOrId) {
+            return send(undefined, []);
+        } else if (typeof slugOrId == "object") {
             conds._id = slugOrId._id || slugOrId;
         } else if (slugOrId.indexOf && slugOrId.indexOf("/") == -1) {
             conds.slug = slugOrId;
