@@ -142,9 +142,9 @@ $}
             <div class="keep-on-reading-wrapper">
                 <a class="keep-on-reading keep-on-reading-next" href="{=extra.article.nextURL}">Next <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
             </div>
-            {$ endif; if (?extra.article.related.0.name ??); $}
+            {$ endif; if (?extra.article.related ??); $}
             <div class="keep-on-reading-wrapper">
-                <a class="keep-on-reading" href="{=config.default.server.url}/{=extra.article.related.0.name}">{:keep-on-reading} <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+                <a class="keep-on-reading" href="{=extra.article.related.url}">{:keep-on-reading} <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
             </div>
             {$ endif; $}
 
@@ -191,8 +191,7 @@ $}
 
 {$ if (?config.default.social.facebook.token); $}
 <script class="execOnLoad">
-    var reqURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?id=http:{=config.default.server.url}/{=extra.article.name}/&access_token={=config.default.social.facebook.appid}|{=config.default.social.facebook.token}";
-
+    var reqURL = "https://graph.facebook.com/v{=config.default.social.facebook.apiversion}/?id={=extra.article.url}/&access_token={=config.default.social.facebook.appid}|{=config.default.social.facebook.token}";
     _v(function() {
         _fb.runForCurrentPage(function(data) {
             var shares = data && data.share && data.share_count ? data.share.share_count : 0;
@@ -209,81 +208,7 @@ $}
 </script>
 {$ endif; $}
 
-<script class="execOnLoad">
-window.adpos = window.adpos || [];
-var lmlads = document.querySelectorAll(".lmlad");
-
-for (var i = 0; i < lmlads.length; i++) {
-    window.adpos.push({
-        height : lmlads[i].getBoundingClientRect().top + window.scrollY,
-        id : lmlads[i].id
-    });
-    lmlads[i].classList.remove('lmlad');
-}
-
-var articles = document.querySelectorAll('article');
-var article = articles[articles.length - 1];
-var rect = article.getBoundingClientRect();
-window.articlepos = window.articlepos || [];
-window.articlepos.push({
-    name : "{=extra.article.name}",
-    endsat : rect.height + rect.top + window.scrollY,
-    trueURL : "{=config.default.server.url}/{=extra.article.name}",
-    fetchURL : "{=config.default.server.url}/next/{=extra.article.name}",
-    title : `{=extra.article.title}`,
-    subtitle : `{=extra.article.subtitle}`
-});
-
-var end = document.querySelector('.article-end');
-window.loadNextAfter = end.getBoundingClientRect().top + window.scrollY - 880;
-end.remove();
-</script>
-
 <script>
-window.nextAt = window.articlepos[0].endsat;
-window.prevAt = -2;
-
-window.relatedArticles = [
-{$ for (nextart in extra.article.related); $}
-    '{=nextart.name}',
-{$ endfor; $}
-false
-];
-
-var execOnLoad = document.querySelectorAll("script.execOnLoad");
-for (var i = execOnLoad.length - 1; i >= 0; i--) {
-     execOnLoad[i].remove();
-}
-
-window.currentPageIndex = 0;
-var switchToNext = function() {
-    if (window.currentPageIndex + 1 == window.articlepos.length) return;
-
-    window.currentPageIndex++;
-    window.prevAt = window.nextAt;
-    var newPage = window.articlepos[window.currentPageIndex];
-    window.history.pushState(newPage, newPage.title, newPage.trueURL);
-
-    if (typeof ga != "undefined") {
-        ga('send', 'pageview');
-    }
-
-    window.nextAt = newPage.endsat;
-}
-
-var switchToPrev = function() {
-    window.currentPageIndex--;
-    window.nextAt = window.articlepos[window.currentPageIndex+1].endsat;
-    var oldPage = window.articlepos[window.currentPageIndex];
-    window.history.pushState(oldPage, oldPage.title, oldPage.trueURL);
-
-    if (typeof ga != "undefined") {
-        ga('send', 'pageview');
-    }
-
-    window.prevAt = window.currentPageIndex == 0 ? -2 : window.articlepos[window.currentPageIndex-1].endsat;
-};
-
 document.querySelector('.keep-on-reading').addEventListener('click', function() {
     typeof ga != "undefined" && ga('send', 'event', 'Recirculation', 'Keep on reading', '{=extra.article.name}');
 });

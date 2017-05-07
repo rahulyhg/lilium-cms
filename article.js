@@ -222,32 +222,31 @@ var Article = function() {
 
                 db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
-                        // Text query with title ; content would be too heavy
                         $match : {
                             _id : {
                                 $lt : arr[0]._id
                             }, 
                             topic : arr[0].topic,
-                            $text : { 
+                            /*$text : { 
                                 $search : titlekeywords
                             },
                             $and : [
                                 {date : {$gt : new Date(new Date(arr[0].date).getTime() - (1000 * 60 * 60 * 24 * 31 * 6) )}},
                                 {date : {$lt : new Date(arr[0].date)}}
-                            ],
+                            ],*/
                             status : "published",
                         }
                     },{
                         // Sort content by what matches the highest
                         $sort : { 
-                            score: { 
+                            /*score: { 
                                 $meta: "textScore" 
-                            },
+                            },*/
                             date : -1 
                         }
                     },{
-                        // Have at three seven related
-                        $limit : 3
+                        // Only one related
+                        $limit : 1
                     },{
                         // Get featured image 
                         $lookup : {
@@ -256,11 +255,15 @@ var Article = function() {
                             foreignField:   "_id",
                             as:             "featuredimage"
                         }
-                    }]).toArray(function(err, relarr) {
-                        if (!err) {
-                            arr[0].related = relarr;
+                    },{
+                        // Get Topic 
+                        $lookup : {
+                            from:           "topics",
+                            localField:     "topic",
+                            foreignField:   "_id",
+                            as:             "topic"
                         }
-
+                    }]).next(function(err, related) {
                         var continueWorking = function() {
                             var continueWithAuthor = function() {
                                 db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
@@ -302,26 +305,16 @@ var Article = function() {
                                 arr[0].url = conf.server.protocol + conf.server.url + arr[0].topicslug + arr[0].name;
                                 arr[0].amp = conf.server.protocol + conf.server.url + "/amp" + arr[0].topicslug + arr[0].name;
 
+                                if (arr[0].related) {
+                                    arr[0].related.url = conf.server.protocol + conf.server.url + arr[0].topicslug + arr[0].name;
+                                }
+
                                 continueWithAuthor();
                             });
                         };
 
-                        if (!relarr || relarr.length == 0) {
-                            col.find({_id : {$lt : arr[0]._id}}).sort({_id : -1}).limit(1).next(function(err, rel) {
-                                if (!err && rel) {
-                                    db.findUnique(conf, 'uploads', {_id : db.mongoID(rel.media)}, function(err, featuredimage) {
-                                        rel.featuredimage = featuredimage;
-                                        arr[0].related = [rel];
-                                    
-                                        continueWorking();
-                                    });
-                                } else {
-                                    continueWorking();
-                                }
-                            });
-                        } else {
-                            continueWorking();
-                        }
+                        arr[0].related = related;
+                        continueWorking();
                     });
                 });
             }
