@@ -46,7 +46,7 @@ class RunningTask {
             return sendback();
         }
 
-        let stats = janitorStats[this._c.uid].cacheArticle;
+        let stats = janitorStats[this._c.uid].cacheTopic;
         stats.skip = (stats.skip || 0) + 1;
 
         db.rawCollection(this._c, 'topics', {}, (err, collection) => {
@@ -61,11 +61,13 @@ class RunningTask {
                     sendback();
                 } else if (topic) {
                     log('RunningTask', "Generating topic : " + topic.displayname + " @ " + topic.completeSlug, 'info');
-                    trigger[firstKey].cb({
-                        _c : this._c,
-                        callback : sendback,
-                        topic : topic,
-                        index : 1
+                    topicLib.deepFetch(this._c, topic._id, (topic) => {
+                        trigger[firstKey].cb({
+                            _c : this._c,
+                            callback : sendback,
+                            topic : topic,
+                            index : 1
+                        });
                     });
                 } else {
                     log('RunningTask', 'No article topic at index ' + stats.skip);
