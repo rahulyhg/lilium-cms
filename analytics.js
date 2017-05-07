@@ -10,7 +10,7 @@ const JWT = googleapis.auth.JWT;
 const analytics = googleapis.analytics('v3');
 
 // Sites config
-let GASites = {};
+const GASites = {};
 
 // Default request metrics and dimensions
 const defaultMetrics = ["ga:users", "ga:pageviews", "ga:organicSearches", "ga:sessions"].join(',');

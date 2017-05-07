@@ -65,6 +65,4 @@ class ConsoleArtificialIntelligenceJanitor {
     }
 }
 
-
-
 module.exports = new ConsoleArtificialIntelligenceJanitor();

@@ -6,9 +6,11 @@ const sites = require('../sites.js');
 const config = require('../config.js');
 const hooks = require('../hooks.js');
 const db = require('../includes/db.js');
+const sitemapLib = require('../sitemap.js');
 const topicLib = require('../topics.js');
 const articleLib = require('../article.js');
 const entitieLib = require('../entities.js');
+const analyticsLib = require('../analytics.js');
 
 const janitorJobs = [
     "cacheTopic",
@@ -25,6 +27,79 @@ class RunningTask {
         this.extra = extra;
         this._c = extra._c;
         this.stats = janitorStats[this._c.uid];
+    }
+
+    refreshSitemaps(sendback) {
+        sitemapLib.generateSitemap(this._c, sendback);
+    }
+
+    statsEmail(sendback) {
+        analyticsLib.addSite(_c, (err) => {
+            if (err) {
+                log("RunningTask", "Error sending emails : " + err, "err");
+                sendback();
+            } else {
+                analyticsLib.getData(_c, {
+                    "start-date" : "yesterday",
+                    "end-date" : "yesterday",
+                    "metrics" : "ga:users,ga:pageviews,ga:sessions",
+                    "dimensions" : "ga:pagePath",
+                    "sort" : "-ga:pageviews",
+                    "max-results" : 10
+                }, (err, result) => {
+                    let metrics = {
+                        users : result.totalsForAllResults["ga:users"],
+                        pageviews : result.totalsForAllResults["ga:pageviews"],
+                        sessions : result.totalsForAllResults["ga:sessions"]
+                    };
+                    let articles = result.rows;
+                    let slugs = {};
+                    let orderedSlugs = [];
+                    let finalObjects = [];
+
+                    for (let i = 0; i < articles.length; i++) {
+                        let url = articles[i][0].split('/');
+                        let slug = url.pop();
+
+                        if (!isNaN(slug)) {
+                            slug = url.pop();
+                        }
+
+                        if (!slug) {
+                            continue;
+                        }
+
+                        if (!slugs[slug]) {
+                            slugs[slug] = {
+                                slug : slug,
+                                users : articles[i][1],
+                                pageviews : articles[i][2],
+                                sessions : articles[i][3]
+                            };
+                            orderedSlugs.push(slug);
+                        } else {
+                            let current = slugs[slug];
+                            current.users += articles[i][1];
+                            current.pageviews += articles[i][2];
+                            current.sessions += articles[i][3];
+                        }
+                    }
+
+                    console.log(orderedSlugs);
+                    articleLib.batchFetch(_c, orderedSlugs, deepArticles => {
+                        let finalArray = [];
+                        deepArticles.forEach(art => {
+                            if (art) {
+                                art.stats = slugs[art.name];
+                                finalArray.push(art);
+                            }
+                        });
+
+                        sendback();
+                    });
+                });
+            }
+        });
     }
 
     refreshHomepage(sendback) {
@@ -67,7 +142,7 @@ class RunningTask {
                             _c : this._c,
                             topic : topic,
                             index : 1,
-                            callback : function() {
+                            callback : (() => {
                                 let trigger = hooks.getHooksFor('rss_needs_refresh_' + this._c.uid);
                                 let firstKey = Object.keys(trigger).shift();
                                 if (!firstKey) {
@@ -80,7 +155,7 @@ class RunningTask {
                                     topic : topic,
                                     callback : sendback
                                 });
-                            }.bind(this)
+                            }).bind(this)
                         });
                     });
 

@@ -195,6 +195,23 @@ var Article = function() {
         });
     };
 
+    this.batchFetch = function(conf, idsOrNames, cb, conditions) {
+        var i = -1;
+        var deepArticles = [];
+        var next = function() {
+            if (++i == idsOrNames.length) {
+                cb(deepArticles);
+            } else {
+                that.deepFetch(conf, idsOrNames[i], function(art) {
+                    deepArticles.push(art);
+                    next();
+                });
+            }
+        };
+
+        next();
+    };
+
     this.deepFetch = function(conf, idOrName, cb, preview, extraconds) {
         conf = conf._c || conf;
         var cond = extraconds || {};

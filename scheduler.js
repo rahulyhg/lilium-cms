@@ -48,9 +48,9 @@ BGJob.prototype.getTimeUntilRun = function () {
     };
     var laterArr = this.timeToRun ? this.timeToRun.split(':') : [0, 0, 0];
     var laterArr = {
-        hours: laterArr[0],
-        minutes: laterArr[1],
-        seconds: laterArr[2]
+        hours:   parseInt(laterArr[0]),
+        minutes: parseInt(laterArr[1]),
+        seconds: parseInt(laterArr[2])
     };
 
     // Verify nearest date
@@ -104,11 +104,16 @@ BGJob.prototype.getTimeUntilRun = function () {
         if ((nowArr.hours < laterArr.hours ||
                 (nowArr.hours == laterArr.hours && nowArr.minutes < laterArr.minutes) ||
                 (nowArr.hours == laterArr.hours && nowArr.minutes == laterArr.minutes && nowArr.seconds < laterArr.seconds))) {
-            later = new Date(now.getFullYear(), now.getMonth(), now.getDate(),
-                laterArr.hours, laterArr.minutes, laterArr.seconds, 500);
+
+            later = new Date(
+                now.getFullYear(), now.getMonth(), now.getDate(),
+                laterArr.hours, laterArr.minutes, laterArr.seconds, 500
+            );
         } else {
-            later = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1,
-                laterArr.hours, laterArr.minutes, laterArr.seconds, 500);
+            later = new Date(
+                now.getFullYear(), now.getMonth(), now.getDate() + 1,
+                laterArr.hours, laterArr.minutes, laterArr.seconds, 500
+            );
         }
     }
 

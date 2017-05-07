@@ -10,7 +10,10 @@ const Knowledge = {
     janitorSites : executor.getJanitorSites(),
     cpuCap : 80,
     cooldown : 100,
-    homepageDelai : 1000 * 60 * 30
+
+    homepageDelai : 1000 * 60 * 30,
+    sitemapDelai : 1000 * 60 * 60,
+    sendEmailAt : "00:15:00"
 };
 
 class AI {
@@ -57,7 +60,36 @@ class AI {
             });
         };
 
+        let createSitemapTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "refreshSitemaps",
+                    extra : {
+                        origin : "AI",
+                        _c : _c
+                    }
+                });
+            });
+        };
+
+        let createStatsEmailTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "statsEmail",
+                    extra : {
+                        origin : "AI",
+                        _c : _c
+                    }
+                });
+            });
+        };
+
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
+        ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
+        ai.statsemailInterval = require('../scheduler.js').schedule("CAIJ_StatEmail_Networkwide", {
+            runat : Knowledge.sendEmailAt
+        }, createStatsEmailTask).start();
+
         createHomepageTask();
     }
 
