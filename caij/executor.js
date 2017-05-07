@@ -28,7 +28,7 @@ class RunningTask {
     }
 
     refreshHomepage(sendback) {
-        let trigger = hooks.getHooksFor('homepage_needs_refresh');
+        let trigger = hooks.getHooksFor('homepage_needs_refresh_' + this._c.uid);
         let firstKey = Object.keys(trigger).shift();
         if (firstKey) {
             trigger[firstKey].cb({
@@ -41,7 +41,7 @@ class RunningTask {
     }
 
     cacheTopic(sendback) {
-        let trigger = hooks.getHooksFor('topic_needs_refresh');
+        let trigger = hooks.getHooksFor('topic_needs_refresh_' + this._c.uid);
         let firstKey = Object.keys(trigger).shift();
         if (!firstKey) {
             return sendback();
@@ -68,7 +68,7 @@ class RunningTask {
                             topic : topic,
                             index : 1,
                             callback : function() {
-                                let trigger = hooks.getHooksFor('rss_needs_refresh');
+                                let trigger = hooks.getHooksFor('rss_needs_refresh_' + this._c.uid);
                                 let firstKey = Object.keys(trigger).shift();
                                 if (!firstKey) {
                                     return sendback();

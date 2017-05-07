@@ -377,7 +377,7 @@ var generateRSS = function(_c, completeSlug, send) {
                 };
 
                 var compile = function() {
-                    LML2.compileToFile(_c.server.base + "/flowers/narcity/feed.lml", rsspath, function() {
+                    LML2.compileToFile(_c.server.base + "flowers/narcity/feed.lml", rsspath, function() {
                         send(200);
                     }, extra);
                 };
@@ -929,22 +929,16 @@ var loadHooks = function(_c, info) {
         generateRSS(_c, undefined, function() {});
     }
 
-    hooks.bind('homepage_needs_refresh', 1, function(pkg) { 
-        if (pkg._c.uid == _c.uid) {
-            generateHomepage(pkg._c || pkg.cli._c, pkg.callback);
-        }
+    hooks.bind('homepage_needs_refresh_' + _c.uid, 1, function(pkg) { 
+        generateHomepage(pkg._c || pkg.cli._c, pkg.callback);
     });
 
-    hooks.bind('topic_needs_refresh', 1, function(pkg) {
-        if (pkg._c.uid == _c.uid) {
-            renderTopicArchive(pkg._c, pkg.topic, pkg.index || 1, pkg.callback || function() {}); 
-        }
+    hooks.bind('topic_needs_refresh_' + _c.uid, 1, function(pkg) {
+        renderTopicArchive(pkg._c, pkg.topic, pkg.index || 1, pkg.callback || function() {}); 
     });
 
-    hooks.bind('rss_needs_refresh', 1, function(pkg) {
-        if (pkg._c.uid == _c.uid) {
-            generateRSS(pkg._c, pkg.completeSlug || pkg.topic.completeSlug, pkg.callback || function() {});
-        }
+    hooks.bind('rss_needs_refresh_' + _c.uid, 1, function(pkg) {
+        generateRSS(pkg._c, pkg.completeSlug || pkg.topic.completeSlug, pkg.callback || function() {});
     });
 
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });

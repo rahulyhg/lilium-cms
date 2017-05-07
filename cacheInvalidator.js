@@ -34,7 +34,7 @@ var CacheInvalidator = function () {
     this.init = function (cb) {
         hooks.bind(['article_published', 'article_updated', 'article_deleted', 'article_unpublished'], 1, function(data) {
             // Update profile page
-            hooks.fire('homepage_needs_refresh', data);
+            hooks.fire('homepage_needs_refresh_' + (data._c && data._c.uid), data);
             if (data._c && data.article) {
                 var html = data._c.server.html;
                 var deleteOpt = {

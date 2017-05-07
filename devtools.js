@@ -230,7 +230,7 @@ var refreshCache = function(cli, ctx) {
             break;
 
         case 'hp':
-            require('./hooks.js').fire('homepage_needs_refresh', {
+            require('./hooks.js').fire('homepage_needs_refresh_' + cli._c.uid, {
                 cli : cli
             });
 

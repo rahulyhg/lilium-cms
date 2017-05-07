@@ -640,12 +640,19 @@ var Article = function() {
                                                         type: 'success'
                                                     });
 
-                                                    hooks.fire('rss_needs_refresh', {
-                                                        _c : cli._c,
-                                                        topic : tObject,
-                                                        callback : function() {
-                                                            log('Article', "RSS feed was refresh, received callback");
-                                                        }
+                                                    tObject && require('./topics.js').deepFetch(
+                                                        cli._c, 
+                                                        maybeTopic, 
+                                                    function(topic, parents) {
+                                                        parents.forEach(function(sTopic) {
+                                                            hooks.fire('rss_needs_refresh_' + cli._c.uid, {
+                                                               _c : cli._c,
+                                                                completeSlug : sTopic.completeSlug,
+                                                                callback : function() {
+                                                                    log('Article', "RSS feed was refresh, received callback");
+                                                                }
+                                                            });
+                                                        });
                                                     });
                                                 });
 
@@ -660,7 +667,7 @@ var Article = function() {
                                                     });
                                                 });
  
-                                                badges.check(cli, 'publish', function(acquired, level) {});
+                                                // badges.check(cli, 'publish', function(acquired, level) {});
                                             }, false, "all");
                                         } else if (pubCtx === "preview") {
                                             var tmpName = "static/tmp/preview" + 
