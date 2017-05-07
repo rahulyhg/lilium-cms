@@ -5,6 +5,7 @@ var LiveVars = require('./livevars.js');
 var log = require('./log.js');
 var entities = require('./entities.js');
 var api = require('./api.js');
+var rewriter = require('./rewriter.js');
 
 var Dispatcher = function () {
     this.dispatch = function (cli) {
@@ -27,6 +28,7 @@ var Dispatcher = function () {
             api.serveApi(cli);
         } else if (cli.routeinfo.livevars) {
             LiveVars.handleRequest(cli);
+        } else if (rewriter.rewrite(cli)) {
         } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
             Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
         } else {
