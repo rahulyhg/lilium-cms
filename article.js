@@ -215,25 +215,27 @@ var Article = function() {
             if (arr.length === 0) {
                 cb(false, new Error("No article found"));
             } else {
+                var article = arr[0];
+                /*
                 var titlekeywords = (arr[0].title || art[0].name).replace(/[^a-zA-Z\s]/g, '').split( ' ' ).filter(function ( str ) {
                     var word = str.match(/(\w+)/);
                     return word && word[0].length > 3;
                 }).join( ' ' );
-
+                */
                 db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
                         $match : {
                             _id : {
-                                $lt : arr[0]._id
+                                $lt : article._id
                             }, 
-                            topic : arr[0].topic,
+                            topic : article.topic,
                             /*$text : { 
                                 $search : titlekeywords
-                            },
+                            },*/
                             $and : [
-                                {date : {$gt : new Date(new Date(arr[0].date).getTime() - (1000 * 60 * 60 * 24 * 31 * 6) )}},
-                                {date : {$lt : new Date(arr[0].date)}}
-                            ],*/
+                                {date : {$gt : new Date(new Date(article.date).getTime() - (1000 * 60 * 60 * 24 * 31 * 6) )}},
+                                {date : {$lt : new Date(article.date)}}
+                            ],
                             status : "published",
                         }
                     },{
@@ -255,19 +257,11 @@ var Article = function() {
                             foreignField:   "_id",
                             as:             "featuredimage"
                         }
-                    },{
-                        // Get Topic 
-                        $lookup : {
-                            from:           "topics",
-                            localField:     "topic",
-                            foreignField:   "_id",
-                            as:             "topic"
-                        }
                     }]).next(function(err, related) {
                         var continueWorking = function() {
                             var continueWithAuthor = function() {
-                                db.findToArray(require("./config.js").default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
-                                    arr[0].authors = autarr;
+                                db.findToArray(require("./config.js").default(), 'entities', {_id : article.author}, function(err, autarr) {
+                                    article.authors = autarr;
 
                                     var evts = hooks.getHooksFor('article_deepfetch');
                                     var keys = Object.keys(evts);
@@ -279,12 +273,12 @@ var Article = function() {
                                         if (kIndex == keys.length) {
                                             hooks.fire('article_will_fetch', {
                                                 _c : conf,
-                                                article: arr[0]
+                                                article: article
                                             });
                                         
-                                            cb(arr[0]);
+                                            cb(article);
                                         } else {
-                                            evts[keys[kIndex]].cb(conf, arr[0], next);
+                                            evts[keys[kIndex]].cb(conf, article, next);
                                         }
                                     };
 
@@ -292,28 +286,28 @@ var Article = function() {
                                 });
                             };
                             
-                            require('./topics.js').deepFetch(conf, arr[0].topic, function(deepTopic, family) {
+                            require('./topics.js').deepFetch(conf, article.topic, function(deepTopic, family) {
                                 if (deepTopic) {
-                                    arr[0].topics = family;
-                                    arr[0].topicslug = "/" + deepTopic.completeSlug + "/";
+                                    article.topics = family;
+                                    article.topicslug = "/" + deepTopic.completeSlug + "/";
                                 } else {
-                                    arr[0].topics = [];
-                                    arr[0].topicslug = "/";
+                                    article.topics = [];
+                                    article.topicslug = "/";
                                 }
 
-                                arr[0].topic = deepTopic;
-                                arr[0].url = conf.server.protocol + conf.server.url + arr[0].topicslug + arr[0].name;
-                                arr[0].amp = conf.server.protocol + conf.server.url + "/amp" + arr[0].topicslug + arr[0].name;
+                                article.topic = deepTopic;
+                                article.url = conf.server.protocol + conf.server.url + article.topicslug + article.name;
+                                article.amp = conf.server.protocol + conf.server.url + "/amp" + article.topicslug + article.name;
 
-                                if (arr[0].related) {
-                                    arr[0].related.url = conf.server.protocol + conf.server.url + arr[0].topicslug + arr[0].name;
+                                if (article.related) {
+                                    article.related.url = conf.server.protocol + conf.server.url + article.topicslug + related.name;
                                 }
 
                                 continueWithAuthor();
                             });
                         };
 
-                        arr[0].related = related;
+                        article.related = related;
                         continueWorking();
                     });
                 });
