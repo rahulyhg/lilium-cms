@@ -231,11 +231,11 @@ var Article = function() {
                             topic : article.topic,
                             /*$text : { 
                                 $search : titlekeywords
-                            },*/
+                            },
                             $and : [
                                 {date : {$gt : new Date(new Date(article.date).getTime() - (1000 * 60 * 60 * 24 * 31 * 6) )}},
                                 {date : {$lt : new Date(article.date)}}
-                            ],
+                            ],*/
                             status : "published",
                         }
                     },{
