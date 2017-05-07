@@ -1475,7 +1475,7 @@ var Article = function() {
                 extra.article = deepArticle;
                 extra.topic = deepArticle.topic;
 
-                if (deepArticle.topic.language) {
+                if (deepArticle.topic && deepArticle.topic.language) {
                     extra.language = deepArticle.topic.language;
                 }
 

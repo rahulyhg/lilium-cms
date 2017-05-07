@@ -425,6 +425,10 @@
             tempForm.values.id = contentid;
             tempForm.values.autosaveid = _id;
 
+            if (!tempForm.values.topic) {
+                return liliumcms.notify({title : "Watch out!", message : "You forgot to assign a topic.", type : "info"});
+            }
+
             if (valid) {
                 $('.alert-wrapper').remove();
 
@@ -465,6 +469,8 @@
                         }, 10000);
                     }
                 });
+            } else {
+                liliumcms.notify({title : "Could not publish", message : "Some required fields are missing."});
             } 
         };
 
