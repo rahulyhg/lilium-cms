@@ -338,74 +338,60 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
     }
 };
 
-var serveFeed = function(cli) {
-    var cpath = cli.routeinfo.path.join('/');
-    cpath = cpath.substring(5);
+var generateRSS = function(_c, completeSlug, send) {
+    var cpath = completeSlug;
 
     var conditions = {
         status : "published"
     };
-    var rsspath = cli._c.server.html + "/feed.rss";
+    var rsspath = _c.server.html + "/feed.rss";
     var topicobj;
-    var archpath = cli._c.server.protocol + cli._c.server.url;
+    var archpath = _c.server.protocol + _c.server.url;
     var feedpath = archpath + "/feed";
 
     var createFeed = function() {
-        fileserver.fileExists(rsspath, function(ex) {
-            if (ex) {
-                fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
-            } else {
-                db.find(cli._c, 'content', conditions, [], function(err, cur) {
-                    cur.project({date : 1, _id : 1}).sort({date : -1}).limit(10).toArray(function(err, arr) {
-                        var extra = {
-                            config : cli._c, 
-                            minify : false, 
-                            articles : [],
-                            cpath : cpath,
-                            archivepath : archpath,
-                            feedpath : feedpath,
-                            title : cli._c.website.sitetitle + (topicobj ? (" " + topicobj.displayname) : "")
-                        };
-        
-                        var index = 0;
+        db.find(_c, 'content', conditions, [], function(err, cur) {
+            cur.project({date : 1, _id : 1}).sort({date : -1}).limit(12).toArray(function(err, arr) {
+                var extra = {
+                    config : _c, 
+                    minify : false, 
+                    articles : [],
+                    cpath : cpath,
+                    archivepath : archpath,
+                    feedpath : feedpath,
+                    title : _c.website.sitetitle + (topicobj ? (" " + topicobj.displayname) : "")
+                };
 
-                        var getNext = function() {
-                            if (index == arr.length) {
-                                compile();
-                            } else {
-                                Article.deepFetch(cli._c, db.mongoID(arr[index]._id), function(fullart) {
-                                    index ++;
-                                    extra.articles.push(fullart);
-                                    getNext();
-                                });
-                            }
-                        };
+                var index = 0;
 
-                        var compile = function() {
-                            LML2.compileToFile(cli._c.server.base + "/flowers/narcity/feed.lml", rsspath, function() {
-                                log('RSS', 'Generated cached RSS feed for 1 hour');
-                                fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
-            
-                                setTimeout(function() {
-                                    fileserver.deleteFile(rsspath, function() {
-                                        log("RSS", "Deleted cached RSS", 'info');
-                                    });
-                                }, 1000 * 60 * 60);
-                            }, extra);
-                        };
+                var getNext = function() {
+                    if (index == arr.length) {
+                        compile();
+                    } else {
+                        Article.deepFetch(_c, db.mongoID(arr[index]._id), function(fullart) {
+                            index ++;
+                            extra.articles.push(fullart);
+                            getNext();
+                        });
+                    }
+                };
 
-                        getNext();
-                    });
-                });
-            }
+                var compile = function() {
+                    LML2.compileToFile(_c.server.base + "/flowers/narcity/feed.lml", rsspath, function() {
+                        send(200);
+                    }, extra);
+                };
+
+                getNext();
+            });
         });
     };
 
     if (cpath) {
-        rsspath = cli._c.server.html + "/" + cpath + "/feed.rss";
-        db.findUnique(cli._c, 'topics', {completeSlug : cpath}, function(err, topic) {
+        rsspath = _c.server.html + "/" + cpath + "/feed.rss";
+        db.findUnique(_c, 'topics', {completeSlug : cpath}, function(err, topic) {
             if (topic) {
-                topics.getFamilyIDs(cli._c, topic._id, function(ids) {
+                topics.getFamilyIDs(_c, topic._id, function(ids) {
                     topicobj = topic;
                     conditions.topic = {
                         "$in" : ids
@@ -417,12 +403,37 @@ var serveFeed = function(cli) {
                 });
             } else {
                 log("RSS", "Requested feed for unexisting topic : " + cpath, "warn");
-                cli.throwHTTP(404);
+                send(404);
             }
         });
     } else {
         createFeed();
     }
+
+};
+
+var serveFeed = function(cli) {
+    var cpath = cli.routeinfo.path.join('/');
+    cpath = cpath.substring(5);
+
+    var rsspath = cli._c.server.html + "/feed.rss";
+    if (cpath) { 
+        rsspath = cli._c.server.html + "/" + cpath + "/feed.rss";
+    }
+
+    fileserver.fileExists(rsspath, function(ex) {
+        if (ex) {
+            fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
+        } else {
+            generateRSS(cli._c, cpath, function(code) {
+                if (code && code == 404)  {
+                    cli.throwHTTP(404, undefined, true);
+                } else {
+                    fileserver.pipeFileToClient(cli, rsspath, function() {}, true, 'application/rss+xml');
+                }
+            });
+        }
+    });
 };
 
 var fetchTopicArticles = function(conf, topic, index, send) {
@@ -649,15 +660,6 @@ var generateHomepage = function(_c, cb) {
             cb && cb(pContent);
         });
     });
-}
-
-var parseArticleAds = function(pkg) {
-    var _c = pkg._c;
-    var article = pkg.article;
-    var done = pkg.done;
-    var force = pkg.force;
-
-    
 }
 
 var getWhatsHot = function(_c, cb) {
@@ -914,22 +916,35 @@ var loadHooks = function(_c, info) {
         }
     });
 
-    fileserver.deleteFile(_c.server.html + "/feed.rss", function() {
-        endpoints.register(_c.id, 'feed', 'GET', function(cli) {
-            serveFeed(cli);
-        });
+    endpoints.register(_c.id, 'feed', 'GET', function(cli) {
+        serveFeed(cli);
     });
 
+    if (process.env.instancenum == 0) {
+        log('RSS', "Recreating main RSS feed for website " + _c.website.sitetitle);
+        setInterval(function() {
+            generateRSS(_c, undefined, function() {});
+        }, 1000 * 60 * 60);
+
+        generateRSS(_c, undefined, function() {});
+    }
+
     hooks.bind('homepage_needs_refresh', 1, function(pkg) { 
-        generateHomepage(pkg._c || pkg.cli._c, pkg.callback);
+        if (pkg._c.uid == _c.uid) {
+            generateHomepage(pkg._c || pkg.cli._c, pkg.callback);
+        }
     });
 
     hooks.bind('topic_needs_refresh', 1, function(pkg) {
-        renderTopicArchive(pkg._c, pkg.topic, pkg.index || 1, pkg.callback || function() {}); 
+        if (pkg._c.uid == _c.uid) {
+            renderTopicArchive(pkg._c, pkg.topic, pkg.index || 1, pkg.callback || function() {}); 
+        }
     });
 
-    hooks.bind('article_ads_will_parse', 10, function(pkg) {
-        parseArticleAds(pkg);
+    hooks.bind('rss_needs_refresh', 1, function(pkg) {
+        if (pkg._c.uid == _c.uid) {
+            generateRSS(pkg._c, pkg.completeSlug || pkg.topic.completeSlug, pkg.callback || function() {});
+        }
     });
 
     hooks.bind('article_will_create', 2000, function(pkg) { articleChanged(pkg.cli, pkg.article); });

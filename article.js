@@ -639,6 +639,14 @@ var Article = function() {
                                                         msg: (deepArticle.isPaginated ? "Paginated article " : "Article ") + '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
                                                         type: 'success'
                                                     });
+
+                                                    hooks.fire('rss_needs_refresh', {
+                                                        _c : cli._c,
+                                                        topic : tObject,
+                                                        callback : function() {
+                                                            log('Article', "RSS feed was refresh, received callback");
+                                                        }
+                                                    });
                                                 });
 
                                                 feed.plop(deepArticle._id, function() {

@@ -1,5 +1,6 @@
 const log = require('../log.js');
 const localcast = require('../localcast.js');
+const request = require('request');
 
 const sites = require('../sites.js');
 const config = require('../config.js');
@@ -64,11 +65,25 @@ class RunningTask {
                     topicLib.deepFetch(this._c, topic._id, (topic) => {
                         trigger[firstKey].cb({
                             _c : this._c,
-                            callback : sendback,
                             topic : topic,
-                            index : 1
+                            index : 1,
+                            callback : function() {
+                                let trigger = hooks.getHooksFor('rss_needs_refresh');
+                                let firstKey = Object.keys(trigger).shift();
+                                if (!firstKey) {
+                                    return sendback();
+                                }
+
+                                log('RunningTask', 'Generating RSS feed');
+                                trigger[firstKey].cb({
+                                    _c : this._c,
+                                    topic : topic,
+                                    callback : sendback
+                                });
+                            }.bind(this)
                         });
                     });
+
                 } else {
                     log('RunningTask', 'No article topic at index ' + stats.skip);
                     stats.skip = 0;
