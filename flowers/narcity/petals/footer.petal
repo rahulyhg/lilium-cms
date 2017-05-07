@@ -73,7 +73,7 @@ $}
         uid : 57714,
         domain : "{=domain}",
         useCanonical : true,
-        sections : "{=?theme.settings.chartbeatsection}",
+        sections : "{=?theme.settings.chartbeatsection},{=?extra.article.topic.displayname}",
         authors : "{=?extra.article.authors.0.displayname}"
     };
     
