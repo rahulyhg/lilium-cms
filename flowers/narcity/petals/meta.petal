@@ -6,8 +6,9 @@
 <meta name="template" content="Narcity 3.1">
 
 <link rel="icon" href="{=theme.settings.favicon}" />
-<meta property="fb:app_id" content="369886419698055" />
-<meta property="fb:pages" content="254768477928383" />
+
+<meta property="fb:pages" content="{=?theme.settings.facebookpageid}" />
+<meta property="fb:app_id" content="{=?theme.settings.facebookappid}" />
 
 {$
     socialfilename = "petals/tags-";

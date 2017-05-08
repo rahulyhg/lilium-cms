@@ -28,9 +28,6 @@
 <meta property="og:image:width" content="{=?extra.article.featuredimage.0.size.width}" />
 <meta property="og:image:height" content="{=?extra.article.featuredimage.0.size.height}" />
 
-<meta property="fb:pages" content="{=?theme.settings.facebookpageid}" />
-<meta property="fb:app_id" content="{=?theme.settings.facebookappid}" />
-
 {$ if (?extra.article.canonical ??); $}
     <link rel="canonical" href="{=extra.article.canonical}" />
     <meta property="og:url" content="{=extra.article.canonical}"/>
