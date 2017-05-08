@@ -71,6 +71,8 @@ var _c = require('./config.js').default(),
                     redis = require('socket.io-redis');
                     io.adapter(redis());
                 }
+
+                server.timeout = 12 * 1000;
             }
 
             return this;
@@ -87,12 +89,6 @@ var _c = require('./config.js').default(),
         this.getTotalRequestHandlesCount = function () {
             return totalReqCount;
         };
-
-        var init = function () {
-
-        };
-
-        init();
     })();
 
 module.exports = __inbound;

@@ -22,7 +22,8 @@ let mailHooks = {
     article_sent_for_review : {displayname : "An article has been sent for review. Send to production."},
     communication_on_article : {displayname : "A new communication is added to an article. Send to subscribers."},
     ticket_submitted : {displayname : "A support ticket was submitted. Send to developers."},
-    ticket_status_update : {displayname : "A support ticket was updated. Send to original poster."}
+    ticket_status_update : {displayname : "A support ticket was updated. Send to original poster."},
+    yesterday_stats_to_editor : {displayname : "It's late; generate stats of yesterday. Send to editors."}
 };
 
 class EMail {
