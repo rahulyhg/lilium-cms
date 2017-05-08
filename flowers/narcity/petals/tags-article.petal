@@ -21,7 +21,7 @@ $}
 <meta name="twitter:creator" content="@{=?config.default.social.accounts.twitter}" />
 
 <meta property="author" content="{=extra.article.authors.0.displayname}" />
-<meta property="article:published_time" content="{=extra.article.date}" />
+<!--meta property="article:published_time" content="{=extra.article.date}" /-->
 <meta property="article:section" content="{=?extra.article.topic.displayname}" />
 <meta property="article:publisher" content="{=?theme.settings.facebook}" />
 <meta property="article:author" content="{=?extra.article.authors.0.socialnetworks.facebook}" />
