@@ -6,9 +6,9 @@ var db = require('./includes/db.js');
 var Embed = function() {};
 
 var createDivFromResponse = function(data) {
-    return '<img src="'+data.thumbnail_url+                  
+    return '<p><img src="'+data.thumbnail_url+                  
         '" class="lml-instagram-embed-2" /><a class="lml-instagram-op-2" href="'+                                                       
-        data.author_url +'">via @'+data.author_name+'</a>';
+        data.author_url +'">via @'+data.author_name+'</a></p>';
 }
 
 var handleRequest = function(cli) {
