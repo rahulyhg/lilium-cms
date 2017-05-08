@@ -1,21 +1,26 @@
 <script>
     var fbtrack = function() {
-        fbq('trackCustom', 'ContentTracking', {
-            content_id: window.lmlarticle.identifier,
-            content_type: window.lmlarticle.category,
-            content_name: window.lmlarticle.title,
-            device_width: window.innerWidth,
-            user_agent : window.navigator.userAgent,
-            city : window.city || "Planet Earth",
-            pps : window.narcitySession.pageViewed,
-            content_page: window.lmlarticle.page,
-            tags: window.lmlarticle.tags,
-            property : window.lmlsite.property
-        });
+        fbq('trackCustom', 'ContentTracking', window.trackData);
     };
 
     if (window.lmlcontext == "article" && typeof fbq != "undefined") {
         window.city = "";
+
+        var urlsplit = document.location.href.split("/");
+        window.trackData = {
+            content_id : window.lmlarticle.identifier,
+            content_type : window.lmlarticle.category,
+            content_name : window.lmlarticle.title,
+            device_width : window.innerWidth,
+            user_agent : window.navigator && window.navigator.userAgent,
+            site_city : urlsplit[5],
+            city : "Planet Earth",
+            topic : urlsplit[urlsplit.length - 2],
+            content_page : window.lmlarticle.page,
+            tags : window.lmlarticle.tags,
+            property : window.lmlsite.property
+        };
+
         if (navigator && navigator.geolocation && navigator.geolocation.getCurrentPosition) {
             navigator.geolocation.getCurrentPosition(function(pos) {                
                 if (!pos) { return fbtrack(); }
@@ -42,6 +47,8 @@
                             }
         
                             window.city = city;
+                            window.trackData.city = city;
+
                             fbtrack();
                         };    
 

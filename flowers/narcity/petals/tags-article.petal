@@ -1,10 +1,5 @@
 {#config;extra;theme}
 
-{$
-    featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
-    author = extra.article.authors.0;
-$}
-
 <!-- Single metas -->
 <meta name="description" content="{=&extra.article.subtitle}">
 <meta itemprop="name" content="{=&extra.article.title}">
@@ -56,13 +51,13 @@ $}
     "dateModified": "{=extra.article.date}",
     "image": {
         "@type": "ImageObject",
-        "url": "{=config.default.server.protocol}{=featimg}",
+        "url": "{=config.default.server.protocol}{=extra.article.featuredimage.0.sizes.narcityfeatured.url}",
         "width": 970,
         "height": 400
     },
     "author":{
         "@type": "Person",
-        "name": "{=author.displayname}"
+        "name": "{=extra.article.authors.0.displayname}"
     },
     "publisher":{
         "@type": "Organization",
