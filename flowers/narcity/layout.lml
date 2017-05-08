@@ -2,10 +2,10 @@
 {#config;theme;extra;debug}
 <html id="lmlhtml" data-htmltype="lml" data-generated="true" data-cachehit="true" lang="{=extra.language}">
 <head id="lmlhead">
-    {=theme.settings.headprio}
     {%petals/meta}
     {%petals/headstyle}
     {%petals/headscript}
+    {=theme.settings.headprio}
     {=theme.getQueueTags()}
     {%petals/title}
     {=theme.settings.headend}
