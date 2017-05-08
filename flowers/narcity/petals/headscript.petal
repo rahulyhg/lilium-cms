@@ -85,33 +85,6 @@
 <script src="{=config.default.server.url}/compiled/theme/vaniryk.js?{=config.default.compilekey}"></script>
 
 <script>
-// AD TARGETING
-if (typeof googletag != "undefined") {
-        googletag.cmd.push(function() {
-            googletag.pubads()
-                {$ if (extra.contextname == "article"); $}
-                .setTargeting("category", ["{=extra.article.topic.displayname}", "ROS"])
-                    {$ if (?extra.article.data.wp_id); $}
-                    .setTargeting("post", "{=?extra.article.data.wp_id}")
-                    {$ else; $}
-                    .setTargeting("contentid", "{=extra.article._id}")
-                    {$ endif; $}
-                {$ if (extra.contextname == "home"); $}
-                .setTargeting("category", ["homepage"])
-                {$ endif; $}
-                .setTargeting('strnativekey', 'G6X4zbWEuSdvaWYd9F2QwDEi')
-            ;
-
-            // Run the whole thing    
-            googletag.pubads().enableAsyncRendering();
-            googletag.enableServices();
-        });
-}
-
-
-</script>
-
-<script>
 var fetchTrending = function() {
     var tUrl = "{=config.default.server.url}/whatshot";
     var gotTrending = function() {
