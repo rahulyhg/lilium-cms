@@ -30,8 +30,8 @@ $}
 <meta property="og:description" content="{=&extra.article.subtitle}" />
 <meta property="og:type" content="article" />
 <meta property="og:image" content="{=config.default.server.protocol}{=config.default.server.url}/uploads/{=extra.article.featuredimage.0.url}" />
-<meta property="og:image:width" content="{=?extra.article.featuredimage.0.width}" />
-<meta property="og:image:height" content="{=?extra.article.featuredimage.0.height}" />
+<meta property="og:image:width" content="{=?extra.article.featuredimage.0.size.width}" />
+<meta property="og:image:height" content="{=?extra.article.featuredimage.0.size.height}" />
 
 <meta property="fb:pages" content="{=?theme.settings.facebookpageid}" />
 <meta property="fb:app_id" content="{=?theme.settings.facebookappid}" />
