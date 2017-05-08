@@ -952,7 +952,7 @@ var loadHooks = function(_c, info) {
         parseInsta(pkg);
     });
 
-    hooks.bind('article_async_render_' + _c.uid, 1000, parseAds);
+    hooks.bind('article_async_render_' + _c.uid, 1000, articleAsyncRender);
     hooks.bind('insert_ads_' + _c.uid, 1000, insertAds);
 };
 
@@ -966,6 +966,35 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
 
 var parseInsta = function(pkg) {
     pkg.article.content = pkg.article.content.replace(/\<script async\=\"\" defer\=\"\" src\=\"\/\/platform.instagram.com\/en_US\/embeds.js\"\>\<\/script\>/g, "") + '<script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>';
+};
+
+var articleAsyncRender = function(pkg) {
+    db.join(pkg._c, 'content', [
+        {
+            $match : {
+                _id : {
+                    $ne : pkg.article._id
+                },
+                topic : pkg.article.topic
+            }
+        }, {
+            $sort : {
+                date : -1
+            }
+        }, {
+            $limit : 8
+        }, {
+            $lookup : {
+                from:           "uploads",
+                localField:     "media",
+                foreignField:   "_id",
+                as:             "featuredimage"
+            }
+        }
+    ], function(arr) {
+        pkg.article.fromtopic = arr;
+        pkg.done();
+    });
 };
 
 var insertAds = function(pkg) {
