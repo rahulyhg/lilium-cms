@@ -88,7 +88,6 @@ $}
 </script>
 
 <script src="https://use.fontawesome.com/c06218d3bc.js"></script>
-<script src="//www.googletagservices.com/tag/js/gpt.js" async=""></script>
 <script src="{=config.default.server.url}/compiled/theme/social.js?{=config.default.compilekey}"></script>
 <script src="{=config.default.server.url}/compiled/theme/facebook.js?{=config.default.compilekey}"></script>
 <script src="{=config.default.server.url}/compiled/theme/global.js?{=config.default.compilekey}"></script>

@@ -954,6 +954,7 @@ var loadHooks = function(_c, info) {
 
     hooks.bind('article_async_render_' + _c.uid, 1000, articleAsyncRender);
     hooks.bind('insert_ads_' + _c.uid, 1000, insertAds);
+    hooks.bind('parse_ads_' + _c.uid, 1000, parseAds);
 };
 
 NarcityTheme.prototype.clearCache = function(ctx, detail) {
@@ -993,7 +994,7 @@ var articleAsyncRender = function(pkg) {
         }
     ], function(arr) {
         pkg.article.fromtopic = arr;
-        pkg.done();
+        parseAds(pkg);
     });
 };
 
