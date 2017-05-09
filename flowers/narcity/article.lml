@@ -124,7 +124,7 @@ $}
             {$ if (topic.slug == "best-of-mtl"); $}
             <div class="bottom-promotion-link">
                 <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's
-                <a href="{=config.default.server.url}/topic/best-of-mtl" target="_blank">&quot;Best Of&quot; lists</a>;
+                <a href="{=config.default.server.url}/{=extra.article.completeSlug}" target="_blank">&quot;Best Of&quot; lists</a>;
                 furthermore, this list represents a showcase of great spots, and is not a numbered ranking.
             </div>
             {$ endif; $}
