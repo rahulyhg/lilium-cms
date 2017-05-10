@@ -191,7 +191,7 @@ var findAds = function() {
     }
 
     var keys = Object.keys(window.lmladslots);
-    for (var i = 0; i < keys.length; i++) {
+    for (var i = 0; i < keys.length && false; i++) {
         if (document.getElementById(keys[i])) {
             (function(i) {
                 googletag.cmd.push(function() {
@@ -212,7 +212,8 @@ var handleAdScroll = function(e) {
         var adinfo = window.adpos.shift();
         googletag.cmd.push(function() {
             console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
-            googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
+            // googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
+            googletag.display(adinfo.id);
         });
         
         handlingScroll = false;
