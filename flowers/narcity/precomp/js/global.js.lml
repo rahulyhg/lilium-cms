@@ -211,8 +211,8 @@ var handleAdScroll = function(e) {
         var adinfo = window.adpos.shift();
         googletag.cmd.push(function() {
             console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
-            // googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
-            googletag.display( adinfo.id );
+            googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
+            // googletag.display( adinfo.id );
         });
         
         handlingScroll = false;
