@@ -189,6 +189,15 @@ var findAds = function() {
             elem : ad
         });
     }
+
+    // Calling display on all adslots 
+    googletag.cmd.push(function() {
+        var keys = Object.keys(window.lmladslots);
+        for (var i = 0; i < keys.length; i++) {
+            console.log("Preloading div ID " + keys[i]);
+            googletag.display(keys[i]);
+        }
+    });
 };
 
 var handlingScroll = false;
