@@ -191,13 +191,14 @@ var findAds = function() {
     }
 
     // Calling display on all adslots 
-    googletag.cmd.push(function() {
-        var keys = Object.keys(window.lmladslots);
-        for (var i = 0; i < keys.length; i++) {
-            console.log("Preloading div ID " + keys[i]);
-            // googletag.display(keys[i]);
-        }
-    });
+    var keys = Object.keys(window.lmladslots);
+    for (var i = 0; i < keys.length; i++) {
+        (function(i) {
+            googletag.cmd.push(function() {
+                googletag.display(keys[i]);
+            });
+        })(i);
+    }
 };
 
 var handlingScroll = false;
