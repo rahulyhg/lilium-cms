@@ -192,11 +192,13 @@ var findAds = function() {
 
     var keys = Object.keys(window.lmladslots);
     for (var i = 0; i < keys.length; i++) {
-        (function(i) {
-            googletag.cmd.push(function() {
-                googletag.display(keys[i]);
-            });
-        })(i);
+        if (document.getElementById(keys[i])) {
+            (function(i) {
+                googletag.cmd.push(function() {
+                    googletag.display(keys[i]);
+                });
+            })(i);
+        }
     }
 };
 
@@ -211,7 +213,6 @@ var handleAdScroll = function(e) {
         googletag.cmd.push(function() {
             console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
             googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
-            // googletag.display( adinfo.id );
         });
         
         handlingScroll = false;
