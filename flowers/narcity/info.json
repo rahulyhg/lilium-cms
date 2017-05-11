@@ -56,6 +56,8 @@
         "fullwidthsize" : {"type" : "number", "attr" : {"displayname" : "Full width size (px)"}, "default" : 1024},
         "articlewidthsize" : {"type" : "number", "attr" : {"displayname" : "Article width size (px)"}, "default" : 640},
         "logo" : {"type" : "text", "attr" : {"displayname" : "Logo"}, "default" : "/static/media/lmllogo.png"},
+        "logowidth" : {"type" : "number", "attr" : {"displayname" : "Logo width"}, "default" : 105},
+        "logoheight" : {"type" : "number", "attr" : {"displayname" : "Logo height"}, "default" : 85},
         "favicon" : {"type" : "text", "attr" : {"displayname" : "Fav Icon"}, "default" : "/static/media/lmllogo.png"},
         "networkname" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montreal"},
         "chartbeatsection" : {"type" : "text", "attr" : {"displayname" : "Chartbeat Section"}, "default" : "Stuff"},
