@@ -1516,6 +1516,11 @@ article.archive-article h3 a {
     visibility:hidden;
 }
 
+#article-text iframe:not(.instagram-media):not(.embedly-card) {
+    width: 100%;
+    height: 320px;
+}
+
 /* Small browser */
 @media only screen and (max-width: {=fw}) {
     article.archive-article {
