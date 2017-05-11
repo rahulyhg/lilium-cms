@@ -316,21 +316,6 @@ $}
                   </div>
                   {$ endif; $}
 
-                  {$ if (?extra.article.isSponsored ??); else; $}
-                  <h4 class="article-section-title">You may like</h4>
-                  <div id="taboola-below-article-thumbnails">
-                      <amp-embed width=100 height=100
-                          type=taboola
-                          layout=responsive
-                          heights="(min-width:780px) 64%, (min-width:480px) 98%, (min-width:460px) 167%, 196%"
-                          data-publisher="narcitymedia-mtlblog"
-                          data-mode="alternating-thumbnails-a"
-                          data-placement="Hybrid Below Article Thumbnails"
-                          data-article="auto">
-                      </amp-embed>
-                  </div>
-                  {$ endif; $}
-
                   {$ if (?author.displayname); $}
                   <div class="article-signature">
                       <div class="article-signature-face-wrapper">
