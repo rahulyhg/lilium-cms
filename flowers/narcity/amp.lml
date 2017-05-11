@@ -40,8 +40,8 @@ $}
                 "logo": {
                     "@type": "ImageObject",
                     "url": "{=config.default.server.protocol}{=config.default.content.cdn.domain}{=theme.settings.logo}",
-                    "height": 60,
-                    "width": 75
+                    "height": {=theme.settings.logoheight},
+                    "width": {=theme.settings.logowidth}
                 }
             }
           }
@@ -137,7 +137,7 @@ $}
                 <div class="narcity-logo-wrapper">
                     <a href="{=config.default.server.url}">
                         <amp-img src="{=config.default.content.cdn.domain}{=theme.settings.logo}"
-                          layout="fixed" width="105px" height="85px">
+                          layout="fixed" width="{=theme.settings.logowidth}px" height="{=theme.settings.logoheight}px">
                         </amp-img>
                     </a>
                 </div>
