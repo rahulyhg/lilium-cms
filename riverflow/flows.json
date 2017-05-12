@@ -237,6 +237,10 @@
                 "children": []
             }
         }, {
+            "module" : "contentchains.js",
+            "endpoint" : "chains",
+            "support" : ["livevar", "admin_get", "admin_post"]
+        }, {
             "module" : "article.js",
             "endpoint" : "content",
             "support" : ["livevar"]
