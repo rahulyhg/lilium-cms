@@ -4,6 +4,7 @@ const article = require('./article.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
 const log = require('./log.js');
+const themes = require('./themes.js');
 
 const setupHtmlToAmp  = require('html-to-amp');
 const htmlToAmp = setupHtmlToAmp();
@@ -49,13 +50,18 @@ class Amp {
             );
         }
 
-        this.parseAMPContent(cli, articleContent, (err, amp) => {
+        this.parseAMPContent(cli, article, articleContent, (err, amp) => {
             if (err) {
                 return cli.throwHTTP(500, undefined, true);
             }
 
             log('AMP', 'Done parsing HTML to AMP');
             article.content = amp;
+            article.has_instagram = article.content.indexOf("<amp-instagram") != -1;        
+            article.has_twitter = article.content.indexOf("<amp-twitter") != -1;
+
+            log("HAS INSTAGRAM", article.has_instagram);
+            log("HAS TWITTER", article.has_twitter);
 
             /* Load theme AMP context, then generate from LML file */
             log('AMP', "Generating AMP page from LML for article : " + article.title);
@@ -74,7 +80,7 @@ class Amp {
         });
     };
 
-    parseAMPContent(cli, articleContent, cb) {
+    parseAMPContent(cli, article, articleContent, cb) {
         if (cli._c.content.cdn && cli._c.content.cdn.domain) {
             articleContent = articleContent.replace(
                 new RegExp('(src=")' + cli._c.server.url, "g"), 
@@ -82,8 +88,16 @@ class Amp {
             );
         }
         articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
-        articleContent = articleContent.replace(/<ad><\/ad>/g, '<p>{ad}</p>');
-      
+        
+        var cTheme = themes.getEnabledTheme(cli._c).settings;
+        var adtags = (article.topic && article.topic.override && article.topic.override.adtags) || 
+                        cTheme.adtags || {};
+        var keys = Object.keys(adtags);
+        for(var i = 0; i < keys.length; i++){
+            articleContent = articleContent.replace("<ad><\/ad>", '<p>{ad}</p>');
+        }
+        articleContent = articleContent.replace(/<ad><\/ad>/g, "");
+
         // Use library to do most of the parsing
         htmlToAmp(articleContent, (err, amp) => {
             if(!err) {
