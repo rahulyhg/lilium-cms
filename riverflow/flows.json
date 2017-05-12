@@ -226,7 +226,7 @@
         }, {
             "module" : "article.js",
             "endpoint" : "article",
-            "support" : ["admin_get", "admin_post", "form", "table"],
+            "support" : ["admin_get", "admin_post", "form", "table", "api_get"],
             "admin_menu" : {
                 "id": "articles",
                 "faicon": "fa-pencil",

@@ -38,6 +38,14 @@ var ContentDeliveryNetwork = function() {
         });
     };
 
+    this.parseOne = function(_c, string, skipValidation) {
+        if (skipValidation || (_c.content && _c.content.cdn && _c.content.cdn.domain)) {
+            return string.replace(_c.server.url, _c.content.cdn.domain);
+        } else {
+            return string;
+        }
+    };
+
     this.parse = function(txt, cli, cb, ignoreHTML) {
         var _c = cli._c || cli;
         if (_c.content && _c.content.cdn && _c.content.cdn.domain) {

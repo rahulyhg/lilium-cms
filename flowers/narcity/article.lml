@@ -121,7 +121,7 @@ $}
             </div>
             {$ endif; $}
 
-            {$ if (topic.slug == "best-of-mtl"); $}
+            {$ if (topic.completeSlug == "best-of-mtl"); $}
             <div class="bottom-promotion-link">
                 <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's
                 <a href="{=config.default.server.url}/{=extra.article.completeSlug}" target="_blank">&quot;Best Of&quot; lists</a>;
