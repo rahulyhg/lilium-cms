@@ -4,6 +4,7 @@ const article = require('./article.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
 const log = require('./log.js');
+const themes = require('./themes.js');
 
 const setupHtmlToAmp  = require('html-to-amp');
 const htmlToAmp = setupHtmlToAmp();
@@ -49,7 +50,7 @@ class Amp {
             );
         }
 
-        this.parseAMPContent(cli, articleContent, (err, amp) => {
+        this.parseAMPContent(cli, article, articleContent, (err, amp) => {
             if (err) {
                 return cli.throwHTTP(500, undefined, true);
             }
@@ -79,7 +80,7 @@ class Amp {
         });
     };
 
-    parseAMPContent(cli, articleContent, cb) {
+    parseAMPContent(cli, article, articleContent, cb) {
         if (cli._c.content.cdn && cli._c.content.cdn.domain) {
             articleContent = articleContent.replace(
                 new RegExp('(src=")' + cli._c.server.url, "g"), 
@@ -87,8 +88,16 @@ class Amp {
             );
         }
         articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
-        articleContent = articleContent.replace(/<ad><\/ad>/g, '<p>{ad}</p>');
-      
+        
+        var cTheme = themes.getEnabledTheme(cli._c).settings;
+        var adtags = (article.topic && article.topic.override && article.topic.override.adtags) || 
+                        cTheme.adtags || {};
+        var keys = Object.keys(adtags);
+        for(var i = 0; i < keys.length; i++){
+            articleContent = articleContent.replace("<ad><\/ad>", '<p>{ad}</p>');
+        }
+        articleContent = articleContent.replace(/<ad><\/ad>/g, "");
+
         // Use library to do most of the parsing
         htmlToAmp(articleContent, (err, amp) => {
             if(!err) {
