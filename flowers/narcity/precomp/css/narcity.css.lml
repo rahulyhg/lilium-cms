@@ -1515,7 +1515,10 @@ article.archive-article h3 a {
     display:none;
     visibility:hidden;
 }
-
+.ck-embed-video {
+    width: 100%;
+    height: 320px;
+}
 /* Small browser */
 @media only screen and (max-width: {=fw}) {
     article.archive-article {

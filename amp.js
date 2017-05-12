@@ -56,6 +56,11 @@ class Amp {
 
             log('AMP', 'Done parsing HTML to AMP');
             article.content = amp;
+            article.has_instagram = article.content.indexOf("<amp-instagram") != -1;        
+            article.has_twitter = article.content.indexOf("<amp-twitter") != -1;
+
+            log("HAS INSTAGRAM", article.has_instagram);
+            log("HAS TWITTER", article.has_twitter);
 
             /* Load theme AMP context, then generate from LML file */
             log('AMP', "Generating AMP page from LML for article : " + article.title);
