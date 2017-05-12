@@ -52,7 +52,12 @@ $}
         <script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script>
         <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-        <script async custom-element="amp-instagram" src="https://cdn.ampproject.org/v0/amp-instagram-0.1.js"></script>
+        {$ if (?extra.article.has_instagram ??); $}
+            <script async custom-element="amp-instagram" src="https://cdn.ampproject.org/v0/amp-instagram-0.1.js"></script>
+        {$ endif; $}
+        {$ if (?extra.article.has_twitter ??); $}
+            <script async custom-element="amp-twitter" src="https://cdn.ampproject.org/v0/amp-twitter-0.1.js"></script>
+        {$ endif; $}
 
         <style amp-custom>
             {%petals/amp-style}
@@ -76,31 +81,31 @@ $}
 
             <div class="slider-follow">
                 <h3>Follow</h3>
-                {$ if (?config.default.social.accounts.facebook != "") $}
+                {$ if (?config.default.social.accounts.facebook != ""); $}
                     <a href="https://facebook.com/{=config.default.social.accounts.facebook}" target="_blank">
                         <i class="fa fa-facebook-official" aria-hidden="true"></i>
                         <span>Facebook</span>
                     </a>
                 {$ endif; $}
-                {$ if (?config.default.social.accounts.twitter != "") $}
+                {$ if (?config.default.social.accounts.twitter != ""); $}
                     <a href="https://twitter.com/{=config.default.social.accounts.twitter}" target="_blank">
                         <i class="fa fa-twitter" aria-hidden="true"></i>
                         <span>Twitter</span>
                     </a>
                 {$ endif; $}
-                {$ if (?config.default.social.accounts.instagram != "") $}
+                {$ if (?config.default.social.accounts.instagram != ""); $}
                     <a href="https://instagram.com/{=config.default.social.accounts.instagram}" target="_blank">
                         <i class="fa fa-instagram" aria-hidden="true"></i>
                         <span>Instagram</span>
                     </a>
                 {$ endif; $}
-                {$ if (?config.default.social.accounts.googleplus != "") $}
+                {$ if (?config.default.social.accounts.googleplus != ""); $}
                     <a href="https://plus.google.com/+{=config.default.social.accounts.googleplus}" target="_blank">
                         <i class="fa fa-google-plus" aria-hidden="true"></i>
                         <span>Google Plus</span>
                     </a>
                 {$ endif; $}
-                {$ if (?config.default.social.accounts.youtube != "") $}
+                {$ if (?config.default.social.accounts.youtube != ""); $}
                     <a href="https://www.youtube.com/user/{=config.default.social.accounts.youtube}" target="_blank">
                         <i class="fa fa-youtube" aria-hidden="true"></i>
                         <span>Youtube</span>
