@@ -6,6 +6,7 @@ const Livevar = require('../livevars.js');
 const Endpoints = require('../endpoints.js');
 const Hooks = require('../hooks.js');
 const Postleaf = require('../postleaf.js');
+const API = require('../api.js');
 
 class FlowHandle {
     constructor(river, flow) {
@@ -22,6 +23,8 @@ class FlowHandle {
             case "livevar"    : Livevar.registerLiveVariable(this.flow.endpoint, this.river.livevar.bind(this.river));          break;
             case "get"        : Endpoints.register('*', this.flow.endpoint, 'GET', this.river.GET.bind(this.river));            break;
             case "post"       : Endpoints.register('*', this.flow.endpoint, 'POST', this.river.POST.bind(this.river));          break;
+            case "api_get"    : API.registerApiEndpoint(this.flow.endpoint, 'GET', this.river.apiGET.bind(this.river));         break;
+            case "api_post"   : API.registerApiEndpoint(this.flow.endpoint, 'POST', this.river.apiPOST.bind(this.river));       break;
             case "form"       : this.river.form.apply(this.river);                                                              break;
             case "table"      : this.river.table.apply(this.river);                                                             break;
             case "setup"      : this.river.setup.apply(this.river);                                                             break;

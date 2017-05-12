@@ -14,6 +14,7 @@ var badges = require('./badges.js');
 var moment = require('moment');
 var log = require('./log.js');
 var feed = require('./feed.js');
+var CDN = require('./cdn.js');
 
 var Article = function() {
     var that = this;
@@ -128,6 +129,80 @@ var Article = function() {
                 default:
                     return cli.throwHTTP(404, 'Not Found');
             }
+        }
+    };
+
+    this.presentable = function(_c, article) {
+        article.identifier = article._id.toString();
+        article._id = undefined;
+
+        if (article.topic) {
+            article.topic = {
+                displayname : article.topic.displayname,
+                slug : article.topic.slug,
+                completeSlug : article.topic.completeSlug
+            }
+        }
+
+        article.topics = undefined;
+        article.subscribers = undefined;
+        article.autosaveid = undefined;
+        article.media = undefined;
+        article.aliases = undefined;
+
+        article.impressions = undefined;
+        article.targetimpressions = undefined;
+        article.targetdate = undefined;
+        article.form_name = undefined;
+
+        article.industry = undefined;
+
+        article["publish-set"] = undefined;
+        article["persona-select"] = undefined;
+
+        if (article.featuredimage && article.featuredimage[0]) {
+            var featimgs = {};
+            for (var size in article.featuredimage[0].sizes) {
+                featimgs[size] = CDN.parseOne(_c, article.featuredimage[0].sizes[size].url);
+            }
+            article.featuredimage = featimgs;
+        }
+
+        if (article.authors && article.authors[0]) {
+            article.author = article.authors[0];
+            article.author = {
+                displayname : article.author.displayname,
+                avatarURL : article.author.avatarURL,
+                slug : article.author.slug
+            };
+
+            article.authors = undefined;
+        }
+
+        for (var k in article) {
+            if (k.indexOf('title-') == 0 || k.indexOf('lml') == 0) {
+                article[k] = undefined;
+            }
+        }
+
+        return article;
+    }
+
+    this.apiGET = function(cli) {
+        var ftc = cli.routeinfo.path[2];
+        if (ftc == "get") {
+            var slug = cli.routeinfo.path[3];
+            that.deepFetch(cli._c, slug, function(article) {
+                if (!article) {
+                    cli.throwHTTP(404);
+                } else {
+                    that.presentable(cli._c, article);
+
+                    cli.sendJSON(article);
+                }
+            }, false, {status : "published"})
+        } else {
+            cli.throwHTTP(404);
         }
     };
 

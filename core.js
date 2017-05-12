@@ -151,28 +151,6 @@ var Core = function () {
             filelogic.serveAdminLML(cli, false);
         });
 
-/*
-        api.registerApiEndpoint('articles', 'GET', function (cli) {
-            cli.touch('admin.GET.articles');
-            api.articlesHandleGET(cli);
-        });      
-
-        api.registerApiEndpoint('authors', 'GET', function (cli) {
-            cli.touch('admin.GET.authors');
-            api.authorsHandleGET(cli);
-        });  
-
-        api.registerApiEndpoint('categories', 'GET', function (cli) {
-            cli.touch('admin.GET.categories');
-            api.categoriesHandleGET(cli);
-        });  
-
-        api.registerApiEndpoint('search', 'GET', function (cli) {
-            cli.touch('admin.GET.search');
-            api.searchArticles(cli);
-        });  
-*/
-
         hooks.fire('endpoints');
         log('Endpoints', 'Loaded endpoints', 'success');
     };

@@ -18,6 +18,8 @@ var Article = undefined;
 var Category = undefined;
 var sharedcache = undefined;
 
+var readersLib = undefined;
+
 var themePath;
 var noOp = function() {};
 
@@ -1115,16 +1117,23 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
     registerLib();
     log('Narcity', 'Registered LML Library');
 
+    readersLib = new (require("./readers.js"))(_c).initialize();
+    log('Narcity', "Registered Readers Wrapper");
+
     registerSnips(_c, function() {
         log('Narcity', 'Registered theme snips');
 
         // Symlink res to html folder
         fileserver.createSymlink(themePath + '/res', _c.server.html + '/res', function() {
             fileserver.createDirIfNotExists(_c.server.html + "/tags", function() {
-                fileserver.createDirIfNotExists(_c.server.html + "/authors", function() {
-                    fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
-                        log('Narcity', 'Created symlink and content directories. Ready to callback');
-                        callback();
+                fileserver.createDirIfNotExists(_c.server.html + "/whoami", function() {
+                    fileserver.createDirIfNotExists(_c.server.html + "/authors", function() {
+                        fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
+                            readersLib.createCollection(function() {
+                                log('Narcity', 'Created symlink and content directories. Ready to callback');
+                                callback();
+                            });
+                        }, true);
                     }, true);
                 }, true);
             }, true);

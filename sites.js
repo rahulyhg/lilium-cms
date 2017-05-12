@@ -37,18 +37,22 @@ var SiteInitializer = function (conf, siteobj) {
 
         fileserver.createDirIfNotExists(conf.server.html, function (valid) {
             fileserver.createDirIfNotExists(conf.server.html + "/next", function(nextvalid) {
-                fileserver.createDirIfNotExists(conf.server.html + "/lmldoc", function(nextvalid) {
-                    if (valid && nextvalid) {
-                        log('FileServer',
-                            'HTML Directory was validated at : ' +
-                            conf.server.html,
-                            'success'
-                        );
-                    } else {
-                        log('FileServer', 'Error validated html directories', 'err');
-                    }
-        
-                    done();
+                fileserver.createDirIfNotExists(conf.server.html + "/amp", function(nextvalid) {
+                    fileserver.createDirIfNotExists(conf.server.html + "/api", function(nextvalid) {
+                        fileserver.createDirIfNotExists(conf.server.html + "/lmldoc", function(nextvalid) {
+                            if (valid && nextvalid) {
+                                log('FileServer',
+                                    'HTML Directory was validated at : ' +
+                                    conf.server.html,
+                                    'success'
+                                );
+                            } else {
+                                log('FileServer', 'Error validated html directories', 'err');
+                            }
+                
+                            done();
+                        }, true);
+                    }, true);
                 }, true);
             }, true);
         }, true);
