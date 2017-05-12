@@ -3,6 +3,7 @@
 <script src="{=config.default.server.url}/bower/timeago.js/dist/timeago.js"></script>
 <script>
     window.lmlhomelinks = [];
+    window.lmlarchivename = {=?extra.topic.displayname};
 </script>
 
 <main class="homepage">
