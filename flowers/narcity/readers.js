@@ -119,19 +119,23 @@ class NarcityReadersWrapper {
         let usertoken = cli.routeinfo.params.accessToken;
         let userid = cli.routeinfo.params.userID;
 
-        this.validateFacebookToken(cli._c, usertoken, (err, resp) => {
-            if (!err && resp.data.user_id == userid) {
-                that.createJSONSession(usertoken, resp.data.app_id, userid, (session, cookie) => {
-                    cli.response.writeHead(200, {
-                        'Set-Cookie' : "lmllove=" + cookie,
-                        'Content-Type' : "application/json"
+        if (usertoken && userid) {
+            this.validateFacebookToken(cli._c, usertoken, (err, resp) => {
+                if (!err && resp.data.user_id == userid) {
+                    that.createJSONSession(usertoken, resp.data.app_id, userid, (session, cookie) => {
+                        cli.response.writeHead(200, {
+                            'Set-Cookie' : "lmllove=" + cookie,
+                            'Content-Type' : "application/json"
+                        });
+                        cli.response.end(JSON.stringify(session));
                     });
-                    cli.response.end(JSON.stringify(session));
-                });
-            } else {
-                cli.throwHTTP(404, null, true);
-            }
-        });
+                } else {
+                    cli.throwHTTP(404, null, true);
+                }
+            });
+        } else {
+            cli.throwHTTP(404, null, true);
+        }
     }
 
     receiveBye(cli) {
