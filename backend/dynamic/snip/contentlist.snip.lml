@@ -1,0 +1,56 @@
+{#config}
+<div class="content-list-picker">
+    <input type="text" class="content-list-search" data-groupname="contentlistpicker" />
+    <div class="content-list-items">
+        <lml:foreach var="art" in="livevars.content.simple">
+            <div class="content-list-item">
+                <lml:value id="art._id" groupname="contentlistpicker" terms="art.title"></lml:value>
+            </div>
+        </lml:foreach>
+    </div>
+</div>
+
+<style>
+.content-list-picker {
+    border: 1px solid #DDD;
+}
+
+.content-list-items {
+    height: 320px;
+    overflow-y: auto;
+}
+
+.content-list-item {
+    padding: 4px 6px;
+    color: #333;
+    font-size: 14px;
+    border-bottom: 1px solid #EEE;
+    cursor: pointer;
+}
+
+.content-list-item:hover {
+    background-color: #FCFCFC;
+}
+
+.lmlform .content-list-picker input.content-list-search {
+    border: none;
+}
+
+.content-list-item small {
+    display : none;
+}
+</style>
+
+<script>
+var handleContentListSearch = function(e) {
+    var searchterms = e.target.value.split(' ');
+    var groupname = e.target.dataset.groupname;
+
+    var valgroup = liliumcms.lmldom.valuegroups[groupname];
+    
+}
+
+var search = document.querySelectorAll('.content-list-search');
+search = search[search.length-1];
+search.addEventListener('keyup', handleContentListSearch);
+</script>

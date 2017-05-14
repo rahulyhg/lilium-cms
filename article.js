@@ -1255,6 +1255,14 @@ var Article = function() {
                 });
             });
 
+        } else if (levels[0] == "simple") {
+            if (!cli.hasRight('list-articles')) {
+                return callback([]);
+            }
+
+            db.findToArray(cli._c, 'content', {status : "published"}, function(err, arr) {
+                callback(arr);
+            }, {_id : 1, title : 1});
         } else if (levels[0] == 'lastEdited') {
             if (!cli.hasRight("list-articles")) {
                 return callback({size:0,data:[],code:403});

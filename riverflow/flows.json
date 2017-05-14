@@ -239,7 +239,16 @@
         }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
-            "support" : ["livevar", "admin_get", "admin_post"]
+            "support" : ["livevar", "admin_get", "admin_post", "form", "table"],
+            "admin_menu" : {
+                "id": "contentchains",
+                "faicon": "fa-link",
+                "displayname": "Content Chains",
+                "priority": 235,
+                "rights": ["editor"],
+                "absURL": "admin/chains",
+                "children": []
+            }
         }, {
             "module" : "article.js",
             "endpoint" : "content",

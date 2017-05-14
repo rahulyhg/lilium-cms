@@ -37,6 +37,7 @@
     lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
     lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
     lml:link        => href="//domain.com/admin/{variableName}" class="" target=""
+    lml:value       => id="variableName" groupname="" terms="variableName"
 
     - Livevar fed fields --
     select.lmldom-liveselect  => data-filledby="livevar.endpoint" name="fieldname"
@@ -388,6 +389,39 @@ var LMLDom = function() {
             lnk.remove();
 
             lnk = elem.querySelector('lml\\:link');
+        }
+
+        var vn = elem.querySelector('lml\\:value');
+        while(vn) {
+            var value = getReturn(ldContext, vn.id);
+            var groupname = vn.getAttribute('groupname');
+            var terms = vn.getAttribute('terms') || "";
+
+            if (terms) {
+                terms = getReturn(ldContext, terms);
+            }
+
+            var valuegroup = liliumcms.lmldom.valuegroups[groupname];
+            if (!valuegroup) {
+                liliumcms.lmldom.valuegroups[groupname] = [];
+                valuegroup = liliumcms.lmldom.valuegroups[groupname];
+                valuegroup.selected = [];
+            }
+
+            valuegroup.push({
+                value : value,
+                terms : terms ? terms.split(' ') : []
+            }); 
+
+            var textvalue = document.createElement('span');
+            textvalue.id = groupname + "_" + value;
+            textvalue.dataset.value = value;
+            textvalue.textContent = terms;
+
+            vn.insertAfter(textvalue);
+            vn.remove();
+
+            vn = elem.querySelector('lml\\:value');
         }
 
         var tn = elem.querySelector('lml\\:text');
@@ -818,6 +852,7 @@ var LMLDom = function() {
         }
 
         ldContext.livevars = liliumcms.livevars.deepLivevars(true);
+        this.valuegroups = [];
 
         log('LMLDOM', 'Parsing Lilium Document Object Model v' + domv);
         var now = new Date();

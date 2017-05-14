@@ -1,5 +1,6 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
+const filelogic = require('./filelogic.js');
 const noop = () => {};
 
 class ContentChains {
@@ -34,10 +35,42 @@ class ContentChains {
     }
 
     adminGET(cli) {
-
+        filelogic.serveAdminLML(cli);
     }
 
     adminPOST(cli) {
+
+    }
+
+    form(cli) {
+        require('./formBuilder.js').createForm("contentchains", {
+            formWrapper: {
+                'tag': 'div',
+                'class': 'row',
+                'id': 'contentchainwrapper',
+                'inner': true
+            },
+            fieldWrapper : "lmlform-fieldwrapper"
+        })
+        .add('title', 'text', {
+            displayname : "Title",
+            placeholder : true,
+            classes : ["bigtitle"]
+        })
+        .add('subtitle', 'text', {
+            placeholder: true,
+            displayname: 'Subtitle'
+        })
+        .add('title-content', 'title', {
+            displayname : "Content"
+        })
+        .add('contentlist', 'snip', {
+            snip : "contentlist",
+            livevars : ["content.simple"]
+        })
+    }
+
+    table(cli) {
 
     }
 }

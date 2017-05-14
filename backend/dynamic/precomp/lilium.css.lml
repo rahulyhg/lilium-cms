@@ -2232,7 +2232,8 @@ button.bigger {
 
 
 #post_create input[type="text"].article_base_title,
-#post_create_new input[name="title"] {
+#post_create_new input[name="title"],
+.lmlform input:not([type="file"]):not([type="submit"]).bigtitle {
     font-family: 'PT Serif', serif;
     font-weight: bold;
     font-size: 32px;
