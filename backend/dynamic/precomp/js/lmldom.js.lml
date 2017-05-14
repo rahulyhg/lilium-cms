@@ -410,12 +410,13 @@ var LMLDom = function() {
 
             valuegroup.push({
                 value : value,
-                terms : terms ? terms.split(' ') : []
+                terms : terms ? terms.toLowerCase().split(' ') : []
             }); 
 
             var textvalue = document.createElement('span');
             textvalue.id = groupname + "_" + value;
             textvalue.dataset.value = value;
+            textvalue.dataset.groupname = groupname;
             textvalue.textContent = terms;
 
             vn.insertAfter(textvalue);

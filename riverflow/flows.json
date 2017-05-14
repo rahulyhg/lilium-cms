@@ -245,7 +245,7 @@
                 "faicon": "fa-link",
                 "displayname": "Content Chains",
                 "priority": 235,
-                "rights": ["editor"],
+                "rights": ["admin"],
                 "absURL": "admin/chains",
                 "children": []
             }

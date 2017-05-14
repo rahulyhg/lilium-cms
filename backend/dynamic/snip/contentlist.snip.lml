@@ -3,7 +3,7 @@
     <input type="text" class="content-list-search" data-groupname="contentlistpicker" />
     <div class="content-list-items">
         <lml:foreach var="art" in="livevars.content.simple">
-            <div class="content-list-item">
+            <div class="content-list-item" onclick="handleContentListClick(this);">
                 <lml:value id="art._id" groupname="contentlistpicker" terms="art.title"></lml:value>
             </div>
         </lml:foreach>
@@ -28,6 +28,10 @@
     cursor: pointer;
 }
 
+.content-list-item.filtered-out {
+    display: none;
+}
+
 .content-list-item:hover {
     background-color: #FCFCFC;
 }
@@ -43,11 +47,41 @@
 
 <script>
 var handleContentListSearch = function(e) {
-    var searchterms = e.target.value.split(' ');
+    var searchterms = e.target.value.trim().toLowerCase().split(' ');
     var groupname = e.target.dataset.groupname;
-
     var valgroup = liliumcms.lmldom.valuegroups[groupname];
-    
+
+    if (!e.target.value.trim()) {
+        for (var i = 0; i < valgroup.length; i++) {
+            document.getElementById(groupname + "_" + valgroup[i].value).parentElement.classList.remove('filtered-out');
+        }
+    } else {
+        for (var i = 0; i < valgroup.length; i++) {
+            var safeCount = 0;
+            for (var j = 0; j < valgroup[i].terms.length; j++) {
+                for (var w = 0; w < searchterms.length; w++) {
+                    if (valgroup[i].terms[j] == (searchterms[w])) {
+                        safeCount++;
+                        break;
+                    }
+                }
+            }
+
+            var safe = safeCount == searchterms.length;
+            document.getElementById(groupname + "_" + valgroup[i].value).parentElement.classList[safe ? "remove" : "add"]("filtered-out");
+        }
+    }
+}
+
+var handleSelectOnID = function(id, group) {
+    var valgroup = liliumcms.lmldom.valuegroups[group];
+    valgroup.selected.push(id);
+    document.getElementById(group + "_" + id).parentElement.style.display = "none";
+}
+
+var handleContentListClick = function(listitem) {
+    var span = listitem.querySelector('span');
+    handleSelectOnID(span.dataset.value, span.dataset.groupname);
 }
 
 var search = document.querySelectorAll('.content-list-search');
