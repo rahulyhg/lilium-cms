@@ -346,7 +346,8 @@ form .campaigncreatefield-checkbox label {
 
 lml\:template, lml\:tobject, lml,
 lml\:queryparam, .lmlloading, .lmlhidden,
-lml\:foreach, lml\:wrapper, lml\:text {
+lml\:foreach, lml\:wrapper, lml\:text,
+lml\:stage {
 	display: none;
 }
 

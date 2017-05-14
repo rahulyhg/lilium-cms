@@ -16,8 +16,8 @@ class ContentChains {
             createdBy : undefined,
             createdOn : new Date(),
             lastModified : new Date(),
-            media : undefined,
-            topic : undefined
+            publishedOn : new Date(),
+            media : undefined
         }, data);
     }
 
@@ -30,12 +30,26 @@ class ContentChains {
         
     }
 
-    livevar(cli, levels, params, send) {
+    bunchLivevar(cli, levels, params, send) {
+        send([]);
+    }
 
+    livevar(cli, levels, params, send) {
+        if (levels[0] == "bunch") {
+            this.bunchLivevar(...arguments);
+        }
     }
 
     adminGET(cli) {
-        filelogic.serveAdminLML(cli);
+        var path = cli.routeinfo.path[2];
+
+        if (!path) {
+            filelogic.serveAdminLML(cli);
+        } else if (path == "edit") {
+            
+        } else {
+            cli.throwHTTP(404);
+        }
     }
 
     adminPOST(cli) {
@@ -71,7 +85,43 @@ class ContentChains {
     }
 
     table(cli) {
-
+        require('./tableBuilder.js').createTable({
+            name : "contentchain",
+            endpoint: "chains.table",
+            paginate : true,
+            searchable : true,
+            max_results : 25, 
+            sortby : '_id',
+            sortorder : -1,
+            filters : {
+                status : {
+                    displayname : "status",
+                    datasource : [{
+                        value : "live",
+                        displayname : "Live"
+                    }, {
+                        value : "draft",
+                        displayname : "Draft"
+                    }]
+                },
+                author : {
+                    displayname : "Author",
+                    livevar : {
+                        endpoint : "entities.simple.active",
+                        value : "_id",
+                        displayname : "displayname"
+                    }
+                }
+            },
+            fields : [{
+                key : "title",
+                displayname : "Title",
+                template : "table-chain-title",
+                sortable : true,
+                sortkey : "title",
+                classes : "chain-table-title"
+            }]                 
+        });
     }
 }
 

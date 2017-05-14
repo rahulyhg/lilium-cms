@@ -35,12 +35,17 @@ var LMLConversations = function() {
     };
 
     this.updateState = function(user) {
-        if (user.status == "online") {
-            var ctn = document.getElementById("chat-list-online");
-            ctn.insertBefore(document.getElementById("user" + user.id), ctn.firstChild);
-        } else {
-            var ctn = document.getElementById("chat-list-everyone");
-            ctn.insertBefore(document.getElementById("user" + user.id), ctn.firstChild);
+        var elem = document.getElementById("user" + user.id);
+        var ctn;
+
+        if (elem) {
+            if (user.status == "online") {
+                ctn = document.getElementById("chat-list-online");
+            } else {
+                ctn = document.getElementById("chat-list-everyone");
+            }
+
+            ctn.insertBefore(elem, ctn.firstChild);
         }
     };
 

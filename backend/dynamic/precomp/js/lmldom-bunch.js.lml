@@ -1,0 +1,48 @@
+// Instanciable by LMLDom
+var LMLDOM_Bunch = function(ldContext, bunchElement) {
+    var that = this;
+
+    this.elem = bunchElement;
+    this.template = bunchElement.querySelector("lml\\:bunchitem");
+    this.settings = new LMLDOM_JSON(ldContext, bunchElement.querySelector('script[type="lmljson"]'));
+    this.filters = {};
+
+    this.valid = false;
+
+    if (this.elem && this.template && this.settings.valid) {
+        this.valid = true;
+    } else {
+        log('LMLDOM', "Error in LMLBunch tag, make sure it has a template and a LMLJson tag", 'err');
+    }
+
+    this.render = function(done) {
+        // Call to livevar
+        var endpoint = that.settings.data.datasource;
+        liliumcms.livevars.getSingleLivevar(endpoint, that.filters, function(lv) {
+            // Get element by ID, fill with template in loop
+            if (lv.response.code == 200) {
+                var items = lv.livevars[endpoint];
+                done();
+            } else {
+                log('LMLDOM', "Received non-200 code from livevar request at endpoint : " + endpoint, "warn");
+                done();
+            }
+        });
+    };
+
+    this.createID = function(salt) {
+        return "bunchwrap_" + salt + Math.random().toString().substring(2) + Math.random().toString().substring(2);
+    };
+
+    this.init = function() {
+        var bunchWrap = document.createElement('div');
+        bunchWrap.id = that.createID(this.settings.name);
+
+        that.bunchWrap = bunchWrap;
+        that.elem.parentElement.insertBefore(that.bunchWrap, that.elem);
+        that.elem.id = "bunch_" + this.settings.name;
+
+        liliumcms.lmldom.stage(that.elem);
+    };
+};
+

@@ -816,7 +816,7 @@ var LiliumCMS = function() {
                 var pageContent = (this.responseText);
                 document.querySelector('main.lmladminmain').innerHTML = pageContent;
 
-                var scripts = document.querySelectorAll('main.lmladminmain script');
+                var scripts = document.querySelectorAll('main.lmladminmain script:not([type="lmljson"])');
                 for (var i = 0; i < scripts.length; i++) {
                     eval.call(window, scripts[i].textContent);
                     scripts[i].dataset.executedby = "pageloader";

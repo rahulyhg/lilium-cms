@@ -74,11 +74,11 @@ var LiliumChartbeat = function($) {
 	var bindLivevars = function() {
         if (true || !window.lmlchartbeatlivevarprerenderedbound) {
             window.lmlchartbeatlivevarprerenderedbound = true;
-		    document.addEventListener('livevarsPrerendered', livevarsPrerendered);
+		    document.addEventListener('livevarsRendered', livevarsRendered);
         }
 	};
 
-    var livevarsPrerendered = function(pkg) {
+    var livevarsRendered = function(pkg) {
             if (!document.getElementById("dash-cb-histo-canvas")) return;
 
 			var livevars = pkg.detail.livevars;

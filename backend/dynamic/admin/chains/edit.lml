@@ -1,0 +1,4 @@
+{#config;extra;forms}
+<lml:dom v="0.8"></lml:dom>
+<h1>Content Chains</h1>
+{=forms.render("contentchains")}

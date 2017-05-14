@@ -15,6 +15,17 @@
 
     -- LMLDom Tags --------
 
+    - Stand-alone features
+    lml:bunch       
+        script:type=lmljson
+        lml:bunchitem
+            # See lmldom-bunch.js
+
+    script=lmljson
+        Json containing values and settings
+        Values will be available through ldContext
+            # See lmldom-json.js
+
     - Loops & Wrappers --
     lml:foreach     => var="newlyDefinedVariable" in="currentArray"
     lml:wrapper     => tag="tagName" id="id_and_{variableName}" class="class passed to new node"
@@ -193,7 +204,45 @@ var LMLDom = function() {
         };
 
         next();
+    };
+
+    this.stage = function(elem) {
+        var stageElement = document.querySelector('lml\\:stage');
+        stageElement && stageElement.appendChild(elem);
+    };
+
+    this.emptyStage = function() {
+        var stageElement = document.querySelector('lml\\:stage');
+        if (stageElement) {
+            while (stageElement.firstChild) {
+                stageElement.removeChild(stageElement.firstChild);
+            }
+        } else {
+            document.documentElement.appendChild(document.createElement("lml:stage"));
+        }
     }
+
+    this.handleSingleBunch = function(bunchElem, done) {
+        var bObj = new LMLDOM_Bunch(ldContext, bunchElem);
+        bObj.init();
+        bObj.render(done);
+    };
+
+    this.parseBunches = function(maindom, done) {
+        ldContext.lmljson = {};
+        var bunches = maindom.querySelectorAll('lml\\:bunch');
+        var bunchIndex = -1;
+        var nextBunch = function() {
+            if (++bunchIndex == bunches.length) {
+                done();
+            } else {
+                liliumcms.lmldom.handleSingleBunch(bunches[bunchIndex], nextBunch);
+            }
+        };
+
+        log('LMLDOM', 'Working with ' + bunches.length + " bunches");
+        nextBunch();
+    };
 
     this.parseNode = function(elem) {
         var fe = elem.querySelector('lml\\:foreach');
@@ -852,6 +901,7 @@ var LMLDom = function() {
             return lmldomReady && lmldomReady();
         }
 
+        lmldom.emptyStage();
         ldContext.livevars = liliumcms.livevars.deepLivevars(true);
         this.valuegroups = [];
 
@@ -859,39 +909,41 @@ var LMLDom = function() {
         var now = new Date();
         lmldom.parseLiveFields(maindom);
         lmldom.parseSnips(maindom, function() {
-            log('LMLDOM', 'Working with LMLDOM markup');
-            lmldom.parseNode(maindom);
-            var lvs = maindom.querySelectorAll("lml\\:livevars");
-            for (var i = 0; i < lvs.length; i++) {
-                lvs[i].remove();
-            }
-
-            lmldom.createEditors(maindom, function() {
-                lmldom.fillForms();
-
-                log('LMLDOM', 'Applying page features');
-                lmldom.removeFeatures();
-                lmldom.addFeatures();
-
-                log("LMLDOM", "Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
-                liliumcms.pageloader.parseDocument();
-
-                log('LMLDOM', 'Dispatching lmlDOMLoaded event');
-                document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
-                    detail : {
-                        version : domv,
-                        protocol : "lmldom",
-                        timetoparse : (new Date() - now)
-                    }
-                }));
-
-                log('LMLDOM', 'Firing ' + domhooks.length + " LMLDOM hooks");
-                while (domhooks.length) {
-                    domhooks.pop()();
+            lmldom.parseBunches(maindom, function() {
+                log('LMLDOM', 'Working with LMLDOM markup');
+                lmldom.parseNode(maindom);
+                var lvs = maindom.querySelectorAll("lml\\:livevars");
+                for (var i = 0; i < lvs.length; i++) {
+                    lvs[i].remove();
                 }
 
-                log('LMLDOM', 'Parsing done!');
-                lmldomReady && lmldomReady(lmldom);
+                lmldom.createEditors(maindom, function() {
+                    lmldom.fillForms();
+
+                    log('LMLDOM', 'Applying page features');
+                    lmldom.removeFeatures();
+                    lmldom.addFeatures();
+
+                    log("LMLDOM", "Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
+                    liliumcms.pageloader.parseDocument();
+
+                    log('LMLDOM', 'Dispatching lmlDOMLoaded event');
+                    document.dispatchEvent(new CustomEvent('lmlDOMLoaded', {
+                        detail : {
+                            version : domv,
+                            protocol : "lmldom",
+                            timetoparse : (new Date() - now)
+                        }
+                    }));
+
+                    log('LMLDOM', 'Firing ' + domhooks.length + " LMLDOM hooks");
+                    while (domhooks.length) {
+                        domhooks.pop()();
+                    }
+
+                    log('LMLDOM', 'Parsing done!');
+                    lmldomReady && lmldomReady(lmldom);
+                });
             });
         });
     };

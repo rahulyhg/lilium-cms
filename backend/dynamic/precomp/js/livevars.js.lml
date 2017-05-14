@@ -418,11 +418,11 @@ var LiveVars = function() {
                                     }
     
                                     $('#' + src).data('_lmlfilled', true);
-                                    document.removeEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
+                                    document.removeEventListener(liliumcms.LiliumEvents.livevarsRendered.name, evnt);
                                 }
                             };
     
-                            document.addEventListener(liliumcms.LiliumEvents.livevarsPrerendered.name, evnt);
+                            document.addEventListener(liliumcms.LiliumEvents.livevarsRendered.name, evnt);
                         })(sourceof, varValue);
                     }
                     if (cacheonly) {
@@ -513,14 +513,6 @@ var LiveVars = function() {
 
             liliumcms.ckeditor && liliumcms.ckeditor.parseDocument();
         }
-
-        // Fire ready event
-        log('Livevars', 'Dispatching event livevarsPrerendered [DEPRECATED]');
-        document.dispatchEvent(new CustomEvent('livevarsPrerendered', {
-            'detail': {
-                'livevars': livevars
-            }
-        }));
 
         log('Livevars', 'Dispatching event livevarsRendered');
         document.dispatchEvent(new CustomEvent('livevarsRendered', {

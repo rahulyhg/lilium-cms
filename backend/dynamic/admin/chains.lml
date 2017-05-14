@@ -1,4 +1,15 @@
-{#config;extra;forms}
-<lml:dom v="0.8"></lml:dom>
+{#config;extra}
+<lml:dom v="0.9"></lml:dom>
 <h1>Content Chains</h1>
-{=forms.render("contentchains")}
+
+<lml:bunch>
+    <lml:bunchitem>
+        
+    </lml:bunchitem>
+
+    <script type="lmljson" name="chainsbunch">
+        {
+            "datasource" : "chains.bunch"
+        }
+    </script>
+</lml:bunch>
