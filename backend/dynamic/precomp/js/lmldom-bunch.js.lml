@@ -45,4 +45,3 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
         liliumcms.lmldom.stage(that.elem);
     };
 };
-

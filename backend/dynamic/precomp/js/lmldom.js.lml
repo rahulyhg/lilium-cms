@@ -7,7 +7,6 @@
 //                                      //
 // Doesn't use jQuery                   //
 /****************************************/
-{#config}
 /*
     -- LMLDom Header tag --
 
@@ -54,6 +53,7 @@
     select.lmldom-liveselect  => data-filledby="livevar.endpoint" name="fieldname"
     div.lmldom-treeselect     => data-filledby="livevar.endpoint" name="fieldname"
 */
+{#config}
 var LMLDom = function() {
     var maindom;
     var livevars;

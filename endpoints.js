@@ -13,6 +13,19 @@ var AllowedMethods = function() {
 };
 
 var EndPoints = function () {
+    this.list = function() {
+        var dump = [];
+        for (var site in registeredEndpoints) {
+            for (var method in registeredEndpoints[site]) {
+                for (var endpoint in registeredEndpoints[site][method]) {
+                    dump.push(method + "  " + site + "/" + endpoint);
+                }
+            }
+        }
+
+        return dump;
+    }
+
     this.register = function (site, endpoint, method, callback) {
         if (typeof endpoint == "object" && endpoint.length) {
             for (var i = 0; i < endpoint.length; i++) {

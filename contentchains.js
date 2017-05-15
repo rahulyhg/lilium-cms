@@ -12,7 +12,8 @@ class ContentChains {
         return Object.assign({
             title : "",
             subtitle : "",
-            description : "",
+            presentation : "",
+            status : "draft",
             createdBy : undefined,
             createdOn : new Date(),
             lastModified : new Date(),
@@ -23,11 +24,13 @@ class ContentChains {
 
     insertNewChain(_c, data, callback) {
         let newChain = this.createFromObject(data);
-        db.insert(_c, 'contentchains', newChain, callback || noop);
+        db.insert(_c, 'contentchains', newChain, callback);
     }
 
-    deepFetch(_c, chainid) {
-        
+    deepFetch(_c, chainid, send) {
+        db.findUnique(_c, 'contentchains', {_id : db.mongoID(chainid)}, (err, item) => {
+            send(item);
+        });
     }
 
     bunchLivevar(cli, levels, params, send) {
@@ -35,25 +38,57 @@ class ContentChains {
     }
 
     livevar(cli, levels, params, send) {
+        if (!cli.hasRight('editor')) {
+            return send();
+        }
+
         if (levels[0] == "bunch") {
             this.bunchLivevar(...arguments);
+        } else if (levels[0] == "deep") {
+            this.deepFetch(cli._c, levels[1], (item) => {
+                send(item);
+            });
         }
     }
 
     adminGET(cli) {
+        if (!cli.hasRight('editor')) {
+            return cli.refuse();
+        }
+
         var path = cli.routeinfo.path[2];
 
-        if (!path) {
+        if (!path || path == "new") {
             filelogic.serveAdminLML(cli);
         } else if (path == "edit") {
-            
+            filelogic.serveAdminLML(cli, true);
         } else {
             cli.throwHTTP(404);
         }
     }
 
     adminPOST(cli) {
+        if (!cli.hasRight('editor')) {
+            return cli.refuse();
+        }
 
+        var path = cli.routeinfo.path[2];   
+
+        if (path == "new") {
+            this.insertNewChain(cli._c, {
+                title : cli.postdata.data.title,
+                createdBy : db.mongoID(cli.userinfo.userid)
+            }, (err, r) => {
+                cli.sendJSON({
+                    editurl : cli._c.server.url + "/admin/chains/edit/" + r.insertedId,
+                    valid : true
+                });
+            });
+        } else if (path == "edit") {
+            
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
     }
 
     form(cli) {
@@ -67,7 +102,7 @@ class ContentChains {
             fieldWrapper : "lmlform-fieldwrapper"
         })
         .add('title', 'text', {
-            displayname : "Title",
+            displayname : "Headline",
             placeholder : true,
             classes : ["bigtitle"]
         })
@@ -76,52 +111,31 @@ class ContentChains {
             displayname: 'Subtitle'
         })
         .add('title-content', 'title', {
-            displayname : "Content"
+            displayname : "Serie"
         })
         .add('contentlist', 'snip', {
             snip : "contentlist",
             livevars : ["content.simple"]
         })
+        .add('title-presentation', 'title', {
+            displayname : "Presentation"
+        })
+        .add('presentation', 'ckeditor', {
+            nolabel : true
+        })
+        .add('title-details', 'title', {
+            displayname : "Details"
+        })
+        .add('publish-set', 'buttonset', { buttons : [{
+                'name' : 'save',
+                'displayname': 'Save changes',
+                'type' : 'button',
+                'classes': ['btn-save']
+            }
+        ]});
     }
 
     table(cli) {
-        require('./tableBuilder.js').createTable({
-            name : "contentchain",
-            endpoint: "chains.table",
-            paginate : true,
-            searchable : true,
-            max_results : 25, 
-            sortby : '_id',
-            sortorder : -1,
-            filters : {
-                status : {
-                    displayname : "status",
-                    datasource : [{
-                        value : "live",
-                        displayname : "Live"
-                    }, {
-                        value : "draft",
-                        displayname : "Draft"
-                    }]
-                },
-                author : {
-                    displayname : "Author",
-                    livevar : {
-                        endpoint : "entities.simple.active",
-                        value : "_id",
-                        displayname : "displayname"
-                    }
-                }
-            },
-            fields : [{
-                key : "title",
-                displayname : "Title",
-                template : "table-chain-title",
-                sortable : true,
-                sortkey : "title",
-                classes : "chain-table-title"
-            }]                 
-        });
     }
 }
 
