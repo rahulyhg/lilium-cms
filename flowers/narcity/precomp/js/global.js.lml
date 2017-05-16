@@ -213,6 +213,7 @@ var handleAdScroll = function(e) {
         googletag.cmd.push(function() {
             console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
             googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
+            typeof dataLayer != "undefined" && dataLayer.push("event", "adLazyLoad");
             // googletag.display(adinfo.id);
         });
         
