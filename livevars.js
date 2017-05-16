@@ -103,6 +103,7 @@ var LiveVariables = function() {
     var startLoop = function(cli, varNames, assoc, callback) {
         var index = -1;
         var max = varNames.length;
+        var now = new Date().getTime();
         var response = {
             code: 200,
             valid: true,
@@ -111,6 +112,7 @@ var LiveVariables = function() {
 
         var checkForCompletion = function() {
             if (++index == max) {
+                response.timer = (new Date().getTime()) - now;
                 callback(response);
             }
         };

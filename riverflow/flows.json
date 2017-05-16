@@ -239,7 +239,7 @@
         }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
-            "support" : ["livevar", "admin_get", "admin_post", "form", "table"],
+            "support" : ["livevar", "admin_get", "admin_post", "form"],
             "admin_menu" : {
                 "id": "contentchains",
                 "faicon": "fa-link",

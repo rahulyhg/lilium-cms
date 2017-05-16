@@ -46,5 +46,10 @@
         "codename" : "Cybel",
         "script" : "1.0.8.js",
         "features" : ["Extreme caching"]
+    },
+    "1.1.0" : {
+        "codename" : "Zeus",
+        "script" : "1.1.0.js",
+        "features" : ["Content chains", "LMLDom JSON"]
     }
 }

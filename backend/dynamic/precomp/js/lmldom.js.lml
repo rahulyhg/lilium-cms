@@ -7,7 +7,6 @@
 //                                      //
 // Doesn't use jQuery                   //
 /****************************************/
-{#config}
 /*
     -- LMLDom Header tag --
 
@@ -44,6 +43,7 @@
 
     - Normal Tags --
     lml:text /      => var="variableName"
+    lml:class       => classes="{variableName}" tag="tag name"
     lml:image /     => src="//domain.com/uploads/{variableName}" 
     lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
     lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
@@ -54,6 +54,7 @@
     select.lmldom-liveselect  => data-filledby="livevar.endpoint" name="fieldname"
     div.lmldom-treeselect     => data-filledby="livevar.endpoint" name="fieldname"
 */
+{#config}
 var LMLDom = function() {
     var maindom;
     var livevars;
@@ -222,6 +223,10 @@ var LMLDom = function() {
         }
     }
 
+    this.injectInContext = function(key, value) {
+        ldContext[key] = value;
+    }
+
     this.handleSingleBunch = function(bunchElem, done) {
         var bObj = new LMLDOM_Bunch(ldContext, bunchElem);
         bObj.init();
@@ -383,6 +388,24 @@ var LMLDom = function() {
             ed.remove();
             
             ed = elem.querySelector('lml\\:editable');
+        }
+
+        var cl = elem.querySelector('lml\\:class');
+        while(cl) {
+            var tag = document.createElement(cl.getAttribute('tag') || "div");
+            var classvar = cl.getAttribute('classes');
+            var classvalue = getReturn(ldContext, classvar);
+
+            if (typeof classvalue == "object") {
+                classvalue = classvalue.join(' ');
+            }
+
+            tag.className = classvalue;
+
+            cl.insertAfter(tag);
+            cl.remove();
+
+            cl = elem.querySelector('lml\\:class');
         }
 
         var lim = elem.querySelector('lml\\:image');

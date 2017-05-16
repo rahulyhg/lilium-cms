@@ -5,7 +5,12 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
     this.elem = bunchElement;
     this.template = bunchElement.querySelector("lml\\:bunchitem");
     this.settings = new LMLDOM_JSON(ldContext, bunchElement.querySelector('script[type="lmljson"]'));
+    this.templateFilters = bunchElement.querySelector('lml\\:bunchfilters');
     this.filters = {};
+    this.page = {
+        index : 1,
+        max : 25
+    };
 
     this.valid = false;
 
@@ -15,19 +20,48 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
         log('LMLDOM', "Error in LMLBunch tag, make sure it has a template and a LMLJson tag", 'err');
     }
 
+    this.loopThroughItems = function(items, done) {
+        for (var i = 0; i < items.length; i++) {
+            liliumcms.lmldom.injectInContext(that.settings.data.loopvar, items[i]);
+            that.bunchWrap.appendChild(
+                liliumcms.lmldom.parseNode(that.template.firstElementChild.cloneNode(true))
+            );
+        }
+
+        done();
+    }
+
     this.render = function(done) {
-        // Call to livevar
         var endpoint = that.settings.data.datasource;
-        liliumcms.livevars.getSingleLivevar(endpoint, that.filters, function(lv) {
-            // Get element by ID, fill with template in loop
+        liliumcms.livevars.getSingleLivevar(endpoint, {
+            filters : that.filters,
+            page : that.page.index,
+            max : that.page.max
+        }, function(lv) {
             if (lv.response.code == 200) {
-                var items = lv.livevars[endpoint];
-                done();
+                var pack = lv.livevars[endpoint];
+                while (that.bunchWrap.firstChild) {
+                    that.bunchWrap.removeChild(that.bunchWrap.firstChild);
+                }
+
+                that.loopThroughItems(pack.items, function() {
+                    done && done();
+                });
             } else {
                 log('LMLDOM', "Received non-200 code from livevar request at endpoint : " + endpoint, "warn");
-                done();
+                done && done();
             }
         });
+    };
+
+    this.bindFilters = function() {
+        var filters = that.filterWrapper ? that.filterWrapper.querySelectorAll("input, select") : [];
+        for (var i = 0; i < filters.length; i++) {
+            filters[i].addEventListener('change', function(e) {
+                that.filters[e.target.name] = e.target.value;
+                that.render();
+            });
+        }
     };
 
     this.createID = function(salt) {
@@ -37,12 +71,18 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
     this.init = function() {
         var bunchWrap = document.createElement('div');
         bunchWrap.id = that.createID(this.settings.name);
+        bunchWrap.className = "lmlbunch-items-wrapper"
 
-        that.bunchWrap = bunchWrap;
-        that.elem.parentElement.insertBefore(that.bunchWrap, that.elem);
+        var filterWrapper = that.templateFilters && that.templateFilters.firstElementChild.cloneNode(true);
+        that.filterWrapper = filterWrapper;
+
+        that.elem.parentElement.insertBefore(bunchWrap, that.elem);
+        filterWrapper && bunchWrap.parentElement.insertBefore(filterWrapper, bunchWrap);
         that.elem.id = "bunch_" + this.settings.name;
 
+        that.bunchWrap = bunchWrap;
         liliumcms.lmldom.stage(that.elem);
+
+        that.bindFilters();
     };
 };
-

@@ -592,6 +592,38 @@ select {
     margin: 0px 10px 0px 0px;
 }
 
+/* LML Bunch default style */
+.bunch-filters {
+    border-bottom: 1px solid #DDD;
+    background-color: #FCFCFC;
+    padding: 5px;
+}
+
+.bunch-filters-title {
+    display: inline-block;
+    margin: -5px 2px -5px -5px;
+    padding: 5px 10px;
+    border-right: 1px dashed #DDD;
+    font-size: 16px;
+    color: #CCC;
+}
+
+.bunch-filters input {
+    border: 1px solid #AAA;
+    background-color: #FCFCFC;
+    padding: 0px 3px;
+    width: 180px;
+}
+
+.bunch-filters input {
+    min-width: 100px;
+}
+
+.bunch-filters label {
+    margin: 0px 5px 0px 5px;
+    color: #333;
+}
+
 /* Select cards */
 .select-card {
     display: inline-block;

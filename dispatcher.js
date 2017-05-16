@@ -29,6 +29,7 @@ var Dispatcher = function () {
         } else if (cli.routeinfo.livevars) {
             LiveVars.handleRequest(cli);
         } else if (rewriter.rewrite(cli)) {
+
         } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
             Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
         } else {

@@ -1,6 +1,6 @@
 {#config}
 <div class="content-list-picker">
-    <input type="text" class="content-list-search" data-groupname="contentlistpicker" />
+    <input type="text" class="content-list-search" data-groupname="contentlistpicker" placeholder="Search a title" />
     <div class="content-list-items">
         <lml:foreach var="art" in="livevars.content.simple">
             <div class="content-list-item" onclick="handleContentListClick(this);">
@@ -8,16 +8,59 @@
             </div>
         </lml:foreach>
     </div>
+    <ul class="content-list-items-selected">
+
+    </ul>
 </div>
 
 <style>
 .content-list-picker {
     border: 1px solid #DDD;
+    clear: both;
+    float: none;
 }
 
 .content-list-items {
     height: 320px;
     overflow-y: auto;
+
+    float: left;
+    width: 50%;
+    margin: 0px;
+    padding: 0px;
+}
+
+.content-list-items-selected {
+    height: 320px;
+    overflow-y: auto;
+
+    float: left;
+    width: 50%;
+    margin: 0px;
+    padding: 0px;
+
+    list-style : none;
+}
+
+.content-list-items-selected .content-list-item-selected {
+    background-color: #FFF;
+    color: #333;
+    padding: 10px 30px 10px 10px;
+    margin: 5px;
+    border: 1px solid #CCC;
+    cursor: move;
+
+    list-style: none;
+    position: relative;
+}
+
+.content-list-items-selected .content-list-item-selected i {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    color: #999;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 .content-list-item {
@@ -28,6 +71,7 @@
     cursor: pointer;
 }
 
+.content-list-item.selected-out, 
 .content-list-item.filtered-out {
     display: none;
 }
@@ -76,7 +120,28 @@ var handleContentListSearch = function(e) {
 var handleSelectOnID = function(id, group) {
     var valgroup = liliumcms.lmldom.valuegroups[group];
     valgroup.selected.push(id);
-    document.getElementById(group + "_" + id).parentElement.style.display = "none";
+
+    var listitem = document.getElementById(group + "_" + id);
+    listitem.parentElement.classList.add("selected-out");
+
+    var carditem = document.createElement('li');
+    carditem.className = "content-list-item-selected";
+    carditem.textContent = listitem.textContent;
+    carditem.dataset.value = id;
+
+    var xout = document.createElement('i');
+    xout.className = "fa fa-times";
+
+    (function(id, group, carditem) {
+        xout.addEventListener('click', function() {
+            document.getElementById(group + "_" + id).parentElement.classList.remove("selected-out");
+            carditem.parentElement.removeChild(carditem);
+            
+        });
+    })(id, group, carditem)
+
+    carditem.appendChild(xout);
+    document.querySelector('.content-list-items-selected').appendChild(carditem);
 }
 
 var handleContentListClick = function(listitem) {
@@ -87,4 +152,15 @@ var handleContentListClick = function(listitem) {
 var search = document.querySelectorAll('.content-list-search');
 search = search[search.length-1];
 search.addEventListener('keyup', handleContentListSearch);
+
+Sortable.create(document.querySelector('.content-list-items-selected'));
+
+liliumcms.lmldom.bind(function() {
+    var item = liliumcms.livevars.pulloutLiveVar('chains.deep.' + liliumcms.pageloader.lastLevel, true) || {};
+    var serieItems = item.serie || [];
+
+    for (var i = 0; i < serieItems.length; i++) {
+        handleSelectOnID(serieItems[i], "contentlistpicker");
+    }
+});
 </script>
