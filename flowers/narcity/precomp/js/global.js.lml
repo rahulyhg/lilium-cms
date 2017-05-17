@@ -223,7 +223,7 @@ var handleAdScroll = function(e) {
 
 var bindEnd = function() {
     window.addEventListener('beforeunload', function() {
-        typeof dataLayer != "undefined" && dataLayer.push("event", "adLazyLoad", nladzdsfop9i23l4);
+        typeof dataLayer != "undefined" && dataLayer.push({totalAdsLoader : nladzdsfop9i23l4});
     });
 };
 
