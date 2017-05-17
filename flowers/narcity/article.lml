@@ -121,14 +121,6 @@ $}
             </div>
             {$ endif; $}
 
-            {$ if (topic.completeSlug == "best-of-mtl"); $}
-            <div class="bottom-promotion-link">
-                <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's
-                <a href="{=config.default.server.url}/{=extra.article.completeSlug}" target="_blank">&quot;Best Of&quot; lists</a>;
-                furthermore, this list represents a showcase of great spots, and is not a numbered ranking.
-            </div>
-            {$ endif; $}
-
             {$ if (extra.article.isSponsored == true); $}
             <div class="bottom-promotion-link">
                 {:article-part-of-sponsored}
@@ -145,6 +137,14 @@ $}
             {$ endif; if (?extra.article.related ??); $}
             <div class="keep-on-reading-wrapper">
                 <a class="keep-on-reading" href="{=extra.article.related.url}">{:keep-on-reading} <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
+            </div>
+            {$ endif; $}
+
+            {$ if (topic.completeSlug == "best-of-mtl"); $}
+            <div class="bottom-promotion-link">
+                <b>Disclaimer:</b> All research done in this article is by the author. Restaurants never pay to be featured on MTL Blog's
+                <a href="{=config.default.server.url}/{=extra.article.completeSlug}" target="_blank">&quot;Best Of&quot; lists</a>;
+                furthermore, this list represents a showcase of great spots, and is not a numbered ranking.
             </div>
             {$ endif; $}
 

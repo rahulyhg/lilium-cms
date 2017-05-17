@@ -203,6 +203,7 @@ var findAds = function() {
 };
 
 var handlingScroll = false;
+window["nladzdsfop9i23l4"]=0;
 var handleAdScroll = function(e) {
     if (window.adpos.length == 0) {
         return;
@@ -213,12 +214,17 @@ var handleAdScroll = function(e) {
         googletag.cmd.push(function() {
             console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
             googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
-            typeof dataLayer != "undefined" && dataLayer.push("event", "adLazyLoad");
-            // googletag.display(adinfo.id);
+            nladzdsfop9i23l4++;
         });
         
         handlingScroll = false;
     }
+};
+
+var bindEnd = function() {
+    window.addEventListener('beforeunload', function() {
+        typeof dataLayer != "undefined" && dataLayer.push("event", "adLazyLoad", nladzdsfop9i23l4);
+    });
 };
 
 var handlingNext = false;
@@ -586,6 +592,7 @@ maybeFadeIn();
 parseEmbeds();
 parseContentLinks();
 rearrangeImages();
+bindEnd();
 
 /* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */
 jQuery = function() {return {is : function() { return this; } } };
