@@ -230,6 +230,8 @@ var bindEnd = function() {
             currentURL : document.location.href
         });
         console.log("[GTM] Sent dataLayer");
+
+        ga('send', 'event', 'userExists', 'totalAdsLoaded', window.nladzdsfop9i23l4.totalAdsLoaded, {useBeacon: true});
     });
 };
 
