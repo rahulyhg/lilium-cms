@@ -203,7 +203,8 @@ var findAds = function() {
 };
 
 var handlingScroll = false;
-window["nladzdsfop9i23l4"]=0;
+window["nladzdsfop9i23l4"]={totalAdsLoaded:0};
+dataLayer.push(window.nladzdsfop9i23l4);
 var handleAdScroll = function(e) {
     if (window.adpos.length == 0) {
         return;
@@ -214,17 +215,11 @@ var handleAdScroll = function(e) {
         googletag.cmd.push(function() {
             console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
             googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
-            nladzdsfop9i23l4++;
+            window.nladzdsfop9i23l4.totalAdsLoaded++;
         });
         
         handlingScroll = false;
     }
-};
-
-var bindEnd = function() {
-    window.addEventListener('beforeunload', function() {
-        typeof dataLayer != "undefined" && dataLayer.push({totalAdsLoaded : nladzdsfop9i23l4, url : document.location.href});
-    });
 };
 
 var handlingNext = false;
