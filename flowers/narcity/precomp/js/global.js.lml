@@ -203,7 +203,7 @@ var findAds = function() {
 };
 
 var handlingScroll = false;
-window["nladzdsfop9i23l4"]={totalAdsLoaded:0};
+window["nladzdsfop9i23l4"]={totalAdsLoaded:0,event:"totalAdsLoaded"};
 dataLayer.push(window.nladzdsfop9i23l4);
 var handleAdScroll = function(e) {
     if (window.adpos.length == 0) {
