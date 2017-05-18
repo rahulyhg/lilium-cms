@@ -223,7 +223,13 @@ var handleAdScroll = function(e) {
 
 var bindEnd = function() {
     window.addEventListener('beforeunload', function() {
-        dataLayer.push(window.nladzdsfop9i23l4);
+        console.log("[GTM] Sending dataLayer");
+        dataLayer.push({
+            event : "userExits",
+            totalAdsLoaded : window.nladzdsfop9i23l4.totalAdsLoaded,
+            currentURL : document.location.href
+        });
+        console.log("[GTM] Sent dataLayer");
     });
 };
 
