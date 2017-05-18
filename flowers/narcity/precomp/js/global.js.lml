@@ -204,7 +204,6 @@ var findAds = function() {
 
 var handlingScroll = false;
 window["nladzdsfop9i23l4"]={totalAdsLoaded:0,event:"totalAdsLoaded"};
-dataLayer.push(window.nladzdsfop9i23l4);
 var handleAdScroll = function(e) {
     if (window.adpos.length == 0) {
         return;
@@ -220,6 +219,12 @@ var handleAdScroll = function(e) {
         
         handlingScroll = false;
     }
+};
+
+var bindEnd = function() {
+    window.addEventListener('beforeunload', function() {
+        dataLayer.push(window.nladzdsfop9i23l4);
+    });
 };
 
 var handlingNext = false;
