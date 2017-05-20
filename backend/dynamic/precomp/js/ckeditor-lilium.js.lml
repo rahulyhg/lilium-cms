@@ -185,30 +185,21 @@ var CKEditor = function() {
     };
 
     this.generateImageWrapper = function(imgobj) {
-        var wrapper = document.createElement('div');
+        var wrapper = document.createElement('p');
         var img = document.createElement('img');
-        var creditname = document.createElement('span');
         var crediturl = document.createElement('a');
 
-        img.dataset.iid = imgobj._id;
-        img.dataset.credit = {
-            name : imgobj.artistname,
-            url : imgobj.artisturl
-        };
         img.setAttribute('src', "{=config.default.server.url}/uploads/" + imgobj.url);
+        img.dataset.iid = imgobj._id;
         img.classList.add("lml-content-image");
+        img.classList.add("lml-instagram-embed-2");
 
-        creditname.innerHTML = "Via ";
-        crediturl.innerHTML = imgobj.artistname;
         crediturl.setAttribute("href", imgobj.artisturl);
         crediturl.setAttribute('target', '_blank');
+        crediturl.textContent = "Via " + imgobj.artistname;
 
-        wrapper.classList.add("lml-image-wrapper");
-        wrapper.classList.add("lml-content-image-wrapper");
         wrapper.appendChild(img);
-
-        imgobj.artistname && wrapper.appendChild(creditname);
-        imgobj.artisturl && wrapper.appendChild(crediturl);
+        wrapper.appendChild(crediturl);
 
         return wrapper;
     };

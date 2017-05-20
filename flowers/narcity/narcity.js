@@ -1010,8 +1010,6 @@ var insertAds = function(pkg) {
         var jsdom = require('jsdom');
         var content = article.content ? article.content
             .replace(/\<ad\>\<?\/?a?d?\>?/g, "")
-            .replace(/\<lml\:ad\>/g, "")
-            .replace(/\<\/lml\:ad\>/g, "")
             .replace(/\<p\>\&nbsp\;\<\/p\>/g, "")
             .replace(/\n/g, "").replace(/\r/g, "")
             .replace(/\<p\>\<\/p\>/g, "") : "";
@@ -1023,7 +1021,7 @@ var insertAds = function(pkg) {
                 return done(article.content);
             }
 
-            var parags = dom.document.querySelectorAll("body > p:not(:empty), body > h3, body > twitterwidget");
+            var parags = dom.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
             for (var i = 0; i < parags.length - 1; i++) if (i % pcount == 0) {
                 var adtag = dom.document.createElement('ad');
                 dom.document.body.insertBefore(adtag, parags[i+1]);
