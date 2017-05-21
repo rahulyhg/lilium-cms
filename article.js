@@ -1650,7 +1650,7 @@ var Article = function() {
                 nextHook();
             };
 
-            if (deepArticle.hasads) {
+            if ((deepArticle.hasads && deepArticle.content && deepArticle.content.indexOf("<ad>") != -1) || deepArticle.nsfw) {
                 gen();
             } else {
                 that.insertAds(_c, deepArticle, function(content) {
@@ -1668,7 +1668,6 @@ var Article = function() {
     };
 
     this.generateFromName = function(cli, articleName, cb, onlyPublished, pageIndex) {
-        // Check for articles in db
         this.deepFetch(cli._c, articleName, function(deepArticle) {
             if (!deepArticle) {
                 db.findToArray(cli._c, 'content', {aliases : articleName}, function(err, arr) {

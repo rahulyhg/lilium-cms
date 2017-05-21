@@ -23,7 +23,6 @@ var readersLib = undefined;
 var themePath;
 var noOp = function() {};
 
-// TODO : Receive context site
 var NarcityTheme = function () {}
 
 var initRequires = function(abspath) {
