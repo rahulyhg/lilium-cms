@@ -216,6 +216,14 @@ class ContentChains {
         }, {
             require : false
         })
+        .add('finished', 'checkbox', {
+            displayname : "This chain is complete"
+        })
+        .add('pendingtext', 'text', {
+            displayname : "Display text for upcoming article if not complete"
+        }, {
+            required : false
+        })
         .add('title-actions', 'title', {
             displayname : "Actions"
         })
