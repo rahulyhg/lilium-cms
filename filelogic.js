@@ -4,6 +4,7 @@ var LML = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
 var log = require('./log.js');
 var db = require('./includes/db.js');
+var sharedcache = require('./sharedcache.js');
 
 var FileLogic = function () {
     /*
@@ -78,28 +79,30 @@ var FileLogic = function () {
 
     this.serveAdminTemplate = function(cli, extra, templatefile, cb) {
         var adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml"); 
-        var savePath = cli._c.server.html + "/admin/_index.html";
-        FileServer.fileExists(savePath, function (isPresent) {
-            if (isPresent) { 
-                serveCachedFile(cli, savePath);
-            } else {
+
+        sharedcache.get('admin_template_' + cli._c.uid, function(hContent) {
+            if (hContent) {
+                cli.response.writeHead(200, {"content-type" : "text/html"});
+                cli.response.end(hContent);
+                cb && cb();
+            } else { 
+                extra = extra || {};
+                extra.rootDir = adminPath.substring(0, adminPath.lastIndexOf('/'));
+                extra.config = cli._c;
+
+                var now = new Date();
+                log('LML2', "Compiling file from " + adminPath, 'info');
                 FileServer.readFile(adminPath, function(content) {
-                    FileServer.createDirIfNotExists(savePath, function() {
-                        var output = FileServer.getOutputFileHandle(savePath);
-                        extra = extra || {};
-                        extra.rootDir = adminPath.substring(0, adminPath.lastIndexOf('/'));
-                        extra.config = cli._c;
-    
-                        var now = new Date();
-                        log('LML2', "Compiling file from " + adminPath, 'info');
-                        LML2.compile(cli._c.id, content, output, extra, function() {
-                            FileServer.pipeFileToClient(cli, savePath, function () {
-                                log('FileLogic', 'Admin template page generated and served in ' + (new Date - now) + "ms", 'success');
-                                cb && cb();
-                            });
+                    LML2.compileToString(cli._c.id, content, extra, function(ctn) {
+                        sharedcache.set({
+                            ["admin_template_" + cli._c.uid] : ctn
+                        }, function() {
+                            cli.response.writeHead(200, {"content-type" : "text/html"});
+                            cli.response.end(ctn);
+                            cb && cb();
                         });
                     });
-                }, false, 'utf8');
+                }, false, "utf8");
             }
         });
     };

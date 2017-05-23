@@ -206,6 +206,17 @@ class ContentChains {
             displayname : "Featured image",
             classes : "content-chain-media-picker"
         })
+        .add('title-complete', 'title', {
+            displayname : "Chain completion"
+        })
+        .add('finished', 'checkbox', {
+            displayname : "This chain is complete"
+        })
+        .add('pendingtext', 'text', {
+            displayname : "Display text for upcoming article if not complete"
+        }, {
+            required : false
+        })
         .add('title-details', 'title', {
             displayname : "Details"
         })
@@ -216,35 +227,29 @@ class ContentChains {
         }, {
             require : false
         })
-        .add('finished', 'checkbox', {
-            displayname : "This chain is complete"
-        })
-        .add('pendingtext', 'text', {
-            displayname : "Display text for upcoming article if not complete"
-        }, {
-            required : false
-        })
         .add('title-actions', 'title', {
             displayname : "Actions"
         })
-        .add('publish-set', 'buttonset', { buttons : [
-            {
-                name : 'save',
-                displayname: 'Save changes',
-                type : 'button',
-                classes: ['btn-save']
-            }, {
-                name : "golive",
-                displayname : "Save and go Live",
-                type : "button",
-                classes : ["btn-publish", "green"]
-            }, {
-                name : "backstage",
-                displayname : "Backstage",
-                type : "button",
-                classes : ["btn-remove"]
-            }
-        ]});
+        .add('publish-set', 'buttonset', { 
+            buttons : [
+                {
+                    name : 'save',
+                    displayname: 'Save changes',
+                    type : 'button',
+                    classes: ['btn-save']
+                }, {
+                    name : "golive",
+                    displayname : "Save and go Live",
+                    type : "button",
+                    classes : ["btn-publish", "green"]
+                }, {
+                    name : "backstage",
+                    displayname : "Backstage",
+                    type : "button",
+                    classes : ["btn-remove"]
+                }
+            ]
+        });
     }
 }
 

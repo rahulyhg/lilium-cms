@@ -217,8 +217,9 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/notifications.css", 2400, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/pushtable.css", 2500, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/multiselect.css", 2600, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/tags.css", 2600, 'admin', conf.id);
-        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lmltable.css", 2600, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/tags.css", 2620, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lmltable.css", 2640, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/modals.css", 2660, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/welcome.css", 2800, 'admin', conf.id);
 
         hooks.fire('frontend_will_precompile', {

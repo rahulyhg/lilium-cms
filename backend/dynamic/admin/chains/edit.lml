@@ -55,9 +55,37 @@ var save = function(status) {
             }
         }
     );
-}
+};
 
 document.querySelector(".btn-save").addEventListener('click', function() {
     save();
 });
+
+document.querySelector(".btn-publish").addEventListener('click', function() {
+    liliumcms.modals.get("chain-go-live").cast();
+});
+
+window["chain-go-live_accept"] = function() {
+    liliumcms.modals.get("chain-go-live").dismiss();
+};
 </script>
+
+<div id="chain-go-live" class="lml-modal">
+    <div class="lml-modal-title">
+        Content Chain - Go Live
+    </div>
+    <div class="lml-modal-body">
+        <div class="lml-modal-big-icon">
+            <i class="fa fa-link" aria-hidden="true"></i>
+        </div>
+        <div class="lml-modal-big-title">
+            Once the contain chain is live, it becomes visible for everyone.
+        </div>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel btn-default" type="button">Cancel</button>
+        <button class="lml-modal-accept green" type="button">Go Live</button>
+    </div>
+</div>
+
+
