@@ -104,6 +104,12 @@ body.willfadein {
     z-index: 500;
 }
 
+#lmlasync {
+    float: none;
+    display: block;
+    clear: both;
+}
+
 body.menuopen #mcanvasoverlay,
 #mcanvasoverlay.shown {
     opacity: 0.5;
