@@ -569,8 +569,6 @@ var Article = function() {
 
         var that = this;
         if (cli.hasRight('list-articles')) {
-            //var form = formBuilder.handleRequest(cli);
-            //var response = formBuilder.validate(form, true);
             var oldSlug = "";
 
             var redirect = '';
@@ -597,6 +595,7 @@ var Article = function() {
 
                 if (formData.topic) {
                     db.update(cli._c, "topics", {_id : formData.topic}, {lastUsed : new Date()});
+                    require('./topics.js').generateTopicLatestJSON(cli._c, formData.topic);
                 }
 
                 var conds = {
@@ -1579,6 +1578,10 @@ var Article = function() {
 
                         var nextPage = function(resp) {
                             if (cIndex == 0) {
+                                require('./fileserver.js').deleteFile(_c.server.html + "/" + deepArticle.topic.completeSlug + "/" + deepArticle.name + ".html", function() {
+                                    log('Article', "Cleared non-paginated version of article from file system");
+                                });
+
                                 cb({
                                     success : true, 
                                     deepArticle : deepArticle,

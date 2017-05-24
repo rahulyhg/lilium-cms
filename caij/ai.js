@@ -97,6 +97,7 @@ class AI {
         log('CAIJ', "Caught an error at process level", 'warn');
         log('CAIJ', err, 'err');
         log("CAIJ", "AI is most likely in a fail state, but won't shutdown until done manually", "warn");
+        log("CAIJ", err.stack);
 
         ai.createInterval();
     }
@@ -107,7 +108,7 @@ class AI {
         if (Knowledge.janitorSites.length == 0) {
             log('CAIJ', "No website supporting CAIJ; Aborting", "warn");
         } else {
-            log('CAIJ', "Starting CAIJ with " + Knowledge.janitorSites.length + " websites");
+            log('CAIJ', "Starting CAIJ with " + Knowledge.janitorSites.length + " websites", "lilium");
             ai.createInterval();
             ai.createTaskInserter();
         }

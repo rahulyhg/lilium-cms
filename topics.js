@@ -105,9 +105,11 @@ class LMLTopics {
                 newTopic.active = true;
                 db.insert(cli._c, 'topics', newTopic, (err, r) => {
                     this.updateFamily(cli._c, newTopic._id, newTopic.slug, () => {
-                        cli.sendJSON({
-                            created : true,
-                            reason : "Valid form"
+                        this.generateFamilyEntry(cli._c, newTopic._id, () => {
+                            cli.sendJSON({
+                                created : true,
+                                reason : "Valid form"
+                            });
                         });
                     });
                 });
@@ -223,6 +225,95 @@ class LMLTopics {
         }, {_id : 1, slug : 1});
     }
 
+    generateFamilyEntry(conf, _id, sendback) {
+        let arr = [_id];
+        let oid = _id;
+        let that = this;
+
+        let nextParent = () => {
+            db.findUnique(conf, 'topics', {_id}, (err, t) => {
+                if (t.parent) {
+                    arr.push(t.parent);
+                    _id = t.parent;
+                    nextParent();
+                } else {
+                    db.update(conf, 'topics', {_id : oid}, {family : arr}, sendback.bind(that));
+                }
+            });
+        };
+
+        nextParent();
+    }
+
+    hashtopic(_id) {
+        return require('crypto-js').SHA256(_id).toString();
+    }
+
+    generateTopicLatestJSON(conf, _id, sendback, max = 6) {
+        db.join(conf, 'content', [
+            {
+                $match : {
+                    topic : _id,
+                    status : "published",
+                    media : {$exists : 1}
+                }
+            }, {
+                $sort : {date : -1}
+            }, {
+                $limit : max
+            }, {
+                $project : {
+                    _id : 0,
+                    title : 1,
+                    subtitle : 1,
+                    media : 1,
+                    name : 1,
+                    isSponsored : 1
+                }
+            }, {
+                $lookup : {
+                    from : "uploads",
+                    localField : "media",
+                    foreignField : "_id",
+                    as : "featuredimage"
+                }
+            }
+        ], (articles) => {
+            db.findUnique(conf, 'topics', {_id}, (err, topic) => {
+                articles.forEach(a => {
+                    if (a.featuredimage[0]) {
+                        a.featuredimage = require('./cdn.js').parseOne(conf, a.featuredimage[0].sizes.square && a.featuredimage[0].sizes.square.url || (conf.server.url + "/uploads/" + a.featuredimage[0].url));
+                        a.url = conf.server.url + "/" + topic.completeSlug + "/" + a.name;
+                        a.media = undefined;
+                    } else {
+                        a.skip = true;
+                    }
+                });
+
+                let hash = topicLib.hashtopic(_id.toString());
+                let generatedOn = new Date();
+                topic = {
+                    completeSlug : topic.completeSlug, 
+                    displayname : topic.displayname,
+                    url : conf.server.url + "/" + topic.completeSlug
+                };
+
+                let resp = { articles, topic, hash, generatedOn };
+
+                log('Topics', "Creating topic latest JSON file for : " + topic.displayname);
+                log("Topics", "Topic " + topic.displayname + " hash is " + hash, "detail");
+                require('./fileserver.js').dumpToFile(
+                    conf.server.html + "/topic_latests_" + hash + ".json", 
+                    JSON.stringify(resp),
+                    () => {
+                        sendback && sendback(resp);
+                    },
+                    'utf8'
+                );
+            });
+        });
+    }
+
     getFamilyIDs(conf, _id, sendback) {
         if (typeof _id !== "object") {
             throw new Error("Topics.getFamilyIds id parameter must be a Mongo Identifier object");
@@ -267,6 +358,7 @@ class LMLTopics {
                 if (!tobj) {
                     done();
                 } else {
+                    tobj.hash = topicLib.hashtopic(tobj._id.toString());
                     parents.push(tobj);
                     if (tobj.parent) {
                         conds = {_id : tobj.parent};
@@ -436,4 +528,5 @@ class LMLTopics {
     }
 }
 
-module.exports = new LMLTopics();
+const topicLib = new LMLTopics();
+module.exports = topicLib

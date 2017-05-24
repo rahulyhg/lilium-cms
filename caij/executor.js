@@ -33,6 +33,23 @@ class RunningTask {
         sitemapLib.generateSitemap(this._c, sendback);
     }
 
+    refreshTopicLatests(sendback) {
+        log('RunningTask', "Recreating all topic latests");
+        let conf = this._c;
+        db.findToArray(conf, 'topics', {}, (err, arr) => {
+            let i = -1;
+            let next = () => {
+                if (++i == arr.length) {
+                    sendback();
+                } else {
+                    topicLib.generateTopicLatestJSON(conf, arr[i]._id, next);
+                }
+            };
+
+            next();
+        }, {_id : 1});
+    }
+
     statsEmail(sendback) {
         analyticsLib.addSite(_c, (err) => {
             if (err) {
@@ -222,6 +239,10 @@ class Executor {
     }
 
     execute(task, done) {
+        if (task.extra.siteid) {
+            task.extra._c = config.fetchConfig(task.extra.siteid);
+        }
+
         if (task.extra._c) {
             let runningtask = new RunningTask(task.taskname, task.extra);
             runningtask.run(done);

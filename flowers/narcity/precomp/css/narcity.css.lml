@@ -8,6 +8,10 @@
     aw += "px";
 
     mc = theme.settings.maincolor;
+
+    awpad = theme.settings.articlewidthsize;
+    awpad -= 40;
+    awpad += "px";
 $}
 
 @import url('https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700');
@@ -788,7 +792,7 @@ article #article-content img.image-asis {
 }
 
 article .article-signature {
-    width: {=aw};
+    width: {=awpad};
     margin: 20px auto;
 
     padding: 20px;
@@ -994,6 +998,42 @@ article .article-related-section .article-thumbnail-featured {
 
 article .article-related-section .article-thumbnail-featured .article-thumbnail-title {
     font-size: 38px;
+}
+
+.sidebar-internal-link-image {
+    height: 160px;
+    width: 300px;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.sidebar-internal-link-title {
+    font-size: 24px;
+    color: #111;
+    font-family: "Oswald", sans-serif;
+    text-decoration: none;
+    display: block;
+}
+
+.sidebar-internal-link-subtitle {
+    display: block;
+    color: #333;
+    margin-top: 1px;
+    font-size: 16px;
+}
+
+.sidebar-internal-link {
+    text-decoration: none;
+    margin-top: 20px;
+    display: block;
+}
+
+#sidebar-links h3 {
+    font-size: 28px;
+    font-family: "Oswald", sans-serif;
+    font-weight: normal;
+    color: #FF2634;
+    margin: 20px 0px 0px;
 }
 
 .fwblock {

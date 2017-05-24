@@ -517,6 +517,13 @@ var Core = function () {
         if (process.env.job == "caij") {
             log('Core', 'Creating CAIJ server');
             require('./caij/caij.js').createServer();
+        } else if (isElder) {
+            require('./config.js').eachSync(function(_c) {
+                require('./caij/caij.js').scheduleTask("refreshTopicLatests", {
+                    siteid : _c.id,
+                    origin : "Elder"
+                });
+            });
         }
     }
 

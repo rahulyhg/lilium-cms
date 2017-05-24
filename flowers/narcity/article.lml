@@ -56,7 +56,6 @@ $}
     <div id="article-section">
         <div id="article-side">
             {=theme.settings.sidetop}
-
             {=theme.settings.sidebottom}
         </div>
 
@@ -212,4 +211,64 @@ $}
 document.querySelector(".keep-on-reading") && document.querySelector('.keep-on-reading').addEventListener('click', function() {
     typeof ga != "undefined" && ga('send', 'event', 'Recirculation', 'Keep on reading', '{=extra.article.name}');
 });
+</script>
+
+<script>
+    var ce = function(nodetype, classes) {
+        var node = document.createElement(nodetype);
+        node.className = classes || "";
+
+        return node;
+    }
+
+    var fillLatests = function(txt) {
+        var obj = txt && JSON.parse(txt);
+        if (obj) {
+            console.log(obj);
+        }
+
+        var wrapper = document.getElementById('sidebar-links');
+        
+        if (wrapper && obj.articles.length != 0) {
+            var h3 = ce('h3');
+            h3.textContent = "{=extra.topic.displayname}";
+            wrapper.appendChild(h3);
+        }
+
+        if (wrapper) 
+        for (var i = 0; i < obj.articles.length; i++) 
+        if (obj.articles[i].name != "{=extra.article.name}" && !obj.articles[i].skip) {
+            var art = obj.articles[i];
+            var link = ce('a', 'sidebar-internal-link');
+            link.href = art.url;
+            link.target = "_blank";
+
+            var img = ce('img', 'sidebar-internal-link-image');
+            img.src = art.featuredimage;
+            link.appendChild(img);
+
+            var title = ce('span', 'sidebar-internal-link-title');
+            title.textContent = art.title;
+            link.appendChild(title);
+
+            var subtitle = ce('span', 'sidebar-internal-link-subtitle');
+            subtitle.textContent = art.subtitle;
+            link.appendChild(subtitle);
+
+            wrapper.appendChild(link);
+        }   
+    }
+
+    var tHashURL = "{=config.default.server.url}/topic_latests_{=extra.article.topic.hash}.json";
+    var req = new XMLHttpRequest();
+    req.onreadystatechange = function() {
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                fillLatests(req.responseText);
+            } 
+        }
+    };
+
+    req.open("GET", tHashURL, true);
+    req.send();
 </script>

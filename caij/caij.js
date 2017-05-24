@@ -52,7 +52,7 @@ class ConsoleArtificialIntelligenceJanitor {
 
     createServer() {
         fileserver.deleteFile(__dirname + "/caij.sock", () => {
-            this.server = net.createServer(this.incoming);
+            this.server = net.createServer(this.incoming.bind(this));
             this.server.on('error', this.error);
             this.server.listen({
                 path : __dirname + "/caij.sock"

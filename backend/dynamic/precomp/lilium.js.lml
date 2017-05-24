@@ -34,22 +34,22 @@ window.lmlsocket = socket;
  
 var LOG_MAX_SENDER_SIZE = 14;
 var log = window.log = function(sender, msg, type, style) {
-    var spacing = "";
+    var spacing = " ";
     var si = sender.length;
     while (si < LOG_MAX_SENDER_SIZE) {
         ++si; 
         spacing += " ";
     }
 
-    var output = new Date().toLocaleTimeString() + ' [' + sender + "] " + spacing + msg;
+    var output = new Date().toLocaleTimeString() + ' [' + sender + "]" + spacing + msg;
     switch (type) {
-        case "warn"  : console.warn(output); break;
-        case "err"   : console.error(output); break;
-        case "info"  : console.info(output); break;
-        case "deprec": console.log("%c" + output, "color: #E56330;"); break;
-        case "lilium": console.log("%c" + output, "color: #9B59B6; font-weight: bold; font-size: 12px;"); break;
-        case "style" : console.log('%c' + output, style); break;
-        default      : console.log(output);
+        case "warn"    :  console.warn  (output); break;
+        case "err"     :  console.error (output); break;
+        case "info"    :  console.info  (output); break;
+        case "deprec"  :  console.log   ("%c" + output, "color: #E56330;"); break;
+        case "lilium"  :  console.log   ("%c" + output, "color: #9B59B6; font-weight: bold; font-size: 12px;"); break;
+        case "style"   :  console.log   ('%c' + output, style); break;
+        default        :  console.log   (output);
     };
 };
 
@@ -58,12 +58,12 @@ var LiliumCMS = function() {
     console.log("%c", "font-size: 1px; line-height: 100px; background-image: url({=config.default.server.protocol}{=config.default.server.url}/static/media/masthead.png); background-size: 340px 100px; padding: 50px 170px;");
     var livevarsResponse;
     var urlParams;
-    var pushtables = this.pushtables = new Array();
-    var multiselects = this.multiselects = new Array();
-    var tags = new Array();
-    var stacktables = new Array();
-    var $url = this.$url = new Array();
-    var queryParams = new Object();
+    var pushtables = this.pushtables = [];
+    var multiselects = this.multiselects = [];
+    var tags = [];
+    var stacktables = [];
+    var $url = this.$url = [];
+    var queryParams = {};
 
     this.cdn;
     this.queryparams;
@@ -81,7 +81,7 @@ var LiliumCMS = function() {
     this.imagepicker;
     this.conversations;
     this.facebook;
-    this.tables = new Array();
+    this.tables = [];
     this.lys = new Lys();
     this.ssl = document.location.protocol === "https:";
 
@@ -277,22 +277,21 @@ var LiliumCMS = function() {
     };
 
     var FormParser = function() {
-        var makeSingleStackTable = this.makeSingleStackTable = function(index, osTable) {
+        var makeSingleStackTable = this.makeSingleStackTable = function(osTable) {
             if (!osTable.dataset.stacktableindex) {
-                var sTable = $(osTable);
+                var sTable = osTable;
                 var stackTable = new StackTable(
-                    sTable.attr('id'),
-                    sTable.data('title'),
+                    sTable.id,
+                    sTable.dataset.title,
                     JSON.parse(osTable.dataset.scheme.replace(/\&lmlquote;/g, '"')),
-                    sTable.data('fieldname')
-
+                    sTable.dataset.fieldname
                 );
+
                 stacktables.push(stackTable);
             }
-
         };
 
-        var makeSingleTag = this.makeSingleTag = function(index, tagsInput) {
+        var makeSingleTag = this.makeSingleTag = function(tagsInput) {
             if (!tagsInput.dataset.tagsindex) {
                 var tag = new Tags(
                     tagsInput
@@ -305,43 +304,56 @@ var LiliumCMS = function() {
 
         var makeStackTables = function() {
             stacktables = [];
-            $('.lmlstacktable').each(makeSingleStackTable);
+
+            var lmlst = document.querySelectorAll('.lmlstacktable');
+            for (var i = 0; i < lmlst.length; i++) {
+                makeSingleStackTable(lmlst[i]);
+            }
         };
 
         var makeTags = function() {
             tags = [];
-            $('.lmltagswrapper .tags-input').each(makeSingleTag);
+
+            var lmlst = document.querySelectorAll('.lmltagswrapper .tags-input');
+            for (var i = 0; i < lmlst.length; i++) {
+                makeSingleTag(lmlst[i]); 
+            }
         };
 
         var makeTables = function() {
             that.tables = [];
-            $('table.lmltablebuilder').each(function(index, elem) {
-                that.tables.push(new LmlTable(elem));
-            });
+            var lmltb = document.querySelectorAll('table.lmltablebuilder');
+            for (var i = 0; i < lmltb.length; i++) {
+                that.tables.push(new LmlTable(lmltb[i]));
+            }
         };
 
         var makeSections = function() {
             if (liliumcms.livevars.retrieveVar('session').roles.indexOf('lilium') === -1) {
-                $('.lmlform-cond-section').each(function(index, section) {
-                    if (section.dataset.if) {
-                        var ifstr = JSON.parse(section.dataset['if'].replace(/\&lmlquote\;/g, '"'));
-                        var cshow = true;
-                        var userRoles = liliumcms.session.current.roles;    
+                var sections = document.querySelectorAll('.lmlform-cond-section');
+                for (var i = 0; i < sections.length; i++) {
+                    var section = sections[i];
 
-                        for (var field in ifstr) {
-                            if (field == "role" && userRoles.indexOf(ifstr[field]) == -1) {
-                                cshow = false;
-                                break;
+                    (function(section) {
+                        if (section.dataset.if) {
+                            var ifstr = JSON.parse(section.dataset['if'].replace(/\&lmlquote\;/g, '"'));
+                            var cshow = true;
+                            var userRoles = liliumcms.session.current.roles;    
+
+                            for (var field in ifstr) {
+                                if (field == "role" && userRoles.indexOf(ifstr[field]) == -1) {
+                                    cshow = false;
+                                    break;
+                                }
+                            }
+            
+                            if (!cshow) {
+                                section.style.display = "none";
+                                section.querySelector('input.lmlsection-ignore').value = 1;
                             }
                         }
-        
-                        if (!cshow) {
-                            $(section).hide().find('input.lmlsection-ignore').val(1);
-                        }
-                    }
-
-
-                });
+                    })(section);
+                };
             }
         };
 
@@ -599,7 +611,7 @@ var LiliumCMS = function() {
     }
 
     this.parseURL = function() {
-        this.$url = new Array();
+        this.$url = [];
         var urlarr = document.location.href.split('/');
 
         this.$url.push(document.location.href);
@@ -1163,7 +1175,7 @@ var LiliumCMS = function() {
         oldBrowsers();
         var pathname = window.location.pathname;
         var split = pathname.split('?')[1];
-        window.location.params = new Object();
+        window.location.params = {};
 
         if (split) {
             split = split.split('&');

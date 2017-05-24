@@ -51,5 +51,10 @@
         "codename" : "Zeus",
         "script" : "1.1.0.js",
         "features" : ["Content chains", "LMLDom JSON"]
+    },
+    "1.2.0" : {
+        "codename":  "Azul",
+        "script" : "1.2.0.js",
+        "features" : ["New LML Dom"]
     }
 }
