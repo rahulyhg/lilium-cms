@@ -144,188 +144,44 @@ var LiliumCMS = function() {
         };
 
         this.beautify = function() {
-            $('input[type="checkbox"]:not(.systeminput)').each(function(index, cbox) {
-                var beautifulCheckbox = $(createCheckboxWrapper(cbox));
+            var cbs = document.querySelectorAll('input[type="checkbox"]:not(.systeminput)');
+            for (var i = 0; i < cbs.length; i++) {
+                var cbox = cbs[i];
+                var beautifulCheckbox = createCheckboxWrapper(cbox);
 
-                $(beautifulCheckbox).bind('click', function() {
-                    $(this).toggleClass('checked');
-                    cbox.checked = $(this).hasClass('checked');
+                beautifulCheckbox.addEventListener('click', function(ev) {
+                    ev.target.classList.toggle('checked');
+                    cbox.checked = ev.target.classList.contains('checked');
                 });
 
-                $(cbox).bind('change', function() {
-                    $(beautifulCheckbox)[cbox.checked ? "addClass" : "removeClass"]('checked');
+                cbox.addEventListener('change', function() {
+                    beautifulCheckbox.classList[cbox.checked ? "add" : "remove"]('checked');
                 });
 
-                $(cbox).after(beautifulCheckbox);
-            });
+                cbox.parentElement.insertBefore(beautifulCheckbox, cbox);
+            };
         };
     };
 
     var FormValidator = function() {
         this.validate = function(form) {
-            var validForm = true;
-            $(form).find('.v_invalid_msg').remove();
-
-            $(form).find('.v_validate ').each(function() {
-                var validField = true;
-
-                // If a field : text, textarea
-                if ($(this).attr('type') == 'text' ||
-                    $(this).attr('type') == 'textarea' ||
-                    $(this).attr('type') == 'email' ||
-                    $(this).attr('type') == 'password') {
-
-                    if ($(this).attr('required') && $(this).val().length == 0) {
-                        validField = false;
-                        $(this).before('<div class="v_invalid_msg">This field is required</div>');
-                    }
-
-                    // Min and maxlength verification
-                    if ($(this).attr('minlength') && $(this).val().length < $(this).attr('minlength')) {
-                        validField = false;
-                        $(this).before('<div class="v_invalid_msg">Minimum length is '+ $(this).attr('minlength') +'</div>');
-
-                    } else if ($(this).attr('maxlength') && $(this).val().length > $(this).attr('maxlength')) {
-                        validField = false;
-                        $(this).before('<div class="v_invalid_msg">Maximum length is '+ $(this).attr('maxlength') +'</div>');
-                    }
-                }
-
-                if ($(this).attr('type') == 'email') {
-                    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                    if (!re.test($(this).val())) {
-                        $(this).before('<div class="v_invalid_msg">This email is invalid</div>');
-                    }
-                }
-
-
-                if ($(this).attr('type') == 'checkbox' && $(this).data('required') == true && !$(this).is(':checked')) {
-                    validField = false;
-                    $(this).before('<div class="v_invalid_msg">This field is required</div>');
-                }
-
-                if ($(this).attr('type') == 'number') {
-                    // Min and maxlength verification
-                    if ($(this).attr('min') && $(this).val() < $(this).attr('min')) {
-
-                        validField = false;
-                        $(this).before('<div class="v_invalid_msg">The minimum value is '+ $(this).attr('min') +'</div>');
-
-                    } else if ($(this).attr('max') && $(this).val() > $(this).attr('max')) {
-                        $(this).before('<div class="v_invalid_msg">The maximum value is '+ $(this).attr('max') +'</div>');
-
-                        validField = false;
-                    }
-                }
-
-                
-                $('[ckeditor]').val($('[ckeditor]').ckeditor().val());
-
-                if (!validField) {
-                    validForm = false;
-                }
-
-                if (!validField) {
-                    $(this).removeClass('v_valid');
-                    $(this).addClass('v_invalid');
-                } else {
-                    $(this).removeClass('v_invalid');
-                    $(this).addClass('v_valid');
-                }
-
-            });
-
-            if (validForm) {
-                $('alert.alert-info').last().remove();
-            } else {
-                lmlAlert('The form contains invalid fields. Please review them.');
-            }
-
-            return validForm;
-
+            log('Validator', 'Called old validation process which is always validate', 'deprec');
+            return true;
         };
 
         this.prepareValidation = function(cb) {
-            var that = this;
-            $('.v_form_validate').submit(function(e) {
-                e.preventDefault();
-
-                if (that.validate()) {
-                    // Send via ajax
-                    processForm($(this));
-                }
-                return false;
-            });
-
             var processForm = function(form) {
-                var that = this;
-                var serialized_form = form.serialize();
-                // Process files
-                processFiles(form, function() {
-                    $.post(form.attr('action') || window.location.href.toString(), serialized_form, function(data) {
-                        if (data.success && data.redirect) {
-                            window.location.replace(data.redirect);
-                        }
-                        var event = new CustomEvent('formSubmited', {
-                            'detail': data
-                        });
-                        document.dispatchEvent(event);
-                        return false;
-                    });
-                    if (cb) cb();
-                });
+                log('Validator', 'Called form processing. This will most likely hang, or crash', 'deprec');
+                cb && cb();
                 return false;
-
             };
 
             var processFiles = function(form, cb) {
-                if (form.find('input[type=file]').length > 0) {
-                    var data = new FormData();
-                    jQuery.each(form.find('input[type=file]')[0].files, function(i, file) {
-                        data.append('file-' + i, file);
-                    });
-
-                    jQuery.ajax({
-                        url: form.attr('action'),
-                        data: data,
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        type: 'POST',
-                        success: function(data) {
-                            return cb();
-                        }
-                    });
-                } else {
-                    return cb();
-                }
+                log('Validator', 'Called file processing. This will most likely hang, or crash', 'deprec');
+                cb && cb();
             };
         };
     }
-
-    var LocalCache = function() {
-        var cache = window.localStorage;
-
-        this.cacheForm = function() {
-
-        };
-
-        this.fillFormFromCache = function(formName) {
-
-        };
-
-        this.setVar = function(key, value) {
-            window.localStorage.setItem(key, value);
-        };
-
-        this.getVar = function(key) {
-            var item = window.localStorage.getItem(key);
-            return item == null ? undefined : item;
-        };
-
-        cache.forms = cache.forms || new Object();
-        cache.adminmenus = cache.adminmenus || new Object();
-    };
 
     var findPushTableFromTitle = function(title) {
         var pt = undefined;
