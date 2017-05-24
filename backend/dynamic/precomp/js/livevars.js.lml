@@ -382,12 +382,13 @@ var LiveVars = function() {
      */
     this.parseTextToView = function(local) {
         if (!document.querySelector('lml\\:dom')) {
-            log('Livevars', 'Rendering livevars to view inside non-lmldom markup');
+            log('Livevars', '[DEPRECATED] Rendering livevars to view inside non-lmldom markup', 'deprec');
+            log('Livevars', 'Use Lilium Document Object Model without jQuery instead :)', 'deprec');
             $((local ? "main.lmladminmain " : "") + "lml\\:livevars").each(function() {
                 var lmlTag = $(this);
 
                 if (typeof livevars[this.dataset.varname] === "object") {
-
+                    log('Livevars', "Parsing to view live variable : " + this.dataset.varname);
                     var templateName = $(this).data('template');
                     var varValue = livevars[this.dataset.varname];
                     var fillerName = $(this).data('filler');
@@ -395,18 +396,22 @@ var LiveVars = function() {
                     var cacheonly = $(this).data('cacheonly');
                     var livevarkey = this.dataset.varname;
                     var readkey = this.dataset.readkey;
-                    if (typeof $(this).data('attribute') !== 'undefined') {
-                        var attributes = typeof $(this).data('attribute') == "object" ? $(this).data('attribute') : JSON.parse($(this).data('attribute').replace(/&lmlquote;/g, '"'));
+                    var attributes = {};
 
+                    if (typeof $(this).data('attribute') !== 'undefined') {
+                        attributes = typeof $(this).data('attribute') == "object" ? $(this).data('attribute') : JSON.parse($(this).data('attribute').replace(/&lmlquote;/g, '"'));
                     }
 
                     if (livevars[this.dataset.varname].length == 0) {
                         var template = $('#' + templateName);
                         $(this).after($(template).find('lml\\:empty').html());
                     }
-                    if (sourceof && sourceof != "") {
+
+                    if (sourceof) {
+                        log('Livevars', 'Found source for form with name : ' + sourceof);
                         (function(src, data) {
                             var evnt = function() {
+                                log('Livevars', "Received livevar rendered signal; filling form with id : " + src);
                                 if (!$('#' + src).data('_lmlfilled')) {
                                     var fCtx = $('#' + src).data('context');
                                     if ($.isArray(data)) {
@@ -418,16 +423,17 @@ var LiveVars = function() {
                                     }
     
                                     $('#' + src).data('_lmlfilled', true);
-                                    document.removeEventListener(liliumcms.LiliumEvents.livevarsRendered.name, evnt);
+                                    document.removeEventListener("livevarsRendered", evnt);
                                 }
                             };
     
-                            document.addEventListener(liliumcms.LiliumEvents.livevarsRendered.name, evnt);
+                            document.addEventListener("livevarsRendered", evnt);
                         })(sourceof, varValue);
                     }
                     if (cacheonly) {
                         // $(lmlTag).remove();
-                    } else if (fillerName == "pushtable") {
+                    } else if (fillerName == "pushtable") { 
+                        log('Livevars', 'Detected PushTable with name : ' + $(this).data('fieldname'));
                         var datascheme = $(this).data('scheme');
                         var pushTable = new PushTable($(this).data('fieldname'), $(this).data('title'), datascheme, varValue);
                         liliumcms.pushtables.push(pushTable);
@@ -456,6 +462,8 @@ var LiveVars = function() {
                             if (attributes.multiple) {
                                 filler.attr("multiple", "multiple");
                             }
+
+                            log('Livevars', 'Found MultiSelect ' + (attributes.multiple && "(multiple)" || "") + ' with name ' + $(this).data('fieldname'));
                             var datascheme = $(this).data('scheme');
                             var multiselect = new MultiSelect($(this).data('fieldname'), lmlTag, filler);
                             liliumcms.multiselects.push(multiselect);
@@ -548,7 +556,7 @@ var LiveVars = function() {
 
     this.deepLivevars = function(reload) {
         if (reload || typeof liliumcms.livevars.deeplivevars === 'undefined') {
-            var dlv = new Object;
+            var dlv = {};
             liliumcms.livevars.deeplivevars = dlv;
 
             for (var k in livevars) {

@@ -32,12 +32,21 @@ var socket = typeof io !== 'undefined' ? io(window.location.urlBase + window.loc
 }) : undefined;
 window.lmlsocket = socket;
  
+var LOG_MAX_SENDER_SIZE = 14;
 var log = window.log = function(sender, msg, type, style) {
-    var output = new Date().toLocaleTimeString() + ' [' + sender + "] " + msg;
+    var spacing = "";
+    var si = sender.length;
+    while (si < LOG_MAX_SENDER_SIZE) {
+        ++si; 
+        spacing += " ";
+    }
+
+    var output = new Date().toLocaleTimeString() + ' [' + sender + "] " + spacing + msg;
     switch (type) {
         case "warn"  : console.warn(output); break;
         case "err"   : console.error(output); break;
         case "info"  : console.info(output); break;
+        case "deprec": console.log("%c" + output, "color: #E56330;"); break;
         case "lilium": console.log("%c" + output, "color: #9B59B6; font-weight: bold; font-size: 12px;"); break;
         case "style" : console.log('%c' + output, style); break;
         default      : console.log(output);
@@ -851,6 +860,8 @@ var LiliumCMS = function() {
 
             document.body.classList.remove('modal-open');
             document.querySelector('.lmladminsidebar').classList.remove("mobile-shown");
+
+            liliumcms.multiselects = [];
         
             log('PageLoader', 'Passing request to Livevars');
             liliumcms.livevars.exec(true);

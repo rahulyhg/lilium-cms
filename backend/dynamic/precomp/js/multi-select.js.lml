@@ -11,24 +11,39 @@ var MultiSelect = function(tableid, lmltag, selectElem) {
     var initialValues = new Array();
     this.isRendered = false;
 
+    log('MultiSelect', 'Created MultiSelect object with name ' + name);
+
     this.render = function() {
-        var html = '<div class="lmlmultiselect multiselect" >';
+        log('MultiSelect', 'Rendering field with name : ' + fieldname);
+        var wrapper = document.createElement('div');
+        wrapper.className = "lmlmultiselect multiselect";
         var data = initialValues;
 
         $(selectElem).find('option').each(function(index, elem) {
-            var elem = $(elem);
             var selected = false;
-            if (typeof data !== "undefined" && $.inArray(elem.attr('value'), data) !== -1) {
-                html += '<span class="selected" id="'+ elem.attr('value') +'">' + elem.html();
-                html += '<input type="hidden" name="'+ selectElem.attr('name') +'[]" value="'+ elem.attr('value') +'">';
-                html += '</span>';
-            } else {
-                html += '<span id="'+ elem.attr('value') +'" class="lmlmultiselect-val-'+elem.attr('value')+'" data-value="'+ elem.attr('value') +'">' + elem.html() + '</span>';
+        
+            var span = document.createElement('span');
+            span.id = elem.value;
+            span.dataset.value = elem.value;
+            span.textContent = elem.textContent;
+            span.classList.add("lmlmultiselect-val-" + elem.value);
+
+            if (data && data.indexOf(elem.value) !== -1) {
+                span.classList.add('selected');
+
+                var hf = document.createElement('input');
+                hf.type = "hidden";
+                hf.name = name + "[]";
+                hf.value = elem.value;
+
+                span.appendChild(hf);
             }
+
+            wrapper.appendChild(span);
         });
-        html += '</div>'
+
         options = selectElem;
-        multiselectElem = $(html);
+        multiselectElem = wrapper;
         lmltag.after(multiselectElem);
         selectElem.remove();
         bindClicks();
@@ -36,9 +51,34 @@ var MultiSelect = function(tableid, lmltag, selectElem) {
     }
 
     this.fillFromData = function(data) {
+        log('MultiSelect', 'Received initial data for field with name : ' + fieldname);
         var selected = data[fieldname];
         if (selected && typeof selected === 'object' && selected.length != 0) {
             initialValues = selected;
+        }
+
+        if (this.isRendered) {
+            this.updateFromInitState();
+        }
+    };
+
+    this.updateFromInitState = function() {
+        log('MultiSelect', 'Initial data was received after initial render. Consider fixing this!');
+        if (multiselectElem) {
+            var el = multiselectElem;
+            for (var i = 0; i < initialValues.length; i++) {
+                var span = el.querySelector('[data-value="'+initialValues[i]+'"]');
+
+                if (span) {
+                    var hf = document.createElement('input');
+                    hf.type = "hidden";
+                    hf.name = name + "[]";
+                    hf.value = initialValues[i];
+                    span.appendChild(hf);
+
+                    span.classList.add('selected');
+                }
+            }
         }
     };
 
