@@ -1008,11 +1008,12 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
 }
 
 .sidebar-internal-link-title {
-    font-size: 24px;
+    font-size: 20px;
     color: #111;
-    font-family: "Oswald", sans-serif;
+    font-family: "Oswald",sans-serif;
     text-decoration: none;
     display: block;
+    margin: 5px 0 0;
 }
 
 .sidebar-internal-link-subtitle {
@@ -1024,16 +1025,19 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
 
 .sidebar-internal-link {
     text-decoration: none;
-    margin-top: 20px;
+    margin-top: 40px;
     display: block;
 }
 
 #sidebar-links h3 {
-    font-size: 28px;
-    font-family: "Oswald", sans-serif;
+    font-family: Oswald,sans-serif;
+    font-size: 24px;
     font-weight: normal;
-    color: #FF2634;
-    margin: 20px 0px 0px;
+    text-transform: uppercase;
+    color: #ff2634 ;
+    clear: both;
+    margin: 30px 0 20px;
+    text-align: left;
 }
 
 .fwblock {
