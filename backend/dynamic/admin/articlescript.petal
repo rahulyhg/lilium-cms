@@ -127,6 +127,8 @@
 
         return {
             show : function() {
+                if (window.innerWidth < 1000) return;
+
                 document.getElementById("publishreport").classList.remove("hidden");
                 setTimeout(function() {
                     document.getElementById("publishreport").classList.add('shown');
