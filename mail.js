@@ -33,6 +33,7 @@ class EMail {
         this.to = to || "";
         this.subject = subject || "";
         this.content = content || "";
+        this.cc = [];
 
         this.files = [];
     }
@@ -43,6 +44,14 @@ class EMail {
 
     attach(filepath) {
         this.files.push(filepath)
+    }
+
+    addCC(addr) {
+        this.cc.push(addr);
+    }
+
+    setCC(ccs) {
+        this.cc = ccs;
     }
 };
 
@@ -258,6 +267,10 @@ class LMLMail {
                     log('Mail', 'Preparing to send LML email to ' + to);
                     const email = that.createEmail(_c, to, template.subject);
                     email.setHTML(compiledPage);
+                    if (extra.cc) {
+                        email.setCC(extra.cc);
+                    }
+
                     that.send(email, () => {
                         log('Mail', 'Sent email to ' + to + ' from hook ' + hookname);
                         cb && cb();
@@ -283,6 +296,7 @@ class LMLMail {
                 from : '"' + senderInfo[email.siteid].from + '" <' + senderInfo[email.siteid].user + ">",
                 to : email.to,
                 subject : email.subject,
+                cc : email.cc
             };
 
             if (email.html) {
@@ -300,46 +314,6 @@ class LMLMail {
 
                 callback && callback(err, res);
             });
-
-            /*
-            fileserver.fileExists(_c.emails.gmailkey, function(exists) {
-                if (!exists) {
-                    return callback && callback(new Error("Missing gmail JSON key file"));
-                }
-
-                const googleKey = require(_c.emails.gmailkey);
-                const jwtClient = new google.auth.JWT(
-                    googleKey.client_email, 
-                    null, 
-                    googleKey.private_key, 
-                    ['https://www.googleapis.com/auth/gmail.send'], 
-                    senderInfo[email.siteid].user
-                );
-
-                jwtClient.authorize((err, tokens) => {
-                    if (err) {
-                        log('Mail', 'Could not send email because of JWT error => ' + err, 'err');
-                        return callback && callback (err);
-                    }
-
-                    var gmail = google.gmail({version: 'v1'});
-                    gmail.users.messages.send({
-                        auth: jwtClient,
-                        userId : senderInfo[email.siteid].user,
-                        uploadType : 'media',
-                        ressource : {
-                            raw : require('js-base64').Base64.encodeURI(email.content)
-                        }
-                    }, (err, res) => {
-                        if (err) {
-                            log('Mail', 'Could not send email => ' + err, 'err');
-                        }
-
-                        callback && callback(err, res);
-                    });
-                });
-            });
-            */
         }
     }
 

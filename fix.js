@@ -180,6 +180,7 @@ class Fix {
                     require('./mail.js').triggerHook(_c, 'ticket_status_update', to.email, {
                         config : _c,
                         to : to,
+                        cc : [from.email],
                         from : from,
                         ticket : ticket,
                         message : message,
