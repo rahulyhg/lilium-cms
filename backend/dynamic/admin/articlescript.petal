@@ -415,6 +415,7 @@
             $('#confirm-send-for-review').modal('show');
         });
 
+        var curConfirmTimeout;
         var publishCurrentArticle = function(e) {
             $('#confirm-publish').modal('hide');
 
@@ -458,15 +459,29 @@
                             liliumcms.pageloader.load(data.redirect);
                         }
 
+                        if (data.newlyPublished) {
+                            liliumcms.livevars.getSingleLivevar('content.publishreport.' + contentid, {}, function(resp) {
+                                if (resp.response.code == 200) {
+                                    log('Content', 'Received publication report for article with id ' + contentid);
+                                    var report = resp.livevars['content.publishreport.' + contentid];
+
+                                    
+                                } else {
+                                    log('Content', 'Received empty publication report for article with id ' + contentid);
+                                }
+                            });
+                        }
+
                         pubBtn.innerHTML = "Generating article...";
                         updateBottomSection();
 
-                        setTimeout(function() {
+                        curConfirmTimeout && clearTimeout(curConfirmTimeout);
+                        curConfirmTimeout = setTimeout(function() {
                             if (pubBtn.classList.contains("waitingForConfirmation")) {
                                 liliumcms.notify( {type : "warning", title : "Weird.", message : "Server could not notify you for some reason, but the article was still published successfully, and should be online."});
                                 enablePublishButton();
                             }
-                        }, 10000);
+                        }, 15000);
                     }
                 });
             } else {
@@ -622,3 +637,10 @@
     <!-- /.modal-dialog -->
 </div>
 <!-- /.modal -->
+
+<div id="publishreport">
+
+</div>
+<script>
+    liliumcms.lmldom.stage(document.getElementById('publishreport'));
+</script>

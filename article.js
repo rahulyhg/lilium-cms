@@ -570,8 +570,9 @@ var Article = function() {
         var that = this;
         if (cli.hasRight('list-articles')) {
             var oldSlug = "";
-
+            var wasNotPublished = false;
             var redirect = '';
+
             if (true || response.success) {
                 var formData = cli.postdata.data; //formBuilder.serializeForm(form);
                 formData.status = 'published';
@@ -661,6 +662,7 @@ var Article = function() {
                                             );
 
                                             that.generateArticle(cli._c, db.mongoID(formData._id), function(resp) {
+                                                resp.newlyPublished = wasNotPublished;
                                                 cli.sendJSON(resp);
                                                 var deepArticle = resp.deepArticle;
 
@@ -744,8 +746,6 @@ var Article = function() {
                                                         authoravatar : deepArticle.authors[0].avatarURL
                                                     });
                                                 });
- 
-                                                // badges.check(cli, 'publish', function(acquired, level) {});
                                             }, false, "all");
                                         } else if (pubCtx === "preview") {
                                             var tmpName = "static/tmp/preview" + 
@@ -789,6 +789,7 @@ var Article = function() {
                     };
 
                     if (arr && arr[0] && arr[0].status != "published") {
+                        wasNotPublished = true;
                         formData.date = new Date(dates.toTimezone(new Date(), cli._c.timezone));
                     }
 
@@ -1127,6 +1128,82 @@ var Article = function() {
         // Return article object from DB
     };
 
+    var countOcc = function(article, occ) {
+        var content = article.content || article || "";
+
+        var i = 0;
+        var count = -1;
+        do {
+            count++;
+            i = content.indexOf(occ, i) + 1;
+        } while (i != 0)
+
+        return count;
+    };
+
+    this.generatePublishReport = function(_c, $match, sendback) {
+        db.join(_c, 'content', [
+            {$limit : 1},
+            {$match},
+            {
+                $lookup : {
+                    from : "uploads",
+                    localField : "media",
+                    foreignField : "_id",
+                    as : "featuredimage"
+                }
+            }, {
+                $lookup : {
+                    from : "topics",
+                    localField : "topic",
+                    foreignField : "_id",
+                    as : "topicobject"
+                }
+            }
+        ], function(arr) {
+            var art = arr.pop();
+            var author = art.author;
+            var topic = art.topicobject.pop();
+            var featuredimage = art.featuredimage.pop();
+
+            // Today
+            var start = new Date();
+            start.setHours(0,0,0,0);
+
+            var end = new Date();
+            end.setHours(23,59,59,999);
+
+            var date = {$gte: start, $lt: end};
+
+            db.count(_c, 'content', {author}, function(err, totalCount) {
+                db.count(_c, 'content', {author, date}, function(err, totalToday) {
+                    var article = {
+                        title : art.title,
+                        subtitle : art.subtitle,
+                        topic,
+                        featuredimage : featuredimage.sizes.content.url,
+                        ads : countOcc(art, "<ad"),
+                        page : countOcc(art, "<lml-page"),
+                        parag : countOcc(art, '<p'),
+                        images : countOcc(art, '<img'),
+                        isSponsored : art.isSponsored,
+                        url : _c.server.protocol + _c.server.url + "/" + art.topic.completeSlug + "/" + art.name,
+                    };
+
+                    author = {
+                        fullname : author.fullname,
+                        avatarURL : author.avatarURL,
+                        totalCount,
+                        totalToday
+                    }
+
+                    sendback({
+                        article, author
+                    });
+                });
+            });
+        });
+    };
 
     this.livevar = function(cli, levels, params, callback) {
         var allContent = levels.length === 0;
@@ -1153,6 +1230,13 @@ var Article = function() {
             } else {
                 callback();
             }
+        } else if (levels[0] == "publishreport") {
+            var match = { _id : db.mongoID(levels[1]) };
+            if (!cli.hasRight('list-articles')) {
+                match.author = db.mongoID(cli.userinfo.userid);
+            }
+            
+            this.generatePublishReport(cli._c, match, callback);
         } else if (levels[0] == "all") {
             var sentArr = new Array();
 

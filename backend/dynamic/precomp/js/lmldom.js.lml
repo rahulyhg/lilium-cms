@@ -914,6 +914,40 @@ var LMLDom = function() {
         nextSnip();
     };
 
+    this.get = function(url, options, callback) {
+        options = options || {}
+        var keys = Object.keys(options.params || {});
+        var received = function() {
+            callback(this.responseText);
+        }
+
+        if (keys.length != 0) {
+            url += "?";
+            for (var i = 0; i < keys.length; i++) {
+                url += keys[i] + "=" + params[keys[i]] + "&";
+            }
+
+            url += "generator=lmldom";
+        }
+
+        if (options.prependroot) {
+            url = "{=config.default.server.protocol}{=config.default.server.url}" + url;
+        }
+
+        var oReq = new XMLHttpRequest();
+
+        if (options.headers) {
+            var headers = Object.keys(options.headers);
+            for (var i = 0; i < headers.length; i++) {
+                oReq.setRequestHeader(headers[i], options.headers[headers[i]]);
+            }
+        }
+
+        oReq.addEventListener("load", received);
+        oReq.open("GET", url);
+        oReq.send();
+    };
+
     this.parse = function(lmldomReady) {
         var domv = document.querySelector('lml\\:dom');
         var lmldom = this;
