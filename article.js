@@ -1201,7 +1201,7 @@ var Article = function() {
                             featuredimage : featuredimage.sizes.content.url,
                             score : {
                                 ads : countOcc(art, "<ad"),
-                                pages : pageCount
+                                pages : pageCount,
                                 paragraphs : countOcc(art, '<p'),
                                 images : countOcc(art, '<img')
                             },
