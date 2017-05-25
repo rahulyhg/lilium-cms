@@ -1185,6 +1185,11 @@ var Article = function() {
 
             var date = {$gte: start, $lt: end};
 
+            var pageCount = countOcc(art, "<lml-page");
+            if (pageCount != 0) {
+                pageCount++;
+            }
+
             // Find counts and author object
             db.count(_c, 'content', {author}, function(err, totalCount) {
                 db.count(_c, 'content', {author, date}, function(err, totalToday) {
@@ -1196,8 +1201,8 @@ var Article = function() {
                             featuredimage : featuredimage.sizes.content.url,
                             score : {
                                 ads : countOcc(art, "<ad"),
-                                pages : countOcc(art, "<lml-page"),
-                                paragaphs : countOcc(art, '<p'),
+                                pages : pageCount
+                                paragraphs : countOcc(art, '<p'),
                                 images : countOcc(art, '<img')
                             },
                             isSponsored : art.isSponsored,

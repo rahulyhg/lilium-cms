@@ -693,7 +693,7 @@
             <div class="prep-stat"><i class="fa fa-money"></i> <span id="prep-adsinserted"></span> ads inserted</div>
             <div class="prep-stat"><i class="fa fa-handshake-o"></i> Article is <span id="prep-sponsored"></span>sponsored</div>
             <div class="prep-stat"><i class="fa fa-columns"></i> <span id="prep-pagecount"></span></div>
-            <div class="prep-stat"><i class="fa fa-paragraph"></i> <span id="prep-paragcount"></span> paragraphs</div>
+            <div class="prep-stat"><i class="fa fa-paragraph"></i> <span id="prep-paragcount"></span> paragraph blocks</div>
             <div class="prep-stat"><i class="fa fa-picture-o"></i> <span id="prep-imagescount"></span> images</div>
             <div class="prep-stat"><i class="fa fa-globe"></i> Full URL : <a id="prep-fullurl" target="_blank"></a></div>
         </div>
