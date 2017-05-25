@@ -2423,7 +2423,10 @@ button.bigger {
     position: absolute;
     top: 0;
     left: 0;
+
+    height: 225px;
     width: 400px;
+    object-fit: cover;
 
     -webkit-transform: rotateZ(-6deg);
        -moz-transform: rotateZ(-6deg);
