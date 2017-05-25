@@ -103,6 +103,49 @@
         });
     }
 
+    var buildReport = function(data) {
+        var g = function(elem, str) { document.getElementById("prep-" + elem).textContent = str; };
+                
+        g('title', data.article.title);
+        g('subtitle', data.article.subtitle);
+        g('adsinserted', data.article.score.ads);
+        g('sponsored', data.article.isSponsored || "not ");
+        g('pagecount', data.article.score.pages ? ("Paginated on " + data.article.score.pages + " pages") : "Not paginated");
+        g('paragcount', data.article.score.paragraphs);
+        g('imagescount', data.article.score.images);
+
+        var link = document.getElementById('prep-fullurl');
+        link.href = data.article.url;
+        link.textContent = data.article.url;
+
+        g('authorname', data.author.fullname);
+        g('authortotal', data.author.totalCount);
+        g('authortoday', data.author.totalToday);
+
+        document.getElementById('prep-image').src = data.article.featuredimage;
+        document.getElementById('prep-authorimage').src = data.author.avatarURL;
+
+        return {
+            show : function() {
+                document.getElementById("publishreport").classList.remove("hidden");
+                setTimeout(function() {
+                    document.getElementById("publishreport").classList.add('shown');
+                    setTimeout(function() {
+                        document.getElementById('prep-wrapper').classList.add('shown');
+                    }, 100);
+                }, 10);
+            }
+        };
+    };
+
+    var dismissReport = function() {
+        document.getElementById("prep-wrapper").classList.remove("shown");
+        document.getElementById('publishreport').classList.remove('shown');
+        setTimeout(function() {
+            document.getElementById('publishreport').classList.add('hidden');
+        }, 100);
+    }
+
     var enablePublishButton = function() {
         pubBtn = $('button[name="publish"]').get(0);
 
@@ -464,7 +507,7 @@
                                 if (resp.response.code == 200) {
                                     log('Content', 'Received publication report for article with id ' + contentid);
                                     var report = resp.livevars['content.publishreport.' + contentid];
-
+                                    buildReport(report).show();
                                     
                                 } else {
                                     log('Content', 'Received empty publication report for article with id ' + contentid);
@@ -638,9 +681,33 @@
 </div>
 <!-- /.modal -->
 
-<div id="publishreport">
-
+<div id="publishreport" class="hidden">
+    <div id="prep-wrapper">
+        <img src="" id="prep-image" />
+        <div class="prep-top">
+            <span id="prep-bigtitle">Article published</span>
+            <span id="prep-title"></span>
+            <span id="prep-subtitle"></span>
+        </div>
+        <div class="prep-stats">
+            <div class="prep-stat"><i class="fa fa-money"></i> <span id="prep-adsinserted"></span> ads inserted</div>
+            <div class="prep-stat"><i class="fa fa-handshake-o"></i> Article is <span id="prep-sponsored"></span>sponsored</div>
+            <div class="prep-stat"><i class="fa fa-columns"></i> <span id="prep-pagecount"></span></div>
+            <div class="prep-stat"><i class="fa fa-paragraph"></i> <span id="prep-paragcount"></span> paragraphs</div>
+            <div class="prep-stat"><i class="fa fa-picture-o"></i> <span id="prep-imagescount"></span> images</div>
+            <div class="prep-stat"><i class="fa fa-globe"></i> Full URL : <a id="prep-fullurl" target="_blank"></a></div>
+        </div>
+        <div class="prep-author">
+            <img src="" id="prep-authorimage" />
+            <div class="prep-authorsection">
+                <div class="prep-authortitle">Written by <span id="prep-authorname"></span></div>
+                <div class="prep-authorfield"><i class="fa fa-paper-plane-o"></i> <span id="prep-authortotal"></span> articles</div>
+                <div class="prep-authorfield"><i class="fa fa-calendar-o"></i> <span id="prep-authortoday"></span> today</div>
+            </div>
+        </div>
+        <div class="prep-footer">
+            <button class="prep-dismiss btn" onclick="dismissReport();"><i class="fa fa-check"></i> Dismiss</button>
+        </div>
+    </div>
 </div>
-<script>
-    liliumcms.lmldom.stage(document.getElementById('publishreport'));
-</script>
+

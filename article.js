@@ -1143,8 +1143,8 @@ var Article = function() {
 
     this.generatePublishReport = function(_c, $match, sendback) {
         db.join(_c, 'content', [
-            {$limit : 1},
             {$match},
+            {$limit : 1},
             {
                 $lookup : {
                     from : "uploads",
@@ -1161,10 +1161,20 @@ var Article = function() {
                 }
             }
         ], function(arr) {
+            if (arr.length == 0) {
+                return sendback({notfound : 1})
+            }
+
             var art = arr.pop();
             var author = art.author;
             var topic = art.topicobject.pop();
             var featuredimage = art.featuredimage.pop();
+
+            // Topic projection
+            topic = {
+                displayname : topic.displayname, 
+                completeSlug : topic.completeSlug
+            }
 
             // Today
             var start = new Date();
@@ -1175,30 +1185,35 @@ var Article = function() {
 
             var date = {$gte: start, $lt: end};
 
+            // Find counts and author object
             db.count(_c, 'content', {author}, function(err, totalCount) {
                 db.count(_c, 'content', {author, date}, function(err, totalToday) {
-                    var article = {
-                        title : art.title,
-                        subtitle : art.subtitle,
-                        topic,
-                        featuredimage : featuredimage.sizes.content.url,
-                        ads : countOcc(art, "<ad"),
-                        page : countOcc(art, "<lml-page"),
-                        parag : countOcc(art, '<p'),
-                        images : countOcc(art, '<img'),
-                        isSponsored : art.isSponsored,
-                        url : _c.server.protocol + _c.server.url + "/" + art.topic.completeSlug + "/" + art.name,
-                    };
+                    db.findUnique(require('./config.js').default(), 'entities', {_id : author}, function(err, author) {
+                        var article = {
+                            title : art.title,
+                            subtitle : art.subtitle,
+                            topic,
+                            featuredimage : featuredimage.sizes.content.url,
+                            score : {
+                                ads : countOcc(art, "<ad"),
+                                pages : countOcc(art, "<lml-page"),
+                                paragaphs : countOcc(art, '<p'),
+                                images : countOcc(art, '<img')
+                            },
+                            isSponsored : art.isSponsored,
+                            url : _c.server.protocol + _c.server.url + "/" + topic.completeSlug + "/" + art.name,
+                        };
 
-                    author = {
-                        fullname : author.fullname,
-                        avatarURL : author.avatarURL,
-                        totalCount,
-                        totalToday
-                    }
+                        author = {
+                            fullname : author.displayname,
+                            avatarURL : author.avatarURL,
+                            totalCount,
+                            totalToday
+                        };
 
-                    sendback({
-                        article, author
+                        sendback({
+                            article, author
+                        });
                     });
                 });
             });
