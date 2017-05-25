@@ -1017,7 +1017,7 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
 }
 
 .sidebar-internal-link-subtitle {
-    display: block;
+    display: none;
     color: #333;
     margin-top: 1px;
     font-size: 16px;
