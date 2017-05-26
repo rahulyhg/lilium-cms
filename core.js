@@ -30,7 +30,6 @@ var persona = undefined;
 var backendSearch = undefined;
 var api = undefined;
 var album = undefined;
-var badges = undefined;
 var localcast = undefined;
 var cdn = undefined;
 var vocab = undefined;
@@ -74,7 +73,6 @@ var Core = function () {
         dashboard = require('./dashboard.js');
         templateBuilder = require('./templateBuilder.js');
         backendSearch = require('./backend/search.js');
-        badges = require('./badges.js');
         localcast = require('./localcast.js');
         cdn = require('./cdn.js');
         vocab = require('./vocab.js');
@@ -314,7 +312,6 @@ var Core = function () {
     var loadLiveVars = function () {
         admin.registerLiveVar();
         backendSearch.registerLiveVar();
-        badges.registerLiveVar();
         notification.registerLiveVar();
 
         Livevars.registerDebugEndpoint();

@@ -342,6 +342,10 @@
                 "children": []
             }
         }, {
+            "module" : "badges.js",
+            "endpoint" : "decorations",
+            "support" : ["setup", "livevar", "admin_post"]
+        }, {
             "module" : "amp.js",
             "endpoint" : "amp",
             "support" : ["get"]

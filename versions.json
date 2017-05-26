@@ -56,5 +56,10 @@
         "codename":  "Azul",
         "script" : "1.2.0.js",
         "features" : ["New LML Dom"]
+    },
+    "1.2.1" : {
+        "codename":  "Azul",
+        "script" : "1.2.1.js",
+        "features" : ["Decoration implementation"]
     }
 }

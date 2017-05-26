@@ -1,172 +1,141 @@
-/*
-    Badges -
+const log = require('./log.js');
+const db = require('./includes/db.js');
+const config = require('./config.js');
+const sharedcache = require('./sharedcache.js');
+const networkinfo = require('./network/info.js');
+const noop = () => {};
 
-    Badges are awarded to users who perform certain interactions with Lilium.
-    Database schema is : 
-    entities.badges = {
-        type : level
+// Endpoint : Decorations
+const BADGE_CACHE_KEY = "systembadges";
+const DECO_COLLECTION = "decorations";
+const BADGES_COLLECTION = "badges";
+const ADMIN_POST_RIGHT = "manage-badges";
+
+/*
+    DATABASE SCHEMA ---
+
+    EntityBadge : { 
+        entity : ObjectId, 
+        badge : ObjectId,
+        level : Number(1, n),
+        receivedOn : Date,
+        issuer : ObjectId || String("system")
+    }
+
+    Badge : {
+        _id : ref by EntityBadge,
+        slug : String,
+        displayname : String,
+        imgPath : String(),
+        checkFunction : String(function),
     }
 */
 
-// Libs
-var log = require('./log.js');
-var db = require('./includes/db.js');
-var notifications = require('./notifications.js');
-var config = require('./config.js');
+class Badge {
+    constructor(dbid) {
+        this.badgeID = dbid;
+    }
 
-// Consts
-// Badge colors
-var BadgeLevels = [
-    "Green",
-    "Bronze",
-    "Silver",
-    "Gold",
-    "Platinum",
-    "Diamond",
-    "Rainbow",
-    "Master"
-];
-
-// Badge System //////////////////////////////////////
-var BadgeSystem = function(_c) {
-    this.userBadges = {};
-    this.teamBadges = {};
-
-    this._c = _c;
-};
-
-BadgeSystem.prototype.cacheDatabase = function(cb) {
-    var that = this;
-    log('Badges', 'Caching badges from database for website with uid : ' + that._c.uid);
-
-    db.findToArray(config.default(), "userbadges", {}, function(err, arr) {
-        for (var i = 0; i < arr.length; i++) {
-            that.userBadges[arr[i].code] = arr[i];
+    static fromDatabase(schema) {
+        let badge = new Badge(schema._id);
+        for (let k in schema) {
+            badge[k] = schema[k];
         }
 
-        db.findToArray(config.default(), "teambadges", {}, function(err, arr) {
-            for (var i = 0; i < arr.length; i++) {
-                that.teamBadges[arr[i].code] = arr[i];
-            }
+        return badge;
+    }
+}
 
-            cb();
-        });
-    });
-};
+class EntityBadge {
+    constructor() {
+        this.badge;
+        this.entity;
+        this.receivedOn = new Date();
+        this.level;
+        this.issuer; // Either an entity ID, or "system" ; At some point, users will be able to reward each other
+    }
 
-// Sites wrapper /////////////////////////////////////
-var BadgeWrapper = function() {};
-var sites = {};
+    static fetchEntityDecorations(entityID, sendback) {
+        sharedcache.get(BADGE_CACHE_KEY, (badges) => {
+            db.findToArray(config.default(), DECO_COLLECTION, {entity}, (err, arr) => {
+                arr.forEach(b => {
+                    b.badgeObject = badges[b.badge];
+                });
 
-BadgeWrapper.prototype.pullSite = function(cli) {
-    return sites[cli._c.uid];
-};
-
-BadgeWrapper.prototype.listUserBadges = function(_c) {
-    return sites[_c.uid].userBadges;
-};
-
-BadgeWrapper.prototype.addSite = function(_c, cb) {
-    var site = new BadgeSystem(_c);
-
-    log('Badges', 'Adding a website with uid ' + _c.uid);
-    site.cacheDatabase(function() {
-        sites[_c.uid] = site;
-        cb();
-    });
-};
-
-// First param is ClientObject type
-BadgeWrapper.prototype.check = function(cli, context, cb) {
-    var site = sites[cli._c.uid];
-    var that = this;
-
-    if (typeof that["checkFor_" + context] === "function") {
-        db.find(config.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, [], function(err, cur) {
-            cur.hasNext(function(err, hasNext) {
-                if (!err && hasNext) {
-                    cur.next(function(err, user) {
-                        if (err) {
-                            cb(new Error("[BadgeException] - " + err));
-                        } else {
-                            that["checkFor_" + context].apply(that, [cli, site, user, cb]);    
-                        }
-                    });
-                } else {
-                    cb(new Error("[BadgeException] - Could not find user with id "+ cli.userinfo.userid));
-                }
+                send(arr);
             });
         });
-    } else {
-        cb(new Error("[BadgeException] - Undefined check context : " + context));
     }
-};
+}
 
-// Acquire badge
-BadgeWrapper.prototype.acquire = function(cli, site, user, badge, level, cb) {
-    var updt = {};
-    updt["badges." + badge] = level;
+// Exported singleton
+class BadgesAPI {
+    cacheBadges(done) {
+        db.findToArray(config.default(), DECO_COLLECTION, {}, (err, badges) => {
+            sharedcache.set({
+                [BADGE_CACHE_KEY] : badges
+            }, done || noop);
+        });
+    }
 
-    log("Badges", "User " + user.username + " acquiring badge " + badge + " level " + level);
-    db.update(config.default(), 'entities', {_id : user._id}, updt, function() {
-        log('Badges', "Badge successfully acquired for user " + user.username);
+    pullBadgesCache(send) {
+        sharedcache.get(BADGE_CACHE_KEY, (obj) => {
+            send(obj);
+        });
+    }
 
-        notifications.notifyUser(user._id, cli._c.id, {
-            title : "Acquired new badge - " + BadgeLevels[level] + " " + site.userBadges[badge].name,
-            url : cli._c.server.url + "/admin/badges",
-            msg : site.userBadges[badge].condition.replace(' x ', " " + site.userBadges[badge].ranks[level] + " "),
-            type : "acquire",
-            icon : site.userBadges[badge].icon,
-            level : level
-        }, "badge");
-        
-        cb(true, badge, level);
-    });
-};
+    fetchEntityDeco(entity, send) {
+        EntityBadge.fetchEntityDecorations(entity, send);
+    }
 
-BadgeWrapper.prototype.registerLiveVar = function() {
-    require('./livevars.js').registerLiveVariable('badges', function(cli, levels, params, cb) {
+    fetchAllDeco(send) {
+        this.pullBadgesCache(badges => send(badges));
+    }
+
+    fetchOneDeco(_id, send) {
+        db.findUnique(config.default(), BADGES_COLLECTION, {_id}, (err, badge) => {
+            send(badge);
+        });
+    }
+
+    adminPOST(cli) {
+        // Allowed top levels : create, edit, give, take
+        if (!cli.hasRight(ADMIN_POST_RIGHT)) {
+            return cli.throwHTTP(403, undefined, true);
+        }
+    }
+
+    // decorations
+    livevar(cli, levels, params, send) {
+        if (levels.length == 0) {
+            return send(new Error("Required first level for live variable 'decorations'"));
+        }
+
+        // Allowed bot level : entity, all, one
         switch (levels[0]) {
-            case undefined:
-            case "user":
-                db.findToArray(config.default(), 'userbadges', {}, function(err, arr) {
-                    cb(arr);
-                });
+            case "entity": 
+                this.fetchEntityDeco(db.mongoID(levels[1]), send); 
                 break;
 
-            case "team":
-                db.findToArray(config.default(), 'teambadges', {}, function(err, arr) {
-                    cb(arr);
-                });
+            case "all":
+                this.fetchAllDeco(send);
+                break;
+
+            case "one":
+                this.fetchOneDeco(db.mongoID(levels[1]), send);
                 break;
 
             default:
-                cb(new Error("[BadgesException] Undefined level " + levels[0] + " for badges live variable"));
+                send(new Error("Undefined top level " + levels[0]))
         }
-    });
-};
-
-// First param can be ClientObject type
-BadgeWrapper.prototype.getUserBadges = function(_c, useridOrName, cb, isId) {
-    var conds = {};
-    _c = _c._c || _c;
-    if (isId) {
-        conds._id = db.mongoID(useridOrName);
-    } else {
-        conds.username = useridOrName;
     }
 
-    db.findToArray(config.default(), "entities", conds, function(err, arr) {
-        if (!err && arr.length !== 0) {
-            cb(arr[0].badges);
-        } else {
-            cb(new Error(err));
+    setup() {
+        if (networkinfo.isElderChild()) {
+            this.cacheBadges();
         }
-    });
-};
+    }
+}
 
-// Load all badge checks
-require('./badgescheck.js')(BadgeWrapper);
-
-// Export the big thing
-module.exports = new BadgeWrapper();
+const badgesAPI = new BadgesAPI();
+module.exports = badgesAPI;

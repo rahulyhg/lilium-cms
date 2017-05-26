@@ -62,7 +62,6 @@ var Sessions = function () {
             admin: cli.session.data.admin,
             god: cli.session.data.god,
             user: cli.session.data.user,
-            badges: cli.session.data.badges,
             power: cli.session.data.power,
             site: cli.routeinfo.configname
         };
@@ -192,7 +191,6 @@ var Sessions = function () {
                 power: dat.power,
                 username: dat.username,
                 site : dat.site,
-                badges : dat.badges,
                 preferences : dat.preferences || preferences.getDefault(cli._c),
                 newNotifications: dat.newNotifications || 0,
                 data : (params.withdata ? dat.data : undefined)

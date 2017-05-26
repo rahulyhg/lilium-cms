@@ -25,7 +25,6 @@ var Entity = function () {
     this.createdOn = undefined;
     this.preferences = new Object();
     this.slug = "";
-    this.badges = {}; // title : level
     this.socialnetworks = {};
 
     // Various data; should always be checked for undefined
@@ -268,7 +267,6 @@ var Entities = module.exports = new function () {
         entity._id = cli.userinfo.userid;
         delete entity.roles;
         delete entity.sites;
-        delete entity.badges;
 
         var split = entity.displayname.split(' ');
         entity.firstname = split.shift();
@@ -753,7 +751,6 @@ var Entities = module.exports = new function () {
         delete valObject.createdOn;
         delete valObject.avatarID;
         delete valObject.avatarURL;
-        delete valObject.badges;
 
         db.update(_c.default(), 'entities', {_id : id}, valObject, cb);
     };
