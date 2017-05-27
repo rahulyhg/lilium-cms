@@ -132,7 +132,7 @@ var Article = function() {
         }
     };
 
-    this.presentable = function(_c, article) {
+    this.toPresentable = function(_c, article) {
         article.identifier = article._id.toString();
         article._id = undefined;
 
@@ -196,9 +196,9 @@ var Article = function() {
                 if (!article) {
                     cli.throwHTTP(404);
                 } else {
-                    that.presentable(cli._c, article);
-
-                    cli.sendJSON(article);
+                    cli.sendJSON(
+                        that.toPresentable(cli._c, article)
+                    );
                 }
             }, false, {status : "published"})
         } else {
@@ -223,9 +223,11 @@ var Article = function() {
                         db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, function(err, modcount) {
                             cli.sendJSON({
                                 status : art.status || "Unknown",
-                                url : art.name ? cli._c.server.url + "/" + (art.topic ? topic.completeSlug : "") + "/" + art.name : "This article doesn't have a URL.",
+                                url : art.name ? 
+                                    (cli._c.server.url + "/" + (art.topic ? topic.completeSlug : "") + "/" + art.name) : 
+                                    "This article doesn't have a URL.",
                                 siteurl : cli._c.server.url,
-                                aliases : art.aliases ? Array.from(new Set(art.aliases)) : [], 
+                                aliases : art.aliases ? Array.from(new Set(art.aliases)) : [],
                                 updated : art.updated || "This article was never updated",
                                 author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
                                 modifications : modcount

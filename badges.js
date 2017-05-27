@@ -10,6 +10,7 @@ const BADGE_CACHE_KEY = "systembadges";
 const DECO_COLLECTION = "decorations";
 const BADGES_COLLECTION = "badges";
 const ADMIN_POST_RIGHT = "manage-badges";
+const ADMIN_GET_RIGHT = "manage-badges";
 
 /*
     DATABASE SCHEMA ---
@@ -24,12 +25,84 @@ const ADMIN_POST_RIGHT = "manage-badges";
 
     Badge : {
         _id : ref by EntityBadge,
-        slug : String,
+        slug : String, index,
+        reason : String,
         displayname : String,
         imgPath : String(),
-        checkFunction : String(function),
+        hook : String(function),
     }
+
+    BADGES CONDITIONS ---
+
+    [ ] Published <n> articles total
+    [ ] Published <n> articles in one day
+    [ ] Wrote <n> paragraphs
+    [ ] Used <n> images in articles
+    [ ] Article got <n> shares in 48h
+    [ ] Got top article <n> times
+    [ ] Logged in <n> days
+    [ ] Has a total of <n> ads
+    [ ] Written <n> sponsored articles
+    [ ] Previewed articles <n> times
+    [ ] Updated password <n> times
+    [ ] Submitted <n> tickets
+    [ ] Submitted <n> change requests
 */
+
+const DEFAULT_BADGES = [
+    {slug : "publish-n", 
+        displayname : "Artist",
+        reason : "Published <n> articles",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "publish-today-n", 
+        displayname : "Vigorous",
+        reason : "Published <n> article today",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "write-n-parags", 
+        displayname : "Descriptor",
+        reason : "Wrote <n> paragraph blocks",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "use-n-images", 
+        displayname : "Photographer",
+        reason : "Used <n> images",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "n-shares-48h", 
+        displayname : "Swift",
+        reason : "Article got <n> shares in 48h",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "top-article-n-times", 
+        displayname : "Rockstar",
+        reason : "Got top article <n> times",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "log-in-n-times", 
+        displayname : "Regular",
+        reason : "Logged in <n> times",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "total-n-ads", 
+        displayname : "Advertiser",
+        reason : "Generated <n> content ads",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "n-sponsored", 
+        displayname : "Influencer",
+        reason : "Wrote <n> sponsored articles",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "preview-n-times", 
+        displayname : "Perfectionist",
+        reason : "Previewed articles <n> times",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "update-pwd-n-times", 
+        displayname : "Guardian",
+        reason : "Updated password <n> times",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "submit-n-tickets", 
+        displayname : "Defender",
+        reason : "Submitted <n> tickets",
+        imgPath : "", hook : "", immutable : true},
+    {slug : "submit-n-change-req", 
+        displayname : "Visionary",
+        reason : "Submitted <n> change requests",
+        imgPath : "", hook : "", immutable : true}
+];
 
 class Badge {
     constructor(dbid) {
@@ -68,7 +141,7 @@ class EntityBadge {
     }
 }
 
-// Exported singleton
+// Exported singleton //////
 class BadgesAPI {
     cacheBadges(done) {
         db.findToArray(config.default(), DECO_COLLECTION, {}, (err, badges) => {
@@ -78,18 +151,12 @@ class BadgesAPI {
         });
     }
 
-    pullBadgesCache(send) {
-        sharedcache.get(BADGE_CACHE_KEY, (obj) => {
-            send(obj);
-        });
-    }
-
     fetchEntityDeco(entity, send) {
         EntityBadge.fetchEntityDecorations(entity, send);
     }
 
     fetchAllDeco(send) {
-        this.pullBadgesCache(badges => send(badges));
+        sharedcache.get(BADGE_CACHE_KEY, send);
     }
 
     fetchOneDeco(_id, send) {
@@ -127,6 +194,12 @@ class BadgesAPI {
 
             default:
                 send(new Error("Undefined top level " + levels[0]))
+        }
+    }
+
+    createDefaultBadges(done) {
+        if (networkinfo.isElderChild()) {
+            db.insert(config.default(), BADGES_COLLECTION, DEFAULT_BADGES, done);
         }
     }
 
