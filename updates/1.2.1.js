@@ -8,8 +8,6 @@ const BADGES_COLLECTION = "badges";
 
 module.exports = (_c, done) => {
     db.createCollections(config.default(), [DECO_COLLECTION, BADGES_COLLECTION], () => {
-        db.createIndex(config.default(), BADGES_COLLECTION, {slug : 1}, () => {
-            badges.createDefaultBadges(done);
-        });
+        badges.createDefaultBadges(done);
     });
 };

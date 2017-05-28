@@ -1,7 +1,6 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
 const config = require('./config.js');
-const sharedcache = require('./sharedcache.js');
 const networkinfo = require('./network/info.js');
 const noop = () => {};
 
@@ -52,57 +51,108 @@ const ADMIN_GET_RIGHT = "manage-badges";
 const DEFAULT_BADGES = [
     {slug : "publish-n", 
         displayname : "Artist",
-        reason : "Published <n> articles",
-        imgPath : "", hook : "", immutable : true},
+        levels : [2, 10, 50, 100, 1000, 2000, 5000, 10000],
+        reason : "Published <n> articles", imgPath : "", hook : "article_published", immutable : true},
     {slug : "publish-today-n", 
         displayname : "Vigorous",
-        reason : "Published <n> article today",
-        imgPath : "", hook : "", immutable : true},
+        levels : [1, 2, 4, 5, 6, 8, 10, 12],
+        reason : "Published <n> article today", imgPath : "", hook : "article_published", immutable : true},
     {slug : "write-n-parags", 
         displayname : "Descriptor",
-        reason : "Wrote <n> paragraph blocks",
-        imgPath : "", hook : "", immutable : true},
+        levels : [20, 100, 500, 2000, 10000, 50000, 100000, 1000000],
+        reason : "Wrote <n> paragraph blocks", imgPath : "", hook : "article_published", immutable : true},
     {slug : "use-n-images", 
         displayname : "Photographer",
-        reason : "Used <n> images",
-        imgPath : "", hook : "", immutable : true},
+        levels : [20, 100, 500, 2000, 10000, 50000, 100000, 1000000],
+        reason : "Used <n> images", imgPath : "", hook : "article_published", immutable : true},
     {slug : "n-shares-48h", 
         displayname : "Swift",
-        reason : "Article got <n> shares in 48h",
-        imgPath : "", hook : "", immutable : true},
+        levels : [500, 1000, 2000, 5000, 10000, 20000, 50000, 100000],
+        reason : "Article got <n> shares in 48h", imgPath : "", hook : "time_is_midnight", immutable : true},
     {slug : "top-article-n-times", 
         displayname : "Rockstar",
-        reason : "Got top article <n> times",
-        imgPath : "", hook : "", immutable : true},
+        levels : [5, 10, 15, 20, 50, 100, 150, 250],
+        reason : "Got top article <n> times", imgPath : "", hook : "time_is_5am", immutable : true},
     {slug : "log-in-n-times", 
         displayname : "Regular",
-        reason : "Logged in <n> times",
-        imgPath : "", hook : "", immutable : true},
+        levels : [2, 10, 20, 50, 80, 180, 365, 500],
+        reason : "Logged in <n> times", imgPath : "", hook : "user_loggedin", immutable : true},
     {slug : "total-n-ads", 
         displayname : "Advertiser",
-        reason : "Generated <n> content ads",
-        imgPath : "", hook : "", immutable : true},
+        levels : [20, 100, 500, 2000, 10000, 50000, 100000, 1000000],
+        reason : "Generated <n> content ads", imgPath : "", hook : "article_published", immutable : true},
     {slug : "n-sponsored", 
         displayname : "Influencer",
-        reason : "Wrote <n> sponsored articles",
-        imgPath : "", hook : "", immutable : true},
+        levels : [2, 4, 8, 12, 20, 50, 80, 200],
+        reason : "Wrote <n> sponsored articles", imgPath : "", hook : "article_published", immutable : true},
     {slug : "preview-n-times", 
         displayname : "Perfectionist",
-        reason : "Previewed articles <n> times",
-        imgPath : "", hook : "", immutable : true},
+        levels : [2, 10, 50, 100, 1000, 2000, 5000, 10000],
+        reason : "Previewed articles <n> times", imgPath : "", hook : "article_previewed", immutable : true},
     {slug : "update-pwd-n-times", 
         displayname : "Guardian",
-        reason : "Updated password <n> times",
-        imgPath : "", hook : "", immutable : true},
+        levels : [2, 5, 10, 20, 50, 100, 200, 500],
+        reason : "Updated password <n> times", imgPath : "", hook : "password_updated", immutable : true},
     {slug : "submit-n-tickets", 
         displayname : "Defender",
-        reason : "Submitted <n> tickets",
-        imgPath : "", hook : "", immutable : true},
+        levels : [2, 5, 10, 20, 30, 40, 50, 100],
+        reason : "Submitted <n> tickets", imgPath : "", hook : "issue_submitted", immutable : true},
     {slug : "submit-n-change-req", 
         displayname : "Visionary",
-        reason : "Submitted <n> change requests",
-        imgPath : "", hook : "", immutable : true}
+        levels : [2, 5, 10, 20, 30, 40, 50, 100],
+        reason : "Submitted <n> change requests", imgPath : "", hook : "cr_submitted", immutable : true}
 ];
+
+const DEFAULT_BADGES_ASSOC = {};
+DEFAULT_BADGES.forEach(x => { DEFAULT_BADGES_ASSOC[x.slug] = x; });
+
+const BADGE_VALIDATORS = {
+    "publish-n" : (data, done) => {
+        // Get all authors article, compare with current level limit
+        db.count(data._c, 'content', {author : data.author}, (err, count) => {
+            db.count(config.default(), 'decorations', {entity : data.author, slug : "publish-n"}, (err, decoration) => {
+                
+            });
+        });
+    }, "publish-today-n" : (data, done) => {
+
+    }, "write-n-parags" : (data, done) => {
+
+    }, "use-n-images" : (data, done) => {
+
+    }, "n-shares-48h" : (data, done) => {
+
+    }, "top-article-n-times" : (data, done) => {
+
+    }, "log-in-n-times" : (data, done) => {
+
+    }, "total-n-ads" : (data, done) => {
+
+    }, "n-sponsored" : (data, done) => {
+
+    }, "preview-n-times": (data, done) => {
+
+    }, "update-pwd-n-times": (data, done) => {
+
+    }, "submit-n-tickets" : (data, done) => {
+
+    }, "submit-n-chage-req" : (data, done) => {
+
+    }
+};
+
+class BadgeValidator {
+    constructor() {
+        this.validators = BADGE_VALIDATORS;
+    }
+
+    validate(slug, data, callback) {
+        slug = slug.replace(/-/g, '');
+        if (this.validators[slug]) {
+            this.validators[slug](data, callback || noop);
+        }
+    }
+}
 
 class Badge {
     constructor(dbid) {
@@ -129,34 +179,24 @@ class EntityBadge {
     }
 
     static fetchEntityDecorations(entityID, sendback) {
-        sharedcache.get(BADGE_CACHE_KEY, (badges) => {
-            db.findToArray(config.default(), DECO_COLLECTION, {entity}, (err, arr) => {
-                arr.forEach(b => {
-                    b.badgeObject = badges[b.badge];
-                });
-
-                send(arr);
+        db.findToArray(config.default(), DECO_COLLECTION, {entity}, (err, arr) => {
+            arr.forEach(b => {
+                b.badgeObject = DEFAULT_BADGES_ASSOC[b.badge];
             });
+
+            send(arr);
         });
     }
 }
 
 // Exported singleton //////
 class BadgesAPI {
-    cacheBadges(done) {
-        db.findToArray(config.default(), DECO_COLLECTION, {}, (err, badges) => {
-            sharedcache.set({
-                [BADGE_CACHE_KEY] : badges
-            }, done || noop);
-        });
-    }
-
     fetchEntityDeco(entity, send) {
         EntityBadge.fetchEntityDecorations(entity, send);
     }
 
     fetchAllDeco(send) {
-        sharedcache.get(BADGE_CACHE_KEY, send);
+        send(DEFAULT_BADGES);
     }
 
     fetchOneDeco(_id, send) {
@@ -198,15 +238,17 @@ class BadgesAPI {
     }
 
     createDefaultBadges(done) {
-        if (networkinfo.isElderChild()) {
-            db.insert(config.default(), BADGES_COLLECTION, DEFAULT_BADGES, done);
-        }
+        // DEPRECATED
+    }
+
+    registerHooks() {
+        DEFAULT_BADGES.forEach(b => {
+            b.hook;
+        });
     }
 
     setup() {
-        if (networkinfo.isElderChild()) {
-            this.cacheBadges();
-        }
+        this.registerHooks();
     }
 }
 

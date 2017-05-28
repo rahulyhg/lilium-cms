@@ -85,10 +85,6 @@ var Core = function () {
         log('Hooks', 'Loading hooks', 'info');
         hooks.bindPluginDisabling();
         hooks.bind('init', 100, readyToRock);
-        hooks.bind('user_loggedin', 100, function (cli) {
-            cli.redirect(cli._c.server.url + "/" + cli._c.paths.admin, false);
-            return true;
-        });
 
         hooks.fire('hooks');
         log('Hooks', 'Loaded hooks', 'success');
@@ -154,10 +150,10 @@ var Core = function () {
     };
 
     var loadGlobalPetals = function () {
-        Petals.register('adminbar', _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
-        Petals.register('adminhead', _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
-        Petals.register('adminsidebar', _c.default().server.base + 'backend/dynamic/admin/adminsidebar.petal');
-        Petals.register('backendsearch', _c.default().server.base + 'backend/dynamic/admin/backendsearch.petal');
+        Petals.register('adminbar',         _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
+        Petals.register('adminhead',        _c.default().server.base + 'backend/dynamic/admin/adminhead.petal');
+        Petals.register('adminsidebar',     _c.default().server.base + 'backend/dynamic/admin/adminsidebar.petal');
+        Petals.register('backendsearch',    _c.default().server.base + 'backend/dynamic/admin/backendsearch.petal');
     };
 
     var loadImageSizes = function () {

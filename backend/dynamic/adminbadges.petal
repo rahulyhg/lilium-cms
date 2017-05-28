@@ -1,24 +1,14 @@
 {#config;extra}
-{*badges.user}
 
-<div id="badge-modal" class="modal fade announcement" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">Acquired new badge</h4>
-            </div>
-            <div class="modal-body">
-                <div class="acquired-badge"></div>
-                <p></p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Receive badge</button>
-            </div>
-        </div>
-        <!-- /.modal-content -->
+<div id="badge-notification-wrapper">
+    <div class="badge-notification-strip top" style=" ">
+        <div style=" "></div>
     </div>
-    <!-- /.modal-dialog -->
+    <div class="badge-notification-strip bottom">
+        <div style=" "></div>
+    </div>
+
+    <div class="badge-image-wrapper">
+        <img src="{=config.default.server.url}/static/badges/1.png" />
+    </div>
 </div>

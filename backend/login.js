@@ -25,7 +25,8 @@ var Login = function() {
                     if (cb) {
                         cb();
                     } else {
-                        hooks.fire('user_loggedin', cli);
+                        hooks.fire('user_loggedin', { _c, userObj });
+                        cli.redirect(cli._c.server.url + "/" + cli._c.paths.admin, false);
                     }
                 });
             }
