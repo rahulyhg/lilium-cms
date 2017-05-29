@@ -1,5 +1,13 @@
 {#config;extra}
-
+{$
+    topic = extra.topic;
+$}
 <title>
-    {=extra.topic.displayname} - {=config.default.website.sitetitle}
+    {=topic.displayname} - {=config.default.website.sitetitle}
 </title>
+
+<meta name="description" content="{=?&topic.description}">
+<meta itemprop="name" content="{=&topic.displayname}">
+
+<meta property="og:title" content="{=topic.displayname} - {=config.default.website.sitetitle}" />
+<meta property="og:description" content="{=?&description}" />
