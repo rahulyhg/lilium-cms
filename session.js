@@ -110,7 +110,7 @@ var Sessions = function () {
                 log('Session', 'Recreating session');
                 that.createSessionInCli(cli, user, cb);
             });
-        });
+        }, true);
     };
 
     this.createSessionInCli = function (cli, userObj, cb) {
