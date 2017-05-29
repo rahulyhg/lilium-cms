@@ -77,11 +77,15 @@ class GoogleAnalyticsRequest {
                 });
             }
 
-            var topPagePath = total.ratio.pages[0] && total.ratio.pages[0].page.substring(total.ratio.pages[0].page.lastIndexOf("/") + 1);
+            var topPagePath = total.ratio.pages[0] && total.ratio.pages[0].page.split("/") || [_c.server.url];
+            var slug = topPagePath.pop();
+            if (!isNaN(slug)) {
+                slug = topPagePath.pop();
+            }
 
-            require('./article.js').deepFetch(_c, topPagePath, (article) => {
+            require('./article.js').deepFetch(_c, slug, (article) => {
                 total.toppage = {
-                    article : article || {title : topPagePath},
+                    article : article || {title : slug},
                     path : topPagePath,
                     url : _c.server.url + total.ratio.pages[0].page,
                     hits : total.ratio.pages[0].views
