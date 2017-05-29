@@ -151,8 +151,8 @@ $(document).ready(function() {
             }
         });
 
-        socket.on('badge', function(badge) {
-            window.receiveBadge(badge.title, badge.msg, badge.icon, badge.level)
+        socket.on('newbadge', function(pack) {
+            liliumcms.badges.fetchLatests();
         });
 
         socket.on('notification', function(notification) {

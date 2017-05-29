@@ -344,7 +344,7 @@
         }, {
             "module" : "badges.js",
             "endpoint" : "decorations",
-            "support" : ["setup", "livevar", "admin_post"]
+            "support" : ["setup", "livevar", "admin_post", "admin_get"]
         }, {
             "module" : "amp.js",
             "endpoint" : "amp",

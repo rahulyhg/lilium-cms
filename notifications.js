@@ -189,14 +189,14 @@ var Notification = function () {
         notification.date = new Date();
 
         // Add it in the user session if it exsists
-        db.insert(dbId, 'notifications', notification, function () {});
+        !difftype && db.insert(dbId, 'notifications', notification, function () {});
 
         // Send to every sockets connected by the user (for multi-tab)
         sharedcache.getSocketID(userID, function(sockets) {
             for (var i = 0; i < sockets.length; i++) {
                 var split = sockets[i].split('#');
                 
-                log('Notifications', 'Emit to socket id ' + split[1] + " of " + split[0], 'live')
+                log('Notifications', 'Emit "'+(difftype||"notification")+'" to socket id ' + split[1] + " of " + split[0], 'live')
                 io.of(split[0]).to(sockets[i]).emit(difftype || 'notification', notification);
             }
         });

@@ -269,8 +269,6 @@ var DB = function() {
 		});
 	};
 
-
-
 	// Will find documents from collection coln according to conds,
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
@@ -300,7 +298,6 @@ var DB = function() {
 				}
 			}
 		});
-
 	};
 
 	this.createIndex = function(conf, coln, fields, cb) {

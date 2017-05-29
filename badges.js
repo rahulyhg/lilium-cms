@@ -2,6 +2,8 @@ const log = require('./log.js');
 const db = require('./includes/db.js');
 const config = require('./config.js');
 const networkinfo = require('./network/info.js');
+const hooks = require('./hooks.js');
+const notifications = require('./notifications.js');
 const noop = () => {};
 
 // Endpoint : Decorations
@@ -10,6 +12,8 @@ const DECO_COLLECTION = "decorations";
 const BADGES_COLLECTION = "badges";
 const ADMIN_POST_RIGHT = "manage-badges";
 const ADMIN_GET_RIGHT = "manage-badges";
+
+const DEFAULT_HOOKS_PRIO = 10000;
 
 /*
     DATABASE SCHEMA ---
@@ -20,15 +24,6 @@ const ADMIN_GET_RIGHT = "manage-badges";
         level : Number(1, n),
         receivedOn : Date,
         issuer : ObjectId || String("system")
-    }
-
-    Badge : {
-        _id : ref by EntityBadge,
-        slug : String, index,
-        reason : String,
-        displayname : String,
-        imgPath : String(),
-        hook : String(function),
     }
 
     BADGES CONDITIONS ---
@@ -52,55 +47,60 @@ const DEFAULT_BADGES = [
     {slug : "publish-n", 
         displayname : "Artist",
         levels : [2, 10, 50, 100, 1000, 2000, 5000, 10000],
-        reason : "Published <n> articles", imgPath : "", hook : "article_published", immutable : true},
+        reason : "For publishing <n> articles", icon : "fa-paper-plane-o", hook : "article_published_from_draft", immutable : true},
     {slug : "publish-today-n", 
         displayname : "Vigorous",
         levels : [1, 2, 4, 5, 6, 8, 10, 12],
-        reason : "Published <n> article today", imgPath : "", hook : "article_published", immutable : true},
+        reason : "For publishing <n> article in one day", icon : "fa-calendar-check-o", hook : "article_published_from_draft", immutable : true},
     {slug : "write-n-parags", 
         displayname : "Descriptor",
         levels : [20, 100, 500, 2000, 10000, 50000, 100000, 1000000],
-        reason : "Wrote <n> paragraph blocks", imgPath : "", hook : "article_published", immutable : true},
+        reason : "For writing <n> paragraph blocks", icon : "fa-paragraph", hook : "article_published_from_draft", immutable : true},
     {slug : "use-n-images", 
         displayname : "Photographer",
         levels : [20, 100, 500, 2000, 10000, 50000, 100000, 1000000],
-        reason : "Used <n> images", imgPath : "", hook : "article_published", immutable : true},
+        reason : "For using <n> images", icon : "fa-camera-retro", hook : "article_published_from_draft", immutable : true},
     {slug : "n-shares-48h", 
         displayname : "Swift",
         levels : [500, 1000, 2000, 5000, 10000, 20000, 50000, 100000],
-        reason : "Article got <n> shares in 48h", imgPath : "", hook : "time_is_midnight", immutable : true},
+        reason : "For getting <n> shares in 48h on one article", icon : "fa-share-alt", hook : "time_is_midnight", immutable : true},
     {slug : "top-article-n-times", 
         displayname : "Rockstar",
         levels : [5, 10, 15, 20, 50, 100, 150, 250],
-        reason : "Got top article <n> times", imgPath : "", hook : "time_is_5am", immutable : true},
+        reason : "For getting top article <n> times", icon : "fa-rocket", hook : "time_is_5am", immutable : true},
     {slug : "log-in-n-times", 
         displayname : "Regular",
-        levels : [2, 10, 20, 50, 80, 180, 365, 500],
-        reason : "Logged in <n> times", imgPath : "", hook : "user_loggedin", immutable : true},
+        levels : [5, 10, 20, 50, 80, 180, 365, 500],
+        reason : "Logged in <n> times", icon : "fa-key", hook : "user_loggedin", immutable : true},
     {slug : "total-n-ads", 
         displayname : "Advertiser",
         levels : [20, 100, 500, 2000, 10000, 50000, 100000, 1000000],
-        reason : "Generated <n> content ads", imgPath : "", hook : "article_published", immutable : true},
+        reason : "For Generating <n> content ads", icon : "fa-money", hook : "article_published_from_draft", immutable : true},
     {slug : "n-sponsored", 
         displayname : "Influencer",
         levels : [2, 4, 8, 12, 20, 50, 80, 200],
-        reason : "Wrote <n> sponsored articles", imgPath : "", hook : "article_published", immutable : true},
+        reason : "For publishing <n> sponsored articles", icon : "fa-handshake-o", hook : "article_published_from_draft", immutable : true},
     {slug : "preview-n-times", 
         displayname : "Perfectionist",
         levels : [2, 10, 50, 100, 1000, 2000, 5000, 10000],
-        reason : "Previewed articles <n> times", imgPath : "", hook : "article_previewed", immutable : true},
+        reason : "For previewing articles <n> times", icon : "fa-eye", hook : "article_previewed", immutable : true},
     {slug : "update-pwd-n-times", 
         displayname : "Guardian",
         levels : [2, 5, 10, 20, 50, 100, 200, 500],
-        reason : "Updated password <n> times", imgPath : "", hook : "password_updated", immutable : true},
+        reason : "For updating your password <n> times", icon : "fa-shield", hook : "password_updated", immutable : true},
     {slug : "submit-n-tickets", 
         displayname : "Defender",
         levels : [2, 5, 10, 20, 30, 40, 50, 100],
-        reason : "Submitted <n> tickets", imgPath : "", hook : "issue_submitted", immutable : true},
+        reason : "Submitted <n> tickets", icon : "fa-ticket", hook : "issue_submitted", immutable : true},
     {slug : "submit-n-change-req", 
         displayname : "Visionary",
         levels : [2, 5, 10, 20, 30, 40, 50, 100],
-        reason : "Submitted <n> change requests", imgPath : "", hook : "cr_submitted", immutable : true}
+        reason : "Submitted <n> change requests", icon : "fa-globe", hook : "cr_submitted", immutable : true}
+];
+
+const BADGE_LEVEL_TEXT = [
+    "Novice", "Apprentice", "Skilled", "Senior",
+    "Guru", "Supreme", "Master", "Legend"
 ];
 
 const DEFAULT_BADGES_ASSOC = {};
@@ -108,14 +108,20 @@ DEFAULT_BADGES.forEach(x => { DEFAULT_BADGES_ASSOC[x.slug] = x; });
 
 const BADGE_VALIDATORS = {
     "publish-n" : (data, done) => {
-        // Get all authors article, compare with current level limit
-        db.count(data._c, 'content', {author : data.author}, (err, count) => {
-            db.count(config.default(), 'decorations', {entity : data.author, slug : "publish-n"}, (err, decoration) => {
-                
-            });
+        db.count(data._c, 'content', {author : data.article.author}, (err, count) => {
+            BadgeValidator.check(data._c, data.article.author, "publish-n", count, done);
         });
     }, "publish-today-n" : (data, done) => {
-
+        let filter = {
+            author : data.article.author,
+            date : {
+                $lt  : new Date().setHours(23,59,59,999),
+                $gte : new Date().setHours(0, 0, 0, 0)
+            }
+        }
+        db.count(data._c, 'content', filter, (err, count) => {
+            BadgeValidator.check(data._c, data.article.author, "publish-today-n", count, done);
+        });
     }, "write-n-parags" : (data, done) => {
 
     }, "use-n-images" : (data, done) => {
@@ -142,15 +148,44 @@ const BADGE_VALIDATORS = {
 };
 
 class BadgeValidator {
-    constructor() {
-        this.validators = BADGE_VALIDATORS;
+    static validate(slug, data, callback) {
+        BADGE_VALIDATORS[slug](data, callback || noop);
     }
 
-    validate(slug, data, callback) {
-        slug = slug.replace(/-/g, '');
-        if (this.validators[slug]) {
-            this.validators[slug](data, callback || noop);
-        }
+    static check(_c, entity, slug, count, done) {
+        db.count(config.default(), 'decorations', {entity, slug}, (err, decoration) => {
+            let nextLevel = decoration ? (decoration.level + 1) : 0;
+            let prospect = DEFAULT_BADGES_ASSOC[slug];
+            let nextValue = prospect.levels[nextLevel];
+
+            if (count >= nextValue) {
+                let query = {};
+                if (!decoration) {
+                    decoration = {
+                        level : -1,
+                        entity,
+                        slug 
+                    };
+                } else {
+                    query._id = decoration._id;
+                }
+
+                decoration.level++;
+                decoration.unread = true;
+                decoration.on = new Date();
+                
+                db.update(config.default(), 'decorations', query, decoration, () => {
+                    notifications.notifyUser(entity.toString(), _c.id, {mustfetch : true}, 'newbadge');
+
+                    done && done(true, {
+                        badge : prospect, 
+                        level : nextLevel
+                    });
+                }, true, true);
+            } else {
+                done && done(false);
+            }
+        });
     }
 }
 
@@ -187,6 +222,19 @@ class EntityBadge {
             send(arr);
         });
     }
+
+    static generateBadgeNotification(entity, badgeslug, level) {
+        let badge = DEFAULT_BADGES_ASSOC[badgeslug];
+
+        return {
+            image : (Math.floor(level / 2) + 1) + ".png",
+            icon : "fa " + badge.icon,
+            text : badge.displayname + " - " + BADGE_LEVEL_TEXT[level],
+            reason : badge.reason.replace("<n>", "<b>"+badge.levels[level]+"</b>"),
+            hue : level * 35,
+            level
+        };
+    }
 }
 
 // Exported singleton //////
@@ -199,10 +247,28 @@ class BadgesAPI {
         send(DEFAULT_BADGES);
     }
 
-    fetchOneDeco(_id, send) {
-        db.findUnique(config.default(), BADGES_COLLECTION, {_id}, (err, badge) => {
-            send(badge);
-        });
+    fetchOneDeco(slug, send) {
+        send(DEFAULT_BADGES_ASSOC[slug]);
+    }
+
+    adminGET(cli) {
+        let action = cli.routeinfo.path[1];
+        switch (action) {
+            case "fetch" : 
+                db.findToArray(config.default(), 'decorations', {entity : db.mongoID(cli.userinfo.userid), unread : true}, (err, arr) => {
+                    let badges = [];
+                    arr.forEach(x => badges.push(EntityBadge.generateBadgeNotification(x.entity, x.badge, x.level)));
+                    cli.sendJSON({
+                        hasNew : arr.length,
+                        badges
+                    });
+
+                    db.update(config.default(), "decorations", {entity : db.mongoID(cli.userinfo.userid)}, {unread : false}, noop)
+                });
+                break;
+            default:
+                cli.throwHTTP(404);
+        }
     }
 
     adminPOST(cli) {
@@ -220,30 +286,18 @@ class BadgesAPI {
 
         // Allowed bot level : entity, all, one
         switch (levels[0]) {
-            case "entity": 
-                this.fetchEntityDeco(db.mongoID(levels[1]), send); 
-                break;
-
-            case "all":
-                this.fetchAllDeco(send);
-                break;
-
-            case "one":
-                this.fetchOneDeco(db.mongoID(levels[1]), send);
-                break;
-
-            default:
-                send(new Error("Undefined top level " + levels[0]))
+            case "entity": this.fetchEntityDeco(db.mongoID(levels[1]), send); break;
+            case "all": this.fetchAllDeco(send); break;
+            case "one": this.fetchOneDeco(db.mongoID(levels[1]), send); break;
+            default: send(new Error("Undefined top level " + levels[0]))
         }
-    }
-
-    createDefaultBadges(done) {
-        // DEPRECATED
     }
 
     registerHooks() {
         DEFAULT_BADGES.forEach(b => {
-            b.hook;
+            hooks.register(b.hook, DEFAULT_HOOKS_PRIO, (pkg) => {
+                BadgeValidator.validate(b.slug, pkg)
+            });
         });
     }
 

@@ -1126,7 +1126,7 @@ var LiliumCMS = function() {
             that.session = new LMLSession();
             that.rights = new LMLRights();
             that.users = new LMLUsers();
-            that.badges = typeof LiliumBadges != "undefined" ? new LiliumBadges() : {};
+            that.badges = new LiliumBadges();
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
 
@@ -1212,6 +1212,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.conversations.fillForms();
         liliumcms.lmldom.init();
         liliumcms.rights.init();
+        liliumcms.badges.bind();
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.queryparams.parseURL();

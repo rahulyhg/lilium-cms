@@ -1,68 +1,84 @@
 {#config;extra}
-var levels = [
-    "green", "bronze", "silver", "gold", 
-    "platinum", "diamond", "rainbow", "master"
-];
-
-window.receiveBadge = function(title, message, icon, level) {
-    var modal = $('#badge-modal');
-    modal.find('h4').html(title);
-    modal.find('.modal-body p').html(message);
-    modal.find('.acquired-badge').removeClass(levels.join(' ')).addClass(levels[level]).html("&#x"+icon+";");
-    
-    modal.modal('show');
-};
-
-$(function() {
-    $('#badge-modal button.btn-primary').bind('click', function() {
-        $('#badge-modal').modal('hide');
-    });
-});
 
 var LiliumBadges = function() {
-    var that = this;
-    var current;
-    var sidebarContainer = document.querySelector('.lmladminsidebadges');
-    var bCache = {};
+    this.affect = function(badge) {
+        document.getElementById('badge-image').src = "{=config.default.server.url}/static/badges/" + badge.image;
+        document.getElementById('badge-icon').className = badge.icon;
+        document.getElementById('badge-text').textContent = badge.text;
+        document.getElementById('badge-reason').innerHTML = badge.reason;
+        document.getElementById('badge-notification-wrapper').style.filter = "hue-rotate("+(badge.hue)+"deg)";
+        document.getElementById('badge-notification-wrapper').className = "level-" + badge.level;
+    };
 
-    this.addSideBadge = function(type, level) {
-        if (!bCache[type]) { return; }
+    this.flash = function() {
+        var el = document.getElementById('badge-flash');
+        el.style.display = "block";
+        el.classList.add('flash');
+        setTimeout(function() {
+            el.classList.remove('flash');
+            setTimeout(function() {
+                el.style.display = "none";
+            }, 310);
+        }, 20);
+    }
 
-        var hBadge = document.createElement('div');
-        var hBadgeImage = document.createElement('i');
+    this.receive = function(badge) {
+        this.affect(badge);
+        this.cast();
+    };
+
+    this.cast = function() {
+        var t = setTimeout;
+        var wrap = document.getElementById('badge-notification-wrapper');
         
-        hBadgeImage.innerHTML = ("&#x" + bCache[type].icon + ";");
-        hBadgeImage.classList.add("fa");
+        wrap.style.display = "block";
+        t(function() {
+            wrap.classList.add('shown');
 
-        hBadge.classList.add("sidebadge");
-        hBadge.classList.add("sidebadge-" + levels[level]);
-        hBadge.dataset.type = type;
-        hBadge.dataset.level = level;
-        hBadge.dataset.levelname = levels[levels];
+            t(function() {
+                document.getElementById('badge-image-wrapper').classList.add('shown');
+                document.getElementById('badge-text').classList.add('shown');
+                t(function() {
+                    liliumcms.badges.flash();
+                    var strips = document.querySelectorAll('.badge-notification-strip');
+                    strips[0].classList.add('shown');
+                    strips[1].classList.add('shown');
 
-        hBadge.appendChild(hBadgeImage);
-        sidebarContainer.appendChild(hBadge);
+                    document.getElementById("badge-reason").classList.add('shown');
+                    document.querySelector(".badge-dismiss-wrapper").classList.add('shown');
+                    
+                }, 400);
+            }, 300);
+        }, 20);
     };
 
-    this.fillSidebar = function() {
-        var bdgs = liliumcms.livevars.retrieveVar('session').badges;
-        var current = bdgs;
-        var total = 0;
+    this.dismiss = function() {
+        var wrap = document.getElementById('badge-notification-wrapper');
+        wrap.classList.remove('shown');
 
-        for (var index in bdgs) {
-            that.addSideBadge(index, bdgs[index]);
-            total++;
-        }
+        setTimeout(function()  {
+            wrap.style.display = "none";
 
-        var badgeboxHeight = Math.floor((total-1) / 6) * 35 + 35;
-        sidebarContainer.style.height = badgeboxHeight + "px";        
+            document.getElementById('badge-image-wrapper').classList.remove('shown');
+            document.getElementById('badge-text').classList.remove('shown');
+            document.getElementById("badge-reason").classList.remove('shown');
+            document.querySelector(".badge-dismiss-wrapper").classList.remove('shown');
+
+            var strips = document.querySelectorAll('.badge-notification-strip');
+            strips[0].classList.remove('shown');
+            strips[1].classList.remove('shown');
+        }, 300);
     };
 
-    this.createCache = function() {
-        var arr = liliumcms.livevars.retrieveVar('badges.user');
-        for (var i = 0; i < arr.length; i++) {
-            bCache[arr[i].code] = arr[i];
-        }
+    this.fetchLatests = function() {
+        liliumcms.lmldom.get("{=config.default.server.url}/admin/decorations/fetch", {
+            headers : {"content-type" : "application/json"}
+        }, function(response) {
+            log('Badges', "Fetched new badges with flag : " + response.hasNew);
+        });
+    };
+
+    this.bind = function() {
+        document.getElementById("badge-dismiss").addEventListener("click", liliumcms.badges.dismiss);
     };
 };
-

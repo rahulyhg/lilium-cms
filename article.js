@@ -516,6 +516,23 @@ var Article = function() {
         nextHook();
     };
 
+    this.updateActionStats = function(_c, deepArticle, callback, reduce) {
+        db.findUnique(_c, 'content', {_id : deepArticle._id || deepArticle}, (err, article) => {
+            var stats = {
+                $inc : {
+                    p   : countOcc(article, '</p>') * (reduce ? -1 : 1),
+                    img : countOcc(article, '<img') * (reduce ? -1 : 1),
+                    ad  : countOcc(article, '<ad>') * (reduce ? -1 : 1)
+                }
+            };
+            var entity = db.mongoID(deepArticle.author);
+
+            db.update(conf.default(), 'actionstats', {entity, type : "article_content"}, stats, function(err, r) {
+                callback && callback(r.value);
+            }, true, true, true, true);
+        });
+    };
+
     this.create = function(cli) {
         cli.touch('article.create');
         var articleObject = {};
@@ -637,6 +654,7 @@ var Article = function() {
                                     if (success) {
                                         log('Article', 'Saved published post to database; Creating cached file');
                                         cli.did('content', 'published', {title : cli.postdata.data.title});
+
                                         hooks.fire('article_published', {
                                             cli: cli,
                                             article: formData,
@@ -737,6 +755,15 @@ var Article = function() {
                                                         });
                                                     });
                                                 });
+
+                                                if (wasNotPublished) {
+                                                    that.updateActionStats(cli._c, deepArticle, function() {
+                                                        hooks.fire('article_published_from_draft', {
+                                                            article: deepArticle,
+                                                            _c : cli._c
+                                                        });
+                                                    });
+                                                }
 
                                                 feed.plop(deepArticle._id, function() {
                                                     feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
@@ -1068,6 +1095,7 @@ var Article = function() {
                     if (cli.hasRight('editor') || result.author.toString() == cli.userinfo.userid.toString()) {
                         // Can delete the current article
                         hooks.fire('article_will_delete', id);
+                        that.updateActionStats(cli._c, result, function() {}, true);
 
                         db.update(cli._c, 'content', {
                             _id: id
