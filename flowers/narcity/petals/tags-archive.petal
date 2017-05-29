@@ -11,3 +11,6 @@ $}
 
 <meta property="og:title" content="{=topic.displayname} - {=config.default.website.sitetitle}" />
 <meta property="og:description" content="{=?&description}" />
+<meta property="og:url" content="{=config.default.server.protocol}{=config.default.server.url}/{=topic.completeSlug}" />
+
+<link rel="canonical" href="{=config.default.server.protocol}{=config.default.server.url}/{=topic.completeSlug}">
