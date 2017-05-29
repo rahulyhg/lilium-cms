@@ -85,6 +85,16 @@ $}
         e.setAttribute('src', '//static.chartbeat.com/js/chartbeat.js');
         document.body.appendChild(e);
     })();
+
+    var searchtopic = "";
+    if (window.lmlarticle) {
+        searchtopic = "{=extra.article.topic.completeSlug}";
+    } else {
+        searchtopic = location.pathname.substring(1);
+    }
+
+    var searchbox = document.getElementById("searchtopicbox");
+    if (searchbox && false) { searchbox.value = searchtopic; }
 </script>
 
 <script src="https://use.fontawesome.com/c06218d3bc.js"></script>

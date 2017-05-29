@@ -1364,10 +1364,10 @@ h1.article__title.str-title {
 
 
 .subtitle-strip {
-    background-color: {=theme.settings.headercolor};
+    /*background-color: {=theme.settings.headercolor};*/
     padding: 30px;
     font-family: "Oswald", sans-serif;
-    color: #FFF;
+    color: #000;
 
     box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -1518,7 +1518,7 @@ article.archive-article h3 a {
     padding: 0;
     font-family: "Open Sans", Arial, sans-serif;
     font-size: 14px;
-    color: #999;
+    color: #111;
 
     width: 600px;
     text-transform: none;

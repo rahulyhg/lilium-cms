@@ -83,11 +83,30 @@ var Login = function() {
                 cli.redirect(cli._c.server.url + "/login?magiclink=failed");
             } else {
                 entities.fetchFromDB(cli._c, user.username, function(userObj) {
-                    loginSuccess(cli, userObj);
+                    loginSuccess(cli, userObj, function() {
+                        cli.redirect(cli._c.server.url + "/admin", false)   
+                    });
                 });
             }
         });
     };
+
+    this.impersonate = function(cli) {
+        var _id = db.mongoID(cli.routeinfo.path[3]);
+        if (cli.hasRight("develop")) {
+            db.findUnique(_c.default(), 'entities', {_id}, function(err, user) {
+    			if (user) {
+            		entities.fetchFromDB(cli._c, user._id, function(userObj) {
+	        			userObj ? loginSuccess(cli, userObj) : cli.throwHTTP(404);
+                    }, true);
+                } else {
+                    cli.throwHTTP(404);
+                }
+            });
+        } else {
+            cli.throwHTTP(403)
+        }
+    }
 
 	this.authUser = function(cli) {
 		cli.touch('login.authUser');

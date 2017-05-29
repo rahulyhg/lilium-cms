@@ -69,5 +69,11 @@
                 <b class="devtools-list-item-title">Shared objects</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/impersonate" >
+                <i class="devtools-list-item-icon fa fa-users"></i>
+                <b class="devtools-list-item-title">Impersonate</b>
+            </a>
+        </li>
     </ul>
 </div>

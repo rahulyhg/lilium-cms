@@ -54,7 +54,7 @@ var Entities = module.exports = new function () {
         db.update(_c.default(), 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : userObj.totalLogin++}, cb);
     };
 
-    this.fetchFromDB = function (conf, idOrUsername, callback) {
+    this.fetchFromDB = function (conf, idOrUsername, callback, force) {
         var condition = new Object();
 
         if (typeof idOrUsername === "object") {
@@ -63,7 +63,7 @@ var Entities = module.exports = new function () {
             condition.username = idOrUsername;
         }
 
-        if (condition.username !== 'lilium'){
+        if (condition.username !== 'lilium' && !force){
             condition.sites = conf.id;           
         }    
 
@@ -149,6 +149,10 @@ var Entities = module.exports = new function () {
             case "new":
                 if (!cli.hasRightOrRefuse("create-entities")) {return;}
                 this.serveNew(cli);
+                break;
+
+            case "impersonate":
+                require('./backend/login.js').impersonate(cli);
                 break;
 
             default:

@@ -25,6 +25,7 @@ DevTools.prototype.adminGET = function(cli) {
         case 'livevars':
         case 'lml':
         case 'endpoints':
+        case 'impersonate':
         case 'cache':
         case 'feed':
         case 'html':

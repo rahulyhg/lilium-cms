@@ -1,4 +1,5 @@
 {#config;theme;extra}
+
 <script>
     // Head globals ////////////////////////////////////////////////
     window.lmlarticle = {};
@@ -6,6 +7,7 @@
     window.lmlurl = "{=config.default.server.url}";
     window.nsfw = "{=?extra.article.nsfw}" == "true";
     window.generators = {};
+    window.currentcityname = "{=?theme.settings.cityname}";
 
     // Utils ///////////////////////////////////////////////////////
     var dimWidths = {

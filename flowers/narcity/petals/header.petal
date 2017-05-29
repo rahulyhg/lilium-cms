@@ -37,14 +37,9 @@
             <div class="header-search-wrapper">
                 <form method="GET" action="{=config.default.server.url}/search">
                     <input class="header-search" name="q" type="text" placeholder="{:search}" required />
+                    <input name="city" value="{=?theme.settings.cityname}" type="hidden" id="searchtopicbox" />
                 </form>
             </div>
-
-            <!--div class="header-login-wrapper">
-                <div class="login-button">
-                    Login
-                </div>
-            </div-->
         </div>
     </div>
 </header>
