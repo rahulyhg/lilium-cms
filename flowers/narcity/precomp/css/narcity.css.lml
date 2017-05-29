@@ -1029,7 +1029,8 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
     display: block;
 }
 
-#sidebar-links h3 {
+#sidebar-links h3,
+article #article-content #article-bottom-links h3 {
     font-family: Oswald,sans-serif;
     font-size: 24px;
     font-weight: normal;
@@ -1038,6 +1039,10 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
     clear: both;
     margin: 30px 0 20px;
     text-align: left;
+}
+
+article #article-content #article-bottom-links h3 {
+    padding: 0px;
 }
 
 .fwblock {
@@ -2284,6 +2289,22 @@ body.slidheader .android-sharer {
 
     .homepage .older-button-wrapper a {
         display: block;
+    }
+
+    .context-city .lmlad,
+    .context-home .lmlad {
+        padding-bottom: 40px;
+    }
+
+    .context-topic .archive-article-list .lmlad {
+        float: none;
+        clear: both;
+        padding: 30px 0px;
+    }
+
+    #article-bottom-links .sidebar-internal-link-image {
+        width: 100%;
+        height: 180px;
     }
 
     article #article-content .lml-instagram-embed-wrapper {

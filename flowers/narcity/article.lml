@@ -169,6 +169,8 @@ $}
             </div>
             {$ endif; $}    
 
+            <div id="article-bottom-links" class="no-tablet no-desktop"></div>
+
             {$ if (?theme.settings.featuredyoutubeid??); $}
                 <h4 class="article-section-title">{:recommended-video}</h4>
                 <iframe width="560" height="315" style="margin-bottom: 60px;" class="recommended-video" src="https://www.youtube.com/embed/{=theme.settings.featuredyoutubeid}" frameborder="0" allowfullscreen></iframe>
@@ -228,11 +230,13 @@ document.querySelector(".keep-on-reading") && document.querySelector('.keep-on-r
         }
 
         var wrapper = document.getElementById('sidebar-links');
+        var botWrapper = document.getElementById("article-bottom-links");
         
         if (wrapper && obj.articles.length != 0) {
             var h3 = ce('h3');
             h3.textContent = "{=extra.topic.displayname}";
             wrapper.appendChild(h3);
+            botWrapper.appendChild(h3.cloneNode(true));
         }
 
         if (wrapper) 
@@ -256,6 +260,7 @@ document.querySelector(".keep-on-reading") && document.querySelector('.keep-on-r
             link.appendChild(subtitle);
 
             wrapper.appendChild(link);
+            botWrapper.appendChild(link.cloneNode(true));
         }   
     }
 

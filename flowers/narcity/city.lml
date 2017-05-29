@@ -4,6 +4,13 @@
 <script>
     window.lmlhomelinks = [];
     window.lmlarchivename = "{=?extra.topic.displayname}";
+    window.hpad = [];
+    window.hpageindex = -1;
+
+    {$ for (tag in theme.settings.adtags); $}
+        window.hpad.push(`{=tag.code}`);
+    {$ endfor; $}
+    window.hpad.shift();
 </script>
 
 <main class="homepage">
@@ -33,7 +40,7 @@
                              />
                             {$ if (?la.isSponsored ??); $}
                             <a class="sponsored-mention sponsored-mention-hp" href="https://www.narcitymedia.com" target="_blank">
-                                Sponsored Content
+                                {:sponsoredcontent}
                             </a>
                             {$ endif; $}
                             {$ if (?la.topic ??); $}
@@ -74,8 +81,14 @@
                         url : document.location.protocol + "{=la.url}",
                         wrapper : "{=la._id}"
                     };
+
                     window.lmlhomelinks.push(nPage);
                     document.getElementById("art" + nPage.wrapper).setAttribute('ogid', nPage.url);
+
+                    window.hpageindex++;
+                    if (window.innerWidth <= 640 && window.hpageindex % 5 == 0) {
+                        document.write(window.hpad.shift() || "");
+                    }
                 </script>
             {$ relindex += 1;
         endfor; $}

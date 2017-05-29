@@ -1,10 +1,20 @@
-{#config;extra;slug}
+{#config;extra;slug;theme}
 {$
     tagname = extra.searchname;
     tagslug = slug.ify(tagname);
 
     details = extra.archivedetails;
 $}
+
+<script>
+    window.hpad = [];
+    window.hpageindex = -1;
+
+    {$ for (tag in theme.settings.adtags); $}
+        window.hpad.push(`{=tag.code}`);
+    {$ endfor; $}
+    window.hpad.shift();
+</script>
 
 {$ if (extra.archivename != "author"); $}
     <div class="subtitle-strip">
@@ -72,6 +82,13 @@ $}
                 <h3><a href="{=article.url}">{=article.title}</a></h3>
             </div>
         </article>
+
+        <script>
+            window.hpageindex++;
+            if (window.innerWidth <= 640 && window.hpageindex % 5 == 0) {
+                document.write(window.hpad.shift() || "");
+            }
+        </script>
     {$ endfor; $}
     </div>
 
