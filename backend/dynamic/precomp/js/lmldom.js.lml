@@ -733,6 +733,12 @@ var LMLDom = function() {
                 ff.values[stacktables[i].getInfo().fieldname] = stacktables[i].getData();
             }
 
+            // Check boxes
+            var checkboxes = document.querySelectorAll('.lmlbeautifiedcheckbox');
+            for (var i = 0; i < checkboxes.length; i++) {
+                ff.values[checkboxes[i].getAttribute('name')] = checkboxes[i].classList.contains("checked")
+            }
+
             // Deep JSONing
             var fieldnames = Object.keys(ff.values);
             for (var i = 0; i < fieldnames.length; i++) {
@@ -918,7 +924,7 @@ var LMLDom = function() {
         options = options || {}
         var keys = Object.keys(options.params || {});
         var received = function() {
-            callback(this.responseText);
+            callback(options.json ? JSON.parse(this.responseText) : this.responseText);
         }
 
         if (keys.length != 0) {
@@ -935,6 +941,8 @@ var LMLDom = function() {
         }
 
         var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", received);
+        oReq.open("GET", url);
 
         if (options.headers) {
             var headers = Object.keys(options.headers);
@@ -943,8 +951,10 @@ var LMLDom = function() {
             }
         }
 
-        oReq.addEventListener("load", received);
-        oReq.open("GET", url);
+        if (options.json) {
+            oReq.setRequestHeader("Content-Type", "application/json");
+        }
+
         oReq.send();
     };
 

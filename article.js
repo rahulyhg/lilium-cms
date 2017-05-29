@@ -757,9 +757,10 @@ var Article = function() {
                                                 });
 
                                                 if (wasNotPublished) {
-                                                    that.updateActionStats(cli._c, deepArticle, function() {
+                                                    that.updateActionStats(cli._c, deepArticle, function(values) {
                                                         hooks.fire('article_published_from_draft', {
                                                             article: deepArticle,
+                                                            score : values,
                                                             _c : cli._c
                                                         });
                                                     });
@@ -799,6 +800,20 @@ var Article = function() {
                                                         fileserver.deleteFile(absPath, function() {});
                                                     }, true);
                                                 });
+
+                                                db.update(conf.default(), "actionstats", {
+                                                    entity : db.mongoID(cli.userinfo.userid), 
+                                                    type : "system"
+                                                }, {
+                                                    $inc : {preview : 1}
+                                                }, (err, r) => {
+                                                    hooks.fire("article_previewed", {
+                                                        entity : db.mongoID(cli.userinfo.userid),
+                                                        _c : cli._c,
+                                                        article : deepArticle,
+                                                        score : r.value ? r.value.preview : 1
+                                                    });
+                                                }, true, true, true, true);
                                             }, true);
                                         }
                                     } else {

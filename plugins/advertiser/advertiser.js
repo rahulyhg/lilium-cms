@@ -161,7 +161,7 @@
 
 	         hooks.bind('user_loggedin', 350, function(cli) {
 	             // Check if user is a publisher
-	             if (cli.userinfo.roles.indexOf('advertiser') != -1) {
+	             if (false && cli.userinfo.roles.indexOf('advertiser') != -1) {
 	                 cli.redirect(conf.default().server.url + "/advertiser", false);
 	                 return true;
 	             } else {

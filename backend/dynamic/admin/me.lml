@@ -1,22 +1,20 @@
 {#config;forms}
 {*me}
-<lml:dom v="0.6" />
+{*decorations.mine}
+<lml:dom v="0.8" />
 
 <div>
     <form data-context="noctx" class="lmlform" name="upload_profile_picture" id="upload_profile_picture" method="POST" enctype="multipart/form-data">
         <div class="profile-photo-form">
             <h1 class="data-livevar" data-livevar='"html":"session.displayname"'></h1>
             <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="square" />
-            <h2>( This is you! )</h2>
         </div>
 
         <div class="me-decoration-wrapper">
-            <h2>Decorations</h2>
-            <h5>Badges will be introduced soon! ;)</h5>
             <div class="me-decorations">
-                <!--lml:foreach var="deco" in="livevars.me.0.badges" wrapper="div">
+                <lml:foreach var="deco" in="livevars.decorations.mine" wrapper="span">
                     <lml:generate call="generatedeco" />
-                </lml:foreach-->
+                </lml:foreach>
             </div>
         </div>
     </form>
@@ -49,46 +47,74 @@
 </div>
 <!-- /.modal -->
 
+<style>
+.me-decorations {
+    display: block;
+    text-align: center;
+}
+
+.me-decoration {
+    display: inline-block;
+    width: 60px;
+    margin: 10px;
+    position: relative;
+}
+
+.me-decoration img {
+    width: 100%;
+    height: auto;
+    display: inline-block;
+}
+
+.me-decoration i {
+    color: #FFF;
+    position: absolute;
+    text-align: center;
+    top: 11px;
+    display: block;
+    left: 0;
+    right: 0;
+}
+
+.me-decoration.level-0 i,
+.me-decoration.level-1 i {
+    margin-top: 12px;
+}
+
+.me-decoration.level-2 i,
+.me-decoration.level-3 i {
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.2);
+}
+
+.me-decoration.level-4 i,
+.me-decoration.level-5 i {
+    margin-top: 5px;
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.4);
+}
+
+.me-decoration.level-6 i,
+.me-decoration.level-7 i {
+    margin-right: 1px;
+    margin-top: 1px;
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.7);
+}
+</style>
+
 <script>
     window.generatedeco = function(ctx) {
+        var badge = ctx.deco;
+
         var wrap = document.createElement('div');
-        wrap.classList.add("me-decoration");
+        wrap.className = "me-decoration level-" + badge.level;
+        wrap.style.filter = "hue-rotate("+badge.hue+"deg)";
 
-        var allbdgs = liliumcms.livevars.retrieveVar('badges.user');
-        var curbadge = ctx.foreachkey;
-        var badgeval = ctx.deco;
+        var img = document.createElement('img');
+        img.src = "{=config.default.server.url}/static/badges/" + badge.image;
+        wrap.appendChild(img);
 
-        for (var i = 0; i < allbdgs.length; i++) if (allbdgs[i].code == curbadge) {
-            var bdg = allbdgs[i];
-            var level = -1;
-
-            for (var j = 0; j < bdg.ranks.length; j++) {
-                var toCompare = bdg.ranks[j];
-                if (badgeval >= toCompare) {
-                    level = j;
-                } else {
-                    break;
-                }
-            }
-
-            var iconwrap = document.createElement('div');
-            iconwrap.classList.add('badge-level' + level);
-            iconwrap.classList.add("me-badge");
-
-            var icon = document.createElement('i');
-            icon.innerHTML = ('&#x' + bdg.icon + ';');
-            icon.classList.add('fa');
-            iconwrap.appendChild(icon);   
-
-            var label = document.createElement('div');
-            label.textContent = bdg.name;
-            label.classList.add("me-badge-label");
-
-            wrap.appendChild(iconwrap);
-            wrap.appendChild(label);    
-
-            break;
-        }
+        var icon = document.createElement('i');
+        icon.className = "fa " + badge.icon;
+        wrap.appendChild(icon);
         
         return wrap;
     };

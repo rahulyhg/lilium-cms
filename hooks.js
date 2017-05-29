@@ -72,7 +72,7 @@ var Hooks = function () {
     };
 
     this.trigger = this.fire = function (eventName, params) {
-        if (typeof events[eventName] !== 'undefined') {
+        if (events[eventName]) {
             var keys = Object.keys(events[eventName]);
             params = params || {};
             params.eventName = eventName;

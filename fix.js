@@ -2,6 +2,7 @@ const log = require('./log.js');
 const db = require('./includes/db.js');
 const filelogic = require('./filelogic.js');
 const config = require('./config.js');
+const hooks = require('./hooks.js');
 
 const PRIORITIES = {
     "0" : "Level 0 : Whenever",
@@ -262,6 +263,14 @@ class Fix {
             } else {
                 cli.sendJSON({success : true});
             }
+
+            db.count(config.default(), 'fix', {author : data.author, type : data.type}, (err, count) => {
+                hooks.fire(data.type + "_submitted", {
+                    _c : cli._c,
+                    score : count,
+                    entity : data.author
+                });
+            });
         });
     }
 

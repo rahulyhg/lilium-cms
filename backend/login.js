@@ -25,8 +25,11 @@ var Login = function() {
                     if (cb) {
                         cb();
                     } else {
-                        hooks.fire('user_loggedin', { _c, userObj });
-                        cli.redirect(cli._c.server.url + "/" + cli._c.paths.admin, false);
+                        var entity = userObj._id;
+                        db.update(_c.default(), 'actionstats', {entity, type : "system"}, {$inc : {login : 1}}, function(err, r) {
+                            hooks.fire('user_loggedin', { _c : cli._c, userObj, score : r.value ? r.value.login : 1 });
+                            cli.redirect(cli._c.server.url + "/admin", false);
+                        }, true, true, true, true);
                     }
                 });
             }

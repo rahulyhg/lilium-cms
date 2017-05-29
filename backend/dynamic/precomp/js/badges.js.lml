@@ -22,12 +22,13 @@ var LiliumBadges = function() {
         }, 20);
     }
 
-    this.receive = function(badge) {
+    this.receive = function(badge, dismissCB) {
+        this.dismissCB = dismissCB;
         this.affect(badge);
         this.cast();
     };
 
-    this.cast = function() {
+    this.cast = function(dismissCB) {
         var t = setTimeout;
         var wrap = document.getElementById('badge-notification-wrapper');
         
@@ -52,6 +53,14 @@ var LiliumBadges = function() {
         }, 20);
     };
 
+    this.markAsRead = function() {
+        liliumcms.lmldom.get("{=config.default.server.url}/admin/decorations/read?async=*", {
+            json : true
+        }, function(response) {
+            log('Badges', "Marked latest badges as received");
+        });
+    };
+
     this.dismiss = function() {
         var wrap = document.getElementById('badge-notification-wrapper');
         wrap.classList.remove('shown');
@@ -67,18 +76,32 @@ var LiliumBadges = function() {
             var strips = document.querySelectorAll('.badge-notification-strip');
             strips[0].classList.remove('shown');
             strips[1].classList.remove('shown');
+
+            liliumcms.badges.dismissCB && liliumcms.badges.dismissCB() || liliumcms.badges.markAsRead();
         }, 300);
     };
 
     this.fetchLatests = function() {
-        liliumcms.lmldom.get("{=config.default.server.url}/admin/decorations/fetch", {
-            headers : {"content-type" : "application/json"}
+        liliumcms.lmldom.get("{=config.default.server.url}/admin/decorations/fetch?async=*", {
+            json : true
         }, function(response) {
-            log('Badges', "Fetched new badges with flag : " + response.hasNew);
+            log('Badges', "Fetched new badges with flag : " + !!response.hasNew);
+            if (response.hasNew) {
+                var index = -1;
+                var next = function() {
+                    var badge = response.badges[++index];
+                    if (badge) {
+                        liliumcms.badges.receive(badge, next);
+                    }
+                };
+
+                next();
+            }
         });
     };
 
     this.bind = function() {
         document.getElementById("badge-dismiss").addEventListener("click", liliumcms.badges.dismiss);
+        liliumcms.badges.fetchLatests();
     };
 };

@@ -9,7 +9,7 @@ $}
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 100000;
+    z-index: 200000;
 
     display: none;
 
@@ -79,6 +79,12 @@ $}
     left: 0;
     right: 0;
     color: #FFF;
+}
+
+.level-6 .badge-image-wrapper i,
+.level-7 .badge-image-wrapper i {
+    font-size: 130px;
+    padding-right: 15px;
 }
 
 #badge-text {

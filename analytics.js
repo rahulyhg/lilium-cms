@@ -3,6 +3,7 @@ const log = require('./log.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
 const sharedcache = require('./sharedcache.js');
+const hooks = require('./hooks.js');
 
 // Google API
 const googleapis = require('googleapis');
@@ -210,6 +211,9 @@ class GoogleAnalytics {
                             cachedAt : new Date().getTime(),
                             data : data
                         };
+
+                        log('Analytics', "Caching values for top level " + topLevel);
+                        hooks.fire("analytics_refresh_" + topLevel, {data, _c : cli._c});
 
                         data.cachehit = true;
                         sharedcache.set(cached); 

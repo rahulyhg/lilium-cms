@@ -459,11 +459,19 @@ var Entities = module.exports = new function () {
 
             cli.did("entity", "passwordchanged", {user : id});
             db.update(_c.default(), 'entities', {
-                _id: db.mongoID(id)
+                _id: db.mongoID(id),
+                shhh : {$ne : shhh}
             }, {
-                shhh: shhh
+                shhh
             }, function (err, result) {
                 cli.refresh();
+
+                var entity = db.mongoID(cli.userinfo.userid);
+                if (profile && result.modifiedCount != 0) {
+                    db.update(_c.default(), 'actionstats', {entity, type : "system"}, {$inc : {pwd : 1}}, function(err, r) {
+                        hooks.fire('password_updated', {_c : cli._c, entity, score : r.value ? r.value.pwd : 1});
+                    }, true, true, true, true);
+                }
             });
         } else {
             cli.sendJSON({
