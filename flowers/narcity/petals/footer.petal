@@ -95,6 +95,10 @@ $}
 
     var searchbox = document.getElementById("searchtopicbox");
     if (searchbox && false) { searchbox.value = searchtopic; }
+
+    if (window.nsfw) {
+        document.body.classList.add('nsfw');
+    }
 </script>
 
 <script src="https://use.fontawesome.com/c06218d3bc.js"></script>

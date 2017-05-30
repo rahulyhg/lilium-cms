@@ -21,6 +21,7 @@
 
     <div id="mcanvas">
         <div id="container">
+            {=theme.settings.afterheader}
             {%petals/beforecontent}
             {=extra.contentHTML}
 

@@ -53,23 +53,8 @@ body.willfadein {
     opacity : 0;
 }
 
-.context-category #mcanvas ,
-.context-author #mcanvas ,
-.context-tags #mcanvas ,
-.context-search #mcanvas {
-    top: 40px;
-}
-
-.context-category #container,
-.context-author #container,
-.context-tags #container,
-.context-search #container {
-    margin-bottom: -40px;
-}
-
 #mcanvas {
-    top: 60px;
-    margin-bottom: 100px;
+    margin-top: 60px;
 
     position: relative;
     -webkit-transition: all 0.2s;
@@ -106,6 +91,10 @@ body.willfadein {
         transition: opacity 0.2s;
 
     z-index: 500;
+}
+
+.nsfw #mcanvas {
+    margin-top: 80px;
 }
 
 #lmlasync {
@@ -185,18 +174,15 @@ body.menuopen #mobileslider {
 }
 
 .lbtop {
-    margin-top: -24px;
-    top: 245px;
     z-index: 5;
     position: relative;
     text-align: center;
 }
 
-header ~ .lbtop.willslide {
-    margin: 30px 0px 15px;
+.lbtop.willslide {
+    padding: 20px 0px 15px;
     text-align: center;
     position: relative;
-    top: 60px;
 }
 
 .midvert {
@@ -1364,12 +1350,9 @@ h1.article__title.str-title {
 
 
 .subtitle-strip {
-    /*background-color: {=theme.settings.headercolor};*/
     padding: 30px;
     font-family: "Oswald", sans-serif;
     color: #000;
-
-    box-shadow: 0px 3px 10px 0px rgba(0, 0, 0, 0.1);
     text-align: center;
 
     text-transform: uppercase;
@@ -1430,7 +1413,7 @@ article.archive-article .artpad {
 }
 
 article.archive-article .archive-article-thumb {
-    height: 250px;
+    height: 200px;
     width: 100%;
     display: block;
     position:relative;
@@ -1491,6 +1474,8 @@ article.archive-article h3 a {
     background-color: #F6F6F6;
 
     border-bottom: 1px solid #E6E6E6;
+    border-top: 1px solid #e6e6e6;
+
     box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
 }
 
@@ -1558,6 +1543,8 @@ article.archive-article h3 a {
     display: block;
     width: {=fw};
     margin: auto;
+    float: none;
+    clear: both;
 }
 
 .ryksponsive-c {
@@ -2265,6 +2252,10 @@ body.slidheader .android-sharer {
     display: initial;
 }
 
+#skin-takeover {
+    height: 0px;
+}
+
 @media only screen and (min-width: {=fw}) {
     body .no-desktop {
         display: none !important;
@@ -2281,6 +2272,10 @@ body.slidheader .android-sharer {
 @media only screen and (max-width: {=fw}) {
     body .no-mobile, {
         display: none !important;
+    }
+
+    #mcanvas {
+        margin-top: 60px;
     }
 
     .homepage {

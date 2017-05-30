@@ -55,11 +55,13 @@ $}
 
 {$ if (extra.articles.length != 0); $}
     <div class="archive-current-page">
-        <h4>{:showing} {=extra.articles.length} {:of} {=extra.indices.totalarticles} {:entries}</h4>
-        <h5>{:page} {=extra.currentpage} {:of} {=extra.indices.totalpages}</h5>
+        <div class="ryksponsive">
+            <h4>{:showing} {=extra.articles.length} {:of} {=extra.indices.totalarticles} {:entries}</h4>
+            <h5>{:page} {=extra.currentpage} {:of} {=extra.indices.totalpages}</h5>
+        </div>
     </div>
 
-    <div class="archive-article-list float-wrapper">
+    <div class="archive-article-list float-wrapper ryksponsive">
     {$ for (article in extra.articles); $}
         <article class="archive-article">
             <div class="artpad">
