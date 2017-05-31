@@ -5,7 +5,9 @@
 		{%adminhead}
 	</head>
 	<body class="lmladminbody lmladmin">
-        {%adminlivevars;adminfacebook;backendsearch;adminwelcome;adminbadges;imagepicker;previewer;lys;modals;chatslider;imagestudio;localclip}
-        {%adminbar;adminsidebar;adminmain}
+        <div id="lilium">
+            {%adminlivevars;adminfacebook;backendsearch;adminwelcome;adminbadges;imagepicker;previewer;lys;modals;chatslider;imagestudio;localclip}
+            {%adminbar;adminsidebar;adminmain}
+        </div>
 	</body>
 </html>

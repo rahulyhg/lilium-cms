@@ -639,16 +639,12 @@ class LMLCompiler {
     };
 
     parseBlocks(ctx) {
-        let now = new Date();
         let nextBlock = () => {
             ctx.blockIndex++;
             if (ctx.blocks.length == ctx.blockIndex) {
                 ctx.flags.finished = true;
                 this.checkForCompletion(ctx);
             } else {
-                // let diff = new Date() - now;
-                now = new Date(); 
-
                 let cBlock = ctx.blocks[ctx.blockIndex];
                 setTimeout(() => {
                     this.parseSingle(cBlock, ctx, nextBlock);
@@ -802,7 +798,6 @@ class LMLCompiler {
 
     compile(siteid, string, stream, extra, cb) {
         const conf = configs.fetchConfig(siteid);
-        let now = new Date();
         let ctx = new LMLContext(conf, string, stream, extra, () => {
             cb && cb.apply(this, [ctx]);
         });
