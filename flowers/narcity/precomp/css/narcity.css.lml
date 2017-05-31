@@ -164,8 +164,6 @@ body.menuopen #mobileslider {
     top: 0;
     left: 0;
     right: 0;
-    margin-top: -144px;
-    margin-bottom: 120px;
 }
 
 #mcanvas {
