@@ -1,3 +1,5 @@
+const log = require('../log.js');
+
 // Documentation : https://docs.google.com/document/d/1CNue3XC7tBQbr1BnBQaQUxkKCPF6qidOW7lgvZe3ets/edit?usp=sharing
 const LMLConst = {
     lmlext : ".lml3",
@@ -39,7 +41,16 @@ class LMLContext {
         this.extra = original;
         this.blocks = {};
 
-        this.generateLivevars().createOutputFunction().readPetals();
+        this.generateLivevars().createOutputFunction().readPetals().loadLibraries();
+    }
+
+    loadLibraries() {
+        this.libs = {
+            formbuilder : require('../formBuilder.js'),
+            encodec : require('entities'),
+            slugify : require('slugify'),
+            postlead : require('../postleaf.js').getLeaves()
+        };
     }
 
     createOutputFunction() {
@@ -64,7 +75,7 @@ class LMLContext {
     generateLivevars() {
         let str = "";
         this.livevars && this.livevars.forEach(l => {
-            let params = l.params ? JSON.stringify(l.params).replace(/\"/g, "&lmlquote;") : "";
+            let params = l.params ? JSON.stringify(l.params).replace(/\"/g, "&lmlquote;") : "{}";
             str += `<lml:livevars data-varname="${l.name}" data-varparam="${params}"></lml:livevars>`;
         });
 
@@ -83,13 +94,17 @@ class LML3 {
     }
 
     compile(_c, abspath, extra, done) {
-        let [settings = {}, compile, preload] = require(abspath);
+        log('LML3', "Loading LML3 file : " + abspath, 'info');
+        let now = new Date();
+        let lml3file = require(abspath);
+        let settings = lml3file.settings || {};
         settings.workdir = abspath.substring(0, abspath.lastIndexOf("/") - 1);
         settings.currentfile = abspath;
 
         let context = new LMLContext(_c, extra, settings);
-        this.preload(preload, context, () => {
-            compile(context.o, context);
+        this.preload(lml3file.preload, context, () => {
+            lml3file.compile(context.o, context);
+            log('LML3', 'Compiled file in ' + (new Date() - now) + "ms", 'detail');
             done(context.markupbuffer.getMarkup());
         });
     }

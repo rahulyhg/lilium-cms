@@ -731,11 +731,17 @@ var rQueue = {
 var cachedTags = {};
 var loadHooks = function(_c, info) {
     endpoints.register(_c.id, ["2012", "2013", "2014", "2015", "2016", "2017", "category"], 'GET', function(cli) {
-        cli.redirect(_c.server.url + "/" + cli.routeinfo.path.pop() + (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : ""));
+        cli.redirect(_c.server.url + "/" + 
+            cli.routeinfo.path.pop() + 
+            (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : "")
+        );
     });
 
     endpoints.register(_c.id, 'tag', 'GET', function(cli) {
-        cli.redirect(_c.server.url + '/tags/' + cli.routeinfo.path[1] + (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : ""));
+        cli.redirect(_c.server.url + '/tags/' + 
+            cli.routeinfo.path[1] + 
+            (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : "")
+        );
     });
 
     endpoints.registerContextual(_c.id, 'topic', 'GET', serveTopic);

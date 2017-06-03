@@ -2,6 +2,7 @@ var FileServer = fileserver = require('./fileserver.js');
 var _c = require('./config.js');
 var LML = require('./lml.js');
 var LML2 = require('./lml/compiler.js');
+var LML3 = require('./lml3/compiler.js');
 var log = require('./log.js');
 var db = require('./includes/db.js');
 var sharedcache = require('./sharedcache.js');
@@ -107,11 +108,36 @@ var FileLogic = function () {
         });
     };
 
+    this.serveAdminLML3 = function(cli, lastIsParam, extra, templatefile, dynamicroot) {
+        var id = cli.routeinfo.relsitepath;
+        if (lastIsParam) {
+            id = id.substring(0, id.lastIndexOf('/'));
+        }
+
+        var cachekey = cli._c.uid + id;
+        sharedcache.get(cachekey, function(ctn) {
+            if (ctn) {
+                cli.sendHTML(ctn, 200);
+            } else {
+                var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + id + ".lml3";
+
+                LML3.compile(cli._c, readPath, extra, function(ctn) {
+                    sharedcache.set({
+                        [cachekey] : ctn
+                    }, () => {
+                        cli.sendHTML(ctn, 200);
+                    });
+                });
+            }
+        });
+    };
+
     this.serveAdminLML = function (cli, lastIsParam, extra, templatefile, dynamicroot) {
-        lastIsParam = typeof lastIsParam == 'undefined' ? false : lastIsParam;
+        lastIsParam = !!lastIsParam;
         var name = "";
 
         if (lastIsParam) {
+            // Could be faster without the replace function
             name = cli.routeinfo.relsitepath.replace('/' + cli.routeinfo.path.pop(), '');
         } else {
             name = cli.routeinfo.relsitepath;
@@ -267,11 +293,57 @@ var FileLogic = function () {
         });
     };
 
+    this.renderThemeLML3 = function(cli, contextname, outputfilename, extra = {}, done, nolayout) {
+        var themeLib = require('./themes.js');
+        var _c = cli._c || cli;
+        
+        themeLib.fetchCurrentTheme(_c, function(cTheme) {
+            if (!extra.language) {
+                extra.language = _c.website.language;
+            }
+
+            extra.theme = cTheme;
+            extra.minify = true;
+            extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
+
+            var readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
+            var layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml3";
+            var savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
+
+            if (extra.topic && extra.topic.override) {
+                extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
+            }
+
+            LML3.compile(_c, readPath, extra, (ctn) => {
+                if (nolayout) {
+                    return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, function(cdned) {
+                        done(cdned);
+                    });
+                }
+
+                extra.contentHTML = ctn;
+                LML3.compile(_c, layoutPath, extra, (fHtml) => {
+                    require('./cdn.js').parse(fileserver.minifyString(fHtml), _c, function(cdned) {
+                        fileserver.createDirIfNotExists(savePath, function() {
+                            var handle = FileServer.getOutputFileHandle(savePath, 'w+');
+                            FileServer.writeToFile(handle, cdned, function() {
+                                handle.close();
+                                handle.destroy();
+
+                                callback(cdned);
+                            });
+                        }, false);
+                    });
+                });
+            });
+        });
+    };
+
     this.renderThemeLML = function(cli, ctxName, preferredFileName, extra, callback, skipLayout) {
         var theme = require('./themes.js');
         var _c = cli._c || cli;
 
-        extra = extra || new Object();
+        extra = extra || {};
         extra.config = _c;
         extra.contextname = ctxName;
         extra.siteid = _c.id;

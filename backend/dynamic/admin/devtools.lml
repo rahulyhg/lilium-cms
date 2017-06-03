@@ -11,8 +11,14 @@
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/lml">
+                <i class="devtools-list-item-icon fa fa-leaf"></i>
+                <b class="devtools-list-item-title">LML v1 &amp; v2</b>
+            </a>
+        </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/lml3" >
                 <i class="devtools-list-item-icon fa fa-code"></i>
-                <b class="devtools-list-item-title">LML</b>
+                <b class="devtools-list-item-title">LML v3</b>
             </a>
         </li>
         <li class="devtools-list-item">

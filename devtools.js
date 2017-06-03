@@ -37,6 +37,10 @@ DevTools.prototype.adminGET = function(cli) {
             filelogic.serveAdminLML(cli);
             break;
 
+        case 'lml3':
+            filelogic.serveAdminLML3(cli);
+            break;
+
         default:
             cli.throwHTTP(404, 'Not Found');
     }
