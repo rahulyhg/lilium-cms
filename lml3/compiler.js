@@ -49,6 +49,7 @@ class LMLContext {
             formbuilder : require('../formBuilder.js'),
             encodec : require('entities'),
             slugify : require('slugify'),
+            fileio : require('../fileserver.js'),
             postlead : require('../postleaf.js').getLeaves()
         };
     }
@@ -98,7 +99,7 @@ class LML3 {
         let now = new Date();
         let lml3file = require(abspath);
         let settings = lml3file.settings || {};
-        settings.workdir = abspath.substring(0, abspath.lastIndexOf("/") - 1);
+        settings.workdir = abspath.substring(0, abspath.lastIndexOf("/"));
         settings.currentfile = abspath;
 
         let context = new LMLContext(_c, extra, settings);

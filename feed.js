@@ -12,7 +12,7 @@ LMLFeed.prototype.setup = function() {
 }
 
 LMLFeed.prototype.adminGET = function(cli) {
-    filelogic.serveAdminLML(cli);
+    filelogic.serveAdminLML3(cli);
 };
 
 LMLFeed.prototype.livevar = function(cli, levels, params, cb) {
