@@ -5,6 +5,8 @@ const ApiEndpoints = {
 
 const db = require('./includes/db.js');
 const article = require('./article.js');
+const endpoints = require('./endpoints.js');
+const sharedcache = require('./sharedcache.js');
 
 class LiliumAPI {
 	serveApi(cli) {
@@ -15,10 +17,12 @@ class LiliumAPI {
 	handleApiEndpoint(cli) {
 		cli.touch('api.handleAdminEndpoint');
 
-		if (api.apiEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
+        if (!cli.routeinfo.path[1]) {
+		    cli.throwHTTP(404, undefined, true);
+        } if (api.apiEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
 		    ApiEndpoints[cli.method][cli.routeinfo.path[1]](cli);
 		} else {
-			cli.throwHTTP(404, 'Unregistered Api Endpoint : ' + cli.routeinfo.path[1]);
+		    cli.throwHTTP(404, undefined, true);
 		}
 	};
 
@@ -29,6 +33,18 @@ class LiliumAPI {
 	registerApiEndpoint(endpoint, method, func) {
 	    ApiEndpoints[method][endpoint] = func;
 	};
+
+    pushInCache(key, value, done) {
+        sharedcache.set({
+            ["api_" + key] : value
+        }, done || function() {});
+    };
+
+    fetchFromCache(key, done) {
+        sharedcache.get(key, value => {
+            done(value);   
+        });
+    };
 }
 
 const api = new LiliumAPI();

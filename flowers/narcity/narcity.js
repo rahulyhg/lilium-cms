@@ -724,6 +724,10 @@ var getWhatsHot = function(_c, cb) {
     }); 
 }
 
+var serveHomepageAPI = function(cli) {
+    
+}
+
 var needsHomeRefresh = true;
 var rQueue = {
     homepage : []
@@ -745,6 +749,7 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.registerContextual(_c.id, 'topic', 'GET', serveTopic);
+    endpoints.registerContextual(_c.id, 'homepage', 'GET', serveHomepageAPI);
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
         sharedcache.get("narcityhomepage_" + _c.id, function(resp) {
