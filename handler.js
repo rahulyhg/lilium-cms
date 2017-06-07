@@ -178,6 +178,16 @@ var Handler = function () {
         }
     };
 
+    var OPTIONS = function(cli) {
+        var headers = {
+            "Access-Control-Allow-Origin" : cli.request.headers.corsorigin || cli.request.headers.origin,
+            "Access-Control-Allow-Methods" : "GET, POST, OPTIONS"
+        };
+
+        cli.response.writeHead(200, headers);
+        cli.response.end();
+    };
+
     var notSupported = function (cli) {
         cli.throwHTTP(405, 'Method Not Allowed : ' + cli.method, true);
     };
@@ -191,6 +201,9 @@ var Handler = function () {
             break;
         case 'POST':
             POST(cli);
+            break;
+        case 'OPTIONS':
+            OPTIONS(cli);
             break;
         default:
             notSupported(cli);

@@ -153,6 +153,7 @@ ClientObject.prototype.sendJSON = function (json) {
 
     if (this.cors && this.request.headers.corsorigin) {
         headers["Access-Control-Allow-Origin"] = this.request.headers.corsorigin;
+        headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
     }
 
     this.response.writeHead(200, headers);
