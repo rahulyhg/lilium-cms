@@ -151,8 +151,8 @@ ClientObject.prototype.sendJSON = function (json) {
         "Lilium-Proto": "livevars"
     }
 
-    if (this.cors && this.request.headers.corsorigin) {
-        headers["Access-Control-Allow-Origin"] = this.request.headers.corsorigin;
+    if (this.cors) {
+        headers["Access-Control-Allow-Origin"] = this.request.headers.corsorigin || this.request.headers.origin;
         headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
     }
 
