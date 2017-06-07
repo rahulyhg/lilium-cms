@@ -767,7 +767,7 @@ var LMLDom = function() {
         return data;
     };
 
-    this.sendForm = function(data, url, callback) {
+    this.sendForm = function(data, url, callback, headers) {
         var maybeParseJson = function(str) {
             try {
                 return JSON.parse(str);
@@ -782,6 +782,14 @@ var LMLDom = function() {
         });
         xmlhttp.open("POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
+        
+        if (headers) {
+            headers = Object.keys(headers);
+            for (var i = 0; i < headers.length; i++) {
+                xmlhttp.setRequestHeader(headers[i], options.headers[headers[i]]);
+            }
+        }
+
         xmlhttp.send(JSON.stringify(data));
     };
 

@@ -38,6 +38,7 @@ DevTools.prototype.adminGET = function(cli) {
             break;
 
         case 'lml3':
+        case 'api':
             filelogic.serveAdminLML3(cli);
             break;
 
@@ -552,7 +553,38 @@ DevTools.prototype.form = function() {
         type: 'button', 
         displayname : 'Insert',
         async : true
+    });
+
+    formBuilder.createForm('devtools_api', {
+        formWrapper: {
+            'tag': 'div',
+            'class': 'row',
+                'id': 'devtools_api',
+                'inner': true
+            },
+        fieldWrapper : "lmlform-fieldwrapper",
+        async : true
     })
+    .add('endpoint', 'text', {
+        displayname : 'API Endpoint'
+    })
+    .add('method', 'select', {
+        displayname : "Method",
+        datasource : [
+            {displayName : "GET",  name : "GET" },
+            {displayName : "POST", name : "POST"}
+        ]
+    })
+    .add('token', 'text', {
+        displayname : "User Token"
+    })
+    .add('hash', 'text', {
+        displayname : "Hash header"
+    })
+    .add('send', 'button', {
+        displayname : "Send request",
+        callback : "sendDevtoolsAPIRequest"
+    });
 };
 
 module.exports = new DevTools();

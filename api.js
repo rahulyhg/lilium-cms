@@ -16,6 +16,7 @@ class LiliumAPI {
 
 	handleApiEndpoint(cli) {
 		cli.touch('api.handleAdminEndpoint');
+        cli.cors = true;
 
         if (!cli.routeinfo.path[1]) {
 		    cli.throwHTTP(404, undefined, true);

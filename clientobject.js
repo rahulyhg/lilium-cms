@@ -145,10 +145,17 @@ ClientObject.prototype.sendJSON = function (json) {
     if (typeof json === 'object') {
         json = JSON.stringify(json);
     }
-    this.response.writeHead(200, {
+
+    var headers = {
         "Content-Type": "application/json; charset=utf-8",
         "Lilium-Proto": "livevars"
-    });
+    }
+
+    if (this.cors && this.request.headers.corsorigin) {
+        headers["Access-Control-Allow-Origin"] = this.request.headers.corsorigin;
+    }
+
+    this.response.writeHead(200, headers);
 
     this.response.end(json);
 };

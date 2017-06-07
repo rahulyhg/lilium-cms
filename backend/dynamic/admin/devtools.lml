@@ -81,5 +81,11 @@
                 <b class="devtools-list-item-title">Impersonate</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/api" >
+                <i class="devtools-list-item-icon fa fa-flask"></i>
+                <b class="devtools-list-item-title">API</b>
+            </a>
+        </li>
     </ul>
 </div>

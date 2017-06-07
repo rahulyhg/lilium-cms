@@ -754,6 +754,22 @@ var serveReadAPI = function(cli) {
     }
 };
 
+var serveTopicAPI = function(cli) {
+    var id = db.mongoID(cli.routeinfo.path[2]);
+    if (cli.routeinfo.path.length > 2) {
+
+    } else {
+        db.findToArray(cli._c, 'topics', {}, function(err, arr) {
+            cli.sendJSON({
+                section : "topic",
+                topics : arr
+            });
+        }, {
+            _id : 1, displayname : 1, completeSlug : 1
+        });
+    }
+}
+
 var needsHomeRefresh = true;
 var rQueue = {
     homepage : []
@@ -775,8 +791,10 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.registerContextual(_c.id, 'topic', 'GET', serveTopic);
+
     API.registerApiEndpoint(_c.id + 'homepage', 'GET', serveHomepageAPI);
     API.registerApiEndpoint(_c.id + 'read', 'GET', serveReadAPI);
+    API.registerApiEndpoint(_c.id + 'topic', 'GET', serveTopicAPI);
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
         sharedcache.get("narcityhomepage_" + _c.id, function(resp) {
