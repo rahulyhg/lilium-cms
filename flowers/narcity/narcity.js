@@ -17,6 +17,7 @@ var LML2 = undefined;
 var Article = undefined;
 var Category = undefined;
 var sharedcache = undefined;
+var API = undefined;
 
 var readersLib = undefined;
 
@@ -45,6 +46,7 @@ var initRequires = function(abspath) {
     cc = require(abspath + "config.js");
     Article = require(abspath + "article.js");
     sharedcache = require(abspath + "sharedcache.js");
+    API = require(abspath + "api.js");
 };
 
 var registerPictureSizes = function() {
@@ -725,7 +727,13 @@ var getWhatsHot = function(_c, cb) {
 }
 
 var serveHomepageAPI = function(cli) {
-    
+    fetchHomepageArticles(cli._c, function(articles) { 
+        articles = Article.toPresentables(cli._c, articles.latests);
+        cli.sendJSON({
+            section : "homepage", 
+            articles
+        });
+    });
 }
 
 var needsHomeRefresh = true;
@@ -749,7 +757,7 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.registerContextual(_c.id, 'topic', 'GET', serveTopic);
-    endpoints.registerContextual(_c.id, 'homepage', 'GET', serveHomepageAPI);
+    API.registerApiEndpoint(_c.id + 'homepage', 'GET', serveHomepageAPI);
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
         sharedcache.get("narcityhomepage_" + _c.id, function(resp) {

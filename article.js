@@ -132,60 +132,61 @@ var Article = function() {
         }
     };
 
-    this.toPresentable = function(_c, article) {
-        article.identifier = article._id.toString();
-        article._id = undefined;
+    this.toPresentables = function(_c, articles) {
+        return articles.map(x => this.toPresentable(_c, x, true));
+    };
 
+    this.toPresentable = function(_c, article, stripContent) {
+        var featuredimages = {};
+        if (article.featuredimage && article.featuredimage[0]) {
+            for (var size in article.featuredimage[0].sizes) {
+                featuredimages[size] = CDN.parseOne(_c, article.featuredimage[0].sizes[size].url);
+            }
+        }
+
+        var topic;
         if (article.topic) {
-            article.topic = {
+            topic = {
                 displayname : article.topic.displayname,
                 slug : article.topic.slug,
                 completeSlug : article.topic.completeSlug
             }
         }
 
-        article.topics = undefined;
-        article.subscribers = undefined;
-        article.autosaveid = undefined;
-        article.media = undefined;
-        article.aliases = undefined;
-
-        article.impressions = undefined;
-        article.targetimpressions = undefined;
-        article.targetdate = undefined;
-        article.form_name = undefined;
-
-        article.industry = undefined;
-
-        article["publish-set"] = undefined;
-        article["persona-select"] = undefined;
-
-        if (article.featuredimage && article.featuredimage[0]) {
-            var featimgs = {};
-            for (var size in article.featuredimage[0].sizes) {
-                featimgs[size] = CDN.parseOne(_c, article.featuredimage[0].sizes[size].url);
-            }
-            article.featuredimage = featimgs;
-        }
-
+        var author;
         if (article.authors && article.authors[0]) {
-            article.author = article.authors[0];
-            article.author = {
-                displayname : article.author.displayname,
-                avatarURL : article.author.avatarURL,
-                slug : article.author.slug
+            author = article.authors[0];
+            author = {
+                displayname : author.displayname,
+                avatarURL : author.avatarURL,
+                slug : author.slug
             };
-
-            article.authors = undefined;
         }
 
-        for (var k in article) {
-            if (k.indexOf('title-') == 0 || k.indexOf('lml') == 0) {
-                article[k] = undefined;
-            }
-        }
+        return {
+            id : article._id.toString(),
+            title : article.title,
+            subtitle : article.subtitle,
+            featuredimageartist : article.featuredimageartist,
+            featuredimagelink : article.featuredimagelink,
+            geolocation : article.geolocation && article.geolocation.split('_'),
+            date : article.date,
+            isSponsored : article.isSponsored,
+            useSponsoredBox : article.useSponsoredBox,
+            sponsoredBoxTitle : article.sponsoredBoxTitle,
+            sponsoredBoxURL : article.sponsoredBoxURL,
+            sponsoredBoxLogo : article.sponsoredBoxLogo,
+            sponsoredBoxContent : article.sponsoredBoxContent,
+            tags : article.tags,
+            tagslugs : article.tagslugs,
+            slug : article.name,
+            nsfw : article.nsfw,
+            url : article.url,
 
-        return article;
+            content : (stripContent ? undefined : article.content),
+
+            author, topic, featuredimages
+        };
     }
 
     this.apiGET = function(cli) {
