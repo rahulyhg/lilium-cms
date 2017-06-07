@@ -152,12 +152,12 @@ ClientObject.prototype.sendJSON = function (json) {
     }
 
     if (this.cors) {
-        headers["Access-Control-Allow-Origin"] = this.request.headers.corsorigin || this.request.headers.origin;
+        headers["Access-Control-Allow-Origin"] = this.request.headers.origin || (this._c.server.protocol + this._c.server.url);
         headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
+        headers["Access-Control-Allow-Header"] = "corsorigin";
     }
 
     this.response.writeHead(200, headers);
-
     this.response.end(json);
 };
 
