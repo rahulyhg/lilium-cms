@@ -404,7 +404,6 @@ h4.article-section-title {
     font-weight: normal;
     text-transform: uppercase;
     color: {=mc};
-    clear: both;
     margin: 30px 0 20px;
     text-align: left;
 }

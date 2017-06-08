@@ -1077,7 +1077,7 @@ var insertAds = function(pkg) {
             }
 
             var parags = dom.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
-            for (var i = 0; i < parags.length - 1; i++) if (i % pcount == 0) {
+            for (var i = 0; i < parags.length - 1; i++) if ((i-2) % pcount == 0) {
                 var adtag = dom.document.createElement('ad');
                 dom.document.body.insertBefore(adtag, parags[i+1]);
                 changed = true;
