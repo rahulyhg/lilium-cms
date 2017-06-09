@@ -12,6 +12,34 @@ var pluginHelper = require('./pluginHelper.js');
 var preferences = require('./preferences.js');
 var feed = require('./feed.js');
 
+const PERSONALITIES_ASSOC = {
+    none : {displayname : "Unknown"     ,description : "Did not take the personality test" },
+    istj : {displayname : "Logistician" ,description : "Practical and fact-minded individuals, whose reliability cannot be doubted." },
+    isfj : {displayname : "Defender"    ,description : "Very dedicated and warm protectors, always ready to defend their loved ones." },
+    infj : {displayname : "Advocate"    ,description : "Quiet and mystical, yet very inspiring and tireless idealists." },
+    intj : {displayname : "Architect"   ,description : "Imaginative and strategic thinkers, with a plan for everything." },
+    istp : {displayname : "Virtuoso"    ,description : "Bold and practical experimenters, masters of all kinds of tools." },
+    isfp : {displayname : "Adventurer"  ,description : "Flexible and charming artists, always ready to explore and experience something new." },
+    infp : {displayname : "Mediator"    ,description : "Poetic, kind and altruistic people, always eager to help a good cause." },
+    intp : {displayname : "Logician"    ,description : "Innovative inventors with an unquenchable thirst for knowledge." },
+    estp : {displayname : "Entrepreneur",description : "Smart, energetic and very perceptive people, who truly enjoy living on the edge." },
+    esfp : {displayname : "Campaigner"  ,description : "Enthusiastic, creative and sociable free spirits, who can always find a reason to smile." },
+    enfp : {displayname : "Entertainer" ,description : "Spontaneous, energetic and enthusiastic people – life is never boring around them." },
+    entp : {displayname : "Debater"     ,description : "Smart and curious thinkers who cannot resist an intellectual challenge." },
+    estj : {displayname : "Executive"   ,description : "Excellent administrators, unsurpassed at managing things – or people." },
+    esfj : {displayname : "Consul"      ,description : "Extraordinarily caring, social and popular people, always eager to help." },
+    enfj : {displayname : "Protagonist" ,description : "Charismatic and inspiring leaders, able to mesmerize their listeners." },
+    entj : {displayname : "Commander"   ,description : "Bold, imaginative and strong-willed leaders, always finding a way – or making one." }
+};
+
+const PERSONALITIES_DATASOURCE = [];
+for (var type in PERSONALITIES_ASSOC) {
+    PERSONALITIES_DATASOURCE.push({
+        displayName : PERSONALITIES_ASSOC[type].displayname,
+        name : type
+    });
+}
+
 var Entity = function () {
     this._id = undefined;
     this.username = "";
@@ -26,6 +54,7 @@ var Entity = function () {
     this.preferences = new Object();
     this.slug = "";
     this.socialnetworks = {};
+    this.personality = "none";
 
     // Various data; should always be checked for undefined
     this.data = new Object();
@@ -626,19 +655,27 @@ var Entities = module.exports = new function () {
         newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
         newEnt.email = entData.email;
         newEnt.description = entData.description || '';
+
         newEnt.roles = [];
         for (var index in entData.roles) {
             if (entData.roles[index] !== "") {
                 newEnt.roles.push(entData.roles[index]);
             }
         }
+
         newEnt.sites = entData.sites || [require('./config.js').default().id];
         newEnt.jobtitle = entData.jobtitle;
         newEnt.displayname = entData.displayname;
         newEnt.firstname = entData.firstname;
         newEnt.lastname = entData.lastname;
+        newEnt.personality = entData.personality;
         newEnt.phone = entData.phone;
-        newEnt.socialnetworks = {facebook:entData["socialnetworks.facebook"]||"",twitter:entData["socialnetworks.twitter"]||"",googleplus:entData["socialnetworks.googleplus"]||"",instagram:entData["socialnetworks.instagram"]||""};
+        newEnt.socialnetworks = {
+            facebook   : entData["socialnetworks.facebook"]   || "",
+            twitter    : entData["socialnetworks.twitter"]    || "",
+            googleplus : entData["socialnetworks.googleplus"] || "",
+            instagram  : entData["socialnetworks.instagram"]  || ""
+        };
         newEnt.createdOn = new Date();
         newEnt.slug = entData.slug || toEntitySlug(entData.displayname || entData.username || "");
 
@@ -903,6 +940,13 @@ var Entities = module.exports = new function () {
             .addTemplate('entity_create')
             .addTemplate('me_edit')
             .addTemplate('entity_social')
+            .add('title_personality', 'title', {
+                displayname : "Personality"
+            })
+            .add('personality', 'select', {
+                displayname : "Personality Type",
+                datasource : PERSONALITIES_DATASOURCE
+            })
             .remove('password')
             .edit('username', '', {
                 disabled : true
