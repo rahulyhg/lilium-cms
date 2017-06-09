@@ -12,6 +12,7 @@ const DECO_COLLECTION = "decorations";
 const BADGES_COLLECTION = "badges";
 const ADMIN_POST_RIGHT = "manage-badges";
 const ADMIN_GET_RIGHT = "manage-badges";
+const HUE_SPIN = 35;
 
 const DEFAULT_HOOKS_PRIO = 10000;
 
@@ -255,7 +256,7 @@ class EntityBadge {
             icon : "fa " + badge.icon,
             text : badge.displayname + " - " + BADGE_LEVEL_TEXT[level],
             reason : badge.reason.replace("<n>", "<b>"+badge.levels[level]+"</b>"),
-            hue : level * 35,
+            hue : level * HUE_SPIN,
             level
         };
     }
@@ -265,6 +266,17 @@ class EntityBadge {
 class BadgesAPI {
     fetchEntityDeco(entity, send) {
         EntityBadge.fetchEntityDecorations(entity, send);
+    }
+
+    fetchBoard(send) {
+        db.join(config.default(), 'entities', [
+            { $match : {revoked : {$ne : true}} }, 
+            { $lookup : { from : "decorations", localField : "_id", foreignField : "entity", as : "badges" } }, 
+            { $match : {badges : {$ne : []}} },
+            { $project : { displayname : 1, badges : 1, avatarURL : 1 } }
+        ], (entities) => {
+            send({ badges : DEFAULT_BADGES_ASSOC, levels : BADGE_LEVEL_TEXT, huespin : HUE_SPIN, entities });
+        });
     }
 
     fetchAllDeco(send) {
@@ -321,6 +333,7 @@ class BadgesAPI {
             case "mine": this.fetchEntityDeco(db.mongoID(cli.userinfo.userid), send); break;
             case "all": this.fetchAllDeco(send); break;
             case "one": this.fetchOneDeco(db.mongoID(levels[1]), send); break;
+            case "board": this.fetchBoard(send); break;
             default: send(new Error("Undefined top level " + levels[0]))
         }
     }
