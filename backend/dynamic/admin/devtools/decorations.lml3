@@ -1,0 +1,39 @@
+const settings = {
+    livevars : [],
+    petals : []
+};
+
+const lmldom = ` <lml:dom v="1.0"></lml:dom> `;
+const title = ` <h1>Decorations</h1> `;
+
+const bunchCode = `
+    <lml:bunch>
+        <lml:bunchitem>
+            <div class="single-entity-item">
+                <div class="single-entity-image">
+                    <lml:image src="{entity.avatarURL}"></lml:image>
+                </div>
+                <div class="">
+                    <h3>
+                        <lml:text var="entity.displayname"></lml:text>
+                    </h3>
+                </div>
+            </div>
+        </lml:bunchitem>
+
+        <script type="lmljson" name="chainsbunch">
+            {
+                "datasource" : "decorations.board",
+                "loopvar" : "entity"
+            }
+        </script>
+    </lml:bunch>
+`;
+
+const compile = (o, context) => {
+    o(lmldom, title, bunchCode);
+};
+
+module.exports = { settings, compile };
+
+

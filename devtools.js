@@ -39,6 +39,7 @@ DevTools.prototype.adminGET = function(cli) {
 
         case 'lml3':
         case 'api':
+        case 'decorations':
             filelogic.serveAdminLML3(cli);
             break;
 

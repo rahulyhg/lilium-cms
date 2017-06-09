@@ -275,7 +275,7 @@ class BadgesAPI {
             { $match : {badges : {$ne : []}} },
             { $project : { displayname : 1, badges : 1, avatarURL : 1 } }
         ], (entities) => {
-            send({ badges : DEFAULT_BADGES_ASSOC, levels : BADGE_LEVEL_TEXT, huespin : HUE_SPIN, entities });
+            send({ badges : DEFAULT_BADGES_ASSOC, levels : BADGE_LEVEL_TEXT, huespin : HUE_SPIN, items : entities });
         });
     }
 
