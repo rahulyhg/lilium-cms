@@ -1,4 +1,4 @@
-var _configs = new Object();
+var _configs = {};
 var log = require('./log.js');
 
 var Config = function () {
@@ -6,15 +6,13 @@ var Config = function () {
 };
 
 Config.prototype.getAllSites = function () {
-    var arr = new Array();
-
+    var arr = [];
     for (var key in _configs) if (key != 'default') arr.push(_configs[key]);
-
     return arr;
 };
 
 Config.prototype.getSimpleSites = function () {
-    var arr = new Array();
+    var arr = [];
 
     for (var key in _configs)
         if (key != 'default') {
@@ -61,12 +59,6 @@ Config.prototype.fetchConfig = function (site) {
 Config.prototype.fetchConfigFromCli = function (cli) {
     var rootdomain = cli.request.headers.host;// .replace(this.httpRegex, ""); // + cli.request.url;
 
-    /*
-    while (rootdomain && !_configs[rootdomain]) {
-        var index = rootdomain.lastIndexOf('/');
-        rootdomain = index == -1 ? undefined : rootdomain.substring(0, index);
-    }
-    */
     cli.routeinfo.configname = rootdomain;
     cli.routeinfo.rootdomain = rootdomain;
     cli._c = _configs[rootdomain];

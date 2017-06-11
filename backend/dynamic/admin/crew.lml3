@@ -1,0 +1,61 @@
+const settings = {
+    livevars : [],
+    petals : [],
+    lmldom : {
+        v : 1.0,
+        features : []
+    },
+    title : "Crew members"
+}; 
+
+const preload = (context, done) => {
+    context.libs.fileio.readFile(context.workdir + "/crew.css", (ctn) => {
+        context.css = `<style>${ctn}</style>`;
+        done();
+    }, false, 'utf8');
+};
+
+// HTML snips for clearer compilation logic
+const compile = (o, context) => {
+    o(context.header, context.css);
+
+    o(`<lml:bunch>
+    <lml:bunchfilters>
+        <div class="bunch-filters">
+            <div class="bunch-filters-title">FILTERS</div>
+            <label>Search</label>
+            <input type="text" name="search" placeholder="Username, Name, Email" />
+        </div>
+    </lml:bunchfilters>
+
+    <lml:bunchitem>
+        <div class="crew-member-card">
+            <div class="crew-member">
+                <div class="crew-card-top">
+                    <lml:image src="{member.avatarURL}"></lml:image> 
+                    <h3><lml:text var="member.displayname"></lml:text></h3>
+                </div>
+                <div class="crew-card-middle">
+                    <div>
+                        <i class="fa fa-lightbulb-o" style="font-size:18px;"></i> 
+                        <lml:text var="member.personality.displayname"></lml:text> personality
+                    </div>
+                    <div>
+                        <i class="fa fa-paper-plane"></i> 
+                        <lml:text var="member.articles"></lml:text> Articles published
+                    </div>
+                </div>
+            </div>
+        </div>
+    </lml:bunchitem>
+
+    <script type="lmljson" name="chainsbunch">
+        {
+            "datasource" : "crew.bunch",
+            "loopvar" : "member"
+        }
+    </script>
+    </lml:bunch>`);
+};
+
+module.exports = { settings, preload, compile };

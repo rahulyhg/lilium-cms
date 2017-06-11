@@ -268,6 +268,14 @@ class BadgesAPI {
         EntityBadge.fetchEntityDecorations(entity, send);
     }
 
+    getDecorationSettings() {
+        return {
+            DEFAULT_BADGES_ASSOC,
+            BADGE_LEVEL_TEXT,
+            HUE_SPIN
+        }
+    }
+
     fetchBoard(send) {
         db.join(config.default(), 'entities', [
             { $match : {revoked : {$ne : true}} }, 

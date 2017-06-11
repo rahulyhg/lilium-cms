@@ -41,7 +41,25 @@ class LMLContext {
         this.extra = original;
         this.blocks = {};
 
-        this.generateLivevars().createOutputFunction().readPetals().loadLibraries();
+        this.generateLivevars()
+            .createOutputFunction()
+            .readPetals()
+            .loadLibraries()
+            .prepareHeader();
+    }
+
+    prepareHeader() {
+        this.header = "";
+
+        if (this.lmldom) {
+            this.header += `<lml:dom v="${this.lmldom.v}" features="${this.lmldom.features?this.lmldom.features.join(','):''}">
+            </lml:dom>`;
+        }
+
+        this.header += this.livevars || '';
+        this.header += this.title ? `<h1>${this.title}</h1>` : '';
+
+        return this;
     }
 
     loadLibraries() {
@@ -52,6 +70,8 @@ class LMLContext {
             fileio : require('../fileserver.js'),
             postlead : require('../postleaf.js').getLeaves()
         };
+
+        return this;
     }
 
     createOutputFunction() {

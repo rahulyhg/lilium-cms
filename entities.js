@@ -38,6 +38,7 @@ for (var type in PERSONALITIES_ASSOC) {
         displayName : PERSONALITIES_ASSOC[type].displayname,
         name : type
     });
+    PERSONALITIES_ASSOC[type].code = type;
 }
 
 var Entity = function () {
@@ -73,6 +74,10 @@ var Entities = module.exports = new function () {
         }
 
         callback(entity);
+    };
+
+    this.getPersonalities = function() {
+        return PERSONALITIES_ASSOC;
     };
 
     this.firstLogin = function(cli, userObj, cb) {
