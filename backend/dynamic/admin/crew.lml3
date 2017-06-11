@@ -9,8 +9,15 @@ const settings = {
 }; 
 
 const preload = (context, done) => {
+    let spin = context.ds.HUE_SPIN;
+    context.css = "<style>";
+
+    for (let i = 1; i <= context.ds.BADGE_LEVEL_TEXT.length; i++) {
+        context.css += ` .level-${i} { filter: hue-rotate(${spin*i}deg); } `;
+    }
+
     context.libs.fileio.readFile(context.workdir + "/crew.css", (ctn) => {
-        context.css = `<style>${ctn}</style>`;
+        context.css += ` ${ctn}</style>`;
         done();
     }, false, 'utf8');
 };
@@ -43,6 +50,14 @@ const compile = (o, context) => {
                     <div>
                         <i class="fa fa-paper-plane"></i> 
                         <lml:text var="member.articles"></lml:text> Articles published
+                    </div>
+                </div>
+                <div class="crew-card-bottom">
+                    <div class="crew-card-badges">
+                        <lml:foreach var="badge" in="member.badges" wrapper="span">
+                            <lml:class classes="badge.classes" tag="i">
+                            </lml:class>
+                        </lml:foreach>
                     </div>
                 </div>
             </div>

@@ -19,9 +19,13 @@ class Crew {
 
     adminGET(cli) {
         let action = cli.routeinfo.path[2];
+        let extra = {
+            ds : require('./badges.js').getDecorationSettings()
+        };
+
         switch(action) {
             case undefined:
-                filelogic.serveAdminLML3(cli);
+                filelogic.serveAdminLML3(cli, false, extra);
                 break;
 
             default:
@@ -63,6 +67,21 @@ class Crew {
 
                 items[i].articles = 0;
                 items[i].personality = personalities[items[i].personality || "none"];
+
+                let badges = [];
+                for (let j = 0; j < items[i].badges.length; j++) {
+                    let b = items[i].badges[j];
+                    let bi = ds.DEFAULT_BADGES_ASSOC[b.slug];
+                    badges.push({
+                        classes : "fa " + bi.icon + " level-" + b.level,
+                        displayname : bi.displayname,
+                        reason : bi.reason.replace("<n>", bi.levels[b.level]),
+                        title : ds.BADGE_LEVEL_TEXT[b.level],
+                        level : b.level
+                    });
+                }
+
+                items[i].badges = badges;
             }
 
             let siteIndex = -1;
