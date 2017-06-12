@@ -88,6 +88,7 @@ class Crew {
                 assoc[items[i]._id] = items[i];
 
                 items[i].articles = 0;
+                items[i].shares = 0;
                 items[i].personality = personalities[items[i].personality || "none"];
 
                 let networks = [];
@@ -129,17 +130,14 @@ class Crew {
                 if (++siteIndex != sites.length) {
                     db.join(sites[siteIndex], 'content', [
                         { $match : { status : "published" } },
-                        { $project : { author : 1} },
-                        { $group : { _id : "$author", articles : { $sum : 1 } } }
+                        { $project : { author : 1, shares : 1 } },
+                        { $group : { _id : "$author", articles : { $sum : 1 }, fbshares : { $sum : "$shares" } } }
                     ], (counts) => {
                         for (let i = 0; i < counts.length; i++) {
                             let obj = assoc[counts[i]._id];
                             if (obj) {
-                                if (obj.articles) {
-                                    obj.articles += counts[i].articles;
-                                } else {
-                                    obj.articles = counts[i].articles;
-                                }
+                                obj.articles += counts[i].articles;
+                                obj.shares += counts[i].fbshares;
                             }
                         }
 
