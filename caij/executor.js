@@ -35,7 +35,7 @@ class RunningTask {
             return sendback();
         }
 
-        const FBMax = 1500;
+        const FBMax = 500;
         if (!this.stats.fb) { this.stats.fb = 0; }
         const _c = this._c;
         const that = this;
