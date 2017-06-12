@@ -746,7 +746,9 @@ var replaceInterlinks = function(_c, article, sendback) {
         var links = window.document.querySelectorAll('a');
         var toInterlink = [];
 
-        links.forEach(a => {
+        for (var i = 0; i < links.length; i++) {
+            var a = links[i];
+
             if (a.href.includes(_c.server.url)) {
                 var urlSplit = a.href.toString().split('/');
                 var nameOrIndex = urlSplit.pop();
@@ -759,7 +761,7 @@ var replaceInterlinks = function(_c, article, sendback) {
                     toInterlink.push({elem : a, name : nameOrIndex});
                 }
             }
-        });
+        }
 
         var finishUp = function() {
             article.content = window.document.body.innerHTML;
