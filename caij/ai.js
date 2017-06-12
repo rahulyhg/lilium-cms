@@ -13,6 +13,7 @@ const Knowledge = {
 
     homepageDelai : 1000 * 60 * 30,
     sitemapDelai : 1000 * 60 * 60,
+    facebookDelai : 1000 * 60 * 10,
     sendEmailAt : "00:15:00"
 };
 
@@ -84,13 +85,27 @@ class AI {
             });
         };
 
+        let createFacebookTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "storeFacebookShares",
+                    extra : {
+                        origin : "AI",
+                        _c : _c
+                    }
+                });
+            });
+        };
+
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
+        ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
         ai.statsemailInterval = require('../scheduler.js').schedule("CAIJ_StatEmail_Networkwide", {
             runat : Knowledge.sendEmailAt
         }, createStatsEmailTask).start();
 
         createHomepageTask();
+        createFacebookTask();
     }
 
     error(err) {
