@@ -736,6 +736,56 @@ var serveHomepageAPI = function(cli) {
     });
 }
 
+var replaceInterlinks = function(_c, article, sendback) {
+    var anchorIndex = 1;
+    while (article.content.indexOf("<lml-page") != -1) {
+        article.content = article.content.replace("<lml-page></lml-page>", '<div id="page-'+(++anchorIndex)+'"></div>');
+    }
+
+    require('jsdom').env(article.content, function(error, window) {
+        var links = window.document.querySelectorAll('a');
+        var toInterlink = [];
+
+        links.forEach(a => {
+            if (a.href.includes(_c.server.url)) {
+                var urlSplit = a.href.toString().split('/');
+                var nameOrIndex = urlSplit.pop();
+                var newref;
+
+                if (!isNaN(nameOrIndex)) {
+                    newref = "#page-" + nameOrIndex
+                    a.href = newref;
+                } else {
+                    toInterlink.push({elem : a, name : nameOrIndex});
+                }
+            }
+        });
+
+        var finishUp = function() {
+            article.content = window.document.body.innerHTML;
+            sendback(article);
+        };
+
+        iin = -1;
+        var nextInterlink = function() {
+            if (++iin == toInterlink.length) {
+                finishUp();
+            } else {
+                db.findUnique(_c, 'content', {name : toInterlink[iin].name}, (err, article) => {
+                    if (article) {
+                        toInterlink[iin].elem.href = "#" + article._id;
+                        toInterlink[iin].elem.classList.add("lilium-interlink");
+                    }
+
+                    nextInterlink();
+                }, {_id : 1});
+            }
+        };
+
+        nextInterlink();
+    });
+}
+
 var serveReadAPI = function(cli) {
     var id = db.mongoID(cli.routeinfo.path[2]);
     if (id) {
@@ -743,15 +793,20 @@ var serveReadAPI = function(cli) {
             if (article) {
                 let splitIndex = 0;
                 article = Article.toPresentable(cli._c, article);
+
+                /*
                 if (article.isPaginated) {
                     splitIndex = parseInt(cli.routeinfo.path[3] || 1) - 1;
                     article.content = article.content.split("<lml-page></lml-page>")[splitIndex];
                     article.currentPage = (splitIndex + 1);
                 }
+                */
 
-                cli.sendJSON({
-                    section : "read",
-                    article
+                replaceInterlinks(cli._c, article, function() {
+                    cli.sendJSON({
+                        section : "read",
+                        article
+                    });
                 });
             } else {
                 cli.throwHTTP(404, undefined, true);
