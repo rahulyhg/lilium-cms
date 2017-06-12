@@ -8,9 +8,11 @@ const BADGE_LOOKUP  = { from : "decorations", localField : "_id", foreignField :
 const LIST_PROJECTION = { 
     displayname : 1, badges : 1, 
     avatarURL : 1, description : 1,
-    badgecount : { "$size": "$badges" },
-    personality : 1
+    personality : 1, socialnetworks : 1,
+    badgecount : { "$size": "$badges" }
 };
+
+const SOCIAL_NETWORKS = entities.getSocialNetworks();
 
 class Crew {
     constructor() {
@@ -87,6 +89,22 @@ class Crew {
 
                 items[i].articles = 0;
                 items[i].personality = personalities[items[i].personality || "none"];
+
+                let networks = [];
+                if (items[i].socialnetworks) {
+                    for (let n in items[i].socialnetworks) {
+                        networks.push({
+                            network : n,
+
+                            link : (SOCIAL_NETWORKS[n].url + items[i].socialnetworks[n]),
+                            color : (SOCIAL_NETWORKS[n].color),
+                            border : (SOCIAL_NETWORKS[n].border),
+                            icon : (SOCIAL_NETWORKS[n].icon)
+                        });
+                    }
+                }
+
+                items[i].socialnetworks = networks;
 
                 let badges = [];
                 for (let j = 0; j < items[i].badges.length; j++) {
