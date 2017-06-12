@@ -171,6 +171,8 @@ var Article = function() {
             featuredimagelink : article.featuredimagelink,
             geolocation : article.geolocation && article.geolocation.split('_'),
             date : article.date,
+            isPaginated : article.content.includes("<lml-page"),
+            totalPages : article.content.split("<lml-page").length,
             isSponsored : article.isSponsored,
             useSponsoredBox : article.useSponsoredBox,
             sponsoredBoxTitle : article.sponsoredBoxTitle,

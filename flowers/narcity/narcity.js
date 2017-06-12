@@ -741,9 +741,17 @@ var serveReadAPI = function(cli) {
     if (id) {
         Article.deepFetch(cli._c, id, function(article) {
             if (article) {
+                let splitIndex = 0;
+                article = Article.toPresentable(cli._c, article);
+                if (article.isPaginated) {
+                    splitIndex = parseInt(cli.routeinfo.path[3] || 1) - 1;
+                    article.content = article.content.split("<lml-page></lml-page>")[splitIndex];
+                    article.currentPage = (splitIndex + 1);
+                }
+
                 cli.sendJSON({
                     section : "read",
-                    article : Article.toPresentable(cli._c, article)
+                    article
                 });
             } else {
                 cli.throwHTTP(404, undefined, true);
