@@ -99,7 +99,7 @@ class RunningTask {
                         let respObj = JSON.parse(resp || {});
 
                         if (respObj.error) {
-                            log('CAIJ', "Facebook Graph Error returned from bulk request : " + respObj.error, 'warn');
+                            log('CAIJ', "Facebook Graph ["+respObj.error.OAuthException+"] returned from bulk request with message : " + respObj.error.message, 'warn');
                             return sendback();
                         }
 
