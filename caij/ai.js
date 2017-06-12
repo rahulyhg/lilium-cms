@@ -13,7 +13,7 @@ const Knowledge = {
 
     homepageDelai : 1000 * 60 * 30,
     sitemapDelai : 1000 * 60 * 60,
-    facebookDelai : 1000 * 60 * 10,
+    facebookDelai : 1000 * 60 * 3,
     sendEmailAt : "00:15:00"
 };
 

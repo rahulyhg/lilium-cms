@@ -96,25 +96,29 @@ class RunningTask {
                         urlString;
 
                     request(urlString, (_1, _2, resp) => {
-                        let respObj = JSON.parse(resp || {});
+                        try {
+                            let respObj = JSON.parse(resp || {});
 
-                        if (respObj.error) {
-                            log('CAIJ', "Facebook Graph ["+respObj.error.OAuthException+"] returned from bulk request with message : " + respObj.error.message, 'warn');
-                            return sendback();
-                        }
-
-                        for (let furl in respObj) {
-                            let graphObj = respObj[furl];
-                            let art = articleAssoc[furl];
-                            let shares = graphObj.share && graphObj.share.share_count || 0;
-
-                            if (art && art.shares != shares) {
-                                art.shares = shares;
-                                art.comments = graphObj.share && graphObj.share.comment_count || 0;
-                                art.updated = true;
-                            } else {
-                                log('CAIJ', 'URL from FB Graph not found in cache : ' + furl, 'warn');
+                            if (respObj.error) {
+                                log('CAIJ', "Facebook Graph ["+respObj.error.OAuthException+"] returned from bulk request with message : " + respObj.error.message, 'warn');
+                                return sendback();
                             }
+
+                            for (let furl in respObj) {
+                                let graphObj = respObj[furl];
+                                let art = articleAssoc[furl];
+                                let shares = graphObj.share && graphObj.share.share_count || 0;
+
+                                if (art && art.shares != shares) {
+                                    art.shares = shares;
+                                    art.comments = graphObj.share && graphObj.share.comment_count || 0;
+                                    art.updated = true;
+                                } else {
+                                    log('CAIJ', 'URL from FB Graph not found in cache : ' + furl, 'warn');
+                                }
+                            }
+                        } catch (ex) {
+                            log('CAIJ', 'Caught exception while parsing Graph response : ' + ex, 'warn');
                         }
 
                         saveCounts(articles);
