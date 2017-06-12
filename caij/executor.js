@@ -35,13 +35,13 @@ class RunningTask {
             return sendback();
         }
 
-        const FBMax = 500;
+        const FBMax = 50;
         if (!this.stats.fb) { this.stats.fb = 0; }
         const _c = this._c;
         const that = this;
 
         const saveCounts = (articles) => {
-            this.stats.fb += FBMax;
+            this.stats.fb += articles.length;
             let saveIndex = -1;
             let nextSave = () => {
                 if (++saveIndex == articles.length) {
