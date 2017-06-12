@@ -97,6 +97,12 @@ class RunningTask {
 
                     request(urlString, (_1, _2, resp) => {
                         let respObj = JSON.parse(resp || {});
+
+                        if (respObj.error) {
+                            log('CAIJ', "Facebook Graph Error returned from bulk request : " + respObj.error, 'warn');
+                            return sendback();
+                        }
+
                         for (let furl in respObj) {
                             let graphObj = respObj[furl];
                             let art = articleAssoc[furl];
