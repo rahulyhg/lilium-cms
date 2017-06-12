@@ -593,6 +593,10 @@ select {
 }
 
 /* LML Bunch default style */
+lml\:bunch {
+    display: none;
+}
+
 .bunch-filters {
     border-bottom: 1px solid #DDD;
     background-color: #FCFCFC;

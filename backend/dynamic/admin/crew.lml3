@@ -9,53 +9,79 @@ const settings = {
 }; 
 
 const preload = (context, done) => {
+    let spin = context.ds.HUE_SPIN;
+    context.css = "<style>";
+
+    for (let i = 1; i <= context.ds.BADGE_LEVEL_TEXT.length; i++) {
+        context.css += ` .level-${i} { filter: hue-rotate(${spin*i}deg); } `;
+    }
+
     context.libs.fileio.readFile(context.workdir + "/crew.css", (ctn) => {
-        context.css = `<style>${ctn}</style>`;
+        context.css += ` ${ctn}</style>`;
         done();
     }, false, 'utf8');
 };
 
-// HTML snips for clearer compilation logic
 const compile = (o, context) => {
-    o(context.header, context.css);
+    o(context.header, context.css, `
 
-    o(`<lml:bunch>
-    <lml:bunchfilters>
-        <div class="bunch-filters">
-            <div class="bunch-filters-title">FILTERS</div>
-            <label>Search</label>
-            <input type="text" name="search" placeholder="Username, Name, Email" />
-        </div>
-    </lml:bunchfilters>
-
-    <lml:bunchitem>
-        <div class="crew-member-card">
-            <div class="crew-member">
-                <div class="crew-card-top">
-                    <lml:image src="{member.avatarURL}"></lml:image> 
-                    <h3><lml:text var="member.displayname"></lml:text></h3>
-                </div>
-                <div class="crew-card-middle">
-                    <div>
-                        <i class="fa fa-lightbulb-o" style="font-size:18px;"></i> 
-                        <lml:text var="member.personality.displayname"></lml:text> personality
-                    </div>
-                    <div>
-                        <i class="fa fa-paper-plane"></i> 
-                        <lml:text var="member.articles"></lml:text> Articles published
-                    </div>
-                </div>
+    <lml:bunch>
+        <lml:bunchfilters>
+            <div class="bunch-filters">
+                <div class="bunch-filters-title">FILTERS</div>
+                <label>Search</label>
+                <input type="text" name="search" placeholder="Username, Name, Email" />
             </div>
-        </div>
-    </lml:bunchitem>
+        </lml:bunchfilters>
 
-    <script type="lmljson" name="chainsbunch">
-        {
-            "datasource" : "crew.bunch",
-            "loopvar" : "member"
-        }
+        <lml:bunchitem>
+            <div class="crew-member-card">
+                <lml:link href="${context._c.server.url}/admin/crew/view/{member._id}">
+                    <div class="crew-member">
+                        <div class="crew-card-top">
+                            <lml:image src="{member.avatarURL}"></lml:image> 
+                            <h3><lml:text var="member.displayname"></lml:text></h3>
+                        </div>
+                        <div class="crew-card-middle">
+                            <lml:filter if="hasSelectedPerso">
+                                <div>
+                                    <i class="fa fa-lightbulb-o" style="font-size:18px;"></i> 
+                                    <lml:text var="member.personality.displayname"></lml:text> personality
+                                </div>
+                            </lml:filter>
+                            <lml:filter if="hasArticles">
+                                <div>
+                                    <i class="fa fa-paper-plane"></i> 
+                                    <lml:text var="member.articles"></lml:text> Articles published
+                                </div>
+                            </lml:filter>
+                        </div>
+                        <div class="crew-card-bottom">
+                            <div class="crew-card-badges">
+                                <lml:foreach var="badge" in="member.badges" wrapper="span">
+                                    <lml:class classes="badge.classes" tag="i">
+                                    </lml:class>
+                                </lml:foreach>
+                            </div>
+                        </div>
+                    </div>
+                </lml:link>
+            </div>
+        </lml:bunchitem>
+
+        <script type="lmljson" name="chainsbunch">
+            {
+                "datasource" : "crew.bunch",
+                "loopvar" : "member"
+            }
+        </script>
+    </lml:bunch>
+    <script>
+        window.hasArticles = function(__, ldContext) { return ldContext.member.articles != 0; }
+        window.hasSelectedPerso = function(__, ldContext) { return ldContext.member.personality.code != "none"; }
     </script>
-    </lml:bunch>`);
+
+    `);
 };
 
 module.exports = { settings, preload, compile };

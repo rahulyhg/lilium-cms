@@ -2,14 +2,26 @@
     height: 70px;
     width: 70px;
     object-fit: contain;
-    border-radius: 50px;
+    border-radius: 35px;
     border: 5px solid #FFF;
 
     position: absolute;
-    top: 15px;
-    left: 15px;
+    top: 10px;
+    left: 10px;
 
     z-index: 5;
+
+    box-shadow: 0px 0px 0px 3px rgb(243, 243, 243);
+
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+}
+
+.crew-member-card:hover .crew-card-top img {
+    border-radius : 0px;
 }
 
 .crew-card-top h3 {
@@ -35,6 +47,18 @@
     border: 1px solid #EEE;
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.08);
     position: relative;
+
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+
+    cursor: pointer;
+}
+
+.crew-member-card:hover {
+    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
 }
 
 .crew-card-top {
@@ -53,6 +77,8 @@
     top: 55px;
     right: 5px;
     color: #777;
+
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.5);
 }
 
 .crew-card-middle .fa {
@@ -61,3 +87,34 @@
     width: 14px;
     text-align: center;
 }
+
+.crew-card-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #FFF;
+}
+
+.crew-card-badges span {
+    display: inline-block;
+}
+
+.crew-card-badges i {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    text-align: center;
+    background-color: #3b9a9a;
+    margin: 1px;
+    padding: 3px 0px;
+    border: 1px solid #1b7a7a;
+    border-radius: 3px;
+}
+
+.crew-member-card a {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
