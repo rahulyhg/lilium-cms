@@ -114,7 +114,7 @@ class RunningTask {
                                     art.comments = graphObj.share && graphObj.share.comment_count || 0;
                                     art.updated = true;
                                 } else {
-                                    log('CAIJ', 'URL from FB Graph not found in cache : ' + furl, 'warn');
+                                    log('CAIJ', 'Skipping URL from FB : ' + furl);
                                 }
                             }
                         } catch (ex) {

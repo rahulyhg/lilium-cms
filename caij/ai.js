@@ -3,17 +3,24 @@ const executor = require('./executor.js');
 
 const log = require('../log.js');
 
+const oneSecond = 1000;
+const oneMinute = oneSecond * 60;
+const halfHour = oneMinute * 30;
+const oneHour = oneMinute * 60;
+const halfDay = oneHour * 12;
+const oneDay = oneHour * 24;
+
 const Knowledge = {
-    queueMaxSize : 25,
+    queueMaxSize : 100,
     cacheDept : 1000,
     janitorJobs : executor.getJanitorJobs(),
     janitorSites : executor.getJanitorSites(),
     cpuCap : 80,
     cooldown : 10,
 
-    homepageDelai : 1000 * 60 * 30,
-    sitemapDelai : 1000 * 60 * 60,
-    facebookDelai : 1000 * 60 * 3,
+    homepageDelai : halfHour,
+    sitemapDelai : oneHour,
+    facebookDelai : oneMinute * 3,
     sendEmailAt : "00:15:00"
 };
 
