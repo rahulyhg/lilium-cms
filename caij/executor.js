@@ -102,10 +102,12 @@ class RunningTask {
                             let art = articleAssoc[furl];
                             let shares = graphObj.share && graphObj.share.share_count || 0;
 
-                            if (art.shares != shares) {
+                            if (art && art.shares != shares) {
                                 art.shares = shares;
                                 art.comments = graphObj.share && graphObj.share.comment_count || 0;
                                 art.updated = true;
+                            } else {
+                                log('CAIJ', 'URL from FB Graph not found in cache : ' + furl, 'warn');
                             }
                         }
 
