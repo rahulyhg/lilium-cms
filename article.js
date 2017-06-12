@@ -147,6 +147,7 @@ var Article = function() {
         var topic;
         if (article.topic) {
             topic = {
+                id : article.topic._id,
                 displayname : article.topic.displayname,
                 slug : article.topic.slug,
                 completeSlug : article.topic.completeSlug
@@ -157,6 +158,7 @@ var Article = function() {
         if (article.authors && article.authors[0]) {
             author = article.authors[0];
             author = {
+                id : author._id,
                 displayname : author.displayname,
                 avatarURL : author.avatarURL,
                 slug : author.slug
