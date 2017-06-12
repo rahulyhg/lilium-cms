@@ -1,0 +1,23 @@
+const settings = {
+    livevars : [{name : "crew.single.{?1}"}],
+    lmldom : {
+        features : ["fullwidth"],
+        v:1.0
+    }
+};
+
+const preload = (context, done) => {
+    done();
+};
+
+const markup = `<div id="single-crew">
+
+    
+    
+</div>`;
+
+const compile = (o, context) => {
+    o(context.header);
+};
+
+module.exports = { settings, preload, compile };

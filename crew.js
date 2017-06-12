@@ -4,7 +4,7 @@ const filelogic = require('./filelogic.js');
 const config = require('./config.js');
 const entities = require('./entities.js');
 
-const BADGE_LOOKUP = { from : "decorations", localField : "_id", foreignField : "entity", as : "badges" };
+const BADGE_LOOKUP  = { from : "decorations", localField : "_id", foreignField : "entity", as : "badges" };
 const LIST_PROJECTION = { 
     displayname : 1, badges : 1, 
     avatarURL : 1, description : 1,
@@ -28,6 +28,14 @@ class Crew {
                 filelogic.serveAdminLML3(cli, false, extra);
                 break;
 
+            case "view":
+                if (cli.routeinfo.path.length < 4) {
+                    cli.throwHTTP(404);
+                } else {
+                    filelogic.serveAdminLML3(cli, true, extra);
+                }
+                break;
+
             default:
                 cli.throwHTTP(404);
         }
@@ -37,10 +45,18 @@ class Crew {
     
     }
 
+    getCrewMember(id, send) {
+        this.getCrewList({
+            _id : id
+        }, (user) => {
+            send(user.items.pop());
+        });
+    }
+
     getCrewList(query = {}, send) {
         const ds = require('./badges.js').getDecorationSettings();
         const personalities = entities.getPersonalities();
-        const $match = {
+        let $match = {
             revoked : {$ne : true}
         };
 
@@ -53,6 +69,10 @@ class Crew {
                     { username : regex }
                 ];
             }
+        }
+
+        if (query._id) {
+            $match = {_id : query._id};
         }
         
         db.join(config.default(), 'entities', [
@@ -107,13 +127,7 @@ class Crew {
                         nextSite();
                     });
                 } else {
-                    send({ 
-                        badges : ds.DEFAULT_BADGES_ASSOC, 
-                        levels : ds.BADGE_LEVEL_TEXT,
-                        huespin : ds.HUE_SPIN, 
-
-                        items 
-                    });
+                    send({ badges : ds.DEFAULT_BADGES_ASSOC, levels : ds.BADGE_LEVEL_TEXT, huespin : ds.HUE_SPIN, items });
                 }
             };
 
@@ -126,6 +140,10 @@ class Crew {
         switch (lvl) {
             case "bunch":
                 this.getCrewList(params, send);
+                break;
+
+            case "single":
+                this.getCrewMember(db.mongoID(levels[1] || ""), send);
                 break;
 
             default:
