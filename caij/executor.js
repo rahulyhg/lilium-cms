@@ -41,7 +41,7 @@ class RunningTask {
         const that = this;
 
         const saveCounts = (articles) => {
-            this.stats.fb += articles.length;
+            this.stats.fb += FBMax;
             let saveIndex = -1;
             let nextSave = () => {
                 if (++saveIndex == articles.length) {
