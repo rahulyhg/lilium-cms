@@ -81,9 +81,11 @@ class RunningTask {
                     let urlString = "";
                     let articleAssoc = [];
                     articles.forEach(a => {
-                        a.url = _c.server.protocol + _c.server.url + "/" + topicAssoc[a.topic].completeSlug + "/" + a.name;
-                        urlString += (urlString?",":"") + a.url;
-                        articleAssoc[a.url] = a;
+                        if (topicAssoc[a.topic]) {
+                            a.url = _c.server.protocol + _c.server.url + "/" + topicAssoc[a.topic].completeSlug + "/" + a.name;
+                            urlString += (urlString?",":"") + a.url;
+                            articleAssoc[a.url] = a;
+                        }
                     });
 
                     urlString = "https://graph.facebook.com/v" + 
