@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {#config;theme;extra;debug}
-<html id="lmlhtml" data-htmltype="lml" data-generated="true" data-cachehit="true" lang="{=extra.language}">
+<html id="lmlhtml" data-markuptype="lml" data-generator="lilium" data-generated="true" data-cachehit="true" lang="{=extra.language}">
 <head id="lmlhead">
     {%petals/meta}
     {%petals/headstyle}

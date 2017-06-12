@@ -97,7 +97,8 @@ class Crew {
                         displayname : bi.displayname,
                         reason : bi.reason.replace("<n>", bi.levels[b.level]),
                         title : ds.BADGE_LEVEL_TEXT[b.level],
-                        level : b.level
+                        level : b.level,
+                        on : b.on
                     });
                 }
 
