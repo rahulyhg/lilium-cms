@@ -147,6 +147,7 @@ var Article = function() {
         var topic;
         if (article.topic) {
             topic = {
+                id : article.topic._id,
                 displayname : article.topic.displayname,
                 slug : article.topic.slug,
                 completeSlug : article.topic.completeSlug
@@ -157,6 +158,7 @@ var Article = function() {
         if (article.authors && article.authors[0]) {
             author = article.authors[0];
             author = {
+                id : author._id,
                 displayname : author.displayname,
                 avatarURL : author.avatarURL,
                 slug : author.slug
@@ -171,6 +173,8 @@ var Article = function() {
             featuredimagelink : article.featuredimagelink,
             geolocation : article.geolocation && article.geolocation.split('_'),
             date : article.date,
+            isPaginated : article.content.includes("<lml-page"),
+            totalPages : article.content.split("<lml-page").length,
             isSponsored : article.isSponsored,
             useSponsoredBox : article.useSponsoredBox,
             sponsoredBoxTitle : article.sponsoredBoxTitle,
