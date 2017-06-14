@@ -160,6 +160,7 @@ var Article = function() {
             author = {
                 id : author._id,
                 displayname : author.displayname,
+                bio : author.description,
                 avatarURL : author.avatarURL,
                 slug : author.slug
             };
@@ -315,12 +316,6 @@ var Article = function() {
                 cb(false, new Error("No article found"));
             } else {
                 var article = arr[0];
-                /*
-                var titlekeywords = (arr[0].title || art[0].name).replace(/[^a-zA-Z\s]/g, '').split( ' ' ).filter(function ( str ) {
-                    var word = str.match(/(\w+)/);
-                    return word && word[0].length > 3;
-                }).join( ' ' );
-                */
                 db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, function(err, col) {
                     col.aggregate([{
                         $match : {
@@ -328,28 +323,15 @@ var Article = function() {
                                 $lt : article._id
                             }, 
                             topic : article.topic,
-                            /*$text : { 
-                                $search : titlekeywords
-                            },
-                            $and : [
-                                {date : {$gt : new Date(new Date(article.date).getTime() - (1000 * 60 * 60 * 24 * 31 * 6) )}},
-                                {date : {$lt : new Date(article.date)}}
-                            ],*/
                             status : "published",
                         }
                     },{
-                        // Sort content by what matches the highest
                         $sort : { 
-                            /*score: { 
-                                $meta: "textScore" 
-                            },*/
                             date : -1 
                         }
                     },{
-                        // Only one related
                         $limit : 1
                     },{
-                        // Get featured image 
                         $lookup : {
                             from:           "uploads",
                             localField:     "media",

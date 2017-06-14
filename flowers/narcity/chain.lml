@@ -1,0 +1,10 @@
+{#config;extra;slug;theme;debug;date}
+{$
+    featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
+    author = extra.article.authors.0;
+    postdate = extra.article.date;
+    formatdate = date.stringify(postdate);
+    topic = extra.article.topic;
+$}
+
+

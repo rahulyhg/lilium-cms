@@ -1,6 +1,7 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
 const filelogic = require('./filelogic.js');
+const articleLib = require('./article.js');
 const noop = () => {};
 
 class ContentChains {
@@ -49,17 +50,26 @@ class ContentChains {
         let that = this;
         id = db.mongoID(id);
         db.update(_c, 'contentchains', {_id : id}, chainData, () => {
-            if (chainData.status) {
-                that.handleStatusChange.apply(that, [_c, id, callback]);
-            } else {
-                callback && callback();
-            }
+            callback && callback();
         });
     }
 
     deepFetch(_c, chainid, send) {
-        db.findUnique(_c, 'contentchains', {_id : db.mongoID(chainid)}, (err, item) => {
-            send(item);
+        db.join(_c, 'contentchains', [ 
+            { 
+                $match : { _id : db.mongoID(chainid) }
+            }, { 
+                $limit : 1
+            }, {
+                $lookup : {
+                    from : "uploads",
+                    localField : "media",
+                    foreignField : "_id",
+                    as : "featuredimage"
+                }
+            }
+        ], (item) => {
+            send(item[0]);
         });
     }
 
@@ -161,13 +171,45 @@ class ContentChains {
         } else if (path == "edit") {
             this.editChain(cli._c, cli.routeinfo.path[3], cli.postdata.data, (error) => {
                 cli.sendJSON({
+                    message : "Content chain saved",
                     success : !error,
                     error 
+                });
+            });
+        } else if (path == "live") {
+            let updatedData = cli.postdata.data;
+            updatedData.status = "live";
+
+            this.editChain(cli._c, cli.routeinfo.path[3], updatedData, (error) => {
+                cli.sendJSON({
+                    title : "Generating content chain.",
+                    message : "Content chain was saved successfully, and Lilium is currently generating the content chain.",
+                    success : !error,
+                    error 
+                });
+
+                this.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
                 });
             });
         } else {
             cli.throwHTTP(404, undefined, true);
         }
+    }
+
+    generateChain(_c, strID, callback) {
+        this.deepFetch(_c, strID, df => {
+            articleLib.batchFetch(_c, df.serie, articles => {
+                let id = df._id;
+                let extra = {
+                    config : _c,
+                    chain : df,
+                    articles : articles
+                };
+                
+                let landingPath = _c.server.html + "/" + df.slug + ".html";
+                filelogic.renderThemeLML(_c, 'chain', landingPath, extra, callback);
+            });
+        });
     }
 
     form(cli) {
@@ -225,7 +267,12 @@ class ContentChains {
             datetime : true,
             context : 'edit'
         }, {
-            require : false
+            required : false
+        })
+        .add('slug', 'text', {
+            displayname : "URL slug"
+        }, {
+            required : false   
         })
         .add('title-actions', 'title', {
             displayname : "Actions"
