@@ -276,6 +276,18 @@ var Entities = module.exports = new function () {
         }
     };
 
+    this.toPresentable = function(entity) {
+        return {
+            displayname : entity.displayname,
+            slug : entity.slug,
+            id : entity._id,
+            socialnetworks : entity.socialnetworks,
+            bio : entity.description,
+            title : entity.jobtitle,
+            avatarURL : entity.avatarURL
+        };
+    };
+
     this.commitfbauth = function(cli) {
         db.update(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, {fbid : cli.postdata.data.fbid}, function() {
             cli.sendJSON({done : true});

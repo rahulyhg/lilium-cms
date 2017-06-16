@@ -819,10 +819,64 @@ var serveReadAPI = function(cli) {
     }
 };
 
-var serveTopicAPI = function(cli) {
-    var id = db.mongoID(cli.routeinfo.path[2]);
-    if (cli.routeinfo.path.length > 2) {
+const AUTHOR_PAGE_LIMIT = 20;
+var serveAuthorAPI = function(cli) {
+    var _id = db.mongoID(cli.routeinfo.path[2]);
+    var page = cli.routeinfo.path[3] || 1;
+    if (_id) {
+        db.findUnique(cc.default(), 'entities', {_id}, (err, author) => {
+            if (!author) {
+                return cli.throwHTTP(404, undefined, true);
+            }
 
+            db.find(cli._c, 'content', {author : _id, status : "published"}, [], (err, cur) => {
+                cur.project({_id : 1})
+                    .sort({date : -1})
+                    .skip(AUTHOR_PAGE_LIMIT * (page-1))
+                    .limit(AUTHOR_PAGE_LIMIT)
+                    .toArray(
+                (err, articles) => {
+                    Article.batchFetch(cli._c, articles.map(a => a._id), (list) => {
+                        list = Article.toPresentables(cli._c, list);
+                        cli.sendJSON({
+                            section : "author",
+                            articles : list,
+                            author : entities.toPresentable(author)
+                        });
+                    });
+                });
+            });
+        });
+    } else {
+        cli.throwHTTP(404, undefined, true);
+    }
+};
+
+var serveTopicAPI = function(cli) {
+    var _id = db.mongoID(cli.routeinfo.path[2]);
+    if (cli.routeinfo.path.length > 2) {
+        db.findUnique(cli._c, "topics", {_id}, (err, topic) => {
+            topics.getFamilyIDs(cli._c, _id, family => {
+                db.findToArray(cc.default(), 'entities', {}, (err, authors) => {
+                    let aAssoc = {};
+                    authors.forEach(x => {
+                        aAssoc[x._id] = x;
+                    });
+
+                    db.findToArray(cli._c, 'content', {topic : {$in : family}}, (err, arr) => {
+                        arr.forEach(a => {
+                            a.authors = [aAssoc[a.author]];
+                        });
+
+                        let articles = Article.toPresentables(cli._c, arr);
+                        cli.sendJSON({
+                            section : "topic",
+                            topic, articles
+                        });
+                    });
+                });
+            });
+        });
     } else {
         db.findToArray(cli._c, 'topics', {}, function(err, arr) {
             cli.sendJSON({
@@ -860,6 +914,7 @@ var loadHooks = function(_c, info) {
     API.registerApiEndpoint(_c.id + 'homepage', 'GET', serveHomepageAPI);
     API.registerApiEndpoint(_c.id + 'read', 'GET', serveReadAPI);
     API.registerApiEndpoint(_c.id + 'topic', 'GET', serveTopicAPI);
+    API.registerApiEndpoint(_c.id + 'author', 'GET', serveAuthorAPI);
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
         sharedcache.get("narcityhomepage_" + _c.id, function(resp) {
