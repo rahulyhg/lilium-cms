@@ -1,6 +1,42 @@
-var Cakepop = function() {
-    this.checkForNew = function() {
+var CAKEPOP_ALLOWED_ACTIONS = {
+    "send" : { displayname : "Send", action : "send" },
+    "dismiss" : { displaylane : "Dismiss", action : "dismiss" }
+};
 
+var Cakepop = function() {
+    var self = this;
+    this.checkForNew = function() {
+        
+    };
+
+    this.collectAndSend = function(nodata) {
+        
+    };
+
+    this.handleAction = function(e) {
+        var actionname = e.target.dataset.action;
+
+        if (actionname == "send") {
+            self.collectAndSend();
+        } else {
+            self.collectAndSend(false);
+        }
+    };
+
+    this.createActionButton = function(act) {
+        if (act) {
+            var actionname = act.action;
+            var displayname = act.displayname;
+
+            var button = document.createElement('button');
+            button.textContent = displayname;
+            button.dataset.action = actionname;
+            button.className = "cakepop-action cakepop-action-" + actionname;
+
+            button.addEventListener('click', this.handleAction);
+
+            return button;
+        }
     };
     
     this.fill = function(popobj) {
@@ -8,8 +44,12 @@ var Cakepop = function() {
         var actions = document.getElementById("cakepop-actions");
         document.getElementById("cakepop-content").innerHTML = popobj.content;
         
+        while (actions.firstElementChild) { actions.firstElementChild.remove(); }
         if (popobj.actions) for (var i = 0; i < popobj.actions; i++) {
-            
+            var act = this.createActionButton( CAKEPOP_ALLOWED_ACTIONS[ popobj.actions[i] ] );
+            if (act) {
+                actions.appendChild(act);
+            }
         }
 
         var cardheight = card.getBoundingClientRect().height;
