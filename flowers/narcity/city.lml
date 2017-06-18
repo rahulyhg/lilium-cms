@@ -34,8 +34,7 @@
                 <div class="{=la.classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
                         <a href="{=la.url}">
-                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
-                                srcset="{=la.featuredimage.0.sizes.thumbnaillarge.url} 600w, {=la.featuredimage.0.sizes.thumbnailarchive.url} 380w"
+                            <img src="{=la.imgsrc}"
                                 alt="{=&la.title}"
                              />
                             {$ if (?la.isSponsored ??); $}

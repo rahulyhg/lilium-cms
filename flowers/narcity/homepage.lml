@@ -33,8 +33,7 @@
                 <div class="{=la.classes}" id="art{=la._id}">
                     <div class="article-thumbnail-featured-image">
                         <a href="{=la.url}">
-                            <img src="{=la.featuredimage.0.sizes.thumbnaillarge.url}"
-                                srcset="{=la.featuredimage.0.sizes.thumbnaillarge.url} 600w, {=la.featuredimage.0.sizes.thumbnailarchive.url} 380w"
+                            <img src="{=la.imgsrc}"
                                 alt="{=&la.title}"
                              />
                             {$ if (?la.isSponsored ??); $}
@@ -123,7 +122,7 @@
                 <a href="{=sa.url}" id="art{=sa._id}">
                     <div class="{=sa.classes}">
                         <div class="article-thumbnail-featured-image">
-                            <img src="{=sa.featuredimage.0.sizes.thumbnaillarge.url}" />
+                            <img src="{=sa.imgsrc}" />
                             <div class="article-share-count-mobile" id="article-share-count-mobile-{=sa._id}">
                                 <span class="article-share-icon">
                                     <img src="{=config.default.server.url}/res/images/flame.png" />

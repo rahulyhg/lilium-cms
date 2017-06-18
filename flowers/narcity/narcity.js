@@ -130,8 +130,10 @@ var fetchHomepageArticles = function(_c, cb, page) {
                     arr[j].classes = "article-thumbnail";
                     if ((9 - j) % 9 == 0) {
                         arr[j].classes += " article-thumbnail-featured"
+                        arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnaillarge.url;
                     } else if ((j + 1) % 9 > 3) {
                         arr[j].classes += " article-thumbnail-margined"
+                        arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnailarchive.url;
                     }
                 }
 
@@ -177,8 +179,10 @@ var fetchHomepageArticles = function(_c, cb, page) {
                     latests[j].classes = "article-thumbnail";
                     if ((9 - j) % 9 == 0) {
                         latests[j].classes += " article-thumbnail-featured"
+                        latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnaillarge.url;
                     } else if ((j + 1) % 9 > 3) {
                         latests[j].classes += " article-thumbnail-margined"
+                        latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnailarchive.url;
                     }
                 }
 
@@ -331,6 +335,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 var topic = arrList[i].topic[0];
                 arrList[i].topic = topic;
                 arrList[i].url = cli._c.server.protocol + cli._c.server.url + (topic ? "/" + topic.completeSlug : "") + "/" + arrList[i].name;
+                arrList[i].imgsrc = cli._c.server.protocol + arrList[i].featuredimage[0].sizes.thumbnailarchive.url;
             }
 
             cb(err || archTypeRes[0], arrList, totalArticles, indices);
@@ -497,6 +502,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                                 arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
                                 arr[i].topic = topicObjects[arr[i].topic];
                                 arr[i].url = conf.server.protocol + conf.server.url + "/" + arr[i].topic.completeSlug + "/" + arr[i].name;
+                                arr[i].imgsrc = conf.server.protocol + arr[i].featuredimage[0].sizes.thumbnailarchive.url;
 
                                 arr[i].classes = "article-thumbnail";
                                 if ((9 - i) % 9 == 0) {
