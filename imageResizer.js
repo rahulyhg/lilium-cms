@@ -47,8 +47,13 @@ var ImageResizer = function () {
 
                 var queue = gm(buffer, currentFilename)
                 .resize(width, height, "^")
-                .gravity('Center')
-                .quality(80);
+                .gravity('Center');
+
+                if (extension == "jpg" || extension == "jpeg") {
+                    queue.quality(50);
+                } else if (extension == "png") {
+                    queue.quality(90).colors(254);
+                }
 
                 if (width && height) {
                     queue.crop(width, height, '!')
@@ -65,7 +70,7 @@ var ImageResizer = function () {
                     images[key].width = width || "relative";
                     images[key].height = height || "relative";
 
-                  execute(buffer, i - 1, _c, cb, extension, sizeKeys, imageSizes, images, currentFilename, fileName);
+                    execute(buffer, i - 1, _c, cb, extension, sizeKeys, imageSizes, images, currentFilename, fileName);
                 });
             } else {
             return cb(images)

@@ -101,6 +101,7 @@
     "sendgrid": "^2.0.0",
     "sesh": "^0.1.0",
     "session": "^0.1.0",
+    "sharp": "^0.18.1",
     "simple-encryptor": "^1.1.0",
     "simple-oauth2": "^0.7.0",
     "slug": "^0.9.1",
