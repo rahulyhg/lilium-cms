@@ -178,12 +178,13 @@ var fetchHomepageArticles = function(_c, cb, page) {
                     latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? "/" + latests[j].topic.completeSlug : "") + "/" + latests[j].name;
 
                     latests[j].classes = "article-thumbnail";
+                    latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnailarchive.url;
+
                     if ((9 - j) % 9 == 0) {
                         latests[j].classes += " article-thumbnail-featured"
                         latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnaillarge.url;
                     } else if ((j + 1) % 9 > 3) {
                         latests[j].classes += " article-thumbnail-margined"
-                        latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnailarchive.url;
                     }
                 }
 
