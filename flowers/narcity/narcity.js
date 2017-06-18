@@ -128,12 +128,13 @@ var fetchHomepageArticles = function(_c, cb, page) {
                     arr[j].url = _c.server.protocol + _c.server.url + sectionTopics[i].completeSlug + "/" + arr[j].name;
 
                     arr[j].classes = "article-thumbnail";
+                    arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnailarchive.url;
+
                     if ((9 - j) % 9 == 0) {
                         arr[j].classes += " article-thumbnail-featured"
                         arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnaillarge.url;
                     } else if ((j + 1) % 9 > 3) {
                         arr[j].classes += " article-thumbnail-margined"
-                        arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnailarchive.url;
                     }
                 }
 
