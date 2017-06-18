@@ -1,0 +1,56 @@
+{#config}
+<div id="cakepop">
+    <div id="cakepop-wrapper">
+        <div id="cakepop-content"></div>
+        <div id="cakepop-actions"></div>
+    </div>
+</div>
+
+<style>
+#cakepop {
+    position: fixed;
+    top:0; bottom:0;
+    left:0; right:0;
+    z-index: 100000;
+
+    background-color: rgba(0, 0, 0, 0.3);
+
+    -webkit-transform: translate3d(0,0,0);
+       -moz-transform: translate3d(0,0,0);
+        -ms-transform: translate3d(0,0,0);
+         -o-transform: translate3d(0,0,0);
+            transform: translate3d(0,0,0);
+
+    -webkit-transition: all 0.2s;
+       -moz-transition: all 0.2s;
+        -ms-transition: all 0.2s;
+         -o-transition: all 0.2s;
+            transition: all 0.2s;
+
+    opacity : 0;
+    display: none;
+
+    overflow-y: auto;
+}
+
+#cakepop.shown {
+    opacity : 1;
+}
+
+#cakepop-wrapper {
+    position: relative;
+    display:block;
+    width: 640px;
+    
+    top: 100px;
+    margin: auto;
+    margin-bottom: 100px;
+
+    background-color: #FFF;
+    border-radius: 4px;
+    overflow: hidden;
+
+    box-shadow: 0 0 10px rgba(0,0,0, 0.35);
+}
+
+</style>

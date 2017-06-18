@@ -1,0 +1,38 @@
+var Cakepop = function() {
+    this.checkForNew = function() {
+
+    };
+    
+    this.fill = function(popobj) {
+        var card = document.getElementById('cakepop-wrapper');
+        var actions = document.getElementById("cakepop-actions");
+        document.getElementById("cakepop-content").innerHTML = popobj.content;
+        
+        if (popobj.actions) for (var i = 0; i < popobj.actions; i++) {
+            
+        }
+
+        var cardheight = card.getBoundingClientRect().height;
+        var screenheight = window.innerHeight;
+        var top = (screenheight / 2) - (cardheight / 2);
+
+        if (top < 100) { top = 100; }
+        card.style.top = top + "px";
+    }; 
+
+    this.cast = function() {
+        var wrap = document.getElementById('cakepop');
+        wrap.style.display = "block";
+        setTimeout(function() {
+            wrap.classList.add('shown');
+        }, 20);
+    };
+
+    this.dismiss = function() {
+        var wrap = document.getElementById('cakepop');
+        wrap.classList.remove('shown');
+        setTimeout(function() {
+            wrap.style.display = "none";
+        }, 200);
+    };
+};

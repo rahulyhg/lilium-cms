@@ -182,8 +182,8 @@ class ContentChains {
 
             this.editChain(cli._c, cli.routeinfo.path[3], updatedData, (error) => {
                 cli.sendJSON({
-                    title : "Generating content chain.",
-                    message : "Content chain was saved successfully, and Lilium is currently generating the content chain.",
+                    title : "Sit tight!",
+                    message : "Content chain was saved successfully, and Lilium is currently generating everything.",
                     success : !error,
                     error 
                 });

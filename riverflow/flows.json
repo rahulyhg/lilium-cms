@@ -363,6 +363,10 @@
             "endpoint" : "amp",
             "support" : ["get"]
         }, {
+            "module" : "cakepop.js",
+            "endpoint" : "cakepop",
+            "support" : ["admin_get", "admin_post", "livevar", "form"]
+        }, {
             "module" : "ipevents.js",
             "endpoint" : "ipevents",
             "support" : ["livevar"]

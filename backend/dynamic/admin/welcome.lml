@@ -60,7 +60,7 @@
 
             <section class="slide-9">
                 <img src="" class="welcome-profile-pic" />
-                <h1>Great shot! Now, let’s choose a password you won’t forget. </h1>
+                <h1>Great shot! Now, let's choose a password you won't forget. </h1>
                 <span class="details no-top">Make sure to include a number and a symbol.</span>
                 <input type="password" id="password" class="opacity0 transiant bouncy no-top" placeholder="Password" />
             </section>
