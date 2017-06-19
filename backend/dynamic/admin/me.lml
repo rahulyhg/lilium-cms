@@ -131,11 +131,13 @@
     window.profile_photo_image_selected = function(elem, img) {
         var imgid = elem.dataset.photoid;
         var imgurl = imgid ? img.sizes.square.url : undefined;
+        var miniurl = imgid ? (img.sizes.mini && img.sizes.mini.url || imgurl) : undefined;
 
         var dat = {
             form_name : "upload_profile_picture",
             imageid : imgid,
-            imageurl : imgurl
+            imageurl : imgurl,
+            miniurl : miniurl
         };
 
         $.post("{=config.default.server.url}/admin/me", dat, function() {

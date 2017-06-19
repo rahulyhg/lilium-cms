@@ -51,6 +51,7 @@ var Entity = function () {
     this.displayname = "";
     this.avatarID = -1;
     this.avatarURL = "";
+    this.avatarMini = "";
     this.createdOn = undefined;
     this.preferences = new Object();
     this.slug = "";
@@ -330,9 +331,10 @@ var Entities = module.exports = new function () {
     this.updateProfilePictureID = function(cli, selff) {
         var imgid = cli.postdata.data.imageid;
         var imgurl = cli.postdata.data.imageurl;
+        var miniurl = cli.postdata.data.miniurl;
 
         if (imgid && imgurl) {
-            db.update(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, {avatarURL : imgurl, avatarID : db.mongoID(imgid)}, function(err, res) {
+            db.update(_c.default(), "entities", {_id : db.mongoID(cli.userinfo.userid)}, {avatarURL : imgurl, avatarMini : miniurl || imgurl, avatarID : db.mongoID(imgid)}, function(err, res) {
                 require('./session.js').reloadSession(cli, function() {
                     cli.sendJSON({
                         imgid : db.mongoID(imgid),
@@ -360,6 +362,7 @@ var Entities = module.exports = new function () {
         imageResizer.resize(cli._c.server.base + "backend/static/uploads/" + filename, filename, ext, cli._c, function(images) {
             var userid = cli.userinfo.userid;
             var avatarURL = images.square.url;
+            var avatarMini = images.mini.url;
             var avatarID = filename.substring(0, filename.lastIndexOf('.'));
 
             cli.did("entity", "picupload");
@@ -367,6 +370,7 @@ var Entities = module.exports = new function () {
                 _id: db.mongoID(userid)
             }, {
                 avatarURL: avatarURL,
+                avatarMini : avatarMini,
                 avatarID: db.mongoID(avatarID)
             }, function(err, result) {
                 images.success = true;
@@ -805,6 +809,7 @@ var Entities = module.exports = new function () {
         delete valObject.createdOn;
         delete valObject.avatarID;
         delete valObject.avatarURL;
+        delete valObject.avatarMini;
 
         db.update(_c.default(), 'entities', {_id : id}, valObject, cb);
     };

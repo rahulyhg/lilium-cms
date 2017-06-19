@@ -1,6 +1,6 @@
 {#config;extra;theme;debug;date}
 
-<script src="{=config.default.server.url}/bower/timeago.js/dist/timeago.js"></script>
+<script src="{=config.default.server.url}/bower/timeago.js/dist/timeago.min.js"></script>
 <script>
     window.lmlhomelinks = [];
 

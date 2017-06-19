@@ -157,6 +157,7 @@ var Core = function () {
     };
 
     var loadImageSizes = function () {
+        imageSize.add("mini", 48, 48);
         imageSize.add("thumbnail", 150, 150);
         imageSize.add("square", 320, 320);
         imageSize.add("content", 640, '*');
