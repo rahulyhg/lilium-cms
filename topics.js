@@ -282,7 +282,7 @@ class LMLTopics {
             db.findUnique(conf, 'topics', {_id}, (err, topic) => {
                 articles.forEach(a => {
                     if (a.featuredimage[0]) {
-                        a.featuredimage = require('./cdn.js').parseOne(conf, a.featuredimage[0].sizes.square && a.featuredimage[0].sizes.square.url || (conf.server.url + "/uploads/" + a.featuredimage[0].url));
+                        a.featuredimage = require('./cdn.js').parseOne(conf, a.featuredimage[0].sizes.thumbnailarchive && a.featuredimage[0].sizes.thumbnailarchive.url || (conf.server.url + "/uploads/" + a.featuredimage[0].url));
                         a.url = conf.server.url + "/" + topic.completeSlug + "/" + a.name;
                         a.media = undefined;
                     } else {

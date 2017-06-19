@@ -160,6 +160,7 @@ var Core = function () {
         imageSize.add("mini", 48, 48);
         imageSize.add("thumbnail", 150, 150);
         imageSize.add("square", 320, 320);
+        imageSize.add("thumbnailarchive", 380, 200);
         imageSize.add("content", 640, '*');
 
         hooks.fire('image_sized_loaded');
