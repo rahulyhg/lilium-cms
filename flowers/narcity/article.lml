@@ -71,7 +71,7 @@ $}
                 </div>
             </div>
             <div class="article-author-face-section">
-                <img src="{=author.avatarURL}" class="article-author-face midvert" />
+                <img src="{=author.avatarMini}" class="article-author-face midvert" />
 
                 <a href="{=url}/author/{=author.slug}" class="article-author-link">
                     <span class="article-author-displayname midvert">{=author.displayname}</span>
@@ -154,7 +154,7 @@ $}
             {$ if (?author.displayname); $}
             <div class="article-signature">
                 <div class="article-signature-face-wrapper">
-                    <img src="{=author.avatarURL}" class="article-signature-face" />
+                    <img src="{=author.avatarMini}" class="article-signature-face" />
                 </div>
                 <div class="article-signature-details-wrapper">
                     <span class="article-signature-name">
