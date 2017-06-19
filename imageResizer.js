@@ -47,6 +47,7 @@ var ImageResizer = function () {
 
                 var queue = gm(buffer, currentFilename)
                 .resize(width, height, "^")
+                .strip()
                 .gravity('Center');
 
                 if (extension == "jpg" || extension == "jpeg") {
