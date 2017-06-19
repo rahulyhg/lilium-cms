@@ -154,7 +154,7 @@ $}
             {$ if (?author.displayname); $}
             <div class="article-signature">
                 <div class="article-signature-face-wrapper">
-                    <img src="{=author.avatarMini}" class="article-signature-face" />
+                    <img src="{=author.avatarURL}" class="article-signature-face" />
                 </div>
                 <div class="article-signature-details-wrapper">
                     <span class="article-signature-name">
