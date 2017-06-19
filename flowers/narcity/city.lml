@@ -68,7 +68,7 @@
                         {=la.subtitle}
                     </div>
                     <div class="article-thumbnail-details">
-                        <img src="{=la.author.avatarURL}" />
+                        <img src="{=la.author.avatarMini}" />
                         <span><a href="{=config.default.server.url}/author/{=la.author.slug}" class="article-thumbnail-author">
                             {=la.author.displayname}
                           </a> &middot; <span class="need_to_be_rendered" datetime="{= la.date }">{= date.stringify(la.date, "short")}</span>
