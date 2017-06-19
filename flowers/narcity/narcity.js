@@ -219,7 +219,7 @@ var fetchHomepageArticles = function(_c, cb, page) {
         }
         
         cacheNextTopic(nextSection);
-    }, {displayname : 1, avatarURL : 1, slug : 1});
+    }, {displayname : 1, avatarURL : 1, avatarMini : 1, slug : 1});
 };
 
 var registerLib = function() {
@@ -719,6 +719,7 @@ var getWhatsHot = function(_c, cb) {
                                 authorname : article.authors[0].displayname,
                                 authorpage : _c.server.url + "/author/" + article.authors[0].slug,
                                 authorface : article.authors[0].avatarURL,
+                                authorsmall: article.authors[0].avatarMini,
                                 date : article.date, 
                                 topic : article.topic,
                                 sponsored : article.isSponsored

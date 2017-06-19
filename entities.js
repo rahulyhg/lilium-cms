@@ -285,6 +285,7 @@ var Entities = module.exports = new function () {
             socialnetworks : entity.socialnetworks,
             bio : entity.description,
             title : entity.jobtitle,
+            avatarMini: entity.avatarMini,
             avatarURL : entity.avatarURL
         };
     };

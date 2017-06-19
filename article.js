@@ -162,6 +162,7 @@ var Article = function() {
                 displayname : author.displayname,
                 bio : author.description,
                 avatarURL : author.avatarURL,
+                avatarMini : author.avatarMini,
                 slug : author.slug
             };
         }
@@ -1244,6 +1245,7 @@ var Article = function() {
                         author = {
                             fullname : author.displayname,
                             avatarURL : author.avatarURL,
+                            avatarMini : author.avatarMini,
                             totalCount,
                             totalToday
                         };
