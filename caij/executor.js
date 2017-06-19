@@ -29,6 +29,105 @@ class RunningTask {
         this.stats = janitorStats[this._c.uid];
     }
 
+    // Uses Graph v2.8 structure, not tested on other versions
+    storeFacebookShares(sendback, secondpass) {
+        if (!this._c.social || !this._c.social.facebook) {
+            return sendback();
+        }
+
+        const FBMax = 50;
+        if (!this.stats.fb) { this.stats.fb = 0; }
+        const _c = this._c;
+        const that = this;
+
+        const saveCounts = (articles) => {
+            this.stats.fb += FBMax;
+            let saveIndex = -1;
+            let nextSave = () => {
+                if (++saveIndex == articles.length) {
+                    sendback();
+                } else {
+                    let art = articles[saveIndex];
+
+                    art.updated ? 
+                        db.update(_c, 'content', {_id : art._id}, { 
+                            shares : art.shares, 
+                            comments : art.comments, 
+                            facebooklastupdate : new Date() 
+                        }, nextSave) :
+                        nextSave();
+                }
+            };
+
+            nextSave();
+        };
+
+        db.findToArray(this._c, 'topics', {}, (err, arr) => {
+            let topicAssoc = {};
+            arr.forEach(x => { topicAssoc[x._id] = x; });
+
+            db.find(this._c, 'content', {status : "published", topic : {$exists : 1}}, [], (err, cur) => {
+                cur .project({topic : 1, name : 1, _id : 1, shares : 1})
+                    .sort({_id : -1})
+                    .limit(FBMax)
+                    .skip(this.stats.fb)
+                    .toArray(
+                (err, articles) => {
+                    if (articles.length == 0) {
+                        that.stats.fb = 0;
+                        return secondpass ? sendback() : that.storeFacebookShares(sendback, true);
+                    }
+
+                    let urlString = "";
+                    let articleAssoc = [];
+                    articles.forEach(a => {
+                        if (topicAssoc[a.topic]) {
+                            a.url = _c.server.protocol + _c.server.url + "/" + topicAssoc[a.topic].completeSlug + "/" + a.name;
+                            urlString += (urlString?",":"") + a.url;
+                            articleAssoc[a.url] = a;
+                        }
+                    });
+
+                    urlString = "https://graph.facebook.com/v" + 
+                        _c.social.facebook.apiversion + 
+                        "/?access_token=" + 
+                        _c.social.facebook.token +
+                        "&ids=" +
+                        urlString;
+
+                    request(urlString, (_1, _2, resp) => {
+                        try {
+                            let respObj = JSON.parse(resp || {});
+
+                            if (respObj.error) {
+                                log('CAIJ', "Facebook Graph ["+respObj.error.OAuthException+"] returned from bulk request with message : " + respObj.error.message, 'warn');
+                                return sendback();
+                            }
+
+                            for (let furl in respObj) {
+                                let graphObj = respObj[furl];
+                                let art = articleAssoc[furl];
+                                let shares = graphObj.share && graphObj.share.share_count || 0;
+
+                                if (art && art.shares != shares) {
+                                    art.shares = shares;
+                                    art.comments = graphObj.share && graphObj.share.comment_count || 0;
+                                    art.updated = true;
+                                } else {
+                                    log('CAIJ', 'Skipping URL from FB : ' + furl);
+                                }
+                            }
+                        } catch (ex) {
+                            log('CAIJ', 'Caught exception while parsing Graph response : ' + ex, 'warn');
+                        }
+
+                        saveCounts(articles);
+                    });
+                });
+            });
+        });
+    }
+
     refreshSitemaps(sendback) {
         sitemapLib.generateSitemap(this._c, sendback);
     }

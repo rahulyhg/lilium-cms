@@ -53,8 +53,6 @@
         -ms-transition: all 0.3s;
          -o-transition: all 0.3s;
             transition: all 0.3s;
-
-    cursor: pointer;
 }
 
 .crew-member-card:hover {
@@ -65,6 +63,7 @@
     height: 50px;
     background: #FFF;
     position: relative;
+    cursor: pointer;
 }
 
 .crew-member {
@@ -117,4 +116,24 @@
     height: 100%;
     display: block;
 }
+
+.crew-card-social a {
+    display: inline-block;
+    height: auto;
+    font-size: 16px;
+    color: #FFF;
+    text-align: center;
+    width: auto;
+    margin: 1px;
+
+    cursor: pointer;
+}
+
+.crew-card-social a .fa {
+    width: 26px;
+    height: 26px;
+    padding-top: 4px;
+    border-radius: 5px;
+}
+
 

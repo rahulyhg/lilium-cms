@@ -36,36 +36,43 @@ const compile = (o, context) => {
 
         <lml:bunchitem>
             <div class="crew-member-card">
-                <lml:link href="${context._c.server.url}/admin/crew/view/{member._id}">
-                    <div class="crew-member">
+                <div class="crew-member">
+                    <lml:link href="${context._c.server.url}/admin/crew/view/{member._id}">
                         <div class="crew-card-top">
                             <lml:image src="{member.avatarURL}"></lml:image> 
                             <h3><lml:text var="member.displayname"></lml:text></h3>
                         </div>
-                        <div class="crew-card-middle">
-                            <lml:filter if="hasSelectedPerso">
-                                <div>
-                                    <i class="fa fa-lightbulb-o" style="font-size:18px;"></i> 
-                                    <lml:text var="member.personality.displayname"></lml:text> personality
-                                </div>
-                            </lml:filter>
-                            <lml:filter if="hasArticles">
-                                <div>
-                                    <i class="fa fa-paper-plane"></i> 
-                                    <lml:text var="member.articles"></lml:text> Articles published
-                                </div>
-                            </lml:filter>
-                        </div>
-                        <div class="crew-card-bottom">
-                            <div class="crew-card-badges">
-                                <lml:foreach var="badge" in="member.badges" wrapper="span">
-                                    <lml:class classes="badge.classes" tag="i">
-                                    </lml:class>
-                                </lml:foreach>
+                    </lml:link>
+                    <div class="crew-card-middle">
+                        <lml:filter if="hasSelectedPerso">
+                            <div>
+                                <i class="fa fa-lightbulb-o" style="font-size:18px;"></i> 
+                                <lml:text var="member.personality.displayname"></lml:text> personality
                             </div>
+                        </lml:filter>
+                        <lml:filter if="hasArticles">
+                            <div>
+                                <i class="fa fa-paper-plane"></i> 
+                                <lml:text var="member.articles"></lml:text> Articles published
+                            </div>
+                            <div>
+                                <i class="fa fa-facebook-official"></i> 
+                                More than <lml:text var="member.shares"></lml:text> shares
+                            </div>
+                        </lml:filter>
+                    </div>
+                    <div class="crew-card-bottom">
+                        <div class="crew-card-social">
+                            <lml:generate call="generateSocials"></lml:generate>
+                        </div>
+                        <div class="crew-card-badges">
+                            <lml:foreach var="badge" in="member.badges" wrapper="span">
+                                <lml:class classes="badge.classes" tag="i">
+                                </lml:class>
+                            </lml:foreach>
                         </div>
                     </div>
-                </lml:link>
+                </div>
             </div>
         </lml:bunchitem>
 
@@ -79,6 +86,28 @@ const compile = (o, context) => {
     <script>
         window.hasArticles = function(__, ldContext) { return ldContext.member.articles != 0; }
         window.hasSelectedPerso = function(__, ldContext) { return ldContext.member.personality.code != "none"; }
+
+        window.generateSocials = function(ldContext) {
+            var social = ldContext.member.socialnetworks || [];
+            var wrap = document.createElement('div');
+
+            for (var i = 0; i < social.length; i++) {
+                var network = social[i];
+                var link = document.createElement('a');
+                var sw = document.createElement('i');
+                link.appendChild(sw);
+                link.href = network.link;
+                link.target = "_blank";
+
+                sw.className = network.icon;
+                sw.style.backgroundColor = network.color;
+                sw.style.border = "1px solid " + network.border;
+
+                wrap.appendChild(link);
+            }
+
+            return wrap;
+        };
     </script>
 
     `);

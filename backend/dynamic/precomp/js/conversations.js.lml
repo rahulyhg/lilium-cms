@@ -224,7 +224,7 @@ var LMLConversations = function() {
     this.createNewGroupForm = function() {
         var wrapper = document.querySelector('.lml-participants-suggestion');
         
-        for (var userid in cachedusers) if (liliumcms.session.current._id != cachedusers[userid]._id) {
+        for (var userid in cachedusers) if (liliumcms.session.current._id != cachedusers[userid]._id && cachedusers[userid]) {
             var usr = cachedusers[userid];
             var userwrapper = document.createElement('div');
             var userimage;

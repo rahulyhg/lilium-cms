@@ -180,6 +180,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/conversations.js", 2280, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/stacktable.js", 2300, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/localclip.js", 2350, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/cakepop.js", 2380, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/socket.js", 2400, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/multi-select.js", 2500, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/ckeditor-lilium.js", 1320, 'admin', conf.id);

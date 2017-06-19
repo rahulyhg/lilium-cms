@@ -61,5 +61,10 @@
         "codename":  "Azul",
         "script" : "1.2.1.js",
         "features" : ["Decoration implementation"]
+    },
+    "1.2.2" : {
+        "codename":  "Azul",
+        "script" : "1.2.2.js",
+        "features" : ["Cakepops"]
     }
 }

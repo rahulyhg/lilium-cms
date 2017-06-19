@@ -8,9 +8,11 @@ const BADGE_LOOKUP  = { from : "decorations", localField : "_id", foreignField :
 const LIST_PROJECTION = { 
     displayname : 1, badges : 1, 
     avatarURL : 1, description : 1,
-    badgecount : { "$size": "$badges" },
-    personality : 1
+    personality : 1, socialnetworks : 1,
+    badgecount : { "$size": "$badges" }
 };
+
+const SOCIAL_NETWORKS = entities.getSocialNetworks();
 
 class Crew {
     constructor() {
@@ -86,7 +88,24 @@ class Crew {
                 assoc[items[i]._id] = items[i];
 
                 items[i].articles = 0;
+                items[i].shares = 0;
                 items[i].personality = personalities[items[i].personality || "none"];
+
+                let networks = [];
+                if (items[i].socialnetworks) {
+                    for (let n in items[i].socialnetworks) {
+                        networks.push({
+                            network : n,
+
+                            link : (SOCIAL_NETWORKS[n].url + items[i].socialnetworks[n]),
+                            color : (SOCIAL_NETWORKS[n].color),
+                            border : (SOCIAL_NETWORKS[n].border),
+                            icon : (SOCIAL_NETWORKS[n].icon)
+                        });
+                    }
+                }
+
+                items[i].socialnetworks = networks;
 
                 let badges = [];
                 for (let j = 0; j < items[i].badges.length; j++) {
@@ -111,17 +130,14 @@ class Crew {
                 if (++siteIndex != sites.length) {
                     db.join(sites[siteIndex], 'content', [
                         { $match : { status : "published" } },
-                        { $project : { author : 1} },
-                        { $group : { _id : "$author", articles : { $sum : 1 } } }
+                        { $project : { author : 1, shares : 1 } },
+                        { $group : { _id : "$author", articles : { $sum : 1 }, fbshares : { $sum : "$shares" } } }
                     ], (counts) => {
                         for (let i = 0; i < counts.length; i++) {
                             let obj = assoc[counts[i]._id];
                             if (obj) {
-                                if (obj.articles) {
-                                    obj.articles += counts[i].articles;
-                                } else {
-                                    obj.articles = counts[i].articles;
-                                }
+                                obj.articles += counts[i].articles;
+                                obj.shares += counts[i].fbshares;
                             }
                         }
 

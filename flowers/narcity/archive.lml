@@ -65,7 +65,7 @@ $}
     {$ for (article in extra.articles); $}
         <article class="archive-article">
             <div class="artpad">
-                <div class="archive-article-thumb" style="background-image: url('{=article.featuredimage.0.sizes.thumbnaillarge.url}')">
+                <div class="archive-article-thumb" style="background-image: url('{=article.imgsrc}')">
                     {$ if (?article.isSponsored ??); $}
                     <a class="sponsored-mention sponsored-mention-archive" href="https://www.narcitymedia.com" target="_blank">
                         Sponsored Content

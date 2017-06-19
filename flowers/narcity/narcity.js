@@ -78,7 +78,7 @@ var registerSnips = function(_c, cb) {
     });
 };
 
-var fetchHomepageArticles = function(_c, cb) {
+var fetchHomepageArticles = function(_c, cb, page) {
     var sett = themes.getEnabledTheme(_c).settings || {};
     var homepageSections = sett.homepagesections;
     var i = 0;
@@ -87,6 +87,7 @@ var fetchHomepageArticles = function(_c, cb) {
     var authors = {};
     var limit = sett.archivearticlecount ? parseInt(sett.archivearticlecount) : 12
     var sectionTopics = [];
+    var skip = ((page || 1) - 1) * limit;
 
     var nextSection = function() {
         if (i < len) {
@@ -101,6 +102,8 @@ var fetchHomepageArticles = function(_c, cb) {
                     $sort : {
                         date : -1
                     }
+                }, {
+                    $skip : skip 
                 }, {
                     $limit : 6 || limit
                 }, {
@@ -125,8 +128,11 @@ var fetchHomepageArticles = function(_c, cb) {
                     arr[j].url = _c.server.protocol + _c.server.url + sectionTopics[i].completeSlug + "/" + arr[j].name;
 
                     arr[j].classes = "article-thumbnail";
+                    arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnailarchive.url;
+
                     if ((9 - j) % 9 == 0) {
                         arr[j].classes += " article-thumbnail-featured"
+                        arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnaillarge.url;
                     } else if ((j + 1) % 9 > 3) {
                         arr[j].classes += " article-thumbnail-margined"
                     }
@@ -146,6 +152,8 @@ var fetchHomepageArticles = function(_c, cb) {
                     $sort : {
                         date : -1
                     }
+                }, {
+                    $skip : skip 
                 }, {
                     $limit : limit
                 }, {
@@ -170,8 +178,11 @@ var fetchHomepageArticles = function(_c, cb) {
                     latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? "/" + latests[j].topic.completeSlug : "") + "/" + latests[j].name;
 
                     latests[j].classes = "article-thumbnail";
+                    latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnailarchive.url;
+
                     if ((9 - j) % 9 == 0) {
                         latests[j].classes += " article-thumbnail-featured"
+                        latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnaillarge.url;
                     } else if ((j + 1) % 9 > 3) {
                         latests[j].classes += " article-thumbnail-margined"
                     }
@@ -326,6 +337,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 var topic = arrList[i].topic[0];
                 arrList[i].topic = topic;
                 arrList[i].url = cli._c.server.protocol + cli._c.server.url + (topic ? "/" + topic.completeSlug : "") + "/" + arrList[i].name;
+                arrList[i].imgsrc = cli._c.server.protocol + arrList[i].featuredimage[0].sizes.thumbnailarchive.url;
             }
 
             cb(err || archTypeRes[0], arrList, totalArticles, indices);
@@ -492,6 +504,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                                 arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
                                 arr[i].topic = topicObjects[arr[i].topic];
                                 arr[i].url = conf.server.protocol + conf.server.url + "/" + arr[i].topic.completeSlug + "/" + arr[i].name;
+                                arr[i].imgsrc = conf.server.protocol + arr[i].featuredimage[0].sizes.thumbnailarchive.url;
 
                                 arr[i].classes = "article-thumbnail";
                                 if ((9 - i) % 9 == 0) {
@@ -696,7 +709,7 @@ var getWhatsHot = function(_c, cb) {
                     cb(articleArray);
                 } else {
                     Article.deepFetch(_c, pages[index], function(article) {
-                        if (article) {
+                        if (article && !article.nsfw) {
                             articleArray.push({
                                 _id : article._id, 
                                 fullurl : article.url,
@@ -726,24 +739,98 @@ var getWhatsHot = function(_c, cb) {
     }); 
 }
 
+// ~/api/homepage/<page?>
 var serveHomepageAPI = function(cli) {
+    var page = cli.routeinfo.path[2];
+    if (page && !isNaN(page)) {
+        page = parseInt(page);
+    } else {
+        page = 1;
+    }
+
     fetchHomepageArticles(cli._c, function(articles) { 
         articles = Article.toPresentables(cli._c, articles.latests);
         cli.sendJSON({
             section : "homepage", 
             articles
         });
-    });
+    }, page);
 }
 
+var replaceInterlinks = function(_c, article, sendback) {
+    var anchorIndex = 1;
+    while (article.content.indexOf("<lml-page") != -1) {
+        article.content = article.content.replace("<lml-page></lml-page>", '<div id="page-'+(++anchorIndex)+'"></div>');
+    }
+
+    require('jsdom').env(article.content, function(error, window) {
+        var links = window.document.querySelectorAll('a');
+        var toInterlink = [];
+
+        for (var i = 0; i < links.length; i++) {
+            var a = links[i];
+
+            if (a.href.includes(_c.server.url)) {
+                var urlSplit = a.href.toString().split('/');
+                var nameOrIndex = urlSplit.pop();
+                var newref;
+
+                if (!isNaN(nameOrIndex)) {
+                    newref = "#page-" + nameOrIndex
+                    a.href = newref;
+                } else {
+                    toInterlink.push({elem : a, name : nameOrIndex});
+                }
+            }
+        }
+
+        var finishUp = function() {
+            article.content = window.document.body.innerHTML;
+            sendback(article);
+        };
+
+        iin = -1;
+        var nextInterlink = function() {
+            if (++iin == toInterlink.length) {
+                finishUp();
+            } else {
+                db.findUnique(_c, 'content', {name : toInterlink[iin].name}, (err, article) => {
+                    if (article) {
+                        toInterlink[iin].elem.href = "#" + article._id;
+                        toInterlink[iin].elem.classList.add("lilium-interlink");
+                    }
+
+                    nextInterlink();
+                }, {_id : 1});
+            }
+        };
+
+        nextInterlink();
+    });
+};
+
+// ~/api/read/<id>
 var serveReadAPI = function(cli) {
     var id = db.mongoID(cli.routeinfo.path[2]);
     if (id) {
         Article.deepFetch(cli._c, id, function(article) {
             if (article) {
-                cli.sendJSON({
-                    section : "read",
-                    article : Article.toPresentable(cli._c, article)
+                let splitIndex = 0;
+                article = Article.toPresentable(cli._c, article);
+
+                let sendArticle = () => {
+                    replaceInterlinks(cli._c, article, function() {
+                        cli.sendJSON({
+                            section : "read",
+                            article
+                        });
+                    });
+                };
+
+                parseAds({
+                    _c : cli._c, 
+                    done : sendArticle,
+                    article
                 });
             } else {
                 cli.throwHTTP(404, undefined, true);
@@ -754,10 +841,70 @@ var serveReadAPI = function(cli) {
     }
 };
 
-var serveTopicAPI = function(cli) {
-    var id = db.mongoID(cli.routeinfo.path[2]);
-    if (cli.routeinfo.path.length > 2) {
+// ~/api/author/<id>/<page?>
+const AUTHOR_PAGE_LIMIT = 20;
+var serveAuthorAPI = function(cli) {
+    var _id = db.mongoID(cli.routeinfo.path[2]);
+    var page = cli.routeinfo.path[3] || 1;
+    if (_id) {
+        db.findUnique(cc.default(), 'entities', {_id}, (err, author) => {
+            if (!author) {
+                return cli.throwHTTP(404, undefined, true);
+            }
 
+            db.find(cli._c, 'content', {author : _id, status : "published"}, [], (err, cur) => {
+                cur.project({_id : 1})
+                    .sort({date : -1})
+                    .skip(AUTHOR_PAGE_LIMIT * (page-1))
+                    .limit(AUTHOR_PAGE_LIMIT)
+                    .toArray(
+                (err, articles) => {
+                    Article.batchFetch(cli._c, articles.map(a => a._id), (list) => {
+                        list = Article.toPresentables(cli._c, list);
+                        cli.sendJSON({
+                            section : "author",
+                            articles : list,
+                            author : entities.toPresentable(author)
+                        });
+                    });
+                });
+            });
+        });
+    } else {
+        cli.throwHTTP(404, undefined, true);
+    }
+};
+
+// ~/api/topic/<id>/<page?>
+const TOPIC_PAGE_LIMIT = 24;
+var serveTopicAPI = function(cli) {
+    var _id = db.mongoID(cli.routeinfo.path[2]);
+    var page = cli.routeinfo.path[3] || 1;
+    if (cli.routeinfo.path.length > 2) {
+        db.findUnique(cli._c, "topics", {_id}, (err, topic) => {
+            topics.getFamilyIDs(cli._c, _id, family => {
+                db.findToArray(cc.default(), 'entities', {}, (err, authors) => {
+                    let aAssoc = {};
+                    authors.forEach(x => {
+                        aAssoc[x._id] = x;
+                    });
+
+                    db.find(cli._c, 'content', {topic : {$in : family}, status : "published"}, [], (err, cur) => {
+                        cur.sort({date : -1}).skip((page-1) * TOPIC_PAGE_LIMIT).limit(TOPIC_PAGE_LIMIT).toArray((err, arr) => {
+                            arr.forEach(a => {
+                                a.authors = [aAssoc[a.author]];
+                            });
+
+                            let articles = Article.toPresentables(cli._c, arr);
+                            cli.sendJSON({
+                                section : "topic",
+                                topic, articles
+                            });
+                        });
+                    });
+                });
+            });
+        });
     } else {
         db.findToArray(cli._c, 'topics', {}, function(err, arr) {
             cli.sendJSON({
@@ -770,19 +917,91 @@ var serveTopicAPI = function(cli) {
     }
 }
 
+const ALLOWED_API_TRANSFORM = {
+    "articleslug"   : {collection : "content",  field : "name" },
+    "authorslug"    : {collection : "entities", field : "slug" },
+    "topicslug"     : {collection : "topics",   field : "slug" }
+};
+
+var handleTransformAPI = function(cli) {
+    var transformation = cli.routeinfo.path[2];
+    var value = cli.routeinfo.path[3]
+    if (ALLOWED_API_TRANSFORM[transformation] && value) {
+        let _c = transformation == "authorslug" ? cc.default() : cli._c;
+        let _t = ALLOWED_API_TRANSFORM[transformation];
+
+        getIdFromSlug(_c, _t.collection, _t.field, value, (id) => {
+            id ? cli.sendJSON({
+                section : "transform",
+                from : value,
+                to : id
+            }) : cli.throwHTTP(
+                404, undefined, true
+            );
+        });
+    } else {
+        cli.throwHTTP(404, undefined, true);
+    }
+};
+
+var getIdFromSlug = function(_c, collection, field, value, sendback) {
+    db.findUnique(_c, collection, {[field] : value}, (err, obj) => {
+        sendback(obj && obj._id || err);
+    }, {_id : 1});
+}
+
 var needsHomeRefresh = true;
 var rQueue = {
     homepage : []
 };
 var cachedTags = {};
 var loadHooks = function(_c, info) {
-    endpoints.register(_c.id, ["2012", "2013", "2014", "2015", "2016", "2017", "category"], 'GET', function(cli) {
+    /**********************************************
+     *                                            *
+     *        API Endpoints under ~/api           *
+     *                                            *
+     **********************************************
+     *                                            *
+     *      /homepage/<page = 1>                  *
+     *      /read/<article_id>                    *
+     *      /topic/<topic_id>/<page = 1>          *
+     *      /author/<entity_id>/><page = 1>       *
+     *                                            *
+     **********************************************/
+    API.registerApiEndpoint(_c.id + 'homepage',  'GET', serveHomepageAPI    );
+    API.registerApiEndpoint(_c.id + 'read',      'GET', serveReadAPI        );
+    API.registerApiEndpoint(_c.id + 'topic',     'GET', serveTopicAPI       );
+    API.registerApiEndpoint(_c.id + 'author',    'GET', serveAuthorAPI      );
+    API.registerApiEndpoint(_c.id + 'transform', 'GET', handleTransformAPI  );
+
+    /**********************************************
+     *                                            *
+     *        HTTP Endpoints under ~/             *
+     *                                            *
+     **********************************************
+     *                                            *   
+     *      /                                     *   
+     *      /tag[s]/<tag_slug?>/<page = 1>        * 
+     *      /topic/<topic_slug?><page = 1>        * 
+     *      /201[2,3,4,5,6,7]/                    * 
+     *      /category/<...>                       * 
+     *      /feed/<topic_slug?>                   * 
+     *      /whatshot                             * 
+     *      /author/<author_slug>                 * 
+     *      /latests/<page = 1>                   * 
+     *      /search?q=<search_terms>              * 
+     *                                            * 
+     **********************************************/
+
+    const redirectYears = ["2012", "2013", "2014", "2015", "2016", "2017"];
+    endpoints.register(_c.id, [...redirectYears, "category"], 'GET', function(cli) {
         cli.redirect(_c.server.url + "/" + 
             cli.routeinfo.path.pop() + 
             (Object.keys(cli.routeinfo.params) ? objToURIParams(cli.routeinfo.params) : "")
         );
     });
 
+    // tag/ => tags/
     endpoints.register(_c.id, 'tag', 'GET', function(cli) {
         cli.redirect(_c.server.url + '/tags/' + 
             cli.routeinfo.path[1] + 
@@ -791,10 +1010,6 @@ var loadHooks = function(_c, info) {
     });
 
     endpoints.registerContextual(_c.id, 'topic', 'GET', serveTopic);
-
-    API.registerApiEndpoint(_c.id + 'homepage', 'GET', serveHomepageAPI);
-    API.registerApiEndpoint(_c.id + 'read', 'GET', serveReadAPI);
-    API.registerApiEndpoint(_c.id + 'topic', 'GET', serveTopicAPI);
 
     endpoints.register(_c.id, '', 'GET', function(cli) {
         sharedcache.get("narcityhomepage_" + _c.id, function(resp) {
@@ -947,15 +1162,15 @@ var loadHooks = function(_c, info) {
     var chartbeaturl = "http://api.chartbeat.com/live/quickstats/v4/?apikey=[key]&host=[host]&path=";
     endpoints.register(_c.id, 'chartbeatbridge', 'GET', function(cli) {
         if (cli.userinfo.loggedin && cli.hasRight('dash') && cli._c.chartbeat && cli._c.chartbeat.api_key) {
-            var requrl = chartbeaturl.replace('[key]', cli._c.chartbeat.api_key).replace('[host]', cli._c.chartbeat.host) +
-                cli.routeinfo.params.url + 
-                (cli._c.chartbeat.section ? "&section=" + cli._c.chartbeat.section : "");
-            
             var key = "chartbeat_url_cache_" + cli.routeinfo.params.url;
             sharedcache.get(key, function(obj) {
                 if (obj && new Date().getTime() - obj.at < 6000) {
                     cli.sendJSON(obj.body);
                 } else {
+                    var requrl = chartbeaturl.replace('[key]', cli._c.chartbeat.api_key).replace('[host]', cli._c.chartbeat.host) +
+                        cli.routeinfo.params.url + 
+                        (cli._c.chartbeat.section ? "&section=" + cli._c.chartbeat.section : "");
+            
                     require('request')(requrl, function(err, resp, bod) {
                         var setobj = {}
                         setobj[key] = {
@@ -986,6 +1201,7 @@ var loadHooks = function(_c, info) {
         generateRSS(_c, undefined, function() {});
     }
 
+    // Hooks
     hooks.bind('homepage_needs_refresh_' + _c.uid, 1, function(pkg) { 
         generateHomepage(pkg._c || pkg.cli._c, pkg.callback);
     });

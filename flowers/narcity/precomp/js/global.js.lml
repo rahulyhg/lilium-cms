@@ -215,24 +215,18 @@ var handleAdScroll = function(e) {
             console.log("[GTAG] Displaying : " + adinfo.id + " at " + adinfo.height + "px");
             googletag.pubads().refresh([ window.lmladslots[adinfo.id] ]);
             window.nladzdsfop9i23l4.totalAdsLoaded++;
+
+            dataLayer.push({
+                event : "AdDisplayed",
+                eventAction : "Displayed",
+                eventCategory : "Advertising",
+                eventLabel : adinfo.id,
+                eventValue : 1
+            });
         });
         
         handlingScroll = false;
     }
-};
-
-var bindEnd = function() {
-    window.addEventListener('beforeunload', function() {
-        console.log("[GTM] Sending dataLayer");
-        dataLayer.push({
-            event : "userExits",
-            totalAdsLoaded : window.nladzdsfop9i23l4.totalAdsLoaded,
-            currentURL : document.location.href
-        });
-        console.log("[GTM] Sent dataLayer");
-
-        ga('send', 'event', 'userExits', 'totalAdsLoaded', window.nladzdsfop9i23l4.totalAdsLoaded, {useBeacon: true});
-    });
 };
 
 var handlingNext = false;
@@ -600,7 +594,6 @@ maybeFadeIn();
 parseEmbeds();
 parseContentLinks();
 rearrangeImages();
-bindEnd();
 
 /* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */
 jQuery = function() {return {is : function() { return this; } } };

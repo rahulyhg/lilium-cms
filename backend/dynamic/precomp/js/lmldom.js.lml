@@ -981,6 +981,7 @@ var LMLDom = function() {
         this.valuegroups = [];
 
         log('LMLDOM', 'Parsing Lilium Document Object Model v' + domv);
+        maindom = document.getElementById('lml-main');
         var now = new Date();
         lmldom.parseLiveFields(maindom);
         lmldom.parseSnips(maindom, function() {

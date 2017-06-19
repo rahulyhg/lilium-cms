@@ -1,0 +1,78 @@
+var CAKEPOP_ALLOWED_ACTIONS = {
+    "send" : { displayname : "Send", action : "send" },
+    "dismiss" : { displaylane : "Dismiss", action : "dismiss" }
+};
+
+var Cakepop = function() {
+    var self = this;
+    this.checkForNew = function() {
+        
+    };
+
+    this.collectAndSend = function(nodata) {
+        
+    };
+
+    this.handleAction = function(e) {
+        var actionname = e.target.dataset.action;
+
+        if (actionname == "send") {
+            self.collectAndSend();
+        } else {
+            self.collectAndSend(false);
+        }
+    };
+
+    this.createActionButton = function(act) {
+        if (act) {
+            var actionname = act.action;
+            var displayname = act.displayname;
+
+            var button = document.createElement('button');
+            button.textContent = displayname;
+            button.dataset.action = actionname;
+            button.className = "cakepop-action cakepop-action-" + actionname;
+
+            button.addEventListener('click', this.handleAction);
+
+            return button;
+        }
+    };
+    
+    this.fill = function(popobj) {
+        var card = document.getElementById('cakepop-wrapper');
+        var actions = document.getElementById("cakepop-actions");
+        document.getElementById("cakepop-content").innerHTML = popobj.content;
+        
+        while (actions.firstElementChild) { actions.firstElementChild.remove(); }
+        if (popobj.actions) for (var i = 0; i < popobj.actions; i++) {
+            var act = this.createActionButton( CAKEPOP_ALLOWED_ACTIONS[ popobj.actions[i] ] );
+            if (act) {
+                actions.appendChild(act);
+            }
+        }
+
+        var cardheight = card.getBoundingClientRect().height;
+        var screenheight = window.innerHeight;
+        var top = (screenheight / 2) - (cardheight / 2);
+
+        if (top < 100) { top = 100; }
+        card.style.top = top + "px";
+    }; 
+
+    this.cast = function() {
+        var wrap = document.getElementById('cakepop');
+        wrap.style.display = "block";
+        setTimeout(function() {
+            wrap.classList.add('shown');
+        }, 20);
+    };
+
+    this.dismiss = function() {
+        var wrap = document.getElementById('cakepop');
+        wrap.classList.remove('shown');
+        setTimeout(function() {
+            wrap.style.display = "none";
+        }, 200);
+    };
+};

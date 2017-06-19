@@ -41,6 +41,13 @@ for (var type in PERSONALITIES_ASSOC) {
     PERSONALITIES_ASSOC[type].code = type;
 }
 
+const SOCIAL_NETWORKS = {
+    facebook :   { icon : "fa fa-facebook",  color : "#3b5998", border : "#1b3979", url : "https://www.facebook.com/" },
+    twitter :    { icon : "fa fa-twitter",   color : "#00b6f1", border : "#0096d1", url : "https://twitter.com/" },
+    instagram :  { icon : "fa fa-instagram", color : "#7232bd", border : "#52129d", url : "https://www.instagram.com/" },
+    googleplus : { icon : "fa fa-google",    color : "#df4a32", border : "#bf2a12", url : "https://plus.google.com/u/1/+" }
+};
+
 var Entity = function () {
     this._id = undefined;
     this.username = "";
@@ -79,6 +86,10 @@ var Entities = module.exports = new function () {
 
     this.getPersonalities = function() {
         return PERSONALITIES_ASSOC;
+    };
+
+    this.getSocialNetworks = function() {
+        return SOCIAL_NETWORKS;
     };
 
     this.firstLogin = function(cli, userObj, cb) {
@@ -264,6 +275,18 @@ var Entities = module.exports = new function () {
                 cli.refuse();
             }
         }
+    };
+
+    this.toPresentable = function(entity) {
+        return {
+            displayname : entity.displayname,
+            slug : entity.slug,
+            id : entity._id,
+            socialnetworks : entity.socialnetworks,
+            bio : entity.description,
+            title : entity.jobtitle,
+            avatarURL : entity.avatarURL
+        };
     };
 
     this.commitfbauth = function(cli) {

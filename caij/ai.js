@@ -3,16 +3,24 @@ const executor = require('./executor.js');
 
 const log = require('../log.js');
 
+const oneSecond = 1000;
+const oneMinute = oneSecond * 60;
+const halfHour = oneMinute * 30;
+const oneHour = oneMinute * 60;
+const halfDay = oneHour * 12;
+const oneDay = oneHour * 24;
+
 const Knowledge = {
-    queueMaxSize : 25,
+    queueMaxSize : 100,
     cacheDept : 1000,
     janitorJobs : executor.getJanitorJobs(),
     janitorSites : executor.getJanitorSites(),
     cpuCap : 80,
     cooldown : 10,
 
-    homepageDelai : 1000 * 60 * 30,
-    sitemapDelai : 1000 * 60 * 60,
+    homepageDelai : halfHour,
+    sitemapDelai : oneHour,
+    facebookDelai : oneMinute * 3,
     sendEmailAt : "00:15:00"
 };
 
@@ -84,13 +92,27 @@ class AI {
             });
         };
 
+        let createFacebookTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "storeFacebookShares",
+                    extra : {
+                        origin : "AI",
+                        _c : _c
+                    }
+                });
+            });
+        };
+
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
+        ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
         ai.statsemailInterval = require('../scheduler.js').schedule("CAIJ_StatEmail_Networkwide", {
             runat : Knowledge.sendEmailAt
         }, createStatsEmailTask).start();
 
         createHomepageTask();
+        createFacebookTask();
     }
 
     error(err) {

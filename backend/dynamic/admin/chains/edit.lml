@@ -23,7 +23,7 @@
 
 <script>
 var chainID = liliumcms.pageloader.lastLevel;
-var save = function(status) {
+var save = function(endpointLevel) {
     var values = liliumcms.lmldom.getFormData()["contentchains"].values;
     values.serie = [];
 
@@ -32,19 +32,15 @@ var save = function(status) {
         values.serie.push(allcards[i].dataset.value);
     }
 
-    if (status) {
-        values.status = status;
-    }
-
     liliumcms.lmldom.sendForm(
         values,
-        "{=config.default.server.url}/admin/chains/edit/" + chainID, 
+        "{=config.default.server.url}/admin/chains/"+(endpointLevel||"edit")+"/" + chainID, 
         function(resp) {
             if (resp.success) {
                 liliumcms.notify({
                     type : "success",
-                    title : "Content chain saved",
-                    message : ""
+                    title : resp.title || resp.message || "Content chain saved",
+                    message : resp.message || ""
                 });
             } else {
                 liliumcms.notify({
@@ -67,6 +63,7 @@ document.querySelector(".btn-publish").addEventListener('click', function() {
 
 window["chain-go-live_accept"] = function() {
     liliumcms.modals.get("chain-go-live").dismiss();
+    save("live");
 };
 </script>
 

@@ -1056,7 +1056,7 @@ main.lmladminmain h1 {
     font-weight: 500;
     background: #F6F6F6;
     border-bottom: 2px solid #EEE;
-    color: #777;
+    color: #AAA;
     padding: 40px 13px 10px;
     font-size: 24px;
     letter-spacing: 0.2px;

@@ -79,6 +79,7 @@ var LiliumCMS = function() {
     this.localclip;
     this.previewer;
     this.imagepicker;
+    this.cakepop;
     this.conversations;
     this.facebook;
     this.tables = [];
@@ -1122,6 +1123,7 @@ var LiliumCMS = function() {
             that.quill = new LMLQuill();
             that.facebook = new LMLFacebook();
             that.lmldom = new LMLDom();
+            that.cakepop = new Cakepop();
             that.modals = new LMLModals();
             that.session = new LMLSession();
             that.rights = new LMLRights();
