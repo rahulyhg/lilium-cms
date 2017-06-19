@@ -63,6 +63,8 @@ var LocalClip = function() {
         var keys = Object.keys(clips);
         for (var i = keys.length - 1; i >= 0; i--) {
             var clip = clips[keys[i]];
+            if (!clip) { continue; }
+
             if (
                 clip.value.trim() == "" || 
                 (new Date(clip.lastTouched).getTime() < new Date().getTime() - (1000 * 60 * 60 * 2))
