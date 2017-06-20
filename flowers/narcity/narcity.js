@@ -840,6 +840,16 @@ var serveReadAPI = function(cli) {
     }
 };
 
+// ~/api/cities
+const serveCityAPI = function(cli) {
+    db.findToArray(cli._c, 'topics', {"override.cityname" : {$exists : 1}}, function(err, cities) {
+        cli.sendJSON({
+            section : "topic",
+            cities : cities
+        });
+    });
+};
+
 // ~/api/author/<id>/<page?>
 const AUTHOR_PAGE_LIMIT = 20;
 var serveAuthorAPI = function(cli) {
@@ -895,10 +905,25 @@ var serveTopicAPI = function(cli) {
                             });
 
                             let articles = Article.toPresentables(cli._c, arr);
-                            cli.sendJSON({
-                                section : "topic",
-                                topic, articles
-                            });
+
+                            const finishup = () => {
+                                cli.sendJSON({
+                                    section : "topic",
+                                    topic, articles
+                                });
+                            };
+
+                            topic.city = topic.override && topic.override.cityname;
+                            topic.cityid = topic.city && topic._id;
+                            if (topic.family.length == 4) {
+                                db.findUnique(cli._c, 'topics', {_id : topic.family[1]}, function(err, maybecity) {
+                                    topic.city = maybecity.override && maybecity.override.cityname;
+                                    topic.cityid = maybecity && topic.family[1];
+                                    finishup();
+                                });
+                            } else {
+                                finishup();
+                            }
                         });
                     });
                 });
@@ -972,6 +997,7 @@ var loadHooks = function(_c, info) {
     API.registerApiEndpoint(_c.id + 'topic',     'GET', serveTopicAPI       );
     API.registerApiEndpoint(_c.id + 'author',    'GET', serveAuthorAPI      );
     API.registerApiEndpoint(_c.id + 'transform', 'GET', handleTransformAPI  );
+    API.registerApiEndpoint(_c.id + 'cities',    'GET', serveCityAPI        );
 
     /**********************************************
      *                                            *
