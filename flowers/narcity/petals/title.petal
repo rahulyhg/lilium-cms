@@ -3,6 +3,8 @@
 <title>{=config.default.website.sitetitle} - {=?&config.default.website.catchline}</title>
 {$ endif; if (extra.contextname == "article"); $}
 <title>{=extra.article.title} - {=config.default.website.sitetitle}</title>
+{$ endif; if (extra.contextname == "chain"); $}
+<title>{=extra.chain.title} - {:series} - {=config.default.website.sitetitle}</title>
 {$ endif; if (extra.contextname == "styledpage"); $}
 <title>{=extra.page.title} - {=config.default.website.sitetitle}</title>
 {$ endif; $}

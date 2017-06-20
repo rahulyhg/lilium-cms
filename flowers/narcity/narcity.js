@@ -17,6 +17,7 @@ var LML2 = undefined;
 var Article = undefined;
 var Category = undefined;
 var sharedcache = undefined;
+var contentchains = undefined;
 var API = undefined;
 
 var readersLib = undefined;
@@ -46,6 +47,7 @@ var initRequires = function(abspath) {
     cc = require(abspath + "config.js");
     Article = require(abspath + "article.js");
     sharedcache = require(abspath + "sharedcache.js");
+    contentchains = require(abspath + "contentchains.js");
     API = require(abspath + "api.js");
 };
 

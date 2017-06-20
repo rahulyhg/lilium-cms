@@ -1,10 +1,132 @@
 {#config;extra;slug;theme;debug;date}
 {$
-    featimg = extra.article.featuredimage.0.sizes.narcityfeatured.url;
-    author = extra.article.authors.0;
-    postdate = extra.article.date;
-    formatdate = date.stringify(postdate);
-    topic = extra.article.topic;
+    serie = extra.chain;
+    featimg = serie.featuredimage.0.sizes.narcityfeatured.url;
 $}
 
+<article id="{=serie.slug}" data-mi="{=serie._id}">
+    {$ if (?extra.article.isSponsored ??); $}
+    <div class="title-sponsored-wrapper">
+        <a class="sponsored-mention sponsored-mention-article" href="https://www.narcitymedia.com" target="_blank">
+            {:sponsoredcontent}
+        </a>
+    </div>
+    {$ endif; $}
 
+    <div class="category-top-wrapper ryksponsive-c">
+        <a href="{=config.default.server.url}/series" class="category-top-link">
+            {:series}
+        </a>
+    </div>
+    <h1>{=&serie.title}</h1>
+    <h2>{=&serie.subtitle}</h2>
+
+    <div class="serie-presentation-wrapper ryksponsive-c">
+        {=serie.presentation}
+    </div>
+
+    <script>var serielistcount = 0;</script>
+    <div class="serie-list ryksponsive-c">
+        {$ counter = 0; for (article in extra.articles); counter += 1; $}
+        <div class="serie-list-item"> 
+            <a href="{=article.url}">
+                <img src="{=article.imageurls.square}" class="serie-list-item-image" />
+                <h3>{=article.title}</h3>
+                <h4>{=article.subtitle}</h4>
+            </a>
+        </div>
+        <script>
+            if (++serielistcount % 3 == 0) {
+                document.write('<div class="float-clear"></div>');
+            }
+        </script>
+        {$ endfor; $}
+
+        {$ if (? serie.finished ??); else; $}
+        <div class="serie-list-item serie-list-item-pending">
+            <h3>{=serie.pendingtext}</h3>
+            <a class="serie-pending-share" href="javascript:narcityFacebook.castShareDialog();">
+                <i class="fa fa-facebook-square" aria-hidden="true"></i> <span>{:share}</span>
+            </a>
+        </div>
+        {$ endif; $}
+    </div>
+</article>
+
+<style>
+.serie-list-item {
+    float: left;
+    width: 33.333%;
+}
+
+.serie-list-item-image {
+    object-fit: cover;
+    height: 220px;
+    width: 100%;
+}
+
+.serie-presentation-wrapper {
+    font-family: 'PT Serif',serif;
+    font-size: 20px;
+    line-height: 1.7em;
+    margin-bottom: 1.7em;
+}
+
+.serie-list-item a {
+    display: block;
+    padding: 5px;
+    text-decoration: none;
+}
+
+.serie-list-item h3 {
+    font-family: "Oswald",sans-serif;
+    font-size: 20px;
+    padding: 5px 0;
+    text-align: left;
+    font-weight: normal;
+    color: #111;
+    text-decoration: none;
+
+    margin: 5px 0px;
+} 
+
+.serie-list-item h4 {
+    color: #333;
+    font-size: 18px;
+    font-weight: normal;
+    margin-top: 0;
+    text-decoration: none;
+}
+
+.serie-list-item.serie-list-item-pending h3 {
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.serie-list-item.serie-list-item-pending {
+    height: 220px;
+    background-color: #F9F9F9;
+    margin-top: 5px;
+    text-align: center;
+}
+
+a.serie-pending-share {
+    display: inline-block;
+    margin: auto;
+    font-family: Arial;
+    margin-top: 15px;
+    padding: 5px 8px;
+    background-color: #3b5998;
+    border-bottom: 2px solid #0b2969;
+    text-decoration: none;
+    color: #FFF;
+    border-radius: 4px;
+    font-size: 18px;
+
+    cursor: pointer;
+}
+
+
+</style>

@@ -28,15 +28,12 @@ $}
     {$ if (extra.article.featuredimage.length != 0); $}
     <div class="featured-image-wrapper">
         <img src='{=featimg}' class="featured-image" alt="{=&extra.article.title} featured image" />
-        
     </div>
     {$ endif; $}
 
 
     {$ if (extra.article.pageIndex == 1); $}
-    
     <div class="article-author-share-section invisible no-tablet" id="article-share-section-mobile">
-
         <div class="article-share-count-wrapper topvert">
             <span class="article-share-count fbshare" data-url="this" data-min="100" data-show="article-share-section-mobile" data-showas="block">0000</span>
             <span class="article-share-words">shares</span>

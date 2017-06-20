@@ -161,6 +161,7 @@ class ContentChains {
         if (path == "new") {
             this.insertNewChain(cli._c, {
                 title : cli.postdata.data.title,
+                slug : require('slug')(cli.postdata.data.title).toLowerCase(),
                 createdBy : db.mongoID(cli.userinfo.userid)
             }, (err, r) => {
                 cli.sendJSON({
@@ -198,14 +199,15 @@ class ContentChains {
 
     generateChain(_c, strID, callback) {
         this.deepFetch(_c, strID, df => {
-            articleLib.batchFetch(_c, df.serie, articles => {
+            console.log(df.serie);
+            articleLib.batchFetch(_c, df.serie.map(x => db.mongoID(x)), articles => {
                 let id = df._id;
                 let extra = {
                     config : _c,
                     chain : df,
                     articles : articles
                 };
-                
+
                 let landingPath = _c.server.html + "/" + df.slug + ".html";
                 filelogic.renderThemeLML(_c, 'chain', landingPath, extra, callback);
             });

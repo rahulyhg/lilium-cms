@@ -4,7 +4,7 @@
     "entry": "narcity.js",
     "contexts" : {
         "article"       :       "article.lml",
-        "chain"         :       "article.lml",
+        "chain"         :       "chain.lml",
         "styledpage"    :       "page.lml",
         "amp"           :       "amp.lml",
         "next"          :       "article.lml",

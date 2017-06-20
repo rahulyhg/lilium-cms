@@ -389,6 +389,11 @@ var Article = function() {
                             });
                         };
 
+                        article.images = article.featuredimage[0];
+                        article.imageurls = {};
+                        if (article.images) for (var size in article.images.sizes) {
+                            article.imageurls[size] = conf.server.protocol + article.images.sizes[size].url;
+                        }
                         article.related = related;
                         continueWorking();
                     });
