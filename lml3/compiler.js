@@ -22,7 +22,7 @@ class MarkupBuffer {
 
 class LMLPetal {
     constructor(context, petalname) {
-        this.petalobject = require(context.workdir + petalname + LMLConst.petalext); 
+        this.petalobject = require(context.workdir + "/" + petalname + LMLConst.petalext); 
         this.context = context;
         this.petalname = petalname;
     }
@@ -86,7 +86,7 @@ class LMLContext {
         let contents = {};
         let petals = this.petals || [];
         petals.forEach(p => {
-            contents[petals[i]] = new LMLPetal(this, petals[i]);
+            contents[p] = new LMLPetal(this, p);
         });
 
         this.petals = contents;
@@ -96,6 +96,9 @@ class LMLContext {
     generateLivevars() {
         let str = "";
         this.livevars && this.livevars.forEach(l => {
+            if (typeof l == "string") { 
+                l = {name : l}; 
+            }
             let params = l.params ? JSON.stringify(l.params).replace(/\"/g, "&lmlquote;") : "{}";
             str += `<lml:livevars data-varname="${l.name}" data-varparam="${params}"></lml:livevars>`;
         });

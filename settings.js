@@ -21,28 +21,7 @@ var Settings = function () {
             var dat = cli.postdata.data;
             delete dat.form_name;
             delete dat[""];
-
-            /*
-            for (var key in dat) {
-                if (!key) { continue; }
-
-                var val = dat[key];
-                key = key.replace(/\[/g, ".").replace(/\]/g, "");
-
-                var keyLevel = key.split('.');
-                var nextLevel = cli._c;
-
-                for (var i = 0; i < keyLevel.length - 1; i++) {
-                    if (typeof nextLevel[keyLevel[i]] === 'undefined') {
-                        nextLevel[keyLevel[i]] = new Object();
-                    }
-
-                    nextLevel = nextLevel[keyLevel[i]];
-                }
-
-                nextLevel[keyLevel[keyLevel.length - 1]] = val;
-            }
-            */
+            delete dat[undefined];
 
             for (var field in dat) {
                 cli._c[field] = dat[field];

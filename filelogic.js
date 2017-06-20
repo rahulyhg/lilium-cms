@@ -383,7 +383,15 @@ var FileLogic = function () {
 
                         if (skipLayout) {
                             return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, function(cdned) {
-                                callback(cdned);
+                                fileserver.createDirIfNotExists(savePath, function() {
+                                    var handle = FileServer.getOutputFileHandle(savePath, 'w+');
+                                    FileServer.writeToFile(handle, cdned, function() {
+                                        handle.close();
+                                        handle.destroy();
+                                        
+                                        callback(cdned);
+                                    });
+                                });
                             });
                         }
 

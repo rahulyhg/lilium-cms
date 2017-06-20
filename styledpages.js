@@ -109,9 +109,9 @@ class StyledPages {
         .add('customjs', 'textarea', {
             displayname : "Custom Javascript"
         })
-        /*.add('skiplayout', 'checkbox', {
+        .add('skiplayout', 'checkbox', {
             displayname : "Do not use theme layout"
-        })*/
+        })
         .add('title-action', 'title', {
             displayname: "Actions"
         })

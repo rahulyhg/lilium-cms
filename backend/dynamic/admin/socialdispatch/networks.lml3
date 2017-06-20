@@ -1,0 +1,23 @@
+const settings = {
+    livevars : ["socialdispatch.networks"],
+    petals : ["networks.js"],
+    lmldom : {
+        v : 1.0,
+        features : []
+    },
+    title : "Social Dispatch"
+};
+
+const preload = (context, done) => {
+    done();
+};
+
+const compile = (o, context) => {
+    o(
+        context.header, 
+        context.libs.formbuilder.render("networksocialaccounts", 'edit', 'socialdispatch.networks'),
+        context.petals["networks.js"].compile()
+    );
+};
+
+module.exports = { settings, preload, compile };

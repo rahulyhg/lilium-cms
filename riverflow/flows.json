@@ -359,6 +359,10 @@
             "endpoint" : "decorations",
             "support" : ["setup", "livevar", "admin_post", "admin_get"]
         }, {
+            "module" : "socialdispatch.js",
+            "endpoint" : "socialdispatch",
+            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"]
+        }, {
             "module" : "amp.js",
             "endpoint" : "amp",
             "support" : ["get"]

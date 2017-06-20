@@ -1,6 +1,7 @@
-var admin = require('./backend/admin.js');
+const db = require('./includes/db.js');
 
-var LMLSystem = function() {
+
+class LMLSystem {
     
 };
 

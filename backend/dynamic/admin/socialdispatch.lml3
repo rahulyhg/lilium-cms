@@ -1,0 +1,19 @@
+const settings = {
+    livevars : ["socialdispatch.calendar"],
+    petals : [],
+    lmldom : {
+        v : 1.0,
+        features : []
+    },
+    title : "Social Dispatch"
+};
+
+const preload = (context, done) => {
+    done();
+};
+
+const compile = (o, context) => {
+    o(context.header);
+};
+
+module.exports = { settings, preload, compile };
