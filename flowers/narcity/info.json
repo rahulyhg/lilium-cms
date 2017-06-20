@@ -63,6 +63,8 @@
         "networkname" : {"type" : "text", "attr" : {"displayname" : "Name on the Network"}, "default" : "Montreal"},
         "chartbeatsection" : {"type" : "text", "attr" : {"displayname" : "Chartbeat Section"}, "default" : "Stuff"},
         "cityname" : {"type" : "text", "attr" : {"displayname" : "City name"}, "default" : "Montreal"},
+        "geolat" : {"type" : "text", "attr" : {"displayname" : "Latitude"}, "default" : "45.5017"},
+        "geolng" : {"type" : "text", "attr" : {"displayname" : "Longitude"}, "default" : "73.5673"},
         "featuredyoutubeid" : {"type" : "text", "attr" : {"displayname" : "Featured YouTube video ID"}, "validations" : {"required" : false}, "default" : "none"},
         "mailchimpdigest" : {"type" : "text", "attr" : {"displayname" : "Mailchimp Digest ID"}, "default" : "#####"},
         "homepagesections" : {"type" : "stack",

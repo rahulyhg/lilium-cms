@@ -842,7 +842,37 @@ var serveReadAPI = function(cli) {
 
 // ~/api/cities
 const serveCityAPI = function(cli) {
-    db.findToArray(cli._c, 'topics', {"override.cityname" : {$exists : 1}}, function(err, cities) {
+    var $match = {
+        "override.cityname" : {$exists : 1}
+    };
+
+    db.join(cli._c, 'topics', [
+        {$match},
+        {
+            $lookup : {
+                from:           "topics",
+                localField:     "_id",
+                foreignField:   "parent",
+                as:             "children"
+            }
+        }
+    ], function(cities) {
+        cities.forEach(c => {
+            for (var i = 0; i < c.children.length; i++) {
+                c.children[i] = {
+                    _id : c.children[i]._id,
+                    displayname : c.children[i].displayname
+                }
+            }
+
+            try {
+                c.geo = {
+                    lat : c.override.geolat && parseFloat(c.override.geolat),
+                    lng : c.override.geolng && parseFloat(c.override.geolng)
+                };
+            } catch (ex) { c.geo = {}; }
+        });
+
         cli.sendJSON({
             section : "topic",
             cities : cities
@@ -913,17 +943,46 @@ var serveTopicAPI = function(cli) {
                                 });
                             };
 
-                            topic.city = topic.override && topic.override.cityname;
-                            topic.cityid = topic.city && topic._id;
-                            if (topic.family.length == 4) {
-                                db.findUnique(cli._c, 'topics', {_id : topic.family[1]}, function(err, maybecity) {
-                                    topic.city = maybecity.override && maybecity.override.cityname;
-                                    topic.cityid = maybecity && topic.family[1];
+
+                            const findCity = () => {
+                                topic.city = topic.override && topic.override.cityname;
+
+                                if (topic.city) {
+                                    topic.cityid = topic._id;
+                                    
+                                    try {
+                                        topic.geo = {
+                                            lat : topic.override.geolat && parseFloat(topic.override.geolat),
+                                            lng : topic.override.geolng && parseFloat(topic.override.geolng)
+                                        };
+                                    } catch (ex) { c.geo = {}; }
+                                }
+
+                                if (topic.family.length == 4) {
+                                    db.findUnique(cli._c, 'topics', {_id : topic.family[1]}, function(err, maybecity) {
+                                        topic.city = maybecity.override && maybecity.override.cityname;
+                                        topic.cityid = maybecity && topic.family[1];
+
+                                        try {
+                                            topic.geo = {
+                                                lat : maybecity.override.geolat && parseFloat(maybecity.override.geolat),
+                                                lng : maybecity.override.geolng && parseFloat(maybecity.override.geolng)
+                                            };
+                                        } catch (ex) { c.geo = {}; }
+
+                                        finishup();
+                                    });
+                                } else {
                                     finishup();
+                                }
+                            };
+
+                            db.find(cli._c, 'topics', {parent : topic._id}, [], function(err, cur) {
+                                cur.project({_id : 1, displayname : 1}).sort({displayname : 1}).toArray(function(err, children) {
+                                    topic.children = children;
+                                    findCity();
                                 });
-                            } else {
-                                finishup();
-                            }
+                            });
                         });
                     });
                 });
