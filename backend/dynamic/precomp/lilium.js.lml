@@ -1221,11 +1221,11 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.quill.reset();
         liliumcms.users.cacheUsers();
         liliumcms.users.cacheUsers();
-        liliumcms.lmldom.parse(function() {
+        liliumcms.lmldom.parse(function(lmldom) {
             liliumcms.imagepicker.seek();
             liliumcms.imagepicker.refresh();
             liliumcms.modals.find(true);
-            liliumcms.formParser.init();
+            !lmldom && liliumcms.formParser.init();
             liliumcms.formbeautifier.beautify();
             liliumcms.pageloader.parseDocument();
             liliumcms.livevars.parseDataLivevars();

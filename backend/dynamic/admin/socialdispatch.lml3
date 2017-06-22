@@ -13,7 +13,10 @@ const preload = (context, done) => {
 };
 
 const compile = (o, context) => {
-    o(context.header);
+    o(
+        context.header, 
+        '<a href="//localhost:8080/admin/socialdispatch/networks">Networks</a>'
+    );
 };
 
 module.exports = { settings, preload, compile };

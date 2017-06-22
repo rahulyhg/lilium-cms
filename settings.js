@@ -159,7 +159,7 @@ var Settings = function () {
             .add('google.apikey', 'text', {
                 displayname: "API Key"
             })
-            .add('google.clientid', 'text', {
+ /*           .add('google.clientid', 'text', {
                 displayname: "Client ID"
             })
             .add('google.clientsecret', 'text', {
@@ -174,7 +174,7 @@ var Settings = function () {
             .add('google.refreshtoken', 'text', {
                 displayname : "Refresh Token"
             })
-            .add('google.jsonfilepath', 'text', {
+*/            .add('google.jsonfilepath', 'text', {
                 displayname : "Backend JSON key file full path"
             })
 
@@ -190,8 +190,8 @@ var Settings = function () {
             .add('analytics.siteviewid', 'text', {
                 displayname: "Site view ID"
             })
-
-        .add('lickstats_title', 'title', {
+/*
+*       .add('lickstats_title', 'title', {
             displayname : "Lickstats Combos"
         })
         .add('lickstatscombos', 'stack', {
@@ -213,7 +213,8 @@ var Settings = function () {
                     }
                 ]
             }
-        }).add('dfp_title', 'title', {
+        })
+        .add('dfp_title', 'title', {
                 displayname: "DFP"
             })
             .add('dfp.client_id', 'text', {
@@ -293,7 +294,7 @@ var Settings = function () {
             }, {
                 required: false
             })
-
+*/
         .add('social-facebook-sep', 'title', {
                 displayname: "Facebook API"
             })
@@ -315,7 +316,7 @@ var Settings = function () {
             .add('social.instagram.accounts', 'text', {
                 displayname : "Instagram accounts"
             })
-
+/*
         .add('stripe-sep', "title", {
                 displayname: "Stripe"
             })
@@ -329,7 +330,7 @@ var Settings = function () {
             }, {
                 required: false
             })
-
+*/
         .add('email-sep', 'title', {
                 displayname: "Email System"
             })
@@ -372,7 +373,8 @@ var Settings = function () {
                 notitle: true,
                 format : "array"
             })
-/*            .add('posts.frontend.dateformat', 'text', {
+/*
+            .add('posts.frontend.dateformat', 'text', {
                 displayname: "Presented date format"
             }, {
                 required: false

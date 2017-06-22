@@ -77,6 +77,7 @@ class LMLContext {
     createOutputFunction() {
         this.markupbuffer = new MarkupBuffer();
         this.o = (...str) => {
+            console.log(str);
             str.forEach(s => this.markupbuffer.write(s));
         }
         return this;

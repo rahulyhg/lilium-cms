@@ -16,8 +16,9 @@ const compile = (o, context) => {
     o(
         context.header, 
         context.libs.formbuilder.render("networksocialaccounts", 'edit', 'socialdispatch.networks'),
-        context.petals["networks.js"].compile()
     );
+
+    context.petals["networks.js"].compile();
 };
 
 module.exports = { settings, preload, compile };

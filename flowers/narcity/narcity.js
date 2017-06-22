@@ -507,6 +507,7 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                                 arr[i].classes = "article-thumbnail";
                                 if ((9 - i) % 9 == 0) {
                                     arr[i].classes += " article-thumbnail-featured"
+                                    arr[i].imgsrc = conf.server.protocol + arr[i].featuredimage[0].sizes.thumbnaillarge.url;
                                 } else if ((i + 1) % 9 > 3) {
                                     arr[i].classes += " article-thumbnail-margined"
                                 }
