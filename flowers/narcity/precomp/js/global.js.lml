@@ -174,9 +174,10 @@ var loadNext = function(url) {
 };
 
 window.adpos = [];
+window["nladzdsfop9i23l4"]={totalAdsLoaded:0,event:"totalAdsLoaded"};
 var findAds = function() {
   googletag.cmd.push(function() {
-    var lmlads = document.querySelectorAll(".lmlad");
+    var lmlads = document.querySelectorAll(".lmlad:not(.nolazyload)");
     var bodyRect = document.body.getBoundingClientRect()
 
     for (var i = 0; i < lmlads.length; i++) {
@@ -195,15 +196,28 @@ var findAds = function() {
     for (var i = 0; i < keys.length; i++) if (document.getElementById(keys[i])) {
         googletag.display(keys[i]);
     }
+
+    var initads = document.querySelectorAll(".lmlad.nolazyload");
+    for (var i = 0; i < initads.length; i++) {
+        var ad = initads[i];
+
+        googletag.pubads().refresh([ window.lmladslots[ad.id] ]);
+        window.nladzdsfop9i23l4.totalAdsLoaded++;
+
+        dataLayer.push({
+            event : "AdDisplayed",
+            eventAction : "Displayed",
+            eventCategory : "Advertising",
+            eventLabel : ad.id,
+            eventValue : 1
+        });
+    }
   });
 
   googletag.cmd.push(handleAdScroll);
-  googletag.cmd.push(handleAdScroll);
-  googletag.cmd.push(handleAdScroll); 
 };
 
 var handlingScroll = false;
-window["nladzdsfop9i23l4"]={totalAdsLoaded:0,event:"totalAdsLoaded"};
 var handleAdScroll = function(e) {
     if (window.adpos.length == 0) {
         return;
