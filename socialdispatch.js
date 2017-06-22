@@ -6,9 +6,28 @@ const filelogic = require('./filelogic.js');
 const DISPATCH_COLLECTION = "socialdispatch";   // Website collection
 const ACCOUNTS_COLLECTION = "socialaccounts";   // Network collection
 
+class SocialPost {
+    constructor(message, postid, published, time) {
+        this.message = message;
+        this.postid = db.mongoID(postid);
+        this.published = typeof published == "undefined" ? true : published;
+        this.time = new Date(time).getTime();
+    }
+
+
+}
+
 class SocialDispatch {
     adminGET(cli) {
-        filelogic.serveAdminLML3(cli);
+        switch (cli.routeinfo.path[2]) {
+            case undefined:
+            case "networks":
+                filelogic.serveAdminLML3(cli);
+                break;
+
+            default:
+                cli.throwHTTP(404);
+        }
     }
 
     adminPOST(cli) {

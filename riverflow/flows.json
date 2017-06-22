@@ -314,16 +314,7 @@
             "support" : ["admin_get", "admin_post", "form", "livevar"],
             "hooks" : [
                 { "name" : "post_create_persona", "priority" : 15, "callback" : "postCreatePersona" }
-            ], 
-            "admin_menu" : {
-                "id": "entities-personas",
-                "faicon": "fa-users",
-                "displayname": "Personas",
-                "priority": 520,
-                "rights": ["manage-personas"],
-                "absURL": "admin/persona/list",
-                "children": []
-            }
+            ]
         }, {
             "module" : "role.js",
             "endpoint" : "role",
@@ -361,7 +352,16 @@
         }, {
             "module" : "socialdispatch.js",
             "endpoint" : "socialdispatch",
-            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"]
+            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"],
+            "admin_menu" : {
+                "id": "socialdispatch",
+                "faicon": "fa-share-alt",
+                "displayname": "Social Dispatch",
+                "priority": 410,
+                "rights": ["editor"],
+                "absURL": "admin/socialdispatch",
+                "children": []
+            }
         }, {
             "module" : "amp.js",
             "endpoint" : "amp",
