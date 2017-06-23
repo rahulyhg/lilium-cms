@@ -801,8 +801,8 @@ var LMLDom = function() {
         for (var i = 0; i < liveselects.length; i++) {
             var select = liveselects[i];
             var endpoint = select.dataset.filledby;
-            var valuekey = select.dataset.selectvalue;
-            var displaykey = select.dataset.selectdisplayname;
+            var valuekey = select.dataset.selectvalue || "name";
+            var displaykey = select.dataset.selectdisplayname || "displayname";
             var filling = liliumcms.livevars.pulloutLiveVar(endpoint, true);
             
             if (filling) for (var j = 0; j < filling.length; j++) {
@@ -883,6 +883,14 @@ var LMLDom = function() {
         var treeselects = maindom.querySelectorAll(".lmldom-treeselect");
         for (var i = 0; i < treeselects.length; i++) {
             liliumcms.treeselect.push(new LMLTreeSelect(treeselects[i]));
+        }
+
+        var dateelem = document.querySelectorAll('.lml-date');
+        for (var i = 0; i < dateelem.length; i++) {
+            var usesTime = dateelem[i].dataset.options && dateelem[i].dataset.options.indexOf("time") != -1
+            new Flatpickr(dateelem[i], {
+                enableTime : usesTime
+            });
         }
     };
 

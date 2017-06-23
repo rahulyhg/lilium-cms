@@ -110,3 +110,26 @@
     color: #999;
     line-height: 30px;
 }
+
+.lml-modal-fulltext {
+    width: 100%;
+    box-sizing: content-box;
+    border-top: 1px solid #DDD;
+    height: 120px;
+    margin: 0px -20px;
+    display: block;
+    border-bottom: 1px solid #DDD;
+    padding: 10px 20px;
+    resize: none;
+}
+
+.lml-modal-field {
+    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+.lml-modal-body select {
+    width: 100%;
+    display: block;
+    box-sizing: border-box;
+}

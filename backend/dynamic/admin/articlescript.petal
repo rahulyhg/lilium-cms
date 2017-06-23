@@ -336,7 +336,7 @@
                 document.getElementById("social-dispatch-status").textContent = "Not scheduled";
             }
 
-            var sList = document.getElementById('social-dispatch-schedule-lis');
+            var sList = document.getElementById('social-dispatch-schedule-list');
             while (sList.firstElementChild) {
                 sList.firstElementChild.remove();
             }
@@ -618,6 +618,10 @@
             }
         });
     }
+
+    var loadScheduleFacebookDialog = function() {
+        liliumcms.modals.get("dlg-facebook-schedule").cast();
+    };
 </script>
 
 <div id="confirm-publish" class="modal fade announcement" tabindex="-1" role="dialog">

@@ -137,6 +137,19 @@ class SocialDispatch {
                 db.findToArray(config.default(), ACCOUNTS_COLLECTION, {}, (err, array) => {
                     send(err || {accounts : array});
                 }, { _id : 1, displayname : 1, network : 1 });
+            } else if (levels[1] == "liveselect") {
+                db.findToArray(config.default(), ACCOUNTS_COLLECTION, {}, (err, array) => {
+                    send(
+                        array.map(
+                            (x) => { 
+                                return {
+                                    displayname : x.displayname, 
+                                    name : x._id
+                                }; 
+                            }
+                        )
+                    );
+                }, { _id : 1, displayname : 1, network : 1 });
             } else if (levels[1] == "full") {
                 if (cli.hasRight('admin')) {
                     db.findToArray(config.default(), ACCOUNTS_COLLECTION, {}, (err, array) => {

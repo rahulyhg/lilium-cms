@@ -1,6 +1,7 @@
 {#config;vocab;forms}
 <lml:dom v="0.8"></lml:dom>
 {*content.{?1}} 
+{*socialdispatch.networks.liveselect}
 {%../articlescript}
 
 <h1>Edit a post</h1>
@@ -84,6 +85,30 @@
         <button onclick="destroyArticleModal()" class="small red">
             Destroy
         </button>
+    </div>
+</div>
+
+<div id="dlg-facebook-schedule" class="lml-modal">
+    <div class="lml-modal-title">
+        Schedule post on Facebook
+    </div>
+    <div class="lml-modal-body">
+        <div class="lml-modal-field">
+            <div><label>Facebook page</label></div>
+            <select class="lmldom-liveselect" data-filledby="socialdispatch.networks.liveselect" name="pageid"></select>
+        </div>
+        <div class="lml-modal-field">
+            <div><label>Post caption</label></div>
+            <textarea class="lml-modal-fulltext"></textarea>
+        </div>
+        <div class="lml-modal-field">
+            <div><label>When should this article go live on Facebook</label></div>
+            <input class="lml-date" data-options="time" />
+        </div>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel btn-default" type="button">Cancel</button>
+        <button class="lml-modal-accept green" type="button">Schedule</button>
     </div>
 </div>
 
