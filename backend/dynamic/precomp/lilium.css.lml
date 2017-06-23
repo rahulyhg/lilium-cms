@@ -2326,6 +2326,10 @@ button.bigger {
     content : '\f1da';
 }
 
+.article-schedule-button-wrapper button::before {
+    content : '\f082';
+}
+
 .article-delete-button-wrapper button::before {
     content : '\f057';
 }

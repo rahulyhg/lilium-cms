@@ -1,5 +1,5 @@
 const settings = {
-    livevars : ["socialdispatch.networks"],
+    livevars : ["socialdispatch.networks.full"],
     petals : ["networks.js"],
     lmldom : {
         v : 1.0,
@@ -15,7 +15,7 @@ const preload = (context, done) => {
 const compile = (o, context) => {
     o(
         context.header, 
-        context.libs.formbuilder.render("networksocialaccounts", 'edit', 'socialdispatch.networks'),
+        context.libs.formbuilder.render("networksocialaccounts", 'edit', 'socialdispatch.networks.full'),
     );
 
     context.petals["networks.js"].compile();

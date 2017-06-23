@@ -305,6 +305,7 @@
 
             if (resp.status == "published") {
                 document.querySelector('.article-delete-button-wrapper').style.display = "";
+                document.querySelector('.article-schedule-button-wrapper').style.display = "";
             } else if (resp.status == "autosaved") {
                 document.querySelector('.article-destroyautosave-button-wrapper').style.display = "";
             } else {
@@ -312,6 +313,59 @@
             }
 
             document.querySelector('.article-history-button-wrapper').style.display = "";
+
+            // Facebook schedule
+            var hasDispatch = resp.socialdispatch && resp.socialdispatch.length != 0;
+            var hasSchedule = false;
+            if (hasDispatch) {
+                for (var i = 0; i < resp.socialdispatch.length; i++) {
+                    if (resp.socialdispatch[0].status == "scheduled") {
+                        hasSchedule = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hasSchedule) {
+                document.getElementById("social-dispatch-schedules").firstElementChild.textContent = 
+                    "This post is scheduled to be posted on social media";
+                document.getElementById("social-dispatch-status").textContent = "Scheduled";
+            } else {
+                document.getElementById("social-dispatch-schedules").firstElementChild.textContent = 
+                    "There are no schedules for this post";
+                document.getElementById("social-dispatch-status").textContent = "Not scheduled";
+            }
+
+            var sList = document.getElementById('social-dispatch-schedule-lis');
+            while (sList.firstElementChild) {
+                sList.firstElementChild.remove();
+            }
+
+            if (hasDispatch) {
+                for (var i = 0; i < resp.socialdispatch.length; i++) {
+                    var dispatch = resp.socialdispatch[i];
+                    var nel = document.createElement('div');
+                    var valid = true;
+                    nel.className = "social-dispatch-schedule";
+
+                    var when = new Date(dispatch.time);
+                    if (dispatch.status == "scheduled") {
+                        nel.textContent = "This post will go live at : " + 
+                            dateFormat(when, "HH:MM") + " on " + 
+                            dateFormat(when, "dd/mm/yyyy");
+                    } else if (dispatch.status == "published") {
+                        nel.textContent = "This article was posted at : " +
+                            dateFormat(when, "HH:MM") + " on " + 
+                            dateFormat(when, "dd/mm/yyyy");
+                    } else {
+                        valid = false;
+                    }
+
+                    if (valid) {
+                        sList.appendChild(nel);
+                    }
+                }
+            }
         });
     };
 

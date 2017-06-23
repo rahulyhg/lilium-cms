@@ -67,7 +67,7 @@
         "script" : "1.2.2.js",
         "features" : ["Cakepops"]
     },
-    "1.2.1" : {
+    "1.2.3" : {
         "codename":  "Azul",
         "script" : "1.2.3.js",
         "features" : ["Social automation"]

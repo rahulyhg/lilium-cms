@@ -9,53 +9,81 @@
 <div id="editor"></div>
 <div class="col-md-12 article-more-info-wrapper">
 	<fieldset class="title">
-	  <legend>More Informations</legend>
+	    <legend>Social Dispatch</legend>
 	</fieldset>
 
-		<div class="article-info-strip">
-			<span>Status : </span><span id="moreinfo-status"></span>
-		</div>
-		<div class="article-info-strip">
-			<span>URL : </span><span id="moreinfo-url"></span>
-            <span id="article-edit-slug-button">
-                <i class="fa fa-pencil" aria-hidden="true"></i>
-            </span>
-		</div>
-		<div class="article-info-strip">
-			<span>Alias : </span><span id="moreinfo-alias"></span>
-		</div>
-		<div class="article-info-strip">
-			<span>Last Updated : </span><span id="moreinfo-updated"></span>
-		</div>
-		<div class="article-info-strip">
-			<span>Author : </span><span id="moreinfo-author"></span>
-		</div>
-		<div class="article-info-strip modcount-info-strip">
-			<span>Modification count : </span><span id="moreinfo-modcount">0</span>
-		</div>
+    <div class="article-info-strip">
+        <span>Dispatch status : </span><span id="social-dispatch-status">Unknown</span>
+    </div>
 
-        <div class="article-info-strip article-history-button-wrapper article-button-wrapper role-author">
-            <button onclick="loadArticleHistory();" class="small">
-                View history
-            </button>
-        </div>
+    <div class="article-info-strip">
+        <span><b>Schedules</b></span>
+        <div id="social-dispatch-schedules">
+            <i>There are no schedules for this post</i>
+            <div id="social-dispatch-schedule-list">
 
-        <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
-            <button onclick="unpublishArticleModal()" class="small red">
-                    Unpublish
-            </button>
+            </div>
         </div>
+    </div>
 
-        <div class="article-info-strip article-destroy-button-wrapper article-destroyautosave-button-wrapper article-button-wrapper">
-            <button onclick="destroyAutosave()" class="small red">
-                    Discard Autosave
-            </button>
-        </div>
-        
-        <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper role-author">
-            <button onclick="destroyArticleModal()" class="small red">
-                    Destroy
-            </button>
-        </div>
+    <div class="article-info-strip article-schedule-button-wrapper article-button-wrapper role-editor">
+        <button onclick="loadScheduleFacebookDialog();" class="small blue">
+            Schedule Facebook post
+        </button>
+    </div>
+
+
+
+	<fieldset class="title">
+	    <legend>More Informations</legend>
+	</fieldset>
+
+	<div class="article-info-strip">
+		<span>Status : </span><span id="moreinfo-status"></span>
+	</div>
+	<div class="article-info-strip">
+		<span>URL : </span><span id="moreinfo-url"></span>
+        <span id="article-edit-slug-button">
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+        </span>
+	</div>
+	<div class="article-info-strip">
+		<span>Alias : </span><span id="moreinfo-alias"></span>
+	</div>
+	<div class="article-info-strip">
+		<span>Last Updated : </span><span id="moreinfo-updated"></span>
+	</div>
+	<div class="article-info-strip">
+		<span>Author : </span><span id="moreinfo-author"></span>
+	</div>
+	<div class="article-info-strip modcount-info-strip">
+		<span>Modification count : </span><span id="moreinfo-modcount">0</span>
+	</div>
+
+
+
+    <div class="article-info-strip article-history-button-wrapper article-button-wrapper role-author">
+        <button onclick="loadArticleHistory();" class="small">
+            View history
+        </button>
+    </div>
+
+    <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
+        <button onclick="unpublishArticleModal()" class="small red">
+             Unpublish
+        </button>
+    </div>
+
+    <div class="article-info-strip article-destroy-button-wrapper article-destroyautosave-button-wrapper article-button-wrapper">
+        <button onclick="destroyAutosave()" class="small red">
+            Discard Autosave
+        </button>
+    </div>
+    
+    <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper role-author">
+        <button onclick="destroyArticleModal()" class="small red">
+            Destroy
+        </button>
+    </div>
 </div>
 

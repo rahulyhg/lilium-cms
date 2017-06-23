@@ -228,16 +228,19 @@ var Article = function() {
                 db.findToArray(conf.default(), 'entities', {_id : art.author}, function(err, autarr) {
                     db.findUnique(cli._c, 'topics', {_id : art.topic}, function(err, topic) {
                         db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, function(err, modcount) {
-                            cli.sendJSON({
-                                status : art.status || "Unknown",
-                                url : art.name ? 
-                                    (cli._c.server.url + "/" + (art.topic ? topic.completeSlug : "") + "/" + art.name) : 
-                                    "This article doesn't have a URL.",
-                                siteurl : cli._c.server.url,
-                                aliases : art.aliases ? Array.from(new Set(art.aliases)) : [],
-                                updated : art.updated || "This article was never updated",
-                                author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
-                                modifications : modcount
+                            db.findToArray(cli._c, 'socialdispatch', { postid : db.mongoID(cli.routeinfo.path[3]) }, (err, socialp) => {
+                                cli.sendJSON({
+                                    status : art.status || "Unknown",
+                                    url : art.name ? 
+                                        (cli._c.server.url + "/" + (art.topic ? topic.completeSlug : "") + "/" + art.name) : 
+                                        "This article doesn't have a URL.",
+                                    siteurl : cli._c.server.url,
+                                    aliases : art.aliases ? Array.from(new Set(art.aliases)) : [],
+                                    updated : art.updated || "This article was never updated",
+                                    author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
+                                    modifications : modcount,
+                                    socialdispatch : socialp
+                                });
                             });
                         });
                     });
