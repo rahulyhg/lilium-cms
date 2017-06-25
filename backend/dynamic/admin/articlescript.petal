@@ -619,6 +619,31 @@
         });
     }
 
+    window["dlg-facebook-schedule_accept"] = function(modal) {
+        var dat = modal.getFormData();
+        if (dat.pageid && dat.postcaption && dat.postdate) {
+            var time = dat.postdate.getTime();
+            liliumcms.lmldom.sendForm(
+                {
+                    postid : contentid,
+                    pageid : dat.pageid,
+                    message : dat.postcaption,
+                    time : time
+                },
+                "{=config.default.server.url}/admin/socialdispatch/schedule",
+            function(resp) {
+                liliumcms.notify({
+                    type : "info",
+                    title : "Facebook Graph",
+                    message : "Your publication request is being processed."
+                });
+            });
+
+            modal.dismiss();
+        } else {
+        }
+    }
+
     var loadScheduleFacebookDialog = function() {
         liliumcms.modals.get("dlg-facebook-schedule").cast();
     };

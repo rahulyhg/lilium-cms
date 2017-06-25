@@ -8,54 +8,71 @@ const articleLib = require('./article.js');
 const DISPATCH_COLLECTION = "socialdispatch";   // Website collection
 const ACCOUNTS_COLLECTION = "socialaccounts";   // Network collection
 
-const GRAPH_API = "https://graph.facebook.com/";
+const GRAPH_API = "https://graph.facebook.com/v";
 const FEED_ENDPOINT = "/feed/";
 const GRAPH_TOKEN = "?access_token=";
 
 class SocialPost {
-    constructor(message, siteid, postid, pageid, time) {
+    constructor(message, siteid, postid, pageid, time, status) {
         this.message = message;
         this.siteid = siteid;
         this.postid = db.mongoID(postid);
         this.pageid = db.mongoID(pageid);
+        this.status = status || "draft";
         this.time = time ? new Date(time).getTime() : Date.now();
     }
 
     publish(done) {
         db.findUnique(config.default(), ACCOUNTS_COLLECTION, {_id : this.pageid}, (err, account) => {
             if (!account || err) {
-                return done(err || true);
+                log("SDispatch", "Social account not found or database error : " + err, 'warn');
+                return done && done(err || true);
             }
 
             let _c = config.fetchConfig(this.siteid);
 
             if (account.network == "facebook") {
                 articleLib.deepFetch(_c, this.postid, (article) => {
+                    log("SDispatch", "Sending POST request to Facebook Graph /feed on page " + account.displayname);
+                    let reqURL = GRAPH_API + _c.social.facebook.apiversion + FEED_ENDPOINT + GRAPH_TOKEN + account.accesstoken;
+
+                    // Debug
+                    if (article.url.includes("localhost")) {
+                        article.url = undefined;
+                    }
+
                     request({
                         method : "POST",
-                        url : GRAPH_API + _c.social.facebook.apiversion + FEED_ENDPOINT + GRAPH_TOKEN + account.token,
+                        url : reqURL,
                         json : {
                             message : this.message, 
                             link : article.url,
                             published : true,
                         }
                     }, (err, msg, body) => {
+                        log("SDispatch", "Got response from Facebook Graph");
                         if (body && body.id) {
                             this.success = true;
                             this.ref = body.id;
                             this.status = "published";
                             this.time = Date.now();
 
+                            log("SDispatch", "Got response from Facebook Graph with success flag : " + !!this.success);
                             db.update(_c, 'content', {_id : this.postid}, { $addToSet : {facebookpostids : body.id} }, () => {
+                                log("SDispatch", "Pushed new Facebookm post ID to content collection under 'facebookpostids'");
                                 db.update(_c, DISPATCH_COLLECTION, {_id : this.pagemongoid, ref : body.id}, {status : "published"}, ()=>{
-                                    done && done(undefined, this);
+                                    log("SDispatch", "Updated schedule from database with the published status");
+                                    done && done(undefined, "Successfully posted on Facebook");
                                 });
-                            });
+                            }, false, true, true);
+                        } else {
+                            log("SDispatch", "But something went wrong : " + (err || body.error.message), "warn");
+                            done && done(err || body.error.message);
                         }
                     });
                 });
             } else {
-                done && done();
+                done && done("Invalid Facebook account");
             }
         });
     }
@@ -65,11 +82,11 @@ class SocialPost {
     }
 
     commit() {
-        setTimeout(this.publish, this.time - Date.now());
+        setTimeout(()=>{this.publish();}, this.time - Date.now());
     }
 
     static buildFromDB(x) {
-        return new SocialPost( x.message, x.siteid, x.postid, x.pageid, x.time );
+        return new SocialPost( x.message, x.siteid, x.postid, x.pageid, x.time, x.status );
     }
 
     static fetchScheduled(_c, send) {
@@ -87,15 +104,19 @@ class SocialPost {
 }
 
 class SocialDispatch {
-    schedule(_c, postid, pageid, message, time) {
-        let sPost = new SocialPost(message, _c.id, postid, pageid, time);
-        if (time == "now" || Date.now() < time) {
-            sPost.publish();
-        } else {
-            sPost.insert(() => {
+    schedule(_c, postid, pageid, message, time, cb) {
+        log('SDispatch', "Received schedule request on site " + _c.id + " for post " + postid);
+        let sPost = new SocialPost(message, _c.id, postid, pageid, time, "scheduled");
+        sPost.insert(() => {
+            if (time == "now" || Date.now() > time) {
+                log('SDispatch', "Publishing " + postid + " now since dispatch time is less than current time");
+                sPost.publish(cb);
+            } else {
+                log('SDispatch', "Dispatch commit of post " + postid);
                 sPost.commit();
-            });
-        }
+                cb && cb(undefined, "Post was scheduled to be published on Facebook successfully");
+            }
+        });
     }
 
     adminGET(cli) {
@@ -124,6 +145,35 @@ class SocialDispatch {
                     });
                 });
             });
+        } else if (level == "schedule") {
+            const notif = require('./notifications.js');
+            let data = cli.postdata.data;
+            let time = data.time;
+            if (!isNaN(time)) {
+                time = parseInt(time);
+            } else {
+                time = "now";
+            }
+
+            this.schedule(cli._c, data.postid, data.pageid, data.message, time, (err, info) => {
+                if (err) {
+                    notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                        type : "danger",
+                        title : "Facebook Graph",
+                        message : err
+                    });
+                } else {
+                    notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                        type : "success",
+                        title : "Facebook Graph",
+                        message : info || "Post was sheduled"
+                    });
+                }
+            });
+
+            cli.sendJSON({
+                success : true
+            })
         } else {
             cli.throwHTTP(404, undefined, true);
         }
