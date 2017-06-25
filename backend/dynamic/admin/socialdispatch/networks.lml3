@@ -15,7 +15,7 @@ const preload = (context, done) => {
 const compile = (o, context) => {
     o(
         context.header, 
-        context.libs.formbuilder.render("networksocialaccounts", 'edit', 'socialdispatch.networks.full'),
+        context.libs.formbuilder.render("networksocialaccounts", 'edit', 'socialdispatch.networks.full')
     );
 
     context.petals["networks.js"].compile();

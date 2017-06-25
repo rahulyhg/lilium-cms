@@ -632,8 +632,9 @@
                 },
                 "{=config.default.server.url}/admin/socialdispatch/schedule",
             function(resp) {
+                updateBottomSection();
                 liliumcms.notify({
-                    type : "info",
+                    type : "log",
                     title : "Facebook Graph",
                     message : "Your publication request is being processed."
                 });

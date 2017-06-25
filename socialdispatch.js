@@ -1,4 +1,5 @@
 const db = require('./includes/db.js');
+const log = require('./log.js');
 const formBuilder = require('./formBuilder.js');
 const config = require('./config.js');
 const filelogic = require('./filelogic.js');
@@ -13,13 +14,14 @@ const FEED_ENDPOINT = "/feed/";
 const GRAPH_TOKEN = "?access_token=";
 
 class SocialPost {
-    constructor(message, siteid, postid, pageid, time, status) {
+    constructor(message, siteid, postid, pageid, time, status, _id) {
         this.message = message;
         this.siteid = siteid;
         this.postid = db.mongoID(postid);
         this.pageid = db.mongoID(pageid);
         this.status = status || "draft";
         this.time = time ? new Date(time).getTime() : Date.now();
+        this._id = _id;
     }
 
     publish(done) {
@@ -57,10 +59,18 @@ class SocialPost {
                             this.status = "published";
                             this.time = Date.now();
 
+                            require('./notifications.js').notifyUser(article.author, this.siteid, {
+                                type : "log",
+                                title : "Facebook Graph",
+                                msg : "Your article " + 
+                                    article.title + " was shared on the " + 
+                                    account.displayname + " Facebook page." 
+                            });
+
                             log("SDispatch", "Got response from Facebook Graph with success flag : " + !!this.success);
                             db.update(_c, 'content', {_id : this.postid}, { $addToSet : {facebookpostids : body.id} }, () => {
                                 log("SDispatch", "Pushed new Facebookm post ID to content collection under 'facebookpostids'");
-                                db.update(_c, DISPATCH_COLLECTION, {_id : this.pagemongoid, ref : body.id}, {status : "published"}, ()=>{
+                                db.update(_c, DISPATCH_COLLECTION, {_id : this._id}, {status : "published", ref : body.id}, ()=>{
                                     log("SDispatch", "Updated schedule from database with the published status");
                                     done && done(undefined, "Successfully posted on Facebook");
                                 });
@@ -86,7 +96,7 @@ class SocialPost {
     }
 
     static buildFromDB(x) {
-        return new SocialPost( x.message, x.siteid, x.postid, x.pageid, x.time, x.status );
+        return new SocialPost( x.message, x.siteid, x.postid, x.pageid, x.time, x.status, x._id );
     }
 
     static fetchScheduled(_c, send) {
@@ -97,13 +107,21 @@ class SocialPost {
 
     static commitScheduled(_c, done) {
         SocialPost.fetchScheduled(_c, (posts) => {
+            log('SDispatch', "Found " + posts.length + " posts to commit on " + _c.website.sitetitle);
             posts.forEach(x => x.commit());
-            done();
+            done && done();
         });
     }
 }
 
 class SocialDispatch {
+    init() {
+        log('SDispatch', "Fetching scheduled post and adding to timeline");
+        config.eachSync((_c) => {
+            SocialPost.commitScheduled(_c);
+        });
+    }
+
     schedule(_c, postid, pageid, message, time, cb) {
         log('SDispatch', "Received schedule request on site " + _c.id + " for post " + postid);
         let sPost = new SocialPost(message, _c.id, postid, pageid, time, "scheduled");
@@ -140,7 +158,7 @@ class SocialDispatch {
                 db.insert(config.default(), ACCOUNTS_COLLECTION, accounts, () => { 
                     cli.sendJSON({
                         success : true,
-                        message : "Network has now " + cli.postdata.data.accounts.length + " social accounts.",
+                        msg : "Network has now " + cli.postdata.data.accounts.length + " social accounts.",
                         title : "Saved"
                     });
                 });
@@ -156,24 +174,24 @@ class SocialDispatch {
             }
 
             this.schedule(cli._c, data.postid, data.pageid, data.message, time, (err, info) => {
+                cli.sendJSON({
+                    success : true
+                });
+
                 if (err) {
                     notif.notifyUser(cli.userinfo.userid, cli._c.id, {
                         type : "danger",
                         title : "Facebook Graph",
-                        message : err
+                        msg : err
                     });
                 } else {
                     notif.notifyUser(cli.userinfo.userid, cli._c.id, {
                         type : "success",
                         title : "Facebook Graph",
-                        message : info || "Post was sheduled"
+                        msg : info || "Post was sheduled"
                     });
                 }
             });
-
-            cli.sendJSON({
-                success : true
-            })
         } else {
             cli.throwHTTP(404, undefined, true);
         }

@@ -40,7 +40,7 @@
 </div>
 <audio preload="metadata" src="{=config.default.server.url}/static/audio/notif1.mp3" id="notification1" style="display: none" ></audio>
 
-<div id="conversation-group-new" class="lml-modal">
+<div id="conversation-group-new" class="lml-modal lml-modal-perma">
     <div class="lml-modal-title">
         New group conversation
     </div>    

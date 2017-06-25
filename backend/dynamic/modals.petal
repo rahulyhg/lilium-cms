@@ -1,4 +1,4 @@
-<div id="lml-error-modal" class="lml-modal">
+<div id="lml-error-modal" class="lml-modal lml-modal-perma">
     <div class="lml-modal-title">
         Error
     </div>
@@ -11,7 +11,7 @@
     </div>
 </div>
 
-<div class="lml-modal-wrapper"><div id="article-slug-edit" class="lml-modal">
+<div class="lml-modal-wrapper"><div id="article-slug-edit" class="lml-modal lml-modal-perma">
     <div class="lml-modal-title">
         Edit article URL slug
     </div>    
