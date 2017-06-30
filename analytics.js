@@ -92,6 +92,11 @@ class GoogleAnalyticsRequest {
                 slug = topPagePath.pop();
             }
 
+            var maybeParam = slug.indexOf('?');
+            if (maybeParam != -1) {
+                slug = slug.substring(0, maybeParam);
+            }
+
             require('./article.js').deepFetch(_c, slug, (article) => {
                 total.toppage = {
                     article : article || {title : slug},
