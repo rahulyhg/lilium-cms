@@ -33,7 +33,14 @@ class ConsoleArtificialIntelligenceJanitor {
 
     handleMessage(msgObject) {
         log('CAIJ', "Handling message with task type " + msgObject.taskname);
-        taskscheduler.push(msgObject);
+        if (msgObject.direct) {
+            taskscheduler.prepend(msgObject);
+            AI.decide(true, () => {
+                log('CAIJ', "Finished handling direct instruction");
+            });
+        } else {
+            taskscheduler.push(msgObject);
+        }
     }
 
     incoming(connection) {

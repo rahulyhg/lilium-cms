@@ -33,7 +33,7 @@ class AI {
         };
     }
 
-    decide() {
+    decide(oneTime, callback) {
         let task = taskscheduler.next();
 
         if (!task) {
@@ -48,7 +48,7 @@ class AI {
             };
         }
 
-        executor.execute(task, ai.createInterval);
+        executor.execute(task, oneTime ? callback : ai.createInterval);
     }
 
     createInterval() {
@@ -104,6 +104,19 @@ class AI {
             });
         };
 
+        let createSocialDispatchTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "socialDispatch",
+                    extra : {
+                        origin : "AI",
+                        _c : _c,
+                        action : "init"
+                    }
+                });
+            });
+        };
+
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
         ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
@@ -113,6 +126,7 @@ class AI {
 
         createHomepageTask();
         createFacebookTask();
+        createSocialDispatchTask();
     }
 
     error(err) {

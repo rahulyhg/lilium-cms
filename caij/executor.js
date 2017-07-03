@@ -11,6 +11,7 @@ const topicLib = require('../topics.js');
 const articleLib = require('../article.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
+const socialDispatchLib = require('../socialdispatch.js');
 
 const janitorJobs = [
     "cacheTopic",
@@ -27,6 +28,31 @@ class RunningTask {
         this.extra = extra;
         this._c = extra._c;
         this.stats = janitorStats[this._c.uid];
+    }
+
+    socialDispatch(sendback) {
+        let action = this.extra.action;
+        switch (action) {
+            case "add":
+
+                break;
+            case "update":
+
+                break;
+
+            case "remove":
+
+                break;
+
+            case "init":
+
+                break;
+
+            default:
+                
+        }
+
+        sendback();
     }
 
     // Uses Graph v2.8 structure, not tested on other versions

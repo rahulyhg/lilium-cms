@@ -11,6 +11,11 @@ class TaskScheduler {
         return tasks.length;
     }
 
+    prepend(taskobject) {
+        log('TaskScheduler', "Pushed priority task");
+        task.unshift(taskobject);
+    }
+
     push(taskobject) {
         log('TaskScheduler', "Pushed a task to schedule");
         tasks.push(taskobject);
