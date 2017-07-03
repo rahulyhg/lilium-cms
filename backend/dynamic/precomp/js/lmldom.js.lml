@@ -885,12 +885,10 @@ var LMLDom = function() {
             liliumcms.treeselect.push(new LMLTreeSelect(treeselects[i]));
         }
 
-        /*
         var fKeys = Object.keys(liliumcms.lmldom.flatpickr || {});
         for (var i = 0; i < fKeys.length; i++) {
             liliumcms.lmldom.flatpickr[fKeys[i]].destroy();
         } 
-        */
 
         liliumcms.lmldom.flatpickr = {}; 
         var dateelem = document.querySelectorAll('.lml-date');

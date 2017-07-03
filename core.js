@@ -34,6 +34,7 @@ var localcast = undefined;
 var cdn = undefined;
 var vocab = undefined;
 var various = undefined;
+var socialdispatch = undefined;
 
 var log = require('./log.js');
 var networkinfo = require('./network/info.js');
@@ -77,6 +78,7 @@ var Core = function () {
         cdn = require('./cdn.js');
         vocab = require('./vocab.js');
         various = require('./various.js');
+        socialdispatch = require('./socialdispatch.js');
 
         log('Core', 'Requires took ' + (new Date() - nn) + 'ms to initialize', 'lilium');
     };
@@ -407,6 +409,10 @@ var Core = function () {
         });
     };
 
+    var loadSocialDispatch = function() {
+        isElder && socialdispatch.init();
+    };
+
     var redirectIfInit = function (resp, cb) {
         if (resp) {
             resp.writeHead(200, {
@@ -535,6 +541,7 @@ var Core = function () {
             
             initForms();
             initTables();
+            loadSocialDispatch();
             loadEndpoints();
             loadStandardInput();
             loadScriptMode();

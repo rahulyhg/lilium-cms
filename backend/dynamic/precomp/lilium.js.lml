@@ -1008,6 +1008,11 @@ var LiliumCMS = function() {
         };
 
         this.find = function(inMain) {
+            var toDelete = document.querySelectorAll("body > .lml-modal-wrapper .lml-modal:not(.lml-modal-perma)");
+            for (var i = 0; i < toDelete.length; i++) {
+                toDelete[i].parentElement.remove();
+            }
+
             var allmodals = (inMain ? document.getElementById('lml-main') : document).querySelectorAll('.lml-modal');
             for (var i = 0; i < allmodals.length; i++) {
                 var mod = allmodals[i];
