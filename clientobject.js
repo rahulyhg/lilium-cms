@@ -37,7 +37,8 @@ var ClientObject = function (req, resp) {
 };
 
 ClientObject.prototype.did = function(cat, type, extra, cb) {
-    events.register(this._c, cat, type, this.userinfo.user, extra, cb);
+    // events.register(this._c, cat, type, this.userinfo.user, extra, cb);
+    cb && cb();
 };
 
 ClientObject.prototype.reloadSession = function(cb) {
