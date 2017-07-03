@@ -1,0 +1,41 @@
+const compile = (o, context) => { o(`
+<script>
+    var calelem = document.getElementById('social-dispatch-calendar');
+    var calendar = new JSCalendar(calelem, {
+        width: "full",
+        datasource : "${context._c.server.url}/admin/socialdispatch/datasource?async=true"
+    }).init().fetch(function() {
+        calendar.render();
+    }, true);
+</script>
+
+<style>
+#social-dispatch-calendar .calendar-wrapper {
+    float: none;
+    clear: both;
+}
+
+#social-dispatch-calendar .control-button {
+    padding: 5px 8px;
+    margin: 0px;
+}
+
+#social-dispatch-calendar .control-button:hover,
+#social-dispatch-calendar .control-button:active,
+#social-dispatch-calendar .control-button.active {
+    color: #FFF;
+    background-color: #333;
+}
+
+#social-dispatch-calendar .control-button.active {
+    text-decoration: none;
+}
+
+#social-dispatch-calendar .control-button:active {
+    margin: 0px;
+    transform: none;
+}
+</style>
+`);};
+
+module.exports = { compile };

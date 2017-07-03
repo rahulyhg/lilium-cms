@@ -156,6 +156,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "node_modules/quill/dist/quill.min.js", 802, "admin", conf.id);
         Frontend.registerJSFile(base + "node_modules/quill/dist/core.min.js", 804, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 808, "admin", conf.id);
+        Frontend.registerJSFile(base + "bower_components/vanilla-js-calendar/dist/js-calendar.min.js", 809, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-deserialize/dist/jquery.deserialize.min.js", 1000, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timer/jquery.timer.js", 1100, "admin", conf.id);
@@ -197,6 +198,7 @@ var SiteInitializer = function (conf, siteobj) {
 
         Frontend.registerCSSFile(base + "bower_components/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
         Frontend.registerCSSFile(base + "bower_components/flatpickr/dist/flatpickr.min.css", 500, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "bower_components/vanilla-js-calendar/dist/js-calendar.min.css", 700, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);

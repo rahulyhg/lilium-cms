@@ -119,11 +119,32 @@ class SocialDispatch {
         });
     }
 
+    getDatasource(_c, params, send) {
+        // Debug
+        send({
+            2017 : {
+                6 : {
+                    2 : [{
+                        displayname : "Test",
+                        at : new Date(2017, 6, 2, 15),
+                        duration : 1000 * 60 * 60 * 2
+                    }]
+                }
+            }
+        });
+    }
+
     adminGET(cli) {
         switch (cli.routeinfo.path[2]) {
             case undefined:
             case "networks":
                 filelogic.serveAdminLML3(cli);
+                break;
+
+            case "datasource":
+                this.getDatasource(cli._c, cli.routeinfo.params, (events) => {
+                    cli.sendJSON(events);
+                });
                 break;
 
             default:
