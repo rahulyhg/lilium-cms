@@ -409,10 +409,6 @@ var Core = function () {
         });
     };
 
-    var loadSocialDispatch = function() {
-        isElder && socialdispatch.init();
-    };
-
     var redirectIfInit = function (resp, cb) {
         if (resp) {
             resp.writeHead(200, {
@@ -541,7 +537,6 @@ var Core = function () {
             
             initForms();
             initTables();
-            loadSocialDispatch();
             loadEndpoints();
             loadStandardInput();
             loadScriptMode();

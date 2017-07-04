@@ -105,15 +105,12 @@ class AI {
         };
 
         let createSocialDispatchTask = () => {
-            Knowledge.janitorSites.forEach(_c => {
-                taskscheduler.push({
-                    taskname : "socialDispatch",
-                    extra : {
-                        origin : "AI",
-                        _c : _c,
-                        action : "init"
-                    }
-                });
+            taskscheduler.push({
+                taskname : "socialDispatch",
+                extra : {
+                    origin : "AI",
+                    action : "init"
+                }
             });
         };
 

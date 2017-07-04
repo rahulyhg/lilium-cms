@@ -48,7 +48,7 @@ class RunningTask {
                 break;
 
             case "init":
-                socialDispatchLib.commitScheduled(this._c, sendback);
+                socialDispatchLib.init();
                 break;
 
             default:
