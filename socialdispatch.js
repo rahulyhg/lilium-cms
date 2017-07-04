@@ -146,17 +146,52 @@ class SocialDispatch {
     }
 
     getDatasource(_c, params, send) {
-        // Debug
-        send({
-            2017 : {
-                6 : {
-                    2 : [{
-                        displayname : "Test",
-                        at : new Date(2017, 6, 2, 15),
-                        duration : 1000 * 60 * 60 * 2
-                    }]
+        let startdate = parseInt(params.startstamp);
+        let enddate = parseInt(params.endstamp);
+
+        db.join(_c, DISPATCH_COLLECTION, [
+            { 
+                $match : {
+                    $and : [ 
+                        { time : { $lt : enddate   }}, 
+                        { time : { $gt : startdate }} 
+                    ]
                 }
-            }
+            }, {
+                $lookup : {
+                    from : "content",
+                    localField : "postid",
+                    foreignField : "_id",
+                    as : "article"
+                }
+            }, {
+                $unwind : "$article"
+            }, {
+                $project : {
+                    time : 1,
+                    status : 1,
+                    "article.title" : 1
+                }
+            } 
+        ], (arr) => {
+            let resp = {};
+            arr.forEach(post => {
+                let d = new Date(post.time);
+                let y = d.getFullYear();
+                let m = d.getMonth();
+                let t = d.getDate();
+                resp[y] = resp[y] || {};
+                resp[y][m] = resp[y][m] || {};
+                resp[y][m][t] = resp[y][m][t] || [];
+
+                resp[y][m][t].push({
+                    at : post.time,
+                    displayname : post.article && post.article.title,
+                    color : post.status == "published" ? "#bbb" : "#af57e4"
+                })
+            });
+
+            send(resp);
         });
     }
 
