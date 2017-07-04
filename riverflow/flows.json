@@ -358,7 +358,7 @@
                 "faicon": "fa-share-alt",
                 "displayname": "Social Dispatch",
                 "priority": 410,
-                "rights": ["editor"],
+                "rights": ["admin"],
                 "absURL": "admin/socialdispatch",
                 "children": []
             }

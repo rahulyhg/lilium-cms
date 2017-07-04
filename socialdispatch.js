@@ -6,6 +6,8 @@ const filelogic = require('./filelogic.js');
 const request = require('request');
 const articleLib = require('./article.js');
 
+const CAIJ = require('./caij/caij.js');
+
 const DISPATCH_COLLECTION = "socialdispatch";   // Website collection
 const ACCOUNTS_COLLECTION = "socialaccounts";   // Network collection
 
@@ -160,7 +162,13 @@ class SocialDispatch {
                 sPost.publish(cb);
             } else {
                 log('SDispatch', "Dispatch commit of post " + postid);
-                sPost.commit();
+                // Send task to CAIJ
+                CAIJ.scheduleTask('socialDispatch', {
+                    siteid : _c.id,
+                    direct : true,
+                    action : "add",
+                    _id : sPost._id
+                });
                 cb && cb(undefined, "Post was scheduled to be published on Facebook successfully");
             }
         });
