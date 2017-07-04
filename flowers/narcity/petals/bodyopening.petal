@@ -21,7 +21,8 @@
             property : window.lmlsite.property
         };
 
-        if (navigator && navigator.geolocation && navigator.geolocation.getCurrentPosition) {
+        // Caused the geolocation popup to always show
+        if (false && navigator && navigator.geolocation && navigator.geolocation.getCurrentPosition) {
             navigator.geolocation.getCurrentPosition(function(pos) {                
                 if (!pos) { return fbtrack(); }
                 window.pos = pos.coords;
