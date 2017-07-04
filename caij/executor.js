@@ -33,26 +33,27 @@ class RunningTask {
     socialDispatch(sendback) {
         let action = this.extra.action;
         switch (action) {
-            case "add":
-
-                break;
-            case "update":
-
+            case "commit":
+                socialDispatchLib.getSingle(this._c, this.extra._id, (scheduledpost) => {
+                    scheduledpost && scheduledpost.commit();
+                    sendback();
+                });
                 break;
 
             case "remove":
-
+                socialDispatchLib.getSingle(this._c, this.extra._id, (scheduledpost) => {
+                    scheduledpost && scheduledpost.cancel();
+                    sendback();
+                });
                 break;
 
             case "init":
-
+                socialDispatchLib.commitScheduled(this._c, sendback);
                 break;
 
             default:
-                
+                sendback(new Error("Undefined action for socialDispatch task"));
         }
-
-        sendback();
     }
 
     // Uses Graph v2.8 structure, not tested on other versions
