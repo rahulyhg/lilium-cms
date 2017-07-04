@@ -13,6 +13,8 @@ const GRAPH_API = "https://graph.facebook.com/v";
 const FEED_ENDPOINT = "/feed/";
 const GRAPH_TOKEN = "?access_token=";
 
+const scheduledTasks = {};
+
 class SocialPost {
     constructor(message, siteid, postid, pageid, time, status, _id) {
         this.message = message;
@@ -25,6 +27,8 @@ class SocialPost {
     }
 
     publish(done) {
+        scheduledTasks[this.siteid + "_" + this._id] = undefined;
+
         db.findUnique(config.default(), ACCOUNTS_COLLECTION, {_id : this.pageid}, (err, account) => {
             if (!account || err) {
                 log("SDispatch", "Social account not found or database error : " + err, 'warn');
@@ -91,8 +95,29 @@ class SocialPost {
         db.insert(this.siteid, DISPATCH_COLLECTION, this, done || function() {});
     }
 
+    update(done) {
+        db.update(this.siteid, DISPATCH_COLLECTION, {_id : this._id}, this, done || function() {});
+    }
+
+    cancel() {
+        clearTimeout(scheduledTasks[this.siteid + "_" + this._id]);
+        scheduledTasks[this.siteid + "_" + this._id] = undefined;
+    }
+
     commit() {
-        setTimeout(()=>{this.publish();}, this.time - Date.now());
+        if (!scheduledTasks[this.siteid + "_" + this._id]) {
+            return scheduledTasks[this.siteid + "_" + this._id] = setTimeout(()=>{this.publish();}, this.time - Date.now());
+        } else {
+            this.cancel();
+            
+            return this.commit();
+        }
+    }
+
+    static getSingle(_c, _id, sendback) {
+        db.findSingle(_c, DISPATCH_COLLECTION, {_id}, (err, x) => {
+            sendback(SocialPost.buildFromDB(x));
+        });
     }
 
     static buildFromDB(x) {
@@ -122,6 +147,10 @@ class SocialDispatch {
         });
     }
 
+    getSingle(_c, _id, sendback) {
+        SocialPost.getSingle(_c, _id, sendback);
+    }
+    
     schedule(_c, postid, pageid, message, time, cb) {
         log('SDispatch', "Received schedule request on site " + _c.id + " for post " + postid);
         let sPost = new SocialPost(message, _c.id, postid, pageid, time, "scheduled");
