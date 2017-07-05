@@ -109,7 +109,8 @@ class AI {
                 taskname : "socialDispatch",
                 extra : {
                     origin : "AI",
-                    action : "init"
+                    action : "init",
+                    _c : require("../config.js").default()
                 }
             });
         };

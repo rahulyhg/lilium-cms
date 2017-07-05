@@ -32,6 +32,8 @@ class RunningTask {
 
     socialDispatch(sendback) {
         let action = this.extra.action;
+
+        log("RunningTask", "Executing socialDispatch task with action : " + action);
         switch (action) {
             case "commit":
                 socialDispatchLib.getSingle(this._c, this.extra._id, (scheduledpost) => {
