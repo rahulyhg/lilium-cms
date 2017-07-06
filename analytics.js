@@ -161,6 +161,11 @@ class StatsBeautifier {
             let lastSlash = path.lastIndexOf('/');
             let maybePage = path.substring(lastSlash + 1);
 
+            let maybeParam = path.indexOf('?');
+            if (maybeParam != -1) {
+                path = path.substring(0, maybeParam);
+            }
+
             if (!isNaN(maybePage)) {
                 path = path.substring(0, lastSlash);
 
