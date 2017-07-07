@@ -1,13 +1,32 @@
+const modalName = "lml-modal-edit-event";
+
 const compile = (o, context) => { o(`
 <script>
+    var statusLabelVocab = {
+        "scheduled" : "scheduled",
+        "published" : "live on Facebook"
+    };
+
     var updateEvent = function(event) {
         liliumcms.lmldom.sendForm({
             _id : event.id,
             date : event.at.getTime()
         }, "${context._c.server.url}/admin/socialdispatch/move", function() {
-
+            
         });
-    }
+    };
+
+    var handleClick = function(event) {
+        liliumcms.lmldom.get("${context._c.server.url}/admin/socialdispatch/deepFetch/" + event.id + "?async=true", { 
+            spinflower : true,
+            json : true 
+        }, function(dispatch) {
+            var modal = liliumcms.modals.get("${modalName}");
+            document.getElementById("edit-event-label").textContent = statusLabelVocab[dispatch.status];
+
+            modal.cast();
+        });
+    };
 
     var calelem = document.getElementById('social-dispatch-calendar');
     var calendar = new JSCalendar(calelem, {
@@ -19,8 +38,26 @@ const compile = (o, context) => { o(`
 
     calendar.on('cellMoved', function(that, extra) {
         updateEvent(extra.event);
+    }).on('click', function(that, event) {
+        handleClick(event);
     });
 </script>
+
+<div id="${modalName}" class="lml-modal">
+    <div class="lml-modal-title">
+        Edit social dispatch event
+    </div>
+    <div class="lml-modal-body">
+        <p>
+            This article is <b id="edit-event-label"></b>.
+        </p>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel btn-default" type="button">Dismiss</button>
+        <button class="lml-modal-danger btn-red red" type="button">Delete</button>
+        <button class="lml-modal-accept green" type="button">Save</button>
+    </div>
+</div>
 
 <style>
 #social-dispatch-calendar .calendar-wrapper {

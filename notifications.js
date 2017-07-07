@@ -183,6 +183,8 @@ var Notification = function () {
     };
 
     this.notifyUser = function (userID, dbId, notification, difftype) {
+        if (global.liliumenv.mode == "script") { return; }
+
         //Check if user will receive notification
         notification.interacted = false;
         notification.userID = db.mongoID(userID);

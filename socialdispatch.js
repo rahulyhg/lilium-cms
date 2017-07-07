@@ -122,6 +122,15 @@ class SocialPost {
         });
     }
 
+    static deepFetch(_c, _id, sendback) {
+        SocialPost.getSingle(_c, _id, (post) => {
+            require('./article.js').deepFetch(_c, post.postid, (article) => {
+                post.article = article;
+                sendback(post);
+            });
+        });
+    }
+
     static buildFromDB(x) {
         return new SocialPost( x.message, x.siteid, x.postid, x.pageid, x.time, x.status, x._id );
     }
@@ -152,7 +161,7 @@ class SocialDispatch {
     getSingle(_c, _id, sendback) {
         SocialPost.getSingle(_c, _id, sendback);
     }
-    
+
     schedule(_c, postid, pageid, message, time, cb) {
         log('SDispatch', "Received schedule request on site " + _c.id + " for post " + postid);
         let sPost = new SocialPost(message, _c.id, postid, pageid, time, "scheduled");
@@ -230,6 +239,12 @@ class SocialDispatch {
             case undefined:
             case "networks":
                 filelogic.serveAdminLML3(cli);
+                break;
+
+            case "deepFetch":
+                SocialPost.deepFetch(cli._c, db.mongoID(cli.routeinfo.path[3]), (item) => {
+                    cli.sendJSON(item);
+                });
                 break;
 
             case "datasource":
