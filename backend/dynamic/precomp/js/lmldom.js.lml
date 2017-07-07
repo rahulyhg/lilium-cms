@@ -777,8 +777,10 @@ var LMLDom = function() {
             }
         }
 
+        liliumcms.pageloader.tidy();
         var xmlhttp = new XMLHttpRequest();
         xmlhttp.addEventListener('load', function(a, b, c) {
+            liliumcms.pageloader.present();
             callback(maybeParseJson(xmlhttp.responseText), a, b, c);
         });
         xmlhttp.open("POST", url);
@@ -879,18 +881,13 @@ var LMLDom = function() {
             }
         */
 
-        liliumcms.treeselect = [];
         var treeselects = maindom.querySelectorAll(".lmldom-treeselect");
         for (var i = 0; i < treeselects.length; i++) {
             liliumcms.treeselect.push(new LMLTreeSelect(treeselects[i]));
         }
+    };
 
-        var fKeys = Object.keys(liliumcms.lmldom.flatpickr || {});
-        for (var i = 0; i < fKeys.length; i++) {
-            liliumcms.lmldom.flatpickr[fKeys[i]].destroy();
-        } 
-
-        liliumcms.lmldom.flatpickr = {}; 
+    this.parseLMLDates = function() {
         var dateelem = document.querySelectorAll('.lml-date');
         for (var i = 0; i < dateelem.length; i++) {
             var usesTime = dateelem[i].dataset.options && dateelem[i].dataset.options.indexOf("time") != -1
@@ -899,6 +896,21 @@ var LMLDom = function() {
             });
         }
     };
+
+    this.tidy = function() {
+        var fKeys = Object.keys(liliumcms.lmldom.flatpickr || {});
+        for (var i = 0; i < fKeys.length; i++) {
+            liliumcms.lmldom.flatpickr[fKeys[i]].destroy();
+        } 
+
+        var oldFlatpickr = document.querySelectorAll(".flatpickr-calendar");
+        for (var i = 0; i < oldFlatpickr.length; i++) {
+            oldFlatpickr[i].remove();
+        }
+
+        liliumcms.lmldom.flatpickr = {}; 
+        liliumcms.treeselect = [];
+    }
 
     this.parseSnips = function(maindom, cb) {
         var allSnips = maindom.querySelectorAll('.lmldom-snip');
@@ -1001,7 +1013,12 @@ var LMLDom = function() {
         log('LMLDOM', 'Parsing Lilium Document Object Model v' + domv);
         maindom = document.getElementById('lml-main');
         var now = new Date();
+
+        lmldom.tidy();
         lmldom.parseLiveFields(maindom);
+        liliumcms.modals.find(true);
+        lmldom.parseLMLDates();
+
         lmldom.parseSnips(maindom, function() {
             lmldom.parseBunches(maindom, function() {
                 log('LMLDOM', 'Working with LMLDOM markup');

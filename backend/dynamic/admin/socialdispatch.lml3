@@ -3,7 +3,7 @@ const settings = {
     petals : ["socialdispatch.js"],
     lmldom : {
         v : 1.0,
-        features : []
+        features : ["fullwidth"]
     },
     title : "Social Dispatch"
 };

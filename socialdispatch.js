@@ -192,7 +192,8 @@ class SocialDispatch {
                 $match : {
                     $and : [ 
                         { time : { $lt : enddate   }}, 
-                        { time : { $gt : startdate }} 
+                        { time : { $gt : startdate }},
+                        { status : { $ne : "deleted" } }
                     ]
                 }
             }, {
@@ -271,6 +272,19 @@ class SocialDispatch {
                         title : "Saved"
                     });
                 });
+            });
+        } else if (level == "remove") {
+            let _id = db.mongoID(cli.postdata.data.id);
+            db.update(cli._c, DISPATCH_COLLECTION, {_id}, {
+                status : "deleted"
+            }, () => {
+                CAIJ.scheduleTask('socialDispatch', {
+                    siteid : cli._c.id,
+                    direct : true,
+                    action : "remove",
+                    _id 
+                });
+                cli.sendJSON({});
             });
         } else if (level == "move") {
             let _id = db.mongoID(cli.postdata.data._id);

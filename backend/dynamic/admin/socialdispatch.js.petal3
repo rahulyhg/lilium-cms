@@ -22,7 +22,14 @@ const compile = (o, context) => { o(`
             json : true 
         }, function(dispatch) {
             var modal = liliumcms.modals.get("${modalName}");
+            modal.dispatchid = dispatch._id;
+
             document.getElementById("edit-event-label").textContent = statusLabelVocab[dispatch.status];
+            document.getElementById("edit-event-image").src = dispatch.article.featuredimage[0].sizes.thumbnaillarge.url;
+            document.getElementById("edit-event-title").textContent = dispatch.article.title;
+            document.getElementById("edit-event-subtitle").textContent = dispatch.article.subtitle;
+            document.getElementById("edit-event-author").textContent = dispatch.article.authors[0].displayname;
+            liliumcms.lmldom.flatpickr["edit-event-time"].setDate(new Date(dispatch.time));
 
             modal.cast();
         });
@@ -31,6 +38,7 @@ const compile = (o, context) => { o(`
     var calelem = document.getElementById('social-dispatch-calendar');
     var calendar = new JSCalendar(calelem, {
         width: "full",
+        fetchReplaces : true,
         datasource : "${context._c.server.url}/admin/socialdispatch/datasource?async=true"
     }).init().fetch(function() {
         calendar.render();
@@ -41,6 +49,21 @@ const compile = (o, context) => { o(`
     }).on('click', function(that, event) {
         handleClick(event);
     });
+
+    window["modal_cb_delete"] = function(modal) {
+        var id = modal.dispatchid;
+        liliumcms.lmldom.sendForm({
+            id : id
+        }, "${context._c.server.url}/admin/socialdispatch/remove", function() {
+            modal.dismiss();
+
+            liliumcms.pageloader.tidy();
+            calendar.fetch(function() {
+                calendar.render();
+                liliumcms.pageloader.present();
+            }, true);
+        });
+    };
 </script>
 
 <div id="${modalName}" class="lml-modal">
@@ -48,13 +71,31 @@ const compile = (o, context) => { o(`
         Edit social dispatch event
     </div>
     <div class="lml-modal-body">
+        <div style="margin: 0px -15px 0px -15px;">
+            <img id="edit-event-image" />
+        </div>
+        <h2 id="edit-event-title"></h2>
+        <div class="edit-event-details">
+            <div>
+                <span id="edit-event-subtitle"></span>
+            </div>
+            <div class="edit-event-site-details">
+                <span>${context._c.website.sitetitle}</span><span> | </span><span id="edit-event-author"></span>
+            </div>
+        </div>
+
+        <hr />
         <p>
             This article is <b id="edit-event-label"></b>.
+        </p>
+        <p>
+            Dispatch schedule : 
+            <input class="lml-date" id="edit-event-time" data-options="time" />
         </p>
     </div>
     <div class="lml-modal-footer">
         <button class="lml-modal-cancel btn-default" type="button">Dismiss</button>
-        <button class="lml-modal-danger btn-red red" type="button">Delete</button>
+        <button class="lml-modal-action btn-red red" type="button" data-callback="modal_cb_delete">Delete</button>
         <button class="lml-modal-accept green" type="button">Save</button>
     </div>
 </div>
@@ -84,6 +125,49 @@ const compile = (o, context) => { o(`
 #social-dispatch-calendar .control-button:active {
     margin: 0px;
     transform: none;
+}
+
+#edit-event-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+#edit-event-title {
+    font-size: 20px;
+    font-family: Georgia, serif;
+    margin-top: 15px;
+}
+
+#lml-modal-edit-event .lml-modal-body .edit-event-details span {
+    font-size: 13px;
+    font-family: Arial;
+    display: inline;
+    color: #333;
+}
+
+#lml-modal-edit-event .lml-modal-body .edit-event-details {
+    margin-top: 2px;
+}
+
+#lml-modal-edit-event .lml-modal-body .edit-event-site-details span {
+    text-transform: uppercase;
+    color: #999;
+    font-size: 13px;
+}
+
+#lml-modal-edit-event .lml-modal-body .edit-event-site-details {
+    margin-top: 8px;
+}
+
+#lml-modal-edit-event hr {
+    border-top-color: #CCC;
+    border-top-style: dashed;
+    margin: 10px 0px;
+}
+
+#lml-modal-edit-event .lml-modal-body {
+    padding-top: 0px;
 }
 </style>
 `);};

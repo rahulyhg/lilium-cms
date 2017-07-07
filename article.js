@@ -228,7 +228,10 @@ var Article = function() {
                 db.findToArray(conf.default(), 'entities', {_id : art.author}, function(err, autarr) {
                     db.findUnique(cli._c, 'topics', {_id : art.topic}, function(err, topic) {
                         db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, function(err, modcount) {
-                            db.findToArray(cli._c, 'socialdispatch', { postid : db.mongoID(cli.routeinfo.path[3]) }, (err, socialp) => {
+                            db.findToArray(cli._c, 'socialdispatch', { 
+                                postid : db.mongoID(cli.routeinfo.path[3]),  
+                                status : { $ne : "deleted" }
+                            }, (err, socialp) => {
                                 cli.sendJSON({
                                     status : art.status || "Unknown",
                                     url : art.name ? 

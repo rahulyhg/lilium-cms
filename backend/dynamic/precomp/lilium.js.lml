@@ -988,6 +988,16 @@ var LiliumCMS = function() {
                         that.fire.apply(that, ['accept']);
                     });
                 }
+
+                var customactions = that.elem.querySelectorAll('.lml-modal-action');
+                for (var i = 0; i < customactions.length; i++) {
+                    let ccb = customactions[i].dataset.callback;
+                    if (ccb && window[ccb]) {
+                        customactions[i].addEventListener('click', function(ev) {
+                            window[ev.target.dataset.callback].apply(that, [that]);
+                        });
+                    }
+                }
             };
 
             this.initwrap = function() {
@@ -995,6 +1005,10 @@ var LiliumCMS = function() {
                 wrapper.className = "lml-modal-wrapper";
                 wrapper.appendChild(that.elem);
                 document.body.appendChild(wrapper);
+
+                if (that.elem.classList.contains("lml-modal-perma")) {
+                    wrapper.className += " lml-modal-wrapper-perma";
+                }
 
                 that.wrapper = wrapper;
             };
@@ -1011,6 +1025,11 @@ var LiliumCMS = function() {
             var toDelete = document.querySelectorAll("body > .lml-modal-wrapper .lml-modal:not(.lml-modal-perma)");
             for (var i = 0; i < toDelete.length; i++) {
                 toDelete[i].parentElement.remove();
+            }
+
+            toDelete = document.querySelectorAll(".lml-modal-wrapper:empty");
+            for (var i = 0; i < toDelete.length; i++) {
+                toDelete[i].remove();
             }
 
             var allmodals = (inMain ? document.getElementById('lml-main') : document).querySelectorAll('.lml-modal');
@@ -1239,11 +1258,10 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.queryparams.parseURL();
         liliumcms.quill.reset();
         liliumcms.users.cacheUsers();
-        liliumcms.users.cacheUsers();
         liliumcms.lmldom.parse(function(lmldom) {
             liliumcms.imagepicker.seek();
             liliumcms.imagepicker.refresh();
-            liliumcms.modals.find(true);
+            !lmldom && liliumcms.modals.find(true);
             !lmldom && liliumcms.formParser.init();
             liliumcms.formbeautifier.beautify();
             liliumcms.pageloader.parseDocument();
