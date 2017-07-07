@@ -11,7 +11,6 @@ const topicLib = require('../topics.js');
 const articleLib = require('../article.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
-const socialDispatchLib = require('../socialdispatch.js');
 
 const janitorJobs = [
     "cacheTopic",
@@ -34,16 +33,18 @@ class RunningTask {
         let action = this.extra.action;
 
         log("RunningTask", "Executing socialDispatch task with action : " + action);
+        const socialDispatchLib = require('../socialdispatch.js');
+
         switch (action) {
             case "commit":
-                socialDispatchLib.getSingle(this._c, this.extra._id, (scheduledpost) => {
-                    scheduledpost && scheduledpost.commit();
+                socialDispatchLib.getSingle(this._c, db.mongoID(this.extra._id), (scheduledpost) => {
+                    scheduledpost && scheduledpost.status == "scheduled" && scheduledpost.commit();
                     sendback();
                 });
                 break;
 
             case "remove":
-                socialDispatchLib.getSingle(this._c, this.extra._id, (scheduledpost) => {
+                socialDispatchLib.getSingle(this._c, db.mongoID(this.extra._id), (scheduledpost) => {
                     scheduledpost && scheduledpost.cancel();
                     sendback();
                 });
@@ -51,6 +52,7 @@ class RunningTask {
 
             case "init":
                 socialDispatchLib.init();
+                sendback();
                 break;
 
             default:

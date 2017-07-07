@@ -1,5 +1,14 @@
 const compile = (o, context) => { o(`
 <script>
+    var updateEvent = function(event) {
+        liliumcms.lmldom.sendForm({
+            _id : event.id,
+            date : event.at.getTime()
+        }, "${context._c.server.url}/admin/socialdispatch/move", function() {
+
+        });
+    }
+
     var calelem = document.getElementById('social-dispatch-calendar');
     var calendar = new JSCalendar(calelem, {
         width: "full",
@@ -7,6 +16,10 @@ const compile = (o, context) => { o(`
     }).init().fetch(function() {
         calendar.render();
     }, true);
+
+    calendar.on('cellMoved', function(that, extra) {
+        updateEvent(extra.event);
+    });
 </script>
 
 <style>

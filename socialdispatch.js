@@ -166,7 +166,7 @@ class SocialDispatch {
                 CAIJ.scheduleTask('socialDispatch', {
                     siteid : _c.id,
                     direct : true,
-                    action : "add",
+                    action : "commit",
                     _id : sPost._id
                 });
                 cb && cb(undefined, "Post was scheduled to be published on Facebook successfully");
@@ -214,6 +214,7 @@ class SocialDispatch {
                 resp[y][m][t] = resp[y][m][t] || [];
 
                 resp[y][m][t].push({
+                    id : post._id,
                     at : post.time,
                     displayname : post.article && post.article.title,
                     color : post.status == "published" ? "#bbb" : "#af57e4"
@@ -256,6 +257,21 @@ class SocialDispatch {
                     });
                 });
             });
+        } else if (level == "move") {
+            let _id = db.mongoID(cli.postdata.data._id);
+            let date = cli.postdata.data.date;
+
+            db.update(cli._c, DISPATCH_COLLECTION, {_id}, {
+                time : parseInt(date)
+            }, () => {
+                CAIJ.scheduleTask('socialDispatch', {
+                    siteid : cli._c.id,
+                    direct : true,
+                    action : "commit",
+                    _id 
+                });
+                cli.sendJSON({});
+            });
         } else if (level == "schedule") {
             const notif = require('./notifications.js');
             let data = cli.postdata.data;
@@ -265,6 +281,7 @@ class SocialDispatch {
             } else {
                 time = "now";
             }
+
 
             this.schedule(cli._c, data.postid, data.pageid, data.message, time, (err, info) => {
                 cli.sendJSON({
