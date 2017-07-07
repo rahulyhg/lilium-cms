@@ -17,7 +17,7 @@ const compile = (o, context) => {
         context.header, 
         '<div id="social-dispatch-calendar"></div>',
         context.petals["socialdispatch.js"].compile(),
-        '<a href="//localhost:8080/admin/socialdispatch/networks" class="role-admin">Networks</a>'
+        '<a href="${context._c.server.url}/admin/socialdispatch/networks" class="role-admin">Networks</a>'
     );
 };
 
