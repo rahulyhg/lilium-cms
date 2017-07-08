@@ -188,30 +188,31 @@ var unwrapImages = function(cli) {
             cur.hasNext(function(err, hasnext) {
                 if (hasnext) {
                     cur.next(function(err, article) {
-                        require('jsdom').env(article.content, function(err, window) {
-                            ps = window.document.querySelectorAll('p');
-                            var changed = 0;
+                        var dom = new require('jsdom').JSDOM(article.content);
+                        var window = dom.window;
 
-                            for (var i = 0; i < ps.length; i++) {
-                                var p = ps[i];
-                                if (p.querySelector('img')) {
-                                    var img = p.querySelector('img');
-                                    img.classList.add("lml-content-image");
-                                    p.outerHTML = '<div class="lml-image-wrapper lml-content-image-wrapper">' + 
-                                        img.outerHTML + 
-                                        "</div>";
+                        ps = window.document.querySelectorAll('p');
+                        var changed = 0;
 
-                                    changed++;
-                                }
-                            };
+                        for (var i = 0; i < ps.length; i++) {
+                            var p = ps[i];
+                            if (p.querySelector('img')) {
+                                var img = p.querySelector('img');
+                                img.classList.add("lml-content-image");
+                                p.outerHTML = '<div class="lml-image-wrapper lml-content-image-wrapper">' + 
+                                    img.outerHTML + 
+                                    "</div>";
 
-                            log('Devtools', 'Unwrapped ' + changed + ' images for article ' + article.title);
-                            db.update(cli._c, 'content', 
-                                {_id : article._id}, 
-                                {content : window.document.documentElement.innerHTML}, 
-                            function() {
-                                next();
-                            });
+                                changed++;
+                            }
+                        };
+
+                        log('Devtools', 'Unwrapped ' + changed + ' images for article ' + article.title);
+                        db.update(cli._c, 'content', 
+                            {_id : article._id}, 
+                            {content : window.document.documentElement.innerHTML}, 
+                        function() {
+                            next();
                         });
                     });
                 } else {

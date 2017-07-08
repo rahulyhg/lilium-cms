@@ -763,50 +763,50 @@ var replaceInterlinks = function(_c, article, sendback) {
         article.content = article.content.replace("<lml-page></lml-page>", '<div id="page-'+(++anchorIndex)+'"></div>');
     }
 
-    require('jsdom').env(article.content, function(error, window) {
-        var links = window.document.querySelectorAll('a');
-        var toInterlink = [];
+    var dom = new require('jsdom').JSDOM(article.content);
+    var window = dom.window;
+    var links = window.document.querySelectorAll('a');
+    var toInterlink = [];
 
-        for (var i = 0; i < links.length; i++) {
-            var a = links[i];
+    for (var i = 0; i < links.length; i++) {
+        var a = links[i];
 
-            if (a.href.includes(_c.server.url)) {
-                var urlSplit = a.href.toString().split('/');
-                var nameOrIndex = urlSplit.pop();
-                var newref;
+        if (a.href.includes(_c.server.url)) {
+            var urlSplit = a.href.toString().split('/');
+            var nameOrIndex = urlSplit.pop();
+            var newref;
 
-                if (!isNaN(nameOrIndex)) {
-                    newref = "#page-" + nameOrIndex
-                    a.href = newref;
-                } else {
-                    toInterlink.push({elem : a, name : nameOrIndex});
-                }
+            if (!isNaN(nameOrIndex)) {
+                newref = "#page-" + nameOrIndex
+                a.href = newref;
+            } else {
+                toInterlink.push({elem : a, name : nameOrIndex});
             }
         }
+    }
 
-        var finishUp = function() {
-            article.content = window.document.body.innerHTML;
-            sendback(article);
-        };
+    var finishUp = function() {
+        article.content = window.document.body.innerHTML;
+        sendback(article);
+    };
 
-        iin = -1;
-        var nextInterlink = function() {
-            if (++iin == toInterlink.length) {
-                finishUp();
-            } else {
-                db.findUnique(_c, 'content', {name : toInterlink[iin].name}, (err, article) => {
-                    if (article) {
-                        toInterlink[iin].elem.href = "#" + article._id;
-                        toInterlink[iin].elem.classList.add("lilium-interlink");
-                    }
+    iin = -1;
+    var nextInterlink = function() {
+        if (++iin == toInterlink.length) {
+            finishUp();
+        } else {
+            db.findUnique(_c, 'content', {name : toInterlink[iin].name}, (err, article) => {
+                if (article) {
+                    toInterlink[iin].elem.href = "#" + article._id;
+                    toInterlink[iin].elem.classList.add("lilium-interlink");
+                }
 
-                    nextInterlink();
-                }, {_id : 1});
-            }
-        };
+                nextInterlink();
+            }, {_id : 1});
+        }
+    };
 
-        nextInterlink();
-    });
+    nextInterlink();
 };
 
 // ~/api/read/<id>
@@ -1371,30 +1371,29 @@ var insertAds = function(pkg) {
             .replace(/\<p\>\<\/p\>/g, "") : "";
 
         var changed = false;
-        jsdom.env(content, function(err, dom) {
-            if (err) {
-                log("Article", "Error parsing dom : " + err, "err");
-                return done(article.content);
-            }
+        var dom = new jsdom.JSDOM(content);
+        if (!dom) {
+            log("Article", "Error parsing dom : " + err, "err");
+            return done(article.content);
+        }
 
-            var parags = dom.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
-            for (var i = 0; i < parags.length - 1; i++) if ((i-2) % pcount == 0) {
-                var adtag = dom.document.createElement('ad');
-                dom.document.body.insertBefore(adtag, parags[i+1]);
-                changed = true;
-            }
+        var parags = dom.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
+        for (var i = 0; i < parags.length - 1; i++) if ((i-2) % pcount == 0) {
+            var adtag = dom.document.createElement('ad');
+            dom.document.body.insertBefore(adtag, parags[i+1]);
+            changed = true;
+        }
 
-            if (changed) {
-                content = dom.document.body.innerHTML;
-                article.content = content;
-                db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
-                    log('Article', "Inserted ads inside article with title " + article.title, 'success');
-                    done(content);
-                });
-            } else {
-                done();
-            }
-        });
+        if (changed) {
+            content = dom.document.body.innerHTML;
+            article.content = content;
+            db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
+                log('Article', "Inserted ads inside article with title " + article.title, 'success');
+                done(content);
+            });
+        } else {
+            done();
+        }
     });
 }
 
