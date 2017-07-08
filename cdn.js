@@ -5,6 +5,8 @@ var jsdom = require('jsdom');
 var ContentDeliveryNetwork = function() {
     var parseText = function(txt, domain, cdndomain, cb, ignoreHTML) {
         var dom = new jsdom.JSDOM(txt);
+        dom = dom.window;
+
         var scripts = dom.document.documentElement.querySelectorAll('script');
         var imgs = dom.document.body.querySelectorAll('img');
         var links = dom.document.head.querySelectorAll('link');
