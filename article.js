@@ -1588,7 +1588,7 @@ class Article {
             }
 
             var sort = {};
-            sort[typeof params.sortby !== 'undefined' ? params.sortby : 'date'] = (typeof params.order == "undefined" ? -1 : params.order);
+            sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (typeof params.order == "undefined" ? -1 : params.order);
             // sort[typeof params.sortby !== 'undefined' ? '_id' : ''] = (typeof params.order == "undefined" ? -1 : params.order);
 
             var match = [{status : params.filters.status || {$ne : "destroyed"}}];
