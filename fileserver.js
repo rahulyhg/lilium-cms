@@ -82,7 +82,7 @@ var FileServer = function () {
                         minifiedString = uglifycss.processString(content);
                         break;
                     case "js":
-                        minifiedString = UglifyJS.minify(content, {fromString: true}).code;
+                        minifiedString = UglifyJS.minify(content).code;
                         break;
                     default: 
                         minifiedString = that.minifyString(content);
