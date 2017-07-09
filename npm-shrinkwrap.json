@@ -6054,6 +6054,11 @@
       "resolved": "https://registry.npmjs.org/stack-trace/-/stack-trace-0.0.10.tgz",
       "integrity": "sha1-VHxws0fo0ytOEI6hoqFZ5f3eGcA="
     },
+    "stackpath": {
+      "version": "0.0.5",
+      "resolved": "https://registry.npmjs.org/stackpath/-/stackpath-0.0.5.tgz",
+      "integrity": "sha1-jABeciV18DAm4cDgOoTY+eZOg6k="
+    },
     "statuses": {
       "version": "1.3.1",
       "resolved": "https://registry.npmjs.org/statuses/-/statuses-1.3.1.tgz",
