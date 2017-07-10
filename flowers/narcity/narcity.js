@@ -763,7 +763,8 @@ var replaceInterlinks = function(_c, article, sendback) {
         article.content = article.content.replace("<lml-page></lml-page>", '<div id="page-'+(++anchorIndex)+'"></div>');
     }
 
-    var dom = new require('jsdom').JSDOM(article.content);
+    var jsdom = require('jsdom');
+    var dom = new jsdom.JSDOM(article.content);
     var window = dom.window;
     var links = window.document.querySelectorAll('a');
     var toInterlink = [];
