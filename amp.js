@@ -28,6 +28,10 @@ class Amp {
         /* Modify content according to AMP guidelines */
 
         // Featured image
+        if (!article.featuredimage[0]) {
+            article.featuredimage = [{sizes : {narcityfeatured : {url : ""}}}];
+        }
+
         article.featuredimage[0].sizes.narcityfeatured.url = article.featuredimage[0].sizes.narcityfeatured.url.replace (
             cli._c.server.url, 
             cli._c.content.cdn.domain
