@@ -23,7 +23,7 @@
  *
  *  Database Schema ~
  *
- *  { title : "", content : "<html>", read : [], responses : [], status : "", expiry : Date, createdBy : ObjectId }
+ *  { title : "", content : "<markup>", read : [], responses : [], status : "", expiry : Date, createdBy : ObjectId }
  *
  *************************************************************************************************************************/
 
@@ -57,13 +57,47 @@ class Cakepop {
                     cakepop : dbobj
                 });
             });
+        } else if (action == "bunch") {
+            let now = new Date();
+            let limit = params.max || 50;
+            let query = {};
+            let filters = params.filters || {};
+
+            if (filters.status) {
+                query.status = filters.status;
+            }
+
+            if (filters.search) {
+                query.title = new Regexp(filters.search);
+            }
+
+            db.find(config.default(), 'cakepops', query, [], (err, cur) => {
+                cur.sort({_id : -1}).limit(limit).project({
+                    title : 1,
+                    expiry : 1,
+                    status : 1
+                }).toArray((err, arr) => {
+                    sendback({
+                        items: arr
+                    });
+                });
+            });
         } else {
             sendback("[CakepopLivevarException] - Required first level");
         }
     }
 
     form() {
-
+        formbuilder.createForm('cakepop_edit', {
+            formWrapper: {
+                'tag': 'div',
+                'class': 'row',
+                'id': 'cakepop_edit',
+                'inner': true
+            },
+            fieldWrapper : "lmlform-fieldwrapper"
+        })
+        .add('title', 'text', { displayname : "Title" })
     }
 }
 
