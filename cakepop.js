@@ -32,10 +32,15 @@ const db = require('./includes/db.js');
 const formbuilder = require('./formBuilder.js');
 const filelogic = require('./filelogic.js');
 const config = require('./config.js');
+const LML3 = require('./lml3/compiler.js');
 
 class Cakepop {
     adminGET(cli) {
-        cli.response.end("Working");
+        if (cli.routeinfo.path[2]) {
+            cli.throwHTTP(404);
+        } else {
+            filelogic.serveAdminLML3(cli);
+        }
     }
 
     adminPOST(cli) {
@@ -59,8 +64,10 @@ class Cakepop {
             });
         } else if (action == "bunch") {
             let now = new Date();
+            let t = now.getTime();
+
             let limit = params.max || 50;
-            let query = {};
+            let query = { $and : [{status : {$ne : "deleted"}}] };
             let filters = params.filters || {};
 
             if (filters.status) {
@@ -68,7 +75,7 @@ class Cakepop {
             }
 
             if (filters.search) {
-                query.title = new Regexp(filters.search);
+                query.title = new RegExp(filters.search);
             }
 
             db.find(config.default(), 'cakepops', query, [], (err, cur) => {
@@ -77,6 +84,9 @@ class Cakepop {
                     expiry : 1,
                     status : 1
                 }).toArray((err, arr) => {
+                    arr.forEach(x => {
+                        x.expired = x.expiry < t;
+                    });
                     sendback({
                         items: arr
                     });

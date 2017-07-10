@@ -1,0 +1,75 @@
+const settings = {
+    lmldom : { v : "1.0" },
+    title : "Cakepops",
+    livevars : ["cakepop.bunch"]
+};
+
+const preload = (context, done) => {
+    context.bunchScript = `
+    <lml:bunch>
+        <lml:bunchfilters>
+            <div class="bunch-filters">
+                <div class="bunch-filters-title">FILTERS</div>
+                <label>Search</label>
+                <input type="text" name="search" placeholder="Title keywords" />
+
+                <label>Status</label>
+                <select name="status">
+                    <option value="">All</option>
+                    <option value="live">Live</option>
+                    <option value="expired">Expired</option>
+                </select>
+            </div>
+        </lml:bunchfilters>
+
+        <lml:bunchitem>
+            <div class="cakepop-strip-wrapper">
+                <div class="cakepop-strip">
+                    <lml:link href="${context._c.server.url}/admin/cakepop/view/{ckp._id}">
+                        <lml:text var="ckp.title" tag="h4" ></lml:text>
+                    </lml:link>
+                </div>
+            </div>
+        </lml:bunchitem>
+
+        <script type="lmljson" name="eakepopbunch">
+            {
+                "datasource" : "cakepop.bunch",
+                "loopvar" : "ckp"
+            }
+        </script>
+    </lml:bunch>
+    <script>
+        window.hasArticles = function(__, ldContext) { return ldContext.member.articles != 0; }
+        window.hasSelectedPerso = function(__, ldContext) { return ldContext.member.personality.code != "none"; }
+
+        window.generateSocials = function(ldContext) {
+            var social = ldContext.member.socialnetworks || [];
+            var wrap = document.createElement('div');
+
+            for (var i = 0; i < social.length; i++) {
+                var network = social[i];
+                var link = document.createElement('a');
+                var sw = document.createElement('i');
+                link.appendChild(sw);
+                link.href = network.link;
+                link.target = "_blank";
+
+                sw.className = network.icon;
+                sw.style.backgroundColor = network.color;
+                sw.style.border = "1px solid " + network.border;
+
+                wrap.appendChild(link);
+            }
+
+            return wrap;
+        };
+    </script>`;
+    done();
+}
+
+const compile = (o, context) => {
+    o(context.header, context.bunchScript);
+};
+
+module.exports = { settings, preload, compile };
