@@ -505,7 +505,8 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                                 arr[i].author = eCache[arr[i].author && arr[i].author.toString()];
                                 arr[i].topic = topicObjects[arr[i].topic];
                                 arr[i].url = conf.server.protocol + conf.server.url + "/" + arr[i].topic.completeSlug + "/" + arr[i].name;
-                                arr[i].imgsrc = conf.server.protocol + arr[i].featuredimage[0].sizes.thumbnailarchive.url;
+                                arr[i].imgsrc = arr[i].featuredimage[0] ?
+                                    conf.server.protocol + arr[i].featuredimage[0].sizes.thumbnailarchive.url : "";
 
                                 arr[i].classes = "article-thumbnail";
                                 if ((9 - i) % 9 == 0) {
