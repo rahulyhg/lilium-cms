@@ -6,9 +6,6 @@ const fileserver = require('./fileserver.js');
 const log = require('./log.js');
 const themes = require('./themes.js');
 
-const setupHtmlToAmp  = require('html-to-amp');
-const htmlToAmp = setupHtmlToAmp();
-
 class Amp {
     // Called from Riverflow
     GET(cli) {
@@ -60,9 +57,6 @@ class Amp {
             article.has_instagram = article.content.indexOf("<amp-instagram") != -1;        
             article.has_twitter = article.content.indexOf("<amp-twitter") != -1;
 
-            log("HAS INSTAGRAM", article.has_instagram);
-            log("HAS TWITTER", article.has_twitter);
-
             /* Load theme AMP context, then generate from LML file */
             log('AMP', "Generating AMP page from LML for article : " + article.title);
             filelogic.renderThemeLML(cli, 'amp', 'amp/' + article.name + '.html', {
@@ -90,16 +84,19 @@ class Amp {
         articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
         
         var cTheme = themes.getEnabledTheme(cli._c).settings;
-        var adtags = (article.topic && article.topic.override && article.topic.override.adtags) || 
-                        cTheme.adtags || {};
+        var adtags = (article.topic && article.topic.override && article.topic.override.adtags) || cTheme.adtags || {};
         var keys = Object.keys(adtags);
         for(var i = 0; i < keys.length; i++){
             articleContent = articleContent.replace("<ad><\/ad>", '<p>{ad}</p>');
         }
         articleContent = articleContent.replace(/<ad><\/ad>/g, "");
 
+        const htmlToAmp = require('html-to-amp')();
+
         // Use library to do most of the parsing
+        log("AMP", "Running htmlToAmp library");
         htmlToAmp(articleContent, (err, amp) => {
+            log("AMP", "Library called back");
             if(!err) {
                 // Replace LML ads with AMP ads
                 amp = amp.replace(
