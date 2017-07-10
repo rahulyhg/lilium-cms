@@ -1380,13 +1380,13 @@ var insertAds = function(pkg) {
         var window = dom.window;
         var parags = window.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
         for (var i = 0; i < parags.length - 1; i++) if ((i-2) % pcount == 0) {
-            var adtag = dom.document.createElement('ad');
+            var adtag = window.document.createElement('ad');
             window.document.body.insertBefore(adtag, parags[i+1]);
             changed = true;
         }
 
         if (changed) {
-            content = dom.document.body.innerHTML;
+            content = window.document.body.innerHTML;
             article.content = content;
             db.update(_c, 'content', {_id : article._id}, {content : content, hasads : true}, function() {
                 log('Article', "Inserted ads inside article with title " + article.title, 'success');
