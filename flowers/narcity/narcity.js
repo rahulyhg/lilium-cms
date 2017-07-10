@@ -335,7 +335,10 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 var topic = arrList[i].topic[0];
                 arrList[i].topic = topic;
                 arrList[i].url = cli._c.server.protocol + cli._c.server.url + (topic ? "/" + topic.completeSlug : "") + "/" + arrList[i].name;
-                arrList[i].imgsrc = cli._c.server.protocol + arrList[i].featuredimage[0].sizes.thumbnailarchive.url;
+                arrList[i].imgsrc = 
+                    arrList[i].featuredimage[0] ?
+                    cli._c.server.protocol + arrList[i].featuredimage[0].sizes.thumbnailarchive.url : 
+                    "";
             }
 
             cb(err || archTypeRes[0], arrList, totalArticles, indices);
