@@ -173,11 +173,12 @@ var CKEditor = function() {
 
         CKEDITOR.plugins.add("lml-image-finder", {
             init: function(editor) {
-                editor.addCommand('imagebrowser', { exec : that.castImageSelector });
-                editor.ui.addButton('imgbrowser', {
+                editor.addCommand('lmlimgbrowser', { exec : that.castImageSelector });
+                editor.ui.addButton('lmlimgbrowser', {
                     label: 'Insert Image',
-                    command: 'imagebrowser',
-                    toolbar: 'insert'
+                    command: 'lmlimgbrowser',
+                    toolbar: 'insert',
+                    icon : "{=config.default.server.url}/static/media/ck-image-icon.png"
                 });
             }
         });
