@@ -51,7 +51,7 @@ class Cakepop {
     livevar(cli, levels, params, sendback) {
         var action = levels[0];
         if (action == "latests") {
-            let now = new Date();
+            let now = new Date().getTime();
             db.findUnique(config.default(), "cakepops", {
                 read : {$ne : db.mongoID(cli.userinfo.userid)},
                 expiry : {$gt : now},
@@ -71,7 +71,8 @@ class Cakepop {
             let filters = params.filters || {};
 
             if (filters.status) {
-                query.status = filters.status;
+                let ftc = filters.status == "live" ? "$gt" : "$lt";
+                query.expiry = { [ftc] : t }
             }
 
             if (filters.search) {
