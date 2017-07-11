@@ -68,7 +68,7 @@ var registeredLibraries = {
     slug : function(context) {
         return {
             ify : function(str) {
-                var sl = require('slugify')(str || "");
+                var sl = require('slugify')(str ? str.toString() : "");
                 return sl ? sl.toLowerCase() : "";
             }
         };
