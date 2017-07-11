@@ -4,8 +4,7 @@
 <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
 
 <!-- Scripts -->
-<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js"></script>
-
+<script src="{=config.default.server.url}/bower/ckeditor/ckeditor.js?key={=config.default.compilekey}"></script>
 <script src="{=config.default.server.url}/compiled/admin.js?key={=config.default.compilekey}"></script>
 
 <!-- Lilium Admin Styles and Scripts  -->
