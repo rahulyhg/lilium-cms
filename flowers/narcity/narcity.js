@@ -257,11 +257,6 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                 }
             ];
             break;
-        case 'search':
-            match["$text"] = {
-                $search : mtc
-            }
-            break;      
         case 'topic':
             match.topic = cli.extra.topic._id;
         case 'latests':
@@ -345,7 +340,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
         });
     }
 
-    if (section == "tags" || section == "search") {
+    if (section == "tags") {
         matchCallback([{tag : mtc}]);
     } else if (section == "topic") {
         matchCallback([{topic : cli.extra.topic}]);
@@ -425,7 +420,6 @@ var generateRSS = function(_c, completeSlug, send) {
     } else {
         createFeed();
     }
-
 };
 
 var serveFeed = function(cli) {
@@ -600,7 +594,11 @@ var serveArchive = function(cli, archType) {
     var tagIndex = cli.routeinfo.path[2] || 1;
 
     if (archType === "search" && !tagName) {
-        tagName = cli.routeinfo.params.q;
+        var q = cli.routeinfo.params.q || "";
+
+        var slugify = require("slugify");
+        tagName = slugify(q.toString().toLowerCase());
+
         if (!tagName || tagName == "") {
             return cli.throwHTTP(404, 'NOT FOUND');
         }

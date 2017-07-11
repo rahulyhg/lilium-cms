@@ -109,6 +109,37 @@ class Cakepop {
             fieldWrapper : "lmlform-fieldwrapper"
         })
         .add('title', 'text', { displayname : "Title" })
+        .add('content', 'ckeditor', {nolabel : true})
+        .add('responses', 'stack', {
+            displayname : "Responses",
+            scheme : {
+                columns : [
+                    { fieldName : "identifier",     dataType : "text", displayname : "Identifier"   }, 
+                    { fieldName : "displayname",    dataType : "text", displayname : "Display Name" }, 
+                    { fieldName : "color",          dataType : "text", displayname : "Color (HEX)"  }
+                ]
+            }
+        })
+        .add('expiry', 'date', {
+            displayname : "Expiry",
+            datetime : true, 
+            context : 'edit'
+        })
+        .add('publish-set', 'buttonset', { 
+            buttons : [
+                {
+                    'name' : 'save',
+                    'displayname': 'Save',
+                    'type' : 'button',
+                    'classes': ['btn-save']
+                }, {
+                    'name' : 'view',
+                    'displayname': 'Test Cakepop',
+                    'type' : 'button',
+                    'classes': ['btn-preview']
+                }        
+            ]
+        });
     }
 }
 
