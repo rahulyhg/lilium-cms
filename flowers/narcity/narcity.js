@@ -259,8 +259,12 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
             break;
         case 'topic':
             match.topic = cli.extra.topic._id;
-        case 'latests':
         case 'search':
+            var words = (cli.routeinfo.params.q || "").split(' ');
+            var reg = new RegExp(words.join('|'), 'i');
+
+            match.title = {$regex : reg};
+        case 'latests':
             break;
         default:
             match['NONE'] = '$';
