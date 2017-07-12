@@ -373,7 +373,7 @@
             "admin_menu" : {
                 "id": "cakepop",
                 "faicon": "fa-window-maximize",
-                "displayname": "Cakepops",
+                "displayname": "Cakepops (Dev)",
                 "priority": 415,
                 "rights": ["cakepops"],
                 "absURL": "admin/cakepop",

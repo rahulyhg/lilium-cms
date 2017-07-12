@@ -1,0 +1,16 @@
+const settings = {
+    lmldom : {v : 1.0},
+    title : "Cakepop",
+    livevars : ["cakepop.single.{?1}"]
+};
+
+const preload = (context, done) => {
+    done();
+};
+
+const compile = (o, context) => {
+    o(context.header, context.libs.formbuilder.render("cakepop_edit", "edit", "cakepop/single/?"));
+
+} 
+
+module.exports = { settings, preload, compile };
