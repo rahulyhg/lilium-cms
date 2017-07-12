@@ -27,20 +27,22 @@ var FileServer = function () {
                 fullpath += "/index.html";
             }
             return typeof fs.accessSync(fullpath, fs.F_OK) == 'undefined';
-
         } else {
-            fs.lstat(fullpath, function (err, stats) {
-                if (err) {
-                    cb(false);
-                    return;
-                }
+            var dirpath = fullpath.substring(0, fullpath.lastIndexOf('/'));
+            mkdirp(dirpath, function() {
+                fs.lstat(fullpath, function (err, stats) {
+                    if (err) {
+                        cb(false);
+                        return;
+                    }
 
-                if (stats.isDirectory()) {
-                    fullpath += "/index.html";
-                }
+                    if (stats.isDirectory()) {
+                        fullpath += "/index.html";
+                    }
 
-                fs.access(fullpath, fs.F_OK, function (err) {
-                    cb(!err);
+                    fs.access(fullpath, fs.F_OK, function (err) {
+                        cb(!err);
+                    });
                 });
             });
         }

@@ -260,6 +260,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
         case 'topic':
             match.topic = cli.extra.topic._id;
         case 'latests':
+        case 'search':
             break;
         default:
             match['NONE'] = '$';
@@ -344,6 +345,22 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
         matchCallback([{tag : mtc}]);
     } else if (section == "topic") {
         matchCallback([{topic : cli.extra.topic}]);
+    } else if (section == "search") {
+        if (cli.routeinfo.params.city) {
+            db.findUnique(cli._c, 'topics', {"override.cityname" : cli.routeinfo.params.city}, (err, topic) => {
+                if (topic) {
+                    db.findToArray(cli._c, 'topics', {parent : topic._id}, (err, arr) => {
+                        var ids = [topic._id, ...arr.map(x => x._id)];
+                        match.topic = {$in : ids};
+                        matchCallback(section, undefined);
+                    });
+                } else {
+                    cb("search", [], 0, 1);
+                }
+            });
+        } else {
+            matchCallback(section, undefined);           
+        }
     } else {
         db.join(typeCollection == "entities" ? cc.default() : cli._c || cli, typeCollection, typeMatch, matchCallback);
     }
@@ -622,9 +639,12 @@ var serveArchive = function(cli, archType) {
     }
 
     var file = _c.server.html + '/' + archType + '/' + tagName + '/' + tagIndex + "/index.html";
+    if (archType == "search") {
+        file = _c.server.html + "/search/" + cli.routeinfo.params.city + "/" + cli.routeinfo.params.q + ".html";
+    }
 
     fileserver.fileExists(file, function(exists) { 
-        if (!exists || typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
+        if (archType == "search" || !exists || typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
             fetchArchiveArticles(cli, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices) {
                 if (typeof archDetails === "number") {
                     return cli.throwHTTP(404, 'NOT FOUND');
@@ -639,11 +659,17 @@ var serveArchive = function(cli, archType) {
                 extra.archivename = archType;
                 extra.archivedetails = archDetails;
                 
-                filelogic.renderThemeLML(cli, archType, archType + "/" + tagName + '/' + tagIndex + '/index.html', extra, function() {
-                    fileserver.pipeFileToClient(cli, file, function() {
-                        cachedTags[archType][tagName][tagIndex] = true;
-                        log('Narcity', 'Generated tag archive for type ' + archType + ' : ' + tagName);
-                    });
+                var outputfile = "";
+                if (archType == "search") {
+                    outputfile = "search/" + cli.routeinfo.params.city + "/" + cli.routeinfo.params.q + ".html";
+                } else {
+                    outputfile = archType + "/" + tagName + '/' + tagIndex + '/index.html';
+                }
+
+                filelogic.renderThemeLML(cli, archType, outputfile, extra, function(ctn) {
+                    cli.sendHTML(ctn);
+                    cachedTags[archType][tagName][tagIndex] = true;
+                    log('Narcity', 'Generated tag archive for type ' + archType + ' : ' + tagName);
                 });
             });
         } else {
