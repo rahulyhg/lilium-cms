@@ -268,7 +268,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
 
     var limit = sett.archivearticlecount ? parseInt(sett.archivearticlecount) : 12
     var skip = skp * limit;
-    var matchCallback = function(archTypeRes, err) { 
+    var matchCallback = function(archTypeRes, err, xtra) { 
         if (err || archTypeRes.length == 0) {
             return cb(404);
         }
@@ -337,7 +337,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                     "";
             }
 
-            cb(err || archTypeRes[0], arrList, totalArticles, indices);
+            cb(err || archTypeRes[0], arrList, totalArticles, indices, xtra);
         });
     }
 
@@ -352,7 +352,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                     db.findToArray(cli._c, 'topics', {parent : topic._id}, (err, arr) => {
                         var ids = [topic._id, ...arr.map(x => x._id)];
                         match.topic = {$in : ids};
-                        matchCallback(section, undefined);
+                        matchCallback(section, undefined, {topic});
                     });
                 } else {
                     cb("search", [], 0, 1);
@@ -645,12 +645,12 @@ var serveArchive = function(cli, archType) {
 
     fileserver.fileExists(file, function(exists) { 
         if (archType == "search" || !exists || typeof cachedTags[archType][tagName][tagIndex] === 'undefined') {
-            fetchArchiveArticles(cli, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices) {
+            fetchArchiveArticles(cli, archType, tagName, parseInt(tagIndex) - 1, function(archDetails, articles, total, indices, xtra) {
                 if (typeof archDetails === "number") {
                     return cli.throwHTTP(404, 'NOT FOUND');
                 }
 
-                var extra = {};
+                var extra = xtra || {};
                 extra.articles = articles;
                 extra.totalarticles = total;
                 extra.searchname = tagName || archType;
