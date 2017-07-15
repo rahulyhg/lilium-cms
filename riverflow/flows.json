@@ -309,6 +309,10 @@
                 "children": []
             }
         }, {
+            "module" : "entityrelationship.js",
+            "endpoint" : "entityrelationship",
+            "support" : ["admin_get", "admin_post", "livevar", "setup"]
+        }, {
             "module" : "personas.js",
             "endpoint" : "persona",
             "support" : ["admin_get", "admin_post", "form", "livevar"],
