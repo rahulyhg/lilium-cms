@@ -11,23 +11,23 @@
     			{=forms.render('role_create')}
 		</main>
 
-		<lml:template id="entity-list-item">
+		<lml-template id="entity-list-item">
 			<li class="entity-item-list">
-				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
+				<lml-tobject data-nodetype="h3" data-key="displayname"></lml-tobject>
 				<h6>
-					Roles : <lml:tobject data-nodetype="span" data-key="role" data-arrayseparator=", "></lml:tobject>
+					Roles : <lml-tobject data-nodetype="span" data-key="role" data-arrayseparator=", "></lml-tobject>
 				</h6>
 				<div class="entity-actions">
-					<lml:tobject data-nodetype="button"
+					<lml-tobject data-nodetype="button"
 						     data-bind="click"
 						     data-action="deleteUser"
 						     data-actionparamkey="_id"
 						     data-filter="canDelete" >
 							Delete
-					</lml:tobject>
+					</lml-tobject>
 				</div>
 			</li>
-		</lml:template>
+		</lml-template>
         <script src="{=config.default.server.base_url}:8080/bower/remarkable-bootstrap-notify/bootstrap-notify.min.js"></script>
 
 <style>

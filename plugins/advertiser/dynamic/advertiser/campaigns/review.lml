@@ -10,25 +10,25 @@ $}
 		{*campaigns.articlereview.{?1}(template:"review-article",sourceof:"advertiser_article_review")}
 	</div>
 
-	<lml:template id="review-article">
+	<lml-template id="review-article">
         <div>
 			{=forms.render(advertiser_article_review)}
         </div>
         <div>
-            <lml:tobject data-nodetype="button"
+            <lml-tobject data-nodetype="button"
                      data-bind="click"
                      data-action="looksGood"
                      data-actionparamkey="_id">
                     Looks Good
-            </lml:tobject>
-            <lml:tobject data-nodetype="button"
+            </lml-tobject>
+            <lml-tobject data-nodetype="button"
                      data-bind="click"
                      data-action="changeRequest"
                      data-actionparamkey="_id">
                     Change Request
-            </lml:tobject>
+            </lml-tobject>
         </div>
-	</lml:template>
+	</lml-template>
 
     <button id="confirm-review">Confirm</button>
 
@@ -45,7 +45,7 @@ $}
 		document.addEventListener('livevarsRendered', function(e) {
 			$('#confirm-review').click(function(e) {
 			    //Check if everything is confirmed
-			    if ($('button.selected').length == liliumcms.livevars.livevars()[$("lml\\:livevars:first").attr('data-varname')].length) {
+			    if ($('button.selected').length == liliumcms.livevars.livevars()[$("lml-livevars:first").attr('data-varname')].length) {
 				    $.post($(location).attr("href"), {changerequests : changeRequests}, function(data) {
 				        if (data.sucess) {
 					        window.location.replace(data.redirect);

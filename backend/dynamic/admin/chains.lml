@@ -1,12 +1,12 @@
 {#config;extra}
-<lml:dom v="0.9"></lml:dom>
+<lml-dom v="0.9"></lml-dom>
 <h1>
     Content Chains
     <a class="fab" href="{=config.default.server.url}/admin/chains/new">+</a>
 </h1>
 
-<lml:bunch>
-    <lml:bunchfilters>
+<lml-bunch>
+    <lml-bunchfilters>
         <div class="bunch-filters">
             <div class="bunch-filters-title">FILTERS</div>
             <label>Status</label>
@@ -18,22 +18,22 @@
             <label>Search</label>
             <input type="text" name="search" placeholder="Title keywords" />
         </div>
-    </lml:bunchfilters>
+    </lml-bunchfilters>
 
-    <lml:bunchitem>
+    <lml-bunchitem>
         <div class="single-chain-item">
-            <lml:link href="{=config.default.server.url}/admin/chains/edit/{chain._id}">
+            <lml-link href="{=config.default.server.url}/admin/chains/edit/{chain._id}">
                 <div class="single-chain-image">
-                    <lml:image src="{chain.featuredimageurl}"></lml:image>
+                    <lml-image src="{chain.featuredimageurl}"></lml-image>
                 </div>
                 <div class="">
                     <h3>
-                        <lml:class classes="chain.status" tag="i"></lml:class><lml:text var="chain.title"></lml:text>
+                        <lml-class classes="chain.status" tag="i"></lml-class><lml-text var="chain.title"></lml-text>
                     </h3>
                 </div>
-            </lml:link>
+            </lml-link>
         </div>
-    </lml:bunchitem>
+    </lml-bunchitem>
 
     <script type="lmljson" name="chainsbunch">
         {
@@ -41,7 +41,7 @@
             "loopvar" : "chain"
         }
     </script>
-</lml:bunch>
+</lml-bunch>
 
 <style>
 .single-chain-item {

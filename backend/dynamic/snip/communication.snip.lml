@@ -9,19 +9,19 @@
         </div>
 
         <div class="communications-list">
-            <lml:foreach var="comm" in="livevars.communications.get.article.?">
+            <lml-foreach var="comm" in="livevars.communications.get.article.?">
                 <div class="communication-single">
                     <div class="communication-author">
-                        <lml:image src="{comm.posterobj.avatarURL}" ></lml:image>
-                        <span><b><lml:text var="comm.posterobj.displayname" /></b></span>
+                        <lml-image src="{comm.posterobj.avatarURL}" ></lml-image>
+                        <span><b><lml-text var="comm.posterobj.displayname" /></b></span>
                         <span>&middot;</span>
-                        <span><lml:text var="comm.date" date="HH:MM, dd/mm/yyyy" /></span>
+                        <span><lml-text var="comm.date" date="HH:MM, dd/mm/yyyy" /></span>
                     </div>
                     <p class="communication-content">
-                        <lml:text var="comm.content" />
+                        <lml-text var="comm.content" />
                     </p>
                 </div>
-            </lml:foreach>
+            </lml-foreach>
         </div>
     </div>    
 </div>

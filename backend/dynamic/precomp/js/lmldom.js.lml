@@ -10,14 +10,14 @@
 /*
     -- LMLDom Header tag --
 
-    lml:dom         => features="list of features split using white spaces"
+    lml-dom         => features="list of features split using white spaces"
 
     -- LMLDom Tags --------
 
     - Stand-alone features
-    lml:bunch       
+    lml-bunch       
         script:type=lmljson
-        lml:bunchitem
+        lml-bunchitem
             # See lmldom-bunch.js
 
     script=lmljson
@@ -26,29 +26,29 @@
             # See lmldom-json.js
 
     - Loops & Wrappers --
-    lml:foreach     => var="newlyDefinedVariable" in="currentArray"
-    lml:wrapper     => tag="tagName" id="id_and_{variableName}" class="class passed to new node"
+    lml-foreach     => var="newlyDefinedVariable" in="currentArray"
+    lml-wrapper     => tag="tagName" id="id_and_{variableName}" class="class passed to new node"
 
     - Tables --
-    lml:table       => id="string_{variableName}" class="" 
-    lml:tbody       => id="string_{variableName}" class="" for="variableName" in="variableName"
-    lml:tcol        => id="string_{variableName}" class="" colspan="number"
-    lml:tfooter     => id="string_{variableName}" class=""
+    lml-table       => id="string_{variableName}" class="" 
+    lml-tbody       => id="string_{variableName}" class="" for="variableName" in="variableName"
+    lml-tcol        => id="string_{variableName}" class="" colspan="number"
+    lml-tfooter     => id="string_{variableName}" class=""
 
     - Filters --
-    lml:filter      => if="functionName" pass="variableName"
+    lml-filter      => if="functionName" pass="variableName"
 
     - Generators --
-    lml:generate    => call="functionName"
+    lml-generate    => call="functionName"
 
     - Normal Tags --
-    lml:text /      => var="variableName"
-    lml:class       => classes="{variableName}" tag="tag name"
-    lml:image /     => src="//domain.com/uploads/{variableName}" 
-    lml:action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
-    lml:editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
-    lml:link        => href="//domain.com/admin/{variableName}" class="" target=""
-    lml:value       => id="variableName" groupname="" terms="variableName"
+    lml-text /      => var="variableName"
+    lml-class       => classes="{variableName}" tag="tag name"
+    lml-image /     => src="//domain.com/uploads/{variableName}" 
+    lml-action      => callback="functionname" class="class passed to new node" pass="param_{variableName}"
+    lml-editable    => value="variableName" name="string" class="class passed to new node" placeholder="string"
+    lml-link        => href="//domain.com/admin/{variableName}" class="" target=""
+    lml-value       => id="variableName" groupname="" terms="variableName"
 
     - Livevar fed fields --
     select.lmldom-liveselect  => data-filledby="livevar.endpoint" name="fieldname"
@@ -121,7 +121,7 @@ var LMLDom = function() {
         chainAppend(theadrow, thead, etab);
 
         // Body
-        var tbody = tab.querySelector('lml\\:tsection[section="body"]');
+        var tbody = tab.querySelector('lml-tsection[section="body"]');
         tbody.setAttribute('wrapper', 'tr');
         var ebody = document.createElement('tbody');
         ebody.className = tbody.className;
@@ -131,13 +131,13 @@ var LMLDom = function() {
         bulkAppend(this.foreach(tbody, ebody), ebody)
 
         // Footer (optional)
-        var tfoot = tab.querySelector('lml\\:tsection[section="foot"]');
+        var tfoot = tab.querySelector('lml-tsection[section="foot"]');
         if (tfoot) {
             var efoot = document.createElement('tfoot');
             efoot.className = tfoot.className;
             efoot.id = tfoot.id;
 
-            var cols = tfoot.querySelectorAll('lml\\:tcol');
+            var cols = tfoot.querySelectorAll('lml-tcol');
             var tr = document.createElement('tr');
             for (var i = 0; i < cols.length; i++) {
                 var foottd = document.createElement('td');
@@ -191,7 +191,7 @@ var LMLDom = function() {
     };
 
     this.createEditors = function(maindom, done) {
-        var editorTemplates = maindom.querySelectorAll('lml\\:editor');
+        var editorTemplates = maindom.querySelectorAll('lml-editor');
         var total = editorTemplates.length;
         var index = -1;
 
@@ -208,18 +208,18 @@ var LMLDom = function() {
     };
 
     this.stage = function(elem) {
-        var stageElement = document.querySelector('lml\\:stage');
+        var stageElement = document.querySelector('lml-stage');
         stageElement && stageElement.appendChild(elem);
     };
 
     this.emptyStage = function() {
-        var stageElement = document.querySelector('lml\\:stage');
+        var stageElement = document.querySelector('lml-stage');
         if (stageElement) {
             while (stageElement.firstChild) {
                 stageElement.removeChild(stageElement.firstChild);
             }
         } else {
-            document.documentElement.appendChild(document.createElement("lml:stage"));
+            document.documentElement.appendChild(document.createElement("lml-stage"));
         }
     }
 
@@ -235,7 +235,7 @@ var LMLDom = function() {
 
     this.parseBunches = function(maindom, done) {
         ldContext.lmljson = {};
-        var bunches = maindom.querySelectorAll('lml\\:bunch');
+        var bunches = maindom.querySelectorAll('lml-bunch');
         var bunchIndex = -1;
         var nextBunch = function() {
             if (++bunchIndex == bunches.length) {
@@ -250,13 +250,13 @@ var LMLDom = function() {
     };
 
     this.parseNode = function(elem) {
-        var fe = elem.querySelector('lml\\:foreach');
+        var fe = elem.querySelector('lml-foreach');
         while (fe) {
             var nd = this.foreach(fe);
-            fe = elem.querySelector('lml\\:foreach');
+            fe = elem.querySelector('lml-foreach');
         }
 
-        var wr = elem.querySelector('lml\\:wrapper');
+        var wr = elem.querySelector('lml-wrapper');
         while (wr) {
             var tagname = wr.getAttribute('tag') || 'div';
             var idstr = wr.id;
@@ -279,16 +279,16 @@ var LMLDom = function() {
             wr.insertAfter(wrap);
             wr.remove();
 
-            wr = elem.querySelector('lml\\:wrapper');
+            wr = elem.querySelector('lml-wrapper');
         }
 
-        var tab = elem.querySelector('lml\\:table');
+        var tab = elem.querySelector('lml-table');
         while (tab) {
             var otab = this.table(tab);
-            tab = document.querySelector('lml\\:table');
+            tab = document.querySelector('lml-table');
         }
 
-        var tcols = elem.querySelectorAll('lml\\:tcol');
+        var tcols = elem.querySelectorAll('lml-tcol');
         for (var i = 0; i < tcols.length; i++) {
             var col = tcols[i]
             var tdd = document.createElement('td');
@@ -302,7 +302,7 @@ var LMLDom = function() {
             col.remove();
         }
 
-        var iftag = elem.querySelector('lml\\:filter');
+        var iftag = elem.querySelector('lml-filter');
         while (iftag) {
             var cbname = iftag.getAttribute('if');
             var paramname = iftag.getAttribute('pass');
@@ -320,10 +320,10 @@ var LMLDom = function() {
             } 
 
             iftag.remove();
-            iftag = elem.querySelector('lml\\:filter');
+            iftag = elem.querySelector('lml-filter');
         }
 
-        var gen = elem.querySelector('lml\\:generate');
+        var gen = elem.querySelector('lml-generate');
         while (gen) {
             var generator = gen.getAttribute('call');
             var genelem = window[generator](ldContext);
@@ -333,10 +333,10 @@ var LMLDom = function() {
             }
 
             gen.remove();
-            gen = elem.querySelector('lml\\:generate');
+            gen = elem.querySelector('lml-generate');
         }
 
-        var act = elem.querySelector('lml\\:action');
+        var act = elem.querySelector('lml-action');
         while (act) {
             var button = document.createElement('button');
             button.setAttribute('type', 'button');
@@ -369,10 +369,10 @@ var LMLDom = function() {
             act.insertAfter(button);
             act.remove();
 
-            act = elem.querySelector('lml\\:action');
+            act = elem.querySelector('lml-action');
         }
 
-        var ed = elem.querySelector('lml\\:editable');
+        var ed = elem.querySelector('lml-editable');
         while (ed) {
             var varlevels = ed.getAttribute('value');
             var txt = getReturn(ldContext, varlevels, "");
@@ -387,10 +387,10 @@ var LMLDom = function() {
             ed.insertAfter(inp);
             ed.remove();
             
-            ed = elem.querySelector('lml\\:editable');
+            ed = elem.querySelector('lml-editable');
         }
 
-        var cl = elem.querySelector('lml\\:class');
+        var cl = elem.querySelector('lml-class');
         while(cl) {
             var tag = document.createElement(cl.getAttribute('tag') || "div");
             var classvar = cl.getAttribute('classes');
@@ -405,10 +405,10 @@ var LMLDom = function() {
             cl.insertAfter(tag);
             cl.remove();
 
-            cl = elem.querySelector('lml\\:class');
+            cl = elem.querySelector('lml-class');
         }
 
-        var lim = elem.querySelector('lml\\:image');
+        var lim = elem.querySelector('lml-image');
         while (lim) {
             var img = document.createElement('img');
 
@@ -432,10 +432,10 @@ var LMLDom = function() {
 
             lim.remove();
 
-            lim = elem.querySelector('lml\\:image');
+            lim = elem.querySelector('lml-image');
         }
 
-        var lnk = elem.querySelector('lml\\:link');
+        var lnk = elem.querySelector('lml-link');
         while (lnk) {
             var a = document.createElement('a');
 
@@ -460,10 +460,10 @@ var LMLDom = function() {
 
             lnk.remove();
 
-            lnk = elem.querySelector('lml\\:link');
+            lnk = elem.querySelector('lml-link');
         }
 
-        var vn = elem.querySelector('lml\\:value');
+        var vn = elem.querySelector('lml-value');
         while(vn) {
             var value = getReturn(ldContext, vn.id);
             var groupname = vn.getAttribute('groupname');
@@ -494,10 +494,10 @@ var LMLDom = function() {
             vn.insertAfter(textvalue);
             vn.remove();
 
-            vn = elem.querySelector('lml\\:value');
+            vn = elem.querySelector('lml-value');
         }
 
-        var tn = elem.querySelector('lml\\:text');
+        var tn = elem.querySelector('lml-text');
         while (tn) {
             var varlevels = tn.getAttribute('var');
             var txt = getReturn(ldContext, varlevels, "");
@@ -516,7 +516,7 @@ var LMLDom = function() {
             tn.insertAfter(spann);
             tn.remove();
             
-            tn = elem.querySelector('lml\\:text');
+            tn = elem.querySelector('lml-text');
         }
 
         return elem;
@@ -678,7 +678,7 @@ var LMLDom = function() {
     };  
 
     this.addFeatures = function() {
-        var features = document.querySelector('lml\\:dom').getAttribute('features');
+        var features = document.querySelector('lml-dom').getAttribute('features');
 
         if (features) {
             features = features.split(' ');
@@ -997,7 +997,7 @@ var LMLDom = function() {
     };
 
     this.parse = function(lmldomReady) {
-        var domv = document.querySelector('lml\\:dom');
+        var domv = document.querySelector('lml-dom');
         var lmldom = this;
         if (domv) {
             domv = domv.getAttribute('v');
@@ -1023,7 +1023,7 @@ var LMLDom = function() {
             lmldom.parseBunches(maindom, function() {
                 log('LMLDOM', 'Working with LMLDOM markup');
                 lmldom.parseNode(maindom);
-                var lvs = maindom.querySelectorAll("lml\\:livevars");
+                var lvs = maindom.querySelectorAll("lml-livevars");
                 for (var i = 0; i < lvs.length; i++) {
                     lvs[i].remove();
                 }

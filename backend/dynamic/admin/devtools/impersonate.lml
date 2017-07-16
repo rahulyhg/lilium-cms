@@ -1,15 +1,15 @@
 {#config}
 {*entities.simple.active}
-<lml:dom v="0.9"></lml:dom>
+<lml-dom v="0.9"></lml-dom>
 
 <h1>Impersonate a user</h1>
-<lml:foreach var="user" in="livevars.entities.simple.active">
+<lml-foreach var="user" in="livevars.entities.simple.active">
     <div class="impersonate-user">
-    <lml:link href="{=config.default.server.url}/admin/entities/impersonate/{user._id}?async=false" target="_blank">
-        <lml:text var="user.displayname"></lml:text>
-    </lml:link>
+    <lml-link href="{=config.default.server.url}/admin/entities/impersonate/{user._id}?async=false" target="_blank">
+        <lml-text var="user.displayname"></lml-text>
+    </lml-link>
     </div>
-</lml:foreach>
+</lml-foreach>
 
 <style>
 .impersonate-user {

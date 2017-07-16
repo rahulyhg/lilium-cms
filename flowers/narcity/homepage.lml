@@ -100,8 +100,8 @@
         {$ if (section.articles.length != 0); $}
         <div class="fwblock suggestions-wrapper">
             <h5 class="article-subsection-title">Suggested</h5>
-            <lml:native></lml:native>
-            <lml:native></lml:native>
+            <lml-native></lml-native>
+            <lml-native></lml-native>
         </div>
 
         <div class="fwblock homepage-section-container">
@@ -175,9 +175,9 @@
     new timeago().render(document.querySelectorAll('.need_to_be_rendered'));
 </script>
 
-<lml:template id="lmltemplate-native">
+<lml-template id="lmltemplate-native">
 
-</lml:template>
+</lml-template>
 
 <script>
 var generateHomepageTrending = function(tArr) { if (tArr && tArr.length != 0) {

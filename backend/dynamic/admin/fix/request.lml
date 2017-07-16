@@ -1,5 +1,5 @@
 {#config;forms}
-<lml:dom v="0.8" features=""></lml:dom>
+<lml-dom v="0.8" features=""></lml-dom>
 
 <h1>Request a new feature</h1>
 <span class="pad10">

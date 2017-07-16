@@ -1,6 +1,6 @@
 {#config;extra}
 {*devtools.htmlfiles}
-<lml:dom v="0.8" features="fullwidth" />
+<lml-dom v="0.8" features="fullwidth" />
 
 <h1>
     Generated HTML Files
@@ -9,18 +9,18 @@
     Click on a cached file to delete it. Admin cached files are not part of the list. 
 </p>
 <div id="devtools-cached-files">
-    <lml:foreach var="section" in="livevars.devtools.htmlfiles" wrapper="span">
-        <h2><lml:text var="section.foreachkey" /></h2>
+    <lml-foreach var="section" in="livevars.devtools.htmlfiles" wrapper="span">
+        <h2><lml-text var="section.foreachkey" /></h2>
         <div class="devtools-cached-files-list-wrapper">
             <ul>
-                <lml:foreach var="file" in="section" wrapper="li">
+                <lml-foreach var="file" in="section" wrapper="li">
                     <span>
-                        <lml:text var="file" />
+                        <lml-text var="file" />
                     </span>
-                </lml:foreach>
+                </lml-foreach>
             </ul>
         </div>
-    </lml:foreach>
+    </lml-foreach>
 </div>
 
 <style>

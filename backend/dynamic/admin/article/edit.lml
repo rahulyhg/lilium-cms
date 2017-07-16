@@ -1,5 +1,5 @@
 {#config;vocab;forms}
-<lml:dom v="0.8"></lml:dom>
+<lml-dom v="0.8"></lml-dom>
 {*content.{?1}} 
 {*socialdispatch.networks.liveselect}
 {%../articlescript}

@@ -77,7 +77,7 @@ var TableBuilder = function () {
                 html += '</div>';
 
                 if (filter.livevar) {
-                    html += '<lml:livevars data-varname="'+filter.livevar.endpoint+'" data-varparam="{}"></lml:livevars>';
+                    html += '<lml-livevars data-varname="'+filter.livevar.endpoint+'" data-varparam="{}"></lml-livevars>';
                 }
             }
         }

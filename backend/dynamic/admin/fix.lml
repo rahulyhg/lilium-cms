@@ -1,6 +1,6 @@
 {#config;extra}
 {*fix.all}
-<lml:dom v="0.8" features="fullwidth"></lml:dom>
+<lml-dom v="0.8" features="fullwidth"></lml-dom>
 
 <span class="admin-title">
     Bugs and feature requests
@@ -10,7 +10,7 @@
     <div class="bnf-stat-slide">
         <div class="bnf-stat-slide-container">
             <span>
-                <lml:text var="livevars.fix.all.issues"></lml:text>
+                <lml-text var="livevars.fix.all.issues"></lml-text>
             </span>
             <div class="bnf-stat-title">
                 open issues
@@ -25,7 +25,7 @@
     <div class="bnf-stat-slide">
         <div class="bnf-stat-slide-container">
             <span>
-                <lml:text var="livevars.fix.all.featurerequests"></lml:text>
+                <lml-text var="livevars.fix.all.featurerequests"></lml-text>
             </span>
             <div class="bnf-stat-title">
                 feature requests
@@ -40,7 +40,7 @@
     <div class="bnf-stat-slide">
         <div class="bnf-stat-slide-container">
             <span>
-                <lml:text var="livevars.fix.all.emergencies"></lml:text>
+                <lml-text var="livevars.fix.all.emergencies"></lml-text>
             </span>
             <div class="bnf-stat-title">
                 emergencies
@@ -54,13 +54,13 @@
 </div>
 
 <div id="bnf-wrapper">
-    <lml:foreach var="ticket" in="livevars.fix.all.tickets">
+    <lml-foreach var="ticket" in="livevars.fix.all.tickets">
         <div class="ticket-card-wrapper">
-            <lml:generate call="generateTicketCard"></lml:generate>
+            <lml-generate call="generateTicketCard"></lml-generate>
         </div>
-    </lml:foreach>
+    </lml-foreach>
 
-    <lml:filter if="hasNoTickets">
+    <lml-filter if="hasNoTickets">
         <div id="noticket-wrapper">
             <div id="noticket-card">
                 <i class="fa fa-star" aria-hidden="true"></i>
@@ -69,7 +69,7 @@
                 </span>
             </div>
         </div>
-    </lml:filter>
+    </lml-filter>
 </div>
 
 

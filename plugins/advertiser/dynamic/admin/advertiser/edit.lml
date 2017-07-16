@@ -15,7 +15,7 @@
 <script>
 	$(document).ready(function() {
 		document.addEventListener('livevarsFetched', function() {
-			liliumcms.formParser.parse($("lml\\:livevars:first").attr('data-varname'));
+			liliumcms.formParser.parse($("lml-livevars:first").attr('data-varname'));
 		})
 	});
 </script>

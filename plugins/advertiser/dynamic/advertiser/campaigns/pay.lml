@@ -25,40 +25,40 @@ TVQ :
 <div>Total : <span id="campaign_total_price"></span></div>
 {*campaigns.{?1}(template:"order_details")}
 
-<lml:template id="order_details">
+<lml-template id="order_details">
 	<h1>Campaign details</h1>
-	<lml:tobject data-nodetype="h3" data-key="campname"></lml:tobject>
+	<lml-tobject data-nodetype="h3" data-key="campname"></lml-tobject>
 	<div>
-		<lml:tobject data-nodetype="div" data-key="products" data-template="product-list" data-target="ordertbody"></lml:tobject>
+		<lml-tobject data-nodetype="div" data-key="products" data-template="product-list" data-target="ordertbody"></lml-tobject>
 		<div class="entity-actions">
 
-			<lml:tobject data-nodetype="div" data-filter="hasStripeAccount">
+			<lml-tobject data-nodetype="div" data-filter="hasStripeAccount">
 				<form method="post">
 					<input type="submit"/>
 				</form>
-			</lml:tobject>
-			<lml:tobject data-nodetype="div" data-filter="needStripeAccount">
+			</lml-tobject>
+			<lml-tobject data-nodetype="div" data-filter="needStripeAccount">
 				<h3>Please provide the following informations for payment</h3>
 				<div class="payment-errors">
 
 				</div>
 				{=forms.render(advertiser_pay)}
-			</lml:tobject>
+			</lml-tobject>
 		</div>
 	</div>
 
 </lml>
 
-<lml:template id="product-list" data-wrapper="tr">
-	<lml:tobject data-nodetype="td" data-key="prodid"  ></lml:tobject>
-	<lml:tobject data-nodetype="td" data-key="enddate" ></lml:tobject>
-	<lml:tobject data-nodetype="td">
-		<lml:tobject data-nodetype="span" data-key="qte"></lml:tobject>
-		<lml:tobject data-nodetype="span" data-key="pricebase"></lml:tobject>
-	</lml:tobject>
-	<lml:tobject data-nodetype="td" data-key="price" ></lml:tobject>
+<lml-template id="product-list" data-wrapper="tr">
+	<lml-tobject data-nodetype="td" data-key="prodid"  ></lml-tobject>
+	<lml-tobject data-nodetype="td" data-key="enddate" ></lml-tobject>
+	<lml-tobject data-nodetype="td">
+		<lml-tobject data-nodetype="span" data-key="qte"></lml-tobject>
+		<lml-tobject data-nodetype="span" data-key="pricebase"></lml-tobject>
+	</lml-tobject>
+	<lml-tobject data-nodetype="td" data-key="price" ></lml-tobject>
 
-</lml:template>
+</lml-template>
 
 	<script>
     function hasStripeAccount(campaign) {
@@ -79,7 +79,7 @@ TVQ :
 				var total = 0;
 
 				// Quick fix for jquery nth-of-type problem
-				var key = $("lml\\:livevars").last().attr('data-varname');
+				var key = $("lml-livevars").last().attr('data-varname');
 				products = livevars[key][0].products;
 				for (var index in products) {
 					// use this line if price is based on qty

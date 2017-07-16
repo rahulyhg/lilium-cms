@@ -10,18 +10,18 @@
     		{=tableBuilder.render('entities')}
 		</main>
 
-        <lml:tabletemplate id="table-entity-profile">
-            <lml:tobject data-nodetype="img" data-key="avatarURL"></lml:tobject>
-        </lml:tabletemplate>
+        <lml-tabletemplate id="table-entity-profile">
+            <lml-tobject data-nodetype="img" data-key="avatarURL"></lml-tobject>
+        </lml-tabletemplate>
 
-        <lml:tabletemplate id="table-entity-roles">
-            <lml:tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml:tobject>
-        </lml:tabletemplate>
+        <lml-tabletemplate id="table-entity-roles">
+            <lml-tobject data-nodetype="span" data-key="roles" data-arrayseparator=", "></lml-tobject>
+        </lml-tabletemplate>
 
-        <lml:tabletemplate id="table-entity-actions">
-            <lml:tobject data-nodetype="a"
+        <lml-tabletemplate id="table-entity-actions">
+            <lml-tobject data-nodetype="a"
                          data-href="{=config.default.server.url}/admin/entities/edit/"
                      data-key="_id">
                     Edit
-            </lml:tobject>
-        </lml:tabletemplate>
+            </lml-tobject>
+        </lml-tabletemplate>

@@ -7,17 +7,17 @@
 			</ul>
 		</main>
 
-		<lml:template id="medias-list-item">
+		<lml-template id="medias-list-item">
 			<li class="medias-item-list">
 				<div class="medias-actions">
-					<lml:tobject data-nodetype="button"
+					<lml-tobject data-nodetype="button"
 							 data-bind="click"
 							 data-action="copyLink"
 							 data-actionparamkey="_id">
 							Copy Link
-					</lml:tobject>
+					</lml-tobject>
 				</div>
-				<lml:tobject data-nodetype="img" data-key="sizes.thumbnail.url"></lml:tobject>
+				<lml-tobject data-nodetype="img" data-key="sizes.thumbnail.url"></lml-tobject>
 			</li>
-		</lml:template>
+		</lml-template>
 		<input type=text id='copyLink' style='position: fixed; top : 9999999px; left: 999999px;'>

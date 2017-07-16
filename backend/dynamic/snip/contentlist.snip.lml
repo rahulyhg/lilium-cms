@@ -2,11 +2,11 @@
 <div class="content-list-picker">
     <input type="text" class="content-list-search" data-groupname="contentlistpicker" placeholder="Search a title" />
     <div class="content-list-items">
-        <lml:foreach var="art" in="livevars.content.simple">
+        <lml-foreach var="art" in="livevars.content.simple">
             <div class="content-list-item" onclick="handleContentListClick(this);">
-                <lml:value id="art._id" groupname="contentlistpicker" terms="art.title"></lml:value>
+                <lml-value id="art._id" groupname="contentlistpicker" terms="art.title"></lml-value>
             </div>
-        </lml:foreach>
+        </lml-foreach>
     </div>
     <ul class="content-list-items-selected">
 

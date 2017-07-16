@@ -32,8 +32,8 @@ const style = `<style>
 
 const preload = (context, done) => {
     context.bunchScript = `
-    <lml:bunch>
-        <lml:bunchfilters>
+    <lml-bunch>
+        <lml-bunchfilters>
             <div class="bunch-filters">
                 <div class="bunch-filters-title">FILTERS</div>
                 <label>Search</label>
@@ -46,23 +46,23 @@ const preload = (context, done) => {
                     <option value="expired">Expired</option>
                 </select>
             </div>
-        </lml:bunchfilters>
+        </lml-bunchfilters>
 
-        <lml:bunchitem>
+        <lml-bunchitem>
             <div class="cakepop-strip-wrapper">
                 <div class="cakepop-strip">
-                    <lml:link href="${context._c.server.url}/admin/cakepop/view/{ckp._id}">
+                    <lml-link href="${context._c.server.url}/admin/cakepop/view/{ckp._id}">
                         <h4>
-                            <lml:generate call="ckp_status_icon"></lml:generate>
-                            <lml:text var="ckp.title" tag="h4" ></lml:text>
+                            <lml-generate call="ckp_status_icon"></lml-generate>
+                            <lml-text var="ckp.title" tag="h4" ></lml-text>
                         </h4>
                         <div>
-                            Expires on : <b><lml:text var="ckp.expiry" date="dd/mm/yyyy HH:MM"></lml:text></b>
+                            Expires on : <b><lml-text var="ckp.expiry" date="dd/mm/yyyy HH:MM"></lml-text></b>
                         </div>
-                    </lml:link>
+                    </lml-link>
                 </div>
             </div>
-        </lml:bunchitem>
+        </lml-bunchitem>
 
         <script type="lmljson" name="eakepopbunch">
             {
@@ -70,7 +70,7 @@ const preload = (context, done) => {
                 "loopvar" : "ckp"
             }
         </script>
-    </lml:bunch>
+    </lml-bunch>
 
     <script>
         window.ckp_now = new Date().getTime();

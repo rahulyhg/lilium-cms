@@ -1,6 +1,6 @@
 {#config;forms}
 {*mailtemplates.{?1}}
-<lml:dom v="0.8" />
+<lml-dom v="0.8" />
 
 <h1>Mail Template</h1>
 {=forms.render("mailtemplate_edit","edit","mailtemplates/?")}

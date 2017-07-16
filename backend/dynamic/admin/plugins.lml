@@ -5,15 +5,15 @@
     {=tableBuilder.render('plugin')}
 </main>
 
-<lml:tabletemplate id="table-plugins-actions">
-    <lml:tobject data-nodetype="button"
+<lml-tabletemplate id="table-plugins-actions">
+    <lml-tobject data-nodetype="button"
              data-bind="click"
              data-action="togglePlugin"
              data-actionparamkey="identifier"
              data-content="genButtons" >
             Enable
-    </lml:tobject>
-</lml:tabletemplate>
+    </lml-tobject>
+</lml-tabletemplate>
 <script>
     var genButtons = function(data) {
         return data.active ? "Disable" : "Enable";

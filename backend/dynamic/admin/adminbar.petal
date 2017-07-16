@@ -69,16 +69,16 @@
     </nav>
 </header>
 
-<lml:template id="adminquickactionbutton">
-    <lml:tobject data-hrefsource="topbuttonlink" data-nodetype="a" data-class="admin-publish-button" data-prependroot="true" >
-        <lml:tobject data-key="topbuttontext" data-nodetype="span"></lml:tobject>
-    </lml:tobject>
-</lml:template>
+<lml-template id="adminquickactionbutton">
+    <lml-tobject data-hrefsource="topbuttonlink" data-nodetype="a" data-class="admin-publish-button" data-prependroot="true" >
+        <lml-tobject data-key="topbuttontext" data-nodetype="span"></lml-tobject>
+    </lml-tobject>
+</lml-template>
 
-<lml:template id="adminbaruserbox">
-    <lml:tobject data-absurl="avatarURL" data-nodetype="img" data-filter="hasAvatar"></lml:tobject>
-    <lml:tobject data-key="displayname" data-nodetype="span" data-class="lmladminbardisplayname"></lml:tobject>
-</lml:template>
+<lml-template id="adminbaruserbox">
+    <lml-tobject data-absurl="avatarURL" data-nodetype="img" data-filter="hasAvatar"></lml-tobject>
+    <lml-tobject data-key="displayname" data-nodetype="span" data-class="lmladminbardisplayname"></lml-tobject>
+</lml-template>
 {*session(template:"adminbaruserbox",target:"loggedinuserbox")}
 {*preferences.mine(template:"adminquickactionbutton",target:"adminquickaction")}
 

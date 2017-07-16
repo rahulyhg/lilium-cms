@@ -150,6 +150,6 @@ table.lmlfullwidthtable td h4, table.lmlfullwidthtable td h6 {
 .lmlform button.lmlstacktableappendbutton:active {
     background-color: #38b042;
 }
-lml\\:table {
+lml-table {
     display: none;
 }

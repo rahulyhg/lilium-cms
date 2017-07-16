@@ -344,10 +344,10 @@ form .campaigncreatefield-checkbox label {
     font-weight: 300;
 }
 
-lml\:template, lml\:tobject, lml,
-lml\:queryparam, .lmlloading, .lmlhidden,
-lml\:foreach, lml\:wrapper, lml\:text,
-lml\:stage {
+lml-template, lml-tobject, lml,
+lml-queryparam, .lmlloading, .lmlhidden,
+lml-foreach, lml-wrapper, lml-text,
+lml-stage {
 	display: none;
 }
 
@@ -593,7 +593,7 @@ select {
 }
 
 /* LML Bunch default style */
-lml\:bunch {
+lml-bunch {
     display: none;
 }
 

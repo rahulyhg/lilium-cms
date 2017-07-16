@@ -1,7 +1,7 @@
 {#config;forms}
 {*me}
 {*decorations.mine}
-<lml:dom v="0.8" />
+<lml-dom v="0.8" />
 
 <div>
     <form data-context="noctx" class="lmlform" name="upload_profile_picture" id="upload_profile_picture" method="POST" enctype="multipart/form-data">
@@ -12,9 +12,9 @@
 
         <div class="me-decoration-wrapper">
             <div class="me-decorations">
-                <lml:foreach var="deco" in="livevars.decorations.mine" wrapper="span">
-                    <lml:generate call="generatedeco" />
-                </lml:foreach>
+                <lml-foreach var="deco" in="livevars.decorations.mine" wrapper="span">
+                    <lml-generate call="generatedeco" />
+                </lml-foreach>
             </div>
         </div>
     </form>

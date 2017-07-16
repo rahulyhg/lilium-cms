@@ -15,21 +15,21 @@
     </div>
 </div>
 
-<lml:template id="lmladminsidebaritemtemplate">
+<lml-template id="lmladminsidebaritemtemplate">
 	<li>
-		<lml:tobject data-nodetype="a" data-hrefsource="absURL" data-prependRoot="true">
-			<lml:tobject data-nodetype="i" data-classsource="faicon" data-class="fa"></lml:tobject>
-			<lml:tobject data-nodetype="span" data-key="displayname"></lml:tobject>
-		</lml:tobject>
-        <lml:tobject data-nodetype="ul" data-key="children" data-template="sub-menu" data-target="this"></lml:tobject>
+		<lml-tobject data-nodetype="a" data-hrefsource="absURL" data-prependRoot="true">
+			<lml-tobject data-nodetype="i" data-classsource="faicon" data-class="fa"></lml-tobject>
+			<lml-tobject data-nodetype="span" data-key="displayname"></lml-tobject>
+		</lml-tobject>
+        <lml-tobject data-nodetype="ul" data-key="children" data-template="sub-menu" data-target="this"></lml-tobject>
 	</li>
-</lml:template>
+</lml-template>
 
-<lml:template id="sub-menu">
+<lml-template id="sub-menu">
     <li>
-        <lml:tobject data-nodetype="a" data-hrefsource="absURL" data-prependRoot="true">
-            <lml:tobject data-nodetype="i" data-classsource="faicon" data-class="fa"></lml:tobject>
-            <lml:tobject data-nodetype="span" data-key="displayname"></lml:tobject>
-        </lml:tobject>
+        <lml-tobject data-nodetype="a" data-hrefsource="absURL" data-prependRoot="true">
+            <lml-tobject data-nodetype="i" data-classsource="faicon" data-class="fa"></lml-tobject>
+            <lml-tobject data-nodetype="span" data-key="displayname"></lml-tobject>
+        </lml-tobject>
     </li>
-</lml:template>
+</lml-template>

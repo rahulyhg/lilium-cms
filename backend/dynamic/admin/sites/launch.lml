@@ -5,12 +5,12 @@
 	The following form will walk you through the creation of a Lilium website. Submitting this form will result in the creation of a new website that will be added to the current Network. 
 </span>
 
-<lml:queryparam data-param="error">
+<lml-queryparam data-param="error">
 	<span class="messagestrip error">
 		<i class="fa fa-exclamation-circle"></i> 
-		<span>Could not create new website : <lml:tobject data-querystring="message"></lml:tobject></span>
+		<span>Could not create new website : <lml-tobject data-querystring="message"></lml-tobject></span>
 	</span>
-</lml:queryparam>
+</lml-queryparam>
 
 {=forms.render("launch_lilium_website")}
 <script src="{=config.default.server.url}/static/sites.js"></script>

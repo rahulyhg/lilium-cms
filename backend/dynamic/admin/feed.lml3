@@ -15,7 +15,7 @@ const preload = (context, done) => {
 
 const compile = (o, context) => {
     o(context.livevars, `
-        <lml:dom v="0.8"></lml:dom>
+        <lml-dom v="0.8"></lml-dom>
 
         <span class="admin-title">
             What's up
@@ -24,9 +24,9 @@ const compile = (o, context) => {
 
         <div class="real-time-feed-wrapper">
             <div class="real-time-feed">
-                <lml:foreach var="card" in="livevars.feed" wrapper="span">
-                    <lml:generate call="generateFeedCard" />
-                </lml:foreach>
+                <lml-foreach var="card" in="livevars.feed" wrapper="span">
+                    <lml-generate call="generateFeedCard" />
+                </lml-foreach>
             </div>
         </div>
     `, context.sas);

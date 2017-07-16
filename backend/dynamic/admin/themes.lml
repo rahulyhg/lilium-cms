@@ -12,15 +12,15 @@ $}
     {=forms.render(formname)}
 </main>
 
-<lml:tabletemplate id="table-themes-actions">
-    <lml:tobject data-nodetype="button"
+<lml-tabletemplate id="table-themes-actions">
+    <lml-tobject data-nodetype="button"
              data-bind="click"
              data-action="toggleTheme"
              data-actionparamkey="uName"
              data-content="genButtons" >
             Enable
-    </lml:tobject>
-</lml:tabletemplate>
+    </lml-tobject>
+</lml-tabletemplate>
 <script>
     var activeTheme;
     var genButtons = function(data, node) {

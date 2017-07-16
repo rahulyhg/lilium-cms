@@ -1,21 +1,21 @@
 {#config;forms}
 {*fix.deep.{?1}}
-<lml:dom v="0.8" feature="fullwidth" />
+<lml-dom v="0.8" feature="fullwidth" />
 
 <div class="ticket-title">
-    <lml:image src="{livevars.fix.deep.?.author.avatarURL}"></lml:image>
+    <lml-image src="{livevars.fix.deep.?.author.avatarURL}"></lml-image>
     <span>
-        <lml:text var="livevars.fix.deep.?.title"></lml:text>
+        <lml-text var="livevars.fix.deep.?.title"></lml-text>
     <span>
 </div>
 
-<pre class="ticket-content"><lml:text var="livevars.fix.deep.?.content"></lml:text><lml:text var="livevars.fix.deep.?.reprosteps"></lml:text></pre>
+<pre class="ticket-content"><lml-text var="livevars.fix.deep.?.content"></lml-text><lml-text var="livevars.fix.deep.?.reprosteps"></lml-text></pre>
 
 <div class="ticket-details">
     <p>
         This ticket was open on 
-        <lml:generate call="ticketNiceDate"></lml:generate>, and its status is 
-        <b><lml:text var="livevars.fix.deep.?.status"></lml:text><b>.
+        <lml-generate call="ticketNiceDate"></lml-generate>, and its status is 
+        <b><lml-text var="livevars.fix.deep.?.status"></lml-text><b>.
     </p>
 </div>
 

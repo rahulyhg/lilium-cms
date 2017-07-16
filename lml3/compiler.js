@@ -52,8 +52,8 @@ class LMLContext {
         this.header = "";
 
         if (this.lmldom) {
-            this.header += `<lml:dom v="${this.lmldom.v}" features="${this.lmldom.features?this.lmldom.features.join(','):''}">
-            </lml:dom>`;
+            this.header += `<lml-dom v="${this.lmldom.v}" features="${this.lmldom.features?this.lmldom.features.join(','):''}">
+            </lml-dom>`;
         }
 
         this.header += this.livevars || '';
@@ -100,7 +100,7 @@ class LMLContext {
                 l = {name : l}; 
             }
             let params = l.params ? JSON.stringify(l.params).replace(/\"/g, "&lmlquote;") : "{}";
-            str += `<lml:livevars data-varname="${l.name}" data-varparam="${params}"></lml:livevars>`;
+            str += `<lml-livevars data-varname="${l.name}" data-varparam="${params}"></lml-livevars>`;
         });
 
         this.livevars = str;

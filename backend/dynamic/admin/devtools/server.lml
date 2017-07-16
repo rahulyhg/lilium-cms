@@ -1,5 +1,5 @@
 {#config}
-<lml:dom v="0.8" features="fullwidth"></lml:dom>
+<lml-dom v="0.8" features="fullwidth"></lml-dom>
 <div id="server-wrapper">
     <div id="restart-button">
         <i class="fa fa-power-off"></i>
