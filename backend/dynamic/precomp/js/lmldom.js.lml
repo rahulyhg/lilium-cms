@@ -797,6 +797,9 @@ var LMLDom = function() {
     };
 
     this.parseLiveFields = function(maindom) {
+        // Refresh deep live variables
+        liliumcms.livevars.deepLivevars(true);
+
         // Live Select : select.lmldom-liveselect
         var liveselects = maindom.querySelectorAll(".lmldom-liveselect");
         log('LMLDOM', 'Working with ' + liveselects.length + ' live select fields');
