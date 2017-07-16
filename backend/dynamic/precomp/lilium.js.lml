@@ -78,6 +78,7 @@ var LiliumCMS = function() {
     this.treeselect;
     this.localclip;
     this.previewer;
+    this.errorhandler;
     this.imagepicker;
     this.cakepop;
     this.conversations;
@@ -85,6 +86,7 @@ var LiliumCMS = function() {
     this.tables = [];
     this.lys = new Lys();
     this.ssl = document.location.protocol === "https:";
+    this.env = "{=config.default.env}";
 
     var that = this;
 
@@ -275,6 +277,24 @@ var LiliumCMS = function() {
         if (form.length != 0) {
             foreachloop(data, "");
         }
+    };
+
+    var ErrorHandler = function() {
+        var handlecrash = function(errorpayload) {
+            if (liliumcms.session.current.roles.indexOf("admin") != -1) {
+                liliumcms.notify({ type : "danger", title : "Unhandled error detected", message : errorpayload.msg + (errorpayload.url ? (" at line " + errorpayload.line + " in file " + errorpayload.url) : ""), delay : 10000 });
+            } else {
+                liliumcms.notify({ type : "danger", title : "Hmm, something went wrong here", message : "Nothing dramatic, really. If the page did not load, I recommend trying again or refreshing your browser.", delay : 10000 });
+            }
+        };
+
+        var bind = function() {
+            window.onerror = function(msg, url, line, col, error) {
+                handlecrash({msg : msg, url : url, line : line, col : col, error : error});
+            }
+        };
+
+        bind();
     };
 
     var FormParser = function() {
@@ -1167,6 +1187,7 @@ var LiliumCMS = function() {
             that.rights = new LMLRights();
             that.users = new LMLUsers();
             that.badges = new LiliumBadges();
+            that.errorhandler = new ErrorHandler();
             that.parseURL();        
             L.Icon.Default.imagePath = "{=config.default.server.url}/static/leaflet/images";
 
