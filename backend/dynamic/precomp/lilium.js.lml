@@ -284,7 +284,7 @@ var LiliumCMS = function() {
             if (liliumcms.session.current.roles.indexOf("admin") != -1) {
                 liliumcms.notify({ type : "danger", title : "Unhandled error detected", message : errorpayload.msg + (errorpayload.url ? (" at line " + errorpayload.line + " in file " + errorpayload.url) : ""), delay : 10000 });
             } else {
-                liliumcms.notify({ type : "danger", title : "Hmm, something went wrong here", message : "Nothing dramatic, really. If the page did not load, I recommend trying again or refreshing your browser.", delay : 10000 });
+                // liliumcms.notify({ type : "danger", title : "Hmm, something went wrong here", message : "Nothing dramatic, really. If the page did not load, I recommend trying again or refreshing your browser.", delay : 10000 });
             }
         };
 
