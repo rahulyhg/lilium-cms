@@ -119,6 +119,15 @@ var Forms = function () {
                 },
                 displayname : "Website access"
             })
+            .add('reportsto', 'liveselect', { 
+                endpoint : "entities.simple",
+                displayname : "Reports to",
+                select : {
+                    value : "_id",
+                    displayname : "displayname",
+                    readkey : "0._id"
+                }
+            })
  
 
         formBuilder.registerFormTemplate('category')
