@@ -1,40 +1,40 @@
 {#config}
 {*sites.all.complex}
-<lml:dom v="0.6" />
+<lml-dom v="0.6" />
 
 <h1>Network Sites</h1>
-<lml:table class="lmlfullwidthtable" cols='["Name","URL","Links","Actions"]'>
-    <lml:tsection for="site" in="livevars.sites.all.complex" id="sites_body" section="body">
-        <lml:tcol>
-            <lml:text var="site.website.sitetitle" />
-            <lml:filter if="isDefaultSite" pass="site">
+<lml-table class="lmlfullwidthtable" cols='["Name","URL","Links","Actions"]'>
+    <lml-tsection for="site" in="livevars.sites.all.complex" id="sites_body" section="body">
+        <lml-tcol>
+            <lml-text var="site.website.sitetitle" />
+            <lml-filter if="isDefaultSite" pass="site">
                 <span class="siteDefaultTag">root</span>
-            </lml:filter>
-            <lml:filter if="isWordpress" pass="site">
+            </lml-filter>
+            <lml-filter if="isWordpress" pass="site">
                 <span class="siteDefaultTag">wordpress</span>
-            </lml:filter>
-            <lml:filter if="isTransferring" pass="site">
+            </lml-filter>
+            <lml-filter if="isTransferring" pass="site">
                 <span class="siteDefaultTag">transferring</span>
                 <i class="fa fa-cog fa-spin" aria-hidden="true"></i>
-            </lml:filter>
-        </lml:tcol>
-        <lml:tcol>
-            <lml:link href="{site.server.url}" ><lml:text var="site.server.url" /></lml:link>
-        </lml:tcol>
-        <lml:tcol>
-            <lml:link href="{site.server.url}/admin" >Admin Panel</lml:link>
-        </lml:tcol>
-        <lml:tcol>
-            <lml:link href="{site.server.url}/admin/settings" >Settings</lml:link>
-        </lml:tcol>
-    </lml:tsection>
-    <lml:tsection section="foot" class="lmlactionfooter">
-        <lml:tcol colspan="4"> 
+            </lml-filter>
+        </lml-tcol>
+        <lml-tcol>
+            <lml-link href="{site.server.url}" ><lml-text var="site.server.url" /></lml-link>
+        </lml-tcol>
+        <lml-tcol>
+            <lml-link href="{site.server.url}/admin" >Admin Panel</lml-link>
+        </lml-tcol>
+        <lml-tcol>
+            <lml-link href="{site.server.url}/admin/settings" >Settings</lml-link>
+        </lml-tcol>
+    </lml-tsection>
+    <lml-tsection section="foot" class="lmlactionfooter">
+        <lml-tcol colspan="4"> 
 		    <a class="button-link" href="{=config.default.server.url}/admin/sites/launch">Launch new website</a>
 			<a class="button-link" href="{=config.default.server.url}/admin/sites/wptransfer">Transfer site from Wordpress</a>
-        </lml:tcol>
-    </lml:tsection>
-</lml:table>
+        </lml-tcol>
+    </lml-tsection>
+</lml-table>
 
 <script>
 	window.isDefaultSite = function(dat) {

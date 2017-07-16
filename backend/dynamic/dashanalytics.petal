@@ -7,51 +7,51 @@
         <div class="dashboard-ga-yesterday-rect">
             <h3>Unique visitors</h3>
             <div class="dashboard-ga-total-unique">
-                <lml:text var="livevars.googleanalytics.dashboard.metrics.unique"></lml:text>
+                <lml-text var="livevars.googleanalytics.dashboard.metrics.unique"></lml-text>
             </div>
             <small>
-                Average of <lml:text var="livevars.googleanalytics.dashboard.ratio.pagepersession"></lml:text> pages per session
+                Average of <lml-text var="livevars.googleanalytics.dashboard.ratio.pagepersession"></lml-text> pages per session
             </small>
         </div>
         <div class="dashboard-ga-yesterday-rect">
             <h3>Page views</h3>
             <div class="dashboard-ga-total-unique">
-                <lml:text var="livevars.googleanalytics.dashboard.metrics.views"></lml:text>
+                <lml-text var="livevars.googleanalytics.dashboard.metrics.views"></lml-text>
             </div>
         </div>
     </div>
     <div class="col-xs-4 col-md-4 dashboard-card">
         <div class="dashboard-ga-yesterday-rect dashboard-ga-publication-list">
-            <h3><lml:text var="livevars.googleanalytics.dashboard.published.length"></lml:text> articles published</h3>
-            <lml:foreach var="publication" in="livevars.googleanalytics.dashboard.published">
-                <lml:link href="{=config.default.server.url}/{publication.name}" target="_blank">
-                    <lml:text var="publication.title"></lml:text>
-                </lml:link>
-            </lml:foreach>
+            <h3><lml-text var="livevars.googleanalytics.dashboard.published.length"></lml-text> articles published</h3>
+            <lml-foreach var="publication" in="livevars.googleanalytics.dashboard.published">
+                <lml-link href="{=config.default.server.url}/{publication.name}" target="_blank">
+                    <lml-text var="publication.title"></lml-text>
+                </lml-link>
+            </lml-foreach>
         </div>
     </div>
     <div class="col-xs-4 col-md-4 dashboard-card">
         <div class="dashboard-ga-yesterday-rect">
             <h3>Top article</h3>
             <div>
-                <lml:link href="{livevars.googleanalytics.dashboard.toppage.url}" target="_blank">
-                    <lml:text var="livevars.googleanalytics.dashboard.toppage.article.title" wrapper="h4" /></lml:text>
-                </lml:link>
-                <lml:text var="livevars.googleanalytics.dashboard.toppage.article.subtitle" wrapper="h5" /></lml:text>
+                <lml-link href="{livevars.googleanalytics.dashboard.toppage.url}" target="_blank">
+                    <lml-text var="livevars.googleanalytics.dashboard.toppage.article.title" wrapper="h4" /></lml-text>
+                </lml-link>
+                <lml-text var="livevars.googleanalytics.dashboard.toppage.article.subtitle" wrapper="h5" /></lml-text>
 
                 <div class="dashboard-ga-toppage-image-wrapper">
-                <lml:image src="{livevars.googleanalytics.dashboard.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml:image>
+                <lml-image src="{livevars.googleanalytics.dashboard.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml-image>
                 </div>
 
                 <div class="dashboard-ga-toppage-author">
-                    <lml:image src="{livevars.googleanalytics.dashboard.toppage.article.authors.0.avatarURL}"></lml:image> 
+                    <lml-image src="{livevars.googleanalytics.dashboard.toppage.article.authors.0.avatarURL}"></lml-image> 
                     <span>
                         Written by 
-                        <lml:text var="livevars.googleanalytics.dashboard.toppage.article.authors.0.displayname"></lml:text>
+                        <lml-text var="livevars.googleanalytics.dashboard.toppage.article.authors.0.displayname"></lml-text>
                     </span>
                 </div>
                 <small class="centered">
-                    With a total of <lml:text var="livevars.googleanalytics.dashboard.toppage.hits"></lml:text> hits
+                    With a total of <lml-text var="livevars.googleanalytics.dashboard.toppage.hits"></lml-text> hits
                 </small>
             </div>
         </div>

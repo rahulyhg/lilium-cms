@@ -12,9 +12,9 @@ $}
             {=forms.render('role_create')}
 		</main>
 
-        <lml:template id="roletemp" data-wrapper="div">
-			<lml:tobject data-nodetype="h1" data-key="name"></lml:tobject>
-		</lml:template>
+        <lml-template id="roletemp" data-wrapper="div">
+			<lml-tobject data-nodetype="h1" data-key="name"></lml-tobject>
+		</lml-template>
 
 		<script>
 		var deleteUser = function(id) {

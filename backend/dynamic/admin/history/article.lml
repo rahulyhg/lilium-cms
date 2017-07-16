@@ -1,5 +1,5 @@
 {#config}
-<lml:dom v="0.6" />
+<lml-dom v="0.6" />
 {*history.article.{?1}}
 
 <h1>Article history</h1>
@@ -7,15 +7,15 @@
 <div class="timeline-page-wrapper">
     <div class="timeline-vertline"></div>
 
-    <lml:foreach var="articlehistory" in="livevars.history.article" wrapper="div">
-        <lml:generate call="historyCurrentGenerator"></lml:generate>
+    <lml-foreach var="articlehistory" in="livevars.history.article" wrapper="div">
+        <lml-generate call="historyCurrentGenerator"></lml-generate>
 
-        <lml:foreach var="histo" in="articlehistory.modifications">
-            <lml:generate call="historyCardGenerator"></lml:generate>
-        </lml:foreach>
+        <lml-foreach var="histo" in="articlehistory.modifications">
+            <lml-generate call="historyCardGenerator"></lml-generate>
+        </lml-foreach>
 
-        <lml:generate call="historyCreatedGenerator"></lml:generate>
-    </lml:foreach>
+        <lml-generate call="historyCreatedGenerator"></lml-generate>
+    </lml-foreach>
 </div>
 
 

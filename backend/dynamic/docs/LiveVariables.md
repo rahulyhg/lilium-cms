@@ -39,7 +39,7 @@ The provided action receives 4 parameters
 
 Live variables are executed from the markup as special tags ressembling the following
 ```javascript
-<lml:livevars data-varname="information.apidoc" data-varparam="{}"></livevars>
+<lml-livevars data-varname="information.apidoc" data-varparam="{}"></livevars>
 ```
 
 > This special markup will be picked up by the Lilium frontend engine which will add the previously defined livevar to the one-time request. All livevars will be queried inside a single request, and their responses will be stored inside the *liliumcms.livevars* global object.

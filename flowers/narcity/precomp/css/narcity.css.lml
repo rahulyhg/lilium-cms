@@ -1045,7 +1045,7 @@ article #article-content #article-bottom-links h3 {
     padding: 10px 0px;
 }
 
-lml\:template, lml\:native {
+lml-template, lml-native {
     display: none;
 }
 

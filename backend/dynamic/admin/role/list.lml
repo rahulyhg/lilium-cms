@@ -14,30 +14,30 @@ $}
     		{=forms.render('role_create')}
 		</main>
 
-		<lml:template id="entity-list-item">
+		<lml-template id="entity-list-item">
 			<li class="entity-item-list">
-				<lml:tobject data-nodetype="h3" data-key="displayname"></lml:tobject>
+				<lml-tobject data-nodetype="h3" data-key="displayname"></lml-tobject>
 				<h6>
-					<lml:tobject data-nodetype="span" data-key="rights" data-arrayseparator=", "></lml:tobject>
+					<lml-tobject data-nodetype="span" data-key="rights" data-arrayseparator=", "></lml-tobject>
 				</h6>
 				<div class="entity-actions">
-					<lml:tobject data-nodetype="a"
+					<lml-tobject data-nodetype="a"
                              data-class="btn-accept"
 						     data-href="edit/"
 						     data-key="_id">
 							Edit
-					</lml:tobject>
-					<lml:tobject data-nodetype="button"
+					</lml-tobject>
+					<lml-tobject data-nodetype="button"
                              data-class="btn-remove"
 						     data-bind="click"
 						     data-action="deleteUser"
 						     data-actionparamkey="_id">
 							Delete
-					</lml:tobject>
+					</lml-tobject>
 
 				</div>
 			</li>
-		</lml:template>
+		</lml-template>
 
 		<script>
 		var deleteUser = function(id) {

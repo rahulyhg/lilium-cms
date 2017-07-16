@@ -857,7 +857,7 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
     text-align: center;
     padding: 10px 0px;
 }
-lml\:template, lml\:native {
+lml-template, lml-native {
     display: none;
 }
 .older-button-wrapper {

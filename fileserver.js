@@ -49,15 +49,15 @@ var FileServer = function () {
 
     };
 
-    this.minifyString = function(content) {
+    this.minifyString = function(content, options) {
         try {
-            return minify(content, {
+            return minify(content, Object.assign({
                 removeComments: true,
                 removeScriptTypeAttributes: true,
                 collapseWhitespace: true,
                 minifyJS: true,
                 minifyCSS: true
-            });
+            }, options || {}));
         } catch (ex) {
             log("FileServer", "Failed to minify string", "warn");
             return content;

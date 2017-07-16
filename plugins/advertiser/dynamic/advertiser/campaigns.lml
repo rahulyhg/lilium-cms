@@ -18,25 +18,25 @@ $}
 	</tbody>
 </table>
 
-<lml:template id="campaigns-list-item" data-wrapper="tr">
-	<lml:tobject data-nodetype="td" data-key="campname"  ></lml:tobject>
-	<lml:tobject data-nodetype="td" data-key="campstatus" ></lml:tobject>
-	<lml:tobject data-nodetype="td">
+<lml-template id="campaigns-list-item" data-wrapper="tr">
+	<lml-tobject data-nodetype="td" data-key="campname"  ></lml-tobject>
+	<lml-tobject data-nodetype="td" data-key="campstatus" ></lml-tobject>
+	<lml-tobject data-nodetype="td">
 		<div class="entity-actions">
-			<lml:tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id"  data-filter="signNeeded">
+			<lml-tobject data-nodetype="a"  data-href="{=baseurl}campaigns/sign/" data-key="_id"  data-filter="signNeeded">
 				Sign to start
-			</lml:tobject>
-			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
+			</lml-tobject>
+			<lml-tobject data-nodetype="a" data-href="{=baseurl}campaigns/pay/" data-key="_id" data-filter="payementNeeded">
 				Pay to start
-			</lml:tobject>
-			<lml:tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-filter="reviewNeeded">
+			</lml-tobject>
+			<lml-tobject data-nodetype="a" data-href="{=baseurl}campaigns/review/" data-key="_id" data-filter="reviewNeeded">
 				Ready for review
-			</lml:tobject>
-			<lml:tobject class="btn btn-default" data-nodetype="a"
+			</lml-tobject>
+			<lml-tobject class="btn btn-default" data-nodetype="a"
 						 data-href="{=baseurl}campaigns/show/"
 					 data-key="_id">
 					 View
-			</lml:tobject>
+			</lml-tobject>
 		</div>
-	</lml:tobject>
-</lml:template>
+	</lml-tobject>
+</lml-template>

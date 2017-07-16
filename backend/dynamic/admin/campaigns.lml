@@ -8,17 +8,17 @@ $}
             {=tableBuilder.render('campaign')}
         </main>
 
-        <!--lml:tabletemplate id="table-campaign-payment">
-            <lml:tobject data-nodetype="span" data-content="isPaymentReq"></lml:tobject>
-        </lml:tabletemplate-->
+        <!--lml-tabletemplate id="table-campaign-payment">
+            <lml-tobject data-nodetype="span" data-content="isPaymentReq"></lml-tobject>
+        </lml-tabletemplate-->
 
-        <lml:tabletemplate id="table-campaign-actions">
-            <lml:tobject data-nodetype="a"
+        <lml-tabletemplate id="table-campaign-actions">
+            <lml-tobject data-nodetype="a"
                     data-href="{=root}campaigns/edit/"
                     data-key="projectid">
                     Edit
-            </lml:tobject>
-        </lml:tabletemplate>
+            </lml-tobject>
+        </lml-tabletemplate>
 
 <script>
     var isPaymentReq = function(data) {

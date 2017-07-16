@@ -6,9 +6,9 @@
 	{=forms.render("campaign_create","edit")}
 </div>
 
-<lml:template id="camptemp" data-wrapper="div">
-	<lml:tobject data-nodetype="h1" data-key="campname"></lml:tobject>
-</lml:template>
+<lml-template id="camptemp" data-wrapper="div">
+	<lml-tobject data-nodetype="h1" data-key="campname"></lml-tobject>
+</lml-template>
 
 <div class="campaign-details-wrapper">
     <ul>

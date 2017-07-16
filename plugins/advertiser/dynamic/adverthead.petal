@@ -37,7 +37,7 @@
     </nav>
 </header>
 
-<lml:template id="adminbaruserbox">
-    <lml:tobject data-key="displayname" data-nodetype="span"></lml:tobject>
-</lml:template>
+<lml-template id="adminbaruserbox">
+    <lml-tobject data-key="displayname" data-nodetype="span"></lml-tobject>
+</lml-template>
 {*session(template:"adminbaruserbox",target:"loggedinuserbox")}

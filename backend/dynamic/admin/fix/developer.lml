@@ -1,6 +1,6 @@
 {#config;forms}
 {*fix.deep.{?1}}
-<lml:dom v="0.8" feature="fullwidth" />
+<lml-dom v="0.8" feature="fullwidth" />
 
 <h1>
     Ticket

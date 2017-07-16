@@ -487,14 +487,14 @@ class LMLTagParser {
             line = line.substring(0, line.indexOf('('));
         }
 
-        let baseString = '<lml:livevars data-varname="' + line +
+        let baseString = '<lml-livevars data-varname="' + line +
                          '" data-varparam="' + JSON.stringify(params).replace(/\"/g, "&lmlquote;") + '" ';
 
         for (let paramname in params) {
             baseString += ' data-' + paramname + '="'+params[paramname]+'" ';
         }
 
-        return baseString + "></lml:livevars>"; 
+        return baseString + "></lml-livevars>"; 
     };
 
     parseVocab(ctx, block) {

@@ -95,6 +95,7 @@ var FileLogic = function () {
                 log('LML2', "Compiling file from " + adminPath, 'info');
                 FileServer.readFile(adminPath, function(content) {
                     LML2.compileToString(cli._c.id, content, extra, function(ctn) {
+                        ctn = fileserver.minifyString(ctn);
                         sharedcache.set({
                             ["admin_template_" + cli._c.uid] : ctn
                         }, function() {

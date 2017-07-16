@@ -1,5 +1,5 @@
 {#config}
-<lml:dom v="1.0"></lml:dom>
+<lml-dom v="1.0"></lml-dom>
 {*topics.all}
 
 <h1>
@@ -9,31 +9,31 @@
 </h1>
 
 <div id="topics-list">
-    <lml:foreach var="topic" in="livevars.topics.all" wrapper="span">
+    <lml-foreach var="topic" in="livevars.topics.all" wrapper="span">
         <div class="topic-wrapper">
             <h2>
-                <lml:link href="{=config.default.server.url}/admin/topics/edit/{topic._id}">
-                    <lml:text var="topic.displayname"></lml:text>
-                </lml:link>
+                <lml-link href="{=config.default.server.url}/admin/topics/edit/{topic._id}">
+                    <lml-text var="topic.displayname"></lml-text>
+                </lml-link>
             </h2>
             <div class="topic-archive"> 
                 <span>
                     <b>Archive page : </b>
-                    <lml:link href="{=config.default.server.url}/{topic.slug}" target="_blank">
-                        {=config.default.server.protocol}{=config.default.server.url}/<lml:text var="topic.slug"></lml:text>
-                    </lml:link>
+                    <lml-link href="{=config.default.server.url}/{topic.slug}" target="_blank">
+                        {=config.default.server.protocol}{=config.default.server.url}/<lml-text var="topic.slug"></lml-text>
+                    </lml-link>
                 </span>
             </div>
             <div class="topic-description">
                 <p>
-                    <lml:text var="topic.description"></lml:text>
+                    <lml-text var="topic.description"></lml-text>
                 </p>
             </div>
 
             <div class="topic-action-wrapper">
             </div>
         </div>
-    </lml:foreach>
+    </lml-foreach>
 
     <div class="float-none"></div>
 </div>

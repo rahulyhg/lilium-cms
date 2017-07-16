@@ -1,5 +1,5 @@
 {#config}
-<lml:dom v="0.8" features="fullwidth" />
+<lml-dom v="0.8" features="fullwidth" />
 
 <div id="lml-imagestudio-open-wrapper">
     <button id="lml-imagestudio-open">

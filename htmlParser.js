@@ -212,7 +212,7 @@ var HtmlParser = function () {
         var deps = form.attr.dependencies;
         if (deps) {
             for (var i = 0; i < deps.length; i++) {
-                htmlForm += '<lml:livevars data-varname="' + deps[i] + '" data-cacheonly="true" data-fromform="' + form.name + '"></lml:livevars>';
+                htmlForm += '<lml-livevars data-varname="' + deps[i] + '" data-cacheonly="true" data-fromform="' + form.name + '"></lml-livevars>';
             }
         }
 
@@ -289,7 +289,7 @@ var HtmlParser = function () {
     var parseSnipField = function(field) {
         var lvs = "";
         if (field.attr.livevars) for (var i = 0; i < field.attr.livevars.length; i++) {
-            lvs += '<lml:livevars data-varname="'+field.attr.livevars[i]+'" data-param="{}"></lml:livevars>';
+            lvs += '<lml-livevars data-varname="'+field.attr.livevars[i]+'" data-param="{}"></lml-livevars>';
         }
 
         return lvs + '<div class="lmldom-snip" data-snip="' + field.attr.snip + '" data-snipname="'+field.name+'" ></div>';
@@ -361,7 +361,7 @@ var HtmlParser = function () {
     };
 
     var parseLMLEditor = function(field) {
-        return '<lml:editor data-name="'+field.name+'"></lml:editor>';
+        return '<lml-editor data-name="'+field.name+'"></lml-editor>';
     };
 
     var parseTagsType = function (field, hasPlaceholder) {
@@ -399,7 +399,7 @@ var HtmlParser = function () {
 
     var parseTreeViewSelect = function(field) {
         var attr = field.attr;
-        var output = '<lml:livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml:livevars>' +
+        var output = '<lml-livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml-livevars>' +
             '<label for="'+field.name+'">'+attr.displayname+'</label>' +
             '<input type="hidden" name="'+field.name+'" class="lmldom-treeselect-value" />' + 
             '<div class="lmldom-treeselect" data-fieldname="'+field.name+'" data-filledby="'+attr.endpoint+'" '+ 
@@ -458,7 +458,7 @@ var HtmlParser = function () {
 
     var parseLiveSelect = function(field) {
         var attr = field.attr;
-        var output = '<lml:livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml:livevars>' +
+        var output = '<lml-livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml-livevars>' +
             '<label for="'+field.name+'">'+attr.displayname+'</label>' +
             '<select name="'+field.name+'" class="lmldom-liveselect" data-filledby="'+attr.endpoint+'" ' + 
                 (attr.select.readkey ? 'data-selectreadkey="'+attr.select.readkey+'" ' : "") + 
@@ -474,7 +474,7 @@ var HtmlParser = function () {
 
     var parseMultiBox = function(field) {
         var attr = field.attr;
-        var output = '<lml:livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml:livevars>' +
+        var output = '<lml-livevars data-varname="'+attr.endpoint+'" data-varparam="{}" ></lml-livevars>' +
             '<label for="'+field.name+'">'+attr.displayname+'</label>' +
             '<input type="hidden" name="'+field.name+'" class="lmldom-multibox-value" />' + 
             '<div class="lmlmultiselect multiselect lmldom-multibox" data-fieldname="'+field.name+'" data-filledby="'+attr.endpoint+'" '+ 
@@ -571,7 +571,7 @@ var HtmlParser = function () {
 
     var parseLiveVar = function (field) {
         return generateLabel(field, false) +
-            '<lml:livevars ' +
+            '<lml-livevars ' +
             'data-attribute="' + (field.attr.attr ? JSON.stringify(field.attr.attr).replace(/"/g, '&lmlquote;') : "{}") +
             '" data-filler="' + field.attr.tag +
             '" data-fieldname="' + field.name +
@@ -581,7 +581,7 @@ var HtmlParser = function () {
             '" data-title="' + (field.attr.title || "") +
             '" data-scheme="' + (field.attr.datascheme ? JSON.stringify(field.attr.datascheme).replace(/"/g, '&lmlquote;') : "{}") +
             '" data-varparam="' + (field.attr.props ? JSON.stringify(field.attr.props).replace(/"/g, '&lmlquote;') : "{}") +
-            '"></lml:livevars>';
+            '"></lml-livevars>';
     };
 
     var parseBasicFieldAttributes = function (field) {

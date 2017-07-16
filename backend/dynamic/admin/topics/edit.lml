@@ -1,5 +1,5 @@
 {#config;forms}
-<lml:dom v="1.0"></lml:dom>
+<lml-dom v="1.0"></lml-dom>
 {*topics.get.{?1}}
 
 {$
@@ -9,7 +9,7 @@ $}
 
 <h1>
     <i class="fa fa-tags" aria-hidden="true"></i>
-    Topic - <lml:text var="livevars.topics.get.?.displayname"></lml:text>
+    Topic - <lml-text var="livevars.topics.get.?.displayname"></lml-text>
     <a class='fab' id="topics-add-button">+</a>
 </h1>
 
@@ -17,29 +17,29 @@ $}
     {=forms.render("topicedit","edit","topics/get/?")}
 </div>
 
-<lml:filter if="topicHasChildren" pass="livevars.topics.get.?">
+<lml-filter if="topicHasChildren" pass="livevars.topics.get.?">
 <div id="topics-list">
-    <lml:foreach var="topic" in="livevars.topics.get.?.children" wrapper="span">
+    <lml-foreach var="topic" in="livevars.topics.get.?.children" wrapper="span">
         <div class="topic-wrapper">
             <h2>
-                <lml:link href="{=config.default.server.url}/admin/topics/edit/{topic._id}">
-                    <lml:text var="topic.displayname"></lml:text>
-                </lml:link>
+                <lml-link href="{=config.default.server.url}/admin/topics/edit/{topic._id}">
+                    <lml-text var="topic.displayname"></lml-text>
+                </lml-link>
             </h2>
             <div class="topic-description">
                 <p>
-                    <lml:text var="topic.description"></lml:text>
+                    <lml-text var="topic.description"></lml-text>
                 </p>
             </div>
 
             <div class="topic-action-wrapper">
             </div>
         </div>
-    </lml:foreach>
+    </lml-foreach>
 
     <div class="float-none"></div>
 </div>
-</lml:filter>
+</lml-filter>
 
 <div id="topic-theme-override">
     <h1>Theme settings override</h1>

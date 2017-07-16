@@ -1,5 +1,5 @@
 {#config;forms}
-<lml:dom v="0.8" features="fullwidth"></lml:dom>
+<lml-dom v="0.8" features="fullwidth"></lml-dom>
 
 <h1>Signal emergency</h1>
 <span class="pad10">

@@ -5,19 +5,19 @@
     {*tools.list(template:"tool-template")}
 </div>
 
-<lml:template id="tool-template">
-    <lml:tobject data-nodetype="a"
+<lml-template id="tool-template">
+    <lml-tobject data-nodetype="a"
         data-href="{=config.default.server.url}/admin/tools/"
         data-key="endpoint"
     >
         <div class="tool-list-item">
-            <lml:tobject data-nodetype="i" data-classsource="icon" data-class="tool-list-item-icon fa "></lml:tobject>
-            <lml:tobject data-nodetype="span"
+            <lml-tobject data-nodetype="i" data-classsource="icon" data-class="tool-list-item-icon fa "></lml-tobject>
+            <lml-tobject data-nodetype="span"
                 data-key="displayname"
-            ></lml:tobject>
+            ></lml-tobject>
         </div>
-    </lml:tobject>
-</lml:template>
+    </lml-tobject>
+</lml-template>
 
 <style>
     .tools-list {

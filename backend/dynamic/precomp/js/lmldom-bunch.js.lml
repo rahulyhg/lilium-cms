@@ -3,9 +3,9 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
     var that = this;
 
     this.elem = bunchElement;
-    this.template = bunchElement.querySelector("lml\\:bunchitem");
+    this.template = bunchElement.querySelector("lml-bunchitem");
     this.settings = new LMLDOM_JSON(ldContext, bunchElement.querySelector('script[type="lmljson"]'));
-    this.templateFilters = bunchElement.querySelector('lml\\:bunchfilters');
+    this.templateFilters = bunchElement.querySelector('lml-bunchfilters');
     this.filters = {};
     this.page = {
         index : 1,

@@ -28,20 +28,20 @@
     </tbody>
 </table>
 
-<lml:template id="campaigns-list-item" data-wrapper="tr">
-    <lml:tobject data-nodetype="td" data-key="campname"  ></lml:tobject>
-    <lml:tobject data-nodetype="td" data-key="campstatus" ></lml:tobject>
-    <lml:tobject data-nodetype="td">
+<lml-template id="campaigns-list-item" data-wrapper="tr">
+    <lml-tobject data-nodetype="td" data-key="campname"  ></lml-tobject>
+    <lml-tobject data-nodetype="td" data-key="campstatus" ></lml-tobject>
+    <lml-tobject data-nodetype="td">
         <div class="entity-actions">
-            <lml:tobject data-nodetype="a"  data-href="{=baseurl}production/changerequest/edit/" data-key="_id"  data-filter="changeRequested">
+            <lml-tobject data-nodetype="a"  data-href="{=baseurl}production/changerequest/edit/" data-key="_id"  data-filter="changeRequested">
                 Change Request
-            </lml:tobject>
-            <lml:tobject data-nodetype="a" data-href="{=baseurl}article/new" data-filter="preprod">
+            </lml-tobject>
+            <lml-tobject data-nodetype="a" data-href="{=baseurl}article/new" data-filter="preprod">
                 Pre-Production
-            </lml:tobject>
+            </lml-tobject>
         </div>
-    </lml:tobject>
-</lml:template>
+    </lml-tobject>
+</lml-template>
 </body>
 
 </html>

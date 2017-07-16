@@ -6,26 +6,26 @@
     baseurl += config.default.paths.admin;
     baseurl += "/";
 $}
-    <lml:dom v="0.6" />
+    <lml-dom v="0.6" />
 
 	<main class="entities-main">
 		<h1>All Categories</h1>
 		<ul class="entity-list">
-	    	<lml:foreach var="cat" in="livevars.categories">
-        		<lml:wrapper id="cat_{cat._id}" tag="li" class="entity-item-list">
+	    	<lml-foreach var="cat" in="livevars.categories">
+        		<lml-wrapper id="cat_{cat._id}" tag="li" class="entity-item-list">
                     <h3>
-	    			    <lml:text var="cat.displayname" />
+	    			    <lml-text var="cat.displayname" />
                     </h3>
 	        		<div class="entity-actions">
-                        <lml:link href="{=baseurl}categories/edit/{cat._id}">
+                        <lml-link href="{=baseurl}categories/edit/{cat._id}">
                             Edit
-                        </lml:link>
-			            <lml:link href="javascript: deleteCampaign('{cat._id}');" class="text-red float-right" >
-			        		Delete <lml:text var="cat.displayname" />
-				        </lml:link>
+                        </lml-link>
+			            <lml-link href="javascript: deleteCampaign('{cat._id}');" class="text-red float-right" >
+			        		Delete <lml-text var="cat.displayname" />
+				        </lml-link>
 	    			</div>
-	        	</lml:wrapper>
-        	</lml:foreach>
+	        	</lml-wrapper>
+        	</lml-foreach>
 		</ul>
     	{=forms.render('category_create')}
 	</main>
