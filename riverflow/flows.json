@@ -37,7 +37,7 @@
             "endpoint" : "fix",
             "support" : ["livevar", "admin_get", "admin_post", "form"],
             "admin_menu" : {
-                "id": "articles-topics",
+                "id": "support",
                 "faicon": "fa-life-ring",
                 "displayname": "Support",
                 "priority": 2500,
@@ -48,42 +48,15 @@
         }, {
             "module" : "topics.js",
             "endpoint" : "topics",
-            "support" : ["admin_get", "admin_post", "livevar", "form"],
-            "admin_menu" : {
-                "id": "articles-topics",
-                "faicon": "fa-tags",
-                "displayname": "Topics",
-                "priority": 210,
-                "rights": ["manage-topics"],
-                "absURL": "admin/topics",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "livevar", "form"]
         }, {
             "module" : "plugins.js",
             "endpoint" : "plugins",
-            "support" : ["admin_get", "admin_post", "livevar", "table"],
-            "admin_menu" : {
-                "id": "plugins",
-                "faicon": "fa-plug",
-                "displayname": "Plugins",
-                "priority": 700,
-                "rights": ["manage-plugins"],
-                "absURL": "admin/plugins",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "livevar", "table"]
         }, {
             "module" : "themes.js",
             "endpoint" : "themes",
-            "support" : ["admin_get", "admin_post", "table", "livevar"],
-            "admin_menu" : {
-                "id": "themes",
-                "faicon": "fa-paint-brush",
-                "displayname": "Themes",
-                "priority": 600,
-                "rights": ["manage-themes"],
-                "absURL": "admin/themes",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "table", "livevar"]
         }, {
             "module" : "dashboard.js",
             "endpoint" : "dashboard",
@@ -144,16 +117,7 @@
         }, {
             "module" : "devtools.js",
             "endpoint" : "devtools",
-            "support" : ["admin_get", "admin_post", "livevar", "form"],
-            "admin_menu" : {
-                "id": "devtools",
-                "faicon": "fa-hashtag",
-                "displayname": "Dev Tools",
-                "priority": 2000,
-                "rights": ["develop"],
-                "absURL": "admin/devtools",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "livevar", "form"]
         }, {
             "module" : "embed.js",
             "endpoint" : "embed",
@@ -195,16 +159,7 @@
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
-            "support" : ["admin_get", "admin_post", "form", "table", "livevar"],
-            "admin_menu" : {
-                "id": "styledpages",
-                "faicon": "fa-paragraph",
-                "displayname": "Styled Pages",
-                "priority": 250,
-                "rights": ["styledpages"],
-                "absURL": "admin/styledpages/list",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "form", "table", "livevar"]
         }, {
             "module" : "docs.js",
             "endpoint" : "docs",
@@ -234,21 +189,36 @@
                 "priority": 200,
                 "rights": ["list-articles"],
                 "absURL": "admin/article",
-                "children": []
+                "children": [{
+                    "id": "articles-topics",
+                    "faicon": "fa-tags",
+                    "displayname": "Topics",
+                    "priority": 210,
+                    "rights": ["manage-topics"],
+                    "absURL": "admin/topics",
+                    "children": []
+                }, {
+                    "id": "contentchains",
+                    "faicon": "fa-link",
+                    "displayname": "Content Chains",
+                    "priority": 235,
+                    "rights": ["admin"],
+                    "absURL": "admin/chains",
+                    "children": []
+                }, {
+                    "id": "styledpages",
+                    "faicon": "fa-paragraph",
+                    "displayname": "Styled Pages",
+                    "priority": 250,
+                    "rights": ["styledpages"],
+                    "absURL": "admin/styledpages/list",
+                    "children": []
+                }]
             }
         }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
-            "support" : ["livevar", "admin_get", "admin_post", "form"],
-            "admin_menu" : {
-                "id": "contentchains",
-                "faicon": "fa-link",
-                "displayname": "Content Chains",
-                "priority": 235,
-                "rights": ["admin"],
-                "absURL": "admin/chains",
-                "children": []
-            }
+            "support" : ["livevar", "admin_get", "admin_post", "form"]
         }, {
             "module" : "article.js",
             "endpoint" : "content",
@@ -306,7 +276,15 @@
                 "priority": 500,
                 "rights": ["list-entities"],
                 "absURL": "admin/entities",
-                "children": []
+                "children": [{
+                    "id": "entities-rights",
+                    "faicon": "fa-minus-circle",
+                    "displayname": "Roles",
+                    "priority": 510,
+                    "rights": ["manage-roles"],
+                    "absURL": "admin/role/list",
+                    "children": []
+                }]
             }
         }, {
             "module" : "entityrelationship.js",
@@ -322,16 +300,7 @@
         }, {
             "module" : "role.js",
             "endpoint" : "role",
-            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"],
-            "admin_menu" : {
-                "id": "entities-rights",
-                "faicon": "fa-minus-circle",
-                "displayname": "Roles",
-                "priority": 510,
-                "rights": ["manage-roles"],
-                "absURL": "admin/role/list",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"]
         }, {
             "module" : "preferences.js",
             "endpoint" : "preferences",
@@ -415,7 +384,31 @@
                 "priority": 1000,
                 "rights": ["manage-settings"],
                 "absURL": "admin/settings",
-                "children": []
+                "children": [{
+                    "id": "themes",
+                    "faicon": "fa-paint-brush",
+                    "displayname": "Themes",
+                    "priority": 600,
+                    "rights": ["manage-themes"],
+                    "absURL": "admin/themes",
+                    "children": []
+                }, {
+                    "id": "devtools",
+                    "faicon": "fa-hashtag",
+                    "displayname": "Dev Tools",
+                    "priority": 2000,
+                    "rights": ["develop"],
+                    "absURL": "admin/devtools",
+                    "children": []
+                }, {
+                    "id": "plugins",
+                    "faicon": "fa-plug",
+                    "displayname": "Plugins",
+                    "priority": 700,
+                    "rights": ["manage-plugins"],
+                    "absURL": "admin/plugins",
+                    "children": []
+                }]
             }
         }       
     ]   

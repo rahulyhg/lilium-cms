@@ -212,11 +212,11 @@ var Role = function () {
                 dependencies: [],
                 async: true
             })
-            .add('name', 'text', {
-                displayname: "Name",
-            })
             .add('displayname', 'text', {
                 displayname: "Display Name",
+            })
+            .add('name', 'text', {
+                displayname: "Name slug",
             })
             .add('power', 'number', {
                 displayname: "Level (Smaller is stronger)"

@@ -1139,19 +1139,10 @@ h2.subtitlestrip, h2.subtitle {
 	font-size: 14px;
 }
 
-.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected,
-.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected:hover {
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected > a,
+.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected > a:hover {
 	background-color: {=actioncolor};
-}
-
-.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected a,
-.lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected:hover a {
 	color: #FFF;
-}
-
-.lmladminsidebar .lmladminsidebaritems li:hover {
-	background-color: {=barcolorhover};
-	color: #EEE;
 }
 
 .lmladminsidebar .lmladminsidebaritems li a {
@@ -1162,7 +1153,8 @@ h2.subtitlestrip, h2.subtitle {
 	text-decoration: none;
 }
 
-.lmladminsidebar .lmladminsidebaritems li:hover a {
+.lmladminsidebar .lmladminsidebaritems li > a:hover {
+	background-color: {=barcolorhover};
 	color: #EEE;
 }
 
@@ -1176,7 +1168,7 @@ h2.subtitlestrip, h2.subtitle {
     color: #FFF;
 }
 
-.lmladminsidebar .lmladminsidebaritems li.go-to-site-listitem:hover a {
+.lmladminsidebar .lmladminsidebaritems li.go-to-site-listitem:hover > a {
     color: #FFF;
 }
 
@@ -1226,14 +1218,11 @@ h2.subtitlestrip, h2.subtitle {
 .lmladminsidebar .lmladminsidebaritems .parent:hover ul{
 	max-height: 100%;
 	height: 100%;
-
 }
 
 .lmladminsidebar .lmladminsidebaritems .parent ul {
 	overflow: hidden;
 	border-left : 5px solid {=activecolor};
-
-
 }
 .lmladminsidebar .lmladminsidebaritems .parent ul li {
 	-webkit-transition: height 0.3s;
@@ -1262,7 +1251,7 @@ h2.subtitlestrip, h2.subtitle {
 }
 
 .lmladminsidebarselected ul li {
-    background-color: {=barcolor};
+    /* background-color: {=barcolor}; */
 }
 
 /* Formatted forms */

@@ -22,13 +22,13 @@ $}
 				</h6>
 				<div class="entity-actions">
 					<lml-tobject data-nodetype="a"
-                             data-class="btn-accept"
+                             data-class="btn button"
 						     data-href="edit/"
 						     data-key="_id">
 							Edit
 					</lml-tobject>
 					<lml-tobject data-nodetype="button"
-                             data-class="btn-remove"
+                             data-class="btn button red"
 						     data-bind="click"
 						     data-action="deleteUser"
 						     data-actionparamkey="_id">
