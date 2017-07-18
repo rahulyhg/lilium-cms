@@ -51,7 +51,7 @@ const preload = (context, done) => {
         <lml-bunchitem>
             <div class="cakepop-strip-wrapper">
                 <div class="cakepop-strip">
-                    <lml-link href="${context._c.server.url}/admin/cakepop/view/{ckp._id}">
+                    <lml:link href="${context._c.server.url}/admin/cakepop/edit/{ckp._id}">
                         <h4>
                             <lml-generate call="ckp_status_icon"></lml-generate>
                             <lml-text var="ckp.title" tag="h4" ></lml-text>

@@ -36,10 +36,12 @@ const LML3 = require('./lml3/compiler.js');
 
 class Cakepop {
     adminGET(cli) {
-        if (cli.routeinfo.path[2]) {
-            cli.throwHTTP(404);
-        } else {
+        if (cli.routeinfo.path[2] == "edit") {
+            filelogic.serveAdminLML3(cli, true);
+        } else if (!cli.routeinfo.path[2]) {
             filelogic.serveAdminLML3(cli);
+        } else {
+            cli.throwHTTP(404);
         }
     }
 
@@ -48,8 +50,27 @@ class Cakepop {
         cli.sendJSON({ message : "Not finished" });
     }
 
+    deepFetch(id, sendback) {
+        db.join(require('./config.js').default(), 'cakepops', [
+            {
+                $match : {
+                    _id : id
+                }
+            }, {
+                $lookup : {
+                    localField : "createdBy",
+                    from : "entities",
+                    foreignField : "_id",
+                    as : "createdByEntity"
+                }
+            }
+        ], (arr) => {
+            sendback(arr[0]);
+        });
+    }
+
     livevar(cli, levels, params, sendback) {
-        var action = levels[0];
+        let action = levels[0];
         if (action == "latests") {
             let now = new Date().getTime();
             db.findUnique(config.default(), "cakepops", {
@@ -61,6 +82,11 @@ class Cakepop {
                     found : !!obobj,
                     cakepop : dbobj
                 });
+            });
+        } else if (action == "single") {
+            let id = db.mongoID(levels[1]);
+            this.deepFetch(id, (ckp) => {
+                sendback(ckp);
             });
         } else if (action == "bunch") {
             let now = new Date();
