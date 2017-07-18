@@ -855,7 +855,8 @@ var serveReadAPI = function(cli) {
                     replaceInterlinks(cli._c, article, function() {
                         cli.sendJSON({
                             section : "read",
-                            article
+                            article,
+                            currentpost : id
                         });
                     });
                 };
@@ -937,7 +938,8 @@ var serveAuthorAPI = function(cli) {
                         cli.sendJSON({
                             section : "author",
                             articles : list,
-                            author : entities.toPresentable(author)
+                            author : entities.toPresentable(author),
+                            currentauthor : _id
                         });
                     });
                 });
@@ -973,7 +975,8 @@ var serveTopicAPI = function(cli) {
                             const finishup = () => {
                                 cli.sendJSON({
                                     section : "topic",
-                                    topic, articles
+                                    topic, articles,
+                                    currenttopic : _id
                                 });
                             };
 
