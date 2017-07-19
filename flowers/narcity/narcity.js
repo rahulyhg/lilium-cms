@@ -855,7 +855,8 @@ var serveReadAPI = function(cli) {
                     replaceInterlinks(cli._c, article, function() {
                         cli.sendJSON({
                             section : "read",
-                            article
+                            article,
+                            currentpost : id
                         });
                     });
                 };
@@ -937,7 +938,8 @@ var serveAuthorAPI = function(cli) {
                         cli.sendJSON({
                             section : "author",
                             articles : list,
-                            author : entities.toPresentable(author)
+                            author : entities.toPresentable(author),
+                            currentauthor : _id
                         });
                     });
                 });
@@ -962,60 +964,79 @@ var serveTopicAPI = function(cli) {
                         aAssoc[x._id] = x;
                     });
 
-                    db.find(cli._c, 'content', {topic : {$in : family}, status : "published"}, [], (err, cur) => {
-                        cur.sort({date : -1}).skip((page-1) * TOPIC_PAGE_LIMIT).limit(TOPIC_PAGE_LIMIT).toArray((err, arr) => {
-                            arr.forEach(a => {
-                                a.authors = [aAssoc[a.author]];
+                    db.join(cli._c, 'content', [
+                        {
+                            $match : {
+                                topic : {$in : family},
+                                status : "published"
+                            }
+                        }, {
+                            $sort : {date : -1}
+                        }, {
+                            $skip : (page-1) * TOPIC_PAGE_LIMIT
+                        }, {
+                            $limit : TOPIC_PAGE_LIMIT
+                        }, {
+                            $lookup : {
+                                from : "uploads",
+                                localField : "media",
+                                foreignField : "_id",
+                                as : "featuredimage"
+                            }
+                        }
+                    ], (arr) => {
+                        arr.forEach(a => {
+                            a.authors = [aAssoc[a.author]];
+                        });
+
+                        let articles = Article.toPresentables(cli._c, arr);
+
+                        const finishup = () => {
+                            cli.sendJSON({
+                                section : "topic",
+                                topic, articles,
+                                currenttopic : _id
                             });
-
-                            let articles = Article.toPresentables(cli._c, arr);
-
-                            const finishup = () => {
-                                cli.sendJSON({
-                                    section : "topic",
-                                    topic, articles
-                                });
-                            };
+                        };
 
 
-                            const findCity = () => {
-                                topic.city = topic.override && topic.override.cityname;
+                        const findCity = () => {
+                            topic.city = topic.override && topic.override.cityname;
 
-                                if (topic.city) {
-                                    topic.cityid = topic._id;
-                                    
+                            if (topic.city) {
+                                topic.cityid = topic._id;
+                                
+                                try {
+                                    topic.geo = {
+                                        lat : topic.override.geolat && parseFloat(topic.override.geolat),
+                                        lng : topic.override.geolng && parseFloat(topic.override.geolng)
+                                    };
+                                } catch (ex) { c.geo = {}; }
+                            }
+
+                            if (topic.family.length == 4) {
+                                db.findUnique(cli._c, 'topics', {_id : topic.family[1]}, function(err, maybecity) {
+                                    topic.city = maybecity.override && maybecity.override.cityname;
+                                    topic.cityid = maybecity && topic.family[1];
+
                                     try {
                                         topic.geo = {
-                                            lat : topic.override.geolat && parseFloat(topic.override.geolat),
-                                            lng : topic.override.geolng && parseFloat(topic.override.geolng)
+                                            lat : maybecity.override.geolat && parseFloat(maybecity.override.geolat),
+                                            lng : maybecity.override.geolng && parseFloat(maybecity.override.geolng)
                                         };
                                     } catch (ex) { c.geo = {}; }
-                                }
 
-                                if (topic.family.length == 4) {
-                                    db.findUnique(cli._c, 'topics', {_id : topic.family[1]}, function(err, maybecity) {
-                                        topic.city = maybecity.override && maybecity.override.cityname;
-                                        topic.cityid = maybecity && topic.family[1];
-
-                                        try {
-                                            topic.geo = {
-                                                lat : maybecity.override.geolat && parseFloat(maybecity.override.geolat),
-                                                lng : maybecity.override.geolng && parseFloat(maybecity.override.geolng)
-                                            };
-                                        } catch (ex) { c.geo = {}; }
-
-                                        finishup();
-                                    });
-                                } else {
                                     finishup();
-                                }
-                            };
-
-                            db.find(cli._c, 'topics', {parent : topic._id}, [], function(err, cur) {
-                                cur.project({_id : 1, displayname : 1}).sort({displayname : 1}).toArray(function(err, children) {
-                                    topic.children = children;
-                                    findCity();
                                 });
+                            } else {
+                                finishup();
+                            }
+                        };
+
+                        db.find(cli._c, 'topics', {parent : topic._id}, [], function(err, cur) {
+                            cur.project({_id : 1, displayname : 1}).sort({displayname : 1}).toArray(function(err, children) {
+                                topic.children = children;
+                                findCity();
                             });
                         });
                     });
