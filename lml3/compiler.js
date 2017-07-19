@@ -32,6 +32,33 @@ class LMLPetal {
     }
 }
 
+class LMLTool {
+    constructor(context, type, tool) {
+        this.type = type;
+
+        switch (type) {
+            case "add":
+                this.markup = `<a class="fab lml3-tool-add" ${tool.href&&'href="'+tool.href+'"'||''}>+</a>` + 
+                    (tool.call && (
+                        `<script>
+                            document.querySelector('.lml3-tool-add').addEventListener("click", function() {
+                                ${tool.call}();
+                            });
+                        </script>`
+                    )
+                );
+                break;
+
+            default : 
+                this.markup = "[Undefined tool type]";
+        }
+    }
+
+    toString() {
+        return this.markup;
+    }
+}
+
 class LMLContext {
     constructor(_c, original = {}, settings = {}) {
         for (var k in settings) { this[k] = settings[k]; }
@@ -48,6 +75,14 @@ class LMLContext {
             .prepareHeader();
     }
 
+    maybeCreateAddTool() {
+        if (this.tools && this.tools.add) {
+            return new LMLTool(this, "add", this.tools.add);
+        }
+
+        return "";
+    }
+
     prepareHeader() {
         this.header = "";
 
@@ -57,7 +92,7 @@ class LMLContext {
         }
 
         this.header += this.livevars || '';
-        this.header += this.title ? `<h1>${this.title}</h1>` : '';
+        this.header += this.title ? `<h1>${this.title} ${this.maybeCreateAddTool()}</h1>` : '';
 
         return this;
     }
