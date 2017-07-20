@@ -34,6 +34,8 @@ const filelogic = require('./filelogic.js');
 const config = require('./config.js');
 const LML3 = require('./lml3/compiler.js');
 
+const CAKEPOP_COLLECTION = "cakepops";
+
 class Cakepop {
     adminGET(cli) {
         if (cli.routeinfo.path[2] == "edit") {
@@ -46,12 +48,37 @@ class Cakepop {
     }
 
     adminPOST(cli) {
-        let action = cli.routeinfo.path[1];
-        cli.sendJSON({ message : "Not finished" });
+        let action = cli.routeinfo.path[2];
+
+        if (action == "new") {
+            if (cli.postdata.data.displayname) {
+                let newDocument = {
+                    title : cli.postdata.data.displayname,
+                    status : "creation",
+                    content : "<p>Write a <i>cute message</i> here.</p>",
+                    stylesheet : "#cakepop-content {\n\n}\n#cakepop-html {\n\n}",
+                    read : [],
+                    responses : [],
+                    expiry : new Date().getTime() + (1000 * 60 * 60 * 24 * 7)
+                };
+
+                db.insert(config.default(), CAKEPOP_COLLECTION, newDocument, () => {
+                    cli.sendJSON({
+                        success : true,
+                        id : newDocument._id,
+                        redirect : cli._c.server.url + "/admin/cakepop/edit/" + newDocument._id
+                    });
+                });
+            } else {
+                cli.sendJSON({success : false, reason : "No displayname provided"})
+            }
+        } else {
+            cli.throwHTTP(404);
+        }
     }
 
     deepFetch(id, sendback) {
-        db.join(require('./config.js').default(), 'cakepops', [
+        db.join(require('./config.js').default(), CAKEPOP_COLLECTION, [
             {
                 $match : {
                     _id : id
@@ -73,7 +100,7 @@ class Cakepop {
         let action = levels[0];
         if (action == "latests") {
             let now = new Date().getTime();
-            db.findUnique(config.default(), "cakepops", {
+            db.findUnique(config.default(), CAKEPOP_COLLECTION, {
                 read : {$ne : db.mongoID(cli.userinfo.userid)},
                 expiry : {$gt : now},
                 status : "live"
@@ -105,7 +132,7 @@ class Cakepop {
                 query.title = new RegExp(filters.search);
             }
 
-            db.find(config.default(), 'cakepops', query, [], (err, cur) => {
+            db.find(config.default(), CAKEPOP_COLLECTION, query, [], (err, cur) => {
                 cur.sort({_id : -1}).limit(limit).project({
                     title : 1,
                     expiry : 1,
@@ -135,7 +162,9 @@ class Cakepop {
             fieldWrapper : "lmlform-fieldwrapper"
         })
         .add('title', 'text', { displayname : "Title" })
-        .add('content', 'ckeditor', {nolabel : true})
+        .add('content', 'ckeditor', {nolabel : true, classes : ["no-style"]})
+        .add('stylesheet', 'textarea', {displayname : "Custom CSS", rows : 10})
+        .add('nocontainer', 'checkbox', {displayname : "Do not use the default container"})
         .add('responses', 'stack', {
             displayname : "Responses",
             scheme : {
@@ -149,7 +178,8 @@ class Cakepop {
         .add('expiry', 'date', {
             displayname : "Expiry",
             datetime : true, 
-            context : 'edit'
+            context : 'edit',
+            classes : ["lml-date"]
         })
         .add('publish-set', 'buttonset', { 
             buttons : [

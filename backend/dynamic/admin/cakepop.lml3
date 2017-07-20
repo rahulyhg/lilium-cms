@@ -107,7 +107,19 @@ const preload = (context, done) => {
         };
 
         window["create-cakepop-modal_accept"] = function(dlg) {
+            var displayname = dlg.getFormData().displayname;
 
+            if (displayname) {
+                liliumcms.lmldom.post({
+                    displayname : displayname
+                }, "${context._c.server.url}/admin/cakepop/new", function(resp) {
+                    dlg.dismiss();
+
+                    if (resp.success && resp.redirect) {
+                        liliumcms.pageloader.load(resp.redirect);
+                    }
+                });
+            }
         };
     </script>`;
 

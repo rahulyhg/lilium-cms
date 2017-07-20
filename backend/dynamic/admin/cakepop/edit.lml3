@@ -8,8 +8,28 @@ const preload = (context, done) => {
     done();
 };
 
+const scripts = `<script>
+    document.querySelector('.btn-preview').addEventListener('click', function() {
+        var dat = liliumcms.lmldom.getFormData().cakepop_edit.values;
+        var ctn = dat.content;
+        var filler = {};
+
+        if (dat.nocontainer) {
+            filler.html = ctn;
+        } else {
+            filler.content = ctn;
+        }
+
+        filler.stylesheet = dat.stylesheet;
+
+        liliumcms.cakepop.fill(filler);
+        liliumcms.cakepop.cast();
+    });
+</script>`;
+
+
 const compile = (o, context) => {
-    o(context.header, context.libs.formbuilder.render("cakepop_edit", "edit", "cakepop/single/?"));
+    o(context.header, context.libs.formbuilder.render("cakepop_edit", "edit", "cakepop/single/?"), scripts);
 
 } 
 

@@ -4,6 +4,8 @@
         <div id="cakepop-content"></div>
         <div id="cakepop-actions"></div>
     </div>
+    <div id="cakepop-html"> </div>
+    <style id="cakepop-stylesheet"></style>
 </div>
 
 <style>
@@ -13,7 +15,7 @@
     left:0; right:0;
     z-index: 100000;
 
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: rgba(0, 0, 0, 0.6);
 
     -webkit-transform: translate3d(0,0,0);
        -moz-transform: translate3d(0,0,0);
@@ -54,3 +56,4 @@
 }
 
 </style>
+

@@ -525,7 +525,16 @@ var LMLDom = function() {
     this.setValueToField = function(field, val) {
         if (field.dataset.editor == "ckeditor") {
             field.value = val;
-            CKEDITOR.replace(field);
+            var options = {
+                removePlugins: 'image,contextmenu,liststyle,tabletools,tableselection,specialchar,table',
+                disableNativeSpellChecker: false
+            }
+
+            if (field.classList.contains("no-style")) {
+                options.contentsCss = "";
+            }
+
+            CKEDITOR.replace(field, options);
 
             log('LMLDOM', 'Filled ckeditor with name ' + field.name);
         } else if (field.classList.contains('media-input')) { 
@@ -572,6 +581,13 @@ var LMLDom = function() {
             }
         } else if (field.type == "datetime-local") {
             field.value = html5datetime(val);
+        } else if (field.classList.contains("lml-date")) {
+            if (liliumcms.lmldom.flatpickr[field.name || field.id]) {
+                liliumcms.lmldom.flatpickr[field.name || field.id].setDate(new Date(val));
+            } else {
+                field.value = new Date(val);
+                field.dataset.initvalue = val;
+            }
         } else {
             field.value = val;
         }
@@ -768,7 +784,7 @@ var LMLDom = function() {
         return data;
     };
 
-    this.sendForm = function(data, url, callback, headers) {
+    this.sendForm = this.post = function(data, url, callback, headers) {
         var maybeParseJson = function(str) {
             try {
                 return JSON.parse(str);
@@ -894,9 +910,13 @@ var LMLDom = function() {
         var dateelem = document.querySelectorAll('.lml-date');
         for (var i = 0; i < dateelem.length; i++) {
             var usesTime = dateelem[i].dataset.options && dateelem[i].dataset.options.indexOf("time") != -1
-            liliumcms.lmldom.flatpickr[dateelem[i].name || dateelem[i].id || ("flatpickr-" + i)] = new Flatpickr(dateelem[i], {
+            var fp = liliumcms.lmldom.flatpickr[dateelem[i].name || dateelem[i].id || ("flatpickr-" + i)] = new Flatpickr(dateelem[i], {
                 enableTime : usesTime
             });
+
+            if (dateelem[i].dataset.initvalue) {
+                fp.setDate(new Date(dateelem[i].dataset.initvalue));
+            }
         }
     };
 

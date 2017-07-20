@@ -40,9 +40,25 @@ var Cakepop = function() {
     };
     
     this.fill = function(popobj) {
-        var card = document.getElementById('cakepop-wrapper');
         var actions = document.getElementById("cakepop-actions");
-        document.getElementById("cakepop-content").innerHTML = popobj.content;
+        var elHTML = document.getElementById("cakepop-html");
+        var elContent = document.getElementById("cakepop-content");
+
+        if (popobj.html) {
+            elHTML.innerHTML = popobj.html;
+            elHTML.style.display = "block";
+
+            elContent.innerHTML = "";
+            elContent.parentElement.style.display = "none";
+        } else {
+            elHTML.innerHTML = "";
+            elHTML.style.display = "none";
+
+            elContent.innerHTML = popobj.content;
+            elContent.parentElement.style.display = "block";
+        }
+
+        document.getElementById("cakepop-stylesheet").textContent = popobj.stylesheet || "";
         
         while (actions.firstElementChild) { actions.firstElementChild.remove(); }
         if (popobj.actions) for (var i = 0; i < popobj.actions; i++) {
@@ -52,18 +68,20 @@ var Cakepop = function() {
             }
         }
 
-        var cardheight = card.getBoundingClientRect().height;
-        var screenheight = window.innerHeight;
-        var top = (screenheight / 2) - (cardheight / 2);
-
-        if (top < 100) { top = 100; }
-        card.style.top = top + "px";
     }; 
 
     this.cast = function() {
         var wrap = document.getElementById('cakepop');
         wrap.style.display = "block";
         setTimeout(function() {
+            var card = document.getElementById('cakepop-wrapper');
+            var cardheight = card.getBoundingClientRect().height;
+            var screenheight = window.innerHeight;
+            var top = (screenheight / 2) - (cardheight / 2);
+
+            if (top < 100) { top = 100; }
+            card.style.top = top + "px";
+
             wrap.classList.add('shown');
         }, 20);
     };
@@ -73,6 +91,18 @@ var Cakepop = function() {
         wrap.classList.remove('shown');
         setTimeout(function() {
             wrap.style.display = "none";
+            document.getElementById("cakepop-stylesheet").textContent = "";
         }, 200);
     };
+
+    this.construct = function() {
+        var cpWrap = document.getElementById('cakepop');
+        cpWrap.addEventListener('click', function(ev) {
+            if (ev.target === cpWrap) {
+                liliumcms.cakepop.dismiss();
+            }
+        });
+    };
+
+    self.construct();
 };

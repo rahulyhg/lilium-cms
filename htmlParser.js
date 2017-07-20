@@ -516,6 +516,7 @@ var HtmlParser = function () {
         var input = generateLabel(field, hasPlaceholder);
         input += '<input type="date' + (field.attr.datetime ? "time-local" : "") +'" ';
         input += parseBasicFieldAttributes(field);
+        input += field.attr.datetime && ' data-options="time" ' || "";
         input += ' />';
 
         return input;
@@ -543,7 +544,7 @@ var HtmlParser = function () {
         var input = generateLabel(field, hasPlaceholder);
         input += '<textarea ';
         input += parseBasicFieldAttributes(field);
-        input += field.type == "ckeditor" ? ' ckeditor data-editor="ckeditor" ' : ''; 
+        input += field.type == "ckeditor" && ' ckeditor data-editor="ckeditor" ' || ''; 
 
         // Rows
         input += field.attr.rows ? 'rows="' + field.attr.rows + '"' : '';
@@ -624,16 +625,7 @@ var HtmlParser = function () {
     };
 
     var parseClasses = function (field) {
-        var classHtml = '';
-
-        if (typeof field.attr.classes !== 'undefined') {
-            for (var index in field.attr.classes) {
-                classHtml += ' ' + field.attr.classes[index];
-            }
-        }
-
-
-        return classHtml;
+        return field.attr.classes && field.attr.classes.join(' ') || "";
     };
 }
 
