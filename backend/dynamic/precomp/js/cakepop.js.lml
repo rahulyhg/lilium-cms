@@ -1,3 +1,5 @@
+{#config}
+
 var CAKEPOP_ALLOWED_ACTIONS = {
     "send" : { displayname : "Send", action : "send" },
     "dismiss" : { displaylane : "Dismiss", action : "dismiss" }
@@ -44,6 +46,8 @@ var Cakepop = function() {
         var elHTML = document.getElementById("cakepop-html");
         var elContent = document.getElementById("cakepop-content");
 
+        self.currentid = popobj._id;
+
         if (popobj.html) {
             elHTML.innerHTML = popobj.html;
             elHTML.style.display = "block";
@@ -84,6 +88,8 @@ var Cakepop = function() {
 
             wrap.classList.add('shown');
         }, 20);
+
+        self.hideIcon();
     };
 
     this.dismiss = function() {
@@ -93,6 +99,34 @@ var Cakepop = function() {
             wrap.style.display = "none";
             document.getElementById("cakepop-stylesheet").textContent = "";
         }, 200);
+    };
+
+    this.showIcon = function() {
+        document.getElementById('topbar-cakepop').style.display = "block";
+    };
+
+    this.hideIcon = function() {
+        document.getElementById('topbar-cakepop').style.display = "none";
+    };
+
+    this.read = function() {
+        liliumcms.lmldom.post({id : self.currentid}, "{=config.default.server.url}/admin/cakepop/read", function(resp) {
+            self.serverResponded = resp && !!resp.delicious;
+        });
+    };
+
+    this.initWithLivevar = function() {
+        var latest = liliumcms.livevars.retrieveVar('cakepop.latests', true);
+        if (latest.found) {
+            var pop = latest.cakepop;
+            self.fill(pop);
+            self.showIcon();
+        }
+
+        document.getElementById('topbar-cakepop').addEventListener('click', function() {
+            self.cast();
+            self.read();
+        });
     };
 
     this.construct = function() {

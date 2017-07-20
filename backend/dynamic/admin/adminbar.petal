@@ -21,6 +21,9 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
+                    <li id="topbar-cakepop" class="link">
+                        <img src="{=config.default.server.url}/static/media/chocopop.png" />
+                    </li>
                     <li id="topbar-localclip" class="link">
                         <span class="fa fa-clipboard"></span>
                     </li>

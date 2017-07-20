@@ -1449,6 +1449,7 @@ header.admin-bar {
 .navbar .dropdown-menu {
 	color: {=fontcolor};
 }
+
 .container-fluid {
 	padding-left: 0px;
 	padding-right: 0px;

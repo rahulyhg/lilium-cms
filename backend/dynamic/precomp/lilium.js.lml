@@ -1274,6 +1274,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.lmldom.init();
         liliumcms.rights.init();
         liliumcms.badges.bind();
+        liliumcms.cakepop.initWithLivevar();
         liliumcms.everythingIsAwesome();
     } else {
         liliumcms.queryparams.parseURL();

@@ -41,6 +41,10 @@ ClientObject.prototype.did = function(cat, type, extra, cb) {
     cb && cb();
 };
 
+ClientObject.prototype.me = function() {
+    return db.mongoID(this.userinfo.userid);
+};
+
 ClientObject.prototype.reloadSession = function(cb) {
     require('./session.js').reloadSession(this, cb);
 };

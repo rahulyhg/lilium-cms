@@ -59,6 +59,7 @@ class Cakepop {
                     stylesheet : "#cakepop-content {\n\n}\n#cakepop-html {\n\n}",
                     read : [],
                     responses : [],
+                    history : [{action : "creation", by : cli.me(), at : new Date().getTime()}],
                     expiry : new Date().getTime() + (1000 * 60 * 60 * 24 * 7)
                 };
 
@@ -71,6 +72,19 @@ class Cakepop {
                 });
             } else {
                 cli.sendJSON({success : false, reason : "No displayname provided"})
+            }
+        } else if (action == "read") {
+            if (cli.postdata.data.id) {
+                db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.postdata.data.id)}, {
+                    $addToSet : {
+                        read : db.mongoID(cli.userinfo.userid),
+                        history : {action : "read", by : cli.me(), at : new Date().getTime()}
+                    }
+                }, () => {
+                    cli.sendJSON({delicious : true, userid : cli.userinfo.userid, cakepop : cli.postdata.data.id});
+                }, false, true, true);
+            } else {
+                cli.throwHTTP(400, undefined, true);
             }
         } else {
             cli.throwHTTP(404);
@@ -106,9 +120,11 @@ class Cakepop {
                 status : "live"
             }, (err, dbobj) => {
                 sendback({
-                    found : !!obobj,
+                    found : !!dbobj,
                     cakepop : dbobj
                 });
+            }, {
+                content : 1, stylesheet : 1, html : 1, expiry : 1
             });
         } else if (action == "single") {
             let id = db.mongoID(levels[1]);
@@ -180,6 +196,16 @@ class Cakepop {
             datetime : true, 
             context : 'edit',
             classes : ["lml-date"]
+        })
+        .add('publish-sep', 'title', {
+            displayname : "Actions"
+        })
+        .add('status', 'select', {
+            datasource: [
+                {displayName : "Creation", name : "creation"},
+                {displayName : "Live", name : "live"}
+            ],
+            displayname : "State"
         })
         .add('publish-set', 'buttonset', { 
             buttons : [
