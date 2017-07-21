@@ -100,7 +100,10 @@ class LMLInstagram {
 
         sharedcache.get('instagram_stats_' + url, (json) => {
             if (!json || json.expire < new Date().getTime()) {
-                request(url, (err, resp, json) => {
+                request({
+                    headers : {"User-Agent" : config.lmlUserAgent},
+                    url
+                }, (err, resp, json) => {
                     if (err) {
                         return send(err);
                     }
