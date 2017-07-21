@@ -4,6 +4,7 @@ const networkinfo = require('./network/info.js');
 const db = require('./includes/db.js');
 const scheduler = require('./scheduler.js');
 const request = require('request');
+const sharedcache = require('./sharedcache.js');
 
 const igDomain = "https://www.instagram.com/";
 const statsParam = "?__a=1";
@@ -93,8 +94,32 @@ class LMLInstagram {
 
     getSingleAccountStats(username, send) {
         let url = igDomain + username + statsParam;
-        request(url, (err, resp, json) => {
-            send(err || JSON.parse(json));
+        if (username.includes('instagram.com')) {
+            url = username + statsParam;
+        }
+
+        sharedcache.get('instagram_stats_' + url, (json) => {
+            if (!json || json.expire < new Date().getTime()) {
+                request({
+                    headers : {"User-Agent" : config.lmlUserAgent},
+                    url
+                }, (err, resp, json) => {
+                    if (err) {
+                        return send(err);
+                    }
+
+                    json = JSON.parse(json);
+                    json.expire = new Date().getTime() + (1000 * 60 * 5);
+
+                    sharedcache.set({
+                        ["instagram_stats_" + url] : json
+                    }, () => {
+                        send(json);
+                    });
+                });
+            } else {
+                send(json);
+            }
         });
     }
 

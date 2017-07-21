@@ -41,9 +41,96 @@ const css = `<style>
     font-weight: 500;
     font-size: 34px;
 }
+
+#single-crew-subtitle {
+    font-size: 22px;
+    padding: 10px 0px 40px 210px;
+}
+
+.single-crew-instagram-image {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border: solid 8px #F6F6F6;
+    margin: 5px;
+}
+
+#single-crew-instagram-images {
+    white-space: nowrap;
+    width: 100%;
+    overflow-x: auto;
+    padding: 5px;
+}
+
+.single-crew-title {
+    font-weight: 500;
+    padding: 10px 10px 0px 10px;
+    font-size: 32px;
+}
+
+.single-crew-instagram-name {
+    display: inline-block;
+    font-size: 16px;
+    margin-left: 5px;
+}
+
+.single-crew-instagram-stats {
+    font-size: 16px;
+    display: inline-block;
+    margin: 2px 0px 10px 10px;
+}
 </style>`;
 
 const preload = (context, done) => { 
+    context.js = `<script>
+        window.singlecrewsub = function(ldContext) {
+            var str = "";
+            if (ldContext.member.jobtitle) {
+                str = ldContext.member.jobtitle;
+            }
+
+            if (ldContext.member.personality) {
+                str += (str ? ", " : "") + ldContext.member.personality.displayname + " personality";
+            }
+
+            var span = document.createElement('span');
+            span.textContent = str;
+
+            return span;
+        };
+
+        window.singlecrewinstagram = function(ctx) {
+            if (!ctx.member.instagram) {
+                return document.createTextNode();
+            }
+
+            var wrap = _a('div', 'single-crew-instagram');
+            wrap.id = "single-crew-instagram";
+
+            var tt = _a('h3', 'single-crew-title', wrap);
+            tt.textContent = "Instagram";
+
+            var igstats = _a('span', 'single-crew-instagram-stats', wrap);
+            igstats.innerHTML = "Followed by <b>" + ctx.member.instagram.followers + "</b> people &middot; ";
+
+            var igname = _a('a', 'single-crew-instagram-name', wrap);
+            igname.textContent = "@" + ctx.member.instagram.username;
+            igname.target = "_blank";
+            igname.href = ctx.member.instagram.url;
+
+            var imagelist = _a('div', 'single-crew-instagram-images', wrap);
+            imagelist.id = "single-crew-instagram-images";
+
+            for (var i = 0; i < ctx.member.instagram.photos.length; i++) {
+                var igimg = ctx.member.instagram.photos[i];
+                var img = _a('img', 'single-crew-instagram-image', imagelist);
+                img.src = igimg.src;
+            }
+
+            return wrap;
+        };
+    </script>`;
+
     context.markup = `<div id="single-crew">
         <lml-affect var="member" equals="livevars.crew.single.?"></lml-affect>
         <div id="single-crew-presentation">
@@ -53,15 +140,19 @@ const preload = (context, done) => {
             <h2 id="single-crew-displayname">
                 <lml-text var="member.displayname"></lml-text>
             </h2>
-
         </div>
+        <div id="single-crew-subtitle">
+            <lml-generate call="singlecrewsub" ></lml-generate>
+        </div>
+
+        <lml-generate call="singlecrewinstagram"></lml-generate>
     </div>`;
 
     done();
 };
 
 const compile = (o, context) => {
-    o(css, context.header, context.markup);
+    o(css, context.header, context.markup, context.js);
 };
 
 module.exports = { settings, preload, compile };
