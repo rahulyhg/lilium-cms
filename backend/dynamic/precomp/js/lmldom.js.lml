@@ -29,6 +29,9 @@
     lml-foreach     => var="newlyDefinedVariable" in="currentArray"
     lml-wrapper     => tag="tagName" id="id_and_{variableName}" class="class passed to new node"
 
+    - Operations --
+    lml-affect      => var="variableName" equals="deepVariableName"
+
     - Tables --
     lml-table       => id="string_{variableName}" class="" 
     lml-tbody       => id="string_{variableName}" class="" for="variableName" in="variableName"
@@ -280,6 +283,17 @@ var LMLDom = function() {
             wr.remove();
 
             wr = elem.querySelector('lml-wrapper');
+        }
+
+        var af = elem.querySelector('lml-affect');
+        while (af) {
+            var newVarName = af.getAttribute('var');
+            var newValue = getReturn(ldContext, af.getAttribute('equals'));
+
+            ldContext[newVarName] = newValue;
+
+            af.remove();
+            af = elem.querySelector('lml-affect');
         }
 
         var tab = elem.querySelector('lml-table');

@@ -1,23 +1,67 @@
 const settings = {
     livevars : [{name : "crew.single.{?1}"}],
     lmldom : {
-        features : ["fullwidth"],
         v:1.0
     }
 };
 
-const preload = (context, done) => {
+const css = `<style>
+#single-crew-presentation {
+    text-align: center;
+    padding: 20px; 
+    height: 130px;
+
+    position: relative;
+
+    border-bottom: 5px solid #421e50;
+
+    background-color: #421e50;
+    background-image: repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px), repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px), linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)), linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
+    background-size: 70px 120px;
+}
+
+#single-crew-image img {
+    border-radius: 80px;
+    height: 140px;
+    width: 140px;
+    object-fit : cover;
+
+    position: absolute;
+    bottom: -70px;
+    left: 50px;
+
+    border: 5px solid #421e50;
+}   
+
+#single-crew-displayname {
+    position: absolute;
+    left: 210px;
+    bottom: 10px;
+    color: #FFF;
+    font-weight: 500;
+    font-size: 34px;
+}
+</style>`;
+
+const preload = (context, done) => { 
+    context.markup = `<div id="single-crew">
+        <lml-affect var="member" equals="livevars.crew.single.?"></lml-affect>
+        <div id="single-crew-presentation">
+            <div id="single-crew-image">
+                <lml-image src="{member.avatarURL}"></lml-image>
+            </div>
+            <h2 id="single-crew-displayname">
+                <lml-text var="member.displayname"></lml-text>
+            </h2>
+
+        </div>
+    </div>`;
+
     done();
 };
 
-const markup = `<div id="single-crew">
-
-    
-    
-</div>`;
-
 const compile = (o, context) => {
-    o(context.header);
+    o(css, context.header, context.markup);
 };
 
 module.exports = { settings, preload, compile };
