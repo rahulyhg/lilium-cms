@@ -163,6 +163,10 @@ var Cakepop = function() {
 
     this.construct = function() {
         var cpWrap = document.getElementById('cakepop');
+        if (!cpWrap) {
+            return;
+        }
+
         cpWrap.addEventListener('click', function(ev) {
             if (ev.target === cpWrap && !self.pop.mendatory) {
                 liliumcms.cakepop.dismiss();
