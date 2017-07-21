@@ -15,7 +15,7 @@ const css = `<style>
 
     border-bottom: 5px solid #421e50;
 
-    background-color: #421e50;
+    background-color: #5c296f;
     background-image: repeating-linear-gradient(120deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px), repeating-linear-gradient(60deg, rgba(255,255,255,.1), rgba(255,255,255,.1) 1px, transparent 1px, transparent 60px), linear-gradient(60deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1)), linear-gradient(120deg, rgba(0,0,0,.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,.1) 75%, rgba(0,0,0,.1));
     background-size: 70px 120px;
 }
@@ -101,33 +101,38 @@ const preload = (context, done) => {
 
         window.singlecrewinstagram = function(ctx) {
             if (!ctx.member.instagram) {
-                return document.createTextNode();
+                return document.createTextNode("");
             }
 
-            var wrap = _a('div', 'single-crew-instagram');
-            wrap.id = "single-crew-instagram";
-
-            var tt = _a('h3', 'single-crew-title', wrap);
-            tt.textContent = "Instagram";
-
-            var igstats = _a('span', 'single-crew-instagram-stats', wrap);
-            igstats.innerHTML = "Followed by <b>" + ctx.member.instagram.followers + "</b> people &middot; ";
-
-            var igname = _a('a', 'single-crew-instagram-name', wrap);
-            igname.textContent = "@" + ctx.member.instagram.username;
-            igname.target = "_blank";
-            igname.href = ctx.member.instagram.url;
-
-            var imagelist = _a('div', 'single-crew-instagram-images', wrap);
-            imagelist.id = "single-crew-instagram-images";
-
+            var domimg = [];
             for (var i = 0; i < ctx.member.instagram.photos.length; i++) {
                 var igimg = ctx.member.instagram.photos[i];
-                var img = _a('img', 'single-crew-instagram-image', imagelist);
-                img.src = igimg.src;
+                domimg.push({ node : "img", className : "single-crew-instagram-image", attr : { src : igimg.src } });
             }
 
-            return wrap;
+            return _d({
+                node : "div",
+                className : "single-crew-instagram",
+                children : [
+                    { node : 'h3', text : "Instagram", className : "single-crew-title" },
+                    { node : "span", className : "single-crew-instagram-stats", html : "Followed by <b>" + ctx.member.instagram.followers + "</b> people &middot; " },
+                    { 
+                        node : 'a', 
+                        className : 'single-crew-instagram-name', 
+                        text : "@" + ctx.member.instagram.username,  
+                        attr : {
+                            target : "_blank",
+                            href : ctx.member.instagram.url
+                        }
+                    },
+                    { 
+                        node : "div", 
+                        className : "single-crew-instagram-images", 
+                        id : "single-crew-instagram-images",
+                        children : domimg
+                    },
+                ]
+            });
         };
     </script>`;
 
