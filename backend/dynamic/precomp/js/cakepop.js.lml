@@ -24,20 +24,23 @@ var Cakepop = function() {
         })
     };
 
-    this.collectAndSend = function(actionid) {
+    this.collectAndSend = function(actionid, cb) {
         liliumcms.lmldom.post({
             response : actionid,
             id : self.currentid
         }, "{=config.default.server.url}/admin/cakepop/respond", function() {
-
+            cb && cb();
         });
     };
 
     this.handleAction = function(e) {
         var actionname = e.target.dataset.action;
 
-        !self.pop.preview && self.collectAndSend(actionname);
-        self.dismiss();
+        if (!self.pop.preview) { 
+            self.collectAndSend(actionname, function() { self.dismiss(); });
+        } else { 
+            self.dismiss();
+        }
     };
 
     this.createActionButton = function(act) {
