@@ -11,6 +11,7 @@ const LIST_PROJECTION = {
     avatarURL : 1, description : 1,
     personality : 1, socialnetworks : 1,
     badgecount : { "$size": "$badges" },
+    firstname : 1, lastname : 1,
     jobtitle : 1, phone : 1, email : 1
 };
 

@@ -151,6 +151,12 @@ const preload = (context, done) => {
         </div>
 
         <lml-generate call="singlecrewinstagram"></lml-generate>
+        <div>
+            <h3 class="single-crew-title">A little about <lml-text var="member.firstname"></lml-text></h3>
+            <p>
+                <lml-text var="member.description"></lml-text>
+            </p>
+        </div>
     </div>`;
 
     done();
