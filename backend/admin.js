@@ -3,7 +3,7 @@ var AdminEndpoints = {
 	POST : {}
 };
 
-var AdminMenus = new Array();
+var AdminMenus = [];
 
 var filelogic = require('../filelogic.js');
 var formBuilder = require('../formBuilder');
@@ -133,27 +133,41 @@ var Admin = function() {
 		var that = this;
 
 		require('../livevars.js').registerLiveVariable('adminmenus', function(cli, levels, params, callback) {
-			var sortedMenus = new Array();
-			var menus = that.getAdminMenus();
+            var sharedkey = "adminmenus_" + cli.userinfo.userid;
+            var sharedcache = require('../sharedcache.js');
 
-			for (var index in menus) {
-                var subMenu = [];
-
-                if (cli.hasRight(menus[index].rights)) {
-                    var submenus = [];
-
-                    for (var subindex in menus[index].children) {
-
-                        if (menus[index].children[subindex] && cli.hasRight(menus[index].children[subindex].rights)) {
-                            subMenu.push(menus[index].children[subindex]);
-                        }
-                    }
-                    menus[index].children = subMenu;
-                    sortedMenus.push(menus[index]);
+            sharedcache.get(sharedkey, function(menus) {
+                if (menus) {
+                    return callback(menus);
                 }
-			}
 
-			callback(sortedMenus);
+                var sortedMenus = [];
+                var menus = that.getAdminMenus();
+
+                for (var index in menus) {
+                    var subMenu = [];
+
+                    if (cli.hasRight(menus[index].rights)) {
+                        var submenus = [];
+
+                        for (var subindex in menus[index].children) {
+
+                            if (menus[index].children[subindex] && cli.hasRight(menus[index].children[subindex].rights)) {
+                                subMenu.push(menus[index].children[subindex]);
+                            }
+                        }
+
+                        menus[index].children = subMenu;
+                        sortedMenus.push(menus[index]);
+                    }
+                }
+
+                sharedcache.set({
+                    [sharedkey] : sortedMenus
+                }, function() {
+                    callback(sortedMenus);
+                });
+            });
 		});
 	};
 

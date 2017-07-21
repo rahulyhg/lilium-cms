@@ -396,6 +396,8 @@ DevTools.prototype.livevar = function(cli, levels, params, cb) {
         }
 
         cb(formattedOutput);
+    } else if (levels[0] == "me") {
+        cb(cli.userinfo);
     } else if (levels[0] == "livevars") {
         var allLV = require('./livevars.js').getAll();
         var arr = [];
