@@ -108,7 +108,7 @@ $}
             <div id="sponsored-box">
                 <img src="{=?extra.article.sponsoredBoxLogoURL}" id="sponsored-logo" />
                 <div id="sponsored-box-content">
-                    <p><strong>Presented by</strong></p>
+                    <p><strong>{:presentedby}</strong></p>
                     <h5><a target="_blank" href="{=?extra.article.sponsoredBoxURL}">{=?extra.article.sponsoredBoxTitle}</a></h5>
                     <p>
                         {=?extra.article.sponsoredBoxContent}
