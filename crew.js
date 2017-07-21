@@ -5,14 +5,14 @@ const config = require('./config.js');
 const entities = require('./entities.js');
 
 const BADGE_LOOKUP  = { from : "decorations", localField : "_id", foreignField : "entity", as : "badges" };
+const SOCIAL_NETWORKS = entities.getSocialNetworks();
 const LIST_PROJECTION = { 
     displayname : 1, badges : 1, 
     avatarURL : 1, description : 1,
     personality : 1, socialnetworks : 1,
-    badgecount : { "$size": "$badges" }
+    badgecount : { "$size": "$badges" },
+    jobtitle : 1, phone : 1, email : 1
 };
-
-const SOCIAL_NETWORKS = entities.getSocialNetworks();
 
 class Crew {
     constructor() {
@@ -48,10 +48,43 @@ class Crew {
     }
 
     getCrewMember(id, send) {
+        const instagram = require('./instagram.js');
+
+        const finish = (user) => {
+            send(user);
+        };
+
         this.getCrewList({
             _id : id
         }, (user) => {
-            send(user.items.pop());
+            user = user.items.pop();
+
+            if (user.socialnetworks && user.socialnetworks.find(x => x.network == "instagram")) {
+                instagram.getSingleAccountStats(user.socialnetworks.find(x => x.network == "instagram").link, (data) => {
+                    if (data && data.user) {
+                        user.instagram = {
+                            username : data.user.username,
+                            followers : data.user.followed_by.count,
+                            url : "https://www.instagram.com/" + data.user.username,
+                            bio : data.user.biography,
+                            totalphotos : data.user.media.count,
+                            photos : []
+                        };
+
+                        data.user.media.nodes.forEach(x => {
+                            user.instagram.photos.push({
+                                src : x.thumbnail_src,
+                                likes : x.likes.count,
+                                caption : x.caption
+                            });
+                        });
+                    }
+
+                    finish(user);
+                });
+            } else {
+                finish(user);
+            }
         });
     }
 
