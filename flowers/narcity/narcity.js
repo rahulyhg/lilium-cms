@@ -585,9 +585,24 @@ var renderTopicArchive = function(_c, topic, index, done) {
         var context = xextra.currentpage != 1 ? "topic" : (topic.archivetemplate || "topic");
         var file = _c.server.html + "/" + topic.completeSlug + (index != 1 ? ("/" + index) : "") + ".html";
 
-        filelogic.renderThemeLML(_c, context, file, xextra, function(content) {
-            done && done(content);
-        });
+        var rend = function() {
+            filelogic.renderThemeLML(_c, context, file, xextra, function(content) {
+                done && done(content);
+            });
+        };
+
+        if (topic.override && topic.override.archivebanner) {
+            db.findUnique(_c, 'uploads', {_id : db.mongoID(topic.override.archivebanner)}, function(err, img) {
+                if (img) {
+                    topic.override.hasbanner = true;
+                    topic.override.archivebannerurl = _c.server.url + "/uploads/" + img.url;
+                }
+
+                rend();
+            });
+        } else {
+            rend();
+        }
     });
 }
 

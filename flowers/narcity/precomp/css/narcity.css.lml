@@ -1664,6 +1664,25 @@ article #article-content .bottom-promotion-link a {
     margin-bottom: 20px;
 }
 
+/* Archive banners */
+.city-banner {
+    height: 300px;
+}
+
+.city-banner-text {
+    text-align: center;
+    padding-top: 80px;
+}
+
+.city-banner-text span {
+    color: #FFF;
+    background-color: {=theme.settings.headercolor};
+    padding: 2px 12px;
+    font-size: 52px;
+    font-family: "Oswald";
+    text-transform: uppercase;
+}
+
 /* Footer */
 footer {
         background: #333333;

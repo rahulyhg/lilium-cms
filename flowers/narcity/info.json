@@ -48,6 +48,7 @@
             },
             "default" : "en-ca"
         },
+        "iscity" : {"type" : "checkbox", "attr" : {"displayname" : "This is an active Narcity city"}, "default" : "false"},
         "logolink" : {"type" : "text", "attr" : {"displayname" : "Topbar logo link"}, "default" : "/"},
         "maincolor" : {"type" : "text", "attr" : {"displayname" : "Main Color"}, "default" : "#FF2634"},
         "headercolor" : {"type" : "text", "attr" : {"displayname" : "Header Color"}, "default" : "#FF2634"},
@@ -67,6 +68,23 @@
         "geolng" : {"type" : "text", "attr" : {"displayname" : "Longitude"}, "default" : "73.5673"},
         "featuredyoutubeid" : {"type" : "text", "attr" : {"displayname" : "Featured YouTube video ID"}, "validations" : {"required" : false}, "default" : "none"},
         "mailchimpdigest" : {"type" : "text", "attr" : {"displayname" : "Mailchimp Digest ID"}, "default" : "#####"},
+        "archivebanner" : {"type" : "media-explorer", "attr" : {
+            "displayname" : "Archive banner image, if any",
+            "size" : 200,
+            "urlfield" : "archivebannerurl"
+        }, "default" : "{}"},
+        "archivebanneralign" : {
+            "type" : "select",
+            "attr" : {
+                "datasource" : [
+                    { "displayName" : "Center", "name" : "center center" },
+                    { "displayName" : "Center, bottom", "name" : "center bottom" },
+                    { "displayName" : "Center, top", "name" : "center top" }
+                ],
+                "displayname" : "Banner Alignment"
+            },
+            "default" : "{}"
+        },
         "homepagesections" : {"type" : "stack",
             "attr" : {
                 "displayname" : "Homepage sections",
