@@ -5,35 +5,54 @@ var CAKEPOP_ALLOWED_ACTIONS = {
     "dismiss" : { displaylane : "Dismiss", action : "dismiss" }
 };
 
+var CAKEPOP_DEFAULT_ACTION = {
+    identifier : "dismiss",
+    color : "black",
+    displayname : "Dismiss"
+};
+
+var CAKEPOP_TIMER_MS = 1000 * 60 * 30;
+
 var Cakepop = function() {
     var self = this;
     this.checkForNew = function() {
-        
+        !self.visible && liliumcms.livevars.getSingleLivevar("cakepop.latests", {}, function(resp) {
+            if (resp && resp.livevars && resp.livevars["cakepop.latests"] && resp.livevars["cakepop.latests"].found) {
+                liliumcms.livevars.livevars()["cakepop.latests"] = resp.livevars["cakepop.latests"];
+                self.initWithLivevar();
+            }
+        })
     };
 
-    this.collectAndSend = function(nodata) {
-        
+    this.collectAndSend = function(actionid) {
+        liliumcms.lmldom.post({
+            response : actionid,
+            id : self.currentid
+        }, "{=config.default.server.url}/admin/cakepop/respond", function() {
+
+        });
     };
 
     this.handleAction = function(e) {
         var actionname = e.target.dataset.action;
 
-        if (actionname == "send") {
-            self.collectAndSend();
-        } else {
-            self.collectAndSend(false);
-        }
+        !self.pop.preview && self.collectAndSend(actionname);
+        self.dismiss();
     };
 
     this.createActionButton = function(act) {
         if (act) {
-            var actionname = act.action;
+            var actionname = act.identifier;
             var displayname = act.displayname;
 
             var button = document.createElement('button');
             button.textContent = displayname;
             button.dataset.action = actionname;
             button.className = "cakepop-action cakepop-action-" + actionname;
+
+            if (act.color) {
+                button.style.color = act.color;
+            }
 
             button.addEventListener('click', this.handleAction);
 
@@ -47,9 +66,10 @@ var Cakepop = function() {
         var elContent = document.getElementById("cakepop-content");
 
         self.currentid = popobj._id;
+        self.pop = popobj;
 
-        if (popobj.html) {
-            elHTML.innerHTML = popobj.html;
+        if (popobj.nocontainer) {
+            elHTML.innerHTML = popobj.content;
             elHTML.style.display = "block";
 
             elContent.innerHTML = "";
@@ -65,16 +85,21 @@ var Cakepop = function() {
         document.getElementById("cakepop-stylesheet").textContent = popobj.stylesheet || "";
         
         while (actions.firstElementChild) { actions.firstElementChild.remove(); }
-        if (popobj.actions) for (var i = 0; i < popobj.actions; i++) {
-            var act = this.createActionButton( CAKEPOP_ALLOWED_ACTIONS[ popobj.actions[i] ] );
-            if (act) {
-                actions.appendChild(act);
+        if (popobj.responses && popobj.responses.length != 0) {
+            for (var i = 0; i < popobj.responses.length; i++) {
+                var act = this.createActionButton( popobj.responses[i] );
+                if (act) {
+                    actions.appendChild(act);
+                }
             }
+        } else {
+            actions.appendChild(this.createActionButton( CAKEPOP_DEFAULT_ACTION ));
         }
 
     }; 
 
     this.cast = function() {
+        self.visible = true;
         var wrap = document.getElementById('cakepop');
         wrap.style.display = "block";
         setTimeout(function() {
@@ -98,6 +123,9 @@ var Cakepop = function() {
         setTimeout(function() {
             wrap.style.display = "none";
             document.getElementById("cakepop-stylesheet").textContent = "";
+            self.visible = false;
+
+            self.checkForNew();
         }, 200);
     };
 
@@ -120,22 +148,30 @@ var Cakepop = function() {
         if (latest.found) {
             var pop = latest.cakepop;
             self.fill(pop);
-            self.showIcon();
-        }
 
-        document.getElementById('topbar-cakepop').addEventListener('click', function() {
-            self.cast();
-            self.read();
-        });
+            if (pop.auto) {
+                self.cast();
+                self.read();
+            } else {
+                self.showIcon();
+            }
+        }
     };
 
     this.construct = function() {
         var cpWrap = document.getElementById('cakepop');
         cpWrap.addEventListener('click', function(ev) {
-            if (ev.target === cpWrap) {
+            if (ev.target === cpWrap && !self.pop.mendatory) {
                 liliumcms.cakepop.dismiss();
             }
         });
+
+        document.getElementById('topbar-cakepop').addEventListener('click', function() {
+            self.cast();
+            self.read();
+        });
+
+        self.timer = setInterval(self.checkForNew, CAKEPOP_TIMER_MS)
     };
 
     self.construct();

@@ -3,6 +3,7 @@ var log = require('./log.js');
 
 var Config = function () {
     this.httpRegex = /https?\:\/\//;
+    this.lmlUserAgent = "Lilium/1.3 Linux Node/" + process.versions.node + " v8/" + process.versions.v8;
 };
 
 Config.prototype.getAllSites = function () {
@@ -57,7 +58,7 @@ Config.prototype.fetchConfig = function (site) {
 }
 
 Config.prototype.fetchConfigFromCli = function (cli) {
-    var rootdomain = cli.request.headers.host;// .replace(this.httpRegex, ""); // + cli.request.url;
+    var rootdomain = cli.request.headers.host;
 
     cli.routeinfo.configname = rootdomain;
     cli.routeinfo.rootdomain = rootdomain;

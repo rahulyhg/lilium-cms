@@ -50,7 +50,7 @@ class Cakepop {
     adminPOST(cli) {
         let action = cli.routeinfo.path[2];
 
-        if (action == "new") {
+        if (action == "new" && cli.hasRight('cakepop')) {
             if (cli.postdata.data.displayname) {
                 let newDocument = {
                     title : cli.postdata.data.displayname,
@@ -59,6 +59,9 @@ class Cakepop {
                     stylesheet : "#cakepop-content {\n\n}\n#cakepop-html {\n\n}",
                     read : [],
                     responses : [],
+                    nocontainer : false,
+                    mendatory : false,
+                    auto : false,
                     history : [{action : "creation", by : cli.me(), at : new Date().getTime()}],
                     expiry : new Date().getTime() + (1000 * 60 * 60 * 24 * 7)
                 };
@@ -73,12 +76,27 @@ class Cakepop {
             } else {
                 cli.sendJSON({success : false, reason : "No displayname provided"})
             }
-        } else if (action == "read") {
+        } else if (action == "save" && cli.hasRight('cakepop')) {
+            const d = cli.postdata.data;
+            db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.routeinfo.path[3])}, d, () => {
+                cli.sendJSON({
+                    success : true,
+                    type : "success",
+                    title : "Cakepop saved successfully",
+                    message : ""
+                });
+            })
+        } else if (action == "read" || action == "respond") {
             if (cli.postdata.data.id) {
-                db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.postdata.data.id)}, {
+                db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.postdata.data.id), mendatory : action == "respond"}, {
                     $addToSet : {
-                        read : db.mongoID(cli.userinfo.userid),
-                        history : {action : "read", by : cli.me(), at : new Date().getTime()}
+                        read : cli.me(),
+                        history : {
+                            action, 
+                            by : cli.me(), 
+                            response : cli.postdata.data.response, 
+                            at : new Date().getTime()
+                        }
                     }
                 }, () => {
                     cli.sendJSON({delicious : true, userid : cli.userinfo.userid, cakepop : cli.postdata.data.id});
@@ -124,7 +142,8 @@ class Cakepop {
                     cakepop : dbobj
                 });
             }, {
-                content : 1, stylesheet : 1, html : 1, expiry : 1
+                content : 1, stylesheet : 1, html : 1, expiry : 1,
+                nocontainer : 1, mendatory : 1, auto : 1, responses : 1
             });
         } else if (action == "single") {
             let id = db.mongoID(levels[1]);
@@ -152,10 +171,12 @@ class Cakepop {
                 cur.sort({_id : -1}).limit(limit).project({
                     title : 1,
                     expiry : 1,
-                    status : 1
+                    status : 1,
+                    read : 1
                 }).toArray((err, arr) => {
                     arr.forEach(x => {
                         x.expired = x.expiry < t;
+                        x.read = x.read && x.read.length || 0;
                     });
                     sendback({
                         items: arr
@@ -179,8 +200,14 @@ class Cakepop {
         })
         .add('title', 'text', { displayname : "Title" })
         .add('content', 'ckeditor', {nolabel : true, classes : ["no-style"]})
+        .add('app-sep', 'title', {
+            displayname : "Appearance"
+        })
         .add('stylesheet', 'textarea', {displayname : "Custom CSS", rows : 10})
         .add('nocontainer', 'checkbox', {displayname : "Do not use the default container"})
+        .add('int-sep', 'title', {
+            displayname : "Interactions"
+        })
         .add('responses', 'stack', {
             displayname : "Responses",
             scheme : {
@@ -191,14 +218,16 @@ class Cakepop {
                 ]
             }
         })
+        .add('mendatory', 'checkbox', {displayname : "The cakepop cannot be dismissed without a response"})
+        .add('auto', 'checkbox', {displayname : "Automatically popup on next request (can be annoying)"})
+        .add('status-sep', 'title', {
+            displayname : "Status"
+        })
         .add('expiry', 'date', {
             displayname : "Expiry",
             datetime : true, 
             context : 'edit',
             classes : ["lml-date"]
-        })
-        .add('publish-sep', 'title', {
-            displayname : "Actions"
         })
         .add('status', 'select', {
             datasource: [

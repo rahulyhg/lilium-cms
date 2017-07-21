@@ -76,5 +76,51 @@
     transform: translate3d(0px,-1px,0);
 }
 
+#cakepop-content h1, 
+#cakepop-content h2, 
+#cakepop-content h3, 
+#cakepop-content p {
+    margin: 5px 15px;
+}
+
+#cakepop-content h2 {
+    font-weight: 300;
+    font-size: 24px;
+    margin: 10px 15px 20px 15px;
+}
+
+#cakepop-content p {
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: 0.42px;
+    margin-bottom: 15px;
+}
+
+#cakepop-content img {
+    width: calc(100% + 30px);
+    height: auto;
+    margin: -5px -15px 0px;
+}
+
+#cakepop-actions {
+    padding: 30px 10px 10px;
+    border-top: 1px solid #ddd;
+    background: #f9f9f9;
+    text-align: center;
+}
+
+button.cakepop-action {
+    display: inline-block;
+    background-color: transparent;
+    border: none;
+    margin-right: 20px;
+    color: #000;
+    font-weight: 500;
+    font-size: 18px;
+    padding: 0px;
+    text-transform: none;
+}
+
+
 </style>
 

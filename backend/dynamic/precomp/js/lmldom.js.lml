@@ -728,6 +728,8 @@ var LMLDom = function() {
                     ff.values[ff.form[i].name] = CKEDITOR.instances[ff.form[i].name].getData();
                 } else if (ff.form[i].type == "checkbox") {
                     ff.values[ff.form[i].name] = ff.form[i].checked;
+                } else if (ff.form[i].classList.contains("lml-date")) {
+                    ff.values[ff.form[i].name] = liliumcms.lmldom.flatpickr[ff.form[i].name].latestSelectedDateObj.getTime()
                 } else {
                     ff.values[ff.form[i].name] = ff.form[i].value;
                 }

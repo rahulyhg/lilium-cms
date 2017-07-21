@@ -538,7 +538,7 @@ select {
 	width: 100%;
     box-sizing: border-box;
 	border: 1px solid transparent;
-    border-left: 3px solid #ccc;
+    border-left: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
 }
@@ -915,7 +915,7 @@ input[type="submit"].blue:active, .btn.blue:active, button.blue:active {
 .lmlform input:focus, .lmlform select:focus,
 .lmlform textarea:focus {
 	border: 1px solid {=actioncolor};
-	border-left: 3px solid {=actioncolor};
+	border-left: 1px solid {=actioncolor};
 }
 
 .lmlform .lmlform-fieldwrapper-title {

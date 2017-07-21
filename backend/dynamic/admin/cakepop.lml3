@@ -20,10 +20,19 @@ const style = `<style>
     border: 2px solid #EEE;
 }
 
+.cakepop-strip-wrapper:hover {
+    background: #FDFDFD;
+}
+
+.cakepop-strip-wrapper a:hover {
+    text-decoration: none;
+}
+
 .cakepop-strip h4 {
     font-size: 16px;
     color: #333;
     font-weight: normal;
+    margin-bottom: 10px;
 }
 
 .cakepop-strip a {
@@ -60,7 +69,10 @@ const preload = (context, done) => {
                             <lml-text var="ckp.title" tag="h4" ></lml-text>
                         </h4>
                         <div>
-                            Expires on : <b><lml-text var="ckp.expiry" date="dd/mm/yyyy HH:MM"></lml-text></b>
+                            Running until <b><lml-text var="ckp.expiry" date="dd/mm/yyyy HH:MM"></lml-text></b>
+                        </div>
+                        <div>
+                            Read reports : <b><lml-text var="ckp.read"></lml-text></b>
                         </div>
                     </lml-link>
                 </div>
@@ -93,9 +105,11 @@ const preload = (context, done) => {
         window.ckp_now = new Date().getTime();
         window.ckp_status_icon = function(ldContext) {
             var elem = document.createElement('i');
-            if (ldContext.ckp.expiry > window.ckp_now) {
+            if (ldContext.ckp.status == "creation") {
+                elem.className = "fa fa-pencil-square";
+            } else if (ldContext.ckp.expiry > window.ckp_now) {
                 elem.className = "fa fa-circle-o-notch fa-spin fa-fw"
-            } else {
+            } else if (ldContext.ckp.status == "live") {
                 elem.className = "fa fa-calendar-check-o";
             }
 

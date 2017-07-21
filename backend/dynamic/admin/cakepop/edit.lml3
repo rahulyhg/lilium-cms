@@ -5,32 +5,41 @@ const settings = {
 };
 
 const preload = (context, done) => {
+    context.scripts = `<script>
+        document.querySelector('.btn-preview').addEventListener('click', function() {
+            var filler = liliumcms.lmldom.getFormData().cakepop_edit.values;
+            filler.preview = true;
+
+            liliumcms.cakepop.fill(filler);
+            liliumcms.cakepop.cast();
+        });
+
+        document.querySelector('.btn-save').addEventListener('click', function() {
+            var dat = liliumcms.lmldom.getFormData().cakepop_edit.values;
+            liliumcms.lmldom.post(dat, '${context._c.server.url}/admin/cakepop/save/' + liliumcms.pageloader.lastLevel, function(resp) {
+                liliumcms.notify(resp || {
+                    type : "danger",
+                    title : "Could not save Cakepop"
+                });
+            });
+        });
+    </script>`;
+
+    context.bottomSection = `<div id="cakepop-report">
+        
+    </div>`;
+
     done();
 };
 
-const scripts = `<script>
-    document.querySelector('.btn-preview').addEventListener('click', function() {
-        var dat = liliumcms.lmldom.getFormData().cakepop_edit.values;
-        var ctn = dat.content;
-        var filler = {};
-
-        if (dat.nocontainer) {
-            filler.html = ctn;
-        } else {
-            filler.content = ctn;
-        }
-
-        filler.stylesheet = dat.stylesheet;
-
-        liliumcms.cakepop.fill(filler);
-        liliumcms.cakepop.cast();
-    });
-</script>`;
-
 
 const compile = (o, context) => {
-    o(context.header, context.libs.formbuilder.render("cakepop_edit", "edit", "cakepop/single/?"), scripts);
-
+    o(
+        context.header, 
+        context.libs.formbuilder.render("cakepop_edit", "edit", "cakepop/single/?"), 
+        context.scripts,
+        context.bottomSection
+    );
 } 
 
 module.exports = { settings, preload, compile };
