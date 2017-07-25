@@ -14,19 +14,6 @@
             </a>
         </div>
 
-        {$ if (theme.settings.othernetworkwebsites.length > 0); $}
-        <div class="city-selector-wrapper">
-            <a href="" class="city-selector-dropper"><span>{=?theme.settings.cityname}</span></a>
-            <ul class="city-selector">
-                {$ for (city in ?theme.settings.othernetworkwebsites); $}
-                <li>
-                    <a href="{=city.url}">{=city.sitename}</a>
-                </li>
-                {$ endfor; $}
-            </ul>
-        </div>
-        {$ endif; $}
-
         {$ for (link in ?theme.settings.headerlinks) $}
         <div class="header-link">
             <a href="{=link.url}">{=link.linktext}</a>

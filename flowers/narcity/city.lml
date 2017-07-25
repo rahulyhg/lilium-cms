@@ -23,9 +23,25 @@
             <div class="city-banner-text">
                 <span>{=?extra.topic.displayname}</span>
             </div>
+
+            <div class="city-banner-links">
+                {$ for (link in ?theme.settings.bannerlinks) $}
+                    <a href="{=link.url}">{=link.linktext}</a>
+                {$ endfor $}
+            </div>
         </div>
     </div>
+    <script>
+        var ba = document.querySelectorAll('.city-banner-links a');
+        for (var i = 0; i < ba.length; i++) {
+            var h = ba[i].href;
+            if (document.location.href.indexOf(h) != -1) {
+                ba[i].className = "current";
+            }
+        }
+    </script>
     {$ endif; $}
+
     <div class="fwblock latest-content-wrapper">
         <h4 class="article-section-title">
             <a href="{=config.default.server.url}/{=extra.topic.completeSlug}/2">

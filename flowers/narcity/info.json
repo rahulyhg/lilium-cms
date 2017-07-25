@@ -77,6 +77,7 @@
             "type" : "select",
             "attr" : {
                 "datasource" : [
+                    { "displayName" : " - Default parent's alignment - ", "name" : "" },
                     { "displayName" : "Center", "name" : "center center" },
                     { "displayName" : "Center, bottom", "name" : "center bottom" },
                     { "displayName" : "Center, top", "name" : "center top" }

@@ -592,6 +592,9 @@ var renderTopicArchive = function(_c, topic, index, done) {
         };
 
         if (topic.override && topic.override.archivebanner) {
+            topic.override.bannerlinks = topic.override.headerlinks;
+            topic.override.headerlinks = [];
+
             db.findUnique(_c, 'uploads', {_id : db.mongoID(topic.override.archivebanner)}, function(err, img) {
                 if (img) {
                     topic.override.hasbanner = true;

@@ -359,7 +359,7 @@ class LMLTopics {
                     done();
                 } else {
                     tobj.hash = topicLib.hashtopic(tobj._id.toString());
-                    parents.push(tobj);
+                    parents.unshift(tobj);
                     if (tobj.parent) {
                         conds = {_id : tobj.parent};
                         getParents(done);
@@ -372,22 +372,21 @@ class LMLTopics {
 
         // Get arbo, then merge settings from children to parent
         getParents(() => {
-            let finalTopic = {};
+            let finalTopic = {override : {}};
             for (let i = 0; i < parents.length; i++) {
                 let curt = parents[i];
                 for (let k in curt) {
                     if (k == "override") {
-                        finalTopic.override = finalTopic.override || {};
-                        for (let ok in curt.override) {
+                        for (let ok in curt.override) if (curt.override[ok]) { 
                             finalTopic.override[ok] = curt.override[ok];
                         }
-                    } else if (!finalTopic[k]) {
+                    } else {
                         finalTopic[k] = curt[k];
                     }
                 }
             }
 
-            send(finalTopic, parents);
+            send(finalTopic, parents.reverse());
         });
     }
 

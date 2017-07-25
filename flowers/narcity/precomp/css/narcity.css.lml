@@ -1667,6 +1667,7 @@ article #article-content .bottom-promotion-link a {
 /* Archive banners */
 .city-banner {
     height: 300px;
+    background-size: cover;
 }
 
 .city-banner-text {
@@ -1681,6 +1682,29 @@ article #article-content .bottom-promotion-link a {
     font-size: 52px;
     font-family: "Oswald";
     text-transform: uppercase;
+}
+
+.city-banner-links {
+    text-align: center;
+    margin: 20px auto;
+
+    background: #FFF;
+    width: {=fw};
+}
+
+.city-banner-links a {
+    display: inline-block;
+    vertical-align: middle;
+    color: #000;
+    font-family: "Oswald", sans-serif;
+    font-size: 32px;
+    text-transform: uppercase;
+    margin: 5px 15px;
+    text-decoration: none;
+}
+
+.city-banner-links a.current {
+    color: {=mc};
 }
 
 /* Footer */

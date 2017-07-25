@@ -17,10 +17,38 @@ $}
 </script>
 
 {$ if (extra.archivename != "author"); $}
+    {$ if (?theme.settings.hasbanner ??) $}
+    <div class="city-banner-wrapper">
+        <div class="city-banner" style="
+            background-position: {=theme.settings.archivebanneralign}; 
+            background-image: url('{=theme.settings.archivebannerurl}');
+        ">
+            <div class="city-banner-text">
+                <span>{=?extra.topic.displayname}</span>
+            </div>
+
+            <div class="city-banner-links">
+                {$ for (link in ?theme.settings.bannerlinks) $}
+                    <a href="{=link.url}">{=link.linktext}</a>
+                {$ endfor $}
+            </div>
+        </div>
+    </div>
+    <script>
+        var ba = document.querySelectorAll('.city-banner-links a');
+        for (var i = 0; i < ba.length; i++) {
+            var h = ba[i].href;
+            if (document.location.href.indexOf(h) != -1) {
+                ba[i].className = "current";
+            }
+        }
+    </script>
+    {$ else; $}
     <div class="subtitle-strip">
         <span class="subtitle-detail">{=&tagname}</span>
         <span class="subtitle-headline">{:posts-archive}</span>
     </div>
+    {$ endif; $}
 {$ else; $}
     <div class="subtitle-strip">
         <div class="ryksponsive">
