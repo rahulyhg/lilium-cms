@@ -24,11 +24,13 @@
                 <span>{=?extra.topic.displayname}</span>
             </div>
 
+            {$ if (?theme.settings.bannerlinks.length != 0) $}
             <div class="city-banner-links">
                 {$ for (link in ?theme.settings.bannerlinks) $}
                     <a href="{=link.url}">{=link.linktext}</a>
                 {$ endfor $}
             </div>
+            {$ endif $}
         </div>
     </div>
     <script>
@@ -40,7 +42,7 @@
             }
         }
     </script>
-    {$ endif; $}
+    {$ endif $}
 
     <div class="fwblock latest-content-wrapper">
         <h4 class="article-section-title">

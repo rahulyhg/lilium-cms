@@ -61,11 +61,11 @@ var Handler = function () {
                        });
                        // File upload
                        busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-                           if (parseInt(cli.request.headers['content-length']) > parseInt(cli._c.server.fileMaxSize)) {
+                           if (!cli.hasRight('editor') && parseInt(cli.request.headers['content-length']) > parseInt(cli._c.server.fileMaxSize)) {
                                file.resume();
                                hasFile = false;
                                finishedCalled = true;
-                               return cli.throwHTTP(413, 'File is too large');
+                               return cli.throwHTTP(413, 'File is too large', true);
 
                            } else {
                                if (mimeTypeIsSupported(mimetype, cli)) {

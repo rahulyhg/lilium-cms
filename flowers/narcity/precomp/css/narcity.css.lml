@@ -2469,7 +2469,31 @@ body.slidheader .android-sharer {
         overflow: hidden;
     }
 
-    
+    .city-banner-text {
+        padding-top: 40px;
+    }
+
+    .city-banner {
+        margin: 0px -10px 20px;
+        height: auto;
+        padding-bottom: 20px;
+    }
+
+    .city-banner-links {
+        width: auto;   
+        height: auto;
+        margin-bottom: 20px;
+        padding: 6px;
+    }
+
+    .city-banner-links a {
+        width: auto;
+        display: block;
+        
+        font-size: 24px;
+        margin: 6px 0px;
+    }
+
     /* Instagram IFrame */
     .instagram-media {
         margin: 0px 20px !important;
