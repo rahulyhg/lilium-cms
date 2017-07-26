@@ -573,7 +573,7 @@ var renderTopicArchive = function(_c, topic, index, done) {
             index : index || 1,
             searchname : topic.displayname,
             context : 'topic',
-            language : topic.language,
+            language : topic.override.language,
             indices : {
                 totalarticles : details.totalLength,
                 totalpages : details.totalPages,

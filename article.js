@@ -1706,8 +1706,8 @@ var Article = function() {
                 extra.article = deepArticle;
                 extra.topic = deepArticle.topic;
 
-                if (deepArticle.topic && deepArticle.topic.language) {
-                    extra.language = deepArticle.topic.language;
+                if (deepArticle.topic && deepArticle.topic.override && deepArticle.topic.override.language) {
+                    extra.language = deepArticle.topic.override.language;
                 }
 
                 hooks.fire('article_will_render', {
