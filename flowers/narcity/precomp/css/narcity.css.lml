@@ -1668,6 +1668,7 @@ article #article-content .bottom-promotion-link a {
 .city-banner {
     height: 300px;
     background-size: cover;
+    position:relative;
 }
 
 .city-banner-text {
@@ -1705,6 +1706,25 @@ article #article-content .bottom-promotion-link a {
 
 .city-banner-links a.current {
     color: {=mc};
+}
+
+.city-banner-credit-wrapper {
+    text-align: right;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #BBB;
+    background-color: rgba(0, 0, 0, 0.5);
+
+    position: absolute;
+    bottom: 0;
+    right:0;
+
+    padding: 2px 5px;
+}
+
+a.city-banner-credit {
+    color: #DDD;
+    font-weight: bold;
 }
 
 /* Footer */

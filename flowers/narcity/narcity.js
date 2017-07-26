@@ -599,6 +599,8 @@ var renderTopicArchive = function(_c, topic, index, done) {
                 if (img) {
                     topic.override.hasbanner = true;
                     topic.override.archivebannerurl = _c.server.url + "/uploads/" + img.url;
+                    topic.override.artistname = img.artistname;
+                    topic.override.artisturl = img.artisturl;
                 }
 
                 rend();

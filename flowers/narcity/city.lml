@@ -31,6 +31,12 @@
                 {$ endfor $}
             </div>
             {$ endif $}
+
+            {$ if (?theme.settings.artisturl) $}
+            <div class="city-banner-credit-wrapper">
+                {:banner-by} <a href="{=theme.settings.artisturl}" class="city-banner-credit" target="_blank"> {=theme.settings.artistname}</a>
+            </div>
+            {$ endif $}
         </div>
     </div>
     <script>
