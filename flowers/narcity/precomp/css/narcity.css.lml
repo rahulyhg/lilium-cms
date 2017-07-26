@@ -1689,7 +1689,6 @@ article #article-content .bottom-promotion-link a {
     text-align: center;
     margin: 20px auto;
 
-    background: #FFF;
     width: {=fw};
 }
 
@@ -1701,11 +1700,13 @@ article #article-content .bottom-promotion-link a {
     display: inline-block;
     vertical-align: middle;
     color: #000;
-    font-family: "Oswald", sans-serif;
+    font-family: "Oswald",sans-serif;
     font-size: 32px;
     text-transform: uppercase;
-    margin: 5px 15px;
+    margin: 5px 12px;
     text-decoration: none;
+    background: #FFF;
+    padding: 0px 10px;
 }
 
 .city-banner-links a.current {
@@ -2512,10 +2513,13 @@ body.slidheader .android-sharer {
 
     .city-banner-links a {
         width: auto;
-        display: block;
-        
+   
         font-size: 24px;
-        margin: 6px 0px;
+        margin: 4px 2px;
+    }
+
+    .city-banner-text span {
+        font-size: 34px;
     }
 
     /* Instagram IFrame */
