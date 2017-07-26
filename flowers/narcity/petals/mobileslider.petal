@@ -3,11 +3,7 @@
 <div id="mobileslider">
 
 {$
-    if (?extra.contextname == "home");
-        sidebarlinks = ?theme.settings.sidebarbrowselinks;
-    else;
-        sidebarlinks = ?theme.settings.headerlinks;
-    endif;
+    sidebarlinks = ?theme.settings.sidebarbrowselinks;
 $}
 
 <div class="menuslider-container" style="padding-top: 15px;">
@@ -19,13 +15,21 @@ $}
     </fom>    
 
     <div>
-        <h3>{:browse}</h3>
-        {$ for (secti in sidebarlinks); $}
+        <h3>{:cities}</h3>
+        {$ for (secti in ?theme.settings.sidebarcitieslinks); $}
+            <a href="{=secti.url}" class="section-link" >{=secti.linktext}</a>
+        {$ endfor; $}
+    </div>
+
+    <div>
+        <h3>{:explore}</h3>
+        {$ for (secti in ?theme.settings.sidebarbrowselinks); $}
             <a href="{=secti.url}" class="section-link" >{=secti.linktext}</a>
         {$ endfor; $}
     </div>
 
     <hr />
+
 
     <div class="slider-follow">
         <h3>{:follow}</h3>

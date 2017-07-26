@@ -129,7 +129,29 @@
                 "url": "//"
             }]
         },
-        "sidebarbrowselinks" : {"type" : "stack",
+         "sidebarcitieslinks" : {"type" : "stack",
+            "attr" : {"displayname" : "Sidebar cities links",
+                "scheme": {
+                    "columns": [
+                        {
+                            "fieldName": "linktext",
+                            "dataType": "text",
+                            "displayname": "Link Text"
+                        }, {
+                            "fieldName": "url",
+                            "dataType": "text",
+                            "displayname": "Url"
+                        }
+                    ]
+                }
+            },
+            "default": [{
+                "linktext": "",
+                "url": "//"
+            }]
+        },
+
+       "sidebarbrowselinks" : {"type" : "stack",
             "attr" : {"displayname" : "Sidebar browse links",
                 "scheme": {
                     "columns": [
