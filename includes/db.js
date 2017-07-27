@@ -389,14 +389,10 @@ var DB = function() {
 
 	// Will callback cb with a boolean representing the existance of a document
 	this.match = this.exists = function(conf, coln, conds, cb) {
-		this.find(conf, coln, conds, {limit:[1]}, function(err, r) {
-				if (err) {
-				cb(false);
-			} else {
-				r.hasNext(function(err, res) {
-					cb(err ? false : res);
-				});
-			};
+        _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+            col.find(conds).limit(1).hasNext(function(err, hasnext) {
+                cb(hasnext);
+            });
 		});
 	};
 
