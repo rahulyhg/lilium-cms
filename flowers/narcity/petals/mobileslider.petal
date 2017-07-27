@@ -2,10 +2,6 @@
 <div id="mcanvasoverlay"></div>
 <div id="mobileslider">
 
-{$
-    sidebarlinks = ?theme.settings.sidebarbrowselinks;
-$}
-
 <div class="menuslider-container" style="padding-top: 15px;">
     <!--button>
         Login
@@ -14,12 +10,14 @@ $}
         <input id="mobile-search-input" name="q" placeholder="{:search}" />
     </fom>    
 
+    {$ if (?theme.settings.sidebarcitieslinks ??) $}
     <div>
         <h3>{:cities}</h3>
-        {$ for (secti in ?theme.settings.sidebarcitieslinks); $}
-            <a href="{=secti.url}" class="section-link" >{=secti.linktext}</a>
+        {$ for (secticity in ?theme.settings.sidebarcitieslinks); $}
+            <a href="{=secticity.url}" class="section-link" >{=secticity.linktext}</a>
         {$ endfor; $}
     </div>
+    {$ endif $}
 
     <div>
         <h3>{:explore}</h3>

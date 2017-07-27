@@ -10,13 +10,16 @@ var ContentDeliveryNetwork = function() {
         var scripts = dom.document.documentElement.querySelectorAll('script');
         var imgs = dom.document.body.querySelectorAll('img');
         var links = dom.document.head.querySelectorAll('link');
+        var cdnbackground = dom.document.body.querySelectorAll('.cdn');
 
         for (var i = 0; i < scripts.length; i++) if (scripts[i].src && !scripts[i].classList.contains("lilium")) {
             scripts[i].src = scripts[i].src.replace(domain, cdndomain);
+            scripts[i].classList.add("cdnized");
         }
 
         for (var i = 0; i < imgs.length; i++) if (imgs[i].src) {
             imgs[i].src = imgs[i].src.replace(domain, cdndomain);
+            imgs[i].classList.add("cdnized");
 
             var max = 10;
             var ctn = 0;
@@ -30,6 +33,13 @@ var ContentDeliveryNetwork = function() {
 
         for (var i = 0; i < links.length; i++) if (links[i].href && links[i].rel != "canonical" && links[i].rel != "amphtml") {
             links[i].href = links[i].href.replace(domain, cdndomain);
+            links[i].classList.add("cdnized");
+        }
+
+        for (var i = 0; i < cdnbackground.length; i++) {
+            cdnbackground[i].style.backgroundImage = cdnbackground[i].style.backgroundImage.toString().replace(domain, cdndomain);
+            cdnbackground[i].style.background = cdnbackground[i].style.background.toString().replace(domain, cdndomain);
+            cdnbackground[i].classList.add("cdnized");
         }
 
         if (ignoreHTML) {

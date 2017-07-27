@@ -19,7 +19,7 @@ $}
 {$ if (extra.archivename != "author"); $}
     {$ if (?theme.settings.hasbanner ??) $}
     <div class="city-banner-wrapper">
-        <div class="city-banner" style="
+        <div class="city-banner cdn" style="
             background-position: {=theme.settings.archivebanneralign}; 
             background-image: url('{=theme.settings.archivebannerurl}');
         ">
@@ -55,7 +55,7 @@ $}
             <div class="archive-author-strip">
                 {$ if (?details.avatarURL != ""); $}
                 <div class="archive-author-avatar-wrapper">
-                    <div class="archive-author-avatar" style="background-image: url('{=details.avatarURL}');" >
+                    <div class="archive-author-avatar cdn" style="background-image: url('{=details.avatarURL}');" >
                     </div>
                 </div>
                 {$ endif; $}
@@ -93,7 +93,7 @@ $}
     {$ for (article in extra.articles); $}
         <article class="archive-article">
             <div class="artpad">
-                <div class="archive-article-thumb" style="background-image: url('{=article.imgsrc}')">
+                <div class="archive-article-thumb cdn" style="background-image: url('{=article.imgsrc}')">
                     {$ if (?article.isSponsored ??); $}
                     <a class="sponsored-mention sponsored-mention-archive" href="https://www.narcitymedia.com" target="_blank">
                         Sponsored Content
