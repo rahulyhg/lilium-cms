@@ -2,6 +2,7 @@ var url = require('url');
 var pathlib = require('path');
 var session = require('./session.js');
 var _c = require('./config.js');
+var clerk = require('./clerk.js');
 
 var Router = function () {
     this.parseClientObject = function (cli, cb) {
@@ -36,6 +37,7 @@ var Router = function () {
         cli.routeinfo.params = pObj.query;
         cli.routeinfo.admin = cli.routeinfo.path[0] === cli._c.paths.admin;
         cli.routeinfo.login = cli.routeinfo.path[0] === cli._c.paths.login;
+        cli.routeinfo.front = cli.routeinfo.path[0] === "_";
         cli.routeinfo.api = cli.routeinfo.path[0] === "api";
         cli.routeinfo.livevars = cli.routeinfo.path[0] === cli._c.paths.livevars;
         cli.routeinfo.root = cli.routeinfo.relsitepath.relsitepath == "/";
@@ -45,8 +47,10 @@ var Router = function () {
 
         cli.response.setHeader("Backend", "Lilium");
 
-        if (!cli.routeinfo.isStatic) {
+        if (!cli.routeinfo.isStatic && !cli.routeinfo.front) {
             session.injectSessionInCli(cli, cb);
+        } else if (cli.routeinfo.front) {
+            clerk.greet(cli, cb);
         } else {
             cb(false);
         };

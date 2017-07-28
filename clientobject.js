@@ -19,6 +19,7 @@ var ClientObject = function (req, resp) {
         admin: false,
         login: false,
         livevars: false,
+        front : false,
         root: false,
         isStatic: false,
         params: [],

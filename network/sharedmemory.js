@@ -5,7 +5,8 @@ const net = require('net');
 const mem = {
     cache : {},
     sockets : {},
-    sessions : {}
+    sessions : {},
+    clerk : {}
 }
 
 const dumpCache = () => {
@@ -74,10 +75,6 @@ const getCache = (keys) => {
 }
 
 class SharedMemory {
-    constructor() {
-
-    }
-
     onConnect(connection) {
         let json = "";
         connection.on('data', (ck) => {
@@ -88,7 +85,19 @@ class SharedMemory {
                     let object = JSON.parse(json.substring(0, json.length -1));
                     let resp = "";
 
-                    if (object.session) {
+                    if (object.clerk) {
+                        let key = object.clerk.key;
+
+                        if (object.clerk.action == "get") {
+                            resp = JSON.stringify({session : mem.clerk[key]});
+                        } else if (object.clerk.action == "set") {
+                            mem.clerk[key] = object.clerk.payload;
+                            resp = '{"set" : true}';
+                        } else if (object.clerk.action == "unset") {
+                            resp = JSON.stringify({session : mem.clerk[key]});
+                            delete mem.clerk[key];
+                        }
+                    } else if (object.session) {
                         let token = object.session.token;
 
                         if (object.session.state == "add") {

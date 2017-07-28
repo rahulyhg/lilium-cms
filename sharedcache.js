@@ -12,6 +12,10 @@ const getUDS = () => {
 
 class SharedCache {
     livevar(cli, levels, params, send) {
+        if (!cli.hasRight('admin')) {
+            return send([]);
+        }
+
         switch (levels[0]) {
             case "dump":
                 let sock = getUDS();
@@ -124,6 +128,22 @@ class SharedCache {
                 session : session, 
                 state : state
             }
+        }) + "\0");
+    }
+
+    clerk(key, action, payload, send) {
+        const sock = getUDS();
+        let response = "";
+        sock.on('data', (c) => {
+            response += c;
+        });
+
+        sock.on('end', () => {
+            send && send(response && JSON.parse(response));
+        });
+
+        sock.write(JSON.stringify({
+            clerk : { key, action, payload }
         }) + "\0");
     }
 

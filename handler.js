@@ -180,7 +180,7 @@ var Handler = function () {
 
     var OPTIONS = function(cli) {
         var headers = {
-            "Access-Control-Allow-Origin" : cli.request.headers.corsorigin || cli.request.headers.origin,
+            "Access-Control-Allow-Origin" : cli.request.headers.corsorigin || cli.request.headers.origin || cli._c.server.url,
             "Access-Control-Allow-Methods" : "GET, POST, OPTIONS"
         };
 
@@ -211,7 +211,7 @@ var Handler = function () {
         }
     };
 
-    var clients = new Object();
+    var clients = {};
     var totalRequests = 0;
 
     this.crash = function(err) {
@@ -247,11 +247,7 @@ var Handler = function () {
         clients[cli.id] = cli;
         cli.bindEnd(handleEnd);
 
-        if (false && cli.request.url[cli.request.url.length - 1] == "/") {
-            cli.redirect(cli.request.url.slice(0, -1), true);
-        } else {
-            parseMethod(cli);
-        }
+        parseMethod(cli);
     };
 
     var init = function () {

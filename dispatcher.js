@@ -6,12 +6,15 @@ var log = require('./log.js');
 var entities = require('./entities.js');
 var api = require('./api.js');
 var rewriter = require('./rewriter.js');
+var clerk = require('./clerk.js');
 
 var Dispatcher = function () {
     this.dispatch = function (cli) {
         cli.touch('dispatcher.dispatch');
         if (cli.routeinfo.isStatic) {
             HTMLServer.serveStatic(cli);
+        } else if (cli.routeinfo.front) {
+            clerk.serve(cli);
         } else if (cli.routeinfo.admin) {
             if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
                 Admin.serveDashboard(cli);
