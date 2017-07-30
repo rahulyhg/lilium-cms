@@ -120,7 +120,7 @@ var Forms = function () {
                 displayname : "Website access"
             })
             .add('reportsto', 'livevar', { 
-                endpoint : "entities.simple",
+                endpoint : "entities.simple.active",
                 tag: 'select',
                 template : 'option',
                 title : 'reportsto',
