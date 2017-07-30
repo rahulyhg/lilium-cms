@@ -448,7 +448,7 @@ var Article = function() {
                     db.findToArray(require('./config.js').default(), 'entities', {_id : {$in : contractor.reportsto || []}}, function(err, reportees)  {
                         for (var i = 0; i < reportees.length; i++) {
                             require('./mail.js').triggerHook(cli._c, 'article_sent_for_review', reportees[i].email, {
-                                to : repotrees[i],
+                                to : reportees[i],
                                 article : article,
                                 contractor : contractor
                             });
