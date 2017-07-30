@@ -442,13 +442,13 @@ var Article = function() {
                     cli.sendJSON({changed : true});
                 });
 
-                db.findToArray(require('./config.js').default(), 'entities', {roles : "production"}, function(err, produser)  {
-                    db.findUnique(require('./config.js').default(), 'entities', 
-                        {_id : db.mongoID(cli.userinfo.userid)}, 
-                        function(err, contractor) {
-                        for (var i = 0; i < produser.length; i++) {
-                            require('./mail.js').triggerHook(cli._c, 'article_sent_for_review', produser[i].email, {
-                                to : produser[i],
+                db.findUnique(require('./config.js').default(), 'entities', 
+                    {_id : db.mongoID(cli.userinfo.userid)}, 
+                    function(err, contractor) {
+                    db.findToArray(require('./config.js').default(), 'entities', {_id : {$in : contractor.reportsto || []}}, function(err, reportees)  {
+                        for (var i = 0; i < reportees.length; i++) {
+                            require('./mail.js').triggerHook(cli._c, 'article_sent_for_review', reportees[i].email, {
+                                to : reportees[i],
                                 article : article,
                                 contractor : contractor
                             });
