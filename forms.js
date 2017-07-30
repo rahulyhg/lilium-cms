@@ -119,17 +119,21 @@ var Forms = function () {
                 },
                 displayname : "Website access"
             })
-            /*
-            .add('reportsto', 'liveselect', { 
+            .add('reportsto', 'livevar', { 
                 endpoint : "entities.simple",
-                displayname : "Reports to",
-                select : {
-                    value : "_id",
-                    displayname : "displayname",
-                    readkey : "0.reportsto"
-                }
+                tag: 'select',
+                template : 'option',
+                title : 'reportsto',
+                attr : {
+                    lmlselect : true
+                },
+                props : {
+                    value : '_id',
+                    html : 'displayname',
+                    header : 'This entity reports to'
+                },
+                displayname : "Reports to"
             })
-            */
  
 
         formBuilder.registerFormTemplate('category')
