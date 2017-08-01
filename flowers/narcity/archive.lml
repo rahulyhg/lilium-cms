@@ -49,7 +49,9 @@ $}
         <span class="subtitle-headline">{:posts-archive}</span>
     </div>
     {$ endif; $}
-{$ else; $}
+{$ endif; $}
+
+{$ if (extra.archivename == "author"); $}
     <div class="subtitle-strip">
         <div class="ryksponsive">
             <div class="archive-author-strip">
