@@ -7,6 +7,7 @@ const fileserver = require('./fileserver.js');
 const filelogic = require('./filelogic.js');
 const livevars = require('./livevars.js');
 const themes = require('./themes.js');
+const networkinfo = require('./network/info.js');
 
 class StyledPages {
     constructor() {
@@ -14,7 +15,7 @@ class StyledPages {
     }
 
     generateFileName(conf, page) {
-        let landingPath = conf.server.html + "/" + page.slug + (page.status == "magiclink" ? page.magiclink : "") + ".html";
+        let landingPath = conf.server.html + "/" + page.slug + (page.status == "magiclink" ? page.magiclink : "") + (page.staticfile ? "" : ".html");
         return landingPath;
     }
 
@@ -25,7 +26,11 @@ class StyledPages {
             page : page
         };
 
-        filelogic.renderThemeLML(conf, 'styledpage', landingPath, extra, done, page.skiplayout);
+        if (page.skiplayout) {
+            fileserver.dumpToFile(landingPath, page.content, done, 'utf8');
+        } else {
+            filelogic.renderThemeLML(conf, 'styledpage', landingPath, extra, done);
+        }
     }
 
     sendPage(cli, page) {
@@ -112,6 +117,9 @@ class StyledPages {
         .add('skiplayout', 'checkbox', {
             displayname : "Do not use theme layout"
         })
+        .add('staticfile', 'checkbox', {
+            displayname : "Save as static file"
+        })
         .add('title-action', 'title', {
             displayname: "Actions"
         })
@@ -184,8 +192,15 @@ class StyledPages {
             if (err || !page) { return done(err); }
 
             var cachedFile = that.generateFileName(conf, page);
-            fileserver.deleteFile(cachedFile, () => {});
-            db.update(conf, 'styledpages', {_id : db.mongoID(pageID)}, newData, done);
+            fileserver.deleteFile(cachedFile, () => {
+                db.update(conf, 'styledpages', {_id : db.mongoID(pageID)}, newData, () => {
+                    db.findUnique(conf, 'styledpages', {_id : db.mongoID(pageID)}, (err, newpage) => {
+                        this.generatePage(conf, newpage, () => {
+                            done && done(undefined, true);
+                        });
+                    });
+                });
+            });
         });
     }
 
@@ -266,6 +281,16 @@ class StyledPages {
             case 'table': that.sendTable(cli, levels, params, send); break;
             case 'get'  : that.getSingle(cli._c, levels[1], send); break;
             default: send([]);
+        }
+    }
+
+    setup() {
+        if (networkinfo.isElderChild()) {
+            require("./config.js").eachSync((site) => {
+                db.findToArray(site, 'styledpages', {staticfile : true}, (err, arr) => {
+                    arr.forEach(p => this.generatePage(site, p, () => {}));
+                });
+            });
         }
     }
 };

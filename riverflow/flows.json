@@ -159,7 +159,7 @@
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
-            "support" : ["admin_get", "admin_post", "form", "table", "livevar"]
+            "support" : ["admin_get", "admin_post", "form", "table", "livevar", "setup"]
         }, {
             "module" : "docs.js",
             "endpoint" : "docs",
