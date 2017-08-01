@@ -1,28 +1,30 @@
-var AdminEndpoints = {
+const AdminEndpoints = {
 	GET : {},
 	POST : {}
 };
 
-var AdminMenus = [];
+const AdminMenus = [];
 
-var filelogic = require('../filelogic.js');
-var formBuilder = require('../formBuilder');
-var pluginHelper = require('../pluginHelper.js');
-var LML2 = require('../lml/compiler.js');
-var hooks = require('../hooks.js');
+const filelogic = require('../filelogic.js');
+const formBuilder = require('../formBuilder');
+const pluginHelper = require('../pluginHelper.js');
+const LML2 = require('../lml/compiler.js');
+const hooks = require('../hooks.js');
 
-var AdminMenu = function() {
-	this.id = "";
-	this.faicon = "";
-	this.displayname = "";
-	this.priority = -1;
-	this.rights = new Array();
-	this.absURL = "";
-	this.children = new Array();
+class AdminMenu {
+    constructor() {
+        this.id = "";
+        this.faicon = "";
+        this.displayname = "";
+        this.priority = -1;
+        this.rights = new Array();
+        this.absURL = "";
+        this.children = new Array();
+    }
 };
 
-var Admin = function() {
-	this.serveDashboard = function(cli) {
+class Admin {
+	serveDashboard (cli) {
 		cli.touch('admin.serverDashboard');
 
 		if (cli.routeinfo.path.length == 1) {
@@ -32,16 +34,16 @@ var Admin = function() {
 		}
 	};
 
-	this.handleGETDashboard = function(cli) {
+	handleGETDashboard (cli) {
 		filelogic.serveAdminLML(cli);
 	};
 
-	this.serveLogin = function(cli) {
+	serveLogin (cli) {
 		cli.touch('admin.serverLogin');
 		filelogic.runLogic(cli);
 	};
 
-    this.welcome = function(cli, method) {
+    welcome (cli, method) {
         if (method == 'GET') {
             LML2.compileToFile(cli._c.server.base + "/backend/dynamic/admin/welcome.lml",
                 cli._c.server.html + "/static/tmp/welcome.html",
@@ -68,7 +70,7 @@ var Admin = function() {
         }
     };
 
-	this.handleAdminEndpoint = function(cli) {
+	handleAdminEndpoint (cli) {
 		cli.touch('admin.handleAdminEndpoint');
     
         if (cli.method === "GET" && !cli.routeinfo.params.async && cli.routeinfo.path[1] != "welcome") {
@@ -81,11 +83,11 @@ var Admin = function() {
 		}
 	};
 
-	this.createAdminMenuTemplate = function() {
+	createAdminMenuTemplate () {
 		return new AdminMenu();
 	};
 
-	this.registerAdminMenu = function(adminmenu) {
+	registerAdminMenu (adminmenu) {
 		if (adminmenu.priority == -1) {
 			return new Error("Admin Menu Priority not set");
 		} else {
@@ -98,8 +100,8 @@ var Admin = function() {
 		}
 	};
 
-    this.registerAdminSubMenu = function(parentMenuId, adminmenu) {
-        for (var index in AdminMenus) {
+    registerAdminSubMenu (parentMenuId, adminmenu) {
+        for (let index in AdminMenus) {
             if (AdminMenus[index].id && AdminMenus[index].id == parentMenuId) {
                 if (adminmenu.priority == -1) {
                     return new Error("Admin Menu Priority not set");
@@ -115,42 +117,42 @@ var Admin = function() {
         }
     }
 
-	this.getAdminMenus = function() {
+	getAdminMenus () {
 		return AdminMenus;
 	};
 
-	this.executeEndpoint = function(cli) {
+	executeEndpoint (cli) {
 		cli.touch('admin.executeEndpoint');
         cli.did('request', 'admin', {'endpoint' : cli.routeinfo.fullpath});
 		AdminEndpoints[cli.method][cli.routeinfo.path[1]](cli);
 	};
 
-	this.adminEndpointRegistered = function(endpoint, method) {
+	adminEndpointRegistered (endpoint, method) {
 		return (typeof AdminEndpoints[method][endpoint] !== 'undefined');
 	};
 
-	this.registerLiveVar = function() {
-		var that = this;
+	registerLiveVar () {
+		let that = this;
 
 		require('../livevars.js').registerLiveVariable('adminmenus', function(cli, levels, params, callback) {
-            var sharedkey = "adminmenus_" + cli.userinfo.userid;
-            var sharedcache = require('../sharedcache.js');
+            const sharedkey = "adminmenus_" + cli.userinfo.userid;
+            const sharedcache = require('../sharedcache.js');
 
-            sharedcache.get(sharedkey, function(menus) {
-                if (menus) {
-                    return callback(menus);
+            sharedcache.get(sharedkey, function(cachedmenus) {
+                if (cachedmenus) {
+                    return callback(cachedmenus);
                 }
 
-                var sortedMenus = [];
-                var menus = that.getAdminMenus();
+                const sortedMenus = [];
+                const menus = that.getAdminMenus();
 
-                for (var index in menus) {
-                    var subMenu = [];
+                for (let index in menus) {
+                    let subMenu = [];
 
                     if (cli.hasRight(menus[index].rights)) {
-                        var submenus = [];
+                        let submenus = [];
 
-                        for (var subindex in menus[index].children) {
+                        for (let subindex in menus[index].children) {
 
                             if (menus[index].children[subindex] && cli.hasRight(menus[index].children[subindex].rights)) {
                                 subMenu.push(menus[index].children[subindex]);
@@ -171,7 +173,7 @@ var Admin = function() {
 		});
 	};
 
-	this.registerAdminEndpoint = function(endpoint, method, func) {
+	registerAdminEndpoint (endpoint, method, func) {
 		if (!this.adminEndpointRegistered(endpoint, method)) {
 			AdminEndpoints[method][endpoint] = func;
             AdminEndpoints[method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
@@ -180,30 +182,22 @@ var Admin = function() {
 		}
 	};
 
-    this.getEndpoints = function() {
+    getEndpoints () {
         return AdminEndpoints;
     };
 
-    var deletePluginEndpoints = function (identifier) {
-        for (var i in AdminEndpoints) {
-            for (var j in AdminEndpoints[i]) {
-                if (AdminEndpoints[i][j].pluginID == identifier) {
-                    AdminEndpoints[i][j] = undefined;
-                    delete AdminEndpoints[i][j];
+	init() {
+        hooks.bind('plugindisabled', 1, function(identifier) {
+            for (let i in AdminEndpoints) {
+                for (let j in AdminEndpoints[i]) {
+                    if (AdminEndpoints[i][j].pluginID == identifier) {
+                        AdminEndpoints[i][j] = undefined;
+                        delete AdminEndpoints[i][j];
+                    }
                 }
             }
-        }
-    };
-
-    var loadHooks = function () {
-        hooks.bind('plugindisabled', 1, function(identifier) {
-            // Check if plugin created endpoints
-            deletePluginEndpoints(identifier);
         });
-    };
 
-	this.init = function() {
-        loadHooks();
         return this;
 	};
 };

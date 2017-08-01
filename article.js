@@ -1,46 +1,59 @@
-var filelogic = require('./filelogic.js');
-var formBuilder = require('./formBuilder.js');
-var conf = require('./config.js');
-var db = require('./includes/db.js');
-var mongo = require('mongodb');
-var livevars = require('./livevars.js');
-var fs = require('./fileserver.js');
-var notifications = require('./notifications.js');
-var slugify = require('slug');
-var tableBuilder = require('./tableBuilder.js');
-var hooks = require('./hooks.js');
-var dates = require('./dates.js');
-var badges = require('./badges.js');
-var moment = require('moment');
-var log = require('./log.js');
-var feed = require('./feed.js');
-var CDN = require('./cdn.js');
+const filelogic = require('./filelogic.js');
+const formBuilder = require('./formBuilder.js');
+const conf = require('./config.js');
+const db = require('./includes/db.js');
+const mongo = require('mongodb');
+const livevars = require('./livevars.js');
+const fs = require('./fileserver.js');
+const notifications = require('./notifications.js');
+const slugify = require('slug');
+const tableBuilder = require('./tableBuilder.js');
+const hooks = require('./hooks.js');
+const dates = require('./dates.js');
+const badges = require('./badges.js');
+const moment = require('moment');
+const log = require('./log.js');
+const feed = require('./feed.js');
+const CDN = require('./cdn.js');
+const noop = require('./noop.js');
 
-var Article = function() {
-    var that = this;
+const publishedNotificationTitles = [
+    "You got this!",
+    "Allllright!",
+    "Look at you!",
+    "Gratz!",
+    "Yes, you did!",
+    "You're simply great!",
+    "Say whaaat!",
+    "Annnd it's live!",
+    "You're the real deal!",
+    "Guess what!",
+    "The MVP; that's you!",
+    "YASSSSS",
+    "💯🙌🎉",
+    "I drink to that!",
+    "Three cheers for this one!",
+    "Good news!",
+    "You. Are. Amazing.",
+    "Hooray!"
+];
 
-    var publishedNotificationTitles = [
-        "You got this!",
-        "Allllright!",
-        "Look at you!",
-        "Gratz!",
-        "Yes, you did!",
-        "You're simply great!",
-        "Say whaaat!",
-        "Annnd it's live!",
-        "You're the real deal!",
-        "Guess what!",
-        "The MVP; that's you!",
-        "YASSSSS",
-        "💯🙌🎉",
-        "I drink to that!",
-        "Three cheers for this one!",
-        "Good news!",
-        "You. Are. Amazing.",
-        "Hooray!"
-    ];
+const countOcc = (article, occ) => {
+    var content = article.content || article || "";
 
-    this.adminPOST = function(cli) {
+    var i = 0;
+    var count = -1;
+    do {
+        count++;
+        i = content.indexOf(occ, i) + 1;
+    } while (i != 0)
+
+    return count;
+};
+
+
+class Article {
+    adminPOST(cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
             case 'new':
@@ -88,7 +101,7 @@ var Article = function() {
         }
     };
 
-    this.adminGET = function(cli) {
+    adminGET(cli) {
         cli.touch('article.handleGET');
         if (!cli.hasRightOrRefuse("list-articles")) { return; }
 
@@ -132,11 +145,11 @@ var Article = function() {
         }
     };
 
-    this.toPresentables = function(_c, articles) {
+    toPresentables(_c, articles) {
         return articles.map(x => this.toPresentable(_c, x, true));
     };
 
-    this.toPresentable = function(_c, article, stripContent) {
+    toPresentable(_c, article, stripContent) {
         var featuredimages = {};
         if (article.featuredimage && article.featuredimage[0]) {
             for (var size in article.featuredimage[0].sizes) {
@@ -195,11 +208,11 @@ var Article = function() {
         };
     }
 
-    this.apiGET = function(cli) {
+    apiGET(cli) {
         var ftc = cli.routeinfo.path[2];
         if (ftc == "get") {
             var slug = cli.routeinfo.path[3];
-            that.deepFetch(cli._c, slug, function(article) {
+            that.deepFetch(cli._c, slug, (article)  => {
                 if (!article) {
                     cli.throwHTTP(404);
                 } else {
@@ -213,21 +226,21 @@ var Article = function() {
         }
     };
 
-    this.query = function(cli, opts, cb) {
+    query(cli, opts, cb) {
         db.paramQuery(cli, opts, cb);
     };
 
-    this.list = function(cli) {
+    list(cli) {
         filelogic.serveAdminLML(cli, false);
     };
 
-    this.infoStrip = function(cli) {
-        db.findToArray(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3])}, function(err, arr) {
+    infoStrip(cli) {
+        db.findToArray(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3])}, (err, arr)  => {
             if (arr.length != 0) {
                 var art = arr[0];
-                db.findToArray(conf.default(), 'entities', {_id : art.author}, function(err, autarr) {
-                    db.findUnique(cli._c, 'topics', {_id : art.topic}, function(err, topic) {
-                        db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, function(err, modcount) {
+                db.findToArray(conf.default(), 'entities', {_id : art.author}, (err, autarr)  => {
+                    db.findUnique(cli._c, 'topics', {_id : art.topic}, (err, topic)  => {
+                        db.count(cli._c, 'history', {contentid : db.mongoID(cli.routeinfo.path[3])}, (err, modcount)  => {
                             db.findToArray(cli._c, 'socialdispatch', { 
                                 postid : db.mongoID(cli.routeinfo.path[3]),  
                                 status : { $ne : "deleted" }
@@ -254,7 +267,7 @@ var Article = function() {
         });
     };
 
-    this.removeAlias = function(conf, article, alias, cb) {
+    removeAlias(conf, article, alias, cb) {
         var aliases = article.aliases || [];
         var index = aliases.indexOf(alias);
         if (index != -1) {
@@ -262,10 +275,10 @@ var Article = function() {
         }
         
         log('Content', "Removing alias " + alias + " from article " + article.title + " at index " + index);
-        db.update(conf, 'content', {_id : article._id}, {aliases : aliases}, cb || function() {});
+        db.update(conf, 'content', {_id : article._id}, {aliases : aliases}, cb || noop);
     };
 
-    this.maybeRemoveAlias = function(cli) {
+    maybeRemoveAlias(cli) {
         var cond = {
             _id : db.mongoID(cli.postdata.data.articleid)
         };
@@ -274,25 +287,25 @@ var Article = function() {
             cond.author = db.mongoID(cli.userdata.userid);
         }
 
-        db.findUnique(cli._c, 'content', cond, function(err, article) {
+        db.findUnique(cli._c, 'content', cond, (err, article)  => {
             if (err || !article) {
                 cli.sendJSON({error : "Missing rights or article not found"});
             } else {
-                that.removeAlias(cli._c, article, cli.postdata.data.alias, function() {
+                that.removeAlias(cli._c, article, cli.postdata.data.alias, ()  => {
                     cli.sendJSON({error : false, success : true});
                 });
             }
         });
     };
 
-    this.batchFetch = function(conf, idsOrNames, cb, conditions) {
+    batchFetch(conf, idsOrNames, cb, conditions) {
         var i = -1;
         var deepArticles = [];
-        var next = function() {
+        var next = ()  => {
             if (++i == idsOrNames.length) {
                 cb(deepArticles);
             } else {
-                that.deepFetch(conf, idsOrNames[i], function(art) {
+                that.deepFetch(conf, idsOrNames[i], (art)  => {
                     deepArticles.push(art);
                     next();
                 });
@@ -302,7 +315,7 @@ var Article = function() {
         next();
     };
 
-    this.deepFetch = function(conf, idOrName, cb, preview, extraconds) {
+    deepFetch(conf, idOrName, cb, preview, extraconds) {
         conf = conf._c || conf;
         var cond = extraconds || {};
         cond[typeof idOrName === "string" ? "name" : "_id"] = idOrName;
@@ -318,12 +331,12 @@ var Article = function() {
                     as:             "featuredimage"
                 }
             }
-        ], function(arr) {
+        ], (arr)  => {
             if (arr.length === 0) {
                 cb(false, new Error("No article found"));
             } else {
                 var article = arr[0];
-                db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, function(err, col) {
+                db.rawCollection(conf, preview ? "preview" : 'content', {"strict":true}, (err, col)  => {
                     col.aggregate([{
                         $match : {
                             _id : {
@@ -345,17 +358,17 @@ var Article = function() {
                             foreignField:   "_id",
                             as:             "featuredimage"
                         }
-                    }]).next(function(err, related) {
-                        var continueWorking = function() {
-                            var continueWithAuthor = function() {
-                                db.findToArray(require("./config.js").default(), 'entities', {_id : article.author}, function(err, autarr) {
+                    }]).next((err, related)  => {
+                        var continueWorking = ()  => {
+                            var continueWithAuthor = ()  => {
+                                db.findToArray(require("./config.js").default(), 'entities', {_id : article.author}, (err, autarr)  => {
                                     article.authors = autarr;
 
                                     var evts = hooks.getHooksFor('article_deepfetch');
                                     var keys = Object.keys(evts);
                                     var kIndex = -1;
 
-                                    var next = function() {
+                                    var next = ()  => {
                                         kIndex++;
 
                                         if (kIndex == keys.length) {
@@ -374,7 +387,7 @@ var Article = function() {
                                 });
                             };
                             
-                            require('./topics.js').deepFetch(conf, article.topic, function(deepTopic, family) {
+                            require('./topics.js').deepFetch(conf, article.topic, (deepTopic, family)  => {
                                 if (deepTopic) {
                                     article.topics = family;
                                     article.topicslug = "/" + deepTopic.completeSlug + "/";
@@ -408,13 +421,13 @@ var Article = function() {
         });
     };
 
-    this.refreshTagSlugs = function(_c, cb) {
-        db.find(_c, 'content', {}, [], function(err, cursor) {
-            var handleNext = function() {
-                cursor.hasNext(function(err, hasnext) {
+    refreshTagSlugs(_c, cb) {
+        db.find(_c, 'content', {}, [], (err, cursor)  => {
+            var handleNext = ()  => {
+                cursor.hasNext((err, hasnext)  => {
                     if (hasnext) {
-                        cursor.next(function(err, dbart) {
-                            var tagslugs = dbart.tags.map(function(tagname) {
+                        cursor.next((err, dbart)  => {
+                            var tagslugs = dbart.tags.map((tagname)  => {
                                 return slugify(tagname).toLowerCase();
                             });
 
@@ -430,22 +443,22 @@ var Article = function() {
         });
     };
 
-    this.sendForReview = function(cli) {
+    sendForReview(cli) {
         var cid = cli.routeinfo.path[3];
         var conds = {
             _id : db.mongoID(cid)
         };
 
-        db.findUnique(cli._c, 'content', conds, function(err, article) {
+        db.findUnique(cli._c, 'content', conds, (err, article)  => {
             if (cli.hasRight('editor') || cli.userinfo.userid == article.author.toString()) {
-                db.update(cli._c, 'content', conds, {status : "reviewing"}, function() {
+                db.update(cli._c, 'content', conds, {status : "reviewing"}, ()  => {
                     cli.sendJSON({changed : true});
                 });
 
                 db.findUnique(require('./config.js').default(), 'entities', 
                     {_id : db.mongoID(cli.userinfo.userid)}, 
-                    function(err, contractor) {
-                    db.findToArray(require('./config.js').default(), 'entities', {_id : {$in : contractor.reportsto || []}}, function(err, reportees)  {
+                    (err, contractor)  => {
+                    db.findToArray(require('./config.js').default(), 'entities', {_id : {$in : contractor.reportsto || []}}, (err, reportees)   => {
                         for (var i = 0; i < reportees.length; i++) {
                             require('./mail.js').triggerHook(cli._c, 'article_sent_for_review', reportees[i].email, {
                                 to : reportees[i],
@@ -461,13 +474,13 @@ var Article = function() {
         });
     };
 
-    this.refuseReview = function(cli) {
-        db.update(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3]), status : "reviewing"}, {status : "draft"}, function() {
+    refuseReview(cli) {
+        db.update(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3]), status : "reviewing"}, {status : "draft"}, ()  => {
             cli.sendJSON({success : true});
         });
     };
 
-    this.addFeature = function(cli) {
+    addFeature(cli) {
         var featurename = cli.postdata.data.feature;
         var conds = {
             _id : db.mongoID(cli.routeinfo.path[3])
@@ -486,13 +499,13 @@ var Article = function() {
         db.update(cli._c, 'content', conds, {
             feature: featurename,
             featuredata : featuredata
-        }, function() {
+        }, ()  => {
             log('Content', 'Added feature "' + featurename + '" to article with id ' + cli.routeinfo.path[3]);
             cli.sendJSON({done : true})
         });
     };
 
-    this.insertAds = function(_c, article, done, force) {
+    insertAds(_c, article, done, force) {
         if ((article.isSponsored || article.nsfw && !force) || !_c.content) {
             return done(article.content);
         }
@@ -501,7 +514,7 @@ var Article = function() {
         var aKeys = Object.keys(asyncHooks);
         var aIndex = -1;
 
-        var nextHook = function() {
+        var nextHook = ()  => {
             if (++aIndex == aKeys.length) {
                 done(article.content);
             } else {
@@ -515,7 +528,7 @@ var Article = function() {
         nextHook();
     };
 
-    this.updateActionStats = function(_c, deepArticle, callback, reduce) {
+    updateActionStats(_c, deepArticle, callback, reduce) {
         db.findUnique(_c, 'content', {_id : deepArticle._id || deepArticle}, (err, article) => {
             var stats = {
                 $inc : {
@@ -526,13 +539,13 @@ var Article = function() {
             };
             var entity = db.mongoID(deepArticle.author);
 
-            db.update(conf.default(), 'actionstats', {entity, type : "article_content"}, stats, function(err, r) {
+            db.update(conf.default(), 'actionstats', {entity, type : "article_content"}, stats, (err, r)  => {
                 callback && callback(r.value);
             }, true, true, true, true);
         });
     };
 
-    this.create = function(cli) {
+    create(cli) {
         cli.touch('article.create');
         var articleObject = {};
 
@@ -546,8 +559,8 @@ var Article = function() {
         articleObject.createdBy = db.mongoID(cli.userinfo.userid);
         articleObject.subscribers = [articleObject.createdBy];
 
-        var commitToCreate = function() {
-            db.insert(cli._c, 'content', articleObject, function(err, result) {
+        var commitToCreate = ()  => {
+            db.insert(cli._c, 'content', articleObject, (err, result)  => {
                 var id = articleObject._id;
                 cli.sendJSON({
                     articleid : id,
@@ -559,7 +572,7 @@ var Article = function() {
         };
 
         if (cli.userinfo.roles.indexOf('contributor') != -1) {
-            db.findToArray(conf.default(), 'entities', {roles : "production"}, function(err, arr) {
+            db.findToArray(conf.default(), 'entities', {roles : "production"}, (err, arr)  => {
                 for (var i = 0; i < arr.length; i++) {
                     articleObject.subscribers.push(arr[i]._id);
                 }
@@ -572,7 +585,7 @@ var Article = function() {
     };
 
     
-    this.publish = function(cli, pubCtx) {
+    publish(cli, pubCtx) {
         cli.touch('article.new');
         pubCtx = pubCtx || "create";
 
@@ -622,7 +635,7 @@ var Article = function() {
                 }; 
 
                 if (formData.tags && formData.tags.map) {
-                    formData.tagslugs = formData.tags.map(function(tagname) {
+                    formData.tagslugs = formData.tags.map((tagname)  => {
                         return slugify(tagname).toLowerCase();
                     });
                 } else {
@@ -631,11 +644,11 @@ var Article = function() {
                 }
 
                 log('Article', 'Saving published post in database', 'info');
-                db.findToArray(cli._c, 'content', conds, function(err, arr) {
-                    var nUpdate = function() {
-                        db.update(cli._c, dbCol[pubCtx], conds, formData, function(err, result) {
+                db.findToArray(cli._c, 'content', conds, (err, arr)  => {
+                    var nUpdate = ()  => {
+                        db.update(cli._c, dbCol[pubCtx], conds, formData, (err, result)  => {
                             if (!err) {
-                                var postUpdate = function() {
+                                var postUpdate = ()  => {
                                     var success = true;
                                     var createdArticle = false;
                                     if (result.upsertedId !== null) {
@@ -665,9 +678,9 @@ var Article = function() {
                                                 db.update(cli._c, 'content', 
                                                     {_id : db.mongoID(formData._id)}, 
                                                     {$push : {aliases : oldSlug}}, 
-                                                function() {
+                                                ()  => {
                                                     log('Article', 'Added alias for slug ' + oldSlug);
-                                                    fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", function() {});
+                                                    fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", ()  => {});
                                                 }, false, true, true);
                                             }
 
@@ -677,10 +690,10 @@ var Article = function() {
                                                     db.mongoID(cli.userinfo.userid),
                                                     formData.author
                                                 ]}}}, 
-                                                function() {}, false, true, true
+                                                ()  => {}, false, true, true
                                             );
 
-                                            that.generateArticle(cli._c, db.mongoID(formData._id), function(resp) {
+                                            that.generateArticle(cli._c, db.mongoID(formData._id), (resp)  => {
                                                 resp.newlyPublished = wasNotPublished;
                                                 cli.sendJSON(resp);
                                                 var deepArticle = resp.deepArticle;
@@ -693,7 +706,7 @@ var Article = function() {
                                                         {
                                                             _id: db.mongoID(cli.postdata.data.autosaveid.replace(' ', ''))
                                                         },
-                                                        function() {}
+                                                        ()  => {}
                                                     );
                                                 }
 
@@ -708,7 +721,7 @@ var Article = function() {
                                                         },
                                                         json : true,
                                                         method : "POST"
-                                                    }, function(a, b, c) {
+                                                    }, (a, b, c)  => {
                                                         if (c && c.title) {
                                                             log('Facebook', 'Debugger responded with title', "success");
                                                             notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
@@ -729,7 +742,7 @@ var Article = function() {
                                                 }
             
                                                 var maybeTopic = formData.topic && db.mongoID(formData.topic);
-                                                db.findUnique(cli._c, 'topics', { _id : maybeTopic  }, function(err, tObject) {
+                                                db.findUnique(cli._c, 'topics', { _id : maybeTopic  }, (err, tObject)  => {
                                                     var nlen = publishedNotificationTitles.length;
                                                     var notifMessage = publishedNotificationTitles[Math.floor(nlen / Math.random()) % nlen];
                                                     notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
@@ -742,12 +755,12 @@ var Article = function() {
                                                     tObject && require('./topics.js').deepFetch(
                                                         cli._c, 
                                                         maybeTopic, 
-                                                    function(topic, parents) {
-                                                        parents.forEach(function(sTopic) {
+                                                    (topic, parents)  => {
+                                                        parents.forEach((sTopic)  => {
                                                             hooks.fire('rss_needs_refresh_' + cli._c.uid, {
                                                                _c : cli._c,
                                                                 completeSlug : sTopic.completeSlug,
-                                                                callback : function() {
+                                                                callback : ()  => {
                                                                     log('Article', "RSS feed was refresh, received callback");
                                                                 }
                                                             });
@@ -756,7 +769,7 @@ var Article = function() {
                                                 });
 
                                                 if (wasNotPublished) {
-                                                    that.updateActionStats(cli._c, deepArticle, function(values) {
+                                                    that.updateActionStats(cli._c, deepArticle, (values)  => {
                                                         hooks.fire('article_published_from_draft', {
                                                             article: deepArticle,
                                                             score : values,
@@ -765,7 +778,7 @@ var Article = function() {
                                                     });
                                                 }
 
-                                                feed.plop(deepArticle._id, function() {
+                                                feed.plop(deepArticle._id, ()  => {
                                                     feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
                                                         title : deepArticle.title,
                                                         subtitle : deepArticle.subtitle,
@@ -784,7 +797,7 @@ var Article = function() {
                                             var absPath = cli._c.server.html + "/" + tmpName;
 
                                             log('Preview', 'Deep fetching article for preview : ' + formData._id);
-                                            that.deepFetch(cli._c, db.mongoID(formData._id), function(deepArticle) {
+                                            that.deepFetch(cli._c, db.mongoID(formData._id), (deepArticle)  => {
                                                 var extra = {};
                                                 extra.ctx = "article";
                                                 extra.article = deepArticle;
@@ -792,11 +805,11 @@ var Article = function() {
                                                 extra.preview = true;
 
                                                 log('Preview', 'Rendering HTML for previewed post');
-                                                filelogic.renderThemeLML(cli._c, "article", tmpName, extra, function() {
+                                                filelogic.renderThemeLML(cli._c, "article", tmpName, extra, ()  => {
                                                     log('Preview', 'Sending preview file before deletion : ' + absPath);
                                                     var fileserver = require('./fileserver.js');
-                                                    fileserver.pipeFileToClient(cli, absPath, function() {
-                                                        fileserver.deleteFile(absPath, function() {});
+                                                    fileserver.pipeFileToClient(cli, absPath, ()  => {
+                                                        fileserver.deleteFile(absPath, ()  => {});
                                                     }, true);
                                                 });
 
@@ -854,7 +867,7 @@ var Article = function() {
      * - contentid, the id of the original content if the save is an autosave
      * - _id, the id of whether the original content or of the auto save if it is an autosave
      */
-    this.save = function(cli, auto) {
+    save(cli, auto) {
         // Article already exists
         cli.postdata.data.form_name = "post_create";
 
@@ -865,7 +878,7 @@ var Article = function() {
         if (cli.postdata.data.autosaveid) {
             db.remove(cli._c, 'autosave', {
                 _id: db.mongoID(cli.postdata.data.autosaveid.replace(" ", ""))
-            }, function() {});
+            }, ()  => {});
         }
 
         formData.author = formData.author ? db.mongoID(formData.author) : db.mongoID(cli.userinfo.userid);
@@ -875,7 +888,7 @@ var Article = function() {
         formData.topic = formData.topic ? db.mongoID(formData.topic) : undefined;
 
         if (formData.tags && formData.tags.map) {
-            formData.tagslugs = formData.tags.map(function(tagname) {
+            formData.tagslugs = formData.tags.map((tagname)  => {
                 return slugify(tagname).toLowerCase();
             });
         }
@@ -892,7 +905,7 @@ var Article = function() {
                 db.update(cli._c, 'content', {
                     _id: db.mongoID(cli.postdata.data.contentid),
                     status : {$ne : "published"}
-                }, formData, function(err, docs) {
+                }, formData, (err, docs)  => {
                     // Is a draft article
                     cli.sendJSON({
                         success: true,
@@ -914,15 +927,15 @@ var Article = function() {
                 // Check if user can edit this article
                 db.findToArray(cli._c, 'content', {
                     _id: id
-                }, function(err, ress) {
+                }, (err, ress)  => {
                     var res = err ? undefined : ress[0];
                     if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
                         log('Article', 'Updating content for article ' + formData.title);
                         delete formData._id;
                         db.update(cli._c, 'content', {
                             _id: id
-                        }, formData, function(err, doc) { 
-                            require("./history.js").pushModification(cli, res, res._id, function(err, revision) {    
+                        }, formData, (err, doc)  => { 
+                            require("./history.js").pushModification(cli, res, res._id, (err, revision)  => {    
                                 cli.sendJSON({
                                     success: true,
                                     _id: cli.postdata.data._id,
@@ -931,7 +944,7 @@ var Article = function() {
                             });
                             db.update(cli._c, 'content', 
                                 {_id : id}, {$addToSet : {subscribers : db.mongoID(cli.userinfo.userid)}}, 
-                                function() {}, false, true, true
+                                ()  => {}, false, true, true
                             );
                         });
                     } else {
@@ -952,12 +965,12 @@ var Article = function() {
         }
     };
 
-    this.preview = function(cli) {
+    preview(cli) {
         this.publish(cli, "preview");
         return;
     };
 
-    this.edit = function(cli) {
+    edit(cli) {
         var that = this;
         if (cli.routeinfo.path[3]) {
 
@@ -980,14 +993,14 @@ var Article = function() {
                     formData.date = new Date(formData.date);
 
                     if (formData.tags.map) {
-                        formData.tagslugs = formData.tags.map(function(tagname) {
+                        formData.tagslugs = formData.tags.map((tagname)  => {
                             return slugify(tagname).toLowerCase();
                         });
                     }
 
                     db.findToArray(cli._c, 'content', {
                         _id: id
-                    }, function(err, row) {
+                    }, (err, row)  => {
                         if (err || row.length == 0) {
                             cli.sendJSON({
                                 success: false,
@@ -1010,8 +1023,8 @@ var Article = function() {
 
                         db.findAndModify(cli._c, 'content', {
                             _id: id
-                        }, formData, function(err, r) {
-                            that.deepFetch(cli._c, id, function(deepArticle) {
+                        }, formData, (err, r)  => {
+                            that.deepFetch(cli._c, id, (deepArticle)  => {
                                 cli.did('content', 'edited', {title : cli.postdata.data.title});
                                 
                                 hooks.fire('article_edited', {
@@ -1024,7 +1037,7 @@ var Article = function() {
                                 extra.topic = deepArticle.topic;
                                 extra.ctx = "article";
  
-                                filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , function(name) {
+                                filelogic.renderThemeLML(cli, "article", formData.name + '.html', extra , (name)  => {
                                     notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                         title: "Article is updated!",
                                         url: cli._c.server.url + '/' + formData.name,
@@ -1056,7 +1069,7 @@ var Article = function() {
         }
     }
 
-    this.editSlug = function(cli) {
+    editSlug(cli) {
         if (cli.routeinfo.path[3]) {
             var newslug = cli.postdata.data.slug;
             if (!newslug) {
@@ -1064,11 +1077,11 @@ var Article = function() {
             } else {
                 if (/^[a-z0-9\-]+$/.test(newslug)) {
                     var id = db.mongoID(cli.routeinfo.path[3]);
-                    db.findUnique(cli._c, 'content', {_id : id}, function(err, article) {
+                    db.findUnique(cli._c, 'content', {_id : id}, (err, article)  => {
                         if (cli.hasRight('editor') || article.author.toString() == cli.userinfo.userid.toString()) {
                             var aliases = article.aliases || [];
                             aliases.push(article.name);
-                            db.update(cli._c, 'content', {_id : id}, {name : newslug, aliases : aliases}, function() {
+                            db.update(cli._c, 'content', {_id : id}, {name : newslug, aliases : aliases}, ()  => {
                                 cli.sendJSON({success : true});
                             });
                         } else {
@@ -1084,12 +1097,12 @@ var Article = function() {
         }
     };
 
-    this.deleteAutosave = function(cli) {
+    deleteAutosave(cli) {
         if (cli.routeinfo.path[3]) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
             db.remove(cli._c, 'autosave', {
                 _id: id
-            }, function(err, res) {
+            }, (err, res)  => {
                 return cli.sendJSON({
                     redirect: cli._c.server.url + '/admin/article/list',
                     success: true
@@ -1098,36 +1111,36 @@ var Article = function() {
         }
     }
 
-    this.delete = function(cli, destroy) {
+    delete(cli, destroy) {
         if (cli.routeinfo.path[3]) {
             var id = new mongo.ObjectID(cli.routeinfo.path[3]);
             db.findToArray(cli._c, 'content', {
                 _id: id
-            }, function(err, results) {
+            }, (err, results)  => {
                 var result = err ? undefined : results[0];
                 if (result) {
                     if (cli.hasRight('editor') || result.author.toString() == cli.userinfo.userid.toString()) {
                         // Can delete the current article
                         hooks.fire('article_will_delete', id);
-                        that.updateActionStats(cli._c, result, function() {}, true);
+                        that.updateActionStats(cli._c, result, ()  => {}, true);
 
                         db.update(cli._c, 'content', {
                             _id: id
                         }, {
                             status: destroy ? 'destroyed' : 'deleted'
-                        }, function(err, r) {
+                        }, (err, r)  => {
                             cli.did('content', destroy ? 'destroyed' : 'deleted', {id : id});
                             
                             var filename = cli._c.server.html + "/" + result.name + '.html';
-                            fs.deleteFile(filename, function() {
+                            fs.deleteFile(filename, ()  => {
                                 hooks.fire('article_deleted', {id : id, cli : cli, _c : cli._c});
                             });
 
                             // Remove autosave pointing to article deleted
                             db.remove(cli._c, 'autosave', {
                                 contentid: id
-                            }, function() {
-                                require('./history.js').pushModification(cli, result, id, function() {
+                            }, ()  => {
+                                require('./history.js').pushModification(cli, result, id, ()  => {
                                     return cli.sendJSON({
                                         redirect: cli._c.server.url + '/admin/article/list',
                                         success: true
@@ -1150,14 +1163,14 @@ var Article = function() {
         }
     }
 
-    this.getArticle = function(cli) {
+    getArticle(cli) {
         var id = new mongo.ObjectID(cli.routeinfo.path[3]);
         db.find(cli._c, 'content', {
             '_id': id
         }, {
             limit: [1]
-        }, function(err, cursor) {
-            cursor.next(function(err, article) {
+        }, (err, cursor)  => {
+            cursor.next((err, article)  => {
                 if (article) {
                     cli.sendJSON({
                         form: formBuilder.unescapeForm(article)
@@ -1172,20 +1185,7 @@ var Article = function() {
         // Return article object from DB
     };
 
-    var countOcc = function(article, occ) {
-        var content = article.content || article || "";
-
-        var i = 0;
-        var count = -1;
-        do {
-            count++;
-            i = content.indexOf(occ, i) + 1;
-        } while (i != 0)
-
-        return count;
-    };
-
-    this.generatePublishReport = function(_c, $match, sendback) {
+    generatePublishReport(_c, $match, sendback) {
         db.join(_c, 'content', [
             {$match},
             {$limit : 1},
@@ -1204,7 +1204,7 @@ var Article = function() {
                     as : "topicobject"
                 }
             }
-        ], function(arr) {
+        ], (arr)  => {
             if (arr.length == 0) {
                 return sendback({notfound : 1})
             }
@@ -1235,9 +1235,9 @@ var Article = function() {
             }
 
             // Find counts and author object
-            db.count(_c, 'content', {author}, function(err, totalCount) {
-                db.count(_c, 'content', {author, date}, function(err, totalToday) {
-                    db.findUnique(require('./config.js').default(), 'entities', {_id : author}, function(err, author) {
+            db.count(_c, 'content', {author}, (err, totalCount)  => {
+                db.count(_c, 'content', {author, date}, (err, totalToday)  => {
+                    db.findUnique(require('./config.js').default(), 'entities', {_id : author}, (err, author)  => {
                         var article = {
                             title : art.title,
                             subtitle : art.subtitle,
@@ -1270,13 +1270,13 @@ var Article = function() {
         });
     };
 
-    this.livevar = function(cli, levels, params, callback) {
+    livevar(cli, levels, params, callback) {
         var allContent = levels.length === 0;
         if (allContent) {
             if (cli.hasRight('editor')) {
                 db.singleLevelFind(cli._c, 'content', callback);
             } else {
-                db.findToArray(cli._c, 'content', {author : db.mongoID(cli.userinfo.userid)}, function(err, arr) {
+                db.findToArray(cli._c, 'content', {author : db.mongoID(cli.userinfo.userid)}, (err, arr)  => {
                     callback(arr);
                 });
             }
@@ -1289,7 +1289,7 @@ var Article = function() {
                     match.author = db.mongoID(cli.userinfo.userid);
                 }
 
-                this.deepFetch(cli._c, id, function(article) {
+                this.deepFetch(cli._c, id, (article)  => {
                     callback(article);
                 }, false, match);
             } else {
@@ -1306,7 +1306,7 @@ var Article = function() {
             var sentArr = new Array();
 
             if (cli.hasRight("list-articles")) {
-                db.findToArray(cli._c, 'content', {}, function(err, arr) {
+                db.findToArray(cli._c, 'content', {}, (err, arr)  => {
                     for (var i = 0; i < arr.length; i++) {
                         sentArr.push({
                             articleid: arr[i]._id,
@@ -1388,14 +1388,14 @@ var Article = function() {
                     date: 1,
                     media: "$media.sizes.thumbnail.url"
                 }
-            }], function(data) {
+            }], (data)  => {
                 if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
                     for (var i = 0; i < data.length; i++) if (data[i].media) {
                         data[i].media = data[i].media.replace(cli._c.server.url, cli._c.content.cdn.domain);
                     }
                 }
 
-                db.count(cli._c, 'content', {$and : match}, function(err, total) {
+                db.count(cli._c, 'content', {$and : match}, (err, total)  => {
                     callback({
                         size: total,
                         data: data
@@ -1408,7 +1408,7 @@ var Article = function() {
                 return callback([]);
             }
 
-            db.findToArray(cli._c, 'content', {status : "published"}, function(err, arr) {
+            db.findToArray(cli._c, 'content', {status : "published"}, (err, arr)  => {
                 callback(arr);
             }, {_id : 1, title : 1});
         } else if (levels[0] == 'lastEdited') {
@@ -1459,7 +1459,7 @@ var Article = function() {
                 }
             }, {
                 $limit: 5
-            }], function(res) {
+            }], (res)  => {
                 callback(res);
 
             });
@@ -1473,12 +1473,12 @@ var Article = function() {
                 {
                     $match : {_id: db.mongoID(levels[0])}
                 }
-            ], function(arr) {
+            ], (arr)  => {
                 // Not found, lets check autosaves
                 if (arr && arr.length == 0) {
                     db.findToArray(cli._c, 'autosave', {
                         _id: db.mongoID(levels[0])
-                    }, function(err, arr) {
+                    }, (err, arr)  => {
                         // Check if there is a newer version than this autosave
                         if (arr && arr.length > 0) {
                             db.findToArray(cli._c, 'content', {
@@ -1486,12 +1486,12 @@ var Article = function() {
                                 date: {
                                     "$gte": arr[0].date
                                 }
-                            }, function(err, content) {
+                            }, (err, content)  => {
                                 if (content && content.length > 0) {
                                     arr[0].recentversion = content[0]._id;
                                 }
 
-                                db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                                db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, (err, autarr)  => {
                                     arr[0].authorname = autarr[0].displayname;
                                     arr[0].author = autarr;
                                     callback(arr[0]);
@@ -1513,11 +1513,11 @@ var Article = function() {
                             updated: {
                                 "$gte": arr[0].updated
                             }
-                        }, function(err, autosave) {
+                        }, (err, autosave)  => {
                             if (autosave && autosave.length > 0) {
                                 arr[0].recentversion = autosave[0]._id;
                             }
-                            db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, function(err, autarr) {
+                            db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, (err, autarr)  => {
                                 arr[0].authorname = autarr[0] ? autarr[0].displayname : "[No Author]";
                                 arr[0].author = autarr || {};
                                 callback(arr[0]);
@@ -1532,7 +1532,7 @@ var Article = function() {
         };
     };
 
-    this.form = function() {
+    form() {
         formBuilder.createForm('post_create', {
                 formWrapper: {
                     'tag': 'div',
@@ -1672,11 +1672,11 @@ var Article = function() {
         );
     }
 
-    this.handleNext = function(cli) {
+    handleNext(cli) {
         var articleName = cli.routeinfo.path[1];
-        this.deepFetch(cli._c, articleName, function(deepArticle) {
+        this.deepFetch(cli._c, articleName, (deepArticle)  => {
              if (!deepArticle) {
-                db.findToArray(cli._c, 'content', {aliases : articleName}, function(err, arr) {
+                db.findToArray(cli._c, 'content', {aliases : articleName}, (err, arr)  => {
                     if (err || !arr.length) {
                         cli.throwHTTP(404);
                     } else {
@@ -1694,13 +1694,13 @@ var Article = function() {
         }, false, {status : "published"});
     };
 
-    this.articleIsPaginated = function(article) {
+    articleIsPaginated(article) {
         return article && article.content && article.content.indexOf("<lml-page>") != -1;
     };
 
-    this.generateArticle = function(_c, aid, cb, alreadyFetched, pageIndex) {
-        var workArticle = function(deepArticle) {
-            var gen = function() {
+    generateArticle(_c, aid, cb, alreadyFetched, pageIndex) {
+        var workArticle = (deepArticle)  => {
+            var gen = ()  => {
                 var extra = {};
                 extra.ctx = "article";
                 extra.article = deepArticle;
@@ -1723,11 +1723,11 @@ var Article = function() {
 
                     if (pageIndex === "all") {
                         log('Article', "Generated paginated article from admin panel : " + deepArticle.title);
-                        cIndex = pages.length;
+                        let cIndex = pages.length;
 
-                        var nextPage = function(resp) {
+                        var nextPage = (resp)  => {
                             if (cIndex == 0) {
-                                require('./fileserver.js').deleteFile(_c.server.html + "/" + deepArticle.topic.completeSlug + "/" + deepArticle.name + ".html", function() {
+                                require('./fileserver.js').deleteFile(_c.server.html + "/" + deepArticle.topic.completeSlug + "/" + deepArticle.name + ".html", ()  => {
                                     log('Article', "Cleared non-paginated version of article from file system");
                                 });
 
@@ -1737,7 +1737,7 @@ var Article = function() {
                                     pages : pages.length
                                 });
                             } else {
-                                that.generateArticle(_c, deepArticle._id, function(resp) {
+                                that.generateArticle(_c, deepArticle._id, (resp)  => {
                                     cIndex--;
                                     nextPage(resp);
                                 }, false, cIndex);
@@ -1753,7 +1753,7 @@ var Article = function() {
                     }
 
                     if (pageIndex != pages.length) {
-                        deepArticle.nextURL = deepArticle.url + "/" + (pageIndex + 1);
+                        deepArticle.nextURL = deepArticle.url + "/1";
                         deepArticle.related = [];
                     } 
 
@@ -1780,7 +1780,7 @@ var Article = function() {
                 var aKeys = Object.keys(asyncHooks);
     
                 var hookIndex = -1;
-                var nextHook = function() {
+                var nextHook = ()  => {
                     if (++hookIndex != aKeys.length) {
                         var hk = asyncHooks[aKeys[hookIndex]];
                         hk.cb({
@@ -1790,7 +1790,7 @@ var Article = function() {
                         }, 'article_async_render_' + _c.uid)
                     } else {
                         // Generate LML page
-                        filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , function(name) {
+                        filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
                             cb && cb({
                                 success: true,
                                 deepArticle : deepArticle
@@ -1805,7 +1805,7 @@ var Article = function() {
             if ((deepArticle.hasads && deepArticle.content && deepArticle.content.indexOf("<ad>") != -1) || deepArticle.nsfw) {
                 gen();
             } else {
-                that.insertAds(_c, deepArticle, function(content) {
+                that.insertAds(_c, deepArticle, (content)  => {
                     deepArticle.content = content || deepArticle.content;
                     gen();
                 });
@@ -1819,10 +1819,10 @@ var Article = function() {
         }
     };
 
-    this.generateFromName = function(cli, articleName, cb, onlyPublished, pageIndex) {
-        this.deepFetch(cli._c, articleName, function(deepArticle) {
+    generateFromName(cli, articleName, cb, onlyPublished, pageIndex) {
+        this.deepFetch(cli._c, articleName, (deepArticle)  => {
             if (!deepArticle) {
-                db.findToArray(cli._c, 'content', {aliases : articleName}, function(err, arr) {
+                db.findToArray(cli._c, 'content', {aliases : articleName}, (err, arr)  => {
                     if (err || !arr.length) {
                         cb(false);
                     } else {
@@ -1835,7 +1835,7 @@ var Article = function() {
                 if (onlyPublished && deepArticle.status !== "published") {
                     cb(false);
                 } else {
-                    that.generateArticle(cli._c, deepArticle, function(resp) {
+                    that.generateArticle(cli._c, deepArticle, (resp)  => {
                         if (resp.deepArticle.url != cli.routeinfo.url) {
                             cb(true, {
                                 realURL : resp.deepArticle.url
@@ -1849,7 +1849,7 @@ var Article = function() {
         }, false, onlyPublished ? {status : "published"} : {});
     }
 
-    this.table = function() {
+    table() {
         tableBuilder.createTable({
             name: 'article',
             endpoint: 'content.table',
@@ -1943,4 +1943,5 @@ var Article = function() {
     };
 }
 
-module.exports = new Article();
+const that = new Article();
+module.exports = that;

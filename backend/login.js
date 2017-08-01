@@ -1,49 +1,54 @@
-var fileserver = require('../fileserver.js');
-var LML = require('../lml.js');
-var db = require('../includes/db.js');
-var CryptoJS = require('crypto-js');
-var _c = require('../config.js');
-var entities = require('../entities.js');
-var formbuilder = require('../formBuilder.js');
-var hooks = require('../hooks.js');
-var sessions = require('../session.js');
-var log = require('../log.js');
+const fileserver = require('../fileserver.js');
+const LML = require('../lml.js');
+const db = require('../includes/db.js');
+const CryptoJS = require('crypto-js');
+const _c = require('../config.js');
+const entities = require('../entities.js');
+const formbuilder = require('../formBuilder.js');
+const hooks = require('../hooks.js');
+const sessions = require('../session.js');
+const log = require('../log.js');
 
-var Login = function() {
-	var loginSuccess = function(cli, userObj, cb) {
-		cli.touch('login.loginsuccess');
-		sessions.createSessionInCli(cli, userObj, function() {
-            cli.did("auth", "login");
+const loginSuccess = (cli, userObj, cb) => {
+	cli.touch('login.loginsuccess');
+	sessions.createSessionInCli(cli, userObj, () => {
+        cli.did("auth", "login");
 
-            if (!userObj.welcomed) {
-                log('Login', 'Logged in user ' + userObj.username + " for the first time");
-                handleFirstLogin(cli, userObj);
-            } else {
-                entities.registerLogin(cli, userObj, function() {
-                    log('Login', 'Logged in user ' + userObj.username);
+        if (!userObj.welcomed) {
+            log('Login', 'Logged in user ' + userObj.username + " for the first time");
 
-                    if (cb) {
-                        cb();
-                    } else {
-                        var entity = userObj._id;
-                        db.update(_c.default(), 'actionstats', {entity, type : "system"}, {$inc : {login : 1}}, function(err, r) {
-                            hooks.fire('user_loggedin', { _c : cli._c, userObj, score : r.value ? r.value.login : 1 });
-                            cli.redirect(cli._c.server.url + "/admin", false);
-                        }, true, true, true, true);
-                    }
-                });
-            }
-        });
-	};
+            entities.firstLogin(cli, userObj, () => {
+                cli.redirect(cli._c.server.url + '/admin/welcome', false);
+            });
+        } else {
+            entities.registerLogin(cli, userObj, () => {
+                log('Login', 'Logged in user ' + userObj.username);
 
-    this.fbAuth = function(cli) {
+                if (cb) {
+                    cb();
+                } else {
+                    const entity = userObj._id;
+                    db.update(_c.default(), 'actionstats', {entity, type : "system"}, {$inc : {login : 1}}, (err, r) => {
+                        hooks.fire('user_loggedin', { _c : cli._c, userObj, score : r.value ? r.value.login : 1 });
+                        cli.redirect(cli._c.server.url + "/admin", false);
+                    }, true, true, true, true);
+                }
+            });
+        }
+    });
+};
+
+
+
+class Login {
+    fbAuth (cli) {
         require('request').get('https://graph.facebook.com/debug_token/?input_token=' + cli.postdata.data.accessToken +
-            '&access_token=' + cli._c.social.facebook.token, {}, function(err, resp) {
+            '&access_token=' + cli._c.social.facebook.token, {}, (err, resp) => {
             if (resp.statusCode == 200) {
                 db.findToArray(_c.default(), 'entities', {
                     fbid : cli.postdata.data.userID,
                     revoked : {$ne : true}
-                }, function(err, arr) {    
+                }, (err, arr) => {    
                     if (arr.length == 0) {
                         cli.sendJSON({
                             status : 200,
@@ -74,16 +79,16 @@ var Login = function() {
         });
     };
 
-    this.magiclink = function(cli) {
+    magiclink (cli) {
         db.findUnique(require('../config.js').default(), 
             'entities', 
             {_id : db.mongoID(cli.routeinfo.path[1]), magiclink : cli.routeinfo.path[2], revoked : {$ne : true}}, 
-        function(err, user) {
+        (err, user) => {
             if (err || !user) {
                 cli.redirect(cli._c.server.url + "/login?magiclink=failed");
             } else {
-                entities.fetchFromDB(cli._c, user.username, function(userObj) {
-                    loginSuccess(cli, userObj, function() {
+                entities.fetchFromDB(cli._c, user.username, userObj => {
+                    loginSuccess(cli, userObj, () => {
                         cli.redirect(cli._c.server.url + "/admin", false)   
                     });
                 });
@@ -91,8 +96,8 @@ var Login = function() {
         });
     };
 
-    this.impersonate = function(cli) {
-        var _id = db.mongoID(cli.routeinfo.path[3]);
+    impersonate (cli) {
+        const _id = db.mongoID(cli.routeinfo.path[3]);
         if (cli.hasRight("develop")) {
             db.findUnique(_c.default(), 'entities', {_id}, function(err, user) {
     			if (user) {
@@ -108,17 +113,17 @@ var Login = function() {
         }
     }
 
-	this.authUser = function(cli) {
+	authUser (cli) {
 		cli.touch('login.authUser');
         if (cli.routeinfo.path[1] == "fb") {
             return this.fbAuth(cli);
         }
 
-		var usr = cli.postdata.data.usr;
-		var psw = cli.postdata.data.psw;
+		const usr = cli.postdata.data.usr;
+		const psw = cli.postdata.data.psw;
 
 		if (usr && psw) {
-            var conds = {
+            const conds = {
                 revoked : {$ne : true},
 				username : usr,
 				shhh : CryptoJS.SHA256(psw).toString(CryptoJS.enc.Hex)
@@ -130,9 +135,9 @@ var Login = function() {
             ];
 
             cli.touch("login.authUser@networkcheck");
-            db.match(_c.default(), 'entities', conds, function(found) {
+            db.match(_c.default(), 'entities', conds, found => {
     			if (found) {
-            		entities.fetchFromDB(cli._c, usr, function(userObj) {
+            		entities.fetchFromDB(cli._c, usr, userObj => {
 	        			loginSuccess(cli, userObj);
 		        	});
 			    } else {
@@ -145,43 +150,31 @@ var Login = function() {
         }
 	};
 
-	this.registerLoginForm = function() {
+	registerLoginForm () {
 		formbuilder.createForm('login_form', {
-				fieldWrapper : {
-					'tag' : 'div',
-					'cssPrefix' : "loginfield-"
-				},
-				cssClass : "dashboard-login-form"
-			})
-			.add('usr', 'text', {displayname:"Username", placeholder:true,wrapperCssSuffix:"username"})
-			.add('psw', 'password', {displayname:"Password", placeholder:true,wrapperCssSuffix:"password"})
-			.trg('userpass')
-            .add('loginbtnset', 'buttonset', {
-                buttons : [{
-                    name : 'login', 
-                    displayname : "Login",
-                    classes : ["loginbutton"]
-                }, {
-                    name : 'login-fb', 
-                    displayname : '<i class="fa fa-facebook-official" aria-hidden="true"></i>',
-                    classes : ["fbloginbutton"],
-                    type : "button",
-                    callback : "window.loginwithfacebook();"
-                }]
-            });
-	};
-
-    var handleFirstLogin = function(cli, userObj) {
-        entities.firstLogin(cli, userObj, function() {
-            cli.redirect(cli._c.server.url + '/admin/welcome', false);
+			fieldWrapper : {
+				'tag' : 'div',
+				'cssPrefix' : "loginfield-"
+			},
+			cssClass : "dashboard-login-form"
+		})
+		.add('usr', 'text', {displayname:"Username", placeholder:true,wrapperCssSuffix:"username"})
+		.add('psw', 'password', {displayname:"Password", placeholder:true,wrapperCssSuffix:"password"})
+		.trg('userpass')
+        .add('loginbtnset', 'buttonset', {
+            buttons : [{
+                name : 'login', 
+                displayname : "Login",
+                classes : ["loginbutton"]
+            }, {
+                name : 'login-fb', 
+                displayname : '<i class="fa fa-facebook-official" aria-hidden="true"></i>',
+                classes : ["fbloginbutton"],
+                type : "button",
+                callback : "window.loginwithfacebook();"
+            }]
         });
-    };
-
-	var init = function() {
-
 	};
-
-	init();
 };
 
 module.exports = new Login();

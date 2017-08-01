@@ -1,36 +1,34 @@
-var fs = require('fs');
-var mkdirp = require('mkdirp');
-var path = require('path');
-var _c = require('./config.js');
-var log = require('./log.js');
-var minify = require('html-minifier').minify;
-var uglifycss = require('uglifycss');
-var UglifyJS = require("uglify-js");
-var Canvas = require('canvas');
-var crypto = require('crypto');
-var dateFormat = require('dateformat');
-var dir = require('node-dir');
-var readdirp = require('readdirp');
+const fs = require('fs');
+const mkdirp = require('mkdirp');
+const path = require('path');
+const _c = require('./config.js');
+const log = require('./log.js');
+const minify = require('html-minifier').minify;
+const uglifycss = require('uglifycss');
+const UglifyJS = require("uglify-js");
+const Canvas = require('canvas');
+const crypto = require('crypto');
+const dateFormat = require('dateformat');
+const dir = require('node-dir');
+const readdirp = require('readdirp');
+const defaultCT = 'text/html; charset=utf-8';
 
-var FileServer = function () {
-    var defaultCT = 'text/html; charset=utf-8';
-    var that = this;
-
-    this.workDir = function () {
+class FileServer {
+    workDir  () {
         return __dirname;
     };
 
-    this.fileExists = function (fullpath, cb, sync) {
+    fileExists  (fullpath, cb, sync) {
         if (sync) {
-            var stats = fs.lstatSync(fullpath);
+            const stats = fs.lstatSync(fullpath);
             if (stats.isDirectory()) {
                 fullpath += "/index.html";
             }
             return typeof fs.accessSync(fullpath, fs.F_OK) == 'undefined';
         } else {
-            var dirpath = fullpath.substring(0, fullpath.lastIndexOf('/'));
-            mkdirp(dirpath, function() {
-                fs.lstat(fullpath, function (err, stats) {
+            let dirpath = fullpath.substring(0, fullpath.lastIndexOf('/'));
+            mkdirp(dirpath, () =>  {
+                fs.lstat(fullpath,  (err, stats)  => {
                     if (err) {
                         cb(false);
                         return;
@@ -40,7 +38,7 @@ var FileServer = function () {
                         fullpath += "/index.html";
                     }
 
-                    fs.access(fullpath, fs.F_OK, function (err) {
+                    fs.access(fullpath, fs.F_OK,  (err)  => {
                         cb(!err);
                     });
                 });
@@ -49,7 +47,7 @@ var FileServer = function () {
 
     };
 
-    this.minifyString = function(content, options) {
+    minifyString (content, options) {
         try {
             return minify(content, Object.assign({
                 removeComments: true,
@@ -64,14 +62,13 @@ var FileServer = function () {
         }
     }
 
-    this.minifyHTML = function (fullpath, cb) {
-        var that = this;
-        var timeStamp = new Date();
+    minifyHTML  (fullpath, cb) {
+        const timeStamp = new Date();
 
-        this.readFile(fullpath, function (content) {
-            var minifiedString = "";
-            var splitdot = fullpath.split('.');
-            var ext = splitdot.pop();
+        this.readFile(fullpath,  (content)  => {
+            let minifiedString = "";
+            let splitdot = fullpath.split('.');
+            let ext = splitdot.pop();
     
             if (ext == "lml") {
                 ext = splitdot.pop();
@@ -94,8 +91,8 @@ var FileServer = function () {
                 minifiedString = content
             }
 
-            var handle = that.getOutputFileHandle(fullpath, 'w+');
-            that.writeToFile(handle, minifiedString, function () {
+            const handle = that.getOutputFileHandle(fullpath, 'w+');
+            that.writeToFile(handle, minifiedString,  ()  => {
                 that.closeFileHandle(handle);
                 log('FileServer', 'Minified file ' + fullpath + ' in ' + (new Date() - timeStamp) + 'ms');
 
@@ -104,8 +101,8 @@ var FileServer = function () {
         }, false, 'utf8');
     };
 
-    this.dirExists = function (fullpath, cb) {
-        fs.lstat(fullpath, function (err, stats) {
+    dirExists  (fullpath, cb) {
+        fs.lstat(fullpath,  (err, stats)  => {
             if (err || !stats.isDirectory() && !stats.isSymbolicLink()) {
                 cb(false);
             } else {
@@ -114,16 +111,16 @@ var FileServer = function () {
         });
     };
 
-    this.createSymlink = function (src, dest, cb) {
+    createSymlink  (src, dest, cb) {
         fs.symlink(src, dest, cb);
     };
 
-    this.createSymlinkSync = function (src, dest) {
+    createSymlinkSync  (src, dest) {
         try {
-            this.dirExists(dest, function (exists) {
+            this.dirExists(dest,  (exists)  => {
                 if (!exists) {
                     try {
-                        var stat = fs.statSync(dest);
+                        const stat = fs.statSync(dest);
 
                         if (!stat.isDirectory()) {
                             fs.symlinkSync(src, dest);
@@ -141,27 +138,31 @@ var FileServer = function () {
         }
     };
 
-    this.dirname = function (fullpath) {
+    dirname  (fullpath) {
         return path.dirname(fullpath);
     };
 
-    this.emptyDirectory = this.rmrf = function(path, opt, cb) {
+    rmrf() {
+        this.emptyDirectory(...arguments);
+    }
+
+    emptyDirectory(path, opt, cb) {
         opt = opt || {};
         opt.root = path;
         opt.fileFilter = opt.fileFilter || "*";
 
         log('Fileserver', 'Emptying directory ' + opt.root);
-        readdirp(opt, function(err, content) { 
+        readdirp(opt, (err, content) =>  { 
             if (err) {
                return cb(err);
             }
 
-            var files = content.files;
+            const files = content.files;
             if (files.length > 500 && !opt.acceptLargeDirectory) {
                 cb(new Error("Found more than 500 files. Might be insecure."));
             } else {
-                var index = -1;
-                var nextFile = function() {
+                let index = -1;
+                const nextFile = () =>  {
                     index++;
 
                     if (index == files.length) {
@@ -175,50 +176,49 @@ var FileServer = function () {
         });
     };
 
-    this.deleteFile = function (path, cb) {
+    deleteFile  (path, cb) {
         fs.unlink(path, cb);
     }
 
-    this.createDirIfNotExists = function (fullpath, callback, abs) {
+    createDirIfNotExists  (fullpath, callback, abs) {
         abs = typeof abs === 'undefined' ? false : abs;
-        var dirname = abs ? fullpath : path.dirname(fullpath);
-        mkdirp(dirname, function (err) {
+        const dirname = abs ? fullpath : path.dirname(fullpath);
+        mkdirp(dirname,  (err)  => {
             callback(!err);
         });
     };
 
-    this.readJSON = function (abspath, callback, sync) {
+    readJSON  (abspath, callback, sync) {
         if (sync) {
             return JSON.parse(this.readFileSync(abspath)) || {};
         } else {
-            this.readFile(abspath, function (content) {
+            this.readFile(abspath,  (content)  => {
                 callback(JSON.parse(content || {}));
             });
         }
 
     };
 
-    this.saveJSON = function (abspath, object, callback) {
-        var that = this;
-        var handle = this.getOutputFileHandle(abspath, 'w+');
-        this.writeToFile(handle, JSON.stringify(object), function () {
-            that.closeFileHandle(handle);
+    saveJSON  (abspath, object, callback) {
+        const handle = this.getOutputFileHandle(abspath, 'w+');
+        this.writeToFile(handle, JSON.stringify(object),  ()  => {
+            this.closeFileHandle(handle);
             callback();
         });
     };
 
-    this.readFile = function (filename, callback, sync, encoding) {
+    readFile  (filename, callback, sync, encoding) {
         if (sync) {
-            var exists = this.fileExists(filename, undefined, true);
+            const exists = this.fileExists(filename, undefined, true);
             if (exists) {
                 return fs.readFileSync(filename, encoding || "binary");
             } else {
                 return undefined;
             }
         } else {
-            this.fileExists(filename, function (exists) {
+            this.fileExists(filename,  (exists)  => {
                 if (exists) {
-                    fs.readFile(filename, encoding || "binary", function (err, file) {
+                    fs.readFile(filename, encoding || "binary",  (err, file)  => {
                         callback(file, err);
                     });
                 } else {
@@ -228,47 +228,47 @@ var FileServer = function () {
         }
     };
 
-    this.readFileSync = function (filename) {
+    readFileSync  (filename) {
         return fs.readFileSync(filename, 'utf8');
     };
 
-    this.listDirContent = function (dirname, callback) {
-        fs.readdir(dirname, function (err, content) {
+    listDirContent  (dirname, callback) {
+        fs.readdir(dirname,  (err, content)  => {
             callback(content || [], err);
         });
     };
 
-    this.listDirContentRecursive = function (dirname, callback) {
-        dir.files(dirname, function (err, files) {
+    listDirContentRecursive  (dirname, callback) {
+        dir.files(dirname,  (err, files)  => {
             callback(err || files);
         });
     }
 
-    this.listDirContentSync = function (dirname) {
+    listDirContentSync  (dirname) {
         return fs.readdirSync(dirname);
     };
 
-    this.copyFile = function (source, dest, callback) {
-        var folders = dest.split(path.sep);
+    copyFile  (source, dest, callback) {
+        const folders = dest.split(path.sep);
         folders.pop();
-        var pathToFile = folders.join('/');
+        const pathToFile = folders.join('/');
 
-        mkdirp(pathToFile, function () {
-            var rs = fs.createReadStream(source);
-            var ws = fs.createWriteStream(dest);
+        mkdirp(pathToFile,  ()  => {
+            const rs = fs.createReadStream(source);
+            const ws = fs.createWriteStream(dest);
 
             rs.on('close', callback);
             rs.pipe(ws);
         });
     };
 
-    this.moveFile = function(source, dest, callback) {
-        this.copyFile(source, dest, function() {
+    moveFile (source, dest, callback) {
+        this.copyFile(source, dest, () =>  {
             fs.unlink(source, callback);
         });
     };
 
-    this.pipeFileToClient = function (cli, filename, callback, abs, mime) {
+    pipeFileToClient  (cli, filename, callback, abs, mime) {
         cli.touch('fileserver.pipeFileToClient');
         if (cli.response.finished) {
             return callback && callback();
@@ -282,17 +282,17 @@ var FileServer = function () {
             });
         }
 
-        var stream = fs.createReadStream(filename)
+        const stream = fs.createReadStream(filename)
         stream.pipe(cli.response);
 
-        stream.on('close', function () {
+        stream.on('close',  ()  => {
             cli.response.end();
             stream.destroy();
             callback && callback();
         });
     };
 
-    this.pipeContentToClient = function (cli, content) {
+    pipeContentToClient  (cli, content) {
         cli.response.writeHead(200, {
             "Content-Type": 'text/html; charset=utf-8'
         });
@@ -300,7 +300,7 @@ var FileServer = function () {
         cli.response.end();
     };
 
-    this.validateIndexPath = function (cli, filename) {
+    validateIndexPath  (cli, filename) {
         if (!cli.routeinfo.isStatic && filename.indexOf("index.html") == -1) {
             filename += "/index.html";
         }
@@ -308,7 +308,7 @@ var FileServer = function () {
         return filename;
     };
 
-    this.getOutputFileHandle = function (filename, flag, encoding) {
+    getOutputFileHandle  (filename, flag, encoding) {
         return fs.createWriteStream(filename, {
             flags: flag ? flag : 'a+',
             defaultEncoding: encoding || 'utf8',
@@ -316,113 +316,51 @@ var FileServer = function () {
         });
     };
 
-    this.pipeFileToHandle = function (handle, filename, callback) {
-        var rs = fs.createReadStream(filename);
+    pipeFileToHandle  (handle, filename, callback) {
+        const rs = fs.createReadStream(filename);
         rs.on('close', callback);
         rs.pipe(handle, {
             end : false   
         });
     };
 
-    this.dumpToFile = function(filename, content, callback, encoding) {
-        var handle = fs.createWriteStream(filename, {
+    dumpToFile (filename, content, callback, encoding) {
+        const handle = fs.createWriteStream(filename, {
             flags: 'w+',
             defaultEncoding: encoding || 'utf8',
             mode: '0644'
         });
 
-        handle.write(content, encoding || 'utf8', function() {
+        handle.write(content, encoding || 'utf8', () =>  {
             handle.close();
             handle.destroy();
             callback && callback();
         });
     };
 
-    this.writeToFile = function (handle, content, callback, encoding) {
+    writeToFile  (handle, content, callback, encoding) {
         handle.write(content, encoding || 'utf8', callback);
     };
 
-    this.closeFileHandle = function (handle) {
+    closeFileHandle  (handle) {
         handle.end();
     };
 
-    this.serveRelFile = function (cli, filename) {
-
-    };
-
-    this.serveAbsFile = function (cli, fullpath) {
+    serveAbsFile  (cli, fullpath) {
         cli.touch('fileserver.serveAbsFile');
-        this.pipeFileToClient(cli, fullpath, function () {
+        this.pipeFileToClient(cli, fullpath,  ()  => {
             cli.touch("fileserver.serveAbsFile.callback");
         });
     };
 
-    this.serveIndex = function (cli, dirpath) {
-
-    };
-
-    this.genRandomNameFile = function (filename, prefix) {
+    genRandomNameFile  (filename, prefix) {
         filename = crypto.randomBytes(10).toString('hex') + 
             filename + dateFormat(new Date(), "isoDateTime") + 
             crypto.randomBytes(10).toString('hex');
 
         return (prefix || "") + crypto.createHash('sha1').update(filename).digest('hex');
     }
-
-    /**
-     * Generate an image based on given text
-     * @param  {string} text     The text to convert in an image
-     * @param  {string} path     The complete path where to save the image. Must be a .png
-     * @param  {function} cb     The callback once the image is generated
-     */
-    this.genImageFromText = function (text, path, cb) {
-        log("FileServer", "Initializing canvas for text to image");
-        // Gen Image
-        var Image = Canvas.Image
-        var canvas = new Canvas(100, 60)
-        var ctx = canvas.getContext('2d');
-        var Font = Canvas.Font;
-
-        //create signature font
-        var artySignFont = new Font('ArtySign', _c.default().server.base + "backend/static/fonts/ArtySignature.otf");
-        ctx.addFont(artySignFont);
-
-        ctx.font = '100px ArtySign';
-        ctx.fillText(text, 0, 29);
-
-        // Recreate a canvas with the appropriate width
-        var size = ctx.measureText(text);
-
-        log("FileServer", "Creating canvas");
-        canvas = new Canvas(size.width + 30, 150);
-
-        newContext = canvas.getContext('2d');
-        newContext.addFont(artySignFont);
-
-        newContext.font = '100px ArtySign';
-        newContext.fillText(text, 15, 100);
-
-
-        // // Save it
-        var out = fs.createWriteStream(path);
-        var stream = canvas.pngStream();
-
-        log("FileServer", "Streaming data to file");
-        stream.on('data', function (chunk) {
-            out.write(chunk);
-        });
-
-        stream.on('end', function () {
-            log('FileServer', "Saved text to image at " + path);
-            cb(path);
-        });
-    }
-
-    var init = function () {
-
-    };
-
-    init();
 };
 
-module.exports = new FileServer();
+const that = new FileServer();
+module.exports = that;

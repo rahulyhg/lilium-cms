@@ -1,110 +1,120 @@
-var _configs = {};
-var log = require('./log.js');
+const log = require('./log.js');
+const _configs = {};
 
-var Config = function () {
-    this.httpRegex = /https?\:\/\//;
-    this.lmlUserAgent = "Lilium/1.3 Linux Node/" + process.versions.node + " v8/" + process.versions.v8;
-};
+class Config  {
+    constructor() {
+        this.httpRegex = /https?\:\/\//;
+        this.lmlUserAgent = "Lilium/1.3 Linux Node/" + process.versions.node + " v8/" + process.versions.v8;
+    }
 
-Config.prototype.getAllSites = function () {
-    var arr = [];
-    for (var key in _configs) if (key != 'default') arr.push(_configs[key]);
-    return arr;
-};
+    getAllSites() {
+        const arr = [];
+        for (var key in _configs) if (key != 'default') arr.push(_configs[key]);
+        return arr;
+    }
 
-Config.prototype.getSimpleSites = function () {
-    var arr = [];
+    getSimpleSites() {
+        const arr = [];
 
-    for (var key in _configs)
-        if (key != 'default') {
-            arr.push({
-                displayName: _configs[key].website.sitetitle,
-                name: key,
-                id : _configs[key].id,
-                network : _configs[key].default || false
-            });
-        }
+        for (let key in _configs)
+            if (key != 'default') {
+                arr.push({
+                    displayName: _configs[key].website.sitetitle,
+                    name: key,
+                    id : _configs[key].id,
+                    network : _configs[key].default || false
+                });
+            }
 
-    return arr;
-};
+        return arr;
+    }
 
-Config.prototype.getSimpleSitesAssoc = function() {
-    var obj = {};
+    getSimpleSitesAssoc() {
+        const obj = {};
 
-    for (var key in _configs)
-        if (key != 'default') {
-            obj[_configs[key].id] = ({
-                displayName: _configs[key].website.sitetitle,
-                name: key,
-                url : _configs[key].server.url,
-                network : _configs[key].default || false
-            });
-        }
+        for (let key in _configs)
+            if (key != 'default') {
+                obj[_configs[key].id] = ({
+                    displayName: _configs[key].website.sitetitle,
+                    name: key,
+                    url : _configs[key].server.url,
+                    network : _configs[key].default || false
+                });
+            }
 
-    return obj;
-};
+        return obj;
+    }
 
-Config.prototype.fetchConfig = function (site) {
-    var s = _configs[site];
-    if (!s) {
-        for (cc in _configs) {
-            if (_configs[cc].uid == site || _configs[cc].id == site) {
-                s = _configs[cc];
-                break;
+    fetchConfig(site) {
+        let s = _configs[site];
+        if (!s) {
+            for (cc in _configs) {
+                if (_configs[cc].uid == site || _configs[cc].id == site) {
+                    s = _configs[cc];
+                    break;
+                }
             }
         }
+        return s;
     }
-    return s;
-}
 
-Config.prototype.fetchConfigFromCli = function (cli) {
-    var rootdomain = cli.request.headers.host;
+    fetchConfigFromCli(cli) {
+        const rootdomain = cli.request.headers.host;
 
-    cli.routeinfo.configname = rootdomain;
-    cli.routeinfo.rootdomain = rootdomain;
-    cli._c = _configs[rootdomain];
-};
-
-Config.prototype.default = function () {
-    return _configs.default;
-};
-
-Config.prototype.eachSync = function (callback) {
-    for (var site in _configs) {
-        if (site != 'default') callback(_configs[site]);
+        cli.routeinfo.configname = rootdomain;
+        cli.routeinfo.rootdomain = rootdomain;
+        cli._c = _configs[rootdomain];
     }
-};
 
-Config.prototype.each = function (loopFtc, end) {
-    var sites = Object.keys(_configs);
-    var siteIndex = 0;
+    tryDefault() {
+        try {
+            return this.default();
+        } catch(ex) { }
 
-    var nextItem = function () {
-        if (siteIndex == sites.length) {
-            end && end();
-        } else if (sites[siteIndex] == 'default') {
-            siteIndex++;
-            nextItem();
-        } else {
-            loopFtc(_configs[sites[siteIndex]], function () {
+        return;
+    }
+
+    default() {
+        return require('./sites/default.json');
+    }
+
+    eachSync(callback) {
+        for (let site in _configs) {
+            if (site != 'default') callback(_configs[site]);
+        }
+    }
+
+    each(loopFtc, end) {
+        const sites = Object.keys(_configs);
+        let siteIndex = 0;
+
+        const nextItem = () => {
+            if (siteIndex == sites.length) {
+                end && end();
+            } else if (sites[siteIndex] == 'default') {
                 siteIndex++;
                 nextItem();
-            });
+            } else {
+                loopFtc(_configs[sites[siteIndex]], () => {
+                    siteIndex++;
+                    nextItem();
+                });
+            }
+        };
+        nextItem();
+    }
+
+    saveConfigs(config, callback) {
+        require('./fileserver.js').saveJSON(config.server.base + "/sites/" + config.jsonfile, config, callback);
+    }
+
+    registerConfigs(key, object) {
+        _configs[key] = object;
+
+        log('Config', 'Registered config with key ' + key);
+        if (key == "default") {
+            object.default = true;
         }
-    };
-    nextItem();
-};
-
-Config.prototype.saveConfigs = function (config, callback) {
-    require('./fileserver.js').saveJSON(config.server.base + "/sites/" + config.jsonfile, config, callback);
-}
-
-Config.prototype.registerConfigs = function (key, object) {
-    _configs[key] = object;
-
-    log('Config', 'Registered config with key ' + key);
-    if (key == "default") {
-        object.default = true;
     }
 };
 

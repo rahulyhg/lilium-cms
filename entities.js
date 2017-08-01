@@ -48,59 +48,60 @@ const SOCIAL_NETWORKS = {
     googleplus : { icon : "fa fa-google",    color : "#df4a32", border : "#bf2a12", url : "https://plus.google.com/u/1/+" }
 };
 
-var Entity = function () {
-    this._id = undefined;
-    this.username = "";
-    this.shhh = "";
-    this.email = "";
-    this.roles = new Array();
-    this.jobtitle = "";
-    this.displayname = "";
-    this.avatarID = -1;
-    this.avatarURL = "";
-    this.avatarMini = "";
-    this.createdOn = undefined;
-    this.preferences = new Object();
-    this.slug = "";
-    this.socialnetworks = {};
-    this.personality = "none";
+class Entity {
+    constructor() {
+        this._id;
+        this.username = "";
+        this.shhh = "";
+        this.email = "";
+        this.roles = [];
+        this.jobtitle = "";
+        this.displayname = "";
+        this.avatarID = -1;
+        this.avatarURL = "";
+        this.avatarMini = "";
+        this.createdOn;
+        this.preferences = {};
+        this.slug = "";
+        this.socialnetworks = {};
+        this.personality = "none";
 
-    // Various data; should always be checked for undefined
-    this.data = new Object();
-};
+        this.data = {};
+    }
+}
 
-var toEntitySlug = function(str) {
+const toEntitySlug = (str) => {
     return require('slugify')(str).toLowerCase().replace(/\'/g, "");
 };
 
-var Entities = module.exports = new function () {
-    var entityWithData = function (oData, callback) {
-        var entity = new Entity();
+const entityWithData = (oData, callback) => {
+    var entity = new Entity();
 
-        for (var key in oData) {
-            entity[key] = oData[key];
-        }
+    for (var key in oData) {
+        entity[key] = oData[key];
+    }
 
-        callback(entity);
-    };
+    callback(entity);
+};
 
-    this.getPersonalities = function() {
+class Entities {
+    getPersonalities () {
         return PERSONALITIES_ASSOC;
     };
 
-    this.getSocialNetworks = function() {
+    getSocialNetworks () {
         return SOCIAL_NETWORKS;
     };
 
-    this.firstLogin = function(cli, userObj, cb) {
+    firstLogin (cli, userObj, cb) {
         db.update(_c.default(), 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : 1}, cb);
     };
 
-    this.registerLogin = function(cli, userObj, cb) {
+    registerLogin (cli, userObj, cb) {
         db.update(_c.default(), 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : userObj.totalLogin++}, cb);
     };
 
-    this.fetchFromDB = function (conf, idOrUsername, callback, force) {
+    fetchFromDB  (conf, idOrUsername, callback, force) {
         var condition = new Object();
 
         if (typeof idOrUsername === "object") {
@@ -136,8 +137,8 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.welcome = function(cli) {
-        var dat = {
+    welcome (cli) {
+        const dat = {
             welcomed : true,
             magiclink : Math.random() + "/" + Math.random() + "/*/" + Math.random(),
             firstname : cli.postdata.data.firstname,
@@ -178,7 +179,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.adminGET = function (cli) {
+    adminGET  (cli) {
         cli.touch('entities.handleGET');
         if (!cli.hasRightOrRefuse("list-entities")) {return;}
 
@@ -208,7 +209,7 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.adminPOST = function (cli) {
+    adminPOST  (cli) {
         cli.touch('entities.handlePOST');
         if (cli.routeinfo.path[1] == 'me') {
             switch (cli.postdata.data.form_name) {
@@ -277,7 +278,7 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.toPresentable = function(entity) {
+    toPresentable (entity) {
         return {
             displayname : entity.displayname,
             slug : entity.slug,
@@ -290,13 +291,13 @@ var Entities = module.exports = new function () {
         };
     };
 
-    this.commitfbauth = function(cli) {
+    commitfbauth (cli) {
         db.update(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, {fbid : cli.postdata.data.fbid}, function() {
             cli.sendJSON({done : true});
         });
     };
 
-    this.canActOn = function(actor, subject, cb) {
+    canActOn (actor, subject, cb) {
         var that = this;
         that.maxPower(undefined, function(actorpower) {
             that.maxPower(undefined, function(subpower) {
@@ -305,7 +306,7 @@ var Entities = module.exports = new function () {
         }, actor);
     }
 
-    this.maybeRevoke = function(cli, userid) {
+    maybeRevoke (cli, userid) {
         var that = this;
         userid = userid || cli.postdata.data.userid;
 
@@ -322,7 +323,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.updateProfile = function (cli) {
+    updateProfile  (cli) {
         cli.touch('entities.updateProfile');
         var entData = cli.postdata.data;
         var entity = this.initialiseBaseEntity(entData);
@@ -352,7 +353,7 @@ var Entities = module.exports = new function () {
 
     };
 
-    this.updateProfilePictureID = function(cli, selff) {
+    updateProfilePictureID (cli, selff) {
         var imgid = cli.postdata.data.imageid;
         var imgurl = cli.postdata.data.imageurl;
         var miniurl = cli.postdata.data.miniurl;
@@ -379,7 +380,7 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.commitProfilePic = function(cli, filename, cb) {
+    commitProfilePic (cli, filename, cb) {
         var sessionManager = require('./session.js');
         var ext = filename.substring(filename.lastIndexOf('.') + 1);
 
@@ -403,7 +404,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.uploadFirstAvatar = function(cli) {
+    uploadFirstAvatar (cli) {
         var filename = cli.postdata.data[0];
         this.commitProfilePic(cli, filename, function(err, images) {
             cli.did("entity", "picupload");
@@ -411,7 +412,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.updateProfilePicture = function (cli, isProfile) {
+    updateProfilePicture  (cli, isProfile) {
         log('Entities', 'Handling entity picture upload');
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
@@ -514,7 +515,7 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.changePassword = function (cli, profile) {
+    changePassword  (cli, profile) {
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
 
@@ -546,7 +547,7 @@ var Entities = module.exports = new function () {
         }
     }
 
-    this.maxPower = function (cli, callback, userid) {
+    maxPower  (cli, callback, userid) {
         db.aggregate(_c.default(), 'entities', [{
             "$unwind": "$roles"
         }, {
@@ -589,7 +590,7 @@ var Entities = module.exports = new function () {
         });
     }
 
-    this.update = function (cli) {
+    update  (cli) {
         var that = this;
         if (cli.hasRight('edit-entities')) {
             var entData = cli.postdata.data;
@@ -644,17 +645,17 @@ var Entities = module.exports = new function () {
         }
     }
 
-    this.serveEdit = function (cli) {
+    serveEdit  (cli) {
         cli.touch('entities.serveEdit');
         filelogic.serveAdminLML(cli, true);
     };
 
-    this.serveNew = function (cli) {
+    serveNew  (cli) {
         cli.touch('entities.serveNew');
         filelogic.serveAdminLML(cli);
     };
 
-    this.refreshSlugs = function(cli, cb) {
+    refreshSlugs (cli, cb) {
         db.findToArray(_c.default(), 'entities', {}, function(err, arr) {
             var i = 0;
             var nextEnt = function() {
@@ -674,14 +675,14 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.getDefaultPrefs = function(_c) {
+    getDefaultPrefs (_c) {
         return {
             "topbuttontext" : "Publish",
             "topbuttonlink" : _c.server.url + "/admin/article/new"
         };
     };
 
-    this.initialiseBaseEntity = function (entData) {
+    initialiseBaseEntity  (entData) {
         var newEnt = this.createEmptyEntity();
 
         newEnt.username = entData.username;
@@ -725,7 +726,7 @@ var Entities = module.exports = new function () {
         return newEnt;
     }
 
-    this.createFromCli = function (cli) {
+    createFromCli  (cli) {
         cli.touch('entities.createFromCli');
         var entData = cli.postdata.data;
         var newEnt = this.initialiseBaseEntity(entData);
@@ -740,7 +741,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.deleteFromCli = function (cli) {
+    deleteFromCli  (cli) {
         var id = cli.postdata.data.uid;
 
         db.update(_c.default(), 'entities', {
@@ -755,11 +756,11 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.createEmptyEntity = function () {
+    createEmptyEntity  () {
         return new Entity();
     };
 
-    this.validateEntityObject = function (e, cli, cb) {
+    validateEntityObject  (e, cli, cb) {
         var valid = true;
         valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.roles;
         cli.hasEnoughPower(e.roles, function (hasEnoughPower) {
@@ -768,7 +769,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.registerEntity = function (cli, entity, callback) {
+    registerEntity  (cli, entity, callback) {
         this.validateEntityObject(entity, cli, function (valid) {
             if (valid) {
                 cli.did("entity", "createduser", {username : entity.username});
@@ -793,7 +794,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.sendMagicLinkToEveryone = function(cli, done) {
+    sendMagicLinkToEveryone (cli, done) {
         var that = this;
         db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, function(arr, users) {
             users.forEach(function(user) {
@@ -804,7 +805,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.sendNewMagicEmail = function (cli, entityid, callback) {
+    sendNewMagicEmail  (cli, entityid, callback) {
         db.findUnique(_c.default(), 'entities', {_id : db.mongoID(entityid)}, function(err, entity) {
             if (entity) {
                 log('Entity', "Sending magic link to " + entity.email);
@@ -829,7 +830,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.updateEntity = function (valObject, siteid, cb) {
+    updateEntity  (valObject, siteid, cb) {
         var id = typeof valObject._id !== "object" ? db.mongoID(valObject._id) : valObject._id;
         // Removing properties we don't want to edit
         delete valObject.username;
@@ -843,7 +844,7 @@ var Entities = module.exports = new function () {
         db.update(_c.default(), 'entities', {_id : id}, valObject, cb);
     };
 
-    this.registerRole = function (rObj, rights, callback, updateIfExists, allsites) {
+    registerRole  (rObj, rights, callback, updateIfExists, allsites) {
         rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
         rObj.rights = rights;
 
@@ -865,7 +866,7 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.isAllowed = function (entity, right) {
+    isAllowed  (entity, right) {
         var allowed = true;
         var that = this;
 
@@ -885,7 +886,7 @@ var Entities = module.exports = new function () {
         return allowed;
     };
 
-    this.table = function () {
+    table  () {
         tableBuilder.createTable({
             name: 'entities',
             endpoint: 'entities.table',
@@ -923,7 +924,7 @@ var Entities = module.exports = new function () {
         });
     };
 
-    this.form = function () {
+    form  () {
         formbuilder.createForm('entity_create', {
                fieldWrapper : "lmlform-fieldwrapper"
             })
@@ -1030,7 +1031,7 @@ var Entities = module.exports = new function () {
             });
     };
 
-    this.livevar = function (cli, levels, params, callback) {
+    livevar  (cli, levels, params, callback) {
         var allEntities = levels.length === 0;
 
         if (allEntities) {
@@ -1145,7 +1146,7 @@ var Entities = module.exports = new function () {
         }
     };
 
-    this.setup = function() {
+    setup () {
         livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
             db.findToArray(_c.default(), 'entities', {
                 _id: db.mongoID(cli.session.data._id)
@@ -1154,8 +1155,6 @@ var Entities = module.exports = new function () {
             });
         }, []);
     };
-
-    var deletePluginRole = function (identifier) {
-
-    };
 };
+
+module.exports = new Entities();

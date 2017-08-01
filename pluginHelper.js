@@ -1,36 +1,29 @@
-var fileserver = require('./fileserver.js');
+class PluginHelper {
+    getPluginIdentifierFromFilename(filename, cb, sync) {
+        const fileserver = require('./fileserver.js');
+        const conf = require('./config.js').default();
 
-var PluginHelper = function () {
-
-    this.getPluginIdentifierFromFilename = function (filename, cb, sync) {
-        var conf = require('./config.js').default();
-        //Remove base path
-        var tempname = filename.replace(conf.server.base, '');
+        let tempname = filename.replace(conf.server.base, '');
         if (tempname.startsWith(conf.paths.plugins + '/')) {
-            // It is a plugin
-
-            // Get the plugin base folder in case the filename is something like : plugins/test/random/content.js
-            var pluginBaseFolder = tempname.replace(conf.paths.plugins + '/', '');
+            let pluginBaseFolder = tempname.replace(conf.paths.plugins + '/', '');
             pluginBaseFolder = pluginBaseFolder.substring(0, pluginBaseFolder.indexOf('/'));
 
-            var infoPath = conf.server.base + conf.paths.plugins + '/' + pluginBaseFolder + "/" + conf.paths.pluginsInfo;
+            let infoPath = conf.server.base + conf.paths.plugins + '/' + pluginBaseFolder + "/" + conf.paths.pluginsInfo;
             if (sync) {
-                var exists = fileserver.fileExists(infoPath, undefined, true);
+                const exists = fileserver.fileExists(infoPath, undefined, true);
                 if (exists) {
                     return fileserver.readJSON(infoPath, undefined, true).identifier || false;
                 }
             } else {
-                fileserver.fileExists(infoPath, function (exists) {
+                fileserver.fileExists(infoPath, (exists) => {
                     if (exists) {
-                        fileserver.readJSON(infoPath, function (json) {
-                            cb((json.identifier) || false);
+                        fileserver.readJSON(infoPath, (json) => {
+                            cb && cb((json.identifier) || false);
                         });
                     }
                 });
             }
-
         } else {
-            // Not a plugin
             return cb ? cb(false) : false;
         }
     };
