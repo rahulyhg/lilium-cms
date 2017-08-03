@@ -1,5 +1,5 @@
 {#config;extra}
-{$ if (extra.contextname == "article"); $}
+{$ if (0 == 1); if (extra.contextname == "article"); $}
 
 <div class="android-sharer" id="android-sharer">
     <i class="fa fa-share-alt" aria-hidden="true"></i>
@@ -76,4 +76,4 @@
     <i class="fa fa-pinterest-p" aria-hidden="true"></i>
 </div>
 
-{$ endif; $}
+{$ endif; endif; $}

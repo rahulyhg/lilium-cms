@@ -400,6 +400,10 @@ class Article {
                                 article.url = conf.server.protocol + conf.server.url + article.topicslug + article.name;
                                 article.amp = conf.server.protocol + conf.server.url + "/amp" + article.topicslug + article.name;
 
+                                if (article.content.includes('<lml-page')) {
+                                    article.paginated = true;
+                                }
+
                                 if (article.related) {
                                     article.related.url = conf.server.protocol + conf.server.url + article.topicslug + related.name;
                                 }

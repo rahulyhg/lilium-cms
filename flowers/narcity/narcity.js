@@ -125,6 +125,10 @@ var fetchHomepageArticles = function(_c, cb, page) {
                     arr[j].topic = sectionTopics[i];
                     arr[j].url = _c.server.protocol + _c.server.url + sectionTopics[i].completeSlug + "/" + arr[j].name;
 
+                    if (arr[j].content.includes('<lml-page')) {
+                        arr[j].url += "/1";
+                    }
+
                     arr[j].classes = "article-thumbnail";
                     arr[j].imgsrc = arr[j].featuredimage[0].sizes.thumbnailarchive.url;
 
@@ -174,6 +178,10 @@ var fetchHomepageArticles = function(_c, cb, page) {
                     latests[j].author = authors[latests[j].author];
                     latests[j].topic = latests[j].topic[0];
                     latests[j].url = _c.server.protocol + _c.server.url + (latests[j].topic ? "/" + latests[j].topic.completeSlug : "") + "/" + latests[j].name;
+
+                    if (latests[j].content.includes('<lml-page')) {
+                        latests[j].url += "/1";
+                    }
 
                     latests[j].classes = "article-thumbnail";
                     latests[j].imgsrc = _c.server.protocol + latests[j].featuredimage[0].sizes.thumbnailarchive.url;
@@ -339,6 +347,11 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
                     arrList[i].featuredimage[0] ?
                     cli._c.server.protocol + arrList[i].featuredimage[0].sizes.thumbnailarchive.url : 
                     "";
+
+                if (arrList[i].content.includes('<lml-page')) {
+                    arrList[i].url += "/1";
+                }
+
             }
 
             cb(err || archTypeRes[0], arrList, totalArticles, indices, xtra);
@@ -350,7 +363,7 @@ var fetchArchiveArticles = function(cli, section, mtc, skp, cb) {
     } else if (section == "topic") {
         matchCallback([{topic : cli.extra.topic}]);
     } else if (section == "search") {
-        if (cli.routeinfo.params.city) {
+        if (cli.routeinfo.params.city && cli.routeinfo.params.city != "Montreal") {
             db.findUnique(cli._c, 'topics', {"override.cityname" : cli.routeinfo.params.city}, (err, topic) => {
                 if (topic) {
                     db.findToArray(cli._c, 'topics', {parent : topic._id}, (err, arr) => {
@@ -522,6 +535,11 @@ var fetchTopicArticles = function(conf, topic, index, send) {
                                 arr[i].url = conf.server.protocol + conf.server.url + "/" + arr[i].topic.completeSlug + "/" + arr[i].name;
                                 arr[i].imgsrc = arr[i].featuredimage[0] ?
                                     conf.server.protocol + arr[i].featuredimage[0].sizes.thumbnailarchive.url : "";
+
+                                if (arr[i].content.includes('<lml-page')) {
+                                    arr[i].url += "/1";
+                                }
+
 
                                 arr[i].classes = "article-thumbnail";
                                 if ((9 - i) % 9 == 0) {
@@ -763,7 +781,7 @@ var getWhatsHot = function(_c, cb) {
                         if (article && !article.nsfw) {
                             articleArray.push({
                                 _id : article._id, 
-                                fullurl : article.url,
+                                fullurl : article.url + (article.paginated ? "/1" : ""),
                                 title : article.title, 
                                 subtitle : article.subtitle,
                                 featuredimage : article.featuredimage[0].sizes.thumbnaillarge.url,

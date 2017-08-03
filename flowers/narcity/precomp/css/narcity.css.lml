@@ -434,6 +434,9 @@ article .article-author-strip {
     width: {=aw};
     margin: 30px 0px;
     font-family: Arial, sans-serif;
+
+    border-bottom: 1px solid #d9d9d9;
+    padding-bottom: 15px;
 }
 
 article .article-author-face-section {
@@ -485,7 +488,8 @@ article .article-share-arrow-wrapper .article-social-upward-arrow {
     width: 34px;
 }
 
-article #article-content .keep-on-reading-wrapper a.keep-on-reading {
+article #article-content .keep-on-reading-wrapper a.keep-on-reading,
+#article-share-on-facebook a {
     color: #FFF;
     background-color: #777;
     border-radius: 3px;
@@ -499,6 +503,18 @@ article #article-content .keep-on-reading-wrapper a.keep-on-reading {
     font-weight: 500;
     text-transform: uppercase;
 }   
+
+article #article-content #article-share-on-facebook a {
+    background-color: #4267b2;
+    color: #FFF;
+}
+
+article #article-content #article-share-on-facebook a span, 
+article #article-content #article-share-on-facebook a i {
+    vertical-align: middle;
+    margin-right: 5px;
+    display: inline-block;
+}
 
 article #article-content .keep-on-reading-wrapper a.keep-on-reading.keep-on-reading-next {
     background-color: {=mc};
@@ -991,7 +1007,7 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
 }
 
 .sidebar-internal-link-title {
-    font-size: 20px;
+    font-size: 18px;
     color: #111;
     font-family: "Oswald",sans-serif;
     text-decoration: none;
@@ -1008,7 +1024,7 @@ article .article-related-section .article-thumbnail-featured .article-thumbnail-
 
 .sidebar-internal-link {
     text-decoration: none;
-    margin-top: 40px;
+    margin-top: 30px;
     display: block;
 }
 
@@ -1748,7 +1764,7 @@ footer {
 footer .footer-topsection {
         display: block;
         background: #000;
-        padding: 30px 0px 130px 0px;
+        padding: 30px 0px 30px 0px;
 }
 
 footer .footer-bottomsection {

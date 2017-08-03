@@ -79,7 +79,7 @@ class LiliumAPI {
                 }
             }
         ], (arr) => {
-            if (!arr || !arr.length) {
+            if (!arr || !arr.filter) {
                 return done();
             }
 

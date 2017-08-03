@@ -126,6 +126,12 @@ $}
             </div>
             {$ endif; $}
 
+            <div id="article-share-on-facebook">
+                <a href="javascript: narcityFacebook.castShareDialog();">
+                    <i class="fa fa-facebook-official"></i> <span>{:shareonfacebook}</span>
+                </a>
+            </div>
+
             {$ if (?extra.article.nextURL ??); $}
             <div class="keep-on-reading-wrapper">
                 <a class="keep-on-reading keep-on-reading-next" href="{=extra.article.nextURL}">Next <i class="fa fa-chevron-right" aria-hidden="true"></i></a>
