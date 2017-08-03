@@ -1757,7 +1757,7 @@ class Article {
                     }
 
                     if (pageIndex != pages.length) {
-                        deepArticle.nextURL = deepArticle.url + "/1";
+                        deepArticle.nextURL = deepArticle.url + "/" + (pageIndex + 1);
                         deepArticle.related = [];
                     } 
 
