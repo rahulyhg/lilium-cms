@@ -8,6 +8,7 @@ const formbuilder = require('../formBuilder.js');
 const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 const log = require('../log.js');
+const api = require('../api.js');
 
 const loginSuccess = (cli, userObj, cb) => {
 	cli.touch('login.loginsuccess');
@@ -37,8 +38,6 @@ const loginSuccess = (cli, userObj, cb) => {
         }
     });
 };
-
-
 
 class Login {
     fbAuth (cli) {
@@ -175,6 +174,50 @@ class Login {
             }]
         });
 	};
+
+    apiAuth(username, password, done) {
+        db.findUnique(_c.default(), 'entities', {
+            revoked : {$ne : false}, 
+            username, 
+            shhh : CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex)
+        }, (err, user) => {
+            done(!!user, user);
+        });
+    }
+
+    apiGET(cli) {
+        if (cli.request.headers["user-agent"].substring(0, 6) == "lilium" && cli.apitoken) {
+            cli.sendJSON(cli.apisession);
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
+    }
+
+    apiPOST(cli) {
+        if (cli.request.headers["user-agent"].substring(0, 6) == "lilium") {
+            cli.readPostData((data) => {
+                if (data.username && data.password && data.domain) {
+                    this.apiAuth(data.username.toString(), data.password.toString(), (loggedin, user) => {
+                        if (loggedin) {
+                            api.createSession(user, (token) => {
+                                cli.response.setHeader('ltk', token);
+                                cli.sendJSON({
+                                    user : entities.toPresentable(user),
+                                    userid : user._id.toString()
+                                });
+                            });
+                        } else {
+                            cli.throwHTTP(404, undefined, true);
+                        }
+                    });
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            });
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
+    }
 };
 
 module.exports = new Login();

@@ -139,6 +139,25 @@ class ClientObject {
         }
     };
 
+    readPostData(done) {
+        if (this.postdata && this.postdata.data) {
+            return done(this.postdata.data);
+        }
+
+        this.postdata = {raw : ""};
+
+        this.request.on('data', (c) => { this.postdata.raw += c; });
+        this.request.on('end', () => {
+            try {
+                this.postdata.data = JSON.parse(this.postdata.raw);
+            } catch (ex) {
+                this.postdata.data = this.postdata.raw;
+            }
+
+            done(this.postdata.data);
+        });
+    }
+
     sendHTML (content, code) {
         this.response.writeHead(code || 200, {
             "Content-Type" : "text/html",

@@ -25,7 +25,9 @@ var Handler = function () {
         cli.touch('handler.POST');
 
         Router.parseClientObject(cli, function(loggedin) { 
-            if (loggedin || cli.routeinfo.path[0] === 'login') {
+            if (cli.routeinfo.api) {
+                require('./api.js').serveApi(cli);
+            } else if (loggedin || cli.routeinfo.path[0] === 'login') {
                cli.postdata = new Object();
                cli.postdata.length = cli.request.headers["content-length"];
                cli.postdata.data = {};

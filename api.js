@@ -3,10 +3,18 @@ const ApiEndpoints = {
     POST : {}
 };
 
+const log = require('./log.js');
 const db = require('./includes/db.js');
 const article = require('./article.js');
 const endpoints = require('./endpoints.js');
 const sharedcache = require('./sharedcache.js');
+const entities = require('./entities.js');
+
+const SESSION_COLLECTION = "apisessions";
+
+const s4 = () => {
+    return Math.random().toString(16).substring(2);
+}
 
 class LiliumAPI {
 	serveApi(cli) {
@@ -22,6 +30,8 @@ class LiliumAPI {
 		    cli.throwHTTP(404, undefined, true);
         } else if (api.apiEndpointRegistered(cli._c.id + cli.routeinfo.path[1], cli.method)) {
 		    ApiEndpoints[cli.method][cli._c.id + cli.routeinfo.path[1]](cli);
+        } else if (api.apiEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
+		    ApiEndpoints[cli.method][cli.routeinfo.path[1]](cli);
 		} else {
 		    cli.throwHTTP(404, undefined, true);
 		}
@@ -32,6 +42,7 @@ class LiliumAPI {
 	};
 
 	registerApiEndpoint(endpoint, method, func) {
+        log('API', 'Registering API endpoint ' + method + "@" + endpoint);
 	    ApiEndpoints[method][endpoint] = func;
 	};
 
@@ -42,10 +53,67 @@ class LiliumAPI {
     };
 
     fetchFromCache(key, done) {
-        sharedcache.get(key, value => {
+        sharedcache.get("api_" + key, value => {
             done(value);   
         });
     };
+
+    generateToken(prefix = "") {
+        return prefix+s4()+s4()+s4()+s4()+s4()+s4()+s4()+s4();
+    }
+
+    getSession(token, done) {
+        this.fetchFromCache("session_" + token, (maybeSession) => {
+            done(maybeSession);
+        });
+    }
+
+    loadSessionsInCache(done) {
+        db.join(require('./config.js').default(), SESSION_COLLECTION, [
+            {
+                $lookup : {
+                    from : "entities",
+                    localField : "userid",
+                    foreignField : "_id",
+                    as : "user"
+                }
+            }
+        ], (arr) => {
+            if (!arr || !arr.length) {
+                return done();
+            }
+
+            log('API', `Loading ${arr.length} sessions in cache`);
+            arr.filter(x => x.user[0] && !x.user[0].revoked).forEach(a => {
+                const session = entities.toPresentable(a.user[0]);
+                session.since = a.since;
+                entities.rightsFromRoles(a.user[0].roles, (rights) => {
+                    session.rights = rights;
+                    this.pushInCache("session_" + a.token, session);
+                });
+            });
+
+            done && done();
+        });
+    }
+
+    createSession(user, done) {
+        let token = this.generateToken('lmlapi') + "_" + Date.now();
+        entities.rightsFromRoles(user.roles, (rights) => {
+            const session = entities.toPresentable(user);
+            session.since = Date.now();
+            session.rights = rights;
+
+            this.pushInCache("session_" + token, session, () => { 
+                db.insert(require('./config.js').default(), SESSION_COLLECTION, { 
+                    token, userid : user._id, 
+                    since : Date.now() 
+                }, () => {
+                    done(token);
+                });
+            });
+        });
+    }
 }
 
 const api = new LiliumAPI();

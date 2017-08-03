@@ -47,8 +47,19 @@ var Router = function () {
 
         cli.response.setHeader("Backend", "Lilium");
 
-        if (!cli.routeinfo.isStatic && !cli.routeinfo.front) {
+        if (!cli.routeinfo.isStatic && !cli.routeinfo.front && !cli.routeinfo.api) {
             session.injectSessionInCli(cli, cb);
+        } else if (cli.routeinfo.api) {
+            cli.apitoken = cli.request.headers.ltk;
+            cli.apisession = false;
+            if (cli.apitoken) {
+                require('./api.js').getSession(cli.apitoken, (session) => {
+                    cli.apisession = session;
+                    cb(!!session);
+                });
+            } else {
+                cb(false);
+            }
         } else if (cli.routeinfo.front) {
             clerk.greet(cli, cb);
         } else {

@@ -17,6 +17,10 @@
 
     "rivers" : [
         {
+            "module" : "backend/login.js",
+            "endpoint" : "login",
+            "support" : ["api_get", "api_post"]
+        }, {
             "module" : "history.js",
             "endpoint" : "history",
             "support" : ["admin_get", "admin_post", "livevar"]

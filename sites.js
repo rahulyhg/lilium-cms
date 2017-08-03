@@ -249,6 +249,7 @@ var SiteInitializer = function (conf, siteobj) {
     var update = function(conf, done) {
         if (!isElder) { return done(); }
 
+        log('Sites', "Checking for updates");
         var versions = require('./versions.json');
         db.findToArray(conf, 'lilium', {}, function(err, dbv) {
             var vIndex = -1;
@@ -293,7 +294,9 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadSessions = function(cb) {
         if (!isElder) { return cb(); }
-        sessions.initSessionsFromDatabase(conf, cb);
+        sessions.initSessionsFromDatabase(conf, () => {
+            require('./api.js').loadSessionsInCache(cb);
+        });
     };
 
     var checkForWP = function(conf) {

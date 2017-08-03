@@ -1146,6 +1146,12 @@ class Entities {
         }
     };
 
+    rightsFromRoles(roles = [], send) {
+        db.findToArray(_c.default(), 'roles', { name : { $in : roles } }, (err, arr) => {
+            send([].concat(...arr.map(r => r.rights)));
+        });
+    };
+
     setup () {
         livevars.registerLiveVariable('me', function (cli, levels, params, callback) {
             db.findToArray(_c.default(), 'entities', {
