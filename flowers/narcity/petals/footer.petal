@@ -50,6 +50,9 @@
                                 </a>
                         </div>
                         <div class="footer-inline">
+                                {$ if (config.default.website.sitetitle == "Narcity") $}
+                                <a href="{=config.default.server.url}/about">{:about}</a>
+                                {$ endif $}
                                 <a href="https://www.narcitymedia.com">{:advertise}</a>
                                 <a href="{=config.default.server.url}/contact-us">{:contact-us}</a>
                                 <a href="https://www.narcitymedia.com/jobs">{:jobs}</a>
