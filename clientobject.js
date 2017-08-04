@@ -204,6 +204,10 @@ class ClientObject {
         return this.userinfo.loggedin && entities.isAllowed(this.userinfo, right);
     }
 
+    hasAPIRight (right) {
+        return this.apisession.rights.includes(right) || this.apisession.rights.includes('admin');
+    }
+
     isGranted  (role) {
         var isGranted = false;
         if (typeof this.userinfo.roles !== 'undefined' && (

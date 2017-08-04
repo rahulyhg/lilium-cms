@@ -220,9 +220,22 @@ class Article {
                         that.toPresentable(cli._c, article)
                     );
                 }
-            }, false, {status : "published"})
+            }, false, {status : "published"});
+        } else if (ftc == "list" && cli.hasAPIRight('list-content')) {
+            const postlimit = 100;
+            db.find(cli._c, 'content', {}, [], (err, cursor) => {
+                cursor
+                .limit(postlimit)
+                .skip(cli.routeinfo.params.page ? (cli.routeinfo.params.page * postlimit) : 0)
+                .project({
+                    title : 1, subtitle : 1, status : 1, author : 1, date : 1
+                })
+                .toArray((err, arr) => {
+                    cli.sendJSON(arr);
+                });
+            });
         } else {
-            cli.throwHTTP(404);
+            cli.throwHTTP(404, undefined, true);
         }
     };
 

@@ -190,8 +190,12 @@ class Login {
             if (cli.routeinfo.path[2] == "bundle") {
                 const menus = require('./admin.js').getAdminMenuFromRights(cli.apisession.rights);
 
-                cli.sendJSON({
-                    menus
+                db.find(_c.default(), 'entities', {}, [], (err, cursor) => {
+                    cursor.project({displayname : 1, revoked : 1, avatarURL : 1}).toArray((err, users) => {
+                        cli.sendJSON({
+                            menus, users
+                        });
+                    });
                 });
             } else if (cli.routeinfo.path.length == 2) {
                 cli.sendJSON(cli.apisession);
