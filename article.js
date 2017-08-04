@@ -221,7 +221,7 @@ class Article {
                     );
                 }
             }, false, {status : "published"});
-        } else if (ftc == "list" && cli.hasAPIRight('list-content')) {
+        } else if (ftc == "list" &&  cli.hasAPIRight('list-content')) {
             const postlimit = 100;
             db.find(cli._c, 'content', {}, [], (err, cursor) => {
                 cursor

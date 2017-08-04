@@ -205,7 +205,7 @@ class ClientObject {
     }
 
     hasAPIRight (right) {
-        return this.apisession.rights.includes(right) || this.apisession.rights.includes('admin');
+        return this.apisession && (this.apisession.rights.includes(right) || this.apisession.rights.includes('admin'));
     }
 
     isGranted  (role) {
