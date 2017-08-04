@@ -187,7 +187,17 @@ class Login {
 
     apiGET(cli) {
         if (cli.request.headers["user-agent"].substring(0, 6) == "lilium" && cli.apitoken) {
-            cli.sendJSON(cli.apisession);
+            if (cli.routeinfo.path[2] == "bundle") {
+                const menus = require('./admin.js').getAdminMenuFromRights(cli.apisession.rights);
+
+                cli.sendJSON({
+                    menus
+                });
+            } else if (cli.routeinfo.path.length == 2) {
+                cli.sendJSON(cli.apisession);
+            } else {
+                cli.throwHTTP(404, undefined, true);
+            }
         } else {
             cli.throwHTTP(404, undefined, true);
         }

@@ -66,6 +66,9 @@
     <hr />
 
     <div class="slider-links">
+        {$ if (config.default.website.sitetitle == "Narcity") $}
+              <a class="section-link" href="{=config.default.server.url}/about">{:about}</a>
+        {$ endif $}
         <a class="section-link" href="https://www.narcitymedia.com">{:advertise}</a>
         <a class="section-link" href="{=config.default.server.url}/contact-us">{:contact-us}</a>
         <a class="section-link" href="https://www.narcitymedia.com/jobs">{:jobs}</a>

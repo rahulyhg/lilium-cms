@@ -25,6 +25,10 @@
             "endpoint" : "history",
             "support" : ["admin_get", "admin_post", "livevar"]
         }, {
+            "module" : "livevars.js",
+            "endpoint" : "livevars",
+            "support" : ["api_get"]
+        }, {
             "module" : "lys.js",
             "endpoint" : "lys",
             "support" : ["livevar"]

@@ -47,7 +47,7 @@ class Admin {
         if (method == 'GET') {
             LML2.compileToFile(cli._c.server.base + "/backend/dynamic/admin/welcome.lml",
                 cli._c.server.html + "/static/tmp/welcome.html",
-                function() {
+                () => {
                     require('../fileserver.js').pipeFileToClient(
                         cli, 
                         cli._c.server.html + "/static/tmp/welcome.html", 
@@ -131,14 +131,44 @@ class Admin {
 		return (typeof AdminEndpoints[method][endpoint] !== 'undefined');
 	};
 
+    getAdminMenuFromRights(rights) {
+        const menus = this.getAdminMenus();
+        const out = [];
+        let all = rights.indexOf('admin') != -1;
+
+        for (let name in menus) {
+            let valid = true;
+            !all && menus[name].rights.forEach(s => {
+                if (valid && rights.indexOf(s) == -1) {
+                    valid = false;
+                }
+            });
+
+            valid && out.push(menus[name]);
+
+            menus[name].children && menus[name].children.forEach(child => {
+                let validc = true;
+                !all && child.rights.forEach(s => {
+                    if (validc && rights.indexOf(s) == -1) {
+                        validc = false;
+                    }
+                });
+
+                validc && out.push(child);
+            });
+        }
+
+        return out.map(x => { return { displayname : x.displayname, icon : x.faicon, id : x.id }; });
+    };
+
 	registerLiveVar () {
 		let that = this;
 
-		require('../livevars.js').registerLiveVariable('adminmenus', function(cli, levels, params, callback) {
+		require('../livevars.js').registerLiveVariable('adminmenus', (cli, levels, params, callback) => {
             const sharedkey = "adminmenus_" + cli.userinfo.userid;
             const sharedcache = require('../sharedcache.js');
 
-            sharedcache.get(sharedkey, function(cachedmenus) {
+            sharedcache.get(sharedkey, cachedmenus => {
                 if (cachedmenus) {
                     return callback(cachedmenus);
                 }
@@ -166,7 +196,7 @@ class Admin {
 
                 sharedcache.set({
                     [sharedkey] : sortedMenus
-                }, function() {
+                }, () => {
                     callback(sortedMenus);
                 });
             });
@@ -187,7 +217,7 @@ class Admin {
     };
 
 	init() {
-        hooks.bind('plugindisabled', 1, function(identifier) {
+        hooks.bind('plugindisabled', 1, identifier => {
             for (let i in AdminEndpoints) {
                 for (let j in AdminEndpoints[i]) {
                     if (AdminEndpoints[i][j].pluginID == identifier) {
