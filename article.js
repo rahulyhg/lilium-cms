@@ -223,7 +223,12 @@ class Article {
             }, false, {status : "published"});
         } else if (ftc == "list" &&  cli.hasAPIRight('list-content')) {
             const postlimit = 100;
-            db.find(cli._c, 'content', {}, [], (err, cursor) => {
+            const conditions = {};
+            if (!cli.hasAPIRight('admin')) {
+                conditions.status = {$ne : "destroyed"};
+            }
+
+            db.find(cli._c, 'content', conditions, [], (err, cursor) => {
                 cursor
                 .limit(postlimit)
                 .skip(cli.routeinfo.params.page ? (cli.routeinfo.params.page * postlimit) : 0)
