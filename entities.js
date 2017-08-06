@@ -760,6 +760,24 @@ class Entities {
         return new Entity();
     };
 
+    apiGET(cli) {
+        if (cli.routeinfo.path[2] == "list" && cli.hasAPIRight("list-entities")) {
+            db.find(require('./config.js').default(), 'entities', {}, [], (err, cursor) => {
+                cursor.project({ displayname : 1, revoked : 1, email : 1, username : 1 })
+                    .sort({revoked : 1, displayname : 1})
+                    .toArray((err, arr) => {
+                    cli.sendJSON(arr);
+                });
+            })
+        } else {
+            cli.throwHTTP(404, undefined, true);
+        }
+    }
+
+    apiPOST(cli) {
+        cli.throwHTTP(404, undefined, true);
+    }
+
     validateEntityObject  (e, cli, cb) {
         var valid = true;
         valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.roles;

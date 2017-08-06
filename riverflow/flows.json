@@ -276,7 +276,7 @@
         }, {
             "module" : "entities.js",
             "endpoint" : "entities",
-            "support" : ["admin_get", "admin_post", "livevar", "setup", "table", "form"],
+            "support" : ["admin_get", "admin_post", "livevar", "setup", "table", "form", "api_get", "api_post"],
             "admin_menu" : {
                 "id": "entities",
                 "faicon": "fa-users",

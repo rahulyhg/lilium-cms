@@ -226,6 +226,12 @@ class Article {
                     status : data.status
                 };
 
+                if (cli.routeinfo.path[3] == "full") {
+                    values.content = data.content;
+                    values.subtitle = data.subtitle;
+                    values.name = data.name;
+                }
+
                 db.update(cli._c, 'content', selector, values, (err, r) => {
                     if (values.status == "published" && r.matchedCount !== 0) {
                         this.generateArticle(cli._c, db.mongoID(data._id), () => {
@@ -258,6 +264,23 @@ class Article {
                     );
                 }
             }, false, {status : "published"});
+        } else if (ftc == "foredit" && cli.hasAPIRight('list-content')) {
+            if (!cli.routeinfo.path[3] || !cli.routeinfo.path[3].trim()) {
+                return cli.throwHTTP(404);
+            }
+
+            const conditions = {};
+            if (!cli.hasAPIRight('editor')) {
+                conditions.author = db.mongoID(cli.apisession.userid);
+            }
+
+            this.deepFetch(cli._c, db.mongoID(cli.routeinfo.path[3]), (art) => {
+                if (art) {
+                    cli.sendJSON(art);
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            }, false, conditions);
         } else if (ftc == "list" &&  cli.hasAPIRight('list-content')) {
             const postlimit = 100;
             const conditions = {};
