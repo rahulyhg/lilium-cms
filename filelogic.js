@@ -369,8 +369,8 @@ class FileLogic {
 
             const readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml");
             const savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
-            const tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".themetmp";
-            const layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
+            let tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".themetmp";
+            let layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
             
             if (skipLayout) {
                 tmpPath = savePath;
