@@ -177,7 +177,7 @@ class Login {
 
     apiAuth(username, password, done) {
         db.findUnique(_c.default(), 'entities', {
-            revoked : {$ne : false}, 
+            revoked : {$ne : true}, 
             username, 
             shhh : CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex)
         }, (err, user) => {
