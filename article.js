@@ -295,6 +295,7 @@ class Article {
                 .project({
                     title : 1, subtitle : 1, status : 1, author : 1, date : 1
                 })
+                .sort({_id : -1})
                 .toArray((err, arr) => {
                     cli.sendJSON(arr);
                 });
