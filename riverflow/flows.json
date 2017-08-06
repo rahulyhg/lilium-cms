@@ -189,7 +189,7 @@
         }, {
             "module" : "article.js",
             "endpoint" : "article",
-            "support" : ["admin_get", "admin_post", "form", "table", "api_get"],
+            "support" : ["admin_get", "admin_post", "form", "table", "api_get", "api_post"],
             "admin_menu" : {
                 "id": "articles",
                 "faicon": "fa-pencil",

@@ -208,6 +208,43 @@ class Article {
         };
     }
 
+    apiPOST(cli) {
+        if (cli.routeinfo.path[2] == "save") {
+            cli.readPostData(data => {
+                if (!data._id) {
+                    log('API', 'Article.save, no ID provided', 'warn');
+                    return cli.throwHTTP(404, undefined, true);
+                }
+
+                const selector = { _id : db.mongoID(data._id) };
+                if (!cli.hasAPIRight('editor')) {
+                    selector.author = db.mongoID(cli.apisession.userid);
+                }
+
+                const values = {
+                    title : data.title,
+                    status : data.status
+                };
+
+                db.update(cli._c, 'content', selector, values, (err, r) => {
+                    if (values.status == "published" && r.matchedCount !== 0) {
+                        this.generateArticle(cli._c, db.mongoID(data._id), () => {
+                            cli.sendJSON({saved : true, published : true});
+                        }, false, "all") ;
+                    } else if (!!r.matchedCount) {
+                        cli.sendJSON({saved : true});
+                    } else {
+                        log('API', 'Article.save, no document found for selector : ' + JSON.stringify(selector), 'warn');
+                        cli.throwHTTP(404, undefined, true);
+                    }
+                }, false, true);
+            });
+        } else {
+            log('API', 'Article, Invalid route ' + cli.routeinfo.path.join('/'), 'warn');
+            return cli.throwHTTP(404, undefined, true);
+        }
+    }
+
     apiGET(cli) {
         var ftc = cli.routeinfo.path[2];
         if (ftc == "get") {

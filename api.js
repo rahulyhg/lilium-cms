@@ -91,6 +91,8 @@ class LiliumAPI {
                     session.rights = rights;
                     this.pushInCache("session_" + a.token, session);
                 });
+
+                session.userid = a._id;
             });
 
             done && done();
