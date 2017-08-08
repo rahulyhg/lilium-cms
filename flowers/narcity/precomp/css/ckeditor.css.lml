@@ -91,3 +91,25 @@ lml-page::after {
     display: block;
     font-size: 12px;
 }
+
+lml-related {
+    display: block;
+    border: 1px dashed #CCC;
+    text-align: center;
+    font-size: 18px;
+    color: #BBB;
+    text-transform: uppercase;
+    padding: 12px;
+    font-weight: 100;
+    font-family: "Arial";
+}
+
+lml-related::before {
+    content: 'Read Also';
+}
+
+lml-related::after {
+    content: 'A "read also" seaction will appear here';
+    display: block;
+    font-size: 12px;
+}

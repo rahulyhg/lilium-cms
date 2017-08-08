@@ -152,7 +152,7 @@ var CKEditor = function() {
         CKEDITOR.config.removePlugins = 'image,liststyle,tabletools,scayt,menubutton,contextmenu,table,specialchar';
         CKEDITOR.config.disableNativeSpellChecker = false;
         CKEDITOR.config.allowedContent = true;
-        CKEDITOR.config.extraAllowedContent = 'ad,lml-page,lml-ad';
+        CKEDITOR.config.extraAllowedContent = 'ad,lml-page,lml-ad,lml-related';
         CKEDITOR.config.contentsCss = '/compiled/theme/ckeditor.css';
         CKEDITOR.config.skin = "BootstrapCK4,/bower/BootstrapCK4-Skin/skins/bootstrapck/";
 

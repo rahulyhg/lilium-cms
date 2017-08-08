@@ -392,6 +392,7 @@ var castPCShare = function() {
 };
 
 var bindPCShare = function() {
+    return false;
     if (window.device == "pc" && window.lmlcontext === "article") {
         var psharer = document.getElementById("pc-sharer");
 

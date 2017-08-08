@@ -20,6 +20,7 @@ var sharedcache = undefined;
 var contentchains = undefined;
 var API = undefined;
 var lmlsearch = undefined;
+var vocab = undefined;
 
 var readersLib = undefined;
 
@@ -51,6 +52,7 @@ var initRequires = function(abspath) {
     lmlsearch = require(abspath + "search.js");
     contentchains = require(abspath + "contentchains.js");
     API = require(abspath + "api.js");
+    vocab = require(abspath + "vocab.js");
 };
 
 var registerPictureSizes = function() {
@@ -1473,10 +1475,14 @@ var insertAds = function(pkg) {
 
         var window = dom.window;
         var parags = window.document.querySelectorAll("body > p, body > h3, body > twitterwidget");
-        for (var i = 0; i < parags.length - 1; i++) if ((i-2) % pcount == 0) {
+        for (var i = 0; i < parags.length - 2; i++) if ((i-2) % pcount == 0) {
             var adtag = window.document.createElement('ad');
-            window.document.body.insertBefore(adtag, parags[i+1]);
+            parags[i+2] && window.document.body.insertBefore(adtag, parags[i+2]);
             changed = true;
+        }
+
+        if (_c.website.sitetitle == "Narcity") {
+            window.document.body.insertBefore(window.document.createElement('lml-related'), parags[1]);
         }
 
         if (changed) {
@@ -1524,6 +1530,16 @@ var parseAds = function(pkg) {
         }
 
         art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
+
+        if (art.content.includes("<lml-related>")) {
+            var scr = require('./cxense.js')(
+                require("./vocab/" + (art.topic.override.language || _c.website.language || "en-ca")), 
+                '8ddab9eb8cc002f512315b910672a13537f0ca00'
+            );
+
+            art.content = art.content.replace('<lml-related></lml-related>', scr);
+        }
+
         done();
     });
 };
