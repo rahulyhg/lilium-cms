@@ -1,6 +1,6 @@
 module.exports = (lang, id) => {
     return `
-        <h4 class="article-section-title"> 
+        <h4 class="article-section-title" style="padding: 20px 0 0;border-top: 1px solid #D9D9D9;"> 
             ${lang.recommendedforyou}
         </h4>
 
