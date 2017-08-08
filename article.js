@@ -1869,7 +1869,8 @@ class Article {
                         hk.cb({
                             _c : _c,
                             done : nextHook,
-                            article : deepArticle
+                            article : deepArticle,
+                            extra : extra
                         }, 'article_async_render_' + _c.uid)
                     } else {
                         // Generate LML page

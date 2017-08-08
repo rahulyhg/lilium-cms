@@ -1533,7 +1533,7 @@ var parseAds = function(pkg) {
 
         if (art.content.includes("<lml-related>")) {
             var scr = require('./cxense.js')(
-                require("./vocab/" + (art.topic.override.language || _c.website.language || "en-ca")), 
+                require("./vocab/" + (pkg.extra.language || art.topic.override.language || _c.website.language || "en-ca")), 
                 '8ddab9eb8cc002f512315b910672a13537f0ca00'
             );
 
