@@ -655,13 +655,13 @@ class Article {
         };
 
         if (cli.userinfo.roles.indexOf('contributor') != -1) {
-            db.findToArray(conf.default(), 'entities', {roles : "production"}, (err, arr)  => {
-                for (var i = 0; i < arr.length; i++) {
-                    articleObject.subscribers.push(arr[i]._id);
-                }
-
-                commitToCreate();
-            }, {_id : 1});
+            db.find(conf.default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, [], (err, cursor) => {
+                cursor.limit(1).project({reportsto : 1}).next((err, u) => {
+                    u.reportsto && u.reportsto.length != 0 && articleObject.subscribers.push(...u.reportsto);
+        
+                    commitToCreate();
+                });
+            });
         } else {
             commitToCreate();
         }
