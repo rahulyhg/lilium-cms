@@ -11,7 +11,7 @@
             <thead>
                 <tr>
                     <th>Media</th>
-                    <th>Title</th>
+                    <th onclick="javascript: liliumcms.backendsearch.refine();" style="cursor: pointer;">Title (Click here to order by relevancy)</th>
                     <th>Status</th>
                     <th>Date</th>
                     <th>Author</th>

@@ -70,7 +70,8 @@ class ContentSearch {
         this.queryList(cli._c, db.mongoID(params.topic), params.q, {
             conditions, 
             max : params.max,
-            page : params.page
+            page : params.page,
+            scoresort : params.scoresort
         }, (posts) => {
             send(posts);
         });

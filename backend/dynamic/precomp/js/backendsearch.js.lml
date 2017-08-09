@@ -96,11 +96,15 @@ var BackendSearch = function() {
         }
     };
 
-    this.search = function(query) {
+    this.refine = function() {
+        this.search(d.id('lml-searchbar').value, {scoresort : true});
+    }
+
+    this.search = function(query, params) {
         that.loading();
-        liliumcms.livevars.getSingleLivevar('search', {
+        liliumcms.livevars.getSingleLivevar('search', Object.assign({
             q : query
-        }, function(resp) {
+        }, params || {}), function(resp) {
             that.done();
             that.list(resp.livevars.search);
         });
