@@ -21,6 +21,10 @@
             "endpoint" : "login",
             "support" : ["api_get", "api_post"]
         }, {
+            "module" : "search.js",
+            "endpoint" : "search",
+            "support" : ["livevar"]
+        }, {
             "module" : "history.js",
             "endpoint" : "history",
             "support" : ["admin_get", "admin_post", "livevar"]

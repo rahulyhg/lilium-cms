@@ -1,22 +1,147 @@
-<div class="backendsearch-wrapper">
-    <div class="backendsearch-close-wrapper">
-        <i class="fa fa-times backendsearch-close" aria-hidden="true"></i>
+{#config}
+
+<div id="lml-search-wrapper">
+    <i id="lml-search-close" class="fa fa-times"></i>
+
+    <div id="lml-searchbar-wrapper">
+        <input text="text" id="lml-searchbar" placeholder="What are we looking for?" />
+    </div>    
+    <div id="lml-search-results">
+        <table id="lml-search-table">
+            <thead>
+                <tr>
+                    <th>Media</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Author</th>
+                </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
     </div>
 
-    <form id="backendsearch-form">
-        <input type="text" class="backendsearch-input" placeholder="What are you looking for..." />
-        <input type="submit" class="backendsearch-submit" value="Search" />
-    </form>
-
-    <div class="backendsearch-results">
-        <h2>Query result for : <span>[QUERIED STRING]</span></h2>
-
-        <div class="backendsearch-working-wrapper">
-            <i class="fa fa-circle-o-notch fa-spin fa-fw"></i>
-        </div>
-
-        <div class="backendsearch-results-list">
-            
-        </div>
+    <div id="lml-search-void">
+        Looks like this query returned an empty set.
     </div>
 </div>
+
+<style>
+#lml-search-wrapper {
+    display: none;
+    transition: all 0.2s;
+    
+    opacity: 0;
+    position: fixed;
+    top:0; bottom:0;
+    left:0; right:0;
+
+    background-color: rgba(0,0,0,.9);
+    z-index: 100000;
+}
+
+#lml-search-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 20px;
+    color: #DDD;
+
+    cursor: pointer;
+}
+
+#lml-search-wrapper.shown {
+    opacity: 1;
+}
+
+#lml-searchbar-wrapper {
+    transition: all 0.2s;
+    transform: translate3d(0px, 120px, 0);
+
+    padding: 20px;
+}
+
+#lml-searchbar {
+    background : transparent;
+    border-bottom: 1px solid #AAA;
+    width: 640px;
+    margin: auto;
+
+    font-size: 32px;
+    color: #F3F3F3;
+    font-family : "Raleway", sans-serif;
+
+    display: block;
+    transition: all 0.2s;
+
+    box-sizing: border-box;
+}
+
+#lml-searchbar-wrapper.drawn {
+    transform: translate3d(0px, 20px, 0);
+}
+
+#lml-searchbar.drawn {
+    width: 100%;
+}
+
+#lml-search-table {
+    opacity: 0;
+    transition: all 0.2s;
+    transform: translate3d(0px, 100px, 0);
+
+    width: 100%;
+
+    color: #EEE;
+    font-size: 18px;
+
+    border-spacing: 8px;
+    border-collapse: separate;
+
+    border: 12px solid transparent;
+}
+
+#lml-search-table.shown {
+    opacity: 1;
+    transform: translate3d(0px, 0px, 0);
+}
+
+#lml-search-table a {
+    color: #FFF;
+}
+
+.lml-search-image {
+    height: 60px;
+    width: auto;
+}
+
+#lml-search-table td:first-child {
+    width: 115px;
+}
+
+#lml-search-void {
+    opacity: 0;
+    transition: all 0.2s;
+
+    font-size: 64px;
+    color: #777;
+
+    text-align: center;
+    padding: 50px;
+    transform: translate3d(0px, 100px, 0);
+
+    pointer-events: none;
+}
+
+#lml-search-void.shown {
+    opacity : 1;
+}
+
+</style>
+
+
+
+
+

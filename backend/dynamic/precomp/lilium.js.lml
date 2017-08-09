@@ -79,6 +79,7 @@ var LiliumCMS = function() {
     this.localclip;
     this.previewer;
     this.errorhandler;
+    this.backendsearch;
     this.imagepicker;
     this.cakepop;
     this.conversations;
@@ -699,6 +700,7 @@ var LiliumCMS = function() {
 
             liliumcms.adminmenu.highlight();
             liliumcms.conversations.closeChat();
+            liliumcms.backendsearch.dismiss();
 
             var formattedUrl = url + (url.indexOf('?') === -1 ? "?" : "&") + "async=*";
             var adminpath = url.substring(url.indexOf('/admin/') + 7);
@@ -758,6 +760,7 @@ var LiliumCMS = function() {
 
         this.parseDocument = function(wrapper) {
             log('PageLoader', 'Seeking links, transform them into async links');
+            var total = 0;
             $(wrapper || 'main.lmladminmain a').each(function(index, a) {
                 a = $(a);
                 var href = a.attr('href') || "";
@@ -770,6 +773,7 @@ var LiliumCMS = function() {
                     href.indexOf('*') === -1 &&
                     a.attr('target') !== "_blank"
                 ) {
+                    total++;
                     a.data("async", true).data("parser", "pageloader").attr("href", href).bind('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
@@ -778,6 +782,8 @@ var LiliumCMS = function() {
                     });
                 }
             });
+
+            log('PageLoader', 'Bound ' + total + ' links');
         };
 
         this.parseAdminPanel = function() {
@@ -1181,6 +1187,7 @@ var LiliumCMS = function() {
             that.quill = new LMLQuill();
             that.facebook = new LMLFacebook();
             that.lmldom = new LMLDom();
+            that.backendsearch = new BackendSearch();
             that.cakepop = new Cakepop();
             that.modals = new LMLModals();
             that.session = new LMLSession();
@@ -1249,6 +1256,7 @@ var LiliumCMS = function() {
     init();
 };
 var liliumcms = new LiliumCMS();
+window.d = DOM;
 
 $(document).ready(function() {
     liliumcms.awesomestrapper.strap();
@@ -1274,6 +1282,7 @@ document.addEventListener('livevarsRendered', function(e) {
         liliumcms.lmldom.init();
         liliumcms.rights.init();
         liliumcms.badges.bind();
+        liliumcms.backendsearch.bind();
         liliumcms.cakepop.initWithLivevar();
         liliumcms.everythingIsAwesome();
     } else {
