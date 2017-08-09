@@ -39,8 +39,7 @@ class ContentSearch {
 
             db.join(_c, 'content', [
                 {$match : conditions},
-                {$sort : {_id : -1}},
-                {$sort: { score: { $meta: "textScore" }} },
+                {$sort: { score: { $meta: "textScore" }, _id : -1} },
                 {$skip : page * max},
                 {$limit : max},
                 {$project : PROJECTION},
