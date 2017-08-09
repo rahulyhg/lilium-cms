@@ -1481,8 +1481,8 @@ var insertAds = function(pkg) {
             changed = true;
         }
 
-        if (_c.website.sitetitle == "Narcity") {
-            window.document.body.insertBefore(window.document.createElement('lml-related'), parags[1]);
+        if (_c.website.sitetitle == "Narcity" && parags.length >= 10) {
+            window.document.body.insertBefore(window.document.createElement('lml-related'), parags[Math.floor(parags.length * 0.60)]);
         }
 
         if (changed) {
@@ -1531,13 +1531,15 @@ var parseAds = function(pkg) {
 
         art.content = art.content.replace(/\<ad\>\<\/ad\>/g, "");
 
-        if (art.content.includes("<lml-related>")) {
+        if (art.content.includes("<lml-related>") && !pkg.article.isSponsored && !pkg.article.paginated) {
             var scr = require('./cxense.js')(
                 require("./vocab/" + (pkg.extra.language || art.topic.override.language || _c.website.language || "en-ca")), 
                 '8ddab9eb8cc002f512315b910672a13537f0ca00'
             );
 
             art.content = art.content.replace('<lml-related></lml-related>', scr);
+        } else {
+            art.content = art.content.replace('<lml-related></lml-related>', '');
         }
 
         done();

@@ -97,13 +97,18 @@ var BackendSearch = function() {
     };
 
     this.refine = function() {
-        this.search(d.id('lml-searchbar').value, {scoresort : true});
+        this.search(d.id('lml-searchbar').value, {scoresort : false});
     }
 
     this.search = function(query, params) {
+        if (!query) {
+            query = d.id('lml-searchbar').value;
+        }
+
         that.loading();
         liliumcms.livevars.getSingleLivevar('search', Object.assign({
-            q : query
+            q : query,
+            scoresort : true
         }, params || {}), function(resp) {
             that.done();
             that.list(resp.livevars.search);
