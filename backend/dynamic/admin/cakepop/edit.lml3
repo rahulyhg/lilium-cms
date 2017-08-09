@@ -23,10 +23,50 @@ const preload = (context, done) => {
                 });
             });
         });
+
+        liliumcms.lmldom.bind(function() {
+            var cp = liliumcms.livevars.livevars()["cakepop.single." + liliumcms.pageloader.lastLevel];
+            if (cp) {
+                var history = cp.history;
+                var users = liliumcms.conversations.getCachedUsers();
+                d.table(d.id('cakepop-report-body'), history, ["by", "action", "at"], {
+                    by : function(userid) {
+                        if (users[userid]) {
+                            return '<img src="'+users[userid].avatarURL+'" style="width: 24px; height: 24px; object-fit: cover; margin-right: 6px; vertical-align: middle; display: inline-block;" /> <b style="display: inline-block; vertical-align: middle;">'+users[userid].displayname+'</b>'
+                        } else {
+                            return "<i>Inactive user</i>";
+                        }
+                    },
+                    action : function(type, row) {
+                        if (type == "respond") {
+                            return "Responded with : '" + row.response + "'";
+                        } else if (type == "creation") {
+                            return "Created the Cakepop";
+                        } else if (type == "read") {
+                            return "Acknowledged";
+                        } else {
+                            return type;
+                        }
+                    },
+                    at : function(time) {
+                        time = new Date(time);
+                        return time.toLocaleDateString() + " " + time.toLocaleTimeString();
+                    }
+                });
+            }
+        });
     </script>`;
 
-    context.bottomSection = `<div id="cakepop-report">
-        
+    context.bottomSection = `<div id="cakepop-report-wrapper">
+        <h3 style="padding: 10px;">Report</h3>
+        <table id="cakepop-report" style="width: 100%; border: 10px solid transparent; font-size: 18px;">
+            <thead><tr>
+                <th>Entity</th>
+                <th>Action</th>
+                <th>Time</th>
+            </tr></thead>
+            <tbody id="cakepop-report-body"></tbody>
+        </table>        
     </div>`;
 
     done();
