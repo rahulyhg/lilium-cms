@@ -28,7 +28,7 @@ const SELECTOR = (words) => {
 
 class ContentSearch {
     queryList(_c, topic, terms, options, send) {
-        const max = options.max || 30;
+        const max = options.max || 50;
         const page = options.page || 0;
         const conditions = Object.assign(SELECTOR(terms), options.conditions || {});
 
@@ -39,7 +39,7 @@ class ContentSearch {
 
             db.join(_c, 'content', [
                 {$match : conditions},
-                {$sort: { score: { $meta: "textScore" }, _id : -1} },
+                options.scoresort ? {$sort: { score: { $meta: "textScore" }, _id : -1} } : {$sort : {_id : -1}},
                 {$skip : page * max},
                 {$limit : max},
                 {$project : PROJECTION},
