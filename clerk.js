@@ -30,7 +30,7 @@ const CLERK_COOKIE_NAME = "clerksid";
 
 class Clerk {
     register(cli, done) {
-
+        
     }
 
     greet(cli, done) {

@@ -42,7 +42,7 @@ class ContentSearch {
                 options.scoresort ? {$sort: { score: { $meta: "textScore" }, _id : -1} } : {$sort : {_id : -1}},
                 {$skip : page * max},
                 {$limit : max},
-                {$project : PROJECTION},
+                {$project : options.projection || PROJECTION},
                 {$lookup : TOPIC_LOOKUP},
                 {$lookup : IMAGE_LOOKUP}
             ], (arr) => {
@@ -50,11 +50,16 @@ class ContentSearch {
                     x.featuredimage = x.featuredimage.pop();
                     x.topic = x.deeptopic.pop();
                     x.deeptopic = undefined;
-                    x.topicname = x.topic && x.topic.displayname;
+
+                    if (x.topic) { 
+                        x.topicname = x.topic.displayname;
+                        x.topicurl = _c.server.url + "/" + x.topic.completeSlug;
+                    }
 
                     if (x.featuredimage) {
                         x.imageurl = x.featuredimage.sizes.thumbnaillarge.url;
                     }
+
                 });
                 send(arr);
             });

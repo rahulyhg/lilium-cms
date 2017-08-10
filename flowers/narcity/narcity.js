@@ -1095,7 +1095,48 @@ var serveTopicAPI = function(cli) {
             _id : 1, displayname : 1, completeSlug : 1
         });
     }
-}
+};
+
+var handleReaderSearch = function(cli) {
+    let terms = cli.request.headers.lmlterms;
+    if (!terms || terms.length < 3) {
+        return cli.throwHTTP(422, undefined, true);
+    }
+
+    let topic = cli.request.headers.lmltopic;
+    let page = cli.request.headers.lmlpage;
+
+    const cachekey = "lquery_" + terms + topic + page;
+
+    sharedcache.get(cachekey, function(cached) {
+        if (cached && cached.expiry > Date.now()) {
+            return cli.sendJSON(cached.articles);
+        }
+
+        lmlsearch.queryList(cli._c, topic, terms, {
+            projection : {title : 1, media : 1, topic : 1, name : 1, _id : 0},
+            max : 20,
+            page : page || 0,
+            scoresort : 1,
+            conditions : {status : "published"}
+        }, function(array) {
+            array.forEach(x => {
+                x.topic = undefined;
+                x.featuredimage = undefined;
+                x.media = undefined;
+            });
+
+            array && array.length && sharedcache.set({
+                [cachekey] : {
+                    articles : array,
+                    expiry : Date.now() + (1000 * 60 * 5)
+                }
+            });
+
+            cli.sendJSON(array);
+        });
+    });
+};
 
 const ALLOWED_API_TRANSFORM = {
     "articleslug"   : {collection : "content",  field : "name" },
@@ -1220,6 +1261,10 @@ var loadHooks = function(_c, info) {
                 });
             }
         });
+    });
+
+    endpoints.register(_c.id, 'lquery', 'GET', function(cli) {
+        handleReaderSearch(cli);
     });
 
     var cachedHot = [];
