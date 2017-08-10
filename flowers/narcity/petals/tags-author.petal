@@ -12,3 +12,5 @@
 <meta property="og:image" content="{=?extra.archivedetails.avatarURL}" />
 
 <title>{=extra.archivedetails.displayname} - {=config.default.website.sitetitle}</title>
+
+<meta name="cXenseParse:recs:recommending" content="false" />

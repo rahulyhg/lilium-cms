@@ -36,6 +36,10 @@
     <meta property="og:url" content="{=extra.article.url}"/>
 {$ endif; $}
 
+{$ if (?extra.article.pageIndex > 1) $}
+<meta name="cXenseParse:recs:recommending" content="false"/>
+{$ endif $}
+
 <link rel="amphtml" href="{=config.default.server.url}/amp/{=extra.article.name}" />
 
 <script type="application/ld+json">
