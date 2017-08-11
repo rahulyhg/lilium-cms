@@ -78,6 +78,13 @@ class ContentSearch {
             scoresort : params.scoresort
         }, (posts) => {
             send(posts);
+
+            db.insert(cli._c, 'searches', {
+                from : "backend",
+                by : db.mongoID(cli.userinfo.userid),
+                terms : params.q,
+                at : Date.now()
+            }, () => {});
         });
     }
 }
