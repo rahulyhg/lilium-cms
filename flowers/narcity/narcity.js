@@ -1175,6 +1175,12 @@ var handleReaderSearch = function(cli) {
             });
 
             cli.sendJSON(array);
+
+            db.insert(cli._c, 'searches', {
+                from : "frontend",
+                terms : terms,
+                at : Date.now()
+            }, function() {});
         });
     });
 };
@@ -1694,7 +1700,10 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
                             fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
                                 readersLib.createCollection(function() {
                                     log('Narcity', 'Created symlink and content directories. Ready to callback');
-                                    callback();
+
+                                    db.createCollection(_c, 'searches', function() {
+                                        callback();
+                                    });
                                 });
                             }, true);
                         }, true);
