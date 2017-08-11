@@ -1143,45 +1143,50 @@ var handleReaderSearch = function(cli) {
         return cli.throwHTTP(422, undefined, true);
     }
 
-    let topic = cli.request.headers.lmltopic;
+    let topic = cli.request.headers.lmltopic || "willnotresolve";
     let page = cli.request.headers.lmlpage;
 
     const cachekey = "lquery_" + cli._c.uid + terms + topic + page;
 
     sharedcache.get(cachekey, function(cached) {
+        db.insert(cli._c, 'searches', {
+            from : "frontend",
+            terms : terms,
+            at : Date.now(),
+            cached : !!cached
+        }, function() {});
+
         if (cached && cached.expiry > Date.now()) {
             return cli.sendJSON(cached.articles);
         }
 
-        lmlsearch.queryList(cli._c, topic, terms, {
-            projection : {title : 1, media : 1, topic : 1, name : 1, _id : 0},
-            max : 18,
-            page : page || 0,
-            scoresort : 1,
-            conditions : {status : "published"}
-        }, function(array) {
-            array.forEach(x => {
-                x.topic = undefined;
-                x.featuredimage = undefined;
-                x.media = undefined;
-                x.imageurl = CDN.parseOne(cli._c, x.imageurl, true);
-            });
-
-            array && array.length && sharedcache.set({
-                [cachekey] : {
-                    articles : array,
-                    expiry : Date.now() + (1000 * 60 * 5)
+        db.findToArray(cli._c, 'topics', {"override.cityname" : {$in : terms.split(' ')}}, function(err, deeptopics) {
+            lmlsearch.queryList(cli._c, deeptopics.length ? {$in : deeptopics.map(x => x._id)} : undefined, terms, {
+                projection : {title : 1, media : 1, topic : 1, name : 1, _id : 0},
+                max : 18,
+                page : page || 0,
+                scoresort : 1,
+                conditions : {
+                    status : "published"
                 }
+            }, function(array) {
+                array.forEach(x => {
+                    x.topic = undefined;
+                    x.featuredimage = undefined;
+                    x.media = undefined;
+                    x.imageurl = CDN.parseOne(cli._c, x.imageurl, true);
+                });
+
+                array && array.length && sharedcache.set({
+                    [cachekey] : {
+                        articles : array,
+                        expiry : Date.now() + (1000 * 60 * 5)
+                    }
+                });
+
+                cli.sendJSON(array);
             });
-
-            cli.sendJSON(array);
-
-            db.insert(cli._c, 'searches', {
-                from : "frontend",
-                terms : terms,
-                at : Date.now()
-            }, function() {});
-        });
+        }, {_id : 1});
     });
 };
 
