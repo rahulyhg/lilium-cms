@@ -1144,7 +1144,7 @@ var handleReaderSearch = function(cli) {
     let topic = cli.request.headers.lmltopic;
     let page = cli.request.headers.lmlpage;
 
-    const cachekey = "lquery_" + terms + topic + page;
+    const cachekey = "lquery_" + cli._c.uid + terms + topic + page;
 
     sharedcache.get(cachekey, function(cached) {
         if (cached && cached.expiry > Date.now()) {
