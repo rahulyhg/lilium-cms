@@ -19,6 +19,7 @@ var Category = undefined;
 var sharedcache = undefined;
 var contentchains = undefined;
 var API = undefined;
+var CDN = undefined;
 var lmlsearch = undefined;
 var vocab = undefined;
 
@@ -52,6 +53,7 @@ var initRequires = function(abspath) {
     lmlsearch = require(abspath + "search.js");
     contentchains = require(abspath + "contentchains.js");
     API = require(abspath + "api.js");
+    CDN = require(abspath + "cdn.js");
     vocab = require(abspath + "vocab.js");
 };
 
@@ -772,7 +774,7 @@ var generateHomepage = function(_c, cb) {
                         title : x.title, 
                         subtitle : x.subtitle, 
                         url : _c.server.url + "/" + x.deeptopic[0].completeSlug + "/" + x.name,
-                        image : x.image[0].sizes.thumbnailsmall.url,
+                        image : cdn.parseOne(_c, x.image[0].sizes.thumbnailsmall.url, true)
                         shares : x.shares
                     }
                 })
@@ -1162,6 +1164,7 @@ var handleReaderSearch = function(cli) {
                 x.topic = undefined;
                 x.featuredimage = undefined;
                 x.media = undefined;
+                x.imageurl = cdn.parseOne(cli._c, x.imageurl, true);
             });
 
             array && array.length && sharedcache.set({
