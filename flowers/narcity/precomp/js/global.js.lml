@@ -683,13 +683,13 @@ var bindSearchBar = function() {
     }
 
     sb.addEventListener('keydown', function(ev) {
-        var content = sb.textContent.toLowerCase();
+        var content = sb.textContent.toLowerCase().trim();
         checkForTags(sb.textContent);
 
         if (ev.which == 13) {
             ev.preventDefault();
 
-            content.trim().length > 2 && fireSearch(content);
+            content.length > 2 && fireSearch(content);
             return false;
         }
     });
