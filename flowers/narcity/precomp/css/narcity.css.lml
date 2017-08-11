@@ -340,6 +340,10 @@ body.menuopen .narcity-header-bar {
     height: 100%;
 }
 
+.context-home .header-float-right {
+    display: none;
+}
+
 .header-login-wrapper {
     height: 100%;
     vertical-align: middle;
