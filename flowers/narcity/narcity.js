@@ -774,7 +774,7 @@ var generateHomepage = function(_c, cb) {
                         title : x.title, 
                         subtitle : x.subtitle, 
                         url : _c.server.url + "/" + x.deeptopic[0].completeSlug + "/" + x.name,
-                        image : CDN.parseOne(_c, x.image[0].sizes.thumbnailsmall.url, true),
+                        image : CDN.parseOne(_c, x.image[0].sizes.thumbnaillarge.url, true),
                         shares : x.shares
                     }
                 })
