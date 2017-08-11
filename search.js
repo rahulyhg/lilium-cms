@@ -59,7 +59,6 @@ class ContentSearch {
                     if (x.featuredimage) {
                         x.imageurl = x.featuredimage.sizes.thumbnaillarge.url;
                     }
-
                 });
                 send(arr);
             });

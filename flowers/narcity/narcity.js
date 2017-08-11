@@ -741,12 +741,50 @@ var generateHomepage = function(_c, cb) {
         extra.sections = articles.sections;
         extra.latests = articles.latests;
 
-        filelogic.renderThemeLML(_c, 'home', 'index.html', extra, function(pContent) {
-            var setObj = {};
-            setObj["narcityhomepage_" + _c.id] = pContent
-            sharedcache.set(setObj);
+        db.join(_c, 'content', [
+            {$match : {
+                date : {$gt : new Date(Date.now() - (1000 * 60 * 60 * 24 * 14))},
+                status : "published",
+                topic : {$exists : 1},
+                media : {$exists : 1}
+            }},
+            {$sort : {shares : -1}},
+            {$limit : 6},
+            {$lookup : {
+                from : "topics",
+                localField : "topic",
+                foreignField : "_id",
+                as : "deeptopic"
+            }},
+            {$lookup : {
+                from : "uploads",
+                localField : "media",
+                foreignField : "_id",
+                as : "image"
+            }},
+            {$project : {
+                title : 1, subtitle : 1, deeptopic : 1, image : 1, name : 1, shares : 1
+            }}
+        ], function(recomm) {
+            extra.recomm = JSON.stringify(
+                recomm.map(x => {
+                    return { 
+                        title : x.title, 
+                        subtitle : x.subtitle, 
+                        url : _c.server.url + "/" + x.deeptopic[0].completeSlug + "/" + x.name,
+                        image : x.image[0].sizes.thumbnailsmall.url,
+                        shares : x.shares
+                    }
+                })
+            );
 
-            cb && cb(pContent);
+            filelogic.renderThemeLML(_c, 'home', 'index.html', extra, function(pContent) {
+                var setObj = {};
+                setObj["narcityhomepage_" + _c.id] = pContent
+                sharedcache.set(setObj);
+
+                cb && cb(pContent);
+            });
         });
     });
 }
@@ -1115,7 +1153,7 @@ var handleReaderSearch = function(cli) {
 
         lmlsearch.queryList(cli._c, topic, terms, {
             projection : {title : 1, media : 1, topic : 1, name : 1, _id : 0},
-            max : 20,
+            max : 18,
             page : page || 0,
             scoresort : 1,
             conditions : {status : "published"}
@@ -1599,7 +1637,7 @@ var parseArticleFields = function(pkg) {
     art.topic = art.topic || {slug : "", displayname : ""};
 }
 
-var registerPrecompFiles = function(_c) {
+var registerPrecompFiles = function(_c, done) {
     // templateBuilder.addJS(path + '/precomp/js/');
     templateBuilder.addCSS(themePath + '/precomp/css/fonts.css.lml', _c.id);
     templateBuilder.addCSS(themePath + '/precomp/css/style.css.lml', _c.id);
@@ -1614,6 +1652,11 @@ var registerPrecompFiles = function(_c) {
     templateBuilder.addJS(themePath + '/precomp/js/social.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/facebook.js.lml', _c.id);
     templateBuilder.addJS(themePath + '/precomp/js/global.js.lml', _c.id);
+
+    db.findToArray(_c, 'topics', {"override.cityname" : {$exists : 1}}, function(err, cities) {
+        templateBuilder.addExtra(_c.id, 'cities', JSON.stringify(cities.map(x => x.override.cityname.toLowerCase())));
+        done();
+    }, {override : 1});
 }
 
 NarcityTheme.prototype.enable = function (_c, info, callback) {
@@ -1625,9 +1668,6 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
     loadHooks(_c);
     log('Narcity', 'Loaded hooks');
 
-    registerPrecompFiles(_c);
-    log('Narcity', 'Registered files for precompilation');
-
     registerPictureSizes();
     log('Narcity', 'Registered custom image sizes');
 
@@ -1637,23 +1677,27 @@ NarcityTheme.prototype.enable = function (_c, info, callback) {
     readersLib = new (require("./readers.js"))(_c).initialize();
     log('Narcity', "Registered Readers Wrapper");
 
-    registerSnips(_c, function() {
-        log('Narcity', 'Registered theme snips');
+    registerPrecompFiles(_c, function() {
+        log('Narcity', 'Registered files for precompilation');
 
-        // Symlink res to html folder
-        fileserver.createSymlink(themePath + '/res', _c.server.html + '/res', function() {
-            fileserver.createDirIfNotExists(_c.server.html + "/tags", function() {
-                fileserver.createDirIfNotExists(_c.server.html + "/whoami", function() {
-                    fileserver.createDirIfNotExists(_c.server.html + "/authors", function() {
-                        fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
-                            readersLib.createCollection(function() {
-                                log('Narcity', 'Created symlink and content directories. Ready to callback');
-                                callback();
-                            });
+        registerSnips(_c, function() {
+            log('Narcity', 'Registered theme snips');
+
+            // Symlink res to html folder
+            fileserver.createSymlink(themePath + '/res', _c.server.html + '/res', function() {
+                fileserver.createDirIfNotExists(_c.server.html + "/tags", function() {
+                    fileserver.createDirIfNotExists(_c.server.html + "/whoami", function() {
+                        fileserver.createDirIfNotExists(_c.server.html + "/authors", function() {
+                            fileserver.createDirIfNotExists(_c.server.html + "/category", function() {
+                                readersLib.createCollection(function() {
+                                    log('Narcity', 'Created symlink and content directories. Ready to callback');
+                                    callback();
+                                });
+                            }, true);
                         }, true);
                     }, true);
                 }, true);
-            }, true);
+            });
         });
     });
 }

@@ -35,12 +35,12 @@ var Precomp = function () {
         return siteQueue[conf.id];
     };
 
-    var compileQueue = function(conf, cb) {
+    var compileQueue = function(conf, cb, extra) {
         hooks.fire('queue_will_compile', {config : conf});
         that.compileMultipleFiles(conf, precompQueue, function() {
             hooks.fire('queue_compiled', {config : conf});
             cb();
-        });
+        }, extra);
     };
 
     var minifyFile = function (conf, inFile, outFile, filetype, callback) {
@@ -87,12 +87,12 @@ var Precomp = function () {
         }
     };
 
-    var runLoop = function (conf, readycb, themeFiles, force) {
+    var runLoop = function (conf, readycb, themeFiles, force, extra) {
         if (themeFiles) {
             var absWritePath = conf.server.html + "/compiled/theme/";
             db.findToArray(conf, 'compiledfiles', {style : true}, function (err, histo) {
                 db.remove(conf, 'compiledfiles', {style : true}, function (remErr, res) {
-                    compileFiles(conf, themeFiles, histo, undefined, absWritePath, readycb, true, force);
+                    compileFiles(conf, themeFiles, histo, undefined, absWritePath, readycb, true, force, extra);
                 });
             });
 
@@ -110,7 +110,7 @@ var Precomp = function () {
                 fileArr = files;
                 db.findToArray(conf, 'compiledfiles', {style : null}, function (err, histo) {
                     db.remove(conf, 'compiledfiles', {style : null}, function (remErr, res) {
-                        compileFiles(conf, fileArr, histo, absReadPath, absWritePath, readycb, false, force)
+                        compileFiles(conf, fileArr, histo, absReadPath, absWritePath, readycb, false, force, extra)
                     });
                 });
             });
@@ -118,14 +118,14 @@ var Precomp = function () {
 
     };
 
-    this.compileMultipleFiles = function(conf, lmlfiles, callback) {
+    this.compileMultipleFiles = function(conf, lmlfiles, callback, extra) {
         var that = this;
         var index = -1;
         var nextFile = function() {
             index++;
 
             if (index < lmlfiles.length) {
-                that.compileSingleFile(conf, lmlfiles[index], nextFile);
+                that.compileSingleFile(conf, lmlfiles[index], nextFile, extra);
             } else {
                 callback();
             }
@@ -134,7 +134,7 @@ var Precomp = function () {
         nextFile();
     };
 
-    this.compileSingleFile = function(conf, lmlfile, callback) {
+    this.compileSingleFile = function(conf, lmlfile, callback, extra) {
         var writepath = conf.server.html + "/compiled/" + lmlfile.slice(lmlfile.lastIndexOf('/') + 1, -4);
         checksum.file(lmlfile, function(err, sum) {
             if (err) {
@@ -153,7 +153,7 @@ var Precomp = function () {
                                     lmlfile,
                                     writepath,
                                     callback,
-                                    {config : conf, minify : false, theme : siteTheme}
+                                    Object.assign({config : conf, minify : false, theme : siteTheme}, extra)
                                 );
                             });
                         });
@@ -165,7 +165,7 @@ var Precomp = function () {
         });
     };
 
-    var compileFiles = function (conf, fileArr, histo, absReadPath, absWritePath,  readycb, isTheme, force) {
+    var compileFiles = function (conf, fileArr, histo, absReadPath, absWritePath,  readycb, isTheme, force, extra) {
         var histoObj = new Object();
         var fileIndex = 0;
         var tempPath = conf.server.html + "/static/tmp/";
@@ -219,11 +219,11 @@ var Precomp = function () {
                                                 nextFile();
                                             });
                                         });
-                                    }, {
+                                    }, Object.assign({
                                         minify: isTheme,
                                         config: conf,
                                         theme : siteTheme
-                                    }
+                                    }, extra)
                                 );
                             }
                         });
@@ -308,15 +308,15 @@ var Precomp = function () {
         nextFile();
     };
 
-    this.precompile = function (conf, readycb, themesFiles, force) {
+    this.precompile = function (conf, readycb, themesFiles, force, extra = {}) {
         fileserver.createDirIfNotExists(conf.server.html + "/compiled/", function () {
             runLoop(conf, function () {
                 compileQueue(conf, function() {
                     mergeJS(conf, function () {
                         mergeCSS(conf, readycb, themesFiles ? true : false);
                     }, themesFiles ? true : false);
-                });
-            }, themesFiles, force);
+                }, extra);
+            }, themesFiles, force, extra);
         }, true);
     };
 };

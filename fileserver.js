@@ -75,6 +75,7 @@ class FileServer {
             }
 
             log("Minifier", "Minifying file with ext : " + ext);
+            log("Minifier", "File has " + content.length + " bytes", content.length == 0 ? "warn" : "info");
             try {
                 switch (ext) {
                     case "css":
@@ -89,6 +90,11 @@ class FileServer {
             } catch (ex) {
                 log('Fileserver', 'Could not minify file ' + fullpath, 'err');
                 minifiedString = content
+            }
+
+            if (!minifiedString) {
+                log('Minified', 'There is most likely a syntax error in file ' + fullpath, 'warn');
+                minifiedString = content;
             }
 
             const handle = that.getOutputFileHandle(fullpath, 'w+');

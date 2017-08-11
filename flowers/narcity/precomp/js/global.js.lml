@@ -1,4 +1,4 @@
-{#config}
+{#config;extra}
 
 var narsettings = {
     infiniteScroll : false
@@ -192,6 +192,9 @@ var findAds = function() {
         });
     }
 
+    if (!window.lmladslots) {
+        window.lmladslots = {};
+    }
     var keys = Object.keys(window.lmladslots);
     for (var i = 0; i < keys.length; i++) if (document.getElementById(keys[i])) {
         googletag.display(keys[i]);
@@ -584,6 +587,187 @@ var presentTrending = function() {
     }
 };
 
+var bindSearchBar = function() {
+    var barwrap = document.getElementById("searchbox-wrapper");
+    if (!barwrap) {return;}
+
+    var sb = document.getElementById('ai-search');
+    var barph = sb.dataset.placeholder;
+    var initstate = true;    
+
+    document.querySelector('.lookingforrec-title b').addEventListener('click', function() {
+        sb.focus();
+    });
+
+    sb.addEventListener('focus', function() {
+        barwrap.classList.add('active');
+        barwrap.style.height = barwrap.scrollHeight + "px";
+        sb.classList.add('active');
+
+        if (initstate) {
+            sb.textContent = "";
+
+            var wrap = document.getElementById('results-wrapper');
+            while (wrap.firstElementChild) { wrap.firstElementChild.remove(); }
+        }
+    });
+
+    sb.addEventListener('blur', function() {
+        if (sb.textContent.trim() == "") {
+            sb.textContent = barph;
+            initstate = true;
+
+            barwrap.classList.remove('active');
+            barwrap.style.height = "";
+            sb.classList.remove('active');
+            document.getElementById('recommendations-wrapper').classList.remove('hid');
+            document.getElementById('recommendations-wrapper').style.display = "";
+
+            while (currentCities.length != 0) {
+                allCities.push(currentCities.pop());
+            }
+
+            currentCities = [];
+        } else {
+            initstate = false;
+        }
+    });
+
+
+    var allCities = JSON.parse(`{=?extra.cities}` || "");    
+    var currentCities = [];
+
+    var getCityNames = function(str) {
+        var words = str.split(' ');
+        var found = false;
+
+        for (var i = 0; i < words.length; i++) if (words[i]) {
+            var cindex = allCities.indexOf(words[i]);
+            if (cindex != -1) {
+                currentCities.push(allCities.splice(cindex, 1).pop());
+                found = true;
+
+                continue;
+            }
+        }
+
+        return found;
+    };  
+
+    var checkForTags = function(content) {
+        var found = getCityNames(content);
+        if (found) {
+            for (var i = 0; i < currentCities.length; i++) {
+                content = content.replace(currentCities[i], '<div contenteditable="false" class="inline-search-kw kw-'+
+                    currentCities[i]+
+                '">'+
+                    currentCities[i]+
+                '</div>');
+            }
+
+            sb.innerHTML = content;
+
+            var allkw = sb.querySelectorAll('.inline-search-kw');
+            if (window.getSelection) {
+                var newNode = allkw[allkw.length-1];
+
+                var sel = window.getSelection();
+                var range = sel.getRangeAt(0); 
+
+                range.setStartAfter(newNode);
+                range.setEndAfter(newNode); 
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+    }
+
+    sb.addEventListener('keydown', function(ev) {
+        var content = sb.textContent.toLowerCase();
+        checkForTags(sb.textContent);
+
+        if (ev.which == 13) {
+            ev.preventDefault();
+
+            content.trim().length > 2 && fireSearch(content);
+            return false;
+        }
+    });
+
+    var parseError = function(code) {
+
+    };
+
+    var parseResults = function(r) {
+        var wrap = document.getElementById('results-wrapper');
+        while (wrap.firstElementChild) { wrap.firstElementChild.remove(); }
+
+        document.getElementById('recommendations-wrapper').classList.add('hid');
+        for (var i = 0; i < r.length; i++) {
+            var art = r[i];
+            var link = document.createElement('a');
+            link.href = art.topicurl + "/" + art.name;
+            link.className = "recomm-link";
+            
+            var img = document.createElement('img');
+            img.className = "recomm-image";
+            img.src = art.imageurl;
+
+            var textwrap = document.createElement('div');
+            textwrap.className = "recom-text";
+
+            var title = document.createElement('h4');
+            title.textContent = art.title;
+        
+            var subtitle = document.createElement("h5");
+            subtitle.textContent = art.subtitle;
+
+            textwrap.appendChild(title);
+            textwrap.appendChild(subtitle);
+
+            link.appendChild(img);
+            link.appendChild(textwrap);
+            wrap.appendChild(link);
+
+            (function(i, link) {
+                setTimeout(function() {
+                    link.classList.add('shown');
+                }, i * 30)
+            })(i, link);
+        }
+
+        setTimeout(function() {
+            document.getElementById('recommendations-wrapper').style.display = "none";
+
+            var barwrap = document.getElementById("searchbox-wrapper");
+            barwrap.style.height = "";
+            barwrap.style.height = barwrap.scrollHeight + "px";
+        }, 200);
+    };
+
+    var lastSearch;
+    var fireSearch = function(q) {
+        if (lastSearch == q) {
+            return;
+        }
+        lastSearch = q;
+
+        var gotResults = function() {
+            if (this.status === 200) {
+                parseResults(JSON.parse(this.responseText));
+            } else {
+                parseError(this.status);
+            }
+        }
+
+        var oReq = new XMLHttpRequest();
+        oReq.addEventListener("load", gotResults);
+        oReq.open("GET", "{=config.default.server.url}/lquery");
+        oReq.setRequestHeader('lmlterms', q);
+        oReq.send();
+    }
+}
+
 var rearrangeImages = function() {
     var asis = document.querySelectorAll('.image-asis');
     for (var i = 0; i < asis.length; i++) {
@@ -595,6 +779,7 @@ var rearrangeImages = function() {
 };
 
 bindReady();
+bindSearchBar();
 presentTrending();
 findAds();
 bindAdsScroll();
@@ -609,6 +794,3 @@ maybeFadeIn();
 parseEmbeds();
 parseContentLinks();
 rearrangeImages();
-
-/* Dirty fix. We don't use jQuery, thank God... but some 3rd parties do. */
-jQuery = function() {return {is : function() { return this; } } };

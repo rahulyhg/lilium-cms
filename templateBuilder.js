@@ -6,6 +6,8 @@ var hooks = require('./hooks.js');
 var log = require('./log.js');
 var _c = require('./config.js');
 
+var siteextra = {};
+
 var templateBuilder = function () {
     var that = this;
     var settings = {};
@@ -128,6 +130,14 @@ var templateBuilder = function () {
         css[siteID].push(absPath);
     };
 
+    this.addExtra = function(siteid, key, value) {
+        if (!siteextra[siteid]) {
+            siteextra[siteid] = {};
+        }
+
+        siteextra[siteid][key] = value;
+    };
+
     this.precompAllFiles = function () {
         var sites = _c.getAllSites();
         for (var i in sites) {
@@ -147,7 +157,7 @@ var templateBuilder = function () {
             fileArr.push(css[_c.id][i]);
         }
 
-        require('./precomp.js').precompile(_c, cb, fileArr, force);
+        require('./precomp.js').precompile(_c, cb, fileArr, force, siteextra[_c.id]);
     };
 
     this.precompJS = function (_c) {
