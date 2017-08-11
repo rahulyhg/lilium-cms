@@ -774,7 +774,7 @@ var generateHomepage = function(_c, cb) {
                         title : x.title, 
                         subtitle : x.subtitle, 
                         url : _c.server.url + "/" + x.deeptopic[0].completeSlug + "/" + x.name,
-                        image : cdn.parseOne(_c, x.image[0].sizes.thumbnailsmall.url, true),
+                        image : CDN.parseOne(_c, x.image[0].sizes.thumbnailsmall.url, true),
                         shares : x.shares
                     }
                 })
@@ -1164,7 +1164,7 @@ var handleReaderSearch = function(cli) {
                 x.topic = undefined;
                 x.featuredimage = undefined;
                 x.media = undefined;
-                x.imageurl = cdn.parseOne(cli._c, x.imageurl, true);
+                x.imageurl = CDN.parseOne(cli._c, x.imageurl, true);
             });
 
             array && array.length && sharedcache.set({
