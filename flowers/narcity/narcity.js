@@ -1137,6 +1137,25 @@ var serveTopicAPI = function(cli) {
     }
 };
 
+var registerReaderSearchChoice = function(cli) {
+    let searchid = cli.request.headers.lmlqid;
+    let articleid = cli.request.headers.lmlaid;
+
+    if (searchid && articleid) {
+        cli.throwHTTP(204, undefined, true);
+
+        db.update(
+            cli._c, 
+            'searches', 
+            { _id : db.mongoID(searchid), clickthrough : {$exists : 0} }, 
+            { clickthrough : db.mongoID(articleid) }, 
+            (err, r) => { }
+        );
+    } else {
+        cli.throwHTTP(404, undefined, true);
+    }
+}
+
 var handleReaderSearch = function(cli) {
     let terms = cli.request.headers.lmlterms;
     if (!terms || terms.length < 3) {
@@ -1154,44 +1173,52 @@ var handleReaderSearch = function(cli) {
             terms : terms,
             at : Date.now(),
             cached : !!cached
-        }, function() {});
+        }, function(err, r) {
+            const queryid = r.insertedId;
 
-        if (cached && cached.expiry > Date.now()) {
-            return cli.sendJSON(cached.articles);
-        }
+            if (cached && cached.expiry > Date.now()) {
+                return cli.sendJSON({articles : cached.articles, qid : queryid});
+            }
 
-        db.findToArray(cli._c, 'topics', { 
-            "override.cityname" : {$in : terms.split(' ')} 
-        }, function(err, deeptopics) {
-            const qtopic = deeptopics.map(x => x._id);
-            topic && qtopic.push( db.mongoID(topic) );
+            db.findToArray(cli._c, 'topics', { 
+                "override.cityname" : {$in : terms.split(' ')} 
+            }, function(err, deeptopics) {
+                const qtopic = deeptopics.map(x => x._id);
+                topic && qtopic.push( db.mongoID(topic) );
 
-            lmlsearch.queryList(cli._c, qtopic.length ? { $in : qtopic } : undefined, terms, {
-                projection : { title : 1, media : 1, topic : 1, name : 1, _id : 0 },
-                max : 18,
-                page : page || 0,
-                scoresort : 1,
-                conditions : {
-                    status : "published"
-                }
-            }, function(array) {
-                array.forEach(x => {
-                    x.topic = undefined;
-                    x.featuredimage = undefined;
-                    x.media = undefined;
-                    x.imageurl = CDN.parseOne(cli._c, x.imageurl, true);
-                });
-
-                array && array.length && sharedcache.set({
-                    [cachekey] : {
-                        articles : array,
-                        expiry : Date.now() + (1000 * 60 * 5)
+                lmlsearch.queryList(cli._c, qtopic.length ? { $in : qtopic } : undefined, terms, {
+                    projection : { title : 1, media : 1, topic : 1, name : 1, _id : 1 },
+                    max : 18,
+                    page : page || 0,
+                    scoresort : 1,
+                    conditions : {
+                        status : "published"
                     }
-                });
+                }, function(array) {
+                    array.forEach(x => {
+                        x.topic = undefined;
+                        x.featuredimage = undefined;
+                        x.media = undefined;
+                        x.imageurl = CDN.parseOne(cli._c, x.imageurl, true);
+                        x.aid = x._id;
+                        x._id = undefined;
+                    });
 
-                cli.sendJSON(array);
-            });
-        }, {_id : 1});
+                    array && array.length && sharedcache.set({
+                        [cachekey] : {
+                            articles : array,
+                            expiry : Date.now() + (1000 * 60 * 5)
+                        }
+                    });
+
+                    if (array.length == 0) {
+                        db.update(cli._c, 'searches', {_id : queryid}, {clickthrough : false}, () => {});
+                    }
+
+                    cli.sendJSON({articles : array, qid : queryid});
+                });
+            }, {_id : 1});
+        });
     });
 };
 
@@ -1322,6 +1349,10 @@ var loadHooks = function(_c, info) {
 
     endpoints.register(_c.id, 'lquery', 'GET', function(cli) {
         handleReaderSearch(cli);
+    });
+
+    endpoints.register(_c.id, 'rquery', 'GET', function(cli) {
+        registerReaderSearchChoice(cli);
     });
 
     var cachedHot = [];

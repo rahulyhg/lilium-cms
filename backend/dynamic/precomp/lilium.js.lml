@@ -1212,6 +1212,8 @@ var LiliumCMS = function() {
             that.bindFocus();
             
             liliumcms.lys.bindKeys();
+
+            window.lml = that.lmldom;
         };
     };
 

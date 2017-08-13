@@ -922,6 +922,22 @@ var LMLDom = function() {
         }
     };
 
+    this.activateSpecialTags = function(maintag) {
+        // Work buttons
+        var wb = document.querySelectorAll('.workbutton');
+        for (var i = 0; i < wb.length; i++) {
+            (function(btn) {
+                btn.addEventListener('click', function() {
+                    btn.classList.add('working');
+                    var cbname = btn.dataset.call;
+                    cbname && window[cbname](function() {
+                        btn.classList.remove('working');
+                    }, btn);
+                });
+            })(wb[i]);
+        }
+    };
+
     this.parseLMLDates = function() {
         var dateelem = document.querySelectorAll('.lml-date');
         for (var i = 0; i < dateelem.length; i++) {
@@ -1073,6 +1089,8 @@ var LMLDom = function() {
                     log('LMLDOM', 'Applying page features');
                     lmldom.removeFeatures();
                     lmldom.addFeatures();
+
+                    lmldom.activateSpecialTags(maindom);
 
                     log("LMLDOM", "Rendered LMLDom v" + domv + " in " + (new Date() - now) + "ms");
                     liliumcms.pageloader.parseDocument();

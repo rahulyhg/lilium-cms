@@ -934,6 +934,24 @@ input[type="submit"].blue:active, .btn.blue:active, button.blue:active {
 	text-shadow: 0 0 3px rgba(0,0,0,0.1);
 }
 
+.workbutton.working span {
+    display: none;
+}
+
+.workbutton.working::before {
+    content: "\f013";
+    animation: fa-spin 2s infinite linear;
+
+    display: block;
+    font: normal normal normal 14px/1 FontAwesome;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+}
+
+.workbutton.working.big::before {
+    font-size: 32px;
+}
+
 .lml-button {
 	background-color: {=actioncolor};
 	color: #EEE;

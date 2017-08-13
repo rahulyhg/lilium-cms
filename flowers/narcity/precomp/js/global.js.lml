@@ -698,10 +698,12 @@ var bindSearchBar = function() {
 
     };
 
-    var parseResults = function(r) {
+    var parseResults = function(resp) {
         var wrap = document.getElementById('results-wrapper');
         while (wrap.firstElementChild) { wrap.firstElementChild.remove(); }
 
+        var r = resp.articles;
+        var qid = resp.qid;
         if (r.length) {
             document.getElementById('ai-no-results').style.display = "none";
             document.getElementById('ai-no-results').classList.remove('shown');
@@ -712,6 +714,8 @@ var bindSearchBar = function() {
                 var link = document.createElement('a');
                 link.href = art.topicurl + "/" + art.name;
                 link.className = "recomm-link";
+                link.dataset.aid = art.aid;
+                link.dataset.qid = qid;
                 
                 var img = document.createElement('img');
                 img.className = "recomm-image";
@@ -737,6 +741,22 @@ var bindSearchBar = function() {
                     setTimeout(function() {
                         link.classList.add('shown');
                     }, i * 30)
+
+                    link.addEventListener('click', function(ev) {
+                        var ack = function() {
+                            document.location = link.href;
+                        }
+
+                        var oReq = new XMLHttpRequest();
+                        oReq.addEventListener("load", ack);
+                        oReq.open("GET", "{=config.default.server.url}/rquery");
+                        oReq.setRequestHeader("lmlqid", link.dataset.qid);
+                        oReq.setRequestHeader("lmlaid", link.dataset.aid); 
+                        oReq.send();                       
+
+                        ev.preventDefault();
+                        return false;
+                    });
                 })(i, link);
             }
 

@@ -8,7 +8,324 @@ var formBuilder = require('./formBuilder.js');
 var configs = require('./config');
 var precomp = require('./precomp.js');
 
-var DevTools = function() {};
+class DevTools {
+    adminGET (cli) {
+        if (!cli.hasRightOrRefuse("develop")) {return;} 
+
+        switch (cli.routeinfo.path[2]) {
+            case 'livevars':
+            case 'lml':
+            case 'endpoints':
+            case 'impersonate':
+            case 'feed':
+            case 'html':
+            case 'sharedobject':
+            case 'server':
+            case 'scripts':
+            case 'mail':
+            case undefined:
+                filelogic.serveAdminLML(cli);
+                break;
+
+            case 'lml3':
+            case 'api':
+            case 'cache':
+            case 'decorations':
+                filelogic.serveAdminLML3(cli);
+                break;
+
+            default:
+                cli.throwHTTP(404, 'Not Found');
+        }
+    };
+
+    adminPOST (cli) {
+        if (!cli.hasRight('develop')) {
+            return cli.throwHTTP(401, "401, GET OUT OF MY FACE");
+        }
+
+        switch (cli.routeinfo.path[2]) {
+            case 'lml':
+                if (cli.routeinfo.path[3] === 'interpret') {
+                    interpretLMLToCli(cli);
+                }
+                break;
+            case 'cache':
+                handleCacheClear(cli);
+                break;
+            case 'scripts':
+                maybeExecuteScript(cli);
+                break;
+            case 'feed':
+                maybeInsertFeed(cli);
+                break;
+            case 'restart':
+                maybeRestart(cli);
+                break;
+            case 'mail':
+                maybeSendMail(cli);
+                break;
+            default:
+                cli.refresh();
+        }
+    };
+
+    livevar (cli, levels, params, cb) {
+        cli.touch("devtools.livevar");
+        if (!cli.hasRight('develop')) { return cb(); }
+
+        if (levels[0] == "endpoints") { 
+            var endpoints = require("./backend/admin.js").getEndpoints();
+            var formattedOutput = {};
+
+            for (var method in endpoints) {
+                formattedOutput[method] = [];
+            
+                var curMethod = endpoints[method];
+                for (var func in curMethod) {
+                    formattedOutput[method].push({
+                        endpoint : func,
+                        pluginid : curMethod[func].pluginID
+                    });
+                }
+            }
+
+            cb(formattedOutput);
+        } else if (levels[0] == "cache") {
+            const type = levels[1];
+
+            const skip = params.page || 0;
+            const max = 100;
+
+            switch (type) {
+                case "posts": 
+                    db.findToArray(cli._c, 'content', {status : "published"}, (err, arr) => {
+                        cb(arr);
+                    }, {title : 1, date : 1, name : 1}, skip * max, max, true);
+                    break;
+
+                case "authors":
+                    db.findToArray(require('./config.js').default(), 'entities', {}, (err, arr) => {
+                        cb(arr);
+                    }, {displayname : 1, slug : 1, username : 1}, undefined, undefined, true);
+                    break;
+
+                case "topics":
+                    db.findToArray(cli._c, 'topics', {}, (err, arr) => {
+                        cb(arr);
+                    }, {displayname : 1, slug : 1}, undefined, undefined, true);
+                    break;
+
+                default: 
+                    cb([]);
+            }
+
+        } else if (levels[0] == "me") {
+            cb(cli.userinfo);
+        } else if (levels[0] == "livevars") {
+            var allLV = require('./livevars.js').getAll();
+            var arr = [];
+
+            for (var ep in allLV) {
+                arr.push(
+                    Object.assign(allLV[ep], {name : ep})
+                );
+            }
+
+            cb(arr); 
+        } else if (levels[0] == "scripts") {
+            require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
+                cb(list);
+            });
+        } else if (levels[0] == "htmlfiles") {
+            listAllCachedFiles(cli, levels, params, cb);
+        }
+    };
+
+    form () {
+        formBuilder.createForm('devtools_livevar', {
+            formWrapper: {
+                'tag': 'div',
+                'class': 'row',
+                    'id': 'article_new',
+                    'inner': true
+                },
+            fieldWrapper : "lmlform-fieldwrapper"
+        })
+        .add('endvar', 'livevar', {
+            displayname : "End Variable",
+            title: 'name',
+            template: 'option', 
+            tag: 'select', 
+            endpoint: 'devtools.livevars.all',
+            attr : {
+                lmlselect : false
+            },
+            props: {
+                value: 'name',
+                html : 'name',
+                header : 'Select One'
+            }
+        })
+        .add('levels', 'stack', {
+            scheme : {
+                columns : [
+                    {
+                        fieldName : "level",
+                        dataType : "text",
+                        displayname : "Level"
+                    }
+                ]
+            },
+            displayname : "Levels"
+        })
+        .add('params', 'stack', {
+            scheme : {
+                columns : [
+                    {
+                        fieldName : "paramname",
+                        dataType : "text",
+                        displayname : "Name"
+                    },
+                    {
+                        fieldName : "paramvalue",
+                        dataType : "text",
+                        displayname : "Value"
+                    }
+                ]
+            },
+            displayname : "Parameters"
+        })
+        .add('query-set', 'buttonset', { buttons: [{
+                name : 'query', 
+                displayname : 'Query', 
+                classes : ['btn-query']
+            }
+        ]});
+
+        formBuilder.createForm('devmail', {
+            async : true,
+            fieldWrapper : 'lmlform-fieldwrapper'
+        })
+        .add('to', 'text', {
+            displayname : "To"
+        })
+        .add('subject', 'text', {
+            displayname : "Subject"
+        })
+        .add('content', 'textarea', {
+            displayname : "Content"
+        })
+        .add('send-set', 'buttonset', { buttons: [{
+                name : 'sendmail', 
+                displayname : 'Send Mail', 
+                classes : ['btn-sendmail']
+            }
+        ]});
+
+
+        formBuilder.createForm('devfeedinsert', {
+            async : true,
+            fieldWrapper : 'lmlform-fieldwrapper'
+        })
+        .add('type', 'select', {
+            displayname : "Type",
+            datasource : [
+                {name : "quote", displayName : "Quote"},
+                {name : "published", displayName : "Published"},
+                {name : "badge", displayName : "Badge"},
+                {name : "welcomed", displayName : "Welcomed"}
+            ]
+        })
+        .add('extid', 'text', {
+            displayname : "External ID"
+        })
+        .add('actor', 'livevar', {
+            displayname : "Actor",
+            endpoint : "entities.chat",
+                tag : "select",
+                template: "option",
+                attr: {
+                    lmlselect : false,
+                    header : 'Select an entity'
+                },
+                props: {
+                    'value' : "_id",
+                    'html' : 'displayname'
+                }            
+        })
+        .add('site', 'livevar', {
+                displayname : "Site",
+                endpoint : "sites.all.complex",
+                tag : "select",
+                template: "option",
+                attr: {
+                    lmlselect : false,
+                    header : 'Select a website'
+                },
+                props: {
+                    'value' : "id",
+                    'html' : 'website.sitetitle'
+                }            
+        })
+        .add('extra', 'stack', {
+            displayname : "Extra data",
+            scheme : {
+                columns : [
+                    { fieldName : "key", dataType : "text", displayname : "Key" },
+                    { fieldName : "value", dataType : "text", displayname : "Value" }
+                ]
+            }
+        })
+        .add('Insert', 'submit', {
+            type: 'button', 
+            displayname : 'Insert',
+            async : true
+        });
+
+        formBuilder.createForm('devtools_api', {
+            formWrapper: {
+                'tag': 'div',
+                'class': 'row',
+                    'id': 'devtools_api',
+                    'inner': true
+                },
+            fieldWrapper : "lmlform-fieldwrapper",
+            async : true
+        })
+        .add('endpoint', 'text', {
+            displayname : 'API Endpoint'
+        })
+        .add('method', 'select', {
+            displayname : "Method",
+            datasource : [
+                {displayName : "GET",  name : "GET" },
+                {displayName : "POST", name : "POST"}
+            ]
+        })
+        .add('token', 'text', {
+            displayname : "User Token"
+        })
+        .add('hash', 'text', {
+            displayname : "Hash header"
+        })
+        .add('send', 'button', {
+            displayname : "Send request",
+            callback : "sendDevtoolsAPIRequest"
+        });
+    }
+}
+
+var handleCacheClear = function(cli) {
+    const type = cli.routeinfo.path[3];
+    if (type == "homepage") {
+        require('./hooks.js').fire('homepage_needs_refresh_' + cli._c.uid, {
+            _c : cli._c, callback : function() {
+                cli.sendJSON({done : true});
+            }
+        });
+    }
+};
 
 var interpretLMLToCli = function(cli) {
     LML2.compileToString(cli._c.id, cli.postdata.data.lml, {config : cli._c, fromClient : true}, function(html) {
@@ -16,72 +333,6 @@ var interpretLMLToCli = function(cli) {
             html: html
         });
     });
-};
-
-DevTools.prototype.adminGET = function(cli) {
-    if (!cli.hasRightOrRefuse("develop")) {return;} 
-
-    switch (cli.routeinfo.path[2]) {
-        case 'livevars':
-        case 'lml':
-        case 'endpoints':
-        case 'impersonate':
-        case 'cache':
-        case 'feed':
-        case 'html':
-        case 'sharedobject':
-        case 'server':
-        case 'scripts':
-        case 'mail':
-        case undefined:
-            filelogic.serveAdminLML(cli);
-            break;
-
-        case 'lml3':
-        case 'api':
-        case 'decorations':
-            filelogic.serveAdminLML3(cli);
-            break;
-
-        default:
-            cli.throwHTTP(404, 'Not Found');
-    }
-};
-
-DevTools.prototype.adminPOST = function(cli) {
-    if (!cli.hasRight('develop')) {
-        return cli.throwHTTP(401, "401 GET OUT OF MY FACE");
-    }
-
-    switch (cli.routeinfo.path[2]) {
-        case 'lml':
-            if (cli.routeinfo.path[3] === 'interpret') {
-                interpretLMLToCli(cli);
-            }
-            break;
-        case 'cache':
-            switch (cli.routeinfo.path[3]) {
-                case 'refresh': refreshCache(cli, cli.routeinfo.path[4]); break;
-                case 'clear': clearCache(cli, cli.routeinfo.path[4]); break;
-                case 'preload' : preloadCache(cli); break;
-                case 'entitymagiclink' : dispatchMagicLink(cli); break;
-            }
-            break;
-        case 'scripts':
-            maybeExecuteScript(cli);
-            break;
-        case 'feed':
-            maybeInsertFeed(cli);
-            break;
-        case 'restart':
-            maybeRestart(cli);
-            break;
-        case 'mail':
-            maybeSendMail(cli);
-            break;
-        default:
-            cli.refresh();
-    }
 };
 
 var restartPM2 = function(cli) {
@@ -372,223 +623,6 @@ var recompileQueue = function(cli) {
             }, true);
         });
     }, function() {}, undefined, true);
-};
-
-
-DevTools.prototype.livevar = function(cli, levels, params, cb) {
-    cli.touch("devtools.livevar");
-    if (!cli.hasRight('develop')) { return cb(); }
-
-    if (levels[0] == "endpoints") { 
-        var endpoints = require("./backend/admin.js").getEndpoints();
-        var formattedOutput = {};
-
-        for (var method in endpoints) {
-            formattedOutput[method] = [];
-        
-            var curMethod = endpoints[method];
-            for (var func in curMethod) {
-                formattedOutput[method].push({
-                    endpoint : func,
-                    pluginid : curMethod[func].pluginID
-                });
-            }
-        }
-
-        cb(formattedOutput);
-    } else if (levels[0] == "me") {
-        cb(cli.userinfo);
-    } else if (levels[0] == "livevars") {
-        var allLV = require('./livevars.js').getAll();
-        var arr = [];
-
-        for (var ep in allLV) {
-            arr.push(
-                Object.assign(allLV[ep], {name : ep})
-            );
-        }
-
-        cb(arr); 
-    } else if (levels[0] == "scripts") {
-        require('./fileserver.js').listDirContent(configs.default().server.base + "scripts/", function(list) {
-            cb(list);
-        });
-    } else if (levels[0] == "htmlfiles") {
-        listAllCachedFiles(cli, levels, params, cb);
-    }
-};
-
-DevTools.prototype.form = function() {
-    formBuilder.createForm('devtools_livevar', {
-        formWrapper: {
-            'tag': 'div',
-            'class': 'row',
-                'id': 'article_new',
-                'inner': true
-            },
-        fieldWrapper : "lmlform-fieldwrapper"
-    })
-    .add('endvar', 'livevar', {
-        displayname : "End Variable",
-        title: 'name',
-        template: 'option', 
-        tag: 'select', 
-        endpoint: 'devtools.livevars.all',
-        attr : {
-            lmlselect : false
-        },
-        props: {
-            value: 'name',
-            html : 'name',
-            header : 'Select One'
-        }
-    })
-    .add('levels', 'stack', {
-        scheme : {
-            columns : [
-                {
-                    fieldName : "level",
-                    dataType : "text",
-                    displayname : "Level"
-                }
-            ]
-        },
-        displayname : "Levels"
-    })
-    .add('params', 'stack', {
-        scheme : {
-            columns : [
-                {
-                    fieldName : "paramname",
-                    dataType : "text",
-                    displayname : "Name"
-                },
-                {
-                    fieldName : "paramvalue",
-                    dataType : "text",
-                    displayname : "Value"
-                }
-            ]
-        },
-        displayname : "Parameters"
-    })
-    .add('query-set', 'buttonset', { buttons: [{
-            name : 'query', 
-            displayname : 'Query', 
-            classes : ['btn-query']
-        }
-    ]});
-
-    formBuilder.createForm('devmail', {
-        async : true,
-        fieldWrapper : 'lmlform-fieldwrapper'
-    })
-    .add('to', 'text', {
-        displayname : "To"
-    })
-    .add('subject', 'text', {
-        displayname : "Subject"
-    })
-    .add('content', 'textarea', {
-        displayname : "Content"
-    })
-    .add('send-set', 'buttonset', { buttons: [{
-            name : 'sendmail', 
-            displayname : 'Send Mail', 
-            classes : ['btn-sendmail']
-        }
-    ]});
-
-
-    formBuilder.createForm('devfeedinsert', {
-        async : true,
-        fieldWrapper : 'lmlform-fieldwrapper'
-    })
-    .add('type', 'select', {
-        displayname : "Type",
-        datasource : [
-            {name : "quote", displayName : "Quote"},
-            {name : "published", displayName : "Published"},
-            {name : "badge", displayName : "Badge"},
-            {name : "welcomed", displayName : "Welcomed"}
-        ]
-    })
-    .add('extid', 'text', {
-        displayname : "External ID"
-    })
-    .add('actor', 'livevar', {
-        displayname : "Actor",
-        endpoint : "entities.chat",
-            tag : "select",
-            template: "option",
-            attr: {
-                lmlselect : false,
-                header : 'Select an entity'
-            },
-            props: {
-                'value' : "_id",
-                'html' : 'displayname'
-            }            
-    })
-    .add('site', 'livevar', {
-            displayname : "Site",
-            endpoint : "sites.all.complex",
-            tag : "select",
-            template: "option",
-            attr: {
-                lmlselect : false,
-                header : 'Select a website'
-            },
-            props: {
-                'value' : "id",
-                'html' : 'website.sitetitle'
-            }            
-    })
-    .add('extra', 'stack', {
-        displayname : "Extra data",
-        scheme : {
-            columns : [
-                { fieldName : "key", dataType : "text", displayname : "Key" },
-                { fieldName : "value", dataType : "text", displayname : "Value" }
-            ]
-        }
-    })
-    .add('Insert', 'submit', {
-        type: 'button', 
-        displayname : 'Insert',
-        async : true
-    });
-
-    formBuilder.createForm('devtools_api', {
-        formWrapper: {
-            'tag': 'div',
-            'class': 'row',
-                'id': 'devtools_api',
-                'inner': true
-            },
-        fieldWrapper : "lmlform-fieldwrapper",
-        async : true
-    })
-    .add('endpoint', 'text', {
-        displayname : 'API Endpoint'
-    })
-    .add('method', 'select', {
-        displayname : "Method",
-        datasource : [
-            {displayName : "GET",  name : "GET" },
-            {displayName : "POST", name : "POST"}
-        ]
-    })
-    .add('token', 'text', {
-        displayname : "User Token"
-    })
-    .add('hash', 'text', {
-        displayname : "Hash header"
-    })
-    .add('send', 'button', {
-        displayname : "Send request",
-        callback : "sendDevtoolsAPIRequest"
-    });
 };
 
 module.exports = new DevTools();

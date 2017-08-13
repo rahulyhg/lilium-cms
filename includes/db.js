@@ -180,11 +180,12 @@ var DB = function() {
     };
 
     this.findUnique = this.findSingle = function(conf, coln, conds, cb, proj) {
-        this.find(conf, coln, conds, undefined, function(err, cur) {
+        _conns[conf.id || conf].collection(coln, {}, function(err, col) { 
+            var cur = col.find(conds).limit(1).project(proj);
             cur.hasNext(function(err, hasnext) {
                 hasnext ? cur.next(cb) : cb(new Error("Could not find item in collection " + coln), undefined);
             });
-        }, proj);
+        });
     }
 
     this.count = this.length = function(conf, coln, conds, cb) {
