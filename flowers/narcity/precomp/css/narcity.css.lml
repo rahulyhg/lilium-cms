@@ -340,6 +340,7 @@ body.menuopen .narcity-header-bar {
     height: 100%;
 }
 
+.context-city .header-float-right,
 .context-home .header-float-right {
     display: none;
 }
