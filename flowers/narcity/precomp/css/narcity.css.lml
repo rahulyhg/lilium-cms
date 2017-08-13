@@ -752,7 +752,7 @@ article > h2 {
 
 .sponsored-mention {
     color: #FFF !important;
-    background-color: #ff2634;
+    background-color: {=mc};
     font-size: 15px;
     padding: 3px 5px;
     font-weight: bold;
@@ -1038,7 +1038,7 @@ article #article-content #article-bottom-links h3 {
     font-size: 24px;
     font-weight: normal;
     text-transform: uppercase;
-    color: #ff2634 ;
+    color: {=mc};
     clear: both;
     margin: 30px 0 20px;
     text-align: left;
@@ -1152,7 +1152,7 @@ $}
 
 .inline-search-kw {
     display: inline-block;
-    background-color: #ff4200;
+    background-color: {=mc};
     color: #fff;
     border-radius: 5px;
     padding: 1px 5px;
@@ -2357,7 +2357,7 @@ footer .footer-digest-sub{
 #android-sharer-cancel {
     display: block;
     text-align: right;
-    color: #ff2634;
+    color: {=mc};
     float: none;
     clear:both;
     padding: 20px;
