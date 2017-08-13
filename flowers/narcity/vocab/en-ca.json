@@ -23,6 +23,7 @@
     "entries" : "entries",
     "lookingforrec" : "Looking for <b>recommendations</b>?",
     "recplaceholder" : "Meilleurs bars",
+    "noresults" : "Looks like this query did not return anything.",
     "cities" : "Cities",
     "explore" : "Explore",
     "page" : "Page",

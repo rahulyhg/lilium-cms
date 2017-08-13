@@ -702,47 +702,64 @@ var bindSearchBar = function() {
         var wrap = document.getElementById('results-wrapper');
         while (wrap.firstElementChild) { wrap.firstElementChild.remove(); }
 
-        document.getElementById('recommendations-wrapper').classList.add('hid');
-        for (var i = 0; i < r.length; i++) {
-            var art = r[i];
-            var link = document.createElement('a');
-            link.href = art.topicurl + "/" + art.name;
-            link.className = "recomm-link";
+        if (r.length) {
+            document.getElementById('ai-no-results').style.display = "none";
+            document.getElementById('ai-no-results').classList.remove('shown');
+
+            document.getElementById('recommendations-wrapper').classList.add('hid');
+            for (var i = 0; i < r.length; i++) {
+                var art = r[i];
+                var link = document.createElement('a');
+                link.href = art.topicurl + "/" + art.name;
+                link.className = "recomm-link";
+                
+                var img = document.createElement('img');
+                img.className = "recomm-image";
+                img.src = art.imageurl;
+
+                var textwrap = document.createElement('div');
+                textwrap.className = "recom-text";
+
+                var title = document.createElement('h4');
+                title.textContent = art.title;
             
-            var img = document.createElement('img');
-            img.className = "recomm-image";
-            img.src = art.imageurl;
+                var subtitle = document.createElement("h5");
+                subtitle.textContent = art.subtitle;
 
-            var textwrap = document.createElement('div');
-            textwrap.className = "recom-text";
+                textwrap.appendChild(title);
+                textwrap.appendChild(subtitle);
 
-            var title = document.createElement('h4');
-            title.textContent = art.title;
-        
-            var subtitle = document.createElement("h5");
-            subtitle.textContent = art.subtitle;
+                link.appendChild(img);
+                link.appendChild(textwrap);
+                wrap.appendChild(link);
 
-            textwrap.appendChild(title);
-            textwrap.appendChild(subtitle);
+                (function(i, link) {
+                    setTimeout(function() {
+                        link.classList.add('shown');
+                    }, i * 30)
+                })(i, link);
+            }
 
-            link.appendChild(img);
-            link.appendChild(textwrap);
-            wrap.appendChild(link);
-
-            (function(i, link) {
-                setTimeout(function() {
-                    link.classList.add('shown');
-                }, i * 30)
-            })(i, link);
-        }
-
-        setTimeout(function() {
             document.getElementById('recommendations-wrapper').style.display = "none";
+            setTimeout(function() {
+                var barwrap = document.getElementById("searchbox-wrapper");
+                barwrap.style.height = "";
+                barwrap.style.height = barwrap.scrollHeight + "px";
+            }, 200);
+        } else {
+            document.getElementById('ai-no-results').style.display = "block";
+            document.getElementById('recommendations-wrapper').style.display = "none";
+            setTimeout(function() {
+                document.getElementById('ai-no-results').classList.add('shown');
 
-            var barwrap = document.getElementById("searchbox-wrapper");
-            barwrap.style.height = "";
-            barwrap.style.height = barwrap.scrollHeight + "px";
-        }, 200);
+                setTimeout(function() {
+                    var barwrap = document.getElementById("searchbox-wrapper");
+                    barwrap.style.height = "";
+                    barwrap.style.height = barwrap.scrollHeight + "px";
+                }, 15);
+
+            }, 15);
+        }
     };
 
     var lastSearch;
@@ -764,6 +781,7 @@ var bindSearchBar = function() {
         oReq.addEventListener("load", gotResults);
         oReq.open("GET", "{=config.default.server.url}/lquery");
         oReq.setRequestHeader('lmlterms', q);
+        oReq.setRequestHeader('lmltopic', document.getElementById("ai-search").dataset.topicjail);
         oReq.send();
     }
 }

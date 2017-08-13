@@ -1143,7 +1143,7 @@ var handleReaderSearch = function(cli) {
         return cli.throwHTTP(422, undefined, true);
     }
 
-    let topic = cli.request.headers.lmltopic || "willnotresolve";
+    let topic = cli.request.headers.lmltopic || undefined;
     let page = cli.request.headers.lmlpage;
 
     const cachekey = "lquery_" + cli._c.uid + terms + topic + page;
@@ -1160,9 +1160,14 @@ var handleReaderSearch = function(cli) {
             return cli.sendJSON(cached.articles);
         }
 
-        db.findToArray(cli._c, 'topics', {"override.cityname" : {$in : terms.split(' ')}}, function(err, deeptopics) {
-            lmlsearch.queryList(cli._c, deeptopics.length ? {$in : deeptopics.map(x => x._id)} : undefined, terms, {
-                projection : {title : 1, media : 1, topic : 1, name : 1, _id : 0},
+        db.findToArray(cli._c, 'topics', { 
+            "override.cityname" : {$in : terms.split(' ')} 
+        }, function(err, deeptopics) {
+            const qtopic = deeptopics.map(x => x._id);
+            topic && qtopic.push( db.mongoID(topic) );
+
+            lmlsearch.queryList(cli._c, qtopic.length ? { $in : qtopic } : undefined, terms, {
+                projection : { title : 1, media : 1, topic : 1, name : 1, _id : 0 },
                 max : 18,
                 page : page || 0,
                 scoresort : 1,

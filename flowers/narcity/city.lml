@@ -15,7 +15,7 @@
 
 <main class="homepage">
     {$ if (?theme.settings.hasbanner ??) $}
-    <div class="city-banner-wrapper">
+    <div class="city-banner-wrapper" style="margin-bottom: 20px;">
         <div class="city-banner cdn" style="
             background-position: {=theme.settings.archivebanneralign}; 
             background-image: url('{=theme.settings.archivebannerurl}');
@@ -49,6 +49,8 @@
         }
     </script>
     {$ endif $}
+
+    {%petals/search}
 
     <div class="fwblock latest-content-wrapper">
         <h4 class="article-section-title">

@@ -17,37 +17,8 @@
     <div class="fwblock trending-content-wrapper">
         <div class="trending-wrapper" data-generator="generateHomepageTrending"></div>
     </div>
-
-    <div class="fwblock searchbox-wrapper" id="searchbox-wrapper">
-        <div class="lookingforrec-title">{:lookingforrec}</div>
-        <div class="searchbox-container">
-            <div contenteditable="true" contenteditable id="ai-search" data-placeholder="{=?theme.settings.searchbarplaceholder}" >
-                {=?theme.settings.searchbarplaceholder}
-            </div>
-        </div>
-
-        <div id="results-wrapper" class="fwblock">
-
-        </div>
-
-        <div id="recommendations-wrapper" class="fwblock">
-            <script>
-                var recs = JSON.parse(`{=?extra.recomm}` || []);
-                for (var i = 0; i < recs.length; i++) {
-                    var art = recs[i];
-                    document.write(
-                        '<a class="recomm-link shown" href="'+art.url+'">'+
-                            '<img src="'+art.image+'" class="recomm-image" />' +
-                            '<div class="recom-text">' +
-                                '<h4>'+art.title+'</h4>' +
-                                '<h5>'+art.subtitle+'</h5>' +
-                            '</div>'+
-                        '</a>'
-                    );
-                }
-            </script>
-        </div>
-    </div>
+    
+    {%petals/search}
 
     <div class="fwblock latest-content-wrapper">
         <h4 class="article-section-title"><a href="{=config.default.server.url}/latests">{:most-recent}</a></h4>
