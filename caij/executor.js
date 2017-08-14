@@ -180,6 +180,12 @@ class RunningTask {
         }, {_id : 1});
     }
 
+    storeRealtime(sendback) {
+        analyticsLib.storeRealtime(this._c, () => {
+            sendback();
+        });
+    }
+
     statsEmail(sendback) {
         analyticsLib.addSite(_c, (err) => {
             if (err) {

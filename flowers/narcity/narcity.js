@@ -1169,7 +1169,6 @@ var handleReaderSearch = function(cli) {
 
     sharedcache.get(cachekey, function(cached) {
         db.insert(cli._c, 'searches', {
-            from : "frontend",
             terms : terms,
             at : Date.now(),
             cached : !!cached

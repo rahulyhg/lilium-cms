@@ -1,14 +1,14 @@
-var log = require('./log.js');
-var config = require('./config.js');
-var Petal = require('./petal.js');
-var filelogic = require('./filelogic.js');
-var lmllib = require('./lmllib.js');
+const log = require('./log.js');
+const config = require('./config.js');
+const Petal = require('./petal.js');
+const filelogic = require('./filelogic.js');
+const lmllib = require('./lmllib.js');
 
-var _dashpetals = new Array();
+const _dashpetals = [];
 
-var Dashboard = function () {
-    this.getPetals = function () {
-        pets = new Array();
+class Dashboard {
+    getPetals() {
+        const pets = [];
 
         for (var pos in _dashpetals) {
             pets.push(Petal.get(_dashpetals[pos]).id);
@@ -17,18 +17,18 @@ var Dashboard = function () {
         return pets;
     };
 
-    this.registerDashPetal = function (petalID, prio) {
+    registerDashPetal(petalID, prio) {
         while (typeof _dashpetals[prio] !== 'undefined') prio++;
         _dashpetals[prio] = petalID;
     };
 
-    this.adminGET = function (cli) {
+    adminGET(cli) {
         if (cli.hasRightOrRefuse("dashboard")) {
             filelogic.serveAdminLML(cli);
         }
     };
 
-    this.registerLMLLib = function () {
+    registerLMLLib() {
         lmllib.registerContextLibrary('dashboard', function (context) {
             return new Dashboard();
         });

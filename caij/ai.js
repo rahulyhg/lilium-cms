@@ -9,6 +9,7 @@ const halfHour = oneMinute * 30;
 const oneHour = oneMinute * 60;
 const halfDay = oneHour * 12;
 const oneDay = oneHour * 24;
+const oneWeek = oneDay * 7;
 
 const Knowledge = {
     queueMaxSize : 100,
@@ -20,6 +21,7 @@ const Knowledge = {
 
     homepageDelai : halfHour,
     sitemapDelai : oneHour,
+    gaRealtimeDelai : oneSecond * 8,
     facebookDelai : oneMinute * 3,
     sendEmailAt : "00:15:00"
 };
@@ -115,6 +117,20 @@ class AI {
             });
         };
 
+        let createAnalyticsTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                _c.analytics.serviceaccount && taskscheduler.push({
+                    taskname : "storeRealtime",
+                    extra : {
+                        origin : "AI",
+                        action : "init",
+                        _c 
+                    }
+                });
+            });
+        };
+
+        ai.gaRealtimeInterval = setInterval(createAnalyticsTask, Knowledge.gaRealtimeDelai);
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
         ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
@@ -125,6 +141,7 @@ class AI {
         createHomepageTask();
         createFacebookTask();
         createSocialDispatchTask();
+        createAnalyticsTask();
     }
 
     error(err) {

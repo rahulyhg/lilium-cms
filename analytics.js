@@ -4,6 +4,7 @@ const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
 const sharedcache = require('./sharedcache.js');
 const hooks = require('./hooks.js');
+const notifications = require('./notifications.js');
 
 // Google API
 const googleapis = require('googleapis');
@@ -22,6 +23,9 @@ const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
 // Cached Analytics Responses
 const cachedAnalytics = {};
+
+// Realtime poll
+const realtimePollMS = 8000;
 
 // Authentication items
 class GoogleAnalyticsInfo {
@@ -42,6 +46,15 @@ class GoogleAnalyticsRequest {
             "max-results" : 10,
             "sort" : "-ga:pageviews"
         }, send);
+    }
+
+    static realtime(_c, gAnalytics, send) {
+        gAnalytics.getData(_c, {
+            "metrics" : "rt:activeUsers", 
+            "dimensions" : "rt:pageTitle,rt:pagePath", 
+            "sort" : "-rt:activeUsers", 
+            "max-results" : 20
+        }, send, true);
     }
 
     static dashboard(_c, gAnalytics, send) {
@@ -132,6 +145,16 @@ class GoogleAnalyticsRequest {
     }
 };
 
+class StatsBeautifier {
+    static realtime(_c, data) {
+        return {
+            pages : data.rows.map(x => { return { title : x[0], url : _c.server.url + x[1], count : x[2] }; }),
+            at : Date.now(),
+            total : data.totalsForAllResults["rt:activeUsers"]
+        }
+    }
+}
+
 class GoogleAnalytics {
     setAuthInfo(_c, sMail, keyfilePath) {
         log('Analytics', "Setting authentication info");
@@ -166,7 +189,7 @@ class GoogleAnalytics {
         }
     }
 
-    getData(_c, params, cb) {
+    getData(_c, params, cb, realtime) {
         if (!GASites[_c.id].AUTH_CLIENT) {
             log("Analytics", "Tried to request Google Analytics data without an authenticated client", 'warn');
             cb & cb(new Error("No auth client defined"));
@@ -177,7 +200,7 @@ class GoogleAnalytics {
         params.ids = "ga:" + _c.analytics.siteviewid;
         params.auth = GASites[_c.id].AUTH_CLIENT;
 
-        analytics.data.ga.get(params, (err, data) => {
+        analytics.data[realtime ? "realtime" : "ga"].get(params, (err, data) => {
             cb && cb(err, data);
         });
     }
@@ -201,34 +224,82 @@ class GoogleAnalytics {
         });
     }
 
+    storeRealtime(_c, done) {
+        GoogleAnalyticsRequest.realtime(_c, this, (err, data) => {
+            if (data) {
+                sharedcache.set({
+                    ['analytics_realtime_' + _c.id] : StatsBeautifier.realtime(_c, data)
+                }, done);
+            } else {
+                log('Analytics', 'Error while fetching realtime data : ' + err, 'warn');
+                done();
+            }
+        });
+    }
+
+    pollRealtime(_c) {
+        setInterval(() => {
+            this.sockSendRealtime(_c);
+        }, realtimePollMS);
+    }
+
+    sockSendRealtime(_c) {
+        sharedcache.get('analytics_realtime_' + _c.id, (data) => {
+            data && notifications.emitToWebsite(_c.id, data, 'analytics_realtime');
+        });
+    }
+
     livevar(cli, levels, params, send) {
         var topLevel = levels[0] || "lastmonth";
 
-        sharedcache.get('analytics_cache_' + topLevel + "_" + cli._c.uid, (cachedAnalytics) => {
-            if (cachedAnalytics && new Date().getTime() - cachedAnalytics.cachedAt < (1000 * 60 * 60)) {
-                send(cachedAnalytics.data);
-            } else if (typeof GoogleAnalyticsRequest[topLevel] == "function") {
-                GoogleAnalyticsRequest[topLevel](cli._c, that, (err, data) => {
-                    if (data) {
-                        let cached = {}
-                        cached['analytics_cache_' + topLevel + "_" + cli._c.uid] = {
-                            cachedAt : new Date().getTime(),
-                            data : data
-                        };
+        if (topLevel == "realtime") {
+            sharedcache.get('analytics_realtime_' + _c.id, (data) => {
+                if (data) {
+                    send(data);
+                } else {
+                    GoogleAnalyticsRequest.realtime(cli._c, that, (err, data) => {
+                        if (data) {
+                            data = StatsBeautifier.realtime(data);
+                            send(data);
 
-                        log('Analytics', "Caching values for top level " + topLevel);
-                        hooks.fire("analytics_refresh_" + topLevel, {data, _c : cli._c});
+                            sharedcache.set({ ["analytics_realtime_" + cli._c.id] : data });
+                        } else {
+                            send([]);
+                        }
+                    });
+                }
+            });
+        } else {
+            sharedcache.get('analytics_cache_' + topLevel + "_" + cli._c.uid, (cachedAnalytics) => {
+                if (cachedAnalytics && new Date().getTime() - cachedAnalytics.cachedAt < (1000 * 60 * 60)) {
+                    send(cachedAnalytics.data);
+                } else if (typeof GoogleAnalyticsRequest[topLevel] == "function") {
+                    GoogleAnalyticsRequest[topLevel](cli._c, that, (err, data) => {
+                        if (data) {
+                            if (StatsBeautifier[topLevel]) {
+                                data = StatsBeautifier[topLevel](cli._c, data);
+                            }
 
-                        data.cachehit = true;
-                        sharedcache.set(cached); 
-                    }
+                            let cached = {}
+                            cached['analytics_cache_' + topLevel + "_" + cli._c.uid] = {
+                                cachedAt : new Date().getTime(),
+                                data : data
+                            };
 
-                    send(err ? {error : err.toString()} : data);
-                });
-            } else {
-                send({error : "Undefined level : " + topLevel});
-            }
-        });
+                            log('Analytics', "Caching values for top level " + topLevel);
+                            hooks.fire("analytics_refresh_" + topLevel, {data, _c : cli._c});
+
+                            data.cachehit = true;
+                            sharedcache.set(cached); 
+                        }
+
+                        send(err ? {error : err.toString()} : data);
+                    });
+                } else {
+                    send({error : "Undefined level : " + topLevel});
+                }
+            });
+        }
     }
 
     settingsSaved(cli) {

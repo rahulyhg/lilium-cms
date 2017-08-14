@@ -20,6 +20,13 @@ const TOPIC_LOOKUP = {
     as           : "deeptopic"
 };
 
+const ARTICLE_LOOKUP = {
+    from : "content",
+    localField : "clickthrough",
+    foreignField : "_id",
+    as : "article"
+};
+
 const SELECTOR = (words) => {
     return {
         status : {$ne : "destroyed"},
@@ -45,7 +52,10 @@ const REPORT_DEFAULT = (overrides) => {
         grouped : false,
 
         // Only match queries with the following term (it's a regex)
-        wordmatch : ""
+        wordmatch : "",
+
+        // Only match queries which resulted in a click, or those which returned an empty set
+        onlyclicked : false, onlyemptysets : false
     }, overrides);
 };
 
@@ -54,14 +64,19 @@ class ContentSearch {
         const params = REPORT_DEFAULT(rawparams);
         const $match = {};
         
-        if (params.oldest) { $match.at = {$lt : params.oldest}; }
-        if (params.newest) { $match.at = {$gt : params.newest}; }
+        if (params.oldest != -1) { $match.at = {$lt : params.oldest}; }
+        if (params.newest != -1) { $match.at = {$gt : params.newest}; }
+
+        if (params.onlyclicked) { query.clickthrough = {$exists : 1, $ne : false}; }
+        else if (params.onlyemptysets) { query.clickthrough = false; }
+
         if (params.wordmatch) { query.terms = {$regex : new RegExp(params.wordmatch)} }
 
         db.rawCollection(params.siteid, 'searches', (err, col) => {
             if (params.grouped) {
                 col.aggregate([
                     { $match },
+                    { $lookup : ARTICLE_LOOKUP },
                     { $group : { _id : "$terms", repeated : {$sum : 1}, times : {$push : "$at"} } },
                     { $sort : {repeated : -1} },
                     { $limit : params.max }
@@ -69,7 +84,14 @@ class ContentSearch {
                     send(arr);
                 }); 
             } else {
-                col.find($match).limit(params.max).sort({_id : -1}).toArray((err, arr) => {
+                col.aggregate([
+                    { $match },
+                    { $limit : params.max },
+                    { $sort : { _id : -1 } },
+                    { $lookup : ARTICLE_LOOKUP }
+                ]).toArray((err, arr) => {
+                    arr.forEach(x => { x.article = x.article.length == 0 ? undefined : x.article[0].title; })
+
                     send(arr);
                 });
             }
@@ -127,13 +149,6 @@ class ContentSearch {
             scoresort : params.scoresort
         }, (posts) => {
             send(posts);
-
-            db.insert(cli._c, 'searches', {
-                from : "backend",
-                by : db.mongoID(cli.userinfo.userid),
-                terms : params.q,
-                at : Date.now()
-            }, () => {});
         });
     }
 }
