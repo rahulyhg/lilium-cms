@@ -160,6 +160,7 @@ class ContentSearch {
                 siteid : cli._c.id,
                 grouped : true,
                 groupGetContent : true,
+                max : 20,
                 oldest : Date.now() - (1000 * 60 * 60 * 24 * 7)
             }, (arr) => {
                 send(arr.reverse());                  
