@@ -28,7 +28,7 @@ The white titles represent terms used by the readers in the search bar along wit
 window.dashGenerateLandings = function(ldContext) {
     var arts = ldContext.res.articles;
     if (arts.length == 0) {
-        return d.make({class : "dashboard-landing-noresult", text : "This query did not generate a click"}).get();
+        return d.make({class : "dashboard-landing-noresult", text : "This query did not generate a click... Let's write about '"+ldContext.res.terms+"'!"}).get();
     } else {
         var list = d.make({class:"dashboard-landing-list"});
         for (var i = 0; i < arts.length; i++) {
