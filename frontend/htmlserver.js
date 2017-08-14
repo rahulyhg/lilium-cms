@@ -85,11 +85,11 @@ var HTMLServer = function() {
 
                                         sharedcache.get(cachekey, function(html) {
                                             if (html) {
-                                                cli.response.writeHead(200, {"content-type" : "text/html"});
+                                                cli.response.writeHead(404, {"content-type" : "text/html"});
                                                 cli.response.end(html);
                                             } else {
                                                 filelogic.renderThemeLML(cli, '404', '404.html', {}, function(content) {
-                                                    cli.response.writeHead(200, {"content-type" : "text/html"});
+                                                    cli.response.writeHead(404, {"content-type" : "text/html"});
                                                     cli.response.end(content);
         
                                                     var setobj = {};
