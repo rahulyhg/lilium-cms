@@ -312,6 +312,8 @@ window.sockUpdateDashboard = function(data) {
     padding: 10px;
     position: relative;
     overflow: hidden;
+
+    white-space: nowrap;
 }
 
 .dashboard-top-details {
