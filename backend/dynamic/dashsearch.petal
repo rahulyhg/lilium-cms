@@ -8,7 +8,7 @@
 </div>
 
 <div class="dashboard-search-desc">
-The white titles represent terms used by the readers in the search bar along with the number of times they were used. The list of articles underneath the terms represents the links on which the readers clicked after querying. 
+The grey titles represent terms used by the readers in the search bar along with the number of times they were used. The list of pink article titles underneath each term represents the links on which the readers clicked after querying. 
 </div>
 
 <div id="dashboard-search-listing">
@@ -67,25 +67,28 @@ window.dashGenerateLandings = function(ldContext) {
 
 .dashboard-search-terms {
     padding: 6px 10px;
-    text-transform: uppercase;
+    text-transform: capitalize;
     font-size: 20px;
     border-bottom: 1px solid #DDD;
-    background: #888;
-    color: #FFF;
+    background: #EEE;
+    color: #333;
     font-weight: 500;
 }
 
 .dashboard-landing-list {
     border-bottom: 1px solid #DDD;
-    padding: 3px 0px;
+    padding: 5px;
 }
 
 .dashboard-landing-item {
-    padding: 3px 10px;
+    margin: 3px 5px;
     font-size: 15px;
-    display: block;
-    color: #333;
+    display: inline-block;
+    color: #6e5371;
     font-weight: 400;
+    background: #f1daff;
+    padding: 1px 5px;
+    border-radius: 5px;
 }
 
 .dashboard-landing-noresult {
