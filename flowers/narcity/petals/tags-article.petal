@@ -37,7 +37,7 @@
 {$ endif; $}
 
 {$ if (?extra.article.pageIndex > 1) $}
-<meta name="cXenseParse:recs:recommending" content="false"/>
+<meta name="cXenseParse:recs:recommendable" content="false"/> 
 {$ endif $}
 
 <link rel="amphtml" href="{=config.default.server.url}/amp/{=extra.article.name}" />

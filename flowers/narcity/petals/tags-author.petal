@@ -13,4 +13,4 @@
 
 <title>{=extra.archivedetails.displayname} - {=config.default.website.sitetitle}</title>
 
-<meta name="cXenseParse:recs:recommending" content="false" />
+<meta name="cXenseParse:recs:recommendable" content="false"/> 
