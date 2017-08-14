@@ -51,6 +51,9 @@ const REPORT_DEFAULT = (overrides) => {
         // Group rows by terms used
         grouped : false,
 
+        // Return a list of clicked articles
+        groupGetContent : false,
+
         // Only match queries with the following term (it's a regex)
         wordmatch : "",
 
@@ -64,8 +67,8 @@ class ContentSearch {
         const params = REPORT_DEFAULT(rawparams);
         const $match = {};
         
-        if (params.oldest != -1) { $match.at = {$lt : params.oldest}; }
-        if (params.newest != -1) { $match.at = {$gt : params.newest}; }
+        if (params.oldest != -1) { $match.at = {$gt : params.oldest}; }
+        if (params.newest != -1) { $match.at = {$lt : params.newest}; }
 
         if (params.onlyclicked) { query.clickthrough = {$exists : 1, $ne : false}; }
         else if (params.onlyemptysets) { query.clickthrough = false; }
@@ -76,12 +79,27 @@ class ContentSearch {
             if (params.grouped) {
                 col.aggregate([
                     { $match },
-                    { $lookup : ARTICLE_LOOKUP },
-                    { $group : { _id : "$terms", repeated : {$sum : 1}, times : {$push : "$at"} } },
+                    { $group : { _id : "$terms", repeated : {$sum : 1}, times : {$push : "$at"}, results : {$push : "$clickthrough"} } },
                     { $sort : {repeated : -1} },
                     { $limit : params.max }
                 ]).toArray((err, arr) => {
-                    send(arr);
+                    if (params.groupGetContent) {
+                        let index = -1;
+                        const next = () => {
+                            if (++index == arr.length) {
+                                send(arr);
+                            } else {
+                                db.findToArray(params.siteid, 'content', {_id : {$in : arr[index].results}}, (err, posts) => {
+                                    arr[index].articles = posts;
+                                    next();
+                                }, {title : 1, name : 1});
+                            }
+                        };
+
+                        next();
+                    } else {
+                        send(arr);
+                    }
                 }); 
             } else {
                 col.aggregate([
@@ -137,19 +155,39 @@ class ContentSearch {
     }
 
     livevar(cli, levels, params, send) {
-        const conditions = {};
-        if (!cli.hasRight('editor')) {
-            conditions.author = db.mongoID(cli.userdata.userid);
-        }
+        if (levels[0] == "dashboard") {
+            this.generateReport({
+                siteid : cli._c.id,
+                grouped : true,
+                groupGetContent : true,
+                oldest : Date.now() - (1000 * 60 * 60 * 24 * 7)
+            }, (arr) => {
+                send(arr.reverse());                  
+            });
+        } else {
+            const conditions = {};
+            if (!cli.hasRight('editor')) {
+                conditions.author = db.mongoID(cli.userdata.userid);
+            }
 
-        this.queryList(cli._c, db.mongoID(params.topic), params.q, {
-            conditions, 
-            max : params.max,
-            page : params.page,
-            scoresort : params.scoresort
-        }, (posts) => {
-            send(posts);
-        });
+            this.queryList(cli._c, db.mongoID(params.topic), params.q, {
+                conditions, 
+                max : params.max,
+                page : params.page,
+                scoresort : params.scoresort
+            }, (posts) => {
+                send(posts);
+            });
+        }
+    }
+
+    setup() {
+        require('./petal.js').register(
+            'dashboardSearch', 
+            require('./config.js').default().server.base + "backend/dynamic/dashsearch.petal"
+        );
+
+        require('./dashboard.js').registerDashPetal("dashboardSearch", 300);
     }
 }
 

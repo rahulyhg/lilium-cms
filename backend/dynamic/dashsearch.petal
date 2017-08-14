@@ -1,0 +1,106 @@
+{#config}
+{*search.dashboard}
+
+<div class="dashboard-search-title" id="dashboard-search-title">
+    <div class="dashboard-search-title-text">
+        Latest search queries
+    </div>
+</div>
+
+<div class="dashboard-search-desc">
+The white titles represent terms used by the readers in the search bar along with the number of times they were used. The list of articles underneath the terms represents the links on which the readers clicked after querying. 
+</div>
+
+<div id="dashboard-search-listing">
+    <lml-foreach var="res" in="livevars.search.dashboard">
+        <div class="dashboard-search-item">
+            <div class="dashboard-search-terms">
+                <lml-text var="res._id"></lml-text> (<lml-text var="res.repeated" wrapper="span"></lml-text>)
+            </div>
+            <div class="dashboard-search-landings">
+                <lml-generate call="dashGenerateLandings"></lml-generate>
+            </div>
+        </div>
+    </lml-foreach>
+</div>
+
+<script>
+window.dashGenerateLandings = function(ldContext) {
+    var arts = ldContext.res.articles;
+    if (arts.length == 0) {
+        return d.make({class : "dashboard-landing-noresult", text : "This query did not generate a click"}).get();
+    } else {
+        var list = d.make({class:"dashboard-landing-list"});
+        for (var i = 0; i < arts.length; i++) {
+            list.born(d.make({
+                node : "a",
+                attr : {href : "/" + arts[i].name, target: "_blank"},
+                class:"dashboard-landing-item",
+                text : arts[i].title
+            }));
+        }
+
+        return list.get();
+    }
+};
+</script>
+
+<style>
+.dashboard-search-title {
+    height: 100px;
+    position: relative;
+    background: #241f25;
+    overflow: hidden;
+
+    border-bottom: 7px solid #af57e4;
+    border-top: 3px solid #AF57E4;
+}
+
+.dashboard-search-title-text {
+    position: absolute;
+    bottom: -15px;
+    left: 20px;
+    color: #af57e4;
+    font-size: 50px;
+    font-family: "Oswald", sans-serif;
+}
+
+.dashboard-search-terms {
+    padding: 6px 10px;
+    text-transform: uppercase;
+    font-size: 20px;
+    border-bottom: 1px solid #DDD;
+    background: #241f25;
+    color: #FFF;
+    font-weight: 500;
+}
+
+.dashboard-landing-list {
+    border-bottom: 1px solid #DDD;
+    padding: 3px 0px;
+}
+
+.dashboard-landing-item {
+    padding: 3px 10px;
+    font-size: 15px;
+    display: block;
+    color: #333;
+    font-weight: 400;
+}
+
+.dashboard-landing-noresult {
+    padding: 10px;
+    font-size: 22px;
+    color: #999;
+    font-style: italic;
+}
+
+.dashboard-search-desc {
+    font-size: 18px;
+    color: #555;
+    padding: 20px;
+    background: #F9F9F9;
+    border-bottom: 1px solid #CCC;
+}
+
+</style>

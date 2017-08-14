@@ -23,7 +23,7 @@
         }, {
             "module" : "search.js",
             "endpoint" : "search",
-            "support" : ["livevar"]
+            "support" : ["livevar", "setup"]
         }, {
             "module" : "history.js",
             "endpoint" : "history",

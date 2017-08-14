@@ -3,28 +3,54 @@
 {*googleanalytics.realtime}
 
 <script>
+var commafy = function(num) {
+    num = num.toString();
+    return num.length > 3 ? num.substring(0, num.length-3) + "'" + num.substring(num.length-3) : num;
+}
+
 liliumcms.lmldom.bind(function() {
     if (!window.dashboardgabound) { 
         window.lmlsocket.on('analytics_realtime', function(data) {
             window._gaRealtimeCache = data;
             window.sockUpdateDashboard && window.sockUpdateDashboard(data);
         });
+
         window.dashboardgabound = true;
     }
 
+    window.gaCountingUp = false;
     window.sockUpdateDashboard(liliumcms.livevars.deeplivevars.googleanalytics.realtime);
 });
 
 window.sockUpdateDashboard = function(data) {
-    console.log('rendering ' + data);
     var dCount = d.id('dashboard-active-users-count');
-    if (!dCount.get() || !data) {return;}
+    if (!dCount.get() || !data || window.gaCountingUp) {return;}
+    window.gaCountingUp = true;
 
+    var jumpsize = 100;
     var oldTotal = parseInt(dCount.dataset.total);
     var newTotal = data.total;
+    var diff = newTotal - oldTotal;
+    var jumps = diff / jumpsize;
 
-    dCount.text(newTotal);
     dCount.dataset.total = newTotal;
+
+    var currentnum = oldTotal;
+    var timestep = 1000 / jumpsize;
+    for (var i = 0; i < jumpsize; i++) {
+        (function(i) {
+            setTimeout(function() {
+                var t = i / jumpsize;
+                currentnum += jumps * ((1-t) * 2);
+                dCount.text(commafy(Math.floor(currentnum)));
+            }, timestep * i);
+        })(i);
+    }
+
+    setTimeout(function() {
+        dCount.text(commafy(newTotal));
+        window.gaCountingUp = false;
+    }, 1000);
 
     var dRank = d.id('dashboard-ga-rank');
     dRank.empty();
@@ -37,15 +63,22 @@ window.sockUpdateDashboard = function(data) {
 
         d.make({ node : "b", text : data.pages[i].count, parent : wrap });
         var link = d.make({ node : "a", text : data.pages[i].title, parent : wrap, attr : { href : data.pages[i].url, target : "_blank" } });
+        if (data.pages[i].source.indexOf('(') == 0) {
+            data.pages[i].source = data.pages[i].source.slice(1, -1);
+        }
+
+        var details = d.make({ class : "dashboard-top-details", parent : wrap });
+        d.make({node : "span", class : "dashboard-top-source " + data.pages[i].source, parent : details, text : data.pages[i].source});
+
         if (data.pages[i].home) {
-            link.cadd('bold');
+            d.make({node : "span", class : "dashboard-top-source homepage", parent : details, text : "Homepage"});
         }
     }
 };
 </script>
 
-<div id="dashboard-ga-realtime">
-    <div id="dashboard-active-users">
+<div id="dashboard-ga-realtime" class="dashboard-ga-title">
+    <div id="dashboard-active-users" class="dashboard-ga-title-text" style="bottom: -22px;">
         <b id="dashboard-active-users-count" data-total="0"></b> <span>active readers</span>
     </div>
 </div>
@@ -54,8 +87,13 @@ window.sockUpdateDashboard = function(data) {
     
 </div>
 
-<div id="dashboard-ga-yesterday">
-    <h2 class="dashboard-ga-head-title">Yesterday</h2>
+<div id="dashboard-ga-yesterday" style="background-color: #f9efff;">
+
+    <div class="dashboard-ga-title" id="dashboard-ga-yesterday-title" style="border-top: 3px solid #AF57E4;">
+        <div class="dashboard-ga-title-text">
+            Yesterday insights
+        </div>
+    </div>
 
     <div class="col-xs-4 col-md-4 dashboard-card">
         <div class="dashboard-ga-yesterday-rect">
@@ -197,20 +235,13 @@ window.sockUpdateDashboard = function(data) {
     text-transform: uppercase;
 }
 
-#dashboard-ga-yesterday {
-    background-color: #F6F6F6;
-    background: linear-gradient(#efd0ff 50%, rgba(255,255,255,0) 0) 0 0,
-        radial-gradient(circle closest-side, #efd0ff 53%, rgba(255,255,255,0) 0) 0 0,
-        radial-gradient(circle closest-side, #efd0ff 50%, rgba(255,255,255,0) 0) 55px 0 #fbf3ff;
+#dashboard-ga-yesterday-title {
+    margin-bottom: 15px;
+}
 
-    background-size:110px 150px;
-    background-repeat:repeat-x;
-
-    display: block;
-    min-height: 320px;
-
-    float: none;
-    clear: both;
+.dashboard-ga-publication-list {
+    max-height: 400px;
+    overflow-y : scroll;
 }
 
 .dashboard-ga-publication-list div a {
@@ -224,7 +255,13 @@ window.sockUpdateDashboard = function(data) {
     border-bottom: none;
 }
 
-#dashboard-ga-realtime {
+#dashboard-active-users-count {
+    font-size: 74px;
+    font-weight: 100;
+    margin-right: 12px;
+}
+
+.dashboard-ga-title {
     height: 100px;
     position: relative;
     background: #241f25;
@@ -233,12 +270,12 @@ window.sockUpdateDashboard = function(data) {
     border-bottom: 7px solid #af57e4;
 }
 
-#dashboard-active-users {
+.dashboard-ga-title-text {
     position: absolute;
-    bottom: -18px;
+    bottom: -15px;
     left: 20px;
     color: #af57e4;
-    font-size: 60px;
+    font-size: 50px;
     font-family: "Oswald", sans-serif;
 }
 
@@ -258,8 +295,10 @@ window.sockUpdateDashboard = function(data) {
     text-overflow: ellipsis;
     color: #333;
     text-decoration: none;
-    margin-left: 50px;
+    margin-left: 60px;
     white-space: nowrap;
+
+    vertical-align: middle;
 }
 
 .dashboard-top-page a.bold {
@@ -273,5 +312,29 @@ window.sockUpdateDashboard = function(data) {
     position: relative;
     overflow: hidden;
 }
+
+.dashboard-top-details {
+    margin-left: 10px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.dashboard-top-source {
+    display: inline-block;
+    font-size: 13px;
+    text-transform: uppercase;
+    padding: 1px 5px 0px;
+    background-color: #333;
+    color: #FFF;
+    border-radius: 4px;
+    font-weight: 600;
+
+    margin-right: 4px;
+}
+
+.dashboard-top-source.facebook { background-color: #6e92e6; }
+.dashboard-top-source.google   { background-color: #ff5757; }
+.dashboard-top-source.direct   { background-color: #c057ff; }
+.dashboard-top-source.homepage { background-color: #f377c0; }
 
 </style>

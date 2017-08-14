@@ -51,7 +51,7 @@ class GoogleAnalyticsRequest {
     static realtime(_c, gAnalytics, send) {
         gAnalytics.getData(_c, {
             "metrics" : "rt:activeUsers", 
-            "dimensions" : "rt:pageTitle,rt:pagePath", 
+            "dimensions" : "rt:pageTitle,rt:pagePath,rt:source", 
             "sort" : "-rt:activeUsers", 
             "max-results" : 10
         }, send, true);
@@ -148,7 +148,7 @@ class GoogleAnalyticsRequest {
 class StatsBeautifier {
     static realtime(_c, data) {
         return data && {
-            pages : data.rows.map(x => { return { title : x[0], url : _c.server.url + x[1], count : x[2], home : x[1] == "/" }; }),
+            pages : data.rows.map(x => { return { title : x[0], url : _c.server.url + x[1], source : x[2].toLowerCase(), count : x[3], home : x[1] == "/" }; }),
             at : Date.now(),
             total : data.totalsForAllResults["rt:activeUsers"]
         }

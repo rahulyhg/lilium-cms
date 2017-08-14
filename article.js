@@ -479,7 +479,7 @@ class Article {
                                 article.url = conf.server.protocol + conf.server.url + article.topicslug + article.name;
                                 article.amp = conf.server.protocol + conf.server.url + "/amp" + article.topicslug + article.name;
 
-                                if (article.content.includes('<lml-page')) {
+                                if (article.content && article.content.includes('<lml-page')) {
                                     article.paginated = true;
                                 }
 
