@@ -1198,7 +1198,7 @@ var handleReaderSearch = function(cli) {
                         x.topic = undefined;
                         x.featuredimage = undefined;
                         x.media = undefined;
-                        x.imageurl = CDN.parseOne(cli._c, x.imageurl, true);
+                        x.imageurl = x.imageurl && CDN.parseOne(cli._c, x.imageurl, true);
                         x.aid = x._id;
                         x._id = undefined;
                     });
