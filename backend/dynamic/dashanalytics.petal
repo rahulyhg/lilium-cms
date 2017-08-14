@@ -268,6 +268,7 @@ window.sockUpdateDashboard = function(data) {
     overflow: hidden;
 
     border-bottom: 7px solid #af57e4;
+    text-shadow: 0px 3px rgba(175, 87, 228, 0.54);
 }
 
 .dashboard-ga-title-text {
