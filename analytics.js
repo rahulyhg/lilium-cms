@@ -53,7 +53,7 @@ class GoogleAnalyticsRequest {
             "metrics" : "rt:activeUsers", 
             "dimensions" : "rt:pageTitle,rt:pagePath", 
             "sort" : "-rt:activeUsers", 
-            "max-results" : 20
+            "max-results" : 10
         }, send, true);
     }
 
@@ -147,8 +147,8 @@ class GoogleAnalyticsRequest {
 
 class StatsBeautifier {
     static realtime(_c, data) {
-        return {
-            pages : data.rows.map(x => { return { title : x[0], url : _c.server.url + x[1], count : x[2] }; }),
+        return data && {
+            pages : data.rows.map(x => { return { title : x[0], url : _c.server.url + x[1], count : x[2], home : x[1] == "/" }; }),
             at : Date.now(),
             total : data.totalsForAllResults["rt:activeUsers"]
         }
@@ -253,7 +253,7 @@ class GoogleAnalytics {
         var topLevel = levels[0] || "lastmonth";
 
         if (topLevel == "realtime") {
-            sharedcache.get('analytics_realtime_' + _c.id, (data) => {
+            sharedcache.get('analytics_realtime_' + cli._c.id, (data) => {
                 if (data) {
                     send(data);
                 } else {

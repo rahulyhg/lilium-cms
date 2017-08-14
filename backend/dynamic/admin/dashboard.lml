@@ -1,11 +1,7 @@
 {#config;vocab;dashboard}
-<lml-dom v="0.8" features="" />
+<lml-dom v="1.0" features="" ></lml-dom>
 
 {$ dashpetals = dashboard.getPetals(); $}
 {$ for (petalname in dashpetals); $}
 	{%=petalname}
 {$ endfor; $}
-
-<footer>
-
-</footer>

@@ -1,5 +1,59 @@
 {#config}
 {*googleanalytics.dashboard}
+{*googleanalytics.realtime}
+
+<script>
+liliumcms.lmldom.bind(function() {
+    if (!window.dashboardgabound) { 
+        window.lmlsocket.on('analytics_realtime', function(data) {
+            window._gaRealtimeCache = data;
+            window.sockUpdateDashboard && window.sockUpdateDashboard(data);
+        });
+        window.dashboardgabound = true;
+    }
+
+    window.sockUpdateDashboard(liliumcms.livevars.deeplivevars.googleanalytics.realtime);
+});
+
+window.sockUpdateDashboard = function(data) {
+    console.log('rendering ' + data);
+    var dCount = d.id('dashboard-active-users-count');
+    if (!dCount.get() || !data) {return;}
+
+    var oldTotal = parseInt(dCount.dataset.total);
+    var newTotal = data.total;
+
+    dCount.text(newTotal);
+    dCount.dataset.total = newTotal;
+
+    var dRank = d.id('dashboard-ga-rank');
+    dRank.empty();
+
+    for (var i = 0; i < data.pages.length; i++) {
+        var wrap = d.make({
+            class : "dashboard-top-page",
+            parent : dRank
+        });
+
+        d.make({ node : "b", text : data.pages[i].count, parent : wrap });
+        var link = d.make({ node : "a", text : data.pages[i].title, parent : wrap, attr : { href : data.pages[i].url, target : "_blank" } });
+        if (data.pages[i].home) {
+            link.cadd('bold');
+        }
+    }
+};
+</script>
+
+<div id="dashboard-ga-realtime">
+    <div id="dashboard-active-users">
+        <b id="dashboard-active-users-count" data-total="0"></b> <span>active readers</span>
+    </div>
+</div>
+
+<div id="dashboard-ga-rank">
+    
+</div>
+
 <div id="dashboard-ga-yesterday">
     <h2 class="dashboard-ga-head-title">Yesterday</h2>
 
@@ -168,6 +222,56 @@
 
 .dashboard-ga-publication-list div:last-child a {
     border-bottom: none;
+}
+
+#dashboard-ga-realtime {
+    height: 100px;
+    position: relative;
+    background: #241f25;
+    overflow: hidden;
+
+    border-bottom: 7px solid #af57e4;
+}
+
+#dashboard-active-users {
+    position: absolute;
+    bottom: -18px;
+    left: 20px;
+    color: #af57e4;
+    font-size: 60px;
+    font-family: "Oswald", sans-serif;
+}
+
+.dashboard-top-page b {
+    position: absolute;
+    bottom: -11px;
+    left: 10px;
+    font-size: 36px;
+    font-weight: normal;
+    font-family: "Oswald", sans-serif;
+    color: #CCC;
+}
+
+.dashboard-top-page a {
+    display: inline-block;
+    font-size: 17px;
+    text-overflow: ellipsis;
+    color: #333;
+    text-decoration: none;
+    margin-left: 50px;
+    white-space: nowrap;
+}
+
+.dashboard-top-page a.bold {
+    font-weight: bold;
+}
+
+.dashboard-top-page {
+    display: block;
+    border-bottom: 1px solid #E3E3E3;
+    padding: 10px;
+    position: relative;
+    overflow: hidden;
 }
 
 </style>
