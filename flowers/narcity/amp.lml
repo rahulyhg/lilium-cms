@@ -52,6 +52,7 @@ $}
         <script async custom-element="amp-form" src="https://cdn.ampproject.org/v0/amp-form-0.1.js"></script>
         <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
         <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+        <script async custom-element="amp-auto-ads" src="https://cdn.ampproject.org/v0/amp-auto-ads-0.1.js"></script>
         {$ if (?extra.article.has_instagram ??); $}
             <script async custom-element="amp-instagram" src="https://cdn.ampproject.org/v0/amp-instagram-0.1.js"></script>
         {$ endif; $}
@@ -65,6 +66,7 @@ $}
     </head>
 
     <body>
+        <amp-auto-ads type="adsense" data-ad-client="ca-pub-7289986524496939"></amp-auto-ads>
         <amp-sidebar id="sidebar" class="menuslider-container" layout="nodisplay" side="left">
             <form method="GET" action="{=config.default.server.url}/search" target="_blank">
                 <input id="mobile-search-input" name="q" placeholder="Search..." />
