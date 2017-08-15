@@ -4,6 +4,7 @@ const article = require('./article.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
 const log = require('./log.js');
+const cdn = require('./cdn.js');
 const themes = require('./themes.js');
 
 class Amp {
@@ -51,17 +52,13 @@ class Amp {
             );
         }
 
-        this.parseAMPContent(cli, article, articleContent, (err, amp) => {
+        this.parseAMPContent(cli, articleContent, (err, amp) => {
             if (err) {
                 return cli.throwHTTP(500, undefined, true);
             }
 
-            log('AMP', 'Done parsing HTML to AMP');
             article.content = amp;
-            article.has_instagram = article.content.indexOf("<amp-instagram") != -1;        
-            article.has_twitter = article.content.indexOf("<amp-twitter") != -1;
 
-            /* Load theme AMP context, then generate from LML file */
             log('AMP', "Generating AMP page from LML for article : " + article.title);
             filelogic.renderThemeLML(cli, 'amp', 'amp/' + article.name + '.html', {
                 config : cli._c,
@@ -78,42 +75,11 @@ class Amp {
         });
     };
 
-    parseAMPContent(cli, article, articleContent, cb) {
-        if (cli._c.content.cdn && cli._c.content.cdn.domain) {
-            articleContent = articleContent.replace(
-                new RegExp('(src=")' + cli._c.server.url, "g"), 
-                '$1' + cli._c.content.cdn.domain
-            );
-        }
-        articleContent = articleContent.replace(/(src=")(\/\/)/g, '$1' + cli._c.server.protocol + '//');
-        
-        var cTheme = themes.getEnabledTheme(cli._c).settings;
-        var adtags = (article.topic && article.topic.override && article.topic.override.adtags) || cTheme.adtags || {};
-        var keys = Object.keys(adtags);
-        for(var i = 0; i < keys.length; i++){
-            articleContent = articleContent.replace("<ad><\/ad>", '<p>{ad}</p>');
-        }
-        articleContent = articleContent.replace(/<ad><\/ad>/g, "");
-
-        const htmlToAmp = require('html-to-amp')();
-
-        // Use library to do most of the parsing
-        log("AMP", "Running htmlToAmp library");
-        htmlToAmp(articleContent, (err, amp) => {
-            log("AMP", "Library called back");
-            if(!err) {
-                // Replace LML ads with AMP ads
-                amp = amp.replace(
-                    /<p>\{ad\}<\/p>/g,
-                    '<div class="ad-section">'+
-                    '<amp-ad width=300 height=250 ' +
-                    'type="doubleclick" ' +
-                    'data-slot="/1020360/amp-bb-before-content">' +
-                    '</amp-ad>' +
-                    '</div>');
-            } 
-            
-            cb(err, amp);
+    parseAMPContent(cli, articleContent, cb) {
+        cdn.parse(articleContent, cli, (articleContent) => {
+            articleContent = articleContent.replace(/<ad><\/ad>/g, "");
+            const htmlToAmp = require('html-to-amp')();
+            htmlToAmp(articleContent, cb); 
         });
     }
 }
