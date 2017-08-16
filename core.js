@@ -479,7 +479,6 @@ const loadBackendSearch = function() {
 };
 
 const maybeRunCAIJ = () => {
-    console.log(process.env.job);
     if (process.env.job == "caij") {
         log('Core', 'Creating CAIJ server', 'lilium');
         require('./caij/caij.js').createServer();

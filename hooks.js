@@ -15,6 +15,8 @@ const events = {
     "lmlstart": {},
     "lmlinclude": {},
     "endpoints": {},
+    "time_is_hour" : {},
+    "time_is_midnight" : {},
     "plugindisabled": {}
 };
 
@@ -24,26 +26,20 @@ class Hooks {
 
         // Time-based hooks
         let timeTillNextHour = (1000 * 60 * 60) - Date.now() % (1000 * 60 * 60);
-        let timeTillNext24h  = (1000 * 60 * 60 * 24) - Date.now() % (1000 * 60 * 60 * 24);
 
         const createHourHook = () => {
             setTimeout(() => {
+                log('Hooks', 'Dispatching hourly event for hour : ' + new Date().getHours());
+
                 this.fire('time_is_hour');
+                new Date().getHours() == 0 && this.fire('time_is_midnight');
+
                 timeTillNextHour = 1000 * 60 * 60;
                 createMidnightHook();
             }, timeTillNextHour);
         };
 
-        const createMidnightHook = () => {
-            setTimeout(() => {
-                this.fire('time_is_midnight');
-                timeTillNext24h = 1000 * 60 * 60 * 24;
-                createMidnightHook();
-            }, timeTillNext24h);
-        }
-
         createHourHook();
-        createMidnightHook();
     }
 
     getHooksFor(eventName) {

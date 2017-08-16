@@ -1552,7 +1552,7 @@ NarcityTheme.prototype.clearCache = function(ctx, detail) {
 };
 
 var parseInsta = function(pkg) {
-    pkg.article.content = pkg.article.content.replace(/\<script async\=\"\" defer\=\"\" src\=\"\/\/platform.instagram.com\/en_US\/embeds.js\"\>\<\/script\>/g, "") + '<script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>';
+    pkg.article.content = pkg.article.content && pkg.article.content.replace(/\<script async\=\"\" defer\=\"\" src\=\"\/\/platform.instagram.com\/en_US\/embeds.js\"\>\<\/script\>/g, "") + '<script async="" defer="" src="//platform.instagram.com/en_US/embeds.js"></script>';
 };
 
 var articleAsyncRender = function(pkg) {

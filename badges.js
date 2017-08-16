@@ -129,7 +129,7 @@ const BADGE_VALIDATORS = {
     }, "use-n-images" : (data, done) => {
         BadgeValidator.check(data._c, data.article.author, "use-n-images", data.score.img, done);
     }, "n-shares-48h" : (data, done) => {
-
+        done(false);
     }, "top-article-n-times" : (data, done) => {
         if (data.data && data.data.toppage) {
             let split = data.data.toppage.url.split("/");
