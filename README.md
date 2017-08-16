@@ -1,4 +1,4 @@
-![LML masthead copy.png](https://bitbucket.org/repo/yqaMzz/images/422959623-LML%20masthead%20copy.png)
+![LML masthead](https://www.narcitymedia.com/wp-content/uploads/2017/08/422959623-LML-masthead-copy.png)
 
 # Lilium CMS #
 
@@ -90,6 +90,9 @@ server {
 }
 ```
 
+## Founder ##
+* Erik Desjardins
+
 ## Contributors ##
 
 * Erik Desjardins
@@ -102,4 +105,4 @@ server {
 This software does not come with a license. 
 
 ## Copyright ##
-© Erik Desjardins, 2017
+© Narcity Media, 2017
