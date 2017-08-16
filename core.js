@@ -68,6 +68,7 @@ class Core {
 const loadHooks = (readyToRock) => {
     log('Hooks', 'Loading hooks', 'info');
     hooks.bindPluginDisabling();
+    hooks.init();
     hooks.bind('init', 100, readyToRock);
 
     hooks.fire('hooks');

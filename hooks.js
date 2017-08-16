@@ -1,8 +1,9 @@
-var log = require('./log.js');
-var _c = require('./config.js');
-var pluginHelper = require('./pluginHelper.js');
+const log = require('./log.js');
+const _c = require('./config.js');
+const pluginHelper = require('./pluginHelper.js');
+const isElder = require('./network/info.js').isElderChild();
 
-var events = {
+const events = {
     "load": {},
     "request": {},
     "clientobject": {},
@@ -17,29 +18,56 @@ var events = {
     "plugindisabled": {}
 };
 
+class Hooks {
+    init() {
+        if (!isElder) {return}
 
-var Hooks = function () {
-    this.getHooksFor = function(eventName) {
+        // Time-based hooks
+        let timeTillNextHour = (1000 * 60 * 60) - Date.now() % (1000 * 60 * 60);
+        let timeTillNext24h  = (1000 * 60 * 60 * 24) - Date.now() % (1000 * 60 * 60 * 24);
+
+        const createHourHook = () => {
+            setTimeout(() => {
+                this.fire('time_is_hour');
+                timeTillNextHour = 1000 * 60 * 60;
+                createMidnightHook();
+            }, timeTillNextHour);
+        };
+
+        const createMidnightHook = () => {
+            setTimeout(() => {
+                this.fire('time_is_midnight');
+                timeTillNext24h = 1000 * 60 * 60 * 24;
+                createMidnightHook();
+            }, timeTillNext24h);
+        }
+
+        createHourHook();
+        createMidnightHook();
+    }
+
+    getHooksFor(eventName) {
         return events[eventName] || {};
     }
 
-    this.bind = this.register = function (eventName, priority, callback, registerFilename) {
-        var registerFilename = registerFilename || __caller;
+    register() {return this.bind(...arguments);}
+    bind(eventName, priority, callback, registerFilename) {
+        registerFilename = registerFilename || __caller;
 
         if (typeof eventName == "object") {
-            for (var i = 0; i < eventName.length; i++) {
+            for (let i = 0; i < eventName.length; i++) {
                 this.bind(eventName[i], priority, callback, registerFilename);
             }
             return;
         }
-        pluginHelper.getPluginIdentifierFromFilename(registerFilename, function (pluginIdentifier) {
 
+        pluginHelper.getPluginIdentifierFromFilename(registerFilename, function (pluginIdentifier) {
             if (typeof events[eventName] === 'undefined') {
                 events[eventName] = {};
             }
 
             //add to Object
-            var switchedPrio = false;
+            let switchedPrio = false;
             if (events[eventName][priority]) {
                 log("Hooks", "Tried to bind on event with existing priority : " + eventName + "@" + priority);
                 switchedPrio = true;
@@ -59,11 +87,11 @@ var Hooks = function () {
             };
 
             //Sort object based on priority
-            var keys = Object.keys(events[eventName]);
-            var len = keys.length;
+            let keys = Object.keys(events[eventName]);
+            let len = keys.length;
             keys.sort();
-            var tempObj = {};
-            for (var i = 0; i < len; i++) {
+            let tempObj = {};
+            for (let i = 0; i < len; i++) {
                 tempObj[keys[i]] = events[eventName][keys[i]];
             }
             events[eventName] = tempObj;
@@ -71,13 +99,14 @@ var Hooks = function () {
 
     };
 
-    this.trigger = this.fire = function (eventName, params) {
+    fire() {this.trigger(...arguments)}
+    trigger(eventName, params) {
         if (events[eventName]) {
-            var keys = Object.keys(events[eventName]);
+            let keys = Object.keys(events[eventName]);
             params = params || {};
             params.eventName = eventName;
 
-            for (var i = keys.length - 1; i >= 0; i--) {
+            for (let i = keys.length - 1; i >= 0; i--) {
                 if (events[eventName][keys[i]].cb(
                         params,
                         eventName
@@ -88,10 +117,10 @@ var Hooks = function () {
         }
     };
 
-    this.bindPluginDisabling = function () {
+    bindPluginDisabling() {
         this.bind('plugindisabled', 9999, function (identifier) {
-            for (var i in events) {
-                for (var j in events[i]) {
+            for (let i in events) {
+                for (let j in events[i]) {
                     if (events[i][j].plugin == identifier) {
                         delete events[i][j];
                     }
@@ -100,4 +129,5 @@ var Hooks = function () {
         });
     }
 };
+
 module.exports = new Hooks();

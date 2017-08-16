@@ -238,7 +238,6 @@ class RunningTask {
                         }
                     }
 
-                    console.log(orderedSlugs);
                     articleLib.batchFetch(_c, orderedSlugs, deepArticles => {
                         let finalArray = [];
                         deepArticles.forEach(art => {

@@ -128,7 +128,7 @@ class Plugins {
                     },  () =>{
                         if (typeof pluginInstance.register !== 'function') {
                             log("Plugins", 'Plugin has no method "register"', 'warn');
-                            hooks.fire('pluginregistered', identifier);
+                            hooks.fire('pluginregistered', {identifier});
 
                             callback();
                         } else {
@@ -137,7 +137,7 @@ class Plugins {
                                 pluginInstance.register(_c, info,  () =>{
                                     cli.cacheClear(undefined, (err) =>{;
                                         log('Plugins', 'Registered ' + identifier, 'success');
-                                        hooks.fire('pluginregistered', identifier);
+                                        hooks.fire('pluginregistered', {identifier});
                                         callback();
                                     });
                                 });
@@ -165,7 +165,7 @@ class Plugins {
             },  () =>{
                 try {
                     RegisteredPlugins[identifier].unregister( () =>{
-                        hooks.fire('plugindisabled', identifier);
+                        hooks.fire('plugindisabled', {identifier});
 
                         RegisteredPlugins[identifier] = undefined;
                         delete RegisteredPlugins[identifier];
