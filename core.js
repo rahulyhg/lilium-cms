@@ -160,50 +160,14 @@ const loadImageSizes = function () {
 
 const loadPlugins = function (cb) {
     const plugins = require('./plugins.js');
-    plugins.init(function () {
-        log('Plugins', 'Loading plugins');
 
-        const fireEvent = () => {
-            log('Plugins', 'Loaded plugins');
-            hooks.fire('plugins_loaded');
-    
-            return cb();
-        };
+    log('Plugins', 'Loading plugins');
+    plugins.init(() => {
+        log('Plugins', 'Loaded plugins');
 
-        db.findToArray(require("./config.js").default(), 'plugins', {
-            "active": true
-        }, (err, results) => {
-            if (err) {
-                log('Plugins', 'Failed to find entries in database; ' + err, 'err');
-                fireEvent();
-
-                return;
-            }
-
-            log('Plugins', 'Read plugins collection in database');
-            let i = -1;
-            const nextObject = () => {
-                i++
-                if (i != results.length) {
-                    plugins.registerPlugin(results[i].identifier, nextObject);
-                } else {
-                    fireEvent();
-                }
-            };
-
-            if (results.length > 0) {
-                nextObject();
-            } else {
-                plugins.getPluginsDirList(function () {
-                    log('Plugins', 'Nothing to register', 'info');
-                    fireEvent();
-                });
-
-            }
-        });
-
+        hooks.fire('plugins_loaded');
+        cb && cb();
     });
-
 };
 
 const loadRoles = function (cb) {
@@ -513,9 +477,10 @@ const loadBackendSearch = function() {
     });
 };
 
-const maybeRunCAIJ = function() {
+const maybeRunCAIJ = () => {
+    console.log(process.env.job);
     if (process.env.job == "caij") {
-        log('Core', 'Creating CAIJ server');
+        log('Core', 'Creating CAIJ server', 'lilium');
         require('./caij/caij.js').createServer();
     } else if (isElder) {
         require('./config.js').eachSync(function(_c) {

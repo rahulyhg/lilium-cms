@@ -388,6 +388,10 @@ class Executor {
         }
     };
 
+    registerJob(task, callback) {
+        RunningTask.prototype[task] = callback;
+    }
+
     getJanitorJobs() {
         return janitorJobs;
     }

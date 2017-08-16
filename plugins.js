@@ -1,42 +1,39 @@
-var fs = require('fs');
-var _c = require('./config.js');
-var fileserver = require('./fileserver.js');
-var filelogic = require('./filelogic.js');
-var log = require('./log.js');
-var Admin = require('./backend/admin.js');
-var db = require('./includes/db.js');
-var livevars = require('./livevars.js');
-var tableBuilder = require('./tableBuilder.js');
-var cli = require('./cli.js');
-var hooks = require('./hooks.js');
-var RegisteredPlugins = new Object();
-var CachedPlugins = new Array();
+const fs = require('fs');
+const _c = require('./config.js');
+const fileserver = require('./fileserver.js');
+const filelogic = require('./filelogic.js');
+const log = require('./log.js');
+const Admin = require('./backend/admin.js');
+const db = require('./includes/db.js');
+const livevars = require('./livevars.js');
+const tableBuilder = require('./tableBuilder.js');
+const cli = require('./cli.js');
+const hooks = require('./hooks.js');
+const RegisteredPlugins = new Object();
 
-var Plugins = module.exports = new function () {
-    var that = this;
-
-    this.adminGET = function (cli) {
+class Plugins {
+    adminGET(cli) {
         cli.touch("plugins.serveAdminList");
         if (!cli.hasRightOrRefuse("site-admin")) {return;} 
 
         filelogic.serveAdminLML(cli)
     };
 
-    this.adminPOST = function (cli) {
+    adminPOST(cli) {
         cli.touch("plugins.handlePOST");
         if (!cli.hasRightOrRefuse("site-admin")) {return;} 
 
         if (cli.routeinfo.path.length > 2) {
             switch (cli.routeinfo.path[2]) {
             case "registerPlugin":
-                that.registerPlugin(cli.postdata.data.identifier, function () {
+                this.registerPlugin(cli.postdata.data.identifier,  () =>{
                     cli.sendJSON({
                         success: true
                     });
                 });
                 break;
             case "unregisterPlugin":
-                that.unregisterPlugin(cli.postdata.data.identifier, function () {
+                this.unregisterPlugin(cli.postdata.data.identifier,  () =>{
                     cli.sendJSON({
                         success: true
                     });
@@ -50,12 +47,8 @@ var Plugins = module.exports = new function () {
         }
     }
 
-    this.getCachedPlugins = function (lmlContext) {
-        return CachedPlugins;
-    };
-
-    this.searchDirForPlugin = function (identifier, callback) {
-        this.getPluginsDirList(function (list) {
+    searchDirForPlugin(identifier, callback) {
+        this.getPluginsDirList( (list) =>{
             var pluginInfo = undefined;
 
             for (var i = 0; i < list.length; i++) {
@@ -69,32 +62,26 @@ var Plugins = module.exports = new function () {
         });
     };
 
-    this.getPluginsDirList = function (callback) {
+    getPluginsDirList(callback) {
         var plugindir = _c.default().server.base + _c.default().paths.plugins + "/";
 
-        if (CachedPlugins && CachedPlugins.length != 0) {
-            callback(CachedPlugins);
-            return;
-        }
-
-        fs.readdir(plugindir, function (err, dirs) {
+        fs.readdir(plugindir,(err, dirs) => {
             if (err) {
                 throw new Error("[PluginException] Could not access plugin directory : " + err);
             }
 
-            var allPlugins = new Array();
+            var allPlugins = [];
 
             var i = -1;
-            nextDir = function () {
+            nextDir = () => {
                 i++;
                 if (i >= dirs.length) {
-                    CachedPlugins = allPlugins;
                     callback(allPlugins);
                 } else {
                     var infoPath = plugindir + dirs[i] + "/" + _c.default().paths.pluginsInfo;
-                    fileserver.fileExists(infoPath, function (exists) {
+                    fileserver.fileExists(infoPath, (exists) => {
                         if (exists) {
-                            fileserver.readJSON(infoPath, function (json) {
+                            fileserver.readJSON(infoPath, (json) => {
                                 json.dirName = dirs[i];
                                 allPlugins.push(json);
                                 nextDir();
@@ -110,26 +97,18 @@ var Plugins = module.exports = new function () {
         });
     };
 
-    this.getCachedPlugin = function (identifier) {
-        for (var i = 0, len = CachedPlugins.length; i < len; i++) {
-            if (CachedPlugins[i]['identifier'] === identifier) return CachedPlugins[i];
-        }
-        return null;
-    }
-
-    this.isRegistered = function (identifier) {
+    isRegistered(identifier) {
         return typeof RegisteredPlugins[identifier] !== 'undefined';
     };
 
-    this.registerPlugin = function (identifier, callback) {
-        var that = this;
+    registerPlugin(identifier, callback) {
         if (this.isRegistered(identifier)) {
             log('Plugins', new Error("[PluginException] Cannot register already registered plugin with identifier " + identifier));
             callback();
             return;
         } else {
             log('Plugins', 'Registering plugin with identifier ' + identifier);
-            that.searchDirForPlugin(identifier, function (info) {
+            this.searchDirForPlugin(identifier,  (info) =>{
                 if (!info) {
                     log("PluginException", "Could not find any info on plugin with identifier " + identifier);
                     throw new Error("[PluginException] Could not find any info on plugin with identifier " + identifier);
@@ -146,7 +125,7 @@ var Plugins = module.exports = new function () {
                     }, {
                         identifier: identifier,
                         active: true
-                    }, function () {
+                    },  () =>{
                         if (typeof pluginInstance.register !== 'function') {
                             log("Plugins", 'Plugin has no method "register"', 'warn');
                             hooks.fire('pluginregistered', identifier);
@@ -155,8 +134,8 @@ var Plugins = module.exports = new function () {
                         } else {
                             log('Plugins', "Calling register method on plugin with identifier " + identifier);
                             try {
-                                pluginInstance.register(_c, info, function () {
-                                    cli.cacheClear(undefined, function(err) {;
+                                pluginInstance.register(_c, info,  () =>{
+                                    cli.cacheClear(undefined, (err) =>{;
                                         log('Plugins', 'Registered ' + identifier, 'success');
                                         hooks.fire('pluginregistered', identifier);
                                         callback();
@@ -176,18 +155,16 @@ var Plugins = module.exports = new function () {
         }
     };
 
-    this.unregisterPlugin = function (identifier, callback) {
+    unregisterPlugin(identifier, callback) {
         if (this.isRegistered(identifier)) {
-
-
             db.update(_c.default(), 'plugins', {
                 identifier: identifier
             }, {
                 identifier: identifier,
                 active: false
-            }, function () {
+            },  () =>{
                 try {
-                    RegisteredPlugins[identifier].unregister(function () {
+                    RegisteredPlugins[identifier].unregister( () =>{
                         hooks.fire('plugindisabled', identifier);
 
                         RegisteredPlugins[identifier] = undefined;
@@ -205,7 +182,7 @@ var Plugins = module.exports = new function () {
         }
     };
 
-    this.getIface = function (identifier) {
+    getIface(identifier) {
         if (this.isRegistered(identifier)) {
             if (typeof RegisteredPlugins[identifier].iface === 'object') {
                 return RegisteredPlugins[identifier].iface;
@@ -217,56 +194,35 @@ var Plugins = module.exports = new function () {
         }
     };
 
-    this.livevar = function (cli, levels, params, callback) {
+    livevar(cli, levels, params, callback) {
         var allPlugins = levels.length === 0;
-        if (!cli.hasRightOrRefuse("site-admin")) {return callback([]);} 
+        if (!cli.hasRightOrRefuse("admin")) {return callback([]);} 
 
-        if (allPlugins) {
-            db.singleLevelFind(_c.default(), 'plugins', callback);
-        } else if (levels[0] == 'table') {
-            var sort = {};
-            sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
-            db.aggregate(cli._c, 'plugins', [{
-                $match:
-                    (params.search ? {
-                        $text: {
-                            $search: params.search
-                        }
-                    } : {})
-
-            }, {
-                $sort: sort
-            }, {
-                $skip: (params.skip || 0)
-            }, {
-                $limit: (params.max || 20)
-            }], function (data) {
-                db.find(cli._c, 'plugins', (params.search ? {
-                    $text: {
-                        $search: params.search
-                    }
-                } : {}), [], function (err, cursor) {
-
-                    cursor.count(function (err, size) {
-                        results = {
-                            size: size,
-                            data: data
-                        }
-                        callback(err || results);
-
+        if (levels[0] == 'table') {
+            db.findToArray(cli._c, 'plugins', {active : true}, (err, activeplugins) =>{
+                const kvActive = {};
+                activeplugins.forEach(x => {
+                    kvActive[x.identifier] = x;
+                });
+                this.getPluginsDirList((list) => {
+                    list.forEach(x => {
+                        x.active = !!kvActive[x.identifier];
                     });
+
+                    const results = {
+                        size: list.length,
+                        data: list
+                    }
+
+                    callback(results);
                 });
             });
         } else {
-            db.multiLevelFind(_c.default(), 'plugins', levels, {
-                identifier: (levels[0])
-            }, {
-                limit: [1]
-            }, callback);
+            callback([]);
         }
     };
 
-    this.table = function () {
+    table() {
         tableBuilder.createTable({
             name: 'plugin',
             endpoint: 'plugins.table',
@@ -291,22 +247,22 @@ var Plugins = module.exports = new function () {
         });
     }
 
-    this.init = function (cb) {
-        that.getPluginsDirList(function (plugins) {
-            db.findToArray(_c.default(), 'plugins', {
-                'active': true
-            }, function (err, results) {
-                for (var i in results) {
-                    for (var j in plugins) {
-                        if (results[i].identifier == plugins[j].identifier) {
-                            plugins[j].active = true;
-                            break;
-                        }
-                    }
+    init(cb) {
+        db.findToArray(_c.default(), 'plugins', {
+            'active': true
+        }, (err, results) => {
+            let i = -1;
+            const nextPlugin = () => {
+                if (++i == results.length) {
+                    cb && cb();
+                } else {
+                    this.registerPlugin(results[i].identifier, () => {nextPlugin()});
                 }
-            });
-            cb();
-        });
+            }
 
+            nextPlugin();
+        });
     };
 };
+
+module.exports = new Plugins;

@@ -6,7 +6,10 @@ const Livevar = require('../livevars.js');
 const Endpoints = require('../endpoints.js');
 const Hooks = require('../hooks.js');
 const Postleaf = require('../postleaf.js');
+const CAIJ = require('../caij/caij.js');
 const API = require('../api.js');
+
+const isElder = require('../network/info.js').isElderChild();
 
 class FlowHandle {
     constructor(river, flow) {
@@ -66,6 +69,16 @@ class Riverflow {
         if (flow.post_leaf) {
             let leaf = flow.post_leaf;
             Postleaf.registerLeaf(leaf.name, leaf.displayname, leaf.script.add, leaf.script.edit, leaf.script.show);
+        }
+
+        if (flow.caij) {
+            isElder && Hooks.bind('init', 1200, () => {
+                Object.keys(flow.caij).forEach(name => {
+                    let details = flow.caij[name];
+                    details.module = flow.module;
+                    CAIJ.scheduleTask(details.taskname || name, details);
+                });
+            });
         }
 
         river.origin = flow.origin || "Riverflow";

@@ -38,6 +38,8 @@ class ConsoleArtificialIntelligenceJanitor {
             AI.decide(true, () => {
                 log('CAIJ', "Finished handling direct instruction");
             });
+        } else if (msgObject.extra && msgObject.extra.module) {
+            AI.moduleTask(msgObject);
         } else {
             taskscheduler.push(msgObject);
         }
@@ -46,15 +48,9 @@ class ConsoleArtificialIntelligenceJanitor {
     incoming(connection) {
         log('CAIJ', "Incoming connection", 'detail');
 
-        let that = this;
         let data = "";
-        connection.on('data', (c) => {
-            data += c.toString();
-        });
-
-        connection.on('end', () => {
-            that.handleMessage.apply(this, [JSON.parse(data)]);
-        });
+        connection.on('data', (c) => { data += c.toString(); });
+        connection.on('end', () => { this.handleMessage(JSON.parse(data)); });
     }
 
     createServer() {

@@ -153,6 +153,20 @@ class AI {
         ai.createInterval();
     }
 
+    moduleTask(messageObject) {
+        const { taskname, extra } = messageObject;
+        log('CAIJ', 'Received task from module ' + extra.module, 'lilium');
+
+        executor.registerJob(taskname, (done) => {
+            const callee = require(__dirname + extra.module);
+            callee[extra.call](this, () => {
+                done();
+            });
+        });
+
+        
+    }
+
     bringToLife() {
         log('CAIJ', 'Brought to life', 'lilium');
 
