@@ -116,16 +116,7 @@
         }, {
             "module" : "secrets.js",
             "endpoint" : "secrets",
-            "support" : ["admin_get", "admin_post", "livevar"],
-            "admin_menu" : {
-                "id": "secrets",
-                "faicon": "fa-key",
-                "displayname": "Secrets",
-                "priority": 540,
-                "rights": ["list-secrets"],
-                "absURL": "admin/secrets",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "livevar"]
         }, {
             "module" : "devtools.js",
             "endpoint" : "devtools",
@@ -358,7 +349,7 @@
             "admin_menu" : {
                 "id": "cakepop",
                 "faicon": "fa-window-maximize",
-                "displayname": "Cakepops (Dev)",
+                "displayname": "Cakepops",
                 "priority": 415,
                 "rights": ["cakepops"],
                 "absURL": "admin/cakepop",
