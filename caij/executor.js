@@ -367,6 +367,10 @@ class Executor {
                 janitorSites.push(sites[i]);
                 janitorStats[sites[i].uid] = {};
 
+                if (sites[i].default) {
+                    janitorSites.default = sites[i];
+                }
+
                 for (let j = 0; j < janitorJobs.length; j++) {
                     janitorStats[sites[i].uid][janitorJobs[j]] = {};
                 }

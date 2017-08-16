@@ -38,7 +38,8 @@ class DarkskyPlugin {
     }   
 
     storeWeather(extra, done) {
-
+        log('Darksky', 'Preparing request to API');
+        done();
     }
 
     appendSettings(form) {
