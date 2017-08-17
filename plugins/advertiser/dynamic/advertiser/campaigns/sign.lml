@@ -1,9 +1,0 @@
-{#config;forms}
-{$
-	var baseurl = config.default.server.url;
-	baseurl += "/";
-	baseurl += "advertiser";
-	baseurl += "/";
-$}
-	<h1>Please, upload a picture of your signature</h1>
-	{=forms.render(advertiser_sign)}
