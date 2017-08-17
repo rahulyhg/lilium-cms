@@ -38,7 +38,7 @@ class DarkskyPlugin {
     }   
 
     storeWeather(extra, done) {
-        log('Darksky', 'Preparing request to API');
+        this.libs.log('Darksky', 'Preparing request to API');
         done();
     }
 
