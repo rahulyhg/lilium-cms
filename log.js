@@ -19,7 +19,7 @@ var levels = {
 
 var Log = function (sender, message, level) {
     level = level || "none";
-    if (Log.levels.indexOf(level) == -1) return;
+    if (!Log.levels.includes(level)) return;
 
     var color = levels[level];
     if (typeof message !== 'undefined') {

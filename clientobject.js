@@ -168,7 +168,7 @@ class ClientObject {
     }
 
     sendText (text) {
-        cli.response.writeHead(200, {
+        this.response.writeHead(200, {
             "Content-Type" : "text/plain",
             "Lilium-Proto" : "livevars"
         });
