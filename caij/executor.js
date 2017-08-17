@@ -181,7 +181,7 @@ class RunningTask {
     }
 
     storeRealtime(sendback) {
-        analyticsLib.storeRealtime(this._c, () => {
+        analyticsLib.storeRealtime(this._c, (err) => {
             sendback();
         });
     }

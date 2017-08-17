@@ -232,7 +232,7 @@ class GoogleAnalytics {
                 }, done);
             } else {
                 log('Analytics', 'Error while fetching realtime data : ' + err, 'warn');
-                done();
+                done(err);
             }
         });
     }
