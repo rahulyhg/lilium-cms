@@ -21,7 +21,7 @@ const Knowledge = {
 
     homepageDelai : halfHour,
     sitemapDelai : oneHour,
-    gaRealtimeDelai : oneSecond * 8,
+    gaRealtimeDelai : oneSecond * 10,
     facebookDelai : oneMinute * 3,
     sendEmailAt : "00:15:00"
 };

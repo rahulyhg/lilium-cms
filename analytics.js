@@ -25,7 +25,7 @@ const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const cachedAnalytics = {};
 
 // Realtime poll
-const realtimePollMS = 8000;
+const realtimePollMS = 10000;
 
 // Authentication items
 class GoogleAnalyticsInfo {
