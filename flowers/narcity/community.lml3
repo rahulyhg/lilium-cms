@@ -1,4 +1,4 @@
-const settings = { };
+const settings = {  };
 
 const preload = (context, done) => {
     done();
