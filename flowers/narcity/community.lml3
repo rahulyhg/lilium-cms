@@ -1,0 +1,21 @@
+const settings = { };
+
+const preload = (context, done) => {
+    done();
+};
+
+const compile = (o, context) => {
+    o(`
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <title>Community</title>
+            </head>
+            <body>
+                Hello, World!
+            </body>
+        </html>
+    `);
+};
+
+module.exports = { settings, preload, compile };

@@ -35,7 +35,7 @@ class Hooks {
                 new Date().getHours() == 0 && this.fire('time_is_midnight');
 
                 timeTillNextHour = 1000 * 60 * 60;
-                createMidnightHook();
+                createHourHook();
             }, timeTillNextHour);
         };
 

@@ -57,7 +57,7 @@ class FileServer {
                 minifyCSS: true
             }, options || {}));
         } catch (ex) {
-            log("FileServer", "Failed to minify string", "warn");
+            log("FileServer", "Failed to minify string : " + ex, "warn");
             return content;
         }
     }

@@ -307,6 +307,7 @@ class FileLogic {
     renderThemeLML3 (cli, contextname, outputfilename, extra = {}, done, nolayout) {
         const themeLib = require('./themes.js');
         const _c = cli._c || cli;
+        const ctxName = contextname || "home";
         
         themeLib.fetchCurrentTheme(_c, cTheme => {
             if (!extra.language) {
@@ -319,7 +320,7 @@ class FileLogic {
 
             const readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
             const layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml3";
-            const savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
+            const savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
 
             if (extra.topic && extra.topic.override) {
                 extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);

@@ -3,22 +3,25 @@
     "dName" : "Narcity Theme",
     "entry": "narcity.js",
     "contexts" : {
-        "article"       :       "article.lml",
-        "chain"         :       "chain.lml",
-        "styledpage"    :       "page.lml",
-        "amp"           :       "amp.lml",
-        "next"          :       "article.lml",
-        "page"          :       "page.lml",
-        "home"          :       "homepage.lml",
-        "city"          :       "city.lml",
-        "search"        :       "archive.lml",
-        "latests"       :       "archive.lml",
-        "archive"       :       "archive.lml",
-        "author"        :       "archive.lml",
-        "category"      :       "archive.lml",
-        "topic"         :       "archive.lml",
-        "tags"          :       "archive.lml",
-        "404"           :       "404.lml"
+        "article"        :       "article.lml",
+        "chain"          :       "chain.lml",
+        "styledpage"     :       "page.lml",
+        "amp"            :       "amp.lml",
+        "next"           :       "article.lml",
+        "page"           :       "page.lml",
+        "home"           :       "homepage.lml",
+        "city"           :       "city.lml",
+        "search"         :       "archive.lml",
+        "latests"        :       "archive.lml",
+        "archive"        :       "archive.lml",
+        "author"         :       "archive.lml",
+        "category"       :       "archive.lml",
+        "topic"          :       "archive.lml",
+        "tags"           :       "archive.lml",
+
+        "community_home" :       "community.lml3",
+
+        "404"            :       "404.lml"
     },
     "templates" : {
         "article" : [
