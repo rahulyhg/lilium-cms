@@ -1,7 +1,0 @@
-{#config;extra}
-{$
-    topic = extra.topic;
-$}
-<title>
-    {=topic.displayname} - {=config.default.website.sitetitle}
-</title>

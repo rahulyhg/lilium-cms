@@ -1,2 +1,0 @@
-{#config;extra}
-<title>Search results : {=&extra.searchname} - {=config.default.website.sitetitle}</title>

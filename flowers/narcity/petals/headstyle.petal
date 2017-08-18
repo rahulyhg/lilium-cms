@@ -1,5 +1,0 @@
-{#config;theme}
-<!-- Styles -->
-<link rel="stylesheet" type="text/css" href="{=config.default.server.protocol}{=config.default.server.url}/compiled/theme/fonts.css?{=config.default.compilekey}" />
-<link rel="stylesheet" type="text/css" href="{=config.default.server.protocol}{=config.default.server.url}/compiled/theme/ads.css?{=config.default.compilekey}" />
-<link rel="stylesheet" type="text/css" href="{=config.default.server.protocol}{=config.default.server.url}/compiled/theme/narcity.css?{=config.default.compilekey}" />
