@@ -1,7 +1,15 @@
-const ApiEndpoints = {
-	GET : {},
-    POST : {}
-};
+class EndpointMethods {
+    constructor() {
+        this.GET    = {};
+        this.POST   = {};
+        this.PUT    = {};
+        this.DELETE = {};
+    }
+
+    addMethod(kind) {
+        this[kind] = this[kind] || {};
+    }
+}
 
 const log = require('./log.js');
 const db = require('./includes/db.js');
@@ -10,17 +18,20 @@ const endpoints = require('./endpoints.js');
 const sharedcache = require('./sharedcache.js');
 const entities = require('./entities.js');
 
+const ApiEndpoints = new EndpointMethods();
 const SESSION_COLLECTION = "apisessions";
 
-const s4 = () => {
-    return Math.random().toString(16).substring(2);
-}
+const s4 = () => Math.random().toString(16).substring(2);
 
 class LiliumAPI {
 	serveApi(cli) {
 		cli.touch('api.serveApi');
 		api.handleApiEndpoint(cli);
 	};	
+
+    registerMethod(methodname) {
+        ApiEndpoints.addMethod(methodname);
+    }
 
 	handleApiEndpoint(cli) {
 		cli.touch('api.handleAdminEndpoint');

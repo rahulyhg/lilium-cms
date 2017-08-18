@@ -6,8 +6,6 @@ class Inbound {
     constructor() {
         this.ready = false;
         this.initqueue = [];
-        this.reqCount = 0,
-        this.totalReqCount = 0;
 
         this.server;
         this.secureServer;
@@ -27,17 +25,14 @@ class Inbound {
     }
 
     handleReq(req, resp) {
-        this.reqCount++;
-        this.totalReqCount++;
-        resp.on('finish', () => this.reqCount--);
-
-        hooks.trigger('request', { req, resp });
-
         const ClientObject = require('./clientobject.js')
         const Handler = require('./handler.js')
+        hooks.trigger('request', { req, resp });
 
-        if (this.ready && this.validate(req, resp)) {
-            Handler.handle(new ClientObject(req, resp));
+        if (this.ready) {
+            if (this.validate(req, resp)) {
+                Handler.handle(new ClientObject(req, resp));
+            }
         } else {
             this.initqueue.push(new ClientObject(req, resp));
         }

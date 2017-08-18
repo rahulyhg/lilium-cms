@@ -207,10 +207,6 @@ const gracefullyCrash = function(err) {
     hooks.fire('crash', err);
 
     log('Core', 'Contacting handler to request a crash to all handles', 'info');
-    // require('./handler.js').crash(err);
-
-    // log('Lilium', 'Shutting down');
-    // process.exit();
 };
 
 const bindCrash = function() {

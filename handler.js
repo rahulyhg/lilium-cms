@@ -1,4 +1,3 @@
-// Will handle the requests and send info to the appropriate dispatcher
 var Router = require('./router.js');
 var Dispatcher = require('./dispatcher.js');
 var inspect = require('util').inspect;
@@ -25,9 +24,7 @@ var Handler = function () {
         cli.touch('handler.POST');
 
         Router.parseClientObject(cli, function(loggedin) { 
-            if (cli.routeinfo.api) {
-                require('./api.js').serveApi(cli);
-            } else if (loggedin || cli.routeinfo.path[0] === 'login') {
+            if (loggedin || cli.routeinfo.path[0] === 'login') {
                cli.postdata = new Object();
                cli.postdata.length = cli.request.headers["content-length"];
                cli.postdata.data = {};
@@ -198,65 +195,27 @@ var Handler = function () {
         cli.touch('handler.parseMethod');
 
         switch (cli.method) {
-        case 'GET':
-            GET(cli);
-            break;
-        case 'POST':
-            POST(cli);
-            break;
-        case 'OPTIONS':
-            OPTIONS(cli);
-            break;
-        default:
-            notSupported(cli);
-            break;
+            case 'GET':     GET(cli); break;
+            case 'POST':    POST(cli); break;
+            case 'OPTIONS': OPTIONS(cli); break;
+
+            default:        notSupported(cli);
         }
     };
 
-    var clients = {};
-    var totalRequests = 0;
-
-    this.crash = function(err) {
-        for (var k in clients) if (clients[k]) {
-            clients[k].crash(err);
-        }
+    var handleAPI = function(cli) {
+        require('./api.js').serveApi(cli);
     }
-
-    var cleanClients = function() {
-        log('Handler', 'Clearing undefined clients');
-        var ctn = 0;
-        var msNow = new Date();
-        for (var k in clients) if (!clients[k]) {
-            delete clients[k];
-            ctn++;
-        }
-        
-        log('Handler', 'Cleared ' + ctn + ' clients in ' + (new Date() - msNow) + 'ms');
-    };
-
-    var handleEnd = function(cli) {
-        clients[cli.id] = undefined;
-        totalRequests++;
-
-        if (totalRequests % 1000 == 0) {
-            cleanClients();
-        }
-    };
 
     this.handle = function (cli) {
         cli.touch('handler.handle');
 
-        clients[cli.id] = cli;
-        cli.bindEnd(handleEnd);
-
-        parseMethod(cli);
+        if (cli.request.url.startsWith('/api')) {
+            handleAPI(cli);
+        } else {
+            parseMethod(cli);
+        }
     };
-
-    var init = function () {
-
-    };
-
-    init();
 };
 
 module.exports = new Handler();

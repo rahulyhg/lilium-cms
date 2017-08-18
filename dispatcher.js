@@ -27,8 +27,6 @@ var Dispatcher = function () {
             }
         } else if (cli.routeinfo.login) {
             Admin.serveLogin(cli);
-        } else if (cli.routeinfo.api) {
-            api.serveApi(cli);
         } else if (cli.routeinfo.livevars) {
             LiveVars.handleRequest(cli);
         } else if (rewriter.rewrite(cli)) {
