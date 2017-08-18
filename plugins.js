@@ -143,6 +143,7 @@ class Plugins {
                                 });
                             } catch (e) {
                                 log("Plugins", "Error while registering plugin " + identifier + ": " + e.message, 'err');
+                                e.stack && log("Plugins", e.stack);
                             }
                         }
                     }, true, true);

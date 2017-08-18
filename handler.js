@@ -204,7 +204,9 @@ var Handler = function () {
     };
 
     var handleAPI = function(cli) {
-        require('./api.js').serveApi(cli);
+        Router.parseClientObject(cli, (loggedin) => {
+            require('./api.js').serveApi(cli);
+        });
     }
 
     this.handle = function (cli) {

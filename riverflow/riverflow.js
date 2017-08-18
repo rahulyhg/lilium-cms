@@ -28,6 +28,8 @@ class FlowHandle {
             case "post"       : Endpoints.register('*', this.flow.endpoint, 'POST', this.river.POST.bind(this.river));          break;
             case "api_get"    : API.registerApiEndpoint(this.flow.endpoint, 'GET', this.river.apiGET.bind(this.river));         break;
             case "api_post"   : API.registerApiEndpoint(this.flow.endpoint, 'POST', this.river.apiPOST.bind(this.river));       break;
+            case "api_put"    : API.registerApiEndpoint(this.flow.endpoint, 'PUT', this.river.apiPUT.bind(this.river));         break;
+            case "api_delete" : API.registerApiEndpoint(this.flow.endpoint, 'DELETE', this.river.apiDELETE.bind(this.river));   break;
             case "form"       : this.river.form.apply(this.river);                                                              break;
             case "table"      : this.river.table.apply(this.river);                                                             break;
             case "setup"      : this.river.setup.apply(this.river);                                                             break;

@@ -39,6 +39,8 @@ class LiliumAPI {
 
         if (!cli.routeinfo.path[1]) {
 		    cli.throwHTTP(404, undefined, true);
+        } else if (!ApiEndpoints[cli.method]) {
+		    cli.throwHTTP(501, undefined, true);
         } else if (api.apiEndpointRegistered(cli._c.id + cli.routeinfo.path[1], cli.method)) {
 		    ApiEndpoints[cli.method][cli._c.id + cli.routeinfo.path[1]](cli);
         } else if (api.apiEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
