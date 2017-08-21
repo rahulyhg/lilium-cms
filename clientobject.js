@@ -176,7 +176,7 @@ class ClientObject {
         this.response.end(text);
     }
 
-    sendJSON  (json) {
+    sendJSON  (json, cheaders) {
         if (typeof json === 'object') {
             json = JSON.stringify(json);
         }
@@ -190,6 +190,10 @@ class ClientObject {
             headers["Access-Control-Allow-Origin"] = this.request.headers.origin || (this._c.server.protocol + this._c.server.url);
             headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
             headers["Access-Control-Allow-Header"] = "corsorigin";
+        }
+
+        if (cheaders) {
+            Object.assign(headers, cheaders);
         }
 
         this.response.writeHead(200, headers);
