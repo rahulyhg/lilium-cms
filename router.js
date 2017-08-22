@@ -23,11 +23,6 @@ var Router = function () {
         }
 
         cli.routeinfo.path = pObj.pathname.replace(/^\/?|\/?$/g, "").split('/');
-        /*
-        for (var i = 0; i < (cli.routeinfo.rootdomain.match(/\//g) || []).length; i++) {
-            cli.routeinfo.path.shift();
-        }
-        */
 
         if (cli.routeinfo.path.length == 0) {
             cli.routeinfo.path = [""];

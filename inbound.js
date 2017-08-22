@@ -25,17 +25,26 @@ class Inbound {
     }
 
     handleReq(req, resp) {
-        const ClientObject = require('./clientobject.js')
-        const Handler = require('./handler.js')
-        hooks.trigger('request', { req, resp });
+        require('./cachefront.js').getURL(req.url, (dat) => {
+            if (dat && (!dat.expiry || dat.expiry > Date.now())) {
+                resp.writeHead(200, { "Content-Type" : dat.ctype });
+                resp.end(dat.html);
 
-        if (this.ready) {
-            if (this.validate(req, resp)) {
-                Handler.handle(new ClientObject(req, resp));
+                return;
             }
-        } else {
-            this.initqueue.push(new ClientObject(req, resp));
-        }
+
+            const ClientObject = require('./clientobject.js')
+            const Handler = require('./handler.js')
+            hooks.trigger('request', { req, resp });
+
+            if (this.ready) {
+                if (this.validate(req, resp)) {
+                    Handler.handle(new ClientObject(req, resp));
+                }
+            } else {
+                this.initqueue.push(new ClientObject(req, resp));
+            }
+        });
     }
 
     handleQueue() {
