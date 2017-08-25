@@ -4,15 +4,42 @@ const settings = {
     livevars : ["datareader.single.{?1}"]
 };
 
-const preload = (context, done) => {
+const preload = (context, done) => { 
+    context.script = `<script>
+        document.querySelector('.btn-save').addEventListener('click', function() {
+            saveForm(function(resp) {
+                liliumcms.notify(resp || {
+                    type : "danger",
+                    title : "Could not save Cakepop"
+                });
+            });
+        });
+
+        document.querySelector('.btn-preview').addEventListener('click', function() {
+            saveForm(function() {
+                liliumcms.livevars.getSingleLivevar('datareader.generate', {id : liliumcms.pageloader.lastLevel}, function(resp) {
+                    var report = resp.livevars["datareader.generate"];
+                    
+                });
+            });
+        });
+
+        var saveForm = function(done) {
+            var dat = liliumcms.lmldom.getFormData().datareader_report.values;
+            liliumcms.lmldom.post(dat, '${context._c.server.url}/admin/datareader/save/' + liliumcms.pageloader.lastLevel, function(resp) {
+                done && done(resp);
+            });
+        };
+    </script>`;
+
     done();
 };
-
 
 const compile = (o, context) => {
     o(
         context.header,
-        context.libs.formbuilder.render('datareader_report', 'edit', 'datareader/single/?')
+        context.libs.formbuilder.render('datareader_report', 'edit', 'datareader/single/?'),
+        context.script
     );
 };
 

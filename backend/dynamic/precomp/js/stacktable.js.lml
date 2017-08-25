@@ -135,10 +135,4 @@ var StackTable = function(tableid, objTitle, dataScheme, fieldName) {
         }
 
     };
-
-    var init = function() {
-        render();
-    };
-
-    init();
 };

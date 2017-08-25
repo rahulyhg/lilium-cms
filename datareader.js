@@ -6,9 +6,59 @@ const formbuilder = require('./formBuilder')
 
 const DR_COLLECTION = "datareaderreports";
 
-class DataReader {
-    generator() {
+class ReportGenerator {
+    constructor(single) {
+        this.report = single
+        this.build();
+    }
 
+    feedOperator(key, value) {
+        if (!value) {
+            return key;
+        }
+
+        const operation = {};
+        const keys = key.split(',');
+        const values = value.split(',');
+
+        for (let i = 0; i < keys.length; i++) {
+            let val = values[i];
+            if (val.includes(':')) {
+                let split = val.split('|');
+                val = {};
+
+                split.forEach(kv => {
+                    kv = kv.split(':');
+                    val[kv[0]] = isNaN(kv[1]) ? kv[1] : parseInt(kv[1]);
+                });
+            } else {
+                val = isNaN(val) ? val : parseInt(val);
+            }
+
+            operation[keys[i]] = val; 
+        }
+
+        return operation;
+    }
+
+    build() {
+        this.join = this.report.aggregation.map(x => {
+            return {
+                [x.method] : this.feedOperator(x.operator, x.value)
+            };
+        });
+
+        return this;
+    }
+
+    generate(send) {
+        db.join(this.report.site, this.report.maincollection, this.join, arr => send(arr));
+    }
+}
+
+class DataReader {
+    generateReport(single, send) {
+        new ReportGenerator(single).generate(arr => send(arr));
     }
     
     adminGET(cli) {
@@ -42,9 +92,14 @@ class DataReader {
                 });
             });
         } else if (action == "save") {
-
-        } else if (aciton == "generate") {
-
+            const dat = cli.postdata.data;
+            db.update(config.default(), DR_COLLECTION, {_id : db.mongoID(cli.routeinfo.path[3])}, dat, () => {
+                cli.sendJSON({
+                    type : "success",
+                    title : "Report saved",
+                    message : ""
+                });
+            });
         } else {
             cli.throwHTTP(404, undefined, true);
         }
@@ -53,7 +108,14 @@ class DataReader {
     livevar(cli, levels, params, send) {
         const section = levels[0];
         if (section == "sites") {
-           send(config.getAllSites().map(x => x.id));
+            send(config.getAllSites().map(x => { return {name : x.id, displayname : x.website.sitetitle} }));
+        } else if (section == "generate") {
+            const id = params.id;
+            db.findUnique(config.default(), DR_COLLECTION, {_id : db.mongoID(id)}, (err, single) => {
+                single.site = single.site || cli._c.id;
+                this.generateReport(single, report => { send(report); });
+            });
+
         } else if (section == "single") {
             const id = levels[1];
             db.findUnique(config.default(), DR_COLLECTION, {_id : db.mongoID(id)}, (err, single) => {
@@ -94,6 +156,17 @@ class DataReader {
         .add("description", "text", {
             displayname : "Description"
         })
+        .add('site', 'liveselect', {
+            endpoint: 'datareader.sites',
+            select : {
+                value : 'name',
+                displayname : 'displayname'
+            },
+            empty : {
+                displayname : " - Current site - "
+            },
+            displayname: "Queried website"
+        })
         .add('maincollection', 'select', {
             displayname : "Queried collection",
             datasource : [
@@ -113,13 +186,42 @@ class DataReader {
                 { displayName : "Uploads", name : "uploads" }
             ]
         })  
+        .add('ag-title', 'title', {
+            displayname : "Aggregation"
+        })
         .add('aggregation', 'stack', {
-            displayname : "Aggregation",
             scheme : {
                 columns : [
-                    { fieldName : "", dataType : "", displayname : "" }
+                    { fieldName : "method", dataType : "select", displayname : "Method", dataSource : [
+                        { name : "$match",   displayname : "Match" },
+                        { name : "$project", displayname : "Projection" },
+                        { name : "$sort",    displayname : "Order / Sort" },
+                        { name : "$regex",   displayname : "Regular Expression" },
+                        { name : "$join",    displayname : "Join lookup" },
+                        { name : "$unwind",  displayname : "Unwind lookup" },
+                        { name : "$group",   displayname : "Group" },
+                        { name : "$limit",   displayname : "Limit results" },
+                        { name : "$skip",    displayname : "Skip results" }
+                    ] },
+                    { fieldName : "operator", dataType : "text", displayname : "Operator / Field" },
+                    { fieldName : "value", dataType : "text", displayname : "Value" }
                 ]
             }
+        })
+        .add("actions", 'buttonset', {
+            buttons : [
+                {
+                    name : "save",
+                    displayname : "Save",
+                    type : "button",
+                    classes : ["btn-save"]
+                }, {
+                    name : "generate",
+                    displayname : "Generate",
+                    type : "button",
+                    classes : ["btn-preview"]
+                }
+            ]
         })
     }
 }
