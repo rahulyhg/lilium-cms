@@ -19,7 +19,36 @@ const preload = (context, done) => {
             saveForm(function() {
                 liliumcms.livevars.getSingleLivevar('datareader.generate', {id : liliumcms.pageloader.lastLevel}, function(resp) {
                     var report = resp.livevars["datareader.generate"];
-                    
+                    if (report) {
+                        var table = d.id('reporttable');
+                        var thead = table.q('thead');
+                        var tbody = table.q('tbody');
+
+                        thead.empty();
+                        tbody.empty();
+                
+                        var tr = d.make({ node : "tr" });
+                        for (var i = 0; i < report.cols.length; i++) {
+                            tr.born(d.make({
+                                node : "th",
+                                text : report.cols[i]
+                            }));
+                        }
+
+                        thead.born(tr);
+
+                        for (var row = 0; row < report.rows.length; row++) {
+                            var tr = d.make({ node : "tr" })
+                            for (var col = 0; col < report.cols.length; col++) {
+                                tr.born(d.make({
+                                    node : "td",
+                                    text : report.rows[row][report.cols[col]]
+                                }));
+                            }
+
+                            tbody.born(tr);
+                        }
+                    }
                 });
             });
         });
@@ -32,6 +61,13 @@ const preload = (context, done) => {
         };
     </script>`;
 
+    context.reporttable = `
+        <table id="reporttable">
+            <thead></thead>
+            <tbody></tbody>
+        </table>
+    `;
+
     done();
 };
 
@@ -39,6 +75,7 @@ const compile = (o, context) => {
     o(
         context.header,
         context.libs.formbuilder.render('datareader_report', 'edit', 'datareader/single/?'),
+        context.reporttable,
         context.script
     );
 };

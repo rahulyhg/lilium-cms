@@ -48,6 +48,15 @@ class ReportGenerator {
             };
         });
 
+        const pFields = this.report.projection.split(',');
+        const projection = { $project : { _id : 0} };
+        pFields.forEach(f => {
+            projection.$project[f] = 1
+        });
+
+        this.join.push(projection);
+        console.log(JSON.stringify(this.join, null, 4));
+    
         return this;
     }
 
@@ -113,7 +122,7 @@ class DataReader {
             const id = params.id;
             db.findUnique(config.default(), DR_COLLECTION, {_id : db.mongoID(id)}, (err, single) => {
                 single.site = single.site || cli._c.id;
-                this.generateReport(single, report => { send(report); });
+                this.generateReport(single, report => { send({rows : report, cols : single.projection.split(',')}); });
             });
 
         } else if (section == "single") {
@@ -197,7 +206,7 @@ class DataReader {
                         { name : "$project", displayname : "Projection" },
                         { name : "$sort",    displayname : "Order / Sort" },
                         { name : "$regex",   displayname : "Regular Expression" },
-                        { name : "$join",    displayname : "Join lookup" },
+                        { name : "$lookup",  displayname : "Join lookup" },
                         { name : "$unwind",  displayname : "Unwind lookup" },
                         { name : "$group",   displayname : "Group" },
                         { name : "$limit",   displayname : "Limit results" },
@@ -207,6 +216,9 @@ class DataReader {
                     { fieldName : "value", dataType : "text", displayname : "Value" }
                 ]
             }
+        })
+        .add('projection', 'text', {
+            displayname : "Projection"
         })
         .add("actions", 'buttonset', {
             buttons : [
