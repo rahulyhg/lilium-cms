@@ -11,13 +11,13 @@ const style = `<style>
 
 .report-strip {
     padding: 10px;
-    padding-bottom: 0px;
     background-color: #F6F6F6;
     border: 1px solid #DDD;
 }
 
 .report-strip-wrapper {
     padding: 10px;
+    padding-bottom: 0px;
 }
 
 .report-strip h4 {
