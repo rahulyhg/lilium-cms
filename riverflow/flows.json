@@ -29,16 +29,16 @@
             "endpoint" : "history",
             "support" : ["admin_get", "admin_post", "livevar"]
         }, {
-            "module" : "stringblocks.js",
-            "endpoint" : "stringblocks",
-            "support" : ["admin_get", "admin_post", "livevar"],
+            "module" : "datareader.js",
+            "endpoint" : "datareader",
+            "support" : ["admin_get", "admin_post", "livevar", "form"],
             "admin_menu" : {
-                "id": "stringblocks",
-                "faicon": "fa-font",
-                "displayname": "String blocks",
+                "id": "datareader",
+                "faicon": "fa-pie-chart",
+                "displayname": "Data Reader",
                 "priority": 530,
-                "rights": ["string-blocks"],
-                "absURL": "admin/stringblocks",
+                "rights": ["analyst"],
+                "absURL": "admin/datareader",
                 "children": []
             }
         }, {
