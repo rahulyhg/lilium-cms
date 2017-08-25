@@ -5,12 +5,16 @@ const config = require('./config')
 const formbuilder = require('./formBuilder')
 
 const DR_COLLECTION = "datareaderreports";
+const NETWORK_TABLE = ["entities", "cakepops", "fix", "decorations", "feed", "roles"];
 
 class ReportGenerator {
     constructor(single) {
         this.report = single
         this.smap = ReportGenerator.createSMap();
 
+        if (NETWORK_TABLE.includes(this.report.maincollection)) {
+            this.report.site = config.default().id;
+        }
         this.build();
     }
 
