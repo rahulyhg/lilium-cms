@@ -10,6 +10,10 @@ const style = `<style>
     margin: 10px;
     border-spacing: 0px;
     border-collapse: separate;
+
+    border-radius: 5px;
+    border: 1px solid #DDD;
+    overflow: hidden;
 }
 
 #reporttable th {
@@ -28,6 +32,16 @@ const style = `<style>
 
 #reporttable tr:nth-child(odd) td {
     background: #EEE;
+}
+
+#reportstatus {
+    padding: 10px;
+    margin: 10px;
+    background: #F6F6F6;
+    border: 1px solid #DDD;
+    border-radius: 5px;
+    color: #333;
+    font-size: 18px;
 }
 
 </style>`
@@ -57,10 +71,13 @@ const preload = (context, done) => {
         });
 
         document.querySelector('.btn-preview').addEventListener('click', function() {
+            var txt = d.id('reportstatus').get();
+            txt.innerHTML = ("<i>Generating...</i>");
+
             saveForm(function() {
                 liliumcms.livevars.getSingleLivevar('datareader.generate', {id : liliumcms.pageloader.lastLevel}, function(resp) {
                     var report = resp.livevars["datareader.generate"];
-                    if (report) {
+                    if (report.rows && report.rows.length != 0) {
                         var table = d.id('reporttable');
                         var thead = table.q('thead');
                         var tbody = table.q('tbody');
@@ -89,6 +106,14 @@ const preload = (context, done) => {
 
                             tbody.born(tr);
                         }
+
+                        txt.innerHTML = ("This report contains <b>" + 
+                            report.rows.length + 
+                            " rows</b>, " + 
+                            (report.rows.length/report.total*100).toString().substring(0, 5) + 
+                            "% of total collection");
+                    } else if (report.rows) {
+                        txt.innerHTML = ("This report query returned an empty set");
                     }
                 });
             });
@@ -103,6 +128,7 @@ const preload = (context, done) => {
     </script>`;
 
     context.reporttable = `
+        <div id="reportstatus"></div>
         <table id="reporttable">
             <thead></thead>
             <tbody></tbody>

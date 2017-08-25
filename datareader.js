@@ -6,7 +6,22 @@ const formbuilder = require('./formBuilder')
 
 const DR_COLLECTION = "datareaderreports";
 
+const S_MAP = {
+    "true" : true,
+    "false" : false,
+    "DESC" : -1,
+    "ASC" : 1
+};
+
 class ReportGenerator {
+    static parseField(value) {
+        if (!isNaN(value)) {
+            return parseInt(value);
+        }
+
+        return typeof S_MAP[value] == "undefined" ? value : S_MAP[value];
+    }
+
     constructor(single) {
         this.report = single
         this.build();
@@ -29,10 +44,10 @@ class ReportGenerator {
 
                 split.forEach(kv => {
                     kv = kv.split(':');
-                    val[kv[0]] = isNaN(kv[1]) ? kv[1] : parseInt(kv[1]);
+                    val[kv[0]] = ReportGenerator.parseField(kv[1]); 
                 });
             } else {
-                val = isNaN(val) ? val : parseInt(val);
+                val = ReportGenerator.parseField(val);
             }
 
             operation[keys[i]] = val; 
@@ -59,15 +74,15 @@ class ReportGenerator {
     }
 
     generate(send) {
-        db.join(this.report.site, this.report.maincollection, this.join, arr => send(arr));
+        db.rawCollection(this.report.site, this.report.maincollection, {}, (err, col) => {
+            col.count({}, (err, total) => {
+                col.aggregate(this.join, (err, arr) => send(arr, total));
+            });
+        });
     }
 }
 
-class DataReader {
-    generateReport(single, send) {
-        new ReportGenerator(single).generate(arr => send(arr));
-    }
-    
+class DataReader { 
     adminGET(cli) {
         const path = cli.routeinfo.path[2];
         if (!path) {
@@ -120,7 +135,9 @@ class DataReader {
             const id = params.id;
             db.findUnique(config.default(), DR_COLLECTION, {_id : db.mongoID(id)}, (err, single) => {
                 single.site = single.site || cli._c.id;
-                this.generateReport(single, report => { send({rows : report, cols : single.projection.split(',')}); });
+                new ReportGenerator(single).generate((arr, total) => {
+                    send({rows : arr, cols : single.projection.split(','), total});
+                });
             });
 
         } else if (section == "single") {
