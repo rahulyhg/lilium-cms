@@ -165,7 +165,7 @@ class DataReader {
             db.findUnique(config.default(), DR_COLLECTION, {_id : db.mongoID(id)}, (err, single) => {
                 single.site = single.site || cli._c.id;
                 new ReportGenerator(single).generate((arr, total) => {
-                    send({rows : arr, cols : single.projection.split(','), total});
+                    send({rows : arr, cols : single.projection.split(','), titles : single.tabletitles.split(','), total});
                 });
             });
 
@@ -263,6 +263,9 @@ class DataReader {
         })
         .add('projection', 'text', {
             displayname : "Projection"
+        })
+        .add('tabletitles', 'text', {
+            displayname : "Projection display names"
         })
         .add("actions", 'buttonset', {
             buttons : [

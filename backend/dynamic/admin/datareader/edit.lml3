@@ -89,7 +89,7 @@ const preload = (context, done) => {
                         for (var i = 0; i < report.cols.length; i++) {
                             tr.born(d.make({
                                 node : "th",
-                                text : report.cols[i]
+                                text : report.titles[i] || report.cols[i]
                             }));
                         }
 
