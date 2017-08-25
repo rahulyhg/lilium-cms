@@ -112,7 +112,7 @@ class DataReader {
                 { displayName : "Topics", name : "topics" },
                 { displayName : "Uploads", name : "uploads" }
             ]
-        })
+        })  
         .add('aggregation', 'stack', {
             displayname : "Aggregation",
             scheme : {
