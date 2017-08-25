@@ -58,7 +58,7 @@ class ReportGenerator {
 
     feedOperator(key, value) {
         if (!value || !value.trim()) {
-            return key;
+            return this.parseField(key);
         }
 
         const operation = {};
