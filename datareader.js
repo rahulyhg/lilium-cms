@@ -19,10 +19,15 @@ class ReportGenerator {
         const now = date.getTime();
         const day = 1000 * 60 * 60 * 24;
 
-        const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getTime();
-        const firstDayOfYear = new Date(date.getFullYear(), 0, 1).getTime();
-        const monthAgo = new Date(date.getFullYear(), date.getMonth() - 1).getTime();
-        const yearAgo = new Date(date.getFullYear() - 1).getTime();
+        const firstDayOfMonthDate = new Date(date.getFullYear(), date.getMonth(), 1);
+        const firstDayOfYearDate = new Date(date.getFullYear(), 0, 1);
+        const monthAgoDate = new Date(date.getFullYear(), date.getMonth() - 1);
+        const yearAgoDate = new Date(date.getFullYear() - 1);
+
+        const firstDayOfMonth = firstDayOfMonthDate.getTime();
+        const firstDayOfYear = firstDayOfYearDate.getTime();
+        const monthAgo = monthAgoDate.getTime();
+        const yearAgo = yearAgoDate.getTime();
 
         return {
             "true" : true,
@@ -31,11 +36,15 @@ class ReportGenerator {
             DESC : -1, 
             ASC : 1,
             
-            "24ago" : now - day,
-            today : now - (now % day),
-            yesterday : now - (now % day) - day,
+            "24ago" : now - day, "24agoDate" : new Date(now - day),
+            today : now - (now % day), todayDate : new Date(date.getFullYear(), date.getMonth(), date.getDate()),
+            yesterday : now - (now % day) - day, yesterdayDate : new Date(date.getFullYear(), date.getMonth(), date.getDate() - 1),
 
-            now, firstDayOfMonth, firstDayOfYear, monthAgo, yearAgo
+            now, nowDate : date, 
+            firstDayOfMonth, firstDayOfMonthDate, 
+            firstDayOfYear, firstDayOfYearDate, 
+            monthAgo, monthAgoDate,
+            yearAgo, yearAgoDate
         };
     }
 
