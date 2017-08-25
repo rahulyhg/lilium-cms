@@ -63,8 +63,14 @@ const preload = (context, done) => {
 
         var dataApplyFormat = function(val, format) {
             switch (format) {
-                case "date": 
+                case "datetime": 
                     return dateFormat(new Date(val), '');
+
+                case "date":
+                    return new Date(val).toLocaleDateString();
+
+                case "time":
+                    return new Date(val).toLocaleTimeString();
 
                 case "crop50":
                     return val.substring(0, 50) + (val.length > 50 ? "..." : "");
