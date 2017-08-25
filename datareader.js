@@ -57,7 +57,7 @@ class ReportGenerator {
     }
 
     feedOperator(key, value) {
-        if (!value) {
+        if (!value || !value.trim()) {
             return key;
         }
 
