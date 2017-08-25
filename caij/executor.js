@@ -119,9 +119,7 @@ class RunningTask {
                         }
                     });
 
-                    urlString = "https://graph.facebook.com/v" + 
-                        _c.social.facebook.apiversion + 
-                        "/?access_token=" + 
+                    urlString = "https://graph.facebook.com/v2.8/?access_token=" + 
                         _c.social.facebook.token +
                         "&ids=" +
                         urlString;
