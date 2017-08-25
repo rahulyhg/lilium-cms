@@ -6,25 +6,41 @@ const formbuilder = require('./formBuilder')
 
 const DR_COLLECTION = "datareaderreports";
 
-const S_MAP = {
-    "true" : true,
-    "false" : false,
-    "DESC" : -1,
-    "ASC" : 1
-};
-
 class ReportGenerator {
-    static parseField(value) {
-        if (!isNaN(value)) {
-            return parseInt(value);
-        }
-
-        return typeof S_MAP[value] == "undefined" ? value : S_MAP[value];
-    }
-
     constructor(single) {
         this.report = single
+        this.smap = ReportGenerator.createSMap();
+
         this.build();
+    }
+
+    static createSMap() {
+        const date = new Date();
+        const now = date.getTime();
+        const day = 1000 * 60 * 60 * 24;
+
+        const firstDayOfMonth = new Date(date.getFullYear(), date.getMonth(), 1).getTime();
+        const firstDayOfYear = new Date(date.getFullYear(), 0, 1).getTime();
+        const monthAgo = new Date(date.getFullYear(), date.getMonth() - 1).getTime();
+        const yearAgo = new Date(date.getFullYear() - 1).getTime();
+
+        return {
+            "true" : true,
+            "false" : false,
+
+            DESC : -1, 
+            ASC : 1,
+            
+            "24ago" : now - day,
+            today : now - (now % day),
+            yesterday : now - (now % day) - day,
+
+            now, firstDayOfMonth, firstDayOfYear, monthAgo, yearAgo
+        };
+    }
+
+    parseField(value) {
+        return !isNaN(value) ? parseInt(value) : this.smap.hasOwnProperty(value) ? this.smap[value] : value;
     }
 
     feedOperator(key, value) {
@@ -44,10 +60,10 @@ class ReportGenerator {
 
                 split.forEach(kv => {
                     kv = kv.split(':');
-                    val[kv[0]] = ReportGenerator.parseField(kv[1]); 
+                    val[kv[0]] = this.parseField(kv[1]); 
                 });
             } else {
-                val = ReportGenerator.parseField(val);
+                val = this.parseField(val);
             }
 
             operation[keys[i]] = val; 
