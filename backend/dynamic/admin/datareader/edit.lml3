@@ -67,7 +67,7 @@ const preload = (context, done) => {
                     return dateFormat(new Date(val), '');
 
                 case "date":
-                    return new Date(val).toLocaleDateString();
+                    return dateFormat(new Date(val), 'mmm dd, yyyy')
 
                 case "time":
                     return new Date(val).toLocaleTimeString();
