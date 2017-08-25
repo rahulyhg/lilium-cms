@@ -61,6 +61,22 @@ const preload = (context, done) => {
             };
         }
 
+        var dataApplyFormat = function(val, format) {
+            switch (format) {
+                case "date": 
+                    return dateFormat(new Date(val), '');
+
+                case "array":
+                    return val.join(', ');
+
+                case "object":
+                    return JSON.stringify(val || {});
+
+                default:
+                    return val;
+            }
+        }
+
         document.querySelector('.btn-save').addEventListener('click', function() {
             saveForm(function(resp) {
                 liliumcms.notify(resp || {
@@ -86,11 +102,15 @@ const preload = (context, done) => {
                         tbody.empty();
                 
                         var tr = d.make({ node : "tr" });
-                        for (var i = 0; i < report.cols.length; i++) {
+                        var colFormats = [];
+                        for (var i = 0; i < report.titles.length; i++) {
+                            var formatSplit = report.titles[i].split('@');
                             tr.born(d.make({
                                 node : "th",
-                                text : report.titles[i] || report.cols[i]
+                                text : formatSplit[0]
                             }));
+
+                            colFormats.push(formatSplit[1]);
                         }
 
                         thead.born(tr);
@@ -98,9 +118,11 @@ const preload = (context, done) => {
                         for (var row = 0; row < report.rows.length; row++) {
                             var tr = d.make({ node : "tr" })
                             for (var col = 0; col < report.cols.length; col++) {
+                                var val = report.cols[col].split('.').reduce(function(obj, i) { return obj[i]}, report.rows[row])
+
                                 tr.born(d.make({
                                     node : "td",
-                                    text : report.cols[col].split('.').reduce(function(obj, i) { return obj[i]}, report.rows[row])
+                                    text : dataApplyFormat(val, colFormats[col])
                                 }));
                             }
 
