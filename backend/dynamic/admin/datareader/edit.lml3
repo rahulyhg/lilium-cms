@@ -66,6 +66,12 @@ const preload = (context, done) => {
                 case "date": 
                     return dateFormat(new Date(val), '');
 
+                case "crop50":
+                    return val.substring(0, 50);
+
+                case "crop100":
+                    return val.substring(0, 100);
+
                 case "array":
                     return val.join(', ');
 
