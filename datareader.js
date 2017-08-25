@@ -55,8 +55,6 @@ class ReportGenerator {
         });
 
         this.join.push(projection);
-        console.log(JSON.stringify(this.join, null, 4));
-    
         return this;
     }
 

@@ -4,8 +4,49 @@ const settings = {
     livevars : ["datareader.single.{?1}"]
 };
 
+const style = `<style>
+
+#reporttable {
+    margin: 10px;
+    border-spacing: 0px;
+    border-collapse: separate;
+}
+
+#reporttable th {
+    padding: 10px;
+    font-size: 18px;
+    background: #333;
+    color: #EEE;
+}
+
+#reporttable td {
+    padding: 5px;
+    font-size: 13px;
+    background: #F6F6F6;
+    color: #111;
+}
+
+#reporttable tr:nth-child(odd) td {
+    background: #EEE;
+}
+
+</style>`
+
 const preload = (context, done) => { 
     context.script = `<script>
+        if (!Array.prototype.reduce) {
+            Array.prototype.reduce = function(callback, initialVal) {
+                var accumulator = (initialVal === undefined) ? undefined : initialVal;
+                for (var i = 0; i < this.length; i++) {
+                    if (accumulator !== undefined)
+                        accumulator = callback.call(undefined, accumulator, this[i], i, this);
+                    else
+                        accumulator = this[i];
+                }
+                return accumulator;
+            };
+        }
+
         document.querySelector('.btn-save').addEventListener('click', function() {
             saveForm(function(resp) {
                 liliumcms.notify(resp || {
@@ -42,7 +83,7 @@ const preload = (context, done) => {
                             for (var col = 0; col < report.cols.length; col++) {
                                 tr.born(d.make({
                                     node : "td",
-                                    text : report.rows[row][report.cols[col]]
+                                    text : report.cols[col].split('.').reduce(function(obj, i) { return obj[i]}, report.rows[row])
                                 }));
                             }
 
@@ -74,6 +115,7 @@ const preload = (context, done) => {
 const compile = (o, context) => {
     o(
         context.header,
+        style,
         context.libs.formbuilder.render('datareader_report', 'edit', 'datareader/single/?'),
         context.reporttable,
         context.script
