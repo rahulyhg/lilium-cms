@@ -24,7 +24,7 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 [Download link](http://www.1001fonts.com/arty-signature-font.html)
 
 ## Working with nginx ##
-###Experimental configuration file###
+### Experimental configuration file
 
 ```
 upstream lilium_proxy  {
