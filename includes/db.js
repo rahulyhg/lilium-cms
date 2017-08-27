@@ -274,6 +274,18 @@ var DB = function() {
 		});
 	};
 
+    this.save = function(conf, coln, doc, cb) {
+        _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+			if (err) {
+				cb("[Database - Error : "+err+"]");
+            } else if (!doc || !doc._id) {
+                cb("[Database - Error : No document _id specified]");
+			} else {
+                coln.updateOne({_id : doc._id}, doc, (err, r) => { cb || cb(err, r); });
+            }
+        });
+    }
+
 	// Will find documents from collection coln according to conds,
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
