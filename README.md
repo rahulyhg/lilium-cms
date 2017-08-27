@@ -101,6 +101,8 @@ server {
 * Era Sinbandith
 * Narcity Media inc.
 
+![bitmoji](https://render.bitstrips.com/v2/cpanel/9188364-18598575_8-s1-v1.png?transparent=1&palette=1&width=246)
+
 ## License ##
 This software does not come with a license. 
 
