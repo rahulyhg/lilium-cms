@@ -1,11 +1,11 @@
-var Garden = function() {
-  this.enable = function(_c, info, callback) {
-    callback();
-  }
+class Garden {
+    enable(_c, info, callback) {
+        callback();
+    }
 
-  this.disable = function(callback){
-    return callback();
-  }
+    disable(callback) {
+        callback();
+    }
 }
 
 module.exports = Garden;
