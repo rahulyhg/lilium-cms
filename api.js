@@ -54,9 +54,9 @@ class LiliumAPI {
 		return (typeof ApiEndpoints[method][endpoint] !== 'undefined');
 	};
 
-	registerApiEndpoint(endpoint, method, func) {
+	registerApiEndpoint(endpoint, method, func, siteid) {
         log('API', 'Registering API endpoint ' + method + "@" + endpoint);
-	    ApiEndpoints[method][endpoint] = func;
+	    ApiEndpoints[method][(siteid || "") + endpoint] = func;
 	};
 
     pushInCache(key, value, done) {
