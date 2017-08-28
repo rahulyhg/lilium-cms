@@ -47,7 +47,7 @@ class IPLocator {
         if (cli.userinfo && cli.userinfo.userid) {
             requestQueue.push({
                 userid : cli.userinfo.userid,
-                ip : cli.request.connection.remoteAddress
+                ip : cli.request.headers["x-real-ip"]
             })
 
             setTimeout(() => {
