@@ -20,10 +20,10 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 **UBUNTU:**
 `sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick`
 
-#### Arty Signature font
-[Download link](http://www.1001fonts.com/arty-signature-font.html)
+## I want to code, too
+See the [Lilium CMS Wiki](https://github.com/narcitymedia/lilium-cms/wiki) and get started!
 
-## Working with nginx ##
+## Working with nginx
 ### Experimental configuration file
 
 ```
