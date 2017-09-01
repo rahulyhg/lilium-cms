@@ -51,12 +51,12 @@ class ClientObject {
         require('./session.js').reloadSession(this, cb);
     };
 
-    throwHTTP  (code, message, hard) {
+    throwHTTP  (code, message, hard, headers) {
         this.responseinfo.httpcode = code;
         this.responseinfo.httpmessage = message;
        
         if (hard) {
-            this.response.writeHead(code);
+            this.response.writeHead(code, headers);
             this.response.end(message || undefined);
         } else if (code >= 400 && code < 500) {
             require('./filelogic.js').serveErrorPage(this, code);
