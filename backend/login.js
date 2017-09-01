@@ -165,13 +165,13 @@ class Login {
                 name : 'login', 
                 displayname : "Login",
                 classes : ["loginbutton"]
-            }, {
+            /*}, {
                 name : 'login-fb', 
                 displayname : '<i class="fa fa-facebook-official" aria-hidden="true"></i>',
                 classes : ["fbloginbutton"],
                 type : "button",
                 callback : "window.loginwithfacebook();"
-            }]
+            */}]
         });
 	};
 

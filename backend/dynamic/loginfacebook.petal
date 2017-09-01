@@ -24,5 +24,5 @@ window.loginwithfacebook = function() {
     }
 };
 
-$(function() { $('.lmllogin-wrapper').css('margin-top', (window.innerHeight / 2 - 152) + "px"); });
+$(function() { $('.lmllogin-wrapper').css('margin-top', (window.innerHeight / 2 - 200) + "px"); });
 </script>

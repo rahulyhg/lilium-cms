@@ -7,16 +7,16 @@
 	<body class="{=frontend.getBodyClasses("login")}" id="{=frontend.getBodyID("login")}">
         {%adminfacebook}
         {%loginfacebook}
-        <div class="lmlhalf-right">
+        <div class="lmlfull-right">
 		    <main class="lmllogin-wrapper">		
 		    	<header>
-                    <h1>Login</h1>
+                    <img src="/static/media/lmllogo.png" />
                 </header>
 
 	    		{=forms.render("login_form")}
 
     			<footer>
-                    {=config.default.vendor.productname} v{=config.default.vendor.version}
+                    {=config.default.vendor.productname} v1.6.32
                 </footer>
 		    </main>
         </div>
