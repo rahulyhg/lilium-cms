@@ -382,7 +382,7 @@ var DB = function() {
 		});
 	};
 
-	this.aggregate = this.join = function(conf, coln, aggregation, cb) {
+	this.aggregate = this.join = function(conf, coln, aggregation, cb, unique) {
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
@@ -392,7 +392,7 @@ var DB = function() {
 				} else {
 					col.aggregate(
 						aggregation
-					).toArray(function(err, result) {
+					)[unique ? "next" : "toArray"](function(err, result) {
 				       cb(err || result);
 				   });
 				}
