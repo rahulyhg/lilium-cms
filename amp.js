@@ -81,16 +81,53 @@ class Amp {
         const dom = new JSDOM.JSDOM('<html><head></head><body>' + articleContent + '</body></html>');        
         const images = dom.window.document.querySelectorAll('img');
 
-        images.forEach(x => { 
+        for (let i = images.length - 1; i >= 0; i--) {
+            const x = images[i];
             if (x.src && x.src.includes('cdninstagram')) {
-                x.src = cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src;
+                const ampimg = dom.window.document.createElement("amp-img");
+                ampimg.setAttribute('src', cdn.parseOne(cli._c, cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src));
+                ampimg.setAttribute('width', 640);
+                ampimg.setAttribute('height', 640);
+                ampimg.setAttribute('layout', "responsive");
+
+                try {
+                    dom.window.document.body.insertBefore(ampimg, x.parentElement);
+                    x.remove();
+                } catch (ex) {}
             }
-        });
+        }
+
+        const scripts = dom.window.document.querySelectorAll('script');
+        for (let i = scripts.length - 1; i >= 0; i--) {
+            scripts[i].remove();
+        }
+
+        const videos = dom.window.document.querySelectorAll('.ck-embed-video');
+        for (let i = videos.length - 1; i >= 0; i--) {
+            const x = videos[i];
+            if (x.src.includes('youtube.com')) {
+                let vid = x.substring(x.indexOf('/embed/') + 7);
+                if (vid.includes('/')) {
+                    vid = vid.substring(0, vid.indexOf('/'));
+                }
+
+                const youtube = dom.window.document.createElement('amp-youtube');
+                youtube.dataset.videoid = vid;
+                youtube.setAttribute('width', '640');
+                youtube.setAttribute('height', '480');
+                youtube.setAttribute('layout', 'responsive');
+
+                try {
+                    dom.window.document.body.insertBefore(youtube, x.parentElement);
+                    x.remove();
+                } catch (ex) {}
+            }
+        }
 
         cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
             articleContent = articleContent.replace(/<ad><\/ad>/g, "");
-            const htmlToAmp = require('html-to-amp')();
-            htmlToAmp(articleContent, cb); 
+
+            cb(undefined, articleContent);
         });
     }
 }
