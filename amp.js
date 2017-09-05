@@ -107,9 +107,9 @@ class Amp {
             const x = videos[i];
             if (x.src.includes('youtube.com')) {
                 let vid = x.src.substring(x.src.indexOf('/embed/') + 7);
-                if (vid.includes('/')) {
-                    vid = vid.substring(0, vid.indexOf('/'));
-                }
+                if (vid.includes('/')) { vid = vid.substring(0, vid.indexOf('/')); }
+                if (vid.includes('?')) { vid = vid.substring(0, vid.indexOf('?')); }
+                if (vid.includes('&')) { vid = vid.substring(0, vid.indexOf('&')); }
 
                 const youtube = dom.window.document.createElement('amp-youtube');
                 youtube.setAttribute('data-videoid', vid);
