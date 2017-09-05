@@ -125,7 +125,7 @@ class Amp {
         }
 
         cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
-            articleContent = articleContent.replace(/<ad><\/ad>/g, "");
+            articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '');
 
             cb(undefined, articleContent);
         });
