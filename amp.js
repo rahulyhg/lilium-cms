@@ -106,7 +106,7 @@ class Amp {
         for (let i = videos.length - 1; i >= 0; i--) {
             const x = videos[i];
             if (x.src.includes('youtube.com')) {
-                let vid = x.substring(x.indexOf('/embed/') + 7);
+                let vid = x.src.substring(x.src.indexOf('/embed/') + 7);
                 if (vid.includes('/')) {
                     vid = vid.substring(0, vid.indexOf('/'));
                 }
