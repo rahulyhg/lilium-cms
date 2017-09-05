@@ -112,7 +112,7 @@ class Amp {
                 }
 
                 const youtube = dom.window.document.createElement('amp-youtube');
-                youtube.dataset.videoid = vid;
+                youtube.setAttribute('data-videoid', vid);
                 youtube.setAttribute('width', '640');
                 youtube.setAttribute('height', '480');
                 youtube.setAttribute('layout', 'responsive');
