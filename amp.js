@@ -7,6 +7,8 @@ const log = require('./log.js');
 const cdn = require('./cdn.js');
 const themes = require('./themes.js');
 
+const JSDOM = require('jsdom'); 
+
 class Amp {
     // Called from Riverflow
     GET(cli) {
@@ -76,7 +78,16 @@ class Amp {
     };
 
     parseAMPContent(cli, articleContent, cb) {
-        cdn.parse(articleContent, cli, (articleContent) => {
+        const dom = new JSDOM.JSDOM('<html><head></head><body>' + articleContent + '</body></html>');        
+        const images = dom.window.document.querySelectorAll('img');
+
+        images.forEach(x => { 
+            if (x.src && x.src.includes('cdninstagram')) {
+                x.src = cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src;
+            }
+        });
+
+        cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
             articleContent = articleContent.replace(/<ad><\/ad>/g, "");
             const htmlToAmp = require('html-to-amp')();
             htmlToAmp(articleContent, cb); 

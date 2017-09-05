@@ -56,7 +56,7 @@
         }, {
             "module" : "instagram.js",
             "endpoint" : "instagram",
-            "support" : ["livevar", "setup"]
+            "support" : ["livevar", "setup", "get"]
         }, {
             "module" : "fix.js",
             "endpoint" : "fix",

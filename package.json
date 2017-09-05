@@ -64,7 +64,7 @@
     "googleapis": "latest",
     "html-entities": "latest",
     "html-minifier": "latest",
-    "html-to-amp": "latest",
+    "html-to-amp": "^2.0.2",
     "http": "latest",
     "https": "latest",
     "image-size": "latest",

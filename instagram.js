@@ -59,6 +59,15 @@ class LMLInstagram {
         }
     }
 
+    GET(cli) {
+        const url = cli.routeinfo.params.u;
+        if (url && url.includes('cdninstagram')) {
+            request(url).pipe(cli.response);
+        } else {
+            cli.throwHTTP(404, undefined, true)
+        }
+    }
+
     storeStats(conf, done) {
         this.getStats(conf, (stats) => {
             let accounts = Object.keys(stats);
