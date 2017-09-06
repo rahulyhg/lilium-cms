@@ -1,4 +1,5 @@
 const modalName = "lml-modal-edit-event";
+const modalNewDispatchName = "lml-modal-new-dispatch";
 
 const compile = (o, context) => { o(`
 <script>
@@ -7,14 +8,23 @@ const compile = (o, context) => { o(`
         "published" : "live on Facebook"
     };
 
-    var updateEvent = function(event) {
+    var updateEvent = function(event, cb) {
         liliumcms.lmldom.sendForm({
             _id : event.id,
             date : event.at.getTime()
         }, "${context._c.server.url}/admin/socialdispatch/move", function() {
-            
+            cb && cb();
         });
     };
+
+    window.newDispatchFromTool = function() {
+        liliumcms.modals.get("${modalNewDispatchName}").cast();
+    }
+
+    var maybeSearchDispatchPost = function(ev) {
+        var terms = ev.target.value;
+        
+    }
 
     var handleClick = function(event) {
         liliumcms.lmldom.get("${context._c.server.url}/admin/socialdispatch/deepFetch/" + event.id + "?async=true", { 
@@ -50,6 +60,16 @@ const compile = (o, context) => { o(`
         handleClick(event);
     });
 
+    window["modal_cb_save"] = function(modal) {
+        var id = modal.dispatchid;
+        updateEvent({id : id, at : new Date(modal.getFormData()["edit-event-time"])}, function() {
+            calendar.fetch(function() {
+                calendar.render();
+            }, true);
+            modal.dismiss();
+        });
+    }
+
     window["modal_cb_delete"] = function(modal) {
         var id = modal.dispatchid;
         liliumcms.lmldom.sendForm({
@@ -66,9 +86,35 @@ const compile = (o, context) => { o(`
     };
 </script>
 
+<div id="${modalNewDispatchName}" class="lml-modal">
+    <div class="lml-modal-title">
+        New social dispatch task
+    </div>
+    <div class="lml-modal-body">
+        <span>Caption</span>
+        <input class="" id="new-dispatch-caption" placeholder="This will appear above the image on Facebook" />
+
+        <span>When should it be published?</span>
+        <input class="lml-date" id="new-dispatch-datetime" data-options="time" />
+
+        <span>Which article should be published?</span>
+        <div>
+            <input class="" id="new-dispatch-search" placeholder="Search for words in the title..." />
+            <input type="hidden" id="new-dispatch-post-id" />
+            <div id="new-dispatch-search-results">
+
+            </div>
+        </div>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel btn-default" type="button">Dismiss</button>
+        <button class="lml-modal-action green" data-callback="modal_cb_create" type="button">Create</button>
+    </div>
+</div>
+
 <div id="${modalName}" class="lml-modal">
     <div class="lml-modal-title">
-        Edit social dispatch event
+        Edit social dispatch task
     </div>
     <div class="lml-modal-body">
         <div style="margin: 0px -15px 0px -15px;">
@@ -96,9 +142,15 @@ const compile = (o, context) => { o(`
     <div class="lml-modal-footer">
         <button class="lml-modal-cancel btn-default" type="button">Dismiss</button>
         <button class="lml-modal-action btn-red red" type="button" data-callback="modal_cb_delete">Delete</button>
-        <button class="lml-modal-accept green" type="button">Save</button>
+        <button class="lml-modal-action green" data-callback="modal_cb_save" type="button">Save</button>
     </div>
 </div>
+
+<script>
+document.getElementById("new-dispatch-search").addEventListener('keypress', function(ev) {
+    maybeSearchDispatchPost(ev);
+});
+</script>
 
 <style>
 #social-dispatch-calendar .calendar-wrapper {
@@ -168,6 +220,14 @@ const compile = (o, context) => { o(`
 
 #lml-modal-edit-event .lml-modal-body {
     padding-top: 0px;
+}
+
+h1 > a.fab {
+    float: none;
+    position: absolute;
+    right: 15px;
+    top: 66px;
+    cursor: pointer;
 }
 </style>
 `);};

@@ -971,7 +971,7 @@ var LiliumCMS = function() {
                     var el = values[i];
 
                     formData[el.name || el.id || ("field-" + i)] = el.classList.contains("lml-date") ? 
-                        liliumcms.lmldom.flatpickr[el.name].selectedDates[0] : 
+                        liliumcms.lmldom.flatpickr[el.name || el.id || ("field-" + i)].selectedDates[0] : 
                         el.value;
                 }
 

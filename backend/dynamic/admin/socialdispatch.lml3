@@ -5,7 +5,10 @@ const settings = {
         v : 1.0,
         features : ["fullwidth"]
     },
-    title : "Social Dispatch"
+    title : "Social Dispatch",
+    tools : {
+        add : { call : "newDispatchFromTool" } 
+    }
 };
 
 const preload = (context, done) => {

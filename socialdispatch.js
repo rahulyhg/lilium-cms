@@ -5,6 +5,7 @@ const config = require('./config.js');
 const filelogic = require('./filelogic.js');
 const request = require('request');
 const articleLib = require('./article.js');
+const searchLib = require('./search.js');
 
 const CAIJ = require('./caij/caij.js');
 
