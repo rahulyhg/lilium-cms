@@ -21,9 +21,46 @@ const compile = (o, context) => { o(`
         liliumcms.modals.get("${modalNewDispatchName}").cast();
     }
 
-    var maybeSearchDispatchPost = function(ev) {
-        var terms = ev.target.value;
-        
+    var fillSearchResults = function(posts) {
+        var wrap = document.getElementById('new-dispatch-search-results');
+        while (wrap.firstElementChild) {
+            wrap.firstElementChild.remove();
+        }
+
+        var dwrap = d.id("new-dispatch-search-results");
+        for (var i = 0; i < posts.length; i++) {
+            var title = d.make({
+                parent : dwrap,
+                html : posts[i].title + " &middot; <i>Published on " + 
+                    dateFormat(new Date(posts[i].date), "dd/mm/yyyy HH:MM") + "</i>"
+            });
+
+            title.cadd('new-dispatch-search-result');
+            (function(post, elem) {
+                title.bind('click', function() {
+                    var maybeSel = dwrap.q('.selected');
+                    if (maybeSel.get()) {
+                        maybeSel.crm('selected');
+                    }
+
+                    elem.cadd('selected');
+                    document.getElementById('npostid').value = post._id;
+                });
+            })(posts[i], title);
+        }
+    }
+
+    var lastrequestterms = "";
+    var maybeSearchDispatchPost = function(terms) {
+        if (lastrequestterms != terms && terms.length > 2) {
+            lastrequestterms = terms;
+            liliumcms.lmldom.get('${context._c.server.url}/admin/socialdispatch/listposts', {
+                json : true,
+                params : { async : "true", terms : terms }
+            }, function(articles) {
+                fillSearchResults(articles);
+            });
+        }
     }
 
     var handleClick = function(event) {
@@ -60,6 +97,22 @@ const compile = (o, context) => { o(`
         handleClick(event);
     });
 
+    window["modal_cb_create"] = function(modal) {
+        var params = modal.getFormData();
+        liliumcms.lmldom.sendForm({
+            pageid : params.npageid,
+            postid : params.npostid,
+            message : params.ncaption,
+            time : params.ndatetime.getTime()
+        }, "${context._c.server.url}/admin/socialdispatch/schedule", function() {
+            modal.dismiss();
+            calendar.fetch(function() {
+                calendar.render();
+                liliumcms.pageloader.present();
+            }, true);
+        });
+    }
+
     window["modal_cb_save"] = function(modal) {
         var id = modal.dispatchid;
         updateEvent({id : id, at : new Date(modal.getFormData()["edit-event-time"])}, function() {
@@ -91,18 +144,29 @@ const compile = (o, context) => { o(`
         New social dispatch task
     </div>
     <div class="lml-modal-body">
-        <span>Caption</span>
-        <input class="" id="new-dispatch-caption" placeholder="This will appear above the image on Facebook" />
+        <div class="lml-modal-field">
+            <label>Facebook Page</label>
+            <select class="lmldom-liveselect" data-filledby="socialdispatch.networks.liveselect" name="npageid"></select>
+        </div>
 
-        <span>When should it be published?</span>
-        <input class="lml-date" id="new-dispatch-datetime" data-options="time" />
+        <div class="lml-modal-field">
+            <label>Caption</label>
+            <textarea id="ncaption" class="lml-modal-fulltext" placeholder="This will appear above the image on Facebook"></textarea>
+        </div>
 
-        <span>Which article should be published?</span>
-        <div>
-            <input class="" id="new-dispatch-search" placeholder="Search for words in the title..." />
-            <input type="hidden" id="new-dispatch-post-id" />
-            <div id="new-dispatch-search-results">
+        <div class="lml-modal-field">
+            <label>When should it be published?</label>
+            <input class="lml-date" id="ndatetime" data-options="time" placeholder="Click to select a date and time" />
+        </div>
 
+        <div class="lml-modal-field">
+            <label>Which article should be published?</label>
+            <div>
+                <input class="" id="new-dispatch-search" placeholder="Search for words in the title..." />
+                <input type="hidden" id="npostid" />
+                <div id="new-dispatch-search-results">
+
+                </div>
             </div>
         </div>
     </div>
@@ -147,12 +211,42 @@ const compile = (o, context) => { o(`
 </div>
 
 <script>
-document.getElementById("new-dispatch-search").addEventListener('keypress', function(ev) {
-    maybeSearchDispatchPost(ev);
+document.getElementById("new-dispatch-search").addEventListener('keyup', function(ev) {
+    maybeSearchDispatchPost(ev.target.value);
 });
 </script>
 
 <style>
+#new-dispatch-search-results {
+    height: 220px;
+    border: 1px solid #DDD;
+}
+
+.new-dispatch-search-result {
+    border-bottom: 1px solid #DDD;
+    padding: 8px;
+    cursor: pointer;
+    font-weight: 500;    
+}
+
+.new-dispatch-search-result:hover {
+    background-color: #F3F3F3;
+}
+
+.new-dispatch-search-result.selected {
+    background-color: #Af57E4;
+    color: #FFF;
+    font-weight: 700;
+}
+
+.new-dispatch-search-result i {
+    color : #777;
+}
+
+.new-dispatch-search-result.selected i {
+    color: #DDD;
+}
+
 #social-dispatch-calendar .calendar-wrapper {
     float: none;
     clear: both;

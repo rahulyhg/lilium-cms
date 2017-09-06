@@ -243,6 +243,14 @@ class SocialDispatch {
                 filelogic.serveAdminLML3(cli);
                 break;
 
+            case "listposts":
+                searchLib.queryList(cli._c, undefined, cli.routeinfo.params.terms, { 
+                    conditions : { status : "published" } 
+                }, (posts) => {
+                    cli.sendJSON(posts);
+                });
+                break;
+
             case "deepFetch":
                 SocialPost.deepFetch(cli._c, db.mongoID(cli.routeinfo.path[3]), (item) => {
                     cli.sendJSON(item);

@@ -1,5 +1,5 @@
 const settings = {
-    livevars : ["socialdispatch.calendar"],
+    livevars : ["socialdispatch.calendar", "socialdispatch.networks.liveselect"],
     petals : ["socialdispatch.js"],
     lmldom : {
         v : 1.0,
