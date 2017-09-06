@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="{=config.default.server.url}/compiled/admin.css?t=10">
+<link rel="stylesheet" href="{=config.default.server.url}/compiled/admin.css?t=12">
 <script src="{=config.default.server.url}/static/jq.js"></script>
 <script src="{=config.default.server.url}/compiled/admin.js?t=10"></script>
 
