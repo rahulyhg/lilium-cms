@@ -16,6 +16,7 @@ $}
     width: 150px;
     padding: 10px;
     margin-bottom: 10px;
+    animation: slowrotate 100s infinite 0s linear;
 }
 
 .lmllogin-wrapper button.loginbutton {
