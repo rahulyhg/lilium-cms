@@ -99,6 +99,16 @@ const compile = (o, context) => { o(`
 
     window["modal_cb_create"] = function(modal) {
         var params = modal.getFormData();
+
+        if (!params.npostid || !params.ncaption || !params.ndatetime) {
+            return;
+        }
+
+        if (params.ndatetime.getTime() < new Date().getTime() ) {
+            modal.dismiss();
+            return liliumcms.notify({type : "danger", title : "Date cannot be set to a past date.", message : "Double-check the date and time!"});
+        }
+
         liliumcms.lmldom.sendForm({
             pageid : params.npageid,
             postid : params.npostid,
