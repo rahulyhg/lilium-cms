@@ -220,6 +220,7 @@ document.getElementById("new-dispatch-search").addEventListener('keyup', functio
 #new-dispatch-search-results {
     height: 220px;
     border: 1px solid #DDD;
+    overflow: auto;
 }
 
 .new-dispatch-search-result {
