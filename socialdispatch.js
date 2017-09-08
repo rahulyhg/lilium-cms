@@ -6,15 +6,21 @@ const filelogic = require('./filelogic.js');
 const request = require('request');
 const articleLib = require('./article.js');
 const searchLib = require('./search.js');
+const sharedcache = require('./sharedcache.js');
 
 const CAIJ = require('./caij/caij.js');
 
 const DISPATCH_COLLECTION = "socialdispatch";   // Website collection
 const ACCOUNTS_COLLECTION = "socialaccounts";   // Network collection
+const FBTARGET_COLLECTION = "fbtargets";        // Network collection
 
 const GRAPH_API = "https://graph.facebook.com/v";
 const FEED_ENDPOINT = "/feed/";
+const SEARCH_ENDPOINT = "/search/";
 const GRAPH_TOKEN = "?access_token=";
+const MIN_GRAPH_VERSION = "2.10";
+
+const networkinfo = require('./network/info.js');
 
 const scheduledTasks = {};
 
@@ -240,6 +246,7 @@ class SocialDispatch {
         switch (cli.routeinfo.path[2]) {
             case undefined:
             case "networks":
+            case "audience":
                 filelogic.serveAdminLML3(cli);
                 break;
 
@@ -424,7 +431,59 @@ class SocialDispatch {
     }
 
     setup() {
-        db.createCollection(config.default(), ACCOUNTS_COLLECTION, () => {});
+        if (networkinfo.isElderChild()) {
+            db.createCollection(config.default(), ACCOUNTS_COLLECTION, () => {});
+
+            const fbdata = [];
+            const REQUEST_COOLDOWN = 10; // ms 
+            const Q_PARAM = "&q=";
+            const TYPE_PARAM = "&type=adgeolocation";
+            const BASE_REQUEST = GRAPH_API + MIN_GRAPH_VERSION + SEARCH_ENDPOINT + GRAPH_TOKEN;
+
+            const nextCity = (count = 0, token, cities, done) => {
+                if (count == cities.length) {
+                    return done();
+                }
+
+                request({
+                    url : BASE_REQUEST + token + Q_PARAM + cities[count] + TYPE_PARAM,
+                    method : "GET",
+                    json : true
+                }, (err, resp, d) => {
+                    if (d && d.data) {
+                        fbdata.push(...d.data);
+                    }
+
+                    setTimeout(() => {
+                        nextCity(count + 1, token, cities, done); 
+                    }, REQUEST_COOLDOWN);
+                });
+           
+            };
+
+            config.each((site, next) => {
+                if (site.social && site.social.facebook && site.social.facebook.privtoken) {
+                    db.findToArray(site, 'topics', {"override.cityname" : { $exists : 1, $ne : "" }}, (err, topics) => {
+                        let cities = topics.map(x => x.displayname);
+                        nextCity(0, site.social.facebook.privtoken, cities, () => { next() });
+                    }, {"override.cityname" : 1, displayname : 1});
+                } else {
+                    next();
+                }
+            }, () => {
+                db.createCollection(config.default(), FBTARGET_COLLECTION, () => {
+                    db.createIndex(config.default(), FBTARGET_COLLECTION, {name : "text", country_name : "text", key : 1}, () => {
+                        db.remove(config.default(), FBTARGET_COLLECTION, {}, () => {
+                            db.insert(config.default(), FBTARGET_COLLECTION, fbdata, () => {
+                                sharedcache.set({["fbcitykeys"] : fbdata}, () => {
+                                    log('SDispatch', `Stored ${fbdata.length} geolocation Facebook keys`, 'lilium');
+                                });               
+                            });               
+                        });               
+                    });               
+                });               
+            });
+        }
     }
 }
 
