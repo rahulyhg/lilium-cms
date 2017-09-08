@@ -258,6 +258,10 @@ class SocialDispatch {
                 });
                 break;
 
+            case "listaudience":
+                // db.fbtargets.find({$text : {$search : "Montreal Canada"}}, {score: { $meta: "textScore" }}).sort( { score: { $meta: "textScore" } } )
+                break;
+
             case "deepFetch":
                 SocialPost.deepFetch(cli._c, db.mongoID(cli.routeinfo.path[3]), (item) => {
                     cli.sendJSON(item);
