@@ -61,6 +61,8 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
                 that.filters[e.target.name] = e.target.value;
                 that.render();
             });
+
+            that.filters[filters[i].name] = filters[i].value;
         }
     };
 

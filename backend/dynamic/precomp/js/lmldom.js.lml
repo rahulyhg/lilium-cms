@@ -409,6 +409,11 @@ var LMLDom = function() {
             var tag = document.createElement(cl.getAttribute('tag') || "div");
             var classvar = cl.getAttribute('classes');
             var classvalue = getReturn(ldContext, classvar);
+            
+            var ctnvar = cl.getAttribute('var');
+            if (ctnvar) {
+                tag.textContent = getReturn(ldContext, ctnvar);
+            }
 
             if (typeof classvalue == "object") {
                 classvalue = classvalue.join(' ');
@@ -523,6 +528,11 @@ var LMLDom = function() {
             if (elementtype) {
                 spann = document.createElement(elementtype);
                 spann.textContent = maybeDateFormat ? dateFormat(new Date(txt), maybeDateFormat) : txt;
+
+                var maybeClass = tn.getAttribute('class');
+                if (maybeClass) {
+                    spann.className = maybeClass;
+                }
             } else {
                 spann = document.createTextNode(maybeDateFormat ? dateFormat(new Date(txt), maybeDateFormat) : txt);
             }
