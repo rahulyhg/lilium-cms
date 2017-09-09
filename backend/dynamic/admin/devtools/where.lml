@@ -19,12 +19,14 @@
 
         for (var i = 0; i < users.length; i++) {
             var user = users[i];
-            L.marker([user.geo.latitude, user.geo.longitude], {
+            var marker = L.marker([user.geo.latitude, user.geo.longitude], {
                 icon : L.icon({
                     iconUrl: user.avatarURL,
                     iconSize: [40, 40],
                 })
             }).addTo(wheremap);
+
+            marker.bindPopup('<div> <div><b>Origin IP</b> : '+user.geo.ip+'</div> <div><b>Last request</b> : '+new Date(user.geo.updatedAt).toLocaleTimeString()+', '+new Date(user.geo.updatedAt).toLocaleDateString()+'</div> <div><b>Timezone</b> : '+user.geo.timezone+'</div> </div>');
         }
     });
 </script>
