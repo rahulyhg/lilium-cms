@@ -26,7 +26,7 @@
                 })
             }).addTo(wheremap);
 
-            marker.bindPopup('<div> <div><b>Origin IP</b> : '+user.geo.ip+'</div> <div><b>Last request</b> : '+new Date(user.geo.updatedAt).toLocaleTimeString()+', '+new Date(user.geo.updatedAt).toLocaleDateString()+'</div> <div><b>Timezone</b> : '+user.geo.timezone+'</div> </div>');
+            marker.bindPopup('<div> <div style="margin-bottom: 12px;"><b>'+user.displayname+'</b></div> <div><b>Origin IP</b> : '+user.geo.ip+'</div> <div><b>Last request</b> : '+new Date(user.geo.updatedAt).toLocaleTimeString()+', '+new Date(user.geo.updatedAt).toLocaleDateString()+'</div> <div><b>Timezone</b> : '+user.geo.timezone+'</div> </div>');
         }
     });
 </script>
