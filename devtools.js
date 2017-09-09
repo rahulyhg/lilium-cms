@@ -7,6 +7,7 @@ var notif = require('./notifications.js');
 var formBuilder = require('./formBuilder.js');
 var configs = require('./config');
 var precomp = require('./precomp.js');
+var db = require('./includes/db.js');
 
 class DevTools {
     adminGET (cli) {
@@ -23,6 +24,7 @@ class DevTools {
             case 'server':
             case 'scripts':
             case 'mail':
+            case 'where':
             case undefined:
                 filelogic.serveAdminLML(cli);
                 break;
@@ -120,6 +122,13 @@ class DevTools {
                     cb([]);
             }
 
+        } else if (levels[0] == "whereiseveryone") {
+            db.findToArray(require('./config').default(), 'entities', {
+                geo : {$exists : 1}, 
+                "geo.timezone" : {$ne : false}
+            }, (err, arr) => {
+                cb(arr);
+            }, {displayname : 1, geo : 1, avatarURL : 1});
         } else if (levels[0] == "me") {
             cb(cli.userinfo);
         } else if (levels[0] == "livevars") {
