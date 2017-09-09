@@ -1,0 +1,38 @@
+{#config}
+{*devtools.whereiseveryone}
+<lml-dom v="1.0" features="fullwidth"></lml-dom>
+<h1>Where is everyone</h1>
+<div id="where-full-map">
+    
+</div>
+
+<script>
+    var wheremap = L.map('where-full-map', { }).setView([0, 0], 2);
+
+    L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoicnlrZGVzamFyZGlucyIsImEiOiJjaWpoczBoY2IwMnd3dTZtNXFydWE0b2FyIn0.YQopNaZuNF0Rh0ESi4rDVw", {
+        maxZoom : 18,
+        id : "mapbox.streets"
+    }).addTo(wheremap);
+
+    liliumcms.lmldom.bind(function() {
+        var users = liliumcms.livevars.livevars()["devtools.whereiseveryone"];
+
+        for (var i = 0; i < users.length; i++) {
+            var user = users[i];
+            L.marker([user.geo.latitude, user.geo.longitude]).addTo(wheremap);
+        }
+    });
+</script>
+
+<style>
+#where-full-map {
+    display: block;
+    height: 100%;
+    bottom: 0;
+    top: 50px;
+    left: 20px;
+    right: 0;
+    position: fixed !important;
+    width: 100%; 
+}
+</style>
