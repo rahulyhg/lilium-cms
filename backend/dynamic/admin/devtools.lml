@@ -87,5 +87,11 @@
                 <b class="devtools-list-item-title">API</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/where" >
+                <i class="devtools-list-item-icon fa fa-globe"></i>
+                <b class="devtools-list-item-title">Where</b>
+            </a>
+        </li>
     </ul>
 </div>
