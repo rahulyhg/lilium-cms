@@ -161,6 +161,9 @@ var HtmlParser = function () {
                     htmlForm += parseClosure(field);
                     break;
                 // LMLDom 0.8+
+                case "markup":
+                    htmlForm += field.attr.markup;
+                    break;
                 case "quill":
                     htmlForm += parseQuillEditor(field);
                     break;

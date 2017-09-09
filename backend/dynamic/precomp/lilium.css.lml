@@ -894,24 +894,6 @@ input[type="submit"].blue:active, .btn.blue:active, button.blue:active {
     opacity: 1;
 }
 
-.lmlform button.red {
-    padding: 6px 10px;
-    background-color: #FF2634;
-    color: #FFF;
-    font-size: 14px;
-    border-radius: 6px;
-    border: none;
-    display: inline-block;
-}
-
-.lmlform button.red:hover {
-    background-color: #FF4654;
-}
-
-.lmlform button.red:active {
-    background-color: #DF0614;
-}
-
 .lmlform input:focus, .lmlform select:focus,
 .lmlform textarea:focus {
 	border: 1px solid {=actioncolor};
