@@ -4,6 +4,7 @@ const configs = require('../config.js');
 const lmllib = require('../lmllib.js');
 const Petals = require('../petal.js');
 const fileserver = require('../fileserver.js');
+const CDN = require('../cdn.js');
 const opChar = '{';
 const clChar = '}';
 
@@ -252,6 +253,10 @@ class LMLSlang {
                 curVal = curVal.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;"); 
             } else if (typeof ctx.consts[curVal] != "undefined"){
                 curVal = ctx.consts[curVal];
+            }
+
+            if (flags["~"]) {
+                curVal = CDN.parseOne(ctx.config, curVal, true);
             }
         } else if (type == "object" && flags["#"]) {
             curVal = JSON.stringify(curVal);
@@ -680,11 +685,12 @@ class LMLCompiler {
 
             let ftc = ctx.s[cPos];
             switch (ftc) {
-                case "=": case "%": case "#": case "*": case ":": 
+                case "=": case "%": case "#": case "*": case ":": case "~":
                     cPos++;
                     while (
                         ctx.s[cPos] == "?" || 
                         ctx.s[cPos] == "&" || 
+                        ctx.s[cPos] == "~" || 
                         ctx.s[cPos] == "%" || 
                         ctx.s[cPos] == "=" || 
                         ctx.s[cPos] == "#" 
