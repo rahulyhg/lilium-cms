@@ -103,14 +103,14 @@ class Plugins {
 
     registerPlugin(identifier, callback) {
         if (this.isRegistered(identifier)) {
-            log('Plugins', new Error("[PluginException] Cannot register already registered plugin with identifier " + identifier));
+            log('Plugins', new Error("[PluginException] Cannot register already registered plugin with identifier " + identifier), 'err');
             callback();
             return;
         } else {
             log('Plugins', 'Registering plugin with identifier ' + identifier);
             this.searchDirForPlugin(identifier,  (info) =>{
                 if (!info) {
-                    log("PluginException", "Could not find any info on plugin with identifier " + identifier);
+                    log("PluginException", "Could not find any info on plugin with identifier " + identifier, 'err');
                     throw new Error("[PluginException] Could not find any info on plugin with identifier " + identifier);
                 }
 
@@ -143,7 +143,7 @@ class Plugins {
                                 });
                             } catch (e) {
                                 log("Plugins", "Error while registering plugin " + identifier + ": " + e.message, 'err');
-                                e.stack && log("Plugins", e.stack);
+                                e.stack && log("Plugins", e.stack, 'err');
                             }
                         }
                     }, true, true);
@@ -191,7 +191,7 @@ class Plugins {
                 throw new Error("[PluginException] Plugin with identifier " + identifier + " has no public iface");
             }
         } else {
-            log('Plugins', new Error("[PluginException] Could not get public iface of unregistered plugin with identifier " + identifier));
+            log('Plugins', new Error("[PluginException] Could not get public iface of unregistered plugin with identifier " + identifier), 'err');
         }
     };
 
