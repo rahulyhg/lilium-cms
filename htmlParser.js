@@ -534,9 +534,9 @@ var HtmlParser = function () {
                 ' class="'+(btn.classes?btn.classes.join(' '):'')+
                 '" name="'+btn.name+
                 '" '+ (btn.callback ? ('onclick="'+btn.callback+'"') : '') +
-                '>'+
+                '>'+(btn.icon ? '<i class="fa '+btn.icon+'"></i>' : "")+'<span>'+
                     (btn.displayname?btn.displayname:btn.name)+
-                '</button>'
+                '</span></button>'
             );
         });
 

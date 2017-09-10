@@ -149,7 +149,7 @@ class Plugins {
                     }, true, true);
                 } catch (ex) {
                     log("Plugins", "Could not register plugin [" + identifier + "] because of an exception : " + ex, 'err');
-                    log("Plugins", ex.stack);
+                    log("Plugins", ex.stack, 'err');
                     callback();
                 }
             });
