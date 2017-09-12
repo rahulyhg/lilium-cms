@@ -17,16 +17,6 @@
         <span>Dispatch status : </span><span id="social-dispatch-status">Unknown</span>
     </div>
 
-    <div class="article-info-strip">
-        <span><b>Schedules</b></span>
-        <div id="social-dispatch-schedules">
-            <i>There are no schedules for this post</i>
-            <div id="social-dispatch-schedule-list">
-
-            </div>
-        </div>
-    </div>
-
     <div class="article-info-strip article-schedule-button-wrapper article-button-wrapper role-editor">
         <button onclick="loadScheduleFacebookDialog();" class="small blue">
             Schedule Facebook post
