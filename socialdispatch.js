@@ -25,13 +25,14 @@ const networkinfo = require('./network/info.js');
 const scheduledTasks = {};
 
 class SocialPost {
-    constructor(message, siteid, postid, pageid, time, status, _id) {
+    constructor(message, siteid, postid, pageid, time, target, status, _id) {
         this.message = message;
         this.siteid = siteid;
         this.postid = db.mongoID(postid);
         this.pageid = db.mongoID(pageid);
         this.status = status || "draft";
         this.time = time ? new Date(time).getTime() : Date.now();
+        this.target = target || [];
         this._id = _id;
     }
 
@@ -139,7 +140,7 @@ class SocialPost {
     }
 
     static buildFromDB(x) {
-        return new SocialPost( x.message, x.siteid, x.postid, x.pageid, x.time, x.status, x._id );
+        return new SocialPost( x.message, x.siteid, x.postid, x.pageid, x.time, x.target, x.status, x._id );
     }
 
     static fetchScheduled(_c, send) {
@@ -169,9 +170,9 @@ class SocialDispatch {
         SocialPost.getSingle(_c, _id, sendback);
     }
 
-    schedule(_c, postid, pageid, message, time, cb) {
+    schedule(_c, postid, pageid, message, time, target = [], cb) {
         log('SDispatch', "Received schedule request on site " + _c.id + " for post " + postid);
-        let sPost = new SocialPost(message, _c.id, postid, pageid, time, "scheduled");
+        let sPost = new SocialPost(message, _c.id, postid, pageid, time, target, "scheduled");
         sPost.insert(() => {
             if (time == "now" || Date.now() > time) {
                 log('SDispatch', "Publishing " + postid + " now since dispatch time is less than current time");
@@ -332,7 +333,7 @@ class SocialDispatch {
             }
 
 
-            this.schedule(cli._c, data.postid, data.pageid, data.message, time, (err, info) => {
+            this.schedule(cli._c, data.postid, data.pageid, data.message, time, data.target, (err, info) => {
                 cli.sendJSON({
                     success : true
                 });
@@ -434,6 +435,29 @@ class SocialDispatch {
         });
     }
 
+    searchForFacebookCity(_c, q, send) {
+        const Q_PARAM = "&q=";
+        const TYPE_PARAM = "&type=adgeolocation";
+        const BASE_REQUEST = GRAPH_API + MIN_GRAPH_VERSION + SEARCH_ENDPOINT + GRAPH_TOKEN;
+        const TOKEN = _c.social.facebook.privtoken;
+
+        request({
+            url : BASE_REQUEST + TOKEN + Q_PARAM + q + TYPE_PARAM,
+            method : "GET",
+            json : true
+        }, (err, resp, d) => {
+            send(d && d.data && d.data.map(x => {
+                return {
+                    displayname : x.name + ", " + (x.region ? (x.region + ", ") : "") + x.country_name,
+                    key : x.key,
+                    regionid : x.region_id,
+                    type : x.type
+                };
+            }));
+        });
+ 
+    }
+
     setup() {
         if (networkinfo.isElderChild()) {
             db.createCollection(config.default(), ACCOUNTS_COLLECTION, () => {});
@@ -475,12 +499,18 @@ class SocialDispatch {
                     next();
                 }
             }, () => {
+                const fbmap = fbdata.filter(x => x.type == "city").map(x => { return { 
+                    displayname : x.name + ", " + x.region + ", " + x.country_name,
+                    key : x.key,
+                    regionid : x.region_id
+                }});
+
                 db.createCollection(config.default(), FBTARGET_COLLECTION, () => {
                     db.createIndex(config.default(), FBTARGET_COLLECTION, {name : "text", country_name : "text", key : 1}, () => {
                         db.remove(config.default(), FBTARGET_COLLECTION, {}, () => {
-                            db.insert(config.default(), FBTARGET_COLLECTION, fbdata, () => {
-                                sharedcache.set({["fbcitykeys"] : fbdata}, () => {
-                                    log('SDispatch', `Stored ${fbdata.length} geolocation Facebook keys`, 'lilium');
+                            db.insert(config.default(), FBTARGET_COLLECTION, fbmap, () => {
+                                sharedcache.set({["fbcitykeys"] : fbmap}, () => {
+                                    log('SDispatch', `Stored ${fbmap.length} geolocation Facebook keys`, 'lilium');
                                 });               
                             });               
                         });               
