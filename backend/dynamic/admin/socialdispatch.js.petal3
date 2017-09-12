@@ -3,6 +3,8 @@ const modalNewDispatchName = "lml-modal-new-dispatch";
 
 const compile = (o, context) => { o(`
 <script>
+    window.fbtargetkv = {};
+
     var statusLabelVocab = {
         "scheduled" : "scheduled",
         "published" : "live on Facebook"
@@ -63,6 +65,34 @@ const compile = (o, context) => { o(`
         }
     }
 
+    var facebookTargetSearch = function(q, send) {
+        liliumcms.lmldom.get("https://graph.facebook.com/v${context._c.social.facebook.apiversion}/search?access_token=${context._c.social.facebook.token}&type=adgeolocation&q=" + q, {
+            spinflower : true,
+            json : true
+        }, function(json) {
+            if (json && json.data) {
+                var f = [];
+                for (var i = 0; i < json.data.length; i++) {
+                    var x = json.data[i];
+                    var y = {
+                        displayname : x.name + ", " + (x.region ? (x.region + ", ") : "") + x.country_name,
+                        name : x.name,
+                        key : x.key,
+                        regionid : x.region_id,
+                        type : x.type
+                    };
+
+                    f.push(y);
+                    window.fbtargetkv[y.key] = y;
+                }
+
+                send(f);
+            } else {
+                send();
+            }
+        });
+    }
+
     var handleClick = function(event) {
         liliumcms.lmldom.get("${context._c.server.url}/admin/socialdispatch/deepFetch/" + event.id + "?async=true", { 
             spinflower : true,
@@ -109,11 +139,19 @@ const compile = (o, context) => { o(`
             return liliumcms.notify({type : "danger", title : "Date cannot be set to a past date.", message : "Double-check the date and time!"});
         }
 
+        var target = [];
+        var telems = document.querySelectorAll('#facebook-target-selections > div');
+
+        for (var i = 0; i < telems.length; i++) {
+            target.push(window.fbtargetkv[telems[i].dataset.key]);
+        }
+
         liliumcms.lmldom.sendForm({
             pageid : params.npageid,
             postid : params.npostid,
             message : params.ncaption,
-            time : params.ndatetime.getTime()
+            time : params.ndatetime.getTime(),
+            target : target
         }, "${context._c.server.url}/admin/socialdispatch/schedule", function() {
             modal.dismiss();
             calendar.fetch(function() {
@@ -147,6 +185,51 @@ const compile = (o, context) => { o(`
             }, true);
         });
     };
+
+    var addSearchTarget = function(fbtarget) {
+        var elem = d.make({
+            text : fbtarget.name + ", " + fbtarget.type,
+            class : "fbtarget-" + fbtarget.type
+        });
+
+        d.id('facebook-target-selections').born(elem);
+        elem.get().dataset.key = fbtarget.key;
+        elem.bind('click', function() {
+            elem.get().remove();
+        });
+    };
+
+    var tsTimeout;
+    var maybeSearchTarget = function(q) {
+        if (!q.trim()) { return; }
+        if (tsTimeout) { clearTimeout(tsTimeout); }
+
+        tsTimeout = setTimeout(function() {
+            tsTimeout = undefined;
+
+            facebookTargetSearch(q, function(results) {
+                var wrap = d.id('facebook-target-search-result');
+                var wrapEl = wrap.get();
+                while (wrapEl.firstElementChild) {
+                    wrapEl.firstElementChild.remove();
+                }
+
+                for (var i = 0; i < results.length; i++) {
+                    var resEl = d.make({
+                        html : results[i].displayname + ' <i class="type-'+results[i].type+'">'+results[i].type+"</i>",
+                        parent : wrap
+                    });
+
+                    (function(el, result) {
+                        el.bind('click', function() {
+                            addSearchTarget(result);
+                            el.get().remove();
+                        });
+                    })(resEl, results[i]);
+                }
+            });
+        }, 500);
+    }
 </script>
 
 <div id="${modalNewDispatchName}" class="lml-modal">
@@ -179,6 +262,17 @@ const compile = (o, context) => { o(`
                 </div>
             </div>
         </div>
+
+        <div class="lml-modal-field">
+            <label>Who should see this post?</label>
+            <div>
+                <input id="facebook-target-search-box" placeholder="Search for a city or region..." />
+                <div id="facebook-target-selections"></div>
+                <div id="facebook-target-search-result">
+
+                </div>
+            </div>
+        </div>
     </div>
     <div class="lml-modal-footer">
         <button class="lml-modal-cancel btn-default" type="button">Dismiss</button>
@@ -194,7 +288,7 @@ const compile = (o, context) => { o(`
         <div style="margin: 0px -15px 0px -15px;">
             <img id="edit-event-image" />
         </div>
-        <h2 id="edit-event-title"></h2>
+        <div id="edit-event-title"></div>
         <div class="edit-event-details">
             <div>
                 <span id="edit-event-subtitle"></span>
@@ -223,6 +317,10 @@ const compile = (o, context) => { o(`
 <script>
 document.getElementById("new-dispatch-search").addEventListener('keyup', function(ev) {
     maybeSearchDispatchPost(ev.target.value);
+});
+
+document.getElementById("facebook-target-search-box").addEventListener('keyup', function(ev) {
+    maybeSearchTarget(ev.target.value);
 });
 </script>
 
@@ -334,6 +432,46 @@ h1 > a.fab {
     top: 66px;
     cursor: pointer;
 }
+
+#facebook-target-search-result {
+    height: 200px;
+    overflow-y: scroll;
+    border: 1px solid #DDD;
+}
+
+#facebook-target-search-result > div {
+    padding: 8px;
+    border-bottom: 1px solid #DDD;
+    cursor: pointer;
+}
+
+#facebook-target-selections > div {
+    display: inline-block;
+    background: #af57e4;
+    color: #FFF;
+    padding: 2px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-size: 12px;
+    margin: 0px 5px 5px 0px;
+    cursor: crosshair;
+}
+
+#facebook-target-search-result i {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 2px 4px 1px;
+    border-radius: 3px;
+    background: #333;
+    color: #FFF;
+    font-size: 12px;
+    text-transform: uppercase;
+    font-style: normal;
+}
+
+#facebook-target-search-result i.type-country, #facebook-target-selections > div.fbtarget-country { background: #b53c3c; }
+#facebook-target-search-result i.type-region, #facebook-target-selections > div.fbtarget-region { background: #73b53c; }
+#facebook-target-search-result i.type-city, #facebook-target-selections > div.fbtarget-city { background: #3cb5a7; }
 </style>
 `);};
 
