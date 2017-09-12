@@ -359,7 +359,7 @@ var DB = function() {
 			} else if (typeof docs !== "object") {
 				cb("[Database - Invalid document]");
 			} else {
-				col[Array.isArray(docs) ? "insertMany" : "insertOne"](docs, cb);
+                Array.isArray(docs) ? docs.length ? col.insertMany(docs, cb) : cb(new Error("Tried to insert empty array")) : col.insertOne(docs, cb);
 			}
 		});
 	};
