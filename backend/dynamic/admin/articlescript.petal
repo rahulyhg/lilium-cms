@@ -305,7 +305,6 @@
 
             if (resp.status == "published") {
                 document.querySelector('.article-delete-button-wrapper').style.display = "";
-                document.querySelector('.article-schedule-button-wrapper').style.display = "";
             } else if (resp.status == "autosaved") {
                 document.querySelector('.article-destroyautosave-button-wrapper').style.display = "";
             } else {
@@ -565,41 +564,6 @@
             }
         });
     }
-
-    window["dlg-facebook-schedule_accept"] = function(modal) {
-        var dat = modal.getFormData();
-        if (dat.pageid && dat.postcaption && dat.postdate) {
-            var time = dat.postdate.getTime();
-            if (time < new Date().getTime()) {
-                modal.dismiss();
-                return liliumcms.notify({type : "danger", title : "Date cannot be set to a past date.", message : "Double-check the date and time!"});
-            }
-
-            liliumcms.lmldom.sendForm(
-                {
-                    postid : contentid,
-                    pageid : dat.pageid,
-                    message : dat.postcaption,
-                    time : time
-                },
-                "{=config.default.server.url}/admin/socialdispatch/schedule",
-            function(resp) {
-                updateBottomSection();
-                liliumcms.notify({
-                    type : "log",
-                    title : "Facebook Graph",
-                    message : "Your publication request is being processed."
-                });
-            });
-
-            modal.dismiss();
-        } else {
-        }
-    }
-
-    var loadScheduleFacebookDialog = function() {
-        liliumcms.modals.get("dlg-facebook-schedule").cast();
-    };
 </script>
 
 <div id="confirm-publish" class="modal fade announcement" tabindex="-1" role="dialog">
