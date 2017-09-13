@@ -187,6 +187,9 @@ var Settings = function () {
             .add('analytics.jsonkeypath', 'text', {
                 displayname: "JSON key file root path"
             })
+            .add('analytics.accountid', 'text', {
+                displayname: "Account ID"
+            })
             .add('analytics.siteviewid', 'text', {
                 displayname: "Site view ID"
             })
