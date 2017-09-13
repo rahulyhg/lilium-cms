@@ -83,18 +83,32 @@ class Amp {
 
         for (let i = images.length - 1; i >= 0; i--) {
             const x = images[i];
-            if (x.src && x.src.includes('cdninstagram')) {
-                const ampimg = dom.window.document.createElement("amp-img");
-                ampimg.setAttribute('src', cdn.parseOne(cli._c, cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src));
-                ampimg.setAttribute('width', 640);
-                ampimg.setAttribute('height', 640);
-                ampimg.setAttribute('layout', "responsive");
+            const ampimg = dom.window.document.createElement("amp-img");
 
+            if (x.src && x.src.includes('cdninstagram')) {
+                ampimg.setAttribute('src', cdn.parseOne(cli._c, cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src));
+            } else if (x.src && x.src.includes('uploads')) { 
+                let source = x.src;
+                if (source.startsWith('//')) {
+                    source = cli._c.server.protocol + source;
+                }
+
+                ampimg.setAttribute('src', cdn.parseOne(cli._c, source));
+            }
+
+            ampimg.setAttribute('width', x.width || 640);
+            ampimg.setAttribute('height', x.height || 640);
+            ampimg.setAttribute('layout', "responsive");
+
+            try {
+                dom.window.document.body.insertBefore(ampimg, x.parentElement);
+            } catch (ex) {
                 try {
-                    dom.window.document.body.insertBefore(ampimg, x.parentElement);
-                    x.remove();
+                    dom.window.document.body.insertBefore(ampimg, x.parentElement.parentElement);
                 } catch (ex) {}
             }
+
+            x.remove();
         }
 
         const scripts = dom.window.document.querySelectorAll('script');
@@ -124,8 +138,14 @@ class Amp {
             }
         }
 
+        // Slow
+        const styled = dom.window.document.querySelectorAll("[style]");
+        for (let i = 0; i < styled.length; i++) {
+            styled[i].removeAttribute('style');
+        }
+
         cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
-            articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '');
+            articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
 
             cb(undefined, articleContent);
         });
