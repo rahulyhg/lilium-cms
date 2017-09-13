@@ -10,22 +10,6 @@
 <div id="editor"></div>
 <div class="col-md-12 article-more-info-wrapper">
 	<fieldset class="title">
-	    <legend>Social Dispatch</legend>
-	</fieldset>
-
-    <div class="article-info-strip">
-        <span>Dispatch status : </span><span id="social-dispatch-status">Unknown</span>
-    </div>
-
-    <div class="article-info-strip article-schedule-button-wrapper article-button-wrapper role-editor">
-        <button onclick="loadScheduleFacebookDialog();" class="small blue">
-            Schedule Facebook post
-        </button>
-    </div>
-
-
-
-	<fieldset class="title">
 	    <legend>More Informations</legend>
 	</fieldset>
 
