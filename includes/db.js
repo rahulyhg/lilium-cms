@@ -311,7 +311,9 @@ var DB = function() {
 						}
 					).then(function(r) {
 						cb && cb(undefined, r);
-					});
+					}).catch(function(err) {
+                        cb && cb(err);
+                    });
 				}
 			}
 		});
