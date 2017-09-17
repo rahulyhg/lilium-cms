@@ -4,12 +4,12 @@ const db = require('./includes/db');
 const retext = require('retext');
 const rtDiact = require('retext-diacritics');
 const rtRepea = require('retext-repeated-words');
+const rtSpell = require('retext-spell');
 
 /*
 const rtIndef = require('retext-indefinite-article');
 const rtContr = require('retext-contractions');
 const rtRedun = require('retext-redundant-acronyms');
-const rtSpell = require('retext-spell');
 const rtMenti = require('retext-syntax-mentions');
 const rtSenti = require('retext-sentiment')
 */
