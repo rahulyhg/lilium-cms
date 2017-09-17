@@ -449,7 +449,7 @@
             var d = document.createElement('div')
             d.innerHTML = CKEDITOR.instances.content.getData();
             
-            var text = d.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').trim();
+            var text = d.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').replace(/https?:\/\/[a-zA-Z0-9.\/]+/g, ' ').trim();
             liliumcms.modals.get("article-packaging").cast();
         };
 
