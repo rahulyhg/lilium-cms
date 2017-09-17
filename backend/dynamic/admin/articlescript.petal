@@ -445,11 +445,19 @@
             });
         });
 
+        var showPackaging = function() {
+            var d = document.createElement('div')
+            d.innerHTML = CKEDITOR.instances.content.getData();
+            
+            var text = d.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').trim();
+            liliumcms.modals.get("article-packaging").cast();
+        };
+
         $('form button[name=publish]').on('click', function(e) {
             if (isPublished) {
                 publishCurrentArticle();
             } else {
-                liliumcms.modals.get("article-packaging").cast();
+                showPackaging();
             }
 
             return false;
