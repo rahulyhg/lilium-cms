@@ -292,7 +292,7 @@ class Article {
         const lang = cli.postdata.data.lang;
 
         Proofreader.proofread(content, lang, report => {
-            
+            cli.sendJSON(report);
         });
     }
 
