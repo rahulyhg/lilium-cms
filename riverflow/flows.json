@@ -21,6 +21,10 @@
             "endpoint" : "login",
             "support" : ["api_get", "api_post"]
         }, {
+            "module" : "proofreader.js",
+            "endpoint" : "proofread",
+            "support" : ["setup"]
+        }, {
             "module" : "search.js",
             "endpoint" : "search",
             "support" : ["livevar", "setup"]
