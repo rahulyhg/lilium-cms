@@ -106,6 +106,7 @@
     "retext-indefinite-article": "^1.1.2",
     "retext-redundant-acronyms": "^1.2.1",
     "retext-repeated-words": "^1.2.1",
+    "retext-sentiment": "^4.1.0",
     "retext-spell": "^2.3.1",
     "retext-syntax-mentions": "^1.1.4",
     "sendgrid": "latest",

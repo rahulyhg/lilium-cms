@@ -56,48 +56,20 @@ class Article {
     adminPOST(cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
-            case 'new':
-                if (cli.hasRightOrRefuse("create-articles")) this.create(cli);
-                break;
-            case 'edit':
-                if (cli.hasRightOrRefuse("publish-articles")) this.publish(cli, "create");
-                break;
-            case 'delete':
-                if (cli.hasRightOrRefuse("publish-articles")) this.delete(cli);
-                break;
-            case 'delete-autosave':
-                if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli);
-                break;
-            case 'autosave':
-                if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true);
-                break;
-            case 'save':
-                if (cli.hasRightOrRefuse("create-articles")) this.save(cli);
-                break;
-            case 'sendforreview':
-                if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli);
-                break;
-            case 'refusereview':
-                if (cli.hasRightOrRefuse("production")) this.refuseReview(cli);
-                break;
-            case 'preview':
-                if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview");
-                break;
-            case 'destroy':
-                if (cli.hasRightOrRefuse("destroy-articles")) this.delete(cli, true);
-                break;
-            case 'addfeature':
-                if (cli.hasRightOrRefuse("create-articles")) this.addFeature(cli);
-                break;
-            case 'editslug':
-                if (cli.hasRightOrRefuse("create-articles")) this.editSlug(cli);
-                break;
-            case 'removealias':
-                if (cli.hasRightOrRefuse("publish-articles")) this.maybeRemoveAlias(cli);
-                break;
-            default:
-                return cli.throwHTTP(404, 'Not Found');
-                break;
+            case 'new': if (cli.hasRightOrRefuse("create-articles")) this.create(cli); break;
+            case 'edit': if (cli.hasRightOrRefuse("publish-articles")) this.publish(cli, "create"); break;
+            case 'delete': if (cli.hasRightOrRefuse("publish-articles")) this.delete(cli); break;
+            case 'delete-autosave': if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli); break;
+            case 'autosave': if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true); break;
+            case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
+            case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
+            case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
+            case 'preview': if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview"); break;
+            case 'destroy': if (cli.hasRightOrRefuse("destroy-articles")) this.delete(cli, true); break;
+            case 'addfeature': if (cli.hasRightOrRefuse("create-articles")) this.addFeature(cli); break;
+            case 'editslug': if (cli.hasRightOrRefuse("create-articles")) this.editSlug(cli); break;
+            case 'removealias': if (cli.hasRightOrRefuse("publish-articles")) this.maybeRemoveAlias(cli); break;
+            default: return cli.throwHTTP(404, 'Not Found');
         }
     };
 
@@ -135,6 +107,9 @@ class Article {
                     break;
                 case 'list':
                     this.list(cli);
+                    break;
+                case 'proofread':
+                    this.proofread(cli);
                     break;
                 case 'infostrip':
                     this.infoStrip(cli);
@@ -312,6 +287,11 @@ class Article {
     list(cli) {
         filelogic.serveAdminLML(cli, false);
     };
+
+    proofread(cli) {
+        const Proofreader = require('./proofreader');
+        Proofreader;
+    }
 
     infoStrip(cli) {
         db.findToArray(cli._c, 'content', {_id : db.mongoID(cli.routeinfo.path[3])}, (err, arr)  => {

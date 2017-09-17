@@ -92,7 +92,9 @@
     </div>    
 
     <div>
-        
+        <strong>Proofreading</strong>
+
+        <div id="proofread"></div>
     </div>
 
     <div class="lml-modal-footer">
