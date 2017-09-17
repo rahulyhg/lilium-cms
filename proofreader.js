@@ -1,12 +1,22 @@
 const log = require('./log');
 const db = require('./includes/db');
+const config = require('./config');
 
-const retext = require('retext');
+const networkinfo = require('./network/info');
+const fileserver = require('./fileserver');
+const sharedcache = require('./sharedcache');
+
+// Retext plugins
+const retext  = require('retext');
 const rtDiact = require('retext-diacritics');
 const rtRepea = require('retext-repeated-words');
 const rtSpell = require('retext-spell');
+const rtKeywd = require('retext-keywords');
+const rtOveru = require('retext-overuse');
 
 /*
+Unused Retext plugins
+
 const rtIndef = require('retext-indefinite-article');
 const rtContr = require('retext-contractions');
 const rtRedun = require('retext-redundant-acronyms');
@@ -14,22 +24,69 @@ const rtMenti = require('retext-syntax-mentions');
 const rtSenti = require('retext-sentiment')
 */
 
-const dico = {
+const DICTIONARIES = {
     en : require('dictionary-en-ca'),
     fr : require('dictionary-fr')
 };
 
+const createRetext = (dico, pdico) => {
+    return retext().use(rtSpell, {
+            dictionary : dico,
+            normalizeApostrophes : false,
+            personal : pdico
+        })
+        .use(rtDiact)
+        .use(rtKeywd)
+        .use(rtOveru)
+        .use(rtRepea);
+};
+
+const DICT_PATH = "dictionary";
+
 class Proofreader {
+    static getRetext(lang, send) {
+        sharedcache.get(DICT_PATH + "_" + lang, pDico => {
+            send(createRetext(DICTIONARIES[lang], pDico || ""));
+        });
+    }
+
     proofread(text, lang = "en", send) {
         const now = Date.now();
-        retext().use(rtSpell, dico[lang])
-            .use(rtDiact)
-            .use(rtRepea)
-            .process(text, (err, report) => {
+        Proofreader.getRetext(lang, rtx => {
+            rtx.process(text, (err, report) => {
                 log('Proofread', 'Corrected ' + text.length + ' characters in ' + (Date.now() - now) + " ms", 'success');
                 send(report);
-            }
-        );
+            });
+        });
+    }
+
+    addWord(word, lang, done) {
+        fileserver.readFile(config.default().server.base + DICT_PATH + "/" + lang, content => {
+            content += "\n" + word;
+            sharedcache.set({[DICT_PATH + "_" + lang] : content}, () => {
+                fileserver.appendToFile(config.default().server.base + DICT_PATH + "/" + lang, "\n" + word, done);
+            }); 
+        }, false, 'utf8');
+    }
+
+    loadDict() {
+        fileserver.listDirContent(config.default().server.base + DICT_PATH, (files) => {
+            files.forEach(file => {
+                fileserver.readFile(config.default().server.base + DICT_PATH + "/" + file, x => {
+                    shareedcache.set({
+                        [DICT_PATH + "_" + file] : x
+                    }, () => {});
+                }, false, 'utf8');
+            });
+        });
+    }
+
+    setup() {
+        if (networkinfo.isElderChild()) {
+            fileserver.createDirIfNotExists(config.default().server.base + DICT_PATH, () => {
+                this.loadDict();
+            }, true);
+        }
     }
 }
 
