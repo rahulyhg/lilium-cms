@@ -62,6 +62,7 @@ class Article {
             case 'delete-autosave': if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli); break;
             case 'autosave': if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true); break;
             case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
+            case 'proofread': if (cli.hasRightOrRefuse("create-articles")) this.proofread(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
             case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
             case 'preview': if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview"); break;
@@ -107,9 +108,6 @@ class Article {
                     break;
                 case 'list':
                     this.list(cli);
-                    break;
-                case 'proofread':
-                    this.proofread(cli);
                     break;
                 case 'infostrip':
                     this.infoStrip(cli);
@@ -290,7 +288,12 @@ class Article {
 
     proofread(cli) {
         const Proofreader = require('./proofreader');
-        Proofreader;
+        const content = cli.postdata.data.content;
+        const lang = cli.postdata.data.lang;
+
+        Proofreader.proofread(content, lang, report => {
+            
+        });
     }
 
     infoStrip(cli) {
