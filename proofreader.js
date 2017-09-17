@@ -12,11 +12,11 @@ const rtDiact = require('retext-diacritics');
 const rtRepea = require('retext-repeated-words');
 const rtSpell = require('retext-spell');
 const rtKeywd = require('retext-keywords');
-const rtOveru = require('retext-overuse');
 
 /*
 Unused Retext plugins
 
+const rtOveru = require('retext-overuse');
 const rtIndef = require('retext-indefinite-article');
 const rtContr = require('retext-contractions');
 const rtRedun = require('retext-redundant-acronyms');
@@ -29,15 +29,16 @@ const DICTIONARIES = {
     fr : require('dictionary-fr')
 };
 
-const createRetext = (dico, pdico) => {
-    return retext().use(rtSpell, {
+const createRetext = (dico, pdico = "") => {
+    // const ignore = pdico.split('\n');
+    return retext()
+        .use(rtSpell, {
             dictionary : dico,
             normalizeApostrophes : false,
             personal : pdico
         })
         .use(rtDiact)
         .use(rtKeywd)
-        .use(rtOveru)
         .use(rtRepea);
 };
 
@@ -73,7 +74,7 @@ class Proofreader {
         fileserver.listDirContent(config.default().server.base + DICT_PATH, (files) => {
             files.forEach(file => {
                 fileserver.readFile(config.default().server.base + DICT_PATH + "/" + file, x => {
-                    shareedcache.set({
+                    sharedcache.set({
                         [DICT_PATH + "_" + file] : x
                     }, () => {});
                 }, false, 'utf8');

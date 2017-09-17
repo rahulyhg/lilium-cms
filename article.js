@@ -292,7 +292,10 @@ class Article {
         const lang = cli.postdata.data.lang;
 
         Proofreader.proofread(content, lang, report => {
-            cli.sendJSON(report && { corrections : report.messages.map(x => { return { reason : x.message, at : x.column, suggestions : x.expected,  } }) } );
+            cli.sendJSON(report && { 
+                corrections : report.messages.map(x => { return { reason : x.message, at : x.column, suggestions : x.expected,  } }),
+                keywords : report.data.keywords
+            });
         });
     }
 
