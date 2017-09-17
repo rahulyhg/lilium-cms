@@ -450,6 +450,12 @@
             d.innerHTML = CKEDITOR.instances.content.getData();
             
             var text = d.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').replace(/https?:\/\/[a-zA-Z0-9.\/]+/g, ' ').trim();
+
+            liliumcms.lmldom.post({ content : text }, '{=config.default.server.url}/admin/article/proofread', function(resp) {
+                var corrections = resp.corrections;
+                console.log(corrections);
+            });
+
             liliumcms.modals.get("article-packaging").cast();
         };
 

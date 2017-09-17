@@ -330,6 +330,15 @@ class FileServer {
         });
     };
 
+    appendToFile(filename, text, callback) {
+        const handle = fs.createWriteStream(filename, { defaultEncoding : 'utf8', flags : "a+", mode : '0644' });
+        handle.write(text, 'utf8', () => {
+            handle.close();
+            handle.destroy();
+            callback && callback();
+        });
+    }
+
     dumpToFile (filename, content, callback, encoding) {
         const handle = fs.createWriteStream(filename, {
             flags: 'w+',
