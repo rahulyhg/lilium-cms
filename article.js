@@ -1614,16 +1614,7 @@ class Article {
                 fieldWrapper : "lmlform-fieldwrapper"
             })
             .addTemplate('article_base')
-            .addTemplate('media-explorer')
-            .edit('media', undefined, {
-                wrapper: {
-                    'class': 'col-md-4'
-                }
-            })
             .add('topic', 'treeselect', {
-                wrapper: {
-                    'class': 'col-md-4'
-                },
                 endpoint: 'topics.all',
                 select: {
                     'value': '_id',
@@ -1632,31 +1623,8 @@ class Article {
                 },
                 displayname: "Topic"
             })
-            .add('tags', 'tags', {
-                displayname: 'Tags',
-                wrapper: {
-                    'class': 'col-md-4'
-                }
-            })
             .trigger('fields')
-            .add('title-featuredimage', 'title', {
-                displayname : "Featured image information"
-            })
-            .add('featuredimageartist', 'text', {
-                displayname : "Artist name"
-            })
-            .add('featuredimagelink', 'text', {
-                displayname : "Artist link"
-            })
-/*            .add('title-postleaf', 'title', {
-                displayname : "Interactive features"
-            })
-            .trigger('postleaf')
-            .add('title-persona', 'title', {
-                displayname : "Persona targeting"
-            })
-            .trigger('persona')
-*/          .add('title-geolocation', 'title', {
+            .add('title-geolocation', 'title', {
                 displayname : "Geolocalisation"
             })
             .add('geolocation', 'map', {
@@ -1719,20 +1687,10 @@ class Article {
                     'type' : 'button',
                     'classes': ['btn-save']
                 }, {
-                    'name' : 'preview',
-                    'displayname': 'Preview',
-                    'type' : 'button',
-                    'classes': ['btn-preview']
-                }, {
                     'name' : 'publish', 
-                    'displayname': 'Save and <b>Publish</b>',
+                    'displayname': 'Package and finalize',
                     'type' : 'button',
-                    'classes': ['btn-publish', 'role-author']
-                }, {
-                    'name' : 'send',
-                    'displayname' : 'Send for review',
-                    'type' : 'button',
-                    'classes': ["btn-send-for-review", "role-contributor"]
+                    'classes': ['btn-publish']
                 }, {
                     'name' : 'refuse',
                     'displayname' : 'Refuse review',
