@@ -1,4 +1,4 @@
-{#config;postleaf}
+{#config;postleaf;theme}
 <script>
     var isAutoSave = false;
     var timer;
@@ -35,6 +35,21 @@
                 } else {
                     contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
                 }
+
+                if (content.media) {
+                    imgtag.value = content.media;
+                    liliumcms.livevars.getSingleLivevar('uploads.single.' + content.media, {}, function(resp) {
+                        try {
+                            imgtag.src = resp.livevars["uploads.single." + content.media].sizes[
+                                "{=?theme.info.featuredimage.sizename}" || "featured"
+                            ].url;
+                        } catch (ex) {
+                            log('Content', 'Could not set featured image with id ' + content.media, 'err');
+                        }
+                    });
+                }
+
+                
 
                 if (isPublished) {
                     $('.article_base_title').bind('keyup', function(e) {
@@ -425,7 +440,7 @@
             return false;
         });
 
-        $('form button[name=preview]').on('click', function(e) {
+        $('.btn-preview').on('click', function(e) {
             // Open in new tab
             var btn = this;
             var textinside = btn.innerHTML;
@@ -582,6 +597,16 @@
             }
         });
     }
+
+    var imgtag = document.getElementById('featured-image-tag');
+    liliumcms.imagepicker.bind(imgtag, function(payload) {
+        if (payload && payload.sizes) {
+            imgtag.src = payload.sizes["{=?theme.info.featuredimage.sizename}" || "featured"].url;
+        }
+    }, {withcredit : true});
+
+    imgtag.style.width = 0{=?theme.info.featuredimage.size.0} || 640;
+    imgtag.style.height = 0{=?theme.info.featuredimage.size.1} || 480;
 </script>
 
 <div id="confirm-publish" class="modal fade announcement" tabindex="-1" role="dialog">
