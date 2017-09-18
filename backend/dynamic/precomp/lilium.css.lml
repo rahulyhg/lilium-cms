@@ -864,6 +864,15 @@ input[type="submit"].blue:active, .btn.blue:active, button.blue:active {
     background-color: #236aa7;
 }
 
+input[type="submit"].green, .btn.green, button.green { 
+    background-color: #3bbf1b;
+    border-color: #30962f;
+}
+
+input[type="submit"].green:active, .btn.green:active, button.green:active {
+    background-color: #2d9015;
+}
+
 .lmlform .async-form-check-icon {
     font-size: 32px;
     vertical-align: middle;
