@@ -166,16 +166,19 @@ class FileLogic {
                         cli.throwHTTP(404);
                     } else {
                         FileServer.createDirIfNotExists(savePath, () => {
-                            let output = FileServer.getOutputFileHandle(savePath);
-                            extra = extra || {};
-                            extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
-                            extra.config = cli._c;
-        
-                            const now = new Date();
-                            log('LML2', "Compiling file from " + readPath, 'info');
-                            LML2.compile(cli._c.id, content, output, extra, () => {
-                                FileServer.pipeFileToClient(cli, savePath, () => {
-                                    log('FileLogic', 'Admin page generated and served in ' + (new Date - now) + "ms", 'success');
+                            require("./themes").fetchCurrentTheme(cli._c, cTheme => {
+                                let output = FileServer.getOutputFileHandle(savePath);
+                                extra = extra || {};
+                                extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
+                                extra.config = cli._c;
+                                extra.theme = cTheme;
+            
+                                const now = new Date();
+                                log('LML2', "Compiling file from " + readPath, 'info');
+                                LML2.compile(cli._c.id, content, output, extra, () => {
+                                    FileServer.pipeFileToClient(cli, savePath, () => {
+                                        log('FileLogic', 'Admin page generated and served in ' + (new Date - now) + "ms", 'success');
+                                    });
                                 });
                             });
                         });
