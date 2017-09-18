@@ -109,6 +109,7 @@ var templateBuilder = function () {
                     return {
                         render: renderBlock,
                         settings: context.extra.theme.settings,
+                        info : context.extra.theme,
                         snip : rendersnip,
                         getQueueTags : function() {return getQueueTags(gconf);}
                     };
