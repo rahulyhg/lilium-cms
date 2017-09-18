@@ -14,14 +14,14 @@ const rtSpell = require('retext-spell');
 const rtKeywd = require('retext-keywords');
 
 /*
-Unused Retext plugins
+    Unused Retext plugins
 
-const rtOveru = require('retext-overuse');
-const rtIndef = require('retext-indefinite-article');
-const rtContr = require('retext-contractions');
-const rtRedun = require('retext-redundant-acronyms');
-const rtMenti = require('retext-syntax-mentions');
-const rtSenti = require('retext-sentiment')
+    const rtOveru = require('retext-overuse');
+    const rtIndef = require('retext-indefinite-article');
+    const rtContr = require('retext-contractions');
+    const rtRedun = require('retext-redundant-acronyms');
+    const rtMenti = require('retext-syntax-mentions');
+    const rtSenti = require('retext-sentiment')
 */
 
 const DICTIONARIES = {
