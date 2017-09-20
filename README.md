@@ -90,6 +90,9 @@ server {
 }
 ```
 
+## Production version ##
+4.1.0
+
 ## Founder ##
 * Erik Desjardins
 
