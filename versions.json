@@ -81,5 +81,10 @@
         "codename" : "Exo",
         "script" : "1.4.0.js",
         "features" : ["Data Reader"]
+    },
+    "1.4.1": {
+        "codename" : "Equinox",
+        "script" : "1.4.1.js",
+        "features" : ["Packaging"]
     }
 }
