@@ -475,12 +475,7 @@
         };
 
         $('form button[name=publish]').on('click', function(e) {
-            if (isPublished) {
-                publishCurrentArticle();
-            } else {
-                showPackaging();
-            }
-
+            showPackaging();
             return false;
         });
 
