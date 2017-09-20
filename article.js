@@ -1683,7 +1683,7 @@ class Article {
             })
             .add('publish-set', 'buttonset', { buttons : [{
                     'name' : 'save',
-                    'displayname': 'Save article',
+                    'displayname': 'Save changes',
                     'type' : 'button',
                     'classes': ['btn-save']
                 }, {
