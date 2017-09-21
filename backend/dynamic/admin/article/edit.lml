@@ -35,6 +35,9 @@
         <div class="article-info-strip modcount-info-strip">
             <span>Modification count : </span><span id="moreinfo-modcount">0</span>
         </div>
+        <div class="article-info-strip modcount-info-strip">
+            <span>Registered shares : </span><span id="moreinfo-registered-shares">0</span>
+        </div>
 
         <hr />
 

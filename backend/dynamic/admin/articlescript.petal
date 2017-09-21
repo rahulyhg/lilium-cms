@@ -241,6 +241,7 @@
             document.getElementById('moreinfo-status').textContent = resp["status"];
             document.getElementById('moreinfo-status').className = "article-status-" + resp.status;
             document.getElementById("moreinfo-modcount").textContent = resp.modifications;
+            document.getElementById('moreinfo-registered-shares').textContent = resp.shares;
 
             isPublished = resp.status == "published";
 

@@ -327,6 +327,7 @@ class Article {
                                         "This article doesn't have a URL.",
                                     siteurl : cli._c.server.url,
                                     name : art.name,
+                                    shares : art.shares,
                                     aliases : art.aliases ? Array.from(new Set(art.aliases)) : [],
                                     updated : art.updated || "This article was never updated",
                                     author : autarr[0] ? autarr[0].displayname : "This article doesn't have an author",
