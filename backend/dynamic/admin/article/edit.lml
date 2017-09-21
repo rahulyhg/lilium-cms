@@ -8,57 +8,59 @@
 {=forms.render('post_create',"edit","content/?")}
 
 <div id="editor"></div>
-<div class="col-md-12 article-more-info-wrapper">
-	<fieldset class="title">
-	    <legend>More Informations</legend>
-	</fieldset>
+<div class="article-more-info-wrapper">
+    <div class="article-more-info-container">
+        <h3>Current state</h3>
 
-	<div class="article-info-strip">
-		<span>Status : </span><span id="moreinfo-status"></span>
-	</div>
-	<div class="article-info-strip">
-		<span>URL : </span><span id="moreinfo-url"></span>
-        <span id="article-edit-slug-button">
-            <i class="fa fa-pencil" aria-hidden="true"></i>
-        </span>
-	</div>
-	<div class="article-info-strip">
-		<span>Alias : </span><span id="moreinfo-alias"></span>
-	</div>
-	<div class="article-info-strip">
-		<span>Last Updated : </span><span id="moreinfo-updated"></span>
-	</div>
-	<div class="article-info-strip">
-		<span>Author : </span><span id="moreinfo-author"></span>
-	</div>
-	<div class="article-info-strip modcount-info-strip">
-		<span>Modification count : </span><span id="moreinfo-modcount">0</span>
-	</div>
+        <hr />
 
+        <div class="article-info-strip">
+            <span>Status : </span><span id="moreinfo-status"></span>
+        </div>
+        <div class="article-info-strip">
+            <span>URL : </span><span id="moreinfo-url"></span>
+            <span id="article-edit-slug-button">
+                <i class="fa fa-pencil" aria-hidden="true"></i>
+            </span>
+        </div>
+        <div class="article-info-strip">
+            <span>Alias : </span><span id="moreinfo-alias"></span>
+        </div>
+        <div class="article-info-strip">
+            <span>Last Updated : </span><span id="moreinfo-updated"></span>
+        </div>
+        <div class="article-info-strip">
+            <span>Author : </span><span id="moreinfo-author"></span>
+        </div>
+        <div class="article-info-strip modcount-info-strip">
+            <span>Modification count : </span><span id="moreinfo-modcount">0</span>
+        </div>
 
+        <hr />
 
-    <div class="article-info-strip article-history-button-wrapper article-button-wrapper role-author">
-        <button onclick="loadArticleHistory();" class="small">
-            View history
-        </button>
-    </div>
+        <div class="article-info-strip article-history-button-wrapper article-button-wrapper role-author">
+            <button onclick="loadArticleHistory();" class="small">
+                View history
+            </button>
+        </div>
 
-    <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
-        <button onclick="unpublishArticleModal()" class="small red">
-             Unpublish
-        </button>
-    </div>
+        <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
+            <button onclick="unpublishArticleModal()" class="small red">
+                 Unpublish
+            </button>
+        </div>
 
-    <div class="article-info-strip article-destroy-button-wrapper article-destroyautosave-button-wrapper article-button-wrapper">
-        <button onclick="destroyAutosave()" class="small red">
-            Discard Autosave
-        </button>
-    </div>
-    
-    <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper role-author">
-        <button onclick="destroyArticleModal()" class="small red">
-            Destroy
-        </button>
+        <div class="article-info-strip article-destroy-button-wrapper article-destroyautosave-button-wrapper article-button-wrapper">
+            <button onclick="destroyAutosave()" class="small red">
+                Discard Autosave
+            </button>
+        </div>
+        
+        <div class="article-info-strip article-destroy-button-wrapper article-destroyarticle-button-wrapper article-button-wrapper role-author">
+            <button onclick="destroyArticleModal()" class="small red">
+                Destroy
+            </button>
+        </div>
     </div>
 </div>
 
@@ -112,7 +114,7 @@
 
     <div>
         <h2>Proofreading</h2>
-        <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience.</p>
+        <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience. You can click on suggestions to automatically apply the changes, or mark the paragraph as verified.</p>
 
         <div id="pr-parag-list">
 
@@ -139,12 +141,52 @@
 </div>
 
 <style>
+.article-more-info-wrapper {
+    background-color: #EEE;
+    padding: 10px;
+}
+
+.article-more-info-container {
+    padding: 10px;
+    background-color: #FFF;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.4);
+}
+
+.article-more-info-container h3 {
+    padding: 5px;
+    font-weight: 500;
+}
+
+.article-more-info-container hr {
+    background-color: #DDD;
+    height: 1px;
+    border: none;
+    margin: 10px 5px;
+}
+
 #article-packaging {
     width: calc(100% - 40px);
+    background: #F3F3F3;
+}
+
+.pr-parag h4 {
+    font-weight: 900;
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333;
+    background-color: #F9F9F9;
+    margin: -10px -10px 10px;
+    padding: 10px;
+    border-bottom: 1px solid #DDD;
 }
 
 #article-packaging.shown {
     transform : translate3d(0px, 20px, 0px) scale(1);
+}
+
+.article-button-wrapper {
+    display: inline-block;
+    margin-right: -5px;
 }
 
 #packaging-title {
@@ -170,6 +212,18 @@
     top: 28px;
     left: 16px;
     font-size: 72px;
+}
+
+#pr-parag-list:empty::before {
+    display: block;
+    content: 'All paragraphs were verified and marked as valid.';
+    padding: 10px;
+    margin: 20px;
+    text-align: center;
+    color: #999;
+    font-size: 22px;
+    background: #FFF;
+    box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.3);
 }
 
 #featured-image-selector {
@@ -238,13 +292,23 @@
 
 .pr-parag {
     display: block;
-    margin: 5px 10px;
+    margin: 5px 10px 12px;
     border: 1px solid #DDD;
-    background-color: #F3F3F3;
+    background-color: #fff;
 
     padding: 10px;
     font-size: 16px;
+
+    box-shadow : 0px 0px 3px 0px rgba(255, 118, 0, 0.3);
 }   
+
+.pr-suggestions li i {
+    margin-right: 5px;
+}
+
+.pr-suggestions li span {
+    margin-right: 5px;
+}
 
 .pr-suggestions {
     margin-bottom: 10px;
@@ -258,9 +322,30 @@
     font-size: 14px;
 }
 
+.pr-suggestions li b {
+    margin-right: 5px;
+    text-decoration: underline;
+    cursor: pointer;
+    color: #9b24ef;
+}
+
+.pr-mark-valid-wrap {
+    margin-top: 30px;
+    text-align: right;
+}
+
+.pr-mark-valid-wrap b {
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    display: inline-block;
+    text-decoration: underline;
+    color: #9b24ef;
+}
+
 .pr-editable {
     background-color: #FFF;
-    padding: 10px;
+    padding: 15px;
     border: 1px dashed #AAA;
 }
 

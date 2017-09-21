@@ -399,8 +399,7 @@
             });
         }
 
-        // Save Draft
-        $('form button[name=save]').on('click', function(e) {
+        var saveCurrentArticle = function(cb) {
             document.dispatchEvent(new CustomEvent("articleWillSave"));
 
             // Save and give notification
@@ -434,8 +433,15 @@
                 });
 
                 updateBottomSection();
+                cb && cb();
                 $(".cke_bottom time.timeago").timeago("update", new Date());
             });
+           
+        }
+
+        // Save Draft
+        $('form button[name=save]').on('click', function(e) {
+            saveCurrentArticle();
 
             return false;
         });
@@ -462,29 +468,14 @@
 
         var fillPackaging = function(serverdata) {
             // Corrections
+            var changes = [];
+
             var plist = d.id('pr-parag-list');
             var ps = serverdata.paragraphs;
 
-            if (ps.length == 0) {
-                plist.born(d.make({ node : "strong", text : "No suggestions from Lilium." }));
-            }
-
             for (var i = 0; i < ps.length; i++) {
                 if (serverdata.corrections[i].length) {
-                    var p = d.make({
-                        class : "pr-parag"
-                    });
-
-                    var clist = d.make({ node : "ul", class : "pr-suggestions" });
-                    for (var j = 0; j < serverdata.corrections[i].length; j++) {
-                        var c = serverdata.corrections[i][j];
-                        clist.born(d.make({
-                            node : "li",
-                            html : '<i class="fa fa-exclamation-circle" aria-hidden="true"></i><span>' + c.reason + "</span>"
-                        }));
-                    }
-
-                    p.born(clist);
+                    var p = d.make({ class : "pr-parag" });
 
                     var pcontent = d.make({
                         class : "pr-editable",
@@ -492,8 +483,49 @@
                     });
                     pcontent.get().contentEditable = true;
 
-                    p.born(pcontent);
+                    var clist = d.make({ node : "ul", class : "pr-suggestions" });
+                    for (var j = 0; j < serverdata.corrections[i].length; j++) {
+                        var c = serverdata.corrections[i][j];
+                        var li = d.make({ node : "li" });
+
+                        li.born(d.make({node : "i", class : "fa fa-exclamation-circle"}));
+                        li.born(d.make({node : "span", text : c.reason.split(';')[0]}));
+
+                        if (c.suggestions) for (var k = 0; k < c.suggestions.length; k++) {
+                            var singlesug = d.make({ node : "b", text : "Use '" + c.suggestions[k] + "'" });
+                            li.born(singlesug);
+
+                            (function(singlesug, sug, reason, li, pcontent) {
+                                singlesug.bind('click', function() {
+                                    pcontent.get().innerHTML = pcontent.get().innerHTML.replace(reason.split('`')[1], sug);
+                                    li.get().remove();
+                                });
+                            })(singlesug, c.suggestions[k], c.reason, li, pcontent)
+                        }
+
+                        clist.born(li);
+                    }
+
+                    var markAsFixedWrap = d.make({ node : "div", class : "pr-mark-valid-wrap" });
+                    var mFixed = d.make({ node : 'b', text : "Mark paragraph as verified", parent : markAsFixedWrap });
+
                     plist.born(p);
+
+                    p.born(d.make({ node : "h4", text : "Suggested change" }));
+                    p.born(clist);
+                    p.born(pcontent);
+                    p.born(markAsFixedWrap);
+
+                    (function(i, mFixed, pcontent, p) {
+                        mFixed.bind('click', function() {
+                            changes[i] = pcontent;
+                            p.get().remove();
+
+                            if (plist.get().querySelectorAll(".pr-parag").length == 0) {
+                                plist.empty();
+                            }
+                        });
+                    })(i, mFixed, pcontent, p);
                 }
             }
 
@@ -519,7 +551,10 @@
         };
 
         $('form button[name=publish]').on('click', function(e) {
-            showPackaging();
+            saveCurrentArticle(function() {
+                showPackaging();
+            });
+
             return false;
         });
 
