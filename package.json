@@ -111,6 +111,7 @@
     "retext-sentiment": "^4.1.0",
     "retext-spell": "^2.3.1",
     "retext-syntax-mentions": "^1.1.4",
+    "retext-syntax-urls": "^1.0.0",
     "sendgrid": "latest",
     "sesh": "latest",
     "session": "latest",
