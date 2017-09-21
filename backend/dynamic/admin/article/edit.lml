@@ -92,7 +92,7 @@
     </div>    
 
     <div>
-        <strong>Select a featured image</strong>
+        <h2>Select a featured image</h2>
         <p>The image credit must be included during the image selection.</p>
 
         <div id="featured-image-selector">
@@ -102,13 +102,26 @@
     </div>
 
     <div>
-        <strong>Proofreading</strong>
+        <h2>Choose a topic</h2>
+        <p>This post will appear under the selected topic's archive pages as well as the archive of the topic's parents. The topic will also alter the final URL of this post.</p>
+
+        <div id="topic-selection">
+            
+        </div>
+    </div>
+
+    <div>
+        <h2>Proofreading</h2>
+        <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience.</p>
+
+        <div id="pr-parag-list">
+
+        </div>
 
         <div id="proofread">
             
         </div>
 
-        
     </div>
 
     <div class="lml-modal-footer">
@@ -211,15 +224,44 @@
     opacity: 0;
 }
 
-#article-packaging strong {
+#article-packaging h2 {
     display: block;
     padding: 20px 0px 0px 20px;
     font-size: 20px;
     color: #333;
+    font-weight: 600;
 }
 
 #article-packaging p {
     padding: 0px 20px;
+}
+
+.pr-parag {
+    display: block;
+    margin: 5px 10px;
+    border: 1px solid #DDD;
+    background-color: #F3F3F3;
+
+    padding: 10px;
+    font-size: 16px;
+}   
+
+.pr-suggestions {
+    margin-bottom: 10px;
+    padding: 0;
+}
+
+.pr-suggestions li {
+    display: block;
+    padding: 0px;
+    margin: 2px 0px;
+    font-size: 14px;
+}
+
+.pr-editable {
+    background-color: #FFF;
+    padding: 10px;
+    border: 1px dashed #AAA;
 }
 
 </style>

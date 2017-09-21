@@ -460,17 +460,61 @@
             });
         });
 
-        var showPackaging = function() {
-            var d = document.createElement('div')
-            d.innerHTML = CKEDITOR.instances.content.getData();
-            
-            var text = d.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').replace(/https?:\/\/[a-zA-Z0-9.\/]+/g, ' ').trim();
+        var fillPackaging = function(serverdata) {
+            // Corrections
+            var plist = d.id('pr-parag-list');
+            var ps = serverdata.paragraphs;
 
-            liliumcms.lmldom.post({ content : text }, '{=config.default.server.url}/admin/article/proofread', function(resp) {
-                var corrections = resp.corrections;
-                console.log(corrections);
+            if (ps.length == 0) {
+                plist.born(d.make({ node : "strong", text : "No suggestions from Lilium." }));
+            }
+
+            for (var i = 0; i < ps.length; i++) {
+                if (serverdata.corrections[i].length) {
+                    var p = d.make({
+                        class : "pr-parag"
+                    });
+
+                    var clist = d.make({ node : "ul", class : "pr-suggestions" });
+                    for (var j = 0; j < serverdata.corrections[i].length; j++) {
+                        var c = serverdata.corrections[i][j];
+                        clist.born(d.make({
+                            node : "li",
+                            html : '<i class="fa fa-exclamation-circle" aria-hidden="true"></i><span>' + c.reason + "</span>"
+                        }));
+                    }
+
+                    p.born(clist);
+
+                    var pcontent = d.make({
+                        class : "pr-editable",
+                        html : ps[i]
+                    });
+                    pcontent.get().contentEditable = true;
+
+                    p.born(pcontent);
+                    plist.born(p);
+                }
+            }
+
+            // Topic
+            var ts = d.id('topic-selection');
+            var alltopic = liliumcms.livevars.livevars()["topics.all"];
+        };      
+
+        var showPackaging = function() {
+            var div = document.createElement('div')
+            div.innerHTML = CKEDITOR.instances.content.getData();
+            
+            var text = div.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').replace(/https?:\/\/[a-zA-Z0-9.\/]+/g, ' ').trim();
+
+            liliumcms.lmldom.post({ 
+                markup : CKEDITOR.instances.content.getData()
+            }, '{=config.default.server.url}/admin/article/proofread', function(resp) {
+                fillPackaging(resp);
             });
 
+            d.id('pr-parag-list').empty();
             liliumcms.modals.get("article-packaging").cast();
         };
 
