@@ -12,15 +12,16 @@ const rtDiact = require('retext-diacritics');
 const rtRepea = require('retext-repeated-words');
 const rtSpell = require('retext-spell');
 const rtKeywd = require('retext-keywords');
+const rtMenti = require('retext-syntax-mentions');
+const rtOveru = require('retext-overuse');
+const rtUrlsy = require('retext-syntax-urls');
 
 /*
     Unused Retext plugins
 
-    const rtOveru = require('retext-overuse');
     const rtIndef = require('retext-indefinite-article');
     const rtContr = require('retext-contractions');
     const rtRedun = require('retext-redundant-acronyms');
-    const rtMenti = require('retext-syntax-mentions');
     const rtSenti = require('retext-sentiment')
 */
 
@@ -37,8 +38,10 @@ const createRetext = (dico, pdico = "") => {
             normalizeApostrophes : false,
             personal : pdico
         })
+        .use(rtMenti)
+        .use(rtUrlsy)
         .use(rtDiact)
-        .use(rtKeywd)
+        // .use(rtKeywd)
         .use(rtRepea);
 };
 
@@ -51,13 +54,32 @@ class Proofreader {
         });
     }
 
-    proofread(text, lang = "en", send) {
+    proofreadOne(rtx, text, send) {
+        const now = Date.now();
+        rtx.process(text, (err, report) => {
+            log('Proofread', 'Corrected ' + text.length + ' characters in ' + (Date.now() - now) + " ms", 'success');
+            send(report);
+        });
+    }
+
+    proofread(parags, lang = "en", send) {
         const now = Date.now();
         Proofreader.getRetext(lang, rtx => {
-            rtx.process(text, (err, report) => {
-                log('Proofread', 'Corrected ' + text.length + ' characters in ' + (Date.now() - now) + " ms", 'success');
-                send(report);
-            });
+            const report = new Array(parags.length);
+            let i = -1;
+
+            const next = () => {
+                if (++i == parags.length) {
+                    return send(report);
+                }
+
+                this.proofreadOne(rtx, parags[i], (err, singlereport) => {
+                    report[i] = singlereport || err;
+                    next();
+                });
+            };
+
+            next();
         });
     }
 
