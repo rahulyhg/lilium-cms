@@ -217,7 +217,7 @@
 #pr-parag-list:empty::before {
     display: block;
     content: 'All paragraphs were verified and marked as valid.';
-    padding: 10px;
+    padding: 40px 10px;
     margin: 20px;
     text-align: center;
     color: #999;

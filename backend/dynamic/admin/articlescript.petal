@@ -532,6 +532,8 @@
             // Topic
             var ts = d.id('topic-selection');
             var alltopic = liliumcms.livevars.livevars()["topics.all"];
+
+            
         };      
 
         var showPackaging = function() {
