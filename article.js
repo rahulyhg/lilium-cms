@@ -1624,23 +1624,7 @@ class Article {
                 fieldWrapper : "lmlform-fieldwrapper"
             })
             .addTemplate('article_base')
-            .add('topic', 'treeselect', {
-                endpoint: 'topics.all',
-                select: {
-                    'value': '_id',
-                    'displayname': 'displayname',
-                    'childrenkey' : 'children'
-                },
-                displayname: "Topic"
-            })
             .trigger('fields')
-            .add('title-geolocation', 'title', {
-                displayname : "Geolocalisation"
-            })
-            .add('geolocation', 'map', {
-                notitle : true,
-                format : 'array'
-            })
             .add('title-author', 'title', {
                 displayname : "Appearance"
             })
