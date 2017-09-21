@@ -288,13 +288,23 @@ class Article {
 
     proofread(cli) {
         const Proofreader = require('./proofreader');
-        const content = cli.postdata.data.content;
+        const markup = cli.postdata.data.markup;
         const lang = cli.postdata.data.lang;
 
-        Proofreader.proofread(content, lang, report => {
+        const jsdom = require('jsdom');
+        const window = new jsdom.JSDOM(markup).window;
+
+        const paragraphs = Array.prototype.filter.call(window.document.querySelectorAll('p'), (
+            x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
+        ));
+
+        Proofreader.proofread(paragraphs.map(x => x.textContent), lang, report => {
             cli.sendJSON(report && { 
-                corrections : report.messages.map(x => { return { reason : x.message, at : x.column, suggestions : x.expected,  } }),
-                keywords : report.data.keywords
+                corrections : report.map(r => r.messages.map(x => { 
+                    return { reason : x.message, at : x.column, suggestions : x.expected,  } })
+                ),
+                keywords : report.map(r => r.data.keywords),
+                paragraphs : paragraphs.map(x => x.innerHTML)
             });
         });
     }
