@@ -1,5 +1,9 @@
 class PluginHelper {
     getPluginIdentifierFromFilename(filename, cb, sync) {
+        if (!filename) {
+            return cb && cb(false);
+        }
+
         const fileserver = require('./fileserver.js');
         const conf = require('./config.js').default();
 
