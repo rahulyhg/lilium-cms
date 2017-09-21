@@ -2337,10 +2337,6 @@ button.bigger {
     content : '\f1f8';
 }
 
-.article-more-info-wrapper {
-    padding-bottom: 12px;
-}
-
 /* Publication report */
 #publishreport.hidden {
     display : none;
