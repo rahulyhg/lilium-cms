@@ -28,6 +28,13 @@ class LMLTopics {
 
                 send(respArray);
             });
+        } else if (levels[0] == "category") {
+            db.join(cli._c, 'topics', [
+                { $match : { active : true } },
+                { $group : { _id : "$category", topics : { $push : "$$ROOT" } } }
+            ], (categories) => {
+                cli.sendJSON(categories);
+            });
         } else if (levels[0] == "treename") {
             db.findToArray(cli._c, 'topics', {active : true}, (err, topicsArray) => {
                 let assoc = {};
@@ -486,6 +493,15 @@ class LMLTopics {
         })
         .add('description', 'textarea', {
             displayname : "Description"
+        })
+        .add('category', 'select', {
+            displayname : "Category", 
+            datasource : [
+                { name : "", displayName : "Other" },
+                { name : "local", displayName : "Local" },
+                { name : "interest", displayName : "Interest" },
+                { name : "partners", displayName : "Partners" }
+            ]
         })
         .trg('top')
         .add('frontend-title', 'title', { displayname : "Templates" })
