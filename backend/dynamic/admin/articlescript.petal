@@ -13,6 +13,8 @@
     var originalTitle = "";    
     var currentSlug = "";
 
+    var selectedTopic;
+
     var articleEdit = {
         keepURL : true,
         urlWillChangeWarningShown : false
@@ -28,6 +30,7 @@
                 isPublished   = content.status == 'published';
                 originalTitle = content.title;
                 currentSlug   = content.name;
+                selectedTopic = content.topic;
 
                 if (isAutoSave) {
                     _id = lastParamUrl;
@@ -49,7 +52,7 @@
                     });
                 }
 
-                
+                bindPackagingPhase();                
 
                 if (isPublished) {
                     $('.article_base_title').bind('keyup', function(e) {
@@ -333,6 +336,34 @@
 
     var loadArticleHistory = function() {
         liliumcms.pageloader.load(window.location.urlBase + "admin/history/article/" + contentid);
+    };
+
+    var bindPackagingPhase = function() {
+        var catbuttons = document.querySelectorAll('.topic-category');
+        for (var i = 0; i < catbuttons.length; i++) {
+            (function(btn) {
+                btn.addEventListener('click', function() {
+                    btn.classList.add("pop");
+                    d.id('topic-slide-1').cadd('dismissed');
+                    d.id('topic-slide-2').get().style.display = "block";
+
+                    var strip = d.id('topic-category-strip')
+                    strip.empty();
+    
+                    strip.born(d.make({ node : "i", class : "fa " + btn.dataset.icon }));
+                    strip.born(d.make({ node : "span", text : btn.dataset.text }));
+                    strip.get().style.backgroundColor = btn.dataset.color;
+
+                    setTimeout(function() {
+                        d.id('topic-slide-1').get().style.display = "none";
+
+                        setTimeout(function() {
+                            d.id('topic-category-strip').cadd('shown');
+                        }, 20);
+                    }, 500)
+                });
+            })(catbuttons[i]);
+        }
     };
 
     var autoSave = function() {
