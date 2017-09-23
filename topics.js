@@ -28,6 +28,10 @@ class LMLTopics {
 
                 send(respArray);
             });
+        } else if (levels[0] == "simple") {
+            db.findToArray(cli._c, 'topics', { active : true }, (err, topics) => {
+                send(topics);
+            }, { _id : 1, displayname : 1, slug : 1, completeSlug : 1, parent : 1, category : 1 });
         } else if (levels[0] == "category") {
             db.join(cli._c, 'topics', [
                 { $match : { active : true } },
