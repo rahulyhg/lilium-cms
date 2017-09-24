@@ -136,9 +136,9 @@
                 <div id="topic-selection-wrapper">
 
                 </div>
-                <div id="topic-selection-done">
-                    
-                </div>
+            </div>
+            <div id="topic-selection-done">
+                
             </div>
         </div>
     </div>
@@ -172,6 +172,22 @@
 </div>
 
 <style>
+#topic-selection-done {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.2);
+    transition: all 0.3s;
+    transform: translate3d(0, 100%, 0);
+}
+
+#topic-selection-done.shown {
+    transform: translate3d(0, 0%, 0);
+}
+
+
 .topic-crumb {
     display: inline-block;
     vertical-align: top;
