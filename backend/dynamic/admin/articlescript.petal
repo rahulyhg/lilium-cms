@@ -338,6 +338,9 @@
 
     var selectTopic = function(tt) {
         currentTopic = tt;
+
+        d.id('topic-selection-name').text(tt.displayname);
+        d.id('topic-selection-slug').text(tt.completeSlug);
     };
 
     var addTopicToBreadcrumb = function(tt) {
@@ -382,6 +385,7 @@
 
         if (!found) {
             d.id('topic-selection-done').cadd('shown');
+            d.id('topic-category-strip').crm('shown');
         }
     };
 
@@ -447,6 +451,7 @@
     var resetTopics = function() {
         currentTopic = undefined;
         d.id('topic-category-strip').crm('shown');
+        d.id('topic-selection-done').crm('shown');
 
         var wrap = d.id('topic-selection-wrapper');
         wrap.empty();

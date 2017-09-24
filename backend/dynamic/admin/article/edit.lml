@@ -138,7 +138,10 @@
                 </div>
             </div>
             <div id="topic-selection-done">
-                
+                <h4 id="topic-selection-name">Selected topic</h4>
+                <div id="topic-selection-slug">/</div>
+
+                <a id="choose-another-topic" onclick="resetTopics();">Choose another topic</a>
             </div>
         </div>
     </div>
@@ -172,15 +175,39 @@
 </div>
 
 <style>
+#topic-selection-done h4 {
+    font-weight: normal;
+    margin-top: 60px;
+    font-size: 32px;
+    color: #333;
+    text-shadow: 0 1px 0px rgba(0,0,0,0.2);
+}
+
+#topic-selection-slug {
+    text-shadow: 0px 1px 0px rgba(0,0,0,0.2);
+    color: #777;
+}
+
+#choose-another-topic {
+    margin-top: 50px;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 #topic-selection-done {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    background-color: rgba(0,0,0,0.2);
     transition: all 0.3s;
     transform: translate3d(0, 100%, 0);
+
+    text-align: center;
+
+    background-color: #EEE;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
 }
 
 #topic-selection-done.shown {
