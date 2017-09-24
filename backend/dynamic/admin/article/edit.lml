@@ -136,6 +136,9 @@
                 <div id="topic-selection-wrapper">
 
                 </div>
+                <div id="topic-selection-done">
+                    
+                </div>
             </div>
         </div>
     </div>
@@ -172,11 +175,10 @@
 .topic-crumb {
     display: inline-block;
     vertical-align: top;
-    margin: -9px 0px 0px 10px;
+    margin: -10px 0px 0px 10px;
     font-size: 14px;
     background-color: rgba(0,0,0,0.8);
     padding: 12px 10px;
-    cursor: pointer;
     color: #FFF;
     height: 50px;
 
@@ -186,6 +188,16 @@
 
 .topic-crumb.shown {
     transform: translate3d(0,0,0);
+}
+
+.topic-strip {
+    margin: 5px;
+    padding: 6px 8px;
+    background: #EEE;
+    border: 1px solid #DDD;
+    cursor: pointer;
+    font-weight: 600;
+    color: #111;
 }
 
 #topic-category-strip {
@@ -201,6 +213,16 @@
     transform: translate3d(0px, -50px, 0px);
 
     overflow: hidden;
+    position: relative;
+}
+
+.strip-close {
+    position: absolute;
+    top: 12px;
+    right: 8px;
+    color: #FFF;
+    cursor: pointer;
+    font-size: 20px;
 }
 
 #topic-category-strip.shown {
@@ -265,6 +287,8 @@
     right:0;
 
     display: none;
+
+    overflow: auto;
 }
 
 #topic-slide-1 {
