@@ -285,9 +285,7 @@
                                 }
                             });
 
-
                             this.parentElement.removeChild(this);
-
                         });
                     })(a);
 
@@ -338,6 +336,74 @@
         liliumcms.pageloader.load(window.location.urlBase + "admin/history/article/" + contentid);
     };
 
+    var selectTopic = function(tt) {
+        currentTopic = tt;
+    };
+
+    var addTopicToBreadcrumb = function(tt) {
+        var crumb = d.make({ class : "topic-crumb", text : tt.displayname });
+        crumb.bind('click', function() {
+            
+        });
+
+        d.id('topic-category-strip').born(crumb);
+
+        setTimeout(function() {
+            crumb.cadd('shown');
+        }, 50);
+    };
+
+    var fillTopicSelParent = function(parent) {
+        var wrap = d.id('topic-selection-wrapper');
+        wrap.empty();
+
+        var tt = liliumcms.livevars.livevars()["topics.simple"];
+        var found = false;
+        for (var i = 0; i < tt.length; i++) if (tt[i].parent == parent) {
+            var twrap = d.make({
+                node : "div",
+                text : tt[i].displayname
+            });
+
+            (function(tt, i) {
+                twrap.bind('click', function() {
+                    fillTopicSelParent(tt[i]._id);
+                    addTopicToBreadcrumb(tt[i]);
+                    selectTopic(tt[i]);
+                });
+            })(tt, i);
+            wrap.born(twrap);
+
+            found = true;
+        }
+
+        if (!found) {
+            
+        }
+    };
+
+    var fillTopicSelCat = function(cat) {
+        var wrap = d.id('topic-selection-wrapper');
+        wrap.empty();
+
+        var tt = liliumcms.livevars.livevars()["topics.simple"];
+        for (var i = 0; i < tt.length; i++) if (tt[i].category == cat) {
+            var twrap = d.make({
+                node : "div",
+                text : tt[i].displayname
+            });
+
+            (function(tt, i) {
+                twrap.bind('click', function() {
+                    fillTopicSelParent(tt[i]._id);
+                    addTopicToBreadcrumb(tt[i]);
+                    selectTopic(tt[i]);
+                });
+            })(tt, i);
+            wrap.born(twrap);
+        }
+    };
+
     var bindPackagingPhase = function() {
         var catbuttons = document.querySelectorAll('.topic-category');
         for (var i = 0; i < catbuttons.length; i++) {
@@ -359,6 +425,7 @@
 
                         setTimeout(function() {
                             d.id('topic-category-strip').cadd('shown');
+                            fillTopicSelCat(btn.dataset.category);
                         }, 20);
                     }, 500)
                 });
@@ -563,9 +630,6 @@
 
             // Topic
             var ts = d.id('topic-selection');
-            var alltopic = liliumcms.livevars.livevars()["topics.all"];
-
-            
         };      
 
         var showPackaging = function() {
