@@ -354,6 +354,8 @@
     };
 
     var fillTopicSelParent = function(parent) {
+        d.id('topic-selection-done').crm('shown');
+
         var wrap = d.id('topic-selection-wrapper');
         wrap.empty();
 
@@ -362,6 +364,7 @@
         for (var i = 0; i < tt.length; i++) if (tt[i].parent == parent) {
             var twrap = d.make({
                 node : "div",
+                class : "topic-strip",
                 text : tt[i].displayname
             });
 
@@ -378,7 +381,7 @@
         }
 
         if (!found) {
-            
+            d.id('topic-selection-done').cadd('shown');
         }
     };
 
@@ -390,6 +393,7 @@
         for (var i = 0; i < tt.length; i++) if (tt[i].category == cat) {
             var twrap = d.make({
                 node : "div",
+                class : "topic-strip",
                 text : tt[i].displayname
             });
 
@@ -420,6 +424,13 @@
                     strip.born(d.make({ node : "span", text : btn.dataset.text }));
                     strip.get().style.backgroundColor = btn.dataset.color;
 
+                    var stripx = d.make({ node : "i", class : "fa fa-times strip-close" });
+                    stripx.bind('click', function() {
+                        resetTopics();
+                    });
+
+                    strip.born(stripx);
+
                     setTimeout(function() {
                         d.id('topic-slide-1').get().style.display = "none";
 
@@ -431,6 +442,28 @@
                 });
             })(catbuttons[i]);
         }
+    };
+
+    var resetTopics = function() {
+        currentTopic = undefined;
+        d.id('topic-category-strip').crm('shown');
+
+        var wrap = d.id('topic-selection-wrapper');
+        wrap.empty();
+
+        setTimeout(function() {
+            document.getElementById('topic-slide-2').style.display = "";
+            d.id('topic-slide-1').get().style.display = "";
+            
+            var poped = document.querySelector('.topic-category.pop');
+            if (poped) {
+                poped.classList.remove('pop');
+            }
+
+            setTimeout(function() {
+                d.id('topic-slide-1').crm('dismissed');
+            }, 50);
+        }, 200);
     };
 
     var autoSave = function() {
