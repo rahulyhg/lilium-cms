@@ -340,7 +340,7 @@
         currentTopic = tt;
 
         d.id('topic-selection-name').text(tt.displayname);
-        d.id('topic-selection-slug').text(tt.completeSlug);
+        d.id('topic-selection-slug').text("/" + tt.completeSlug);
     };
 
     var addTopicToBreadcrumb = function(tt) {
@@ -714,10 +714,6 @@
             tempForm.values.id = contentid;
             tempForm.values.autosaveid = _id;
 
-            if (!tempForm.values.topic) {
-                return liliumcms.notify({title : "Watch out!", message : "You forgot to assign a topic.", type : "info"});
-            }
-
             if (valid) {
                 $('.alert-wrapper').remove();
 
@@ -737,6 +733,17 @@
 
                 if (currentSlug) {
                     tempForm.values.currentSlug = currentSlug;
+                }
+
+                tempForm.values.topic = currentTopic && currentTopic._id;
+                tempForm.values.media = document.querySelector('[name="media"]').value;
+
+                if (!tempForm.values.topic) {
+                    return liliumcms.notify({title : "Watch out!", message : "You forgot to assign a topic.", type : "warn"});
+                }
+
+                if (!tempForm.values.media) {
+                    return liliumcms.notify({title : "Watch out!", message : "You forgot to assign a featured image.", type : "warn"});
                 }
     
                 liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/edit', function(data) {
@@ -812,6 +819,7 @@
     liliumcms.imagepicker.bind(imgtag, function(payload) {
         if (payload && payload.sizes) {
             imgtag.src = payload.sizes["{=?theme.info.featuredimage.sizename}" || "featured"].url;
+            document.getElementById('mediapicker').value = payload._id;
         }
     }, {withcredit : true});
 
