@@ -963,10 +963,8 @@ class Article {
         }
 
         formData.author = formData.author ? db.mongoID(formData.author) : db.mongoID(cli.userinfo.userid);
-        formData.media = db.mongoID(formData.media);
         formData.updated = new Date();
         formData.date = formData.date ? new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone)) : undefined;
-        formData.topic = formData.topic ? db.mongoID(formData.topic) : undefined;
 
         if (formData.tags && formData.tags.map) {
             formData.tagslugs = formData.tags.map((tagname)  => {
@@ -1552,9 +1550,19 @@ class Article {
 
             // First, check for saved content
             db.aggregate(cli._c, 'content', [
-                {
-                    $match : {_id: db.mongoID(levels[0])}
-                }
+                { $match : {_id: db.mongoID(levels[0])} },
+                { $lookup : {
+                    localField : "topic",
+                    from : "topics",
+                    foreignField : "_id",
+                    as : "fulltopic"
+                } },
+                { $lookup : {
+                    localField : "media",
+                    from : "uploads",
+                    foreignField : "_id",
+                    as : "fullmedia"
+                } }
             ], (arr)  => {
                 // Not found, lets check autosaves
                 if (arr && arr.length == 0) {
@@ -1602,6 +1610,10 @@ class Article {
                             db.findToArray(conf.default(), 'entities', {_id : arr[0].author}, (err, autarr)  => {
                                 arr[0].authorname = autarr[0] ? autarr[0].displayname : "[No Author]";
                                 arr[0].author = autarr || {};
+
+                                arr[0].fullmedia = arr[0].fullmedia.pop();
+                                arr[0].fulltopic = arr[0].fulltopic.pop();
+
                                 callback(arr[0]);
                             });
                         });
