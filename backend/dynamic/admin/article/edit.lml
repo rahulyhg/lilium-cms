@@ -147,7 +147,7 @@
     </div>
 
     <div>
-        <h2>Proofreading</h2>
+        <h2>Suggestions</h2>
         <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience. You can click on suggestions to automatically apply the changes, or mark the paragraph as verified.</p>
 
         <div id="pr-parag-list">
