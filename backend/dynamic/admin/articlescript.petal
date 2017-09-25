@@ -52,6 +52,14 @@
                     });
                 }
 
+                if (content.fulltopic) {
+                    selectTopic(content.fulltopic);
+                    d.id('topic-slide-1').get().style.display = "none";
+                    d.id('topic-slide-2').get().style.display = "block";
+                    d.id('topic-slide-2').cadd('shown');
+                    d.id('topic-selection-done').cadd('shown');
+                }
+
                 bindPackagingPhase();                
 
                 if (isPublished) {
