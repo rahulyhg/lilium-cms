@@ -658,7 +658,7 @@
 
                     plist.born(p);
 
-                    p.born(d.make({ node : "h4", text : "Suggested change" }));
+                    p.born(d.make({ node : "h4", text : "Suggested change for paragraph #" + (i+1) }));
                     p.born(clist);
                     p.born(pcontent);
                     p.born(markAsFixedWrap);
