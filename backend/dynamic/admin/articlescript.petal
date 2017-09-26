@@ -41,6 +41,8 @@
 
                 if (content.media) {
                     imgtag.value = content.media;
+                    document.getElementById('mediapicker').value = content.media;
+
                     liliumcms.livevars.getSingleLivevar('uploads.single.' + content.media, {}, function(resp) {
                         try {
                             imgtag.src = resp.livevars["uploads.single." + content.media].sizes[
@@ -691,6 +693,10 @@
             });
 
             d.id('pr-parag-list').empty();
+
+            d.id('pages-selector').empty();
+            d.id('pages-wrapper').empty();
+
             liliumcms.modals.get("article-packaging").cast();
         };
 
