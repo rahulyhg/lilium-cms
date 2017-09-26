@@ -595,11 +595,13 @@
 
     margin-bottom: 6px;
     cursor: move;
+
+    font-size: 12px;
 }
 
 .page-block::before {
     display: block;
-    font-weight: 400;
+    font-weight: 600;
     font-size: 18px;
     color: #777;
 }
@@ -609,6 +611,7 @@
 .page-ad-block::before { content: 'Advertisement'; color : #d63d0b; }
 .page-related-block::before { content: 'Related links'; color : #cd0bd6; }
 .page-img-block::before { content: 'Image'; color : #0b62d6; }
+.page-hr-block::before { content: 'Horizontal ruler'; color : #AAA; font-size: 12px; }
 
 .page-parag-block { background: #F3F3F3; }
 .page-head-block { border-color : #b58018; }
