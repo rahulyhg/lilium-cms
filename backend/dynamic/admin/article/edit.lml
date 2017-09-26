@@ -168,7 +168,7 @@
         </div>
         <div id="pages-wrapper">
             <div class="page-wrapper" id="page-wrapper-1">
-
+                Loading...
             </div>
         </div>
     </div>
@@ -579,4 +579,40 @@
     border: 1px dashed #AAA;
 }
 
+.page-block {
+    display: block;
+    margin: 4px;
+    background-color: #FCFCFC;
+    color: #AAA;
+    
+    padding: 8px 10px;
+    border: 1px dashed #DDD;
+
+    margin-bottom: 6px;
+    cursor: move;
+}
+
+.page-block::before {
+    display: block;
+    font-weight: 400;
+    font-size: 18px;
+    color: #777;
+}
+
+.page-parag-block::before { content: 'Text paragraph'; }
+.page-head-block::before { content: 'Header'; color : #b58018; }
+.page-ad-block::before { content: 'Advertisement'; color : #d63d0b; }
+.page-related-block::before { content: 'Related links'; color : #cd0bd6; }
+.page-img-block::before { content: 'Image'; color : #0b62d6; }
+
+.page-parag-block { background: #F3F3F3; }
+.page-head-block { border-color : #b58018; }
+.page-ad-block { border-color : #d63d0b; }
+.page-related-block { border-color : #cd0bd6; }
+.page-img-block { border-color : #0b62d6; }
+
+.page-wrapper {
+    padding: 5px;
+    background-color: #E9E9E9;
+}
 </style>
