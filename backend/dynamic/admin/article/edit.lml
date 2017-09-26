@@ -148,7 +148,7 @@
 
     <div>
         <h2>Corrections &amp; suggestions</h2>
-        <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience. You can click on suggestions to automatically apply the changes, or mark the paragraph as verified.</p>
+        <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience. You can click on suggestions to automatically apply the changes, or manually make modifications. Then, the paragraph can be marked as verified.</p>
 
         <div id="pr-parag-list">
             
@@ -163,8 +163,13 @@
         <h2>Pagination and banners</h2>
         <p>You can reposition ad banners to make sure they were not inserted at awkward places.</p>
 
+        <div id="pages-selector">
+            <div class="page-selector" data-pageid="1">1</div>
+        </div>
         <div id="pages-wrapper">
+            <div class="page-wrapper" id="page-wrapper-1">
 
+            </div>
         </div>
     </div>
 
