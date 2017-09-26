@@ -63,6 +63,7 @@ class Article {
             case 'autosave': if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true); break;
             case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
             case 'proofread': if (cli.hasRightOrRefuse("create-articles")) this.proofread(cli); break;
+            case 'withads': if (cli.hasRightOrRefuse('create-articles')) this.insertAdsFromCli(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
             case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
             case 'preview': if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview"); break;
@@ -583,6 +584,14 @@ class Article {
         }, ()  => {
             log('Content', 'Added feature "' + featurename + '" to article with id ' + cli.routeinfo.path[3]);
             cli.sendJSON({done : true})
+        });
+    };
+
+    insertAdsFromCli(cli) {
+        db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
+            this.insertAds(cli._c, article, content => {
+                cli.sendHTML(content);
+            });
         });
     };
 
