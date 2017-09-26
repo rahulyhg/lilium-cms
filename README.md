@@ -20,6 +20,9 @@ All NodeJS plugins are to be installed, and are documented in the package file s
 **UBUNTU:**
 `sudo apt-get install libcairo2-dev libjpeg8-dev libpango1.0-dev libgif-dev build-essential g++ libkrb5-dev imagemagick`
 
+### Language detection
+Lilium uses *franc* to detect languages and currently supports English and French.
+
 ## I want to code, too
 See the [Lilium CMS Wiki](https://github.com/narcitymedia/lilium-cms/wiki) and get started!
 
