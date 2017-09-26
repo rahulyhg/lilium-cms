@@ -684,6 +684,14 @@
 
         }
 
+        var createPageTag = function(index) {
+            var div = document.createElement('div');
+            div.className = "page-wrapper";
+            div.id = "page-wrapper-" + index;
+
+            return div;
+        }
+
         var createPageTabs = function(content) {
             var selectors = d.id('pages-selector').empty();
             var pages = d.id('pages-wrapper').empty();
@@ -695,11 +703,36 @@
             var pageindex = 0;
             createPageSelector(pageindex);
             
+            var page = createPageTag(pageindex);
+            pages.get().appendChild(page);
+            
             for (var i = 0; i < tags.length; i++) {
                 var tag = tags[i];
                 var shouldsplit = !!tag.querySelector("lml-page");
+                var isImage = !!tag.querySelector('img');
 
-                
+                switch (tag.nodeName) {
+                    case "H3": case "H4": case "H5": case "H6":
+                        page.appendChild( d.make({ class : "page-block page-head-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                        break;
+
+                    case "AD":
+                        page.appendChild( d.make({ class : "page-block page-ad-block", text : "This can be moved around" }).get() );
+                        break;
+
+                    case "LML-RELATED":
+                        page.appendChild( d.make({ class : "page-block page-related-block", text : "This can be moved around" }).get() );
+                        break;
+
+                    case "P": 
+                        isImage ? 
+                            page.appendChild( d.make({ class : "page-block page-img-block", text : "Image" }).get() ) :
+                            page.appendChild( d.make({ class : "page-block page-parag-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                        break;
+
+                    default:
+                        page.appendChild( d.make({ class : "page-block page-unknown-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                }
             }
         };
 
