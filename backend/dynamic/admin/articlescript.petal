@@ -724,6 +724,10 @@
                         page.appendChild( d.make({ class : "page-block page-related-block", text : "This can be moved around" }).get() );
                         break;
 
+                    case "HR":
+                        page.appendChild( d.make({ class : "page-block page-hr-block" }).get() );
+                        break;
+
                     case "P": 
                         isImage ? 
                             page.appendChild( d.make({ class : "page-block page-img-block", text : "Image" }).get() ) :
