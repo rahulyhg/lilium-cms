@@ -25,6 +25,8 @@ const rtUrlsy = require('retext-syntax-urls');
     const rtSenti = require('retext-sentiment')
 */
 
+const franc = require('franc-min');
+
 const DICTIONARIES = {
     en : require('dictionary-en-ca'),
     fr : require('dictionary-fr')
@@ -54,6 +56,16 @@ class Proofreader {
         });
     }
 
+    static francLang(langcode) {
+        switch (langcode) {
+            case "fra":
+                return "fr";
+
+            default:
+                return "en";
+        }
+    }
+
     proofreadOne(rtx, text, send) {
         const now = Date.now();
         rtx.process(text, (err, report) => {
@@ -62,8 +74,12 @@ class Proofreader {
         });
     }
 
-    proofread(parags, lang = "en", send) {
+    proofread(parags, lang, send) {
         const now = Date.now();
+
+        if (!lang) {
+            lang = Proofreader.francLang(franc(parags.join(' '), { whitelist : ["eng", "fra"] }));
+        }
         Proofreader.getRetext(lang, rtx => {
             const report = new Array(parags.length);
             let i = -1;
