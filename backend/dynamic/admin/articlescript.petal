@@ -680,6 +680,29 @@
             var ts = d.id('topic-selection');
         };      
 
+        var createPageSelector = function(index) {
+
+        }
+
+        var createPageTabs = function(content) {
+            var selectors = d.id('pages-selector').empty();
+            var pages = d.id('pages-wrapper').empty();
+            var ph = document.createElement('div');
+
+            ph.innerHTML = content;
+
+            var tags = ph.children;
+            var pageindex = 0;
+            createPageSelector(pageindex);
+            
+            for (var i = 0; i < tags.length; i++) {
+                var tag = tags[i];
+                var shouldsplit = !!tag.querySelector("lml-page");
+
+                
+            }
+        };
+
         var showPackaging = function() {
             var div = document.createElement('div')
             div.innerHTML = CKEDITOR.instances.content.getData();
@@ -694,8 +717,9 @@
 
             d.id('pr-parag-list').empty();
 
-            d.id('pages-selector').empty();
-            d.id('pages-wrapper').empty();
+            liliumcms.lmldom.post({ }, '{=config.default.server.url}/admin/article/withads/' + liliumcms.pageloader.lastLevel, function(resp) {
+                createPageTabs(resp);
+            });
 
             liliumcms.modals.get("article-packaging").cast();
         };
