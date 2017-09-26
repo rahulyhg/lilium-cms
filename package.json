@@ -58,6 +58,7 @@
     "eyes": "latest",
     "facebook-ads-sdk": "latest",
     "facebook-js-ads-sdk": "latest",
+    "franc-min": "^3.1.1",
     "fs": "latest",
     "globe": "latest",
     "gm": "latest",
