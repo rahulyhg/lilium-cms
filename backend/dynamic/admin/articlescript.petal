@@ -716,6 +716,7 @@
             return div;
         }
 
+        window.PP_TAGS = [];
         var createPageTabs = function(content) {
             var selectors = d.id('pages-selector').empty();
             var pages = d.id('pages-wrapper').empty();
@@ -736,6 +737,7 @@
                 var tag = tags[i];
                 var shouldsplit = !!tag.querySelector("lml-page");
                 var isImage = !!tag.querySelector('img');
+                var markup = tag.outerHTML;
                 var box;
 
                 switch (tag.nodeName) {
@@ -773,12 +775,26 @@
                     page.appendChild(box);
                     box.dataset.index = i;
                     box.dataset.pageindex = pageindex;
-                    box.dataset.markup = tag.outerHTML;
+                    box.dataset.markup = markup;
 
-                    debugger;
+                    PP_TAGS.push({ 
+                        markup : markup, 
+                        tag : tag.nodeName.toLowerCase(), 
+                        type : "tag",
+                        initialIndex : i,
+                        initialPageIndex : pageindex,
+                        pageIndex : pageindex 
+                    });
                 }
              
                 if (shouldsplit) {
+                    PP_TAGS.push({ 
+                        markup : "<lml-page></lml-page>", 
+                        tag : "lml-page", 
+                        type : "split", 
+                        index : pageindex 
+                    });
+
                     page = createPageTag(++pageindex);
                     pages.get().appendChild(page);
 
