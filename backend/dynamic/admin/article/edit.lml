@@ -91,6 +91,26 @@
     </div>
 </div>
 
+<div id="dlg-modal-packaging-loading" class="lml-modal">
+    <div class="lml-modal-body">
+        <div id="modal-preparing-title">
+            <b>Sprinkling some magic on your masterpiece</b>
+            <i>This should take less than a minute.</i>
+        </div>
+        <img src="{=config.default.server.url}/static/media/packbox.gif" />
+    </div>
+</div>
+
+<div id="dlg-modal-publishing-loading" class="lml-modal">
+    <div class="lml-modal-body">
+        <div id="modal-preparing-title">
+            <b>Sit tight while I finalize everything</b>
+            <i>Bwing, bwing, bwing.</i>
+        </div>
+        <img src="{=config.default.server.url}/static/media/pug.gif" />
+    </div>
+</div>
+
 <div id="article-packaging" class="lml-modal">
     <div id="packaging-title">
         <b>Packaging</b>
@@ -395,8 +415,11 @@
 }
 
 #article-packaging {
-    width: calc(100% - 40px);
+    width: auto;
     background: #F3F3F3;
+
+    transform: translate3d(0px, 0px, 0px) scale(1);
+    border-radius: 0px;
 }
 
 .pr-parag h4 {
@@ -408,10 +431,6 @@
     margin: -10px -10px 10px;
     padding: 10px;
     border-bottom: 1px solid #DDD;
-}
-
-#article-packaging.shown {
-    transform : translate3d(0px, 20px, 0px) scale(1);
 }
 
 .article-button-wrapper {
@@ -622,5 +641,68 @@
 .page-wrapper {
     padding: 5px;
     background-color: #E9E9E9;
+    display: none;
 }
+
+.page-wrapper.shown {
+    display: block;
+}
+
+#pages-wrapper {
+    border-top: 1px solid #CCC;
+    position: relative;
+    z-index: 5;
+}
+
+#pages-selector div {
+    display: inline-block;
+    padding: 6px 10px;
+    background-color: #E1E1E1;
+    border: 1px solid #CCC;
+    margin: 0px 0px 0px 10px;
+    transform: translate3d(0,1px,0);
+
+    position:relative;
+    z-index: 10;
+
+    cursor: pointer;
+}
+
+#pages-selector div.selected {
+    border-bottom: none;
+    background-color: #E9E9E9;
+    transform: translate3d(0,2px,0);
+}   
+
+#dlg-modal-packaging-loading,
+#dlg-modal-publishing-loading {
+    background-color: #FFF;
+    width: 640px;
+}
+
+#dlg-modal-packaging-loading img,
+#dlg-modal-publishing-loading img {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+#modal-preparing-title {
+    position: absolute;
+    top: 50px;
+    text-align: center;
+    left: 0;
+    right: 0;
+    font-size: 32px;
+}
+
+#modal-preparing-title b {
+    display: block;
+    line-height: 38px;
+}
+
+#modal-preparing-title i {
+    display: block;
+    font-size: 18px;
+}
+
 </style>
