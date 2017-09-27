@@ -680,8 +680,27 @@
             var ts = d.id('topic-selection');
         };      
 
-        var createPageSelector = function(index) {
+        var switchToPage = function(index) {
+            var shown = document.querySelector('.page-wrapper.shown');
+            shown.classList.remove('shown');
 
+            document.getElementById("page-wrapper-" + index).classList.add('shown');
+
+            var selected = document.querySelector('#pages-selector div.selected');
+            selected.classList.remove('selected');
+
+            document.getElementById('page-selector-' + index).classList.add('selected');
+        };
+
+        var createPageSelector = function(index) {
+            var sel = d.make({ text : index ? "Page " + (index + 1) : "Landing", id : "page-selector-" + index });
+            sel.bind('click', function() {
+                switchToPage(index);
+            });
+
+            if (index === 0) { sel.cadd('selected'); }
+
+            d.id('pages-selector').born(sel);
         }
 
         var createPageTag = function(index) {
@@ -705,38 +724,59 @@
             
             var page = createPageTag(pageindex);
             pages.get().appendChild(page);
+
+            page.classList.add("shown");
             
             for (var i = 0; i < tags.length; i++) {
                 var tag = tags[i];
                 var shouldsplit = !!tag.querySelector("lml-page");
                 var isImage = !!tag.querySelector('img');
+                var box;
 
                 switch (tag.nodeName) {
                     case "H3": case "H4": case "H5": case "H6":
-                        page.appendChild( d.make({ class : "page-block page-head-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                        box = ( d.make({ class : "page-block page-head-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
                         break;
 
                     case "AD":
-                        page.appendChild( d.make({ class : "page-block page-ad-block", text : "This can be moved around" }).get() );
+                        box = ( d.make({ class : "page-block page-ad-block", text : "This can be moved around" }).get() );
                         break;
 
                     case "LML-RELATED":
-                        page.appendChild( d.make({ class : "page-block page-related-block", text : "This can be moved around" }).get() );
+                        box = ( d.make({ class : "page-block page-related-block", text : "This can be moved around" }).get() );
                         break;
 
                     case "HR":
-                        page.appendChild( d.make({ class : "page-block page-hr-block" }).get() );
+                        box = ( d.make({ class : "page-block page-hr-block" }).get() );
                         break;
 
                     case "P": 
-                        isImage ? 
-                            page.appendChild( d.make({ class : "page-block page-img-block", text : "Image" }).get() ) :
-                            page.appendChild( d.make({ class : "page-block page-parag-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                        box = isImage ? 
+                            ( d.make({ class : "page-block page-img-block", text : "Image" }).get() ) :
+                            ( d.make({ class : "page-block page-parag-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                        break;
+
+                    case "LML-PAGE":
+                        shouldsplit = true;
                         break;
 
                     default:
-                        page.appendChild( d.make({ class : "page-block page-unknown-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                        box = d.make({ class : "page-block page-unknown-block", text : tag.textContent.substring(0, 50) + "..." }).get();
                 }
+
+                if (box) {
+                    page.appendChild(box);
+                    box.dataset.index = i;
+                    box.dataset.pageindex = pageindex;
+                    box.markup = tag.innerHTML;
+                }
+             
+                if (shouldsplit) {
+                    page = createPageTag(++pageindex);
+                    pages.get().appendChild(page);
+
+                    createPageSelector(pageindex);
+                }   
             }
         };
 
@@ -746,19 +786,26 @@
             
             var text = div.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').replace(/https?:\/\/[a-zA-Z0-9.\/]+/g, ' ').trim();
 
+            liliumcms.modals.get('dlg-modal-packaging-loading').cast();
+            d.id('pr-parag-list').empty();
             liliumcms.lmldom.post({ 
                 markup : CKEDITOR.instances.content.getData()
             }, '{=config.default.server.url}/admin/article/proofread', function(resp) {
                 fillPackaging(resp);
+                liliumcms.lmldom.post(
+                    { }, 
+                    '{=config.default.server.url}/admin/article/withads/' + liliumcms.pageloader.lastLevel, 
+                function(resp) {
+                    createPageTabs(resp);
+
+                    liliumcms.modals.get('dlg-modal-packaging-loading').dismiss();
+
+                    setTimeout(function() {
+                        liliumcms.modals.get("article-packaging").cast();
+                    }, 300);
+                });
             });
 
-            d.id('pr-parag-list').empty();
-
-            liliumcms.lmldom.post({ }, '{=config.default.server.url}/admin/article/withads/' + liliumcms.pageloader.lastLevel, function(resp) {
-                createPageTabs(resp);
-            });
-
-            liliumcms.modals.get("article-packaging").cast();
         };
 
         $('form button[name=publish]').on('click', function(e) {
@@ -780,8 +827,6 @@
 
         var curConfirmTimeout;
         var publishCurrentArticle = function(e) {
-            $('#confirm-publish').modal('hide');
-
             var valid = true || liliumcms.formvalidator.validate($('form#post_create'));
             var form = liliumcms.lmldom.getFormData().post_create;
             var tempForm = form;
@@ -790,6 +835,7 @@
             tempForm.values.autosaveid = _id;
 
             if (valid) {
+                liliumcms.modals.get('dlg-modal-publishing-loading').cast();
                 $('.alert-wrapper').remove();
 
                 document.dispatchEvent(new CustomEvent("articleWillPublish"));
@@ -822,6 +868,7 @@
                 }
     
                 liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/edit', function(data) {
+                    liliumcms.modals.get('dlg-modal-publishing-loading').dismiss();
                     if (data.success) {
                         lastSave = form;
                         
