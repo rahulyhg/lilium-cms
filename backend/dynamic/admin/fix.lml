@@ -324,7 +324,7 @@ a.ticket-edit-link {
             class : "ticket-details"
         }, card);
 
-        var userObject = liliumcms.users.get(ticket.author);
+        var userObject = liliumcms.users.get(ticket.author) || {avatarURL : "/static/media/lmllogo.png", displayname : "Inactive user"};
         var author = ce('div', {
             class : "ticket-author"
         }, details);
