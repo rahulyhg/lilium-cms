@@ -77,9 +77,8 @@ class Proofreader {
     proofread(parags, lang, send) {
         const now = Date.now();
 
-        if (!lang) {
-            lang = Proofreader.francLang(franc(parags.join(' '), { whitelist : ["eng", "fra"] }));
-        }
+        lang = lang || Proofreader.francLang(franc(parags.join(' '), { whitelist : ["eng", "fra"] }));
+
         Proofreader.getRetext(lang, rtx => {
             const report = new Array(parags.length);
             let i = -1;
