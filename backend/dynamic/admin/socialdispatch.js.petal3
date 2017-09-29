@@ -469,6 +469,10 @@ h1 > a.fab {
     font-style: normal;
 }
 
+.control-bar-views {
+    display: none;
+}
+
 #facebook-target-search-result i.type-country, #facebook-target-selections > div.fbtarget-country { background: #b53c3c; }
 #facebook-target-search-result i.type-region, #facebook-target-selections > div.fbtarget-region { background: #73b53c; }
 #facebook-target-search-result i.type-city, #facebook-target-selections > div.fbtarget-city { background: #3cb5a7; }
