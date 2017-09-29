@@ -30,7 +30,7 @@
 .lml-modal {
     display: block;
     width: 520px;
-    margin: auto;
+    margin: 0px auto 70px;
     background-color: #F9F9F9;
     overflow: hidden;
 
