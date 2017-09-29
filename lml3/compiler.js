@@ -161,8 +161,6 @@ class LML3 {
         log('LML3', "Loading LML3 file : " + abspath, 'info');
 
         if (_c.env == "dev") {
-            console.log(abspath);
-            console.log(require.cache[abspath]);
             require.cache[abspath] = undefined;
         }
 

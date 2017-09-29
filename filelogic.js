@@ -131,7 +131,6 @@ class FileLogic {
         const cachekey = cli._c.uid + id;
         sharedcache.get(cachekey, ctn => {
             if (cli._c.env != "dev" && ctn) {
-                console.log(cli._c.env);
                 cli.sendHTML(ctn, 200);
             } else {
                 var readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + id + ".lml3";
