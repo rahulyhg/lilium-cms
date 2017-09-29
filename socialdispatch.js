@@ -228,6 +228,10 @@ class SocialDispatch {
                     "article.title" : 1,
                     "article.date" : 1
                 }
+            }, {
+                $sort : {
+                    time : 1
+                }
             } 
         ], (arr) => {
             let res = {};
