@@ -91,7 +91,12 @@ class SocialPost {
                             }, false, true, true);
                         } else {
                             log("SDispatch", "But something went wrong : " + (err || body.error.message), "warn");
-                            done && done(err || body.error.message);
+                            db.update(_c, DISPATCH_COLLECTION, {_id : this._id}, {
+                                status : "error", 
+                                error : err || body.error.message
+                            }, () => {
+                                done && done(err || body.error.message);
+                            });
                         }
                     });
                 });
@@ -399,12 +404,13 @@ class SocialDispatch {
                             (x) => { 
                                 return {
                                     displayname : x.displayname, 
-                                    name : x._id
+                                    name : x._id,
+                                    color : x.color
                                 }; 
                             }
                         )
                     );
-                }, { _id : 1, displayname : 1, network : 1 });
+                }, { _id : 1, displayname : 1, network : 1, color : 1 });
             } else if (levels[1] == "full") {
                 if (cli.hasRight('admin')) {
                     db.findToArray(config.default(), ACCOUNTS_COLLECTION, {}, (err, array) => {
@@ -444,6 +450,10 @@ class SocialDispatch {
                         fieldName   : "network",
                         dataType    : "text",
                         displayname : "Network"
+                    }, {
+                        fieldName   : "color",
+                        dataType    : "text",
+                        displayname : "Color identifier"
                     }, {
                         fieldName   : "accountid",
                         dataType    : "text",
