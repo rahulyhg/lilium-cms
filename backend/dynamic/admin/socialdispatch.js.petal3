@@ -3,11 +3,106 @@ const modalNewDispatchName = "lml-modal-new-dispatch";
 
 const compile = (o, context) => { o(`
 <script>
+    var calendarDataSource = "${context._c.server.url}/admin/socialdispatch/datasource";
+    var oneDay = 1000 * 60 * 60 * 24;
+    var now = new Date();
+    var calendarData = { };
+    var calendarID = "social-dispatch-calendar";
+    var calendarHeaderID = "social-dispatch-headers";
+    var calendarSingleHeaderClass = "social-dispatch-single-header";
+    var calendarColumnsID = "social-dispatch-columns";
+    var calendarSingleColumnClass = "social-dispatch-single-column";
+    var calendarSinglePostClass = "social-dispatch-single-post";
+    var timeHops = 1000 * 60 * 15;
+
+    var calendarArticleTitleLimit = 50;
+    
+    var selectedStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    calendarData[selectedStartDate] = [];
+    calendarData[selectedStartDate + oneDay] = [];
+    calendarData[selectedStartDate + (2*oneDay)] = [];
+
+    var calendar = {
+        fetch : function(cb) {
+            liliumcms.lmldom.get(calendarDataSource, { flowserspin : true, json : true, params : {
+                startstamp : selectedStartDate,
+                endstamp : selectedStartDate + (3*oneDay),
+                async : "true",
+                format : "blocks"
+            } }, function(data) {
+                if (data) {
+                    for (var i = 0; i < data.length; i++) {
+                        var dd = new Date(data[i].time);
+                        var day = new Date(dd.getFullYear(), dd.getMonth(), dd.getDate()).getTime();
+                        if (!calendarData[day]) {
+                            calendarData[day] = [];
+                        }
+
+                        calendarData[day].push(data[i]);
+                    }
+                } else {
+
+                }
+
+                cb && cb();
+            });
+        },
+        render : function() {
+            var cal = d.id(calendarColumnsID).empty();
+            var headers = d.id(calendarHeaderID).empty();
+            
+            for (var i = selectedStartDate; i <= selectedStartDate + (oneDay * 2); i += oneDay) {
+                var thatday = new Date(i);
+                var posts = calendarData[i];
+
+                headers.born(d.make({
+                    class : calendarSingleHeaderClass,
+                    text : dateFormat(thatday, 'dddd, mmmm dd') 
+                }));
+
+                var col = d.make({
+                    class : calendarSingleColumnClass
+                });
+                cal.born(col);
+
+                if (posts) for (var j = 0; j < posts.length; j++) {
+                    var post = posts[j];
+                    var cell = d.make({
+                        parent : col,
+                        class : calendarSinglePostClass
+                    });
+
+                    var time = new Date(post.time);
+                    cell.born(d.make({
+                        node : "b",
+                        text : post.article.title.substring(0, calendarArticleTitleLimit) + 
+                            (post.article.title.length > calendarArticleTitleLimit ? "..." : "")
+                    }));
+
+                    cell.born(d.make({
+                        node : "i",
+                        text : dateFormat(time, 'HH:MM')
+                    }));
+
+                    cell.bind('click', handleCellClick.bind(post, cell, post));
+                }
+            }
+        }
+    };
+
     window.fbtargetkv = {};
 
     var statusLabelVocab = {
         "scheduled" : "scheduled",
         "published" : "live on Facebook"
+    };
+
+    // "this" is a post object
+    var handleCellClick = function(cell, post) {
+        var article = this.article;
+        var cellel = cell.get();
+
+        
     };
 
     var updateEvent = function(event, cb) {
@@ -93,40 +188,6 @@ const compile = (o, context) => { o(`
         });
     }
 
-    var handleClick = function(event) {
-        liliumcms.lmldom.get("${context._c.server.url}/admin/socialdispatch/deepFetch/" + event.id + "?async=true", { 
-            spinflower : true,
-            json : true 
-        }, function(dispatch) {
-            var modal = liliumcms.modals.get("${modalName}");
-            modal.dispatchid = dispatch._id;
-
-            document.getElementById("edit-event-label").textContent = statusLabelVocab[dispatch.status];
-            document.getElementById("edit-event-image").src = dispatch.article.featuredimage[0].sizes.thumbnaillarge.url;
-            document.getElementById("edit-event-title").textContent = dispatch.article.title;
-            document.getElementById("edit-event-subtitle").textContent = dispatch.article.subtitle;
-            document.getElementById("edit-event-author").textContent = dispatch.article.authors[0].displayname;
-            liliumcms.lmldom.flatpickr["edit-event-time"].setDate(new Date(dispatch.time));
-
-            modal.cast();
-        });
-    };
-
-    var calelem = document.getElementById('social-dispatch-calendar');
-    var calendar = new JSCalendar(calelem, {
-        width: "full",
-        fetchReplaces : true,
-        datasource : "${context._c.server.url}/admin/socialdispatch/datasource?async=true"
-    }).init().fetch(function() {
-        calendar.render();
-    }, true);
-
-    calendar.on('cellMoved', function(that, extra) {
-        updateEvent(extra.event);
-    }).on('click', function(that, event) {
-        handleClick(event);
-    });
-
     window["modal_cb_create"] = function(modal) {
         var params = modal.getFormData();
 
@@ -185,6 +246,21 @@ const compile = (o, context) => { o(`
             }, true);
         });
     };
+
+
+    liliumcms.lmldom.bind(function() {
+        var cal = d.id(calendarID).empty();
+        var dateheader = d.make({
+            parent : cal,
+            id : calendarHeaderID
+        });
+        var columns = d.make({
+            parent : cal,
+            id : calendarColumnsID
+        });
+
+        calendar.fetch(function() { calendar.render(); });
+    });
 
     var addSearchTarget = function(fbtarget) {
         var elem = d.make({
@@ -325,6 +401,46 @@ document.getElementById("facebook-target-search-box").addEventListener('keyup', 
 </script>
 
 <style>
+#social-dispatch-single-header,
+#social-dispatch-headers {
+    float: none;
+    clear: both;
+
+    display: block;
+}
+
+.social-dispatch-single-header {
+    width: 33.3%;
+    float: left;
+
+    padding: 10px;
+}
+
+#social-dispatch-columns {
+
+}
+
+.social-dispatch-single-column {
+    width: 33.3%;
+    float: left;
+}
+
+.social-dispatch-single-post {
+    display: block;
+    padding: 10px;
+    border: 1px solid #DDD;
+    margin: 0px 10px 10px;
+}
+
+.social-dispatch-single-post b {
+    display: block;
+    
+}
+
+.social-dispatch-single-post i {
+
+}
+
 #new-dispatch-search-results {
     height: 220px;
     border: 1px solid #DDD;
