@@ -18,6 +18,7 @@ const preload = (context, done) => {
 const compile = (o, context) => {
     o(
         context.header, 
+        '<div id="social-dispatch-filters"></div>',
         '<div id="social-dispatch-calendar"></div>',
         context.petals["socialdispatch.js"].compile() || "",
         '<div class="float-clear"></div>',
