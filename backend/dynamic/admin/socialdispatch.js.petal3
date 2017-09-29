@@ -6,29 +6,34 @@ const compile = (o, context) => { o(`
     var calendarDataSource = "${context._c.server.url}/admin/socialdispatch/datasource";
     var oneDay = 1000 * 60 * 60 * 24;
     var now = new Date();
+
+    var selectedStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     var calendarData = { };
+    var networksByID = {};
+
     var calendarID = "social-dispatch-calendar";
     var calendarHeaderID = "social-dispatch-headers";
     var calendarSingleHeaderClass = "social-dispatch-single-header";
     var calendarColumnsID = "social-dispatch-columns";
     var calendarSingleColumnClass = "social-dispatch-single-column";
     var calendarSinglePostClass = "social-dispatch-single-post";
-    var calendarLegendID = "social-dispatch-legend"
-    var calendarLegendItemClass = "social-dispatch-legend-item"
-    var timeHops = 1000 * 60 * 15;
-    var numberOfColumns = 3;
+    var calendarLegendID = "social-dispatch-legend";
+    var calendarLegendItemClass = "social-dispatch-legend-item";
+    var calendarFiltersID = "social-dispatch-filters";
 
-    var networksByID = {};
-
+    var numberOfColumns = window.innerWidth > 1300 ? window.innerWidth > 1700 ? 5 : 4 : 3;
     var calendarArticleTitleLimit = 30;
-    
-    var selectedStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+   
+    var showOnlyPage = "";
+    var statusFilter = "";
 
     var calendar = {
         fetch : function(cb) {
             liliumcms.lmldom.get(calendarDataSource, { flowserspin : true, json : true, params : {
                 startstamp : selectedStartDate,
                 endstamp : selectedStartDate + (numberOfColumns*oneDay),
+                page : showOnlyPage,
+                status : statusFilter,
                 async : "true",
                 format : "blocks"
             } }, function(data) {
@@ -146,6 +151,14 @@ const compile = (o, context) => { o(`
     };
 
     window.newDispatchFromTool = function() {
+        d.id('new-dispatch-search-results').empty();
+        d.id('facebook-target-search-result').empty();
+        d.id('facebook-target-selections').empty();
+
+        d.id('new-dispatch-search').get().value = "";
+        d.id('ncaption').get().value = "";
+        d.id('facebook-target-search-box').get().value = "";
+
         liliumcms.modals.get("${modalNewDispatchName}").cast();
     }
 
@@ -313,8 +326,101 @@ const compile = (o, context) => { o(`
                 node : "span",
                 text : networks[i].displayname
             });
-
         }
+
+        var filters = d.id(calendarFiltersID);
+        filters.cadd("bunch-filters")
+        d.make({
+            parent : filters,
+            class : "bunch-filters-title",
+            text : "Display".toUpperCase()
+        });
+        d.make({
+            parent: filters,
+            node : "label",
+            text : "Number of days"
+        });
+        
+        var numDaySelect = d.make({
+            parent : filters,
+            node : "select",
+            id : "numberofdays"
+        });
+
+        for (var i = 3; i < 8; i++) {
+            d.make({
+                parent : numDaySelect,
+                node : "option",
+                text : i
+            });
+        }
+
+        d.make({
+            parent : filters,
+            node : "label",
+            text : "Facebook page"
+        });
+        
+        var pagefilter = d.make({
+            parent: filters,
+            node : "select",
+            id : "pagefilter"
+        });
+        var optall = document.createElement('option');
+        optall.textContent = "All";
+        optall.value = "";
+        pagefilter.get().appendChild(optall);
+
+        for (var i = 0; i < networks.length; i++) {
+            var opt = d.make({
+                parent : pagefilter,
+                node : "option",
+                text : networks[i].displayname
+            });
+            opt.get().value = networks[i].name;
+        }
+
+        
+        d.make({
+            parent : filters,
+            node : "label",
+            text : "Status"
+        });
+        
+        var statusfilter = d.make({
+            parent: filters,
+            node : "select",
+            id : "statusfilter"
+        });
+
+        var allstatus = [
+            {name : "All", value : ""},
+            {name : "Published", value : "published"},
+            {name : "Scheduled", value : "scheduled"},
+            {name : "Error", value : "error"}
+        ];
+        for (var i = 0; i < allstatus.length; i++) {
+            optall = document.createElement('option');
+            optall.textContent = allstatus[i].name;
+            optall.value = allstatus[i].value;
+            statusfilter.get().appendChild(optall);
+        }
+        
+        pagefilter.bind('change', function() {
+            showOnlyPage = pagefilter.value;
+            calendar.fetch(function() { calendar.render(); });
+        });
+
+        numDaySelect.get().value = numberOfColumns;
+        numDaySelect.bind('change', function() {
+            numberOfColumns = parseInt(numDaySelect.value);
+            calendar.fetch(function() { calendar.render(); });
+        });
+
+        statusfilter.bind('change', function() {
+            statusFilter = statusfilter.value;
+            calendar.fetch(function() { calendar.render(); });
+        });
 
         calendar.fetch(function() { calendar.render(); });
     });

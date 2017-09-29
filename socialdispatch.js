@@ -212,6 +212,10 @@ class SocialDispatch {
             $match.pageid = db.mongoID(params.page);
         }
 
+        if (params.status) {
+            $match.status = params.status;
+        }
+
         db.join(_c, DISPATCH_COLLECTION, [
             { 
                 $match 
