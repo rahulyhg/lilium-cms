@@ -13,24 +13,27 @@ const compile = (o, context) => { o(`
     var calendarColumnsID = "social-dispatch-columns";
     var calendarSingleColumnClass = "social-dispatch-single-column";
     var calendarSinglePostClass = "social-dispatch-single-post";
+    var calendarLegendID = "social-dispatch-legend"
+    var calendarLegendItemClass = "social-dispatch-legend-item"
     var timeHops = 1000 * 60 * 15;
+    var numberOfColumns = 3;
 
-    var calendarArticleTitleLimit = 50;
+    var networksByID = {};
+
+    var calendarArticleTitleLimit = 30;
     
     var selectedStartDate = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    calendarData[selectedStartDate] = [];
-    calendarData[selectedStartDate + oneDay] = [];
-    calendarData[selectedStartDate + (2*oneDay)] = [];
 
     var calendar = {
         fetch : function(cb) {
             liliumcms.lmldom.get(calendarDataSource, { flowserspin : true, json : true, params : {
                 startstamp : selectedStartDate,
-                endstamp : selectedStartDate + (3*oneDay),
+                endstamp : selectedStartDate + (numberOfColumns*oneDay),
                 async : "true",
                 format : "blocks"
             } }, function(data) {
                 if (data) {
+                    calendarData = {};
                     for (var i = 0; i < data.length; i++) {
                         var dd = new Date(data[i].time);
                         var day = new Date(dd.getFullYear(), dd.getMonth(), dd.getDate()).getTime();
@@ -51,42 +54,70 @@ const compile = (o, context) => { o(`
             var cal = d.id(calendarColumnsID).empty();
             var headers = d.id(calendarHeaderID).empty();
             
-            for (var i = selectedStartDate; i <= selectedStartDate + (oneDay * 2); i += oneDay) {
+            for (var i = selectedStartDate; i <= selectedStartDate + (oneDay * (numberOfColumns-1)); i += oneDay) {
                 var thatday = new Date(i);
                 var posts = calendarData[i];
 
-                headers.born(d.make({
+                header = d.make({
                     class : calendarSingleHeaderClass,
                     text : dateFormat(thatday, 'dddd, mmmm dd') 
-                }));
+                });
+                header.style("width", 100/numberOfColumns + "%");
+                headers.born(header);
 
                 var col = d.make({
                     class : calendarSingleColumnClass
                 });
+                col.style("width", 100/numberOfColumns + "%");
                 cal.born(col);
 
                 if (posts) for (var j = 0; j < posts.length; j++) {
                     var post = posts[j];
+                    var page = networksByID[post.pageid] || {};
+                    var pagename = page.displayname || "Deleted page";
                     var cell = d.make({
                         parent : col,
-                        class : calendarSinglePostClass
+                        class : calendarSinglePostClass + " pageid-" + post.pageid + " status-" + post.status
                     });
+                    cell.style('border', '2px solid ' + (page.color || ""));
+
+                    var bar = d.make({
+                        class : "social-dispatch-single-post-bar"
+                    });
+                    bar.get().style.backgroundColor = page.color || "";
+                    cell.born(bar);
 
                     var time = new Date(post.time);
-                    cell.born(d.make({
-                        node : "b",
+                    var timecell = d.make({
+                        class : "sd-post-time",
+                        text : dateFormat(time, 'HH:MM')
+                    });
+                    timecell.style('backgroundColor', page.color || "");
+                    cell.born(timecell);
+
+                    var titlecell = d.make({
+                        class : "sd-post-title"
+                    });
+            
+                    titlecell.born(d.make({
+                        node : "span",
+                        text : post.status,
+                        class : "sd-post-status status-" + post.status
+                    }));
+
+                    titlecell.born(d.make({
+                        node : "span",
                         text : post.article.title.substring(0, calendarArticleTitleLimit) + 
                             (post.article.title.length > calendarArticleTitleLimit ? "..." : "")
                     }));
 
-                    cell.born(d.make({
-                        node : "i",
-                        text : dateFormat(time, 'HH:MM')
-                    }));
-
+                    cell.born(titlecell);
                     cell.bind('click', handleCellClick.bind(post, cell, post));
                 }
+                col.born(d.make({class : "float-clear"}))
             }
+
+            headers.born(d.make({class : "float-clear"}))
         }
     };
 
@@ -250,6 +281,10 @@ const compile = (o, context) => { o(`
 
     liliumcms.lmldom.bind(function() {
         var cal = d.id(calendarID).empty();
+        var legend = d.make({
+            parent : cal,
+            id : calendarLegendID
+        });
         var dateheader = d.make({
             parent : cal,
             id : calendarHeaderID
@@ -258,6 +293,28 @@ const compile = (o, context) => { o(`
             parent : cal,
             id : calendarColumnsID
         });
+
+        var networks = liliumcms.livevars.livevars()["socialdispatch.networks.liveselect"] || [];
+        for (var i = 0; i < networks.length; i++) {
+            networksByID[networks[i].name] = networks[i];
+            var litem = d.make({
+                parent : legend,
+                class : calendarLegendItemClass
+            });
+
+            var dot = d.make({
+                parent : litem,
+                node : "i"
+            });
+            dot.style("backgroundColor", networks[i].color);
+            
+            d.make({
+                parent: litem,
+                node : "span",
+                text : networks[i].displayname
+            });
+
+        }
 
         calendar.fetch(function() { calendar.render(); });
     });
@@ -401,12 +458,23 @@ document.getElementById("facebook-target-search-box").addEventListener('keyup', 
 </script>
 
 <style>
+.float-clear {
+    float: none;
+    clear: both;
+}
+
 #social-dispatch-single-header,
 #social-dispatch-headers {
     float: none;
     clear: both;
 
     display: block;
+}
+
+#social-dispatch-headers {
+    background: #FAFAFA;
+    border-bottom: 1px solid #CCC;
+    box-shadow: 0px 1px 5px rgba(0,0,0,0.1);
 }
 
 .social-dispatch-single-header {
@@ -427,18 +495,69 @@ document.getElementById("facebook-target-search-box").addEventListener('keyup', 
 
 .social-dispatch-single-post {
     display: block;
+    border: 2px solid #DDD;
+    margin: 10px 10px 0px;
+
+    cursor: pointer;
+    position: relative;
+
+    overflow: hidden;
+}
+
+.social-dispatch-single-post .sd-post-title {
+    display: inline-block;
+    width: calc(100% - 55px);
+    padding: 6px 10px 6px;
+    vertical-align: top;
+    font-size: 13px;
+    background-color: #F6F6F6;
+    height: 30px;
+}
+
+.sd-post-time {
+    display: inline-block;
+    background-color: #333;
+    color: #FFF;
+    font-family: "Oswald", sans-serif;
+    font-size: 20px;
+    padding: 2px 6px;
+    width: 55px;
+    height: 30px;
+}
+
+.sd-post-status {
+    display: inline-block;
+    margin-right: 5px;
+    background: #333;
+    padding: 1px 4px 0px;
+    color: #FFF;
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status-published {}
+.status-error {}
+.status-scheduled {}
+
+#social-dispatch-legend {
     padding: 10px;
-    border: 1px solid #DDD;
-    margin: 0px 10px 10px;
+    border-bottom: 1px solid #CCC;
+    background-color: #F9F9F9;
 }
 
-.social-dispatch-single-post b {
-    display: block;
-    
+.social-dispatch-legend-item {
+    display: inline-block;
+    margin-right: 10px;
 }
 
-.social-dispatch-single-post i {
-
+.social-dispatch-legend-item i {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 8px;
+    margin-right: 6px;
 }
 
 #new-dispatch-search-results {
@@ -585,13 +704,23 @@ h1 > a.fab {
     font-style: normal;
 }
 
-.control-bar-views {
-    display: none;
+.sd-footer {
+    background-color: #F6F6F6;
+    border-top: 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+    margin-top: 10px;
 }
 
-#facebook-target-search-result i.type-country, #facebook-target-selections > div.fbtarget-country { background: #b53c3c; }
-#facebook-target-search-result i.type-region, #facebook-target-selections > div.fbtarget-region { background: #73b53c; }
-#facebook-target-search-result i.type-city, #facebook-target-selections > div.fbtarget-city { background: #3cb5a7; }
+#networks-link {
+    display: inline-block;
+    margin: 10px;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#facebook-target-search-result i.type-country, #facebook-target-selections > div.fbtarget-country, .type-country, { background: #b53c3c; }
+#facebook-target-search-result i.type-region, #facebook-target-selections > div.fbtarget-region, .type-region { background: #73b53c; }
+#facebook-target-search-result i.type-city, #facebook-target-selections > div.fbtarget-city, .type-city { background: #3cb5a7; }
 </style>
 `);};
 
