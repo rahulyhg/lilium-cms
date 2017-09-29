@@ -195,15 +195,21 @@ class SocialDispatch {
         let startdate = parseInt(params.startstamp);
         let enddate = parseInt(params.endstamp);
 
+        let $match = {
+            $and : [ 
+                { time : { $lt : enddate   }}, 
+                { time : { $gt : startdate }},
+                { status : { $ne : "deleted" } }
+            ]
+        };
+
+        if (params.page) {
+            $match.pageid = db.mongoID(params.page);
+        }
+
         db.join(_c, DISPATCH_COLLECTION, [
             { 
-                $match : {
-                    $and : [ 
-                        { time : { $lt : enddate   }}, 
-                        { time : { $gt : startdate }},
-                        { status : { $ne : "deleted" } }
-                    ]
-                }
+                $match 
             }, {
                 $lookup : {
                     from : "content",
@@ -217,11 +223,15 @@ class SocialDispatch {
                 $project : {
                     time : 1,
                     status : 1,
-                    "article.title" : 1
+                    pageid : 1,
+                    message : 1,
+                    "article.title" : 1,
+                    "article.date" : 1
                 }
             } 
         ], (arr) => {
-            let resp = {};
+            let res = {};
+            /*
             arr.forEach(post => {
                 let d = new Date(post.time);
                 let y = d.getFullYear();
@@ -238,8 +248,9 @@ class SocialDispatch {
                     color : post.status == "published" ? "#bbb" : "#af57e4"
                 })
             });
+            */
 
-            send(resp);
+            send(arr);
         });
     }
 
