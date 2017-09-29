@@ -20,7 +20,10 @@ const compile = (o, context) => {
         context.header, 
         '<div id="social-dispatch-calendar"></div>',
         context.petals["socialdispatch.js"].compile() || "",
-        `<a href="${context._c.server.url}/admin/socialdispatch/networks" class="role-admin">Networks</a>`
+        '<div class="float-clear"></div>',
+        '<div class="sd-footer role-admin">',
+        `<a href="${context._c.server.url}/admin/socialdispatch/networks" class="role-admin" id="networks-link">Networks</a>`,
+        '</div>'
     );
 };
 
