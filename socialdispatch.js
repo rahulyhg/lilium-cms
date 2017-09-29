@@ -225,6 +225,8 @@ class SocialDispatch {
                     status : 1,
                     pageid : 1,
                     message : 1,
+                    "target.displayname" : 1,
+                    "target.type" : 1,
                     "article.title" : 1,
                     "article.date" : 1
                 }
@@ -300,12 +302,22 @@ class SocialDispatch {
 
         if (level == "networks") {
             let accounts = cli.postdata.data.accounts || [];
-            db.remove(config.default(), ACCOUNTS_COLLECTION, {}, () => {
-                db.insert(config.default(), ACCOUNTS_COLLECTION, accounts, () => { 
-                    cli.sendJSON({
-                        success : true,
-                        msg : "Network has now " + cli.postdata.data.accounts.length + " social accounts.",
-                        title : "Saved"
+            db.findToArray(config.default(), ACCOUNTS_COLLECTION, {}, (err, arr) => {
+                
+                arr.forEach(reg => {
+                    let maybeac = accounts.find(ac => reg.accountid == ac.accountid);
+                    if (maybeac) {
+                        maybeac._id = reg._id;
+                    }
+                });
+
+                db.remove(config.default(), ACCOUNTS_COLLECTION, {}, () => {
+                    db.insert(config.default(), ACCOUNTS_COLLECTION, accounts, () => { 
+                        cli.sendJSON({
+                            success : true,
+                            msg : "Network has now " + cli.postdata.data.accounts.length + " social accounts.",
+                            title : "Saved"
+                        });
                     });
                 });
             });
