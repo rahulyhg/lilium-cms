@@ -218,6 +218,7 @@ const compile = (o, context) => { o(`
                         name : x.name,
                         key : x.key,
                         regionid : x.region_id,
+                        countrycode : x.country_code,
                         type : x.type
                     };
 

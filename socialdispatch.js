@@ -57,14 +57,45 @@ class SocialPost {
                         article.url = undefined;
                     }
 
+                    const pkgData = {
+                        message : this.message, 
+                        link : article.url,
+                        published : true,
+                    }
+
+                    if (this.target && this.target.length != 0) {
+                        pkgData.targeting = {
+                            geo_locations : {
+                                countries : [],
+                                regions : [],
+                                cities : []
+                            }
+                        };
+
+                        this.target.forEach(x => {
+                            switch (x.type) {
+                                case "city": 
+                                    pkgData.targeting.geo_locations.cities.push({ key : x.key/*, name : x.name*/ });
+                                    x.countrycode && pkgData.targeting.geo_locations.countries.push(x.countrycode);
+                                    break;
+
+                                case "region":
+                                    pkgData.targeting.geo_locations.regions.push({ key : x.key });
+                                    x.countrycode && pkgData.targeting.geo_locations.countries.push(x.countrycode);
+                                    break;
+                            }
+                        });
+
+                        // Remove duplicate country
+                        pkgData.targeting.geo_locations.countries = pkgData.targeting.geo_locations.countries.filter((elem, index, self) => {
+                            return index == self.indexOf(elem);
+                        });
+                    }
+
                     request({
                         method : "POST",
                         url : reqURL,
-                        json : {
-                            message : this.message, 
-                            link : article.url,
-                            published : true,
-                        }
+                        json : pkgData
                     }, (err, msg, body) => {
                         log("SDispatch", "Got response from Facebook Graph");
                         if (body && body.id) {
