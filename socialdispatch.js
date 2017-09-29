@@ -79,6 +79,10 @@ class SocialPost {
                                     x.countrycode && pkgData.targeting.geo_locations.countries.push(x.countrycode);
                                     break;
 
+                                case "country":
+                                    x.countrycode && pkgData.targeting.geo_locations.countries.push(x.countrycode);
+                                    break;
+
                                 case "region":
                                     pkgData.targeting.geo_locations.regions.push({ key : x.key });
                                     x.countrycode && pkgData.targeting.geo_locations.countries.push(x.countrycode);
