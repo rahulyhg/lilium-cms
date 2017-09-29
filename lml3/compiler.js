@@ -22,7 +22,12 @@ class MarkupBuffer {
 
 class LMLPetal {
     constructor(context, petalname) {
-        this.petalobject = require(context.workdir + "/" + petalname + LMLConst.petalext); 
+        const petalpath = context.workdir + "/" + petalname + LMLConst.petalext;
+        if (context._c.env == "dev") {
+            require.cache[petalpath] = undefined;
+        }
+
+        this.petalobject = require(petalpath); 
         this.context = context;
         this.petalname = petalname;
     }
@@ -154,6 +159,13 @@ class LML3 {
 
     compile(_c, abspath, extra, done) {
         log('LML3', "Loading LML3 file : " + abspath, 'info');
+
+        if (_c.env == "dev") {
+            console.log(abspath);
+            console.log(require.cache[abspath]);
+            require.cache[abspath] = undefined;
+        }
+
         let now = new Date();
         let lml3file = require(abspath);
         let settings = lml3file.settings || {};
