@@ -140,10 +140,36 @@ const compile = (o, context) => { o(`
 
         liliumcms.lmldom.get('${context._c.server.url}/admin/socialdispatch/deepFetch/' + post._id, {
             params : { async : "true" },
-            spinflower : true
+            spinflower : true,
+            json : true
         }, function(sched) {
             var mod = liliumcms.modals.get('lml-modal-edit-event');
             mod.dispatchid = post._id;
+            mod.fill(sched);
+            liliumcms.lmldom.flatpickr["edit-event-time"].setDate(new Date(sched.time));
+            d.id('edit-event-image').attr('src', sched.article.featuredimage[0].sizes.thumbnaillarge.url);
+            d.id('edit-event-author').get().textContent = sched.article.authors[0].displayname;
+            d.id('edit-event-title').get().textContent = sched.article.title;
+            d.id('edit-event-subtitle').get().textContent = sched.article.subtitle;
+            d.id('edit-event-href').attr('href', sched.article.url).get().textContent = sched.article.url;
+            d.id('edit-event-edit-href').attr('href', '${context._c.server.url}/admin/article/edit/' + sched.article._id).get()
+                .textContent = '${context._c.server.url}/admin/article/edit/' + sched.article._id;
+
+            var targetwrap = d.id('edit-event-target').empty();
+            if (sched.target && sched.target.length) for (var i = 0; i < sched.target.length; i++) {
+                var tt = sched.target[i];
+                d.make({
+                    class : "targeting-blob type-" + tt.type,
+                    text : tt.name,
+                    parent : targetwrap
+                });
+            } else {
+                d.make({
+                    text : "No targeting set.",
+                    parent : targetwrap
+                });
+            }
+
             mod.cast();
         });
     };
@@ -276,7 +302,14 @@ const compile = (o, context) => { o(`
 
     window["modal_cb_save"] = function(modal) {
         var id = modal.dispatchid;
-        updateEvent({id : id, at : new Date(modal.getFormData()["edit-event-time"])}, function() {
+        var dat = modal.getFormData();
+
+        liliumcms.lmldom.sendForm({
+            id : id, 
+            pageid : dat.pageid,
+            message : dat.message,
+            date : new Date(dat["edit-event-time"]).getTime()
+        }, "${context._c.server.url}/admin/socialdispatch/move", function() {
             calendar.fetch(function() {
                 calendar.render();
             }, true);
@@ -532,6 +565,10 @@ const compile = (o, context) => { o(`
         Edit social dispatch task
     </div>
     <div class="lml-modal-body">
+        <div>
+            <textarea name="message" class="lml-modal-fulltext" style="height: 60px;"></textarea>
+        </div>
+
         <div style="margin: 0px -15px 0px -15px;">
             <img id="edit-event-image" />
         </div>
@@ -546,13 +583,32 @@ const compile = (o, context) => { o(`
         </div>
 
         <hr />
-        <p>
-            This article is <b id="edit-event-label"></b>.
-        </p>
-        <p>
-            Dispatch schedule : 
+        <div class="lml-modal-field">
+            <label>Dispatch schedule</label>
             <input class="lml-date" id="edit-event-time" data-options="time" />
-        </p>
+        </div>
+
+        <div class="lml-modal-field">
+            <label>Facebook Page</label>
+            <select class="lmldom-liveselect" data-filledby="socialdispatch.networks.liveselect" name="pageid"></select>
+        </div>
+
+        <div class="lml-modal-field">
+            <label>Targeting</label>
+            <div id="edit-event-target">
+                
+            </div>
+        </div>      
+
+        <div class="lml-modal-field">
+            <label style="display: block;">Article URL</label>
+            <a href="" id="edit-event-href" target="_blank"></a>
+        </div>
+
+        <div class="lml-modal-field">
+            <label style="display: block;">Article edition link</label>
+            <a href="${context._c.server.url}/admin/article/edit/" id="edit-event-edit-href"></a>
+        </div>
     </div>
     <div class="lml-modal-footer">
         <button class="lml-modal-cancel btn-default" type="button">Dismiss</button>
@@ -610,6 +666,7 @@ document.getElementById("facebook-target-search-box").addEventListener('keyup', 
 .social-dispatch-single-post {
     display: block;
     border: 2px solid #DDD;
+    border-radius : 5px;
     margin: 10px 10px 0px;
 
     cursor: pointer;
@@ -794,7 +851,7 @@ h1 > a.fab {
     cursor: pointer;
 }
 
-#facebook-target-selections > div {
+#facebook-target-selections > div, .targeting-blob {
     display: inline-block;
     background: #af57e4;
     color: #FFF;
@@ -804,6 +861,10 @@ h1 > a.fab {
     font-size: 12px;
     margin: 0px 5px 5px 0px;
     cursor: crosshair;
+}
+
+.targeting-blob {
+    cursor: normal;
 }
 
 #facebook-target-search-result i {
