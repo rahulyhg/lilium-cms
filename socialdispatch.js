@@ -379,11 +379,13 @@ class SocialDispatch {
                 cli.sendJSON({});
             });
         } else if (level == "move") {
-            let _id = db.mongoID(cli.postdata.data._id);
+            let _id = db.mongoID(cli.postdata.data.id);
             let date = cli.postdata.data.date;
 
             db.update(cli._c, DISPATCH_COLLECTION, {_id}, {
-                time : parseInt(date)
+                time : parseInt(date),
+                message : cli.postdata.data.message,
+                pageid : db.mongoID(cli.postdata.data.pageid)
             }, () => {
                 CAIJ.scheduleTask('socialDispatch', {
                     siteid : cli._c.id,
