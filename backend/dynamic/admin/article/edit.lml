@@ -645,7 +645,7 @@
 .page-list-block::before { content: 'Bulleted list'; }
 .page-unknown-block::before { content: 'Not sure what this is'; }
 .page-script-block::before { content: 'Script'; color : #0aab0a; }
-.page-instagram-script-block::before { content: 'Instagram Embed Script'; color : #0aab0a; }
+.page-instagram-script-block::before { content: 'Instagram embed script'; color : #0aab0a; }
 .page-instaembed-block::before { content: 'Instagram embed';  color : #0b62d6; }
 
 .page-parag-block, .page-list-block, page-unknown-block { background: #F3F3F3; }
