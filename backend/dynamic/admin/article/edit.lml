@@ -642,8 +642,9 @@
 .page-related-block::before { content: 'Related links'; color : #cd0bd6; }
 .page-img-block::before { content: 'Image'; color : #0b62d6; }
 .page-hr-block::before { content: 'Horizontal ruler'; color : #AAA; font-size: 12px; }
+.page-list-block::before { content: 'Bulleted list'; }
 
-.page-parag-block { background: #F3F3F3; }
+.page-parag-block, .page-list-block { background: #F3F3F3; }
 .page-head-block { border-color : #b58018; }
 .page-ad-block { border-color : #d63d0b; }
 .page-related-block { border-color : #cd0bd6; }

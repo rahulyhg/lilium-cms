@@ -780,6 +780,10 @@
                         box = ( d.make({ class : "page-block page-hr-block" }).get() );
                         break;
 
+                    case "UL":
+                        box = ( d.make({ class : "page-block page-list-block", text : tag.children.length + " list elements" }).get() );
+                        break;
+
                     case "P": 
                         box = isImage ? 
                             ( d.make({ class : "page-block page-img-block", text : "Image" }).get() ) :
