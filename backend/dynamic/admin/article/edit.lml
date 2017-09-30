@@ -180,7 +180,7 @@
         </div>
     </div>
 
-    <div>
+    <div id="pagination-and-banners">
         <h2>Pagination and banners</h2>
         <p>You can reposition ad banners to make sure they were not inserted at awkward places.</p>
 
@@ -614,9 +614,19 @@
     border: 1px dashed #DDD;
 
     margin-bottom: 6px;
-    cursor: move;
+    cursor: row-resize;
 
     font-size: 12px;
+
+    -moz-user-select: none;
+    -ms-user-select: none; 
+    -khtml-user-select: none;
+    -webkit-user-select: none; 
+    -webkit-touch-callout: none; 
+}
+
+.page-block.moving {
+    opacity : 0.5;
 }
 
 .page-block::before {
