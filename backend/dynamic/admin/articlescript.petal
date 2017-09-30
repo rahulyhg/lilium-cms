@@ -517,6 +517,17 @@
         }, 60 * 1000, true);
 
 
+        d.id('pagination-and-banners').bind('mouseleave', function() {
+            movingBlock = false; 
+            movingBlockElem && movingBlockElem.classList.remove('moving');
+            movingBlockElem = undefined; 
+        });
+        d.id('pagination-and-banners').bind('mouseup', function() {
+            movingBlock = false; 
+            movingBlockElem && movingBlockElem.classList.remove('moving');
+            movingBlockElem = undefined; 
+        });
+
         window.addEventListener("beforeunload", function(e) {
             if (lastSave !== $('form').serialize()) {
 
@@ -689,7 +700,12 @@
             var shown = document.querySelector('.page-wrapper.shown');
             shown.classList.remove('shown');
 
-            document.getElementById("page-wrapper-" + index).classList.add('shown');
+            var newPage = document.getElementById("page-wrapper-" + index);
+            newPage.classList.add('shown');
+
+            if (movingBlock && movingBlockElem) {
+                newPage.insertBefore(movingBlockElem, newPage.firstElementChild);
+            }
 
             var selected = document.querySelector('#pages-selector div.selected');
             selected.classList.remove('selected');
@@ -701,6 +717,11 @@
             var sel = d.make({ text : index ? "Page " + (index + 1) : "Landing", id : "page-selector-" + index });
             sel.bind('click', function() {
                 switchToPage(index);
+            });
+            sel.bind('mouseenter', function() {
+                if (movingBlock && movingBlockElem) {
+                    switchToPage(index);
+                }
             });
 
             if (index === 0) { sel.cadd('selected'); }
@@ -717,6 +738,8 @@
         }
 
         window.PP_TAGS = [];
+        var movingBlock = false;
+        var movingBlockElem;
         var createPageTabs = function(content) {
             var selectors = d.id('pages-selector').empty();
             var pages = d.id('pages-wrapper').empty();
@@ -785,6 +808,20 @@
                         initialPageIndex : pageindex,
                         pageIndex : pageindex 
                     });
+
+                    (function(box) {
+                        box.addEventListener('mousedown', function() {
+                            movingBlock = true;
+                            movingBlockElem = box;
+                            box.classList.add('moving');
+                        });
+
+                        box.addEventListener('mouseenter', function() {
+                            if (movingBlock && box != movingBlockElem) {
+                                movingBlockElem.parentElement.insertBefore(movingBlockElem, box);
+                            }
+                        });
+                    })(box);
                 }
              
                 if (shouldsplit) {
