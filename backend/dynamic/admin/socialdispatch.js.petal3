@@ -138,7 +138,14 @@ const compile = (o, context) => { o(`
         var article = this.article;
         var cellel = cell.get();
 
-        
+        liliumcms.lmldom.get('${context._c.server.url}/admin/socialdispatch/deepFetch/' + post._id, {
+            params : { async : "true" },
+            spinflower : true
+        }, function(sched) {
+            var mod = liliumcms.modals.get('lml-modal-edit-event');
+            mod.dispatchid = post._id;
+            mod.cast();
+        });
     };
 
     var updateEvent = function(event, cb) {
