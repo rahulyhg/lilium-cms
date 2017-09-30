@@ -295,7 +295,7 @@ class Article {
         const jsdom = require('jsdom');
         const window = new jsdom.JSDOM(markup).window;
 
-        const paragraphs = Array.prototype.filter.call(window.document.querySelectorAll('p'), (
+        const paragraphs = Array.prototype.filter.call(window.document.querySelectorAll('body > p'), (
             x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
         ));
 
