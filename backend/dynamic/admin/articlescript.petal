@@ -784,9 +784,30 @@
                         box = ( d.make({ class : "page-block page-list-block", text : tag.children.length + " list elements" }).get() );
                         break;
 
+                    case 'BLOCKQUOTE':
+                        if (tag.classList.contains('instagram-media')) {
+                            box = ( d.make({ class : "page-block page-instaembed-block", text : "Using script embed" }).get() );
+                        } else {
+                            box = ( d.make({ class : "page-block page-quote-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                        }
+                        break;
+
+                    case 'SCRIPT':
+                        box = ( d.make({ class : "page-block page-script-block", text : "Plain Javascript block" }).get() );
+                        if (tag.src && tag.src.indexOf('instagram') != -1) {
+                            box.textContent += ", needed for Instagram embed"
+                            box.classList.add('page-instagram-script-block');
+                        }
+                        break;
+
                     case "P": 
                         box = isImage ? 
-                            ( d.make({ class : "page-block page-img-block", text : "Image" }).get() ) :
+                            ( d.make(
+                                { 
+                                    class : "page-block page-img-block", 
+                                    text : tag.querySelector('a') ? tag.querySelector('a').textContent : tag.querySelector('img').src
+                                }).get() 
+                            ) :
                             ( d.make({ class : "page-block page-parag-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
                         break;
 

@@ -643,12 +643,17 @@
 .page-img-block::before { content: 'Image'; color : #0b62d6; }
 .page-hr-block::before { content: 'Horizontal ruler'; color : #AAA; font-size: 12px; }
 .page-list-block::before { content: 'Bulleted list'; }
+.page-unknown-block::before { content: 'Not sure what this is'; }
+.page-script-block::before { content: 'Script'; color : #0aab0a; }
+.page-instagram-script-block::before { content: 'Instagram Embed Script'; color : #0aab0a; }
+.page-instaembed-block::before { content: 'Instagram embed';  color : #0b62d6; }
 
-.page-parag-block, .page-list-block { background: #F3F3F3; }
+.page-parag-block, .page-list-block, page-unknown-block { background: #F3F3F3; }
+.page-script-block { border-color : #0aab0a; }
 .page-head-block { border-color : #b58018; }
 .page-ad-block { border-color : #d63d0b; }
 .page-related-block { border-color : #cd0bd6; }
-.page-img-block { border-color : #0b62d6; }
+.page-img-block, .page-instaembed-block { border-color : #0b62d6; }
 
 .page-wrapper {
     padding: 5px;
@@ -678,6 +683,12 @@
     z-index: 10;
 
     cursor: pointer;
+
+    -moz-user-select: none;
+    -ms-user-select: none; 
+    -khtml-user-select: none;
+    -webkit-user-select: none; 
+    -webkit-touch-callout: none; 
 }
 
 #pages-selector div.selected {
