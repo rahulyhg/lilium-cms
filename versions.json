@@ -85,6 +85,6 @@
     "1.4.1": {
         "codename" : "Equinox",
         "script" : "1.4.1.js",
-        "features" : ["Packaging"]
+        "features" : ["Packaging", "Proofreading", "Scheduling"]
     }
 }
