@@ -902,6 +902,7 @@
         });
 
         window["article-packaging_accept"] = function(modal) {
+            // Package current paragraph order + content in dataset
             publishCurrentArticle();
             modal.dismiss();
         };
@@ -909,6 +910,16 @@
         $('.btn-send-for-review').bind('click', function() {
             $('#confirm-send-for-review').modal('show');
         });
+
+        var buildContentFromPackage = function() {
+            var content = "";
+            var blocks = document.querySelectorAll('.page-block');
+            for (var i = 0; i < blocks.length; i++) {
+                content += blocks[i].dataset.markup;
+            }
+
+            return content + '<!-- '+ Math.random().toString().substring(2) +' -->';
+        }
 
         var curConfirmTimeout;
         var publishCurrentArticle = function(e) {
@@ -951,10 +962,14 @@
                 if (!tempForm.values.media) {
                     return liliumcms.notify({title : "Watch out!", message : "You forgot to assign a featured image.", type : "warn"});
                 }
+
+                var contentMarkup = buildContentFromPackage();
+                tempForm.values.content = contentMarkup;
     
                 liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/edit', function(data) {
                     liliumcms.modals.get('dlg-modal-publishing-loading').dismiss();
                     if (data.success) {
+                        CKEDITOR.instances.content.setData(contentMarkup);
                         lastSave = form;
                         
                         if (data.redirect) {
@@ -991,10 +1006,6 @@
             } 
         };
 
-
-        $('#confirm-publish button.btn-primary').on('click', function(e) {
-            publishCurrentArticle(e);
-        });
 
         $('#confirm-unpublish button.btn-danger').on('click', function() {
             unpublishArticle();
