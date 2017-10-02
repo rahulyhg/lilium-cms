@@ -177,7 +177,56 @@ $(document).ready(function() {
         document.dispatchEvent(event);
     };
 
-    liliumcms.notify = function(notification) {
+    var makeNotifyOptions = function(n) {
+        // Adapter from jQuery
+        n.duration = n.delay;
+        n.content = n.message;
+        n.link = n.url;
+
+        return Object.assign({
+            duration : 5000,
+            title : "Notification",
+            link : "",
+            content : "",
+            type : "info"
+        }, n);
+    }
+
+    liliumcms.notify = function(n) {
+        n = makeNotifyOptions(n || {});
+        var wrap = document.createElement('div');
+        wrap.className = "notification lml-notification notification-type-" + n.type;
+        
+        var title = document.createElement(n.link ? 'a' : 'div');
+        title.className = "notification-title";
+        title.textContent = n.title;
+
+        if (n.link) {
+            title.href = n.link;
+            title.target = "_blank";
+        }
+
+        var content = document.createElement('div');
+        content.className = "notification-content";
+        content.textContent = n.content;
+
+        document.body.appendChild(wrap);
+
+        setTimeout(function() {
+            wrap.classList.add('shown');
+        }, 20);
+
+        setTimeout(function() {
+            wrap.classList.remove('shown');
+            wrap.classList.add('dismissed');
+
+            setTimeout(function() {
+                wrap.remove();
+            }, 300);
+        }, n.duration + 20);
+    };
+
+    liliumcms.notify_DEPRECATED = function(notification) {
         $.notify(notification, {
             type: notification.type,
             newest_on_top: false,
