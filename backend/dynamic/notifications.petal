@@ -57,7 +57,7 @@
 }
 
 
-.notification-type-info { border-color: #4c6de0; }
+.notification-type-info, .notification-type-log { border-color: #4c6de0; }
 .notification-type-success { border-color: #3ebf11; }
 .notification-type-error { border-color: #bf1111; }
 .notification-type-warning { border-color: #f3c11a; }
