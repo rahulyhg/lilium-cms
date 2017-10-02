@@ -1,0 +1,63 @@
+<div id="notifications-wrapper"></div>
+
+<style>
+#notifications-wrapper {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+}
+
+.lml-notification {
+    display: block;
+    width: 300px;
+    margin: 0px 10px 10px;
+    background: #FFF;
+    border: 3px solid #DDD;
+    border-bottom-width: 5px;
+
+    cursor: pointer;
+
+    -webkit-transition: all 0.3s;
+       -moz-transition: all 0.3s;
+        -ms-transition: all 0.3s;
+         -o-transition: all 0.3s;
+            transition: all 0.3s;
+
+    opacity: 0;
+    -webkit-transform: scale(1) translate3d(100%, 0, 0);
+       -moz-transform: scale(1) translate3d(100%, 0, 0);
+        -ms-transform: scale(1) translate3d(100%, 0, 0);
+         -o-transform: scale(1) translate3d(100%, 0, 0);
+            transform: scale(1) translate3d(100%, 0, 0);
+}
+
+.lml-notification.shown {
+    opacity : 1;
+
+    -webkit-transform: scale(1) translate3d(0, 0, 0);
+       -moz-transform: scale(1) translate3d(0, 0, 0);
+        -ms-transform: scale(1) translate3d(0, 0, 0);
+         -o-transform: scale(1) translate3d(0, 0, 0);
+            transform: scale(1) translate3d(0, 0, 0);
+}
+
+.notification-title {
+    display: block;
+    margin: 8px 10px 0px 10px;
+    font-weight: 700;
+    color: #333;
+    font-size: 16px;
+}
+
+.notification-content {
+    margin: 0px 10px 8px;
+    font-size: 12px;
+}
+
+
+.notification-type-info { border-color: #4c6de0; }
+.notification-type-success { border-color: #3ebf11; }
+.notification-type-error { border-color: #bf1111; }
+.notification-type-warning { border-color: #f3c11a; }
+.notification-type-system { border-color: #af58e4; }
+</style>
