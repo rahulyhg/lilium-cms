@@ -179,9 +179,10 @@ $(document).ready(function() {
 
     var makeNotifyOptions = function(n) {
         // Adapter from jQuery
-        n.duration = n.delay;
-        n.content = n.message;
-        n.link = n.url;
+        if (n.delay) n.duration = n.delay;
+        if (n.message) n.content = n.message;
+        if (n.url) n.link = n.url;
+        if (n.type == "danger") { n.type = "error" }
 
         return Object.assign({
             duration : 5000,
@@ -208,22 +209,33 @@ $(document).ready(function() {
 
         var content = document.createElement('div');
         content.className = "notification-content";
-        content.textContent = n.content;
+        content.innerHTML = n.content;
 
-        document.body.appendChild(wrap);
+        wrap.appendChild(title);
+        wrap.appendChild(content);
+        document.getElementById("notifications-wrapper").appendChild(wrap);
 
         setTimeout(function() {
             wrap.classList.add('shown');
         }, 20);
 
-        setTimeout(function() {
-            wrap.classList.remove('shown');
-            wrap.classList.add('dismissed');
+        (function(wrap) {
+            var dismissWrap = function() {
+                wrap.classList.remove('shown');
+                wrap.classList.add('dismissed');
 
-            setTimeout(function() {
-                wrap.remove();
-            }, 300);
-        }, n.duration + 20);
+                setTimeout(function() {
+                    wrap.remove();
+                }, 300);
+            }
+
+            var dismissTick = setTimeout(dismissWrap, n.duration + 20);
+
+            wrap.addEventListener('click', function() {
+                clearTimeout(dismissTick);
+                dismissWrap();
+            });
+        })(wrap);
     };
 
     liliumcms.notify_DEPRECATED = function(notification) {
