@@ -918,7 +918,7 @@
                 content += blocks[i].dataset.markup;
             }
 
-            return content + '<!-- '+ Math.random().toString().substring(2) +' -->';
+            return content + '<!-- '+ Date.now() +' -->';
         }
 
         var curConfirmTimeout;
