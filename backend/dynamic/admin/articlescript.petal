@@ -513,10 +513,13 @@
     $(document).ready(function() {
         // Will be edit, new or an id
         // Check if we can get an id
-        timer = $.timer(function() {
+        var autoSaveInterval = setInterval(function() {
             if (!isPublished) { autoSave(); }
-        }, 60 * 1000, true);
+        }, 60 * 1000);
 
+        liliumcms.pageloader.bindUnload(function() {
+            clearInterval(autoSaveInterval);
+        });
 
         d.id('pagination-and-banners').bind('mouseleave', function() {
             movingBlock = false; 
@@ -528,24 +531,6 @@
             movingBlockElem && movingBlockElem.classList.remove('moving');
             movingBlockElem = undefined; 
         });
-
-        if (CKEDITOR) {
-            CKEDITOR.on('instanceReady', function() {
-                CKEDITOR.instances.content.on('focus', function() {
-                    if (timer) {
-                        timer.play();
-                    }
-                });
-
-                CKEDITOR.instances.content.on('blur', function() {
-                    if (document.activeElement === document.getElementsByTagName("iframe")[0]) {
-                        if (timer) {
-                            timer.pause();
-                        }
-                    }
-                });
-            });
-        }
 
         var saveCurrentArticle = function(cb) {
             document.dispatchEvent(new CustomEvent("articleWillSave"));
