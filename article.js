@@ -64,6 +64,7 @@ class Article {
             case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
             case 'proofread': if (cli.hasRightOrRefuse("create-articles")) this.proofread(cli); break;
             case 'withads': if (cli.hasRightOrRefuse('create-articles')) this.insertAdsFromCli(cli); break;
+            case 'addwordtodico': if (cli.hasRightOrRefuse('create-articles')) this.addWordToDico(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
             case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
             case 'preview': if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview"); break;
@@ -285,6 +286,13 @@ class Article {
 
     list(cli) {
         filelogic.serveAdminLML(cli, false);
+    };
+
+    addWordToDico(cli) {
+        const Proofreader = require('./proofreader');
+        Proofreader.addWord(cli.postdata.data.word, cli.postdata.data.lang || "en", () => {
+            cli.sendJSON({ok : true});
+        });
     };
 
     proofread(cli) {
