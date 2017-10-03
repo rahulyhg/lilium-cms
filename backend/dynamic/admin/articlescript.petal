@@ -602,6 +602,12 @@
             });
         });
 
+        var addToWhiteList = function(txt, lang) {
+            liliumcms.lmldom.post({ word : txt, lang : lang }, '{=config.default.server.url}/admin/article/addwordtodico', function() {
+                liliumcms.notify({title : "Word added to whitelist", type : "success", "content" : "The word '" + txt + "' was added to the whitelist." });
+            });
+        }
+
         var fillPackaging = function(serverdata) {
             // Corrections
             var changes = [];
@@ -628,8 +634,7 @@
                         li.born(d.make({node : "span", text : c.reason.split(';')[0]}));
 
                         if (c.suggestions) for (var k = 0; k < c.suggestions.length; k++) {
-                            var singlesug = d.make({ node : "b", text : "Use '" + c.suggestions[k] + "'" });
-                            li.born(singlesug);
+                            var singlesug = d.make({ node : "b", text : "Change to '" + c.suggestions[k] + "'", parent : li });
 
                             (function(singlesug, sug, reason, li, pcontent) {
                                 singlesug.bind('click', function() {
@@ -638,6 +643,14 @@
                                 });
                             })(singlesug, c.suggestions[k], c.reason, li, pcontent)
                         }
+
+                        var singlesug = d.make({ node : "b", text : "Add '" + c.reason.split('`')[1] + "' to whitelist", parent : li });
+                        (function(addbtn, txt, li) {
+                            addbtn.style('color', '#c7a4e0').bind('click', function() {
+                                addToWhiteList(txt, serverdata.language);
+                                li.get().remove();
+                            });
+                        })(singlesug, c.reason.split('`')[1], li);
 
                         clist.born(li);
                     }
