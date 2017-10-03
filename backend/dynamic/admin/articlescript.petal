@@ -598,13 +598,13 @@
         }
 
         // Save Draft
-        $('form button[name=save]').on('click', function(e) {
+        d.q('form button[name=save]').bind('click', function(e) {
             saveCurrentArticle();
 
             return false;
         });
 
-        $('.btn-preview').on('click', function(e) {
+        d.q('.btn-preview').bind('click', function(e) {
             // Open in new tab
             var btn = this;
             var textinside = btn.innerHTML;
@@ -618,11 +618,9 @@
             formdat.id = contentid;
             formdat.topic = currentTopic._id;
             formdat.media = d.id('mediapicker').value;
+            formdat.content = buildContentFromPackage();
 
-            // TODO : Package content
-            formdat.content = formdat.content;
-
-            $.post('{=config.default.server.url}/admin/article/preview', formdat, function(html) {
+            liliumcms.lmldom.post(formdat, '{=config.default.server.url}/admin/article/preview', function(html) {
                 liliumcms.previewer.setContent(html);
                 btn.disabled = false;
                 btn.innerHTML = textinside;
