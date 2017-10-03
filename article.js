@@ -299,13 +299,14 @@ class Article {
             x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
         ));
 
-        Proofreader.proofread(paragraphs.map(x => x.textContent), lang, report => {
+        Proofreader.proofread(paragraphs.map(x => x.textContent), lang, (report, lang) => {
             cli.sendJSON(report && { 
                 corrections : report.map(r => r.messages.map(x => { 
                     return { reason : x.message, at : x.column, suggestions : x.expected,  } })
                 ),
                 keywords : report.map(r => r.data.keywords),
-                paragraphs : paragraphs.map(x => x.innerHTML)
+                paragraphs : paragraphs.map(x => x.innerHTML),
+                language : lang
             });
         });
     }

@@ -85,7 +85,7 @@ class Proofreader {
 
             const next = () => {
                 if (++i == parags.length) {
-                    return send(report);
+                    return send(report, lang);
                 }
 
                 this.proofreadOne(rtx, parags[i], (err, singlereport) => {
