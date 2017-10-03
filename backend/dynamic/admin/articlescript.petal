@@ -31,6 +31,7 @@
                 originalTitle = content.title;
                 currentSlug   = content.name;
                 selectedTopic = content.topic;
+                lastSave = content.content;
 
                 if (isAutoSave) {
                     _id = lastParamUrl;
@@ -490,7 +491,7 @@
                 var tempSave = currentSave + '&_id=' + _id + '&contentid=' + contentid;
 
                 $.post('{=config.default.server.url}/admin/article/autosave', tempSave, function(data) {
-                    lastSave = currentSave;
+                    lastSave = CKEDITOR.instances.content.getData();
 
                     if (data.success && data._id) {
                         _id = data._id;
@@ -528,17 +529,6 @@
             movingBlockElem = undefined; 
         });
 
-        window.addEventListener("beforeunload", function(e) {
-            if (lastSave !== $('form').serialize()) {
-
-                var confirmationMessage = 'It looks like you have been editing something. ' +
-                    'If you leave before saving, your changes will be lost.';
-
-                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-            }
-        });
-
         if (CKEDITOR) {
             CKEDITOR.on('instanceReady', function() {
                 CKEDITOR.instances.content.on('focus', function() {
@@ -570,7 +560,7 @@
             tempsave.autosaveid = _id;
 
             liliumcms.lmldom.sendForm(tempsave, '{=config.default.server.url}/admin/article' + url, function(data) {
-                lastSave = currentSave;
+                lastSave = CKEDITOR.instances.content.getData();
 
                 if (data.success && data.redirect) {
                     liliumcms.pageloader.load(data.redirect);
@@ -968,7 +958,7 @@
                     liliumcms.modals.get('dlg-modal-publishing-loading').dismiss();
                     if (data.success) {
                         CKEDITOR.instances.content.setData(contentMarkup);
-                        lastSave = form;
+                        lastSave = CKEDITOR.instances.content.getData();
                         
                         if (data.redirect) {
                             liliumcms.pageloader.load(data.redirect);
