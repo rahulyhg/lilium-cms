@@ -517,6 +517,7 @@ select {
     clear: both;
     float: none;
     display: block;
+    padding-top: 30px;
 }
 
 .lmlform-fieldwrapper-hidden {
@@ -909,20 +910,11 @@ input[type="submit"].green:active, .btn.green:active, button.green:active {
 	border-left: 1px solid {=actioncolor};
 }
 
-.lmlform .lmlform-fieldwrapper-title {
-	background-color: #EEE;
-}
-
-.lmlform .lmlform-fieldwrapper-title:not(:first-child) {
-	border-top: 1px solid #DDD;
-}
-
-.lmlform .lmlform-fieldwrapper-title:not(:last-child) {
-	border-bottom: 1px solid #DDD;
-}
-
 .lmlform .lmlform-fieldwrapper-title h3 {
-	text-shadow: 0 0 3px rgba(0,0,0,0.1);
+    border-bottom: 1px solid #CCC;
+    padding-bottom: 5px;
+    font-size: 24px;
+    font-weight: 300;
 }
 
 .workbutton.working span {
@@ -1062,13 +1054,15 @@ main.lmladminmain.left.lefter {
 }
 
 main.lmladminmain h1 {
-    font-weight: 500;
-    background: #F6F6F6;
-    border-bottom: 2px solid #EEE;
-    color: #AAA;
+    font-weight: 300;
     padding: 40px 13px 10px;
-    font-size: 24px;
+    font-size: 30px;
     letter-spacing: 0.2px;
+    border-bottom: 1px solid #DDD;
+
+    background: #F3F3F3;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
+    color: #555;
 }
 
 main.lmladminmain .pad10 {
