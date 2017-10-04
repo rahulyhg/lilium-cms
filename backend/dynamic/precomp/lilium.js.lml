@@ -662,6 +662,7 @@ var LiliumCMS = function() {
 
     var PageLoader = function() {   
         var that = this;
+        this.unloadHooks = [];
 
         this.present = function() {
             log('PageLoader', 'Presenting current page');
@@ -687,12 +688,22 @@ var LiliumCMS = function() {
             window.history.back();
         };
 
+        this.bindUnload = function(cb) {
+            that.unloadHooks.push(cb);
+        };
+
         this.load = function(url, ignoreHistory) {
             log('PageLoader', 'Loading URL : ' + url + (ignoreHistory ? " without " : " with ") + "history support");
             this.tidy();
             if (!ignoreHistory) {
                 this.pushHistory(url);
             }
+
+            for (var i = 0; i < that.unloadHooks.length; i++) {
+                that.unloadHooks[i]();
+            }
+
+            that.unloadHooks = [];
 
             this.levels = document.location.href.split('/');
             if (!this.levels[this.levels.length - 1]) { this.levels.pop(); }

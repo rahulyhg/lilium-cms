@@ -64,6 +64,7 @@ class Article {
             case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
             case 'proofread': if (cli.hasRightOrRefuse("create-articles")) this.proofread(cli); break;
             case 'withads': if (cli.hasRightOrRefuse('create-articles')) this.insertAdsFromCli(cli); break;
+            case 'addwordtodico': if (cli.hasRightOrRefuse('create-articles')) this.addWordToDico(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
             case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
             case 'preview': if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview"); break;
@@ -287,6 +288,13 @@ class Article {
         filelogic.serveAdminLML(cli, false);
     };
 
+    addWordToDico(cli) {
+        const Proofreader = require('./proofreader');
+        Proofreader.addWord(cli.postdata.data.word, cli.postdata.data.lang || "en", () => {
+            cli.sendJSON({ok : true});
+        });
+    };
+
     proofread(cli) {
         const Proofreader = require('./proofreader');
         const markup = cli.postdata.data.markup;
@@ -299,13 +307,14 @@ class Article {
             x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
         ));
 
-        Proofreader.proofread(paragraphs.map(x => x.textContent), lang, report => {
+        Proofreader.proofread(paragraphs.map(x => x.textContent), lang, (report, lang) => {
             cli.sendJSON(report && { 
                 corrections : report.map(r => r.messages.map(x => { 
                     return { reason : x.message, at : x.column, suggestions : x.expected,  } })
                 ),
                 keywords : report.map(r => r.data.keywords),
-                paragraphs : paragraphs.map(x => x.innerHTML)
+                paragraphs : paragraphs.map(x => x.innerHTML),
+                language : lang
             });
         });
     }

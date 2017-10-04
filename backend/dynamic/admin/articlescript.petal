@@ -31,6 +31,7 @@
                 originalTitle = content.title;
                 currentSlug   = content.name;
                 selectedTopic = content.topic;
+                lastSave = content.content;
 
                 if (isAutoSave) {
                     _id = lastParamUrl;
@@ -490,7 +491,7 @@
                 var tempSave = currentSave + '&_id=' + _id + '&contentid=' + contentid;
 
                 $.post('{=config.default.server.url}/admin/article/autosave', tempSave, function(data) {
-                    lastSave = currentSave;
+                    lastSave = CKEDITOR.instances.content.getData();
 
                     if (data.success && data._id) {
                         _id = data._id;
@@ -512,10 +513,13 @@
     $(document).ready(function() {
         // Will be edit, new or an id
         // Check if we can get an id
-        timer = $.timer(function() {
+        var autoSaveInterval = setInterval(function() {
             if (!isPublished) { autoSave(); }
-        }, 60 * 1000, true);
+        }, 60 * 1000);
 
+        liliumcms.pageloader.bindUnload(function() {
+            clearInterval(autoSaveInterval);
+        });
 
         d.id('pagination-and-banners').bind('mouseleave', function() {
             movingBlock = false; 
@@ -527,35 +531,6 @@
             movingBlockElem && movingBlockElem.classList.remove('moving');
             movingBlockElem = undefined; 
         });
-
-        window.addEventListener("beforeunload", function(e) {
-            if (lastSave !== $('form').serialize()) {
-
-                var confirmationMessage = 'It looks like you have been editing something. ' +
-                    'If you leave before saving, your changes will be lost.';
-
-                (e || window.event).returnValue = confirmationMessage; //Gecko + IE
-                return confirmationMessage; //Gecko + Webkit, Safari, Chrome etc.
-            }
-        });
-
-        if (CKEDITOR) {
-            CKEDITOR.on('instanceReady', function() {
-                CKEDITOR.instances.content.on('focus', function() {
-                    if (timer) {
-                        timer.play();
-                    }
-                });
-
-                CKEDITOR.instances.content.on('blur', function() {
-                    if (document.activeElement === document.getElementsByTagName("iframe")[0]) {
-                        if (timer) {
-                            timer.pause();
-                        }
-                    }
-                });
-            });
-        }
 
         var saveCurrentArticle = function(cb) {
             document.dispatchEvent(new CustomEvent("articleWillSave"));
@@ -570,7 +545,7 @@
             tempsave.autosaveid = _id;
 
             liliumcms.lmldom.sendForm(tempsave, '{=config.default.server.url}/admin/article' + url, function(data) {
-                lastSave = currentSave;
+                lastSave = CKEDITOR.instances.content.getData();
 
                 if (data.success && data.redirect) {
                     liliumcms.pageloader.load(data.redirect);
@@ -598,13 +573,13 @@
         }
 
         // Save Draft
-        $('form button[name=save]').on('click', function(e) {
+        d.q('form button[name=save]').bind('click', function(e) {
             saveCurrentArticle();
 
             return false;
         });
 
-        $('.btn-preview').on('click', function(e) {
+        d.q('.btn-preview').bind('click', function(e) {
             // Open in new tab
             var btn = this;
             var textinside = btn.innerHTML;
@@ -618,16 +593,20 @@
             formdat.id = contentid;
             formdat.topic = currentTopic._id;
             formdat.media = d.id('mediapicker').value;
+            formdat.content = buildContentFromPackage();
 
-            // TODO : Package content
-            formdat.content = formdat.content;
-
-            $.post('{=config.default.server.url}/admin/article/preview', formdat, function(html) {
+            liliumcms.lmldom.post(formdat, '{=config.default.server.url}/admin/article/preview', function(html) {
                 liliumcms.previewer.setContent(html);
                 btn.disabled = false;
                 btn.innerHTML = textinside;
             });
         });
+
+        var addToWhiteList = function(txt, lang) {
+            liliumcms.lmldom.post({ word : txt, lang : lang }, '{=config.default.server.url}/admin/article/addwordtodico', function() {
+                liliumcms.notify({title : "Word added to whitelist", type : "success", "content" : "The word '" + txt + "' was added to the whitelist." });
+            });
+        }
 
         var fillPackaging = function(serverdata) {
             // Corrections
@@ -655,8 +634,7 @@
                         li.born(d.make({node : "span", text : c.reason.split(';')[0]}));
 
                         if (c.suggestions) for (var k = 0; k < c.suggestions.length; k++) {
-                            var singlesug = d.make({ node : "b", text : "Use '" + c.suggestions[k] + "'" });
-                            li.born(singlesug);
+                            var singlesug = d.make({ node : "b", text : "Change to '" + c.suggestions[k] + "'", parent : li });
 
                             (function(singlesug, sug, reason, li, pcontent) {
                                 singlesug.bind('click', function() {
@@ -665,6 +643,14 @@
                                 });
                             })(singlesug, c.suggestions[k], c.reason, li, pcontent)
                         }
+
+                        var singlesug = d.make({ node : "b", text : "Add '" + c.reason.split('`')[1] + "' to whitelist", parent : li });
+                        (function(addbtn, txt, li) {
+                            addbtn.style('color', '#c7a4e0').bind('click', function() {
+                                addToWhiteList(txt, serverdata.language);
+                                li.get().remove();
+                            });
+                        })(singlesug, c.reason.split('`')[1], li);
 
                         clist.born(li);
                     }
@@ -970,7 +956,7 @@
                     liliumcms.modals.get('dlg-modal-publishing-loading').dismiss();
                     if (data.success) {
                         CKEDITOR.instances.content.setData(contentMarkup);
-                        lastSave = form;
+                        lastSave = CKEDITOR.instances.content.getData();
                         
                         if (data.redirect) {
                             liliumcms.pageloader.load(data.redirect);
