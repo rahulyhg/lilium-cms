@@ -859,23 +859,25 @@
 
             liliumcms.modals.get('dlg-modal-packaging-loading').cast();
             d.id('pr-parag-list').empty();
-            liliumcms.lmldom.post({ 
-                markup : CKEDITOR.instances.content.getData()
-            }, '{=config.default.server.url}/admin/article/proofread', function(respproofread) {
-                liliumcms.lmldom.post(
-                    { }, 
-                    '{=config.default.server.url}/admin/article/withads/' + liliumcms.pageloader.lastLevel, 
-                function(respwithads) {
-                    fillPackaging(respproofread);
-                    createPageTabs(respwithads);
+            setTimeout(function() {
+                liliumcms.lmldom.post({ 
+                    markup : CKEDITOR.instances.content.getData()
+                }, '{=config.default.server.url}/admin/article/proofread', function(respproofread) {
+                    liliumcms.lmldom.post(
+                        { }, 
+                        '{=config.default.server.url}/admin/article/withads/' + liliumcms.pageloader.lastLevel, 
+                    function(respwithads) {
+                        fillPackaging(respproofread);
+                        createPageTabs(respwithads);
 
-                    liliumcms.modals.get('dlg-modal-packaging-loading').dismiss();
+                        liliumcms.modals.get('dlg-modal-packaging-loading').dismiss();
 
-                    setTimeout(function() {
-                        liliumcms.modals.get("article-packaging").cast();
-                    }, 300);
+                        setTimeout(function() {
+                            liliumcms.modals.get("article-packaging").cast();
+                        }, 300);
+                    });
                 });
-            });
+            }, 300);
 
         };
 
