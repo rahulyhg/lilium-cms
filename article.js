@@ -62,8 +62,7 @@ class Article {
             case 'delete-autosave': if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli); break;
             case 'autosave': if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true); break;
             case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
-            case 'proofread': if (cli.hasRightOrRefuse("create-articles")) this.proofread(cli); break;
-            case 'withads': if (cli.hasRightOrRefuse('create-articles')) this.insertAdsFromCli(cli); break;
+            case 'package': if (cli.hasRightOrRefuse("create-articles")) this.packageArticle(cli); break;
             case 'addwordtodico': if (cli.hasRightOrRefuse('create-articles')) this.addWordToDico(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
             case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
@@ -295,11 +294,9 @@ class Article {
         });
     };
 
-    proofread(cli) {
-        const Proofreader = require('./proofreader');
+    packageArticle(cli) {
         const markup = cli.postdata.data.markup;
         const lang = cli.postdata.data.lang;
-
         const jsdom = require('jsdom');
         const window = new jsdom.JSDOM(markup).window;
 
@@ -307,8 +304,20 @@ class Article {
             x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
         ));
 
+        this.proofread(paragraphs, lang, report => {
+            db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
+                this.insertAds(cli._c, article, content => {
+                    cli.sendHTML({ content, report });
+                });
+            });
+        });
+    }
+
+    proofread(paragraphs, lang, send) {
+        const Proofreader = require('./proofreader');
+
         Proofreader.proofread(paragraphs.map(x => x.textContent), lang, (report, lang) => {
-            cli.sendJSON(report && { 
+            send(report && { 
                 corrections : report.map(r => r.messages.map(x => { 
                     return { reason : x.message, at : x.column, suggestions : x.expected,  } })
                 ),
