@@ -862,20 +862,15 @@
             setTimeout(function() {
                 liliumcms.lmldom.post({ 
                     markup : CKEDITOR.instances.content.getData()
-                }, '{=config.default.server.url}/admin/article/proofread', function(respproofread) {
-                    liliumcms.lmldom.post(
-                        { }, 
-                        '{=config.default.server.url}/admin/article/withads/' + liliumcms.pageloader.lastLevel, 
-                    function(respwithads) {
-                        fillPackaging(respproofread);
-                        createPageTabs(respwithads);
+                }, '{=config.default.server.url}/admin/article/package/' + liliumcms.pageloader.lastLevel, function(pkg) {
+                    fillPackaging(pkg.report);
+                    createPageTabs(pkg.content);
 
-                        liliumcms.modals.get('dlg-modal-packaging-loading').dismiss();
+                    liliumcms.modals.get('dlg-modal-packaging-loading').dismiss();
 
-                        setTimeout(function() {
-                            liliumcms.modals.get("article-packaging").cast();
-                        }, 300);
-                    });
+                    setTimeout(function() {
+                        liliumcms.modals.get("article-packaging").cast();
+                    }, 300);
                 });
             }, 300);
 
