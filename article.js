@@ -295,24 +295,32 @@ class Article {
     };
 
     packageArticle(cli) {
-        const markup = cli.postdata.data.markup;
         const lang = cli.postdata.data.lang;
-        const jsdom = require('jsdom');
-        const window = new jsdom.JSDOM(markup).window;
 
+        db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
+            const jsdom = require('jsdom');
+            const window = new jsdom.JSDOM(article.content).window;
 
+            const paragraphs = Array.prototype.filter.call(window.document.querySelectorAll('body > p'), (
+                x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
+            ));
 
-        const paragraphs = Array.prototype.filter.call(window.document.querySelectorAll('body > p'), (
-            x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
-        ));
-
-        this.proofread(paragraphs, lang, report => {
-            db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
-                this.insertAds(cli._c, article, content => {
-                    cli.sendJSON({ content, report });
-                });
+            this.proofread(paragraphs, lang, report => {
+                if (article.hasads || article.isSponsored || article.nsfw || !cli._c.content) {
+                    cli.sendJSON({ content : article.content, report });
+                } else {
+                    this.insertAds(cli._c, article._id, article.content, content => {
+                        if (content) {
+                            db.update(cli._c, 'content', { _id : article._id }, { content, hasads : true }, () => {
+                                cli.sendJSON({ content, report });
+                            });
+                        } else {
+                            cli.sendJSON({ content, report });
+                        }
+                    });
+                }
             });
-        });
+        }, {content : 1, title : 1, isSponsored : 1, nsfw : 1, hasads : 1});
     }
 
     proofread(paragraphs, lang, send) {
@@ -607,35 +615,23 @@ class Article {
         });
     };
 
-    insertAdsFromCli(cli) {
-        db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
-            this.insertAds(cli._c, article, content => {
-                cli.sendHTML(content);
-            });
-        });
-    };
-
-    insertAds(_c, article, done, force) {
-        if ((article.isSponsored || article.nsfw && !force) || !_c.content) {
-            return done(article.content);
-        }
-
+    insertAds(_c, articleid, content, done, force) {
         var asyncHooks = hooks.getHooksFor('insert_ads_' + _c.uid);
         var aKeys = Object.keys(asyncHooks);
         var aIndex = -1;
 
-        var nextHook = ()  => {
+        var nextHook = (newctn)  => {
+            content = newctn || content;
+
             if (++aIndex == aKeys.length) {
-                done(article.content);
+                done(content);
             } else {
                 asyncHooks[aKeys[aIndex]].cb({
-                    _c : _c,
-                    article : article,
-                    done : nextHook
+                    _c, content, done : nextHook
                 }, 'insert_ads_' + _c.uid);
             }
         };
-        nextHook();
+        nextHook(content);
     };
 
     updateActionStats(_c, deepArticle, callback, reduce) {
@@ -1868,14 +1864,7 @@ class Article {
                 nextHook();
             };
 
-            if ((deepArticle.hasads && deepArticle.content && deepArticle.content.indexOf("<ad>") != -1) || deepArticle.nsfw) {
-                gen();
-            } else {
-                that.insertAds(_c, deepArticle, (content)  => {
-                    deepArticle.content = content || deepArticle.content;
-                    gen();
-                });
-            }
+            gen();
         };
 
         if (alreadyFetched && typeof aid == "object") {
