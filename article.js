@@ -300,6 +300,8 @@ class Article {
         const jsdom = require('jsdom');
         const window = new jsdom.JSDOM(markup).window;
 
+
+
         const paragraphs = Array.prototype.filter.call(window.document.querySelectorAll('body > p'), (
             x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
         ));
@@ -307,7 +309,7 @@ class Article {
         this.proofread(paragraphs, lang, report => {
             db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
                 this.insertAds(cli._c, article, content => {
-                    cli.sendHTML({ content, report });
+                    cli.sendJSON({ content, report });
                 });
             });
         });
