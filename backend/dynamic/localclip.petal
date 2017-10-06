@@ -8,7 +8,7 @@
 <h1>Lilium clipboard</h1>
 <div>
     <p class="description">
-        This clipboard contains <b>auto-saved data</b> that was considered important by Lilium. The clipboard's data is stored locally on your machine for a short period of time. Ephemeral data will be lost after 2 hours, or after clearing your local cache. 
+        This clipboard contains <b>auto-saved data</b> that was considered important by Lilium. Ephemeral data is kept for 2 hours.
     </p>
 </div>
 
