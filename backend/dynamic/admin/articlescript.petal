@@ -424,6 +424,11 @@
     };
 
     var bindPackagingPhase = function() {
+        d.id('dismiss-pp-modal').bind('click', function() {
+            document.body.classList.remove('block-scroll');
+            liliumcms.modals.get('article-packaging').dismiss();
+        });
+
         var catbuttons = document.querySelectorAll('.topic-category');
         for (var i = 0; i < catbuttons.length; i++) {
             (function(btn) {
@@ -859,10 +864,12 @@
 
             liliumcms.modals.get('dlg-modal-packaging-loading').cast();
             d.id('pr-parag-list').empty();
+            document.body.classList.add('block-scroll');
             setTimeout(function() {
-                liliumcms.lmldom.post({ 
-                    markup : CKEDITOR.instances.content.getData()
-                }, '{=config.default.server.url}/admin/article/package/' + liliumcms.pageloader.lastLevel, function(pkg) {
+                liliumcms.lmldom.post(
+                    {}, 
+                    '{=config.default.server.url}/admin/article/package/' + liliumcms.pageloader.lastLevel, 
+                function(pkg) {
                     fillPackaging(pkg.report);
                     createPageTabs(pkg.content);
 
@@ -888,10 +895,12 @@
             // Package current paragraph order + content in dataset
             publishCurrentArticle();
             modal.dismiss();
+            document.body.classList.remove('block-scroll');
         };
 
         $('.btn-send-for-review').bind('click', function() {
             $('#confirm-send-for-review').modal('show');
+            document.body.classList.remove('block-scroll');
         });
 
         var buildContentFromPackage = function() {
@@ -914,6 +923,7 @@
             tempForm.values.autosaveid = _id;
 
             if (valid) {
+                document.body.classList.remove('block-scroll');
                 liliumcms.modals.get('dlg-modal-publishing-loading').cast();
                 $('.alert-wrapper').remove();
 
