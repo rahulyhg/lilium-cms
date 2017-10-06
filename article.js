@@ -301,15 +301,21 @@ class Article {
             const jsdom = require('jsdom');
             const window = new jsdom.JSDOM(article.content).window;
 
-            const paragraphs = Array.prototype.filter.call(window.document.querySelectorAll('body > p'), (
+            const paragraphs = Array.prototype.filter.call(
+                window.document.querySelectorAll('body > p'), 
                 x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
-            ));
+            );
+
+            paragraphs.forEach((x, i) => {
+                x.id = "article-p-" + i
+            });
 
             this.proofread(paragraphs, lang, report => {
+                let content = window.document.body.innerHTML;
                 if (article.hasads || article.isSponsored || article.nsfw || !cli._c.content) {
-                    cli.sendJSON({ content : article.content, report });
+                    cli.sendJSON({ content, report });
                 } else {
-                    this.insertAds(cli._c, article._id, article.content, content => {
+                    this.insertAds(cli._c, article._id, content, content => {
                         if (content) {
                             db.update(cli._c, 'content', { _id : article._id }, { content, hasads : true }, () => {
                                 cli.sendJSON({ content, report });
@@ -609,9 +615,9 @@ class Article {
         db.update(cli._c, 'content', conds, {
             feature: featurename,
             featuredata : featuredata
-        }, ()  => {
+        }, () => {
             log('Content', 'Added feature "' + featurename + '" to article with id ' + cli.routeinfo.path[3]);
-            cli.sendJSON({done : true})
+            cli.sendJSON({done : true});
         });
     };
 

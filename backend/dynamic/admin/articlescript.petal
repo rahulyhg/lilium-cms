@@ -1,7 +1,6 @@
 {#config;postleaf;theme}
 <script>
     var isAutoSave = false;
-    var timer;
     var lastSave;
     var _id;
     var contentid;
@@ -203,8 +202,8 @@
         var deleteID = contentid;
         $.post('{=config.default.server.url}/admin/article/delete/' + deleteID, {}, function(data) {
             if (data.success && data.redirect) {
-                $('#confirm-destroy').modal('hide');
-                liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
+                $('#confirm-unpublish').modal('hide');
+                updateBottomSection();
             } else {
                 alert('There was an error deleting this post.');
             }
@@ -488,7 +487,6 @@
     };
 
     var autoSave = function() {
-            timer.pause();
             var currentSave = $('form').serialize();
 
             // Save only if content has changed
@@ -678,6 +676,11 @@
                             if (plist.get().querySelectorAll(".pr-parag").length == 0) {
                                 plist.empty();
                             }
+
+                            var box = document.getElementById('box-article-p-' + i);
+                            if (box) {
+                                box.dataset.markup = '<p id="article-p-'+i+'">' + pcontent.html + '</p>';
+                            }
                         });
                     })(i, mFixed, pcontent, p);
                 }
@@ -815,6 +818,10 @@
                     box.dataset.index = i;
                     box.dataset.pageindex = pageindex;
                     box.dataset.markup = markup;
+
+                    if (tag.id) {
+                        box.id = "box-" + tag.id;
+                    }
 
                     PP_TAGS.push({ 
                         markup : markup, 
