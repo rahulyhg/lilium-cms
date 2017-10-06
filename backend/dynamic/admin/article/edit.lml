@@ -195,7 +195,7 @@
     </div>
 
     <div class="lml-modal-footer">
-        <button class="lml-modal-cancel btn-default" type="button">Cancel</button>
+        <button class="lml-modal-action btn-default" id="dismiss-pp-modal" type="button">Cancel</button>
         <button class="lml-modal-action blue btn-preview" name="preview">
             Preview
         </button>
@@ -462,6 +462,7 @@
     top: 28px;
     left: 16px;
     font-size: 72px;
+    color: #f3f3f3;
 }
 
 #pr-parag-list:empty::before {
