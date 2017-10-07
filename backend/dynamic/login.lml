@@ -16,7 +16,7 @@
 	    		{=forms.render("login_form")}
 
     			<footer>
-                    {=config.default.vendor.productname} v1.6.32
+                    {=config.default.vendor.productname} v2.0.19
                 </footer>
 		    </main>
         </div>
