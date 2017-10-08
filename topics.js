@@ -531,7 +531,6 @@ class LMLTopics {
             },
             displayname : "Archive template"
         })
-        .add('topic-social-title', 'title', { displayname : "Social Networks" })
         .trg('bottom')
         .add('topic-action-title', 'title', { displayname : "Actions" })
         .add('publish-set', 'buttonset', { buttons : [{
