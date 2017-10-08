@@ -748,13 +748,25 @@
             pages.get().appendChild(page);
 
             page.classList.add("shown");
-            
+
             for (var i = 0; i < tags.length; i++) {
                 var tag = tags[i];
                 var shouldsplit = !!tag.querySelector("lml-page");
+
+                if (shouldsplit) {
+                    if (tag.querySelector('lml-page') == tag.firstElementChild) {
+                        page = createPageTag(++pageindex);
+                        pages.get().appendChild(page);
+                        createPageSelector(pageindex);
+                        tag.firstElementChild.remove();
+
+                        shouldsplit = false;
+                    }
+                }
+
                 var isImage = !!tag.querySelector('img');
                 var markup = tag.outerHTML;
-                var box;
+                var box = undefined;
 
                 switch (tag.nodeName) {
                     case "H3": case "H4": case "H5": case "H6":
@@ -811,7 +823,6 @@
                         box = d.make({ class : "page-block page-unknown-block", text : tag.textContent.substring(0, 50) + "..." }).get();
                 }
 
-                console.log(tag.nodeName);
 
                 if (box) {
                     page.appendChild(box);
@@ -841,8 +852,10 @@
                 if (shouldsplit) {
                     page = createPageTag(++pageindex);
                     pages.get().appendChild(page);
-
                     createPageSelector(pageindex);
+
+                    var maybepage = tag.querySelector("lml-page");
+                    maybepage && maybepage.remove(); 
                 }   
             }
         };
@@ -896,9 +909,17 @@
 
         var buildContentFromPackage = function() {
             var content = "";
-            var blocks = document.querySelectorAll('.page-block');
-            for (var i = 0; i < blocks.length; i++) {
-                content += blocks[i].dataset.markup;
+            var pages = document.querySelectorAll('.page-wrapper');
+            
+            for (var pindex = 0; pindex < pages.length; pindex++) {
+                if (pindex != 0) {
+                    content += "<lml-page></lml-page>";
+                }
+
+                var blocks = pages[pindex].querySelectorAll('.page-block');
+                for (var i = 0; i < blocks.length; i++) {
+                    content += blocks[i].dataset.markup;
+                }
             }
 
             return content + '<!-- '+ Date.now() +' -->';
