@@ -1146,6 +1146,7 @@ h2.subtitlestrip, h2.subtitle {
 .lmladminsidebar .lmladminsidebaritems li.lmladminsidebarselected > a:hover {
 	background-color: {=actioncolor};
 	color: #FFF;
+    font-weight: bolder;
 }
 
 .lmladminsidebar .lmladminsidebaritems li a {
@@ -1226,7 +1227,6 @@ h2.subtitlestrip, h2.subtitle {
 
 .lmladminsidebar .lmladminsidebaritems .parent ul {
 	overflow: hidden;
-	border-left : 5px solid {=activecolor};
 }
 .lmladminsidebar .lmladminsidebaritems .parent ul li {
 	-webkit-transition: height 0.3s;
