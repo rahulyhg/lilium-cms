@@ -35,6 +35,11 @@ table.lmlfullwidthtable td h4, table.lmlfullwidthtable td h6 {
     font-weight: 400;
     color: #333;
 }
+table.lmlfullwidthtable td h6 {
+    color: #999;
+    font-size: 13px;
+    font-weight: 300;
+}
 .lmltablebuilder .footer {
     border: 1px solid #EEE;
     padding: 10px;
@@ -95,8 +100,8 @@ table.lmlfullwidthtable td h4, table.lmlfullwidthtable td h6 {
     color: #999;
 }
 .lmltablebuilder tbody td img {
-    height: 70px;
-    width: 90px;
+    height: 50px;
+    width: 70px;
     object-fit: cover;
 }
 .lmltablebuilder .navbuttons button {
