@@ -1152,6 +1152,7 @@ h2.subtitlestrip, h2.subtitle {
 	display: block;
 	padding: 9px 12px;
 	color: #BBB;
+    font-weight: 600;
 
 	text-decoration: none;
 }
