@@ -576,6 +576,8 @@ var LiliumCMS = function() {
                 li = $(li);
                 var href = li.find('a').attr('href');
                 if (currentHref.indexOf(href) !== -1) {
+                    $('.child-selected').removeClass('child-selected');
+
                     // Check if child
                     if (li.parent().parent().hasClass('parent')) {
                         li.parent().parent().addClass('child-selected');
