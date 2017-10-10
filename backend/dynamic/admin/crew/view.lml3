@@ -33,6 +33,14 @@ const css = `<style>
     border: 5px solid #421e50;
 }   
 
+#crew-member-bio {
+    padding: 10px;
+    border-bottom: 1px dashed #CCC;
+    border-top: 1px dashed #CCC;
+    margin-top: 10px;
+    background: #F6F6F6;
+}
+
 #single-crew-displayname {
     position: absolute;
     left: 210px;
@@ -78,6 +86,71 @@ const css = `<style>
     font-size: 16px;
     display: inline-block;
     margin: 2px 0px 10px 10px;
+}
+
+.me-decorations {
+    display: block;
+    text-align: center;
+}
+
+.me-decoration {
+    display: inline-block;
+    width: 60px;
+    margin: 10px;
+    position: relative;
+}
+
+.me-decoration img {
+    width: 100%;
+    height: auto;
+    display: inline-block;
+}
+
+.me-decoration i {
+    color: #FFF;
+    position: absolute;
+    text-align: center;
+    top: 11px;
+    display: block;
+    left: 0;
+    right: 0;
+}
+
+.me-decoration.level-0 i,
+.me-decoration.level-1 i {
+    margin-top: 12px;
+}
+
+.me-decoration.level-2 i,
+.me-decoration.level-3 i {
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.2);
+}
+
+.me-decoration.level-4 i,
+.me-decoration.level-5 i {
+    margin-top: 5px;
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.4);
+}
+
+.me-decoration.level-6 i,
+.me-decoration.level-7 i {
+    margin-right: 1px;
+    margin-top: 1px;
+    text-shadow: 0px 0px 10px rgba(255,255,255,0.7);
+}
+
+.crew-decoration-wrapper {
+    margin: 5px 0px;
+    padding: 5px;
+    background: #EEE;
+}
+
+.crew-badge-slide {
+    margin: 5px;
+    padding: 2px;
+    background-color: #FFF;
+    border-bottom: 5px solid #DDD;
+    box-shadow: 0px 0px 2px rgba(0,0,0,0.2);
 }
 </style>`;
 
@@ -134,6 +207,40 @@ const preload = (context, done) => {
                 ]
             });
         };
+
+        window.listCrewDecorations = function(ldContext) {
+            var badges = ldContext.livevars.crew.single[liliumcms.pageloader.lastLevel].badges;
+            var cluster = document.createElement('div');
+            cluster.className = "crew-decoration-wrapper";
+
+            for (var i = 0; i < badges.length; i++) {
+                var badge = badges[i];
+
+                var slide = document.createElement('div');
+                slide.className = "crew-badge-slide";
+
+                var wrap = document.createElement('div');
+                wrap.className = "me-decoration level-" + badge.level;
+                wrap.style.filter = "hue-rotate("+ (badge.level * 35) +"deg)";
+
+                var img = document.createElement('img');
+                img.src = "${context._c.server.url}/static/badges/" + (Math.floor((badge.level / 2 + 1))) + ".png";
+                wrap.appendChild(img);
+
+                var icon = document.createElement('i');
+                icon.className = badge.classes;
+                wrap.appendChild(icon);
+
+                slide.appendChild(wrap);
+
+                
+                
+
+                cluster.appendChild(slide);
+            }
+
+            return cluster;
+        };
     </script>`;
 
     context.markup = `<div id="single-crew">
@@ -153,9 +260,14 @@ const preload = (context, done) => {
         <lml-generate call="singlecrewinstagram"></lml-generate>
         <div>
             <h3 class="single-crew-title">A little about <lml-text var="member.firstname"></lml-text></h3>
-            <p>
+            <p id="crew-member-bio">
                 <lml-text var="member.description"></lml-text>
             </p>
+        </div>
+
+        <div>
+            <h3 class="single-crew-title">Decorations</h3>
+            <lml-generate call="listCrewDecorations"></lml-generate>
         </div>
     </div>`;
 
