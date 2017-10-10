@@ -1013,6 +1013,12 @@ class Entities {
                 value: 'Update Profile'
             })
             .add('Save', 'submit');
+            .add('authbtnset', 'buttonset', {
+                buttons: [{
+                    displayname : 'Edit Password',
+                    name : 'update'
+                }]
+            });
 
 
         formbuilder.createForm('update_password', {
@@ -1027,11 +1033,6 @@ class Entities {
                 buttons: [{
                     displayname : 'Edit Password',
                     name : 'update'
-                }, {
-                    name : 'allowfbauth',
-                    displayname : 'Allow Facebook Authentication',
-                    type : 'button',
-                    callback : "liliumcms.facebook.allowfbauth();"
                 }]
             });
 
