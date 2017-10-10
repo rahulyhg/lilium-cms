@@ -48,6 +48,38 @@ class Crew {
     
     }
 
+    injectMemberFeaturedPosts(member, done) {
+        let siteIndex = -1;
+        let sites = config.getAllSites();
+        member.featuredposts = [];
+        
+        let nextSite = () => {
+            if (++siteIndex == sites.length) {
+                member.featuredposts.sort((a, b) => { return b.shares - a.shares });
+                return done(member);
+            }
+
+            db.join(sites[siteIndex], 'content', [
+                { $match : { status : "published", author : member._id } },
+                { $sort : { shares : -1 } },
+                { $limit : 3 },
+                { $lookup : {
+                    from : "uploads",
+                    as : "featuredimage",
+                    localField : "media",
+                    foreignField : "_id"
+                }},
+                { $unwind : "$featuredimage" },
+                { $project : { title : 1, subtitle : 1, shares : 1, media : "$featuredimage.sizes.thumbnaillarge.url", date : 1, publicnote : 1, site : sites[siteIndex].website.sitetitle }}
+            ], posts => {
+                member.featuredposts.push(...posts);
+                nextSite();
+            });
+        };
+
+        nextSite();
+    }
+
     getCrewMember(id, send) {
         const instagram = require('./instagram.js');
 
@@ -60,32 +92,34 @@ class Crew {
         }, (user) => {
             user = user.items.pop();
 
-            if (user.socialnetworks && user.socialnetworks.find(x => x.network == "instagram")) {
-                instagram.getSingleAccountStats(user.socialnetworks.find(x => x.network == "instagram").link, (data) => {
-                    if (data && data.user) {
-                        user.instagram = {
-                            username : data.user.username,
-                            followers : data.user.followed_by.count,
-                            url : "https://www.instagram.com/" + data.user.username,
-                            bio : data.user.biography,
-                            totalphotos : data.user.media.count,
-                            photos : []
-                        };
+            this.injectMemberFeaturedPosts(user, () => {
+                if (user.socialnetworks && user.socialnetworks.find(x => x.network == "instagram")) {
+                    instagram.getSingleAccountStats(user.socialnetworks.find(x => x.network == "instagram").link, (data) => {
+                        if (data && data.user) {
+                            user.instagram = {
+                                username : data.user.username,
+                                followers : data.user.followed_by.count,
+                                url : "https://www.instagram.com/" + data.user.username,
+                                bio : data.user.biography,
+                                totalphotos : data.user.media.count,
+                                photos : []
+                            };
 
-                        data.user.media.nodes.forEach(x => {
-                            user.instagram.photos.push({
-                                src : x.thumbnail_src,
-                                likes : x.likes.count,
-                                caption : x.caption
+                            data.user.media.nodes.forEach(x => {
+                                user.instagram.photos.push({
+                                    src : x.thumbnail_src,
+                                    likes : x.likes.count,
+                                    caption : x.caption
+                                });
                             });
-                        });
-                    }
+                        }
 
+                        finish(user);
+                    });
+                } else {
                     finish(user);
-                });
-            } else {
-                finish(user);
-            }
+                }
+            });
         });
     }
 
@@ -155,7 +189,7 @@ class Crew {
                     });
                 }
 
-                items[i].badges = badges;
+                items[i].badges = badges.sort((a, b) => { return b.level - a.level; });
             }
 
             let siteIndex = -1;
