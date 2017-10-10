@@ -20,6 +20,10 @@ const css = `<style>
     background-size: 70px 120px;
 }
 
+.single-crew-instagram {
+    margin-bottom: 20px;
+}
+
 #single-crew-image img {
     border-radius: 80px;
     height: 140px;
@@ -38,7 +42,11 @@ const css = `<style>
     border-bottom: 1px dashed #CCC;
     border-top: 1px dashed #CCC;
     margin-top: 10px;
+    margin-bottom: 25px;
     background: #F6F6F6;
+
+    font-size: 16px;
+    color: #777;
 }
 
 #single-crew-displayname {
@@ -95,6 +103,7 @@ const css = `<style>
 
 .me-decoration {
     display: inline-block;
+    vertical-align: top;
     width: 60px;
     margin: 10px;
     position: relative;
@@ -148,9 +157,92 @@ const css = `<style>
 .crew-badge-slide {
     margin: 5px;
     padding: 2px;
-    background-color: #FFF;
-    border-bottom: 5px solid #DDD;
+    background-color: #A2FFFE;
+    border-bottom: 5px solid #92EFEE;
     box-shadow: 0px 0px 2px rgba(0,0,0,0.2);
+}
+
+.crew-badge-text {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.crew-badge-title {
+    font-size: 22px;
+    font-weight: normal;
+    margin-top: 8px;
+    display: block;
+    margin-bottom: 0;
+    color : #2ec1c0;
+}
+
+.crew-badge-reason {
+    font-size: 14px;
+    margin-top: -4px;
+    display: block;
+    color: #0c8887;
+}
+
+#featured-posts-wrapper {
+    margin-bottom: 20px;
+}
+
+.single-highlight {
+    float: left;
+    width: 33.33%;
+    padding: 10px;
+}
+
+.single-highlight-content {
+    overflow: hidden;
+    border: 0px solid #e5e7ff;
+    border-bottom-width: 3px;
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.2);
+
+    position: relative;
+}
+
+.highlight-image {
+    height: 280px;
+    object-fit: cover;
+    width: auto;
+    object-position: center;
+}
+
+.hightlight-title {
+    font-size: 24px;
+    font-family: Helvetiva, Arial, sans-serif;
+    padding: 10px 10px 0px;
+}
+
+.hightlight-subtitle {
+    font-size: 12px;
+    padding: 0px 10px 10px;
+}
+
+.hightlight-site {
+    margin: 0px 10px;
+    border-top: 1px dashed #EEE;
+    padding: 10px 0px;
+    text-transform: uppercase;
+    color: #777;
+}
+
+.highlight-shares {
+    position: absolute;
+    background: #e47b58;
+    color: #FFF;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-family: Helvetica;
+    left: 0;
+    top: 0;
+    transform: rotateZ(45deg) translate3d(138px,-61px,0);
+    padding: 10px 0px;
+    border: 3px solid #c34d27;
+    border-top-width: 1px;
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.2);
 }
 </style>`;
 
@@ -218,10 +310,10 @@ const preload = (context, done) => {
 
                 var slide = document.createElement('div');
                 slide.className = "crew-badge-slide";
+                slide.style.filter = "hue-rotate("+ (badge.level * 35) +"deg)";
 
                 var wrap = document.createElement('div');
                 wrap.className = "me-decoration level-" + badge.level;
-                wrap.style.filter = "hue-rotate("+ (badge.level * 35) +"deg)";
 
                 var img = document.createElement('img');
                 img.src = "${context._c.server.url}/static/badges/" + (Math.floor((badge.level / 2 + 1))) + ".png";
@@ -234,12 +326,59 @@ const preload = (context, done) => {
                 slide.appendChild(wrap);
 
                 
-                
+                var textblock = document.createElement('div');
+                textblock.className = "crew-badge-text";
 
+                var badgetext = document.createElement('b');
+                badgetext.className = "crew-badge-title";
+                badgetext.textContent = badge.displayname + " - " + badge.title;
+                textblock.appendChild(badgetext);
+
+                var badgereason = document.createElement('div');
+                badgereason.className = "crew-badge-reason";
+                badgereason.textContent = badge.reason;
+                textblock.appendChild(badgereason);
+                
+                slide.appendChild(textblock);
+            
                 cluster.appendChild(slide);
             }
 
             return cluster;
+        };
+
+        window.generateHighlights = function(ldContext) {
+            var posts = ldContext.livevars.crew.single[liliumcms.pageloader.lastLevel].featuredposts;
+
+            if (!posts || posts.length == 0) {
+                d.id("featured-posts-wrapper").hide();
+                return document.createElement('div');
+            }
+
+            var cluster = d.make({ class : "featured-posts-wrapper" });
+            for (var i = 0; i < posts.length && i < 3; i++) {
+                var hl = d.make({ class : "single-highlight", parent : cluster });
+                var hlc = d.make({ class : "single-highlight-content", parent : hl })
+                
+                d.make({
+                    class : "highlight-shares",
+                    text : posts[i].shares + " Shares",
+                    parent : hlc
+                })
+
+                d.make({
+                    node : "img",
+                    attr : { src : posts[i].media },
+                    parent : hlc,
+                    class : "highlight-image"
+                });
+
+                d.make({ text : posts[i].title, class : "hightlight-title", parent : hlc });
+                d.make({ text : posts[i].subtitle, class : "hightlight-subtitle", parent : hlc });
+                d.make({ text : "Published on " + posts[i].site, class : "hightlight-site", parent : hlc });
+            }
+
+            return cluster.get(); 
         };
     </script>`;
 
@@ -255,6 +394,13 @@ const preload = (context, done) => {
         </div>
         <div id="single-crew-subtitle">
             <lml-generate call="singlecrewsub" ></lml-generate>
+        </div>
+
+        <div id="featured-posts-wrapper">
+            <h3 class="single-crew-title">Highlights</h3>
+            <lml-generate call="generateHighlights"></lml-generate>
+
+            <div style="float: none; clear: both;"></div>
         </div>
 
         <lml-generate call="singlecrewinstagram"></lml-generate>
