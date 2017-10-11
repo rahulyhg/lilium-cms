@@ -39,6 +39,13 @@ class LMLTopics {
             ], (categories) => {
                 cli.sendJSON(categories);
             });
+        } else if (levels[0] == "tablepicker") {
+            db.findToArray(cli._c, 'topics', { active : true }, (err, arr) => {
+                const assoc = {};
+                arr.forEach(x => { assoc[x._id] = x; });
+
+                send(arr);
+            }, { displayname : 1, parent : 1 });
         } else if (levels[0] == "treename") {
             db.findToArray(cli._c, 'topics', {active : true}, (err, topicsArray) => {
                 let assoc = {};
