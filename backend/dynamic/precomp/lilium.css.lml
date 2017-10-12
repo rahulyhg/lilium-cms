@@ -381,7 +381,7 @@ select {
 /* Lilium */
 /* Bootstrap */
 .container {
-    padding-left: 200px;
+    padding-left: {=sidebarwidth};
     width: 100%;
     padding-right: 0px;
 }
@@ -1468,7 +1468,7 @@ header.admin-bar > * {
 }
 
 header.admin-bar .lilium-logo-link {
-    width: 200px;
+    width: {=sidebarwidth};
     height: 50px;
     display: inline-block;
     background-color: rgba(0,0,0, 0.2);
