@@ -1376,7 +1376,7 @@ header.admin-bar .lilium-logo-link span.product-text {
     font-weight: 500;
     font-size: 24px;
     vertical-align: middle;
-    padding-top: 7px;
+    padding-top: 6px;
     display: inline-block;
     margin-left: 55px;
 }

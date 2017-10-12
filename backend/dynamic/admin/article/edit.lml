@@ -68,30 +68,6 @@
     </div>
 </div>
 
-<div id="dlg-facebook-schedule" class="lml-modal">
-    <div class="lml-modal-title">
-        Schedule post on Facebook
-    </div>
-    <div class="lml-modal-body">
-        <div class="lml-modal-field">
-            <div><label>Facebook page</label></div>
-            <select class="lmldom-liveselect" data-filledby="socialdispatch.networks.liveselect" name="pageid"></select>
-        </div>
-        <div class="lml-modal-field">
-            <div><label>Post caption</label></div>
-            <textarea class="lml-modal-fulltext" name="postcaption"></textarea>
-        </div>
-        <div class="lml-modal-field">
-            <div><label>When should this article go live on Facebook</label></div>
-            <input class="lml-date" data-options="time" name="postdate" />
-        </div>
-    </div>
-    <div class="lml-modal-footer">
-        <button class="lml-modal-cancel btn-default" type="button">Cancel</button>
-        <button class="lml-modal-accept green" type="button">Schedule</button>
-    </div>
-</div>
-
 <div id="dlg-modal-packaging-loading" class="lml-modal">
     <div class="lml-modal-body">
         <div id="modal-preparing-title">
@@ -199,11 +175,11 @@
         <button class="lml-modal-action blue btn-preview" name="preview">
             Preview
         </button>
+        <button class="lml-modal-action green role-contributor" id="button-send-review" type="button">
+            <i class="fa fa-check" aria-hidden="true"></i> Package and send for review
+        </button>
         <button class="lml-modal-accept green role-author" type="button">
             <i class="fa fa-paper-plane-o" aria-hidden="true"></i> Package and go live
-        </button>
-        <button class="lml-modal-accept green role-contributor" type="button">
-            <i class="fa fa-paper-plane-o" aria-hidden="true"></i> Package and send for review
         </button>
     </div>
 </div>
