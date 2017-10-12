@@ -328,16 +328,7 @@
         }, {
             "module" : "media.js",
             "endpoint" : "media",
-            "support" : ["admin_get", "admin_post", "setup"],
-            "admin_menu" : {
-                "id": "media",
-                "faicon": "fa-picture-o",
-                "displayname": "Media",
-                "priority": 400,
-                "rights": ["list-uploads"],
-                "absURL": "admin/media/list",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "setup"]
         }, {
             "module" : "badges.js",
             "endpoint" : "decorations",
