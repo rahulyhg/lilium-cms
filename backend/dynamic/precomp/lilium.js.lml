@@ -538,7 +538,6 @@ var LiliumCMS = function() {
                 // Check if menu as submenus
                 if (li.find('ul > li').size() > 0) {
                     li.addClass('parent');
-                    li.find('> a').append('<i class="fa fa-angle-left"></i>');
                 }
             });
         
