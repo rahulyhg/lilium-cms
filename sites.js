@@ -691,6 +691,9 @@ var Sites = function () {
                             config.registerConfigs(urlbase, siteInfo);
                         }
 
+                        // Convenience props
+                        siteInfo.server.fullurl = (siteInfo.server.protocol || "http:") + siteInfo.server.url;
+
                         _cachedSites.push(siteInfo);
                         fileIndex++;
                         that.initializeWebsite(config.fetchConfig(keyname), nextFile);
