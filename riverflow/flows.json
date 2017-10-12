@@ -155,7 +155,7 @@
                 "faicon": "fa-wrench",
                 "displayname": "Tools",
                 "priority": 800,
-                "rights": [],
+                "rights": ["develop"],
                 "absURL": "admin/tools",
                 "children": []
             }
