@@ -21,20 +21,17 @@ const publishedNotificationTitles = [
     "You got this!",
     "Allllright!",
     "Look at you!",
-    "Gratz!",
     "Yes, you did!",
     "You're simply great!",
-    "Say whaaat!",
     "Annnd it's live!",
     "You're the real deal!",
     "Guess what!",
     "The MVP; that's you!",
     "YASSSSS",
-    "💯🙌🎉",
-    "I drink to that!",
-    "Three cheers for this one!",
     "Good news!",
     "You. Are. Amazing.",
+    "Current state : AWESOME.",
+    "Let's celebrate!",
     "Hooray!"
 ];
 
