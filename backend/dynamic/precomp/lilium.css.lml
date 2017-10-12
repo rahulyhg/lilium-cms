@@ -37,7 +37,7 @@
 	successcolor = "#27af61";
 
 	topbarheight = "50px";
-	sidebarwidth = "50px";
+	sidebarwidth = "40px";
 
 	fontdir = config.default.server.url;
 	fontdir += "/static/fonts/font-awesome";
@@ -1074,23 +1074,21 @@ h2.subtitlestrip, h2.subtitle {
 }
 
 .lmladminsidebar .lmladminsidebaritems li {
-	cursor: pointer;
-	font-size: 14px;
+    cursor: pointer;
+    font-size: 14px;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
-    width: 40px;
+    width: 29px;
     border-radius: 40px;
-
-    margin-left: 5px; 
-
+    margin-left: 5px;
     -webkit-transition: all 0.2s;
-       -moz-transition: all 0.2s;
-        -ms-transition: all 0.2s;
-         -o-transition: all 0.2s;
-            transition: all 0.2s;
-
-    background-color : #241f25;
+    -moz-transition: all 0.2s;
+    -ms-transition: all 0.2s;
+    -o-transition: all 0.2s;
+    transition: all 0.2s;
+    background-color: #241f25;
+    display: inline-block;
 }
 
 .lmladminsidebar .lmladminsidebaritems li ul li {
@@ -1110,15 +1108,13 @@ h2.subtitlestrip, h2.subtitle {
 }
 
 .lmladminsidebar .lmladminsidebaritems li a {
-	display: block;
-	padding: 10px 3px 8px;
-	color: #BBB;
+    display: block;
+    padding: 6px 0px 1px;
+    color: #BBB;
     font-weight: 600;
-
-	text-decoration: none;
+    text-decoration: none;
     vertical-align: middle;
-
-    margin-left: 6px;
+    margin-left: 3px;
 }
 
 .lmladminsidebar .lmladminsidebaritems li span {
@@ -1213,11 +1209,11 @@ h2.subtitlestrip, h2.subtitle {
 	height: 0px;
 }
 .lmladminsidebar .lmladminsidebaritems .parent:hover ul li {
-	height: 38px;
+	height: 29px;
     margin: 0;
 }
 .lmladminsidebar .lmladminsidebaritems .parent.child-selected ul li {
-	height: 38px;
+	height: 29px;
     margin: 0;
 }
 .lmladminsidebar .lmladminsidebaritems .parent.child-selected > a > i:nth-of-type(2){
