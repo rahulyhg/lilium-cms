@@ -279,7 +279,7 @@
             "admin_menu" : {
                 "id": "crew",
                 "faicon": "fa-glass",
-                "displayname": "Crew (Dev)",
+                "displayname": "Crew",
                 "priority": 500,
                 "rights": ["admin"],
                 "absURL": "admin/crew",
