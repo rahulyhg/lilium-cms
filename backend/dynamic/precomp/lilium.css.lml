@@ -46,147 +46,6 @@ $}
 @import url('https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700');
 
 @font-face {
-  font-family: 'Raleway';
-  font-weight: 100;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Raleway-100/Raleway-100.eot');
-  src: url('{=siteurl}/static/fonts/Raleway-100/Raleway-100.eot?#iefix') format('embedded-opentype'),
-       local('Raleway Thin'),
-       local('Raleway-100'),
-       url('{=siteurl}/static/fonts/Raleway-100/Raleway-100.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Raleway-100/Raleway-100.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Raleway-100/Raleway-100.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Raleway-100/Raleway-100.svg#Raleway') format('svg');
-}
-
-@font-face {
-  font-family: 'Raleway';
-  font-weight: 300;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Raleway-300/Raleway-300.eot');
-  src: url('{=siteurl}/static/fonts/Raleway-300/Raleway-300.eot?#iefix') format('embedded-opentype'),
-       local('Raleway Light'),
-       local('Raleway-300'),
-       url('{=siteurl}/static/fonts/Raleway-300/Raleway-300.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Raleway-300/Raleway-300.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Raleway-300/Raleway-300.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Raleway-300/Raleway-300.svg#Raleway') format('svg');
-}
-
-@font-face {
-  font-family: 'Raleway';
-  font-weight: 400;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Raleway-regular/Raleway-regular.eot');
-  src: url('{=siteurl}/static/fonts/Raleway-regular/Raleway-regular.eot?#iefix') format('embedded-opentype'),
-       local('Raleway'),
-       local('Raleway-regular'),
-       url('{=siteurl}/static/fonts/Raleway-regular/Raleway-regular.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Raleway-regular/Raleway-regular.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Raleway-regular/Raleway-regular.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Raleway-regular/Raleway-regular.svg#Raleway') format('svg');
-}
-
-@font-face {
-  font-family: 'Raleway';
-  font-weight: 500;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Raleway-500/Raleway-500.eot');
-  src: url('{=siteurl}/static/fonts/Raleway-500/Raleway-500.eot?#iefix') format('embedded-opentype'),
-       local('Raleway Medium'),
-       local('Raleway-500'),
-       url('{=siteurl}/static/fonts/Raleway-500/Raleway-500.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Raleway-500/Raleway-500.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Raleway-500/Raleway-500.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Raleway-500/Raleway-500.svg#Raleway') format('svg');
-}
-
-@font-face {
-  font-family: 'Raleway';
-  font-weight: 600;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Raleway-600/Raleway-600.eot');
-  src: url('{=siteurl}/static/fonts/Raleway-600/Raleway-600.eot?#iefix') format('embedded-opentype'),
-       local('Raleway SemiBold'),
-       local('Raleway-600'),
-       url('{=siteurl}/static/fonts/Raleway-600/Raleway-600.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Raleway-600/Raleway-600.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Raleway-600/Raleway-600.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Raleway-600/Raleway-600.svg#Raleway') format('svg');
-}
-
-@font-face {
-  font-family: 'Raleway';
-  font-weight: 700;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Raleway-700/Raleway-700.eot');
-  src: url('{=siteurl}/static/fonts/Raleway-700/Raleway-700.eot?#iefix') format('embedded-opentype'),
-       local('Raleway Bold'),
-       local('Raleway-700'),
-       url('{=siteurl}/static/fonts/Raleway-700/Raleway-700.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Raleway-700/Raleway-700.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Raleway-700/Raleway-700.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Raleway-700/Raleway-700.svg#Raleway') format('svg');
-}
-
-
-@font-face {
-  font-family: 'Crimson Text';
-  font-weight: 400;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Crimson-Text-regular/Crimson-Text-regular.eot');
-  src: url('{=siteurl}/static/fonts/Crimson-Text-regular/Crimson-Text-regular.eot?#iefix') format('embedded-opentype'),
-       local('Crimson Text'),
-       local('Crimson-Text-regular'),
-       url('{=siteurl}/static/fonts/Crimson-Text-regular/Crimson-Text-regular.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Crimson-Text-regular/Crimson-Text-regular.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Crimson-Text-regular/Crimson-Text-regular.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Crimson-Text-regular/Crimson-Text-regular.svg#CrimsonText') format('svg');
-}
-
-@font-face {
-  font-family: 'Crimson Text';
-  font-weight: 600;
-  font-style: normal;
-  src: url('{=siteurl}/static/fonts/Crimson-Text-600/Crimson-Text-600.eot');
-  src: url('{=siteurl}/static/fonts/Crimson-Text-600/Crimson-Text-600.eot?#iefix') format('embedded-opentype'),
-       local('Crimson Text Semibold'),
-       local('Crimson-Text-600'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600/Crimson-Text-600.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600/Crimson-Text-600.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600/Crimson-Text-600.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600/Crimson-Text-600.svg#CrimsonText') format('svg');
-}
-
-@font-face {
-  font-family: 'Crimson Text';
-  font-weight: 400;
-  font-style: italic;
-  src: url('{=siteurl}/static/fonts/Crimson-Text-italic/Crimson-Text-italic.eot');
-  src: url('{=siteurl}/static/fonts/Crimson-Text-italic/Crimson-Text-italic.eot?#iefix') format('embedded-opentype'),
-       local('Crimson Text Italic'),
-       local('Crimson-Text-italic'),
-       url('{=siteurl}/static/fonts/Crimson-Text-italic/Crimson-Text-italic.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Crimson-Text-italic/Crimson-Text-italic.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Crimson-Text-italic/Crimson-Text-italic.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Crimson-Text-italic/Crimson-Text-italic.svg#CrimsonText') format('svg');
-}
-
-@font-face {
-  font-family: 'Crimson Text';
-  font-weight: 600;
-  font-style: italic;
-  src: url('{=siteurl}/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.eot');
-  src: url('{=siteurl}/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.eot?#iefix') format('embedded-opentype'),
-       local('Crimson Text Semibold Italic'),
-       local('Crimson-Text-600italic'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.woff2') format('woff2'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.woff') format('woff'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.ttf') format('truetype'),
-       url('{=siteurl}/static/fonts/Crimson-Text-600italic/Crimson-Text-600italic.svg#CrimsonText') format('svg');
-}
-
-@font-face {
     font-family: 'Oswald';
     src: url('{=siteurl}/static/fonts/Oswald/oswald-regular.eot');
     src: url('{=siteurl}/static/fonts/Oswald/oswald-regular.eot?#iefix') format('embedded-opentype'),
@@ -196,7 +55,6 @@ $}
          url('{=siteurl}/static/fonts/Oswald/oswald-regular.svg#oswaldbook') format('svg');
     font-weight: normal;
     font-style: normal;
-
 }
 
 @font-face {
@@ -207,11 +65,43 @@ $}
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'Muli';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Muli Light'), local('Muli-Light'), url('{=siteurl}/static/fonts/Muli/Muli-Light.ttf') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Muli';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Muli Regular'), local('Muli-Regular'), url('{=siteurl}/static/fonts/Muli/Muli-Regular.ttf') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+@font-face {
+  font-family: 'Muli';
+  font-style: normal;
+  font-weight: 600;
+  src: local('Muli SemiBold'), local('Muli-SemiBold'), url('{=siteurl}/static/fonts/Muli/Muli-SemiBold.ttf') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+@font-face {
+  font-family: 'Muli';
+  font-style: normal;
+  font-weight: 800;
+  src: local('Muli ExtraBold'), local('Muli-ExtraBold'), url('{=siteurl}/static/fonts/Muli/Muli-ExtraBold.ttf') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
+}
+
+
 html, body {
 	padding:0;
 	margin:0;
 
-	font-family: 'Raleway', sans-serif;
+	font-family: 'Muli', sans-serif;
 	color: {=fontcolor};
 }
 
@@ -526,6 +416,9 @@ select {
 
 .lmlform-fieldwrapper label {
 	margin-right: 10px;
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
 }
 
 .lmlform-fieldwrapper label.inline, .lmlform input.inline,
@@ -542,6 +435,8 @@ select {
     border-left: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.1);
+
+    color: #111;
 }
 
 .lmlform .ck-image-credit-field-text input {
@@ -1447,7 +1342,6 @@ header.admin-bar .lilium-logo-link {
     width: 200px;
     height: 50px;
     display: inline-block;
-    background-color: rgba(0,0,0, 0.2);
     padding: 2px 6px 3px 5px;
 
     cursor: pointer;
@@ -1457,7 +1351,7 @@ header.admin-bar .lilium-logo-link {
 }
 
 header.admin-bar .lilium-logo-link:hover {
-    background-color : rgba(0,0,0,0.4);
+    background-color : rgba(0,0,0,0.6);
 }
 
 header.admin-bar .lilium-logo-link:hover span.product-text {
@@ -1708,7 +1602,7 @@ input.lml-leaflet-search-input {
 	background-color: #222222;
 	color: #CCC;
 
-	font-family: "Raleway", Arial, sans-serif;
+	font-family: "Muli", Arial, sans-serif;
 }
 
 .lmlcrash header {
@@ -1800,14 +1694,16 @@ h1 > a.fab {
     background-color: {=actioncolor};
     color: #fff;
     border-radius: 50%;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     text-align: center;
-    line-height: 45px;
+    line-height: 35px;
     text-decoration: none;
-    top: 30px;
+    top: 23px;
     position: relative;
-    font-size: 50px;
+    font-size: 38px;
+    box-shadow: 1px 1px 0px 0px rgba(0,0,0,0.3);
+    text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.2);
 }
 
 h1 > a.fab:hover {
