@@ -706,15 +706,9 @@ var LMLDom = function() {
     };
 
     this.removeFeatures = function() {
-        document.body.classList.remove('fullwidth');
     };
 
     this.applyFeature = function(featurename) {
-        switch (featurename) {
-            case 'fullwidth':
-                document.body.classList.add('fullwidth');
-                break;
-        }
     };  
 
     this.addFeatures = function() {
