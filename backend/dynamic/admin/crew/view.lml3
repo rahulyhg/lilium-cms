@@ -204,6 +204,7 @@ const css = `<style>
 
 .highlight-image {
     height: 280px;
+    width: 100%;
     object-fit: cover;
     width: auto;
     object-position: center;
