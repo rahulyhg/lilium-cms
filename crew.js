@@ -70,8 +70,9 @@ class Crew {
                     foreignField : "_id"
                 }},
                 { $unwind : "$featuredimage" },
-                { $project : { title : 1, subtitle : 1, shares : 1, media : "$featuredimage.sizes.thumbnaillarge.url", date : 1, publicnote : 1, site : sites[siteIndex].website.sitetitle }}
+                { $project : { title : 1, subtitle : 1, shares : 1, media : "$featuredimage.sizes.thumbnaillarge.url", date : 1, publicnote : 1 }}
             ], posts => {
+                posts.forEach(x => x.site = sites[siteIndex].website.sitetitle);
                 member.featuredposts.push(...posts);
                 nextSite();
             });
