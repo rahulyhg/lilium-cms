@@ -62,12 +62,12 @@ var ImageResizer = function () {
 
                 queue.write(resizedFilename, function (err) {
                     if (err) {
-                      console.log(err);
+                        log("ImageResizer", err, 'err');
                     }
 
                     images[key] = {};
                     images[key].path = resizedFilename;
-                    images[key].url = _c.server.url + '/uploads/' + fileName + resizedEndName;
+                    images[key].url = _c.server.url + require('./media').getRelativeUrlForNew("/") + fileName + resizedEndName;
                     images[key].width = width || "relative";
                     images[key].height = height || "relative";
 

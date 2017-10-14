@@ -10,8 +10,21 @@ var imageResizer = require('./imageResizer.js');
 var imageSize = require('image-size');
 var nURL = require('url');
 var nHTTP = require('http');
+var mkdirp = require('mkdirp');
+var dateformat = require('dateformat');
 
 var Media = function () {
+    this.getDirectoryForNew = function(_c, send) {
+        let dir = _c.server.base + "/backend/static/u/" + dateformat(new Date(), 'yyyy/mm/dd') + "/";
+        mkdirp(dir, () => {
+            send(dir);
+        });
+    };
+
+    this.getRelativeUrlForNew = function(prepend) {
+        return (prepend || "") + "u/" + dateformat(new Date(), 'yyyy/mm/dd') + "/";
+    }
+
     this.adminPOST = function (cli) {
         cli.touch('article.handlePOST');
         switch (cli.routeinfo.path[2]) {
@@ -138,37 +151,42 @@ var Media = function () {
         }
     };
 
-    this.handleUploadedFile = function(_c, filename, cb, force, extra) {
-        var extensions = filename.split('.');
-        var mime = extensions[extensions.length - 1];
-        var saveTo = _c.server.base + "backend/static/uploads/" + filename;
+    this.handleUploadedFile = function(_c, uploader, filename, cb, force, extra) {
+        this.getDirectoryForNew(_c, updir => {
+            var extensions = filename.split('.');
+            var mime = extensions[extensions.length - 1];
+            var saveTo = updir + filename;
 
-        if (force || _c.supported_pictures.indexOf('.' + mime) != -1) {
-            imageResizer.resize(saveTo, filename, mime, _c, function (images, oSize) {
-                if (oSize.code !== 1) {
-                    try {
-                        // Save it in database
-                        db.insert(_c, 'uploads', Object.assign({
-                            path: saveTo,
-                            url: filename,
-                            name: "Full Size",
-                            size: oSize,
-                            type: 'image',
-                            sizes: images
-                        }, extra || {}), function (err, result) {
-                            cb(undefined, result)
-                        });
-                    } catch (ex) {
-                        log("Media", "ERROR : " + ex + " : " + saveTo);
-                        cb(ex);
+            if (force || _c.supported_pictures.indexOf('.' + mime) != -1) {
+                imageResizer.resize(saveTo, filename, mime, _c, (images, oSize) => {
+                    if (oSize.code !== 1) {
+                        try {
+                            // Save it in database
+                            db.insert(_c, 'uploads', Object.assign({
+                                filename,
+                                uploader,
+                                path: saveTo,
+                                fullurl : this.getRelativeUrlForNew() + filename,
+                                name: "Full Size",
+                                v : 2,
+                                size: oSize,
+                                type: 'image',
+                                sizes: images
+                            }, extra || {}), (err, result) => {
+                                cb(undefined, result)
+                            });
+                        } catch (ex) {
+                            log("Media", "ERROR : " + ex + " : " + saveTo);
+                            cb(ex);
+                        }
+                    } else {
+                        cb(new Error(oSize.core));
                     }
-                } else {
-                    cb(new Error(oSize.core));
-                }
-            });
-        } else {
-            cb(true);
-        }
+                });
+            } else {
+                cb(true);
+            }
+        });
     };
 
     this.upload = function (cli) {
@@ -180,7 +198,7 @@ var Media = function () {
 
             if (response.success || cli.postdata.data.form_name == "lmlimagepicker") {
                 var imagefile = response.success ? formBuilder.serializeForm(form).File : cli.postdata.data.File;
-                this.handleUploadedFile(cli._c, imagefile, function(err, result) {
+                this.handleUploadedFile(cli._c, db.mongoID(cli.userinfo.userid), imagefile, (err, result) => {
                     if (err) {
                         cli.sendJSON({
                             form: response
