@@ -384,22 +384,24 @@ class Entities {
         var sessionManager = require('./session.js');
         var ext = filename.substring(filename.lastIndexOf('.') + 1);
 
-        imageResizer.resize(cli._c.server.base + "backend/static/uploads/" + filename, filename, ext, cli._c, function(images) {
-            var userid = cli.userinfo.userid;
-            var avatarURL = images.square.url;
-            var avatarMini = images.mini.url;
-            var avatarID = filename.substring(0, filename.lastIndexOf('.'));
+        require('./media').getDirectoryForNew(cli._c, updir => {
+            imageResizer.resize(updir + filename, filename, ext, cli._c, function(images) {
+                var userid = cli.userinfo.userid;
+                var avatarURL = images.square.url;
+                var avatarMini = images.mini.url;
+                var avatarID = filename.substring(0, filename.lastIndexOf('.'));
 
-            cli.did("entity", "picupload");
-            db.update(_c.default(), 'entities', {
-                _id: db.mongoID(userid)
-            }, {
-                avatarURL: avatarURL,
-                avatarMini : avatarMini,
-                avatarID: db.mongoID(avatarID)
-            }, function(err, result) {
-                images.success = true;
-                cb(err, images);
+                cli.did("entity", "picupload");
+                db.update(_c.default(), 'entities', {
+                    _id: db.mongoID(userid)
+                }, {
+                    avatarURL: avatarURL,
+                    avatarMini : avatarMini,
+                    avatarID: db.mongoID(avatarID)
+                }, function(err, result) {
+                    images.success = true;
+                    cb(err, images);
+                });
             });
         });
     };
@@ -419,95 +421,96 @@ class Entities {
 
         if (response.success) {
 
-            var image = formbuilder.serializeForm(form);
-            var extensions = image.picture.split('.');
-            var mime = extensions[extensions.length - 1];
-            var saveTo = cli._c.server.base + "backend/static/uploads/" + image.picture;
+            require('./media').getDirectoryForNew(cli._c, updir => {
+                var image = formbuilder.serializeForm(form);
+                var extensions = image.picture.split('.');
+                var mime = extensions[extensions.length - 1];
+                var saveTo = updir + image.picture;
 
-            if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
+                if (cli._c.supported_pictures.indexOf('.' + mime) != -1) {
 
-                imageResizer.resize(saveTo, image.picture, mime, cli._c, function (images) {
-                    var avatarURL = images.square.url;
-                    var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
-                    var id = isProfile ? cli.userinfo.userid : cli.routeinfo.path[3];
-                    var sessionManager = require('./session.js');
+                    imageResizer.resize(saveTo, image.picture, mime, cli._c, function (images) {
+                        var avatarURL = images.square.url;
+                        var avatarID = image.picture.substring(0, image.picture.lastIndexOf('.'));
+                        var id = isProfile ? cli.userinfo.userid : cli.routeinfo.path[3];
+                        var sessionManager = require('./session.js');
 
-                    // Save it in database
-                    db.update(_c.default(), 'entities', {
-                        _id: db.mongoID(id)
-                    }, {
-                        avatarURL: avatarURL,
-                        avatarID: db.mongoID(avatarID)
-                    }, function (err, result) {
-                        cli.did("entity", "picupload");
+                        // Save it in database
+                        db.update(_c.default(), 'entities', {
+                            _id: db.mongoID(id)
+                        }, {
+                            avatarURL: avatarURL,
+                            avatarID: db.mongoID(avatarID)
+                        }, function (err, result) {
+                            cli.did("entity", "picupload");
 
-                        // Update session
-                        if (isProfile) {
-                            var sessToken = cli.session.token;
-                            sessionManager.getSessionFromSID(sessToken, function(session) {
-                                session.data.avatarID = avatarID;
-                                session.data.avatarURL = avatarURL;
+                            // Update session
+                            if (isProfile) {
+                                var sessToken = cli.session.token;
+                                sessionManager.getSessionFromSID(sessToken, function(session) {
+                                    session.data.avatarID = avatarID;
+                                    session.data.avatarURL = avatarURL;
 
-                                cli.session.data.avatarURL = avatarURL;
-                                cli.session.data.avatarID = avatarID;
+                                    cli.session.data.avatarURL = avatarURL;
+                                    cli.session.data.avatarID = avatarID;
 
-                                hooks.fire('profile_picture_updated', {
-                                    cli: cli
-                                });
+                                    hooks.fire('profile_picture_updated', {
+                                        cli: cli
+                                    });
 
-                                sessionManager.saveSession(cli, function () {
-                                    cli.sendJSON({
-                                        success: true
+                                    sessionManager.saveSession(cli, function () {
+                                        cli.sendJSON({
+                                            success: true
+                                        });
                                     });
                                 });
-                            });
-                        } else {
-                            db.findToArray(cli._c, 'sessions', {"data._id" : db.mongoID(id)}, function(err, arr){
-                                if (arr[0] && arr[0].token) {
+                            } else {
+                                db.findToArray(cli._c, 'sessions', {"data._id" : db.mongoID(id)}, function(err, arr){
+                                    if (arr[0] && arr[0].token) {
 
-                                    sessionManager.getSessionFromSID(arr[0].token, function(session) {
-                                        if (session) {
-                                            session.data.avatarID = avatarID;
-                                            session.data.avatarURL = avatarURL;
+                                        sessionManager.getSessionFromSID(arr[0].token, function(session) {
+                                            if (session) {
+                                                session.data.avatarID = avatarID;
+                                                session.data.avatarURL = avatarURL;
 
-                                            cli.session.data.avatarURL = avatarURL;
-                                            cli.session.data.avatarID = avatarID;
+                                                cli.session.data.avatarURL = avatarURL;
+                                                cli.session.data.avatarID = avatarID;
 
-                                            // Bypass session manager taking only a cli
-                                            var dummycli = {};
-                                            dummycli.session = session;
-                                            dummycli._c = {};
-                                            dummycli._c.id = cli._c.id;
+                                                // Bypass session manager taking only a cli
+                                                var dummycli = {};
+                                                dummycli.session = session;
+                                                dummycli._c = {};
+                                                dummycli._c.id = cli._c.id;
 
-                                            // Save it
-                                            sessionManager.saveSession(dummycli, function () {
-                                                cli.sendJSON({
-                                                    redirect: '',
-                                                    success: true
+                                                // Save it
+                                                sessionManager.saveSession(dummycli, function () {
+                                                    cli.sendJSON({
+                                                        redirect: '',
+                                                        success: true
+                                                    });
                                                 });
-                                            });
-                                        }
-                                    });
-                                } else {
-                                    cli.sendJSON({
-                                        redirect: '',
-                                        success: true
-                                    });
-                                }
-                            });
-                        }
+                                            }
+                                        });
+                                    } else {
+                                        cli.sendJSON({
+                                            redirect: '',
+                                            success: true
+                                        });
+                                    }
+                                });
+                            }
+
+                        });
 
                     });
-
-                });
-            } else {
-                cli.sendJSON({
-                    form: response
-                });
-            }
-            // var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
-            // Create post
-
+                } else {
+                    cli.sendJSON({
+                        form: response
+                    });
+                }
+                // var url = conf.default.server.url + "/uploads/" + cli.postdata.uploads[0].url;
+                // Create post
+            });
         } else {
             cli.sendJSON({
                 msg: 'Invalid file type'
