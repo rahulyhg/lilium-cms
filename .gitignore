@@ -36,8 +36,15 @@ bower_components
 
 # Temp files
 backend/static/tmp
+
+# Uploads
 backend/static/uploads/*
+backend/static/u/*
+
+# Generated files
 backend/static/gen/*
+
+# Custom frontend libraries
 backend/static/lib
 
 # Optional REPL history
