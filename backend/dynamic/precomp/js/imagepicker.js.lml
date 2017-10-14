@@ -189,12 +189,22 @@ var LMLImagePicker = function() {
         var imginfo = imgpickercache[imgid];
         focusedID = imgid;
     
-        ePicker.querySelector(".image-details-bigger").setAttribute('src', "{=config.default.server.url}/uploads/" + imginfo.url);
-        ePicker.querySelector(".image-details-size span").innerHTML = imginfo.size.width + " x " + imginfo.size.height;
-        ePicker.querySelector(".image-details-filename span").innerHTML = imginfo.url;
-        ePicker.querySelector(".image-details-view-original a").setAttribute('href', "{=config.default.server.url}/uploads/" + imginfo.url);
+        ePicker.querySelector(".image-details-bigger").setAttribute('src', "{=config.default.server.url}/" + imginfo.fullurl);
+
+        ePicker.querySelector(".image-details-size span").textContent = imginfo.size.width + " x " + imginfo.size.height;
+        ePicker.querySelector(".image-details-fullurl a").href = "{=config.default.server.url}/" + imginfo.fullurl;
+        ePicker.querySelector(".image-details-fullurl a").textContent = "{=config.default.server.url}/" + imginfo.fullurl;
+
+        var allusers = liliumcms.conversations.getCachedUsers();
+        var uploader = "Unknown";
+        if (imginfo.uploader) {
+            upuser = allusers[imginfo.uploader];
+            uploader = upuser ? upuser.displayname : "Inactive user";
+        }
 
         if (sessionInfo.multiple && Object.keys(selectedImage).length > 1) {
+            uploader = [uploader];
+
             var ids = Object.keys(selectedImage);
             var artist = imginfo.artistname || "";
             var arturl = imginfo.artisturl || "";
@@ -202,14 +212,25 @@ var LMLImagePicker = function() {
             for (var i = 0; i < ids.length; i++) {
                 if (artist != (selectedImage[ids[i]].artistname || "")) { artist = "[Multiple values]" }
                 if (arturl != (selectedImage[ids[i]].artisturl || "") ) { arturl = "[Multiple values]" }
+
+                if (selectedImage[ids[i]].uploader) {
+                    upuser = allusers[selectedImage[ids[i]].uploader];
+                    var newuploader = upuser ? upuser.displayname : "Inactive user";
+                    if (uploader.indexOf(newuploader) == -1) {
+                        uploader.push(newuploader);
+                    }
+                }
             }
 
+            uploader = uploader.join(', ');
             ePicker.querySelector(".image-details-artist-input").value = artist;
             ePicker.querySelector(".image-details-artist-url-input").value = arturl;
         } else {
             ePicker.querySelector(".image-details-artist-input").value = imginfo.artistname || "";
             ePicker.querySelector(".image-details-artist-url-input").value = imginfo.artisturl || "";
         }
+
+        ePicker.querySelector(".image-details-uploader span").textContent = uploader;
 
         ePicker.querySelector(".lmlimagepicker-details").classList.add("with-details");
     };

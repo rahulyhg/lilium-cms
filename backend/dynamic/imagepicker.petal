@@ -22,13 +22,16 @@
                     </div>
 
                     <div class="image-details-size image-details-line">
-                        <b>Original size : </b><span></span>
+                        <b>Original size</b>
+                        <span></span>
                     </div>
-                    <div class="image-details-filename image-details-line">
-                        <b>Filename : </b><span></span>
+                    <div class="image-details-uploader image-details-line">
+                        <b>Uploader</b>
+                        <span></span>
                     </div>
-                    <div class="image-details-view-original image-details-line">
-                        <a target="_blank">View original</a>
+                    <div class="image-details-fullurl image-details-line">
+                        <b>Full URL</b>
+                        <span><a href="#" target="_blank"></a></span>
                     </div>
                 </div>
             </div>

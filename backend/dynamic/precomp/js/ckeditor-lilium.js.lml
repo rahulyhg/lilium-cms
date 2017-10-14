@@ -191,7 +191,7 @@ var CKEditor = function() {
         var img = document.createElement('img');
         var crediturl = document.createElement('a');
 
-        img.setAttribute('src', "{=config.default.server.url}/uploads/" + imgobj.url);
+        img.setAttribute('src', "{=config.default.server.url}/" + imgobj.fullurl);
         img.dataset.iid = imgobj._id;
         img.classList.add("lml-content-image");
         img.classList.add("lml-instagram-embed-2");
