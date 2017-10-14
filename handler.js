@@ -70,16 +70,18 @@ var Handler = function () {
                                if (mimeTypeIsSupported(mimetype, cli)) {
                                    hasFile = true;
            
-                                   var mime = getMimeByMimeType(mimetype, cli);
-                                   //Gen random name
-                                   filename = fileserver.genRandomNameFile(filename);
-                                   var saveTo = cli._c.server.base + "backend/static/uploads/" + filename + mime;
-                                   var name = filename + mime;
+                                   require('./media').getDirectoryForNew(cli._c, updir => {
+                                       var mime = getMimeByMimeType(mimetype, cli);
+                                       //Gen random name
+                                       filename = fileserver.genRandomNameFile(filename);
+                                       var saveTo = updir + filename + mime;
+                                       var name = filename + mime;
 
-                                   file.pipe(fs.createWriteStream(saveTo));
+                                       file.pipe(fs.createWriteStream(saveTo));
 
-                                   file.on('end', function () {
-                                       cli.postdata.data[fieldname] = name;
+                                       file.on('end', function () {
+                                           cli.postdata.data[fieldname] = name;
+                                       });
                                    });
                                } else {
             
