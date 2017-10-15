@@ -646,7 +646,8 @@ var LMLConversations = function() {
 
         socket.on('readreport', function(details) {
             if (currentConv == details.convid) {
-                document.querySelector(".pars-list-user-" + details.userid).classList.add("read");
+                var listuser = document.querySelector(".pars-list-user-" + details.userid);
+                listuser && listuser.classList.add("read");
             }
         });
 
