@@ -238,6 +238,7 @@
     var sendForReview = function() {
         liliumcms.modals.get('article-packaging').dismiss()
         $.post('{=config.default.server.url}/admin/article/sendforreview/' + contentid, {}, function() {
+            document.body.classList.remove("block-scroll");
             $('#confirm-send-for-review').modal('hide');
             liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
         });
