@@ -327,13 +327,14 @@ class Article {
                     newdata.title = indexofpage == -1 ? newdata.title : newdata.title.substring(0, indexofpage);
                 }
 
-                require("./history.js").pushModification(cli, article, article._id, (err, revision)  => {    
                 db.update(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, newdata, (err, r) => {
-                    this.generateArticle(cli._c, db.mongoID(cli.routeinfo.path[3]), resp => {
-                        cli.sendJSON({
-                            ok : 1
-                        });
-                    }, false, index);
+                    require("./history.js").pushModification(cli, article, article._id, (err, revision)  => {    
+                        this.generateArticle(cli._c, db.mongoID(cli.routeinfo.path[3]), resp => {
+                            cli.sendJSON({
+                                ok : 1
+                            });
+                        }, false, index);
+                    });
                 });
             } else {
                 cli.throwHTTP(404, undefined, true);
