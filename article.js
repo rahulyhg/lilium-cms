@@ -327,6 +327,7 @@ class Article {
                     newdata.title = indexofpage == -1 ? newdata.title : newdata.title.substring(0, indexofpage);
                 }
 
+                require("./history.js").pushModification(cli, article, article._id, (err, revision)  => {    
                 db.update(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, newdata, (err, r) => {
                     this.generateArticle(cli._c, db.mongoID(cli.routeinfo.path[3]), resp => {
                         cli.sendJSON({
@@ -337,7 +338,7 @@ class Article {
             } else {
                 cli.throwHTTP(404, undefined, true);
             }
-        }, { title : 1, subtitle : 1, content : 1, author : 1 });
+        });
     };
 
     addWordToDico(cli) {
