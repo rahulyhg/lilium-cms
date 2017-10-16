@@ -59,6 +59,8 @@ class Article {
             case 'delete-autosave': if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli); break;
             case 'autosave': if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true); break;
             case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
+            case 'haseditrights': if (cli.hasRightOrRefuse("create-articles")) this.haseditrights(cli); break;
+            case 'liveedit': if (cli.hasRightOrRefuse("create-articles")) this.liveedit(cli); break;
             case 'package': if (cli.hasRightOrRefuse("create-articles")) this.packageArticle(cli); break;
             case 'addwordtodico': if (cli.hasRightOrRefuse('create-articles')) this.addWordToDico(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
@@ -252,7 +254,7 @@ class Article {
                     cli.throwHTTP(404, undefined, true);
                 }
             }, false, conditions);
-        } else if (ftc == "list" &&  cli.hasAPIRight('list-content')) {
+        } else if (ftc == "list" && cli.hasAPIRight('list-content')) {
             const postlimit = 100;
             const conditions = {};
             if (!cli.hasAPIRight('admin')) {
@@ -282,6 +284,57 @@ class Article {
 
     list(cli) {
         filelogic.serveAdminLML(cli, false);
+    };
+
+    haseditrights(cli) {
+        if (cli.hasRight('editor')) {
+            cli.sendJSON({ edit : true, read : true });
+        } else {
+            db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
+                if (cli.userinfo.userid == article.author) {
+                    cli.sendJSON({ edit : true, read : true });
+                } else {
+                    cli.sendJSON({ edit : false, read : true });
+                }
+            });
+        }
+    };
+
+    liveedit(cli) {
+        const postdata = cli.postdata.data;
+        const newdata = {
+            title : postdata.title,
+            subtitle : postdata.subtitle
+        };
+
+        if (postdata.markup) {
+            newdata.content = postdata.markup;
+        }
+
+        db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
+            if (article && cli.userinfo.userid == article.author || cli.hasRight('editor')) {
+                let index;
+                if (article.content && article.content.includes("<lml-page")) {
+                    index = (postdata.page || 1) - 1;
+
+                    const currentcontent = article.content;
+                    const arr = currentcontent.split("<lml-page></lml-page>");
+                    arr[index] = newdata.content;
+
+                    newdata.content = arr.join("<lml-page></lml-page>");
+                }
+
+                db.update(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, newdata, (err, r) => {
+                    this.generateArticle(cli._c, db.mongoID(cli.routeinfo.path[3]), resp => {
+                        cli.sendJSON({
+                            ok : 1
+                        });
+                    }, false, index);
+                });
+            } else {
+                cli.throwHTTP(404, undefined, true);
+            }
+        }, { title : 1, subtitle : 1, content : 1, author : 1 });
     };
 
     addWordToDico(cli) {
