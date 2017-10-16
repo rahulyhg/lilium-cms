@@ -315,13 +315,16 @@ class Article {
             if (article && cli.userinfo.userid == article.author || cli.hasRight('editor')) {
                 let index;
                 if (article.content && article.content.includes("<lml-page")) {
-                    index = (postdata.page || 1) - 1;
+                    index = (postdata.page || 1);
 
                     const currentcontent = article.content;
                     const arr = currentcontent.split("<lml-page></lml-page>");
                     arr[index] = newdata.content;
 
                     newdata.content = arr.join("<lml-page></lml-page>");
+
+                    const indexofpage = newdata.title.indexOf(' - Page ');
+                    newdata.title = indexofpage == -1 ? newdata.title : newdata.title.substring(0, indexofpage);
                 }
 
                 db.update(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, newdata, (err, r) => {
