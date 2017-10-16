@@ -22,6 +22,10 @@ class History extends RFExtender {
             let lmldiffs = [];
             let newStatus = false;
 
+            if (!diffs) {
+                return cb && cb(false);
+            }
+
             diffs.forEach((diff) => {
                 if (history.ignoredFields.indexOf(diff.path[0]) == -1) {
                     let diffobj = {};
