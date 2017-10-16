@@ -319,7 +319,7 @@ class Article {
 
                     const currentcontent = article.content;
                     const arr = currentcontent.split("<lml-page></lml-page>");
-                    arr[index] = newdata.content;
+                    arr[index - 1] = newdata.content;
 
                     newdata.content = arr.join("<lml-page></lml-page>");
 
