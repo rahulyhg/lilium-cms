@@ -950,7 +950,7 @@ class Article {
                                                         title : deepArticle.title,
                                                         subtitle : deepArticle.subtitle,
                                                         slug : deepArticle.name,
-                                                        image : deepArticle.featuredimage[0].sizes.square.url,
+                                                        image : deepArticle.featuredimage[0].sizes.thumbnaillarge.url,
                                                         authorname : deepArticle.authors[0].displayname,
                                                         authoravatar : deepArticle.authors[0].avatarURL
                                                     });
