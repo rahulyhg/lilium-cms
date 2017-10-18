@@ -102,47 +102,18 @@ window.generateFeedCard_quote = function(card, ctx) {
 };
 
 window.generateFeedCard_published = function(card, ctx) {
-    var wrap = document.createElement('a');
-    var header = document.createElement('div');
-    var avatar = document.createElement('img');
-    var announce = document.createElement('span');
-    var timespan = document.createElement('span');
-    var articletitle = document.createElement('h2');
-    var articleimg = document.createElement('div');
+    var wrap = d.make({ class : "feed-pubcard" });
 
-    wrap.classList.add('card-link');
-    avatar.classList.add('card-avatar');
-    announce.classList.add('card-title');
-    header.classList.add('card-header');
-    timespan.classList.add('card-datetime');
-    articleimg.classList.add('card-image');
-    articletitle.classList.add('card-details');
+    var img = d.make({ node : "img", class : "feed-pubimg", attr : { src : card.extra.image }, parent : wrap });
+    var title = d.make({ class : "feed-pubtitle", text : card.extra.title, parent : wrap, node : "a", attr : { href : "/" + card.extra.slug, target : "_blank" } })
+    var subtitle = d.make({ class : "feed-pubsubtitle", text : card.extra.subtitle, parent : wrap })
 
-    wrap.appendChild(header);
-    header.appendChild(avatar);
-    header.appendChild(announce);
+    var authorslide = d.make({ class : "feed-pubauthorslide", parent : wrap });
 
-    timespan.textContent = dateFormat(card.time, 'd mmmm, h:MMTT');
-    wrap.appendChild(timespan);
+    var avatar = d.make({ class : "feed-pubavatar", parent : authorslide, attr : { src : card.extra.authoravatar }, node : "img" });
+    var author = d.make({ class : "feed-pubauthor", parent : authorslide, text : card.extra.authorname });
 
-    wrap.appendChild(articleimg);
-    wrap.appendChild(articletitle);
-
-    avatar.setAttribute('src', liliumcms.cdn.ize(card.extra.authoravatar));
-    announce.textContent = card.extra.authorname.split(' ')[0] + 
-        " published on " + (
-            ctx.livevars.sites.all.simple.assoc[card.site] ?
-            ctx.livevars.sites.all.simple.assoc[card.site].displayName :
-            "the network"
-        );
-
-    articletitle.textContent = card.extra.title;
-    articleimg.style.backgroundImage = "url('"+liliumcms.cdn.ize(card.extra.image)+"')";
-    
-    wrap.setAttribute('href', ctx.livevars.sites.all.simple.assoc[card.site].url + '/' + card.extra.slug);
-    wrap.setAttribute('target', '_blank');
-
-    return wrap;
+    return wrap.get();
 };
 </script>
 
@@ -153,16 +124,15 @@ window.generateFeedCard_published = function(card, ctx) {
 }
 
 .real-time-card {
-    text-align: left;
-    width: calc(50% - 16px);
+    width: 600px;
     background-color: #FFF;
     box-shadow: 0px 0px 6px 0px rgba(0,0,0,0.2);
-    margin: 8px;
-    display: inline-block;
-    float: left;
-    height: 300px;
+    display: block;
     overflow: hidden;
 
+    border: 1px solid #dcb3ff;
+
+    margin: 10px auto;
     opacity: 0;
 
     -webkit-transform: translate3d(0,100px,0);
@@ -176,6 +146,9 @@ window.generateFeedCard_published = function(card, ctx) {
     -ms-transition: all 0.2s;
      -o-transition: all 0.2s;
         transition: all 0.2s;
+
+    display: inline-block;
+    vertical-align: top;
 }
 
 .real-time-card.shown {
@@ -187,15 +160,71 @@ window.generateFeedCard_published = function(card, ctx) {
         transform: translate3d(0,0,0);
 }
 
-@media screen and (min-width: 1600px) {
+.feed-pubcard {
+    position: relative;
+}
+
+.feed-pubavatar {
+    width: 48px;
+    height: 48px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 48px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.feed-pubauthor {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 10px;
+    font-size: 16px;
+}
+
+.feed-pubauthorslide {
+    padding: 10px;
+    text-align: left;
+}
+
+@media screen and (max-width: 600px) {
     .real-time-card {
-        width: calc(33% - 12px);
+        width: auto;
+    }
+
+    .feed-pubimg {
+        height: 280px;
     }
 }
 
 .real-time-card-welcomed {
     border: 5px dotted rgba(255, 255, 255, 0.8);
     background: #9b59b6;
+    height: 400px;
+    padding-top: 60px;
+}
+
+.feed-pubimg {
+    width: 100%;
+    height: 340px;
+    object-fit: cover;
+    object-position: center center;
+}
+
+.feed-pubtitle {
+    text-align: left;
+    padding: 10px 10px 0px;
+    font-size: 22px;
+    line-height: 26px;
+    color: #333;
+
+    display : block;
+}
+
+.feed-pubsubtitle {
+    padding: 4px 10px;
+    text-align: left;
+    font-size: 14px;
+    color: #333;
 }
 
 .real-time-card-badge {
