@@ -1,8 +1,8 @@
-var log = require('./log.js');
+const log = require('./log.js');
 
-var registeredLibraries = {
+const registeredLibraries = {
     config: function (context) {
-        var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
+        const conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
         return {
             default: conf
         };
@@ -13,7 +13,7 @@ var registeredLibraries = {
         };
     },
     encodec : function(context) {
-        var entities = require('entities');
+        const entities = require('entities');
         return {
             encodeURI  : function(str) { return encodeURI(str); },
             decodeURI  : function(str) { return decodeURI(str); },
@@ -32,7 +32,7 @@ var registeredLibraries = {
     date: function(context) {
         return {
             stringify : function(str, format) {
-                var formats = {
+                const formats = {
                     short : "mmm dd, yyyy",
                     full : "mmmm dd, yyyy",
                     slash : "dd/mm/yyyy",
@@ -50,7 +50,7 @@ var registeredLibraries = {
         };
     },
     vocab: function (context) {
-        var conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
+        const conf = context.config || require('./config.js').fetchConfig(context.extra.siteid);
         return require('./vocab.js').getDico(conf.website.language);
     },
     forms: function (context) {
@@ -68,7 +68,7 @@ var registeredLibraries = {
     slug : function(context) {
         return {
             ify : function(str) {
-                var sl = require('slugify')(str ? str.toString() : "");
+                const sl = require('slugify')(str ? str.toString() : "");
                 return sl ? sl.toLowerCase() : "";
             }
         };
@@ -93,16 +93,16 @@ var registeredLibraries = {
     }
 };
 
-var LMLLib = function () {
-    this.pulloutLib = function (libName, context) {
+class LMLLib {
+    pulloutLib(libName, context) {
         return registeredLibraries[libName].apply(context, [context]);
     };
 
-    this.isRegistered = function (libName) {
+    isRegistered(libName) {
         return typeof registeredLibraries[libName] !== "undefined";
     };
 
-    this.registerContextLibrary = function (libName, callback) {
+    registerContextLibrary(libName, callback) {
         if (this.isRegistered(libName)) {
             require('./log.js')("Tried to add already registered LML Context Library " + libName);
         } else {
