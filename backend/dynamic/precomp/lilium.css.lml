@@ -1527,7 +1527,7 @@ header.admin-bar .navbar-default .navbar-nav .admin-publish-button:active {
 
 header.admin-bar .navbar-default .navbar-nav  .loggedin-user-box {
 	text-transform: uppercase;
-    border-left: 1px solid #777;
+    border-left: 2px solid #333;
 	font-size: 14px;
 }
 
