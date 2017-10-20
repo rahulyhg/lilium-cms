@@ -73,7 +73,6 @@
 
     font-size: 32px;
     color: #F3F3F3;
-    font-family : "Raleway", sans-serif;
 
     display: block;
     transition: all 0.2s;
