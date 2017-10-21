@@ -155,6 +155,7 @@ const loadImageSizes = function () {
     imageSize.add("square", 320, 320);
     imageSize.add("thumbnailarchive", 380, 200);
     imageSize.add("content", 640, '*');
+    imageSize.add("facebook", 1200, 630);
 
     hooks.fire('image_sized_loaded');
 };
