@@ -28,6 +28,12 @@ ContentTools is part of the dependencies so that on-site editing is possible dir
 ## I want to code, too
 See the [Lilium CMS Wiki](https://github.com/narcitymedia/lilium-cms/wiki) and get started!
 
+## Script mode
+It is possible to run a Javascript file in script mode. It will prevent Lilium from loading the listeners, CAIJ and other modules related to networking. The websites and databases will still be loaded on a single thread, and the script passed as an argument will be executed. 
+
+### Usage
+`node runscript.js [script.js]`
+
 ## Working with nginx
 ### Experimental configuration file
 
