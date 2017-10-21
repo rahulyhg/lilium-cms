@@ -79,7 +79,7 @@ const loadHooks = (readyToRock) => {
 };
 
 const loadEndpoints = () => {
-    if (global.liliumenv.mode == "script") { return; }
+    if (global.liliumenv.mode == "script" || global.liliumenv.caij) { return; }
 
     log('Endpoints', 'Loading endpoints', 'info');
     const endpoints = require('./endpoints.js');
@@ -357,7 +357,7 @@ const loadLMLLibs = function () {
 };
 
 const precompile = function (done) {
-    if (global.liliumenv.mode == "script") {
+    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
         return done();
     }
 
@@ -401,7 +401,7 @@ const bindLocalCast = function() {
 };
 
 const loadDocs = function(cb) {
-    if (global.liliumenv.mode == "script") {
+    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
         return cb();
     }
 
@@ -449,7 +449,7 @@ const loadEnv = function() {
 };
 
 const executeRunScript = function() {
-    if (global.liliumenv.mode == "script") {
+    if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
         global.liliumenv.run && global.liliumenv.run.apply(require('./config.js'), [__dirname]);
     }
 }

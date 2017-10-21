@@ -160,7 +160,7 @@ var Notification = function () {
     };
 
     this.init = function () {
-        if (global.liliumenv.mode != "script") {
+        if (global.liliumenv.mode != "script" || global.liliumenv.caij) {
             io = require('./inbound.js').io();
 
             log('Notifications', 'Creating site groups', 'live');
@@ -183,7 +183,7 @@ var Notification = function () {
     };
 
     this.notifyUser = function (userID, dbId, notification, difftype) {
-        if (global.liliumenv.mode == "script") { return; }
+        if (global.liliumenv.mode == "script" || global.liliumenv.caij) { return; }
 
         //Check if user will receive notification
         notification.interacted = false;

@@ -62,7 +62,7 @@ class Inbound {
     }
 
     createServer(startAfterCreation) {
-        if (global.liliumenv.mode != "script") {
+        if (global.liliumenv.mode != "script" || global.liliumenv.caij) {
             log('Inbound', 'Creating HTTP server');
 
             const _http = require('http')
