@@ -19,13 +19,16 @@ class Core {
         require('./includes/caller.js')
         log('Core', 'Loading all websites', 'info');
         loadWebsites((resp) => {
+            if (loadScriptMode()) {
+                return;
+            }
+
             loadHooks(readyToRock);
             
             loadForms();
             loadTables();
             loadEndpoints();
             loadStandardInput();
-            loadScriptMode();
             loadImageSizes();
             loadLiveVars();
             loadGlobalPetals();
@@ -419,6 +422,8 @@ const loadScriptMode = function() {
         if (scriptpath) {
             require(scriptpath);
         }
+
+        return true;
     }
 };
 

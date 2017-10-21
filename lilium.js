@@ -34,7 +34,7 @@ class LiliumCMS {
     };
 };
 
-if (typeof process.env.parent != "undefined") {
+if (typeof process.env.parent != "undefined" || global.liliumenv.mode == "script") {
     module.exports = LiliumCMS
 } else {
     require('./log.js')('Lilium', "Lilium started from main class. Please use npm start.", "warn");

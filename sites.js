@@ -348,9 +348,13 @@ var SiteInitializer = function (conf, siteobj) {
                             });
                         }
 
-                        if (isElder) {
+                        if (isElder && (global.liliumenv.mode != "script" || global.liliumenv.caij)) {
                             sitemap.scheduleCreation(conf, true);
                             analytics.pollRealtime(conf);
+                        }
+
+                        if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
+                            return done();
                         }
 
                         loadVarious(function() {
@@ -359,10 +363,8 @@ var SiteInitializer = function (conf, siteobj) {
                                     loadSessions(function() {
                                         loadRobots(function() {
                                             update(conf, function() {
-                                                if (global.liliumenv.mode == "script") {
-                                                    if (isElder) {
-                                                        require('./network/sharedmemory.js').bind();
-                                                    }
+                                                if (isElder) {
+                                                    require('./network/sharedmemory.js').bind();
                                                 } else {
                                                     sharedcache.hi();
                                                 }
