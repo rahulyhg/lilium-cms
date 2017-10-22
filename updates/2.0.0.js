@@ -6,7 +6,7 @@ const configlib = require('../config');
 module.exports = (conf, done) => {
     log('Update', 'Updating uploads to new format...');
 
-    mkdirp(conf.server.base + "/static/u", () => {
+    mkdirp(conf.server.base + "backend/static/u", () => {
         db.findUnique(configlib.default(), 'entities', {}, (err, firstuser) => {
             db.rawCollection(conf, 'uploads', (err, col) => {
                 col.find({}, (err, cur) => {
