@@ -15,7 +15,7 @@ var dateformat = require('dateformat');
 
 var Media = function () {
     this.getDirectoryForNew = function(_c, send) {
-        let dir = _c.server.base + "/backend/static/u/" + dateformat(new Date(), 'yyyy/mm/dd') + "/";
+        let dir = _c.server.base + "backend/static/u/" + dateformat(new Date(), 'yyyy/mm/dd') + "/";
         mkdirp(dir, () => {
             send(dir);
         });
