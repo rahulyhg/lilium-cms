@@ -358,7 +358,7 @@ class Article {
 
             const paragraphs = Array.prototype.filter.call(
                 window.document.querySelectorAll('body > p'), 
-                x => x.textContent.length > 20 && !x.textContent.startsWith('@') && !x.textContent.startsWith('via')
+                !x.textContent.startsWith('@') && !x.textContent.toLowerCase().startsWith('via')
             );
 
             paragraphs.forEach((x, i) => {
@@ -367,7 +367,7 @@ class Article {
 
             this.proofread(paragraphs, lang, report => {
                 let content = window.document.body.innerHTML;
-                if (article.hasads || article.isSponsored || article.nsfw || !cli._c.content) {
+                if (article.hasads || article.isSponsored || article.nsfw) {
                     cli.sendJSON({ content, report });
                 } else {
                     this.insertAds(cli._c, article._id, content, content => {
