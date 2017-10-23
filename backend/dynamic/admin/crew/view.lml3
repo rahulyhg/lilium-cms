@@ -266,7 +266,7 @@ const preload = (context, done) => {
         };
 
         window.singlecrewinstagram = function(ctx) {
-            if (!ctx.member.instagram) {
+            if (!ctx.member.instagram || ctx.member.instagram.error) {
                 return document.createTextNode("");
             }
 
