@@ -331,8 +331,10 @@
                 buttons[i].style.display = "none";
             }
 
+            document.getElementById('btn-dismiss-and-save').style.display = "";
             if (resp.status == "published") {
                 document.querySelector('.article-delete-button-wrapper').style.display = "";
+                document.getElementById('btn-dismiss-and-save').style.display = "none";
             } else if (resp.status == "autosaved") {
                 document.querySelector('.article-destroyautosave-button-wrapper').style.display = "";
             } else {
@@ -750,6 +752,7 @@
 
             page.classList.add("shown");
 
+            var didsplit = false;
             for (var i = 0; i < tags.length; i++) {
                 var tag = tags[i];
                 var shouldsplit = !!tag.querySelector("lml-page");
@@ -759,9 +762,14 @@
                         page = createPageTag(++pageindex);
                         pages.get().appendChild(page);
                         createPageSelector(pageindex);
-                        tag.firstElementChild.remove();
 
                         shouldsplit = false;
+
+                        var rmpagetag = tag.querySelector('lml-page');
+                        while (rmpagetag) {
+                            rmpagetag.remove();
+                            rmpagetag = tag.querySelector('lml-page');
+                        }
                     }
                 }
 
@@ -850,14 +858,23 @@
                     })(box);
                 }
              
-                if (shouldsplit) {
+                if (shouldsplit && didsplit) {
+                    
+                } else if (shouldsplit) {
                     page = createPageTag(++pageindex);
                     pages.get().appendChild(page);
                     createPageSelector(pageindex);
 
-                    var maybepage = tag.querySelector("lml-page");
-                    maybepage && maybepage.remove(); 
-                }   
+                    var rmpagetag = tag.querySelector('lml-page');
+                    while (rmpagetag) {
+                        rmpagetag.remove();
+                        rmpagetag = tag.querySelector('lml-page');
+                    }
+
+                    didsplit = true;
+                } else {
+                    didsplit = false;
+                }  
             }
         };
 
@@ -899,7 +916,6 @@
         window["article-packaging_accept"] = function(modal) {
             // Package current paragraph order + content in dataset
             publishCurrentArticle();
-            modal.dismiss();
             document.body.classList.remove('block-scroll');
         };
 
@@ -913,13 +929,13 @@
             var pages = document.querySelectorAll('.page-wrapper');
             
             for (var pindex = 0; pindex < pages.length; pindex++) {
-                if (pindex != 0) {
+                var blocks = pages[pindex].querySelectorAll('.page-block');
+                if (pindex != 0 && blocks.length != 0) {
                     content += "<lml-page></lml-page>";
                 }
 
-                var blocks = pages[pindex].querySelectorAll('.page-block');
                 for (var i = 0; i < blocks.length; i++) {
-                    content += blocks[i].dataset.markup;
+                    content += blocks[i].dataset.markup.replace(/<lml-page><\/lml-page>/g, "");
                 }
             }
 
@@ -927,7 +943,7 @@
         }
 
         var curConfirmTimeout;
-        var publishCurrentArticle = function(e) {
+        var publishCurrentArticle = function(e, justsave) {
             var valid = true || liliumcms.formvalidator.validate($('form#post_create'));
             var form = liliumcms.lmldom.getFormData().post_create;
             var tempForm = form;
@@ -937,7 +953,6 @@
 
             if (valid) {
                 document.body.classList.remove('block-scroll');
-                liliumcms.modals.get('dlg-modal-publishing-loading').cast();
                 $('.alert-wrapper').remove();
 
                 document.dispatchEvent(new CustomEvent("articleWillPublish"));
@@ -972,46 +987,64 @@
                 var contentMarkup = buildContentFromPackage();
                 tempForm.values.content = contentMarkup;
     
-                liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/edit', function(data) {
+                liliumcms.modals.get("article-packaging").dismiss();
+
+                if (justsave) {
+                    tempForm.values._id = contentid;
+                    tempForm.values.id = undefined;
                     liliumcms.modals.get('dlg-modal-publishing-loading').dismiss();
-                    if (data.success) {
-                        CKEDITOR.instances.content.setData(contentMarkup);
-                        lastSave = CKEDITOR.instances.content.getData();
-                        
-                        if (data.redirect) {
-                            liliumcms.pageloader.load(data.redirect);
-                        }
-
-                        if (data.newlyPublished) {
-                            liliumcms.livevars.getSingleLivevar('content.publishreport.' + contentid, {}, function(resp) {
-                                if (resp.response.code == 200) {
-                                    log('Content', 'Received publication report for article with id ' + contentid);
-                                    var report = resp.livevars['content.publishreport.' + contentid];
-                                    buildReport(report).show();
-                                    
-                                } else {
-                                    log('Content', 'Received empty publication report for article with id ' + contentid);
-                                }
-                            });
-                        }
-
-                        pubBtn.innerHTML = "Generating article...";
+                    liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/save', function(data) {
+                        liliumcms.notify( {type : "success", title : "Saved", message : "The packaged article was successfully saved and is ready to be published."});
                         updateBottomSection();
-
-                        curConfirmTimeout && clearTimeout(curConfirmTimeout);
-                        curConfirmTimeout = setTimeout(function() {
-                            if (pubBtn.classList.contains("waitingForConfirmation")) {
-                                liliumcms.notify( {type : "warning", title : "Weird.", message : "Server could not notify you for some reason, but the article was still published successfully, and should be online."});
-                                enablePublishButton();
+                        CKEDITOR.instances.content.setData(contentMarkup);
+                    });
+                } else {
+                    liliumcms.modals.get('dlg-modal-publishing-loading').cast();
+                    liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/edit', function(data) {
+                        liliumcms.modals.get('dlg-modal-publishing-loading').dismiss();
+                        if (data.success) {
+                            CKEDITOR.instances.content.setData(contentMarkup);
+                            lastSave = CKEDITOR.instances.content.getData();
+                            
+                            if (data.redirect) {
+                                liliumcms.pageloader.load(data.redirect);
                             }
-                        }, 15000);
-                    }
-                });
+
+                            if (data.newlyPublished) {
+                                liliumcms.livevars.getSingleLivevar('content.publishreport.' + contentid, {}, function(resp) {
+                                    if (resp.response.code == 200) {
+                                        log('Content', 'Received publication report for article with id ' + contentid);
+                                        var report = resp.livevars['content.publishreport.' + contentid];
+                                        buildReport(report).show();
+                                        
+                                    } else {
+                                        log('Content', 'Received empty publication report for article with id ' + contentid);
+                                    }
+                                });
+                            }
+
+                            pubBtn.innerHTML = "Generating article...";
+                            updateBottomSection();
+
+                            curConfirmTimeout && clearTimeout(curConfirmTimeout);
+                            curConfirmTimeout = setTimeout(function() {
+                                if (pubBtn.classList.contains("waitingForConfirmation")) {
+                                    liliumcms.notify( {type : "warning", title : "Weird.", message : "Server could not notify you for some reason, but the article was still published successfully, and should be online."});
+                                    enablePublishButton();
+                                }
+                            }, 15000);
+                        }
+                    });
+                }
             } else {
                 liliumcms.notify({title : "Could not publish", message : "Some required fields are missing."});
             } 
         };
 
+        $('#btn-dismiss-and-save').on('click', function(e) {
+            publishCurrentArticle(e, true);
+            enablePublishButton();
+        });
 
         $('#confirm-unpublish button.btn-danger').on('click', function() {
             unpublishArticle();

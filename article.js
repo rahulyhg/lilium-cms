@@ -1056,6 +1056,10 @@ class Article {
         formData.updated = new Date();
         formData.date = formData.date ? new Date(dates.toTimezone(formData.date !== '' ? formData.date : new Date(), cli._c.timezone)) : undefined;
 
+        if (formData.topic) {
+            formData.topic = db.mongoID(formData.topic);
+        }
+
         if (formData.tags && formData.tags.map) {
             formData.tagslugs = formData.tags.map((tagname)  => {
                 return slugify(tagname).toLowerCase();

@@ -175,6 +175,9 @@
         <button class="lml-modal-action blue btn-preview" name="preview">
             Preview
         </button>
+        <button class="lml-modal-action" id="btn-dismiss-and-save" type="button">
+            <i class="fa fa-pencil" aria-hidden="true"></i> Save and dismiss
+        </button>
         <button class="lml-modal-action green role-contributor" id="button-send-review" type="button">
             <i class="fa fa-check" aria-hidden="true"></i> Package and send for review
         </button>
