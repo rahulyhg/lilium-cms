@@ -358,7 +358,7 @@ class Article {
 
             const paragraphs = Array.prototype.filter.call(
                 window.document.querySelectorAll('body > p'), 
-                !x.textContent.startsWith('@') && !x.textContent.toLowerCase().startsWith('via')
+                x => !x.textContent.startsWith('@') && !x.textContent.toLowerCase().startsWith('via')
             );
 
             paragraphs.forEach((x, i) => {
