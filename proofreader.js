@@ -70,7 +70,9 @@ class Proofreader {
         const now = Date.now();
         rtx.process(text, (err, report) => {
             log('Proofread', 'Corrected ' + text.length + ' characters in ' + (Date.now() - now) + " ms", 'success');
-            send(report);
+            setTimeout(() => {
+                send(report);
+            }, 0);
         });
     }
 
