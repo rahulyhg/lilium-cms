@@ -117,14 +117,18 @@ class LMLInstagram {
                         return send(err);
                     }
 
-                    json = JSON.parse(json);
-                    json.expire = new Date().getTime() + (1000 * 60 * 5);
+                    try {
+                        json = JSON.parse(json);
+                        json.expire = new Date().getTime() + (1000 * 60 * 5);
 
-                    sharedcache.set({
-                        ["instagram_stats_" + url] : json
-                    }, () => {
-                        send(json);
-                    });
+                        sharedcache.set({
+                            ["instagram_stats_" + url] : json
+                        }, () => {
+                            send(json);
+                        });
+                    } catch (ex) {
+                        send({error : ex})
+                    }
                 });
             } else {
                 send(json);
