@@ -581,8 +581,12 @@ class Article {
 
                         article.images = article.featuredimage[0];
                         article.imageurls = {};
-                        if (article.images) for (var size in article.images.sizes) {
-                            article.imageurls[size] = conf.server.protocol + article.images.sizes[size].url;
+                        if (article.images) {
+                            for (var size in article.images.sizes) {
+                                article.imageurls[size] = conf.server.protocol + article.images.sizes[size].url;
+                            }
+                            article.imagecreditname = article.images.artistname;
+                            article.imagecrediturl  = article.images.artisturl;
                         }
                         article.related = related;
                         continueWorking();
