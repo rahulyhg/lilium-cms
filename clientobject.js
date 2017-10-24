@@ -189,7 +189,7 @@ class ClientObject {
         if (this.cors) {
             headers["Access-Control-Allow-Origin"] = this.request.headers.origin || (this._c.server.protocol + this._c.server.url);
             headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS";
-            headers["Access-Control-Allow-Header"] = "corsorigin";
+            headers["Access-Control-Allow-Header"] = "corsorigin, lmlterms, lmltopic, lmlaid, lmlqid";
         }
 
         if (cheaders) {
