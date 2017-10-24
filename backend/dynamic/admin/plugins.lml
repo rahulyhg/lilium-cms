@@ -1,5 +1,5 @@
 {#vocab;config;tableBuilder}
-<h1>{=vocab.plugins}</h1>
+<h1>Plugins</h1>
 
 <main class="entities-main">
     {=tableBuilder.render('plugin')}
