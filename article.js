@@ -312,7 +312,7 @@ class Article {
         }
 
         db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
-            if (article && cli.userinfo.userid == article.author || cli.hasRight('editor')) {
+            if (article && (cli.userinfo.userid == article.author || cli.hasRight('editor'))) {
                 let index;
                 if (article.content && article.content.includes("<lml-page")) {
                     index = (postdata.page || 1);
