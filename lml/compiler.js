@@ -782,11 +782,11 @@ class LMLCompiler {
 
     compileToFile(lmlfile, savepath, cb, extra) {
         let that = this;
-        fileserver.readFile(lmlfile, function(content) {
+        fileserver.readFile(lmlfile, (content = "") => {
             extra = extra || {};
             extra.rootDir = lmlfile.substring(0, lmlfile.lastIndexOf('/'));
 
-            fileserver.createDirIfNotExists(savepath, function() {
+            fileserver.createDirIfNotExists(savepath, () => {
                 const stream = fileserver.getOutputFileHandle(savepath, 'w+');
                 log('LML2', 'Compiling file ' + lmlfile, 'info');
                 let now = new Date();
@@ -802,7 +802,7 @@ class LMLCompiler {
         });
     };
 
-    compile(siteid, string, stream, extra, cb) {
+    compile(siteid, string = "", stream, extra, cb) {
         const conf = configs.fetchConfig(siteid);
         let ctx = new LMLContext(conf, string, stream, extra, () => {
             cb && cb.apply(this, [ctx]);
@@ -811,7 +811,7 @@ class LMLCompiler {
         this.deal(ctx);
     };
 
-    compileToString(siteid, string, extra, cb) {
+    compileToString(siteid, string = "", extra, cb) {
         let streamSpoof = new LMLWritableStream();
 
         extra = extra || {};
