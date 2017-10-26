@@ -180,6 +180,10 @@ button, input[type="submit"] {
 	cursor: pointer;
 }
 
+form.lmlform input[type="submit"] {
+    margin: 0px 10px 10px;
+}
+
 input[type="checkbox"], .lmlcheckbox {
 	display: none;
 }
