@@ -64,6 +64,7 @@
     "gm": "latest",
     "gmail-send": "latest",
     "gmail-sender": "latest",
+    "google-trends-api": "^4.3.0",
     "googleapis": "latest",
     "html-entities": "latest",
     "html-minifier": "latest",
