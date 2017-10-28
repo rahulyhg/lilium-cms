@@ -335,6 +335,11 @@ window.sockUpdateDashboard = function(data) {
     margin-right: 4px;
 }
 
+#dashboard-ga-rank {
+    height: 430px;
+    overflow-y: auto;
+}
+
 .dashboard-top-source.facebook { background-color: #6e92e6; }
 .dashboard-top-source.google   { background-color: #ff5757; }
 .dashboard-top-source.direct   { background-color: #c057ff; }

@@ -43,7 +43,7 @@ class GoogleAnalyticsRequest {
             "end-date" : "yesterday",
             "metrics" : defaultMetrics,
             "dimensions" : defaultDimensions,
-            "max-results" : 10,
+            "max-results" : 50,
             "sort" : "-ga:pageviews"
         }, send);
     }
@@ -53,7 +53,7 @@ class GoogleAnalyticsRequest {
             "metrics" : "rt:activeUsers", 
             "dimensions" : "rt:pageTitle,rt:pagePath,rt:source", 
             "sort" : "-rt:activeUsers", 
-            "max-results" : 10
+            "max-results" : 50
         }, send, true);
     }
 
