@@ -146,9 +146,47 @@ class GoogleAnalyticsRequest {
 };
 
 class StatsBeautifier {
+    static xToRt(x, path, empty) {
+        return {
+            title : x[0], 
+            url : path, 
+            source : x[2].toLowerCase(), 
+            count : empty ? 0 : parseInt(x[3]), 
+            home : x[1] == "/" 
+        };
+    }
+
     static realtime(_c, data) {
-        return data && {
-            pages : data.rows.map(x => { return { title : x[0], url : _c.server.url + x[1], source : x[2].toLowerCase(), count : x[3], home : x[1] == "/" }; }),
+        if (!data) { return; }
+
+        let pages = {};
+        data.rows.forEach(x => { 
+            let path = x[1];
+            let lastSlash = path.lastIndexOf('/');
+            let maybePage = path.substring(lastSlash + 1);
+
+            if (!isNaN(maybePage)) {
+                path = path.substring(0, lastSlash);
+
+                let page = pages[path] || StatsBeautifier.xToRt(x, path, true);
+                page.count += parseInt(x[3]);
+                page.paginated = true;
+
+                if (!page.retitled) {
+                    page.title = page.title.replace(" - Page " + maybePage, '');
+                    page.retitled = true;
+                }
+
+                pages[path] = page;
+            } else {
+                let page = StatsBeautifier.xToRt(x, path);
+                page.retitled = true;
+                pages[path] = page;
+            }
+        });
+
+        return {
+            pages : Object.keys(pages).map(x => pages[x]).sort((a, b) => b.count - a.count),
             at : Date.now(),
             total : data.totalsForAllResults["rt:activeUsers"]
         }

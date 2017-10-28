@@ -63,6 +63,7 @@ window.sockUpdateDashboard = function(data) {
 
         d.make({ node : "b", text : data.pages[i].count, parent : wrap });
         var link = d.make({ node : "a", text : data.pages[i].title, parent : wrap, attr : { href : data.pages[i].url, target : "_blank" } });
+        
         if (data.pages[i].source.indexOf('(') == 0) {
             data.pages[i].source = data.pages[i].source.slice(1, -1);
         }
@@ -70,9 +71,8 @@ window.sockUpdateDashboard = function(data) {
         var details = d.make({ class : "dashboard-top-details", parent : wrap });
         d.make({node : "span", class : "dashboard-top-source " + data.pages[i].source, parent : details, text : data.pages[i].source});
 
-        if (data.pages[i].home) {
-            d.make({node : "span", class : "dashboard-top-source homepage", parent : details, text : "Homepage"});
-        }
+        data.pages[i].home && d.make({node : "span", class : "dashboard-top-source homepage", parent : details, text : "Homepage"});
+        data.pages[i].paginated && d.make({node : "span", class : "dashboard-top-source paginated", parent : details, text : "Paginated"});
     }
 };
 </script>
@@ -340,9 +340,10 @@ window.sockUpdateDashboard = function(data) {
     overflow-y: auto;
 }
 
-.dashboard-top-source.facebook { background-color: #6e92e6; }
-.dashboard-top-source.google   { background-color: #ff5757; }
-.dashboard-top-source.direct   { background-color: #c057ff; }
-.dashboard-top-source.homepage { background-color: #f377c0; }
+.dashboard-top-source.facebook  { background-color: #6e92e6; }
+.dashboard-top-source.google    { background-color: #ff5757; }
+.dashboard-top-source.direct    { background-color: #c057ff; }
+.dashboard-top-source.homepage  { background-color: #f377c0; }
+.dashboard-top-source.paginated { background-color: #1ac321; }
 
 </style>
