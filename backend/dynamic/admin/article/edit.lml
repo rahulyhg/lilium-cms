@@ -461,8 +461,8 @@
 #featured-image-selector {
     display: block;
     margin: auto;
-    width: 970px;
-    height: 400px;
+    width: 900px;
+    height: 472px;
 
     border: 5px dashed #CCC;
     overflow: hidden;
