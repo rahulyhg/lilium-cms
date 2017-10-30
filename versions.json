@@ -91,5 +91,10 @@
         "codename" : "Monoceros",
         "script" : "2.0.0.js",
         "features" : ["v2"]
+    },
+    "2.1.0": {
+        "codename" : "Monoceros",
+        "script" : "2.1.0.js",
+        "features" : ["paginationv2"]
     }
 }
