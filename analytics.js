@@ -181,7 +181,12 @@ class StatsBeautifier {
             } else {
                 let page = StatsBeautifier.xToRt(x, path);
                 page.retitled = true;
-                pages[path] = page;
+
+                if (pages[path]) {
+                    pages[path].count += page.count;
+                } else {
+                    pages[path] = page;
+                }
             }
         });
 
