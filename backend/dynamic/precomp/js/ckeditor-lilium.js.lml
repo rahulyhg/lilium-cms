@@ -143,7 +143,7 @@ var CKEditor = function() {
         });
         CKEDITOR.config.entities = false;
         CKEDITOR.config.height = 360;
-        CKEDITOR.config.extraPlugins = 'lml-image-finder,lml-insert-page';
+        CKEDITOR.config.extraPlugins = 'lml-image-finder';
         CKEDITOR.config.fillEmptyBlocks = false;
         CKEDITOR.config.autoParagraph = false;
         CKEDITOR.config.entities_greek = false;
@@ -159,6 +159,7 @@ var CKEditor = function() {
         var validUrlRegex = /^(https?|ftp):\/\/(-\.)?([^\s\/?\.#-]+\.?)+(\/[^\s]*)?[^\s\.,]$/ig,
             doubleQuoteRegex = /"/g;
 
+        /*
         CKEDITOR.plugins.add( 'lml-insert-page', {
             init: function(editor) {
                 editor.addCommand('insertpage', { exec : that.insertPage });
@@ -170,6 +171,7 @@ var CKEditor = function() {
                 });
             }
         });
+        */
 
         CKEDITOR.plugins.add("lml-image-finder", {
             init: function(editor) {
