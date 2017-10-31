@@ -773,7 +773,18 @@ class Article {
         }
 
         if (pubCtx == "publish" && !cli.hasRight('publish-articles')) {
-            return cli.throwHTTP(403, true);
+            return cli.throwHTTP(403, undefined, true);
+        }
+
+        if (!cli.postdata.data.id) {
+            // No post id provided
+            notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                title: "How should I put this...",
+                msg: 'I could not publish this article because no identifier was provided. No data was lost during the process. I invite you to try again.',
+                type: 'danger'
+            });
+            
+            return cli.throwHTTP(400, undefined, true);
         }
 
         var that = this;
@@ -809,7 +820,7 @@ class Article {
                 }
 
                 var conds = {
-                    _id: cli.postdata.data.id ? db.mongoID(cli.postdata.data.id) : "Will not resolve"
+                    _id: db.mongoID(cli.postdata.data.id)
                 }; 
 
                 if (formData.tags && formData.tags.map) {
@@ -1019,7 +1030,7 @@ class Article {
                             } else {
                                 cli.throwHTTP(500);
                             }
-                        }, true, true);
+                        }, false, true);
                     };
 
                     if (arr && arr[0] && arr[0].status != "published") {
