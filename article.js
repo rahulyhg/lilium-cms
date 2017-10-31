@@ -36,16 +36,18 @@ const publishedNotificationTitles = [
 ];
 
 const countOcc = (article, occ) => {
-    var content = article.content || article || "";
+    var content = article.content || article || [""];
+    var total = 0;
 
-    var i = 0;
-    var count = -1;
-    do {
-        count++;
-        i = content.indexOf(occ, i) + 1;
-    } while (i != 0)
+    content.forEach(x => {
+        var i = 0;
+        do {
+            total++;
+            i = x.indexOf(occ, i) + 1;
+        } while (i != 0)
+    });
 
-    return count;
+    return total;
 };
 
 
@@ -161,8 +163,8 @@ class Article {
             featuredimagelink : article.featuredimagelink,
             geolocation : article.geolocation && article.geolocation.split('_'),
             date : article.date,
-            isPaginated : article.content.includes("<lml-page"),
-            totalPages : article.content.split("<lml-page").length,
+            isPaginated : article.content.length > 1,
+            totalPages : article.content.length,
             isSponsored : article.isSponsored,
             useSponsoredBox : article.useSponsoredBox,
             sponsoredBoxTitle : article.sponsoredBoxTitle,
@@ -176,6 +178,7 @@ class Article {
             url : article.url,
 
             content : (stripContent ? undefined : article.content),
+            contentmarkup : (stripContent ? undefined : article.contentmarkup),
 
             author, topic, featuredimages
         };
@@ -314,16 +317,12 @@ class Article {
         db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
             if (article && (cli.userinfo.userid == article.author || cli.hasRight('editor'))) {
                 let index;
-                if (article.content && article.content.includes("<lml-page")) {
+                if (article.content.length > 1) {
                     index = (postdata.page || 1);
 
-                    const currentcontent = article.content;
-                    const arr = currentcontent.split("<lml-page></lml-page>");
-                    arr[index - 1] = newdata.content;
-
-                    newdata.content = arr.join("<lml-page></lml-page>");
-
+                    article.content[index - 1] = newdata.content;
                     const indexofpage = newdata.title.indexOf(' - Page ');
+
                     newdata.title = indexofpage == -1 ? newdata.title : newdata.title.substring(0, indexofpage);
                 }
 
@@ -354,7 +353,7 @@ class Article {
 
         db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
             const jsdom = require('jsdom');
-            const window = new jsdom.JSDOM(article.content).window;
+            const window = new jsdom.JSDOM(article.contentmarkup).window;
 
             const paragraphs = Array.prototype.filter.call(
                 window.document.querySelectorAll('body > p'), 
@@ -726,7 +725,7 @@ class Article {
         articleObject.createdOn = new Date();
         articleObject.status = "draft";
         articleObject.type = "post";
-        articleObject.content = "";
+        articleObject.content = [""];
         articleObject.createdBy = db.mongoID(cli.userinfo.userid);
         articleObject.subscribers = [articleObject.createdBy];
 
@@ -1825,7 +1824,7 @@ class Article {
     };
 
     articleIsPaginated(article) {
-        return article && article.content && article.content.indexOf("<lml-page>") != -1;
+        return article && article.content && article.content.length > 1;
     };
 
     generateArticle(_c, aid, cb, alreadyFetched, pageIndex) {
@@ -1849,7 +1848,7 @@ class Article {
                 var filename = deepArticle.topicslug.substring(1) + deepArticle.name;
 
                 if (that.articleIsPaginated(deepArticle)) {
-                    var pages = deepArticle.content.split("<lml-page></lml-page>");
+                    var pages = deepArticle.content;
 
                     if (pageIndex === "all") {
                         log('Article', "Generated paginated article from admin panel : " + deepArticle.title);
@@ -1888,7 +1887,7 @@ class Article {
                     } 
 
                     filename += "/" + pageIndex;
-                    deepArticle.content = pages[pageIndex - 1];
+                    deepArticle.contentmarkup = pages[pageIndex - 1];
                     deepArticle.isPaginated = true;
                     deepArticle.totalPages = pages.length;
                     deepArticle.pageIndex = pageIndex;
