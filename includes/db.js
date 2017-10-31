@@ -320,6 +320,7 @@ var DB = function() {
 	};
 
 	this.createIndex = function(conf, coln, fields, cb) {
+        log("Database", "Creating index for collection " + coln + "@" + (conf.id || conf));
 		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
 			col.createIndex(fields, {}, function(err, results) {
 				cb(err, results);

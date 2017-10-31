@@ -9,7 +9,7 @@ var log = require('../log.js');
 var mongoDocuments = {
 	names : [
 		"entities", "roles", "plugins", "themes", "config", "compiledfiles", "preview",
-		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache",
+		"sites", "discussions", "types", "vocab", "content", "sessions", "dfpcache", "styledpages",
 		"lilium", "uploads", "cachedFiles", "dfp", "personas", "secrets", "conversations",
 		"messages", "notifications", "categories", "autosave", "userbadges", "teambadges"
 	]
