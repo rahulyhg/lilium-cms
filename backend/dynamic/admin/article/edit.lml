@@ -6,6 +6,7 @@
 {%../articlescript}
 
 <h1>Edit a post</h1>
+<div id="content-tabs"></div>
 {=forms.render('post_create',"edit","content/?")}
 
 <div id="editor"></div>
@@ -320,6 +321,45 @@
 
 .topic-category:hover {
     color: #FFF;
+}
+
+#content-tabs {
+    background: #FCFCFC;
+}
+
+.content-tab {
+    display : inline-block;
+    margin-left: 10px;
+    border : 1px solid #DDD;
+    border-bottom: 1px solid #DDD;
+    font-size: 16px;
+    padding: 5px 10px;
+    margin-top: 10px;
+    background: #EEE;
+
+    position: relative;
+    z-index: 10;
+    margin-bottom: -1px;
+
+    cursor: pointer;
+}
+
+.content-tab.selected {
+    background: #F6F6F6;
+    border-bottom: 1px solid #F6F6F6;
+    cursor : default;
+    border-top-width: 2px;
+}
+
+.content-tab.content-tab-add {
+    background: #af57e4;
+    color: #FFF;
+    font-weight: bold;
+    border-color: #653c75;
+    font-size: 22px;
+    padding: 0px 9px;
+    margin-bottom: -1px;
+    top: 1px;
 }
 
 #topic-categories-wrapper {

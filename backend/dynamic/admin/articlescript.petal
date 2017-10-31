@@ -12,6 +12,9 @@
     var originalTitle = "";    
     var currentSlug = "";
 
+    var contentpages = [];
+    var contentPageIndex = 0;
+
     var selectedTopic;
 
     var articleEdit = {
@@ -30,7 +33,12 @@
                 originalTitle = content.title;
                 currentSlug   = content.name;
                 selectedTopic = content.topic;
+                contentpages  = content.content;
                 lastSave = content.content;
+
+                d.q("[name=contenteditor]").get().id = "contenteditor";
+                CKEDITOR.replace("contenteditor");
+                CKEDITOR.instances.contenteditor.setData(contentpages[0]);
 
                 if (isAutoSave) {
                     _id = lastParamUrl;
@@ -38,6 +46,8 @@
                 } else {
                     contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
                 }
+
+                createTabs();
 
                 if (content.media) {
                     imgtag.value = content.media;
@@ -130,6 +140,54 @@
             enablePublishButton();
         });
     }
+
+    var switchContentTab = function(index) {
+        d.q(".content-tab.selected").crm("selected");
+        d.q(".content-tab-" + index).cadd("selected");
+ 
+        contentpages[contentPageIndex] = CKEDITOR.instances.contenteditor.getData();
+        CKEDITOR.instances.contenteditor.setData(contentpages[index]);
+        CKEDITOR.instances.contenteditor.undoManager.reset()
+
+        contentPageIndex = index;
+    };
+
+    var addContentTab = function() {
+        var ct = d.id("content-tabs");
+        makeContentTab(ct, contentpages.length);
+        ct.born(d.q(".content-tab.content-tab-add"));
+        contentpages.push("");
+    };
+
+    var makeContentTab = function(ct, i) {
+        var tab = d.make({
+            parent : ct,
+            class : "content-tab " + (i == 0 ? "selected" : "") + " content-tab-" + i,
+            text : i == 0 ? "Landing" : ("Page " + (i+1))
+        })
+
+        tab.get().dataset.index = i;
+        tab.bind('click', function(ev) {
+            switchContentTab(ev.target.dataset.index);
+        });
+    }
+
+    var createTabs = function() {
+        var ct = d.id('content-tabs');
+        var total = contentpages.length;
+
+        for (var i = 0; i < total; i++) {
+            makeContentTab(ct, i);
+        }
+
+        var addtab = d.make({
+            parent : ct,
+            class : "content-tab content-tab-add",
+            text : "+"
+        });
+
+        addtab.bind('click', addContentTab);
+    };
 
     var buildReport = function(data) {
         var g = function(elem, str) { document.getElementById("prep-" + elem).textContent = str; };
