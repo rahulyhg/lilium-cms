@@ -13,6 +13,9 @@
     var currentSlug = "";
 
     var contentpages = [];
+    var contenttitles = [];
+    var contentsubtitles = [];
+
     var contentPageIndex = 0;
 
     var selectedTopic;
@@ -30,15 +33,25 @@
             if (content) {
                 isAutoSave    = content.status == 'autosaved';
                 isPublished   = content.status == 'published';
-                originalTitle = content.title;
+                originalTitle = content.title[0];
                 currentSlug   = content.name;
                 selectedTopic = content.topic;
                 contentpages  = content.content;
+                contenttitle  = content.title;
+                contentsubtitle = content.subtitle;
                 lastSave = content.content;
 
                 d.q("[name=contenteditor]").get().id = "contenteditor";
-                CKEDITOR.replace("contenteditor");
-                CKEDITOR.instances.contenteditor.setData(contentpages[0]);
+                d.q("[name=contenttitle]").get().id = "contenttitle";
+                d.q("[name=contentsubtitle]").get().id = "contentsubtitle";
+
+                CKEDITOR.replace("contenteditor", {
+                    on: {
+                        instanceReady: function( evt ) {
+                            createTabs();
+                        }
+                    }
+                });
 
                 if (isAutoSave) {
                     _id = lastParamUrl;
@@ -46,8 +59,6 @@
                 } else {
                     contentid = lastParamUrl == 'edit' || lastParamUrl == 'new' ? undefined : lastParamUrl;
                 }
-
-                createTabs();
 
                 if (content.media) {
                     imgtag.value = content.media;
@@ -75,22 +86,7 @@
                 bindPackagingPhase();                
 
                 if (isPublished) {
-                    $('.article_base_title').bind('keyup', function(e) {
-                        if (!articleEdit.urlWillChangeWarningShown && originalTitle !== $('.article_base_title').val()) {
-                            articleEdit.urlWillChangeWarningShown = true;
-                            $('#urlchanged-modal').modal('show');
-                        }
-                    });
-
-                    $('#button-update-url').bind('click', function() {
-                        articleEdit.keepURL = false;
-                        $('#urlchanged-modal').modal('hide');
-                    });
-
-                    $('#button-keep-url').bind('click', function() {
-                        articleEdit.keepURL = true;
-                        $('#urlchanged-modal').modal('hide');
-                    });
+                    articleEdit.keepURL = true;
                 }
 
                 // You can't have a draft if article is published
@@ -141,14 +137,23 @@
         });
     }
 
-    var switchContentTab = function(index) {
+    var localSave = function() {
+        contentpages[contentPageIndex] = CKEDITOR.instances.contenteditor.getData();
+        contenttitle[contentPageIndex] = d.id("contenttitle").value;
+        contentsubtitle[contentPageIndex] = d.id("contentsubtitle").value;
+    }
+
+    var switchContentTab = function(index, initial) {
         d.q(".content-tab.selected").crm("selected");
         d.q(".content-tab-" + index).cadd("selected");
  
-        contentpages[contentPageIndex] = CKEDITOR.instances.contenteditor.getData();
-        CKEDITOR.instances.contenteditor.setData(contentpages[index]);
-        CKEDITOR.instances.contenteditor.undoManager.reset()
+        !initial && localSave();
 
+        CKEDITOR.instances.contenteditor.setData(contentpages[index]);
+        d.id("contenttitle").get().value = contenttitle[index];
+        d.id("contentsubtitle").get().value = contentsubtitle[index];
+
+        CKEDITOR.instances.contenteditor.undoManager.reset();
         contentPageIndex = index;
     };
 
@@ -157,6 +162,8 @@
         makeContentTab(ct, contentpages.length);
         ct.born(d.q(".content-tab.content-tab-add"));
         contentpages.push("");
+        contenttitle.push(contenttitle[0] + " - Page " + contentpages.length);
+        contentsubtitle.push(contentsubtitle[0]);
     };
 
     var makeContentTab = function(ct, i) {
@@ -187,6 +194,7 @@
         });
 
         addtab.bind('click', addContentTab);
+        switchContentTab(0, true);
     };
 
     var buildReport = function(data) {

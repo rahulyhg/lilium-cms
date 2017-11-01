@@ -202,7 +202,7 @@ var Forms = function () {
             });
 
         formBuilder.registerFormTemplate('article_base')
-            .add('title', 'text', {
+            .add('contenttitle', 'text', {
                 placeholder: true,
                 displayname: 'Title',
                 classes : ["article_base_title"]
@@ -210,7 +210,7 @@ var Forms = function () {
                 minLenght: 3,
                 maxLenght: 200
             })
-            .add('subtitle', 'text', {
+            .add('contentsubtitle', 'text', {
                 placeholder: true,
                 displayname: 'Subtitle',
                 classes : ["article_base_subtitle"]
