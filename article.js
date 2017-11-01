@@ -440,7 +440,7 @@ class Article {
             aliases.splice(index, 1);
         }
         
-        log('Content', "Removing alias " + alias + " from article " + article.title + " at index " + index);
+        log('Content', "Removing alias " + alias + " from article " + article.title[0] + " at index " + index);
         db.update(conf, 'content', {_id : article._id}, {aliases : aliases}, cb || noop);
     };
 
@@ -719,7 +719,8 @@ class Article {
         cli.touch('article.create');
         var articleObject = {};
 
-        articleObject.title = cli.postdata.data.title;
+        articleObject.title = [cli.postdata.data.title];
+        articleObject.subtitle = [""] 
         articleObject.author = db.mongoID(cli.userinfo.userid);
         articleObject.updated = new Date();
         articleObject.createdOn = new Date();
@@ -779,7 +780,7 @@ class Article {
                 formData.status = 'published';
 
                 if (!cli.postdata.data._keepURL || cli.postdata.data._keepURL == "false") {
-                    formData.name = slugify(formData.title).toLowerCase();
+                    formData.name = slugify(formData.title[0]).toLowerCase();
                     oldSlug = cli.postdata.data.currentSlug;
                 }
 
@@ -835,7 +836,7 @@ class Article {
 
                                     if (success) {
                                         log('Article', 'Saved published post to database; Creating cached file');
-                                        cli.did('content', 'published', {title : cli.postdata.data.title});
+                                        cli.did('content', 'published', {title : cli.postdata.data.title[0]});
 
                                         hooks.fire('article_published', {
                                             cli: cli,
@@ -896,7 +897,7 @@ class Article {
                                                             log('Facebook', 'Debugger responded with title', "success");
                                                             notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                                                 title: "Facebook Graph",
-                                                                msg: '<i>'+deepArticle.title+'</i> has been debugged on Facebook Graph.',
+                                                                msg: '<i>'+deepArticle.title[0]+'</i> has been debugged on Facebook Graph.',
                                                                 type: 'log'
                                                             });
                                                         } else {
@@ -904,7 +905,7 @@ class Article {
                                                             notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                                                 title: "Facebook Graph",
                                                                 url : "https://developers.facebook.com/tools/debug/og/object/",
-                                                                msg: '<i>'+deepArticle.title+'</i> was not debugged on Facebook Graph.',
+                                                                msg: '<i>'+deepArticle.title[0]+'</i> was not debugged on Facebook Graph.',
                                                                 type: 'warning'
                                                             });
                                                         }
@@ -918,7 +919,7 @@ class Article {
                                                     notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
                                                         title: notifMessage,
                                                         url: cli._c.server.url + (tObject ? ("/" + tObject.completeSlug) : "") + '/' + deepArticle.name,
-                                                        msg: (deepArticle.isPaginated ? "Paginated article " : "Article ") + '<i>'+deepArticle.title+'</i> has been published. Click here to see it live.',
+                                                        msg: (deepArticle.isPaginated ? "Paginated article " : "Article ") + '<i>'+deepArticle.title[0]+'</i> has been published. Click here to see it live.',
                                                         type: 'success'
                                                     });
 
@@ -950,7 +951,7 @@ class Article {
 
                                                 feed.plop(deepArticle._id, ()  => {
                                                     feed.push(deepArticle._id, cli.userinfo.userid, 'published', cli._c.id, {
-                                                        title : deepArticle.title,
+                                                        title : deepArticle.title[0],
                                                         subtitle : deepArticle.subtitle,
                                                         slug : deepArticle.name,
                                                         image : deepArticle.featuredimage[0].sizes.thumbnaillarge.url,
@@ -1069,7 +1070,7 @@ class Article {
             delete formData.date;
         }
 
-        log('Article', 'Preparing to save article ' + formData.title);
+        log('Article', 'Preparing to save article ' + formData.title[0]);
         // Autosave
         if (auto) {
             // Check if article is edit, non-existing or published
@@ -1103,7 +1104,7 @@ class Article {
                 }, (err, ress)  => {
                     var res = err ? undefined : ress[0];
                     if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
-                        log('Article', 'Updating content for article ' + formData.title);
+                        log('Article', 'Updating content for article ' + formData.title[0]);
                         delete formData._id;
                         db.update(cli._c, 'content', {
                             _id: id
@@ -1157,7 +1158,7 @@ class Article {
                     formData = formBuilder.serializeForm(form);
 
                     if (!cli.postdata.data._keepURL) {
-                        formData.name = slugify(formData.title).toLowerCase();
+                        formData.name = slugify(formData.title[0]).toLowerCase();
                     }
 
                     formData.media = db.mongoID(formData.media);
@@ -1198,7 +1199,7 @@ class Article {
                             _id: id
                         }, formData, (err, r)  => {
                             that.deepFetch(cli._c, id, (deepArticle)  => {
-                                cli.did('content', 'edited', {title : cli.postdata.data.title});
+                                cli.did('content', 'edited', {title : cli.postdata.data.title[0]});
                                 
                                 hooks.fire('article_edited', {
                                     cli: cli,
@@ -1851,7 +1852,7 @@ class Article {
                     var pages = deepArticle.content;
 
                     if (pageIndex === "all") {
-                        log('Article', "Generated paginated article from admin panel : " + deepArticle.title);
+                        log('Article', "Generated paginated article from admin panel : " + deepArticle.title[0]);
                         let cIndex = pages.length;
 
                         var nextPage = (resp)  => {
@@ -1897,7 +1898,6 @@ class Article {
                     if (pageIndex != 1) {
                         deepArticle.featuredimage = [];
                         deepArticle.featuredimageartist = undefined;
-                        deepArticle.title += " - Page " + pageIndex;
                     }
 
                     log('Article', "Generated page " + pageIndex + " of paginated article " + deepArticle.title);
