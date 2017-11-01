@@ -353,19 +353,26 @@ class Article {
 
         db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
             const jsdom = require('jsdom');
-            const window = new jsdom.JSDOM(article.contentmarkup).window;
+            const pages = article.content;
 
-            const paragraphs = Array.prototype.filter.call(
-                window.document.querySelectorAll('body > p'), 
-                x => !x.textContent.startsWith('@') && !x.textContent.toLowerCase().startsWith('via')
-            );
+            pages.forEach((page, index) => {
+                const window = new jsdom.JSDOM(page).window;
 
-            paragraphs.forEach((x, i) => {
-                x.id = "article-p-" + i
+                const paragraphs = Array.prototype.filter.call(
+                    window.document.querySelectorAll('body > p'), 
+                    x => !x.textContent.startsWith('@') && !x.textContent.toLowerCase().startsWith('via')
+                );
+
+                paragraphs.forEach((x, i) => {
+                    x.id = "article-p-" + i
+                });
+
+                pages[index] = window.document.body.innerHTML;
             });
 
+            // WIP 
+            // TODO : Loop through paragraphs from pages array
             this.proofread(paragraphs, lang, report => {
-                let content = window.document.body.innerHTML;
                 if (article.hasads || article.isSponsored || article.nsfw) {
                     cli.sendJSON({ content, report });
                 } else {
@@ -1566,6 +1573,8 @@ class Article {
                 if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
                     for (var i = 0; i < data.length; i++) if (data[i].media) {
                         data[i].media = data[i].media.replace(cli._c.server.url, cli._c.content.cdn.domain);
+                        data[i].title = data[i].title[0] + (data[i].title.length > 1 ? (" ("+data[i].title.length+" pages)") : "");
+                        data[i].subtitle = data[i].subtitle[0];
                     }
                 }
 
