@@ -178,7 +178,6 @@ class Article {
             url : article.url,
 
             content : (stripContent ? undefined : article.content),
-            contentmarkup : (stripContent ? undefined : article.contentmarkup),
 
             author, topic, featuredimages
         };
@@ -354,8 +353,26 @@ class Article {
         db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
             const jsdom = require('jsdom');
             const pages = article.content;
+            const contents = [];
+            const reports = []; 
 
-            pages.forEach((page, index) => {
+            const done = () => {
+                if (contents.length == article.content.length) {
+                    db.update(cli._c, 'content', { _id : article._id }, { content : contents, hasads : true }, () => {
+                        cli.sendJSON({ content : contents, report : reports });
+                    });
+                } else {
+                    cli.sendJSON({ content : contents, report : reports });
+                }
+            }
+
+            let index = -1;
+            const nextpage = () => {
+                if (++index == pages.length) {
+                    return done();
+                }
+
+                const page = pages[index]
                 const window = new jsdom.JSDOM(page).window;
 
                 const paragraphs = Array.prototype.filter.call(
@@ -368,23 +385,23 @@ class Article {
                 });
 
                 pages[index] = window.document.body.innerHTML;
-            });
 
-            this.proofread(paragraphs, lang, report => {
-                if (article.hasads || article.isSponsored || article.nsfw) {
-                    cli.sendJSON({ content, report });
-                } else {
-                    this.insertAds(cli._c, article._id, content, content => {
-                        if (content) {
-                            db.update(cli._c, 'content', { _id : article._id }, { content, hasads : true }, () => {
-                                cli.sendJSON({ content, report });
-                            });
-                        } else {
-                            cli.sendJSON({ content, report });
-                        }
-                    });
-                }
-            });
+                this.proofread(paragraphs, lang, report => {
+                    reports.push(report);
+
+                    if (article.hasads || article.isSponsored || article.nsfw) {
+                        contents.push(pages[index]);
+                        nextpage();
+                    } else {
+                        this.insertAds(cli._c, article._id, pages[index], content => {
+                            contents.push(content);
+                            nextpage();
+                        });
+                    }
+                });
+            };
+
+            nextpage();
         }, {content : 1, title : 1, isSponsored : 1, nsfw : 1, hasads : 1});
     }
 
@@ -1868,7 +1885,7 @@ class Article {
                 var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
                 var filename = deepArticle.topicslug.substring(1) + deepArticle.name;
 
-                if (that.articleIsPaginated(deepArticle)) {
+                if (deepArticle.content.length > 1) {
                     var pages = deepArticle.content;
 
                     if (pageIndex === "all") {
@@ -1908,7 +1925,7 @@ class Article {
                     } 
 
                     filename += "/" + pageIndex;
-                    deepArticle.contentmarkup = pages[pageIndex - 1];
+                    deepArticle.content = pages[pageIndex - 1];
                     deepArticle.isPaginated = true;
                     deepArticle.totalPages = pages.length;
                     deepArticle.pageIndex = pageIndex;
@@ -1923,6 +1940,7 @@ class Article {
                     log('Article', "Generated page " + pageIndex + " of paginated article " + deepArticle.title);
                 } else {
                     deepArticle.pageIndex = 1;
+                    deepArticle.content = deepArticle.content[0];
                 }
 
                 var asyncHooks = hooks.getHooksFor('article_async_render_' + _c.uid);
