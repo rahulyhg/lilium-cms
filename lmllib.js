@@ -15,12 +15,12 @@ const registeredLibraries = {
     encodec : function(context) {
         const entities = require('entities');
         return {
-            encodeURI  : function(str) { return encodeURI(str); },
-            decodeURI  : function(str) { return decodeURI(str); },
-            encodeXML  : function(str) { return require('entities').encodeXML (str); },
-            encodeHTML : function(str) { return require('entities').encodeHTML(str); },
-            decodeXML  : function(str) { return require('entities').decodeXML (str); },
-            decodeHTML : function(str) { return require('entities').decodeHTML(str); } 
+            encodeURI  : function(str = "") { return encodeURI(str); },
+            decodeURI  : function(str = "") { return decodeURI(str); },
+            encodeXML  : function(str = "") { return require('entities').encodeXML (str); },
+            encodeHTML : function(str = "") { return require('entities').encodeHTML(str); },
+            decodeXML  : function(str = "") { return require('entities').decodeXML (str); },
+            decodeHTML : function(str = "") { return require('entities').decodeHTML(str); } 
         };
     },
     frontend: function (context) {
