@@ -568,7 +568,7 @@
                 tempsave.content = contentpages;
 
                 $.post('{=config.default.server.url}/admin/article/autosave', tempSave, function(data) {
-                    lastSave = CKEDITOR.instances.content.getData();
+                    lastSave = CKEDITOR.instances.contenteditor.getData();
 
                     if (data.success && data._id) {
                         _id = data._id;
@@ -673,7 +673,11 @@
             formdat.id = contentid;
             formdat.topic = currentTopic._id;
             formdat.media = d.id('mediapicker').value;
-            formdat.content = buildContentFromPackage();
+            buildContentFromPackage();
+
+            formdat.content = contentpages;
+            formdat.title = contenttitle;
+            formdat.subtitle = contentsubtitle;
 
             liliumcms.lmldom.post(formdat, '{=config.default.server.url}/admin/article/preview', function(html) {
                 liliumcms.previewer.setContent(html);
@@ -693,73 +697,77 @@
             var changes = [];
 
             var plist = d.id('pr-parag-list');
-            var ps = serverdata.paragraphs;
+            
+            for (var s = 0; s < serverdata.length; s++) {
+                var sdata = serverdata[s];
+                var ps = sdata.paragraphs;
 
-            for (var i = 0; i < ps.length; i++) {
-                if (serverdata.corrections[i].length) {
-                    var p = d.make({ class : "pr-parag" });
+                for (var i = 0; i < ps.length; i++) {
+                    if (sdata.corrections[i].length) {
+                        var p = d.make({ class : "pr-parag" });
 
-                    var pcontent = d.make({
-                        class : "pr-editable",
-                        html : ps[i]
-                    });
-                    pcontent.get().contentEditable = true;
+                        var pcontent = d.make({
+                            class : "pr-editable",
+                            html : ps[i]
+                        });
+                        pcontent.get().contentEditable = true;
 
-                    var clist = d.make({ node : "ul", class : "pr-suggestions" });
-                    for (var j = 0; j < serverdata.corrections[i].length; j++) {
-                        var c = serverdata.corrections[i][j];
-                        var li = d.make({ node : "li" });
+                        var clist = d.make({ node : "ul", class : "pr-suggestions" });
+                        for (var j = 0; j < sdata.corrections[i].length; j++) {
+                            var c = sdata.corrections[i][j];
+                            var li = d.make({ node : "li" });
 
-                        li.born(d.make({node : "i", class : "fa fa-exclamation-circle"}));
-                        li.born(d.make({node : "span", text : c.reason.split(';')[0]}));
+                            li.born(d.make({node : "i", class : "fa fa-exclamation-circle"}));
+                            li.born(d.make({node : "span", text : c.reason.split(';')[0]}));
 
-                        if (c.suggestions) for (var k = 0; k < c.suggestions.length; k++) {
-                            var singlesug = d.make({ node : "b", text : "Change to '" + c.suggestions[k] + "'", parent : li });
+                            if (c.suggestions) for (var k = 0; k < c.suggestions.length; k++) {
+                                var singlesug = d.make({ node : "b", text : "Change to '" + c.suggestions[k] + "'", parent : li });
 
-                            (function(singlesug, sug, reason, li, pcontent) {
-                                singlesug.bind('click', function() {
-                                    pcontent.get().innerHTML = pcontent.get().innerHTML.replace(reason.split('`')[1], sug);
+                                (function(singlesug, sug, reason, li, pcontent) {
+                                    singlesug.bind('click', function() {
+                                        pcontent.get().innerHTML = pcontent.get().innerHTML.replace(reason.split('`')[1], sug);
+                                        li.get().remove();
+                                    });
+                                })(singlesug, c.suggestions[k], c.reason, li, pcontent)
+                            }
+
+                            var singlesug = d.make({ node : "b", text : "Add '" + c.reason.split('`')[1] + "' to whitelist", parent : li });
+                            (function(addbtn, txt, li) {
+                                addbtn.style('color', '#c7a4e0').bind('click', function() {
+                                    addToWhiteList(txt, sdata.language);
                                     li.get().remove();
                                 });
-                            })(singlesug, c.suggestions[k], c.reason, li, pcontent)
+                            })(singlesug, c.reason.split('`')[1], li);
+
+                            clist.born(li);
                         }
 
-                        var singlesug = d.make({ node : "b", text : "Add '" + c.reason.split('`')[1] + "' to whitelist", parent : li });
-                        (function(addbtn, txt, li) {
-                            addbtn.style('color', '#c7a4e0').bind('click', function() {
-                                addToWhiteList(txt, serverdata.language);
-                                li.get().remove();
+                        var markAsFixedWrap = d.make({ node : "div", class : "pr-mark-valid-wrap" });
+                        var mFixed = d.make({ node : 'b', text : "Mark paragraph as verified", parent : markAsFixedWrap });
+
+                        plist.born(p);
+
+                        p.born(d.make({ node : "h4", text : "Suggested change for paragraph #" + (i+1) + " on page #" + (s+1) }));
+                        p.born(clist);
+                        p.born(pcontent);
+                        p.born(markAsFixedWrap);
+
+                        (function(i, mFixed, pcontent, p) {
+                            mFixed.bind('click', function() {
+                                changes[i] = pcontent;
+                                p.get().remove();
+
+                                if (plist.get().querySelectorAll(".pr-parag").length == 0) {
+                                    plist.empty();
+                                }
+
+                                var box = document.getElementById('box-article-p-' + i);
+                                if (box) {
+                                    box.dataset.markup = '<p id="article-p-'+i+'">' + pcontent.html + '</p>';
+                                }
                             });
-                        })(singlesug, c.reason.split('`')[1], li);
-
-                        clist.born(li);
+                        })(i, mFixed, pcontent, p);
                     }
-
-                    var markAsFixedWrap = d.make({ node : "div", class : "pr-mark-valid-wrap" });
-                    var mFixed = d.make({ node : 'b', text : "Mark paragraph as verified", parent : markAsFixedWrap });
-
-                    plist.born(p);
-
-                    p.born(d.make({ node : "h4", text : "Suggested change for paragraph #" + (i+1) }));
-                    p.born(clist);
-                    p.born(pcontent);
-                    p.born(markAsFixedWrap);
-
-                    (function(i, mFixed, pcontent, p) {
-                        mFixed.bind('click', function() {
-                            changes[i] = pcontent;
-                            p.get().remove();
-
-                            if (plist.get().querySelectorAll(".pr-parag").length == 0) {
-                                plist.empty();
-                            }
-
-                            var box = document.getElementById('box-article-p-' + i);
-                            if (box) {
-                                box.dataset.markup = '<p id="article-p-'+i+'">' + pcontent.html + '</p>';
-                            }
-                        });
-                    })(i, mFixed, pcontent, p);
                 }
             }
 
@@ -995,21 +1003,21 @@
         });
 
         var buildContentFromPackage = function() {
-            var content = "";
+            var content = [];
             var pages = document.querySelectorAll('.page-wrapper');
             
             for (var pindex = 0; pindex < pages.length; pindex++) {
                 var blocks = pages[pindex].querySelectorAll('.page-block');
-                if (pindex != 0 && blocks.length != 0) {
-                    content += "<lml-page></lml-page>";
+                var markup = "";
+                for (var i = 0; i < blocks.length; i++) {
+                    markup += (blocks[i].dataset.markup)
                 }
 
-                for (var i = 0; i < blocks.length; i++) {
-                    content += blocks[i].dataset.markup.replace(/<lml-page><\/lml-page>/g, "");
-                }
+                content.push(markup + '<!-- '+ Date.now() +' -->');
             }
 
-            return content + '<!-- '+ Date.now() +' -->';
+            contentpages = content;
+            return content;
         }
 
         var curConfirmTimeout;
@@ -1054,11 +1062,15 @@
                     return liliumcms.notify({title : "Watch out!", message : "You forgot to assign a featured image.", type : "warn"});
                 }
 
-                var contentMarkup = buildContentFromPackage();
-                tempForm.values.content = contentMarkup;
+                buildContentFromPackage();
+
+                tempForm.values.content = contentpages;
+                tempForm.values.title = contenttitle;
+                tempForm.values.subtitle = contentsubtitle;
     
                 liliumcms.modals.get("article-packaging").dismiss();
 
+                var contentMarkup = contentpages[contentPageIndex];
                 if (justsave) {
                     tempForm.values._id = contentid;
                     tempForm.values.id = undefined;
@@ -1066,15 +1078,15 @@
                     liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/save', function(data) {
                         liliumcms.notify( {type : "success", title : "Saved", message : "The packaged article was successfully saved and is ready to be published."});
                         updateBottomSection();
-                        CKEDITOR.instances.content.setData(contentMarkup);
+                        CKEDITOR.instances.contenteditor.setData(contentMarkup);
                     });
                 } else {
                     liliumcms.modals.get('dlg-modal-publishing-loading').cast();
                     liliumcms.lmldom.sendForm(tempForm.values, '{=config.default.server.url}/admin/article/edit', function(data) {
                         liliumcms.modals.get('dlg-modal-publishing-loading').dismiss();
                         if (data.success) {
-                            CKEDITOR.instances.content.setData(contentMarkup);
-                            lastSave = CKEDITOR.instances.content.getData();
+                            CKEDITOR.instances.contenteditor.setData(contentMarkup);
+                            lastSave = CKEDITOR.instances.contenteditor.getData();
                             
                             if (data.redirect) {
                                 liliumcms.pageloader.load(data.redirect);
