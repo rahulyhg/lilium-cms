@@ -562,6 +562,11 @@
             if (lastSave != currentSave && $('.article_base_title').val().trim() != "" && $('textarea[name="content"]').val() != "") {
                 var tempSave = currentSave + '&_id=' + _id + '&contentid=' + contentid;
 
+                localSave();
+                tempsave.title = contenttitle;
+                tempsave.subtitle = contentsubtitle;
+                tempsave.content = contentpages;
+
                 $.post('{=config.default.server.url}/admin/article/autosave', tempSave, function(data) {
                     lastSave = CKEDITOR.instances.content.getData();
 
@@ -606,6 +611,7 @@
 
         var saveCurrentArticle = function(cb) {
             document.dispatchEvent(new CustomEvent("articleWillSave"));
+            localSave();
 
             // Save and give notification
             var currentSave = liliumcms.lmldom.getFormData().post_create.values;
@@ -615,9 +621,12 @@
             url = '/save';
             tempsave._id = contentid;
             tempsave.autosaveid = _id;
+            tempsave.title = contenttitle;
+            tempsave.subtitle = contentsubtitle;
+            tempsave.content = contentpages;
 
             liliumcms.lmldom.sendForm(tempsave, '{=config.default.server.url}/admin/article' + url, function(data) {
-                lastSave = CKEDITOR.instances.content.getData();
+                lastSave = contentpages;
 
                 if (data.success && data.redirect) {
                     liliumcms.pageloader.load(data.redirect);
@@ -641,7 +650,6 @@
                 cb && cb();
                 $(".cke_bottom time.timeago").timeago("update", new Date());
             });
-           
         }
 
         // Save Draft
@@ -945,14 +953,10 @@
         };
 
         var showPackaging = function() {
-            var div = document.createElement('div')
-            div.innerHTML = CKEDITOR.instances.content.getData();
-            
-            var text = div.textContent.replace(/\n/g, ' ').replace(/@[a-zA-Z0-9]+/g, '').replace(/https?:\/\/[a-zA-Z0-9.\/]+/g, ' ').trim();
-
             liliumcms.modals.get('dlg-modal-packaging-loading').cast();
             d.id('pr-parag-list').empty();
             document.body.classList.add('block-scroll');
+
             setTimeout(function() {
                 liliumcms.lmldom.post(
                     {}, 
@@ -967,7 +971,7 @@
                         liliumcms.modals.get("article-packaging").cast();
                     }, 300);
                 });
-            }, 300);
+            }, 100);
 
         };
 
