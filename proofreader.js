@@ -32,19 +32,25 @@ const DICTIONARIES = {
     fr : require('dictionary-fr')
 };
 
+const _retexts = {};
+
 const createRetext = (dico, pdico = "") => {
     // const ignore = pdico.split('\n');
-    return retext()
-        .use(rtSpell, {
-            dictionary : dico,
-            normalizeApostrophes : false,
-            personal : pdico
-        })
-        .use(rtMenti)
-        .use(rtUrlsy)
-        .use(rtDiact)
-        // .use(rtKeywd)
-        .use(rtRepea);
+    if (!_retexts[dico]) {
+        _retexts[dico] = retext()
+            .use(rtSpell, {
+                dictionary : dico,
+                normalizeApostrophes : false,
+                personal : pdico
+            })
+            .use(rtMenti)
+            .use(rtUrlsy)
+            .use(rtDiact)
+            // .use(rtKeywd)
+            .use(rtRepea);
+    }
+
+    return _retexts[dico];
 };
 
 const DICT_PATH = "dictionary";
