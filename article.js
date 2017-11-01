@@ -370,8 +370,6 @@ class Article {
                 pages[index] = window.document.body.innerHTML;
             });
 
-            // WIP 
-            // TODO : Loop through paragraphs from pages array
             this.proofread(paragraphs, lang, report => {
                 if (article.hasads || article.isSponsored || article.nsfw) {
                     cli.sendJSON({ content, report });
@@ -1581,12 +1579,14 @@ class Article {
                     media: "$media.sizes.thumbnail.url"
                 }
             }], (data)  => {
-                if (cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length) {
-                    for (var i = 0; i < data.length; i++) if (data[i].media) {
+                var usecdn = cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length; 
+                for (var i = 0; i < data.length; i++) {
+                    if (usecdn) {
                         data[i].media = data[i].media.replace(cli._c.server.url, cli._c.content.cdn.domain);
-                        data[i].title = data[i].title[0] + (data[i].title.length > 1 ? (" ("+data[i].title.length+" pages)") : "");
-                        data[i].subtitle = data[i].subtitle[0];
                     }
+
+                    data[i].title = data[i].title[0] + (data[i].title.length > 1 ? (" ("+data[i].title.length+" pages)") : "");
+                    data[i].subtitle = data[i].subtitle[0];
                 }
 
                 db.count(cli._c, 'content', {$and : match}, (err, total)  => {
