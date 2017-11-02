@@ -333,7 +333,7 @@ class RunningTask {
                     log('RunningTask', 'Database error in task cacheArticle : ' + err);
                     sendback();
                 } else if (article) {
-                    log('RunningTask', "Generating article : " + article.title, 'info');
+                    log('RunningTask', "Generating article : " + article.title[0], 'info');
                     articleLib.generateArticle(this._c, article._id, sendback);
                 } else {
                     log('RunningTask', 'No article found at index ' + stats.skip);
