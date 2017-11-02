@@ -97,9 +97,9 @@ window.sockUpdateDashboard = function(data) {
 
     <div class="col-xs-4 col-md-4 dashboard-card">
         <div class="dashboard-ga-yesterday-rect">
-            <h3>Unique visitors</h3>
+            <h3>User sessions</h3>
             <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.metrics.unique"></lml-text>
+                <lml-text var="livevars.googleanalytics.dashboard.metrics.sessions"></lml-text>
             </div>
             <small>
                 Average of <lml-text var="livevars.googleanalytics.dashboard.ratio.pagepersession"></lml-text> pages per session
@@ -220,7 +220,6 @@ window.sockUpdateDashboard = function(data) {
     font-size: 13px;
     color: #888;
     background-color: #f3f3f3;
-    margin-top: 10px;
     border-top: 1px solid #d9d9d9;
 }
 
@@ -240,7 +239,7 @@ window.sockUpdateDashboard = function(data) {
 }
 
 .dashboard-ga-publication-list {
-    max-height: 400px;
+    max-height: 500px;
     overflow-y : scroll;
 }
 

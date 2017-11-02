@@ -63,21 +63,17 @@ class GoogleAnalyticsRequest {
                 return send(err);
             }
 
+            const metrics = {
+                unique : data.totalsForAllResults["ga:users"],
+                views : data.totalsForAllResults["ga:pageviews"],
+                searchs : data.totalsForAllResults["ga:organicSearches"],
+                sessions : data.totalsForAllResults["ga:sessions"]
+            };
             var total = {
-                metrics : {
-                    unique : data.totalsForAllResults["ga:users"],
-                    views : data.totalsForAllResults["ga:pageviews"],
-                    searchs : data.totalsForAllResults["ga:organicSearches"],
-                    sessions : data.totalsForAllResults["ga:sessions"]
-                },
+                metrics,
                 ratio : {
-                    pagepersession : parseFloat(data.totalsForAllResults["ga:pageviews"] / data.totalsForAllResults["ga:sessions"]).toFixed(2),
-                    search : Math.round(data.totalsForAllResults["ga:organicSearches"] / data.totalsForAllResults["ga:pageviews"] * 100),
-                    devices : {
-                        desktop : 0,
-                        mobile : 0,
-                        tablet : 0
-                    },
+                    pagepersession : parseFloat(metrics.views / metrics.sessions).toFixed(2),
+                    search : Math.round(metrics.searchs / metrics.views * 100),
                     pages : []
                 }
             };
