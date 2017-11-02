@@ -171,8 +171,6 @@ class Article {
             sponsoredBoxURL : article.sponsoredBoxURL,
             sponsoredBoxLogo : article.sponsoredBoxLogo,
             sponsoredBoxContent : article.sponsoredBoxContent,
-            tags : article.tags,
-            tagslugs : article.tagslugs,
             slug : article.name,
             nsfw : article.nsfw,
             url : article.url,
@@ -1423,7 +1421,7 @@ class Article {
 
             var date = {$gte: start, $lt: end};
 
-            var pageCount = art.countent.length;
+            var pageCount = art.content.length;
             var pcount = 0;
             var imgcount = 0;
             var adcount = 0;
@@ -1433,8 +1431,8 @@ class Article {
                 db.count(_c, 'content', {author, date}, (err, totalToday)  => {
                     db.findUnique(require('./config.js').default(), 'entities', {_id : author}, (err, author)  => {
                         var article = {
-                            title : art.title,
-                            subtitle : art.subtitle,
+                            title : art.title[0],
+                            subtitle : art.subtitle[0],
                             topic,
                             featuredimage : featuredimage.sizes.content.url,
                             score : {

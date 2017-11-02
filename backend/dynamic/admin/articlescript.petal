@@ -164,6 +164,9 @@
         contentpages.push("");
         contenttitle.push(contenttitle[0] + " - Page " + contentpages.length);
         contentsubtitle.push(contentsubtitle[0]);
+
+        localSave();
+        switchContentTab(contentpages.length - 1);
     };
 
     var makeContentTab = function(ct, i) {
