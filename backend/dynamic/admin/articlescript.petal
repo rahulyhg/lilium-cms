@@ -628,6 +628,11 @@
             tempsave.title = contenttitle;
             tempsave.subtitle = contentsubtitle;
             tempsave.content = contentpages;
+            tempsave.date = new Date(tempsave.date);
+
+            delete tempsave.contenttitle;
+            delete tempsave.contentsubtitle;
+            delete tempsave.contenteditor;
 
             liliumcms.lmldom.sendForm(tempsave, '{=config.default.server.url}/admin/article' + url, function(data) {
                 lastSave = contentpages;

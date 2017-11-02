@@ -6,7 +6,7 @@ var lmldate = function(str) {
 }
 
 var html5datetime = function(dt) {
-    return dateFormat(new Date(dt || new Date()), 'yyyy-mm-dd\'T\'hh:MM');
+    return dateFormat(new Date(dt || new Date()), 'yyyy-mm-dd\'T\'HH:MM');
 }
 
 var LiveVars = function() {
