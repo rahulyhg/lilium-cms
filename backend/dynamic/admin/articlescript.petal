@@ -556,6 +556,7 @@
     };
 
     var autoSave = function() {
+        return;
             var currentSave = $('form').serialize();
 
             // Save only if content has changed
@@ -821,142 +822,109 @@
         var createPageTabs = function(content) {
             var selectors = d.id('pages-selector').empty();
             var pages = d.id('pages-wrapper').empty();
-            var ph = document.createElement('div');
 
-            ph.innerHTML = content;
+            for (var pindex = 0; pindex < content.length; pindex++) {
+                var ph = document.createElement('div');
+                ph.innerHTML = content[pindex];
 
-            var tags = ph.children;
-            var pageindex = 0;
-            createPageSelector(pageindex);
-            
-            var page = createPageTag(pageindex);
-            pages.get().appendChild(page);
+                var tags = ph.children;
 
-            page.classList.add("shown");
+                page = createPageTag(pindex);
+                pages.get().appendChild(page);
+                createPageSelector(pindex);
 
-            var didsplit = false;
-            for (var i = 0; i < tags.length; i++) {
-                var tag = tags[i];
-                var shouldsplit = !!tag.querySelector("lml-page");
+                !pindex && page.classList.add("shown");
 
-                if (shouldsplit) {
-                    if (tag.querySelector('lml-page') == tag.firstElementChild) {
-                        page = createPageTag(++pageindex);
-                        pages.get().appendChild(page);
-                        createPageSelector(pageindex);
+                var didsplit = false;
+                for (var i = 0; i < tags.length; i++) {
+                    var tag = tags[i];
 
-                        shouldsplit = false;
+                    var isImage = !!tag.querySelector('img');
+                    var markup = tag.outerHTML;
+                    var box = undefined;
 
-                        var rmpagetag = tag.querySelector('lml-page');
-                        while (rmpagetag) {
-                            rmpagetag.remove();
-                            rmpagetag = tag.querySelector('lml-page');
-                        }
-                    }
-                }
+                    switch (tag.nodeName) {
+                        case "H3": case "H4": case "H5": case "H6":
+                            box = ( d.make({ class : "page-block page-head-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
+                            break;
 
-                var isImage = !!tag.querySelector('img');
-                var markup = tag.outerHTML;
-                var box = undefined;
+                        case "AD":
+                            box = ( d.make({ class : "page-block page-ad-block", text : "This can be moved around" }).get() );
+                            break;
 
-                switch (tag.nodeName) {
-                    case "H3": case "H4": case "H5": case "H6":
-                        box = ( d.make({ class : "page-block page-head-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
-                        break;
+                        case "LML-RELATED":
+                            box = ( d.make({ class : "page-block page-related-block", text : "This can be moved around" }).get() );
+                            break;
 
-                    case "AD":
-                        box = ( d.make({ class : "page-block page-ad-block", text : "This can be moved around" }).get() );
-                        break;
+                        case "HR":
+                            box = ( d.make({ class : "page-block page-hr-block" }).get() );
+                            break;
 
-                    case "LML-RELATED":
-                        box = ( d.make({ class : "page-block page-related-block", text : "This can be moved around" }).get() );
-                        break;
+                        case "UL":
+                            box = ( d.make({ class : "page-block page-list-block", text : tag.children.length + " list elements" }).get() );
+                            break;
 
-                    case "HR":
-                        box = ( d.make({ class : "page-block page-hr-block" }).get() );
-                        break;
-
-                    case "UL":
-                        box = ( d.make({ class : "page-block page-list-block", text : tag.children.length + " list elements" }).get() );
-                        break;
-
-                    case 'BLOCKQUOTE':
-                        if (tag.classList.contains('instagram-media')) {
-                            box = ( d.make({ class : "page-block page-instaembed-block", text : "Using script embed" }).get() );
-                        } else {
-                            box = ( d.make({ class : "page-block page-quote-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
-                        }
-                        break;
-
-                    case 'SCRIPT':
-                        box = ( d.make({ class : "page-block page-script-block", text : "Plain Javascript block" }).get() );
-                        if (tag.src && tag.src.indexOf('instagram') != -1) {
-                            box.textContent += ", needed for Instagram embed"
-                            box.classList.add('page-instagram-script-block');
-                        }
-                        break;
-
-                    case "P": 
-                        box = isImage ? d.make({ 
-                            class : "page-block page-img-block", 
-                            text : tag.querySelector('a') ? tag.querySelector('a').textContent : tag.querySelector('img').src
-                        }).get() : d.make({ 
-                            class : "page-block page-parag-block", 
-                            text : tag.textContent.substring(0, 50) + "..." 
-                        }).get();
-                        break;
-
-                    case "LML-PAGE":
-                        shouldsplit = true;
-                        break;
-
-                    default:
-                        box = d.make({ class : "page-block page-unknown-block", text : tag.textContent.substring(0, 50) + "..." }).get();
-                }
-
-
-                if (box) {
-                    page.appendChild(box);
-                    box.dataset.index = i;
-                    box.dataset.pageindex = pageindex;
-                    box.dataset.markup = markup;
-
-                    if (tag.id) {
-                        box.id = "box-" + tag.id;
-                    }
-
-                    (function(box) {
-                        box.addEventListener('mousedown', function() {
-                            movingBlock = true;
-                            movingBlockElem = box;
-                            box.classList.add('moving');
-                        });
-
-                        box.addEventListener('mouseenter', function() {
-                            if (movingBlock && box != movingBlockElem) {
-                                movingBlockElem.parentElement.insertBefore(movingBlockElem, box);
+                        case 'BLOCKQUOTE':
+                            if (tag.classList.contains('instagram-media')) {
+                                box = ( d.make({ class : "page-block page-instaembed-block", text : "Using script embed" }).get() );
+                            } else {
+                                box = ( d.make({ class : "page-block page-quote-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
                             }
-                        });
-                    })(box);
-                }
-             
-                if (shouldsplit && didsplit) {
-                    
-                } else if (shouldsplit) {
-                    page = createPageTag(++pageindex);
-                    pages.get().appendChild(page);
-                    createPageSelector(pageindex);
+                            break;
 
-                    var rmpagetag = tag.querySelector('lml-page');
-                    while (rmpagetag) {
-                        rmpagetag.remove();
-                        rmpagetag = tag.querySelector('lml-page');
+                        case 'SCRIPT':
+                            box = ( d.make({ class : "page-block page-script-block", text : "Plain Javascript block" }).get() );
+                            if (tag.src && tag.src.indexOf('instagram') != -1) {
+                                box.textContent += ", needed for Instagram embed"
+                                box.classList.add('page-instagram-script-block');
+                            }
+                            break;
+
+                        case "P": 
+                            box = isImage ? d.make({ 
+                                class : "page-block page-img-block", 
+                                text : tag.querySelector('a') ? tag.querySelector('a').textContent : tag.querySelector('img').src
+                            }).get() : d.make({ 
+                                class : "page-block page-parag-block", 
+                                text : tag.textContent.substring(0, 50) + "..." 
+                            }).get();
+                            break;
+
+                        case "LML-PAGE":
+                            shouldsplit = true;
+                            break;
+
+                        default:
+                            box = d.make({ class : "page-block page-unknown-block", text : tag.textContent.substring(0, 50) + "..." }).get();
                     }
 
-                    didsplit = true;
-                } else {
-                    didsplit = false;
-                }  
+
+                    if (box) {
+                        page.appendChild(box);
+                        box.dataset.index = i;
+                        box.dataset.pageindex = pindex;
+                        box.dataset.markup = markup;
+
+                        if (tag.id) {
+                            box.id = "box-" + tag.id;
+                        }
+
+                        (function(box) {
+                            box.addEventListener('mousedown', function() {
+                                movingBlock = true;
+                                movingBlockElem = box;
+                                box.classList.add('moving');
+                            });
+
+                            box.addEventListener('mouseenter', function() {
+                                if (movingBlock && box != movingBlockElem) {
+                                    movingBlockElem.parentElement.insertBefore(movingBlockElem, box);
+                                }
+                            });
+                        })(box);
+                    }
+                        
+                }
             }
         };
 
@@ -979,8 +947,7 @@
                         liliumcms.modals.get("article-packaging").cast();
                     }, 300);
                 });
-            }, 100);
-
+            }, 300);
         };
 
         $('form button[name=publish]').on('click', function(e) {

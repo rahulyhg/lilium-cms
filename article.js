@@ -356,7 +356,7 @@ class Article {
             const contents = [];
             const reports = []; 
 
-            const done = () => {
+            const sendback = () => {
                 if (contents.length == article.content.length) {
                     db.update(cli._c, 'content', { _id : article._id }, { content : contents, hasads : true }, () => {
                         cli.sendJSON({ content : contents, report : reports });
@@ -364,15 +364,15 @@ class Article {
                 } else {
                     cli.sendJSON({ content : contents, report : reports });
                 }
-            }
+            };
 
             let index = -1;
             const nextpage = () => {
                 if (++index == pages.length) {
-                    return done();
+                    return sendback();
                 }
 
-                const page = pages[index]
+                const page = pages[index];
                 const window = new jsdom.JSDOM(page).window;
 
                 const paragraphs = Array.prototype.filter.call(
@@ -1436,10 +1436,10 @@ class Article {
 
             var date = {$gte: start, $lt: end};
 
-            var pageCount = countOcc(art, "<lml-page");
-            if (pageCount != 0) {
-                pageCount++;
-            }
+            var pageCount = art.countent.length;
+            var pcount = 0;
+            var imgcount = 0;
+            var adcount = 0;
 
             // Find counts and author object
             db.count(_c, 'content', {author}, (err, totalCount)  => {
@@ -1887,6 +1887,8 @@ class Article {
 
                 if (deepArticle.content.length > 1) {
                     var pages = deepArticle.content;
+                    var titles = deepArticle.title;
+                    var subtitles = deepArticle.subtitle;
 
                     if (pageIndex === "all") {
                         log('Article', "Generated paginated article from admin panel : " + deepArticle.title[0]);
@@ -1926,6 +1928,8 @@ class Article {
 
                     filename += "/" + pageIndex;
                     deepArticle.content = pages[pageIndex - 1];
+                    deepArticle.title = titles[pageIndex - 1];
+                    deepArticle.subtitle = subtitles[pageIndex - 1];
                     deepArticle.isPaginated = true;
                     deepArticle.totalPages = pages.length;
                     deepArticle.pageIndex = pageIndex;
