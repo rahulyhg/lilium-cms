@@ -304,34 +304,21 @@ class Article {
 
     liveedit(cli) {
         const postdata = cli.postdata.data;
-        const newdata = {
-            title : postdata.title,
-            subtitle : postdata.subtitle
-        };
-
-        if (postdata.markup) {
-            newdata.content = postdata.markup;
-        }
+        let index = parseInt(postdata.page || 1) - 1;
 
         db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
             if (article && (cli.userinfo.userid == article.author || cli.hasRight('editor'))) {
-                let index;
-                if (article.content.length > 1) {
-                    index = (postdata.page || 1);
+                article.content[index] = postdata.markup || article.content[index];
+                article.title[index] = postdata.title;
+                article.subtitle[index] = postdata.subtitle;
 
-                    article.content[index - 1] = newdata.content;
-                    const indexofpage = newdata.title.indexOf(' - Page ');
-
-                    newdata.title = indexofpage == -1 ? newdata.title : newdata.title.substring(0, indexofpage);
-                }
-
-                db.update(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, newdata, (err, r) => {
+                db.update(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, article, (err, r) => {
                     require("./history.js").pushModification(cli, article, article._id, (err, revision)  => {    
                         this.generateArticle(cli._c, db.mongoID(cli.routeinfo.path[3]), resp => {
                             cli.sendJSON({
                                 ok : 1
                             });
-                        }, false, index);
+                        }, false, index + 1);
                     });
                 });
             } else {
