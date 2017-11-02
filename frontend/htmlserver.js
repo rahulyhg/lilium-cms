@@ -80,7 +80,7 @@ var HTMLServer = function() {
                                             });
                                         }
                                     } else {
-                                        log('HTMLServer', 'Not found on ' + cli.routeinfo.fullpath + " from " + cli.ip, 'warn');
+                                        log('HTMLServer', '404 => ' + cli._c.server.url + cli.routeinfo.fullpath + " from " + cli.ip + " with agent " + cli.request.headers["user-agent"], 'warn');
                                         var cachekey = "404_html_" + cli._c.uid;
 
                                         sharedcache.get(cachekey, function(html) {
