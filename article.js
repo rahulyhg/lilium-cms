@@ -1928,7 +1928,7 @@ class Article {
                         deepArticle.featuredimageartist = undefined;
                     }
 
-                    log('Article', "Generated page " + pageIndex + " of paginated article " + deepArticle.title);
+                    log('Article', "Generated page " + pageIndex + " of paginated article " + deepArticle.title[0]);
                 } else {
                     deepArticle.pageIndex = 1;
                     deepArticle.content = deepArticle.content[0];
