@@ -72,7 +72,8 @@ window.sockUpdateDashboard = function(data) {
         d.make({node : "span", class : "dashboard-top-source " + data.pages[i].source, parent : details, text : data.pages[i].source});
 
         data.pages[i].home && d.make({node : "span", class : "dashboard-top-source homepage", parent : details, text : "Homepage"});
-        data.pages[i].paginated && d.make({node : "span", class : "dashboard-top-source paginated", parent : details, text : "Paginated"});
+        data.pages[i].paginated && d.make({node : "span", class : "dashboard-top-source paginated", parent : details, text : "paginated"});
+        0 == data.pages[i].url.indexOf('/amp') && d.make({node : "span", class : "dashboard-top-source amp", parent : details, text : "AMP"});
     }
 };
 </script>
@@ -344,5 +345,6 @@ window.sockUpdateDashboard = function(data) {
 .dashboard-top-source.direct    { background-color: #c057ff; }
 .dashboard-top-source.homepage  { background-color: #f377c0; }
 .dashboard-top-source.paginated { background-color: #1ac321; }
+.dashboard-top-source.amp       { background-color: #e47f57; }
 
 </style>
