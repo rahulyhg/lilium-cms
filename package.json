@@ -137,6 +137,7 @@
     "util": "latest",
     "validator": "latest",
     "vanilla-js-calendar": "latest",
-    "websocket": "latest"
+    "websocket": "latest",
+    "ws": "^3.2.0"
   }
 }

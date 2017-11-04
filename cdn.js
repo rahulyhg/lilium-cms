@@ -38,9 +38,7 @@ const parseText = (txt, domain, cdndomain, cb, ignoreHTML) => {
     for (let i = 0; i < cdnbackground.length; i++) {
         if (cdnbackground[i].style.backgroundImage) {
             cdnbackground[i].style.backgroundImage = cdnbackground[i].style.backgroundImage.toString().replace(domain, cdndomain);
-        }
-
-        if (cdnbackground[i].style.background) {
+        } else if (cdnbackground[i].style.background) {
             cdnbackground[i].style.background = cdnbackground[i].style.background.toString().replace(domain, cdndomain);
         }
 
