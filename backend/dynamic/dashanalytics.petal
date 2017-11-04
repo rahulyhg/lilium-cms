@@ -128,9 +128,9 @@ window.sockUpdateDashboard = function(data) {
             <h3>Top article</h3>
             <div>
                 <lml-link href="{livevars.googleanalytics.dashboard.toppage.url}" target="_blank">
-                    <lml-text var="livevars.googleanalytics.dashboard.toppage.article.title" wrapper="h4" /></lml-text>
+                    <lml-text var="livevars.googleanalytics.dashboard.toppage.article.title.0" wrapper="h4" /></lml-text>
                 </lml-link>
-                <lml-text var="livevars.googleanalytics.dashboard.toppage.article.subtitle" wrapper="h5" /></lml-text>
+                <lml-text var="livevars.googleanalytics.dashboard.toppage.article.subtitle.0" wrapper="h5" /></lml-text>
 
                 <div class="dashboard-ga-toppage-image-wrapper">
                 <lml-image src="{livevars.googleanalytics.dashboard.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml-image>
