@@ -12,11 +12,7 @@ class LiliumCMS {
             log('Config', 'Root URL is at ' + _config.default().server.url, 'info');
             log('Config', 'Public signature ' + _config.default().signature.publichash, 'info');
             log();
-            log(
-                'Lilium', ' *** Running ' + 
-                _config.default().vendor.productname + ' v' + _config.default().vendor.version + ' ***', 
-                'lilium'
-            );
+            log( 'Lilium', ' *** Running Lilium CMS v2.1.1 ***', 'lilium');
             log();
             log('Benchmark', 'Init time : ' + (new Date() - startupTime) + "ms", 'success');
             log('Developer', 'Documentation : http://liliumcms.com/docs', 'info');
