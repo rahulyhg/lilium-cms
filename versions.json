@@ -96,5 +96,10 @@
         "codename" : "Monoceros",
         "script" : "2.1.0.js",
         "features" : ["paginationv2"]
+    },
+    "2.1.1": {
+        "codename" : "Monoceros",
+        "script" : "2.1.1.js",
+        "features" : ["facebookpreview"]
     }
 }
