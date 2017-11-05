@@ -345,10 +345,10 @@ class Article {
             const sendback = () => {
                 if (contents.length == article.content.length) {
                     db.update(cli._c, 'content', { _id : article._id }, { content : contents, hasads : true }, () => {
-                        cli.sendJSON({ content : contents, report : reports });
+                        cli.sendJSON({ content : contents, report : reports, article });
                     });
                 } else {
-                    cli.sendJSON({ content : contents, report : reports });
+                    cli.sendJSON({ content : contents, report : reports, article });
                 }
             };
 
@@ -388,7 +388,7 @@ class Article {
             };
 
             nextpage();
-        }, {content : 1, title : 1, isSponsored : 1, nsfw : 1, hasads : 1});
+        }, {content : 1, title : 1, subtitle : 1, facebooktitle : 1, facebooksubtitle : 1, isSponsored : 1, nsfw : 1, hasads : 1});
     }
 
     proofread(paragraphs, lang, send) {
