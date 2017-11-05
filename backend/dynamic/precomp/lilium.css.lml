@@ -2431,6 +2431,10 @@ button.bigger {
     content: '\f1d9';
 }
 
+.btn-rebuild::before {
+    content : '\f1d8';
+}
+
 .announcement.modal .modal-body {
     position: relative; 
     padding: 15px; 
