@@ -57,6 +57,7 @@ class Article {
         switch (cli.routeinfo.path[2]) {
             case 'new': if (cli.hasRightOrRefuse("create-articles")) this.create(cli); break;
             case 'edit': if (cli.hasRightOrRefuse("publish-articles")) this.publish(cli, "create"); break;
+            case 'rebuild': if (cli.hasRightOrRefuse("publish-articles")) this.rebuild(cli); break;
             case 'delete': if (cli.hasRightOrRefuse("publish-articles")) this.delete(cli); break;
             case 'delete-autosave': if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli); break;
             case 'autosave': if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true); break;
@@ -762,6 +763,65 @@ class Article {
         }
     };
 
+    facebookDebug(cli, postid) {
+        db.findUnique(cli._c, 'content', {_id : postid}, (err, article) => {
+            if (cli._c.social.facebook.appid && cli._c.social.facebook.token) {
+                log('Facebook', 'Sending request to debug link');
+                require('request')({
+                    url : 'https://graph.facebook.com/v' + cli._c.social.facebook.apiversion || "2.8",
+                    body : {
+                        scrape : true,
+                        access_token : cli._c.social.facebook.token,
+                        id : cli._c.server.protocol + cli._c.server.url + "/" + article.name
+                    },
+                    json : true,
+                    method : "POST"
+                }, (a, b, c)  => {
+                    if (c && c.title) {
+                        log('Facebook', 'Debugger responded with title', "success");
+                        notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                            title: "Facebook Graph",
+                            msg: '<i>'+article.title[0]+'</i> has been debugged on Facebook Graph.',
+                            type: 'log'
+                        });
+                    } else {
+                        log('Facebook', 'Debugger responded with error', "warn");
+                        notifications.notifyUser(cli.userinfo.userid, cli._c.id, {
+                            title: "Facebook Graph",
+                            url : "https://developers.facebook.com/tools/debug/og/object/",
+                            msg: '<i>'+article.title[0]+'</i> was not debugged on Facebook Graph.',
+                            type: 'warning'
+                        });
+                    }
+                });
+            }
+        });
+ 
+    }
+
+    rebuild(cli) {
+        cli.touch('article.rebuild');
+        const postid = db.mongoID(cli.routeinfo.path[3]);
+
+        const goOn = () => {
+            that.generateArticle(cli._c, postid, (resp)  => {
+                cli.throwHTTP(201, undefined, true);
+                that.facebookDebug(cli, postid);
+            }, false, 'all');
+        };
+
+        if (cli.hasRight('editor')) {
+            goOn();
+        } else {
+            db.findUnique(cli._c, 'content', {_id : postid}, (err, article) => {
+                if (article && article.author && article.author.toString() == cli.userinfo.userid) {
+                    goOn();
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            });
+        }
+    };
     
     publish(cli, pubCtx) {
         cli.touch('article.new');
@@ -1814,6 +1874,11 @@ class Article {
                     'displayname': 'Package and finalize',
                     'type' : 'button',
                     'classes': ['btn-publish']
+                }, {
+                    'name' : 'rebuild', 
+                    'displayname': 'Update and refresh',
+                    'type' : 'button',
+                    'classes': ['btn-rebuild']
                 }, {
                     'name' : 'refuse',
                     'displayname' : 'Refuse review',
