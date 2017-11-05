@@ -1049,6 +1049,9 @@
                 tempForm.values.content = contentpages;
                 tempForm.values.title = contenttitle;
                 tempForm.values.subtitle = contentsubtitle;
+
+                tempForm.facebooktitle = document.getElementById("facebook-package-title").textContent;
+                tempForm.facebooksubtitle = document.getElementById('facebook-package-subtitle').textContent;
     
                 liliumcms.modals.get("article-packaging").dismiss();
 
