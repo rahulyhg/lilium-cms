@@ -131,10 +131,6 @@
         document.addEventListener('livevarsRendered', function(e) {
             lastSave = $('form').serialize();
         });
-
-        document.addEventListener('lmlnotification', function(event, notification) {
-            enablePublishButton();
-        });
     }
 
     var localSave = function() {
@@ -246,13 +242,6 @@
     }
 
     var enablePublishButton = function() {
-        pubBtn = $('button[name="publish"]').get(0);
-
-        if (pubBtn) {
-            pubBtn.classList.remove("waitingForConfirmation");
-            pubBtn.disabled = false;
-            pubBtn.innerHTML = publishButtonText;
-        }
     };
 
     var unpublishArticleModal = function(id) {    
@@ -401,8 +390,10 @@
             }
 
             document.getElementById('btn-dismiss-and-save').style.display = "";
+            document.querySelector('.btn-rebuild').style.display = "none";
             if (resp.status == "published") {
                 document.querySelector('.article-delete-button-wrapper').style.display = "";
+                document.querySelector('.btn-rebuild').style.display = "";
                 document.getElementById('btn-dismiss-and-save').style.display = "none";
             } else if (resp.status == "autosaved") {
                 document.querySelector('.article-destroyautosave-button-wrapper').style.display = "";
@@ -650,8 +641,8 @@
                 }
 
                 liliumcms.notify({
-                    title: 'Article',
-                    message: 'Your draft is saved',
+                    title: 'Article was saved',
+                    message: 'The latest modifications were successfully saved',
                     type: 'success'
                 });
 
@@ -694,6 +685,20 @@
                 btn.innerHTML = textinside;
             });
         });
+
+        document.querySelector('.btn-rebuild').addEventListener('click', function() {
+            rebuildPublishedArticle();
+        });
+    
+        var rebuildPublishedArticle = function() {
+            saveCurrentArticle(function() {
+                liliumcms.modals.get("dlg-modal-publishing-loading").cast()
+                liliumcms.lmldom.post({}, '{=config.default.server.url}/admin/article/rebuild/' + contentid, function(resp, b, c) {
+                    liliumcms.modals.get("dlg-modal-publishing-loading").dismiss();
+                    liliumcms.notify({title : "Article updated", type : "success", "content" : "The article was successfully updated and published on the website." });
+                });
+            });
+        };
 
         var addToWhiteList = function(txt, lang) {
             liliumcms.lmldom.post({ word : txt, lang : lang }, '{=config.default.server.url}/admin/article/addwordtodico', function() {
@@ -1010,12 +1015,6 @@
 
                 document.dispatchEvent(new CustomEvent("articleWillPublish"));
     
-                var pubBtn = $('button[name="publish"]').get(0);
-                pubBtn.disabled = true;
-                publishButtonText = pubBtn.innerHTML;
-                pubBtn.innerHTML = "Publishing...";
-                pubBtn.classList.add("waitingForConfirmation");
-
                 if (articleEdit.urlWillChangeWarningShown) {
                     tempForm.values._keepURL = articleEdit.keepURL;
                 } else if (isPublished) {
@@ -1080,16 +1079,7 @@
                                 });
                             }
 
-                            pubBtn.innerHTML = "Generating article...";
                             updateBottomSection();
-
-                            curConfirmTimeout && clearTimeout(curConfirmTimeout);
-                            curConfirmTimeout = setTimeout(function() {
-                                if (pubBtn.classList.contains("waitingForConfirmation")) {
-                                    liliumcms.notify( {type : "warning", title : "Weird.", message : "Server could not notify you for some reason, but the article was still published successfully, and should be online."});
-                                    enablePublishButton();
-                                }
-                            }, 15000);
                         }
                     });
                 }
