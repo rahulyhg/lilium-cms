@@ -1583,7 +1583,7 @@ class Article {
             }], (data)  => {
                 var usecdn = cli._c.content && cli._c.content.cdn && cli._c.content.cdn.domain && data && data.length; 
                 for (var i = 0; i < data.length; i++) {
-                    if (usecdn) {
+                    if (usecdn && data[i].media) {
                         data[i].media = data[i].media.replace(cli._c.server.url, cli._c.content.cdn.domain);
                     }
 
