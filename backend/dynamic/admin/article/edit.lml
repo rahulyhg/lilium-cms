@@ -144,6 +144,18 @@
         </div>
     </div>
 
+    <div id="facebook-package-wrapper">
+        <h2>Facebook package preview</h2>
+        <p>You can modify how the post will appear on Facebook by clicking on the title and subtitle. Please note that this <b>will not</b> update the original post title, but will simply affect how it appears on Facebook.</p>
+
+        <div id="facebook-package">
+            <img src="" alt="Facebook preview image" id="facebook-package-image" />
+            <div id="facebook-package-title" contenteditable></div>
+            <div id="facebook-package-subtitle" contenteditable></div>
+            <div id="facebook-package-site"></div>
+        </div>
+    </div>
+
     <div>
         <h2>Corrections &amp; suggestions</h2>
         <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience. You can click on suggestions to automatically apply the changes, or manually make modifications. Then, the paragraph can be marked as verified.</p>
@@ -665,7 +677,7 @@
 .page-img-block::before { content: 'Image'; color : #0b62d6; }
 .page-hr-block::before { content: 'Horizontal ruler'; color : #AAA; font-size: 12px; }
 .page-list-block::before { content: 'Bulleted list'; }
-.page-unknown-block::before { content: 'Not sure what this is'; }
+.page-unknown-block::before { content: 'Custom tag'; }
 .page-script-block::before { content: 'Script'; color : #0aab0a; }
 .page-instagram-script-block::before { content: 'Instagram embed script'; color : #0aab0a; }
 .page-instaembed-block::before { content: 'Instagram embed';  color : #0b62d6; }
@@ -748,6 +760,40 @@
 #modal-preparing-title i {
     display: block;
     font-size: 18px;
+}
+
+#facebook-package {
+    margin: 20px auto;
+    display: block;
+    width: 476px;
+    background: #FFF;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+}
+
+#facebook-package-image {
+    width: 476px;
+    height: 250px;
+    object-fit: cover;
+}
+
+#facebook-package-title {
+    font-family : Georgia, serif;
+    font-size: 18px;
+    margin: 10px 10px 0px;
+}
+
+#facebook-package-subtitle {
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 12px;
+    margin: 0px 10px 0px;
+}
+
+#facebook-package-site {
+    font-size: 11px;
+    font-family: Helvetica, Arial, sans-serif;
+    color: rgb(144, 148, 156);
+    text-transform: uppercase;
+    padding: 10px 10px 8px;
 }
 
 </style>

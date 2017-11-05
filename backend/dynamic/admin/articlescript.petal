@@ -244,6 +244,13 @@
     var enablePublishButton = function() {
     };
 
+    var updateFacebookPreview = function(article) {
+        document.getElementById("facebook-package-image").src = document.getElementById('featured-image-tag').src;
+        document.getElementById('facebook-package-title').textContent = article.facebooktitle || article.title[0];
+        document.getElementById('facebook-package-subtitle').textContent = article.facebooksubtitle || article.subtitle[0];
+        document.getElementById('facebook-package-site').textContent = "{=config.default.website.sitetitle}";
+    };
+
     var unpublishArticleModal = function(id) {    
         deleteID = id;
         $('#confirm-unpublish').modal('show');
@@ -953,6 +960,7 @@
                 function(pkg) {
                     fillPackaging(pkg.report);
                     createPageTabs(pkg.content);
+                    updateFacebookPreview(pkg.article);
 
                     liliumcms.modals.get('dlg-modal-packaging-loading').dismiss();
 
@@ -1122,6 +1130,7 @@
     liliumcms.imagepicker.bind(imgtag, function(payload) {
         if (payload && payload.sizes) {
             imgtag.src = payload.sizes["{=?theme.info.featuredimage.sizename}" || "featured"].url;
+            document.getElementById("facebook-package-image").src = imgtag.src;
             document.getElementById('mediapicker').value = payload._id;
         }
     }, {withcredit : true});
