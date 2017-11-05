@@ -874,6 +874,10 @@ class Article {
                     article: formData
                 });
 
+                formData.contenttitle = undefined;
+                formData.contentsubtitle = undefined;
+                formData.contenteditor = undefined;
+
                 if (formData.topic) {
                     db.update(cli._c, "topics", {_id : formData.topic}, {lastUsed : new Date()});
                     require('./topics.js').generateTopicLatestJSON(cli._c, formData.topic);
