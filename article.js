@@ -1100,7 +1100,7 @@ class Article {
                             } else {
                                 cli.throwHTTP(500);
                             }
-                        }, false, true);
+                        }, pubCtx == "preview", true);
                     };
 
                     if (arr && arr[0] && arr[0].status != "published") {
