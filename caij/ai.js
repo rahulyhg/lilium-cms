@@ -147,8 +147,8 @@ class AI {
     error(err) {
         log('CAIJ', "Caught an error at process level", 'warn');
         log('CAIJ', err, 'err');
+        log("CAIJ", err.stack, 'err');
         log("CAIJ", "AI is most likely in a fail state, but won't shutdown until done manually", "warn");
-        log("CAIJ", err.stack);
 
         ai.createInterval();
     }
