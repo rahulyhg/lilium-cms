@@ -1059,8 +1059,9 @@ class Article {
                                                     content += x;
                                                 });
 
-                                                deepArticle.content = content;
-                                                deepArticle.title = deepArticle.title[0];
+                                                deepArticle.content  = content;
+                                                deepArticle.title    = deepArticle.title && deepArticle.title[0];
+                                                deepArticle.subtitle = deepArticle.subtitle && deepArticle.subtitle[0];
 
                                                 log('Preview', 'Rendering HTML for previewed post');
                                                 filelogic.renderThemeLML(cli._c, "article", tmpName, extra, ()  => {
