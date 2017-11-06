@@ -1656,8 +1656,8 @@ class Article {
                         data[i].media = data[i].media.replace(cli._c.server.url, cli._c.content.cdn.domain);
                     }
 
-                    data[i].title = data[i].title[0] + (data[i].title.length > 1 ? (" ("+data[i].title.length+" pages)") : "");
-                    data[i].subtitle = data[i].subtitle[0];
+                    data[i].title = data[i].title && (data[i].title[0] + (data[i].title.length > 1 ? (" ("+data[i].title.length+" pages)") : ""));
+                    data[i].subtitle = data[i].subtitle && data[i].subtitle[0];
                 }
 
                 db.count(cli._c, 'content', {$and : match}, (err, total)  => {
