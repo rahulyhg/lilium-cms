@@ -874,10 +874,6 @@ class Article {
                     article: formData
                 });
 
-                formData.contenttitle = undefined;
-                formData.contentsubtitle = undefined;
-                formData.contenteditor = undefined;
-
                 if (formData.topic) {
                     db.update(cli._c, "topics", {_id : formData.topic}, {lastUsed : new Date()});
                     require('./topics.js').generateTopicLatestJSON(cli._c, formData.topic);
@@ -1056,6 +1052,15 @@ class Article {
                                                 extra.article = deepArticle;
                                                 extra.topic = deepArticle.topic;
                                                 extra.preview = true;
+
+                                                var content = deepArticle.content.shift();
+                                                deepArticle.content.forEach((x, i) => {
+                                                    content += '<hr /><h1 class="preview-page-break">'+deepArticle.title[i+1]+"</h1>"
+                                                    content += x;
+                                                });
+
+                                                deepArticle.content = content;
+                                                deepArticle.title = deepArticle.title[0];
 
                                                 log('Preview', 'Rendering HTML for previewed post');
                                                 filelogic.renderThemeLML(cli._c, "article", tmpName, extra, ()  => {
