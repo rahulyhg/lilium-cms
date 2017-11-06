@@ -137,6 +137,14 @@
         contentpages[contentPageIndex] = CKEDITOR.instances.contenteditor.getData();
         contenttitle[contentPageIndex] = d.id("contenttitle").value;
         contentsubtitle[contentPageIndex] = d.id("contentsubtitle").value;
+
+        if (!contenttitle[contenttitle.length-1] && !contentsubtitle[contentsubtitle.length-1] && !contentpages[contentpages.length-1]) {
+            contentpages.pop();
+            contenttitle.pop();
+            contentsubtitle.pop();
+
+            document.querySelector('.content-tab-' + contenttitle.length).remove();
+        }
     }
 
     var switchContentTab = function(index, initial) {
