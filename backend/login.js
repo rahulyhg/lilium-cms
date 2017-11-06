@@ -141,6 +141,7 @@ class Login {
 		        	});
 			    } else {
 	    		    hooks.fire('user_login_failed', cli);
+                    log("Auth", "Login attempt with user " + usr + " and non-hash " + psw, "warn");
     			    cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
                 }
             });
