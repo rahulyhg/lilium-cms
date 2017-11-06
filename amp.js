@@ -33,6 +33,8 @@ class Amp {
         // Featured image
         if (!article.featuredimage[0]) {
             article.featuredimage = [{sizes : {facebook : {url : ""}}}];
+        } else if (!article.featuredimage[0].sizes.facebook) {
+            article.featuredimage[0].sizes.facebook = article.featuredimage[0].sizes.content;
         }
 
         article.featuredimage[0].sizes.facebook.url = article.featuredimage[0].sizes.facebook.url.replace (
