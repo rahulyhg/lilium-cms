@@ -28,7 +28,11 @@ var Dispatcher = function () {
         } else if (cli.routeinfo.login) {
             Admin.serveLogin(cli);
         } else if (cli.routeinfo.livevars) {
-            LiveVars.handleRequest(cli);
+            if (cli.userinfo.loggedin) {
+                LiveVars.handleRequest(cli);
+            } else {
+                cli.throwHTTP(401, undefined, true);
+            }
         } else if (rewriter.rewrite(cli)) {
 
         } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
