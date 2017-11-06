@@ -137,11 +137,12 @@ class Login {
             db.match(_c.default(), 'entities', conds, found => {
     			if (found) {
             		entities.fetchFromDB(cli._c, usr, userObj => {
+                        log("Auth", "Login success with user " + usr, "lilium");
 	        			loginSuccess(cli, userObj);
 		        	});
 			    } else {
 	    		    hooks.fire('user_login_failed', cli);
-                    log("Auth", "Login attempt with user " + usr + " and non-hash " + psw, "warn");
+                    log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
     			    cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
                 }
             });
