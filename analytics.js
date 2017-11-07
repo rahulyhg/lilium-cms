@@ -292,6 +292,7 @@ class StatsBeautifier {
         }
                 
         const ArticleLib = require('./article');
+        const EntityLib = require('./entities');
 
         let arti = -1;
         const nextArticle = () => {
@@ -300,6 +301,14 @@ class StatsBeautifier {
             } 
 
             ArticleLib.deepFetch(_c, stats.toppages[arti].name, (deeparticle) => {
+                if (deeparticle) {
+                    deeparticle.content = undefined;
+                    deeparticle.images = undefined;
+                    deeparticle.featuredimage = undefined;
+                    deeparticle.related = undefined;
+                    deeparticle.author = deeparticle.authors && EntityLib.toPresentable(deeparticle.authors[0]);
+                }
+
                 stats.toppages[arti].article = deeparticle;
                 nextArticle();
             });
