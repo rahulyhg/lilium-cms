@@ -55,7 +55,7 @@ class ClientObject {
         this.responseinfo.httpcode = code;
         this.responseinfo.httpmessage = message;
        
-        code >= 400 && log('ClientObject', code + ' => ' + this._c.server.url + this.routeinfo.fullpath + " from " + this.ip + " with agent " + this.request.headers["user-agent"], 'warn');
+        code >= 400 && log('ClientObject', code + ' => ' + (this._c ? this._c.server.url : "//") + this.routeinfo.fullpath + " from " + this.ip + " with agent " + this.request.headers["user-agent"], 'warn');
 
         if (hard) {
             this.response.writeHead(code, headers);
