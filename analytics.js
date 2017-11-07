@@ -18,6 +18,10 @@ const GASites = {};
 const defaultMetrics = ["ga:users", "ga:pageviews", "ga:organicSearches", "ga:sessions"].join(',');
 const defaultDimensions = "ga:pagePath";
 
+// Monthly
+const monthlyMetrics = ["ga:sessions", "ga:users", "ga:pageviews", "ga:percentNewSessions", "ga:sessionsPerUser", "ga:avgSessionDuration"].join(',');
+const monthlyDimensions = "ga:pagePath";
+
 // Month days
 const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
@@ -55,6 +59,35 @@ class GoogleAnalyticsRequest {
             "sort" : "-rt:activeUsers", 
             "max-results" : 50
         }, send, true);
+    }
+
+    static lastMonth(_c, gAnalytics, send) {
+        const now = new Date();
+        const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); 
+        const lastMonthEnd   = new Date(now.getFullYear(), now.getMonth(), 0);
+
+        gAnalytics.getData(_c, {
+            "start-date" : require('dateformat')(lastMonthStart, 'yyyy-mm-dd'),
+            "end-date" : require('dateformat')(lastMonthEnd, 'yyyy-mm-dd'),
+            "metrics" : monthlyMetrics,
+            "dimensions" : monthlyDimensions,
+            "max-results" : 10,
+            "sort" : "-ga:pageviews"
+        }, (err, lastmonthdata) => {
+            const monthBefore = new Date(now.getFullYear(), now.getMonth() - 2, 1);
+            const monthBeforeEnd = new Date(now.getFullYear(), now.getMonth() - 1, 0);
+
+            gAnalytics.getData(_c, {
+                "start-date" : require('dateformat')(monthBefore, 'yyyy-mm-dd'),
+                "end-date" : require('dateformat')(monthBeforeEnd, 'yyyy-mm-dd'),
+                "metrics" : monthlyMetrics,
+                "dimensions" : monthlyDimensions,
+                "max-results" : 10,
+                "sort" : "-ga:pageviews"
+            }, (err, monthbeforedata) => {
+                send({ lastmonth : lastmonthdata, monthbefore : monthbeforedata });
+            });
+        });
     }
 
     static dashboard(_c, gAnalytics, send) {
@@ -202,6 +235,78 @@ class StatsBeautifier {
             total : data.totalsForAllResults["rt:activeUsers"]
         }
     }
+
+    static lastMonth(_c, data, sendback) {
+        const lastmonth = data.lastmonth;
+        const monthbefore = data.monthbefore;
+
+        const stats = {
+            month : new Date().getMonth() - 1,
+
+            lastmonth : {
+                session :            lastmonth.totalsForAllResults["ga:sessions"],
+                users :              lastmonth.totalsForAllResults["ga:users"],
+                pageviews :          lastmonth.totalsForAllResults["ga:pageviews"],
+                newsessions :        lastmonth.totalsForAllResults["ga:percentNewSessions"],
+                sessionsperuser :    lastmonth.totalsForAllResults["ga:sessionsPerUser"],
+                avgsessionduration : lastmonth.totalsForAllResults["ga:avgSessionDuration"]
+            },
+            monthbefore : {
+                session :            monthbefore.totalsForAllResults["ga:sessions"],
+                users :              monthbefore.totalsForAllResults["ga:users"],
+                pageviews :          monthbefore.totalsForAllResults["ga:pageviews"],
+                newsessions :        monthbefore.totalsForAllResults["ga:percentNewSessions"],
+                sessionsperuser :    monthbefore.totalsForAllResults["ga:sessionsPerUser"],
+                avgsessionduration : monthbefore.totalsForAllResults["ga:avgSessionDuration"]
+            },
+
+            toppages : []
+        };
+
+        // Get 3 top pages
+        const slugs = [];
+        for (let i = 0; i < lastmonth.rows.length && stats.toppages.length < 3; i++) {
+            let row = lastmonth.rows[i];
+            let slug = row[0];
+            let maybeParam = slug.indexOf('?');
+            if (maybeParam != -1) {
+                slug = slug.substring(0, maybeParam);
+            }
+            let split = slug.split('/');
+
+            slug = split[split.length - (!isNaN(split[split.length-1]) ? 2 : 1)];
+            if (!slugs.includes(slug)) {
+                stats.toppages.push({ 
+                    index : i, 
+                    name : slug, 
+                    sessions : row[1],
+                    users : row[2],
+                    pageviews : row[3],
+                    newsessions : row[4],
+                    sessionsperuser : row[5],
+                    avgsessionduration : row[6]
+                });
+
+                slugs.push(slug);
+            }
+        }
+                
+        const ArticleLib = require('./article');
+
+        let arti = -1;
+        const nextArticle = () => {
+            if (++arti == stats.toppages.length) {
+                return sendback(stats);
+            } 
+
+            ArticleLib.deepFetch(_c, stats.toppages[arti].name, (deeparticle) => {
+                stats.toppages[arti].article = deeparticle;
+                nextArticle();
+            });
+        };
+
+        nextArticle();
+    }
 }
 
 class GoogleAnalytics {
@@ -314,6 +419,24 @@ class GoogleAnalytics {
                             sharedcache.set({ ["analytics_realtime_" + cli._c.id] : data });
                         } else {
                             send([]);
+                        }
+                    });
+                }
+            });
+        } else if (topLevel == "lastMonth") {
+            const cachekey = 'analytics_lastmonth_' + cli._c.id;
+            sharedcache.get(cachekey, (data) => {
+                if (data && data.month == new Date().getMonth() - 1) {
+                    send(data);
+                } else {
+                    GoogleAnalyticsRequest.lastMonth(cli._c, that, data => {
+                        if (data) {
+                            StatsBeautifier.lastMonth(cli._c, data, finaldata => {
+                               send(finaldata);
+                               sharedcache.set({[cachekey] : finaldata});
+                            });
+                        } else {
+                            send({error : err, valid : false});
                         }
                     });
                 }
