@@ -307,6 +307,7 @@ class StatsBeautifier {
                     deeparticle.featuredimage = undefined;
                     deeparticle.related = undefined;
                     deeparticle.author = deeparticle.authors && EntityLib.toPresentable(deeparticle.authors[0]);
+                    deeparticle.authors = undefined;
                 }
 
                 stats.toppages[arti].article = deeparticle;
