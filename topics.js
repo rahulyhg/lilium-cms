@@ -303,6 +303,8 @@ class LMLTopics {
                         a.featuredimage = require('./cdn.js').parseOne(conf, a.featuredimage[0].sizes.thumbnailarchive && a.featuredimage[0].sizes.thumbnailarchive.url || (conf.server.url + "/uploads/" + a.featuredimage[0].url));
                         a.url = conf.server.url + "/" + topic.completeSlug + "/" + a.name;
                         a.media = undefined;
+                        a.title = a.title[0];
+                        a.subtitle = a.subtitle[0];
                     } else {
                         a.skip = true;
                     }
