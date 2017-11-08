@@ -33,11 +33,22 @@ class LiliumAPI {
         ApiEndpoints.addMethod(methodname);
     }
 
+    sendCORSHeaders(cli) {
+        cli.response.writeHead(200, {
+            "Access-Control-Allow-Origin" : cli.request.headers.origin,
+            "Access-Control-Allow-Method" : "GET, POST, OPTIONS",
+            "Access-Control-Allow-Headers" : "lmlterms,corsorigin,lmltopic,lmltoken"
+        });
+        cli.response.end();
+    }
+
 	handleApiEndpoint(cli) {
 		cli.touch('api.handleAdminEndpoint');
         cli.cors = true;
 
-        if (!cli.routeinfo.path[1]) {
+        if (cli.method == "OPTIONS") {
+            this.sendCORSHeaders(cli);
+        } else if (!cli.routeinfo.path[1]) {
 		    cli.throwHTTP(404, undefined, true);
         } else if (!ApiEndpoints[cli.method]) {
 		    cli.throwHTTP(501, undefined, true);
