@@ -1194,6 +1194,12 @@ class Article {
                     if (!err && (res.author.toString() == cli.userinfo.userid.toString() || cli.hasRight('editor'))) {
                         log('Article', 'Updating content for article ' + formData.title[0]);
                         delete formData._id;
+
+                        if (!res.usefacebooktitle) {
+                            formData.facebooktitle = formData.title[0];
+                            formData.facebooksubtitle = formData.subtitle[0];
+                        }
+
                         db.update(cli._c, 'content', {
                             _id: id
                         }, formData, (err, doc)  => { 
