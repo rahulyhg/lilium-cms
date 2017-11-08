@@ -215,7 +215,7 @@ var Handler = function () {
     this.handle = function (cli) {
         cli.touch('handler.handle');
 
-        if (cli.request.url.startsWith('/api') && cli.method == "OPTIONS") {
+        if (cli.request.url.startsWith('/api') /*&& cli.method == "OPTIONS"*/) {
             handleAPI(cli);
         } else {
             parseMethod(cli);
