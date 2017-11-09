@@ -13,8 +13,8 @@
     var currentSlug = "";
 
     var contentpages = [];
-    var contenttitles = [];
-    var contentsubtitles = [];
+    var contenttitle = [];
+    var contentsubtitle = [];
 
     var contentPageIndex = 0;
 
@@ -36,9 +36,22 @@
                 originalTitle = content.title[0];
                 currentSlug   = content.name;
                 selectedTopic = content.topic;
-                contentpages  = content.content;
-                contenttitle  = content.title;
-                contentsubtitle = content.subtitle;
+
+                if (window._restoredClip) {
+                    contentpages    = window._restoredClip.content;
+                    contenttitle    = window._restoredClip.titles;
+                    contentsubtitle = window._restoredClip.subtitles;
+
+                    delete window._restoredClip;
+
+                    liliumcms.modals.get("restored-from-clip").cast();
+                    liliumcms.localclip.dismiss();
+                } else {
+                    contentpages  = content.content;
+                    contenttitle  = content.title;
+                    contentsubtitle = content.subtitle;
+                }
+
                 lastSave = content.content;
 
                 d.q("[name=contenteditor]").get().id = "contenteditor";
@@ -133,12 +146,12 @@
         });
     }
 
-    var localSave = function() {
+    var localSave = function(ignoreEmpty) {
         contentpages[contentPageIndex] = CKEDITOR.instances.contenteditor.getData();
         contenttitle[contentPageIndex] = d.id("contenttitle").value;
         contentsubtitle[contentPageIndex] = d.id("contentsubtitle").value;
 
-        if (!contenttitle[contenttitle.length-1] && !contentsubtitle[contentsubtitle.length-1] && !contentpages[contentpages.length-1]) {
+        if (!ignoreEmpty && !contenttitle[contenttitle.length-1] && !contentsubtitle[contentsubtitle.length-1] && !contentpages[contentpages.length-1]) {
             contentpages.pop();
             contenttitle.pop();
             contentsubtitle.pop();
@@ -204,13 +217,25 @@
         switchContentTab(0, true);
     };
 
+    var snapToLocalClipboard = function() {
+        localSave(true);
+        
+        var clip = {
+            titles : contenttitle,
+            subtitles : contentsubtitle,
+            content : contentpages
+        };
+
+        liliumcms.localclip.push(contentid, JSON.stringify(clip), 'content', contenttitle[0]);
+    };
+
     var buildReport = function(data) {
         var g = function(elem, str) { document.getElementById("prep-" + elem).textContent = str; };
                 
         g('title', data.article.title);
         g('subtitle', data.article.subtitle);
         g('adsinserted', data.article.score.ads);
-        g('sponsored', data.article.isSponsored || "not ");
+        g('sponsored', data.article.isSponsored ? "" : "not ");
         g('pagecount', data.article.score.pages ? ("Paginated on " + data.article.score.pages + " pages") : "Not paginated");
         g('paragcount', data.article.score.paragraphs);
         g('imagescount', data.article.score.images);
@@ -564,45 +589,13 @@
         }, 200);
     };
 
-    var autoSave = function() {
-        return;
-            var currentSave = $('form').serialize();
-
-            // Save only if content has changed
-            if (lastSave != currentSave && $('.article_base_title').val().trim() != "" && $('textarea[name="content"]').val() != "") {
-                var tempSave = currentSave + '&_id=' + _id + '&contentid=' + contentid;
-
-                localSave();
-                tempsave.title = contenttitle;
-                tempsave.subtitle = contentsubtitle;
-                tempsave.content = contentpages;
-
-                $.post('{=config.default.server.url}/admin/article/autosave', tempSave, function(data) {
-                    lastSave = CKEDITOR.instances.contenteditor.getData();
-
-                    if (data.success && data._id) {
-                        _id = data._id;
-                    }
-
-                    if ($('.cke_bottom .status').size() == 0) {
-                        $('.cke_bottom').append('<span class="status">Last saved : <time class="date timeago" datetime="' + new Date().toString() + '">' + new Date() + '</time></span>');
-                    }
-
-                    $(".cke_bottom time.timeago").timeago("update", new Date());
-
-                });
-            } else {
-                console.log("Skipping auto-save");
-            }
-    };
-
-
     $(document).ready(function() {
-        // Will be edit, new or an id
-        // Check if we can get an id
         var autoSaveInterval = setInterval(function() {
-            if (!isPublished) { autoSave(); }
-        }, 60 * 1000);
+            snapToLocalClipboard();
+            if (!isPublished) { 
+                saveCurrentArticle(undefined, true); 
+            }
+        }, 45 * 1000);
 
         liliumcms.pageloader.bindUnload(function() {
             clearInterval(autoSaveInterval);
@@ -619,7 +612,7 @@
             movingBlockElem = undefined; 
         });
 
-        var saveCurrentArticle = function(cb) {
+        var saveCurrentArticle = function(cb, silent) {
             document.dispatchEvent(new CustomEvent("articleWillSave"));
             localSave();
 
@@ -655,7 +648,7 @@
                     $('.cke_bottom').append('<span class="status">Last saved : <time class="date timeago" datetime="' + new Date().toString() + '">' + new Date() + '</time></span>');
                 }
 
-                liliumcms.notify({
+                !silent && liliumcms.notify({
                     title: 'Article was saved',
                     message: 'The latest modifications were successfully saved',
                     type: 'success'

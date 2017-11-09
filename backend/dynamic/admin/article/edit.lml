@@ -69,6 +69,18 @@
     </div>
 </div>
 
+<div id="restored-from-clip" class="lml-modal">
+    <div class="lml-modal-body">
+        <div id="restored-clip-title">
+            <b>Restored saved article from Local Clipboard</b>
+            <i class="fa fa-life-ring" aria-hidden="true"></i>
+        </div>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel btn-default" id="dismiss-restored-clip-modal" type="button">Awesome!</button>
+    </div>
+</div>
+
 <div id="dlg-modal-packaging-loading" class="lml-modal">
     <div class="lml-modal-body">
         <div id="modal-preparing-title">
@@ -794,6 +806,20 @@
     color: rgb(144, 148, 156);
     text-transform: uppercase;
     padding: 10px 10px 8px;
+}
+
+#restored-clip-title b {
+    text-align: center;
+    display: block;
+    font-size: 20px;
+    margin: 30px 10px 10px;
+}
+
+#restored-clip-title .fa {
+    text-align: center;
+    display: block;
+    font-size: 80px;
+    margin: 30px;
 }
 
 </style>
