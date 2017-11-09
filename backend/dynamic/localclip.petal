@@ -1,25 +1,22 @@
 <div id="localclip-overlay">
-<div id="localclip-wrapper">
-        
-<div id="localclip-dismiss">
-    <i class="fa fa-times" aria-hidden="true"></i>
-</div>
+    <div id="localclip-wrapper">
+        <div id="localclip-dismiss">
+            <i class="fa fa-times" aria-hidden="true"></i>
+        </div>
 
-<h1>Lilium clipboard</h1>
-<div>
-    <p class="description">
-        This clipboard contains <b>auto-saved data</b> that was considered important by Lilium. Ephemeral data is kept for 2 hours.
-    </p>
-</div>
+        <h1>Lilium clipboard</h1>
+        <div>
+            <p class="description">
+                This clipboard contains <b>auto-saved data</b> that was considered important by Lilium. Ephemeral data is kept for 2 hours.
+            </p>
+        </div>
 
-<div id="localclip-list">
-    
-</div>
-
-
-</div>
+        <div id="localclip-list">
+            
+        </div>
+    </div>
 </div>
 
 <style>
-@import url('https://fonts.googleapis.com/css?family=Gloria+Hallelujah');
+    @import url('https://fonts.googleapis.com/css?family=Gloria+Hallelujah');
 </style>

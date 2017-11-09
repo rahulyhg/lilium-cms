@@ -1,3 +1,4 @@
+{#config}
 var LocalClip = function() {
     var that = this;
     var store = window.localStorage;
@@ -6,10 +7,12 @@ var LocalClip = function() {
 
     var localclipshown = false;
 
-    var Clip = function(name, value, date) {
+    var Clip = function(name, value, date, type, displayname) {
         this.lastTouched = date || new Date();
         this.name = name;
         this.value = value;
+        this.displayname = displayname || name;
+        this.type = type || "text";
     }
 
     this.init = function() {
@@ -76,8 +79,8 @@ var LocalClip = function() {
         store.setItem(CACHE_KEY, JSON.stringify(clips));
     }
 
-    this.push = function(name, value) {
-        var clip = new Clip(name, value);
+    this.push = function(name, value, type, displayname) {
+        var clip = new Clip(name, value, new Date(), type, displayname);
         clips[name] = clip;
         that.save();
     }
@@ -92,23 +95,36 @@ var LocalClip = function() {
         sheet.className = "localclip-sheet";
 
         var title = document.createElement('h2');
-        title.textContent = clip.name;
+        title.textContent = clip.displayname;
 
         var moddate = document.createElement('h3');
         moddate.textContent = "Modified on " + dateFormat(clip.lastTouched, 'dd/mm/yyyy @ HH:MM');
 
-        var content = document.createElement('textarea');
-        content.dataset.name = clip.name;
-        content.className = "localclip-content";
-        content.value = clip.value;
-        content.addEventListener('change', function() {
-            clips[this.dataset.name].value = this.value;
-            that.save();
-        });
-
         sheet.appendChild(title);
         sheet.appendChild(moddate);
-        sheet.appendChild(content);
+
+        if (clip.type == "content") {
+            var restoreButton = document.createElement('button');
+            restoreButton.textContent = "Restore and reload";
+            restoreButton.className = "autosave-restore-button";
+            restoreButton.addEventListener('click', function() {
+                window._restoredClip = JSON.parse(clip.value);
+                liliumcms.pageloader.load("{=config.default.server.url}/admin/article/edit/" + clip.name);
+            });
+
+            sheet.appendChild(restoreButton);
+        } else {
+            var content = document.createElement('textarea');
+            content.dataset.name = clip.name;
+            content.className = "localclip-content";
+            content.value = clip.value;
+            content.addEventListener('change', function() {
+                clips[this.dataset.name].value = this.value;
+                that.save();
+            });
+
+            sheet.appendChild(content);
+        }
 
         return sheet;
     };

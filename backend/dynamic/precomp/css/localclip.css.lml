@@ -1,4 +1,4 @@
-
+{#config}
 #localclip-overlay {
     display: none;
 
@@ -88,4 +88,9 @@
     font-size: 32px;
     color: #F99;
     cursor: pointer;
+}
+
+.autosave-restore-button {
+    display: block;
+    margin: 20px auto;
 }
