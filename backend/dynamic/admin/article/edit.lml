@@ -166,6 +166,11 @@
             <div id="facebook-package-subtitle" contenteditable></div>
             <div id="facebook-package-site"></div>
         </div>
+
+        <div id="facebook-package-toggle-wrapper">
+            <input type="checkbox" id="facebook-package-toggle" name="customfacebooktitle" />
+            <label for="customfacebooktitle">Use Facebook custom title</label>
+        </div>
     </div>
 
     <div>
@@ -821,5 +826,10 @@
     font-size: 80px;
     margin: 30px;
 }
+
+#facebook-package-toggle-wrapper {
+    text-align: center;
+}
+
 
 </style>

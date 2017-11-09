@@ -11,6 +11,7 @@
     var isPublished = false;
     var originalTitle = "";    
     var currentSlug = "";
+    var customfacebooktitle = false;
 
     var contentpages = [];
     var contenttitle = [];
@@ -36,6 +37,8 @@
                 originalTitle = content.title[0];
                 currentSlug   = content.name;
                 selectedTopic = content.topic;
+
+                customfacebooktitle = content.customfacebooktitle;
 
                 if (window._restoredClip) {
                     contentpages    = window._restoredClip.content;
@@ -274,13 +277,10 @@
         }, 100);
     }
 
-    var enablePublishButton = function() {
-    };
-
     var updateFacebookPreview = function(article) {
         document.getElementById("facebook-package-image").src = document.getElementById('featured-image-tag').src;
-        document.getElementById('facebook-package-title').textContent = article.facebooktitle || article.title[0];
-        document.getElementById('facebook-package-subtitle').textContent = article.facebooksubtitle || article.subtitle[0];
+        document.getElementById('facebook-package-title').textContent = customfacebooktitle ? article.facebooktitle : article.title[0];
+        document.getElementById('facebook-package-subtitle').textContent = customfacebooktitle ? article.facebooksubtitle : article.subtitle[0];
         document.getElementById('facebook-package-site').textContent = "{=config.default.website.sitetitle}";
     };
 
@@ -795,6 +795,12 @@
 
             // Topic
             var ts = d.id('topic-selection');
+
+            if (customfacebooktitle) {
+                document.querySelector('#facebook-package-toggle-wrapper .lmlbeautifiedcheckbox').classList.add("checked");
+            } else {
+                document.querySelector('#facebook-package-toggle-wrapper .lmlbeautifiedcheckbox').classList.remove("checked");
+            }
         };      
 
         var switchToPage = function(index) {
@@ -1054,8 +1060,16 @@
                 delete tempForm.values.contentsubtitle;
                 delete tempForm.values.contentpages;
 
-                tempForm.values.facebooktitle = document.getElementById("facebook-package-title").textContent;
-                tempForm.values.facebooksubtitle = document.getElementById('facebook-package-subtitle').textContent;
+                customfacebooktitle = !!document.querySelector('#facebook-package-toggle-wrapper .checked');
+                tempForm.values.customfacebooktitle = customfacebooktitle;
+                
+                if (customfacebooktitle) {
+                    tempForm.values.facebooktitle = document.getElementById("facebook-package-title").textContent;
+                    tempForm.values.facebooksubtitle = document.getElementById('facebook-package-subtitle').textContent;
+                } else {
+                    tempForm.values.facebooktitle = tempForm.values.title[0];
+                    tempForm.values.facebooksubtitle = tempForm.values.subtitle[0];
+                }
     
                 liliumcms.modals.get("article-packaging").dismiss();
 
@@ -1105,7 +1119,6 @@
 
         $('#btn-dismiss-and-save').on('click', function(e) {
             publishCurrentArticle(e, true);
-            enablePublishButton();
         });
 
         $('#confirm-unpublish button.btn-danger').on('click', function() {
