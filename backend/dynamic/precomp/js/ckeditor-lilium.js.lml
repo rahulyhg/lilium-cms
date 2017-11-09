@@ -128,6 +128,7 @@ var CKEditor = function() {
             this.document.appendStyleSheet('/compiled/admin.css');
             ckBindEmbedPaste(ev);
 
+            /*
             var blurLastSaved = ev.editor.getData();
             ev.editor.on('blur', function(e) {
                 var data = e.editor.getData();
@@ -136,6 +137,7 @@ var CKEditor = function() {
                     liliumcms.localclip.push("Autosave @ " + dateFormat(new Date(), 'HH:MM:ss'), data);
                 }
             });
+            */
 
             ev.editor.document.on('copy', function(e) {
                 liliumcms.localclip.handleCopy(e, this.$);
