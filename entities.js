@@ -1069,6 +1069,7 @@ class Entities {
         } else if (levels[0] == "simple") {
             var simpProj = {
                 displayname : 1,
+                revoked : 1,
                 _id : 1
             };
         
@@ -1080,6 +1081,11 @@ class Entities {
 
             db.find(_c.default(), 'entities', match, [], function(err, cur) {
                 cur.sort({displayname : 1}).toArray(function(err, arr) {
+                    arr.forEach(x => {
+                        if (x.revoked) {
+                            x.displayname += " (inactive)";
+                        }
+                    });
                     callback(arr);
                 });
             }, simpProj);
