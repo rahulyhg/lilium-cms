@@ -1081,12 +1081,17 @@ class Entities {
 
             db.find(_c.default(), 'entities', match, [], function(err, cur) {
                 cur.sort({displayname : 1}).toArray(function(err, arr) {
+                    let revoked = [];
+                    let active = [];
                     arr.forEach(x => {
                         if (x.revoked) {
                             x.displayname += " (inactive)";
+                            revoked.push(x);
+                        } else {
+                            active.push(x);
                         }
                     });
-                    callback(arr);
+                    callback([...active, ...revoked]);
                 });
             }, simpProj);
         } else if (levels[0] == 'query') {
