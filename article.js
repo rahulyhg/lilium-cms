@@ -1994,17 +1994,26 @@ class Article {
 
                     filename += "/" + pageIndex;
                     deepArticle.content = pages[pageIndex - 1];
+                    deepArticle.headline = titles[0];
+                    deepArticle.headsub = subtitles[0]
                     deepArticle.title = titles[pageIndex - 1];
                     deepArticle.subtitle = subtitles[pageIndex - 1];
                     deepArticle.isPaginated = true;
                     deepArticle.totalPages = pages.length;
                     deepArticle.pageIndex = pageIndex;
 
+                    if (deepArticle.title.indexOf(deepArticle.headline) != -1) {
+                        deepArticle.similartitle = true;
+                    }
+
+                    hooks.fire('paginated_article_generated_' + _c.uid, { article : deepArticle, page : pageIndex });
+
                     deepArticle.url += "/" + pageIndex;
 
                     if (pageIndex != 1) {
                         deepArticle.featuredimage = [];
                         deepArticle.featuredimageartist = undefined;
+                        deepArticle.imagecreditname = undefined;
                     }
 
                     log('Article', "Generated page " + pageIndex + " of paginated article " + deepArticle.title[0]);
