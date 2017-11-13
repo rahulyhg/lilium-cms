@@ -1,43 +1,48 @@
 {#config;forms;tableBuilder}
-<lml-dom v="0.8"></lml-dom>
-		<main class="entities-main">
-            <h1>List of articles<a class='fab' href="{=config.default.server.url}/admin/article/new">+</a></h1>
-			{=tableBuilder.render("article")}
-		</main>
+{*content.lastEdited}
+<lml-dom v="1.0"></lml-dom>
 
-		<lml-tabletemplate id="imgArticle" data-classes="table-article-image nomobile">
-            <div class="imgArticleWrapper">
-			    <lml-tobject data-nodetype="img" data-key="media"></lml-tobject>
-		    </div>
-        </lml-tabletemplate>
+<main class="entities-main">
+    <lml-generate call="makeContinueWorkingOn"></lml-generate>
 
-		<lml-tabletemplate id="table-article-title" data-classes="table-article-title">
-			<lml-tobject data-nodetype="h4" data-key="title"></lml-tobject>
-			<lml-tobject data-nodetype="h6" data-key="subtitle" data-classes="nomobile"></lml-tobject>
-		</lml-tabletemplate>
+    <h1>All posts<a class='fab' href="{=config.default.server.url}/admin/article/new">+</a></h1>
+    {=tableBuilder.render("article")}
+</main>
 
-        <lml-tabletemplate id="table-article-date" data-classes="nomobile">
-            <lml-tobject data-nodetype="div" data-key="date" data-formatter="lmldate"></lml-tobject>
-        </lml-tabletemplate>
-    
-		<lml-tabletemplate id="table-article-status" data-classes="first-cap nomobile">
-			<lml-tobject data-nodetype="div" data-key="status"></lml-tobject>
-		</lml-tabletemplate>
+<lml-tabletemplate id="imgArticle" data-classes="table-article-image nomobile">
+    <div class="imgArticleWrapper">
+        <lml-tobject data-nodetype="img" data-key="media"></lml-tobject>
+    </div>
+</lml-tabletemplate>
 
-        <lml-tabletemplate id="table-article-actions">
-            <lml-tobject data-nodetype="a"
-                         data-href="{=config.default.server.url}/admin/article/edit/"
-                     data-key="_id">
-                    Edit
-            </lml-tobject>
-            <lml-tobject data-nodetype="a"
-                         data-href="{=config.default.server.url}/"
-                         data-filter="isViewable"
-                         data-key="name"
-                         data-target="_blank">
-                    View
-            </lml-tobject>
-    	</lml-tabletemplate>
+<lml-tabletemplate id="table-article-title" data-classes="table-article-title">
+    <lml-tobject data-nodetype="h4" data-key="title"></lml-tobject>
+    <lml-tobject data-nodetype="h6" data-key="subtitle" data-classes="nomobile"></lml-tobject>
+</lml-tabletemplate>
+
+<lml-tabletemplate id="table-article-date" data-classes="nomobile">
+    <lml-tobject data-nodetype="div" data-key="date" data-formatter="lmldate"></lml-tobject>
+</lml-tabletemplate>
+
+<lml-tabletemplate id="table-article-status" data-classes="first-cap nomobile">
+    <lml-tobject data-nodetype="div" data-key="status"></lml-tobject>
+</lml-tabletemplate>
+
+<lml-tabletemplate id="table-article-actions">
+    <lml-tobject data-nodetype="a"
+                 data-href="{=config.default.server.url}/admin/article/edit/"
+             data-key="_id">
+            Edit
+    </lml-tobject>
+    <lml-tobject data-nodetype="a"
+                 data-href="{=config.default.server.url}/"
+                 data-filter="isViewable"
+                 data-key="name"
+                 data-target="_blank">
+            View
+    </lml-tobject>
+</lml-tabletemplate>
+
 <script>
     var isViewable = function (){
         return (this.title !=='' && this.status == 'published') && window.innerWidth > 600;
@@ -48,9 +53,112 @@
         td.classList.add('nomobile');
         td.textContent = writer ? writer.displayname : "[Inactive author]";
     };
+
+
+var makeSingleContinue = function(latest) {
+    var wrap = d.make({ class : "continue-single", node : "a" });
+    wrap.attr('href', '{=config.default.server.url}/admin/article/edit/' + latest._id);
+
+    if (latest.fullmedia) {
+        d.make({
+            node : "img",
+            attr : { src : latest.fullmedia },
+            class : "continue-single-image",
+            parent : wrap
+        });
+    } else {
+        d.make({
+            class : "continue-single-noimage",
+            parent : wrap
+        });
+    }
+
+    d.make({ text : latest.title[0], class : "continue-single-title", parent : wrap, node : "span", parent : wrap })
+    // d.make({ text : latest.subtitle[0], class : "continue-single-subtitle", parent : wrap, node : "span" , parent : wrap})
+    d.make({ text : latest.status, class : "continue-single-status continue-single-status-" + latest.status, node : "span", parent : wrap })
+
+    return wrap;
+}
+
+var makeContinueWorkingOn = function(ldContext) {
+    var wrapper = d.make({ id : "continue-working-on" });
+
+    var latests = ldContext.livevars.content.lastEdited;
+    if (!latests) {
+        return wrapper;
+    }
+
+    wrapper.born(d.make({ node : "h1", text : "Continue working on" }));
+    var list = d.make({ id : "continue-working-on-list", parent : wrapper });
+    for (var i = 0; i < latests.length; i++) {
+        list.born(makeSingleContinue(latests[i]));
+    }
+
+    return wrapper.get();
+}
+
 </script>
 <style>
 table.lmlfullwidthtable tbody tr td.table-article-image {
     padding: 2px 4px;
 }
+
+#continue-working-on-list {
+    padding: 5px;
+    background: #F3F3F3;
+    border-bottom: 1px solid #DDD;
+}
+
+.continue-single {
+    width: 18%;
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+    margin: 5px;
+
+    background-color: #FFF;
+}
+
+.continue-single-image {
+    width: 100%;
+    height: auto;
+}
+
+.continue-single-title {
+    display: block;
+    padding: 8px;
+    font-size: 16px;
+
+    color: #111;
+}
+
+.continue-single-noimage {
+    border-bottom: 1px solid #DDD;
+    height: 130px;
+}
+
+.continue-single-noimage::before {
+    content: 'No image';
+    color: #CCC;
+    font-size: 26px;
+    text-align: center;
+    display: block;
+    padding-top: 45px;
+}
+
+.continue-single-status {
+    display: inline-block;
+    margin: 0px 10px 10px;
+    background-color: #333;
+    color: #FFF;
+    text-transform: uppercase;
+    font-size: 13px;
+    padding: 1px 5px;
+    border-radius: 4px;
+}
+
+.continue-single-status.continue-single-status-draft     { background-color: #0e74a7; }
+.continue-single-status.continue-single-status-published { background-color: #571bc7; }
+.continue-single-status.continue-single-status-deleted   { background-color: #bb4f1a; }
 </style>

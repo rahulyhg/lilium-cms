@@ -1688,52 +1688,37 @@ class Article {
                 return callback({size:0,data:[],code:403});
             }
 
-            db.aggregate(cli._c, 'autosave', [{
-                $lookup: {
-                    from: 'content',
-                    localField: 'contentid',
-                    foreignField: '_id',
-                    as: 'contentid'
+            db.aggregate(cli._c, 'content', [{
+                $match : { author : db.mongoID(cli.userinfo.userid), updated : {$exists : 1}, status : {$ne : "destroyed"} }
+            }, {
+                $sort : { updated : -1 }
+            }, {
+                $limit : 5
+            }, {
+                $project : {
+                    title : 1,
+                    subtitle : 1,
+                    media : 1,
+                    status : 1,
+                    date : 1,
+                    createdOn : 1
                 }
             }, {
-                $unwind: {
-                    path: '$contentid',
-                    preserveNullAndEmptyArrays: true
+                $lookup : {
+                    localField : "media",
+                    from : "uploads",
+                    foreignField : "_id",
+                    as : "fullmedia"
                 }
-            }, {
-                $project: {
-                    title: 1,
-                    media: 1,
-                    updated: 1,
-                    contentid: 1,
-                    author: 1,
-                    newer: {
-                        $cmp: ['$contentid.updated', '$updated']
+            }], (posts) => {
+                posts.forEach(x => {
+                    if (x.fullmedia[0]) {
+                        x.fullmedia = CDN.parseOne(cli._c, x.fullmedia[0].sizes.facebook.url);
+                    } else {
+                        x.fullmedia = undefined;
                     }
-                }
-            }, {
-                $match: {
-                    $or: [{
-                        contentid: null
-                    }, {
-                        $and: [{
-                            author: db.mongoID(cli.userinfo.userid)
-                        }, {
-                            newer: {
-                                $lt: 0
-                            }
-                        }]
-                    }]
-                }
-            }, {
-                $sort: {
-                    date: -1
-                }
-            }, {
-                $limit: 5
-            }], (res)  => {
-                callback(res);
-
+                }); 
+                callback(posts);
             });
         } else {
             if (!cli.hasRight("list-articles")) {
