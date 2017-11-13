@@ -206,7 +206,6 @@ const css = `<style>
     height: 280px;
     width: 100%;
     object-fit: cover;
-    width: auto;
     object-position: center;
 }
 
