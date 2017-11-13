@@ -25,7 +25,22 @@ class Amp {
             return cli.throwHTTP(404, undefined, true);
         }
 
-        let articleContent = article.content;
+        let articleContent = article.content.shift();
+
+        article.content.forEach((page, index) => {
+            if (article.title[index+1].indexOf(article.title[0]) == -1) {
+                articleContent += `<h3 class="page-sep">${article.title[index+1]}</h3>`
+            }
+
+            if (article.subtitle[index+1].indexOf(article.subtitle[0]) == -1) {
+                articleContent += `<h4 class="page-sep-sub">${article.subtitle[index+1]}</h4>`
+            }
+
+            articleContent += page;
+        });
+
+        article.title = article.title[0];
+        article.subtitle = article.subtitle[0];
 
         log('AMP', 'Preparing for parsing content');
         /* Modify content according to AMP guidelines */
@@ -98,8 +113,8 @@ class Amp {
                 ampimg.setAttribute('src', cdn.parseOne(cli._c, source));
             }
 
-            ampimg.setAttribute('width', x.width || 640);
-            ampimg.setAttribute('height', x.height || 640);
+            ampimg.setAttribute('width', x.dataset.width || 640);
+            ampimg.setAttribute('height', x.dataset.height || 640);
             ampimg.setAttribute('layout', "responsive");
 
             try {
