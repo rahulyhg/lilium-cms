@@ -1936,6 +1936,9 @@ class Article {
                 var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
                 var filename = deepArticle.topicslug.substring(1) + deepArticle.name;
 
+                deepArticle.headline = titles[0];
+                deepArticle.headsub = subtitles[0]
+
                 if (deepArticle.content.length > 1) {
                     var pages = deepArticle.content;
                     var titles = deepArticle.title;
@@ -1979,8 +1982,6 @@ class Article {
 
                     filename += "/" + pageIndex;
                     deepArticle.content = pages[pageIndex - 1];
-                    deepArticle.headline = titles[0];
-                    deepArticle.headsub = subtitles[0]
                     deepArticle.title = titles[pageIndex - 1];
                     deepArticle.subtitle = subtitles[pageIndex - 1];
                     deepArticle.isPaginated = true;
