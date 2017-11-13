@@ -202,7 +202,10 @@ window.sockUpdateDashboard = function(data) {
 .dashboard-ga-toppage-image-wrapper img {
     object-fit: cover;
     width: 100%;
-    margin-bottom: 15px
+}
+
+.dashboard-ga-toppage-author {
+    padding: 12px 0px;
 }
 
 .dashboard-ga-total-unique {
