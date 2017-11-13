@@ -84,7 +84,7 @@ var makeContinueWorkingOn = function(ldContext) {
     var wrapper = d.make({ id : "continue-working-on" });
 
     var latests = ldContext.livevars.content.lastEdited;
-    if (!latests) {
+    if (!latests || latests.length == 0) {
         return wrapper;
     }
 
