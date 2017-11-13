@@ -1936,8 +1936,8 @@ class Article {
                 var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
                 var filename = deepArticle.topicslug.substring(1) + deepArticle.name;
 
-                deepArticle.headline = titles[0];
-                deepArticle.headsub = subtitles[0]
+                deepArticle.headline = deepArticle.title[0];
+                deepArticle.headsub = deepArticle.subtitle[0]
 
                 if (deepArticle.content.length > 1) {
                     var pages = deepArticle.content;
