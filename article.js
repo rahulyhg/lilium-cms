@@ -450,6 +450,11 @@ class Article {
         
         log('Content', "Removing alias " + alias + " from article " + article.title[0] + " at index " + index);
         db.update(conf, 'content', {_id : article._id}, {aliases : aliases}, cb || noop);
+
+        // Delete cached file is it exists
+        db.findUnique(conf, 'topics', { _id : article.topic }, (err, topic) => {
+            topic && fileserver.deleteFile(conf.server.html + "/" + topic.completeSlug + "/" + alias + ".html", () => {});
+        });
     };
 
     maybeRemoveAlias(cli) {
