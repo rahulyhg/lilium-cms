@@ -198,7 +198,9 @@
 
         tab.get().dataset.index = i;
         tab.bind('click', function(ev) {
-            switchContentTab(ev.target.dataset.index);
+            if (ev.target.dataset.index != contentPageIndex) {
+                switchContentTab(ev.target.dataset.index);
+            }
         });
     }
 
