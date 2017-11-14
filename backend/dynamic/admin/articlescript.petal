@@ -181,9 +181,9 @@
         var ct = d.id("content-tabs");
         makeContentTab(ct, contentpages.length);
         ct.born(d.q(".content-tab.content-tab-add"));
-        contentpages.push("");
-        contenttitle.push(contenttitle[0] + " - Page " + contentpages.length);
-        contentsubtitle.push(contentsubtitle[0]);
+        contentpages.push(" ");
+        contenttitle.push("");
+        contentsubtitle.push("");
 
         localSave();
         switchContentTab(contentpages.length - 1);
