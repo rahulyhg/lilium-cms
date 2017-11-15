@@ -682,7 +682,7 @@
             liliumcms.previewer.cast(contenttitle[0]);
             var formdat = liliumcms.lmldom.getFormData().post_create.values; 
             formdat.id = contentid;
-            formdat.topic = currentTopic._id;
+            formdat.topic = currentTopic && currentTopic._id;
             formdat.media = d.id('mediapicker').value;
             buildContentFromPackage();
 

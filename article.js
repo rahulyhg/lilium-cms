@@ -1055,7 +1055,7 @@ class Article {
                                                 var extra = {};
                                                 extra.ctx = "article";
                                                 extra.article = deepArticle;
-                                                extra.topic = deepArticle.topic;
+                                                extra.topic = deepArticle.topic || { displayname : "No topic selected" };
                                                 extra.preview = true;
 
                                                 var content = deepArticle.content.shift();
