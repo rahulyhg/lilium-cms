@@ -882,6 +882,10 @@
                             box = ( d.make({ class : "page-block page-ad-block", text : "This can be moved around" }).get() );
                             break;
 
+                        case "IFRAME":
+                            box = d.make({ class : "page-block page-iframe-block", text : "Embed" }).get();
+                            break;
+
                         case "LML-RELATED":
                             box = ( d.make({ class : "page-block page-related-block", text : "This can be moved around" }).get() );
                             break;
@@ -897,6 +901,8 @@
                         case 'BLOCKQUOTE':
                             if (tag.classList.contains('instagram-media')) {
                                 box = ( d.make({ class : "page-block page-instaembed-block", text : "Using script embed" }).get() );
+                            if (tag.classList.contains('twitter')) {
+                                box = ( d.make({ class : "page-block page-twitterembed-block", text : "Tweet, using blockquote" }).get() );
                             } else {
                                 box = ( d.make({ class : "page-block page-quote-block", text : tag.textContent.substring(0, 50) + "..." }).get() );
                             }

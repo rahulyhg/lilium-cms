@@ -360,6 +360,16 @@ class Article {
 
                 const page = pages[index];
                 const window = new jsdom.JSDOM(page).window;
+                const body = window.document.body;
+
+                Array.prototype.forEach.call(window.document.getElementsByTagName('iframe'), x => {
+                    if (x.parentElement != body) {
+                        let toRemove = x.parentElement;
+                        body.insertBefore(x, x.parentElement);
+
+                        toRemove.remove();
+                    }
+                });
 
                 const paragraphs = Array.prototype.filter.call(
                     window.document.querySelectorAll('body > p'), 
