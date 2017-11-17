@@ -16,6 +16,7 @@ const log = require('./log.js');
 const feed = require('./feed.js');
 const CDN = require('./cdn.js');
 const noop = require('./noop.js');
+const adslib = require('./ads');
 
 const publishedNotificationTitles = [
     "You got this!",
@@ -380,20 +381,15 @@ class Article {
                     x.id = "article-p-" + i
                 });
 
-                pages[index] = window.document.body.innerHTML;
-
                 this.proofread(paragraphs, lang, report => {
                     reports.push(report);
 
                     if (article.hasads || article.isSponsored || article.nsfw) {
-                        contents.push(pages[index]);
-                        nextpage();
-                    } else {
-                        this.insertAds(cli._c, article._id, pages[index], content => {
-                            contents.push(content);
-                            nextpage();
-                        });
+                        this.insertAds(cli._c, article, window);
                     }
+
+                    contents.push(window.document.body.innerHTML);
+                    nextpage();
                 });
             };
 
@@ -702,23 +698,8 @@ class Article {
         });
     };
 
-    insertAds(_c, articleid, content, done, force) {
-        var asyncHooks = hooks.getHooksFor('insert_ads_' + _c.uid);
-        var aKeys = Object.keys(asyncHooks);
-        var aIndex = -1;
-
-        var nextHook = (newctn)  => {
-            content = newctn || content;
-
-            if (++aIndex == aKeys.length) {
-                done(content);
-            } else {
-                asyncHooks[aKeys[aIndex]].cb({
-                    _c, content, done : nextHook
-                }, 'insert_ads_' + _c.uid);
-            }
-        };
-        nextHook(content);
+    insertAds(_c, article, window) {
+        return adslib.detectPatternType(_c.id, window.document.body.children).applyPattern(window.document);
     };
 
     updateActionStats(_c, deepArticle, callback, reduce) {
