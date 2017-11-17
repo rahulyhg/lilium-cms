@@ -22,6 +22,7 @@ var mail = require('./mail.js');
 var sharedcache = require('./sharedcache.js');
 var sitemap = require('./sitemap.js');
 var analytics = require('./analytics.js');
+var adslib = require('./ads');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -333,6 +334,7 @@ var SiteInitializer = function (conf, siteobj) {
         hooks.fire('site_will_initialize', conf);
         endpoints.addSite(conf.id);
         analytics.addSite(conf);
+        adslib.registerSite(conf.id);
 
         loadHTMLStructure(function () {
             loadStaticSymlinks(function () {
