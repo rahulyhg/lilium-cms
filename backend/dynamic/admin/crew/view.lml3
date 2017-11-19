@@ -373,8 +373,8 @@ const preload = (context, done) => {
                     class : "highlight-image"
                 });
 
-                d.make({ text : posts[i].title, class : "hightlight-title", parent : hlc });
-                d.make({ text : posts[i].subtitle, class : "hightlight-subtitle", parent : hlc });
+                d.make({ text : posts[i].title[0], class : "hightlight-title", parent : hlc });
+                d.make({ text : posts[i].subtitle[0], class : "hightlight-subtitle", parent : hlc });
                 d.make({ text : "Published on " + posts[i].site, class : "hightlight-site", parent : hlc });
             }
 
