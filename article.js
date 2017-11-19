@@ -384,7 +384,7 @@ class Article {
                 this.proofread(paragraphs, lang, report => {
                     reports.push(report);
 
-                    if (article.hasads || article.isSponsored || article.nsfw) {
+                    if (!article.hasads && !article.isSponsored && !article.nsfw) {
                         this.insertAds(cli._c, article, window);
                     }
 
