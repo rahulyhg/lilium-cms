@@ -388,7 +388,6 @@ class Article {
 
                     if (!article.isSponsored && !article.nsfw) {
                         const pattern = this.insertAds(cli._c, article, window);
-                        console.log(pattern && pattern.name);
                     }
 
                     contents.push(window.document.body.innerHTML);
