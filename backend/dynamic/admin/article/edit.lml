@@ -5,7 +5,7 @@
 {*topics.simple}
 {%../articlescript}
 
-<h1>Edit a post</h1>
+<h1>Redaction</h1>
 <div id="content-tabs"></div>
 {=forms.render('post_create',"edit","content/?")}
 
