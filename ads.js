@@ -10,12 +10,13 @@ class AdPatterns {
     }
  
     // List of nodes
-    detect(nodes) {
-        return this.detectcb(nodes);
+    detect(window) {
+        return this.detectcb(window.document.body, window.document.body.children);
     }
 
     applyPattern(window) {
-        return this.application(window);
+        this.application(window);
+        return this;
     }
 }
 
@@ -52,6 +53,7 @@ class AdsLib {
             }
 
             index = i;
+            return false;
         })
 
         return _patterns[siteid][index];

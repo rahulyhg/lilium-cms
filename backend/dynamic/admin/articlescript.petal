@@ -901,7 +901,7 @@
                         case 'BLOCKQUOTE':
                             if (tag.classList.contains('instagram-media')) {
                                 box = ( d.make({ class : "page-block page-instaembed-block", text : "Using script embed" }).get() );
-                            if (tag.classList.contains('twitter')) {
+                            } else if (tag.classList.contains('twitter')) {
                                 box = ( d.make({ class : "page-block page-twitterembed-block", text : "Tweet, using blockquote" }).get() );
                             } else {
                                 box = ( d.make({ class : "page-block page-quote-block", text : tag.textContent.substring(0, 50) + "..." }).get() );

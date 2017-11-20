@@ -386,8 +386,9 @@ class Article {
                 this.proofread(paragraphs, lang, report => {
                     reports.push(report);
 
-                    if (!article.hasads && !article.isSponsored && !article.nsfw) {
-                        this.insertAds(cli._c, article, window);
+                    if (!article.isSponsored && !article.nsfw) {
+                        const pattern = this.insertAds(cli._c, article, window);
+                        console.log(pattern && pattern.name);
                     }
 
                     contents.push(window.document.body.innerHTML);
@@ -701,7 +702,8 @@ class Article {
     };
 
     insertAds(_c, article, window) {
-        return adslib.detectPatternType(_c.id, window.document.body.children).applyPattern(window.document);
+        Array.prototype.forEach.call(window.document.body.querySelectorAll('ad'), x => x.remove());
+        return adslib.detectPatternType(_c.id, window).applyPattern(window);
     };
 
     updateActionStats(_c, deepArticle, callback, reduce) {
