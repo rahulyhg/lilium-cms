@@ -12,6 +12,7 @@ const dateFormat = require('dateformat');
 const dir = require('node-dir');
 const readdirp = require('readdirp');
 const defaultCT = 'text/html; charset=utf-8';
+const glob = require('glob');
 
 class FileServer {
     workDir  () {
@@ -184,6 +185,27 @@ class FileServer {
 
     deleteFile  (path, cb) {
         fs.unlink(path, cb);
+    }
+
+    deleteOccur(filter, cb, force) {
+        glob(filter, {}, (err, files) => {
+            log('FileServer', "Deleting occur of " + filter + " resulting in " + files.length + " files", 'info');
+            if (files.length > 80 && !force) {
+                log('FileServer', "Refused to delete more than 80 files", "warn");
+                return cb && cb();
+            }
+
+            let i = -1;
+            const nextFile = () => {
+                if (++i == files.length) {
+                    return cb && cb();
+                }
+
+                fs.unlink(files[i], nextFile);
+            };
+
+            nextFile();
+        });
     }
 
     createDirIfNotExists  (fullpath, callback, abs) {

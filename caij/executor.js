@@ -282,7 +282,7 @@ class RunningTask {
                 .skip(stats.skip)
                 .next(
             (err, topic) => {
-                 if (err) {
+                if (err) {
                     log('RunningTask', 'Database error in task cacheTopic : ' + err);
                     sendback();
                 } else if (topic) {
