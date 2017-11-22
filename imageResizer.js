@@ -45,19 +45,22 @@ var ImageResizer = function () {
                 var resizedEndName = "_" + (width||"rel") + "x" + (height||"rel") + "." + extension
                 var resizedFilename = currentFilename + resizedEndName;
 
-                var queue = gm(buffer, currentFilename)
-                .resize(width, height, "^")
-                .strip()
-                .gravity('Center');
+                var queue = gm(buffer, currentFilename);
 
-                if (extension == "jpg" || extension == "jpeg") {
-                    queue.quality(50);
-                } else if (extension == "png") {
-                    queue.quality(90).colors(254);
-                }
+                if (extension != "gif") {
+                    queue = queue.resize(width, height, "^")
+                    .strip()
+                    .gravity('Center');
 
-                if (width && height) {
-                    queue.crop(width, height, '!')
+                    if (extension == "jpg" || extension == "jpeg") {
+                        queue.quality(50);
+                    } else if (extension == "png") {
+                        queue.quality(90).colors(254);
+                    }
+
+                    if (width && height) {
+                        queue.crop(width, height, '!')
+                    }
                 }
 
                 queue.write(resizedFilename, function (err) {
