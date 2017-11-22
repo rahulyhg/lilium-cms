@@ -1,2 +1,254 @@
+{#config}
+
 <lml-dom v="1.0"></lml-dom>
 <h1>Raw editing</h1>
+{*content.{?1}} 
+{*entities.simple}
+{*topics.treename}
+
+<div>
+    <lml-generate call="makeTitleSubtitleContent"></lml-generate>
+
+    <div id="details-wrapper">
+        <label>Author</label>
+        <lml-generate call="makeAuthorBox"></lml-generate>
+
+        <label>Status</label>
+        <select id="raw-status">
+            <option value="draft">Draft</option>
+            <option value="pending">Pending review</option>
+            <option value="published">Published</option>
+            <option value="deleted">Deleted from website</option>
+            <option value="destroyed">Destroyed (cannot be recovered)</option>
+        </select>
+
+        <label>Publication date</label>
+        <input type="datetime-local" id="raw-date" data-options="time">
+
+        <label>Topic</label>
+        <select id="raw-topic">
+        </select>
+
+        <label>Slug</label>
+        <input type="text" id="raw-slug" />
+
+        <label>Featured Image</label>
+        <div>
+            <img id="raw-media-preview" class="media_explorer_form pickable" data-hiddenfield="media">
+            <input type="hidden" id="raw-media" class="media-input" name="media" value="">
+        </div>
+    </div>
+
+    <div id="raw-actions">
+        <button id="raw-save-button" onclick="return void rawSave();">
+            <i class="fa fa-save"></i> Save raw article
+        </button>
+    </div>
+
+    <lml-generate call="rawFinalize"></lml-generate>
+</div>
+
+<div class="lml-modal" id="raw-saving-modal">
+    Saving article, please wait.
+</div>
+
+<script>
+
+var article;
+function packageIntoPayload(ldContext) {
+    var payload = {
+        title : [],
+        subtitle : [],
+        content : []
+    };
+    var pageCount = article.content.length;
+    
+    for (var i = 0; i < pageCount; i++) {
+        payload.title.push(d.id("raw-title-" + i).value);
+        payload.subtitle.push(d.id("raw-subtitle-" + i).value);
+        payload.content.push(d.id("raw-content-" + i).value);
+    }
+
+    payload.author = d.id('raw-author').value;
+    payload.date = new Date(d.id('raw-date').value);
+    payload.topic = d.id('raw-topic').value;
+    payload.status = d.id('raw-status').value;
+    payload.name = d.id('raw-slug').value;
+    payload.media = d.id('raw-media').value;
+
+    return payload;
+}
+
+function rawSave(ldContext) {
+    var modal = liliumcms.modals.get('raw-saving-modal');
+
+    modal.cast();
+    var payload = packageIntoPayload(ldContext);
+    
+    liliumcms.lmldom.post(payload, '{=config.default.server.url}/admin/article/saveraw/' + liliumcms.pageloader.lastLevel, function(resp) {
+        modal.dismiss();
+
+        if (resp && resp.modified) {
+            liliumcms.notify({
+                type : "success",
+                title : "Article saved"
+            });
+        } else {
+            liliumcms.notify({
+                type : "info",
+                title : "No changes were made",
+                message : resp && resp.err
+            });
+        }
+    });
+}
+
+function fillImage(uploadid) {
+    if (!uploadid) {
+        return;
+    }
+
+    d.id('raw-media').get().value = uploadid;
+    liliumcms.lmldom.get('{=config.default.server.url}/admin/media/getMedia/' + uploadid + "?async=false", { json : true }, function(resp) {
+        if (resp && resp.media && resp.media.sizes && resp.media.sizes.thumbnail) {
+            d.id('raw-media-preview').get().src = resp.media.sizes.thumbnail.url;
+        }
+    });
+}
+
+function rawFinalize(ldContext) {
+    document.getElementById('raw-status').value = ldContext.livevars.content[liliumcms.pageloader.lastLevel].status;
+    document.getElementById('raw-date').value = dateFormat(new Date(ldContext.livevars.content[liliumcms.pageloader.lastLevel].date), "yyyy-mm-dd'T'HH:MM");
+    document.getElementById('raw-slug').value = ldContext.livevars.content[liliumcms.pageloader.lastLevel].name;
+
+    var topics = ldContext.livevars.topics.treename;
+    var rawtopic = d.id("raw-topic");
+    for (var i = 0; i < topics.length; i++) {
+        d.make({ node : "option", text : topics[i].treename, attr : { value : topics[i]._id }, parent : rawtopic });
+    }
+    try {
+        rawtopic.get().value = ldContext.livevars.content[liliumcms.pageloader.lastLevel].topic;
+    } catch (ex) {} 
+
+    article = ldContext.livevars.content[liliumcms.pageloader.lastLevel];
+    fillImage(article.media);
+    return d.make({}).get();
+}
+
+function makeAuthorBox(ldContext) {
+    var authors = ldContext.livevars.entities.simple;
+    var selectbox = d.make({ node : "select", name : "author", id : "raw-author" });
+    for (var i = 0; i < authors.length; i++) {
+        d.make({ node : "option", text : authors[i].displayname, attr : { value : authors[i]._id }, parent : selectbox })
+    }
+
+    var elem = selectbox.get();
+    try {
+        elem.value = ldContext.livevars.content[liliumcms.pageloader.lastLevel].author[0]._id;
+    } catch (ex) {}
+
+    return elem;
+}
+
+function makeTextField(label, name, value, type) {
+    var wrap = d.make({});
+    var label = d.make({ node : "label", text : label, parent : wrap });
+    var input = d.make({ node : "input", attr : { type : type || "text", value : value }, id : name, parent : wrap })
+
+    return wrap;
+}
+
+function makeTitleSubtitleContent(ldContext) {
+    var article = ldContext.livevars.content[liliumcms.pageloader.lastLevel];
+    var pageCount = article.content.length;
+
+    var wrapper = d.make({ class : "titlecombo" });
+    for (var i = 0; i < pageCount; i++) {
+        d.make({ node : "h2", text : i == 0 ? "Landing page" : ("Page " + (i+1)), parent : wrapper });
+        wrapper.born(makeTextField("Title", "raw-title-" + i, article.title[i]));
+        wrapper.born(makeTextField("Subtitle", "raw-subtitle-" + i, article.subtitle[i]));
+
+        d.make({ node : "label", text : "Content as HTML", parent : wrapper })
+        d.make({ node : "textarea", text : article.content[i], parent : wrapper, id : "raw-content-" + i })
+    }
+
+    return wrapper.get();
+};
+
+</script>
+
+<style>
+main#lml-main {
+    background: #F3F3F3;
+}
+
+.titlecombo, #details-wrapper {
+    padding: 0px 10px;
+}
+
+#details-wrapper {
+    padding: 20px 10px;
+    margin: 20px 0;
+    border-top: 4px dashed #DDD;
+    border-bottom: 4px dashed #DDD;
+}
+
+h2 {
+    padding: 10px 0px;
+    margin-bottom: 10px;
+    font-size: 32px;
+    color: #777;
+}
+
+label {
+    display: block;
+    padding: 0px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+input[type="text"], 
+input[type="datetime-local"] {
+    margin: 0px 0px 20px;
+    background: #FFF;
+    padding: 8px 7px;
+    border: 1px solid #DDD;
+    width: 100%;
+    box-shadow: 0px 0px 2px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+textarea {
+    margin: 0px 0px 20px;
+    background: #FFF;
+    padding: 8px 7px;
+    border: 1px solid #DDD;
+    width: 100%;
+    box-shadow: 0px 0px 2px rgba(0,0,0,0.1);
+    height: 300px;
+    box-sizing: border-box;
+}
+
+select {
+    margin: 0px 0px 20px;
+    padding: 10px 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#raw-actions {
+    padding: 10px;
+}
+
+#raw-saving-modal {
+    padding: 80px 10px;
+    text-align: center;
+    font-size: 32px;
+}
+
+#raw-media-preview {
+    width: 150px;
+    height: 100px;
+}
+
+</style>
