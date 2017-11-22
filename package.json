@@ -60,6 +60,7 @@
     "facebook-js-ads-sdk": "latest",
     "franc-min": "^3.1.1",
     "fs": "latest",
+    "glob": "^7.1.2",
     "globe": "latest",
     "gm": "latest",
     "gmail-send": "latest",
