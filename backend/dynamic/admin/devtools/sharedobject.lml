@@ -60,6 +60,15 @@
     </lml-foreach>
 </div>
 
-
-
+<h1>Hits</h1>
+<div>
+    <lml-foreach var="obj" in="livevars.sharedcache.dump.hits">
+        <div style="margin: 5px; padding: 5px; background-color: #F9F9F9; border: 1px solid #EEE;">
+            <h4><lml-text var="foreachkey"></lml-text></h4> 
+            <div>
+                <lml-text var="obj"></lml-text>
+            </div>
+        </div>
+    </lml-foreach>
+</div>
 

@@ -33,6 +33,7 @@ LiliumSocket.prototype.bind = function () {
     this.socket.on('notification-view', this.notificationView);
     this.socket.on('broadcast', this.broadcast);
     this.socket.on('disconnect', this.disconnect);
+    this.socket.on('hit', this.hit);
     this.socket.on('alert', this.alert);
     this.socket.on('error', this.error);
 
@@ -41,6 +42,42 @@ LiliumSocket.prototype.bind = function () {
 
 LiliumSocket.prototype.join = function (groupName) {
     var ls = this.liliumsocket;
+};
+
+LiliumSocket.prototype.hit = function(param) {
+    var ls = this.liliumsocket;
+    var sid = ls.sid;
+    var uid = ls.clientId;
+    var path = param.path;
+
+    sharedcache.hit('set', uid, path, () => {
+        for (var i = 0; i < namespaces.length; i++) {
+            io.of(namespaces[i]).emit('userhit', {
+                id : ls.clientId,
+                displayname : ls.session.data.displayname,
+                path : path
+            });
+        }
+    });
+};
+
+LiliumSocket.prototype.disconnect = function () {
+    var ls = this.liliumsocket;
+    var sid = ls.sid;
+    var uid = ls.clientId;
+    
+    var memObj = {};
+    sharedcache.socket(uid, 'remove', sid, function(remainingSessions) {
+        var sessionCount = remainingSessions.length;
+        for (var i = 0; i < namespaces.length; i++) {
+            io.of(namespaces[i]).emit('userstatus', {
+                id: ls.clientId,
+                displayname: ls.session.data.displayname,
+                status : !sessionCount ? 'offline' : 'online',
+                seshCount : sessionCount
+            });
+        }
+    });
 };
 
 LiliumSocket.prototype.notificationInteraction = function (notifId) {
@@ -90,25 +127,6 @@ LiliumSocket.prototype.notificationView = function () {
 
 LiliumSocket.prototype.broadcast = function (emission) {
     var ls = this.liliumsocket;
-};
-
-LiliumSocket.prototype.disconnect = function () {
-    var ls = this.liliumsocket;
-    var sid = ls.sid;
-    var uid = ls.clientId;
-    
-    var memObj = {};
-    sharedcache.socket(uid, 'remove', sid, function(remainingSessions) {
-        var sessionCount = remainingSessions.length;
-        for (var i = 0; i < namespaces.length; i++) {
-            io.of(namespaces[i]).emit('userstatus', {
-                id: ls.clientId,
-                displayname: ls.session.data.displayname,
-                status : !sessionCount ? 'offline' : 'online',
-                seshCount : sessionCount
-            });
-        }
-    });
 };
 
 LiliumSocket.prototype.alert = function () {
@@ -361,7 +379,6 @@ var Notification = function () {
             }], function (result) {
                 insertBatchNotificationInSessions(result, notification, site);
             });
-            // Broadcast for user connected
         };
 
         for (var i in sites) {
@@ -389,29 +406,17 @@ var Notification = function () {
             });
         });
 
-        // Not working anymore
         livevars.registerLiveVariable('online', function(cli, levels, params, cb) {
             if (levels[0] == "list") {
                 sharedcache.getSocketID(false, function(sockets) {
                     cb(sockets);
                 });
+            } else if (levels[0] == "hits") {
+                sharedcache.hit('dump', undefined, undefined, (list) => {
+                    cb(list);
+                });
             } else {
                 return cb({users : [], sessions : {}});
-
-                var newnet = {
-                    users : net.users,
-                    sessions : {}
-                };
-                for (var sid in net.sessions) {
-                    newnet.sessions[sid] = {
-                        session : net.sessions[sid].session,
-                        client :  net.sessions[sid].client,
-                        site :  net.sessions[sid].site,
-                        user :  net.sessions[sid].user
-                    };
-                }
-
-                cb(newnet);
             }
         }, ["dash"]);
     };

@@ -6,7 +6,8 @@ const mem = {
     cache : {},
     sockets : {},
     sessions : {},
-    clerk : {}
+    clerk : {},
+    hits : {}
 }
 
 const dumpCache = () => {
@@ -44,11 +45,11 @@ const unsetCache = (keys) => {
 };
 
 const remCache = (kv) => {
-    var resp = {};
+    let resp = {};
 
-    for (var k in kv) if (mem.cache[k]) {
-        var val = kv[k];
-        var index = mem.cache[k].indexOf(val);
+    for (let k in kv) if (mem.cache[k]) {
+        let val = kv[k];
+        let index = mem.cache[k].indexOf(val);
 
         if (index != -1) {
             mem.cache[k].splice(index, 1);
@@ -107,6 +108,24 @@ class SharedMemory {
                         } else if (object.session.state == "get") {
                             resp = token && mem.sessions[token] ? JSON.stringify(mem.sessions[token]) : "";
                         }
+                    } else if (object.hit) {
+                        let uid = object.hit.uid;
+                        let url = object.hit.url;
+                        let action = object.hit.action;
+
+                        if (action == "dump") {
+                            resp = JSON.stringify(mem.hits);
+                        } else if (action == "set") {
+                            mem.hits[uid] = url;
+                            resp = "{}";
+                        } else if (action == "get") {
+                            resp = JSON.stringify(mem.hits[uid] || {});
+                        } else if (action == "unset") {
+                            delete mem.hits[uid];
+                            resp = "{}";
+                        } else {
+                            resp = '{"error" : "Undefined action"}'
+                        }
                     } else if (object.socket) {
                         let sid = object.socket.sid;
                         let uid = object.socket.uid;
@@ -118,8 +137,10 @@ class SharedMemory {
                                 mem.sockets[uid] = [sid];
                             }
                         } else if (object.socket.state == "remove") {
+                            delete mem.hits[uid];
+
                             if (mem.sockets[uid]) {
-                                var index = mem.sockets[uid].indexOf(sid);
+                                let index = mem.sockets[uid].indexOf(sid);
 
                                 if (index != -1) {
                                     mem.sockets[uid].splice(index, 1);

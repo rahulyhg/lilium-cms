@@ -100,9 +100,7 @@ class SharedCache {
 
         sock.write(JSON.stringify({
             socket : {
-                uid : uid,
-                sid : sid, 
-                state : state
+                uid, sid, state
             }
         }) + "\0");
     }
@@ -124,9 +122,25 @@ class SharedCache {
 
         sock.write(JSON.stringify({
             session : {
-                token : token, 
-                session : session, 
-                state : state
+                token, session, state
+            }
+        }) + "\0");
+    }
+
+    hit(action, uid, url, send) {
+        const sock = getUDS();
+        let response = "";
+        sock.on('data', (c) => {
+            response += c;
+        });
+
+        sock.on('end', () => {
+            send && send(response && JSON.parse(response));
+        });
+
+        sock.write(JSON.stringify({
+            hit : {
+                action, uid, url
             }
         }) + "\0");
     }
