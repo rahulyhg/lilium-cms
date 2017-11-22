@@ -15,7 +15,11 @@ class AdPatterns {
     }
 
     applyPattern(window) {
-        this.application(window);
+        try {
+            this.application(window);
+        } catch (ex) {
+            log('Ads', 'Error applying pattern ' + this.name + " : " + ex, 'err');
+        }
         return this;
     }
 }
