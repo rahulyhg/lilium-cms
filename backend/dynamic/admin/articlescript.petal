@@ -345,7 +345,7 @@
     };
 
     var loadRaw = function() {
-
+        liliumcms.pageloader.load("{=config.default.server.url}/admin/article/raw/" + liliumcms.pageloader.lastLevel);
     };
 
     var refuseReview = function() {

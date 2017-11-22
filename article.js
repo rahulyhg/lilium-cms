@@ -91,6 +91,11 @@ class Article {
                         filelogic.serveAdminLML(cli) :
                         cli.refuse();
                     break;
+                case 'raw':
+                    cli.hasRight('editor') ?
+                        filelogic.serveAdminLML(cli, true) :
+                        cli.refuse();
+                    break;
                 case 'edit':
                     if (cli.hasRight('create-articles')) {
                         var action = cli.routeinfo.path[4];
