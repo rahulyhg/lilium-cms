@@ -344,6 +344,10 @@
         });
     };
 
+    var loadRaw = function() {
+
+    };
+
     var refuseReview = function() {
         $.post('{=config.default.server.url}/admin/article/refusereview/' + contentid, {}, function() {
             liliumcms.pageloader.load("{=config.default.server.url}/admin/article");
@@ -444,6 +448,7 @@
             }
 
             document.querySelector('.article-history-button-wrapper').style.display = "";
+            document.querySelector('.article-raw-button-wrapper').style.display = "";
         });
     };
 

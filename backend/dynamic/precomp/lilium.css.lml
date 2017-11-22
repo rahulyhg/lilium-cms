@@ -2196,6 +2196,10 @@ button.bigger {
     content : '\f1da';
 }
 
+.article-raw-button-wrapper button::before {
+    content : '\f071';
+}
+
 .article-schedule-button-wrapper button::before {
     content : '\f082';
 }

@@ -49,6 +49,12 @@
             </button>
         </div>
 
+        <div class="article-info-strip article-raw-button-wrapper article-button-wrapper role-editor">
+            <button onclick="loadRaw();" class="small">
+                Raw editing
+            </button>
+        </div>
+
         <div class="article-info-strip article-delete-button-wrapper article-button-wrapper role-author">
             <button onclick="unpublishArticleModal()" class="small red">
                  Unpublish
