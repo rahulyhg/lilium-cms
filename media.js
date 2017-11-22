@@ -292,20 +292,9 @@ var Media = function () {
 
     this.getMedia = function (cli) {
         var id = new mongo.ObjectID(cli.routeinfo.path[3]);
-        db.find(cli._c, 'uploads', {
-            '_id': id
-        }, {
-            limit: [1]
-        }, function (err, cursor) {
-            cursor.next(function (err, media) {
-                if (media) {
-                    cli.sendJSON({
-                        data: media
-                    });
-                } else {
-                    cli.throwHTTP(404, 'Media Not Found');
-                }
-                cursor.close();
+        db.findUnique(cli._c, 'uploads', { '_id': id }, function (err, media) {
+            cli.sendJSON({
+                media : media || {}
             });
         });
 
