@@ -100,6 +100,9 @@ var LiliumCMS = function() {
         },
         livevarsFetched: {
             name: "livevarsFetched"
+        },
+        pageLoaded: {
+            name : "pageLoaded"
         }
     };
 
@@ -738,6 +741,9 @@ var LiliumCMS = function() {
                     var url = this.responseURL.substring(0, this.responseURL.indexOf('?'));
                     that.pushHistory(url)
                 }
+
+                var hitEvent = new CustomEvent(liliumcms.LiliumEvents.pageLoaded.name);
+                document.dispatchEvent(hitEvent, {url : url});
 
                 log('PageLoader', 'Done loading page, calling post load');
                 that.postload();

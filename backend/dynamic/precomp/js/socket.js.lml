@@ -63,8 +63,11 @@ $(document).ready(function() {
         }
     });
 
-    var generateNotification = function(notif) {
+    document.addEventListener(liliumcms.LiliumEvents.pageLoaded.name, function(ev) {
+        socket.emit('hit', { path : document.location.pathname });
+    });
 
+    var generateNotification = function(notif) {
         var isNew = typeof notif.interacted !== 'undefined' && !notif.interacted ? "new" : "";
         var type = notif.type ? notif.type : "info";
         var link = notif.url ? "data-href='" + notif.url + "'" : "";
