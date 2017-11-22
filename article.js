@@ -63,6 +63,7 @@ class Article {
             case 'delete-autosave': if (cli.hasRightOrRefuse("create-articles")) this.deleteAutosave(cli); break;
             case 'autosave': if (cli.hasRightOrRefuse("create-articles")) this.save(cli, true); break;
             case 'save': if (cli.hasRightOrRefuse("create-articles")) this.save(cli); break;
+            case 'saveraw': if (cli.hasRightOrRefuse('editor')) this.saveraw(cli); break;
             case 'haseditrights': if (cli.hasRightOrRefuse("create-articles")) this.haseditrights(cli); break;
             case 'liveedit': if (cli.hasRightOrRefuse("create-articles")) this.liveedit(cli); break;
             case 'package': if (cli.hasRightOrRefuse("create-articles")) this.packageArticle(cli); break;
@@ -285,6 +286,38 @@ class Article {
         }
     };
 
+    handleNewStatus(_c, articleid, status, done) {
+        if (status == "published") {
+            this.generateArticle(_c, articleid, done, false, "all");
+        } else {
+            db.findUnique(_c, 'content', { _id : articleid }, (err, article) => {
+                if (article.title && article.title.length) {
+                    fileserver.deleteOccur(_c.server.html + "/**/" + article.name + (article.title.length > 1 ? "/*" : "") + ".html", done);
+                } else {
+                    done();
+                }
+            }, { name : 1, alias : 1, title : 1});
+        }
+    };
+
+    saveraw(cli) {
+        const payload = cli.postdata.data;
+
+        payload.author = db.mongoID(payload.author);
+        payload.media = db.mongoID(payload.media);
+        payload.topic = db.mongoID(payload.topic);
+
+        db.update(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, payload, (err, r) => {
+            if (!err && r.modifiedCount) {
+                this.handleNewStatus(cli._c, db.mongoID(cli.routeinfo.path[3]), payload.status, () => {
+                    cli.sendJSON({ modified : true });
+                });
+            } else {
+                cli.sendJSON({ modified : false, err })
+            }
+        });
+    }
+
     query(cli, opts, cb) {
         db.paramQuery(cli, opts, cb);
     };
@@ -466,7 +499,7 @@ class Article {
 
         // Delete cached file is it exists
         db.findUnique(conf, 'topics', { _id : article.topic }, (err, topic) => {
-            topic && fileserver.deleteFile(conf.server.html + "/" + topic.completeSlug + "/" + alias + ".html", () => {});
+            topic && fileserver.deleteOccur(conf.server.html + "/**/" + alias + ".html", noop);
         });
     };
 
@@ -1403,8 +1436,7 @@ class Article {
                         }, (err, r)  => {
                             cli.did('content', destroy ? 'destroyed' : 'deleted', {id : id});
                             
-                            var filename = cli._c.server.html + "/" + result.name + '.html';
-                            fs.deleteFile(filename, ()  => {
+                            this.handleNewStatus(cli._c, id, destroy ? "destroyed" : "deleted", () => {
                                 hooks.fire('article_deleted', {id : id, cli : cli, _c : cli._c});
                             });
 
