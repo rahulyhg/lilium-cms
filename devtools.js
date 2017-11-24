@@ -23,6 +23,7 @@ class DevTools {
             case 'sharedobject':
             case 'server':
             case 'scripts':
+            case 'hits':
             case 'mail':
             case 'where':
             case undefined:

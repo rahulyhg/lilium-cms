@@ -118,6 +118,10 @@ $(document).ready(function() {
             });
         });
 
+        socket.on('userhit', function(data) {
+            document.dispatchEvent(new CustomEvent('userhit', { detail : { hit : data } }));
+        });
+
         socket.on('reconnect', function(rec) {
             log("Lilium", 'Reconnected with server after ' + rec + ' tries.', "info");
             $('body').removeClass('offline');

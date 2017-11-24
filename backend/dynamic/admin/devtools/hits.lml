@@ -1,0 +1,63 @@
+{#config}
+{*online.hits}
+<lml-dom v="1.0"></lml-dom>
+
+<h1>Admin endpoint live hits</h1>
+<div id="live-hits">
+
+</div>
+
+<script>
+    var addLine = function(userid, displayname, page) {
+        var w = d.make({ id : userid, class : "hit-user-line" });
+        d.make({ parent : w, text : (displayname || "Unknown name") + " (" + userid + ")", class : "hit-user-name" });
+        d.make({ parent : w, text : page, class : "hit-user-page" })
+
+        w.bind('click', function() {
+            liliumcms.pageloader.load(page);
+        });
+
+        wrapper.appendChild(w.get());
+    };
+
+    var userhit = function(hitev) {
+        var hit = hitev.detail.hit;
+        var maybediv = document.getElementById(hit.id);
+
+        if (maybediv) {
+            maybediv.querySelector('.hit-user-page').textContent = hit.path;
+            maybediv.querySelector('.hit-user-name').textContent = hit.displayname + " (" + hit.id + ")";
+        } else {
+            addLine(hit.id, hit.displayname, hit.path);
+        }
+    };
+
+    var wrapper = document.getElementById('live-hits');
+    liliumcms.lmldom.bind(function() {
+        var initialHits = liliumcms.livevars.livevars()["online.hits"];
+        for (var userid in initialHits) {
+            addLine(userid, "", initialHits[userid]);
+        }
+
+        document.addEventListener('userhit', userhit);
+
+        liliumcms.pageloader.bindUnload(function() {
+            document.removeEventListener(userhit, userhit);
+        });
+    });
+</script>
+
+<style>
+.hit-user-line {
+    padding: 10px;
+    margin: 5px;
+    background: #EEE;
+    color: #333;
+
+    cursor: pointer;
+}
+
+.hit-user-name {
+    font-weight: bold;
+}
+</style>
