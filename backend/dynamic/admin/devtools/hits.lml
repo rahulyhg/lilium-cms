@@ -10,7 +10,7 @@
 <script>
     var addLine = function(userid, displayname, page) {
         var w = d.make({ id : userid, class : "hit-user-line" });
-        d.make({ parent : w, text : (displayname || "Unknown name") + " (" + userid + ")", class : "hit-user-name" });
+        d.make({ parent : w, text : displayname + " (" + userid + ")", class : "hit-user-name" });
         d.make({ parent : w, text : page, class : "hit-user-page" })
 
         w.bind('click', function() {
@@ -36,7 +36,8 @@
     liliumcms.lmldom.bind(function() {
         var initialHits = liliumcms.livevars.livevars()["online.hits"];
         for (var userid in initialHits) {
-            addLine(userid, "", initialHits[userid]);
+            var maybeuser = liliumcms.conversations.getCachedUser(userid);
+            addLine(userid, maybeuser ? maybeuser.displayname : "Unknown name", initialHits[userid]);
         }
 
         document.addEventListener('userhit', userhit);
