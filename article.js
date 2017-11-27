@@ -739,8 +739,7 @@ class Article {
     };
 
     insertAds(_c, article, window) {
-        Array.prototype.forEach.call(window.document.body.querySelectorAll('ad'), x => x.remove());
-        return adslib.detectPatternType(_c.id, window).applyPattern(window);
+        return !window.document.body.querySelector('ad') && adslib.detectPatternType(_c.id, window).applyPattern(window);
     };
 
     updateActionStats(_c, deepArticle, callback, reduce) {
