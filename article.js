@@ -1150,7 +1150,17 @@ class Article {
                         formData.date = new Date(dates.toTimezone(new Date(), cli._c.timezone));
                     }
 
-                    nUpdate();
+                    if (formData.name) {
+                        db.exists(cli._c, 'content', { name : formData.name, _id : { $ne : db.mongoID(cli.postdata.data.id) } }, (alreadyused) => {
+                            if (alreadyused) {
+                                formData.name += "-" + Math.random().toString().substring(2);
+                            }
+
+                            nUpdate();
+                        });
+                    } else {
+                        nUpdate();
+                    }
                 });
             } else {
                 cli.sendJSON({
@@ -1387,16 +1397,22 @@ class Article {
             } else {
                 if (/^[a-z0-9\-]+$/.test(newslug)) {
                     var id = db.mongoID(cli.routeinfo.path[3]);
-                    db.findUnique(cli._c, 'content', {_id : id}, (err, article)  => {
-                        if (cli.hasRight('editor') || article.author.toString() == cli.userinfo.userid.toString()) {
-                            var aliases = article.aliases || [];
-                            aliases.push(article.name);
-                            db.update(cli._c, 'content', {_id : id}, {name : newslug, aliases : aliases}, ()  => {
-                                cli.sendJSON({success : true});
-                            });
-                        } else {
-                            cli.sendJSON({error : "Missing rights", success : false});
+                    db.exists(cli._c, 'content', { name : newslug }, (alreadyused) => {
+                        if (alreadyused) {
+                            return cli.sendJSON({error : "Slug already used by another article", success : false});
                         }
+
+                        db.findUnique(cli._c, 'content', {_id : id}, (err, article)  => {
+                            if (cli.hasRight('editor') || article.author.toString() == cli.userinfo.userid.toString()) {
+                                var aliases = article.aliases || [];
+                                aliases.push(article.name);
+                                db.update(cli._c, 'content', {_id : id}, {name : newslug, aliases : aliases}, ()  => {
+                                    cli.sendJSON({success : true});
+                                });
+                            } else {
+                                cli.sendJSON({error : "Missing rights", success : false});
+                            }
+                        });
                     });
                 } else {
                     cli.sendJSON({error : "Bad slug format", success : false});
