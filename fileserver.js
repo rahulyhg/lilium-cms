@@ -184,6 +184,7 @@ class FileServer {
     };
 
     deleteFile  (path, cb) {
+        log('FileServer', 'Unlinking file ' + path);
         fs.unlink(path, cb);
     }
 
