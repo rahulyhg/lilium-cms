@@ -1055,6 +1055,10 @@ class Entities {
             }, function(err, arr) { 
                 callback(arr); 
             });
+        } else if (levels[0] == "exists") {
+            db.findUnique(_c.default(), 'entities', { username : levels[1] }, (err, user) => {
+                callback({ exists : !!user, user });
+            }, {_id : 1, displayname : 1, username : 1, avatarURL : 1 });
         } else if (levels[0] == "chat") {
             db.find(_c.default(), 'entities', {revoked : {$ne : true}}, [], function(err, cur) {
                 cur.sort({fullname : 1}).toArray(function(err, arr) {

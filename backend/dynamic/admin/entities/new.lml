@@ -5,3 +5,17 @@
 <div class="entity-create-wrapper">
     {=forms.render('entity_create')}
 </div>
+
+<script>
+    d.q('input[name="username"]').bind('change', function(ev) {
+        var content = ev.target.value;
+        if (content && content.trim()) {
+            liliumcms.livevars.getSingleLivevar("entities.exists." + content, {}, function(resp) { 
+                if (resp && resp.livevars && resp.livevars["entities.exists." + content].exists) {
+                    ev.target.value = "";
+                    liliumcms.modals.error("Username taken", "This username is already taken by an entity with the display name : " + resp.livevars["entities.exists.lilium"].user.displayname);
+                }
+            })
+        }
+    });
+</script>
