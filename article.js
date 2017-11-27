@@ -291,12 +291,18 @@ class Article {
             this.generateArticle(_c, articleid, done, false, "all");
         } else {
             db.findUnique(_c, 'content', { _id : articleid }, (err, article) => {
-                if (article.title && article.title.length) {
-                    fileserver.deleteOccur(_c.server.html + "/**/" + article.name + (article.title.length > 1 ? "/*" : "") + ".html", done);
-                } else {
+                db.findUnique(_c, 'topics', { _id : article.topic }, (err, topic) => {
+                    if (topic && article.title && article.title.length > 1) {
+                        article.title.forEach((x, i) => {
+                            fileserver.deleteFile(_c.server.html + "/" + topic.completeSlug + "/" + article.name + "/" + (i+1) + ".html", () => {});
+                        })
+                    } else if (topic) {
+                        fileserver.deleteFile(_c.server.html + "/" + topic.completeSlug + "/" + article.name + ".html", () => {});
+                    }
+
                     done();
-                }
-            }, { name : 1, alias : 1, title : 1});
+                });
+            }, { name : 1, alias : 1, title : 1, topic : 1 });
         }
     };
 
@@ -499,7 +505,7 @@ class Article {
 
         // Delete cached file is it exists
         db.findUnique(conf, 'topics', { _id : article.topic }, (err, topic) => {
-            topic && fileserver.deleteOccur(conf.server.html + "/**/" + alias + ".html", noop);
+            topic &&  fileserver.deleteFile(conf.server.html + "/" + alias + ".html", noop);
         });
     };
 
