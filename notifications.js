@@ -53,8 +53,9 @@ LiliumSocket.prototype.hit = function(param) {
     sharedcache.hit('set', uid, path, () => {
         for (var i = 0; i < namespaces.length; i++) {
             io.of(namespaces[i]).emit('userhit', {
-                id : ls.clientId,
+                _id : ls.clientId,
                 displayname : ls.session.data.displayname,
+                avatarURL : ls.session.data.avatarURL,
                 path : path
             });
         }
@@ -413,7 +414,10 @@ var Notification = function () {
                 });
             } else if (levels[0] == "hits") {
                 sharedcache.hit('dump', undefined, undefined, (list) => {
-                    cb(list);
+                    db.findToArray(_c.default(), 'entities', { _id : { $in : Object.keys(list).map(x => db.mongoID(x)) }}, (err, users) => {
+                        users.forEach(x => { x.path = list[x._id]; });
+                        cb(users);
+                    }, { displayname : 1, _id : 1, avatarURL : 1 });
                 });
             } else {
                 return cb({users : [], sessions : {}});
