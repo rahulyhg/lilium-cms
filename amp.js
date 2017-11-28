@@ -150,9 +150,9 @@ class Amp {
                 youtube.setAttribute('layout', 'responsive');
 
                 try {
-                    dom.window.document.body.insertBefore(youtube, x.parentElement);
+                    dom.window.document.body.insertBefore(youtube, x);
                     x.remove();
-                } catch (ex) {}
+                } catch (ex) { log('AMP', 'Could not remove iframe : ' + ex.stack || ex, 'warn');}
             }
         }
 
@@ -165,7 +165,7 @@ class Amp {
         cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
             themes.fetchCurrentTheme(cli._c, cTheme => {
                 let articlewrap = { content : articleContent };
-                hooks.fire("amp_replace_ads" + cli._c.uid, { article : articlewrap, theme : cTheme });
+                hooks.fire("amp_replace_ads_" + cli._c.uid, { article : articlewrap, theme : cTheme });
                 articleContent = articlewrap.content;
                 articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
 
