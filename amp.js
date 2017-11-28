@@ -4,6 +4,7 @@ const article = require('./article.js');
 const filelogic = require('./filelogic.js');
 const fileserver = require('./fileserver.js');
 const log = require('./log.js');
+const hooks = require('./hooks.js');
 const cdn = require('./cdn.js');
 const themes = require('./themes.js');
 
@@ -162,9 +163,14 @@ class Amp {
         }
 
         cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
-            articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
+            themes.fetchCurrentTheme(cli._c, cTheme => {
+                let articlewrap = { content : articleContent };
+                hooks.fire("amp_replace_ads" + cli._c.uid, { article : articlewrap, theme : cTheme });
+                articleContent = articlewrap.content;
+                articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
 
-            cb(undefined, articleContent);
+                cb(undefined, articleContent);
+            });
         });
     }
 }
