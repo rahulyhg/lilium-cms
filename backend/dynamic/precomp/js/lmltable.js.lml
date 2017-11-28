@@ -3,6 +3,7 @@ var LmlTable = function(table) {
 	var table = $(table);
     var domid = table.attr('id');
 	var maxEntries = table.data('max');
+    var rowid = table.data('rowid');
 	var currentPage = 1;
 	var currentData;
 	var keys = new Array();
@@ -233,6 +234,7 @@ var LmlTable = function(table) {
 				if (i < rowNum) {
 					// Get current tr
 					var tr = tableContent.children[i];
+                    tr.id = rowid ? trdata[rowid] : "";
 					for (var j in keys) {
 						var td = document.createElement('TD');
 
@@ -253,6 +255,7 @@ var LmlTable = function(table) {
 					}
 				} else { // Create a new tr
 					var tr = document.createElement('TR');
+                    tr.id = rowid ? trdata[rowid] : "";
 					rowNum++;
 					for (var j in keys) {
 						var td = document.createElement('TD');
@@ -287,6 +290,7 @@ var LmlTable = function(table) {
 			table.append('<tr class="lmltable-no-entry"><td class="empty" colspan="' + numberOfCols + '">There are no entries...</td></tr>');
 		}
 
+        document.dispatchEvent(new CustomEvent('lmltableUpdated', { detail : { domid : domid } }));
 	};
 
 	this.addRow = function() {

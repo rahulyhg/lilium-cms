@@ -1,5 +1,6 @@
 {#config;forms;tableBuilder}
 {*content.lastEdited}
+{*online.hits}
 <lml-dom v="1.0"></lml-dom>
 
 <main class="entities-main">
@@ -44,6 +45,80 @@
 </lml-tabletemplate>
 
 <script>
+var liveeditors = [];
+
+var addEditMention = function(liveeditor, row) {
+    var wrap = d.make({ class : "live-editor-wrap" });
+    d.make({ class : "live-editor-face", node : "img", attr : { src : liveeditor.avatarURL }, parent : wrap });
+
+    row.querySelector('h4').appendChild(wrap.get());
+}
+
+var updateLiveEditors = function() {
+    var editmentions = document.querySelectorAll('.live-editor-wrap');
+    for (var i = editmentions.length - 1; i >= 0; i--) { editmentions[i].remove(); }
+
+    for (var i = 0; i < liveeditors.length; i++) {
+        var le = liveeditors[i];
+        var row = document.getElementById(le.path.substring(le.path.indexOf('edit/') + 5));
+
+        if (!row) { continue; }
+
+        addEditMention(le, row);
+    }    
+}
+
+liliumcms.lmldom.bind(function() {
+    var hits = liliumcms.livevars.livevars()["online.hits"]
+    for (var i = 0; i < hits; i++) {
+        hits[i].path.indexOf("article/edit") != -1 && liveeditors.push(hits[i]);
+    }
+
+    updateLiveEditors();
+});
+
+!window.boundUserHitArticleList && (function() { 
+    window.boundUserHitArticleList = true;
+    document.addEventListener('userhit', function(ev) {
+        if (document.location.pathname != "/admin/article") { return; }
+
+        var hit = ev.detail.hit;
+        for (var i = 0; i < liveeditors.length; i++) {
+            if (liveeditors[i]._id == ev.detail.hit._id) {
+                liveeditors.splice(i, 1);
+                break;
+            }
+        }
+
+        if (hit.path.indexOf("article/edit") != -1) {
+            liveeditors.push(hit);
+        }
+
+        updateLiveEditors();
+    });
+
+    document.addEventListener('userstatus', function(ev) {
+        if (document.location.pathname != "/admin/article") { return; }
+
+        if (ev.detail.user.status != "online") {
+            for (var i = 0; i < liveeditors.length; i++) {
+                if (liveeditors[i]._id == ev.detail.user.id) {
+                    liveeditors.splice(i, 1);
+                    break;
+                }
+            }
+        }
+
+        updateLiveEditors();
+    });
+
+    document.addEventListener('lmltableUpdated', function(ev) {
+        if (document.location.pathname != "/admin/article") { return; }
+
+        updateLiveEditors();
+    });
+})();
+
     var isViewable = function (){
         return (this.title !=='' && this.status == 'published') && window.innerWidth > 600;
     }
@@ -156,6 +231,18 @@ table.lmlfullwidthtable tbody tr td.table-article-image {
     font-size: 13px;
     padding: 1px 5px;
     border-radius: 4px;
+}
+
+.live-editor-wrap {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.lmltablebuilder tbody td img.live-editor-face {
+    height: 36px;
+    width: 36px;
+    border-radius: 18px;
+    box-shadow: 0px 0px 4px rgba(0,0,0,0.4);
 }
 
 .continue-single-status.continue-single-status-draft     { background-color: #0e74a7; }

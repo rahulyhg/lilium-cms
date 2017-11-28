@@ -118,6 +118,10 @@ $(document).ready(function() {
             });
         });
 
+        socket.on('userstatus', function(data) {
+            document.dispatchEvent(new CustomEvent('userstatus', { detail : { user : data } }));
+        });
+        
         socket.on('userhit', function(data) {
             document.dispatchEvent(new CustomEvent('userhit', { detail : { hit : data } }));
         });

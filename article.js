@@ -2136,6 +2136,7 @@ class Article {
         tableBuilder.createTable({
             name: 'article',
             endpoint: 'content.table',
+            rowid : "_id",
             paginate: true,
             searchable: true,
             max_results: 25,
