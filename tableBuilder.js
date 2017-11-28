@@ -84,7 +84,7 @@ var TableBuilder = function () {
         html += '</div>';
         html += '<div class="search pull-right"><label>Search : </label><input type="text" name="search-table" class="search-table"></div>';
         html += '</div>';
-        html += '<table class="lmltablebuilder lmlfullwidthtable" id=' + table.name + ' data-endpoint="' + table.endpoint + '" data-max="' + (table.max_results || 20) + '" data-page="1" data-sort-order="'+sortOrder+'" data-sortby="' + sortbyKey + '">';
+        html += '<table class="lmltablebuilder lmlfullwidthtable" id=' + table.name + ' data-endpoint="' + table.endpoint + '" data-max="' + (table.max_results || 20) + '" data-page="1" data-sort-order="'+sortOrder+'" data-sortby="' + sortbyKey + '" data-rowid="'+table.rowid+'">';
         html += '<thead>';
         html += '<tr>';
         for (var i in table.fields) {
