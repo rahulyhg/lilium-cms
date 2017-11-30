@@ -27,13 +27,17 @@ class LMLPetal {
             require.cache[petalpath] = undefined;
         }
 
-        this.petalobject = require(petalpath); 
+        log("Petal", "Requiring petal file " + petalname, 'info')
+        this.petalobject = require(petalpath);
         this.context = context;
         this.petalname = petalname;
     }
 
     compile() {
-        this.petalobject.compile(this.context.o, this.context);
+        log("Petal", "Compiling petal file " + this.petalname, 'info');
+        const buffer = new MarkupBuffer();
+        this.petalobject.compile((...str) => { str.forEach(x => buffer.write(x)) }, this.context, this.context.vocab);
+        return "<!-- petalstart "+this.petalname+" -->" + buffer.getMarkup() + "<!-- petalend -->";
     }
 }
 
@@ -43,7 +47,7 @@ class LMLTool {
 
         switch (type) {
             case "add":
-                this.markup = `<a class="fab lml3-tool-add" ${tool.href&&'href="'+tool.href+'"'||''}>+</a>` + 
+                this.markup = `<a class="fab lml3-tool-add" ${tool.href&&'href="'+tool.href+'"'||''}>+</a>` +
                     (tool.call && (
                         `<script>
                             document.querySelector('.lml3-tool-add').addEventListener("click", function() {
@@ -54,7 +58,7 @@ class LMLTool {
                 );
                 break;
 
-            default : 
+            default :
                 this.markup = "[Undefined tool type]";
         }
     }
@@ -106,9 +110,13 @@ class LMLContext {
         this.libs = {
             formbuilder : require('../formBuilder.js'),
             encodec : require('entities'),
+            cdn : require('../cdn'),
             slugify : require('slugify'),
             fileio : require('../fileserver.js'),
-            postlead : require('../postleaf.js').getLeaves()
+            postlead : require('../postleaf.js').getLeaves(),
+            encode : x => (x ? x.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") : ""),
+            snip : (snipid, ...args) => require('../themes').renderSnip(this._c, snipid, args),
+            getQueueTags : () => require('../templateBuilder').getQueueTags(this._c)
         };
 
         return this;
@@ -120,7 +128,7 @@ class LMLContext {
             str.forEach(s => this.markupbuffer.write(s));
         }
         return this;
-    } 
+    }
 
     readPetals() {
         let contents = {};
@@ -136,8 +144,8 @@ class LMLContext {
     generateLivevars() {
         let str = "";
         this.livevars && this.livevars.forEach(l => {
-            if (typeof l == "string") { 
-                l = {name : l}; 
+            if (typeof l == "string") {
+                l = {name : l};
             }
             let params = l.params ? JSON.stringify(l.params).replace(/\"/g, "&lmlquote;") : "{}";
             str += `<lml-livevars data-varname="${l.name}" data-varparam="${params}"></lml-livevars>`;
@@ -157,11 +165,22 @@ class LML3 {
         ftc ? ftc(context, done) : done();
     }
 
-    compile(_c, abspath, extra, done) {
+    compile(_c, abspath, extra, done, ___notsafe) {
         log('LML3', "Loading LML3 file : " + abspath, 'info');
 
-        if (_c.env == "dev") {
+        if (_c.env == "dev" && !___notsafe) {
             require.cache[abspath] = undefined;
+
+            log('LML3', 'Running in safe mode', 'info');
+            try {
+              this.compile(_c, abspath, extra, done, true);
+            } catch (ex) {
+              log('LML3', 'Error compiling file ' + abspath, 'err');
+              log('LML3', ex.stack, 'err');
+              done("<h2>Crashed.</h2>" + ex.stack.split('\n').join("<br />"));
+            }
+
+            return;
         }
 
         let now = new Date();
@@ -172,7 +191,7 @@ class LML3 {
 
         let context = new LMLContext(_c, extra, settings);
         this.preload(lml3file.preload, context, () => {
-            lml3file.compile(context.o, context);
+            lml3file.compile(context.o, context, context.extra.vocab);
             log('LML3', 'Compiled file in ' + (new Date() - now) + "ms", 'detail');
             done(context.markupbuffer.getMarkup());
         });
