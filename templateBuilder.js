@@ -95,9 +95,32 @@ var templateBuilder = function () {
         return string;
     };
 
+    this.getQueueTags = function(config) {
+        var string = "";
+        var queue =  require('./precomp.js').getSiteQueue(config);
+
+        if (queue) {
+            queue.forEach(function(tag) {
+                switch (tag.type) {
+                    case 'css':
+                        string += '<link rel="stylesheet" type="text/css" href="'+tag.src+'" />\n';
+                        break;
+                    case 'js':
+                        string += '<script src="'+tag.src+'"></script>\n'
+                        break;
+                    default:
+                        string += '';
+                        break;
+                }
+            });
+        }
+
+        return string;
+    }
+
     this.init = function (config) {
         log('TemplateBuilder', "Initializing for site " + config.id);
-    
+
         (function(gconf) {
             themes.fetchCurrentTheme(gconf, function(enabledTheme) {
                 lmllib.registerContextLibrary('theme', function (context) {
@@ -105,7 +128,7 @@ var templateBuilder = function () {
                         var args = Array.prototype.slice.call(arguments, 1);
                         return themes.renderSnip(gconf, snipid, args);
                     };
-    
+
                     return {
                         render: renderBlock,
                         settings: context.extra.theme.settings,
