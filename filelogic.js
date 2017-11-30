@@ -90,16 +90,16 @@ class FileLogic {
     };
 
     serveAdminTemplate (cli, extra, templatefile, cb) {
-        const adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml"); 
+        const adminPath = cli._c.server.base + (templatefile || "backend/dynamic/admintemplate.lml");
 
-        // Locate entity 
+        // Locate entity
         require('./iplocator').findClient(cli);
         sharedcache.get('admin_template_' + cli._c.uid, function(hContent) {
             if (hContent) {
                 cli.response.writeHead(200, {"content-type" : "text/html"});
                 cli.response.end(hContent);
                 cb && cb();
-            } else { 
+            } else {
                 extra = extra || {};
                 extra.rootDir = adminPath.substring(0, adminPath.lastIndexOf('/'));
                 extra.config = cli._c;
@@ -172,7 +172,7 @@ class FileLogic {
                                 extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
                                 extra.config = cli._c;
                                 extra.theme = cTheme;
-            
+
                                 const now = new Date();
                                 log('LML2', "Compiling file from " + readPath, 'info');
                                 LML2.compile(cli._c.id, content, output, extra, () => {
@@ -287,7 +287,7 @@ class FileLogic {
                             require('./fileserver.js').readFile(tmpPath, ctn => {
                                 log('FileLogic', 'Passing content through CDN', 'detail');
 
-                                require('./cdn.js').parse(ctn, cli, cdned => { 
+                                require('./cdn.js').parse(ctn, cli, cdned => {
                                     log('FileLogic', 'Parsed content', 'success');
                                     var handle = FileServer.getOutputFileHandle(savePath, 'w+');
                                     FileServer.writeToFile(handle, cdned, () => {
@@ -300,7 +300,7 @@ class FileLogic {
                                     });
                                 }, true);
                             }, false, 'utf8');
-                        }, 
+                        },
                         extra
                     );
                 });
@@ -313,7 +313,7 @@ class FileLogic {
         const themeLib = require('./themes.js');
         const _c = cli._c || cli;
         const ctxName = contextname || "home";
-        
+
         themeLib.fetchCurrentTheme(_c, cTheme => {
             if (!extra.language) {
                 extra.language = _c.website.language;
@@ -322,15 +322,17 @@ class FileLogic {
             extra.theme = cTheme;
             extra.minify = true;
             extra.vocab = require(_c.server.base + "flowers/" + cTheme.uName + "/vocab/" + extra.language + ".json");
+            extra.url = _c.server.url;
 
             const readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml3");
-            const layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml3";
+            const layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || layout.lml3);
             const savePath = outputfilename[0] == "/" ? outputfilename : (_c.server.html + "/" + outputfilename);
 
             if (extra.topic && extra.topic.override) {
                 extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
             }
 
+            log('FileLogic', 'Compiling theme LML3 with context ' + contextname, 'info')
             LML3.compile(_c, readPath, extra, (ctn) => {
                 if (nolayout) {
                     return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, cdned => {
@@ -338,16 +340,17 @@ class FileLogic {
                     });
                 }
 
+                log('FileLogic', 'Adding template to LML3 theme compilation', 'info')
                 extra.contentHTML = ctn;
                 LML3.compile(_c, layoutPath, extra, (fHtml) => {
-                    require('./cdn.js').parse(fileserver.minifyString(fHtml), _c, cdned => {
+                    require('./cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minifyString(fHtml), _c, cdned => {
                         fileserver.createDirIfNotExists(savePath, () => {
                             var handle = FileServer.getOutputFileHandle(savePath, 'w+');
                             FileServer.writeToFile(handle, cdned, () => {
                                 handle.close();
                                 handle.destroy();
 
-                                callback(cdned);
+                                done(cdned);
                             });
                         }, false);
                     });
@@ -365,6 +368,10 @@ class FileLogic {
         extra.siteid = _c.id;
 
         theme.fetchCurrentTheme(_c, cTheme => {
+            if (cTheme && cTheme.layout && cTheme.layout.charAt(cTheme.layout.length-1) == "3") {
+              return this.renderThemeLML3(...arguments)
+            }
+
             if (!extra.language) {
                 extra.language = _c.website.language;
             }
@@ -376,8 +383,8 @@ class FileLogic {
             const readPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.contexts[ctxName] || ctxName + ".lml");
             const savePath = preferredFileName[0] == "/" ? preferredFileName : (_c.server.html + "/" + preferredFileName);
             let tmpPath = _c.server.html + "/static/tmp/" + (Math.random()).toString().substring(2) + ".themetmp";
-            let layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/layout.lml";
-            
+            let layoutPath = _c.server.base + "flowers/" + cTheme.uName + "/" + (cTheme.layout || "layout.lml");
+
             if (skipLayout) {
                 tmpPath = savePath;
             }
@@ -390,8 +397,8 @@ class FileLogic {
             fileserver.readFile(readPath, lml => {
                 extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
                 LML2.compileToString(
-                    extra.siteid, 
-                    lml, 
+                    extra.siteid,
+                    lml,
                     extra,
                     ctn => {
                         log('FileLogic', 'Including compiled theme page to layout', 'detail');
@@ -404,7 +411,7 @@ class FileLogic {
                                     FileServer.writeToFile(handle, cdned, () => {
                                         handle.close();
                                         handle.destroy();
-                                        
+
                                         callback(cdned);
                                     });
                                 });
@@ -419,7 +426,7 @@ class FileLogic {
                                 extra,
                                 fHtml => {
                                     log('FileLogic', 'Completed Theme page compilation', 'success');
-                                    require('./cdn.js').parse(fileserver.minifyString(fHtml), _c, cdned => { 
+                                    require('./cdn.js').parse(fileserver.minifyString(fHtml), _c, cdned => {
                                         log("FileLogic", "Minifier and CDN called back to Filelogic", 'detail');
 
                                         fileserver.createDirIfNotExists(savePath, () => {
