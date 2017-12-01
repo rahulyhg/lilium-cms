@@ -14,8 +14,11 @@ const analyticsLib = require('../analytics.js');
 
 const janitorJobs = [
     "cacheTopic",
-    "cacheArticle",
-    "cacheEntity"
+    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
+    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
+    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
+    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
+    "cacheEntity", "cacheEntity"
 ];
 
 const janitorSites = [];
@@ -66,7 +69,7 @@ class RunningTask {
             return sendback();
         }
 
-        const FBMax = 50;
+        const FBMax = 40;
         if (!this.stats.fb) { this.stats.fb = 0; }
         const _c = this._c;
         const that = this;
@@ -133,6 +136,7 @@ class RunningTask {
                                 return sendback();
                             }
 
+                            log('CAIJ', "Facebook Graph responded correctly to the request for shares of " + articles.length + " articles", "success");
                             for (let furl in respObj) {
                                 let graphObj = respObj[furl];
                                 let art = articleAssoc[furl];

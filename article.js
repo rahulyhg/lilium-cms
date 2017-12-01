@@ -1052,7 +1052,7 @@ class Article {
                                                                _c : cli._c,
                                                                 completeSlug : sTopic.completeSlug,
                                                                 callback : ()  => {
-                                                                    log('Article', "RSS feed was refresh, received callback");
+                                                                    log('Article', "RSS feed was refresh, received callback", 'detail');
                                                                 }
                                                             });
                                                         });
