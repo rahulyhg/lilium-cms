@@ -1255,13 +1255,6 @@ class Article {
                         db.update(cli._c, 'content', {
                             _id: id
                         }, formData, (err, doc)  => { 
-                            require("./history.js").pushModification(cli, res, res._id, (err, revision)  => {    
-                                cli.sendJSON({
-                                    success: true,
-                                    _id: cli.postdata.data._id,
-                                    reason : 200
-                                });
-                            });
                             db.update(cli._c, 'content', 
                                 {_id : id}, {$addToSet : {subscribers : db.mongoID(cli.userinfo.userid)}}, 
                                 ()  => {}, false, true, true
