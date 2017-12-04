@@ -1255,6 +1255,11 @@ class Article {
                         db.update(cli._c, 'content', {
                             _id: id
                         }, formData, (err, doc)  => { 
+                            cli.sendJSON({     
+                                success: true,        
+                                _id: cli.postdata.data._id,      
+                                reason : 200        
+                            });
                             db.update(cli._c, 'content', 
                                 {_id : id}, {$addToSet : {subscribers : db.mongoID(cli.userinfo.userid)}}, 
                                 ()  => {}, false, true, true
