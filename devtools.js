@@ -53,6 +53,11 @@ class DevTools {
                     interpretLMLToCli(cli);
                 }
                 break;
+            case 'lml3':
+                if (cli.routeinfo.path[3] === "clearlml3") {
+                    clearLML3Cache(cli);
+                }
+                break;
             case 'cache':
                 handleCacheClear(cli);
                 break;
@@ -423,6 +428,14 @@ var clearCache = function(cli, ctx) {
         default:
             cli.response.end("");
     }
+};
+
+var clearLML3Cache = function(cli) {
+    Object.keys(require.cache).filter(x => x.endsWith('lml3') || x.endsWith('petal3')).forEach(file => {
+        delete require.cache[file];
+    });
+    
+    cli.sendJSON({ok : 1})
 };
 
 var maybeInsertFeed = function(cli) {
