@@ -52,13 +52,12 @@ class FileServer {
         try {
             return minify(content, Object.assign({
                 removeComments: true,
-                removeScriptTypeAttributes: true,
                 collapseWhitespace: true,
                 minifyJS: true,
                 minifyCSS: true
             }, options || {}));
         } catch (ex) {
-            log("FileServer", "Failed to minify string", "warn");
+            log("FileServer", "Failed to minify string : " + ex.toString().split('\n')[0], "warn");
             return content;
         }
     }

@@ -114,7 +114,7 @@ class LMLContext {
             slugify : require('slugify'),
             fileio : require('../fileserver.js'),
             postlead : require('../postleaf.js').getLeaves(),
-            encode : x => (x ? x.replace ? x.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") : x : ""),
+            encode : x => (x && x.replace ? x.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\"/g, "&quot;") : x),
             snip : (snipid, ...args) => require('../themes').renderSnip(this._c, snipid, args),
             getQueueTags : () => require('../templateBuilder').getQueueTags(this._c)
         };
