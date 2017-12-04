@@ -11,9 +11,6 @@ var caijProc;
 var bootCount = 0;
 
 var Gardener = function() {
-    this.relConfigPath = "/network/gardener.json";    
-    this.configPath = __dirname + this.relConfigPath;
-
     if (cluster.isMaster) {
         var that = this;
 
@@ -91,10 +88,8 @@ Gardener.prototype.broadcast = function(m) {
 };
 
 Gardener.prototype.loadConfig = function(cb) {
-    fileserver.readJSON(this.configPath, function(json) {
-        networkConfig = json;
-        cb();
-    }, false);
+    networkConfig = require('./sites/default.json').network;
+    cb();
 }
 
 Gardener.prototype.define = function() {

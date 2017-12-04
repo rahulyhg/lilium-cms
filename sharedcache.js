@@ -1,6 +1,5 @@
 const log = require('./log.js');
 const net = require('net');
-const gdconf = require('./network/gardener.json');
 const gdinfo = require('./network/info.js');
 const noop = () => {};
 

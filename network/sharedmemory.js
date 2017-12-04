@@ -1,5 +1,4 @@
 const log = require('../log.js');
-const gdconf = require('./gardener.json');
 const net = require('net');
 
 const mem = {
@@ -187,7 +186,8 @@ class SharedMemory {
     }
 
     bind() {
-        if (gdconf.useUDS) {
+        this.gdconf = require('../sites/default').network;
+        if (this.gdconf.useUDS) {
             log('SharedMem', "Removing old UDS file");
             try {
                 require('fs').unlinkSync(__dirname + "/sharedmemory.sock");
@@ -198,8 +198,8 @@ class SharedMemory {
 
         this.server = net.createServer(this.onConnect);
         this.server.on('error', this.onError);
-        this.server.listen(!gdconf.useUDS ? {
-            port : gdconf.cacheport,
+        this.server.listen(!this.gdconf.useUDS ? {
+            port : this.gdconf.cacheport,
             host : "localhost",
             exclusive : true
         } : {

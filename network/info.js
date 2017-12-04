@@ -1,14 +1,14 @@
 const process = require('process');
-const gdconf = require('./gardener.json');
 
-let info = {};
 class NetworkInfo {
     constructor() {
-        info.isElderChild = process.env.instancenum == 0 || typeof process.env.parent == "undefined";
+        this.info = {
+            isElderChild : process.env.instancenum == 0 || typeof process.env.parent == "undefined"
+        };
     }
 
     isElderChild() {
-        return info.isElderChild;
+        return this.info.isElderChild;
     }
 
     instanceNumber() {
@@ -16,7 +16,7 @@ class NetworkInfo {
     }
 
     getGardenerConfig() {
-        return gdconf;
+        return require('../sites/default').network;
     }
 }
 
