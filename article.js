@@ -2138,7 +2138,7 @@ class Article {
             paginate: true,
             searchable: true,
             max_results: 25,
-            sortby : 'date',
+            sortby : '_id',
             filters : {
                 status : {
                     displayname : "Status",
@@ -2188,8 +2188,9 @@ class Article {
                 key: 'media',
                 displayname: 'Media',
                 template: 'imgArticle',
-                sortable: false,
+                sortable: true,
                 classes : "article-table-image nomobile",
+                sortkey : "_id"
             }, {
                 key: '',
                 displayname: 'Title - Subtitle',
