@@ -53,10 +53,8 @@ class DevTools {
                     interpretLMLToCli(cli);
                 }
                 break;
-            case 'lml3':
-                if (cli.routeinfo.path[3] === "clearlml3") {
-                    clearLML3Cache(cli);
-                }
+            case 'clearlml3':
+                clearLML3Cache(cli);
                 break;
             case 'cache':
                 handleCacheClear(cli);

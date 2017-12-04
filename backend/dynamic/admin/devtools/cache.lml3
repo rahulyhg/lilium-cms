@@ -6,7 +6,7 @@ const settings = {
 
 const style = `<style>
 
-#clear-homepage-button {
+.workbutton {
     display: block;
     margin: 20px;
     border: 2px solid #713694;
@@ -23,11 +23,11 @@ const style = `<style>
     cursor: pointer;
 }
 
-#clear-homepage-button:hover {
+.workbutton:hover {
     box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.4) inset;
 }
 
-#clear-homepage-button:active {
+.workbutton:active {
     border-bottom-width: 2px;
     transform: translate3d(0, 3px, 0);
     margin-bottom: 23px;
@@ -44,109 +44,22 @@ const preload = (context, done) => {
                 done();
             });
         };
+
+        window.clearlml3 = function(done, btn) {
+            lml.post({}, '${context._c.server.url}/admin/devtools/clearlml3', function() {
+                liliumcms.notify({ title : "Homepage", message : "LML3 cache was cleared", type : "success" });
+                done();
+            });
+        };
     </script>`;
-
-    context.bunchArticles = `
-        <lml-bunch>
-            <lml-bunchfilters>
-                <div class="bunch-filters">
-                    <div class="bunch-filters-title">FILTERS</div>
-                    <label>Search</label>
-                    <input type="text" name="search" placeholder="Title keywords" />
-
-                    <label>Status</label>
-                    <select name="status">
-                        <option value="">All</option>
-                        <option value="live">Live</option>
-                        <option value="expired">Expired</option>
-                    </select>
-                </div>
-            </lml-bunchfilters>
-
-            <lml-bunchitem>
-                <div class="cakepop-strip-wrapper">
-                    <div class="cakepop-strip">
-                        <lml-link href="${context._c.server.url}/admin/cakepop/edit/{ckp._id}">
-                            <h4>
-                                <lml-generate call="ckp_status_icon"></lml-generate>
-                                <lml-text var="ckp.title" tag="h4" ></lml-text>
-                            </h4>
-                            <div>
-                                Running until <b><lml-text var="ckp.expiry" date="dd/mm/yyyy HH:MM"></lml-text></b>
-                            </div>
-                            <div>
-                                Read reports : <b><lml-text var="ckp.read"></lml-text></b>
-                            </div>
-                        </lml-link>
-                    </div>
-                </div>
-            </lml-bunchitem>
-
-            <script type="lmljson" name="eakepopbunch">
-                {
-                    "datasource" : "cakepop.bunch",
-                    "loopvar" : "ckp"
-                }
-            </script>
-        </lml-bunch>
-
-        <div id="create-cakepop-modal" class="lml-modal">
-            <div class="lml-modal-title">
-                Create a new cakepop
-            </div>
-            <div class="lml-modal-body">
-                <span>Give it a name</span>
-                <input id="new-topic-displayname" placeholder="This is simply for reference, it will only appear in the list" name="displayname" />
-            </div>
-            <div class="lml-modal-footer">
-                <button class="lml-modal-cancel" type="button">Cancel</button>
-                <button class="lml-modal-accept" type="button">Create Cakepop</button>
-            </div>
-        </div>
-
-        <script>
-            window.ckp_now = new Date().getTime();
-            window.ckp_status_icon = function(ldContext) {
-                var elem = document.createElement('i');
-                if (ldContext.ckp.status == "creation") {
-                    elem.className = "fa fa-pencil-square";
-                } else if (ldContext.ckp.expiry > window.ckp_now) {
-                    elem.className = "fa fa-circle-o-notch fa-spin fa-fw"
-                } else if (ldContext.ckp.status == "live") {
-                    elem.className = "fa fa-calendar-check-o";
-                }
-
-                return elem;
-            };
-
-            window.newCakepopDialog = function() {
-                liliumcms.modals.get("create-cakepop-modal").cast();
-            };
-
-            window["create-cakepop-modal_accept"] = function(dlg) {
-                var displayname = dlg.getFormData().displayname;
-
-                if (displayname) {
-                    liliumcms.lmldom.post({
-                        displayname : displayname
-                    }, "${context._c.server.url}/admin/cakepop/new", function(resp) {
-                        dlg.dismiss();
-
-                        if (resp.success && resp.redirect) {
-                            liliumcms.pageloader.load(resp.redirect);
-                        }
-                    });
-                }
-            };
-        </script>
-    `;
 
     context.homebutton = `
         <div id="clear-homepage-button" class="workbutton big" data-call="generateHomepage">
             <span>Rebuild homepage markup</span>
         </div>
-
-        <h2>Posts</h2>
+        <div id="clear-lml3-button" class="workbutton big" data-call="clearlml3">
+            <span>Clear LML3 require cache</span>
+        </div>
     `;
 
     done();
