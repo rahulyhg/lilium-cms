@@ -3,6 +3,14 @@ const net = require('net');
 const gdinfo = require('./network/info.js');
 const noop = () => {};
 
+class SockFallback {
+    on(ev, cb) {
+        if (ev == "end") { cb && cb(); }
+    }
+
+    write(dat) { }
+}
+
 const getUDS = () => {
     return net.connect({
         path : __dirname + "/network/sharedmemory.sock"

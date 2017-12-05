@@ -562,8 +562,7 @@ var maybeRestart = function(cli) {
 
 var restartLilium = function(cli) {
     cli.sendJSON({ok : true, message : "restart"});
-    require.cache = {};
-    // require('./lilium.js').cms();
+    process.send("updateAndRestart", () => {})
 }
 
 var maybeExecuteScript = function(cli) {

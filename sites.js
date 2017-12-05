@@ -369,11 +369,7 @@ var SiteInitializer = function (conf, siteobj) {
                                     loadSessions(function() {
                                         loadRobots(function() {
                                             update(conf, function() {
-                                                if (isElder) {
-                                                    require('./network/sharedmemory.js').bind();
-                                                } else {
-                                                    sharedcache.hi();
-                                                }
+                                                sharedcache.hi();
 
                                                 checkForWP(conf);
                                                 hooks.fire('site_initialized', conf);

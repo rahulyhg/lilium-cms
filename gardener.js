@@ -1,108 +1,125 @@
-var config = require('./config.js');
-var fileserver = require('./fileserver.js');
-var cluster = require('cluster');
-var RedisServer = require('redis-server');
-var SharedMemory = require('./network/sharedmemory.js');
-var log = require('./log.js');
+const config = require('./config.js');
+const fileserver = require('./fileserver.js');
+const cluster = require('cluster');
+const RedisServer = require('redis-server');
+const fs = require('fs');
+const SharedMemory = require('./network/sharedmemory.js');
+const log = require('./log.js');
 
-var networkConfig = {loaded:false};
-var garden = {};
-var caijProc;
-var bootCount = 0;
+const garden = {};
 
-var Gardener = function() {
-    if (cluster.isMaster) {
-        var that = this;
+let bootCount = 0;
 
-        require('./masthead.js');
-        log('Network', 'Loading network config', 'lilium');
-        this.loadConfig(function() {
+class Gardener {
+    constructor() {
+        if (cluster.isMaster) {
+            require('./masthead.js');
+
+            log('Network', 'Loading network config', 'lilium');
+            this.networkConfig = require('./sites/default.json').network;
+
             log('Network', 'Network configuration loaded', 'success');
             log('Network', 'Spawning redis server', 'lilium');
-            var redisserver = new RedisServer(6379);
+            const redisserver = new RedisServer(6379);
 
-            redisserver.open(function(a, b) {
+            redisserver.open(() => {
                 log('Network', 'Redis server spawned', 'success');
-                var lmlinstances = networkConfig.familysize || require('os').cpus().length;
+                const lmlinstances = this.networkConfig.familysize || require('os').cpus().length;
 
                 log('Network', 'Starting up Shared Memory module', 'lilium');
                 SharedMemory.bind();
 
-                var server = require('http').createServer();
-                var io = require('socket.io').listen(server);
-                var redis = require('socket.io-redis');
+                const server = require('http').createServer();
+                const io = require('socket.io').listen(server);
+                const redis = require('socket.io-redis');
     
                 io.adapter(redis());
     
                 log('Network', "Starting CAIJ", 'lilium');
-                caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash"})
-                caijProc.on('message', that.broadcast);
+                this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash"})
+                this.caijProc.on('message', this.broadcast.bind(this));
 
                 log('Network', 'Starting ' + lmlinstances + ' processes', 'lilium');
-                for (var i = 0; i < lmlinstances; i++) {
-                    var chld = cluster.fork({instancenum : i, parent : "gardener"});
+                for (let i = 0; i < lmlinstances; i++) {
+                    const chld = cluster.fork({instancenum : i, parent : "gardener"});
                     chld.instancenum = i;
                     garden[chld.process.pid] = chld;
-                    chld.on('message', that.broadcast);
+                    chld.on('message', this.broadcast.bind(this));
                     bootCount++;
                 }
 
-                cluster.on('online', function(worker) {
+                cluster.on('online', worker => {
                     log('Network', 'Worker ' + worker.process.pid + ' is online', 'success');
                 });
 
-                cluster.on('exit', function(worker, code, signal) {
+                cluster.on('exit', (worker, code, signal) => {
+                    if (worker == this.caijProc) {
+                        this.caijProc = cluster.fork({parent : "gardener", job : "caij", handleError : "crash"})
+                        return this.caijProc.on('message', this.broadcast.bind(this));
+                    }
+
                     log('Network', 'Worker ' + worker.process.pid + ' died with code: ' + code + ', and signal: ' + signal, 'err');
                     log('Network', 'Starting a new worker', 'info');
-                    var dyingChld = garden[worker.process.pid];
-                    var chld = cluster.fork({instancenum : dyingChld.instancenum, parent : "gardener"});
-                    chld.on('message', that.broadcast);
 
-                    delete garden[worker.process.pid];
+                    const pid = worker.process.pid;
+                    const dyingChld = garden[pid];
+                    const chld = cluster.fork({instancenum : dyingChld.instancenum, parent : "gardener"});
+                    chld.instancenum = dyingChld.instancenum;
+                    chld.on('message', this.broadcast.bind(this));
+
+                    delete garden[pid];
                     garden[chld.process.pid] = chld;
                     bootCount++;
                     log('Network', 'Started a new worked with process ' + worker.process.pid, 'success');
                 }); 
-            });       
-        });
-    } else {
-        var Lilium = require('./lilium.js');
-        var lilium = new Lilium();
-        garden[process.id] = lilium.cms();
-    } 
-};
-
-Gardener.prototype.broadcast = function(m) {
-    var senderpid = m.sender;
-    if (!senderpid) {
-        return;
+            });
+        } else {
+            const Lilium = require('./lilium.js');
+            const lilium = new Lilium();
+            garden[process.id] = lilium.cms();
+        } 
     }
 
-    for (var pid in garden) if (pid != senderpid || m.sendback) {
-        garden[pid].send({
-            type : m.type,
-            payload : m.payload,
-            from : senderpid
+    updateAndRestart() {
+        log('Gardener', 'Pulling from git', 'Lilium');
+
+        const { spawn } = require('child_process');
+        const gitcommand = spawn('git', 'pull origin master'.split(' '));
+        gitcommand.on('close', code => {
+            log('Gardener', 'Clearing require cache', 'Lilium');
+            const cachedFiles = Object.keys(require.cache);
+            for (let file in cachedFiles) {
+                delete require.cache[file];
+            }
+
+            // this.caijProc.kill();
+
+            log('Gardener', 'Killing children processes', 'Lilium');
+            for (let pid in garden) {
+                garden[pid].kill();
+            }
         });
     }
+
+    broadcast(m) {
+        if (m == "updateAndRestart") {
+            return this.updateAndRestart();
+        }
+
+        var senderpid = m.sender;
+        if (!senderpid) {
+            return;
+        }
+
+        for (var pid in garden) if (pid != senderpid || m.sendback) {
+            garden[pid].send({
+                type : m.type,
+                payload : m.payload,
+                from : senderpid
+            });
+        }
+    };
+
 };
 
-Gardener.prototype.loadConfig = function(cb) {
-    networkConfig = require('./sites/default.json').network;
-    cb();
-}
-
-Gardener.prototype.define = function() {
-    server = http.createServer(this.helloClient);
-    io = require('socket.io')(server);
-};
-
-Gardener.prototype.openProxy = function() {
-    
-}
-
-Gardener.prototype.spinThatShitDJ = function() {
-    
-};
-
-var lmlnetwork = new Gardener();
+const lmlnetwork = new Gardener();
