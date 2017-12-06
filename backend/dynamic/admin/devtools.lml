@@ -94,6 +94,12 @@
             </a>
         </li>
         <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/unlink" >
+                <i class="devtools-list-item-icon fa fa-picture-o"></i>
+                <b class="devtools-list-item-title">Unlink files</b>
+            </a>
+        </li>
+        <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/hits" >
                 <i class="devtools-list-item-icon fa fa-exchange"></i>
                 <b class="devtools-list-item-title">Admin hits</b>

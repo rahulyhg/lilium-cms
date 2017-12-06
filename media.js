@@ -193,21 +193,16 @@ var Media = function () {
         cli.touch('media.new');
 
         if (cli.method == 'POST') {
-            var form = formBuilder.handleRequest(cli);
-            var response = formBuilder.validate(form, true);
-
-            if (response.success || cli.postdata.data.form_name == "lmlimagepicker") {
-                var imagefile = response.success ? formBuilder.serializeForm(form).File : cli.postdata.data.File;
+            if (cli.postdata.data.form_name == "lmlimagepicker") {
+                var imagefile = cli.postdata.data.File;
                 this.handleUploadedFile(cli._c, db.mongoID(cli.userinfo.userid), imagefile, (err, result) => {
                     if (err) {
-                        cli.sendJSON({
-                            form: response
-                        });
+                        cli.sendJSON({ err });
                     } else {
                         cli.did('media', 'upload', { file : imagefile });
 
                         cli.sendJSON({
-                            redirect: '',
+                            redirect: "",
                             success: true,
                             picture: result.ops[0]
                         });
@@ -215,7 +210,7 @@ var Media = function () {
                 });
             } else {
                 cli.sendJSON({
-                    msg: 'Invalid file type'
+                    msg: 'Invalid request'
                 });
             }
         } else {

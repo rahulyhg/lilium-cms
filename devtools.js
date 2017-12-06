@@ -7,6 +7,7 @@ var notif = require('./notifications.js');
 var formBuilder = require('./formBuilder.js');
 var configs = require('./config');
 var precomp = require('./precomp.js');
+var fs = require('fs');
 var db = require('./includes/db.js');
 
 class DevTools {
@@ -25,6 +26,7 @@ class DevTools {
             case 'scripts':
             case 'hits':
             case 'mail':
+            case 'unlink':
             case 'where':
             case undefined:
                 filelogic.serveAdminLML(cli);
@@ -55,6 +57,9 @@ class DevTools {
                 break;
             case 'clearlml3':
                 clearLML3Cache(cli);
+                break;
+            case 'unlink':
+                unlinkUpload(cli);
                 break;
             case 'cache':
                 handleCacheClear(cli);
@@ -154,7 +159,8 @@ class DevTools {
             listAllCachedFiles(cli, levels, params, cb);
         }
     };
-
+    
+    
     form () {
         formBuilder.createForm('devtools_livevar', {
             formWrapper: {
@@ -328,6 +334,31 @@ class DevTools {
         });
     }
 }
+
+var unlinkUpload = function(cli) {
+    const url = cli.postdata.data.url;
+    const filename = url.split('/').pop().split('_')[0];
+
+    db.findUnique(cli._c, 'uploads', { filename }, (err, entry) => {
+        if (entry) {
+            let fullpath = entry.path;
+            let totalFiles = 1;
+            fs.unlinkSync(fullpath);
+
+            Object.keys(entry.sizes).forEach(size => {
+                fs.unlinkSync(entry.sizes[size].path);
+                totalFiles++;
+            });
+
+            db.remove(cli._c, 'uploads', { _id : entry._id }, () => {
+                cli.sendJSON({ unlinked : true, entry, total : totalFiles });
+            });
+        } else {
+            cli.sendJSON({ unlinked : false });
+        }
+    });
+}
+
 
 var handleCacheClear = function(cli) {
     const type = cli.routeinfo.path[3];
