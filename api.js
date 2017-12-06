@@ -37,7 +37,7 @@ class LiliumAPI {
         cli.response.writeHead(200, {
             "Access-Control-Allow-Origin" : cli.request.headers.origin,
             "Access-Control-Allow-Method" : "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers" : "lml-token, lmlterms, corsorigin, lmltopic, lmlqid, lmlaid"
+            "Access-Control-Allow-Headers" : "lmltoken, lmlterms, corsorigin, lmltopic, lmlqid, lmlaid"
         });
         cli.response.end();
     }
