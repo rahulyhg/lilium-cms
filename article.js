@@ -2037,6 +2037,7 @@ class Article {
 
                     filename += "/" + pageIndex;
                     deepArticle.content = pages[pageIndex - 1];
+                    deepArticle.numberOfPages = pages.length;
                     deepArticle.title = titles[pageIndex - 1];
                     deepArticle.subtitle = subtitles[pageIndex - 1];
                     deepArticle.isPaginated = true;
