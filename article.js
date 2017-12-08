@@ -2062,6 +2062,9 @@ class Article {
                 } else {
                     deepArticle.pageIndex = 1;
                     deepArticle.content = deepArticle.content[0];
+                    deepArticle.title = deepArticle.title[0];
+                    deepArticle.subtitle = deepArticle.subtitle[0];
+                    deepArticle.numberOfPages = 1;
                 }
 
                 var asyncHooks = hooks.getHooksFor('article_async_render_' + _c.uid);
