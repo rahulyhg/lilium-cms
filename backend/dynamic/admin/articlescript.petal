@@ -722,10 +722,11 @@
             });
         }
 
-        var fillPackaging = function(serverdata) {
+        var fillPackaging = function(/*serverdata*/) {
             // Corrections
             var changes = [];
 
+            /*
             var plist = d.id('pr-parag-list');
             
             for (var s = 0; s < serverdata.length; s++) {
@@ -800,6 +801,7 @@
                     }
                 }
             }
+            */
 
             // Topic
             var ts = d.id('topic-selection');
@@ -971,7 +973,7 @@
 
         var showPackaging = function() {
             liliumcms.modals.get('dlg-modal-packaging-loading').cast();
-            d.id('pr-parag-list').empty();
+            // d.id('pr-parag-list').empty();
             document.body.classList.add('block-scroll');
 
             setTimeout(function() {
@@ -979,7 +981,7 @@
                     {}, 
                     '{=config.default.server.url}/admin/article/package/' + liliumcms.pageloader.lastLevel, 
                 function(pkg) {
-                    fillPackaging(pkg.report);
+                    fillPackaging(/*pkg.report*/);
                     createPageTabs(pkg.content);
                     updateFacebookPreview(pkg.article);
 

@@ -179,7 +179,7 @@
         </div>
     </div>
 
-    <div>
+    <!--div>
         <h2>Corrections &amp; suggestions</h2>
         <p>First, let's review all paragraphs for typos and syntax errors. Here are a couple suggestions on how to improve the user experience. You can click on suggestions to automatically apply the changes, or manually make modifications. Then, the paragraph can be marked as verified.</p>
 
@@ -190,7 +190,7 @@
         <div id="proofread">
             
         </div>
-    </div>
+    </div-->
 
     <div id="pagination-and-banners">
         <h2>Pagination and banners</h2>
