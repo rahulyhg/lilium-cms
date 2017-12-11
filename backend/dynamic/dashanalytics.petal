@@ -100,23 +100,23 @@ window.sockUpdateDashboard = function(data) {
         <div class="dashboard-ga-yesterday-rect">
             <h3>User sessions</h3>
             <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.metrics.sessions"></lml-text>
+                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions"></lml-text>
             </div>
             <small>
-                Average of <lml-text var="livevars.googleanalytics.dashboard.ratio.pagepersession"></lml-text> pages per session
+                Average of <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.ratio.pagepersession"></lml-text> pages per session
             </small>
         </div>
         <div class="dashboard-ga-yesterday-rect">
             <h3>Page views</h3>
             <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.metrics.views"></lml-text>
+                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.views"></lml-text>
             </div>
         </div>
     </div>
     <div class="col-xs-4 col-md-4 dashboard-card">
         <div class="dashboard-ga-yesterday-rect dashboard-ga-publication-list">
-            <h3><lml-text var="livevars.googleanalytics.dashboard.published.length"></lml-text> articles published</h3>
-            <lml-foreach var="publication" in="livevars.googleanalytics.dashboard.published">
+            <h3><lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.published.length"></lml-text> articles published</h3>
+            <lml-foreach var="publication" in="livevars.googleanalytics.dashboard.performance.yesterday.published">
                 <lml-link href="{=config.default.server.url}/{publication.name}" target="_blank">
                     <lml-text var="publication.title.0"></lml-text>
                 </lml-link>
