@@ -68,7 +68,7 @@ class GoogleAnalyticsRequest {
 
     static lastWeek(_c, gAnalytics, send) {
         const lastSun = new Date();
-        lastSun.setDate(now.getDate() - now.getDay());
+        lastSun.setDate(lastSun.getDate() - lastSun.getDay());
 
         const beforeSun = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate() - 7);
 
@@ -135,6 +135,42 @@ class GoogleAnalyticsRequest {
             });
         });
     }
+    
+    static extendedDashboard(_c, gAnalytics, original, send) {
+        log('Analytics', 'Requesting extended dashboard', 'detail');
+        const base = {
+            performance : {
+                yesterday : {
+                    metrics : original.metrics,
+                    toppage : original.toppage,
+                    published : original.published,
+                    ratio : original.ratio
+                }
+            }
+        };
+
+        const datethen = Date.now();
+        GoogleAnalyticsRequest.lastMonth(_c, gAnalytics, (data) => {
+            base.performance.lastmonth = {
+                lastmonth : StatsBeautifier.toPresentable(data.lastmonth),
+                monthbefore : StatsBeautifier.toPresentable(data.monthbefore)
+            }; 
+
+            GoogleAnalyticsRequest.last30Days(_c, gAnalytics, (err, data) => {
+                base.performance.last30days = StatsBeautifier.toPresentable(data);
+
+                GoogleAnalyticsRequest.lastWeek(_c, gAnalytics, (err, data) => {
+                    base.performance.lastweek = StatsBeautifier.toPresentable(data);
+
+                    GoogleAnalyticsRequest.sameDay(_c, gAnalytics, (err, data) => {
+                        base.performance.sameday = StatsBeautifier.toPresentable(data);
+                        log('Analytics', 'Received extended dashboard data in ' + (Date.now() - datethen) + "ms", 'detail');
+                        send(base);
+                    });
+                });
+            });
+        });
+    }
 
     static dashboard(_c, gAnalytics, send) {
         GoogleAnalyticsRequest.yesterday(_c, gAnalytics, (err, data) => {
@@ -148,6 +184,7 @@ class GoogleAnalyticsRequest {
                 searchs : data.totalsForAllResults["ga:organicSearches"],
                 sessions : data.totalsForAllResults["ga:sessions"]
             };
+
             var total = {
                 metrics,
                 ratio : {
@@ -197,32 +234,14 @@ class GoogleAnalyticsRequest {
                     }
                 }, (err, arr) => {
                     total.published = arr;
-                    send(undefined, total);
+                    GoogleAnalyticsRequest.extendedDashboard(_c, gAnalytics, total, (extendeddata) => {
+                        send(err, extendeddata);
+                    });
                 }, {title : 1, name : 1});
             });
         });
     }
 
-    static lastmonth(_c, gAnalytics, send) {
-        var monthNumber = new Date().getMonth();
-        var lastDay = monthDays[monthNumber];
-        var year = new Date().getFullYear().toString();
-        if (year % 4 == 0) {
-            lastDay++;
-        }
-
-        monthNumber++;
-        if (monthNumber < 10) {
-            monthNumber = "0" + monthNumber.toString();
-        }
-
-        gAnalytics.getData(_c, {
-            "start-date" : year + "-" + monthNumber + "-01",
-            "end-date" : year + "-" + monthNumber + "-" + lastDay,
-            "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions
-        }, send);
-    }
 };
 
 class StatsBeautifier {
@@ -233,6 +252,14 @@ class StatsBeautifier {
             source : x[2].toLowerCase(), 
             count : empty ? 0 : parseInt(x[3]), 
             home : x[1] == "/" 
+        };
+    }
+
+    static toPresentable(data) {
+        return {
+            unique : data.totalsForAllResults["ga:users"],
+            views : data.totalsForAllResults["ga:pageviews"],
+            sessions : data.totalsForAllResults["ga:sessions"]
         };
     }
 
@@ -479,6 +506,24 @@ class GoogleAnalytics {
                     });
                 }
             });
+        } else if (topLevel == "dashboard") {
+            const cachekey = 'analytics_dashboard_' + cli._c.id;
+            sharedcache.get(cachekey, (data) => {
+                if (data && new Date().getTime() - data.cachedAt < (1000 * 60 * 60 * 6)) {
+                    send(data);
+                } else {
+                    GoogleAnalyticsRequest.dashboard(cli._c, this, (err, data) => {
+                        if (data) {
+                            send(data);
+
+                            data.cachedAt = Date.now();
+                            sharedcache.set({[cachekey] : data});
+                        } else {
+                            send({ error : err, valid : false});
+                        }
+                    });
+                }
+            });
         } else if (topLevel == "lastMonth") {
             const cachekey = 'analytics_lastmonth_' + cli._c.id;
             sharedcache.get(cachekey, (data) => {
@@ -499,7 +544,7 @@ class GoogleAnalytics {
             });
         } else {
             sharedcache.get('analytics_cache_' + topLevel + "_" + cli._c.uid, (cachedAnalytics) => {
-                if (cachedAnalytics && new Date().getTime() - cachedAnalytics.cachedAt < (1000 * 60 * 60)) {
+                if (cachedAnalytics && new Date().getTime() - cachedAnalytics.cachedAt < (1000 * 60 * 60 * 6)) {
                     send(cachedAnalytics.data);
                 } else if (typeof GoogleAnalyticsRequest[topLevel] == "function") {
                     GoogleAnalyticsRequest[topLevel](cli._c, that, (err, data) => {
