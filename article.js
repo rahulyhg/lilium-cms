@@ -390,10 +390,10 @@ class Article {
             const sendback = () => {
                 if (contents.length == article.content.length) {
                     db.update(cli._c, 'content', { _id : article._id }, { content : contents, hasads : true }, () => {
-                        cli.sendJSON({ content : contents, report : reports, article });
+                        cli.sendJSON({ content : contents, article });
                     });
                 } else {
-                    cli.sendJSON({ content : contents, report : reports, article });
+                    cli.sendJSON({ content : contents, article });
                 }
             };
 
@@ -427,8 +427,8 @@ class Article {
                     x.id = "article-p-" + i
                 });
 
-                this.proofread(paragraphs, lang, report => {
-                    reports.push(report);
+                // this.proofread(paragraphs, lang, report => {
+                    // reports.push(report);
 
                     if (!article.isSponsored && !article.nsfw) {
                         const pattern = this.insertAds(cli._c, article, window);
@@ -436,7 +436,7 @@ class Article {
 
                     contents.push(window.document.body.innerHTML);
                     nextpage();
-                });
+                // });
             };
 
             nextpage();
