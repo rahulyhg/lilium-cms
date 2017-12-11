@@ -31,6 +31,9 @@ See the [Lilium CMS Wiki](https://github.com/narcitymedia/lilium-cms/wiki) and g
 ## Script mode
 It is possible to run a Javascript file in script mode. It will prevent Lilium from loading the listeners, CAIJ and other modules related to networking. The websites and databases will still be loaded on a single thread, and the script passed as an argument will be executed. 
 
+## Random quote API
+http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en
+
 ### Usage
 `node runscript.js [script.js]`
 
