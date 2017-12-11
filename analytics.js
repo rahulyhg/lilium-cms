@@ -52,6 +52,36 @@ class GoogleAnalyticsRequest {
         }, send);
     }
 
+    static sameDay(_c, gAnalytics, send) {
+        const now = new Date();
+        const sameday = require('dateformat')(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 8), 'yyyy-mm-dd');
+
+        gAnalytics.getData(_c, {
+            "start-date" : sameday,
+            "end-date" : sameday,
+            "metrics" : defaultMetrics,
+            "dimensions" : defaultDimensions,
+            "max-results" : 50,
+            "sort" : "-ga:pageviews"
+        }, send);
+    }
+
+    static lastWeek(_c, gAnalytics, send) {
+        const lastSun = new Date();
+        lastSun.setDate(now.getDate() - now.getDay());
+
+        const beforeSun = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate() - 7);
+
+        gAnalytics.getData(_c, {
+            "start-date" : require('dateformat')(beforeSun, 'yyyy-mm-dd'),
+            "end-date" : require('dateformat')(lastSun, 'yyyy-mm-dd'),
+            "metrics" : defaultMetrics,
+            "dimensions" : defaultDimensions,
+            "max-results" : 50,
+            "sort" : "-ga:pageviews"
+        }, send);
+    }
+
     static realtime(_c, gAnalytics, send) {
         gAnalytics.getData(_c, {
             "metrics" : "rt:activeUsers", 
@@ -59,6 +89,22 @@ class GoogleAnalyticsRequest {
             "sort" : "-rt:activeUsers", 
             "max-results" : 50
         }, send, true);
+    }
+
+    static last30Days(_c, gAnalytics, send) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        const last30 = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate() - 30);
+
+        gAnalytics.getData(_c, {
+            "start-date" : require('dateformat')(last30, 'yyyy-mm-dd'),
+            "end-date" : require('dateformat')(yesterday, 'yyyy-mm-dd'),
+            "metrics" : defaultMetrics,
+            "dimensions" : defaultDimensions,
+            "max-results" : 50,
+            "sort" : "-ga:pageviews"
+        }, send);
     }
 
     static lastMonth(_c, gAnalytics, send) {
