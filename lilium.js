@@ -1,6 +1,7 @@
 class LiliumCMS {
     init() {
         const log = require('./log.js');
+        global.log = log;
         log('Lilium', 'Starting up...', 'lilium');
 
         let startupTime = new Date();
