@@ -395,6 +395,9 @@ var Settings = function () {
                     name: "dev",
                     displayName: "Development"
                 }, {
+                    name: "output",
+                    displayName: "Full output"
+                }, {
                     name: "prod",
                     displayName: "Production"
                 }]
