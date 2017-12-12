@@ -23,8 +23,38 @@ class Core {
                 return;
             }
 
+            log('Core', 'Creating global library access', 'lilium');
+
+            global.core = {
+                fileserver : require('./fileserver'),
+                filelogic : require('./filelogic'),
+                hooks : require('./hooks'),
+                entities : require('./entities'),
+                endpoints : require('./endpoints'),
+                livevars : require('./livevars'),
+                API : require('./api'),
+                formBuilder : require('./formBuilder'),
+                imageResizer : require('./imageResizer'),
+                LML3 : require('./lml3/compiler'),
+                LML2 : require('./lml'),
+                notifications : require('./notifications'),
+                petal : require('./petal'),
+                precomp : require('./precomp'),
+                preferences : require('./preferences'),
+                scheduler : require('./scheduler'),
+                search : require('./search'),
+                sharedcache : require('./sharedcache'),
+                socialdispatch : require('./socialdispatch'),
+                tableBuilder : require('./tableBuilder'),
+                themes : require('./themes'),
+                topics : require('./topics'),
+                utils : require('./utils'),
+                various : require('./various')
+            };
+
+            log('Core', 'Created global library', 'success');
+
             loadHooks(readyToRock);
-            
             loadForms();
             loadTables();
             loadEndpoints();

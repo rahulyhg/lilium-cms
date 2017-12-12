@@ -361,7 +361,6 @@ class RunningTask {
 class Executor {
     constructor() {
         let sites = config.getAllSites();
-
         for (let i = 0; i < sites.length; i++) {
             if (sites[i].caij === true) {
                 log('CAIJ', "Adding site to CAIJ janitor sites");
