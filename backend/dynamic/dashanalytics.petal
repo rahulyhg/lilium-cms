@@ -127,24 +127,24 @@ window.sockUpdateDashboard = function(data) {
         <div class="dashboard-ga-yesterday-rect">
             <h3>Top article</h3>
             <div>
-                <lml-link href="{livevars.googleanalytics.dashboard.toppage.url}" target="_blank">
-                    <lml-text var="livevars.googleanalytics.dashboard.toppage.article.title.0" wrapper="h4" /></lml-text>
+                <lml-link href="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.url}" target="_blank">
+                    <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.title.0" wrapper="h4" /></lml-text>
                 </lml-link>
-                <lml-text var="livevars.googleanalytics.dashboard.toppage.article.subtitle.0" wrapper="h5" /></lml-text>
+                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.subtitle.0" wrapper="h5" /></lml-text>
 
                 <div class="dashboard-ga-toppage-image-wrapper">
-                <lml-image src="{livevars.googleanalytics.dashboard.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml-image>
+                <lml-image src="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml-image>
                 </div>
 
                 <div class="dashboard-ga-toppage-author">
-                    <lml-image src="{livevars.googleanalytics.dashboard.toppage.article.authors.0.avatarURL}"></lml-image> 
+                    <lml-image src="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.authors.0.avatarURL}"></lml-image> 
                     <span>
                         Written by 
-                        <lml-text var="livevars.googleanalytics.dashboard.toppage.article.authors.0.displayname"></lml-text>
+                        <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.authors.0.displayname"></lml-text>
                     </span>
                 </div>
                 <small class="centered">
-                    With a total of <lml-text var="livevars.googleanalytics.dashboard.toppage.hits"></lml-text> hits
+                    With a total of <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.hits"></lml-text> hits
                 </small>
             </div>
         </div>
