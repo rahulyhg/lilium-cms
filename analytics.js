@@ -92,17 +92,11 @@ class GoogleAnalyticsRequest {
     }
 
     static last30Days(_c, gAnalytics, send) {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        
-        const last30 = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate() - 30);
-
         gAnalytics.getData(_c, {
-            "start-date" : require('dateformat')(last30, 'yyyy-mm-dd'),
-            "end-date" : require('dateformat')(yesterday, 'yyyy-mm-dd'),
+            "start-date" : "30daysAgo",
+            "end-date" : "yesterday",
             "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions,
-            "max-results" : 50,
+            "dimensions" : "ga:nthDay",
             "sort" : "-ga:pageviews"
         }, send);
     }
@@ -157,7 +151,7 @@ class GoogleAnalyticsRequest {
             }; 
 
             GoogleAnalyticsRequest.last30Days(_c, gAnalytics, (err, data) => {
-                base.performance.last30days = StatsBeautifier.toPresentable(data);
+                base.performance.last30days = StatsBeautifier.toPresentableArray(data);
 
                 GoogleAnalyticsRequest.lastWeek(_c, gAnalytics, (err, data) => {
                     base.performance.lastweek = StatsBeautifier.toPresentable(data);
@@ -252,6 +246,22 @@ class StatsBeautifier {
             source : x[2].toLowerCase(), 
             count : empty ? 0 : parseInt(x[3]), 
             home : x[1] == "/" 
+        };
+    }
+
+    static toPresentableArray(data) {
+        return {
+            unique : data.totalsForAllResults["ga:users"],
+            views : data.totalsForAllResults["ga:pageviews"],
+            sessions : data.totalsForAllResults["ga:sessions"],
+            daily : data.rows.map(x => {
+                return {
+                    unique : x[1],
+                    views : x[2],
+                    organicsearch : x[3],
+                    sessions : x[4]
+                }
+            })
         };
     }
 
