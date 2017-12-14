@@ -76,6 +76,32 @@ window.sockUpdateDashboard = function(data) {
         0 == data.pages[i].url.indexOf('/amp') && d.make({node : "span", class : "dashboard-top-source amp", parent : details, text : "AMP"});
     }
 };
+
+var generateLastMonth = function(ldContext) {
+    var lastmonth = ldContext.livevars.googleanalytics.dashboard.performance.lastmonth.lastmonth.sessions;
+    var monthbefore = ldContext.livevars.googleanalytics.dashboard.performance.lastmonth.monthbefore.sessions;
+
+    var ratio = lastmonth / monthbefore;
+    
+    var diffwrapper = d.make({}); 
+    d.make({ node : "i", class : "fa fa-chevron-" + (ratio > 0 ? "up" : "down"), parent : diffwrapper });
+    d.make({ id : "lastmonth-ratio", node : "span", text : ratio.toString().substring(0, 5) + "% " + (ratio > 0 ? "more" : "less") + " then the month before", parent : diffwrapper });
+
+    return diffwrapper.get();
+}
+
+var generateSameDayLastWeek = function(ldContext) {
+    var lastday = ldContext.livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions;
+    var daybefore = ldContext.livevars.googleanalytics.dashboard.performance.sameday.sessions;
+
+    var ratio = lastday / daybefore;
+    
+    var diffwrapper = d.make({}); 
+    d.make({ node : "i", class : "fa fa-chevron-" + (ratio > 0 ? "up" : "down"), parent : diffwrapper });
+    d.make({ id : "lastday-ratio", node : "span", text : ratio.toString().substring(0, 5) + "% " + (ratio > 0 ? "more" : "less") + " then the same day of last week", parent : diffwrapper });
+
+    return diffwrapper.get();
+}
 </script>
 
 <div id="dashboard-ga-realtime" class="dashboard-ga-title">
@@ -147,6 +173,47 @@ window.sockUpdateDashboard = function(data) {
                     With a total of <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.hits"></lml-text> hits
                 </small>
             </div>
+        </div>
+    </div>
+
+    <div style="float: none; clear: both; height: 1px;"></div>
+
+    <div class="dashboard-ga-title" id="dashboard-ga-performance-title" style="border-top: 3px solid #AF57E4;">
+        <div class="dashboard-ga-title-text">
+            Performance
+        </div>
+    </div>
+
+    <div class="col-xs-4 col-md-4 dashboard-card">
+        <div class="dashboard-ga-yesterday-rect">
+            <h3>Last month sessions</h3>
+            <div class="dashboard-ga-total-unique">
+                <lml-text var="livevars.googleanalytics.dashboard.performance.lastmonth.lastmonth.sessions"></lml-text>
+            </div>
+            <small>
+                <lml-generate call="generateLastMonth"></lml-generate>
+            </small>
+        </div>
+    </div>
+
+    <div class="col-xs-4 col-md-4 dashboard-card">
+        <div class="dashboard-ga-yesterday-rect">
+            <h3>Last week sessions</h3>
+            <div class="dashboard-ga-total-unique">
+                <lml-text var="livevars.googleanalytics.dashboard.performance.lastweek.sessions"></lml-text>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xs-4 col-md-4 dashboard-card">
+        <div class="dashboard-ga-yesterday-rect">
+            <h3>Yesterday session</h3>
+            <div class="dashboard-ga-total-unique">
+                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions"></lml-text>
+            </div>
+            <small>
+                <lml-generate call="generateSameDayLastWeek"></lml-generate>
+            </small>
         </div>
     </div>
 
@@ -227,6 +294,20 @@ window.sockUpdateDashboard = function(data) {
     border-top: 1px solid #d9d9d9;
 }
 
+.dashboard-ga-yesterday-rect small i {
+    margin-right: 4px;
+    vertical-align: baseline;
+    font-size: 14px;
+}
+
+.dashboard-ga-yesterday-rect small i.fa-chevron-up {
+    color: #00af00;
+}
+
+.dashboard-ga-yesterday-rect small i.fa-chevron-down {
+    color: #af0000;
+}
+
 .dashboard-ga-head-title {
     display: block;
     font-weight: 300;
@@ -238,6 +319,7 @@ window.sockUpdateDashboard = function(data) {
     text-transform: uppercase;
 }
 
+#dashboard-ga-performance-title,
 #dashboard-ga-yesterday-title {
     margin-bottom: 15px;
 }
