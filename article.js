@@ -17,6 +17,7 @@ const feed = require('./feed.js');
 const CDN = require('./cdn.js');
 const noop = require('./noop.js');
 const adslib = require('./ads');
+const contentlib = require('./content');
 
 const publishedNotificationTitles = [
     "You got this!",
@@ -767,42 +768,14 @@ class Article {
 
     create(cli) {
         cli.touch('article.create');
-        var articleObject = {};
-
-        articleObject.title = [cli.postdata.data.title];
-        articleObject.subtitle = [""] 
-        articleObject.author = db.mongoID(cli.userinfo.userid);
-        articleObject.updated = new Date();
-        articleObject.createdOn = new Date();
-        articleObject.status = "draft";
-        articleObject.type = "post";
-        articleObject.content = [""];
-        articleObject.createdBy = db.mongoID(cli.userinfo.userid);
-        articleObject.subscribers = [articleObject.createdBy];
-
-        var commitToCreate = ()  => {
-            db.insert(cli._c, 'content', articleObject, (err, result)  => {
-                var id = articleObject._id;
-                cli.sendJSON({
-                    articleid : id,
-                    editurl : cli._c.server.url + "/admin/article/edit/" + id,
-                    error : err,
-                    valid : !err
-                });
+        contentlib.create(cli._c, cli.postdata.data.title, db.mongoID(cli.userinfo.userid), (err, art) => {
+            cli.sendJSON({
+                articleid : art._id,
+                editurl : cli._c.server.url + "/admin/article/edit/" + art._id,
+                error : err,
+                valid : !err
             });
-        };
-
-        if (cli.userinfo.roles.indexOf('contributor') != -1) {
-            db.find(conf.default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, [], (err, cursor) => {
-                cursor.limit(1).project({reportsto : 1}).next((err, u) => {
-                    u.reportsto && u.reportsto.length != 0 && articleObject.subscribers.push(...u.reportsto);
-        
-                    commitToCreate();
-                });
-            });
-        } else {
-            commitToCreate();
-        }
+        });
     };
 
     facebookDebug(cli, postid) {
@@ -1972,135 +1945,10 @@ class Article {
     };
 
     generateArticle(_c, aid, cb, alreadyFetched, pageIndex) {
-        var workArticle = (deepArticle)  => {
-            var gen = ()  => {
-                var extra = {};
-                extra.ctx = "article";
-                extra.article = deepArticle;
-                extra.topic = deepArticle.topic;
-
-                if (deepArticle.topic && deepArticle.topic.override && deepArticle.topic.override.language) {
-                    extra.language = deepArticle.topic.override.language;
-                }
-
-                hooks.fire('article_will_render', {
-                    _c : _c,
-                    article: deepArticle
-                });
-
-                var ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
-                var filename = deepArticle.topicslug.substring(1) + deepArticle.name;
-
-                deepArticle.headline = deepArticle.title[0];
-                deepArticle.headsub = deepArticle.subtitle[0]
-
-                if (deepArticle.content.length > 1) {
-                    var pages = deepArticle.content;
-                    var titles = deepArticle.title;
-                    var subtitles = deepArticle.subtitle;
-
-                    if (pageIndex === "all") {
-                        log('Article', "Generated paginated article from admin panel : " + deepArticle.title[0]);
-                        let cIndex = pages.length;
-
-                        var nextPage = (resp)  => {
-                            if (cIndex == 0) {
-                                require('./fileserver.js').deleteFile(_c.server.html + "/" + deepArticle.topic.completeSlug + "/" + deepArticle.name + ".html", ()  => {
-                                    log('Article', "Cleared non-paginated version of article from file system");
-                                });
-
-                                cb({
-                                    success : true, 
-                                    deepArticle : deepArticle,
-                                    pages : pages.length
-                                });
-                            } else {
-                                that.generateArticle(_c, deepArticle._id, (resp)  => {
-                                    cIndex--;
-                                    nextPage(resp);
-                                }, false, cIndex);
-                            }
-                        };
-                        return nextPage();
-                    }
-
-                    if (!pageIndex || pageIndex <= 0) {
-                        pageIndex = 1;
-                    } else if (pageIndex > pages.length) {
-                        pageIndex = pages.length;
-                    }
-
-                    if (pageIndex != pages.length) {
-                        deepArticle.nextURL = deepArticle.url + "/" + (pageIndex + 1);
-                        deepArticle.related = [];
-                    } 
-
-                    filename += "/" + pageIndex;
-                    deepArticle.content = pages[pageIndex - 1];
-                    deepArticle.numberOfPages = pages.length;
-                    deepArticle.title = titles[pageIndex - 1];
-                    deepArticle.subtitle = subtitles[pageIndex - 1];
-                    deepArticle.isPaginated = true;
-                    deepArticle.totalPages = pages.length;
-                    deepArticle.pageIndex = pageIndex;
-
-                    if (deepArticle.title.indexOf(deepArticle.headline) != -1) {
-                        deepArticle.similartitle = true;
-                    }
-
-                    hooks.fire('paginated_article_generated_' + _c.uid, { article : deepArticle, page : pageIndex });
-
-                    deepArticle.url += "/" + pageIndex;
-
-                    if (pageIndex != 1) {
-                        deepArticle.featuredimage = [];
-                        deepArticle.featuredimageartist = undefined;
-                        deepArticle.imagecreditname = undefined;
-                    }
-
-                    log('Article', "Generated page " + pageIndex + " of paginated article " + deepArticle.title[0]);
-                } else {
-                    deepArticle.pageIndex = 1;
-                    deepArticle.content = deepArticle.content[0];
-                    deepArticle.title = deepArticle.title[0];
-                    deepArticle.subtitle = deepArticle.subtitle[0];
-                    deepArticle.numberOfPages = 1;
-                }
-
-                var asyncHooks = hooks.getHooksFor('article_async_render_' + _c.uid);
-                var aKeys = Object.keys(asyncHooks);
-    
-                var hookIndex = -1;
-                var nextHook = ()  => {
-                    if (++hookIndex != aKeys.length) {
-                        var hk = asyncHooks[aKeys[hookIndex]];
-                        hk.cb({
-                            _c : _c,
-                            done : nextHook,
-                            article : deepArticle,
-                            extra : extra
-                        }, 'article_async_render_' + _c.uid)
-                    } else {
-                        // Generate LML page
-                        filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
-                            cb && cb({
-                                success: true,
-                                deepArticle : deepArticle
-                            });
-                        });
-                    }
-                };
-
-                nextHook();
-            };
-
-            gen();
-        };
-
-        if (alreadyFetched && typeof aid == "object") {
-            workArticle(aid);
+        if (alreadyFetched) {
+            contentlib.generate(_c, aid, cb, pageIndex);
         } else {
-            that.deepFetch(_c, db.mongoID(aid), workArticle);
+            this.deepFetch(_c, aid, deepArticle => { contentlib.generate(_c, deepArticle, cb, pageIndex) });
         }
     };
 
