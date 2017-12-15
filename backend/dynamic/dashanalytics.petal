@@ -1,6 +1,8 @@
 {#config}
 {*googleanalytics.dashboard}
 {*googleanalytics.realtime}
+{*content.randomtop}
+{*dashboard.quote}
 
 <script>
 var commafy = function(num) {
@@ -101,7 +103,26 @@ var generateSameDayLastWeek = function(ldContext) {
     d.make({ id : "lastday-ratio", node : "span", text : ratio.toString().substring(0, 5) + "% " + (ratio > 0 ? "more" : "less") + " then the same day of last week", parent : diffwrapper });
 
     return diffwrapper.get();
-}
+};
+
+var generateRandomTopPost = function(ldContext) {
+    var rpost = ldContext.livevars.content.randomtop;
+    var wrap = d.make({ id : "random-top-post" });
+
+    d.make({ parent : wrap, node : "img", id : "random-top-image", attr : { src : rpost.media.sizes.thumbnaillarge.url } })
+
+    var info = d.make({ id : "random-top-info", parent : wrap });
+    d.make({ id : "random-top-title", text : rpost.title, parent : info });
+    d.make({ id : "random-top-sub", html : ( 
+        "Published on <b>" + dateFormat(new Date(rpost.date), "mmmm dd, yyyy") + "</b> by <b>" + rpost.author.displayname + "</b>"
+    ), parent : info })
+
+    d.make({ id : "random-top-shares", html : (
+        "Shared <b>" + rpost.shares + "</b> times on Facebook"
+    ), parent : info });
+
+    return wrap.get();
+};
 </script>
 
 <div id="dashboard-ga-realtime" class="dashboard-ga-title">
@@ -225,6 +246,20 @@ var generateSameDayLastWeek = function(ldContext) {
     </div>
 
     <h3 class="performance-title">Random success story</h3>
+
+    <lml-generate call="generateRandomTopPost"></lml-generate>
+    <div style="float: none; clear: both; height: 1px;"></div>
+
+    <h3 class="performance-title" style="margin-top: 15px;">Quote of the day</h3>
+    <div id="quote-of-the-day">
+        <span>
+        &ldquo; <lml-text var="livevars.dashboard.quote.quoteText"></lml-text>&rdquo; &ndash; <lml-text var="livevars.dashboard.quote.quoteAuthor"></lml-text>
+        </span>
+    </div>
+
+    <div id="dashface">
+        <img src="{=config.default.server.url}/static/media/dashface.png" />
+    </div>
 </div>
 
 <script>
@@ -292,8 +327,62 @@ liliumcms.lmldom.bind(function() {
 </script>
 
 <style>
+#dashface {
+    padding: 20px 0px 50px;
+    text-align: center;
+}
+
+#dashface img {
+    opacity: 0.3;
+}
+
+#quote-of-the-day span {
+    display: block;
+    max-width: 600px;
+    margin: auto;
+    padding: 50px 0px;
+    font-size: 40px;
+    font-family: "PT Serif", serif;
+    color: #7e6494;
+    line-height: 43px;
+}
+
 #chart30wrapper {
     padding: 0px 15px;
+}
+
+#random-top-post {
+    padding: 20px;
+} 
+
+#random-top-image {
+    width: 30%;
+    float: left;
+}
+
+#random-top-info {
+    float: left;
+    width: 70%;
+    padding: 10px;
+}
+
+#random-top-title {
+    font-size: 28px;
+    font-family: "Oswald", sans-serif;
+}
+
+#random-top-sub {
+    font-size: 18px;
+    color: #777;
+}
+
+#random-top-shares {
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+#random-top-shares b {
+    color : #af57e4;
 }
 
 .performance-title {
