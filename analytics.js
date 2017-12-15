@@ -46,7 +46,9 @@ class GoogleAnalyticsRequest {
             "start-date" : "yesterday",
             "end-date" : "yesterday",
             "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions
+            "dimensions" : defaultDimensions,
+            "max-results" : 50,
+            "sort" : "-ga:pageviews"
         }, send);
     }
 
