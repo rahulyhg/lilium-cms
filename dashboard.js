@@ -3,6 +3,9 @@ const config = require('./config.js');
 const Petal = require('./petal.js');
 const filelogic = require('./filelogic.js');
 const lmllib = require('./lmllib.js');
+const sharedcache = require('./sharedcache');
+
+const request = require('request');
 
 const _dashpetals = [];
 
@@ -32,6 +35,26 @@ class Dashboard {
         lmllib.registerContextLibrary('dashboard', function (context) {
             return new Dashboard();
         });
+    };
+
+    livevar(cli, levels, params, send) {
+        if (levels[0] == "quote") {
+            sharedcache.get('quoteoftheday', quote => {
+                if (quote && quote.day == new Date().getDate()) {
+                    send(quote);
+                } else {
+                    request('http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en', {json:true}, (err, resp, text) => {
+                        quote = text;
+                        quote.day = new Date().getDate();
+                        sharedcache.set({ quoteoftheday : quote });
+
+                        send(quote);
+                    });
+                }
+            });
+        } else {
+            send({});
+        }
     };
 };
 
