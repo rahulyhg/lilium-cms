@@ -218,9 +218,88 @@ var generateSameDayLastWeek = function(ldContext) {
     </div>
 
     <div style="float: none; clear: both; height: 1px;"></div>
+
+    <h3 class="performance-title">Last 30 days</h3>
+    <div id="chart30wrapper">
+        <lml-generate call="createPerfCanvas"></lml-generate>
+    </div>
 </div>
 
+<script>
+var createPerfCanvas = function() {
+    var canvas = document.createElement('canvas');
+    canvas.id = "performance-30days-wrapper";
+    return canvas;
+};
+
+liliumcms.lmldom.bind(function() {
+    Chart.defaults.global.hover.mode = 'nearest';
+
+    var resizePerformance30 = function() {
+        performance30daysChart.resize();
+    };
+
+    var perf = liliumcms.livevars.livevars()["googleanalytics.dashboard"].performance.last30days.daily;
+    var stats = {
+        sessions : [],
+        views : [],
+        labels : []
+    };
+
+    var now = new Date();
+    for (var i = 0; i < perf.length; i++) {
+        stats.sessions.unshift(perf[i].sessions);
+        stats.views.unshift(perf[i].views);
+        now.setDate(now.getDate() - 1);
+
+        stats.labels.unshift(now.toLocaleDateString());
+    }
+
+    var canvas = document.getElementById("performance-30days-wrapper");
+    canvas.width = window.innerWidth - 70;
+    canvas.height = window.innerHeight / 2;
+
+    console.log(stats);
+    var ctx = canvas.getContext('2d');
+    var performance30daysChart = new Chart(ctx, {
+        type : "line",
+
+        data : {
+            labels : stats.labels,
+            datasets : [{
+                label : "Page views",
+                borderColor : "rgba(175, 87, 228, 0.8)",
+                backgroundColor : "rgba(175, 87, 228, 0.54)",
+                data : stats.views
+            }, {
+                label : "Sessions",
+                borderColor : "rgba(135, 47, 188, 0.8)",
+                backgroundColor : "rgba(135, 47, 188, 0.54)",
+                data : stats.sessions
+            }]
+        }
+    });
+
+    window.addEventListener('resize', resizePerformance30);
+    liliumcms.pageloader.bindUnload(function() {
+        window.removeEventListener('resize', resizePerformance30);
+    });
+
+    resizePerformance30();
+});
+</script>
+
 <style>
+#chart30wrapper {
+    padding: 0px 15px;
+}
+
+.performance-title {
+    margin: 0px 20px;
+    padding: 5px 0px;
+    border-bottom: 1px solid #DDD;
+}
+
 .dashboard-ga-yesterday-rect {
     background-color: #FFF;
     margin: 5px 5px 40px;
