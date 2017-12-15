@@ -1591,6 +1591,37 @@ class Article {
             } else {
                 callback();
             }
+        } else if (levels[0] == "randomtop") {
+            const skip = Math.floor(Math.random() * 30);
+            
+            db.join(cli._c, 'content', [
+                { $sort : { shares : -1 } },
+                { $skip : skip },
+                { $limit : 1 },
+                { 
+                    $lookup : {
+                        from : "uploads",
+                        as : "upload", 
+                        localField : "media",
+                        foreignField : "_id"
+                    }
+                }
+            ], arr => {
+                const article = arr[0];
+                
+                db.findUnique(require('./config').default(), 'entities', { _id : article.author }, (err, author) => {
+                    article.author = { displayname : author.displayname, avatarURL : author.avatarURL };
+                    
+                    callback({
+                        title : article.title[0],
+                        subtitle : article.subtitle[0],
+                        date : article.date,
+                        author : article.author,
+                        shares : article.shares,
+                        media : article.upload[0]
+                    })
+                });
+            });
         } else if (levels[0] == "publishreport") {
             var match = { _id : db.mongoID(levels[1]) };
             if (!cli.hasRight('list-articles')) {
