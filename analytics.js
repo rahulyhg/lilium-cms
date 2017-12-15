@@ -46,9 +46,7 @@ class GoogleAnalyticsRequest {
             "start-date" : "yesterday",
             "end-date" : "yesterday",
             "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions,
-            "max-results" : 50,
-            "sort" : "-ga:pageviews"
+            "dimensions" : defaultDimensions
         }, send);
     }
 
@@ -60,9 +58,7 @@ class GoogleAnalyticsRequest {
             "start-date" : sameday,
             "end-date" : sameday,
             "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions,
-            "max-results" : 50,
-            "sort" : "-ga:pageviews"
+            "dimensions" : defaultDimensions
         }, send);
     }
 
@@ -76,9 +72,7 @@ class GoogleAnalyticsRequest {
             "start-date" : require('dateformat')(beforeSun, 'yyyy-mm-dd'),
             "end-date" : require('dateformat')(lastSun, 'yyyy-mm-dd'),
             "metrics" : defaultMetrics,
-            "dimensions" : defaultDimensions,
-            "max-results" : 50,
-            "sort" : "-ga:pageviews"
+            "dimensions" : defaultDimensions
         }, send);
     }
 
@@ -109,9 +103,7 @@ class GoogleAnalyticsRequest {
             "start-date" : require('dateformat')(lastMonthStart, 'yyyy-mm-dd'),
             "end-date" : require('dateformat')(lastMonthEnd, 'yyyy-mm-dd'),
             "metrics" : monthlyMetrics,
-            "dimensions" : monthlyDimensions,
-            "max-results" : 10,
-            "sort" : "-ga:pageviews"
+            "dimensions" : monthlyDimensions
         }, (err, lastmonthdata) => {
             const monthBefore = new Date(now.getFullYear(), now.getMonth() - 2, 1);
             const monthBeforeEnd = new Date(now.getFullYear(), now.getMonth() - 1, 0);
@@ -120,9 +112,7 @@ class GoogleAnalyticsRequest {
                 "start-date" : require('dateformat')(monthBefore, 'yyyy-mm-dd'),
                 "end-date" : require('dateformat')(monthBeforeEnd, 'yyyy-mm-dd'),
                 "metrics" : monthlyMetrics,
-                "dimensions" : monthlyDimensions,
-                "max-results" : 10,
-                "sort" : "-ga:pageviews"
+                "dimensions" : monthlyDimensions
             }, (err, monthbeforedata) => {
                 send({ lastmonth : lastmonthdata, monthbefore : monthbeforedata });
             });

@@ -223,6 +223,8 @@ var generateSameDayLastWeek = function(ldContext) {
     <div id="chart30wrapper">
         <lml-generate call="createPerfCanvas"></lml-generate>
     </div>
+
+    <h3 class="performance-title">Random success story</h3>
 </div>
 
 <script>
@@ -248,11 +250,11 @@ liliumcms.lmldom.bind(function() {
 
     var now = new Date();
     for (var i = 0; i < perf.length; i++) {
-        stats.sessions.unshift(perf[i].sessions);
-        stats.views.unshift(perf[i].views);
+        stats.sessions.push(perf[i].sessions);
+        stats.views.push(perf[i].views);
         now.setDate(now.getDate() - 1);
 
-        stats.labels.unshift(now.toLocaleDateString());
+        stats.labels.push(now.toLocaleDateString());
     }
 
     var canvas = document.getElementById("performance-30days-wrapper");
