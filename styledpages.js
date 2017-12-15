@@ -252,19 +252,25 @@ class StyledPages {
             filter.status = params.filters.status;
         }
 
-        db.findToArray(cli._c, 'styledpages', filter, function(err, arr) {
-            for (let i = 0; i < arr.length; i++) {
-                arr[i].editlink = cli._c.server.url + "/admin/styledpages/edit/" + arr[i]._id;
-                arr[i].title = arr[i].title || "[No title]";
-            }
+        if (params.search) {
+            filter.title = new RegExp(params.search, 'gi');
+        }
 
-            response.size = arr.length;
-            response.data = arr;
-            response.code = 200;
+        db.count(cli._c, 'styledpages', filter, function(err, total) {
+            db.findToArray(cli._c, 'styledpages', filter, function(err, arr) {
+                for (let i = 0; i < arr.length; i++) {
+                    arr[i].editlink = cli._c.server.url + "/admin/styledpages/edit/" + arr[i]._id;
+                    arr[i].title = arr[i].title || "[No title]";
+                }
 
-            send(response);
-        }, {
-            title : 1, status : 1
+                response.size = total;
+                response.data = arr;
+                response.code = 200;
+
+                send(response);
+            }, {
+                title : 1, status : 1
+            }, params.skip || 0, params.max || 20);
         });
     }
 
