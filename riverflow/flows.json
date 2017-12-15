@@ -89,7 +89,7 @@
         }, {
             "module" : "dashboard.js",
             "endpoint" : "dashboard",
-            "support" : ["admin_get"],
+            "support" : ["admin_get", "livevar"],
             "admin_menu" : {
                 "id": "dashboard",
                 "faicon": "fa-tachometer",
