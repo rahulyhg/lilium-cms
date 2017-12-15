@@ -96,8 +96,7 @@ class GoogleAnalyticsRequest {
             "start-date" : "30daysAgo",
             "end-date" : "yesterday",
             "metrics" : defaultMetrics,
-            "dimensions" : "ga:nthDay",
-            "sort" : "-ga:pageviews"
+            "dimensions" : "ga:nthDay"
         }, send);
     }
 
