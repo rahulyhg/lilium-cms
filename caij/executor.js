@@ -215,10 +215,10 @@ class RunningTask {
             ], arr => {
                 arr.forEach(post => {
                     post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
-                    post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug.pop() + "/" + post.name;
-                    post.media = post.media.pop();
-                    post.title = post.title.pop();
-                    post.subtitle = post.subtitle.pop();
+                    post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug[0] + "/" + post.name;
+                    post.media = post.media[0]
+                    post.title = post.title[0];
+                    post.subtitle = post.subtitle[0];
                 });
 
                 const jsonpath = this._c.server.html + "/lmlsug.json";
