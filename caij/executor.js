@@ -1,6 +1,7 @@
 const log = require('../log.js');
 const localcast = require('../localcast.js');
 const request = require('request');
+const fs = require('fs');
 
 const sites = require('../sites.js');
 const config = require('../config.js');
@@ -166,14 +167,14 @@ class RunningTask {
     }
 
     storeHot(sendback) {
-        const cache = require('../network/sharedmemory.js').raw();
+        const cache = require('../network/sharedmemory.js').rawMemory();
         const data = cache.cache["analytics_realtime_" + this._c.id];
 
         if (data) {
             const MAGIC_RATIO = 1942;
             const rowSlug = {};
-            const slugs = data.rows.map(x => {
-                let url = x[1];
+            const slugs = data.pages.map(x => {
+                let url = x.url;
                 const paramindex = url.indexOf('?');
                 if (paramindex != -1) {
                     url = url.substring(0, paramindex);
@@ -191,7 +192,7 @@ class RunningTask {
             db.join(this._c, 'content', [
                 { $match : { 
                     status : "published", 
-                    slug : { 
+                    name : { 
                         $in : slugs 
                     } 
                 }}, { 
@@ -207,19 +208,19 @@ class RunningTask {
                     localField : "topic",
                     foreignField : "_id"
                 }}, { $project : { 
-                    title : 1, slug : 1, 
+                    title : 1, name : 1, 
                     media : "$deepmedia.sizes.thumbnailarchive.url", 
                     topicslug : "$deeptopic.completeSlug" 
                 }}
             ], arr => {
                 arr.forEach(post => {
-                    post.score = x[3] / MAGIC_RATIO;
+                    post.score = rowSlug[post.name].count / MAGIC_RATIO;
                 });
 
                 const jsonpath = this._c.server.html + "/lmlsug.json";
-                // TODO : Save to file
-
-                sendback();
+                fs.writeFile(jsonpath, JSON.stringify(arr), { encoding : "utf8", flag : "w+" }, () => {
+                    sendback();
+                });
             });
         } else {
             sendback();
