@@ -196,7 +196,7 @@ class RunningTask {
                         $in : slugs 
                     } 
                 }}, { 
-                    $limit : 30 
+                    $limit : 50 
                 }, { $lookup : {
                     from : "uploads",
                     as : "deepmedia",
