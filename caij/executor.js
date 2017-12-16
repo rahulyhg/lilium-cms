@@ -12,6 +12,7 @@ const topicLib = require('../topics.js');
 const articleLib = require('../article.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
+const CDN = require('../cdn');
 
 const janitorJobs = [
     "cacheTopic",
@@ -216,7 +217,7 @@ class RunningTask {
                 arr.forEach(post => {
                     post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
                     post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug[0] + "/" + post.name;
-                    post.media = post.media[0]
+                    post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
                     post.title = post.title[0];
                     post.subtitle = post.subtitle[0];
                 });
