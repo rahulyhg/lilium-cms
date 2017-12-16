@@ -170,7 +170,8 @@ class RunningTask {
     storeHot(sendback) {
         const cache = require('../network/sharedmemory.js').rawMemory();
         const data = cache.cache["analytics_realtime_" + this._c.id];
-
+        
+        // TODO : Get data directly from Analytics, max 100, then parse language with Franc
         if (data) {
             const MAGIC_RATIO = 1942;
             const rowSlug = {};
