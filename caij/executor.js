@@ -222,7 +222,7 @@ class RunningTask {
                 });
 
                 const jsonpath = this._c.server.html + "/lmlsug.json";
-                fs.writeFile(jsonpath, JSON.stringify(arr), { encoding : "utf8", flag : "w+" }, () => {
+                fs.writeFile(jsonpath, JSON.stringify(arr.sort((a, b) => b.score - a.score)), { encoding : "utf8", flag : "w+" }, () => {
                     sendback();
                 });
             });
