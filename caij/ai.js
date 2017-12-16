@@ -126,7 +126,7 @@ class AI {
 
         ai.gaRealtimeInterval = setInterval(createAnalyticsTask, Knowledge.gaRealtimeDelai);
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
-        ai.hotInterval = setInterbal(createHotTask, Knowledge.hotDelai);
+        ai.hotInterval = setInterval(createHotTask, Knowledge.hotDelai);
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
         ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
         ai.statsemailInterval = require('../scheduler.js').schedule("CAIJ_StatEmail_Networkwide", {
