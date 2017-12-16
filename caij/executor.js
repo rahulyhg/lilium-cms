@@ -166,62 +166,64 @@ class RunningTask {
     }
 
     storeHot(sendback) {
-        sharedcache.get('analytics_realtime_' + this._c.id, data => {
-            if (data) {
-                const MAGIC_RATIO = 1942;
-                const rowSlug = {};
-                const slugs = data.rows.map(x => {
-                    let url = x[1];
-                    const paramindex = url.indexOf('?');
-                    if (paramindex != -1) {
-                        url = url.substring(0, paramindex);
-                    }
+        const cache = require('../network/sharedmemory.js').raw();
+        const data = cache.cache["analytics_realtime_" + this._c.id];
 
-                    const split = url.split('/');
-                    const maybeslug = split.pop();
+        if (data) {
+            const MAGIC_RATIO = 1942;
+            const rowSlug = {};
+            const slugs = data.rows.map(x => {
+                let url = x[1];
+                const paramindex = url.indexOf('?');
+                if (paramindex != -1) {
+                    url = url.substring(0, paramindex);
+                }
 
-                    const slug = isNaN(maybeslug) ? maybeslug : split.pop();
+                const split = url.split('/');
+                const maybeslug = split.pop();
 
-                    rowSlug[slug] = x;
-                    return slug;
+                const slug = isNaN(maybeslug) ? maybeslug : split.pop();
+
+                rowSlug[slug] = x;
+                return slug;
+            });
+
+            db.join(this._c, 'content', [
+                { $match : { 
+                    status : "published", 
+                    slug : { 
+                        $in : slugs 
+                    } 
+                }}, { 
+                    $limit : 30 
+                }, { $lookup : {
+                    from : "uploads",
+                    as : "deepmedia",
+                    localField : "media",
+                    foreignField : "_id"
+                }}, { $lookup : {
+                    from : "topics",
+                    as : "deeptopic",
+                    localField : "topic",
+                    foreignField : "_id"
+                }}, { $project : { 
+                    title : 1, slug : 1, 
+                    media : "$deepmedia.sizes.thumbnailarchive.url", 
+                    topicslug : "$deeptopic.completeSlug" 
+                }}
+            ], arr => {
+                arr.forEach(post => {
+                    post.score = x[3] / MAGIC_RATIO;
                 });
 
-                db.join(this._c, 'content', [
-                    { $match : { 
-                        status : "published", 
-                        slug : { 
-                            $in : slugs 
-                        } 
-                    }}, { 
-                        $limit : 30 
-                    }, { $lookup : {
-                        from : "uploads",
-                        as : "deepmedia",
-                        localField : "media",
-                        foreignField : "_id"
-                    }}, { $lookup : {
-                        from : "topics",
-                        as : "deeptopic",
-                        localField : "topic",
-                        foreignField : "_id"
-                    }}, { $project : { 
-                        title : 1, slug : 1, 
-                        media : "$deepmedia.sizes.thumbnailarchive.url", 
-                        topicslug : "$deeptopic.completeSlug" 
-                    }}
-                ], arr => {
-                    arr.forEach(post => {
-                        post.score = x[3] / MAGIC_RATIO;
-                    });
+                const jsonpath = this._c.server.html + "/lmlsug.json";
+                // TODO : Save to file
 
-                    // TODO : Store in JSON file
-
-                    sendback();
-                });
-            } else {
                 sendback();
-            }
-        });
+            });
+        } else {
+            sendback();
+        }
     }
 
     refreshTopicLatests(sendback) {

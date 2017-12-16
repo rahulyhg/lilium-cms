@@ -180,6 +180,10 @@ class SharedMemory {
             }
         });
     }
+    
+    rawMemory() {
+        return mem;
+    }
 
     onError(err) {
         log('SharedMem', err, 'err');
