@@ -208,13 +208,17 @@ class RunningTask {
                     localField : "topic",
                     foreignField : "_id"
                 }}, { $project : { 
-                    title : 1, name : 1, 
+                    title : 1, subtitle : 1, name : 1, shares : 1,
                     media : "$deepmedia.sizes.thumbnailarchive.url", 
                     topicslug : "$deeptopic.completeSlug" 
                 }}
             ], arr => {
                 arr.forEach(post => {
-                    post.score = rowSlug[post.name].count / MAGIC_RATIO;
+                    post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
+                    post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug.pop() + "/" + post.name;
+                    post.media = post.media.pop();
+                    post.title = post.title.pop();
+                    post.subtitle = post.subtitle.pop();
                 });
 
                 const jsonpath = this._c.server.html + "/lmlsug.json";
