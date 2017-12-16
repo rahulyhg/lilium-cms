@@ -22,6 +22,7 @@ const Knowledge = {
     homepageDelai : oneMinute * 5,
     sitemapDelai : oneHour,
     gaRealtimeDelai : oneSecond * 10,
+    hotDelai : oneMinute * 10,
     facebookDelai : oneMinute * 3,
     sendEmailAt : "00:15:00"
 };
@@ -62,10 +63,7 @@ class AI {
             Knowledge.janitorSites.forEach(_c => {
                 taskscheduler.push({
                     taskname : "refreshHomepage",
-                    extra : {
-                        origin : "AI",
-                        _c : _c
-                    }
+                    extra : { origin : "AI", _c }
                 });
             });
         };
@@ -74,10 +72,16 @@ class AI {
             Knowledge.janitorSites.forEach(_c => {
                 taskscheduler.push({
                     taskname : "refreshSitemaps",
-                    extra : {
-                        origin : "AI",
-                        _c : _c
-                    }
+                    extra : { origin : "AI", _c }
+                });
+            });
+        };
+
+        let createHotTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "storeHot",
+                    extra : { origin : "AI", _c }
                 });
             });
         };
@@ -86,10 +90,7 @@ class AI {
             Knowledge.janitorSites.forEach(_c => {
                 taskscheduler.push({
                     taskname : "statsEmail",
-                    extra : {
-                        origin : "AI",
-                        _c : _c
-                    }
+                    extra : { origin : "AI", _c }
                 });
             });
         };
@@ -98,10 +99,7 @@ class AI {
             Knowledge.janitorSites.forEach(_c => {
                 taskscheduler.push({
                     taskname : "storeFacebookShares",
-                    extra : {
-                        origin : "AI",
-                        _c : _c
-                    }
+                    extra : { origin : "AI", _c }
                 });
             });
         };
@@ -121,17 +119,14 @@ class AI {
             Knowledge.janitorSites.forEach(_c => {
                 _c.analytics.serviceaccount && taskscheduler.push({
                     taskname : "storeRealtime",
-                    extra : {
-                        origin : "AI",
-                        action : "init",
-                        _c 
-                    }
+                    extra : { origin : "AI", action : "init", _c }
                 });
             });
         };
 
         ai.gaRealtimeInterval = setInterval(createAnalyticsTask, Knowledge.gaRealtimeDelai);
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
+        ai.hotInterval = setInterbal(createHotTask, Knowledge.hotDelai);
         ai.sitemapInterval = setInterval(createSitemapTask, Knowledge.sitemapDelai);
         ai.facebookInterval = setInterval(createFacebookTask, Knowledge.facebookDelai);
         ai.statsemailInterval = require('../scheduler.js').schedule("CAIJ_StatEmail_Networkwide", {
@@ -142,6 +137,7 @@ class AI {
         createFacebookTask();
         createSocialDispatchTask();
         createAnalyticsTask();
+        createHotTask();
     }
 
     error(err) {
