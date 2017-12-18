@@ -302,7 +302,7 @@ liliumcms.lmldom.bind(function() {
         type : "line",
 
         data : {
-            labels : stats.labels,
+            labels : stats.labels.reverse(),
             datasets : [{
                 label : "Page views",
                 borderColor : "rgba(175, 87, 228, 0.8)",
