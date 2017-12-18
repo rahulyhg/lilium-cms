@@ -52,7 +52,7 @@ LiliumSocket.prototype.hit = function(param) {
 
     sharedcache.hit('set', uid, path, () => {
         for (var i = 0; i < namespaces.length; i++) {
-            io.of(namespaces[i]).emit('userhit', {
+            require('./inbound.js').io().of(namespaces[i]).emit('userhit', {
                 _id : ls.clientId,
                 displayname : ls.session.data.displayname,
                 avatarURL : ls.session.data.avatarURL,
