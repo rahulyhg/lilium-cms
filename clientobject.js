@@ -276,7 +276,13 @@ class ClientObject {
             cookieString.split(';').forEach(function (cookie) {
                 var keyVal = cookie.split('=');
                 var keyName = keyVal.shift().trim();
-                keyVal = decodeURI(keyVal.join('=').trim());
+
+                try {
+                    keyVal = decodeURI(keyVal.join('=').trim());
+                } catch (ex) {
+                    log('ClientObject', 'Malformed cookie', 'warn');
+                    return this.throwHTTP(400, 'That is one weird cookie.', true);
+                }
 
                 if (!that.cookies[keyName]) {
                     that.cookies[keyName] = keyVal;
