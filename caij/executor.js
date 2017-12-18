@@ -1,6 +1,7 @@
 const log = require('../log.js');
 const localcast = require('../localcast.js');
 const request = require('request');
+const fs = require('fs');
 
 const sites = require('../sites.js');
 const config = require('../config.js');
@@ -11,6 +12,7 @@ const topicLib = require('../topics.js');
 const articleLib = require('../article.js');
 const entitieLib = require('../entities.js');
 const analyticsLib = require('../analytics.js');
+const CDN = require('../cdn');
 
 const janitorJobs = [
     "cacheTopic",
@@ -166,62 +168,69 @@ class RunningTask {
     }
 
     storeHot(sendback) {
-        sharedcache.get('analytics_realtime_' + this._c.id, data => {
-            if (data) {
-                const MAGIC_RATIO = 1942;
-                const rowSlug = {};
-                const slugs = data.rows.map(x => {
-                    let url = x[1];
-                    const paramindex = url.indexOf('?');
-                    if (paramindex != -1) {
-                        url = url.substring(0, paramindex);
-                    }
+        const cache = require('../network/sharedmemory.js').rawMemory();
+        const data = cache.cache["analytics_realtime_" + this._c.id];
+        
+        // TODO : Get data directly from Analytics, max 100, then parse language with Franc
+        if (data) {
+            const MAGIC_RATIO = 1942;
+            const rowSlug = {};
+            const slugs = data.pages.map(x => {
+                let url = x.url;
+                const paramindex = url.indexOf('?');
+                if (paramindex != -1) {
+                    url = url.substring(0, paramindex);
+                }
 
-                    const split = url.split('/');
-                    const maybeslug = split.pop();
+                const split = url.split('/');
+                const maybeslug = split.pop();
 
-                    const slug = isNaN(maybeslug) ? maybeslug : split.pop();
+                const slug = isNaN(maybeslug) ? maybeslug : split.pop();
 
-                    rowSlug[slug] = x;
-                    return slug;
+                rowSlug[slug] = x;
+                return slug;
+            });
+
+            db.join(this._c, 'content', [
+                { $match : { 
+                    status : "published", 
+                    name : { 
+                        $in : slugs 
+                    } 
+                }}, { 
+                    $limit : 50 
+                }, { $lookup : {
+                    from : "uploads",
+                    as : "deepmedia",
+                    localField : "media",
+                    foreignField : "_id"
+                }}, { $lookup : {
+                    from : "topics",
+                    as : "deeptopic",
+                    localField : "topic",
+                    foreignField : "_id"
+                }}, { $project : { 
+                    title : 1, subtitle : 1, name : 1, shares : 1,
+                    media : "$deepmedia.sizes.thumbnailarchive.url", 
+                    topicslug : "$deeptopic.completeSlug" 
+                }}
+            ], arr => {
+                arr.forEach(post => {
+                    post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
+                    post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug[0] + "/" + post.name;
+                    post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
+                    post.title = post.title[0];
+                    post.subtitle = post.subtitle[0];
                 });
 
-                db.join(this._c, 'content', [
-                    { $match : { 
-                        status : "published", 
-                        slug : { 
-                            $in : slugs 
-                        } 
-                    }}, { 
-                        $limit : 30 
-                    }, { $lookup : {
-                        from : "uploads",
-                        as : "deepmedia",
-                        localField : "media",
-                        foreignField : "_id"
-                    }}, { $lookup : {
-                        from : "topics",
-                        as : "deeptopic",
-                        localField : "topic",
-                        foreignField : "_id"
-                    }}, { $project : { 
-                        title : 1, slug : 1, 
-                        media : "$deepmedia.sizes.thumbnailarchive.url", 
-                        topicslug : "$deeptopic.completeSlug" 
-                    }}
-                ], arr => {
-                    arr.forEach(post => {
-                        post.score = x[3] / MAGIC_RATIO;
-                    });
-
-                    // TODO : Store in JSON file
-
+                const jsonpath = this._c.server.html + "/lmlsug.json";
+                fs.writeFile(jsonpath, JSON.stringify(arr.sort((a, b) => b.score - a.score)), { encoding : "utf8", flag : "w+" }, () => {
                     sendback();
                 });
-            } else {
-                sendback();
-            }
-        });
+            });
+        } else {
+            sendback();
+        }
     }
 
     refreshTopicLatests(sendback) {
