@@ -15,12 +15,7 @@ const analyticsLib = require('../analytics.js');
 const CDN = require('../cdn');
 
 const janitorJobs = [
-    "cacheTopic",
-    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
-    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
-    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
-    "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle", "cacheArticle",
-    "cacheEntity", "cacheEntity"
+    "cacheTopic", "batchCacheArticle", "cacheEntity"
 ];
 
 const janitorSites = [];
@@ -383,6 +378,47 @@ class RunningTask {
 
                 } else {
                     log('RunningTask', 'No article topic at index ' + stats.skip);
+                    stats.skip = 0;
+                    sendback();
+                }
+            });
+        });
+    }
+
+    batchCacheArticle(sendback) {
+        const BATCHSIZE = 30;
+        let stats = janitorStats[this._c.uid].batchCacheArticle;
+        stats.skip = (stats.skip || 0);
+
+        db.rawCollection(this._c, 'content', {}, (err, collection) => {
+            collection.find({status : "published"})
+                .project({_id : 1})
+                .sort({_id : -1})
+                .skip(stats.skip)
+                .limit(BATCHSIZE)
+                .toArray(
+            (err, postids) => {
+                if (err) {
+                    log('RunningTask', 'Database error in task cacheArticle : ' + err);
+                    sendback();
+                } else if (postids.length) {
+                    log('RunningTask', 'Generating a batch of ' + postids.length + ' articles on ' + this._c.website.sitetitle);
+                    let now = Date.now();
+                    let index = -1;
+                    const nextpost = () => {
+                        if (++index == postids.length) {
+                            stats.skip += BATCHSIZE;
+
+                            log('RunningTask', "Generated " + index + " articles in " + (Date.now() - now) + "ms", 'success');
+                            return sendback();
+                        }
+
+                        articleLib.generateArticle(this._c, postids[index]._id, nextpost);
+                    };
+
+                    nextpost();
+                } else {
+                    log('RunningTask', 'No article found at index ' + stats.skip);
                     stats.skip = 0;
                     sendback();
                 }

@@ -17,7 +17,7 @@ const Knowledge = {
     janitorJobs : executor.getJanitorJobs(),
     janitorSites : executor.getJanitorSites(),
     cpuCap : 80,
-    cooldown : 100,
+    cooldown : 1000,
 
     homepageDelai : oneMinute * 5,
     sitemapDelai : oneHour,
