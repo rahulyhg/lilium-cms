@@ -74,7 +74,7 @@ class ContentLib {
                             pages : pages.length
                         });
                     } else {
-                        that.generateArticle(_c, deepArticle._id, (resp)  => {
+                        require('./article').generateArticle(_c, deepArticle._id, (resp)  => {
                             cIndex--;
                             nextPage(resp);
                         }, false, cIndex);
