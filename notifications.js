@@ -71,7 +71,7 @@ LiliumSocket.prototype.disconnect = function () {
     sharedcache.socket(uid, 'remove', sid, function(remainingSessions) {
         var sessionCount = remainingSessions.length;
         for (var i = 0; i < namespaces.length; i++) {
-            io.of(namespaces[i]).emit('userstatus', {
+            require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
                 id: ls.clientId,
                 displayname: ls.session.data.displayname,
                 status : !sessionCount ? 'offline' : 'online',
@@ -165,7 +165,7 @@ var Notification = function () {
                         new LiliumSocket(socket, session).bind();
 
                         for (var i = 0; i < namespaces.length; i++) {
-                            io.of(namespaces[i]).emit('userstatus', {
+                            require('./inbound.js').io().of(namespaces[i]).emit('userstatus', {
                                 id: session.data._id,
                                 displayname: session.data.displayname,
                                 status : 'online',
@@ -180,7 +180,7 @@ var Notification = function () {
 
     this.init = function () {
         if (global.liliumenv.mode != "script" || global.liliumenv.caij) {
-            io = require('./inbound.js').io();
+            let io = require('./inbound.js').io();
 
             log('Notifications', 'Creating site groups', 'live');
             _c.eachSync(function (conf) {
@@ -218,7 +218,7 @@ var Notification = function () {
                 var split = sockets[i].split('#');
                 
                 log('Notifications', 'Emit "'+(difftype||"notification")+'" to socket id ' + split[1] + " of " + split[0], 'live')
-                io.of(split[0]).to(sockets[i]).emit(difftype || 'notification', notification);
+                require('./inbound.js').io().of(split[0]).to(sockets[i]).emit(difftype || 'notification', notification);
             }
         });
     };
@@ -288,7 +288,7 @@ var Notification = function () {
     };
 
     this.emitToWebsite = function (siteid, data, type) {
-        io && io.of(idToNamespace[siteid]).emit(type || 'notification', data);
+        require('./inbound.js').io().of(idToNamespace[siteid]).emit(type || 'notification', data);
     };
 
     this.messageNotif = function(user, msg, type) {
@@ -297,7 +297,7 @@ var Notification = function () {
                 var split = sockets[i].split('#');
                 
                 log('Notifications', 'Emit to socket id ' + split[1] + " of " + split[0], 'live')
-                io.of(split[0]).to(sockets[i]).emit(type || 'message', msg);
+                require('./inbound.js').io().of(split[0]).to(sockets[i]).emit(type || 'message', msg);
             }
         });
     };
@@ -386,12 +386,12 @@ var Notification = function () {
             broadcast(sites[i].id);
         }
 
-        io.sockets.emit('notification', notification);
+        require('./inbound.js').io().sockets.emit('notification', notification);
     };
 
     this.broadcast = function (data, msgType) {
         for (var i = 0; i < namespaces.length; i++) {
-            io.of(namespaces[i]).emit(msgType || 'message', data);
+            require('./inbound.js').io().of(namespaces[i]).emit(msgType || 'message', data);
         }
     };
 
