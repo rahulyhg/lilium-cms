@@ -27,14 +27,14 @@ class LMLPetal {
             require.cache[petalpath] = undefined;
         }
 
-        log("Petal", "Requiring petal file " + petalname, 'info')
+        // log("Petal", "Requiring petal file " + petalname, 'info')
         this.petalobject = require(petalpath);
         this.context = context;
         this.petalname = petalname;
     }
 
     compile() {
-        log("Petal", "Compiling petal file " + this.petalname, 'info');
+        // log("Petal", "Compiling petal file " + this.petalname, 'info');
         const buffer = new MarkupBuffer();
         this.petalobject.compile((...str) => { str.forEach(x => buffer.write(x)) }, this.context, this.context.vocab);
         return "<!-- petalstart "+this.petalname+" -->" + buffer.getMarkup() + "<!-- petalend -->";
@@ -166,7 +166,7 @@ class LML3 {
     }
 
     compile(_c, abspath, extra, done, ___notsafe) {
-        log('LML3', "Loading LML3 file : " + abspath, 'info');
+        // log('LML3', "Loading LML3 file : " + abspath, 'info');
 
         if (_c.env == "dev" && !___notsafe) {
             require.cache[abspath] = undefined;
