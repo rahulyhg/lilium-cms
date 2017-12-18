@@ -57,7 +57,7 @@ class FileServer {
                 minifyCSS: true
             }, options || {}));
         } catch (ex) {
-            log("FileServer", "Failed to minify string : " + ex.toString().split('\n')[0], "warn");
+            log("FileServer", "Failed to minify string : " + ex.toString().split('\n')[0], "info");
             return content;
         }
     }
