@@ -62,7 +62,7 @@ class Inbound {
     }
 
     createServer(startAfterCreation) {
-        if (global.liliumenv.mode != "script" || global.liliumenv.caij) {
+        if (global.liliumenv.mode != "script" && !process.env.job) {
             log('Inbound', 'Creating HTTP server');
 
             const _http = require('http')
@@ -79,7 +79,7 @@ class Inbound {
 
             this.server.timeout = 12 * 1000;
         } else {
-            log('Inbound', 'Did not create server because of mode ' + global.liliumenv.mode);
+            log('Inbound', 'Did not create server because of mode or job ' + (global.liliumenv.mode || process.env.job));
         }
 
         return this;
