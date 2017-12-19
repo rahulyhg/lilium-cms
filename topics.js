@@ -360,6 +360,23 @@ class LMLTopics {
         getChildrenOf(_id, sendback);
     }
 
+    batchDeepFetch(conf, ids, send) {
+        let index = -1;
+        const results = {};
+        const next = () => {
+            if (++index == ids.length) {
+                return send(results);
+            }
+
+            this.deepFetch(conf, ids[index], deeptopic => {
+                results[ids[index]] = deeptopic;
+                next();
+            });
+        };
+
+        next()
+    }
+
     deepFetch(conf, slugOrId, send) {
         let conds = {};
         if (!slugOrId) {

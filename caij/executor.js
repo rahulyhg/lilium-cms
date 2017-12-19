@@ -210,17 +210,21 @@ class RunningTask {
                     topicslug : "$deeptopic.completeSlug" 
                 }}
             ], arr => {
-                arr.forEach(post => {
-                    post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
-                    post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug[0] + "/" + post.name;
-                    post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
-                    post.title = post.title[0];
-                    post.subtitle = post.subtitle[0];
-                });
+                const topicList = Array.from(new Set(arr.map(x => x.topic)));
+                topicLib.batchDeepFetch(this._c, topicList, deeptopics => {
+                    arr.forEach(post => {
+                        post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
+                        post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug[0] + "/" + post.name;
+                        post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
+                        post.title = post.title[0];
+                        post.language = (deeptopics[post.topic] && deeptopics[post.topic].override.language) || this._c.website.language || "en-ca";
+                        post.subtitle = post.subtitle[0];
+                    });
 
-                const jsonpath = this._c.server.html + "/lmlsug.json";
-                fs.writeFile(jsonpath, JSON.stringify(arr.sort((a, b) => b.score - a.score)), { encoding : "utf8", flag : "w+" }, () => {
-                    sendback();
+                    const jsonpath = this._c.server.html + "/lmlsug.json";
+                    fs.writeFile(jsonpath, JSON.stringify(arr.sort((a, b) => b.score - a.score)), { encoding : "utf8", flag : "w+" }, () => {
+                        sendback();
+                    });
                 });
             });
         } else {
