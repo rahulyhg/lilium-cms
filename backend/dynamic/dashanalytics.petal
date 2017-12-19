@@ -289,7 +289,7 @@ liliumcms.lmldom.bind(function() {
         stats.views.push(perf[i].views);
         now.setDate(now.getDate() - 1);
 
-        stats.labels.push(now.toLocaleDateString());
+        stats.labels.unshift(now.toLocaleDateString());
     }
 
     var canvas = document.getElementById("performance-30days-wrapper");

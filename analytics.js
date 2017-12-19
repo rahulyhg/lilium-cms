@@ -269,6 +269,7 @@ class StatsBeautifier {
 
         let pages = {};
         data.rows.forEach(x => { 
+            // rt:pageTitle ,rt:pagePath, rt:source
             let path = x[1];
             let lastSlash = path.lastIndexOf('/');
             let maybePage = path.substring(lastSlash + 1);
