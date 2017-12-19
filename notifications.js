@@ -179,7 +179,7 @@ var Notification = function () {
     };
 
     this.init = function () {
-        if (global.liliumenv.mode != "script" || global.liliumenv.caij) {
+        if (global.liliumenv.mode != "script" && !global.liliumenv.caij && !process.env.job) {
             let io = require('./inbound.js').io();
 
             log('Notifications', 'Creating site groups', 'live');

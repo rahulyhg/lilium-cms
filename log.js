@@ -24,7 +24,7 @@ var Log = function (sender, message, level) {
     var color = levels[level];
     if (typeof message !== 'undefined') {
         var spacing = nameMaxLength - sender.length;
-        console.log("\x1b[2m["+(process.env.job?"CAIJ":pid)+"]\x1b[0m"+color+"[" + new Date() + " - \x1b[1m" + sender + "\x1b[0m" + color + "]" + (spacing > 0 ? separator.substr(0, spacing) : '') + message + levels.none);
+        console.log("\x1b[2m["+pid+"]\x1b[0m"+color+"[" + new Date() + " - \x1b[1m" + sender + "\x1b[0m" + color + "]" + (spacing > 0 ? separator.substr(0, spacing) : '') + message + levels.none);
     } else {
         console.log('');
     }
