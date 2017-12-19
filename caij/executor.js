@@ -199,25 +199,21 @@ class RunningTask {
                     as : "deepmedia",
                     localField : "media",
                     foreignField : "_id"
-                }}, { $lookup : {
-                    from : "topics",
-                    as : "deeptopic",
-                    localField : "topic",
-                    foreignField : "_id"
                 }}, { $project : { 
-                    title : 1, subtitle : 1, name : 1, shares : 1,
-                    media : "$deepmedia.sizes.thumbnailarchive.url", 
-                    topicslug : "$deeptopic.completeSlug" 
+                    title : 1, subtitle : 1, name : 1, shares : 1, topic : 1,
+                    media : "$deepmedia.sizes.thumbnailarchive.url"
                 }}
             ], arr => {
                 const topicList = Array.from(new Set(arr.map(x => x.topic)));
                 topicLib.batchDeepFetch(this._c, topicList, deeptopics => {
                     arr.forEach(post => {
+                        if (!deeptopics[post.topic]) { return; }
+
                         post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
-                        post.url = this._c.server.protocol + this._c.server.url + "/" + post.topicslug[0] + "/" + post.name;
+                        post.url = this._c.server.protocol + this._c.server.url + "/" + deeptopics[post.topic].completeSlug + "/" + post.name;
                         post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
                         post.title = post.title[0];
-                        post.language = (deeptopics[post.topic] && deeptopics[post.topic].override.language) || this._c.website.language || "en-ca";
+                        post.language = deeptopics[post.topic].override.language || this._c.website.language || "en-ca";
                         post.subtitle = post.subtitle[0];
                     });
 
