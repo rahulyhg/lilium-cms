@@ -357,11 +357,14 @@ var SiteInitializer = function (conf, siteobj) {
 
                         if (isElder && (global.liliumenv.mode != "script" || global.liliumenv.caij)) {
                             sitemap.scheduleCreation(conf, true);
-                            analytics.pollRealtime(conf);
                         }
 
                         if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
                             return done();
+                        }
+
+                        if (isElder) {
+                            analytics.pollRealtime(conf);
                         }
 
                         loadVarious(function() {
