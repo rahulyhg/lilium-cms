@@ -73,7 +73,7 @@ class Plugins {
             var allPlugins = [];
 
             var i = -1;
-            nextDir = () => {
+            const nextDir = () => {
                 i++;
                 if (i >= dirs.length) {
                     callback(allPlugins);

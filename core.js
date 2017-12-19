@@ -475,6 +475,9 @@ const loadEnv = function() {
         total++;
     }
 
+    global.liliumenv.caij = process.env.job == "caij";
+    global.liliumenv.caij && log('Core', 'Found CAIJ job process environment', 'lilium');
+
     log('Core', `Loaded ${total} env variables.`);
 };
 
