@@ -96,6 +96,18 @@ class GoogleAnalyticsRequest {
         }, send);
     }
 
+    static fill3Days(_c, gAnalytics, send) {
+        gAnalytics.getData(_c, {
+            "start-date" : "3daysAgo",
+            "end-date" : "today",
+            "metrics" : "ga:users",
+            "dimensions" : "ga:pagePath",
+            "filters" : "ga:pagePath!@?",
+            "sort" : "-ga:users",
+            "max-results" : 100
+        }, send);
+    }
+
     static lastMonth(_c, gAnalytics, send) {
         const now = new Date();
         const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1); 
@@ -262,6 +274,17 @@ class StatsBeautifier {
             views : data.totalsForAllResults["ga:pageviews"],
             sessions : data.totalsForAllResults["ga:sessions"]
         };
+    }
+
+    static fill3days(data) {
+        return Array.from(
+            new Set(
+                data.rows.map(x => {
+                    const spl = x[0].split('/')
+                    return { slug : spl[spl.length - (isNaN(spl[spl.length-1]) ? 1 : 2) ], count : x[1] };
+                }
+            )
+        )).filter(x => x && x.slug);
     }
 
     static realtime(_c, data) {
@@ -473,6 +496,12 @@ class GoogleAnalytics {
                 log('Analytics', 'Error while fetching realtime data : ' + err, 'warn');
                 done(err);
             }
+        });
+    }
+
+    get3daysFiller(_c, send) {
+        GoogleAnalyticsRequest.fill3Days(_c, this, (err, data) => {
+            send(err || StatsBeautifier.fill3days(data));
         });
     }
 
