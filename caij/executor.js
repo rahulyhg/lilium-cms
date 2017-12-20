@@ -165,12 +165,14 @@ class RunningTask {
     storeHot(sendback) {
         const cache = require('../network/sharedmemory.js').rawMemory();
         const data = cache.cache["analytics_realtime_" + this._c.id];
+        const fillers = cache.cache["analytics_3daysfiller_slugs_" + this._c.id];
         
-        // TODO : Get data directly from Analytics, max 100, then parse language with Franc
-        if (data) {
-            const MAGIC_RATIO = 1942;
+        if (data && fillers && data.pages[0] && fillers[0]) {
+            const TOPDATA = data.pages[0].count;
+            const TOPFILLER = fillers[0].count;
+
             const rowSlug = {};
-            const slugs = data.pages.map(x => {
+            const slugs = Array.from(new Set([...data.pages.map(x => {
                 let url = x.url;
                 const paramindex = url.indexOf('?');
                 if (paramindex != -1) {
@@ -182,9 +184,18 @@ class RunningTask {
 
                 const slug = isNaN(maybeslug) ? maybeslug : split.pop();
 
-                rowSlug[slug] = x;
+                x.score = x.count / TOPDATA;
+                if (!rowSlug[slug]) {
+                    rowSlug[slug] = x;
+                }
                 return slug;
-            });
+            }), ...fillers.map(x => {
+                x.score = x.count / TOPFILLER;
+                if (!rowSlug[x.slug]) {
+                    rowSlug[x.slug] = x;
+                }
+                return x.slug;
+            })]));
 
             db.join(this._c, 'content', [
                 { $match : { 
@@ -193,7 +204,7 @@ class RunningTask {
                         $in : slugs 
                     } 
                 }}, { 
-                    $limit : 50 
+                    $limit : slugs.length
                 }, { $lookup : {
                     from : "uploads",
                     as : "deepmedia",
@@ -209,7 +220,7 @@ class RunningTask {
                     arr.forEach(post => {
                         if (!deeptopics[post.topic]) { return; }
 
-                        post.score = (rowSlug[post.name].count / MAGIC_RATIO) || Math.random();
+                        post.score = rowSlug[post.name].score || Math.random();
                         post.url = this._c.server.protocol + this._c.server.url + "/" + deeptopics[post.topic].completeSlug + "/" + post.name;
                         post.media = this._c.server.protocol + CDN.parseOne(this._c, post.media[0], true);
                         post.title = post.title[0];
@@ -226,6 +237,13 @@ class RunningTask {
         } else {
             sendback();
         }
+    }
+
+    store3daysFiller(sendback) {
+        analyticsLib.get3daysFiller(this._c, rtdata => {
+            require('../network/sharedmemory.js').rawMemory().cache["analytics_3daysfiller_slugs_" + this._c.id] = rtdata;
+            sendback();
+        });
     }
 
     refreshTopicLatests(sendback) {
