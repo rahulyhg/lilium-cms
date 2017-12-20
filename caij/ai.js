@@ -23,6 +23,7 @@ const Knowledge = {
     sitemapDelai : oneHour,
     gaRealtimeDelai : oneSecond * 10,
     hotDelai : oneMinute * 10,
+    filler3days : oneDay,
     facebookDelai : oneMinute * 3,
     sendEmailAt : "00:15:00"
 };
@@ -124,6 +125,16 @@ class AI {
             });
         };
 
+        let createFiller3daysTask = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                _c.analytics.serviceaccount && taskscheduler.push({
+                    taskname : "store3daysFiller",
+                    extra : { origin : "AI", action : "init", _c }
+                });
+            });
+        };
+
+        ai.filler3days = setInterval(createFiller3daysTask, Knowledge.filler3days);
         ai.gaRealtimeInterval = setInterval(createAnalyticsTask, Knowledge.gaRealtimeDelai);
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
         ai.hotInterval = setInterval(createHotTask, Knowledge.hotDelai);
@@ -137,6 +148,7 @@ class AI {
         createFacebookTask();
         createSocialDispatchTask();
         createAnalyticsTask();
+        createFiller3daysTask();
         createHotTask();
     }
 
