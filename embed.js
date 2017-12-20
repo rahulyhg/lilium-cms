@@ -11,12 +11,27 @@ var createDivFromResponse = function(data) {
         data.author_url +'" >via @'+data.author_name+'</a></p>';
 }
 
+var createV3DivFromResponse = function(data) {
+    return '<p><img data-width="'+data.dimensions.width+'" data-height="'+data.dimensions.height+'" src="'+data.display_url+                  
+        '" class="lml-instagram-embed-3" /><a class="lml-instagram-op-3" href="https://www.instagram.com/'+                                                       
+        data.owner.username +'" ><img src="'+data.owner.profile_pic_url+'" class="lml-instagram-avatar-3" /> @'+data.owner.username+
+        '<span class="lml-instagram-via-3">embedded via <i class="fa fa-instagram"> </i></span></a></p>';
+}
+
 var handleRequest = function(cli) {
     var url = cli.routeinfo.params.url;
     var type = cli.routeinfo.params.type;
 
+    url += (url.includes('?') ? '&' : '?') + "__a=1";
+
     switch (type) {
         case "instagram":
+            request.get({url, json:true}, function(err, r, data) {
+                cli.response.end(createV3DivFromResponse(data.graphql.shortcode_media));
+            });
+            break;
+
+        case "instagram_DEPRECATED":
             request.get({url:"https://api.instagram.com/oembed?url=" + url, json:true}, function(err, r, data) {
                 cli.response.end(createDivFromResponse(data));
             });
