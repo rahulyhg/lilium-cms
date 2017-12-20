@@ -38,6 +38,11 @@ class ContentLib {
         extra.article = deepArticle;
         extra.topic = deepArticle.topic;
 
+        if (!extra.topic) {
+            log('Content', 'Cannot generate article without a topic, ID : ' + (deepArticle && deepArticle._id), 'warn');
+            return cb && cb(new Error("Cannot generate article without a topic"));
+        }
+
         if (deepArticle.topic && deepArticle.topic.override && deepArticle.topic.override.language) {
             extra.language = deepArticle.topic.override.language;
         }
@@ -47,7 +52,7 @@ class ContentLib {
             article: deepArticle
         });
 
-        let ctx = deepArticle.templatename || deepArticle.topic.articletemplate || "article";
+        let ctx = deepArticle.templatename || (deepArticle.topic && deepArticle.topic.articletemplate) || "article";
         let filename = deepArticle.topicslug.substring(1) + deepArticle.name;
 
         deepArticle.headline = deepArticle.title[0];
