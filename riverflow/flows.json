@@ -50,6 +50,10 @@
             "endpoint" : "livevars",
             "support" : ["api_get"]
         }, {
+            "module" : "passwordrecovery.js",
+            "endpoint" : "accesscheckpoint",
+            "support" : ["get", "post", "admin_get"]
+        }, {
             "module" : "lys.js",
             "endpoint" : "lys",
             "support" : ["livevar"]

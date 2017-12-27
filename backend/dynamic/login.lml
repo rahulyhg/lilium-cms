@@ -16,7 +16,9 @@
 	    		{=forms.render("login_form")}
 
     			<footer>
-                    {=config.default.vendor.productname} v2.0.19
+                    <a href="/liliumrecover">
+                        I have no idea what my password is
+                    </a>
                 </footer>
 		    </main>
         </div>
