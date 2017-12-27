@@ -1,0 +1,93 @@
+const settings = { };
+
+// Markup
+const LRMarkup = `<div id="lr-wrapper">
+    <h1 id="pagetitle">Access checkpoint - Level <span id="accesscheckpoint-level">1</span></h1>
+
+    <p style="display: none;" id="presentation-p">
+        So you can't login. It happens. The good news is it most likely happened because you've chosen a password that is not used anywhere else. Let's do our best together to get you a new password. 
+    </p>
+</div>`;
+
+// Script
+const LRScript = `<script>
+    var totalwait = function() {
+        
+    };
+
+    setTimeout(function() {
+        var parag = document.getElementById('presentation-p');
+        var text = parag.textContent;
+
+        parag.textContent = "";
+
+        for (var i = 0; i < text.length; i++) {
+            var span = document.createElement('span');
+            span.textContent = text[i];
+            span.style.display = "none";
+            parag.appendChild(span);
+
+            parag.style.display = "block";
+            (function(span, i) {
+                setTimeout(function() {
+                    span.style.display = "";
+                }, i * 10);
+            })(span, i);
+        }
+
+        var totalwait = text.length * 10;
+
+        setTimeout(displayform, totalwait);
+    }, 500);
+</script>`;
+
+// CSS
+const LRStyle = `<style>
+
+html, body {
+    padding : 0;
+    margin : 0;
+
+    background-color: #333;
+    color : #FFF;
+    font-family: 'VT323', monospace;
+}
+
+h1 {
+    font-weight: normal;
+    padding: 20px 20px 0px;
+    margin: 0px;
+    border-bottom: 3px solid #FFF;
+    font-size: 48px;
+    background: #111;
+    height: 45px;
+}
+
+p {
+    font-size: 30px;
+    margin: 30px auto;
+    width: 640px;
+}
+
+</style>`;
+
+// Logic
+const compile = (o, context) => { o(`
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Lilium - Access checkpoint</title>
+        <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
+
+        ${LRStyle}
+    </head>
+    <body data-pagetype="lilium-special" data-endpoint="liliumrecover" data-generator="LML3">
+        ${LRMarkup}
+        ${LRScript}
+    </body>
+</html>
+
+`); }
+
+module.exports = { settings, compile };
