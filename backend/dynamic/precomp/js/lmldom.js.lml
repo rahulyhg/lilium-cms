@@ -1129,10 +1129,8 @@ var LMLDom = function() {
         log('LMLDOM', 'Initializing Lilium Document Object Model');
         maindom = document.getElementById('lml-main');
 
-        HTMLUnknownElement.prototype.insertAfter = 
-        HTMLElement.prototype.insertAfter = 
-        function (newNode) { 
-            this.parentNode.insertBefore(newNode, this.nextSibling); 
+        HTMLUnknownElement.prototype.insertAfter = HTMLElement.prototype.insertAfter = function (newNode) { 
+            newNode && this.parentNode.insertBefore(newNode.get ? newNode.get() : newNode, this.nextSibling); 
         };
 
         HTMLElement.prototype.getElementsByName = function(name) {
