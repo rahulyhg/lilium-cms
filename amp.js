@@ -103,7 +103,17 @@ class Amp {
             const x = images[i];
             const ampimg = dom.window.document.createElement("amp-img");
 
-            if (x.src && x.src.includes('cdninstagram')) {
+            if (x.classList.contains("lml-instagram-avatar-3")) {
+                ampimg.setAttribute('width', 24);
+                ampimg.setAttribute('height', 24);
+                ampimg.setAttribute('layout', "fixed");
+                ampimg.setAttribute('src', cdn.parseOne(cli._c, cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src));
+
+                x.parentElement.insertBefore(ampimg, x);
+                x.remove();
+
+                continue;
+            } else if (x.src && x.src.includes("instagram")) {
                 ampimg.setAttribute('src', cdn.parseOne(cli._c, cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src));
             } else if (x.src && x.src.includes('uploads')) { 
                 let source = x.src;
@@ -118,6 +128,8 @@ class Amp {
             ampimg.setAttribute('height', x.dataset.height || 640);
             ampimg.setAttribute('layout', "responsive");
 
+            x.parentElement.insertBefore(ampimg, x);
+            /*
             try {
                 dom.window.document.body.insertBefore(ampimg, x.parentElement);
             } catch (ex) {
@@ -125,6 +137,7 @@ class Amp {
                     dom.window.document.body.insertBefore(ampimg, x.parentElement.parentElement);
                 } catch (ex) {}
             }
+            */
 
             x.remove();
         }
