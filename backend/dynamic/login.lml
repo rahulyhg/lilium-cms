@@ -16,7 +16,7 @@
 	    		{=forms.render("login_form")}
 
     			<footer>
-                    <a href="/liliumrecover">
+                    <a href="/accesscheckpoint">
                         I have no idea what my password is
                     </a>
                 </footer>
