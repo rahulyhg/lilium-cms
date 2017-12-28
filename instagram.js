@@ -61,7 +61,7 @@ class LMLInstagram {
 
     GET(cli) {
         const url = cli.routeinfo.params.u;
-        if (url && url.includes('cdninstagram')) {
+        if (url && url.includes('instagram')) {
             request(url).pipe(cli.response);
         } else {
             cli.throwHTTP(404, undefined, true)
