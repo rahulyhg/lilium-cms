@@ -518,6 +518,10 @@ class Entities {
         }
     };
 
+    hashPassword(password) {
+        return CryptoJS.SHA256(password).toString(CryptoJS.enc.Hex);
+    }
+
     changePassword  (cli, profile) {
         var form = formbuilder.handleRequest(cli);
         var response = formbuilder.validate(form, true);
