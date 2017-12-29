@@ -64,6 +64,9 @@ var Forms = function () {
             .add('email', 'text', {
                 displayname: "Email"
             })
+            .add('phone', 'text', {
+                displayname: "Phone number"
+            })
             .add('displayname', 'text', {
                 displayname: "Full name"
             })

@@ -336,6 +336,10 @@ class Entities {
         entity.firstname = split.shift();
         entity.lastname = split.join(' ');
 
+        if (entData.phone) {
+            entity.phone = entData.phone.trim().replace(/[()\-\sa-zA-Z]/g, '');
+        }
+
         this.updateEntity(entity, cli._c.id, function(err, res) {
             cli.did("entity", "update");
             if (!err){
