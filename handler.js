@@ -170,7 +170,7 @@ var Handler = function () {
                         currentLevel.push(isBool ? val : inspect(val).slice(1, -1));
                     } else {
                         if (typeof currentLevel[nIndex] === 'undefined') {
-                            currentLevel[nIndex] = isArray && levelIndex == levelsTotal - 1 ? new Array() : levelIndex == levelsTotal ? (isBool ? val : inspect(val).slice(1, -1)) : new Object();
+                            currentLevel[nIndex] = isArray && levelIndex == levelsTotal - 1 ? [] : levelIndex == levelsTotal ? (isBool ? val : inspect(val).slice(1, -1)) : {};
                         }
                     }
 
@@ -183,13 +183,22 @@ var Handler = function () {
     };
 
     var OPTIONS = function(cli) {
-        var headers = {
-            "Access-Control-Allow-Origin" : cli.request.headers.corsorigin || cli.request.headers.origin,
-            "Access-Control-Allow-Methods" : "GET, POST, OPTIONS",
-            "Access-Control-Allow-Headers" : cli.request.headers["access-control-request-headers"] || "*"
-        };
+        if (!cli._c) {
+            require('./config').fetchConfigFromCli(cli);
+        }
 
-        cli.response.writeHead(200, headers);
+        const origin = cli.request.headers.corsorigin || cli.request.headers.origin || (cli._c && cli._c.server.url);
+
+        if (origin) {
+            cli.response.writeHead(200, {
+                "Access-Control-Allow-Origin" : origin,
+                "Access-Control-Allow-Methods" : "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers" : cli.request.headers["access-control-request-headers"] || "*"
+            };
+        } else {
+            cli.response.writeHead(400);
+        }
+    
         cli.response.end();
     };
 
