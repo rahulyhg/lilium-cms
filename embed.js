@@ -27,7 +27,11 @@ var handleRequest = function(cli) {
     switch (type) {
         case "instagram":
             request.get({url, json:true}, function(err, r, data) {
-                cli.response.end(createV3DivFromResponse(data.graphql.shortcode_media, cli.routeinfo.params.url));
+                cli.response.end(
+                    data.graphql ? 
+                        createV3DivFromResponse(data.graphql.shortcode_media, cli.routeinfo.params.url)
+                        '<p class="lml-instagram-embed-err">Oops. It appears <b>Instagram.com</b> responded with an error. Make sure the Instagram account is public, that the picture is still available and that Instagram is not down.</p>'
+                );
             });
             break;
 
