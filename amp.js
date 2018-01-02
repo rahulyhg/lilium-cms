@@ -22,7 +22,7 @@ class Amp {
 
     handleArticle(cli, article) {
         // Article is undefined if nothing was found
-        if (!article) {
+        if (!article || !article.authors || !article.authors[0] || !article.title || !article.title[0] || !article.topic) {
             return cli.throwHTTP(404, undefined, true);
         }
 
