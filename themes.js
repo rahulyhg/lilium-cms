@@ -44,7 +44,15 @@ var Themes = function () {
 
     this.adminPOST = function(cli) {
         if (cli.hasRightOrRefuse("manage-themes")) {
-            this.updateThemeSettings(cli);
+            if (cli.routeinfo.path.length > 2 && cli.routeinfo.path[2] == "enableTheme") {
+                that.enableTheme(cli._c, cli.postdata.data.uName, function () {
+                    cli.sendJSON({
+                        success: true
+                    });
+                });
+            } else {
+                this.updateThemeSettings(cli);
+            }
         } 
     };
 
