@@ -13,7 +13,7 @@ const dir = require('node-dir');
 const readdirp = require('readdirp');
 const defaultCT = 'text/html; charset=utf-8';
 const glob = require('glob');
-const Minimize = new (require('minimize'))(/*{
+const Minimize = new (require('minimize'))({ loose: true } /*{
     plugins: [{
         id : "inlinescript",
         element : (node, next) => {
