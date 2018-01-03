@@ -88,8 +88,8 @@ var DB = function() {
 	};
 
 	this.initDatabase = function(conf, callback) {
-		MongoClient.connect(formatMongoString(conf), function(err, db) {
-			db.collection('lilium', {strict:true}, function(err, c) {
+		MongoClient.connect(formatMongoString(conf), function(err, client) {
+			client.db(conf.data.use).collection('lilium', {strict:true}, function(err, c) {
 				if (err) {
 					require('./dbinit.js')(conf, db, callback);
 				} else {
@@ -102,7 +102,7 @@ var DB = function() {
 	this.createPool = function(conf, callback) {
 		log('Database', 'Creating database global connection object');
 		MongoClient.connect(formatMongoString(conf), function(err, conn) {
-			_conns[conf.id || conf] = conn;
+			_conns[conf.id || conf] = conn.db(conf.data.use);
 			callback(!err);
 		});
 	};
