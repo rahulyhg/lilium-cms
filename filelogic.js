@@ -343,9 +343,9 @@ class FileLogic {
                 log('FileLogic', 'Adding template to LML3 theme compilation', 'info')
                 extra.contentHTML = ctn;
                 LML3.compile(_c, layoutPath, extra, (fHtml) => {
-                    require('./cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minifyString(fHtml), _c, cdned => {
+                    require('./cdn.js').parse(_c.env == "dev" ? fHtml : fileserver.minimize(fHtml), _c, cdned => {
                         fileserver.createDirIfNotExists(savePath, () => {
-                            var handle = FileServer.getOutputFileHandle(savePath, 'w+');
+                            const handle = FileServer.getOutputFileHandle(savePath, 'w+');
                             FileServer.writeToFile(handle, cdned, () => {
                                 handle.close();
                                 handle.destroy();
