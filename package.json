@@ -83,6 +83,7 @@
     "maxcdn": "latest",
     "mdoc": "latest",
     "meme-maker": "latest",
+    "minimize": "^2.1.0",
     "mkdirp": "latest",
     "moment": "latest",
     "moment-timezone": "latest",

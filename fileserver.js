@@ -13,6 +13,19 @@ const dir = require('node-dir');
 const readdirp = require('readdirp');
 const defaultCT = 'text/html; charset=utf-8';
 const glob = require('glob');
+const Minimize = new (require('minimize'))(/*{
+    plugins: [{
+        id : "inlinescript",
+        element : (node, next) => {
+            if (node.type == "script" && node.children.length != 0) {
+                const min = UglifyJS.minify(node.children[0].data).code || node.children[0].data;
+                node.children[0].data = min;
+            }
+
+            next();
+        }
+    }]
+}*/);
 
 class FileServer {
     workDir  () {
@@ -47,6 +60,10 @@ class FileServer {
         }
 
     };
+
+    minimize(content) {
+        return Minimize.parse(content);
+    }
 
     minifyString (content, options) {
         try {
