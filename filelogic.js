@@ -390,7 +390,7 @@ class FileLogic {
             }
 
             if (extra.topic && extra.topic.override) {
-                extra.theme.settings = Object.assign(extra.theme.settings, extra.topic.override);
+                extra.theme.settings = Object.assign(extra.theme.settings || {}, extra.topic.override || {});
             }
 
             log('FileLogic', 'Compiling context theme page', 'info');
