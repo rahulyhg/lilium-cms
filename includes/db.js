@@ -91,7 +91,7 @@ var DB = function() {
 		MongoClient.connect(formatMongoString(conf), function(err, client) {
 			client.db(conf.data.use).collection('lilium', {strict:true}, function(err, c) {
 				if (err) {
-					require('./dbinit.js')(conf, db, callback);
+					require('./dbinit.js')(conf, c, callback);
 				} else {
 					callback(false);
 				}
