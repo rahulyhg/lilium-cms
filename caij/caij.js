@@ -6,6 +6,8 @@ const fileserver = require('../fileserver.js');
 const taskscheduler = require('./taskscheduler.js');
 const AI = require('./ai.js');
 
+const CAIJport = require('../sites/default').caijport;
+
 class ConsoleArtificialIntelligenceJanitor {
     constructor() {
 
@@ -13,7 +15,9 @@ class ConsoleArtificialIntelligenceJanitor {
 
     // Client CAIJ
     getConnection() {
-        return net.connect({path : __dirname + "/caij.sock"});
+        return net.connect(CAIJport ? {
+            host : "localhost", port : CAIJport
+        } : {path : __dirname + "/caij.sock"});
     }
 
     scheduleTask(taskname, extra) {
@@ -58,7 +62,7 @@ class ConsoleArtificialIntelligenceJanitor {
         fileserver.deleteFile(__dirname + "/caij.sock", () => {
             this.server = net.createServer(this.incoming.bind(this));
             this.server.on('error', this.error);
-            this.server.listen({
+            this.server.listen(CAIJport ? {port : CAIJport, exclusive : true, host: "localhost"} : {
                 path : __dirname + "/caij.sock"
             }, () => {
                 log('CAIJ', "Socket file open", 'live');
