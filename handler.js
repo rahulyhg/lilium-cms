@@ -24,18 +24,21 @@ var Handler = function () {
         cli.touch('handler.POST');
 
         Router.parseClientObject(cli, function(loggedin) { 
-            if (loggedin || cli.routeinfo.path[0] === 'login' || cli._c.allowAnonymousPOST) {
-               cli.postdata = new Object();
-               cli.postdata.length = cli.request.headers["content-length"];
-               cli.postdata.data = {};
-       
-               var finishedCalled = false;
-               var req = cli.request;
-               var hasFile = false;
-       
-               req.headers["content-type"] = req.headers["content-type"] || "application/x-www-form-urlencoded";
+            if (cli._c.allowAnonymousPOST && !loggedin && !cli.routeinfo.login) {
+                // Do not read post data yet
+                Dispatcher.dispost(cli);
+            } else if (loggedin || cli.routeinfo.path[0] === 'login') {
+                cli.postdata = new Object();
+                cli.postdata.length = cli.request.headers["content-length"];
+                cli.postdata.data = {};
 
-               if (req.headers["content-type"] == "application/json") {
+                var finishedCalled = false;
+                var req = cli.request;
+                var hasFile = false;
+
+                req.headers["content-type"] = req.headers["content-type"] || "application/x-www-form-urlencoded";
+
+                if (req.headers["content-type"] == "application/json") {
                     var chunks = "";
 
                     req.on('data', function(jsonchunk) {
