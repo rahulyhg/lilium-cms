@@ -1,6 +1,7 @@
 const log = require('./log.js');
 const net = require('net');
 const gdinfo = require('./network/info.js');
+const gdconf = require('./sites/default').network;
 const noop = () => {};
 
 class SockFallback {
@@ -12,8 +13,11 @@ class SockFallback {
 }
 
 const getUDS = () => {
-    return net.connect({
+    return net.connect(gdconf.useUDS ? {
         path : __dirname + "/network/sharedmemory.sock"
+    } : {
+        port : gdconf.cacheport,
+        host : "localhost"
     });
 }
 
