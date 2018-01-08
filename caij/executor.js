@@ -431,7 +431,9 @@ class RunningTask {
                             return sendback();
                         }
 
-                        articleLib.generateArticle(this._c, postids[index]._id, nextpost);
+                        articleLib.deepFetch(this._c, postids[index]._id, deepArticle => {
+                            articleLib.generateArticle(this._c, deepArticle, nextpost, true);
+                        });
                     };
 
                     nextpost();

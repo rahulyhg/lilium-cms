@@ -130,7 +130,7 @@ class ContentLib {
             deepArticle.subtitle = deepArticle.subtitle[0];
             deepArticle.numberOfPages = 1;
         }
-
+ 
         const asyncHooks = hooks.getHooksFor('article_async_render_' + _c.uid);
         const aKeys = Object.keys(asyncHooks);
     

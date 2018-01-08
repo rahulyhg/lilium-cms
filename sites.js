@@ -359,16 +359,16 @@ var SiteInitializer = function (conf, siteobj) {
                             sitemap.scheduleCreation(conf, true);
                         }
 
-                        if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
-                            return done();
-                        }
-
                         if (isElder) {
                             analytics.pollRealtime(conf);
                         }
 
                         loadVarious(function() {
                             loadTheme(function() {
+                                if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
+                                    return done();
+                                }
+
                                 category.preload(conf, function() {
                                     loadSessions(function() {
                                         loadRobots(function() {
