@@ -119,7 +119,7 @@ class ContentSearch {
     queryList(_c, topic, terms, options, send) {
         const max = options.max || 50;
         const page = options.page || 0;
-        const conditions = Object.assign(SELECTOR(terms), options.conditions || {});
+        const conditions = Object.assign({ status : "published", $text : { $search : terms.split(' ').map(x => "\"" + x + "\"").join(' ') } }, options.conditions || {});
 
         db.findToArray(_c, 'topics', { family : topic || "willnotresolve" }, (err, topics) => {
             if (topics.length) {
