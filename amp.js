@@ -115,7 +115,7 @@ class Amp {
                 continue;
             } else if (x.src && x.src.includes("instagram")) {
                 ampimg.setAttribute('src', cdn.parseOne(cli._c, cli._c.server.protocol + cli._c.server.url + "/instagram?u=" + x.src));
-            } else if (x.src && x.src.includes('uploads')) { 
+            } else if (x.src && (x.src.includes('uploads') || x.src.includes("/u/"))) { 
                 let source = x.src;
                 if (source.startsWith('//')) {
                     source = cli._c.server.protocol + source;
