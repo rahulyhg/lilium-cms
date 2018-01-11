@@ -128,7 +128,9 @@ class Amp {
             ampimg.setAttribute('height', x.dataset.height || 640);
             ampimg.setAttribute('layout', "responsive");
 
-            x.parentElement.insertBefore(ampimg, x);
+            if (ampimg.getAttribute('src')) {
+                x.parentElement.insertBefore(ampimg, x);
+            }
             /*
             try {
                 dom.window.document.body.insertBefore(ampimg, x.parentElement);
