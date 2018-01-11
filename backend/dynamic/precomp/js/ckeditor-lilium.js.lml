@@ -199,6 +199,8 @@ var CKEditor = function() {
         img.dataset.iid = imgobj._id;
         img.classList.add("lml-content-image");
         img.classList.add("lml-instagram-embed-2");
+        img.dataset.width = imgobj.size.width;
+        img.dataset.height = imgobj.size.height;
 
         crediturl.setAttribute("href", imgobj.artisturl);
         crediturl.setAttribute('target', '_blank');
