@@ -229,8 +229,16 @@ class RunningTask {
                     });
 
                     const jsonpath = this._c.server.html + "/lmlsug.json";
-                    fs.writeFile(jsonpath, JSON.stringify(arr.sort((a, b) => b.score - a.score)), { encoding : "utf8", flag : "w+" }, () => {
-                        sendback();
+                    const jsonfrpath = this._c.server.html + "/lmlsug-fr-ca.json";
+                    const jsonenpath = this._c.server.html + "/lmlsug-en-ca.json";
+
+                    arr = arr.sort((a, b) => b.score - a.score);
+                    fs.writeFile(jsonpath, JSON.stringify(arr), { encoding : "utf8", flag : "w+" }, () => {
+                        fs.writeFile(jsonfrpath, JSON.stringify(arr.filter(x => x.language == "fr-ca")), { encoding : "utf8", flag : "w+" }, () => {
+                            fs.writeFile(jsonenpath, JSON.stringify(arr.filter(x => x.language == "en-ca")), { encoding : "utf8", flag : "w+" }, () => {
+                                sendback();
+                            });
+                        });
                     });
                 });
             });
