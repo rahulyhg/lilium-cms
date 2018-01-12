@@ -124,4 +124,4 @@ server {
 This software does not come with a license. 
 
 ## Copyright ##
-© Narcity Media, 2017
+© Narcity Media, 2018
