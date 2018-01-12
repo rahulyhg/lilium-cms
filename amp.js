@@ -79,10 +79,16 @@ class Amp {
 
             article.content = amp;
 
+            let language = cli._c.website.language;
+            if (article.topic && article.topic.override && article.topic.override.language) {
+                language = article.topic.override.language;
+            }
+
+
             log('AMP', "Generating AMP page from LML for article : " + article.title);
-            filelogic.renderThemeLML(cli, 'amp', 'amp/' + article.name + '.html', {
+            filelogic.renderThemeLML3(cli, 'amp', 'amp/' + article.name + '.html', {
                 config : cli._c,
-                article : article
+                article, language 
             }, (filecontent) => {
                 log("AMP", "Generated AMP page for article : " + article.title);
                 cli.response.writeHead(200);
