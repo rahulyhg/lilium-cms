@@ -62,6 +62,18 @@ class AdsLib {
 
         return _patterns[siteid][index];
     }
+
+    adminGET(cli) {
+        cli.response.end('hello, world');
+    }
+
+    adminPOST(cli) {
+        cli.response.end('hi, world');
+    }
+
+    livevar(cli, levels, params, sendback) {
+        sendback({ hello : "world" });
+    }
 }
 
 module.exports = new AdsLib();

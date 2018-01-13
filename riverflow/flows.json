@@ -29,6 +29,10 @@
             "endpoint" : "search",
             "support" : ["livevar", "setup"]
         }, {
+            "module" : "ads.js",
+            "endpoint" : "ads",
+            "support" : ["admin_get", "admin_post", "livevar"]
+        }, {
             "module" : "history.js",
             "endpoint" : "history",
             "support" : ["admin_get", "admin_post", "livevar"]
