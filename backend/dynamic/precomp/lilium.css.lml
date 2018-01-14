@@ -190,9 +190,11 @@ input[type="checkbox"], .lmlcheckbox {
 	height:32px;
 	vertical-align: middle;
 
-    font: normal normal normal 14px/1 FontAwesome;
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
     text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
+    line-height: 1;
 
 	margin-right: 10px;
 	cursor: pointer;
@@ -342,10 +344,12 @@ select {
 
 .treeview-pane-selection.treeview-pane-selection-has-children::after {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: inherit;
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
     text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
+    line-height: 1;
 
     content: "\f105";
 
@@ -378,13 +382,19 @@ select {
 
 .select-wrapper:before {
     content: '\f0d7';
-    font-family: FontAwesome;
     color: #fff;
     display: inline-block;
     position: absolute;
     right: 20px;
     top: 15px;
     pointer-events: none;
+
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
 }
 
 .lmlform select::-ms-expand {
@@ -698,11 +708,13 @@ input[type="submit"].small, .btn.small, button.small {
 
 input[type="submit"]::before, .btn::before, button::before {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;    
     margin-right: 8px;
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
 }
 
 input[type="submit"]:hover, .btn:hover, button:hover, 
@@ -817,9 +829,12 @@ input[type="submit"].green:active, .btn.green:active, button.green:active {
     animation: fa-spin 2s infinite linear;
 
     display: block;
-    font: normal normal normal 14px/1 FontAwesome;
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
     text-rendering: auto;
-    -webkit-font-smoothing: antialiased;
+    line-height: 1;
 }
 
 .workbutton.working.big::before {
@@ -864,6 +879,14 @@ input[type="submit"].green:active, .btn.green:active, button.green:active {
     right: 0;
     top: 0;
     z-index: 1000;
+}
+
+.lmladminsidebar .lmladminsidebaritems li a i {
+    font-size: 16px;
+    display: inline-block;
+    margin: 0px 2px;
+    text-align: center;
+    width: 18px;
 }
 
 .lmladminbardisplayname {
@@ -2403,15 +2426,18 @@ button.bigger {
 
 .btn::before {
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
-    font-size: inherit;
-    text-rendering: auto;
-    -webkit-font-smoothing: antialiased;    
     margin-right: 8px;
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
 }
 
 .btn-save::before {
-    content: '\f0c6';
+    content: '\f0c7';
 }
 
 .btn-preview::before {
@@ -2424,7 +2450,7 @@ button.bigger {
 
 .btn-publish::before,
 .btn-send-for-review::before {
-    content: '\f1d9';
+    content: '\f1d8';
 }
 
 .btn-rebuild::before {
@@ -2442,7 +2468,6 @@ button.bigger {
 .announcement.modal .modal-body::before {
     content: 'fd';
     display: inline-block;
-    font: normal normal normal 14px/1 FontAwesome;
     font-size: inherit;
     text-rendering: auto;
     -webkit-font-smoothing: antialiased;
@@ -2450,6 +2475,12 @@ button.bigger {
     color: #EEE;
     font-weight: normal;
     margin: 30px;
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
 }
 
 #confirm-publish .modal-body::before,

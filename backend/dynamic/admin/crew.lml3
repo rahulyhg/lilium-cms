@@ -46,17 +46,17 @@ const compile = (o, context) => {
                     <div class="crew-card-middle">
                         <lml-filter if="hasSelectedPerso">
                             <div>
-                                <i class="fa fa-lightbulb-o" style="font-size:18px;"></i> 
+                                <i class="far fa-lightbulb" style="font-size:18px;"></i> 
                                 <lml-text var="member.personality.displayname"></lml-text> personality
                             </div>
                         </lml-filter>
                         <lml-filter if="hasArticles">
                             <div>
-                                <i class="fa fa-paper-plane"></i> 
+                                <i class="far fa-paper-plane"></i> 
                                 <lml-text var="member.articles"></lml-text> Articles published
                             </div>
                             <div>
-                                <i class="fa fa-facebook-official"></i> 
+                                <i class="fab fa-facebook-square"></i> 
                                 More than <lml-text var="member.shares"></lml-text> shares
                             </div>
                         </lml-filter>

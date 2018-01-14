@@ -5,97 +5,97 @@
     <ul class="devtools-list">
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/livevars">
-                <i class="devtools-list-item-icon fa fa-asterisk"></i>
+                <i class="devtools-list-item-icon far fa-asterisk"></i>
                 <b class="devtools-list-item-title">Livevars</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/lml">
-                <i class="devtools-list-item-icon fa fa-leaf"></i>
+                <i class="devtools-list-item-icon far fa-leaf"></i>
                 <b class="devtools-list-item-title">LML v1 &amp; v2</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/lml3" >
-                <i class="devtools-list-item-icon fa fa-code"></i>
+                <i class="devtools-list-item-icon far fa-code"></i>
                 <b class="devtools-list-item-title">LML v3</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/endpoints">
-                <i class="devtools-list-item-icon fa fa-dot-circle-o"></i>
+                <i class="devtools-list-item-icon far fa-dot-circle"></i>
                 <b class="devtools-list-item-title">Endpoints</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/cache">
-                <i class="devtools-list-item-icon fa fa-file-code-o"></i>
+                <i class="devtools-list-item-icon far fa-file-code"></i>
                 <b class="devtools-list-item-title">Cache</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/html">
-                <i class="devtools-list-item-icon fa fa-folder-open-o"></i>
+                <i class="devtools-list-item-icon far fa-folder-open"></i>
                 <b class="devtools-list-item-title">HTML files</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/scripts">
-                <i class="devtools-list-item-icon fa fa-rocket"></i>
+                <i class="devtools-list-item-icon far fa-rocket"></i>
                 <b class="devtools-list-item-title">Scripts</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/feed">
-                <i class="devtools-list-item-icon fa fa-newspaper-o"></i>
+                <i class="devtools-list-item-icon far fa-newspaper"></i>
                 <b class="devtools-list-item-title">Feed</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/server">
-                <i class="devtools-list-item-icon fa fa-power-off"></i>
+                <i class="devtools-list-item-icon far fa-power-off"></i>
                 <b class="devtools-list-item-title">Server</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/mail">
-                <i class="devtools-list-item-icon fa fa-envelope-o"></i>
+                <i class="devtools-list-item-icon far fa-envelope"></i>
                 <b class="devtools-list-item-title">Email</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/mongoadmin" target="_blank">
-                <i class="devtools-list-item-icon fa fa-database"></i>
+                <i class="devtools-list-item-icon far fa-database"></i>
                 <b class="devtools-list-item-title">Mongo Admin</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/sharedobject" >
-                <i class="devtools-list-item-icon fa fa-server"></i>
+                <i class="devtools-list-item-icon far fa-server"></i>
                 <b class="devtools-list-item-title">Shared objects</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/impersonate" >
-                <i class="devtools-list-item-icon fa fa-users"></i>
+                <i class="devtools-list-item-icon far fa-users"></i>
                 <b class="devtools-list-item-title">Impersonate</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/api" >
-                <i class="devtools-list-item-icon fa fa-flask"></i>
+                <i class="devtools-list-item-icon far fa-flask"></i>
                 <b class="devtools-list-item-title">API</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/where" >
-                <i class="devtools-list-item-icon fa fa-globe"></i>
+                <i class="devtools-list-item-icon far fa-globe"></i>
                 <b class="devtools-list-item-title">Where</b>
             </a>
         </li>
         <li class="devtools-list-item">
             <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/unlink" >
-                <i class="devtools-list-item-icon fa fa-picture-o"></i>
+                <i class="devtools-list-item-icon far fa-trash"></i>
                 <b class="devtools-list-item-title">Unlink files</b>
             </a>
         </li>

@@ -106,11 +106,11 @@ const preload = (context, done) => {
         window.ckp_status_icon = function(ldContext) {
             var elem = document.createElement('i');
             if (ldContext.ckp.status == "creation") {
-                elem.className = "fa fa-pencil-square";
+                elem.className = "fal fa-pencil-square";
             } else if (ldContext.ckp.expiry > window.ckp_now) {
-                elem.className = "fa fa-circle-o-notch fa-spin fa-fw"
+                elem.className = "fal fa-circle-o-notch fa-spin fa-fw"
             } else if (ldContext.ckp.status == "live") {
-                elem.className = "fa fa-calendar-check-o";
+                elem.className = "fal fa-calendar-check";
             }
 
             return elem;
