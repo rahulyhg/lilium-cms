@@ -1,0 +1,14 @@
+const settings = {
+    lmldom : { v : 1.0 },
+    title : "Ads management",
+    livevars : [
+        "ads.list"
+    ]
+};
+
+const compile = (o, context) => {
+    o(context.header);
+    
+};
+
+module.exports = { settings, compile };

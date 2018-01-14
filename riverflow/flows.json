@@ -403,7 +403,15 @@
                 "priority": 1000,
                 "rights": ["manage-settings"],
                 "absURL": "admin/settings",
-                "children": [{
+                "children": [{    
+                    "id": "ads",
+                    "faicon": "fa-money",
+                    "displayname": "Ads management",
+                    "priority": 400,
+                    "rights": ["admin"],
+                    "absURL": "admin/ads",
+                    "children": []
+                }, {
                     "id": "themes",
                     "faicon": "fa-paint-brush",
                     "displayname": "Themes",

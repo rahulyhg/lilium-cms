@@ -1,4 +1,5 @@
 const log = require('./log');
+const filelogic = require('./filelogic');
 const _patterns = {};
 
 class AdPatterns {
@@ -64,7 +65,7 @@ class AdsLib {
     }
 
     adminGET(cli) {
-        cli.response.end('hello, world');
+        filelogic.serveAdminLML3(cli);
     }
 
     adminPOST(cli) {
