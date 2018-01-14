@@ -42,7 +42,7 @@
             "support" : ["admin_get", "admin_post", "livevar", "form"],
             "admin_menu" : {
                 "id": "datareader",
-                "faicon": "fa-pie-chart",
+                "faicon": "fa-chart-pie",
                 "displayname": "Data Reader",
                 "priority": 530,
                 "rights": ["analyst"],
@@ -127,7 +127,7 @@
             ],
             "admin_menu" : {
                 "id": "mailtemplates",
-                "faicon": "fa-envelope-o",
+                "faicon": "fa-envelope",
                 "displayname": "Email Templates",
                 "priority": 250,
                 "rights": ["edit-emails"],
@@ -177,7 +177,7 @@
             "support" : ["setup", "admin_get", "livevar"],
             "admin_menu" : {
                 "id": "feed",
-                "faicon": "fa-newspaper-o",
+                "faicon": "fa-newspaper",
                 "displayname": "What's up",
                 "priority": 80,
                 "rights": ["dash"],
@@ -286,7 +286,7 @@
             "support" : ["admin_get", "admin_post", "livevar", "setup", "form"],
             "admin_menu" : {
                 "id": "crew",
-                "faicon": "fa-glass",
+                "faicon": "fa-beer",
                 "displayname": "Crew",
                 "priority": 500,
                 "rights": ["admin"],
@@ -381,7 +381,7 @@
             "support" : ["admin_get", "admin_post", "livevar", "form"],
             "admin_menu" : {
                 "id": "sites",
-                "faicon": "fa-sitemap",
+                "faicon": "fa-globe",
                 "displayname": "Network",
                 "priority": 50,
                 "rights": ["manage-sites"],
@@ -405,7 +405,7 @@
                 "absURL": "admin/settings",
                 "children": [{    
                     "id": "ads",
-                    "faicon": "fa-money",
+                    "faicon": "fa-usd-square",
                     "displayname": "Ads management",
                     "priority": 400,
                     "rights": ["admin"],
