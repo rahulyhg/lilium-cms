@@ -203,7 +203,8 @@ var SiteInitializer = function (conf, siteobj) {
 
         Frontend.registerCSSFile(base + "bower_components/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
         Frontend.registerCSSFile(base + "bower_components/flatpickr/dist/flatpickr.min.css", 500, 'admin', conf.id);
-        Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
+        // Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "backend/static/fa/fontawesome-all.min.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/hightlight.agate.css", 1120, 'admin', conf.id);
