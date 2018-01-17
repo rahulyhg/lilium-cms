@@ -6,6 +6,7 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
     this.template = bunchElement.querySelector("lml-bunchitem");
     this.settings = new LMLDOM_JSON(ldContext, bunchElement.querySelector('script[type="lmljson"]'));
     this.templateFilters = bunchElement.querySelector('lml-bunchfilters');
+    this.topbar = bunchElement.querySelector('lml-topbar');
     this.filters = {};
     this.page = {
         index : 1,
@@ -23,9 +24,13 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
     this.loopThroughItems = function(items, done) {
         for (var i = 0; i < items.length; i++) {
             liliumcms.lmldom.injectInContext(that.settings.data.loopvar, items[i]);
-            that.bunchWrap.appendChild(
-                liliumcms.lmldom.parseNode(that.template.firstElementChild.cloneNode(true))
-            );
+            var nds = that.template.children;
+
+            for (var j = 0; j < nds.length; j++) {
+                that.bunchWrap.appendChild(
+                    liliumcms.lmldom.parseNode(nds[j].cloneNode(true))
+                );
+            }
         }
 
         done();
@@ -72,7 +77,7 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
 
     this.init = function() {
         var bunchWrap = document.createElement('div');
-        bunchWrap.id = that.createID(this.settings.name);
+        bunchWrap.id = this.settings.data.id || that.createID(this.settings.name);
         bunchWrap.className = "lmlbunch-items-wrapper"
 
         var filterWrapper = that.templateFilters && that.templateFilters.firstElementChild.cloneNode(true);
@@ -80,7 +85,9 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
 
         that.elem.parentElement.insertBefore(bunchWrap, that.elem);
         filterWrapper && bunchWrap.parentElement.insertBefore(filterWrapper, bunchWrap);
-        that.elem.id = "bunch_" + this.settings.name;
+        that.elem.id = "bunch_" + (this.settings.data.id || this.settings.name);
+
+        this.topbar && bunchWrap.parentElement.insertBefore(this.topbar.firstElementChild.cloneNode(true), bunchWrap);
 
         that.bunchWrap = bunchWrap;
         liliumcms.lmldom.stage(that.elem);
