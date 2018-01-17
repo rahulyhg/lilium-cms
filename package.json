@@ -129,7 +129,7 @@
     "stackpath": "latest",
     "stream-browserify": "latest",
     "streamify": "latest",
-    "stripe": "latest",
+    "stripe": "^5.4.0",
     "twitter": "latest",
     "uglify": "latest",
     "uglify-js": "latest",
