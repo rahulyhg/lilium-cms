@@ -407,13 +407,15 @@ var DB = function() {
         const sites = require(liliumroot + "/config").getAllSites();
         let siteIndex = -1;
         let resp = [];
+        let resps = {};
 
         const nextSite = () => {
             if (++siteIndex == sites.length) {
-                return cb(resp);
+                return cb(resp, resps);
             }
 
             this.join(sites[siteIndex], coln, aggregation, arr => {
+                resps[sites[siteIndex].id] = arr;
                 resp = [...resp, ...arr];
                 nextSite();
             }, unique);
