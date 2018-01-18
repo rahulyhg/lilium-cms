@@ -403,6 +403,25 @@ var DB = function() {
 		});
 	}
 
+    this.networkJoin = function(coln, aggregation, cb, unique) {
+        const sites = require(liliumroot + "/config").getAllSites();
+        let siteIndex = -1;
+        let resp = [];
+
+        const nextSite = () => {
+            if (++siteIndex == sites.length) {
+                return cb(resp);
+            }
+
+            this.join(sites[siteIndex], coln, aggregation, arr => {
+                resp = [...resp, ...arr];
+                nextSite();
+            }, unique);
+        };
+
+        nextSite();
+    };
+
 	// Will callback cb with a boolean representing the existance of a document
 	this.match = this.exists = function(conf, coln, conds, cb) {
         _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {

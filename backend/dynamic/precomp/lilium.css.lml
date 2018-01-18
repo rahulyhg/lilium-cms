@@ -114,6 +114,12 @@ body.lmlrendered {
 	opacity: 1;
 }
 
+::selection,
+::-moz-selection {
+    color : #fff;
+    background : {=liliumcolor};
+}
+
 /* Scroll bars */
 ::-webkit-scrollbar {
   width:  7px;
