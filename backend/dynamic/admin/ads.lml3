@@ -109,6 +109,10 @@ const compile = (o, context) => { o(css, context.header, `
             var ads = [];
             for (var i = 0; i < areas.length; i++) {
                 var area = areas[i];
+                if (!area.value) {
+                    continue;
+                }
+   
                 ads.push({
                     lang : area.dataset.lang,
                     type : area.dataset.type,
