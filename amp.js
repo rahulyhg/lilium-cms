@@ -72,7 +72,7 @@ class Amp {
             );
         }
 
-        this.parseAMPContent(cli, articleContent, (err, amp) => {
+        this.parseAMPContent(cli, article, articleContent, (err, amp) => {
             if (err) {
                 return cli.throwHTTP(500, undefined, true);
             }
@@ -101,7 +101,7 @@ class Amp {
         });
     };
 
-    parseAMPContent(cli, articleContent, cb) {
+    parseAMPContent(cli, article, articleContent, cb) {
         const dom = new JSDOM.JSDOM('<html><head></head><body>' + articleContent + '</body></html>');        
         const images = dom.window.document.querySelectorAll('img');
 
