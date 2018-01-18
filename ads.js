@@ -1,4 +1,6 @@
 const log = require('./log');
+const db = require('./includes/db');
+const config = require('./config');
 const filelogic = require('./filelogic');
 const _patterns = {};
 
@@ -65,15 +67,43 @@ class AdsLib {
     }
 
     adminGET(cli) {
+        if (!cli.hasRight('admin')) {
+            return cli.throwHTTP(403);
+        }   
+
         filelogic.serveAdminLML3(cli);
     }
 
     adminPOST(cli) {
-        cli.response.end('hi, world');
+        if (!cli.hasRight('admin')) {
+            return cli.throwHTTP(403);
+        }   
+
+        const ads = cli.postdata.data.ads;
+        db.remove(cli._c, 'ads', {}, () => {
+            db.insert(cli._c, 'ads', ads, () => {
+                cli.sendJSON({ total : ads.length });
+            });
+        });
     }
 
     livevar(cli, levels, params, sendback) {
-        sendback({ hello : "world" });
+        if (!cli.hasRight('admin')) {
+            return cli.throwHTTP(403);
+        }   
+
+        const levelOne = levels[0];
+        if (levelOne == "list") {
+            db.findToArray(cli._c, "ads", {}, (err, arr) => {
+                sendback(arr);
+            });
+        } else {
+            sendback("");
+        }
+    }
+
+    setup() {
+        config.getAllSites().forEach(site => db.createCollection(site, 'ads', () => {}));
     }
 }
 
