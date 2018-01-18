@@ -31,7 +31,7 @@
         }, {
             "module" : "ads.js",
             "endpoint" : "ads",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_get", "admin_post", "livevar", "setup"]
         }, {
             "module" : "history.js",
             "endpoint" : "history",
