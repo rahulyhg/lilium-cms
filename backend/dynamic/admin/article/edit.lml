@@ -131,15 +131,15 @@
                 <h3>Select a topic category</h3>
                 <div id="topic-categories-wrapper">
                     <div class="topic-category" data-icon="fa-map-marker" data-text="Local" data-color="#ea0f36" data-category="local">
-                        <i class="fa fa-map-marker" aria-hidden="true"></i>
+                        <i class="far fa-map-marker" aria-hidden="true"></i>
                         <span>Local</span>
                     </div>
-                    <div class="topic-category" data-icon="fa-futbol-o" data-text="Interest" data-color="#830fea" data-category="interest">
-                        <i class="fa fa-futbol-o" aria-hidden="true"></i>
+                    <div class="topic-category" data-icon="fa-futbol" data-text="Interest" data-color="#830fea" data-category="interest">
+                        <i class="far fa-futbol" aria-hidden="true"></i>
                         <span>Interest</span>
                     </div>
-                    <div class="topic-category" data-icon="fa-handshake-o" data-text="Partners" data-color="#0f50ea" data-category="partners">
-                        <i class="fa fa-handshake-o" aria-hidden="true"></i>
+                    <div class="topic-category" data-icon="fa-handshake" data-text="Partners" data-color="#0f50ea" data-category="partners">
+                        <i class="far fa-handshake" aria-hidden="true"></i>
                         <span>Partners</span>
                     </div>
                 </div>
@@ -325,7 +325,8 @@
     margin-right: 8px;
 }
 
-.topic-category .fa {
+.topic-category .fa,
+.topic-category .far {
     display: block;
     font-size: 42px;
     margin: 25px 0px 0px;
