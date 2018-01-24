@@ -54,6 +54,7 @@ class Core {
 
             log('Core', 'Created global library', 'success');
 
+            maybeRunCAIJ();
             loadHooks(readyToRock);
             loadForms();
             loadTables();
@@ -84,7 +85,7 @@ class Core {
                                     loadNotifications();
                                     notifyAdminsViaEmail();
                                     executeRunScript();
-                                    maybeRunCAIJ();
+                                    initSchedulingTasks();
             
                                     log('Core', 'Firing initialized signal', 'info');
                                     hooks.fire('init');
@@ -513,17 +514,21 @@ const loadBackendSearch = function() {
     });
 };
 
-const maybeRunCAIJ = () => {
-    if (process.env.job == "caij") {
-        log('Core', 'Creating CAIJ server', 'lilium');
-        require('./caij/caij.js').createServer();
-    } else if (isElder) {
+const initSchedulingTasks = () => {
+    if (isElder) {
         require('./config.js').eachSync(function(_c) {
             require('./caij/caij.js').scheduleTask("refreshTopicLatests", {
                 siteid : _c.id,
                 origin : "Elder"
             });
         });
+    }
+};
+
+const maybeRunCAIJ = () => {
+    if (process.env.job == "caij") {
+        log('Core', 'Creating CAIJ server', 'lilium');
+        require('./caij/caij.js').createServer();
     }
 }
 
