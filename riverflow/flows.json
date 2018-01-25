@@ -25,6 +25,14 @@
             "endpoint" : "proofread",
             "support" : ["setup"]
         }, {
+            "module" : "ponglinks.js",
+            "endpoint" : "ponglinks",
+            "support" : ["livevar", "admin_get", "admin_post", "setup"]
+        }, {
+            "module" : "ponglinks.js",
+            "endpoint" : "pong",
+            "support" : ["get"]
+        }, {
             "module" : "search.js",
             "endpoint" : "search",
             "support" : ["livevar", "setup"]
