@@ -1,0 +1,58 @@
+const settings = {
+    title : "Ponglinks",
+    lmldom : { v : 1.0 }
+};
+
+const compile = (o, context, v) => { o(context.header, `
+  
+    <lml-bunch>
+        <lml-bunchfilters>
+            <div class="bunch-filters">
+                <div class="bunch-filters-title">FILTERS</div>
+                <label>Search</label>
+                <input type="text" name="search" placeholder="Title keywords" />
+
+                <label>Status</label>
+                <select name="status">
+                    <option value="active">Active</option>
+                    <option value="">All</option>
+                    <option value="paused">Paused</option>
+                    <option value="archived">Archived</option>
+                </select>
+            </div>
+        </lml-bunchfilters>
+
+        <lml-topbar>
+            <div id="cdash-topbar">
+                <div class="cdash-post-cell">Identifier</div>
+                <div class="cdash-post-cell">Status</div>
+                <div class="cdash-post-cell">Outbound link</div>
+                <div class="cdash-post-cell">Hash</div>
+                <div class="cdash-post-cell">Unique clicks / Total</div>
+            </div>
+        </lml-topbar>
+
+        <lml-bunchitem>
+            <div class="cdash-post-cell"> <lml-text var="link.identifier"></lml-text> </div>
+            <div class="cdash-post-cell"> <lml-text var="link.status"></lml-text> </div>
+            <div class="cdash-post-cell"> <lml-text var="link.outbound"></lml-text> </div>
+            <div class="cdash-post-cell"> <lml-text var="link.hash"></lml-text> </div>
+            <div class="cdash-post-cell"> 
+                <lml-text var="link.uniqueclicks"></lml-text> / <lml-text var="link.clicks"></lml-text> 
+            </div>
+        </lml-bunchitem>
+
+        <script type="lmljson" name="ponglinkbunch">
+            {
+                "datasource" : "ponglinks.bunch",
+                "loopvar" : "link",
+                "id" : "ponglinks-list"
+            }
+        </script>
+    </lml-bunch>
+
+
+  
+`)};
+
+module.exports = { settings, compile };
