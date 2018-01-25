@@ -65,6 +65,7 @@ var LMLDom = function() {
     var adminEndpoint = currentSiteURL + "/admin";
     var edgeVersion = 0.6;
     var domhooks = [];
+    var currentBunches = {};
 
     var ldContext = {};
 
@@ -230,13 +231,27 @@ var LMLDom = function() {
         ldContext[key] = value;
     }
 
+    this.getBunches = function() {
+        return currentBunches;
+    }
+
+    this.updatedBunches = function() {
+        var ids = Object.keys(currentBunches);
+        ids.forEach(function(k) {
+            currentBunches[k].render();
+        });
+    }
+
     this.handleSingleBunch = function(bunchElem, done) {
         var bObj = new LMLDOM_Bunch(ldContext, bunchElem);
         bObj.init();
         bObj.render(done);
+
+        currentBunches[bObj.id] = bObj;
     };
 
     this.parseBunches = function(maindom, done) {
+        currentBunches = {};
         ldContext.lmljson = {};
         var bunches = maindom.querySelectorAll('lml-bunch');
         var bunchIndex = -1;

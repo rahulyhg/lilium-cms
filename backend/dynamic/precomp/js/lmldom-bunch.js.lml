@@ -86,6 +86,7 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
         that.elem.parentElement.insertBefore(bunchWrap, that.elem);
         filterWrapper && bunchWrap.parentElement.insertBefore(filterWrapper, bunchWrap);
         that.elem.id = "bunch_" + (this.settings.data.id || this.settings.name);
+        that.id = (this.settings.data.id || this.settings.name);
 
         this.topbar && bunchWrap.parentElement.insertBefore(this.topbar.firstElementChild.cloneNode(true), bunchWrap);
 
