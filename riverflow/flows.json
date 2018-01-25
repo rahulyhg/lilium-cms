@@ -27,7 +27,16 @@
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
-            "support" : ["livevar", "admin_get", "admin_post", "setup"]
+            "support" : ["livevar", "admin_get", "admin_post", "setup"],
+            "admin_menu" : {
+                "id": "ponglinks",
+                "faicon": "fa-external-link",
+                "displayname": "Ponglinks",
+                "priority": 330,
+                "rights": ["ponglinks"],
+                "absURL": "admin/ponglinks",
+                "children": []
+            }
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "pong",
