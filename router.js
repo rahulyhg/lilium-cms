@@ -39,6 +39,7 @@ var Router = function () {
         cli.routeinfo.async = cli.routeinfo.params.async || false;
 
         cli.routeinfo.url = cli._c.server.protocol + "//" + cli.request.headers.host + pObj.pathname;
+        cli.ip = cli.request.headers["x-real-ip"] || cli.request.connection.remoteAddress;
 
         cli.response.setHeader("Backend", "Lilium");
 
