@@ -7,6 +7,7 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
     this.settings = new LMLDOM_JSON(ldContext, bunchElement.querySelector('script[type="lmljson"]'));
     this.templateFilters = bunchElement.querySelector('lml-bunchfilters');
     this.topbar = bunchElement.querySelector('lml-topbar');
+    this.emptytemplate = bunchElement.querySelector('lml-emptytemplate');
     this.filters = {};
     this.page = {
         index : 1,
@@ -22,7 +23,7 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
     }
 
     this.loopThroughItems = function(items, done) {
-        for (var i = 0; i < items.length; i++) {
+        if (items.length != 0) for (var i = 0; i < items.length; i++) {
             liliumcms.lmldom.injectInContext(that.settings.data.loopvar, items[i]);
             var nds = that.template.children;
 
@@ -31,6 +32,8 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
                     liliumcms.lmldom.parseNode(nds[j].cloneNode(true))
                 );
             }
+        } else if (this.emptytemplate) {
+            that.bunchWrap.appendChild(this.emptytemplate.cloneNode(true));
         }
 
         done();
