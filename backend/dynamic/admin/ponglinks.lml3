@@ -1,9 +1,105 @@
 const settings = {
     title : "Ponglinks",
+    tools : {
+        "add" : { call : "popupCreate" }
+    },
     lmldom : { v : 1.0 }
 };
 
-const compile = (o, context, v) => { o(context.header, `
+const css = `<style>
+
+.ponglink-card h3 {
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+    color: #333;
+}
+
+#emptytemplate {
+    width: 500px;
+    padding: 20px;
+    margin: 40px auto;
+    display: block;
+    
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+    text-align: center;
+}
+
+#emptytemplate span {
+    display: block;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+#emptytemplate b {
+    cursor: pointer;
+    color : #af57e4;
+}
+
+.ponglink-card {
+    margin: 5px;
+    padding: 10px;
+    border : 1px solid #DDD;
+    border-bottom-width: 3px;
+}
+
+.link-status {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.link-status span::before {
+    display: inline-block;
+    margin: 4px 0px;
+    padding: 1px 4px;
+    background-color: #333;
+    color: #FFF;
+    border-radius : 3px;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.link-status span.active::before {
+    content : 'Active';
+    background-color: #5767e4;
+}
+
+.link-status span.paused::before {
+    content : 'Paused';
+    background-color: #e49357;
+}
+
+.link-status span.archived::before {
+    content : 'Archived';
+}
+
+.ponglink-creator {
+    color: #888
+}
+
+</style>`;
+
+const modal = `<div id="create-ponglink-modal" class="lml-modal">
+
+    <div class="lml-modal-title">Create new ponglink</div>
+
+    <div class="lml-modal-body">
+        <span>Unique identifier</span>
+        <input id="modal-identifier" placeholder="Campaign ID, client name, website name..." />
+
+        <span>Destination URL</span>
+        <input id="modal-destination" placeholder="www.lilium-is-cool.com" />
+    </div>
+
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button> 
+        <button class="lml-modal-accept" type="button">Create</button>
+    </div>
+</div>`;
+
+const compile = (o, context, v) => { o(context.header, css, modal, `
   
     <lml-bunch>
         <lml-bunchfilters>
@@ -22,23 +118,21 @@ const compile = (o, context, v) => { o(context.header, `
             </div>
         </lml-bunchfilters>
 
-        <lml-topbar>
-            <div id="cdash-topbar">
-                <div class="cdash-post-cell">Identifier</div>
-                <div class="cdash-post-cell">Status</div>
-                <div class="cdash-post-cell">Outbound link</div>
-                <div class="cdash-post-cell">Hash</div>
-                <div class="cdash-post-cell">Unique clicks / Total</div>
+        <lml-emptytemplate>
+            <div id="emptytemplate">
+                <span>Nothing found</span>
+                <p>It would appear there is currently nothing in the database matching the current filters. Would you like to <b onclick="popupCreate();">create a new ponglink</b>?</p>
             </div>
-        </lml-topbar>
+        </lml-emptytemplate>
 
         <lml-bunchitem>
-            <div class="cdash-post-cell"> <lml-text var="link.identifier"></lml-text> </div>
-            <div class="cdash-post-cell"> <lml-text var="link.status"></lml-text> </div>
-            <div class="cdash-post-cell"> <lml-text var="link.outbound"></lml-text> </div>
-            <div class="cdash-post-cell"> <lml-text var="link.hash"></lml-text> </div>
-            <div class="cdash-post-cell"> 
-                <lml-text var="link.uniqueclicks"></lml-text> / <lml-text var="link.clicks"></lml-text> 
+            <div class="ponglink-card">
+                <h3><lml-text var="link.identifier"></lml-text></h3>
+                <div class="link-status">
+                    <lml-class classes="link.status" tag="span"></lml-class>
+                </div>
+                <div> <lml-link href="{link.destination}"><lml-text var="link.destination"></lml-text></lml-link> </div>
+                <div class="ponglink-creator">Created by <lml-generate call="displayOwner"></lml-generate></div>
             </div>
         </lml-bunchitem>
 
@@ -51,8 +145,33 @@ const compile = (o, context, v) => { o(context.header, `
         </script>
     </lml-bunch>
 
+    <script>
+        var displayOwner = function(ldContext) {
+            var creator = liliumcms.conversations.getCachedUsers()[ldContext.link.creatorid];
+            return document.createTextNode(creator ? creator.displayname : "an inactive user");
+        }
 
-  
+        var popupCreate = function() {
+            liliumcms.modals.get('create-ponglink-modal').show();
+            return void 0;
+        }
+
+        document.querySelector('#create-ponglink-modal .lml-modal-accept').addEventListener('click', function() {
+            var payload = {};
+            payload.identifier = d.id('modal-identifier').value;
+            payload.destination = d.id('modal-destination').value;
+
+            if (payload.identifier && payload.destination) {
+                liliumcms.lmldom.post(payload, '${context._c.server.url}/admin/ponglinks/create', function(r) {
+                    liliumcms.lmldom.getBunches()["ponglinks-list"].render();
+                    liliumcms.modals.get('create-ponglink-modal').dismiss();
+                });
+            } else {
+                liliumcms.notify({ type : "warning", title : "Missing information", message : "You need to provide an identifier as well as a destination URL." })
+            } 
+        });
+    </script>
+
 `)};
 
 module.exports = { settings, compile };
