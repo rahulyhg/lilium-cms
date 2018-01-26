@@ -72,7 +72,7 @@ class PongLinks {
     }
 
     livevar(cli, levels, params, sendback) {
-        const $match = { status : "active" };
+        const $match = { };
 
         if (params.filters.search) {
             $match.identifier = new RegExp(params.filters.search, 'i');
@@ -82,22 +82,22 @@ class PongLinks {
             $match.status = params.filters.status;
         }
 
-        db.findToArray(cli._c, 'ponglinks', $match, (err, items) => {
+        db.join(cli._c, 'ponglinks', [ {$match}, {$sort : {_id : -1}} ], (items) => {
             sendback({ items });
         });
     }
 
     setup() {
         if (isElder) {
-            require('./config').each((site, next) => {
+            log('Ponglinks', 'Elder process is storing links', 'info');
+            const sites = require('./config').getAllSites();
+            sites.forEach(site => {
                 db.createCollection(site, 'ponglinks', () => {
-                    db.findToArray(site, 'ponglinks', { active : true }, (err, arr) => {
-                        log('Ponglinks', 'Storing ' + arr.length + " links in shared cache");
+                    db.findToArray(site, 'ponglinks', {}, (err, arr) => {
+                        log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
                         arr.forEach(x => {
                             sharedcache.set({ ["ponglinks_" + x.hash] : x.destination });
                         });
-
-                        next();
                     });
                 });
             });
