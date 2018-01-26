@@ -79,6 +79,27 @@ const css = `<style>
     color: #888
 }
 
+.ponglink-linklist {
+    text-align: center;
+    padding: 10px 0px;
+    border-top: 1px solid #EEE;
+    margin: 10px 0px;
+    border-bottom: 1px solid #EEE;
+}
+
+.ponglink-linklist i {
+    font-size: 26px;
+    margin: 5px 0px;
+}
+
+.link-action {
+    display: inline-block;
+    vertical-align: baseline;
+    margin-right: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
 </style>`;
 
 const modal = `<div id="create-ponglink-modal" class="lml-modal">
@@ -131,8 +152,15 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
                 <div class="link-status">
                     <lml-class classes="link.status" tag="span"></lml-class>
                 </div>
-                <div> <lml-link href="{link.destination}"><lml-text var="link.destination"></lml-text></lml-link> </div>
                 <div class="ponglink-creator">Created by <lml-generate call="displayOwner"></lml-generate></div>
+                <div class="ponglink-linklist"> 
+                    <div>${context._c.server.protocol}${context._c.server.url}/pong/<lml-text var="link.hash"></lml-text></div>
+                    <div><i class="far fa-long-arrow-alt-down"></i></div>
+                    <div><lml-link href="{link.destination}"><lml-text var="link.destination"></lml-text></lml-link></div>
+                </div>
+                <div class="ponglink-actions">
+                    <lml-generate call="createLinkActions"></lml-generate>
+                </div>
             </div>
         </lml-bunchitem>
 
@@ -146,6 +174,38 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
     </lml-bunch>
 
     <script>
+        var LINK_STATUSES = [
+            {id : "active", action : "activate"},
+            {id : "paused", action : "pause"},
+            {id : "archived", action : "archive"}
+        ];
+        var createLinkActions = function(ldContext) {
+            if (ldContext.link.status == "archived") {
+                return document.createElement('div');
+            }
+
+            var actionwrap = d.make({});
+            var currentstatus = ldContext.link.status;
+            var _id = ldContext.link._id;
+
+            LINK_STATUSES.forEach(function(status) {
+                if (currentstatus != status.id) {
+                    var btn = d.make({ node : "u", class : "link-action", text : status.action, parent : actionwrap });
+                    btn.bind('click', function() {
+                        updateStatus(_id, status.id);
+                    });
+                }
+            });
+
+            return actionwrap.get();
+        }   
+
+        var updateStatus = function(_id, status) {
+            liliumcms.lmldom.post({ status : status }, "${context._c.server.url}/admin/ponglinks/edit/" + _id, function() {
+                liliumcms.lmldom.getBunches()["ponglinks-list"].render();
+            });
+        }
+    
         var displayOwner = function(ldContext) {
             var creator = liliumcms.conversations.getCachedUsers()[ldContext.link.creatorid];
             return document.createTextNode(creator ? creator.displayname : "an inactive user");
