@@ -179,7 +179,7 @@ var LMLDom = function() {
             if (nowrap) {
                 for (var j = 0; j < elem.childNodes.length; j++) {
                     var cloned = elem.childNodes[j].cloneNode(true);
-                    elem.insertAfter(cloned);
+                    elem.parentElement.insertBefore(cloned, elem);
                     
                     cloned.querySelector && this.parseNode(cloned);
                 }
