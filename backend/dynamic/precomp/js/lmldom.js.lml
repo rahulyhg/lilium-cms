@@ -175,16 +175,26 @@ var LMLDom = function() {
             ldContext.foreachkey = keys[i];
             ldContext.foreachindex = i;
 
-            var wrap = document.createElement(elem.getAttribute('wrapper') || "div");
-            for (var j = 0; j < elem.childNodes.length; j++) {
-                wrap.appendChild(elem.childNodes[j].cloneNode(true));
-            }
-
-            this.parseNode(wrap);
-            if (virtual) {
-                virtual.appendChild(wrap);
+            var nowrap = elem.getAttribute('nowrap');
+            if (nowrap) {
+                for (var j = 0; j < elem.childNodes.length; j++) {
+                    var cloned = elem.childNodes[j].cloneNode(true);
+                    elem.insertAfter(cloned);
+                    
+                    cloned.querySelector && this.parseNode(cloned);
+                }
             } else {
-                elem.insertAfter(wrap);
+                var wrap = document.createElement(elem.getAttribute('wrapper') || "div");
+                for (var j = 0; j < elem.childNodes.length; j++) {
+                    wrap.appendChild(elem.childNodes[j].cloneNode(true));
+                }
+
+                this.parseNode(wrap);
+                if (virtual) {
+                    virtual.appendChild(wrap);
+                } else {
+                    elem.insertAfter(wrap);
+                }
             }
         }
 
