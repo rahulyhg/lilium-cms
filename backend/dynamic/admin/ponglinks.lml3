@@ -42,6 +42,25 @@ const css = `<style>
     padding: 10px;
     border : 1px solid #DDD;
     border-bottom-width: 3px;
+
+    position: relative;
+}
+
+.link-clicks {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    font-size: 20px;
+}
+
+.link-clicks i {
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.link-clicks span {
+    vertical-align: middle;
+    font-weight: 100;
 }
 
 .link-status {
@@ -148,6 +167,10 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
 
         <lml-bunchitem>
             <div class="ponglink-card">
+                <div class="link-clicks">
+                    <lml-text var="link.clicks" wrapper="span"></lml-text>
+                    <i class="far fa-share-all"></i>
+                </div>
                 <h3><lml-text var="link.identifier"></lml-text></h3>
                 <div class="link-status">
                     <lml-class classes="link.status" tag="span"></lml-class>
@@ -156,7 +179,7 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
                 <div class="ponglink-linklist"> 
                     <div>${context._c.server.protocol}${context._c.server.url}/pong/<lml-text var="link.hash"></lml-text></div>
                     <div><i class="far fa-long-arrow-alt-down"></i></div>
-                    <div><lml-link href="{link.destination}"><lml-text var="link.destination"></lml-text></lml-link></div>
+                    <div><lml-link href="{link.destination}" target="_blank"><lml-text var="link.destination"></lml-text></lml-link></div>
                 </div>
                 <div class="ponglink-actions">
                     <lml-generate call="createLinkActions"></lml-generate>

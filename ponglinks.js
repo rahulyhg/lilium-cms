@@ -72,6 +72,8 @@ class PongLinks {
     GET(cli) {
         const hash = cli.routeinfo.path[1];
         sharedcache.get("ponglinks_" + hash, domain => domain ? cli.redirect(domain) : cli.throwHTTP(404, undefined, true));
+
+        db.increment(cli._c, 'ponglinks', { hash, status : "active" }, { clicks : 1 });
     }
 
     livevar(cli, levels, params, sendback) {
