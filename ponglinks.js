@@ -37,18 +37,21 @@ class PongLinks {
     }   
 
     createLink(_c, creatorid, link, done) {
+        const hash = this.hashDestination(link.identifier + link.destination);
         db.insert(_c, 'ponglinks', {
-            creatorid, 
+            creatorid, hash,
             createdOn : new Date(),
             createdAt : Date.now(),
 
             status : "active", 
             identifier : link.identifier,
             destination : link.destination,
-            hash : this.hashDestination(link.identifier + link.destination),
             uniqueclicks : 0,
             clicks : 0
-        }, (err, r) => done(err, r.insertedId));
+        }, (err, r) => {
+            done(err, r.insertedId);
+            sharedcache.set({ ["ponglinks_" + hash] : link.destination });
+        });
     }
 
     adminPOST(cli) {
