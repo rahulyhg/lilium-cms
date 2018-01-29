@@ -12,7 +12,10 @@ const css = `<style>
     display: inline-block;
     vertical-align: middle;
     margin-right: 6px;
-    color: #333;
+}
+
+.ponglink-card h3 a {
+    color : #333;
 }
 
 #emptytemplate {
@@ -171,7 +174,11 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
                     <lml-text var="link.clicks" wrapper="span"></lml-text>
                     <i class="far fa-share-all"></i>
                 </div>
-                <h3><lml-text var="link.identifier"></lml-text></h3>
+                <h3>
+                    <lml-link href="${context._c.server.url}/admin/ponglinks/view/{link._id}">
+                        <lml-text var="link.identifier"></lml-text>
+                    </lml-link>
+                </h3>
                 <div class="link-status">
                     <lml-class classes="link.status" tag="span"></lml-class>
                 </div>

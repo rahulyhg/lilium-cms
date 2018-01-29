@@ -1,0 +1,19 @@
+const settings = {
+    title : "Ponglink insights",
+    lmldom : { v : 1.0 },
+    livevars : ["ponglinks.insights.$1"]
+};
+
+const css = `<style>
+
+
+
+</style>`;
+
+const compile = (o, context) => { o(context.header, css, `
+
+
+
+`); };
+
+module.exports = { settings, compile };

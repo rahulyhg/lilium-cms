@@ -29,7 +29,11 @@ class PongLinks {
             return cli.refuse();
         }
 
-        filelogic.serveAdminLML3(cli);
+        if (cli.routeinfo.path[3]) {
+            filelogic.serveAdminLML3(cli, true);
+        } else {
+            filelogic.serveAdminLML3(cli);
+        }
     }
 
     editLink(_c, _id, keyval, done) {
@@ -74,22 +78,29 @@ class PongLinks {
         sharedcache.get("ponglinks_" + hash, domain => domain ? cli.redirect(domain) : cli.throwHTTP(404, undefined, true));
 
         db.increment(cli._c, 'ponglinks', { hash, status : "active" }, { clicks : 1 });
+        db.insert(cli._c, 'pongclicks', { at : Date.now(), ip : cli.ip }, () => {});
     }
 
     livevar(cli, levels, params, sendback) {
         const $match = { };
 
-        if (params.filters.search) {
-            $match.identifier = new RegExp(params.filters.search, 'i');
-        }
+        if (levels[0] == "insights") {
+            db.findUnique(cli._c, 'ponglinks', { _id : db.mongoID(levels[1]) }, (err, link) => {
+                sendback(link);
+            });
+        } else {
+            if (params.filters.search) {
+                $match.identifier = new RegExp(params.filters.search, 'i');
+            }
 
-        if (params.filters.status) {
-            $match.status = params.filters.status;
-        }
+            if (params.filters.status) {
+                $match.status = params.filters.status;
+            }
 
-        db.join(cli._c, 'ponglinks', [ {$match}, {$sort : {_id : -1}} ], (items) => {
-            sendback({ items });
-        });
+            db.join(cli._c, 'ponglinks', [ {$match}, {$sort : {_id : -1}} ], (items) => {
+                sendback({ items });
+            });
+        }
     }
 
     setup() {
@@ -97,7 +108,7 @@ class PongLinks {
             log('Ponglinks', 'Elder process is storing links', 'info');
             const sites = require('./config').getAllSites();
             sites.forEach(site => {
-                db.createCollection(site, 'ponglinks', () => {
+                db.createCollections(site, ['ponglinks', 'pongclicks'], () => {
                     db.findToArray(site, 'ponglinks', {}, (err, arr) => {
                         log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
                         arr.forEach(x => {
