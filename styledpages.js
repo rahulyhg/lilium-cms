@@ -204,6 +204,17 @@ class StyledPages {
         });
     }
 
+    apiGET(cli) {
+        db.findUnique(cli._c, 'styledpages', { slug : cli.routeinfo.path[2], status : "public" }, (err, page) => {
+            page ? cli.sendJSON({
+                title : page.title,
+                content : page.content,
+                css : page.customcss,
+                js : page.customjs
+            }) : cli.throwHTTP(404, 'No such page', true);
+        });
+    }
+
     adminGET(cli) {
         if (!cli.hasRight("styledpages")) { return cli.refuse(); }
 
