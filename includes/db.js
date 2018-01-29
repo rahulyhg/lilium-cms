@@ -2,6 +2,7 @@ var _c = require('../config.js');
 var log = require('../log.js');
 var MongoClient = require('mongodb').MongoClient
 var mongoObjectID = require('mongodb').ObjectID;
+var noop = () => {};
 
 var _conn = undefined;
 var _conns = new Object();
@@ -318,6 +319,12 @@ var DB = function() {
 			}
 		});
 	};
+
+    this.increment = function(conf, coln, match, fields, done) {
+        _conns[conf.id].collection(coln, {}, (err, col) => {
+            col.updateOne(match, {$inc : fields}).then(done || noop).catch(done || noop);
+        });
+    }
 
 	this.createIndex = function(conf, coln, fields, cb) {
         log("Database", "Creating index for collection " + coln + "@" + (conf.id || conf));
