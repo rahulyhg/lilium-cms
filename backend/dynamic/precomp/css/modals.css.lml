@@ -83,11 +83,16 @@
     font-weight: 500;
 }
 
+.lml-modal-body hr {
+    margin: 10px 0px 15px;
+    border-color: #DDD;
+}
+
 .lml-modal-body span {
     display: block;
     font-size: 16px;
-    font-weight: 300;
-    color: #999;
+    font-weight: normal;
+    color: #555;
 }
 
 .lml-modal-footer {

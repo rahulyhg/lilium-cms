@@ -134,6 +134,24 @@ const modal = `<div id="create-ponglink-modal" class="lml-modal">
 
         <span>Destination URL</span>
         <input id="modal-destination" placeholder="www.lilium-is-cool.com" />
+
+        <hr />
+        <span>Source</span>
+        <input id="modal-source" placeholder="Also known as utm_source" />
+
+        <span>Medium</span>
+        <input id="modal-medium" placeholder="Also known as utm_medium" />
+
+        <span>Campaign ID</span>
+        <input id="modal-source" placeholder="Also known as utm_campaign" />
+
+        <hr />
+        <span>Variations</span>
+        <p>
+            It is possible to define multiple versions of the same link and compare clicks between them. 
+            Simply fill the following field with a comma separated list of version names.
+        </p>
+        <input id="modal-versions" placeholder="Top, Middle, Bottom, Signature" />
     </div>
 
     <div class="lml-modal-footer">
