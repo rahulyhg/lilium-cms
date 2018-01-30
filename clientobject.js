@@ -141,14 +141,22 @@ class ClientObject {
         }
     };
 
-    readPostData(done) {
+    readPostData(done, max = 65536) {
         if (this.postdata && this.postdata.data) {
             return done(this.postdata.data);
         }
 
         this.postdata = {raw : ""};
 
-        this.request.on('data', (c) => { this.postdata.raw += c; });
+        let length = 0;
+        this.request.on('data', (c) => { 
+            this.postdata.raw += c; 
+            length += c.length;  
+
+            if (length > max) {
+                this.throwHTTP(413, undefined, true);
+            }
+        });
         this.request.on('end', () => {
             try {
                 this.postdata.data = JSON.parse(this.postdata.raw);
