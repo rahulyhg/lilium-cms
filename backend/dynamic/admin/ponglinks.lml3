@@ -102,7 +102,6 @@ const css = `<style>
 }
 
 .ponglink-linklist {
-    text-align: center;
     padding: 10px 0px;
     border-top: 1px solid #EEE;
     margin: 10px 0px;
@@ -120,6 +119,32 @@ const css = `<style>
     margin-right: 10px;
     font-size: 16px;
     cursor: pointer;
+}
+
+.ponglink-links {
+    margin : 5px;
+    border: 1px solid #DDD;
+    border-radius : 5px;
+}
+
+.ponglink-linkrow {
+    display: flex;
+    flex-flow: wrap;
+
+    border-bottom: 1px solid #DDD;
+}
+
+.ponglink-linkcell {
+    padding: 6px;
+}
+
+.ponglink-linkcell:nth-child(odd) {
+    flex: 0 0 120px;
+    border-right: 1px solid #DDD;
+}
+
+.ponglink-linkcell:nth-child(even) {
+    flex : 1;
 }
 
 </style>`;
@@ -142,8 +167,8 @@ const modal = `<div id="create-ponglink-modal" class="lml-modal">
         <span>Medium</span>
         <input id="modal-medium" placeholder="Also known as utm_medium" />
 
-        <span>Campaign ID</span>
-        <input id="modal-source" placeholder="Also known as utm_campaign" />
+        <span>Campaign</span>
+        <input id="modal-campaign" placeholder="Also known as utm_campaign" />
 
         <hr />
         <span>Variations</span>
@@ -202,9 +227,7 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
                 </div>
                 <div class="ponglink-creator">Created by <lml-generate call="displayOwner"></lml-generate></div>
                 <div class="ponglink-linklist"> 
-                    <div>${context._c.server.protocol}${context._c.server.url}/pong/<lml-text var="link.hash"></lml-text></div>
-                    <div><i class="far fa-long-arrow-alt-down"></i></div>
-                    <div><lml-link href="{link.destination}" target="_blank"><lml-text var="link.destination"></lml-text></lml-link></div>
+                    <lml-generate call="listLinksVersions" ></lml-generate>
                 </div>
                 <div class="ponglink-actions">
                     <lml-generate call="createLinkActions"></lml-generate>
@@ -248,6 +271,27 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
             return actionwrap.get();
         }   
 
+        var listLinksVersions = function(ldContext) {
+            var link = ldContext.link;
+            var href = "${context._c.server.protocol}${context._c.server.url}/ponglinks/" + link.hash + 
+                "?utm_campaign=" + link.campaign + "&utm_source=" + link.source + "&utm_medium=" + link.medium + "&version=";
+
+            var wrap = d.make({ class : "ponglink-links" })
+            for (var i = 0; i < link.versions.length; i++) {
+                var row = d.make({ class : "ponglink-linkrow", parent : wrap });
+                d.make({ text : link.versions[i], parent : row, class : "ponglink-linkcell" });
+                d.make({ text : href + link.versions[i], parent : row, class : "ponglink-linkcell" });
+            }
+
+            var row = d.make({ class : "ponglink-linkrow", parent : wrap });
+            d.make({ text : "Destination", parent : row, class : "ponglink-linkcell bold" });
+
+            var linkwrap = d.make({ parent : row, class : "ponglink-linkcell" });
+            d.make({ node : "a", attr : { href : link.destination }, text : link.destination, parent : linkwrap });
+
+            return wrap.get();
+        }
+
         var updateStatus = function(_id, status) {
             liliumcms.lmldom.post({ status : status }, "${context._c.server.url}/admin/ponglinks/edit/" + _id, function() {
                 liliumcms.lmldom.getBunches()["ponglinks-list"].render();
@@ -268,6 +312,14 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
             var payload = {};
             payload.identifier = d.id('modal-identifier').value;
             payload.destination = d.id('modal-destination').value;
+            payload.source = d.id('modal-source').value;
+            payload.campaign = d.id('modal-campaign').value;
+            payload.medium = d.id('modal-medium').value;
+            payload.versions = d.id('modal-versions').value;
+
+            if (!payload.versions.trim()) {
+                payload.versions = "Main";
+            }
 
             if (payload.identifier && payload.destination) {
                 liliumcms.lmldom.post(payload, '${context._c.server.url}/admin/ponglinks/create', function(r) {
