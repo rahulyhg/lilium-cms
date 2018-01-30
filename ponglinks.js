@@ -54,7 +54,6 @@ class PongLinks {
             campaign : link.campaign, 
             medium : link.medium,
             versions : link.versions.split(',').map(x => x.trim()), 
-            uniqueclicks : 0,
             clicks : 0
         }, (err, r) => {
             done(err, r.insertedId);
@@ -81,8 +80,9 @@ class PongLinks {
         const hash = cli.routeinfo.path[1];
         sharedcache.get("ponglinks_" + hash, domain => domain ? cli.redirect(domain) : cli.throwHTTP(404, undefined, true));
 
-        db.increment(cli._c, 'ponglinks', { hash, status : "active" }, { clicks : 1 });
-        db.insert(cli._c, 'pongclicks', { at : Date.now(), ip : cli.ip }, () => {});
+        db.increment(cli._c, 'ponglinks', { hash, status : "active" }, { clicks : 1 }, (r) => {
+            r.modifiedCount && db.insert(cli._c, 'pongclicks', { at : Date.now(), ip : cli.ip, hash, version : cli.routeinfo.params.version }, () => {});
+        });
     }
 
     livevar(cli, levels, params, sendback) {

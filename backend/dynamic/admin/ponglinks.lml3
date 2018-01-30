@@ -44,13 +44,13 @@ const css = `<style>
 
 #ponglinks-list {
     background: #EEE;
-    padding-top: 10px;
+    padding-top: 20px;
     min-height: 250px;
     border-bottom: 1px solid #DDD;
 }
 
 .ponglink-card {
-    margin: 0px 10px 10px;
+    margin: 0px 20px 20px;
     padding: 10px;
     border : 1px solid #DDD;
     border-bottom-width: 3px;
@@ -298,7 +298,7 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
 
         var listLinksVersions = function(ldContext) {
             var link = ldContext.link;
-            var href = "${context._c.server.protocol}${context._c.server.url}/ponglinks/" + link.hash + 
+            var href = "${context._c.server.protocol}${context._c.server.url}/pong/" + link.hash + 
                 "?utm_campaign=" + link.campaign + "&utm_source=" + link.source + "&utm_medium=" + link.medium + "&version=";
 
             var wrap = d.make({ class : "ponglink-links" })
