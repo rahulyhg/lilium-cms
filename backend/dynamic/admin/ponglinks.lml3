@@ -27,6 +27,8 @@ const css = `<style>
     border: 1px solid #DDD;
     border-bottom-width: 3px;
     text-align: center;
+
+    background : #FFF;
 }
 
 #emptytemplate span {
@@ -40,13 +42,22 @@ const css = `<style>
     color : #af57e4;
 }
 
+#ponglinks-list {
+    background: #EEE;
+    padding-top: 10px;
+    min-height: 250px;
+    border-bottom: 1px solid #DDD;
+}
+
 .ponglink-card {
-    margin: 5px;
+    margin: 0px 10px 10px;
     padding: 10px;
     border : 1px solid #DDD;
     border-bottom-width: 3px;
+    background-color: #FFF;
 
     position: relative;
+    border-radius: 5px;
 }
 
 .link-clicks {
@@ -136,6 +147,7 @@ const css = `<style>
 
 .ponglink-linkcell {
     padding: 6px;
+    font-size: 12px;
 }
 
 .ponglink-linkcell:nth-child(odd) {
@@ -145,6 +157,19 @@ const css = `<style>
 
 .ponglink-linkcell:nth-child(even) {
     flex : 1;
+    word-wrap: break-word;
+    line-break: loose;
+    break-inside: auto;
+    word-break: break-all;
+    cursor: copy;
+}
+
+.ponglink-linkrow:last-child {
+    background: #fff6fc;
+}
+
+.ponglink-linkrow:last-child .ponglink-linkcell {
+    cursor: default;
 }
 
 </style>`;
@@ -280,14 +305,38 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
             for (var i = 0; i < link.versions.length; i++) {
                 var row = d.make({ class : "ponglink-linkrow", parent : wrap });
                 d.make({ text : link.versions[i], parent : row, class : "ponglink-linkcell" });
-                d.make({ text : href + link.versions[i], parent : row, class : "ponglink-linkcell" });
+
+                var ccell = d.make({ text : href + link.versions[i], parent : row, class : "ponglink-linkcell" });
+                ccell.bind('click', function(ev) {
+                    var t = ev.target;
+                    var text = t.textContent.trim();
+                    
+                    t.textContent = "";
+                    var tb = document.createElement('input');
+                    tb.value = text;
+                    document.body.appendChild(tb);
+
+                    if (tb && tb.select) {
+                        tb.select();
+                    }
+
+                    try {
+                        document.execCommand('copy');
+                        liliumcms.notify({ type : "info", title : "Clipboard", message : "A ponglink was copied onto the clipboard." })
+                    } catch (err) {
+                        alert('please press Ctrl/Cmd+C to copy');
+                    }
+
+                    t.textContent = text;
+                    tb.remove();
+                });
             }
 
             var row = d.make({ class : "ponglink-linkrow", parent : wrap });
             d.make({ text : "Destination", parent : row, class : "ponglink-linkcell bold" });
 
             var linkwrap = d.make({ parent : row, class : "ponglink-linkcell" });
-            d.make({ node : "a", attr : { href : link.destination }, text : link.destination, parent : linkwrap });
+            d.make({ node : "a", attr : { href : link.destination, target : "_blank" }, text : link.destination, parent : linkwrap });
 
             return wrap.get();
         }
