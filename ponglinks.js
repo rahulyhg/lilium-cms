@@ -1,7 +1,7 @@
 const db = require('./includes/db');
 const sharedcache = require('./sharedcache');
 const isElder = require('./network/info').isElderChild();
-const SHA256 = (str) => require('crypto-js').SHA256(str).toString();
+const SHA1 = (str) => require('crypto-js').SHA1(str).toString();
 const filelogic = require('./filelogic');
 
 const ALLOWED_EDIT_FIELDS = [
@@ -10,7 +10,7 @@ const ALLOWED_EDIT_FIELDS = [
 
 class PongLinks {
     hashDestination(dest) {
-        return SHA256(dest);
+        return SHA1(dest);
     }
 
     parseEditFields(keyval) {
@@ -50,6 +50,10 @@ class PongLinks {
             status : "active", 
             identifier : link.identifier,
             destination : link.destination,
+            source : link.source,
+            campaign : link.campaign, 
+            medium : link.medium,
+            versions : link.versions.split(',').map(x => x.trim()), 
             uniqueclicks : 0,
             clicks : 0
         }, (err, r) => {
