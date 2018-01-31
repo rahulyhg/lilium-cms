@@ -148,19 +148,20 @@ class GoogleAnalyticsRequest {
 
         const datethen = Date.now();
         GoogleAnalyticsRequest.lastMonth(_c, gAnalytics, (data) => {
+            data = data.data || data;
             base.performance.lastmonth = {
                 lastmonth : StatsBeautifier.toPresentable(data.lastmonth),
                 monthbefore : StatsBeautifier.toPresentable(data.monthbefore)
             }; 
 
             GoogleAnalyticsRequest.last30Days(_c, gAnalytics, (err, data) => {
-                base.performance.last30days = StatsBeautifier.toPresentableArray(data);
+                base.performance.last30days = StatsBeautifier.toPresentableArray(data.data || data);
 
                 GoogleAnalyticsRequest.lastWeek(_c, gAnalytics, (err, data) => {
-                    base.performance.lastweek = StatsBeautifier.toPresentable(data);
+                    base.performance.lastweek = StatsBeautifier.toPresentable(data.data || data);
 
                     GoogleAnalyticsRequest.sameDay(_c, gAnalytics, (err, data) => {
-                        base.performance.sameday = StatsBeautifier.toPresentable(data);
+                        base.performance.sameday = StatsBeautifier.toPresentable(data.data || data);
                         log('Analytics', 'Received extended dashboard data in ' + (Date.now() - datethen) + "ms", 'detail');
                         send(base);
                     });
@@ -290,8 +291,9 @@ class StatsBeautifier {
     static realtime(_c, data) {
         if (!data) { return; }
 
+        const dat = data.data || data;
         let pages = {};
-        data.rows.forEach(x => { 
+        dat.rows.forEach(x => { 
             // rt:pageTitle ,rt:pagePath, rt:source
             let path = x[1];
             let lastSlash = path.lastIndexOf('/');
@@ -330,7 +332,7 @@ class StatsBeautifier {
         return {
             pages : Object.keys(pages).map(x => pages[x]).sort((a, b) => b.count - a.count),
             at : Date.now(),
-            total : data.totalsForAllResults["rt:activeUsers"]
+            total : dat.totalsForAllResults["rt:activeUsers"]
         }
     }
 
@@ -490,7 +492,7 @@ class GoogleAnalytics {
         GoogleAnalyticsRequest.realtime(_c, this, (err, data) => {
             if (data) {
                 sharedcache.set({
-                    ['analytics_realtime_' + _c.id] : StatsBeautifier.realtime(_c, data)
+                    ['analytics_realtime_' + _c.id] : StatsBeautifier.realtime(_c, data.data || data)
                 }, done);
             } else {
                 log('Analytics', 'Error while fetching realtime data : ' + err, 'warn');
@@ -501,7 +503,7 @@ class GoogleAnalytics {
 
     get3daysFiller(_c, send) {
         GoogleAnalyticsRequest.fill3Days(_c, this, (err, data) => {
-            send(err || StatsBeautifier.fill3days(data));
+            send(err || StatsBeautifier.fill3days(data.data || data));
         });
     }
 
@@ -517,6 +519,32 @@ class GoogleAnalytics {
         });
     }
 
+    getMergedRealtime(sendback) {
+        const response = {
+            pages : [],
+            total : 0,
+            sites : []
+        };
+        require('./config').each((site, next) => {
+            sharedcache.get('analytics_realtime_' + site.id, data => {
+                if (!data) {
+                    next();
+                }
+
+                response.pages = [...response.pages, ...data.pages.map(x => {
+                    return { title : x.title, url : site.server.protocol + site.server.url + x.url, count : x.count, site : site.website.sitetitle }
+                })];
+                response.total += parseInt(data.total);
+                response.sites.push(site.website.sitetitle);
+
+                next();
+            });
+        }, () => {
+            response.pages = response.pages.sort((a, b) => b.count - a.count);
+            sendback(response)
+        });
+    }
+
     livevar(cli, levels, params, send) {
         var topLevel = levels[0] || "lastmonth";
 
@@ -527,7 +555,7 @@ class GoogleAnalytics {
                 } else {
                     GoogleAnalyticsRequest.realtime(cli._c, that, (err, data) => {
                         if (data) {
-                            data = StatsBeautifier.realtime(data);
+                            data = StatsBeautifier.realtime(data.data || data);
                             send(data);
 
                             sharedcache.set({ ["analytics_realtime_" + cli._c.id] : data });
@@ -555,6 +583,8 @@ class GoogleAnalytics {
                     });
                 }
             });
+        } else if (topLevel == "merged") {
+            this.getMergedRealtime(resp => send(resp));
         } else if (topLevel == "lastMonth") {
             const cachekey = 'analytics_lastmonth_' + cli._c.id;
             sharedcache.get(cachekey, (data) => {
@@ -563,7 +593,7 @@ class GoogleAnalytics {
                 } else {
                     GoogleAnalyticsRequest.lastMonth(cli._c, that, data => {
                         if (data) {
-                            StatsBeautifier.lastMonth(cli._c, data, finaldata => {
+                            StatsBeautifier.lastMonth(cli._c, data.data || data, finaldata => {
                                send(finaldata);
                                sharedcache.set({[cachekey] : finaldata});
                             });
@@ -581,7 +611,7 @@ class GoogleAnalytics {
                     GoogleAnalyticsRequest[topLevel](cli._c, that, (err, data) => {
                         if (data) {
                             if (StatsBeautifier[topLevel]) {
-                                data = StatsBeautifier[topLevel](cli._c, data);
+                                data = StatsBeautifier[topLevel](cli._c, data.data || data);
                             }
 
                             let cached = {}
