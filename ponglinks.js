@@ -42,17 +42,18 @@ class PongLinks {
 
     createLink(_c, creatorid, link, done) {
         const hash = this.hashDestination(link.identifier + link.destination);
+        const destination = link.destination + (link.destination.includes("?") ? "&" : "?") +
+            "utm_campaign=" + link.campaign +
+            "&utm_source=" + link.source +
+            "&utm_medium=" + link.medium;
+
         db.insert(_c, 'ponglinks', {
-            creatorid, hash,
+            creatorid, hash, destination,
             createdOn : new Date(),
             createdAt : Date.now(),
 
             status : "active", 
             identifier : link.identifier,
-            destination : link.destination + (link.destination.includes("?") ? "&" : "?") + 
-                "utm_campaign=" + link.campaign + 
-                "&utm_source=" + link.source + 
-                "&utm_medium=" + link.medium,
             source : link.source,
             campaign : link.campaign, 
             medium : link.medium,
@@ -60,7 +61,7 @@ class PongLinks {
             clicks : 0
         }, (err, r) => {
             done(err, r.insertedId);
-            sharedcache.set({ ["ponglinks_" + hash] : link.destination });
+            sharedcache.set({ ["ponglinks_" + hash] : destination });
         });
     }
 
@@ -81,10 +82,11 @@ class PongLinks {
 
     GET(cli) {
         const hash = cli.routeinfo.path[1];
-        sharedcache.get("ponglinks_" + hash, domain => domain ? cli.redirect(domain) : cli.throwHTTP(404, undefined, true));
+        const version = cli.routeinfo.params.version || "forged";
+        sharedcache.get("ponglinks_" + hash, domain => domain ? cli.redirect(domain + "&version=" + version) : cli.throwHTTP(404, undefined, true));
 
         db.increment(cli._c, 'ponglinks', { hash, status : "active" }, { clicks : 1 }, (r) => {
-            r.modifiedCount && db.insert(cli._c, 'pongclicks', { at : Date.now(), ip : cli.ip, hash, version : cli.routeinfo.params.version }, () => {});
+            r.modifiedCount && db.insert(cli._c, 'pongclicks', { at : Date.now(), ip : cli.ip, hash, version }, () => {});
         });
     }
 
