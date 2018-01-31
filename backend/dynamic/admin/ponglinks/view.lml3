@@ -1,7 +1,7 @@
 const settings = {
     title : "Ponglink insights",
     lmldom : { v : 1.0 },
-    livevars : ["ponglinks.insights.$1"]
+    livevars : ["ponglinks.insights.{?1}"]
 };
 
 const css = `<style>

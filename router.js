@@ -11,6 +11,7 @@ var Router = function () {
         pObj = url.parse(cli.request.url, true);
         cli.routeinfo.fileExt = pathlib.extname(pObj.pathname);
         cli.routeinfo.isStatic = cli.routeinfo.fileExt !== '';
+        cli.routeinfo.paramtrail = pObj.search;
 
         cli.routeinfo.fullpath = pObj.pathname[pObj.pathname.length - 1] == '/' ?
             pObj.pathname.substr(0, pObj.pathname.length - 1) :

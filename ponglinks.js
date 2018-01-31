@@ -49,11 +49,14 @@ class PongLinks {
 
             status : "active", 
             identifier : link.identifier,
-            destination : link.destination,
+            destination : link.destination + (link.destination.includes("?") ? "&" : "?") + 
+                "utm_campaign=" + link.campaign + 
+                "&utm_source=" + link.source + 
+                "&utm_medium=" + link.medium,
             source : link.source,
             campaign : link.campaign, 
             medium : link.medium,
-            versions : link.versions.split(',').map(x => x.trim()), 
+            versions : link.versions.split(',').map(x => x.trim().replace(/[\s\&]/g, '_')), 
             clicks : 0
         }, (err, r) => {
             done(err, r.insertedId);

@@ -298,8 +298,7 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
 
         var listLinksVersions = function(ldContext) {
             var link = ldContext.link;
-            var href = "${context._c.server.protocol}${context._c.server.url}/pong/" + link.hash + 
-                "?utm_campaign=" + link.campaign + "&utm_source=" + link.source + "&utm_medium=" + link.medium + "&version=";
+            var href = "${context._c.server.protocol}${context._c.server.url}/pong/" + link.hash + "?version=";
 
             var wrap = d.make({ class : "ponglink-links" })
             for (var i = 0; i < link.versions.length; i++) {
