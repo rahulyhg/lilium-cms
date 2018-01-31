@@ -90,6 +90,8 @@ class Login {
                         cli.redirect(cli._c.server.url + "/admin", false)   
                     });
                 });
+
+                db.update(require('../config.js').default(), 'entities', {_id : user._id}, { magiclink : CryptoJS.SHA256(Math.random()).toString() }, () => {});
             }
         });
     };
