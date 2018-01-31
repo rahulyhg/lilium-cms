@@ -528,7 +528,7 @@ class GoogleAnalytics {
         require('./config').each((site, next) => {
             sharedcache.get('analytics_realtime_' + site.id, data => {
                 if (!data || !data.pages || !data.pages.map) {
-                    next();
+                    return next();
                 }
 
                 response.pages = [...response.pages, ...data.pages.map(x => {
