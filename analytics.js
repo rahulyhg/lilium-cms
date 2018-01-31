@@ -527,7 +527,7 @@ class GoogleAnalytics {
         };
         require('./config').each((site, next) => {
             sharedcache.get('analytics_realtime_' + site.id, data => {
-                if (!data) {
+                if (!data || !data.pages || !data.pages.map) {
                     next();
                 }
 
