@@ -184,7 +184,7 @@ var Handler = function () {
 
     var OPTIONS = function(cli) {
         var headers = {
-            "Access-Control-Allow-Origin" : cli.request.headers.corsorigin || cli.request.headers.origin || cli._c.server.url,
+            "Access-Control-Allow-Origin" : cli.request.headers.corsorigin || cli.request.headers.origin,
             "Access-Control-Allow-Methods" : "GET, POST, OPTIONS",
             "Access-Control-Allow-Headers" : cli.request.headers["access-control-request-headers"] || "*"
         };
