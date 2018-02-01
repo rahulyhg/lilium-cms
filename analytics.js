@@ -522,7 +522,8 @@ class GoogleAnalytics {
         const response = {
             pages : [],
             total : 0,
-            sites : []
+            sites : [],
+            sitetotal : []
         };
         require('./config').each((site, next) => {
             sharedcache.get('analytics_realtime_' + site.id, data => {
@@ -535,6 +536,7 @@ class GoogleAnalytics {
                 })];
                 response.total += parseInt(data.total);
                 response.sites.push(site.website.sitetitle);
+                response.sitetotal.push(parseInt(data.total));
 
                 next();
             });
