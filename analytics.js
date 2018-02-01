@@ -294,15 +294,14 @@ class StatsBeautifier {
         const dat = data.data || data;
         let pages = {};
         dat.rows.forEach(x => { 
-            // rt:pageTitle ,rt:pagePath, rt:source
             let path = x[1];
-            let lastSlash = path.lastIndexOf('/');
-            let maybePage = path.substring(lastSlash + 1);
-
             let maybeParam = path.indexOf('?');
             if (maybeParam != -1) {
                 path = path.substring(0, maybeParam);
             }
+
+            let lastSlash = path.lastIndexOf('/');
+            let maybePage = path.substring(lastSlash + 1);
 
             if (!isNaN(maybePage)) {
                 path = path.substring(0, lastSlash);
