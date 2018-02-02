@@ -1986,21 +1986,23 @@ class Article {
     generateFromName(cli, articleName, cb, onlyPublished, pageIndex) {
         this.deepFetch(cli._c, articleName, (deepArticle)  => {
             if (!deepArticle) {
-                db.findToArray(cli._c, 'content', {aliases : articleName}, (err, arr)  => {
-                    if (err || !arr.length) {
+                db.findUnique(cli._c, 'content', {aliases : articleName}, (err, art)  => {
+                    if (err || !art) {
                         cb(false);
                     } else {
                         cb(true, {
-                            realName : arr[0].name
+                            realName : art.name
                         });
                     }
                 }, {name : 1});
             } else {
-                if (onlyPublished && deepArticle.status !== "published") {
+                if (onlyPublished && deepArticle.status != "published") {
                     cb(false);
                 } else {
                     that.generateArticle(cli._c, deepArticle, (resp)  => {
-                        if (resp.deepArticle.url != cli.routeinfo.url) {
+                        if (!resp || !resp.deepArticle) {
+                            cb(false);
+                        } if (resp.deepArticle.url != cli.routeinfo.url) {
                             cb(true, {
                                 realURL : resp.deepArticle.url
                             });

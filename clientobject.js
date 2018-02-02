@@ -281,7 +281,7 @@ class ClientObject {
         var that = this;
 
         if (cookieString) {
-            cookieString.split(';').forEach(function (cookie) {
+            cookieString.split(';').forEach(cookie => {
                 var keyVal = cookie.split('=');
                 var keyName = keyVal.shift().trim();
 
