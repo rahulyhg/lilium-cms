@@ -183,17 +183,17 @@ const modal = `<div id="create-ponglink-modal" class="lml-modal">
         <input id="modal-identifier" placeholder="Campaign ID, client name, website name..." />
 
         <span>Destination URL</span>
-        <input id="modal-destination" placeholder="www.lilium-is-cool.com" />
+        <input id="modal-destination" placeholder="https://www.liliumcms.com" />
 
         <hr />
         <span>Source</span>
-        <input id="modal-source" placeholder="Also known as utm_source" />
+        <input id="modal-source" placeholder="utm_source" />
 
         <span>Medium</span>
-        <input id="modal-medium" placeholder="Also known as utm_medium" />
+        <input id="modal-medium" placeholder="utm_medium" />
 
         <span>Campaign</span>
-        <input id="modal-campaign" placeholder="Also known as utm_campaign" />
+        <input id="modal-campaign" placeholder="utm_campaign" />
 
         <hr />
         <span>Variations</span>

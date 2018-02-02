@@ -86,7 +86,7 @@ class PongLinks {
         sharedcache.get("ponglinks_" + hash, domain => domain ? cli.redirect(domain + "&version=" + version) : cli.throwHTTP(404, undefined, true));
 
         db.increment(cli._c, 'ponglinks', { hash, status : "active" }, { clicks : 1 }, (r) => {
-            r.modifiedCount && db.insert(cli._c, 'pongclicks', { at : Date.now(), ip : cli.ip, hash, version }, () => {});
+            r.modifiedCount && db.insert(cli._c, 'pongclicks', { at : new Date(), ip : cli.ip, hash, version }, () => {});
         });
     }
 
@@ -95,7 +95,29 @@ class PongLinks {
 
         if (levels[0] == "insights") {
             db.findUnique(cli._c, 'ponglinks', { _id : db.mongoID(levels[1]) }, (err, link) => {
-                sendback(link);
+                db.join(cli._c, 'pongclicks', [
+                    { $match : { hash : link.hash } },
+                    { $group: { 
+                        _id: { $dayOfYear: "$at" },
+                        clicks: { $sum: 1 }
+                    } },
+                    { $project : {
+                        day : "$_id", clicks : 1, _id : 0 
+                    } }
+                ], (daily) => {
+                    db.join(cli._c, 'pongclicks', [
+                        { $match : { hash : link.hash } },
+                        { $group: { 
+                            _id: "$version",
+                            clicks: { $sum: 1 }
+                        } },
+                        { $project : {
+                            version : "$_id", clicks : 1, _id : 0
+                        } }
+                    ], (versions) => {
+                        sendback({ link, daily, versions });
+                    });
+                });
             });
         } else {
             if (params.filters.search) {

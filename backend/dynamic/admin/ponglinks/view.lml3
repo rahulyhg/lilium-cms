@@ -12,7 +12,20 @@ const css = `<style>
 
 const compile = (o, context) => { o(context.header, css, `
 
+    <h2><lml-text var="livevars.ponglinks.insights.?.identifier"></lml-text></h2>
 
+    <div id="ponglink-graph">
+
+    </div>
+
+    <script>
+        var init_ponglinks = function() {
+            var graphel = document.getElementById('ponglink-graph');
+            
+        };
+
+        liliumcms.lmldom.bind(init_ponglinks);
+    </script>
 
 `); };
 
