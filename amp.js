@@ -59,10 +59,14 @@ class Amp {
         );
         
         // Avatar URL
-        article.authors[0].avatarURL = article.authors[0].avatarURL.replace(
-            cli._c.server.url, 
-            cli._c.content.cdn.domain
-        );
+        if (article.authors[0].avatarURL) {
+            article.authors[0].avatarURL = article.authors[0].avatarURL.replace(
+                cli._c.server.url, 
+                cli._c.content.cdn.domain
+            );
+        } else {
+            article.authors[0].avatarURL = cli._c.server.protocol + cli._c.content.cdn.domain + "/static/media/lmllogo.png";
+        }
         
         // Sponsored Logo
         if (article.sponsoredBoxLogoURL) {
