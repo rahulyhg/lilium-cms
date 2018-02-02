@@ -194,7 +194,7 @@ var Handler = function () {
                 "Access-Control-Allow-Origin" : origin,
                 "Access-Control-Allow-Methods" : "GET, POST, OPTIONS",
                 "Access-Control-Allow-Headers" : cli.request.headers["access-control-request-headers"] || "*"
-            };
+            });
         } else {
             cli.response.writeHead(400);
         }
