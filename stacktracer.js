@@ -1,12 +1,27 @@
 const fs = require('fs');
+const dateFormat = require('dateformat');
 
 const padding = "          ";
-let padLine = linenum => {
+const padLine = linenum => {
     return linenum + padding.substring(linenum.toString().length);
 }
 
+const mdTemplate = (err) => { return `💥 *StackTracer report*
+_${err.title}_
+
+*Detailed Stack trace*
+${err.blocks.map(x => `*${x.file}*, line ${x.line} in \`${x.title}\`\n\`\`\`${x.code.join('\n')}\`\`\``).join('\n\n')}
+
+*Original Stack trace*
+\`\`\`${err._err.stack}\`\`\`
+
+Error occured on *${dateFormat(new Date(), "dddd, mmmm dS, yyyy, h:MM:ss TT Z")}*
+`;};
+// `
+
 class StackTrace {
-    constructor (title) {
+    constructor (err, title) {
+        this._err = err;
         this.title = title;
         this.blocks = [];
     }
@@ -16,7 +31,7 @@ class StackTrace {
     }
 
     toMarkDown() {
-        
+        return mdTemplate(this);
     }
 
     appendFromFile(stackline, done) {
@@ -40,8 +55,8 @@ class StackTrace {
                 if (min < 0) { min = 0; }
                 if (max >= lines.length) { max = lines.length - 1; }
 
-                let line = min - 1;
-                block.code = lines.slice(min, max).map(x => padLine(++min) + x);
+                let line = min;
+                block.code = lines.slice(min, max).map(x => padLine((++line) + (line == block.line ? "💥" : "")) + x);
             }
 
             this.blocks.push(block);
@@ -51,7 +66,7 @@ class StackTrace {
     }
 
     static makeFromSyntaxError(err, sendback) {
-        const st = new StackTrace("SyntaxError");
+        const st = new StackTrace(err, "SyntaxError");
 
         const levels = err.stack.split('\n');
         const fileinfo = levels[0].split(':');
@@ -84,7 +99,7 @@ class StackTrace {
 
     static makeFromError(err, sendback) {
         const levels = err.stack.split('\n');
-        const st = new StackTrace(levels[0]);
+        const st = new StackTrace(err, levels[0]);
 
         let index = 0;
         let next = () => {
