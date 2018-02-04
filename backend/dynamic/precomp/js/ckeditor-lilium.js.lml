@@ -115,6 +115,10 @@ var CKEditor = function() {
         e.insertElement(lmlpage);
     };
 
+    this.castInstagramSelector = function(e) {
+        liliumcms.modals.get('lml-insert-instagram-modal').cast();
+    };
+
     this.initEditor = function() {
         log('CKEditor', 'Initializing CKEditor global object');
         if (typeof CKEDITOR === 'undefined') {
@@ -128,24 +132,13 @@ var CKEditor = function() {
             this.document.appendStyleSheet('/compiled/admin.css');
             ckBindEmbedPaste(ev);
 
-            /*
-            var blurLastSaved = ev.editor.getData();
-            ev.editor.on('blur', function(e) {
-                var data = e.editor.getData();
-                if (blurLastSaved != data) {
-                    blurLastSaved = data;
-                    liliumcms.localclip.push("Autosave @ " + dateFormat(new Date(), 'HH:MM:ss'), data);
-                }
-            });
-            */
-
             ev.editor.document.on('copy', function(e) {
                 liliumcms.localclip.handleCopy(e, this.$);
             });
         });
         CKEDITOR.config.entities = false;
         CKEDITOR.config.height = 360;
-        CKEDITOR.config.extraPlugins = 'lml-image-finder';
+        CKEDITOR.config.extraPlugins = 'lml-image-finder,lml-insert-instagram';
         CKEDITOR.config.fillEmptyBlocks = false;
         CKEDITOR.config.autoParagraph = false;
         CKEDITOR.config.entities_greek = false;
@@ -161,20 +154,6 @@ var CKEditor = function() {
         var validUrlRegex = /^(https?|ftp):\/\/(-\.)?([^\s\/?\.#-]+\.?)+(\/[^\s]*)?[^\s\.,]$/ig,
             doubleQuoteRegex = /"/g;
 
-        /*
-        CKEDITOR.plugins.add( 'lml-insert-page', {
-            init: function(editor) {
-                editor.addCommand('insertpage', { exec : that.insertPage });
-                editor.ui.addButton('insertpage', {
-                    label: 'Insert Page',
-                    command: 'insertpage',
-                    toolbar: 'insert',
-                    icon: '{=config.default.server.url}/static/media/ck-panel-icon.png'
-                });
-            }
-        });
-        */
-
         CKEDITOR.plugins.add("lml-image-finder", {
             init: function(editor) {
                 editor.addCommand('lmlimgbrowser', { exec : that.castImageSelector });
@@ -183,6 +162,18 @@ var CKEditor = function() {
                     command: 'lmlimgbrowser',
                     toolbar: 'insert',
                     icon : "{=config.default.server.url}/static/media/ck-image-icon.png"
+                });
+            }
+        });
+
+        CKEDITOR.plugins.add('lml-insert-instagram', {
+            init: function(editor) {
+                editor.addCommand('lmlpopupinstagram', { exec : that.castInstagramSelector });
+                editor.ui.addButton('lmlpopupinstagram', {
+                    label : "Insert image from Instagram",
+                    command: 'lmlpopupinstagram',
+                    toolbar : 'insert', 
+                    icon : "{=config.default.server.url}/static/media/ck-instagram-icon.png"
                 });
             }
         });
