@@ -116,6 +116,43 @@ var CKEditor = function() {
     };
 
     this.castInstagramSelector = function(e) {
+        window["lml-insert-instagram-modal_accept"] = function() {
+            var igurl = d.id('insert-instagram-embed').value;
+            liliumcms.lmldom.get("{=config.default.server.url}/admin/embed", {
+                spinflower : true,
+                params : {
+                    async : "*",
+                    type : "instagram",
+                    as : "json",
+                    url : igurl
+                }
+            }, function(resp) {
+                if (typeof resp != "object") {
+                    try {
+                        resp = JSON.parse(resp);
+                    } catch (err) {
+                        return liliumcms.notify({ 
+                            type : "error", 
+                            message : "Instagram refused to embed the provided URL. Make sure that the user profile is public and that the image still exists.", 
+                            delay : 10000,
+                            title : "Embed error" 
+                        });
+                    }
+                }
+
+                var wrap = document.createElement('div');
+                wrap.innerHTML = resp.markup;
+
+                var parag = e.document.createElement('p');
+                while (wrap.firstElementChild) {
+                    parag.$.appendChild(wrap.firstElementChild);
+                }
+                
+                e.insertElement(parag);
+                liliumcms.modals.get('lml-insert-instagram-modal').dismiss();
+            });
+        };
+
         liliumcms.modals.get('lml-insert-instagram-modal').cast();
     };
 
