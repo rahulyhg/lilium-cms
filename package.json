@@ -90,7 +90,7 @@
     "mongodb": "latest",
     "mysql": "latest",
     "node-dir": "latest",
-    "node-google-dfp": "latest",
+    "node-google-dfp": "^0.2.2",
     "node-minify": "latest",
     "node-readability": "latest",
     "node-rsync": "latest",

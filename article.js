@@ -761,7 +761,8 @@ class Article {
             var entity = db.mongoID(deepArticle.author);
 
             db.update(conf.default(), 'actionstats', {entity, type : "article_content"}, stats, (err, r)  => {
-                callback && callback(r.value);
+                err && log('Article', 'Error during action stats : ' + err, 'err');
+                callback && callback(err ? err : r && r.value);
             }, true, true, true, true);
         });
     };
