@@ -579,7 +579,7 @@ class GoogleAnalytics {
                             data.cachedAt = Date.now();
                             sharedcache.set({[cachekey] : data});
                         } else {
-                            send({ error : err, valid : false});
+                            send({ error : err && err.toString(), valid : false, err_json : JSON.stringify(err || {})});
                         }
                     });
                 }
