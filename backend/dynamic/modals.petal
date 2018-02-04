@@ -26,3 +26,19 @@
         <button class="lml-modal-accept" type="button">Set URL</button>
     </div>
 </div></div>
+
+<div class="lml-modal-wrapper"><div id="lml-insert-instagram-modal" class="lml-modal lml-modal-perma">
+    <div class="lml-modal-title">
+        Convert URL to Instagram Embed
+    </div>
+    <div class="lml-modal-body">
+        <p>Simply paste the URL of an Instagram picture in the textbox and press insert.</p>
+        <input type="text" id="insert-instagram-embed" placeholder="Instagram URL" />
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Insert</button>
+    </div>
+</div></div>
+
+
