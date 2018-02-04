@@ -176,6 +176,7 @@ class GoogleAnalyticsRequest {
                 return send(err);
             }
 
+            data = data.data || data;
             const metrics = {
                 unique : data.totalsForAllResults["ga:users"],
                 views : data.totalsForAllResults["ga:pageviews"],
@@ -464,7 +465,7 @@ class GoogleAnalytics {
         params.auth = GASites[_c.id].AUTH_CLIENT;
 
         analytics.data[realtime ? "realtime" : "ga"].get(params, (err, data) => {
-            cb && cb(err, data);
+            cb && cb(err, data ? data.data || data : data);
         });
     }
 
