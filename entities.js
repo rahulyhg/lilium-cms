@@ -98,7 +98,7 @@ class Entities {
     };
 
     registerLogin (cli, userObj, cb) {
-        db.update(_c.default(), 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : userObj.totalLogin++}, cb);
+        db.update(_c.default(), 'entities', {_id : db.mongoID(userObj._id)}, {totalLogin : ++userObj.totalLogin, lastLogin : new Date()}, cb);
     };
 
     fetchFromDB  (conf, idOrUsername, callback, force) {
