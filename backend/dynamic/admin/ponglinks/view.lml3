@@ -6,22 +6,97 @@ const settings = {
 
 const css = `<style>
 
+#ponglink-stat-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+}
 
+.half-cell {
+    width: 50%;
+    flex-grow : 1;
+}
 
 </style>`;
 
 const compile = (o, context) => { o(context.header, css, `
 
-    <h2><lml-text var="livevars.ponglinks.insights.?.identifier"></lml-text></h2>
+    <div id="ponglink-stat-wrapper">
+        <div id="ponglink-graph-wrapper" style="height: 450px; position: relative;" class="half-cell">
+            <canvas id="ponglink-graph"></canvas>
+        </div>
+        <div id="ponglink-daily-table" class="half-cell">
 
-    <div id="ponglink-graph">
+        </div>
 
+        <div id="ponglink-pie-wrapper" style="height: 450px; position: relative;" class="half-cell">
+            <canvas id="ponglink-pie"></canvas>
+        </div>
+        <div id="ponglink-versions-table" class="half-cell">
+
+        </div>
     </div>
 
     <script>
+        var ponglinkGraph;
+        var ponglinkPie;
+
         var init_ponglinks = function() {
             var graphel = document.getElementById('ponglink-graph');
+            var ctx = graphel.getContext('2d');
+            var now = new Date();
             
+            var lv = liliumcms.livevars.livevars()["ponglinks.insights." + liliumcms.pageloader.lastLevel];
+            var link = lv.link;
+            var daily = lv.daily;
+            var versions = lv.versions;
+
+            var labels = [];
+            var data = [];
+            daily.forEach(function(x) {
+                labels.unshift(dateFormat(new Date(now.getYear(), 0, x.day), "d mmm"));
+                data.unshift(x.clicks);
+            });
+            
+            ponglinkGraph = new Chart(ctx, {
+                type: 'bar',
+                options : {
+                    maintainAspectRatio : false
+                },
+                data: {
+                    labels : labels,
+                    datasets: [{
+                        label : "Clicks per day",
+                        data : data,
+                        backgroundColor : "rgba(175,87,228, 0.5)"
+                    }]
+                }
+            });
+
+            graphel = document.getElementById('ponglink-pie');
+            ctx = graphel.getContext('2d');
+            labels = [];
+            data = [];
+            versions.forEach(function(x) {
+                labels.unshift(x.version);
+                data.unshift(x.clicks);
+            });
+
+            ponglinkPie = new Chart(ctx, {
+                type : 'pie',
+                options : {
+                    maintainAspectRatio : false
+                },
+                data : {
+                    labels : labels,
+                    datasets: [{
+                        label : "Clicks per version",
+                        data : data,
+                        backgroundColor : ["rgba(255, 205, 86, 0.5)","rgba(75, 192, 192, 0.5)","rgba(54, 162, 235, 0.5)","rgba(153, 102, 255, 0.5)","rgba(201, 203, 207, 0.5)","rgba(255, 99, 132, 0.5)","rgba(255, 159, 64, 0.5)"]
+                    }]
+                }
+            });
+
+            document.querySelector('main.lmladminmain h1').textContent += " - " + link.identifier
         };
 
         liliumcms.lmldom.bind(init_ponglinks);
