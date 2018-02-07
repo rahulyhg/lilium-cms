@@ -43,7 +43,7 @@ var handleRequest = function(cli) {
             break;
 
         case "twitter":
-            request({url : "https://publish.twitter.com/oembed?url=" + url, json:true}, (err, r, data) => {
+            request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
                 cli.sendJSON(data);
             });
             break;

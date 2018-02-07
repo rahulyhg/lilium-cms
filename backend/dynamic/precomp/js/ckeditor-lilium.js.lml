@@ -115,6 +115,49 @@ var CKEditor = function() {
         e.insertElement(lmlpage);
     };
 
+    this.castTwitterSelector = function(e) {
+        window["lml-insert-twitter-modal_accept"] = function() {
+            var twurl = d.id('insert-twitter-embed').value;
+            liliumcms.lmldom.get("{=config.default.server.url}/admin/embed", {
+                spinflower : true,
+                params : {
+                    async : "*",
+                    type : "twitter",
+                    as : "json",
+                    url : twurl
+                }
+            }, function(resp) {
+                if (typeof resp != "object") {
+                    try {
+                        resp = JSON.parse(resp);
+                    } catch (err) {
+                        return liliumcms.notify({ 
+                            type : "error", 
+                            message : "Twitter refused to embed the provided URL. Make sure it is complete and that the Tweet was not deleted.", 
+                            delay : 10000,
+                            title : "Embed error" 
+                        });
+                    }
+                }
+
+                var wrap = document.createElement('div');
+                wrap.innerHTML = resp.html;
+
+                var parag = e.document.createElement('blockquote');
+                var blockquote = wrap.querySelector('blockquote');
+
+                parag.$.innerHTML = blockquote.innerHTML;
+                parag.$.className = blockquote.className; 
+                e.insertElement(parag);
+
+                liliumcms.modals.get('lml-insert-twitter-modal').dismiss();
+            });
+        };
+
+        liliumcms.modals.get('lml-insert-twitter-modal').cast();
+
+    };
+
     this.castInstagramSelector = function(e) {
         window["lml-insert-instagram-modal_accept"] = function() {
             var igurl = d.id('insert-instagram-embed').value;
@@ -175,7 +218,7 @@ var CKEditor = function() {
         });
         CKEDITOR.config.entities = false;
         CKEDITOR.config.height = 360;
-        CKEDITOR.config.extraPlugins = 'lml-image-finder,lml-insert-instagram';
+        CKEDITOR.config.extraPlugins = 'lml-image-finder,lml-insert-instagram,lml-insert-twitter';
         CKEDITOR.config.fillEmptyBlocks = false;
         CKEDITOR.config.autoParagraph = false;
         CKEDITOR.config.entities_greek = false;
@@ -211,6 +254,18 @@ var CKEditor = function() {
                     command: 'lmlpopupinstagram',
                     toolbar : 'insert', 
                     icon : "{=config.default.server.url}/static/media/ck-instagram-icon.png"
+                });
+            }
+        });
+
+        CKEDITOR.plugins.add('lml-insert-twitter', {
+            init: function(editor) {
+                editor.addCommand('lmlpopuptwitter', { exec : that.castTwitterSelector });
+                editor.ui.addButton('lmlpopuptwitter', {
+                    label : "Insert Tweet",
+                    command: 'lmlpopuptwitter',
+                    toolbar : 'insert', 
+                    icon : "{=config.default.server.url}/static/media/ck-twitter-icon.png"
                 });
             }
         });
