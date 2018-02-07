@@ -34,7 +34,7 @@ class StackTrace {
         return mdTemplate(this);
     }
 
-    appendFromFile(stackline, done) {
+    appendFromFile(stackline, done, trimcode) {
         let blocktitle = stackline.trim().substring(3);
 
         const block = {
@@ -44,19 +44,32 @@ class StackTrace {
             line : stackline.substring(stackline.indexOf(':') + 1, stackline.lastIndexOf(':'))
         };
 
+        if (block.file == "module.js" || block.file.includes('node_modules')) {
+            return done();
+        }
+
         fs.readFile(block.file, 'utf8', (err, text) => {
             if (err) {
-                block.code.push("Cannot read the content of a file with a relative path or of a native library.");
+                // block.code.push("Cannot read the content of a file with a relative path or of a native library.");
+                return done();
             } else {
                 const lines = text.split("\n")
-                let min = block.line - 8;
-                let max = min + 17;
-
-                if (min < 0) { min = 0; }
-                if (max >= lines.length) { max = lines.length - 1; }
-
-                let line = min;
-                block.code = lines.slice(min, max).map(x => padLine((++line) + (line == block.line ? "💥" : "")) + x);
+                if (trimcode) {
+                    let line = lines[block.line - 1];
+                    if (!line) {
+                        return done();
+                    }
+                    block.code = [line.trim()];
+                } else {
+                    let min = block.line - 8;
+                    let max = min + 17;
+    
+                    if (min < 0) { min = 0; }
+                    if (max >= lines.length) { max = lines.length - 1; }
+    
+                    let line = min;
+                    block.code = lines.slice(min, max).map(x => padLine((++line) + (line == block.line ? "💥" : "")) + x);
+                }
             }
 
             this.blocks.push(block);
@@ -103,11 +116,11 @@ class StackTrace {
 
         let index = 0;
         let next = () => {
-            if (++index == levels.length) {
+            if (++index == levels.length || st.blocks.length > 7) {
                 return sendback(st);
             }
 
-            st.appendFromFile(levels[index], next);
+            st.appendFromFile(levels[index], next, index > 3);
         };
 
         next();
