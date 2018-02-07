@@ -30,7 +30,7 @@ class Inbound {
                 resp.writeHead(200, { "Content-Type" : dat.ctype });
                 resp.end(dat.html);
 
-                return;
+                return false;
             }
 
             const ClientObject = require('./clientobject.js')
@@ -38,9 +38,7 @@ class Inbound {
             hooks.trigger('request', { req, resp });
 
             if (this.ready) {
-                if (this.validate(req, resp)) {
-                    Handler.handle(new ClientObject(req, resp));
-                }
+                this.validate(req, resp) && Handler.handle(new ClientObject(req, resp));
             } else {
                 this.initqueue.push(new ClientObject(req, resp));
             }
@@ -49,7 +47,7 @@ class Inbound {
 
     handleQueue() {
         this.ready = true;
-        this.initqueue.forEach(cli => require("./handler.js").handle(cli));
+        this.initqueue.forEach(cli => this.validate(cli.request, cli.response) && require("./handler.js").handle(cli));
     }
 
     start() {
