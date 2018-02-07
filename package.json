@@ -126,7 +126,7 @@
     "slugify": "latest",
     "socket.io": "latest",
     "socket.io-redis": "latest",
-    "stackpath": "latest",
+    "stackpath": "0.0.5",
     "stream-browserify": "latest",
     "streamify": "latest",
     "stripe": "^5.4.0",
