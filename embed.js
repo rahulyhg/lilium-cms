@@ -23,10 +23,9 @@ var handleRequest = function(cli) {
     var type = cli.routeinfo.params.type;
     var as = cli.routeinfo.params.as;
 
-    url += (url.includes('?') ? '&' : '?') + "__a=1";
-
     switch (type) {
         case "instagram":
+            url += (url.includes('?') ? '&' : '?') + "__a=1";
             request.get({url, json:true}, function(err, r, data) {
                 if (as == "json") {
                     cli.sendJSON(data.graphql ? {
@@ -40,6 +39,12 @@ var handleRequest = function(cli) {
                             '<p class="lml-instagram-embed-err">Oops. It appears <b>Instagram.com</b> responded with an error. Make sure the Instagram account is public, that the picture is still available and that Instagram is not down.</p>'
                     );
                 }
+            });
+            break;
+
+        case "twitter":
+            request({url : "https://publish.twitter.com/oembed?url=" + url, json:true}, (err, r, data) => {
+                cli.sendJSON(data);
             });
             break;
 
