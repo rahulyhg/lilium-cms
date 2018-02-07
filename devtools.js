@@ -338,6 +338,7 @@ class DevTools {
 var unlinkUpload = function(cli) {
     const url = cli.postdata.data.url;
     const filename = url.split('/').pop().split('_')[0];
+    const hooks = require('./hooks');
 
     db.findUnique(cli._c, 'uploads', { filename }, (err, entry) => {
         if (entry) {
@@ -353,6 +354,8 @@ var unlinkUpload = function(cli) {
             db.remove(cli._c, 'uploads', { _id : entry._id }, () => {
                 cli.sendJSON({ unlinked : true, entry, total : totalFiles });
             });
+
+            hooks.fire('file_did_unlink', { entry, cli, files : Object.keys(entry.sizes).map(x => entry.sizes[x].path) });
         } else {
             cli.sendJSON({ unlinked : false });
         }
