@@ -37,11 +37,11 @@ const css = `<style>
     border-top: 1px solid #EEE;
 }
 
-.half-cell:nth-child(even) {
+.half-cell:nth-child(3n + 0) {
     width: 60%;
 }
 
-.half-cell:nth-child(odd) {
+.half-cell:nth-child(3n + 2) {
     width: 40%;
 }
 
@@ -105,7 +105,7 @@ const compile = (o, context) => { o(context.header, css, `
             
             var lv = liliumcms.livevars.livevars()["ponglinks.insights." + liliumcms.pageloader.lastLevel];
             var link = lv.link;
-            var daily = lv.daily;
+            var daily = lv.daily.sort(function(a, b) {b.clicks - a.clicks});
             var versions = lv.versions;
 
             var dailytable = d.id('ponglink-daily-table');

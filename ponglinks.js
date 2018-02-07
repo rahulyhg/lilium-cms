@@ -103,6 +103,9 @@ class PongLinks {
                     } },
                     { $project : {
                         day : "$_id", clicks : 1, _id : 0 
+                    } },
+                    { $sort : {
+                        day : -1
                     } }
                 ], (daily) => {
                     db.join(cli._c, 'pongclicks', [
