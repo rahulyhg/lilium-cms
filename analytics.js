@@ -22,14 +22,11 @@ const defaultDimensions = "ga:pagePath";
 const monthlyMetrics = ["ga:sessions", "ga:users", "ga:pageviews", "ga:percentNewSessions", "ga:sessionsPerUser", "ga:avgSessionDuration"].join(',');
 const monthlyDimensions = "ga:pagePath";
 
-// Month days
-const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
 // Cached Analytics Responses
 const cachedAnalytics = {};
 
 // Realtime poll
-const realtimePollMS = 10000;
+const realtimePollMS = 8000;
 
 // Authentication items
 class GoogleAnalyticsInfo {
