@@ -271,7 +271,7 @@ class SocialDispatch {
                     message : 1,
                     "target.displayname" : 1,
                     "target.type" : 1,
-                    "article.title" : 1,
+                    "article.title" : { $arrayElemAt : [ "$article.title", 0 ] },
                     "article.date" : 1
                 }
             }, {
@@ -279,29 +279,7 @@ class SocialDispatch {
                     time : 1
                 }
             } 
-        ], (arr) => {
-            let res = {};
-            /*
-            arr.forEach(post => {
-                let d = new Date(post.time);
-                let y = d.getFullYear();
-                let m = d.getMonth();
-                let t = d.getDate();
-                resp[y] = resp[y] || {};
-                resp[y][m] = resp[y][m] || {};
-                resp[y][m][t] = resp[y][m][t] || [];
-
-                resp[y][m][t].push({
-                    id : post._id,
-                    at : post.time,
-                    displayname : post.article && post.article.title,
-                    color : post.status == "published" ? "#bbb" : "#af57e4"
-                })
-            });
-            */
-
-            send(arr);
-        });
+        ], arr => send(arr));
     }
 
     adminGET(cli) {

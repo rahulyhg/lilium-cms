@@ -941,9 +941,9 @@ class Article {
                                         if (pubCtx === "create") {
                                              if (oldSlug) {
                                                 db.update(cli._c, 'content', 
-                                                    {_id : db.mongoID(formData._id)}, 
-                                                    {$push : {aliases : oldSlug}}, 
-                                                ()  => {
+                                                    { _id : db.mongoID(formData._id) }, 
+                                                    { $addToSet : {aliases : oldSlug} }, 
+                                                () => {
                                                     log('Article', 'Added alias for slug ' + oldSlug);
                                                     fileserver.deleteFile(cli._c.server.html + "/" + oldSlug + ".html", ()  => {});
                                                 }, false, true, true);
