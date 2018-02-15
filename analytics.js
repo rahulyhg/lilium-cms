@@ -291,6 +291,14 @@ class StatsBeautifier {
 
         const dat = data.data || data;
         let pages = {};
+
+        if (!dat.rows || !dat.rows.forEach) {
+            log("Analytics", "Received weird response from Analytics which prevents the realtime data from being stored. Dumping data : ", "warn");
+            console.log(data);
+
+            return;
+        }
+
         dat.rows.forEach(x => { 
             let path = x[1];
             let maybeParam = path.indexOf('?');
@@ -488,11 +496,12 @@ class GoogleAnalytics {
     storeRealtime(_c, done) {
         GoogleAnalyticsRequest.realtime(_c, this, (err, data) => {
             if (data) {
-                sharedcache.set({
-                    ['analytics_realtime_' + _c.id] : StatsBeautifier.realtime(_c, data.data || data)
-                }, done);
+                const beautifulData = StatsBeautifier.realtime(_c, data.data || data);
+                beautifulData ? sharedcache.set({
+                    ['analytics_realtime_' + _c.id] : beautifulData
+                }, done) : done();
             } else {
-                log('Analytics', 'Error while fetching realtime data : ' + err, 'warn');
+                log('Analytics', 'Error while fetching realtime data : ' + err, 'err');
                 done(err);
             }
         });
