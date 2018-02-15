@@ -36,6 +36,10 @@ class ClientObject {
 
         this.parseCookie();
         this.setID();
+
+        this.request.on('error', err => {
+            console.log('HERE! : ' + err);
+        });
     }
 
     did (cat, type, extra, cb) {

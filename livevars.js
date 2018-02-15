@@ -21,7 +21,6 @@
 
 var db = require('./includes/db.js');
 var log = require('./log.js');
-var pluginHelper = require('./pluginHelper.js');
 var hooks = require('./hooks.js');
 
 var RegisteredLiveVariables = new Object();
@@ -189,31 +188,14 @@ var LiveVariables = function() {
     this.registerLiveVariable = function(endpoint, func, rights) {
         rights = rights || new Array();
 
-        if (typeof RegisteredLiveVariables[endpoint] === 'undefined') {
+        if (!RegisteredLiveVariables[endpoint]) {
             RegisteredLiveVariables[endpoint] = createEndpoint(func, rights);
-            RegisteredLiveVariables[endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
         } else {
             log('LiveVariables', new Error("[LiveVariables] Tried to register an already defined endpoint : " + endpoint));
         }
     
         // Possibility to chain
         return this;
-    };
-
-    deletePluginLivevars = function(identifier) {
-        for (var i in RegisteredLiveVariables) {
-            if (RegisteredLiveVariables[i].pluginID == identifier) {
-                RegisteredLiveVariables[i] = undefined;
-                delete RegisteredLiveVariables[i];
-            }
-        }
-    };
-
-    var loadHooks = function() {
-        hooks.bind('plugindisabled', 1, function(identifier) {
-            // Check if plugin created endpoints
-            deletePluginLivevars(identifier);
-        });
     };
 
     this.apiGET = function(cli) {
@@ -271,7 +253,6 @@ var LiveVariables = function() {
     };
 
     this.init = function() {
-        loadHooks();
         return this;
     };
 };

@@ -38,34 +38,28 @@ var templateBuilder = function () {
     };
 
     this.registerPetal = function (sectionName, absPetalPath, priority, extra) {
-        var registerFilename = __caller;
-        pluginHelper.getPluginIdentifierFromFilename(registerFilename, function (pluginIdentifier) {
+        if (typeof petals[sectionName] === 'undefined') {
+            petals[sectionName] = {};
+        }
 
-            if (typeof petals[sectionName] === 'undefined') {
-                petals[sectionName] = {};
-            }
+        var switchedPrio = false;
+        if (petals[sectionName][priority]) {
+            log("Template", "Tried to register petal with existing priority : " + sectionName + "@" + priority);
+            switchedPrio = true;
+        }
 
-            var switchedPrio = false;
-            if (petals[sectionName][priority]) {
-                log("Template", "Tried to register petal with existing priority : " + sectionName + "@" + priority);
-                switchedPrio = true;
-            }
+        while (events[sectionName][priority]) {
+            priority++;
+        }
 
-            while (events[sectionName][priority]) {
-                priority++;
-            }
+        if (switchedPrio) {
+            log("Hooks", "Modified priority to " + priority);
+        }
 
-            if (switchedPrio) {
-                log("Hooks", "Modified priority to " + priority);
-            }
-
-            petals[sectionName][priority] = {
-                petal: absPetalPath,
-                extra: extra,
-                plugin: pluginIdentifier
-            };
-
-        });
+        petals[sectionName][priority] = {
+            petal: absPetalPath,
+            extra: extra
+        };
     };
 
     this.registerRoute = function (route, lmltemplate) {

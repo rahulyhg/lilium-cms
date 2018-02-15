@@ -44,15 +44,19 @@ class Dashboard {
                     send(quote);
                 } else {
                     request('http://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en', {json:true}, (err, resp, text) => {
-                        if (typeof text == "string") {
-                            text = JSON.parse(text);
+                        try {
+                            if (typeof text == "string") {
+                                text = JSON.parse(text);
+                            }
+    
+                            quote = text;
+                            quote.day = new Date().getDate();
+                            sharedcache.set({ quoteoftheday : quote });
+
+                            send(quote);
+                        } catch (err) {
+                            send({});
                         }
-
-                        quote = text;
-                        quote.day = new Date().getDate();
-                        sharedcache.set({ quoteoftheday : quote });
-
-                        send(quote);
                     });
                 }
             });
