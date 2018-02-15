@@ -28,10 +28,10 @@ var handleRequest = function(cli) {
             url += (url.includes('?') ? '&' : '?') + "__a=1";
             request.get({url, json:true}, function(err, r, data) {
                 if (as == "json") {
-                    cli.sendJSON(data.graphql ? {
+                    data ? cli.sendJSON(data.graphql ? {
                         instagram : data.graphql.shortcode_media,
                         markup : createV3DivFromResponse(data.graphql.shortcode_media, cli.routeinfo.params.url)
-                    } : data);
+                    } : data) : { instagram : "", markup : '<p class="lml-instagram-embed-err">Oops. It appears <b>Instagram.com</b> responded with an error. Make sure the Instagram account is public, that the picture is still available and that Instagram is not down.</p>', error : "Invalid Instagram Response" };
                 } else {
                     cli.response.end(
                         data.graphql ? 
