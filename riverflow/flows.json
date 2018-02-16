@@ -224,6 +224,19 @@
                 { "name" : "post_create_postleaf", "priority" : 10, "callback" : "postCreatePostleaf" }
             ]
         }, {
+            "module" : "contentcontroller.js",
+            "endpoint" : "publishing",
+            "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "livevar"],
+            "admin_menu" : {
+                "id" : "publishing",
+                "faicon": "fa-pen-square",
+                "displayname": "Content",
+                "priority": 225,
+                "rights": ["list-articles"],
+                "absURL": "admin/publishing/list",
+                "children": []
+            }
+        }, {
             "module" : "article.js",
             "endpoint" : "article",
             "support" : ["admin_get", "admin_post", "form", "table", "api_get", "api_post"],

@@ -21,18 +21,20 @@ class FlowHandle {
         this.type = type;
 
         switch (this.type) {
-            case "admin_get"  : Admin.registerAdminEndpoint(this.flow.endpoint, 'GET',  this.river.adminGET.bind(this.river));  break;
-            case "admin_post" : Admin.registerAdminEndpoint(this.flow.endpoint, 'POST', this.river.adminPOST.bind(this.river)); break;
-            case "livevar"    : Livevar.registerLiveVariable(this.flow.endpoint, this.river.livevar.bind(this.river));          break;
-            case "get"        : Endpoints.register('*', this.flow.endpoint, 'GET', this.river.GET.bind(this.river));            break;
-            case "post"       : Endpoints.register('*', this.flow.endpoint, 'POST', this.river.POST.bind(this.river));          break;
-            case "api_get"    : API.registerApiEndpoint(this.flow.endpoint, 'GET', this.river.apiGET.bind(this.river));         break;
-            case "api_post"   : API.registerApiEndpoint(this.flow.endpoint, 'POST', this.river.apiPOST.bind(this.river));       break;
-            case "api_put"    : API.registerApiEndpoint(this.flow.endpoint, 'PUT', this.river.apiPUT.bind(this.river));         break;
-            case "api_delete" : API.registerApiEndpoint(this.flow.endpoint, 'DELETE', this.river.apiDELETE.bind(this.river));   break;
-            case "form"       : this.river.form.apply(this.river);                                                              break;
-            case "table"      : this.river.table.apply(this.river);                                                             break;
-            case "setup"      : this.river.setup.apply(this.river);                                                             break;
+            case "admin_get"   : Admin.registerAdminEndpoint(this.flow.endpoint, 'GET',  this.river.adminGET.bind(this.river));  break;
+            case "admin_post"  : Admin.registerAdminEndpoint(this.flow.endpoint, 'POST', this.river.adminPOST.bind(this.river)); break;
+            case "admin_put"   : Admin.registerAdminEndpoint(this.flow.endpoint, 'PUT',  this.river.adminPUT.bind(this.river));  break;
+            case "admin_delete": Admin.registerAdminEndpoint(this.flow.endpoint, 'DELETE', this.river.adminDELETE.bind(this.river)); break;
+            case "livevar"     : Livevar.registerLiveVariable(this.flow.endpoint, this.river.livevar.bind(this.river));          break;
+            case "get"         : Endpoints.register('*', this.flow.endpoint, 'GET', this.river.GET.bind(this.river));            break;
+            case "post"        : Endpoints.register('*', this.flow.endpoint, 'POST', this.river.POST.bind(this.river));          break;
+            case "api_get"     : API.registerApiEndpoint(this.flow.endpoint, 'GET', this.river.apiGET.bind(this.river));         break;
+            case "api_post"    : API.registerApiEndpoint(this.flow.endpoint, 'POST', this.river.apiPOST.bind(this.river));       break;
+            case "api_put"     : API.registerApiEndpoint(this.flow.endpoint, 'PUT', this.river.apiPUT.bind(this.river));         break;
+            case "api_delete"  : API.registerApiEndpoint(this.flow.endpoint, 'DELETE', this.river.apiDELETE.bind(this.river));   break;
+            case "form"        : this.river.form.apply(this.river);                                                              break;
+            case "table"       : this.river.table.apply(this.river);                                                             break;
+            case "setup"       : this.river.setup.apply(this.river);                                                             break;
         }
 
         log('Riverflow', "Created '" + this.type + "' handle for flow with endpoint : " + this.flow.endpoint);
