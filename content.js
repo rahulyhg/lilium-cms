@@ -158,6 +158,41 @@ class ContentLib {
         nextHook();
     }
 
+    bunch(_c, filters = {}, sort, max = 50, skip = 0, sendback) {
+        const $match = { status : { $ne : "destroyed" } };
+        const $sort = { [sort || "_id"] : -1 };
+        const $limit = max;
+        const $skip = skip;
+        const medialookup = { from : "uploads", as : "deepmedia", localField : "media", foreignField : "_id" };
+        const topiclookup = { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" };
+        const $project = {
+            headline : { $arrayElemAt : ["$title", 0] },
+            subtitle : { $arrayElemAt : ["$subtitle", 0] },
+            thumbnail : "$deepmedia.sizes.square.url",
+            topic : "$fulltopic.displayname",
+            status : 1, date : 1, author : 1, shares : 1
+        };
+
+        if (filters.status) { $match.status = filters.status };
+        if (filters.author) { $match.author = filters.author };
+        if (filters.isSponsored) { $match.isSponsored = filters.isSponsored.toString() == "true" ? true : { $ne : true } };
+
+        const pipeline = [
+            { $match }, 
+            { $sort },
+            { $skip },
+            { $limit },
+            { $lookup : medialookup },
+            { $lookup : topiclookup },
+            { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
+            { $unwind : { path : "$fulltopic", preserveNullAndEmptyArrays : true } },
+            { $project }
+        ];
+
+        console.log(pipeline);
+        db.join(_c, CONTENT_COLLECTION, pipeline, arr => sendback({ items : arr }));
+    }
+
     update() {
 
     }
