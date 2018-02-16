@@ -1,6 +1,8 @@
 const AdminEndpoints = {
 	GET : {},
-	POST : {}
+	POST : {},
+    PUT : {},
+    DELETE : {}
 };
 
 const AdminMenus = [];
