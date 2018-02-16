@@ -1,0 +1,138 @@
+const settings = {
+    title : "Publishing",
+    lmldom : { v : 1.0 }
+};
+
+const css = `<style>
+
+main {
+    background: #F3F3F3;
+}
+
+.content-card {
+    display: flex;
+    margin: 5px;
+    background: #FFF;
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+}
+
+.content-card {
+    display: flex;
+}   
+
+.card-image, .no-image-placeholder {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.no-image-placeholder {
+    border-right: 1px solid #DDD;
+}
+
+.card-headline {
+    font-size: 18px;
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.card-subtitle {
+    font-size: 12px;
+    color: #777;
+}
+
+.card-text-wrap {
+    margin-left: 10px;
+}
+
+</style>`;
+
+const compile = (o, context, v) => { o(context.header, css, `
+    
+    <lml-bunch>
+        <lml-bunchfilters>
+            <div class="bunch-filters">
+                <div class="bunch-filters-title">FILTERS</div>
+                <label>Search</label>
+                <input type="text" name="search" placeholder="Title keywords" />
+
+                <label>Status</label>
+                <select name="status">
+                    <option value="">Any</option>
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                    <option value="deleted">Unpublished</option>
+                </select>
+
+                <label>Author</label>
+                <select name="author">
+                    <option value="">Any</option>
+                </select>
+
+                <label>Sponsored</label>
+                <select name="isSponsored">
+                    <option value="">Any</option>
+                    <option value="true">Show only</option>
+                    <option value="false">Hide all</option>
+                </select>
+
+                <label>Sort by</label>
+                <select name="sort">
+                    <option value="">Lilium Blend</option>
+                    <option value="date">Publication date</option>
+                    <option value="shares">Most shares</option>
+                </select>
+            </div>
+        </lml-bunchfilters>
+
+        <lml-emptytemplate>
+            <div id="emptytemplate">
+                <span>Nothing found</span>
+                <p>It would appear there is currently nothing in the database matching the current filters. Would you like to <b onclick="popupCreate();">publish a new article</b>?</p>
+            </div>
+        </lml-emptytemplate>
+
+        <lml-bunchitem generator="generateCard"></lml-bunchitem>
+
+        <script type="lmljson" name="ponglinkbunch">
+            {
+                "datasource" : "publishing.bunch",
+                "loopvar" : "post",
+                "id" : "article-list"
+            }
+        </script>
+    </lml-bunch> 
+
+    <script>
+        window.generateCard = function(post) {
+            var isAuthor = post.author == liliumcms.session.current._id;
+            var fullAuthor = liliumcms.conversations.getCachedUsers()[post.author];
+
+            var authorName = isAuthor ? "you" : fullAuthor ? fullAuthor.displayname : "[Inactive author]";
+            
+            var wrap = d.make({
+                class : 'content-card' + (post.thumbnail ? '' : ' no-image') 
+            });
+
+            d.make(post.thumbnail ? 
+                { parent : wrap, node : "img", attr : { src : liliumcms.cdn.parse(post.thumbnail) }, class : "card-image" } : 
+                { parent : wrap, class : 'no-image-placeholder' }
+            );
+
+            var titlewrap = d.make({ class : "card-text-wrap", parent : wrap });
+            d.make({ text : post.headline, class : "card-headline", parent : titlewrap });
+            d.make({ text : post.subtitle, class : "card-subtitle", parent : titlewrap });
+            
+            var pubby = d.make({ text : "Created by ", class : "card-author card-by-" + authorName, parent : titlewrap });
+            d.make({ text : authorName, node : "b", parent : pubby });
+        
+
+            return wrap.get();
+        }
+    </script>
+
+`); };
+
+module.exports = { settings, compile };
+
