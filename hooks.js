@@ -1,6 +1,5 @@
 const log = require('./log.js');
 const _c = require('./config.js');
-const pluginHelper = require('./pluginHelper.js');
 const isElder = require('./network/info.js').isElderChild();
 
 const events = {
@@ -16,8 +15,7 @@ const events = {
     "lmlinclude": {},
     "endpoints": {},
     "time_is_hour" : {},
-    "time_is_midnight" : {},
-    "plugindisabled": {}
+    "time_is_midnight" : {}
 };
 
 class Hooks {
@@ -46,53 +44,51 @@ class Hooks {
         return events[eventName] || {};
     }
 
-    register() {return this.bind(...arguments);}
-    bind(eventName, priority, callback, registerFilename) {
-        registerFilename = registerFilename || __caller;
+    debug() {
+        return events;
+    }
 
+    register() {return this.bind(...arguments);}
+    bind(eventName, priority, callback) {
         if (typeof eventName == "object") {
             for (let i = 0; i < eventName.length; i++) {
-                this.bind(eventName[i], priority, callback, registerFilename);
+                this.bind(eventName[i], priority, callback);
             }
             return;
         }
 
-        pluginHelper.getPluginIdentifierFromFilename(registerFilename, function (pluginIdentifier) {
-            if (typeof events[eventName] === 'undefined') {
-                events[eventName] = {};
-            }
+        if (!events[eventName]) {
+            events[eventName] = {};
+        }
 
-            //add to Object
-            let switchedPrio = false;
-            if (events[eventName][priority]) {
-                log("Hooks", "Tried to bind on event with existing priority : " + eventName + "@" + priority);
-                switchedPrio = true;
-            }
+        //add to Object
+        let switchedPrio = false;
+        if (events[eventName][priority]) {
+            log("Hooks", "Tried to bind on event with existing priority : " + eventName + "@" + priority);
+            switchedPrio = true;
+        }
 
-            while (events[eventName][priority]) {
-                priority++;
-            }
+        while (events[eventName][priority]) {
+            priority++;
+        }
 
-            if (switchedPrio) {
-                log("Hooks", "Modified priority to " + priority);
-            }
+        if (switchedPrio) {
+            log("Hooks", "Modified priority to " + priority);
+        }
 
-            events[eventName][priority] = {
-                cb: callback,
-                plugin: pluginIdentifier
-            };
+        events[eventName][priority] = {
+            cb: callback
+        };
 
-            //Sort object based on priority
-            let keys = Object.keys(events[eventName]);
-            let len = keys.length;
-            keys.sort();
-            let tempObj = {};
-            for (let i = 0; i < len; i++) {
-                tempObj[keys[i]] = events[eventName][keys[i]];
-            }
-            events[eventName] = tempObj;
-        });
-
+        //Sort object based on priority
+        let keys = Object.keys(events[eventName]);
+        let len = keys.length;
+        keys.sort();
+        let tempObj = {};
+        for (let i = 0; i < len; i++) {
+            tempObj[keys[i]] = events[eventName][keys[i]];
+        }
+        events[eventName] = tempObj;
     };
 
     fire() {this.trigger(...arguments)}
@@ -113,16 +109,9 @@ class Hooks {
         }
     };
 
+    // DEPRECATED
     bindPluginDisabling() {
-        this.bind('plugindisabled', 9999, function (identifier) {
-            for (let i in events) {
-                for (let j in events[i]) {
-                    if (events[i][j].plugin == identifier) {
-                        delete events[i][j];
-                    }
-                }
-            }
-        });
+        log('Hooks', 'Call to deprecated method : bindPluginDisabling', 'warn');
     }
 };
 

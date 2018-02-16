@@ -42,7 +42,11 @@ var Router = function () {
         cli.routeinfo.url = cli._c.server.protocol + "//" + cli.request.headers.host + pObj.pathname;
         cli.ip = cli.request.headers["x-real-ip"] || cli.request.connection.remoteAddress;
 
-        cli.response.setHeader("Backend", "Lilium");
+        try {
+            cli.response.setHeader("Backend", "Lilium");
+        } catch (err) {
+            log('Router', "Headers were sent after sending request. From : " + cli.request.url + " on " + cli._c.website.sitetitle, 'err');
+        }
 
         if (!cli.routeinfo.isStatic && !cli.routeinfo.front && !cli.routeinfo.api) {
             session.injectSessionInCli(cli, cb);

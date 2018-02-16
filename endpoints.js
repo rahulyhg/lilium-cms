@@ -1,4 +1,3 @@
-const pluginHelper = require('./pluginHelper.js');
 const hooks = require('./hooks.js');
 const config = require('./config.js'); 
 const log = require('./log.js');
@@ -15,20 +14,6 @@ class AllowedMethods {
 }
 
 const loadHooks = () => {
-    hooks.bind('plugindisabled', 2, identifier => deletePluginEndpoints(identifier) );
-};
-
-const deletePluginEndpoints = (identifier) => {
-    config.eachSync(siteinfo => {
-        const regEnd = registeredEndpoints[siteinfo.id];
-        for (let i in regEnd) {
-            for (let j in regEnd[i]) {
-                if (regEnd[i][j].pluginID == identifier) {
-                    delete regEnd[i][j];
-                }
-            }
-        }
-    });
 };
 
 class EndPoints {
@@ -61,7 +46,6 @@ class EndPoints {
             }
 
             registeredEndpoints[site][method][endpoint] = callback;
-            registeredEndpoints[site][method][endpoint].pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
         } else if (site == '*') {
             config.eachSync(config => {
                 var site = config.id;
@@ -70,7 +54,6 @@ class EndPoints {
                 }
 
                 registeredEndpoints[site][method][endpoint] = callback;
-                registeredEndpoints[site][method][endpoint].pluginID = false;
             });
         }
     };

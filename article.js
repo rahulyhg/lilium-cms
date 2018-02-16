@@ -352,7 +352,7 @@ class Article {
         let index = parseInt(postdata.page || 1) - 1;
 
         db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
-            if (article && (cli.userinfo.userid == article.author || cli.hasRight('editor'))) {
+            if (article && (cli.userinfo.userid.toString() == article.author.toString() || cli.hasRight('editor'))) {
                 article.content[index] = postdata.markup || article.content[index];
                 article.title[index] = postdata.title;
                 article.subtitle[index] = postdata.subtitle;

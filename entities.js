@@ -8,7 +8,6 @@ var livevars = require('./livevars.js');
 var imageResizer = require('./imageResizer.js');
 var tableBuilder = require('./tableBuilder.js');
 var hooks = require('./hooks.js');
-var pluginHelper = require('./pluginHelper.js');
 var preferences = require('./preferences.js');
 var feed = require('./feed.js');
 
@@ -874,7 +873,6 @@ class Entities {
     };
 
     registerRole  (rObj, rights, callback, updateIfExists, allsites) {
-        rObj.pluginID = pluginHelper.getPluginIdentifierFromFilename(__caller, undefined, true);
         rObj.rights = rights;
 
         if (allsites) {

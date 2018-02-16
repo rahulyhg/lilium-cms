@@ -102,6 +102,12 @@ class DevTools {
             }
 
             cb(formattedOutput);
+        } else if (levels[0] == "hooks") {
+            const allhooks = require('./hooks').debug();
+            const resp = {};
+            Object.keys(allhooks).forEach(x => { resp[x] = Object.keys(allhooks[x]).length || undefined; });
+
+            cb(resp);
         } else if (levels[0] == "cache") {
             const type = levels[1];
 

@@ -6,10 +6,7 @@
 var htmlParser = require('./htmlParser');
 var validator = require('validator');
 var hooks = require('./hooks.js');
-var pluginHelper = require('./pluginHelper.js');
 var log = require('./log.js');
-
-var plugin = {};
 
 var Form = function(name, cb) {
     this.name = name;
@@ -54,7 +51,6 @@ var Field = function(name, type) {
 };
 
 var FormBuilder = function() {
-    var pluginName;
     var templates = {};
     var forms = {};
     var currentForm = undefined;
@@ -62,11 +58,6 @@ var FormBuilder = function() {
     var that = this;
 
     this.createForm = function(name, attr, cb, auto) {
-        if (!auto) {
-            registerFilename = __caller;
-            history.save(this.createForm, [name, attr]);
-        }
-
         instanciateForm(name, attr, auto);
         // Add it to the form list
         forms[name] = currentForm;
@@ -97,12 +88,6 @@ var FormBuilder = function() {
     };
 
     this.addTemplate = function(name, auto) {
-
-        if (!auto) {
-            registerFilename = __caller;
-            history.save(this.addTemplate, [name]);
-        }
-
         if (typeof templates[name] == 'undefined') {
             var err = new Error ( "[FormBuilderException] - Template not created. Please call createFormTemplate() first.");
             log('FormBuilder', err, 'warn');
@@ -140,11 +125,6 @@ var FormBuilder = function() {
     };
 
     this.add = function(name, type, attr, requirements, contextForm, auto) {
-        if (!auto && !contextForm) {
-            registerFilename = __caller;
-            history.save(this.add, [name, type, attr, requirements, contextForm]);
-        }
-
         if (typeof type === 'object') {
             attr = type;
             type = 'text';
@@ -171,7 +151,6 @@ var FormBuilder = function() {
         log('FormBuilder', 'Trigger on form with section name ' + sectionname, 'detail');
         if (!auto) {
             registerFilename = __caller;
-            history.save(this.trg, [sectionname, auto]);
         }
 
         var that = this;
@@ -182,13 +161,6 @@ var FormBuilder = function() {
     };
 
     this.edit = function(name, type, attr, requirements, auto) {
-        if (!auto) {
-            registerFilename = __caller;
-            // Add to history
-            history.save(this.edit, [name, type, attr, requirements]);
-        }
-
-
         if (typeof currentForm.fields[name] !== 'undefined') {
             var field = currentForm.fields[name];
             if (typeof type !== 'undefined' && type != '') {
@@ -467,111 +439,6 @@ var FormBuilder = function() {
         // TODO
     };
 
-    var history = new function() {
-        this.save = function(fct, params) {
-            if (currentForm) {
-
-                if (registerFilename) {
-                    pluginName = pluginHelper.getPluginIdentifierFromFilename(registerFilename, undefined, true);
-                }
-
-                currentForm.history = currentForm.history ? currentForm.history : [];
-                currentForm.history.push({
-                    fct: fct,
-                    params: params,
-                    pluginnamme: pluginName
-                });
-            }
-        };
-
-        this.recreate = function(formName) {
-            log('FormBuilder', 'Recreating form: ' + formName, 'info');
-            if (forms[formName]) {
-                currentForm = forms[formName];
-                for (var i in currentForm.history) {
-
-                    var params = currentForm.history[i].params.slice();
-                    if (currentForm.history[i].fct) {
-                        var nbOfArgs = currentForm.history[i].fct.length;
-
-                        params[nbOfArgs - 1] = true;
-
-                        currentForm.history[i].fct.apply(that, params);
-
-                    }
-                }
-            }
-        };
-
-        this.invalidateFromPlugin = function(pluginID) {
-            log('FormBuilder', 'Invalidating from Plugin with ID ' + pluginID, 'info');
-            try {
-                if (pluginID) {
-                    for (var i in forms) {
-                        var hasRelatedPlugin = false;
-                        var deleteCompleteForm = false;
-                        // Remove the form fields
-                        for (var j in forms[i].history) {
-
-                            if (forms[i].history[j].pluginnamme && forms[i].history[j].pluginnamme == pluginID) {
-
-                                if (j == 0 && forms[i].history[j].pluginnamme !== false) {
-                                    deleteCompleteForm = true;
-                                }
-
-                                // Remove history related to this plugin
-                                forms[i].history.splice(j, 1);
-                                hasRelatedPlugin = true;
-                            }
-                        }
-
-                        if (hasRelatedPlugin) {
-                            if (deleteCompleteForm) {
-                                forms[i] = undefined;
-                                delete forms[i];
-                            } else {
-                                // Destruct form fields
-                                forms[i].fields = {};
-                                this.recreate(i);
-                            }
-
-                        }
-                    }
-                }
-            } catch (e) {
-                console.log(e);
-            }
-
-
-        };
-
-        this.newPluginInitialised = function(identifier) {
-            // [DEBUG]
-            // TODO : Fix form complete deletion
-            // Experience : All fields are deleted from form, but the recreate function doesn't recreate the form
-            // Result : Form renders with no fields
-            return;
-
-            log('FormBuilder', "New plugin was initialized with identifier " + identifier, 'info');
-            // Recreate the forms to relaunch the hooks for the new plugin
-            try {
-                for (var i in forms) {
-                    if (i == 'post_create') {
-
-                    }
-                    // Delete plugin history
-                    forms[i].fields = {};
-                    this.recreate(i);
-                }
-            } catch (e) {
-                console.log(e);
-            }
-
-        }
-
-
-    };
-
     this.unescapeForm = function(escapedForm) {
         for (var field in escapedForm) {
             if (typeof escapedForm[field] === 'string') {
@@ -589,27 +456,10 @@ var FormBuilder = function() {
     };
 
     this.debug = function() {
-        console.log(forms);
-
+        return forms;
     };
 
-    var loadHooks = function() {
-        hooks.bind('plugindisabled', 1, function(identifier) {
-            // Check if plugin changed some forms
-            history.invalidateFromPlugin(identifier);
-
-
-        });
-
-        hooks.bind('pluginregistered', 1, function(identifier) {
-            // Check if plugin changed some forms
-            history.newPluginInitialised(identifier);
-        });
-    };
-
-    this.init = function() {
-        loadHooks();
-    };
+    this.init = function() { };
 };
 
 module.exports = new FormBuilder();

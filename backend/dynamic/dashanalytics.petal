@@ -83,11 +83,12 @@ var generateLastMonth = function(ldContext) {
     var lastmonth = ldContext.livevars.googleanalytics.dashboard.performance.lastmonth.lastmonth.sessions;
     var monthbefore = ldContext.livevars.googleanalytics.dashboard.performance.lastmonth.monthbefore.sessions;
 
-    var ratio = lastmonth / monthbefore;
+    var diff = monthbefore - lastmonth;
+    var ratio = diff / monthbefore * -100;
     
     var diffwrapper = d.make({}); 
     d.make({ node : "i", class : "fa fa-chevron-" + (ratio > 0 ? "up" : "down"), parent : diffwrapper });
-    d.make({ id : "lastmonth-ratio", node : "span", text : ratio.toString().substring(0, 5) + "% " + (ratio > 0 ? "more" : "less") + " then the month before", parent : diffwrapper });
+    d.make({ id : "lastmonth-ratio", node : "span", text : Math.abs(ratio).toString().substring(0, 5) + "% " + (ratio > 0 ? "more" : "less") + " then the month before", parent : diffwrapper });
 
     return diffwrapper.get();
 }
@@ -96,11 +97,12 @@ var generateSameDayLastWeek = function(ldContext) {
     var lastday = ldContext.livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions;
     var daybefore = ldContext.livevars.googleanalytics.dashboard.performance.sameday.sessions;
 
-    var ratio = lastday / daybefore;
+    var diff = daybefore - lastday;
+    var ratio = diff / daybefore * -100;
     
     var diffwrapper = d.make({}); 
     d.make({ node : "i", class : "fa fa-chevron-" + (ratio > 0 ? "up" : "down"), parent : diffwrapper });
-    d.make({ id : "lastday-ratio", node : "span", text : ratio.toString().substring(0, 5) + "% " + (ratio > 0 ? "more" : "less") + " then the same day of last week", parent : diffwrapper });
+    d.make({ id : "lastday-ratio", node : "span", text : Math.abs(ratio).toString().substring(0, 5) + "% " + (ratio > 0 ? "more" : "less") + " then the same day of last week", parent : diffwrapper });
 
     return diffwrapper.get();
 };
