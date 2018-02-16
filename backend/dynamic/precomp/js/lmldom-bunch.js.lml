@@ -22,15 +22,26 @@ var LMLDOM_Bunch = function(ldContext, bunchElement) {
         log('LMLDOM', "Error in LMLBunch tag, make sure it has a template and a LMLJson tag", 'err');
     }
 
-    this.loopThroughItems = function(items, done) {
-        if (items.length != 0) for (var i = 0; i < items.length; i++) {
-            liliumcms.lmldom.injectInContext(that.settings.data.loopvar, items[i]);
-            var nds = that.template.children;
+    this.generator = this.template.getAttribute('generator');
 
-            for (var j = 0; j < nds.length; j++) {
-                that.bunchWrap.appendChild(
-                    liliumcms.lmldom.parseNode(nds[j].cloneNode(true))
-                );
+    this.loopThroughItems = function(items, done) {
+        if (items.length != 0) {
+            if (this.generator) {
+                var loopftc = window[this.generator];
+                for (var i = 0; i < items.length; i++) {
+                    that.bunchWrap.appendChild(loopftc(items[i]));
+                }
+            } else {
+                for (var i = 0; i < items.length; i++) {
+                    liliumcms.lmldom.injectInContext(that.settings.data.loopvar, items[i]);
+                    var nds = that.template.children;
+
+                    for (var j = 0; j < nds.length; j++) {
+                        that.bunchWrap.appendChild(
+                            liliumcms.lmldom.parseNode(nds[j].cloneNode(true))
+                        );
+                    }
+                }
             }
         } else if (this.emptytemplate) {
             that.bunchWrap.appendChild(this.emptytemplate.cloneNode(true));
