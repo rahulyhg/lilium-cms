@@ -172,6 +172,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify.min.js", 1500, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify-html.min.js", 1510, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/Sortable/Sortable.min.js", 1800, "admin", conf.id);
+        Frontend.registerJSFile(base + "node_modules/lilium-text/build/liliumtext.js", 1850, "admin", conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/dom.js", 1900, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/facebook.js", 2025, 'admin', conf.id);
@@ -212,6 +213,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/hightlight.agate.css", 1120, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "node_modules/lilium-text/build/minim.min.css", 1180, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/mobile.css", 2005, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/ckeditor.css", 2100, 'admin', conf.id);

@@ -6478,6 +6478,11 @@
         "unreachable-branch-transform": "0.3.0"
       }
     },
+    "lilium-text": {
+      "version": "1.0.4",
+      "resolved": "https://registry.npmjs.org/lilium-text/-/lilium-text-1.0.4.tgz",
+      "integrity": "sha512-+XnzhofMeyws/xSeam3Gw1smwENZ42iqQL6L8yNPZqEH07u9Jm312q4DwgU7ArAH8lNnToH9+3Oy+ZEqJxh08Q=="
+    },
     "linkify-it": {
       "version": "2.0.3",
       "resolved": "https://registry.npmjs.org/linkify-it/-/linkify-it-2.0.3.tgz",
