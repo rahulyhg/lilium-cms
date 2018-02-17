@@ -5,6 +5,12 @@ const log = require('./log');
 const hooks = require('./hooks');
 
 const CONTENT_COLLECTION = 'content';
+const ENTITY_COLLECTION = 'entities';
+
+const LOOKUPS = {
+    media : { from : "uploads", as : "deepmedia", localField : "media", foreignField : "_id" },
+    topic : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" }
+};
 
 class ContentLib {
     create(_c, title, author, done) {
@@ -163,8 +169,6 @@ class ContentLib {
         const $sort = { [sort || "_id"] : -1 };
         const $limit = max;
         const $skip = skip;
-        const medialookup = { from : "uploads", as : "deepmedia", localField : "media", foreignField : "_id" };
-        const topiclookup = { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" };
         const $project = {
             headline : { $arrayElemAt : ["$title", 0] },
             subtitle : { $arrayElemAt : ["$subtitle", 0] },
@@ -174,7 +178,7 @@ class ContentLib {
         };
 
         if (filters.status) { $match.status = filters.status };
-        if (filters.author) { $match.author = filters.author };
+        if (filters.author) { $match.author = db.mongoID(filters.author) };
         if (filters.isSponsored) { $match.isSponsored = filters.isSponsored.toString() == "true" ? true : { $ne : true } };
 
         const pipeline = [
@@ -182,15 +186,40 @@ class ContentLib {
             { $sort },
             { $skip },
             { $limit },
-            { $lookup : medialookup },
-            { $lookup : topiclookup },
+            { $lookup : LOOKUPS.media },
+            { $lookup : LOOKUPS.topic },
             { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
             { $unwind : { path : "$fulltopic", preserveNullAndEmptyArrays : true } },
             { $project }
         ];
 
-        console.log(pipeline);
         db.join(_c, CONTENT_COLLECTION, pipeline, arr => sendback({ items : arr }));
+    }
+
+    getFull(_c, _id, sendback, match = {}) {
+        const $match = match;
+        $match._id = db.mongoID(_id);
+
+        db.join(_c, CONTENT_COLLECTION, [
+            { $match },
+            { $limit : 1 },
+            { $lookup : LOOKUPS.media },
+            { $lookup : LOOKUPS.topic },
+            { $unwind : { path : "$deepmedia", preserveNullAndEmptyArrays : true } },
+            { $unwind : { path : "$fulltopic", preserveNullAndEmptyArrays : true } },
+        ], arr => {
+            const post = arr[0];
+            if (!post) {
+                return sendback();
+            }
+
+            db.findUnique(config.default(), ENTITY_COLLECTION, { _id : post.author }, (err, author) => {
+                post.author = author;
+                post.headline = post.title[0];
+
+                sendback(post);
+            }, { displayname : 1, username : 1, avatarURL : 1, avatarMini : 1, slug : 1, revoked : 1 });
+        });
     }
 
     update() {
