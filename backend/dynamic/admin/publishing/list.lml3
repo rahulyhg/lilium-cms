@@ -1,5 +1,8 @@
 const settings = {
     title : "Publishing",
+    tools : {
+        "add" : { call : "popupCreate" }
+    },
     lmldom : { v : 1.0 }
 };
 
@@ -15,26 +18,45 @@ main {
     background: #FFF;
     border: 1px solid #DDD;
     border-bottom-width: 3px;
+
+    position: relative;
+    overflow : hidden;
+
+    cursor: pointer;
 }
 
-.content-card {
-    display: flex;
+
+.content-card:hover .no-image-placeholder, 
+.content-card:hover .card-image {
+    width: 120px;
 }   
 
 .card-image, .no-image-placeholder {
     width: 100px;
     height: 100px;
     object-fit: cover;
+    transition: all 0.2s;
+    background-color: #F9F9F9;
+    min-width: 100px;
+    border-right: 1px solid #DDD;
 }
 
-.no-image-placeholder {
-    border-right: 1px solid #DDD;
+.no-image-placeholder i {
+    display: block;
+    text-align: center;
+    padding-top: 30px;
+    font-size: 40px;
+    color: #CCC;
 }
 
 .card-headline {
     font-size: 18px;
     margin-top: 10px;
     font-weight: 600;
+    text-overflow:ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    width: calc(100% - 10px);
 }
 
 .card-subtitle {
@@ -44,6 +66,57 @@ main {
 
 .card-text-wrap {
     margin-left: 10px;
+    position: relative;
+    z-index: 2;
+    flex-grow: 1;
+    overflow: hidden;
+}
+
+.no-image-background, 
+.card-image-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+
+    object-fit: cover;
+    opacity: 0.05;
+    z-index: 1;
+}
+
+.card-status {
+    display: inline-block;
+    background: #333;
+    color: #FFF;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 14px;
+}
+
+#emptytemplate {
+    width: 500px;
+    padding: 20px;
+    margin: 40px auto;
+    display: block;
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+    text-align: center;
+    background: #FFF;
+}
+
+#emptytemplate span {
+    display: block;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+#emptytemplate b {
+    cursor: pointer;
+    color: #af57e4;
 }
 
 </style>`;
@@ -66,7 +139,7 @@ const compile = (o, context, v) => { o(context.header, css, `
                 </select>
 
                 <label>Author</label>
-                <select name="author">
+                <select name="author" id="author-filter">
                     <option value="">Any</option>
                 </select>
 
@@ -105,6 +178,14 @@ const compile = (o, context, v) => { o(context.header, css, `
     </lml-bunch> 
 
     <script>
+        var STATUS_VOCAB = {
+            published   : { text : "Published",     color : "#2162b9" },
+            draft       : { text : "Draft",         color : "#576c88" },
+            pending     : { text : "Pending review",color : "#701ab9" },
+            deleted     : { text : "Unpublished",   color : "#9a471b" },
+            destroyed   : { text : "Destroyed",     color : "#ff4405" },
+        };
+
         window.generateCard = function(post) {
             var isAuthor = post.author == liliumcms.session.current._id;
             var fullAuthor = liliumcms.conversations.getCachedUsers()[post.author];
@@ -115,21 +196,48 @@ const compile = (o, context, v) => { o(context.header, css, `
                 class : 'content-card' + (post.thumbnail ? '' : ' no-image') 
             });
 
-            d.make(post.thumbnail ? 
-                { parent : wrap, node : "img", attr : { src : liliumcms.cdn.parse(post.thumbnail) }, class : "card-image" } : 
-                { parent : wrap, class : 'no-image-placeholder' }
-            );
+            if (post.thumbnail) {
+                var finalurl = liliumcms.cdn.parse(post.thumbnail);
+                d.make( { parent : wrap, node : "img", attr : { src : finalurl }, class : "card-image" } );
+                d.make( { parent : wrap, node : "img", attr : { src : finalurl }, class : "card-image-background" } );
+            } else { 
+                var placeholder = d.make( { parent : wrap, class : 'no-image-placeholder' });
+                d.make( { parent : wrap, class : 'no-image-background', attr : { style : "background-color : #AAA" /*+ Math.floor(0x1000000 * Math.random()).toString(16)*/ } });
+                d.make( { parent : placeholder, node : "i", class : "fal fa-image" } )
+            }
 
             var titlewrap = d.make({ class : "card-text-wrap", parent : wrap });
             d.make({ text : post.headline, class : "card-headline", parent : titlewrap });
-            d.make({ text : post.subtitle, class : "card-subtitle", parent : titlewrap });
+            // d.make({ text : post.subtitle, class : "card-subtitle", parent : titlewrap });
             
             var pubby = d.make({ text : "Created by ", class : "card-author card-by-" + authorName, parent : titlewrap });
             d.make({ text : authorName, node : "b", parent : pubby });
         
+            var statusobject = STATUS_VOCAB[post.status];
+            statusobject && d.make({ class : "card-status", text : statusobject.text, attr : { style : "background-color: " + statusobject.color }, parent : titlewrap });
+
+            wrap.bind('click', function() {
+                liliumcms.pageloader.load("${context._c.server.url}/admin/publishing/write/" + post._id);
+            });
 
             return wrap.get();
         }
+
+        liliumcms.lmldom.bind(function() {
+            var users = liliumcms.conversations.getCachedUsers();
+            var ids = Object.keys(users);
+            var arr = [];
+
+            for (var id in users) {
+                arr.push(users[id]);
+            };
+            arr = arr.sort(function(a, b) { return a.displayname > b.displayname ? 1 : -1 });
+
+            var selectbox = d.id('author-filter');
+            arr.forEach(function(user) {
+                d.make({ node : "option", text : user.displayname, attr : { value : user._id }, parent : selectbox });
+            });
+        });
     </script>
 
 `); };
