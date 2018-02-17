@@ -1,0 +1,153 @@
+const settings = {     
+    livevars : ["publishing.write.{?1}"],
+    lmldom : { v : 1.0 }
+};                    
+                  
+const css = `<style>
+
+main {
+    background: #F3F3F3;
+}
+
+#publishing-headers {
+    margin: 0px 10px;
+    padding: 14px;
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+    background: #FFF;
+}
+
+.big-title {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: "Oswald", sans-serif;
+    font-size: 32px;
+}
+
+.big-subtitle {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+}
+
+.big-content {
+    margin-top: 10px;
+}
+
+.publishing-tab {
+}
+
+.publishing-header {
+    display: none;
+}
+
+.publishing-header.selected {
+    display: block;
+}
+
+#publishing-tabs {
+    display: flex;
+    margin: 10px 10px -1px;
+}
+
+.publishing-tab {
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.publishing-tab.selected {
+    background: #FFF;
+    border: 1px solid #DDD;
+    border-bottom: none;
+    border-top: 3px solid #af57e4;
+    font-weight: 700;
+}
+
+#publishing-tab-add {
+    font-weight: 700;
+    color: #af57e4;
+}
+
+</style>`;
+
+const compile = (o, context) => { o(context.header, css, `
+
+<div id="publishing-form">
+
+    <div id="publishing-tabs">
+        <div class="publishing-tab" id="publishing-tab-add">Add</div>
+    </div>
+    <div id="publishing-headers">
+        
+    </div>
+
+</div>
+
+
+<script>
+    var switchToTab = function(index) {
+        var tab = d.q('.publishing-tab.selected').get();
+        tab && tab.classList.remove('selected');
+
+        var header = d.q('.publishing-header.selected').get();
+        header && header.classList.remove('selected');
+
+        d.id('publishing-tab-' + index).cadd('selected');
+        d.id('publishing-header-' + index).cadd('selected');
+    };
+
+    var totalpage = 0;
+    var createHeaderSlide = function(title, subtitle, content) {
+        log('Publishing', 'Creating new header slide with index ' + totalpage);
+
+        var wrap = d.make({ class : "publishing-header", id : "publishing-header-" + totalpage });        
+        var btitle = d.make({ node : "input", attr : { placeholder : totalpage ? "(Reuse headline)" : "Headline" }, class : "big-title", parent : wrap }).get();
+        var bsubtitle = d.make({ node : "input", attr : { placeholder : totalpage ? "(Reuse subtitle)" : "Subtitle" }, class : "big-subtitle", parent : wrap }).get();
+        var beditor = d.make({ class : "big-content", id : "publishing-" + totalpage, parent : wrap }).get();
+        var textEditor = new LiliumText(beditor, {
+            content : content
+        });
+
+        btitle.value = title;
+        bsubtitle.value = subtitle;
+        d.id('publishing-headers').born(wrap);
+
+        var tab = d.make({ class : "publishing-tab", id : "publishing-tab-" + totalpage, text : totalpage == 0 ? "Landing" : "Page " + totalpage });
+
+        var currentpage = totalpage;
+        tab.bind('click', function() {
+            switchToTab(currentpage);
+        });
+
+        d.id('publishing-tabs').born(tab).born(d.id('publishing-tab-add'));
+
+        return totalpage++;
+    };
+
+    var showNotFound = function() {
+
+    };
+
+    liliumcms.lmldom.bind(function() {
+        var post = liliumcms.livevars.livevars()["publishing.write." + liliumcms.pageloader.lastLevel];
+        if (!post) {
+            return showNotFound();
+        }
+
+        for (var i = 0; i < post.title.length; i++) {
+            createHeaderSlide(post.title[i], post.subtitle[i], post.content[i]);
+        }
+
+        d.id('publishing-tab-add').bind('click', function() {
+            switchToTab(createHeaderSlide('', '', ''));
+        });
+
+        switchToTab(0);
+    });
+</script>
+
+`);};
+
+module.exports = { settings, compile };
