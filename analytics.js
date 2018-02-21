@@ -7,9 +7,9 @@ const hooks = require('./hooks.js');
 const notifications = require('./notifications.js');
 
 // Google API
-const googleapis = require('googleapis');
-const JWT = googleapis.auth.JWT;
-const analytics = googleapis.analytics('v3');
+const {google} = require('googleapis');
+const JWT = google.auth.JWT;
+const analytics = google.analytics('v3');
 
 // Sites config
 const GASites = {};

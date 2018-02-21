@@ -1,5 +1,6 @@
 const settings = {     
     livevars : ["publishing.write.{?1}"],
+    title : "Publishing",
     lmldom : { v : 1.0 }
 };                    
                   

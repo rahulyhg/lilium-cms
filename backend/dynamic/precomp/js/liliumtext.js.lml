@@ -1,0 +1,14 @@
+var LiliumTextImageInsertionPlugin = function(editor) {
+    this.identifier = "LiliumTextImageInsertionPlugin";
+    this.editor = editor;
+};
+
+LiliumTextImageInsertionPlugin.prototype.register = function() {
+    log('LiliumText', 'Registering plugin LiliumTextImageInsertionPlugin');
+};
+
+LiliumTextImageInsertionPlugin.prototype.unregister = function() {
+
+};
+
+

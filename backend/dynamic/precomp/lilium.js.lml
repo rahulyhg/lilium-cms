@@ -47,7 +47,7 @@ var log = window.log = function(sender, msg, type, style) {
         case "err"     :  console.error (output); break;
         case "info"    :  console.info  (output); break;
         case "deprec"  :  console.log   ("%c" + output, "color: #E56330;"); break;
-        case "lilium"  :  console.log   ("%c" + output, "color: #9B59B6; font-weight: bold; font-size: 12px;"); break;
+        case "lilium"  :  console.log   ("%c" + output, "color: #9B59B6; font-weight: bold;"); break;
         case "style"   :  console.log   ('%c' + output, style); break;
         default        :  console.log   (output);
     };
