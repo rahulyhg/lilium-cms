@@ -339,7 +339,7 @@ var SiteInitializer = function (conf, siteobj) {
         if (conf.env == "prod") {
             log.setLevels(["err", "warn", "lilium"]);
         } else if (conf.env == "dev") {
-            log.setLevels(["success", "detail", "live", "err", "warn", "lilium"]);
+            log.setLevels(["success", "detail", "live", "err", "warn", "info", "lilium"]);
         } else if (conf.env == "output") {
             log.setLevels(["none", "info", "success", "detail", "live", "err", "warn", "lilium"]);
         }
