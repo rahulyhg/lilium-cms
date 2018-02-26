@@ -12,7 +12,7 @@ main {
 
 #publishing-headers {
     margin: 0px 10px;
-    padding: 14px;
+    padding: 20px;
     border: 1px solid #DDD;
     border-bottom-width: 3px;
     background: #FFF;
@@ -34,10 +34,14 @@ main {
 }
 
 .big-content {
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 .publishing-tab {
+}
+
+.liliumtext.theme-minim .liliumtext-topbar-command {
+    height: 34px;
 }
 
 .publishing-header {
@@ -71,7 +75,7 @@ main {
     color: #af57e4;
 }
 
-</style>`;
+</style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
 
 const compile = (o, context) => { o(context.header, css, `
 
@@ -109,6 +113,31 @@ const compile = (o, context) => { o(context.header, css, `
         var beditor = d.make({ class : "big-content", id : "publishing-" + totalpage, parent : wrap }).get();
         var textEditor = new LiliumText(beditor, {
             content : content,
+            boldnode : "b",
+            commandsets : [
+                [
+                    new LiliumTextWebCommand('text', "b", "far fa-bold"), 
+                    new LiliumTextWebCommand('text', "i", "far fa-italic"), 
+                    new LiliumTextWebCommand('text', "u", "far fa-underline"),  
+                    new LiliumTextWebCommand('text', "strike", "far fa-strikethrough"),
+                    new LiliumTextWebCommand('remove', undefined, "far fa-eraser")
+                ], [
+                    new LiliumTextCustomCommand('undo', LiliumTextCustomUndo, 'far fa-undo'),
+                    new LiliumTextCustomCommand('redo', LiliumTextCustomRedo, 'far fa-redo')
+                ], [
+                    new LiliumTextWebCommand('block', 'p', 'far fa-paragraph'), 
+                    new LiliumTextWebCommand("block", "h3", "far fa-h3"),
+                    new LiliumTextWebCommand("block", "blockquote", "far fa-quote-right"),
+                ], [
+                    new LiliumTextWebCommand('insert', 'hr', 'far fa-minus')
+                ], [
+                    new LiliumTextWebCommand('exec', "insertOrderedList",   "far fa-list-ol"),  
+                    new LiliumTextWebCommand('exec', "insertUnorderedList", "far fa-list-ul"), 
+                    new LiliumTextWebCommand('remove', 'a', 'far fa-unlink')
+                ], [
+                    new LiliumTextCustomCommand("code", LiliumTextCustomCommandCode, "far fa-code")
+                ]
+            ],
             plugins : [
                 LiliumTextImageInsertionPlugin
             ]

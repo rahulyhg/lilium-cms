@@ -161,7 +161,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "backend/static/highlight.js", 290, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/leaflet/leaflet.js", 410, "admin", conf.id);
-        Frontend.registerJSFile(base + "/backend/static/dateformat.js", 600, 'admin', conf.id);
+        Frontend.registerJSFile(base + "backend/static/dateformat.js", 600, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/flatpickr/dist/flatpickr.min.js", 700, 'admin', conf.id);
         Frontend.registerJSFile(base + "bower_components/ckeditor/adapters/jquery.js", 808, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/jquery-timeago/jquery.timeago.js", 810, "admin", conf.id);

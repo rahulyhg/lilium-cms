@@ -1,3 +1,4 @@
+// Image Insertion
 var LiliumTextImageInsertionPlugin = function(editor) {
     this.identifier = "LiliumTextImageInsertionPlugin";
     this.editor = editor;
@@ -50,4 +51,14 @@ LiliumTextImageInsertionPlugin.prototype.unregister = function() {
 
 };
 
+var LiliumTextCustomUndo = function(ev, that, editor) {
+    editor.undo();
+}
 
+var LiliumTextCustomRedo = function(ev, that, editor) {
+    editor.redo();
+}
+
+var LiliumTextCustomCommandCode = function(ev, that, editor) {
+    editor.toggleCode();
+}

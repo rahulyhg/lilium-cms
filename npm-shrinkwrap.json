@@ -5541,6 +5541,11 @@
       "resolved": "https://registry.npmjs.org/he/-/he-0.3.6.tgz",
       "integrity": "sha1-nXvERud5Y5MzAd1gLVcxy4YRNeA="
     },
+    "highlight.js": {
+      "version": "9.12.0",
+      "resolved": "https://registry.npmjs.org/highlight.js/-/highlight.js-9.12.0.tgz",
+      "integrity": "sha1-5tnb5Xy+/mB1HwKvM2GVhwyQwB4="
+    },
     "hoek": {
       "version": "2.16.3",
       "resolved": "https://registry.npmjs.org/hoek/-/hoek-2.16.3.tgz",
@@ -6525,9 +6530,9 @@
       }
     },
     "lilium-text": {
-      "version": "0.1.0",
-      "resolved": "https://registry.npmjs.org/lilium-text/-/lilium-text-0.1.0.tgz",
-      "integrity": "sha512-pCia2FdRuQlV0YfVQ6f6Zflh9Fa/DLYwVezrNxU9XJKtGcHvc1HIbutC2fzvUtGl6pyE/aa5UO95thBsNHxn+g=="
+      "version": "0.1.7",
+      "resolved": "https://registry.npmjs.org/lilium-text/-/lilium-text-0.1.7.tgz",
+      "integrity": "sha512-gglIdLVCFQMdACcCeL/QbSUiChCz+ePXd4tlEXlJko0bSYhR12VfE5aygnMiUghSxPLmzi4r6axtgyBhlti/4g=="
     },
     "linkify-it": {
       "version": "2.0.3",
