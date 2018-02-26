@@ -108,7 +108,10 @@ const compile = (o, context) => { o(context.header, css, `
         var bsubtitle = d.make({ node : "input", attr : { placeholder : totalpage ? "(Reuse subtitle)" : "Subtitle" }, class : "big-subtitle", parent : wrap }).get();
         var beditor = d.make({ class : "big-content", id : "publishing-" + totalpage, parent : wrap }).get();
         var textEditor = new LiliumText(beditor, {
-            content : content
+            content : content,
+            plugins : [
+                LiliumTextImageInsertionPlugin
+            ]
         });
 
         btitle.value = title;

@@ -3,8 +3,47 @@ var LiliumTextImageInsertionPlugin = function(editor) {
     this.editor = editor;
 };
 
+LiliumTextImageInsertionPlugin.prototype.executeInsertImage = function() {
+    var that = this;
+    liliumcms.imagepicker.cast(function(images) {
+        if (images == -1) {
+            
+        } else if (images) {
+            Object.keys(images).forEach(imageid => {
+                var image = images[imageid];
+                var parag = document.createElement('p');
+                parag.className = "parag-image-wrapper";
+                
+                var imgel = document.createElement('img');
+                imgel.className = "lml-content-image lml-instagram-embed-2";
+                imgel.dataset.height = image.size.height;
+                imgel.dataset.width = image.size.width;
+                imgel.dataset.iid = imageid;
+                imgel.src = image.sizes.content.url;
+                parag.appendChild(imgel);
+                
+                if (image.artistname) {
+                    var cred = document.createElement('a');
+                    cred.target = "_blank";
+                    cred.href = image.artisturl;
+                    cred.textContent = "Via " + image.artistname;
+                    parag.appendChild(cred);
+                }
+
+                that.editor.insertBlock(parag);
+            });
+
+            that.editor.takeSnapshot();
+        }
+    }, undefined, {
+        multiple : true
+    });
+}
+
 LiliumTextImageInsertionPlugin.prototype.register = function() {
     log('LiliumText', 'Registering plugin LiliumTextImageInsertionPlugin');
+    this.insertCommand = new LiliumTextCustomCommand("insert-image", this.executeInsertImage.bind(this), 'far fa-image');
+    this.editor.addCommand(this.insertCommand, 3);
 };
 
 LiliumTextImageInsertionPlugin.prototype.unregister = function() {
