@@ -104,7 +104,7 @@ const compile = (o, context) => { o(context.header, css, `
     };
 
     var totalpage = 0;
-    var createHeaderSlide = function(title, subtitle, content) {
+    var createHeaderSlide = function(title = "", subtitle = "", content = "<p></p>") {
         log('Publishing', 'Creating new header slide with index ' + totalpage);
 
         var wrap = d.make({ class : "publishing-header", id : "publishing-header-" + totalpage });        
@@ -135,6 +135,7 @@ const compile = (o, context) => { o(context.header, css, `
                     new LiliumTextWebCommand('exec', "insertUnorderedList", "far fa-list-ul"), 
                     new LiliumTextWebCommand('remove', 'a', 'far fa-unlink')
                 ], [
+                    new LiliumTextCustomCommand("full", LiliumTextCustomCommandFullscreen, "far fa-window-maximize"),
                     new LiliumTextCustomCommand("code", LiliumTextCustomCommandCode, "far fa-code")
                 ]
             ],
@@ -143,8 +144,8 @@ const compile = (o, context) => { o(context.header, css, `
             ]
         });
 
-        btitle.value = title;
-        bsubtitle.value = subtitle;
+        btitle.value = title.trim();
+        bsubtitle.value = subtitle.trim();
         d.id('publishing-headers').born(wrap);
 
         var tab = d.make({ class : "publishing-tab", id : "publishing-tab-" + totalpage, text : totalpage == 0 ? "Landing" : "Page " + totalpage });
