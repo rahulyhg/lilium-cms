@@ -111,7 +111,7 @@ class Plugins {
             this.searchDirForPlugin(identifier,  (info) =>{
                 if (!info) {
                     log("PluginException", "Could not find any info on plugin with identifier " + identifier, 'err');
-                    throw new Error("[PluginException] Could not find any info on plugin with identifier " + identifier);
+                    return callback();
                 }
 
                 try {
