@@ -1,6 +1,6 @@
 {
   "name": "LiliumCMS",
-  "version": "1.2.3",
+  "version": "2.2.4",
   "description": "Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.",
   "main": "index.prod.js",
   "scripts": {
@@ -78,7 +78,7 @@
     "jsdiff": "latest",
     "jsdom": "latest",
     "kerberos": "latest",
-    "lilium-text": "^0.1.7",
+    "lilium-text": "latest",
     "markdown": "latest",
     "markdown-it": "latest",
     "maxcdn": "latest",
