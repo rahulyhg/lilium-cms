@@ -62,3 +62,7 @@ var LiliumTextCustomRedo = function(ev, that, editor) {
 var LiliumTextCustomCommandCode = function(ev, that, editor) {
     editor.toggleCode();
 }
+
+var LiliumTextCustomCommandFullscreen = function(ev, that, editor) {
+    editor.wrapperel.classList.toggle("fullscreen");
+};
