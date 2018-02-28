@@ -1,5 +1,5 @@
 const settings = {     
-    livevars : ["publishing.write.{?1}"],
+    livevars : ["publishing.write.{?1}", "topics.simple"],
     title : "Publishing",
     lmldom : { v : 1.0 }
 };                    
@@ -75,6 +75,38 @@ main {
     color: #af57e4;
 }
 
+/* Topic box */
+#publishing-topic {
+    display: block;
+    margin: 10px;
+    background: #FFF;
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+    position: relative;
+    height: 300px;
+    overflow: hidden;
+}
+
+#publishing-category {
+    font-size: 32px;
+    display: flex;
+    flex-wrap: nowrap;
+    height: 100%;
+    text-transform: uppercase;
+    padding-top: 120px;
+    cursor: pointer;
+}
+
+#publishing-category:nth-child(1) {}
+#publishing-category:nth-child(2) {}
+#publishing-category:nth-child(3) {}
+
+.publishing-category-single {
+    flex-grow: 1;
+    width: 33.3333%;
+    text-align: center;
+}
+
 </style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
 
 const compile = (o, context) => { o(context.header, css, `
@@ -87,7 +119,16 @@ const compile = (o, context) => { o(context.header, css, `
     <div id="publishing-headers">
         
     </div>
+    <div id="publishing-topic">
+        <div id="publishing-category">
+            <div class="publishing-category-single" data-category="local">Local</div>
+            <div class="publishing-category-single" data-category="interest">Interests</div>
+            <div class="publishing-category-single" data-category="partners">Partners</div>
+        </div>
+        <div id="publishing-topic-cards">
 
+        </div>
+    </div>
 </div>
 
 
@@ -160,6 +201,51 @@ const compile = (o, context) => { o(context.header, css, `
         return totalpage++;
     };
 
+    var selectFinalTopic = function(topicid) {
+        var fulltopic = window._cachedAllTopics.find(function(x) { return x._id == topicid  });        
+    }
+
+    var selectTopic = function(topicid, forceFinal) {
+        window._selectedTopic = topicid;
+        var list = window._cachedAllTopics.filter(function(x) { return x.parent == topicid });
+
+        if (forceFinal || list.length == 0) {
+            selectFinalTopic(topicid);
+        } else {
+            var fulltopic = window._cachedAllTopics.find(function(x) { return x._id == topicid  });        
+            addTopicCard(fulltopic.displayname, list);
+        }
+    }
+
+    var addTopicCard = function(title, list) {
+        var card = d.make({ parent : d.id("publishing-topic-cards"), class : "topic-card" });
+        var title = d.make({ parent : card, class : "topic-card-title", text : title });
+        var elementlist = d.make({ parent : card, class : "topic-card-topics" });
+        list.forEach(function(t) {
+            var elementtopic = d.make({ parent : elementlist, class : "topic-card-topic", text : t.displayname });
+            elementtopic.bind('click', function() {
+                selectTopic(t._id);
+            });
+        });
+    }
+
+    var addTopicCardFromCat = function(cat) {
+        var list = window._cachedAllTopics.filter(function(x) { return x.category == cat });
+        d.q('.topic-card', true).forEach(function(x) { x.get().remove(); });
+        addTopicCard(cat, list);
+    };
+
+    var initTopics = function() {
+        window._cachedAllTopics = liliumcms.livevars.livevars()["topics.simple"];
+
+        d.q('.publishing-category-single', true).forEach(function(x) {
+            x.bind('click', function(ev) {
+                var cat = x.dataset.category;
+                addTopicCardFromCat(cat);
+            });
+        });
+    };
+
     var showNotFound = function() {
 
     };
@@ -175,10 +261,12 @@ const compile = (o, context) => { o(context.header, css, `
         }
 
         d.id('publishing-tab-add').bind('click', function() {
-            switchToTab(createHeaderSlide('', '', ''));
+            switchToTab(createHeaderSlide());
         });
 
         switchToTab(0);
+
+        initTopics();
     });
 </script>
 
