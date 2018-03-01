@@ -266,6 +266,17 @@ const compile = (o, context) => { o(context.header, css, `
 <script>
     window._poststate = {};
 
+    var updateState = function() {
+        var titles    = Array.prototype.map.call(document.querySelectorAll('.big-title'),    function(x) { return x.value; });
+        var subtitles = Array.prototype.map.call(document.querySelectorAll('.big-subtitle'), function(x) { return x.value; });
+        var contents  = allEditors.map(function(x) { return x.content; });
+
+        window._poststate.title = titles;
+        window._poststate.subtitle = subtitles;
+        window._poststate.content = contents;
+    }    
+
+
     var switchToTab = function(index) {
         var tab = d.q('.publishing-tab.selected').get();
         tab && tab.classList.remove('selected');
@@ -278,6 +289,7 @@ const compile = (o, context) => { o(context.header, css, `
     };
 
     var totalpage = 0;
+    var allEditors = [];
     var createHeaderSlide = function(title = "", subtitle = "", content = "<p></p>") {
         log('Publishing', 'Creating new header slide with index ' + totalpage);
 
@@ -320,6 +332,7 @@ const compile = (o, context) => { o(context.header, css, `
 
         btitle.value = title.trim();
         bsubtitle.value = subtitle.trim();
+        allEditors.push(textEditor);
         d.id('publishing-headers').born(wrap);
 
         var tab = d.make({ class : "publishing-tab", id : "publishing-tab-" + totalpage, text : totalpage == 0 ? "Landing" : "Page " + totalpage });
