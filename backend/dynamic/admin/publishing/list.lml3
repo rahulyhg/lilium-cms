@@ -186,6 +186,10 @@ const compile = (o, context, v) => { o(context.header, css, `
             destroyed   : { text : "Destroyed",     color : "#ff4405" },
         };
 
+        var popupCreate = function() {
+            liliumcms.pageloader.load("/admin/article/new");
+        }
+
         window.generateCard = function(post) {
             var isAuthor = post.author == liliumcms.session.current._id;
             var fullAuthor = liliumcms.conversations.getCachedUsers()[post.author];
