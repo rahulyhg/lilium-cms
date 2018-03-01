@@ -106,7 +106,7 @@ main {
 .publishing-category-single:nth-child(4) { background: #d6e8ff; }
 
 .publishing-category-single {
-    height: 30%;
+    height: 33.333%;
     position: relative;
     overflow: hidden;
     cursor: pointer;
@@ -235,14 +235,16 @@ const compile = (o, context) => { o(context.header, css, `
     <div id="publishing-tabs">
         <div class="publishing-tab" id="publishing-tab-add">Add</div>
     </div>
+
     <div id="publishing-headers">
         
     </div>
+
+    <div class="publishing-caregory-title">
+        Select a topic category
+    </div>
     <div id="publishing-topic">
         <div id="publishing-category">
-            <div class="publishing-caregory-title">
-                Select a topic category
-            </div>
             <div class="publishing-category-single" data-category="local">
                 <i class="far fa-map-marker"></i>
                 <span>Local content</span>
@@ -260,6 +262,14 @@ const compile = (o, context) => { o(context.header, css, `
 
         </div>
     </div>
+
+    <div id="publishing-media">
+        <h2>Select a featured image</h2>
+        <div id="featured-image-selector">
+            <img id="featured-image-tag" class="media_explorer_form pickable" data-hiddenfield="media" />
+            <input type="hidden" name="media" id="mediapicker" />
+        </div>
+    </div>    
 </div>
 
 
@@ -274,6 +284,7 @@ const compile = (o, context) => { o(context.header, css, `
         window._poststate.title = titles;
         window._poststate.subtitle = subtitles;
         window._poststate.content = contents;
+        // Topic set at : window._poststate.topic;
     }    
 
 
