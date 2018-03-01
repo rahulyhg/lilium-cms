@@ -87,21 +87,29 @@ main {
     overflow: hidden;
 }
 
-#publishing-category {
-    font-size: 32px;    
-    flex-wrap: nowrap;
-    height: 100%;
-    cursor: pointer;
+.publishing-caregory-title {
+    height: 10%;
+    font-size: 16px;
+    background: #F6F6FF;
+    padding: 2px 6px;
+    text-transform: uppercase;
+    border-bottom: 3px solid #DDD;
 }
 
-.publishing-category-single:nth-child(1) { background: #ffeaea; }
-.publishing-category-single:nth-child(2) { background: #f5e1ff; }
-.publishing-category-single:nth-child(3) { background: #d6e8ff; }
+#publishing-category {
+    font-size: 32px;    
+    height: 100%;
+}
+
+.publishing-category-single:nth-child(2) { background: #ffeaea; }
+.publishing-category-single:nth-child(3) { background: #f5e1ff; }
+.publishing-category-single:nth-child(4) { background: #d6e8ff; }
 
 .publishing-category-single {
-    height: 33.3333%;
+    height: 30%;
     position: relative;
     overflow: hidden;
+    cursor: pointer;
 }
 
 .publishing-category-single i {
@@ -119,23 +127,103 @@ main {
     left: 100px;
     position: absolute;
     letter-spacing: 3px;
+    transition: all 1s;
 }
 
-.publishing-category-single:nth-child(1):hover i {
-    transform: translate3d(0, -30px, 0);
+.publishing-category-single:hover span {
+    letter-spacing : 5px;
 }
 
 .publishing-category-single:nth-child(2):hover i {
-    transform: translate3d(20px, 0px, 0) rotateZ(30deg);
+    transform: translate3d(0, -30px, 0);
 }
 
 .publishing-category-single:nth-child(3):hover i {
-    animation: handshake 0s linear 0.5s infinite; 
+    transform: translate3d(20px, 0px, 0) rotateZ(30deg);
 }
 
-@keyframes handshake {
-    from : { translate3d(0, 0, 0); }
-    to :   { translate3d(0, 20px, 0); }
+.publishing-category-single:nth-child(4):hover i {
+    -webkit-animation: handshakeanim 0.5s ease-in-out 0s infinite; 
+    animation: handshakeanim 0.5s ease-in-out 0s infinite; 
+}
+
+.topic-card {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 20px;
+    height: 100%;
+    background: #FFF;
+    border-left: 1px solid #EEE;
+    box-shadow: -5px 0px 5px rgba(0,0,0,0.1);
+    transform: translate3d(40%, 0, 0);
+    transition: all 0.3s;
+    opacity: 0;
+
+    overflow : auto;
+}
+
+.topic-card-title {
+    padding: 10px;
+    border-bottom: 1px solid #DDD;
+    text-transform: uppercase;
+    font-size: 16px;
+    letter-spacing: 1px;
+    background: #F6F6F6;
+}
+
+.topic-card-topic {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #DDD;
+}
+
+.topic-card-topic:hover {
+    background: #F3F3F3;
+}
+
+.topic-card.shown {
+    transform: translate3d(0,0,0);
+    opacity: 1;
+}
+
+.topic-card.topic-final-card {
+    left: 0;
+    background: #f1f4fb;
+    background: linear-gradient(115deg, transparent 75%, rgba(255,255,255,.8) 75%) 0 0, linear-gradient(245deg, transparent 75%, rgba(255,255,255,.8) 75%) 0 0, linear-gradient(115deg, transparent 75%, rgba(255,255,255,.8) 75%) 7px -15px, linear-gradient(245deg, transparent 75%, rgba(255,255,255,.8) 75%) 7px -15px, #f1f4fb;
+    background-size: 15px 30px;
+}
+
+.topic-final-title {
+    margin-top: 80px;
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+.topic-final-displayname {
+    text-align: center;
+    font-size: 34px;
+}
+
+.topic-final-cancel {
+    text-align: center;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 10px;
+    color: #333;
+}
+
+@-webkit-keyframes handshakeanim {
+    0%   : { transform: translate3d(0, 0, 0); }
+    50%  : { transform: translate3d(0, -20px, 0); }
+    100% : { transform: translate3d(0, 0, 0); }
+}
+
+@keyframes handshakeanim {
+    0%   : { transform: translate3d(0, 0, 0); }
+    50%  : { transform: translate3d(0, -20px, 0); }
+    100% : { transform: translate3d(0, 0, 0); }
 }
 
 </style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
@@ -152,6 +240,9 @@ const compile = (o, context) => { o(context.header, css, `
     </div>
     <div id="publishing-topic">
         <div id="publishing-category">
+            <div class="publishing-caregory-title">
+                Select a topic category
+            </div>
             <div class="publishing-category-single" data-category="local">
                 <i class="far fa-map-marker"></i>
                 <span>Local content</span>
@@ -173,6 +264,8 @@ const compile = (o, context) => { o(context.header, css, `
 
 
 <script>
+    window._poststate = {};
+
     var switchToTab = function(index) {
         var tab = d.q('.publishing-tab.selected').get();
         tab && tab.classList.remove('selected');
@@ -243,6 +336,35 @@ const compile = (o, context) => { o(context.header, css, `
 
     var selectFinalTopic = function(topicid) {
         var fulltopic = window._cachedAllTopics.find(function(x) { return x._id == topicid  });        
+        var card = d.make({ class : "topic-card topic-final-card", parent : d.id("publishing-topic-cards") });
+        d.make({ parent : card, class : "topic-final-title", text : "Selected topic" });
+        d.make({ parent : card, class : "topic-final-displayname", text : fulltopic.displayname });
+        
+        var cancelbutton = d.make({ parent : card, class : "topic-final-cancel", text : "Change topic" });
+        cancelbutton.bind('click', function() {
+            resetTopic();
+        });
+
+        setTimeout(function() {
+            card.cadd('shown');
+        }, 5);
+
+        window._poststate.topic = topicid;
+    }
+
+    var resetTopic = function() {
+        var cards = document.querySelectorAll('.topic-card:not(.topic-final-card)');
+        for (var i = cards.length - 1; i >= 0; i--) {
+            cards[i].remove();
+        }
+
+        var finalcard = document.querySelector('.topic-final-card');
+        if (finalcard) {
+            finalcard.classList.remove('shown');
+            setTimeout(function() {
+                finalcard.remove();
+            }, 200);
+        }
     }
 
     var selectTopic = function(topicid, forceFinal) {
@@ -267,6 +389,10 @@ const compile = (o, context) => { o(context.header, css, `
                 selectTopic(t._id);
             });
         });
+
+        setTimeout(function() {
+            card.cadd('shown');
+        }, 5);
     }
 
     var addTopicCardFromCat = function(cat) {
@@ -296,6 +422,7 @@ const compile = (o, context) => { o(context.header, css, `
             return showNotFound();
         }
 
+        window._poststate = post;
         for (var i = 0; i < post.title.length; i++) {
             createHeaderSlide(post.title[i], post.subtitle[i], post.content[i]);
         }
@@ -307,6 +434,7 @@ const compile = (o, context) => { o(context.header, css, `
         switchToTab(0);
 
         initTopics();
+        post.topic && selectFinalTopic(post.topic);
     });
 </script>
 
