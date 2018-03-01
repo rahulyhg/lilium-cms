@@ -88,23 +88,54 @@ main {
 }
 
 #publishing-category {
-    font-size: 32px;
-    display: flex;
+    font-size: 32px;    
     flex-wrap: nowrap;
     height: 100%;
-    text-transform: uppercase;
-    padding-top: 120px;
     cursor: pointer;
 }
 
-#publishing-category:nth-child(1) {}
-#publishing-category:nth-child(2) {}
-#publishing-category:nth-child(3) {}
+.publishing-category-single:nth-child(1) { background: #ffeaea; }
+.publishing-category-single:nth-child(2) { background: #f5e1ff; }
+.publishing-category-single:nth-child(3) { background: #d6e8ff; }
 
 .publishing-category-single {
-    flex-grow: 1;
-    width: 33.3333%;
-    text-align: center;
+    height: 33.3333%;
+    position: relative;
+    overflow: hidden;
+}
+
+.publishing-category-single i {
+    position: absolute;
+    bottom: -9px;
+    left: -12px;
+    font-size: 72px;
+    opacity: 0.3;
+
+    transition: all 1s;
+}
+
+.publishing-category-single span {
+    bottom: 10px;
+    left: 100px;
+    position: absolute;
+    letter-spacing: 3px;
+}
+
+.publishing-category-single:nth-child(1):hover i {
+    transform: translate3d(0, -30px, 0);
+}
+
+.publishing-category-single:nth-child(2):hover i {
+    transform: translate3d(20px, 0px, 0) rotateZ(30deg);
+}
+
+.publishing-category-single:nth-child(3):hover i {
+    animation: handshake 0s linear 0.5s infinite; 
+}
+
+@keyframes handshake {
+    from : { translate3d(0, 0, 0); }
+    to :   { translate3d(0, 20px, 0); }
 }
 
 </style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
@@ -121,9 +152,18 @@ const compile = (o, context) => { o(context.header, css, `
     </div>
     <div id="publishing-topic">
         <div id="publishing-category">
-            <div class="publishing-category-single" data-category="local">Local</div>
-            <div class="publishing-category-single" data-category="interest">Interests</div>
-            <div class="publishing-category-single" data-category="partners">Partners</div>
+            <div class="publishing-category-single" data-category="local">
+                <i class="far fa-map-marker"></i>
+                <span>Local content</span>
+            </div>
+            <div class="publishing-category-single" data-category="interest">
+                <i class="far fa-futbol"></i>
+                <span>Interests</span>
+            </div>
+            <div class="publishing-category-single" data-category="partners">
+                <i class="far fa-handshake"></i>
+                <span>Partners</span>
+            </div>
         </div>
         <div id="publishing-topic-cards">
 
