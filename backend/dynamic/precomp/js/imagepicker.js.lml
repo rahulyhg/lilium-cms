@@ -59,7 +59,7 @@ var LMLImagePicker = function() {
         log('ImagePicker', 'Looking for pickable images to bind click; found ' + pickers.length);
         
         for (var i = 0; i < pickers.length; i++) {
-            that.bind(pickers[i]);
+            that.bind(pickers[i], undefined, pickers[i].dataset);
         };
     };
 
