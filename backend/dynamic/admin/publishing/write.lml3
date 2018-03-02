@@ -1,5 +1,5 @@
 const settings = {     
-    livevars : ["publishing.write.{?1}", "topics.simple"],
+    livevars : ["publishing.write.{?1}", "topics.simple", "entities.simple", "themes.templates.article"],
     title : "Publishing",
     lmldom : { v : 1.0 }
 };                    
@@ -78,7 +78,7 @@ main {
 /* Topic box */
 #publishing-topic {
     display: block;
-    margin: 10px;
+    margin: 0px 10px;
     background: #FFF;
     border: 1px solid #DDD;
     border-bottom-width: 3px;
@@ -101,9 +101,9 @@ main {
     height: 100%;
 }
 
-.publishing-category-single:nth-child(2) { background: #ffeaea; }
-.publishing-category-single:nth-child(3) { background: #f5e1ff; }
-.publishing-category-single:nth-child(4) { background: #d6e8ff; }
+.publishing-category-single:nth-child(1) { background: #ffeaea; border-bottom: 1px solid #ffd6d6; color: #d07878; }
+.publishing-category-single:nth-child(2) { background: #f5e1ff; border-bottom: 1px solid #ebc3ff; border-top: 1px solid #fff6f6; color: #d0789b; }
+.publishing-category-single:nth-child(3) { background: #d6e8ff; border-top: 1px solid #f3f8ff; color: #8cabc7; }
 
 .publishing-category-single {
     height: 33.333%;
@@ -117,7 +117,7 @@ main {
     bottom: -9px;
     left: -12px;
     font-size: 72px;
-    opacity: 0.3;
+    opacity: 0.5;
 
     transition: all 1s;
 }
@@ -134,15 +134,15 @@ main {
     letter-spacing : 5px;
 }
 
-.publishing-category-single:nth-child(2):hover i {
+.publishing-category-single:nth-child(1):hover i {
     transform: translate3d(0, -30px, 0);
 }
 
-.publishing-category-single:nth-child(3):hover i {
+.publishing-category-single:nth-child(2):hover i {
     transform: translate3d(20px, 0px, 0) rotateZ(30deg);
 }
 
-.publishing-category-single:nth-child(4):hover i {
+.publishing-category-single:nth-child(3):hover i {
     -webkit-animation: handshakeanim 0.5s ease-in-out 0s infinite; 
     animation: handshakeanim 0.5s ease-in-out 0s infinite; 
 }
@@ -226,6 +226,77 @@ main {
     100% : { transform: translate3d(0, 0, 0); }
 }
 
+#publishing-media {
+    border: 1px solid #CCC;
+    border-bottom-width: 3px;
+    margin: 0px 10px;
+
+    background-color: #f7f7f7;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23dfd7ec' fill-opacity='0.4' fill-rule='evenodd'%3E%3Cpath d='M0 40L40 0H20L0 20M40 40V20L20 40'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#featured-image-selector {
+    text-align: center;
+}
+
+#featured-image-tag {
+    max-width: 900px;
+    margin: 50px;
+    height: auto;
+    max-height: 600px;
+    min-height: 300px;
+    min-width: 200px;
+    border: 3px solid #AAA;
+    border-bottom-width: 5px;
+    object-fit : cover;
+}
+
+#featured-image-tag:hover {
+    border-color: #af57e4;
+}
+
+#publishing-form .pub-field {
+    
+}
+
+#publishing-form h3 {
+    margin-top: 40px;
+    padding-left: 10px;
+    z-index: 10;
+    position: relative;
+    margin-bottom: -8px;
+    text-transform: uppercase;
+    font-size: 42px;
+    color: #AAA;
+}
+
+#publication-details {
+    margin: 0px 10px;
+    padding: 10px;
+    background: #FFF;
+    border: 1px solid #ddd;
+    border-bottom-width: 3px;
+}
+
+.pub-detail-field {
+    display: flex;
+    flex-wrap : wrap;
+    margin-bottom: 12px;
+}
+
+.pub-detail-field span {
+    width: 200px;
+    display: block;
+    font-weight: bold;
+    padding-top: 5px;
+}
+
+#publishing-form .pub-field {
+    border: 1px solid #DDD;
+    padding: 5px 10px;
+    width: 300px;
+}
+
 </style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
 
 const compile = (o, context) => { o(context.header, css, `
@@ -240,9 +311,9 @@ const compile = (o, context) => { o(context.header, css, `
         
     </div>
 
-    <div class="publishing-caregory-title">
-        Select a topic category
-    </div>
+    <h3>
+        Topic category
+    </h3>
     <div id="publishing-topic">
         <div id="publishing-category">
             <div class="publishing-category-single" data-category="local">
@@ -263,13 +334,31 @@ const compile = (o, context) => { o(context.header, css, `
         </div>
     </div>
 
+    <h3>Featured image</h3>
     <div id="publishing-media">
-        <h2>Select a featured image</h2>
         <div id="featured-image-selector">
-            <img id="featured-image-tag" class="media_explorer_form pickable" data-hiddenfield="media" />
+            <img id="featured-image-tag" class="media_explorer_form pickable" data-hiddenfield="media" data-size="facebook" data-withcredit="true" />
             <input type="hidden" name="media" id="mediapicker" />
         </div>
     </div>    
+
+    <h3>Publication State</h3>
+    <div id="publication-details">
+        <div class="pub-detail-field">
+            <span>URL</span>
+            <a id="pub-url-link"></a>
+        </div>
+        <div class="pub-detail-field">
+            <span>Publication date</span>
+            <input class="pub-field lml-date" id="pdate" data-options="time" placeholder="Click to select a date and time" type="text">
+        </div>
+        <div class="pub-detail-field">
+            <span>Author</span>
+            <select id="pauthor" class="pub-field">
+
+            </select>
+        </div>
+    </div>
 </div>
 
 
@@ -285,8 +374,18 @@ const compile = (o, context) => { o(context.header, css, `
         window._poststate.subtitle = subtitles;
         window._poststate.content = contents;
         // Topic set at : window._poststate.topic;
+
+        window._poststate.media = d.id('mediapicker').value;
     }    
 
+    var refreshState = function() {
+        // Url, Date, author, status
+        
+    };
+
+    var refreshActions = function() {
+
+    };
 
     var switchToTab = function(index) {
         var tab = d.q('.publishing-tab.selected').get();
@@ -436,6 +535,17 @@ const compile = (o, context) => { o(context.header, css, `
         });
     };
 
+    var initAuthor = function() {
+        var entities = liliumcms.livevars.livevars()["entities.simple"];
+        var selectbox = d.id("pauthor").get();
+        entities.forEach(function(x) {
+            var opt = document.createElement('option');
+            opt.textContent = x.displayname;
+            opt.value = x._id;
+            selectbox.appendChild(opt);
+        });
+    };
+
     var showNotFound = function() {
 
     };
@@ -459,6 +569,21 @@ const compile = (o, context) => { o(context.header, css, `
 
         initTopics();
         post.topic && selectFinalTopic(post.topic);
+
+        initAuthor();
+
+        if (post.media) {
+            d.id('mediapicker').get().value = post.media;
+            liliumcms.livevars.getSingleLivevar("uploads.single." + post.media, {}, function(r) { 
+                var fullmedia = r.livevars["uploads.single." + post.media];
+                if (fullmedia) {
+                    d.id('featured-image-tag').get().src = fullmedia.sizes.facebook && fullmedia.sizes.facebook.url;
+                }
+            });
+        }
+
+        refreshState();
+        refreshActions();
     });
 </script>
 
