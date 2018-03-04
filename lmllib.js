@@ -84,8 +84,6 @@ const registeredLibraries = {
     debug: function (context) {
         return {
             printcontext: function () {
-                log('LML', 'Debug : ');
-                console.log(JSON.stringify(context));
                 return JSON.stringify(context);
             },
             format: "json"

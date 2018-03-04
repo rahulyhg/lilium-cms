@@ -173,7 +173,7 @@ class Plugins {
                         cli.cacheClear(undefined, callback);
                     });
                 } catch(e) {
-                    console.log(e);
+                    log('Plugin', e, 'err');
                 }
 
             }, true, true);
