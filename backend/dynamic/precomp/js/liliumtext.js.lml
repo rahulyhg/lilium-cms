@@ -37,7 +37,8 @@ LiliumTextImageInsertionPlugin.prototype.executeInsertImage = function() {
             that.editor.takeSnapshot();
         }
     }, undefined, {
-        multiple : true
+        multiple : true,
+        withcredit : true
     });
 }
 
