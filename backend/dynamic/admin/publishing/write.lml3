@@ -299,6 +299,23 @@ main {
 
 </style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
 
+<script>
+    var STICKY_ACTIONS = [
+        {
+            id : "publish"
+            shouldShow : function() {
+                return window._poststate.status == "draft" || window._poststate.status == "deleted";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Publish article";
+                button.addEventListener('click', this.publishCurrentPost);
+                return button;
+            }
+        }
+    ];
+</script>
+
 const compile = (o, context) => { o(context.header, css, `
 
 <div id="publishing-form">
@@ -359,8 +376,11 @@ const compile = (o, context) => { o(context.header, css, `
             </select>
         </div>
     </div>
-</div>
 
+    <div id="sticky-actions">
+        
+    </div>
+</div>
 
 <script>
     window._poststate = {};
@@ -384,7 +404,7 @@ const compile = (o, context) => { o(context.header, css, `
     };
 
     var refreshActions = function() {
-
+        var wrap = d.id('sticky-actions');
     };
 
     var switchToTab = function(index) {
@@ -445,7 +465,11 @@ const compile = (o, context) => { o(context.header, css, `
         allEditors.push(textEditor);
         d.id('publishing-headers').born(wrap);
 
-        var tab = d.make({ class : "publishing-tab", id : "publishing-tab-" + totalpage, text : totalpage == 0 ? "Landing" : "Page " + totalpage });
+        var tab = d.make({ 
+            class : "publishing-tab", 
+            id : "publishing-tab-" + totalpage, 
+            text : totalpage == 0 ? "Landing" : "Page " + totalpage 
+        });
 
         var currentpage = totalpage;
         tab.bind('click', function() {
