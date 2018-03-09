@@ -299,10 +299,12 @@ main {
 
 </style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
 
+const compile = (o, context) => { o(context.header, css, `
+
 <script>
     var STICKY_ACTIONS = [
         {
-            id : "publish"
+            id : "publish",
             shouldShow : function() {
                 return window._poststate.status == "draft" || window._poststate.status == "deleted";
             },
@@ -315,8 +317,6 @@ main {
         }
     ];
 </script>
-
-const compile = (o, context) => { o(context.header, css, `
 
 <div id="publishing-form">
 
