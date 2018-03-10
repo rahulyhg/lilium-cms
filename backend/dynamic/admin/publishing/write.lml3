@@ -301,6 +301,7 @@ main {
 #pub-url-link,
 .pub-detail-field b {
     margin-top: 5px;
+    width: calc(100% - 200px);
 }
 
 #pub-url-link[href=""] {
