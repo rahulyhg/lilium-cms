@@ -216,6 +216,7 @@ class ContentLib {
             db.findUnique(config.default(), ENTITY_COLLECTION, { _id : post.author }, (err, author) => {
                 post.author = author;
                 post.headline = post.title[0];
+                post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
 
                 sendback(post);
             }, { displayname : 1, username : 1, avatarURL : 1, avatarMini : 1, slug : 1, revoked : 1 });
