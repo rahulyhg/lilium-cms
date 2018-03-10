@@ -272,7 +272,7 @@ main {
 
 #publication-details {
     margin: 0px 10px;
-    padding: 10px;
+    padding: 15px;
     background: #FFF;
     border: 1px solid #ddd;
     border-bottom-width: 3px;
@@ -282,6 +282,7 @@ main {
     display: flex;
     flex-wrap : wrap;
     margin-bottom: 12px;
+    height: 30px;
 }
 
 .pub-detail-field span {
@@ -295,6 +296,15 @@ main {
     border: 1px solid #DDD;
     padding: 5px 10px;
     width: 300px;
+}
+
+#pub-url-link,
+.pub-detail-field b {
+    margin-top: 5px;
+}
+
+#pub-url-link[href=""] {
+    color: #000;
 }
 
 </style><link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">`;
@@ -362,18 +372,26 @@ const compile = (o, context) => { o(context.header, css, `
     <h3>Publication State</h3>
     <div id="publication-details">
         <div class="pub-detail-field">
-            <span>URL</span>
-            <a id="pub-url-link"></a>
+            <span>Author</span>
+            <select id="pauthor" class="pub-field">
+
+            </select>
         </div>
         <div class="pub-detail-field">
             <span>Publication date</span>
             <input class="pub-field lml-date" id="pdate" data-options="time" placeholder="Click to select a date and time" type="text">
         </div>
         <div class="pub-detail-field">
-            <span>Author</span>
-            <select id="pauthor" class="pub-field">
-
-            </select>
+            <span>URL</span>
+            <a id="pub-url-link" href="" target="_blank"></a>
+        </div>
+        <div class="pub-detail-field">
+            <span>Registered shares</span>
+            <b id="pub-shares">-</b>
+        </div>
+        <div class="pub-detail-field">
+            <span>Last updated on</span>
+            <b id="pub-last-update">Never updated</b>
         </div>
     </div>
 
@@ -385,6 +403,7 @@ const compile = (o, context) => { o(context.header, css, `
 <script>
     window._poststate = {};
 
+    // Update local object sent to the server
     var updateState = function() {
         var titles    = Array.prototype.map.call(document.querySelectorAll('.big-title'),    function(x) { return x.value; });
         var subtitles = Array.prototype.map.call(document.querySelectorAll('.big-subtitle'), function(x) { return x.value; });
@@ -398,11 +417,24 @@ const compile = (o, context) => { o(context.header, css, `
         window._poststate.media = d.id('mediapicker').value;
     }    
 
+    // Update bottom section with current article state
     var refreshState = function() {
         // Url, Date, author, status
-        
+        document.getElementById('pub-url-link').text = window._poststate.url || "This article does not have a URL";
+        document.getElementById('pub-url-link').href = window._poststate.url || "";
+
+        document.getElementById('pauthor').value = window._poststate.author._id;
+        if (window._poststate.date) {
+            liliumcms.lmldom.flatpickr.pdate.setDate(new Date(window._poststate.date))
+        }
+
+        document.getElementById('pub-shares').textContent = window._poststate.shares || "-";
+        document.getElementById('pub-last-update').textContent = window._poststate.updated ?
+            dateFormat(new Date(window._poststate.updated), "mmmm, dd yyyy 'at' HH:MM:ss") : 
+            "Never updated";
     };
 
+    // Refresh possible actions
     var refreshActions = function() {
         var wrap = d.id('sticky-actions');
     };
