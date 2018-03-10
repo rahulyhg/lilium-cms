@@ -119,10 +119,86 @@ main {
     color: #af57e4;
 }
 
+.publish-overlay {
+    position:fixed;
+    top:0; 
+    bottom:0;
+
+    z-index: 100000;
+    transition: all 0.5s;
+}
+
+#lilium .publish-overlay.shown {
+    transform: translate3d(0,0,0);
+    box-shadow: -5px 0px 10px 0px rgba(0,0,0,1);
+}
+
+#publish-overlay-left {
+    width: 100%;
+    left : 0;
+    transform: translate3d(-100%, 0, 0);
+    background-color: #2c1d2f;
+    color: rgb(244, 191, 255);
+}
+
+#publish-overlay-right {
+    width: 60%;
+    right : 0;
+    background-color: rgb(244, 191, 255);
+    color: #2c1d2f;
+    transform: translate3d(100%, 0, 0);
+    z-index: 100001;
+}
+
+#publish-input-section {
+    
+}
+
+.site-name {
+    font-family: "Oswald", sans-serif;
+    font-size: 72px;
+    text-transform: uppercase;
+    font-weight: normal;
+    display: block;
+
+    margin-bottom: -20px;
+    margin-left: -3px;
+}
+
+.publish-title {
+    font-family: "Muli", sans-serif;
+    font-size: 20px;
+    text-transform: uppercase;
+    display: block;
+    letter-spacing: -1px;
+}
+
+#publish-title-section {
+    height: 100px;
+    position: relative;
+    top: 40%;
+    left: 100px;
+}
+
+
+
 </style>`;
 
 const compile = (o, context, v) => { o(context.header, css, `
     
+    <div id="publish-overlay-left" class="publish-overlay">
+        <div id="publish-title-section">
+            <b class="site-name">${context._c.website.sitetitle}</b>
+            <b class="publish-title">Publish a new post</b>
+        </div>
+    </div>
+
+    <div id="publish-overlay-right" class="publish-overlay">
+        <div id="publish-input-section">
+            
+        </div>
+    </div>
+
     <lml-bunch>
         <lml-bunchfilters>
             <div class="bunch-filters">
@@ -187,7 +263,8 @@ const compile = (o, context, v) => { o(context.header, css, `
         };
 
         var popupCreate = function() {
-            liliumcms.pageloader.load("/admin/article/new");
+            d.id('publish-overlay-left').cadd('shown');
+            d.id('publish-overlay-right').cadd('shown');
         }
 
         window.generateCard = function(post) {
