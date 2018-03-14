@@ -63,7 +63,7 @@ var SiteInitializer = function (conf, siteobj) {
     var loadStaticSymlinks = function (done) {
         if (!isElder) { return done(); }
 
-        log('Sites', 'Initializing symlinks');
+        log('Sites', 'Initializing symlinks', 'info');
         var to = conf.server.html + '/static';
         var rootDir = conf.server.base + 'backend/static/';
         fileserver.createSymlinkSync(rootDir, to);

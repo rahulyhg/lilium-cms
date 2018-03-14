@@ -210,7 +210,7 @@ var Precomp = function () {
                                             if (!err) {
                                                 log("Precompiler", "Minified file to " + wPath + " in " + (new Date() - beforeMinify) + "ms", 'success');
                                             }
-
+    
                                             db.insert(conf, 'compiledfiles', {
                                                 filename: curFile,
                                                 sum: sum,

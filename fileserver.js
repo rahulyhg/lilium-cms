@@ -139,6 +139,7 @@ class FileServer {
     };
 
     createSymlinkSync  (src, dest) {
+        log('FileServer', 'Symlink ' + src + ' => ' + dest, 'detail');
         try {
             this.dirExists(dest,  (exists)  => {
                 if (!exists) {
@@ -151,13 +152,15 @@ class FileServer {
                     } catch (ex) {
                         try {
                             fs.symlinkSync(src, dest);
-                        } catch (ex) {}
+                        } catch (ex) {
+                            log('FileServer', 'Error while creating sync symlink ' + src, 'err');
+                        }
                     }
                 }
             })
 
         } catch (ex) {
-
+            log('FileServer', 'Error while creating sync symlink ' + src, 'err');
         }
     };
 
