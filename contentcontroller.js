@@ -1,5 +1,6 @@
 const filelogic = require('./filelogic');
 const contentlib = require('./content');
+const db = require('./includes/db');
 
 class ContentController {
     adminGET(cli) {
@@ -13,7 +14,14 @@ class ContentController {
 
     adminPOST(cli) {
         // Create new post
-
+        switch (cli.routeinfo.path[2]) {
+            case "new" : cli.hasRightOrRefuse('create-articles') 
+                && cli.postdata.data.headline
+                && contentlib.create(cli._c, cli.postdata.data.headline, db.mongoID(cli.userinfo.userid), (err, art) => {
+                    cli.sendJSON(err ? { error : err } : { _id : art._id });
+                }); break;
+            default : cli.refuse();
+        }
     }
 
     adminPUT(cli) {

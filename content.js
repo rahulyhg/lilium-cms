@@ -26,6 +26,7 @@ class ContentLib {
                 subscribers : [author],
                 type : "post",
                 status : "draft",
+                shares : 0,
                 updated : new Date(),
                 createdOn : new Date()
             };
@@ -33,7 +34,7 @@ class ContentLib {
             authorentity.reportsto && authorentity.reportsto.length > 0 && art.subscribers.push(...authorentity.reportsto)
 
             db.insert(_c, CONTENT_COLLECTION, art, (err, result) => {
-               done(err, art);
+               done && done(err, art);
             });
         }, {reportsto : 1, displayname : 1});
     }
