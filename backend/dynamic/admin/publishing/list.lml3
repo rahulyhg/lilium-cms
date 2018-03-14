@@ -186,6 +186,21 @@ main {
     box-sizing: border-box;
 }
 
+#writeheadline {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: "Oswald", sans-serif;
+    font-size: 40px;
+    padding: 5px 12px;
+    border-bottom: 1px solid #2c1d2f;
+    background: transparent;
+    color: #2c1d2f;
+    margin-top: 15px;
+}
+
+#writeheadline::placeholder {
+    color: #d09bda;
+}
 
 </style>`;
 
@@ -200,7 +215,7 @@ const compile = (o, context, v) => { o(context.header, css, `
 
     <div id="publish-overlay-right" class="publish-overlay">
         <div id="publish-input-section">
-            <input placeholder="Headline" id="writeheadline" />
+            <input placeholder="Article headline" id="writeheadline" />
         </div>
     </div>
 
@@ -270,8 +285,23 @@ const compile = (o, context, v) => { o(context.header, css, `
         var popupCreate = function() {
             d.id('publish-overlay-left').cadd('shown');
             d.id('publish-overlay-right').cadd('shown');
-        }
-        popupCreate();
+        };
+
+        var createNewPost = function(t) {
+            if (!t || !t.trim()) {
+                liliumcms.modals.error("No title", "You must provide a headline before creating an article.");
+            } else {
+                liliumcms.lmldom.post({
+                    headline : t
+                }, '${context._c.server.url}/admin/publishing/new', function(resp) {
+                    if (resp.error) {
+                        liliumcms.modals.error("Error", "There was an error while creating an article : " + resp.error);
+                    } else {
+                        liliumcms.pageloader.load("${context._c.server.url}/admin/publishing/write/" + resp._id);
+                    }
+                });
+            }
+        };
 
         window.generateCard = function(post) {
             var isAuthor = post.author == liliumcms.session.current._id;
@@ -323,6 +353,10 @@ const compile = (o, context, v) => { o(context.header, css, `
             var selectbox = d.id('author-filter');
             arr.forEach(function(user) {
                 d.make({ node : "option", text : user.displayname, attr : { value : user._id }, parent : selectbox });
+            });
+
+            d.id('writeheadline').bind('keyup', function(ev) {
+                ev.key == "Enter" && createNewPost(ev.target.value);
             });
         });
     </script>
