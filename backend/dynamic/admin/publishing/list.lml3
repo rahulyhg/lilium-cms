@@ -173,13 +173,18 @@ main {
     letter-spacing: -1px;
 }
 
-#publish-title-section {
+#publish-title-section, #publish-input-section {
     height: 100px;
     position: relative;
     top: 40%;
     left: 100px;
+    width: calc(100% - 200px);
 }
 
+#writeheadline {
+    width: 100%;
+    box-sizing: border-box;
+}
 
 
 </style>`;
@@ -195,7 +200,7 @@ const compile = (o, context, v) => { o(context.header, css, `
 
     <div id="publish-overlay-right" class="publish-overlay">
         <div id="publish-input-section">
-            
+            <input placeholder="Headline" id="writeheadline" />
         </div>
     </div>
 
@@ -266,6 +271,7 @@ const compile = (o, context, v) => { o(context.header, css, `
             d.id('publish-overlay-left').cadd('shown');
             d.id('publish-overlay-right').cadd('shown');
         }
+        popupCreate();
 
         window.generateCard = function(post) {
             var isAuthor = post.author == liliumcms.session.current._id;
