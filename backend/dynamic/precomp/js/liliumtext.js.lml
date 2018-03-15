@@ -1,4 +1,8 @@
-// Image Insertion
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+// Image Insertion                                                        //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
 var LiliumTextImageInsertionPlugin = function(editor) {
     this.identifier = "LiliumTextImageInsertionPlugin";
     this.editor = editor;
@@ -52,6 +56,11 @@ LiliumTextImageInsertionPlugin.prototype.unregister = function() {
 
 };
 
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+// Custom commands                                                        //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
 var LiliumTextCustomUndo = function(ev, that, editor) {
     editor.undo();
 }
@@ -67,3 +76,43 @@ var LiliumTextCustomCommandCode = function(ev, that, editor) {
 var LiliumTextCustomCommandFullscreen = function(ev, that, editor) {
     editor.wrapperel.classList.toggle("fullscreen");
 };
+
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+// Embeds                                                                 //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+var LiliumTextEmbedPlugin= function(editor) {
+    this.identifier = "LiliumTextEmbedPlugin";
+    this.editor = editor;
+    this.domains = [
+        "instagram.c", "facebook.c", "youtube.c", "soundcloud.c", "imgur"
+    ];
+};
+
+LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, text) {
+
+};
+
+LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, transfer) {
+    var textdata = transfer.getData("text");
+    if (textdata) {
+        var isURL = /^(https?\:\/\/)?[a-zA-Z0-9\.]+[a-zA-Z0-9\-\=\?\&\/]*$/.test(textdata);
+        if (isURL) {
+            for (var i = 0; i < this.domains.length; i++) {
+                if (textdata.includes(this.domains[i])) {
+                    this.handleEmbed(this.domains[i], textdata);
+                    return false;
+                }
+            }   
+        }
+    }
+};
+
+LiliumTextEmbedPlugin.prototype.register = function() {
+    this.editor.bind('paste', this.handlePaste.bind(this));
+}
+
+LiliumTextEmbedPlugin.prototype.unregister = function() {
+
+}
