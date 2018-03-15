@@ -27,3 +27,9 @@ if (!Array.prototype.find) {
     }
   });
 }
+
+if (!String.prototype.includes) {
+    String.prototype.includes = function(str) {
+        return !!str && this.indexOf(str) != -1;
+    };
+}

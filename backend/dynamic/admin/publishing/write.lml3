@@ -489,6 +489,7 @@ const compile = (o, context) => { o(context.header, css, `
                 ]
             ],
             plugins : [
+                LiliumTextImageSelectionPlugin,
                 LiliumTextImageInsertionPlugin,
                 LiliumTextEmbedPlugin
             ]

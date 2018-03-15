@@ -78,7 +78,7 @@
     "jsdiff": "latest",
     "jsdom": "latest",
     "kerberos": "latest",
-    "lilium-text": "latest",
+    "lilium-text": "^0.2.0",
     "markdown": "latest",
     "markdown-it": "latest",
     "maxcdn": "latest",

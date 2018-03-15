@@ -1,3 +1,4 @@
+{#config}
 ////////////////////////////////////////////////////////////////////////////
 //                                                                        //
 // Image Insertion                                                        //
@@ -79,29 +80,95 @@ var LiliumTextCustomCommandFullscreen = function(ev, that, editor) {
 
 ////////////////////////////////////////////////////////////////////////////
 //                                                                        //
+// Image Selection                                                        //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+var LiliumTextImageSelectionPlugin = function(editor) {
+    this.identifier = "LiliumTextImageSelectionPlugin";
+    this.editor = editor;
+};
+
+LiliumTextImageSelectionPlugin.prototype.clicked = function(editor, clickArgs) {
+    window.clickArgs = clickArgs;
+};
+
+LiliumTextImageSelectionPlugin.prototype.register = function() {
+    this.editor.bind('clicked', this.clicked.bind(this));
+};
+
+LiliumTextImageSelectionPlugin.prototype.unregister = function() {
+
+};
+
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
 // Embeds                                                                 //
 //                                                                        //
 ////////////////////////////////////////////////////////////////////////////
 var LiliumTextEmbedPlugin= function(editor) {
     this.identifier = "LiliumTextEmbedPlugin";
     this.editor = editor;
-    this.domains = [
-        "instagram.c", "facebook.c", "youtube.c", "soundcloud.c", "imgur"
-    ];
+    this.domains = [ "instagram.c", "facebook.c", "youtube.c", "soundcloud.c", "imgur" ];
 };
 
-LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, text) {
+LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
+    switch (type) {
+        case "instagram.c":
+            var wrapid = "instatemp" + Math.random().toString().substring(2);
+            var template = document.createElement('div');
+            template.className = "instatemp";
+            template.id = wrapid;
+            this.editor.insertBlock(template);
+            
+            log('Instagram', "Handling Instagram embed");
+            liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type=instagram&as=json&url=' + text, { }, function(resp) {
+                try {
+                    resp = JSON.parse(resp);
+                    if (!resp.instagram) {
+                        throw new Error("No markup");
+                    }
 
+                    var parser = document.createElement('div');
+                    parser.innerHTML = resp.markup;
+    
+                    var newParag = parser.firstElementChild;
+                    template.parentElement.insertBefore(newParag, template);
+                } catch (err) {
+                    liliumcms.modals.error("Instagram embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the Instagram embed feature of this post. Make sure the picture is from a public account, and that it is correctly formatted.");
+                }
+
+                template.remove();
+            });
+            break;
+
+        case "facebook.c":
+
+            break;
+
+        case "youtube.c":
+
+            break;
+
+        case "soundcloud.c":
+
+            break;
+
+        case "imgur":
+
+            break;
+    }
 };
 
-LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, transfer) {
+LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, pasteArgs) {
+    var transfer = pasteArgs.dataTransfer;
     var textdata = transfer.getData("text");
     if (textdata) {
         var isURL = /^(https?\:\/\/)?[a-zA-Z0-9\.]+[a-zA-Z0-9\-\=\?\&\/]*$/.test(textdata);
         if (isURL) {
             for (var i = 0; i < this.domains.length; i++) {
                 if (textdata.includes(this.domains[i])) {
-                    this.handleEmbed(this.domains[i], textdata);
+                    this.handleEmbed(this.domains[i], transfer, textdata);
+                    pasteArgs.event.preventDefault();
                     return false;
                 }
             }   
