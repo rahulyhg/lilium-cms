@@ -15,7 +15,7 @@ var createV3DivFromResponse = function(data, ourl) {
     return '<p><img data-width="'+data.dimensions.width+'" data-height="'+data.dimensions.height+'" src="'+data.display_url+                  
         '" class="lml-instagram-embed-3" /><a class="lml-instagram-op-3" href="'+
         ourl +'" ><img src="'+data.owner.profile_pic_url+'" class="lml-instagram-avatar-3" /> @'+data.owner.username+
-        '<span class="lml-instagram-via-3">embedded via <i class="fa fa-instagram"> </i> </span> </a> </p>';
+        '<span class="lml-instagram-via-3">embedded via <i class="fab fa-instagram">&nbsp;</i> </span> </a> </p>';
 }
 
 var handleRequest = function(cli) {
