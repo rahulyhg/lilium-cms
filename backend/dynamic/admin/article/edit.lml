@@ -107,7 +107,7 @@
     </div>
 </div>
 
-<div id="article-packaging" class="lml-modal">
+<div id="article-packaging" class="lml-modal" style="z-index: 20000;">
     <div id="packaging-title">
         <b>Packaging</b>
     </div>    
