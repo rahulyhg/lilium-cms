@@ -19,6 +19,7 @@ LiliumTextImageInsertionPlugin.prototype.executeInsertImage = function() {
                 var image = images[imageid];
                 var parag = document.createElement('p');
                 parag.className = "parag-image-wrapper";
+                parag.contentEditable = false;
                 
                 var imgel = document.createElement('img');
                 imgel.className = "lml-content-image lml-instagram-embed-2";
@@ -94,16 +95,26 @@ LiliumTextImageSelectionPlugin.prototype.clicked = function(editor, clickArgs) {
 
     if (el.nodeName == "IMG") {
         var imageparag = el.parentElement;
-        while (imageparag.nodeName != "P" && imageparag.className != "liliumtext-editor") {
+        while (!imageparag.classList.contains("instagram-media") && 
+            !imageparag.classList.contains("twitter-tweet") && 
+            imageparag.nodeName != "P" && 
+            imageparag.className != "liliumtext-editor"
+        ) {
             imageparag = imageparag.parentElement;
         }
 
         if (imageparag.className == "liliumtext-editor") {
             imageparag = undefined;
         }
-    } else if (clickArgs.context && clickArgs.context.length != 0) {
+    } else if (clickArgs.context && clickArgs.context.length != 0 && el != editor.contentel) {
         var maybeparag = clickArgs.context[clickArgs.context.length - 1];
-        if (maybeparag.querySelector && maybeparag.querySelector('img')) {
+        if (maybeparag.classList.contains('instagram-media') || 
+            maybeparag.classList.contains('twitter-tweet') || 
+            (
+                maybeparag.querySelector && 
+                maybeparag.querySelector('img')
+            )
+        ) {
             imageparag = maybeparag;
         }
     }
@@ -179,6 +190,9 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
                     var sel = window.getSelection();
                     sel.removeAllRanges();
                     sel.addRange(range);
+
+                    var scrolltop = maybeNext.getClientRects()[0].top;
+                    editor.contentel.scrollTop = scrolltop + 30;
                 } catch (err) {
                     liliumcms.modals.error("Instagram embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the Instagram embed feature of this post. Make sure the picture is from a public account, and that it is correctly formatted.");
                     console.err(err);
