@@ -89,7 +89,33 @@ var LiliumTextImageSelectionPlugin = function(editor) {
 };
 
 LiliumTextImageSelectionPlugin.prototype.clicked = function(editor, clickArgs) {
-    window.clickArgs = clickArgs;
+    var el = clickArgs.event.target;
+    var imageparag;
+
+    if (el.nodeName == "IMG") {
+        var imageparag = el.parentElement;
+        while (imageparag.nodeName != "P" && imageparag.className != "liliumtext-editor") {
+            imageparag = imageparag.parentElement;
+        }
+
+        if (imageparag.className == "liliumtext-editor") {
+            imageparag = undefined;
+        }
+    } else if (clickArgs.context && clickArgs.context.length != 0) {
+        var maybeparag = clickArgs.context[clickArgs.context.length - 1];
+        if (maybeparag.querySelector && maybeparag.querySelector('img')) {
+            imageparag = maybeparag;
+        }
+    }
+
+    if (imageparag) {
+        var range = document.createRange();
+        range.selectNode(imageparag);
+
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+    }
 };
 
 LiliumTextImageSelectionPlugin.prototype.register = function() {
@@ -112,13 +138,14 @@ var LiliumTextEmbedPlugin= function(editor) {
 };
 
 LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
+    var editor = this.editor;
     switch (type) {
         case "instagram.c":
             var wrapid = "instatemp" + Math.random().toString().substring(2);
             var template = document.createElement('div');
             template.className = "instatemp";
             template.id = wrapid;
-            this.editor.insertBlock(template);
+            editor.insertBlock(template);
             
             log('Instagram', "Handling Instagram embed");
             liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type=instagram&as=json&url=' + text, { }, function(resp) {
@@ -133,8 +160,28 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
     
                     var newParag = parser.firstElementChild;
                     template.parentElement.insertBefore(newParag, template);
+
+                    var maybeNext = newParag.nextElementSibling;
+                    if (!maybeNext || !maybeNext.textContent.toString().trim()) {
+                        var nextp = document.createElement('p');
+                        newParag.insertAfter(nextp);
+                        maybeNext = nextp;
+                    }
+
+                    if (!maybeNext.textContent.toString().trim()) {
+                        maybeNext.innerHTML = "<br>";
+                    }
+
+                    var range = document.createRange();
+                    range.setStart(maybeNext, 0);
+                    range.collapse(true);
+
+                    var sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
                 } catch (err) {
                     liliumcms.modals.error("Instagram embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the Instagram embed feature of this post. Make sure the picture is from a public account, and that it is correctly formatted.");
+                    console.err(err);
                 }
 
                 template.remove();
