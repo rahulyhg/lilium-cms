@@ -184,22 +184,27 @@ main {
 #writeheadline {
     width: 100%;
     box-sizing: border-box;
-}
-
-#writeheadline {
-    width: 100%;
-    box-sizing: border-box;
     font-family: "Oswald", sans-serif;
     font-size: 40px;
     padding: 5px 12px;
     border-bottom: 1px solid #2c1d2f;
     background: transparent;
     color: #2c1d2f;
-    margin-top: 15px;
 }
 
 #writeheadline::placeholder {
     color: #d09bda;
+}
+
+#writeactions {
+    text-align: right;
+    margin-top: 10px;
+}
+
+#writeactions b {
+    margin-left: 20px;
+    color: #2c1d2f;
+    cursor: pointer;
 }
 
 </style>`;
@@ -216,6 +221,10 @@ const compile = (o, context, v) => { o(context.header, css, `
     <div id="publish-overlay-right" class="publish-overlay">
         <div id="publish-input-section">
             <input placeholder="Article headline" id="writeheadline" />
+            <div id="writeactions">
+                <b onclick="dismissCreate();">Dismiss</b>
+                <b onclick="createNewPost(document.getElementById('writeheadline').value);">Create article</b>
+            </div>
         </div>
     </div>
 
@@ -285,6 +294,11 @@ const compile = (o, context, v) => { o(context.header, css, `
         var popupCreate = function() {
             d.id('publish-overlay-left').cadd('shown');
             d.id('publish-overlay-right').cadd('shown');
+        };
+
+        var dismissCreate = function() {
+            d.id('publish-overlay-left').crm('shown');
+            d.id('publish-overlay-right').crm('shown');
         };
 
         var createNewPost = function(t) {
