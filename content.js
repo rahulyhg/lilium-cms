@@ -20,7 +20,7 @@ class ContentLib {
             const art = {
                 title : [title],
                 subtitle : [""],
-                content : [""],
+                content : ["&nbsp;"],
                 author : author, 
                 createdBy : author, 
                 subscribers : [author],
