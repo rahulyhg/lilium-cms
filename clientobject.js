@@ -85,45 +85,6 @@ class ClientObject {
         this.response.end();
     };
 
-    hasEnoughPower  (power, cb) {
-        var conf = require('./config.js');
-        var cli = this;
-        // Check if role or number given
-        if (typeof power === 'string') {
-            db.findToArray(conf.default(), 'roles', {
-                name: power
-            }, function (err, arr) {
-                if (arr[0] && this.userinfo.power <= arr[0].power) {
-                    cb(true);
-                } else {
-                    cb(false);
-                }
-            })
-        } else if (!isNaN(power)) {
-            cb(cli.userinfo.power <= power);
-        } else {
-            db.findToArray(conf.default(), 'roles', {
-                name: {
-                    '$in': power
-                }
-            }, function (err, arr) {
-                if (err) {
-                    cli.crash(err);
-                }
-                if (arr.length > 0) {
-                    for (var index in arr) {
-                        if (cli.userinfo.power > arr[index].power) {
-                            cb(false);
-                        }
-                    }
-                    cb(true);
-                } else {
-                    cb(false);
-                }
-            });
-        }
-    }
-
     refresh  () {
         this.redirect(this.routeinfo.fullpath);
     };
@@ -231,10 +192,6 @@ class ClientObject {
             isGranted = true;
         }
         return isGranted;
-    }
-
-    hasEnoughPermission  (minimumRole) {
-        // Check minimumRole power and check client maximumRole
     }
 
     isLoggedIn  () {
