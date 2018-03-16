@@ -211,7 +211,6 @@ const loadRoles = function (cb) {
     entities.registerRole({
         name: 'admin',
         displayname: 'admin',
-        power: 5
     }, ['dash', 'admin'], function () {
         return;
     }, true, true);
@@ -219,7 +218,6 @@ const loadRoles = function (cb) {
     entities.registerRole({
         name: 'lilium',
         displayname: 'lilium',
-        power: 1
     }, ['dash', 'admin'], function () {
         return;
     }, true, true);

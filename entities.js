@@ -296,30 +296,14 @@ class Entities {
         });
     };
 
-    canActOn (actor, subject, cb) {
-        var that = this;
-        that.maxPower(undefined, function(actorpower) {
-            that.maxPower(undefined, function(subpower) {
-                cb(actorpower == -1 || actorpower < subpower);
-            }, subject);
-        }, actor);
-    }
-
     maybeRevoke (cli, userid) {
-        var that = this;
-        userid = userid || cli.postdata.data.userid;
-
-        this.maxPower(cli, function(userpower) {
-            that.maxPower(cli, function(entitypower) {
-                if (userpower < entitypower || (cli.userinfo.roles && cli.userinfo.roles.indexOf("lilium") != -1)) {
-                    db.update(_c.default(), 'entities', {_id : db.mongoID(userid)}, {revoked : true}, function() {
-                        cli.sendJSON({revoked : true});
-                    });
-                } else {
-                    cli.sendJSON({revoked : false, reason : "power", powerlevel : {you : userpower, entity : entitypower}});
-                }
-            }, db.mongoID(userid));
-        });
+        if (cli.hasRight('admin')) {
+            db.update(_c.default(), 'entities', {_id : db.mongoID(userid)}, {revoked : true}, function() {
+                cli.sendJSON({revoked : true});
+            });
+        } else {
+            cli.sendJSON({revoked : false, reason : "role"});
+        }
     };
 
     updateProfile  (cli) {
@@ -557,97 +541,33 @@ class Entities {
         }
     }
 
-    maxPower  (cli, callback, userid) {
-        db.aggregate(_c.default(), 'entities', [{
-            "$unwind": "$roles"
-        }, {
-            $lookup: {
-                from: 'roles',
-                localField: 'roles',
-                foreignField: 'name',
-                as: 'rights'
-            }
-        }, {
-            $match: {
-                '_id': userid || db.mongoID(cli.userinfo._id ? cli.userinfo._id : cli.userinfo.userid)
-            }
-        }, {
-            $group: {
-                _id: '$_id',
-                power: {
-                    $push: "$rights.power"
-                },
-                roles : 1
-            }
-        }, {
-            $project: {
-                _id: 0,
-                power: {
-                    $min: '$power'
-                },
-                roles : 1
-            }
-        }], function (result) {
-            // Make sure there is a result
-            if (result[0] && result[0].power[0]) {
-                // Pull out the result
-                callback(result[0].power[0]);
-            } else {
-                // Poorest power
-                callback(999);
-            }
-
-        });
-    }
-
     update  (cli) {
         var that = this;
         if (cli.hasRight('edit-entities')) {
             var entData = cli.postdata.data;
             var entity = this.initialiseBaseEntity(entData);
-            entity._id = cli.routeinfo.path[3];
+            entity._id = db.mongoID(cli.routeinfo.path[3]);
 
-            var split = entity.displayname.split(' ');
-            entity.firstname = split.shift();
-            entity.lastname = split.join(' ');
+            db.findUnique(_c.default(), 'entities', { _id : entity._id }, (err, original) => {
+                var split = entity.displayname.split(' ');
+                entity.firstname = split.shift();
+                entity.lastname = split.join(' ');
 
-            log("Entities", "User " + cli.userinfo.displayname + " validates its right to update user with id " + entity._id, "info");
-            that.canActOn(db.mongoID(cli.userinfo.userid), db.mongoID(entity._id), function(allowed) {
-                if (!allowed && cli.userinfo.roles.indexOf("lilium") == -1) {
-                    return cli.throwHTTP(401, "I'm so sorry... I simply can't let you edit this user. Contact your admin!", true);
+                log("Entities", "User " + cli.userinfo.displayname + " validates its right to update user with id " + entity._id, "info");
+                if (original.roles.indexOf("lilium") != -1) {  
+                    entity.roles.push("lilium");
                 }
-
-                db.findToArray(_c.default(), 'entities', {_id : db.mongoID(entity._id)}, function(err, arr) {
-                    db.findToArray(_c.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, function(err, uarr) {
-                        if (arr[0].roles.indexOf("lilium") != -1) {  
-                            entity.roles.push("lilium");
-                        }
-        
-                        if (arr[0].sites) {
-                            var loggeduser = uarr[0];
-                            var currentsites = arr[0].sites;
-                            var newsites = entity.sites;
-        
-                            for (var i = 0; i < currentsites.length; i++) if (
-                                loggeduser.roles.indexOf('lilium') != -1 || loggeduser.roles.indexOf('admin') != -1 ||
-                                loggeduser.sites.indexOf(currentsites[i]) == -1
-                            ) {
-                                newsites.push(currentsites[i]);
-                            }
-    
-                            entity.sites = newsites;
-                        }
-                    
-                        that.updateEntity(entity, cli._c.id, function(err, res) {
-                            if (!err){
-                                log("Entities", "User " + cli.userinfo.displayname + " updated user " + entity.displayname + " (" + arr[0]._id + ")", "success");
-                                cli.sendJSON({error : err, updated : !err});
-                            } else {
-                                log('[Database] error while updating entity : ' + err);
-                                cli.throwHTTP(500, err, true);
-                            }
-                        });
-                    });
+            
+                entity.sites = Array.from(new Set(entity.sites));
+                
+                that.updateEntity(entity, cli._c.id, function(err, res) {
+                    if (!err){
+                        log("Entities", "User " + cli.userinfo.displayname + " updated user " + entity.displayname + " (" + entity._id + ")", "success");
+                        cli.sendJSON({error : err, updated : !err});
+                    } else {
+                        log('[Database] error while updating entity : ' + err);
+                        cli.throwHTTP(500, err, true);
+                    }
                 });
             });
         } else {
@@ -791,10 +711,7 @@ class Entities {
     validateEntityObject  (e, cli, cb) {
         var valid = true;
         valid = e.username != "" && e.shhh != "" && e.email != "" && e.displayname != "" && e.roles;
-        cli.hasEnoughPower(e.roles, function (hasEnoughPower) {
-            valid = hasEnoughPower;
-            cb(valid);
-        });
+        cb(valid);
     };
 
     registerEntity  (cli, entity, callback) {
