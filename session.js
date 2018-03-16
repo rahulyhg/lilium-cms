@@ -62,7 +62,6 @@ var Sessions = function () {
             admin: cli.session.data.admin,
             god: cli.session.data.god,
             user: cli.session.data.user,
-            power: cli.session.data.power,
             site: cli.routeinfo.configname
         };
     }
@@ -129,15 +128,10 @@ var Sessions = function () {
         cli.userinfo = cli.session.data;
 
         cli.session.data.preferences = userObj.preferences || {};
-        cli.session.data.power = 999;
+        cli.session.lastupdate = new Date();
 
-        entities.maxPower(cli, function (maxUserPower) {
-            cli.session.data.power = maxUserPower;
-            cli.session.lastupdate = new Date();
-
-            // No need for callback
-            db.insert(cli._c, 'sessions', cli.session, function () {});
-        });
+        // No need for callback
+        db.insert(cli._c, 'sessions', cli.session, function () {});
 
         sharedcache.session(cli.session.token, 'add', cli.session, function() {
             that.setCookieToCli(cli);
@@ -188,7 +182,6 @@ var Sessions = function () {
                 displayname: dat.displayname,
                 roles: dat.roles,
                 rights : rights,
-                power: dat.power,
                 username: dat.username,
                 site : dat.site,
                 preferences : dat.preferences || preferences.getDefault(cli._c),
