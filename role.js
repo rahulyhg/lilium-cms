@@ -74,7 +74,7 @@ var Role = function () {
             var redirect = '';
 
             // Check if current user has sufficient role power
-            if (cli.userinfo.roles.indexOf("lilium") != -1 || cli.userinfo.power < cli.postdata.data.power) {
+            if (cli.hasRight('admin')) {
                 // Create post
                 db.insert(conf.default(), 'roles', prepareRoleForDB(cli), function (err, result) {
                     // Generate LML page
@@ -86,8 +86,6 @@ var Role = function () {
                     msg: 'Insufficient Power'
                 });
             }
-
-
         } else {
             filelogic.serveAdminLML(cli);
         }
@@ -102,8 +100,7 @@ var Role = function () {
 
                 var form = formBuilder.handleRequest(cli);
                 var response = formBuilder.validate(form, true);
-                if (cli.userinfo.power < cli.postdata.data.power) {
-
+                if (cli.hasRight('admin')) {
                     if (response.success) {
                         var data = prepareRoleForDB(cli);
                         db.update(conf.default(), 'roles', {
@@ -111,7 +108,6 @@ var Role = function () {
                         }, data, function (err, r) {
                             cli.refresh();
                         });
-
                     } else {
                         cli.sendJSON({
                             form: response
@@ -165,7 +161,6 @@ var Role = function () {
         return {
             "name": postdata.name,
             "displayname": postdata.displayname,
-            "power": parseInt(postdata.power),
             "rights": rights
         };
     }
@@ -173,23 +168,9 @@ var Role = function () {
     this.livevar = function (cli, levels, params, callback) {
         var allContent = levels.length === 0;
 
-        var maxpower = 100000000000;
         db.findToArray(conf.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
-            var Roles = {};
-            for (var i = 0; i < roles.length; i++) {
-                Roles[roles[i].name] = roles[i];
-            }
-
-            for (var i in cli.session.data.roles) {
-                var role = cli.session.data.roles[i];
-
-                if (Roles[role] && Roles[role].power < maxpower) {
-                    maxpower = Roles[role].power;
-                }
-            }
-
             if (allContent || levels[0] == "all") {
-                db.findToArray(conf.default(), 'roles', { power : {$gt : maxpower} }, function (err, arr) {
+                db.findToArray(conf.default(), 'roles', { }, function (err, arr) {
                     callback(arr);
                 });
             } else {
@@ -217,9 +198,6 @@ var Role = function () {
             })
             .add('name', 'text', {
                 displayname: "Name slug",
-            })
-            .add('power', 'number', {
-                displayname: "Level (Smaller is stronger)"
             })
             .add('rights', 'stack', {
                 displayname: "User Rights",
