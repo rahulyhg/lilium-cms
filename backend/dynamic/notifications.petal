@@ -6,7 +6,7 @@
     bottom: 0;
     right: 0;
 
-    z-index: 30000;
+    z-index: 140000;
 }
 
 .lml-notification {

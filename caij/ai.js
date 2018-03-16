@@ -182,7 +182,14 @@ class AI {
         if (extra.every) {
             ai["module_" + extra.call] = setInterval(createModuleTask, extra.every);
         }
-        createModuleTask();
+
+        if (extra.runAt) {
+            ai["module_" + extra.call] = require('../scheduler').schedule("module_" + extra.call, {
+                runat : extra.runAt
+            }, createModuleTask).start();
+        }
+
+        !extra.notImmediate && createModuleTask();
     }
 
     bringToLife() {

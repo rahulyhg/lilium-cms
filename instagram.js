@@ -79,6 +79,11 @@ class LMLInstagram {
                 }
 
                 let stat = stats[accounts[aindex]];
+
+                if (!stat || !stat.user || !stat.user.username) {
+                    return nextAccount();
+                }
+
                 log("Instagram", "Storing stats for account : " + stat.user.username);
                 db.update(conf, 'instagram', {username : stat.user.username}, {
                     username : stat.user.username,
