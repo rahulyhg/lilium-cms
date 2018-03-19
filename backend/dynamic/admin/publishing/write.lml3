@@ -380,8 +380,19 @@ const compile = (o, context) => { o(context.header, css, `
     var createHistory = function() {
         var users = liliumcms.livevars.livevars()["entities.simple"];
         var hist = d.id("history-wrap");
-        var creatorname = users.find(function(user) { user._id == window._poststate.window._poststate.createdBy }) || { displayname : "Unknown" };
+        var creator = users.find(function(user) { return user._id == window._poststate.createdBy }) || { displayname : "An Unknown Author", avatarURL : "/static/media/lmllogo.png" };
         
+        var card = d.make({ id : "created-history-card", class : "history-card", parent : hist }).get();
+        hist.get().insertBefore(card, hist.firstElementChild);
+
+        var creatorAvatar = document.createElement('img');
+        creatorAvatar.className = "history-actor";
+        creatorAvatar.src = creator.avatarURL;
+        card.appendChild(creatorAvatar);
+    
+        var textspan = document.createElement('span');
+        textspan.textContent = creator.displayname + " created this article on " + dateFormat(window._poststate.date, "mmmm dd, 'at' HH:MM");
+        card.appendChild(textspan);
     }
 
     var showNotFound = function() {
