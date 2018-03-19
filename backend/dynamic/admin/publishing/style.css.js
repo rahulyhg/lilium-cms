@@ -3,8 +3,8 @@ main {
     background: #F3F3F3;
 }
 
-button {
-    display: inline-block;
+#sticky-actions button {
+    display: block;
     padding: 8px 14px;
     background-color: #Af57E4;
     color: #FFF;
@@ -12,9 +12,10 @@ button {
     font-weight: bold;
     border-bottom: 3px solid #793b9e;
     cursor: pointer;
-    margin-right: 6px;
     box-shadow: 0px 0px 1px 1px #c260ff inset;
     border-radius: 4px;
+    width: 100%;
+    margin-top: 10px;
 }
 
 body #lilium .liliumtext.theme-minim.fullscreen {
@@ -38,8 +39,13 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     overflow-y : scroll;
 }
 
-#history-wrap {
-    padding : 10px;
+#history-wrap,
+#sticky-actions {
+    padding: 10px;
+}
+
+#sticky-actions {
+    padding-top: 0px;
 }
 
 #created-history-card {
