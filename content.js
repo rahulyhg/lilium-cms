@@ -3,6 +3,8 @@ const config = require('./config');
 const filelogic = require('./filelogic');
 const log = require('./log');
 const hooks = require('./hooks');
+const DeepDiff = require('deep-diff');
+const diff = DeepDiff.diff;
 
 const CONTENT_COLLECTION = 'content';
 const ENTITY_COLLECTION = 'entities';
@@ -224,8 +226,71 @@ class ContentLib {
         });
     }
 
-    update() {
+    pushHistoryEntryFromDiff(_c, postid, actor, diffres, type, done) {
+        const diffs = diffres.filter(d => d.rhs || d.kind == "A").map(d => {
+            return {
+                field : d.path[0],
+                kind : d.kind
+            }
+        }).filter(
+            (thing, index, self) => index === self.findIndex(t => (t.place === thing.place && t.field == thing.field))
+        );
 
+        if (diffs.length != 0) {
+            const entry = {
+                diffs, actor, type, postid,
+                at : new Date(),
+            }
+    
+            db.insert(_c, 'contenthistory', entry, (err, r) => done(entry));
+        } else {
+            done();
+        }
+    }
+
+    getHistoryList(_c, postid, sendback) {
+        db.find(_c, 'contenthistory', { postid : db.mongoID(postid) }, [], (err, cur) => {
+            cur.sort({ _id : -1 }).project({ 
+                actor : 1, at : 1, type : 1, diffs : 1
+            }).toArray((err, arr) => sendback(arr));
+        });
+    }
+
+    parseSpecialValues(v) {
+        v.date && (v.date = new Date(v.date));
+        v.author && (v.author = db.mongoID(v.author));
+        v.topic && (v.topic = db.mongoID(v.topic));
+        v.media && (v.media = db.mongoID(v.media));
+    }
+
+    update(_c, postid, caller, values, callback) {
+        this.parseSpecialValues(values);
+
+        log('Content', 'Updating article with id ' + postid, 'detail');
+        db.rawCollection(_c, 'content', {}, (err, col) => {
+            col.findOne({ _id : postid }, {}, (err, oldpost) => {
+                const newpost = {};
+                Object.assign(newpost, oldpost, values);
+
+                const deepdiff = diff(oldpost, newpost);
+                if (!deepdiff) {
+                    log('Content', 'Did not update article (no diff) with headline ' + newpost.title[0] + " (" + newpost._id + ")", 'info');
+                    callback();
+                } else {
+                    this.pushHistoryEntryFromDiff(_c, postid, caller, deepdiff, 'update', entry => {
+                        if (entry) {
+                            col.replaceOne({_id : postid}, newpost, {}, () => {
+                                log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
+                                callback(undefined, entry);
+                            });
+                        } else {
+                            log('Content', 'Did not update article (no diff) with headline ' + newpost.title[0], 'info');
+                            callback();
+                        }
+                    });
+                }
+            });
+        });
     }
 
     publish() {
