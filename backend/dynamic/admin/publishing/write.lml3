@@ -1,5 +1,5 @@
 const settings = {     
-    livevars : ["publishing.write.{?1}", "topics.simple", "entities.simple", "themes.templates.article"],
+    livevars : ["publishing.write.{?1}", "topics.simple", "entities.simple", "themes.templates.article", "publishing.history.{?1}"],
     lmldom : { v : 1.0 }
 };                    
          
@@ -140,13 +140,14 @@ const compile = (o, context) => { o(context.header, css, `
     window._poststate = {};
 
     var createPayload = function() {
-        var s = window._poststate;
+        var s = updateState();
         return {
             title : s.title,
             subtitle : s.subtitle,
             content : s.content,
             topic : s.topic,
             media : s.media,
+            author : s.author,
             name : s.name,
             nsfw : s.nsfw,
             date : s.date,
@@ -172,11 +173,12 @@ const compile = (o, context) => { o(context.header, css, `
         window._poststate.title = titles;
         window._poststate.subtitle = subtitles;
         window._poststate.content = contents;
-        // Topic set at : window._poststate.topic;
         window._poststate.date = liliumcms.lmldom.flatpickr.pdate.input.value ? new Date(liliumcms.lmldom.flatpickr.pdate.input.value) : undefined;
 
         window._poststate.media = document.getElementById('mediapicker').value;
         window._poststate.author = document.getElementById('pauthor').value;
+
+        return window._poststate;
     }    
 
     // Update bottom section with current article state
@@ -299,7 +301,8 @@ const compile = (o, context) => { o(context.header, css, `
             card.cadd('shown');
         }, 5);
 
-        window._poststate.topic = fulltopic;
+        window._poststate.topic = fulltopic._id;
+        window._poststate.fulltopic = fulltopic;
     }
 
     var resetTopic = function() {
@@ -319,6 +322,7 @@ const compile = (o, context) => { o(context.header, css, `
 
     var selectTopic = function(topicid, forceFinal) {
         window._selectedTopic = topicid;
+        window._poststate.topic = topicid;
         var list = window._cachedAllTopics.filter(function(x) { return x.parent == topicid });
 
         if (forceFinal || list.length == 0) {
@@ -373,8 +377,33 @@ const compile = (o, context) => { o(context.header, css, `
         });
     };
 
-    var pushHistoryCard = function() {
+    var makeHistoryText = function(displayname, history) {
+        switch (history.type) {
+            case "update":
+                return displayname + " updated the " + history.diffs.map(function(e) { return e.field }).join(", ");
 
+            default:
+                return displayname + " updated this post";
+        }
+    };
+
+    var pushHistoryCard = function(history) {
+        var hist = document.getElementById("history-wrap");
+        var card = document.createElement('div'); 
+        card.className = "history-card";
+        hist.insertBefore(card, hist.firstElementChild);
+        
+        var users = liliumcms.livevars.livevars()["entities.simple"];
+        var creator = users.find(function(user) { return user._id == history.actor }) || { displayname : "An Unknown Author", avatarURL : "/static/media/lmllogo.png" };
+        
+        var creatorAvatar = document.createElement('img');
+        creatorAvatar.className = "history-actor";
+        creatorAvatar.src = creator.avatarURL;
+        card.appendChild(creatorAvatar);
+
+        var textspan = document.createElement('span');
+        textspan.textContent = makeHistoryText(creator.displayname, history) + " on " + dateFormat(window._poststate.date, "mmmm dd, 'at' HH:MM");
+        card.appendChild(textspan);
     };
 
     var createHistory = function() {
@@ -383,7 +412,6 @@ const compile = (o, context) => { o(context.header, css, `
         var creator = users.find(function(user) { return user._id == window._poststate.createdBy }) || { displayname : "An Unknown Author", avatarURL : "/static/media/lmllogo.png" };
         
         var card = d.make({ id : "created-history-card", class : "history-card", parent : hist }).get();
-        hist.get().insertBefore(card, hist.firstElementChild);
 
         var creatorAvatar = document.createElement('img');
         creatorAvatar.className = "history-actor";
@@ -393,6 +421,8 @@ const compile = (o, context) => { o(context.header, css, `
         var textspan = document.createElement('span');
         textspan.textContent = creator.displayname + " created this article on " + dateFormat(window._poststate.date, "mmmm dd, 'at' HH:MM");
         card.appendChild(textspan);
+
+        window._posthistory.forEach(pushHistoryCard);
     }
 
     var showNotFound = function() {
@@ -404,7 +434,14 @@ const compile = (o, context) => { o(context.header, css, `
     };
 
     var saveCurrentPost = function() {
-
+        liliumcms.lmldom.put(createPayload(), "${context._c.server.url}/admin/publishing/save/" + liliumcms.pageloader.lastLevel, function(resp) {
+            if (resp && resp.historyentry) {
+                pushHistoryCard(resp.historyentry);
+                liliumcms.notify({ type : "success", title : "Post updated", message : "This article was successfully updated."});
+            } else {
+                liliumcms.notify({ type : "info", title : "Did not save", message : "Article was not updated due to lack of motifications."});
+            }
+        });
     };
 
     liliumcms.lmldom.bind(function() {
@@ -414,6 +451,7 @@ const compile = (o, context) => { o(context.header, css, `
         }
 
         window._poststate = post;
+        window._posthistory = liliumcms.livevars.livevars()["publishing.history." + liliumcms.pageloader.lastLevel]
         for (var i = 0; i < post.title.length; i++) {
             createHeaderSlide(post.title[i], post.subtitle[i], post.content[i]);
         }
