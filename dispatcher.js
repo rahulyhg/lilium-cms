@@ -42,6 +42,11 @@ var Dispatcher = function () {
         }
     };
 
+    this.disput = function(cli) {
+        cli.touch('dispatcher.disput');
+
+    }
+
     this.dispost = function (cli) {
         cli.touch("dispatcher.dispost");
 
@@ -57,7 +62,7 @@ var Dispatcher = function () {
             }
         } else {
             log("Dispatcher", "Endpoint not registered : " + cli.routeinfo.path[0]);
-            cli.debug();
+            cli.throwHTTP(403, undefined, true);
         }
     };
 
