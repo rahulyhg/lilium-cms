@@ -52,6 +52,19 @@ class ContentLib {
             return cb && cb(new Error("Cannot generate article without a topic"));
         }
 
+        // Legacy support
+        if (deepArticle.fulltopic) {
+            deepArticle.topic = deepArticle.fulltopic;
+            deepArticle.topicslug = deepArticle.topic.completeSlug;
+            extra.topic = deepArticle.fulltopic;
+        }
+        if (deepArticle.deepmedia) {
+            deepArticle.featuredimage = [ deepArticle.deepmedia ];
+        }
+        if (deepArticle.fullauthor) {
+            deepArticle.authors = [deepArticle.fullauthor];
+        }
+
         if (deepArticle.topic && deepArticle.topic.override && deepArticle.topic.override.language) {
             extra.language = deepArticle.topic.override.language;
         }
@@ -250,7 +263,7 @@ class ContentLib {
 
     getHistoryList(_c, postid, sendback) {
         db.find(_c, 'contenthistory', { postid : db.mongoID(postid) }, [], (err, cur) => {
-            cur.sort({ _id : -1 }).project({ 
+            cur.sort({ _id : 1 }).project({ 
                 actor : 1, at : 1, type : 1, diffs : 1
             }).toArray((err, arr) => sendback(arr));
         });
@@ -293,8 +306,33 @@ class ContentLib {
         });
     }
 
-    publish() {
+    publish(_c, post, caller, callback) {
+        const payload = { status : "published" };
+        post.status = payload.status;
 
+        if (!post.date) {
+            payload.date = new Date();
+            post.date = payload.date;
+        }
+
+        if (!post.name) {
+            payload.name = require('slug')(post.title[0]).toLowerCase();
+            post.name = payload.name;
+        }
+
+        if (!post.topic || !post.author || !post.media) {
+            return callback({ error : "Missing fields", type : "fields" });
+        }
+
+        db.update(_c, 'content', { _id : post._id }, payload, () => {
+            this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
+                this.getFull(_c, post._id, fullpost => {
+                    this.generate(_c, fullpost, () => {
+                        callback({ historyentry, newstate : fullpost });
+                    }, 'all');
+                });
+            });
+        });
     }
 
     sendForReview() {
