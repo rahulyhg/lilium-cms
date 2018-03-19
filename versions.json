@@ -101,5 +101,10 @@
         "codename" : "Monoceros",
         "script" : "2.1.1.js",
         "features" : ["facebookpreview"]
+    },
+    "2.2.0": {
+        "codename" : "Cerebus",
+        "script" : "2.2.0.js",
+        "features" : ["publishingv2"]
     }
 }
