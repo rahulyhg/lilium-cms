@@ -829,7 +829,11 @@ var LMLDom = function() {
         return data;
     };
 
-    this.sendForm = this.post = function(data, url, callback, headers) {
+    this.put = function(data, url, callback, headers) {
+        this.post(data, url, callback, headers, 'PUT');
+    }
+
+    this.sendForm = this.post = function(data, url, callback, headers, method) {
         var maybeParseJson = function(str) {
             try {
                 return JSON.parse(str);
@@ -844,7 +848,7 @@ var LMLDom = function() {
             liliumcms.pageloader.present();
             callback(maybeParseJson(xmlhttp.responseText), a, b, c);
         });
-        xmlhttp.open("POST", url);
+        xmlhttp.open(method || "POST", url);
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         
         if (headers) {
