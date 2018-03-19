@@ -20,6 +20,14 @@ var Handler = function () {
         });
     };
 
+    var PUT = function(cli) {
+        cli.touch('handler.PUT');
+
+        Router.parseClientObject(cli, loggedin => {
+            Dispatcher.disput(cli);
+        });
+    }
+
     var POST = function (cli) {
         cli.touch('handler.POST');
 
@@ -212,6 +220,7 @@ var Handler = function () {
         switch (cli.method) {
             case 'GET':     GET(cli); break;
             case 'POST':    POST(cli); break;
+            case 'PUT':     PUT(cli);  break;
             case 'OPTIONS': OPTIONS(cli); break;
 
             default:        notSupported(cli);

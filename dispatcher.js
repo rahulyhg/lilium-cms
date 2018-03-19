@@ -45,6 +45,21 @@ var Dispatcher = function () {
     this.disput = function(cli) {
         cli.touch('dispatcher.disput');
 
+        if (cli.userinfo.loggedin) {
+            if (cli.routeinfo.admin) {
+                if (Admin.adminEndpointRegistered(cli.routeinfo.path[1], 'PUT')) {
+                    Admin.handleAdminEndpoint(cli);
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            } else {
+                if (Endpoints.isRegistered(cli._c.id, cli.routeinfo.path[0], 'PUT')) {
+                    Endpoints.execute(cli.routeinfo.path[0], 'PUT', cli);
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            }
+        }
     }
 
     this.dispost = function (cli) {
