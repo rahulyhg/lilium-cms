@@ -43,8 +43,8 @@ const compile = (o, context) => { o(context.header, css, `
             },
             render : function() {
                 var button = document.createElement('button');
-                button.textContent = "Update";
-                button.addEventListener('click', publishCurrentPost);
+                button.textContent = "Update and refresh";
+                button.addEventListener('click', refreshPublishedPost);
                 return button;
             }
         }
@@ -382,6 +382,9 @@ const compile = (o, context) => { o(context.header, css, `
             case "update":
                 return displayname + " updated the " + history.diffs.map(function(e) { return e.field }).join(", ");
 
+            case "published":
+                return displayname + " published this article";
+
             default:
                 return displayname + " updated this post";
         }
@@ -390,7 +393,7 @@ const compile = (o, context) => { o(context.header, css, `
     var pushHistoryCard = function(history) {
         var hist = document.getElementById("history-wrap");
         var card = document.createElement('div'); 
-        card.className = "history-card";
+        card.className = "history-card history-card-" + history.type;
         hist.insertBefore(card, hist.firstElementChild);
         
         var users = liliumcms.livevars.livevars()["entities.simple"];
@@ -402,7 +405,7 @@ const compile = (o, context) => { o(context.header, css, `
         card.appendChild(creatorAvatar);
 
         var textspan = document.createElement('span');
-        textspan.textContent = makeHistoryText(creator.displayname, history) + " on " + dateFormat(window._poststate.date, "mmmm dd, 'at' HH:MM");
+        textspan.textContent = makeHistoryText(creator.displayname, history) + " on " + dateFormat(history.at, "mmmm dd, 'at' HH:MM");
         card.appendChild(textspan);
     };
 
@@ -419,7 +422,7 @@ const compile = (o, context) => { o(context.header, css, `
         card.appendChild(creatorAvatar);
     
         var textspan = document.createElement('span');
-        textspan.textContent = creator.displayname + " created this article on " + dateFormat(window._poststate.date, "mmmm dd, 'at' HH:MM");
+        textspan.textContent = creator.displayname + " created this article on " + dateFormat(window._poststate.createdOn, "mmmm dd, 'at' HH:MM");
         card.appendChild(textspan);
 
         window._posthistory.forEach(pushHistoryCard);
@@ -429,11 +432,37 @@ const compile = (o, context) => { o(context.header, css, `
 
     };
 
-    var publishCurrentPost = function() {
-
+    var refreshPublishedPost = function() {
+        saveCurrentPost(function(saveresp) {
+            liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/refresh/" + liliumcms.pageloader.lastLevel, function(resp) {
+                liliumcms.notify({ type : "success", title : "Article refreshed", message : "The article markup was successfully refreshed." });
+            });
+        });
     };
 
-    var saveCurrentPost = function() {
+    var publishCurrentPost = function() {
+        saveCurrentPost(function(saveresp) {
+            liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/publish/" + liliumcms.pageloader.lastLevel, function(resp) {
+                if (resp) {
+                    if (resp.error) {
+                        liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article because some fields are missing."});
+                    } else {
+                        resp.historyentry && pushHistoryCard(resp.historyentry);
+                        resp.newstate && (window._poststate = resp.newstate);
+    
+                        refreshState();
+                        refreshActions();
+    
+                        liliumcms.notify({ type : "success", title : "Published", message : "This article was published live on the website."});
+                    }
+                } else {
+                    liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article for an unknown reason."});
+                }
+            });
+        });
+    };
+
+    var saveCurrentPost = function(done) {
         liliumcms.lmldom.put(createPayload(), "${context._c.server.url}/admin/publishing/save/" + liliumcms.pageloader.lastLevel, function(resp) {
             if (resp && resp.historyentry) {
                 pushHistoryCard(resp.historyentry);
@@ -441,6 +470,8 @@ const compile = (o, context) => { o(context.header, css, `
             } else {
                 liliumcms.notify({ type : "info", title : "Did not save", message : "Article was not updated due to lack of motifications."});
             }
+
+            typeof done == "function" && done(resp);
         });
     };
 
