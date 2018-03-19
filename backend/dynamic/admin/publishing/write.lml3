@@ -163,6 +163,51 @@ const compile = (o, context) => { o(context.header, css, `
         };
     }
 
+    // Update local object sent to the server
+    var updateState = function() {
+        var titles    = Array.prototype.map.call(document.querySelectorAll('.big-title'),    function(x) { return x.value; });
+        var subtitles = Array.prototype.map.call(document.querySelectorAll('.big-subtitle'), function(x) { return x.value; });
+        var contents  = allEditors.map(function(x) { return x.content; });
+
+        window._poststate.title = titles;
+        window._poststate.subtitle = subtitles;
+        window._poststate.content = contents;
+        // Topic set at : window._poststate.topic;
+        window._poststate.date = liliumcms.lmldom.flatpickr.pdate.input.value ? new Date(liliumcms.lmldom.flatpickr.pdate.input.value) : undefined;
+
+        window._poststate.media = document.getElementById('mediapicker').value;
+        window._poststate.author = document.getElementById('pauthor').value;
+    }    
+
+    // Update bottom section with current article state
+    var refreshState = function() {
+        // Url, Date, author, status
+        document.getElementById('pub-url-link').text = window._poststate.url || "This article does not have a URL";
+        document.getElementById('pub-url-link').href = window._poststate.url || "";
+
+        document.getElementById('pauthor').value = window._poststate.author;
+        if (window._poststate.date) {
+            liliumcms.lmldom.flatpickr.pdate.setDate(new Date(window._poststate.date))
+        }
+
+        document.getElementById('pub-shares').textContent = window._poststate.shares || "-";
+        document.getElementById('pub-last-update').textContent = window._poststate.updated ?
+            dateFormat(new Date(window._poststate.updated), "mmmm, dd yyyy 'at' HH:MM:ss") : 
+            "Never updated";
+
+        document.getElementById('pub-status').textContent = window._poststate.status;
+    };
+
+    // Refresh possible actions
+    var refreshActions = function() {
+        var wrap = d.id('sticky-actions');
+        wrap.empty();
+
+        STICKY_ACTIONS.forEach(function(act) {
+            act.shouldShow() && wrap.get().appendChild(act.render());
+        });
+    };
+
     var switchToTab = function(index) {
         var tab = d.q('.publishing-tab.selected').get();
         tab && tab.classList.remove('selected');
@@ -326,6 +371,29 @@ const compile = (o, context) => { o(context.header, css, `
             opt.value = x._id;
             selectbox.appendChild(opt);
         });
+    };
+
+    var pushHistoryCard = function() {
+
+    };
+
+    var createHistory = function() {
+        var users = liliumcms.livevars.livevars()["entities.simple"];
+        var hist = d.id("history-wrap");
+        var creatorname = users.find(function(user) { user._id == window._poststate.window._poststate.createdBy }) || { displayname : "Unknown" };
+        
+    }
+
+    var showNotFound = function() {
+
+    };
+
+    var publishCurrentPost = function() {
+
+    };
+
+    var saveCurrentPost = function() {
+
     };
 
     liliumcms.lmldom.bind(function() {
