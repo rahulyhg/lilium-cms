@@ -38,6 +38,39 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     overflow-y : scroll;
 }
 
+#history-wrap {
+    padding : 10px;
+}
+
+#created-history-card {
+    background-color: #e6e1ee;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23cfbaf2' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+    border: 1px solid #d5bef9;
+}
+
+.history-card span {
+    padding-left: 10px;
+}
+
+.history-actor {
+    width: 32px;
+    height: 32px;
+    object-fit : cover;
+    border-radius: 5px;
+}
+
+.history-card {
+    display: flex;
+    border: 1px solid #DDD;
+    background: #FFF;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.history-card {
+    margin-bottom: 10px;
+}
+
 #publishing-actions {
     position: fixed;
     top: 50px;
