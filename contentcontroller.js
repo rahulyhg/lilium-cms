@@ -45,8 +45,35 @@ class ContentController {
                     }
                 }, { author : 1 });
                 break;
+            case 'publish':
+                log('Content', 'Publishing from PUT under /publish', 'detail');
+                db.findUnique(cli._c, 'content', { _id }, (err, article) => {
+                    if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
+                        contentlib.publish(cli._c, article, db.mongoID(cli.userinfo.userid), resp => cli.sendJSON(resp));
+                    } else {
+                        log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
+                        cli.throwHTTP(404, undefined, true);
+                    }
+                });
+                break;
 
-
+            case 'refresh':
+                log('Content', 'Refreshing article from PUT under /refresh', 'detail');
+                db.findUnique(cli._c, 'content', { _id }, (err, article) => {
+                    if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
+                        contentlib.getFull(cli._c, _id, fullpost => {
+                            contentlib.generate(cli._c, fullpost, () => {
+                                cli.sendJSON({ ok : 1 });
+                            }, 'all');
+                        });
+                    } else {
+                        log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
+                        cli.throwHTTP(404, undefined, true);
+                    }
+                }, { author : 1 });
+                break;
+            default:
+                cli.throwHTTP(404, undefined, true);
         }
     }
 
