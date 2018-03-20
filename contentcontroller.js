@@ -19,7 +19,12 @@ class ContentController {
                 && cli.postdata.data.headline
                 && contentlib.create(cli._c, cli.postdata.data.headline, db.mongoID(cli.userinfo.userid), (err, art) => {
                     cli.sendJSON(err ? { error : err } : { _id : art._id });
-                }); break;
+                }); 
+                break;
+            case "preview" : 
+                contentlib.getPreview(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, markup => cli.sendHTML(markup));
+                break;
+
             default : cli.refuse();
         }
     }
