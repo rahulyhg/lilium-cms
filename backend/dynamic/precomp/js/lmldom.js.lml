@@ -833,6 +833,10 @@ var LMLDom = function() {
         this.post(data, url, callback, headers, 'PUT');
     }
 
+    this.del = function(data, url, callback, headers) {
+        this.post(data, url, callback, headers, 'DELETE');
+    }
+
     this.sendForm = this.post = function(data, url, callback, headers, method) {
         var maybeParseJson = function(str) {
             try {
