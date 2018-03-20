@@ -37,6 +37,18 @@ const compile = (o, context) => { o(context.header, css, `
             }
         },
         {
+            id : "preview",
+            shouldShow : function() {
+                return true;
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Preview";
+                button.addEventListener('click', previewCurrentPost);
+                return button;
+            }
+        },
+        {
             id : "update",
             shouldShow : function() {
                 return window._poststate.status == "published";
@@ -430,6 +442,12 @@ const compile = (o, context) => { o(context.header, css, `
 
     var showNotFound = function() {
 
+    };
+
+    var previewCurrentPost = function() {
+        liliumcms.lmldom.post(createPayload(), "${context._c.server.url}/admin/publishing/preview/" + liliumcms.pageloader.lastLevel, function(resp) {
+            liliumcms.previewer.cast(window._poststate.title[0], undefined, resp);
+        });
     };
 
     var refreshPublishedPost = function() {
