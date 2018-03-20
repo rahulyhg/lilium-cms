@@ -28,6 +28,14 @@ var Handler = function () {
         });
     }
 
+    var DEL = function(cli) {
+        cli.touch('handler.DEL');
+
+        Router.parseClientObject(cli, loggedin => {
+            Dispatcher.disdel(cli);
+        });
+    }
+
     var POST = function (cli) {
         cli.touch('handler.POST');
 
@@ -221,6 +229,7 @@ var Handler = function () {
             case 'GET':     GET(cli); break;
             case 'POST':    POST(cli); break;
             case 'PUT':     PUT(cli);  break;
+            case 'DELETE' : DEL(cli); break;
             case 'OPTIONS': OPTIONS(cli); break;
 
             default:        notSupported(cli);

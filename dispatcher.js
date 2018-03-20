@@ -62,6 +62,26 @@ var Dispatcher = function () {
         }
     }
 
+    this.disdel = function(cli) {
+        cli.touch('dispatcher.disdel');
+
+        if (cli.userinfo.loggedin) {
+            if (cli.routeinfo.admin) {
+                if (Admin.adminEndpointRegistered(cli.routeinfo.path[1], 'DELETE')) {
+                    Admin.handleAdminEndpoint(cli);
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            } else {
+                if (Endpoints.isRegistered(cli._c.id, cli.routeinfo.path[0], 'DELETE')) {
+                    Endpoints.execute(cli.routeinfo.path[0], 'DELETE', cli);
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            }
+        }
+    }
+
     this.dispost = function (cli) {
         cli.touch("dispatcher.dispost");
 
