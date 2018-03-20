@@ -91,10 +91,11 @@ class ContentController {
 
         switch (cli.routeinfo.path[2]) {
             case 'unpublish':
-                log('Content', 'Received DELETE request under /unpublish', 'detail');
+            case 'destroy' :
+                log('Content', 'Received DELETE request under /' + cli.routeinfo.path[2], 'detail');
                 db.findUnique(cli._c, 'content', { _id }, (err, article) => {
                     if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
-                        contentlib.unpublish(cli._c, _id, db.mongoID(cli.userinfo.userid), payload => cli.sendJSON(payload));
+                        contentlib[cli.routeinfo.path[2]](cli._c, _id, db.mongoID(cli.userinfo.userid), payload => cli.sendJSON(payload));
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
                         cli.throwHTTP(404, undefined, true);

@@ -359,6 +359,24 @@ class ContentLib {
         });
     }
 
+    destroy(_c, postid, caller, callback) {
+        db.update(_c, 'content', { _id : postid }, { status : "destroyed" }, () => {
+            this.getFull(_c, postid, fullpost => {
+                this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "destroyed" }), 'destroyed', historyentry => {
+                    callback({ historyentry, newstate : fullpost });
+                });
+
+                if (fullpost.fulltopic && fullpost.title && fullpost.title.length > 1) {
+                    fullpost.title.forEach((x, i) => {
+                        fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + "/" + (i+1) + ".html", () => {});
+                    })
+                } else if (fullpost.fulltopic) {
+                    fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
+                }
+            });
+        });
+    }
+
     getPreview(_c, postid, payload, sendback) {
         payload = this.parseSpecialValues(payload);
 
@@ -407,10 +425,6 @@ class ContentLib {
                 });
             });
         });
-    }
-
-    destroy() {
-
     }
 }
 

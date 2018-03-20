@@ -1,5 +1,11 @@
 const settings = {     
-    livevars : ["publishing.write.{?1}", "topics.simple", "entities.simple", "themes.templates.article", "publishing.history.{?1}"],
+    livevars : [
+        "publishing.write.{?1}", 
+        "topics.simple", 
+        "entities.simple", 
+        "themes.templates.article", 
+        "publishing.history.{?1}"
+    ],
     lmldom : { v : 1.0 }
 };                    
          
@@ -39,7 +45,7 @@ const compile = (o, context) => { o(context.header, css, `
         {
             id : "preview",
             shouldShow : function() {
-                return true;
+                return window._poststate.status != "destroyed";
             },
             render : function() {
                 var button = document.createElement('button');
@@ -70,6 +76,19 @@ const compile = (o, context) => { o(context.header, css, `
                 button.textContent = "Unpublish";
                 button.className = "red";
                 button.addEventListener('click', unpublishCurrentPost);
+                return button;
+            }
+        },  
+        {
+            id : "destroy",
+            shouldShow : function() {
+                return window._poststate.status == "draft" || window._poststate.status == "deleted";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Destroy";
+                button.className = "red";
+                button.addEventListener('click', destroyCurrentPost);
                 return button;
             }
         }
@@ -413,6 +432,9 @@ const compile = (o, context) => { o(context.header, css, `
             case "unpublished":
                 return displayname + " removed this article from the website";
 
+            case "destroyed":
+                return displayname + " destroyed this article"
+
             default:
                 return displayname + " updated this post";
         }
@@ -473,6 +495,21 @@ const compile = (o, context) => { o(context.header, css, `
             });
         });
     };
+
+    var destroyCurrentPost = function() {
+        liliumcms.lmldom.del({}, "${context._c.server.url}/admin/publishing/destroy/" + liliumcms.pageloader.lastLevel, function(resp) {
+            if (resp) {
+                if (resp.error) {
+                    liliumcms.notify({ type : "danger", title : "Did not Destroy", message : "Could not destroy the article because of an error : " + resp.error});
+                } else {
+                    liliumcms.notify({ type : "success", title : "Unpublished", message : "This article was removed from the website, but is still editable and can be published later."});
+                    liliumcms.pageloader.load("/admin/publishing/list");
+                }
+            } else{
+                liliumcms.notify({ type : "danger", title : "Did not destroy", message : "Could not destroy the article for an unknown reason."});
+            }
+        });
+    }
 
     var unpublishCurrentPost = function() {
         liliumcms.lmldom.del({}, "${context._c.server.url}/admin/publishing/unpublish/" + liliumcms.pageloader.lastLevel, function(resp) {

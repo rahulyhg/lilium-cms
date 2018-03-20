@@ -56,6 +56,13 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     box-shadow: 0px 0px 3px #f3a24a;
 }
 
+.history-card.history-card-destroyed {
+    background-color: #eca8a8;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23FF7777' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+    border: 1px solid #bd6d6d;
+    box-shadow: 0px 0px 3px #e05656;
+}
+
 #created-history-card {
     background-color: #e6e1ee;
     background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23cfbaf2' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
