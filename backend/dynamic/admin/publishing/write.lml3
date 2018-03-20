@@ -59,6 +59,19 @@ const compile = (o, context) => { o(context.header, css, `
                 button.addEventListener('click', refreshPublishedPost);
                 return button;
             }
+        },
+        {
+            id : "unpublish",
+            shouldShow : function() {
+                return window._poststate.status == "published";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Unpublish";
+                button.className = "red";
+                button.addEventListener('click', unpublishCurrentPost);
+                return button;
+            }
         }
     ];
 </script>
@@ -397,6 +410,9 @@ const compile = (o, context) => { o(context.header, css, `
             case "published":
                 return displayname + " published this article";
 
+            case "unpublished":
+                return displayname + " removed this article from the website";
+
             default:
                 return displayname + " updated this post";
         }
@@ -457,6 +473,26 @@ const compile = (o, context) => { o(context.header, css, `
             });
         });
     };
+
+    var unpublishCurrentPost = function() {
+        liliumcms.lmldom.del({}, "${context._c.server.url}/admin/publishing/unpublish/" + liliumcms.pageloader.lastLevel, function(resp) {
+            if (resp) {
+                if (resp.error) {
+                    liliumcms.notify({ type : "danger", title : "Did not unpublish", message : "Could not unpublish the article because of an error : " + resp.error});
+                } else {
+                    resp.historyentry && pushHistoryCard(resp.historyentry);
+                    resp.newstate && (window._poststate = resp.newstate);
+
+                    refreshState();
+                    refreshActions();
+
+                    liliumcms.notify({ type : "success", title : "Unpublished", message : "This article was removed from the website, but is still editable and can be published later."});
+                }
+            } else {
+                liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not unpublish the article for an unknown reason."});
+            }
+        });
+    }
 
     var publishCurrentPost = function() {
         saveCurrentPost(function(saveresp) {
