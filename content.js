@@ -60,6 +60,8 @@ class ContentLib {
         }
         if (deepArticle.deepmedia) {
             deepArticle.featuredimage = [ deepArticle.deepmedia ];
+            deepArticle.imagecreditname = deepArticle.deepmedia.artistname;
+            deepArticle.imagecrediturl = deepArticle.deepmedia.artisturl;
         }
         if (deepArticle.fullauthor) {
             deepArticle.authors = [deepArticle.fullauthor];
@@ -212,11 +214,11 @@ class ContentLib {
         db.join(_c, CONTENT_COLLECTION, pipeline, arr => sendback({ items : arr }));
     }
 
-    getFull(_c, _id, sendback, match = {}) {
+    getFull(_c, _id, sendback, match = {}, collection = CONTENT_COLLECTION) {
         const $match = match;
         $match._id = db.mongoID(_id);
 
-        db.join(_c, CONTENT_COLLECTION, [
+        db.join(_c, collection, [
             { $match },
             { $limit : 1 },
             { $lookup : LOOKUPS.media },
@@ -343,8 +345,54 @@ class ContentLib {
 
     }
 
-    preview() {
+    getPreview(_c, postid, payload, sendback) {
+        payload = this.parseSpecialValues(payload);
 
+        db.findUnique(_c, 'content', { _id : postid }, (err, post) => {
+            const previewpost = {};
+            Object.assign(previewpost, post, payload);
+
+            db.findUnique(_c, 'topic', { _id : previewpost.topic }, (err, fulltopic) => {
+                db.findUnique(_c, 'uploads', { _id : previewpost.media }, (err, deepmedia) => {
+                    db.findUnique(config.default(), 'entities', { _id : previewpost.author }, (err, fullauthor) => {
+                        previewpost.fulltopic = fulltopic;
+                        previewpost.deepmedia = deepmedia;
+                        previewpost.fullauthor = fullauthor;
+
+                        previewpost.content = [previewpost.content.join('<hr >')];
+                        previewpost.title = [previewpost.title[0]];
+                        previewpost.subtitle = [previewpost.subtitle[0]];
+
+                        if (deepmedia) {
+                            previewpost.featuredimage = [deepmedia];
+                            previewpost.imagecreditname = previewpost.deepmedia.artistname;
+                            previewpost.imagecrediturl  = previewpost.deepmedia.artisturl;
+                        }
+
+                        previewpost.authors = [fullauthor];
+
+                        const ctx = previewpost.templatename || (previewpost.fulltopic && previewpost.fulltopic.articletemplate) || "article";
+
+                        const extra = {
+                            ctx : "article",
+                            contextname : ctx,
+                            preview : true, 
+                            topic : fulltopic, 
+                            article : previewpost
+                        };
+
+                        const abspath  = _c.server.html + "/static/tmp/preview" + 
+                            Math.random().toString().slice(2) + 
+                            Math.random().toString().slice(2) + 
+                            ".tmp";
+
+                        filelogic.renderThemeLML3(_c, ctx, abspath, extra, (markup) => {
+                            sendback(markup);
+                        });
+                    });
+                });
+            });
+        });
     }
 
     destroy() {
