@@ -149,6 +149,11 @@ const compile = (o, context) => { o(context.header, css, `
         </div>
     </div>    
 
+    <h3>Sponsored Post</h3>
+    <div id="publishing-sponsored">
+        
+    </div>
+
     <h3>Publication State</h3>
     <div id="publication-details">
         <div class="pub-detail-field">
@@ -164,6 +169,10 @@ const compile = (o, context) => { o(context.header, css, `
         <div class="pub-detail-field">
             <span>Publication date</span>
             <input class="pub-field lml-date" id="pdate" data-options="time" placeholder="Click to select a date and time" type="text">
+        </div>
+        <div class="pub-detail-field">
+            <span>NSFW content</span>
+            <input type="checkbox" id="pnsfw" />
         </div>
         <div class="pub-detail-field">
             <span>URL</span>
@@ -186,25 +195,25 @@ const compile = (o, context) => { o(context.header, css, `
     var createPayload = function() {
         var s = updateState();
         return {
-            title : s.title,
-            subtitle : s.subtitle,
-            content : s.content,
-            topic : s.topic,
-            media : s.media,
-            author : s.author,
-            name : s.name,
-            nsfw : s.nsfw,
-            date : s.date,
+            title       : s.title,
+            subtitle    : s.subtitle,
+            content     : s.content,
+            topic       : s.topic,
+            media       : s.media,
+            author      : s.author,
+            name        : s.name,
+            nsfw        : s.nsfw,
+            date        : s.date,
 
-            useSponsoredBox : s.useSponsoredBox,
+            useSponsoredBox     : s.useSponsoredBox,
             sponsoredBoxContent : s.sponsoredBoxContent,
-            sponsoredBoxLogo : s.sponsoredBoxLogo,
-            sponsoredBoxTitle : s.sponsoredBoxTitle,
-            sponsoredBoxURL : s.sponsoredBoxURL,
+            sponsoredBoxLogo    : s.sponsoredBoxLogo,
+            sponsoredBoxTitle   : s.sponsoredBoxTitle,
+            sponsoredBoxURL     : s.sponsoredBoxURL,
 
             customfacebooktitle : s.customfacebooktitle,
-            facebooktitle : s.facebooktitle,
-            facebooksubtitle : s.facebooksubtitle
+            facebooktitle       : s.facebooktitle,
+            facebooksubtitle    : s.facebooksubtitle
         };
     }
 
@@ -221,6 +230,7 @@ const compile = (o, context) => { o(context.header, css, `
 
         window._poststate.media = document.getElementById('mediapicker').value;
         window._poststate.author = document.getElementById('pauthor').value;
+        window._poststate.nsfw = !!document.getElementById('pnsfw').checked;
 
         return window._poststate;
     }    
@@ -242,6 +252,7 @@ const compile = (o, context) => { o(context.header, css, `
             "Never updated";
 
         document.getElementById('pub-status').textContent = window._poststate.status;
+        document.getElementById('pnsfw').checked = window._poststate.nsfw;
     };
 
     // Refresh possible actions
