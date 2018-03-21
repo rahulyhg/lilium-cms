@@ -152,13 +152,17 @@ var LiliumCMS = function() {
 
         this.beautify = function() {
             var cbs = document.querySelectorAll('input[type="checkbox"]:not(.systeminput)');
-            for (var i = 0; i < cbs.length; i++) {
-                var cbox = cbs[i];
+            Array.prototype.forEach.call(cbs, function(cbox) {
                 var beautifulCheckbox = createCheckboxWrapper(cbox);
 
                 beautifulCheckbox.addEventListener('click', function(ev) {
                     ev.target.classList.toggle('checked');
                     cbox.checked = ev.target.classList.contains('checked');
+
+                    if (cbox.dataset.changed) {
+                        var fcn = window[cbox.dataset.changed];
+                        typeof fcn == "function" && fcn(cbox, cbox.checked);
+                    }                    
                 });
 
                 cbox.addEventListener('change', function() {
@@ -166,7 +170,7 @@ var LiliumCMS = function() {
                 });
 
                 cbox.parentElement.insertBefore(beautifulCheckbox, cbox);
-            };
+            });
         };
     };
 
