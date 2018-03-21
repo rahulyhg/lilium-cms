@@ -242,7 +242,7 @@ class ContentLib {
     }
 
     pushHistoryEntryFromDiff(_c, postid, actor, diffres, type, done) {
-        const diffs = diffres.filter(d => d.rhs || d.kind == "A").map(d => {
+        const diffs = diffres.filter(d => typeof d.rhs != "undefined" || d.kind == "A").map(d => {
             return {
                 field : d.path[0],
                 kind : d.kind
