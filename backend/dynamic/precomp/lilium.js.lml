@@ -85,7 +85,7 @@ var LiliumCMS = function() {
     this.conversations;
     this.facebook;
     this.tables = [];
-    this.lys = new Lys();
+    // this.lys = new Lys();
     this.ssl = document.location.protocol === "https:";
     this.env = "{=config.default.env}";
 
@@ -1254,7 +1254,7 @@ var LiliumCMS = function() {
             that.facebook.loadfbscript();
             that.bindFocus();
             
-            liliumcms.lys.bindKeys();
+            // liliumcms.lys.bindKeys();
 
             window.lml = that.lmldom;
         };

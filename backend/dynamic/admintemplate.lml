@@ -6,7 +6,7 @@
 	</head>
 	<body class="lmladminbody lmladmin">
         <div id="lilium">
-            {%adminlivevars;adminfacebook;backendsearch;adminwelcome;adminbadges;imagepicker;previewer;lys;modals;chatslider;imagestudio;localclip;adminbar;adminsidebar;adminmain;cakepops;notifications}
+            {%adminlivevars;adminfacebook;backendsearch;adminwelcome;adminbadges;imagepicker;previewer;modals;chatslider;imagestudio;localclip;adminbar;adminsidebar;adminmain;cakepops;notifications}
         </div>
 	</body>
 </html>
