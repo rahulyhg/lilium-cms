@@ -361,6 +361,17 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     
 }
 
+#publishing-sponsored-wrap {
+    margin-top: 10px;
+}
+
+#publishing-sponsored {
+    margin: 0px 10px;
+    padding: 10px;
+    background: #F6F6F6;
+    border: 1px solid #DDD;
+}
+
 #publishing-form h3 {
     margin-top: 40px;
     padding-left: 10px;

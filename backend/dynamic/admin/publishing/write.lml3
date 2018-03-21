@@ -151,7 +151,19 @@ const compile = (o, context) => { o(context.header, css, `
 
     <h3>Sponsored Post</h3>
     <div id="publishing-sponsored">
-        
+        <input type="checkbox" id="psponsored" name="isSponsored" data-changed="onChangeToggleSponsoredBoxes" />
+        <label for="isSponsored">This article is sponsored</label>
+
+        <div id="publishing-sponsored-wrap" style="display: none;">
+            <div class="pub-detail-field">
+                <span>Sponsored campaign ID</span>
+                <input type="text" class="pub-field" id="pcampid" />
+            </div>
+            <div class="pub-detail-field">
+                <span>Use sponsored box</span>
+                <input type="checkbox" id="psponsbox" name="useSponsoredBox" />
+            </div>
+        </div>
     </div>
 
     <h3>Publication State</h3>
@@ -172,7 +184,7 @@ const compile = (o, context) => { o(context.header, css, `
         </div>
         <div class="pub-detail-field">
             <span>NSFW content</span>
-            <input type="checkbox" id="pnsfw" />
+            <input type="checkbox" id="pnsfw" name="nsfw" />
         </div>
         <div class="pub-detail-field">
             <span>URL</span>
@@ -205,6 +217,8 @@ const compile = (o, context) => { o(context.header, css, `
             nsfw        : s.nsfw,
             date        : s.date,
 
+            isSponsored         : s.isSponsored,
+            sponsoredCampaignID : s.sponsoredCampaignID,
             useSponsoredBox     : s.useSponsoredBox,
             sponsoredBoxContent : s.sponsoredBoxContent,
             sponsoredBoxLogo    : s.sponsoredBoxLogo,
@@ -215,6 +229,10 @@ const compile = (o, context) => { o(context.header, css, `
             facebooktitle       : s.facebooktitle,
             facebooksubtitle    : s.facebooksubtitle
         };
+    }
+
+    var onChangeToggleSponsoredBoxes = function(ev, checked) {
+        document.getElementById('publishing-sponsored-wrap').style.display = checked ? "block" : "none";
     }
 
     // Update local object sent to the server
@@ -231,6 +249,9 @@ const compile = (o, context) => { o(context.header, css, `
         window._poststate.media = document.getElementById('mediapicker').value;
         window._poststate.author = document.getElementById('pauthor').value;
         window._poststate.nsfw = !!document.getElementById('pnsfw').checked;
+
+        window._poststate.isSponsored = document.getElementById('psponsored').checked;
+        window._poststate.sponsoredCampaignID = document.getElementById('pcampid').value;
 
         return window._poststate;
     }    
@@ -253,6 +274,10 @@ const compile = (o, context) => { o(context.header, css, `
 
         document.getElementById('pub-status').textContent = window._poststate.status;
         document.getElementById('pnsfw').checked = window._poststate.nsfw;
+
+        document.getElementById('psponsored').checked = window._poststate.isSponsored;
+        onChangeToggleSponsoredBoxes(undefined, document.getElementById('psponsored').checked);
+        document.getElementById('pcampid').value = window._poststate.sponsoredCampaignID || "";
     };
 
     // Refresh possible actions
