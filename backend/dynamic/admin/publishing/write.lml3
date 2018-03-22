@@ -17,50 +17,50 @@ const compile = (o, context) => { o(context.header, css, `
 <link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
 
 <script>
-    var STICKY_ACTIONS = [
+    var sticky_actions = [
         {
             id : "save",
-            shouldShow : function() {
+            shouldshow : function() {
                 return window._poststate.status == "draft" || window._poststate.status == "deleted";
             },
             render : function() {
-                var button = document.createElement('button');
-                button.textContent = "Save";
-                button.addEventListener('click', saveCurrentPost);
+                var button = document.createelement('button');
+                button.textcontent = "save";
+                button.addeventlistener('click', savecurrentpost);
                 return button;
             }
         },
         {
             id : "publish",
-            shouldShow : function() {
+            shouldshow : function() {
                 return window._poststate.status == "draft" || window._poststate.status == "deleted";
             },
             render : function() {
-                var button = document.createElement('button');
-                button.textContent = "Publish article";
-                button.addEventListener('click', publishCurrentPost);
+                var button = document.createelement('button');
+                button.textcontent = "publish article";
+                button.addeventlistener('click', publishcurrentpost);
                 return button;
             }
         },
         {
             id : "preview",
-            shouldShow : function() {
+            shouldshow : function() {
                 return window._poststate.status != "destroyed";
             },
             render : function() {
-                var button = document.createElement('button');
-                button.textContent = "Preview";
-                button.addEventListener('click', previewCurrentPost);
+                var button = document.createelement('button');
+                button.textcontent = "preview";
+                button.addeventlistener('click', previewcurrentpost);
                 return button;
             }
         },
         {
             id : "update",
-            shouldShow : function() {
+            shouldshow : function() {
                 return window._poststate.status == "published";
             },
             render : function() {
-                var button = document.createElement('button');
+                var button = document.createelement('button');
                 button.textContent = "Update and refresh";
                 button.addEventListener('click', refreshPublishedPost);
                 return button;

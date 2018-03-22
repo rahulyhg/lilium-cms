@@ -343,7 +343,7 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 
 #featured-image-tag {
     max-width: 900px;
-    margin: 50px;
+    margin: 50px auto;
     height: auto;
     max-height: 600px;
     min-height: 300px;
@@ -351,6 +351,8 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     border: 3px solid #AAA;
     border-bottom-width: 5px;
     object-fit : cover;
+    display: block;
+    width: calc(100% - 100px);
 }
 
 #featured-image-tag:hover {
