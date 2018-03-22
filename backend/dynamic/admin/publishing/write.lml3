@@ -12,88 +12,7 @@ const settings = {
          
 const css = require('./style.css');
 
-const compile = (o, context) => { o(context.header, css, `
-
-<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
-
-<script>
-    var sticky_actions = [
-        {
-            id : "save",
-            shouldshow : function() {
-                return window._poststate.status == "draft" || window._poststate.status == "deleted";
-            },
-            render : function() {
-                var button = document.createelement('button');
-                button.textcontent = "save";
-                button.addeventlistener('click', savecurrentpost);
-                return button;
-            }
-        },
-        {
-            id : "publish",
-            shouldshow : function() {
-                return window._poststate.status == "draft" || window._poststate.status == "deleted";
-            },
-            render : function() {
-                var button = document.createelement('button');
-                button.textcontent = "publish article";
-                button.addeventlistener('click', publishcurrentpost);
-                return button;
-            }
-        },
-        {
-            id : "preview",
-            shouldshow : function() {
-                return window._poststate.status != "destroyed";
-            },
-            render : function() {
-                var button = document.createelement('button');
-                button.textcontent = "preview";
-                button.addeventlistener('click', previewcurrentpost);
-                return button;
-            }
-        },
-        {
-            id : "update",
-            shouldshow : function() {
-                return window._poststate.status == "published";
-            },
-            render : function() {
-                var button = document.createelement('button');
-                button.textContent = "Update and refresh";
-                button.addEventListener('click', refreshPublishedPost);
-                return button;
-            }
-        },
-        {
-            id : "unpublish",
-            shouldShow : function() {
-                return window._poststate.status == "published";
-            },
-            render : function() {
-                var button = document.createElement('button');
-                button.textContent = "Unpublish";
-                button.className = "red";
-                button.addEventListener('click', unpublishCurrentPost);
-                return button;
-            }
-        },  
-        {
-            id : "destroy",
-            shouldShow : function() {
-                return window._poststate.status == "draft" || window._poststate.status == "deleted";
-            },
-            render : function() {
-                var button = document.createElement('button');
-                button.textContent = "Destroy";
-                button.className = "red";
-                button.addEventListener('click', destroyCurrentPost);
-                return button;
-            }
-        }
-    ];
-</script>
+const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
 
 <div id="publishing-actions">
     <h3>Manage</h3>
@@ -203,6 +122,84 @@ const compile = (o, context) => { o(context.header, css, `
 
 <script>
     window._poststate = {};
+
+    var STICKY_ACTIONS = [
+         {
+            id : "save",
+            shouldShow : function() {
+                return window._poststate.status == "draft" || window._poststate.status == "deleted";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Save";
+                button.addEventListener('click', saveCurrentPost);
+                return button;
+            }
+        },
+        {
+            id : "publish",
+            shouldShow : function() {
+                return window._poststate.status == "draft" || window._poststate.status == "deleted";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Publish article";
+                button.addEventListener('click', publishCurrentPost);
+                return button;
+            }
+        },
+        {
+            id : "preview",
+            shouldShow : function() {
+                return true;
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Preview";
+                button.addEventListener('click', previewCurrentPost);
+                return button;
+            }
+        },
+        {
+            id : "update",
+            shouldShow : function() {
+                return window._poststate.status == "published";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Update and refresh";
+                button.addEventListener('click', refreshPublishedPost);
+                return button;
+            }
+        },
+        {
+            id : "unpublish",
+            shouldShow : function() {
+                return window._poststate.status == "published";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Unpublish";
+                button.className = "red";
+                button.addEventListener('click', unpublishCurrentPost);
+                return button;
+            }
+        },  
+        {
+            id : "destroy",
+            shouldShow : function() {
+                return window._poststate.status == "draft" || window._poststate.status == "deleted";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Destroy";
+                button.className = "red";
+                button.addEventListener('click', destroyCurrentPost);
+                return button;
+            }
+        }
+    ];
+
 
     var createPayload = function() {
         var s = updateState();
