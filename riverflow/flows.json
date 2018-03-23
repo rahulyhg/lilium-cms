@@ -332,7 +332,7 @@
                 "faicon": "fa-users",
                 "displayname": "Entities",
                 "priority": 500,
-                "rights": ["hr"],
+                "rights": ["list-entities"],
                 "absURL": "admin/entities",
                 "children": [{
                     "id": "entities-rights",
