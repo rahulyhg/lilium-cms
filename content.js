@@ -276,6 +276,7 @@ class ContentLib {
         v.author && (v.author = db.mongoID(v.author));
         v.topic && (v.topic = db.mongoID(v.topic));
         v.media && (v.media = db.mongoID(v.media));
+        v.sponsoredBoxLogo && (v.sponsoredBoxLogo = db.mongoID(v.sponsoredBoxLogo))
     }
 
     update(_c, postid, caller, values, callback) {
