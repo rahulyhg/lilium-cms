@@ -557,7 +557,7 @@ class Entities {
                 if (original.roles.indexOf("lilium") != -1) {  
                     entity.roles.push("lilium");
                 }
-            
+
                 entity.sites = Array.from(new Set(entity.sites));
                 
                 that.updateEntity(entity, cli._c.id, function(err, res) {
@@ -718,7 +718,11 @@ class Entities {
         this.validateEntityObject(entity, cli, function (valid) {
             if (valid) {
                 cli.did("entity", "createduser", {username : entity.username});
-                
+               
+                if (!cli.hasRight('admin')) {
+                    entity.roles = entity.roles.filter(x => x != "admin" && x != "lilium");
+                }
+
                 // Create Magic Link
                 var magiclink = "lml_" + 
                     Math.random().toString().substring(3) + "_ml_" + 
