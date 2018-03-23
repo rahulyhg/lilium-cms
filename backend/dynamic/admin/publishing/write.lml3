@@ -80,7 +80,29 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             </div>
             <div class="pub-detail-field">
                 <span>Use sponsored box</span>
-                <input type="checkbox" id="psponsbox" name="useSponsoredBox" />
+                <input type="checkbox" id="psponsbox" name="useSponsoredBox" data-changed="onChangeToggleSponsoredBoxBoxes" />
+            </div>
+            <div id="publishing-sponsored-box-wrap">
+                <div class="pub-detail-field">
+                    <span>Business name</span>
+                    <input type="text" class="pub-field" id="psponsboxtitle" />
+                </div>
+                <div class="pub-detail-field">
+                    <span>Business website</span>
+                    <input type="text" class="pub-field" id="psponsboxlink" />
+                </div>
+                <div class="pub-detail-field">
+                    <span>Business description</span>
+                    <textarea class="pub-field" id="psponsboxdesc"></textarea>
+                </div>
+                <div class="pub-detail-field">
+                    <span>Business Logo</span>
+                    
+                    <img id="sponsored-box-image" 
+                        class="media_explorer_form pickable" 
+                        data-hiddenfield="psponsboximg" data-size="square" />
+                    <input type="hidden" name="psponsboximg" id="psponsboximg" />
+                </div>
             </div>
         </div>
     </div>
@@ -232,6 +254,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         document.getElementById('publishing-sponsored-wrap').style.display = checked ? "block" : "none";
     }
 
+    var onChangeToggleSponsoredBoxBoxes = function(ev, checked) {
+        document.getElementById('publishing-sponsored-box-wrap').style.display = checked ? "block" : "none";
+    }
+
     // Update local object sent to the server
     var updateState = function() {
         var titles    = Array.prototype.map.call(document.querySelectorAll('.big-title'),    function(x) { return x.value; });
@@ -249,6 +275,11 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
         window._poststate.isSponsored = document.getElementById('psponsored').checked;
         window._poststate.sponsoredCampaignID = document.getElementById('pcampid').value;
+        window._poststate.useSponsoredBox = document.getElementById('psponsbox').checked;
+        window._poststate.sponsoredBoxTitle = document.getElementById('psponsboxtitle').value;
+        window._poststate.sponsoredBoxURL = document.getElementById('psponsboxlink').value;
+        window._poststate.sponsoredBoxContent = document.getElementById('psponsboxdesc').value;
+        window._poststate.sponsoredBoxLogo = document.getElementById('psponsboximg').value;
 
         return window._poststate;
     }    
@@ -275,6 +306,14 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         document.getElementById('psponsored').checked = window._poststate.isSponsored;
         onChangeToggleSponsoredBoxes(undefined, document.getElementById('psponsored').checked);
         document.getElementById('pcampid').value = window._poststate.sponsoredCampaignID || "";
+
+        document.getElementById('psponsbox').checked = window._poststate.useSponsoredBox;
+        onChangeToggleSponsoredBoxBoxes(undefined, document.getElementById('psponsbox').checked);
+
+        document.getElementById('psponsboxtitle').value = window._poststate.sponsoredBoxTitle;
+        document.getElementById('psponsboxlink').value = window._poststate.sponsoredBoxURL;
+        document.getElementById('psponsboxdesc').value = window._poststate.sponsoredBoxContent;
+        document.getElementById('psponsboximg').value = window._poststate.sponsoredBoxLogo;
     };
 
     // Refresh possible actions
@@ -628,6 +667,15 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 var fullmedia = r.livevars["uploads.single." + post.media];
                 if (fullmedia) {
                     d.id('featured-image-tag').get().src = fullmedia.sizes.facebook && fullmedia.sizes.facebook.url;
+                }
+            });
+        }
+
+        if (post.sponsoredBoxLogo) {
+            liliumcms.livevars.getSingleLivevar("uploads.single." + post.sponsoredBoxLogo, {}, function(r) { 
+                var fullmedia = r.livevars["uploads.single." + post.sponsoredBoxLogo];
+                if (fullmedia) {
+                    d.id('sponsored-box-image').get().src = fullmedia.sizes.square && fullmedia.sizes.square.url;
                 }
             });
         }

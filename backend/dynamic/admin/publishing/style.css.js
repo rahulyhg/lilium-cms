@@ -360,12 +360,14 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     border-color: #af57e4;
 }
 
-#publishing-form .pub-field {
-    
+#publishing-form textarea.pub-field {
+    height: 80px;
 }
 
 #publishing-sponsored-wrap {
     margin-top: 10px;
+    padding-top: 20px;
+    border-top: 1px dashed #CCC;
 }
 
 #publishing-sponsored {
@@ -398,7 +400,7 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     display: flex;
     flex-wrap : wrap;
     margin-bottom: 12px;
-    height: 30px;
+    min-height: 30px;
 }
 
 .pub-detail-field span {
@@ -411,7 +413,12 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 #publishing-form .pub-field {
     border: 1px solid #DDD;
     padding: 5px 10px;
-    width: 300px;
+    flex-grow: 0.5;
+}
+
+#sponsored-box-image {
+    width: 120px;
+    height: 120px;
 }
 
 #pub-url-link,
