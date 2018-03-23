@@ -297,7 +297,7 @@ class Entities {
     };
 
     maybeRevoke (cli, userid) {
-        if (cli.hasRight('admin')) {
+        if (cli.hasRight('revoke-access')) {
             db.update(_c.default(), 'entities', {_id : db.mongoID(userid)}, {revoked : true}, function() {
                 cli.sendJSON({revoked : true});
             });

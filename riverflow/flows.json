@@ -319,7 +319,7 @@
                 "faicon": "fa-beer",
                 "displayname": "Crew",
                 "priority": 500,
-                "rights": ["admin"],
+                "rights": ["dashboard"],
                 "absURL": "admin/crew",
                 "children": []
             }
@@ -332,7 +332,7 @@
                 "faicon": "fa-users",
                 "displayname": "Entities",
                 "priority": 500,
-                "rights": ["admin"],
+                "rights": ["hr"],
                 "absURL": "admin/entities",
                 "children": [{
                     "id": "entities-rights",
