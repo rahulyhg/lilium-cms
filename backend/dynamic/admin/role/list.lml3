@@ -1,0 +1,57 @@
+const settings = {
+    title : "Roles",
+    lmldom : { v : 1.0 }
+}
+
+const compile = (o, context) => { o(context.header, `
+
+<lml-bunch>
+    <lml-emptytemplate>
+        <div id="emptytemplate">
+            <span>Nothing found</span>
+            <p>It would appear there is currently nothing in the database matching the current filters.</p>
+        </div>
+    </lml-emptytemplate>
+
+    <lml-bunchitem generator="generateCard"></lml-bunchitem>
+
+    <script type="lmljson" name="rolebunch">
+        {
+            "datasource" : "role.bunch",
+            "loopvar" : "role",
+            "id" : "role-list"
+        }
+    </script>
+</lml-bunch> 
+
+<script>
+var deleteUser = function(id) {
+    liliumcms.lmldom.post({_id : id}, '{=config.default.server.url}/admin/role/delete', function(data) {
+        liliumcms.lmldom.updatedBunches()
+    });
+};
+
+window.generateCard = function(role, ldContext) {
+    var wrap = d.make({ class : "role-card" });
+
+    d.make({ parent : wrap, class : "role-title", text : role.displayname })
+    d.make({ parent : wrap, class : "role-desc", text : role.description || "This role has no description." })
+    var list = d.make({ parent : wrap, class : "role-rights-list" });
+
+    role.rights.forEach(function(right) {
+        d.make({ class : "role-right", text : right, parent : list })
+    });
+
+    return wrap.get();
+}
+</script>
+
+<style>
+
+
+
+</style>
+
+`);};
+
+module.exports = { settings, compile };
