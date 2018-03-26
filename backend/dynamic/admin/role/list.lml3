@@ -38,6 +38,8 @@ window.generateCard = function(role, ldContext) {
         liliumcms.lmldom.post({ displayname : ev.target.textContent }, '${context._c.server.url}/admin/role/quickedit/' + role._id, function() {});
     });
 
+    d.make({ parent : wrap, class : "role-slug", text : role.name});
+
     d.make({ parent : wrap, class : "role-desc", text : role.description || "This role has no description.", attr : { contenteditable : true } }).bind('blur', function(ev) {
         liliumcms.lmldom.post({ description : ev.target.textContent }, '${context._c.server.url}/admin/role/quickedit/' + role._id, function() {});
     });
@@ -90,9 +92,18 @@ main {
 
 .role-title {
     padding: 10px 14px;
-    border-bottom: 1px solid #DDD;
+    border-bottom: 1px solid #CCC;
     background: #EEE;
     font-size: 18px;
+}
+
+.role-slug {
+    background: #DDD;
+    padding: 5px 15px;
+    color: #333;
+    font-weight: bold;
+    font-size: 12px;
+    border-bottom: 1px solid #CCC;
 }
 
 .role-desc {
