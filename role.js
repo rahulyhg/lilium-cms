@@ -19,15 +19,8 @@ var Role = function () {
 
         cli.touch('role.handlePOST');
         switch (cli.routeinfo.path[2]) {
-        case 'list':
-            this.new(cli);
-            break;
-        case 'edit':
-            this.edit(cli);
-            break;
-        case 'delete':
-            this.delete(cli);
-            break;
+            case "quickedit":
+                this.quickEdit(cli);
         default:
             return cli.throwHTTP(404, 'Not Found');
             break;
@@ -55,6 +48,12 @@ var Role = function () {
 
             }
         }
+    };
+
+    this.quickEdit = function(cli) {
+        const _id = db.mongoID(cli.routeinfo.path[3]);
+
+        db.update(config.default(), 'roles', { _id }, cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
     };
 
     this.list = function (cli) {
