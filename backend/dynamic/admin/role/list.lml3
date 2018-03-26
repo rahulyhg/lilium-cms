@@ -45,7 +45,22 @@ window.generateCard = function(role, ldContext) {
     var list = d.make({ parent : wrap, class : "role-rights-list" });
 
     role.rights.forEach(function(right) {
-        d.make({ class : "role-right", text : right, parent : list })
+        d.make({ class : "role-right role-right-single", text : right, parent : list, attr : { contenteditable : true } }).bind('blur', function(ev) {
+            var rights = Array.prototype.map.call(list.get().querySelectorAll(".role-right-single"), function(el) { return el.textContent });
+            liliumcms.lmldom.post({ rights : rights }, '${context._c.server.url}/admin/role/quickedit/' + role._id, function() {});
+        });
+    });
+
+    d.make({ parent : list, class : "role-right role-right-new", text : "+", attr : { contenteditable : true } }).bind('blur', function(ev) {
+        var newright = ev.target.textContent.toString().trim();
+
+        if (newright && newright != "+") {
+            var rights = Array.prototype.map.call(list.get().querySelectorAll(".role-right-single"), function(el) { return el.textContent });
+            rights.push(newright);
+            liliumcms.lmldom.post({ rights : rights }, '${context._c.server.url}/admin/role/quickedit/' + role._id, function() {
+                liliumcms.lmldom.updatedBunches();
+            });
+        }
     });
 
     return wrap.get();
@@ -87,6 +102,10 @@ main {
 
 .role-rights-list {
     padding: 10px;
+}
+
+.role-right.role-right-new {
+    background: #111;
 }
 
 .role-right {
