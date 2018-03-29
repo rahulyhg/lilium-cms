@@ -302,6 +302,7 @@ liliumcms.lmldom.bind(function() {
     var ctx = canvas.getContext('2d');
     var performance30daysChart = new Chart(ctx, {
         type : "line",
+        lineTension : 0,
 
         data : {
             labels : stats.labels.reverse(),
