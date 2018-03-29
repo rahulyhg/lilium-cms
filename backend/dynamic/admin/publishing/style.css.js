@@ -178,6 +178,17 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     color: #af57e4;
 }
 
+#pub-status {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    margin-top: 0;
+    color: #FFF;
+    padding: 5px 10px;
+    border-radius: 5px;
+    text-transform: uppercase;
+}
+
 /* Topic box */
 #publishing-topic {
     display: block;

@@ -145,6 +145,14 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 <script>
     window._poststate = {};
 
+    var STATUS_VOCAB = {
+        published   : { text : "Published",     color : "#2162b9" },
+        draft       : { text : "Draft",         color : "#576c88" },
+        pending     : { text : "Pending review",color : "#701ab9" },
+        deleted     : { text : "Unpublished",   color : "#9a471b" },
+        destroyed   : { text : "Destroyed",     color : "#ff4405" },
+    };
+
     var STICKY_ACTIONS = [
          {
             id : "save",
@@ -300,7 +308,9 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             dateFormat(new Date(window._poststate.updated), "mmmm, dd yyyy 'at' HH:MM:ss") : 
             "Never updated";
 
-        document.getElementById('pub-status').textContent = window._poststate.status;
+        document.getElementById('pub-status').textContent = STATUS_VOCAB[window._poststate.status].text;
+        document.getElementById('pub-status').style.backgroundColor = STATUS_VOCAB[window._poststate.status].color;
+        
         document.getElementById('pnsfw').checked = window._poststate.nsfw;
 
         document.getElementById('psponsored').checked = window._poststate.isSponsored;

@@ -19,15 +19,8 @@ var Role = function () {
 
         cli.touch('role.handlePOST');
         switch (cli.routeinfo.path[2]) {
-        case 'list':
-            this.new(cli);
-            break;
-        case 'edit':
-            this.edit(cli);
-            break;
-        case 'delete':
-            this.delete(cli);
-            break;
+            case "quickedit":
+                this.quickEdit(cli);
         default:
             return cli.throwHTTP(404, 'Not Found');
             break;
@@ -46,14 +39,8 @@ var Role = function () {
             cli.redirect(cli._c.server.url + "admin/role/list", true);
         } else {
             switch (cli.routeinfo.path[2]) {
-            case 'new':
-                this.new(cli);
-                break;
-            case 'edit':
-                this.edit(cli);
-                break;
-            case 'list':
-                this.list(cli);
+            case "list":
+                filelogic.serveAdminLML3(cli);
                 break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
@@ -61,6 +48,12 @@ var Role = function () {
 
             }
         }
+    };
+
+    this.quickEdit = function(cli) {
+        const _id = db.mongoID(cli.routeinfo.path[3]);
+
+        db.update(config.default(), 'roles', { _id }, cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
     };
 
     this.list = function (cli) {
@@ -168,19 +161,28 @@ var Role = function () {
     this.livevar = function (cli, levels, params, callback) {
         var allContent = levels.length === 0;
 
-        db.findToArray(conf.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
-            if (allContent || levels[0] == "all") {
-                db.findToArray(conf.default(), 'roles', { }, function (err, arr) {
-                    callback(arr);
-                });
-            } else {
-                db.multiLevelFind(conf.default(), 'roles', levels, {
-                    _id: db.mongoID(levels[0])
-                }, {
-                    limit: [1]
-                }, callback);
-            }
-        });
+        if (levels[0] == "bunch") {
+            db.findToArray(conf.default(), 'roles', { $and : [ 
+                { name : { $ne : "admin" }}, 
+                { name : { $ne : "lilium" }} 
+            ]}, (err, roles) => {
+                callback({ items : roles, total : roles.length });
+            }); 
+        } else {
+            db.findToArray(conf.default(), 'roles', {$or : [{'pluginID': false}, {'pluginID': null}]}, function (err, roles) {
+                if (allContent || levels[0] == "all") {
+                    db.findToArray(conf.default(), 'roles', { }, function (err, arr) {
+                        callback(arr);
+                    });
+                } else {
+                    db.multiLevelFind(conf.default(), 'roles', levels, {
+                        _id: db.mongoID(levels[0])
+                    }, {
+                        limit: [1]
+                    }, callback);
+                }
+            });
+        }
     }
 
     this.form = function () {
