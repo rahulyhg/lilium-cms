@@ -4,6 +4,8 @@ const filelogic = require('./filelogic');
 const log = require('./log');
 const hooks = require('./hooks');
 const DeepDiff = require('deep-diff');
+const mkdirp = require('mkdirp');
+const fs = require('fs');
 const diff = DeepDiff.diff;
 
 const CONTENT_COLLECTION = 'content';
@@ -41,7 +43,25 @@ class ContentLib {
         }, {reportsto : 1, displayname : 1});
     }
 
+    generateJSON(_c, deepArticle, done) {
+        log('Content', 'Creating JSON version of article ' + deepArticle._id, 'detail');
+        const filedir = _c.server.html + "/content/"; 
+        const fullpath = filedir + deepArticle._id + ".json";
+        mkdirp(filedir, () => {
+            fs.writeFile(fullpath, JSON.stringify(require('./article').toPresentable(_c, deepArticle)), { encoding : "utf8" }, () => {
+                log('Content', 'Created JSON version of article ' + deepArticle._id, 'success');
+                done()
+            });
+        });
+    }
+
     generate(_c, deepArticle, cb, pageIndex) {
+        const allDone = response => {
+            this.generateJSON(_c, deepArticle, () => {
+                cb && cb(response);
+            });
+        };
+
         let extra = {};
         extra.ctx = "article";
         extra.article = deepArticle;
@@ -97,7 +117,7 @@ class ContentLib {
                             log('Article', "Cleared non-paginated version of article from file system");
                         });
 
-                        cb({
+                        allDone({
                             success : true, 
                             deepArticle : deepArticle,
                             pages : pages.length
@@ -171,7 +191,7 @@ class ContentLib {
             } else {
                 // Generate LML page
                 filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
-                    cb && cb({
+                    allDone({
                         success: true,
                         deepArticle : deepArticle
                     });
