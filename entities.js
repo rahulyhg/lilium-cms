@@ -183,7 +183,7 @@ class Entities {
         if (!cli.hasRightOrRefuse("list-entities")) {return;}
 
         if (cli.routeinfo.path.length == 2) {
-            filelogic.serveAdminLML(cli);
+            filelogic.serveAdminLML3(cli);
         } else {
             var action = cli.routeinfo.path[2];
 
@@ -981,6 +981,30 @@ class Entities {
                 _id : db.mongoID(cli.session.data._id)
             }, function(err, arr) { 
                 callback(arr); 
+            });
+        } else if (levels[0] == "bunch") {
+            const filters = params.filters;
+            const $match = { };
+
+            if (filters.status == "revoked") {
+                $match.revoked = true;
+            } else if (filters.status == "not-revoked") {
+                $match.revoked = { $ne : true }
+            }
+
+            if (filters.search && filters.search.trim()) {
+                const reg = new RegExp(filters.search, 'i');
+                $match.$or = [
+                    { username : reg },
+                    { displayname : reg }
+                ];
+            }
+
+            cli.hasRightOrRefuse('list-entities') && db.join(_c.default(), 'entities', [
+                { $match },
+                { $sort : { displayname : 1 } }
+            ], users => {
+                callback({ items : users, length : users.length });
             });
         } else if (levels[0] == "exists") {
             db.findUnique(_c.default(), 'entities', { username : levels[1] }, (err, user) => {
