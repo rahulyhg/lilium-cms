@@ -1,0 +1,160 @@
+const settings = {
+    lmldom : { v : 1.0 },
+    title : "Entities"
+};
+
+const compile = (o, context) => { o(context.header, `
+
+<lml-bunch>
+    <lml-bunchfilters>
+        <div class="bunch-filters">
+            <div class="bunch-filters-title">FILTERS</div>
+            <label>Search</label>
+            <input type="text" name="search" placeholder="Display name, username" />
+
+            <label>Status</label>
+            <select name="status">
+                <option value="not-revoked">Active</option>
+                <option value="revoked">Revoked</option>
+                <option value="all">Any</option>
+            </select>
+        </div>
+    </lml-bunchfilters>
+
+    <lml-emptytemplate>
+        <div id="emptytemplate">
+            <span>Nothing found</span>
+            <p>It would appear there is currently nothing in the database matching the current filters.</p>
+        </div>
+    </lml-emptytemplate>
+
+    <lml-bunchitem generator="generateCard"></lml-bunchitem>
+
+    <script type="lmljson" name="rolebunch">
+        {
+            "datasource" : "entities.bunch",
+            "loopvar" : "entity",
+            "id" : "entity-list"
+        }
+    </script>
+</lml-bunch> 
+
+<script>
+var popupEntity = function(entity) {
+
+};
+
+window.generateCard = function(entity, ldContext) {
+    var wrap = d.make({ class : "entity-card" });
+
+    var photowrap = d.make({ class : "entity-photo-wrap", parent : wrap })
+    d.make({ class : "entity-picture", node : "img", attr : { src : entity.avatarURL }, parent : photowrap });
+    d.make({ class : "entity-name", text : entity.displayname, parent : photowrap });
+    entity.roles && entity.roles.includes('admin') && d.make({ class : "admin-mention", text : "admin", parent : photowrap });
+
+    var details = d.make({ class : "entity-details", parent : wrap });
+    d.make({ class : "entity-username", text : "@" + entity.username, parent : details });
+    entity.lastLogin ? 
+        d.make({ class : "last-seen", text : "Last seen on " + dateFormat(new Date(entity.lastLogin), "mmmm dd, yyyy") , parent : details}) :
+        d.make({ class : "last-seen", text : "Never logged in", parent : details}); 
+
+    var btnwrap = d.make({ class : "entity-actions", parent : details });
+    d.make({ node : "u", text : "manage", parent : btnwrap }).bind('click', function() {
+        popupEntity(entity);
+    });
+
+    return wrap.get();
+}
+</script>
+
+<style>
+
+#entity-list {
+    display: flex;
+    flex-wrap : wrap;
+    padding: 6px;
+    background : #f3f3f3;
+}
+
+.entity-card {
+    width: 250px;
+    height: auto;
+    margin: 6px;
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+}
+
+.entity-picture {
+    height : 250px;
+    width : 100%;
+    object-fit : cover;
+}
+
+.entity-photo-wrap {
+    position: relative;
+    overflow : hidden;
+}
+
+.admin-mention {
+    position: absolute;
+    top: 12px;
+    right: -47px;
+    background: #af57e4;
+    color: #FFF;
+    text-transform: uppercase;
+    padding: 6px 46px;
+    font-weight: bold;
+    border-radius: 3px;
+    font-size: 16px;
+    transform: rotateZ(45deg);
+    width: 150px;
+
+    border-bottom: 3px solid #871faf;
+    border-top: 1px solid #871faf;
+}
+
+.entity-name {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    z-index: 10;
+    font-size: 20px;
+    font-weight: bold;
+    color: #eac3f3;
+    text-shadow: 0px 1px 0px #7f3e98;
+    background-color: rgba(137, 19, 208, 0.62);
+    padding: 6px 12px;
+
+    border-top: 1px solid #871faf;
+    border-bottom: 1px solid #871faf;
+}
+
+.entity-details {
+    background: #fff;
+    padding : 12px;
+}
+
+.entity-username {
+    color: #777;
+    font-weight: bold;
+}
+
+.last-seen {
+    font-size: 12px;
+}
+
+.entity-actions {
+    text-align: right;
+    margin-top: 12px;
+}
+
+.entity-actions u {
+    cursor: pointer;
+}
+
+</style>
+
+`); };
+
+module.exports = { settings, compile };
