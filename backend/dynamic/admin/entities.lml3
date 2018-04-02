@@ -18,6 +18,15 @@ const compile = (o, context) => { o(context.header, `
                 <option value="revoked">Revoked</option>
                 <option value="all">Any</option>
             </select>
+
+            <label>Sort</label>
+            <select name="sort">
+                <option value="displayname-az">Displayname A-Z</option>
+                <option value="displayname-za">Displayname Z-A</option>
+                <option value="latest-logged">Login time</option>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+            </select>
         </div>
     </lml-bunchfilters>
 
