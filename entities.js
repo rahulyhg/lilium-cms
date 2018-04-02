@@ -985,11 +985,20 @@ class Entities {
         } else if (levels[0] == "bunch") {
             const filters = params.filters;
             const $match = { };
+            const $sort = { };
 
             if (filters.status == "revoked") {
                 $match.revoked = true;
             } else if (filters.status == "not-revoked") {
                 $match.revoked = { $ne : true }
+            }
+
+            switch (filters.sort) {
+                case "displayname-az": $sort.displayname = 1; break;
+                case "displayname-za": $sort.displayname = -1; break;
+                case "latest-logged" : $sort.lastLogin = -1; break;
+                case "newest" : $sort._id = -1; break;
+                case "oldest" : $sort._id = 1; break;
             }
 
             if (filters.search && filters.search.trim()) {
@@ -1002,7 +1011,7 @@ class Entities {
 
             cli.hasRightOrRefuse('list-entities') && db.join(_c.default(), 'entities', [
                 { $match },
-                { $sort : { displayname : 1 } }
+                { $sort }
             ], users => {
                 callback({ items : users, length : users.length });
             });
