@@ -1,7 +1,7 @@
 const settings = {
     lmldom : { v : 1.0 },
     title : "Entities",
-    livevars : ["role"]
+    livevars : ["role", "entities.simple.active", "sites.all.simple"]
 };
 
 const compile = (o, context) => { o(context.header, `
@@ -58,12 +58,30 @@ const compile = (o, context) => { o(context.header, `
     <div class="lml-modal-title">
         Edit entity
     </div>
-    <div class="lml-modal-body">
+    <div class="lml-modal-body lmlform">
+        <h3>Public information</h3>
         <span>Display Name</span>
         <input id="e-displayname" placeholder="This name is public and will appear on the website" name="displayname" />
 
         <span>URL Slug</span>
         <input id="e-slug" placeholder="The URL representation of the entity's name" name="slug" />
+
+        <hr />
+
+        <h3>Contact information</h3>
+        <span>Email</span>
+        <input id="e-email" />
+
+        <span>Phone number</span>
+        <input id="e-phonenumber" />
+
+        <hr />
+
+        <h3>Reporting</h3>
+        <span>This entity reports to</span>
+        <select id="e-reports-to">
+            <option value=""> - No one - </option>
+        </select>
     </div>
     <div class="lml-modal-footer">
         <button class="lml-modal-cancel" type="button">Cancel</button>
@@ -71,18 +89,84 @@ const compile = (o, context) => { o(context.header, `
     </div>
 </div>
 
+<div id="access-entity-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Entity access
+    </div>
+    <div class="lml-modal-body lmlform">
+        <h3>Websites</h3>
+        <span>Network access</span>
+        <div id="e-sites"></div>
 
+        <span>Roles</span>
+        <div id="e-roles"></div>
+    </div>
+
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-action" type="button">Send Magic Link</button>
+        <button class="lml-modal-accept" type="button">Save</button>
+    </div>
+</div>
 
 <script>
+var _contextEntity;
+var _contextWidgets = {};
+
+var EDIT_ENTITY_BUNDLE_LAYOUT = {
+    'e-displayname' : "displayname",
+    'e-slug'        : "slug",
+    'e-email'       : "email",
+    'e-phonenumber' : "phone",
+    'e-reports-to'  : "reportsto"
+};
+
+window["edit-entity-modal_accept"] = function(modal) {
+    var b = liliumcms.lmldom.bundle(EDIT_ENTITY_BUNDLE_LAYOUT);
+    liliumcms.lmldom.post(b, '${context._c.server.url}/admin/entities/edit/' + _contextEntity._id, function() {
+        liliumcms.notify({ type : "success", title : "Edit entity", message : _contextEntity.displayname + "'s entity was updated successfully" });
+        liliumcms.lmldom.updatedBunches();
+        modal.dismiss();
+    });
+};
+
 var popupEntity = function(entity) {
+    _contextEntity = entity;
+    liliumcms.lmldom.unbundle(entity, EDIT_ENTITY_BUNDLE_LAYOUT);
     liliumcms.modals.get('edit-entity-modal').cast();
 };
 
+var popupEntityPassword = function(entity) {
+    _contextEntity = entity;
+    _contextWidgets["e-sites"].setValues(entity.sites);
+    _contextWidgets["e-roles"].setValues(entity.roles);
+    liliumcms.modals.get('access-entity-modal').cast();
+}
+
+var popupRevokeEntity = function(entity) {
+    _contextEntity = entity;
+}
+
 liliumcms.lmldom.bind(function() {
+    _contextWidgets["e-sites"] = new LMLDOM_MultiSelect(document.getElementById("e-sites"));
+    _contextWidgets["e-roles"] = new LMLDOM_MultiSelect(document.getElementById("e-roles"));
+
     var roles = liliumcms.livevars.livevars().role;
     var dbrole = d.id("filter-roles");
     roles && roles.forEach(function(role) {
         d.make({ node : "option", attr : { value : role.name }, text : role.displayname, parent : dbrole });
+        _contextWidgets["e-roles"].add(role.name, role.displayname);
+    });
+
+    var everyone = liliumcms.livevars.livevars()["entities.simple.active"];
+    var dbreports = d.id('e-reports-to');
+    everyone && everyone.forEach(function(u) {
+        d.make({ node : "option", attr : { value : u._id }, text : u.displayname, parent : dbreports });
+    });
+
+    var sites = liliumcms.livevars.livevars()["sites.all.simple"];
+    sites && sites.forEach(function(s) {
+        _contextWidgets["e-sites"].add(s.id, s.displayName);
     });
 });
 
@@ -101,10 +185,11 @@ window.generateCard = function(entity, ldContext) {
         d.make({ class : "last-seen", text : "Never logged in", parent : details}); 
 
     if ((!entity.roles || !entity.roles.includes('admin') || liliumcms.session.current.roles.includes('admin')) && entity._id != liliumcms.session.current._id) {
-        var btnwrap = d.make({ class : "entity-actions", parent : details });
-        d.make({ node : "u", text : "manage", parent : btnwrap }).bind('click', function() {
-            popupEntity(entity);
-        });
+        var btnwrap = d.make({ class : "entity-actions", parent : wrap });
+
+        d.make({ node : "u", text : "manage access", parent : btnwrap }).bind('click', function() { popupEntityPassword(entity); });
+        d.make({ node : "u", text : "edit", parent : btnwrap }).bind('click', function() { popupEntity(entity); });
+        d.make({ node : "u", text : "revoke", parent : btnwrap, class : "red" }).bind('click', function() { popupRevokeEntity(entity); });
     }
 
     return wrap.get();
@@ -126,6 +211,7 @@ window.generateCard = function(entity, ldContext) {
     margin: 6px;
     border: 1px solid #DDD;
     border-bottom-width: 3px;
+    background: #FFF;
 }
 
 .entity-picture {
@@ -190,11 +276,21 @@ window.generateCard = function(entity, ldContext) {
 
 .entity-actions {
     text-align: right;
+    margin: 10px;
     margin-top: 12px;
+    border-top: 1px solid #DDD;
+    padding: 5px 0px 0px;
 }
 
 .entity-actions u {
+    display: inline-block;
     cursor: pointer;
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+.entity-actions u.red {
+    color: #de2f0f;
 }
 
 #emptytemplate {
@@ -217,6 +313,20 @@ window.generateCard = function(entity, ldContext) {
 lml-emptytemplate {
     display: block;
     width: 100%;
+}
+
+.lml-modal-body h3 {
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 4px;
+    color: #BBB;
+}
+
+.lml-modal-body span {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 0px;
+    color: #333;
 }
 
 </style>
