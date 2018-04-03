@@ -1004,6 +1004,22 @@ var LMLDom = function() {
         liliumcms.treeselect = [];
     }
 
+    this.unbundle = function(bundle, ids) {
+        Object.keys().forEach(function(k) {
+            document.getElementById(k).value = bundle[ids[k]] || "";
+        });
+    }
+
+    this.bundle = function(ids) {
+        var b = {};
+        
+        Object.keys().forEach(function(k) {
+            b[k] = document.getElementById(ids[k]).value;
+        });
+
+        return b;
+    }
+
     this.parseSnips = function(maindom, cb) {
         var allSnips = maindom.querySelectorAll('.lmldom-snip');
         var total = allSnips.length;
