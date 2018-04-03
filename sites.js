@@ -180,6 +180,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/livevars.js", 2100, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmldom-bunch.js", 2105, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmldom-json.js", 2106, 'admin', conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmldom-widgets.js", 2107, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmldom.js", 2110, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/badges.js", 2130, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/preview.js", 2150, 'admin', conf.id);
@@ -221,6 +222,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/badges.css", 2105, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/localclip.css", 2108, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/preview.css", 2110, 'admin', conf.id);
+        Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/widgets.css", 2115, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lys.css", 2120, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/imagepicker.css", 2150, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/imagestudio.css", 2155, 'admin', conf.id);
