@@ -1,6 +1,7 @@
 const settings = {
     lmldom : { v : 1.0 },
-    title : "Entities"
+    title : "Entities",
+    livevars : ["role"]
 };
 
 const compile = (o, context) => { o(context.header, `
@@ -21,11 +22,16 @@ const compile = (o, context) => { o(context.header, `
 
             <label>Sort</label>
             <select name="sort">
-                <option value="displayname-az">Displayname A-Z</option>
-                <option value="displayname-za">Displayname Z-A</option>
+                <option value="displayname-az">Display name A-Z</option>
+                <option value="displayname-za">Display name Z-A</option>
                 <option value="latest-logged">Login time</option>
                 <option value="newest">Newest</option>
                 <option value="oldest">Oldest</option>
+            </select>
+
+            <label>Role</label>
+            <select name="role" id="filter-roles">
+                <option value="all">Any</option>
             </select>
         </div>
     </lml-bunchfilters>
@@ -48,10 +54,37 @@ const compile = (o, context) => { o(context.header, `
     </script>
 </lml-bunch> 
 
+<div id="edit-entity-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Edit entity
+    </div>
+    <div class="lml-modal-body">
+        <span>Display Name</span>
+        <input id="e-displayname" placeholder="This name is public and will appear on the website" name="displayname" />
+
+        <span>URL Slug</span>
+        <input id="e-slug" placeholder="The URL representation of the entity's name" name="slug" />
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Save</button>
+    </div>
+</div>
+
+
+
 <script>
 var popupEntity = function(entity) {
-
+    liliumcms.modals.get('edit-entity-modal').cast();
 };
+
+liliumcms.lmldom.bind(function() {
+    var roles = liliumcms.livevars.livevars().role;
+    var dbrole = d.id("filter-roles");
+    roles && roles.forEach(function(role) {
+        d.make({ node : "option", attr : { value : role.name }, text : role.displayname, parent : dbrole });
+    });
+});
 
 window.generateCard = function(entity, ldContext) {
     var wrap = d.make({ class : "entity-card" });
@@ -67,10 +100,12 @@ window.generateCard = function(entity, ldContext) {
         d.make({ class : "last-seen", text : "Last seen on " + dateFormat(new Date(entity.lastLogin), "mmmm dd, yyyy") , parent : details}) :
         d.make({ class : "last-seen", text : "Never logged in", parent : details}); 
 
-    var btnwrap = d.make({ class : "entity-actions", parent : details });
-    d.make({ node : "u", text : "manage", parent : btnwrap }).bind('click', function() {
-        popupEntity(entity);
-    });
+    if ((!entity.roles || !entity.roles.includes('admin') || liliumcms.session.current.roles.includes('admin')) && entity._id != liliumcms.session.current._id) {
+        var btnwrap = d.make({ class : "entity-actions", parent : details });
+        d.make({ node : "u", text : "manage", parent : btnwrap }).bind('click', function() {
+            popupEntity(entity);
+        });
+    }
 
     return wrap.get();
 }
@@ -160,6 +195,28 @@ window.generateCard = function(entity, ldContext) {
 
 .entity-actions u {
     cursor: pointer;
+}
+
+#emptytemplate {
+    width: 500px;
+    padding: 20px;
+    margin: 40px auto;
+    display: block;
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+    text-align: center;
+    background: #FFF;
+}
+
+#emptytemplate span {
+    display: block;
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+lml-emptytemplate {
+    display: block;
+    width: 100%;
 }
 
 </style>
