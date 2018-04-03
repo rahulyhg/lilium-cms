@@ -1009,6 +1009,10 @@ class Entities {
                 ];
             }
 
+            if (filters.role && filters.role != "all") {
+                $match.roles = filters.role;
+            }
+
             cli.hasRightOrRefuse('list-entities') && db.join(_c.default(), 'entities', [
                 { $match },
                 { $sort }
