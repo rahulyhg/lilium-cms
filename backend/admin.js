@@ -169,38 +169,40 @@ class Admin {
             const sharedkey = "adminmenus_" + cli.userinfo.userid;
             const sharedcache = require('../sharedcache.js');
 
+            /*
             sharedcache.get(sharedkey, cachedmenus => {
                 if (cachedmenus) {
                     return callback(cachedmenus);
                 }
+            */
 
-                const sortedMenus = [];
-                const menus = that.getAdminMenus();
+            const sortedMenus = [];
+            const menus = that.getAdminMenus();
 
-                for (let index in menus) {
-                    let subMenu = [];
+            for (let index in menus) {
+                let subMenu = [];
 
-                    if (cli.hasRight(menus[index].rights)) {
-                        let submenus = [];
+                if (cli.hasRight(menus[index].rights)) {
+                    let submenus = [];
 
-                        for (let subindex in menus[index].children) {
-
-                            if (menus[index].children[subindex] && cli.hasRight(menus[index].children[subindex].rights)) {
-                                subMenu.push(menus[index].children[subindex]);
-                            }
+                    for (let subindex in menus[index].children) {
+                        if (menus[index].children[subindex] && cli.hasRight(menus[index].children[subindex].rights)) {
+                            subMenu.push(menus[index].children[subindex]);
                         }
-
-                        menus[index].children = subMenu;
-                        sortedMenus.push(menus[index]);
                     }
-                }
 
+                    menus[index].children = subMenu;
+                    sortedMenus.push(menus[index]);
+                }
+            }
+            
+            /*
                 sharedcache.set({
                     [sharedkey] : sortedMenus
-                }, () => {
+                }, () => {*/
                     callback(sortedMenus);
-                });
-            });
+            //    });
+            //});
 		});
 	};
 
