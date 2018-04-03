@@ -1,9 +1,9 @@
 var options;
 
 var MultiSelect = function(tableid, lmltag, selectElem) {
-    var selectElem = selectElem;
+    var selectElem = $(selectElem);
     var multiselectElem = undefined;
-    var lmltag = lmltag;
+    var lmltag = $(lmltag);
     var name = selectElem.attr('name');
     var isMultiSelect = selectElem.attr('multiple') == 'multiple' ? true : false;
     var props = JSON.parse(lmltag[0].dataset.varparam.replace(/&lmlquote;/g, '"'));

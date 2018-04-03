@@ -1005,7 +1005,7 @@ var LMLDom = function() {
     }
 
     this.unbundle = function(bundle, ids) {
-        Object.keys().forEach(function(k) {
+        Object.keys(ids).forEach(function(k) {
             document.getElementById(k).value = bundle[ids[k]] || "";
         });
     }
@@ -1013,8 +1013,8 @@ var LMLDom = function() {
     this.bundle = function(ids) {
         var b = {};
         
-        Object.keys().forEach(function(k) {
-            b[k] = document.getElementById(ids[k]).value;
+        Object.keys(ids).forEach(function(k) {
+            b[ids[k]] = document.getElementById(k).value;
         });
 
         return b;

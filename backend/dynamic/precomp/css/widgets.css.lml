@@ -1,0 +1,22 @@
+{#config}
+
+.lmldom-multiselect {
+    display: block;
+    border: 1px solid #CCC;
+    max-height: 150px;
+    overflow-y: scroll;
+
+    margin-bottom: 20px;
+}
+
+.lmldom-multiselect-item {
+    padding: 4px 8px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.lmldom-multiselect-item.lmldom-multiselect-selected {
+    background: #844992;
+    color: #FFF;
+}
+
