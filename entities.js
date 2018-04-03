@@ -228,54 +228,24 @@ class Entities {
                 cli.throwHTTP(401);
                 break;
             }
-        } else if (cli.routeinfo.path[2] == 'edit') {
-            if (cli.hasRight('edit-entities')) {
-
-            var action = cli.postdata.data.form_name;
-            switch (action) {
-                case "update_entitiy":
-                    this.update(cli);
-                    break;
-                case "sendmagiclink":
-                    this.sendNewMagicEmail(cli, cli.postdata.data.userid);
-                    break;
-                case "update_password":
-                    this.changePassword(cli, false);
-                    break;
-                case "upload_profile_picture":
-                    this.updateProfilePicture(cli, false);
-                    break;
-                }
-            } else {
-                cli.refuse();
-            }
         } else if (cli.routeinfo.path[2] == "revoke") {
-            // Double check this portion of code
-            // Async call
-            if (cli.hasRightOrRefuse('create-entities')) {
-                this.maybeRevoke(cli, cli.postdata.data.userid);
-            }
+            cli.hasRightOrRefuse('revoke-access') && this.revoke(db.mongoID(cli.routeinfo.path[3]), () => { cli.sendJSON({ ok : 1 }) });
+        } else if (cli.routeinfo.path[2] == "edit") {
+            cli.hasRightOrRefuse('edit-entities') && this.editInformation(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
         } else {
             if (cli.hasRight('edit-entities')) {
-                var action = cli.postdata.data.form_name;
-
-                switch (action) {
-                case "entity_create":
-                    this.createFromCli(cli);
-                    break;
-
-                case "entity_delete":
-                    this.deleteFromCli(cli);
-                    break;
-
-                default:
-                    cli.debug();
-                }
+                this.createFromCli(cli);
             } else {
                 cli.refuse();
             }
         }
-    };
+    }
+
+    editInformation(_id, payload, done) {
+        payload.reportsto && (payload.reportsto = db.mongoID(payload.reportsto));
+
+        db.update(_c.default(), 'entities', {_id}, payload, () => done());
+    }
 
     toPresentable (entity) {
         return {
@@ -291,10 +261,16 @@ class Entities {
     };
 
     commitfbauth (cli) {
-        db.update(cli._c, 'entities', {_id : db.mongoID(cli.userinfo.userid)}, {fbid : cli.postdata.data.fbid}, function() {
+        db.update(_c.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, {fbid : cli.postdata.data.fbid}, function() {
             cli.sendJSON({done : true});
         });
     };
+
+    revoke(_id, done) {
+        db.update(_c.default(), 'entities', {_id}, {revoked : true}, function() {
+            done && done();
+        });
+    }
 
     maybeRevoke (cli, userid) {
         if (cli.hasRight('revoke-access')) {
