@@ -1,6 +1,9 @@
 const settings = {
     lmldom : { v : 1.0 },
     title : "Entities",
+    tools : {
+        "add" : { call : "popupCreate" }
+    }
     livevars : ["role", "entities.simple.active", "sites.all.simple"]
 };
 
@@ -109,6 +112,37 @@ const compile = (o, context) => { o(context.header, `
     </div>
 </div>
 
+<div id="revoke-entity-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Revoke access
+    </div>
+    <div class="lml-modal-body lmlform">
+        <p>
+            You are about to revoke the access of <b id="revoke-entity-displayname"></b>. 
+            Once an entity has their access revoked, they will not be able to connect on Lilium anymore. 
+        </p>
+
+        <p>
+            All data related to the entity will still be accessible, but will become immutable. 
+            The entity will still appear on the website, will not lose their articles, and all the data will remain intact in the database.
+        </p>
+
+        <p>
+            The entity will <b>not</b> be notified via email about their access being revoked.
+        </p>
+
+        <p>
+            <b>Proceed?</b>
+        </p>
+    </div>
+
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Revoke Access</button>
+    </div>
+</div>
+
+
 <script>
 var _contextEntity;
 var _contextWidgets = {};
@@ -130,6 +164,29 @@ window["edit-entity-modal_accept"] = function(modal) {
     });
 };
 
+window["access-entity-modal_accept"] = function(modal) {
+    var sites = _contextWidgets["e-sites"].getValue();
+    var roles = _contextWidgets["e-roles"].getValue();
+
+    liliumcms.lmldom.post({ sites : sites, roles : roles }, '${context._c.server.url}/admin/entities/edit/' + _contextEntity._id, function() {
+        liliumcms.notify({ type : "success", title : "Edit entity", message : _contextEntity.displayname + "'s access was updated successfully" });
+        liliumcms.lmldom.updatedBunches();
+        modal.dismiss();
+    });
+};
+
+window["revoke-entity-modal_accept"] = function(modal) {
+    liliumcms.lmldom.post({}, '${context._c.server.url}/admin/entities/revoke/' + _contextEntity._id, function() {
+        liliumcms.notify({ type : "success", title : "Revoke access", message : _contextEntity.displayname + " will not be able to log in anymore." });
+        liliumcms.lmldom.updatedBunches();
+        modal.dismiss();
+    });
+};
+
+var popupCreate = function() {
+
+};
+
 var popupEntity = function(entity) {
     _contextEntity = entity;
     liliumcms.lmldom.unbundle(entity, EDIT_ENTITY_BUNDLE_LAYOUT);
@@ -145,6 +202,9 @@ var popupEntityPassword = function(entity) {
 
 var popupRevokeEntity = function(entity) {
     _contextEntity = entity;
+    document.getElementById('revoke-entity-displayname').textContent = entity.displayname;
+
+    liliumcms.modals.get('revoke-entity-modal').cast();
 }
 
 liliumcms.lmldom.bind(function() {
