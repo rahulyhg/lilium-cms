@@ -197,12 +197,14 @@ class Amp {
                 }
                 let lang = language.split('-')[0];
 
-                db.findToArray(cli._c, 'ads', { type : "amp", lang }, (err, ads) => {
-                    hooks.fire("amp_replace_ads_" + cli._c.uid, { article : articlewrap, theme : cTheme, lang, ads });
-                    articleContent = articlewrap.content;
-                    articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
+                db.find(cli._c, 'ads', { type : "amp", lang }, [], (err, cur) => {
+                    cur.sort({_id : 1}).toArray((err, ads) => {
+                        hooks.fire("amp_replace_ads_" + cli._c.uid, { article : articlewrap, theme : cTheme, lang, ads });
+                        articleContent = articlewrap.content;
+                        articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
 
-                    cb(undefined, articleContent);
+                        cb(undefined, articleContent);
+                    });
                 });
             });
         });
