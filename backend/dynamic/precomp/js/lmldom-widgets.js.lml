@@ -23,8 +23,8 @@ var LMLDOM_MultiSelect = function(elem) {
         });
     };
 
-    that.getValue = function() {
-        Array.prototype.map.call(that.elem.querySelectorAll('.lmldom-multiselect-selected'), function(opt) { return opt.dataset.value; });
+    that.getValue = this.getValues = function() {
+        return Array.prototype.map.call(that.elem.querySelectorAll('.lmldom-multiselect-selected'), function(opt) { return opt.dataset.value; });
     };
 
     that.reset = function() {
