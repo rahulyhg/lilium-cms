@@ -232,6 +232,8 @@ class Entities {
             cli.hasRightOrRefuse('revoke-access') && this.revoke(db.mongoID(cli.routeinfo.path[3]), () => { cli.sendJSON({ ok : 1 }) });
         } else if (cli.routeinfo.path[2] == "edit") {
             cli.hasRightOrRefuse('edit-entities') && this.editInformation(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
+        } else if (cli.routeinfo.path[2] == "invite") {
+            cli.hasRightOrRefuse('create-entities') && this.invite(cli._c, cli.postdata.data, ok => { cli.sendJSON({ ok }) });
         } else {
             if (cli.hasRight('edit-entities')) {
                 this.createFromCli(cli);
@@ -630,6 +632,30 @@ class Entities {
             }
         }
         return newEnt;
+    }
+
+    invite(_c, data, done) {
+        if (!data.username || !data.roles || !data.sites || !data.displayname || !data.email) {
+            return done(false);
+        }
+
+        const entity = this.initialiseBaseEntity(data);
+
+        // Create Magic Link
+        var magiclink = "lml_" + 
+            Math.random().toString().substring(3) + "_ml_" + 
+            Math.random().toString().substring(3) + "_" + new Date().getTime();
+
+        entity.magiclink = magiclink;
+        entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
+
+        db.insert(require('./config').default(), 'entities', entity, () => {
+            require('./mail.js').triggerHook(_c, 'to_new_user', entity.email, {
+                entity : entity
+            });
+
+            done(true);
+        });
     }
 
     createFromCli  (cli) {
