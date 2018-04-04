@@ -1123,6 +1123,18 @@ var LiliumCMS = function() {
 
             errmod.show();
         };
+
+        this.ask = this.prompt = function(options, callback) {
+            var askmod = _modals["lml-prompt-modal"];
+            askmod.elem.querySelector('.lml-modal-title').textContent  = options.title      || "Prompt";
+            askmod.elem.querySelector('.lml-modal-body p').textContent = options.message    || "Continue?";
+            askmod.elem.querySelector('.lml-modal-accept').textContent = options.accepttext || "Yes";
+            askmod.elem.querySelector('.lml-modal-cancel').textContent = options.canceltext || "No";
+            
+            window["lml-prompt-modal_accept"] = callback;
+
+            askmod.cast();
+        };
     };
 
     var LMLSession = function() {

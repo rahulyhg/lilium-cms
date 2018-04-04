@@ -3,11 +3,23 @@
         Error
     </div>
     <div class="lml-modal-body">
-        <p>
-        </p>
+        <p>Error.</p>
     </div>
     <div class="lml-modal-footer">
         <button class="lml-modal-cancel" type="button">Got it</button>
+    </div>
+</div>
+
+<div id="lml-prompt-modal" class="lml-modal lml-modal-perma">
+    <div class="lml-modal-title">
+        Prompt
+    </div>
+    <div class="lml-modal-body">
+        <p>Continue?</p>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">No</button>
+        <button class="lml-modal-accept" type="button">Yes</button>
     </div>
 </div>
 
