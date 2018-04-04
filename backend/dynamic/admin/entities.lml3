@@ -233,7 +233,18 @@ window["create-entity-modal_accept"] = function(modal) {
             liliumcms.lmldom.updatedBunches();
             modal.dismiss();
         } else {
-            liliumcms.notify({ type : "warning", title : "Create entity", message : "Could not invite a new member. Make sure all fields are filled!" });
+            switch (resp.reason) {
+                case 'fields' : 
+                    liliumcms.notify({ type : "warning", title : "Create entity", message : "Could not invite a new member. Make sure all fields are filled!" });
+                    break;
+
+                case 'username':
+                    liliumcms.notify({ type : "warning", title : "Create entity", message : "Could not invite a new member. The provided username already belongs to an other entity." });
+                    break;
+
+                default:
+                    liliumcms.notify({ type : "warning", title : "Create entity", message : "Could not invite a new member." });
+            }
         }
 
     });

@@ -233,7 +233,7 @@ class Entities {
         } else if (cli.routeinfo.path[2] == "edit") {
             cli.hasRightOrRefuse('edit-entities') && this.editInformation(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
         } else if (cli.routeinfo.path[2] == "invite") {
-            cli.hasRightOrRefuse('create-entities') && this.invite(cli._c, cli.postdata.data, ok => { cli.sendJSON({ ok }) });
+            cli.hasRightOrRefuse('create-entities') && this.invite(cli._c, cli.postdata.data, (ok, reason) => { cli.sendJSON({ ok, reason }) });
         } else {
             if (cli.hasRight('edit-entities')) {
                 this.createFromCli(cli);
@@ -636,25 +636,31 @@ class Entities {
 
     invite(_c, data, done) {
         if (!data.username || !data.roles || !data.sites || !data.displayname || !data.email) {
-            return done(false);
+            return done(false, 'fields');
         }
 
-        const entity = this.initialiseBaseEntity(data);
+        db.findUnique(require('./config').default(), 'entities', { username : data.username }, (err, maybeExist) => {
+            if (maybeExist) {
+                return done(false, 'username');
+            }
 
-        // Create Magic Link
-        var magiclink = "lml_" + 
-            Math.random().toString().substring(3) + "_ml_" + 
-            Math.random().toString().substring(3) + "_" + new Date().getTime();
+            const entity = this.initialiseBaseEntity(data);
 
-        entity.magiclink = magiclink;
-        entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
+            // Create Magic Link
+            var magiclink = "lml_" + 
+                Math.random().toString().substring(3) + "_ml_" + 
+                Math.random().toString().substring(3) + "_" + new Date().getTime();
 
-        db.insert(require('./config').default(), 'entities', entity, () => {
-            require('./mail.js').triggerHook(_c, 'to_new_user', entity.email, {
-                entity : entity
+            entity.magiclink = magiclink;
+            entity.firstname = entity.firstname || entity.displayname.split(' ')[0];
+
+            db.insert(require('./config').default(), 'entities', entity, () => {
+                require('./mail.js').triggerHook(_c, 'to_new_user', entity.email, {
+                    entity : entity
+                });
+
+                done(true);
             });
-
-            done(true);
         });
     }
 
