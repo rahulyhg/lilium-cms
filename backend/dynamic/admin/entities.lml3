@@ -3,7 +3,7 @@ const settings = {
     title : "Entities",
     tools : {
         "add" : { call : "popupCreate" }
-    }
+    },
     livevars : ["role", "entities.simple.active", "sites.all.simple"]
 };
 
@@ -142,6 +142,41 @@ const compile = (o, context) => { o(context.header, `
     </div>
 </div>
 
+<div id="create-entity-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Entity creation
+    </div>
+    <div class="lml-modal-body lmlform">
+        <p>
+            Someone is about to join the party! Let's send an invitation email to that amazing person. 
+            To whom should I address this message?
+        </p>
+
+        <h3>Contact information</h3>
+        <span>Username</span>
+        <input id="n-username" placeholder="The username will be used to authenticate. Must be unique." />
+
+        <span>Display Name</span>
+        <input id="n-displayname" placeholder="This name will be used in the invitation email." />
+
+        <span>Email</span>
+        <input id="n-email" />
+
+        <h3>Lilium access</h3>
+        <span>Network access</span>
+        <div id="n-sites"></div>
+
+        <span>Roles</span>
+        <div id="n-roles"></div>
+    </div>
+
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Invite</button>
+    </div>
+</div>
+
+
 
 <script>
 var _contextEntity;
@@ -183,8 +218,34 @@ window["revoke-entity-modal_accept"] = function(modal) {
     });
 };
 
-var popupCreate = function() {
+window["create-entity-modal_accept"] = function(modal) {
+    var bundle = { 
+        sites : _contextWidgets["n-sites"].getValues(),
+        roles : _contextWidgets["n-roles"].getValues(),
+        username : document.getElementById("n-username").value,
+        displayname : document.getElementById('n-displayname').value,
+        email : document.getElementById('n-email').value
+    };
 
+    liliumcms.lmldom.post(bundle, '${context._c.server.url}/admin/entities/invite', function(resp) {
+        if (resp.ok) {
+            liliumcms.notify({ type : "success", title : "Create entity", message : bundle.displayname + " was successfully invited to join the team." });
+            liliumcms.lmldom.updatedBunches();
+            modal.dismiss();
+        } else {
+            liliumcms.notify({ type : "warning", title : "Create entity", message : "Could not invite a new member. Make sure all fields are filled!" });
+        }
+
+    });
+};
+
+var popupCreate = function() {
+    _contextWidgets["n-sites"].reset();
+    _contextWidgets["n-roles"].reset();
+    document.getElementById('n-displayname').value = "";
+    document.getElementById('n-email').value = "";
+
+    liliumcms.modals.get('create-entity-modal').cast();
 };
 
 var popupEntity = function(entity) {
@@ -210,12 +271,15 @@ var popupRevokeEntity = function(entity) {
 liliumcms.lmldom.bind(function() {
     _contextWidgets["e-sites"] = new LMLDOM_MultiSelect(document.getElementById("e-sites"));
     _contextWidgets["e-roles"] = new LMLDOM_MultiSelect(document.getElementById("e-roles"));
+    _contextWidgets["n-sites"] = new LMLDOM_MultiSelect(document.getElementById("n-sites"));
+    _contextWidgets["n-roles"] = new LMLDOM_MultiSelect(document.getElementById("n-roles"));
 
     var roles = liliumcms.livevars.livevars().role;
     var dbrole = d.id("filter-roles");
     roles && roles.forEach(function(role) {
         d.make({ node : "option", attr : { value : role.name }, text : role.displayname, parent : dbrole });
         _contextWidgets["e-roles"].add(role.name, role.displayname);
+        _contextWidgets["n-roles"].add(role.name, role.displayname);
     });
 
     var everyone = liliumcms.livevars.livevars()["entities.simple.active"];
@@ -227,6 +291,7 @@ liliumcms.lmldom.bind(function() {
     var sites = liliumcms.livevars.livevars()["sites.all.simple"];
     sites && sites.forEach(function(s) {
         _contextWidgets["e-sites"].add(s.id, s.displayName);
+        _contextWidgets["n-sites"].add(s.id, s.displayName);
     });
 });
 
