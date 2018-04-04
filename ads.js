@@ -94,8 +94,10 @@ class AdsLib {
 
         const levelOne = levels[0];
         if (levelOne == "list") {
-            db.findToArray(cli._c, "ads", {}, (err, arr) => {
-                sendback(arr);
+            db.find(cli._c, "ads", {}, [], (err, cur) => {
+                cur.sort({_id : 1}).toArray((err, arr) => {
+                    sendback(arr);
+                });
             });
         } else {
             sendback("");
