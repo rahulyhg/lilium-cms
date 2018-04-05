@@ -234,6 +234,8 @@ class Entities {
             cli.hasRightOrRefuse('edit-entities') && this.editInformation(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
         } else if (cli.routeinfo.path[2] == "invite") {
             cli.hasRightOrRefuse('create-entities') && this.invite(cli._c, cli.postdata.data, (ok, reason) => { cli.sendJSON({ ok, reason }) });
+        } else if (cli.routeinfo.path[2] == "magiclink") {
+            cli.hasRightOrRefuse('edit-entities') && this.sendNewMagicEmail(cli, db.mongoID(cli.routeinfo.path[3]), () => { cli.sendJSON({ ok : 1 }); });
         } else {
             if (cli.hasRight('edit-entities')) {
                 this.createFromCli(cli);
