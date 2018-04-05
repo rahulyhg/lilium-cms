@@ -250,6 +250,13 @@ window["create-entity-modal_accept"] = function(modal) {
     });
 };
 
+var sendMagicLink = function() {
+    liliumcms.modals.get('access-entity-modal').dismiss();
+    liliumcms.lmldom.post({ }, '${context._c.server.url}/admin/entities/magiclink/' + _contextEntity._id, function() {
+        liliumcms.notify({ type : "success", title : "Edit entity", message : _contextEntity.displayname + " should receive a magic link at the following address : " + _contextEntity.email });
+    });
+}
+
 var popupCreate = function() {
     _contextWidgets["n-sites"].reset();
     _contextWidgets["n-roles"].reset();
@@ -304,6 +311,8 @@ liliumcms.lmldom.bind(function() {
         _contextWidgets["e-sites"].add(s.id, s.displayName);
         _contextWidgets["n-sites"].add(s.id, s.displayName);
     });
+
+    d.q('#access-entity-modal .lml-modal-action').bind('click', function() { sendMagicLink(); });
 });
 
 window.generateCard = function(entity, ldContext) {
