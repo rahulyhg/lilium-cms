@@ -176,7 +176,40 @@ const compile = (o, context) => { o(context.header, `
     </div>
 </div>
 
+<div id="restore-entity-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        Grant access back
+    </div>
+    <div class="lml-modal-body lmlform">
+        <p>
+            No one can get enough of us, can't they? Awesome! 
+        </p>
 
+        <p>
+            Once you confirm the reactivation of this account, an email will be sent to the following address.
+        </p>
+
+        <span>Email</span>
+        <input id="r-email" />
+
+        <p>
+            If the provided address is not accessible anymore, you can set a new one. The new email address will then be saved in the entity's profile. Make sure to double-check the address.
+        </p>
+
+        <p>
+            Once the access is granted back to the entity, you will be able to edit their rights. 
+        </p>
+
+        <p>
+            <b>Proceed?</b>
+        </p>
+    </div>
+
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Send invitation email</button>
+    </div>
+</div>
 
 <script>
 var _contextEntity;
@@ -198,6 +231,15 @@ window["edit-entity-modal_accept"] = function(modal) {
         modal.dismiss();
     });
 };
+
+window["restore-entity-modal_accept"] = function(modal) {
+    var address = document.getElementById('r-email').value;
+    liliumcms.lmldom.post({ address : address }, '${context._c.server.url}/admin/entities/restore/' + _contextEntity._id, function() {
+        liliumcms.notify({ type : "success", title : "Restore access", message : _contextEntity.displayname + " was invited to Lilium using the following address : " + address });
+        liliumcms.lmldom.updatedBunches();
+        modal.dismiss();
+    });
+}
 
 window["access-entity-modal_accept"] = function(modal) {
     var sites = _contextWidgets["e-sites"].getValue();
@@ -256,6 +298,12 @@ var sendMagicLink = function() {
         liliumcms.notify({ type : "success", title : "Edit entity", message : _contextEntity.displayname + " should receive a magic link at the following address : " + _contextEntity.email });
     });
 }
+
+var popupRestoreEntity = function(entity) {
+    _contextEntity = entity;
+    document.getElementById('r-email').value = entity.email;
+    liliumcms.modals.get('restore-entity-modal').cast();
+};
 
 var popupCreate = function() {
     _contextWidgets["n-sites"].reset();
@@ -333,8 +381,13 @@ window.generateCard = function(entity, ldContext) {
         var btnwrap = d.make({ class : "entity-actions", parent : wrap });
 
         d.make({ node : "u", text : "manage access", parent : btnwrap }).bind('click', function() { popupEntityPassword(entity); });
-        d.make({ node : "u", text : "edit", parent : btnwrap }).bind('click', function() { popupEntity(entity); });
-        d.make({ node : "u", text : "revoke", parent : btnwrap, class : "red" }).bind('click', function() { popupRevokeEntity(entity); });
+
+        if (entity.revoked) {
+            d.make({ node : "u", text : "restore", parent : btnwrap }).bind('click', function() { popupRestoreEntity(entity); });
+        } else {
+            d.make({ node : "u", text : "edit", parent : btnwrap }).bind('click', function() { popupEntity(entity); });
+            d.make({ node : "u", text : "revoke", parent : btnwrap, class : "red" }).bind('click', function() { popupRevokeEntity(entity); });
+        }
     }
 
     return wrap.get();
