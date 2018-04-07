@@ -229,24 +229,11 @@
             "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "livevar"],
             "admin_menu" : {
                 "id" : "publishing",
-                "faicon": "fa-pen-square",
+                "faicon": "fa-pencil",
                 "displayname": "Content",
                 "priority": 225,
                 "rights": ["list-articles"],
                 "absURL": "admin/publishing/list",
-                "children": []
-            }
-        }, {
-            "module" : "article.js",
-            "endpoint" : "article",
-            "support" : ["admin_get", "admin_post", "form", "table", "api_get", "api_post"],
-            "admin_menu" : {
-                "id": "articles",
-                "faicon": "fa-pencil",
-                "displayname": "Content",
-                "priority": 200,
-                "rights": ["list-articles"],
-                "absURL": "admin/article",
                 "children": [{
                     "id": "articles-topics",
                     "faicon": "fa-tags",
@@ -273,6 +260,10 @@
                     "children": []
                 }]
             }
+        }, {
+            "module" : "article.js",
+            "endpoint" : "article",
+            "support" : ["admin_get", "admin_post", "form", "table", "api_get", "api_post"]
         }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
