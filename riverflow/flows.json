@@ -230,7 +230,7 @@
             "admin_menu" : {
                 "id" : "publishing",
                 "faicon": "fa-pencil",
-                "displayname": "Content",
+                "displayname": "Publishing",
                 "priority": 225,
                 "rights": ["list-articles"],
                 "absURL": "admin/publishing/list",
