@@ -22,5 +22,12 @@
                 </footer>
 		    </main>
         </div>
+
+        <script>
+            if (document.location.hash) {
+                document.querySelector('input[name="usr"]').value = document.location.hash.toString().substring(1);
+                history.pushState("", document.title, window.location.pathname + window.location.search);
+            }
+        </script>
 	</body>
 </html>
