@@ -43,57 +43,11 @@
 	fontdir += "/static/fonts/font-awesome";
 $}
 
-@import url('https://fonts.googleapis.com/css?family=PT+Serif:400,400i,700');
-
-@font-face {
-    font-family: 'Oswald';
-    src: url('{=siteurl}/static/fonts/Oswald/oswald-regular.eot');
-    src: url('{=siteurl}/static/fonts/Oswald/oswald-regular.eot?#iefix') format('embedded-opentype'),
-         url('{=siteurl}/static/fonts/Oswald/oswald-regular.woff2') format('woff2'),
-         url('{=siteurl}/static/fonts/Oswald/oswald-regular.woff') format('woff'),
-         url('{=siteurl}/static/fonts/Oswald/oswald-regular.ttf') format('truetype'),
-         url('{=siteurl}/static/fonts/Oswald/oswald-regular.svg#oswaldbook') format('svg');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-  font-family: 'Muli';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Muli Light'), local('Muli-Light'), url('{=siteurl}/static/fonts/Muli/Muli-Light.ttf') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-}
-
-@font-face {
-  font-family: 'Muli';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Muli Regular'), local('Muli-Regular'), url('{=siteurl}/static/fonts/Muli/Muli-Regular.ttf') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-}
-
-@font-face {
-  font-family: 'Muli';
-  font-style: normal;
-  font-weight: 600;
-  src: local('Muli SemiBold'), local('Muli-SemiBold'), url('{=siteurl}/static/fonts/Muli/Muli-SemiBold.ttf') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-}
-@font-face {
-  font-family: 'Muli';
-  font-style: normal;
-  font-weight: 800;
-  src: local('Muli ExtraBold'), local('Muli-ExtraBold'), url('{=siteurl}/static/fonts/Muli/Muli-ExtraBold.ttf') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2212, U+2215;
-}
-
-
 html, body {
 	padding:0;
 	margin:0;
 
-	font-family: 'Muli', sans-serif;
+	font-family: 'Lato', sans-serif;
 	color: {=fontcolor};
 }
 
@@ -1401,7 +1355,7 @@ header.admin-bar .lilium-logo-link span.product-text {
     font-weight: 500;
     font-size: 24px;
     vertical-align: middle;
-    padding-top: 6px;
+    padding-top: 5px;
     display: inline-block;
     margin-left: 55px;
 }
@@ -1627,7 +1581,7 @@ input.lml-leaflet-search-input {
 	background-color: #222222;
 	color: #CCC;
 
-	font-family: "Muli", Arial, sans-serif;
+	font-family: "Lato", Arial, sans-serif;
 }
 
 .lmlcrash header {
