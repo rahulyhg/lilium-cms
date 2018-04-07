@@ -52,7 +52,7 @@ main {
 .card-headline {
     font-size: 18px;
     margin-top: 10px;
-    font-weight: 600;
+    font-weight: 500;
     text-overflow:ellipsis;
     overflow: hidden;
     white-space: nowrap;
