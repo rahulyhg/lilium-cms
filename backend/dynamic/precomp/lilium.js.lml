@@ -64,6 +64,7 @@ var LiliumCMS = function() {
     var stacktables = [];
     var $url = this.$url = [];
     var queryParams = {};
+    var initialBinds = [];
 
     this.cdn;
     this.queryparams;
@@ -82,7 +83,6 @@ var LiliumCMS = function() {
     this.backendsearch;
     this.imagepicker;
     this.cakepop;
-    this.conversations;
     this.facebook;
     this.tables = [];
     // this.lys = new Lys();
@@ -718,7 +718,6 @@ var LiliumCMS = function() {
             this.lastLevel = this.levels[this.levels.length - 1];
 
             liliumcms.adminmenu.highlight();
-            liliumcms.conversations.closeChat();
             liliumcms.backendsearch.dismiss();
 
             var formattedUrl = url + (url.indexOf('?') === -1 ? "?" : "&") + "async=*";
@@ -1139,22 +1138,23 @@ var LiliumCMS = function() {
 
     var LMLSession = function() {
         this.current = {};
+        this.allUsers = [];
+        this.users = {};
 
         this.init = function() {
             log('Session', 'Recrieving session');
             this.current = liliumcms.livevars.retrieveVar('session');
+            this.allUsers = liliumcms.livevars.livevars()["entities.cached"];
+
+            var that = this;
+            this.allUsers.forEach(function(u) {
+                that.users[u._id] = u;
+            });
         }
-    };
 
-    var LMLResponsive = function() {
-        this.init = function() {
-            document.querySelector('.header-burger').addEventListener('click', liliumcms.responsive.toggleSlideMenu);
-            log('Responsive', 'Bound click on burger icon for mobile support');
-        };
-
-        this.toggleSlideMenu = function() {
-            document.querySelector('.lmladminsidebar').classList.toggle("mobile-shown");
-        };
+        this.getCachedUsers = function() {
+            return this.users;
+        }
     };
 
     var LMLRights = function() {
@@ -1213,6 +1213,25 @@ var LiliumCMS = function() {
         };
     };
 
+    this.initjewels = function() {
+        d.id('topbar-profile-name').bind('click', function() {
+            d.id('topbar-profile-name').get().classList.toggle("dropped");
+        });  
+
+        d.id('dropdown-notification').bind('click', function() {
+            d.id('dropdown-notification').get().classList.toggle("dropped");
+        });  
+
+        d.id('lml-main').bind('click', function() {
+            d.id('topbar-profile-name').get().classList.remove("dropped");
+            d.id('dropdown-notification').get().classList.remove("dropped");
+        });
+    };
+
+    this.initBind = function(callback) {
+        initialBinds.push(callback);
+    };
+
     this.everythingIsAwesome = function() {
         log('Lilium', 'Everything is awesome! Cleaning up...', 'lilium');
         $('.dropdown-menu #avatar img').attr('src', that.livevars.livevars().session.avatarURL);
@@ -1223,6 +1242,8 @@ var LiliumCMS = function() {
             log('Lilium', 'Requesting permission to push desktop notifications');
             Notification.requestPermission();
         }
+
+        initialBinds.forEach(function(cb) { cb(); });
     };
 
     var AwesomeStrapper = function() {
@@ -1231,12 +1252,10 @@ var LiliumCMS = function() {
             that.cdn = new LMLCDN();
             that.queryparams = new QueryParams();
             that.formvalidator = new FormValidator();
-            that.responsive = new LMLResponsive();
             that.formParser = new FormParser();
             that.pageloader = new PageLoader();
             that.imagepicker = new LMLImagePicker();
             that.previewer = new LMLPreviewer();
-            that.conversations = new LMLConversations();
             that.animator = new Animator();
             that.localclip = new LocalClip();
             that.quill = new LMLQuill();
@@ -1326,16 +1345,14 @@ document.addEventListener('livevarsRendered', function(e) {
         log('Lilium', 'Awesomestrapping some amazingness', 'lilium');
 
         liliumcms.queryparams.parseURL();
-        liliumcms.responsive.init();
         liliumcms.session.init();
+        liliumcms.initjewels();
         liliumcms.ckeditor && liliumcms.ckeditor.initEditor();
         liliumcms.adminmenu.init();
         liliumcms.modals.find();
         liliumcms.pageloader.parseAdminPanel();
         liliumcms.pageloader.loadCurrentURL();
         liliumcms.pageloader.bindHistory();
-        liliumcms.conversations.fillChat();
-        liliumcms.conversations.fillForms();
         liliumcms.lmldom.init();
         liliumcms.rights.init();
         liliumcms.badges.bind();
