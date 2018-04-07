@@ -156,7 +156,6 @@ var SiteInitializer = function (conf, siteobj) {
 
         log('SiteInitializer', "Registering admin default frontend JS and CSS", 'info');
         Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
-        Frontend.registerJSFile(base + "backend/static/bootstrap.min.js", 200, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/mousetrap.js", 250, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/highlight.js", 290, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
@@ -206,9 +205,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/quiz.js", 1380, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/album.js", 1390, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/alert.js", 1400, 'admin', conf.id);
-        Frontend.registerJSFile(base + "bower_components/remarkable-bootstrap-notify/dist/bootstrap-notify.min.js", 1000, "admin", conf.id);
 
-        Frontend.registerCSSFile(base + "bower_components/bootstrap/dist/css/bootstrap.min.css", 300, 'admin', conf.id);
         Frontend.registerCSSFile(base + "bower_components/flatpickr/dist/flatpickr.min.css", 500, 'admin', conf.id);
         // Frontend.registerCSSFile(base + "backend/static/fontawesome.css", 1000, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/fa/fontawesome-all.min.css", 1000, 'admin', conf.id);
@@ -243,17 +240,11 @@ var SiteInitializer = function (conf, siteobj) {
             Frontend: Frontend
         });
         Precompiler.precompile(conf, function () {
-            fileserver.copyFile(
-                base + "bower_components/bootstrap/dist/css/bootstrap.min.css.map", 
-                htmlbase + "/compiled/bootstrap.min.css.map",
-                function() {
-                    hooks.fire('frontend_precompiled', {
-                        config: conf,
-                        Frontend: Frontend
-                    });
-                    done();
-                }
-            );
+            hooks.fire('frontend_precompiled', {
+                config: conf,
+                Frontend
+            });
+            done();
         });
     };
 
