@@ -1176,6 +1176,27 @@ class Entities {
                 callback(err || arr);
             });
         }, []);
+
+        require('./backend/admin').registerAdminEndpoint('initialLogin', 'POST', cli => {
+            this.commitProfilePic(cli, cli.postdata.data.picture, (err, images) => {
+                const displayname = cli.postdata.data.displayname;
+                const split = displayname.split(' ');
+
+                const payload = {
+                    shhh : CryptoJS.SHA256(cli.postdata.data.password).toString(CryptoJS.enc.Hex),
+                    displayname,
+                    firstname : split.shift(),
+                    lastname : split.join(' '),
+                    welcomed : true,
+                    welcomedAt : new Date(),
+                    phone : cli.postdata.data.phone.replace(/([^0-9])/g, '')
+                }
+
+                db.update(require('./config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, payload, () => {
+                    cli.sendJSON({avatarURL : images.square.url});
+                });
+            });
+        });
     };
 };
 
