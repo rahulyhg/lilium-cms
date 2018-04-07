@@ -8,7 +8,8 @@
 <script src="{=config.default.server.url}/compiled/admin.js?key={=config.default.compilekey}"></script>
 
 <!-- Lilium Admin Styles and Scripts  -->
-<link href="https://fonts.googleapis.com/css?family=Lobster" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Lobster|Lato|Oswald|PT+Serif" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="{=config.default.server.url}/compiled/admin.css?key={=config.default.compilekey}"/>
-<title>{=config.default.website.sitetitle}</title>
+
+<title>Lilium CMS | {=config.default.website.sitetitle}</title>
 <link rel="icon" type="image/png" href="{=config.default.server.url}/static/media/favicon.png" />

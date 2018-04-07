@@ -3,7 +3,7 @@
 <html>
     <head>
         <title>Lilium | {=config.default.website.sitetitle}</title>
-        <link href="https://fonts.googleapis.com/css?family=Anton|Lato" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
         <link rel="icon" type="image/png" href="{=config.default.server.url}/static/media/favicon.png">
 
         <style>
