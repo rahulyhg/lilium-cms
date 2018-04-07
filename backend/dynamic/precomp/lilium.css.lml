@@ -1010,7 +1010,7 @@ h2.subtitlestrip, h2.subtitle {
 
 .lmladminsidebar .lmladminsidebaritems li a {
     display: block;
-    padding: 8px 7px 1px;
+    padding: 8px 7px 3px;
     color: #BBB;
     font-weight: 600;
     text-decoration: none;
