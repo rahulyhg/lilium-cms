@@ -145,56 +145,58 @@ var generateRandomTopPost = function(ldContext) {
         </div>
     </div>
 
-    <div class="col-xs-4 col-md-4 dashboard-card">
-        <div class="dashboard-ga-yesterday-rect">
-            <h3>User sessions</h3>
-            <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions"></lml-text>
-            </div>
-            <small>
-                Average of <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.ratio.pagepersession"></lml-text> pages per session
-            </small>
-        </div>
-        <div class="dashboard-ga-yesterday-rect">
-            <h3>Page views</h3>
-            <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.views"></lml-text>
-            </div>
-        </div>
-    </div>
-    <div class="col-xs-4 col-md-4 dashboard-card">
-        <div class="dashboard-ga-yesterday-rect dashboard-ga-publication-list">
-            <h3><lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.published.length"></lml-text> articles published</h3>
-            <lml-foreach var="publication" in="livevars.googleanalytics.dashboard.performance.yesterday.published">
-                <lml-link href="{=config.default.server.url}/{publication.name}" target="_blank">
-                    <lml-text var="publication.title.0"></lml-text>
-                </lml-link>
-            </lml-foreach>
-        </div>
-    </div>
-    <div class="col-xs-4 col-md-4 dashboard-card">
-        <div class="dashboard-ga-yesterday-rect">
-            <h3>Top article</h3>
-            <div>
-                <lml-link href="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.url}" target="_blank">
-                    <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.title.0" wrapper="h4" /></lml-text>
-                </lml-link>
-                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.subtitle.0" wrapper="h5" /></lml-text>
-
-                <div class="dashboard-ga-toppage-image-wrapper">
-                <lml-image src="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml-image>
+    <div class="flex">
+        <div class="in-flex dashboard-card">
+            <div class="dashboard-ga-yesterday-rect">
+                <h3>User sessions</h3>
+                <div class="dashboard-ga-total-unique">
+                    <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions"></lml-text>
                 </div>
-
-                <div class="dashboard-ga-toppage-author">
-                    <lml-image src="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.authors.0.avatarURL}"></lml-image> 
-                    <span>
-                        Written by 
-                        <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.authors.0.displayname"></lml-text>
-                    </span>
-                </div>
-                <small class="centered">
-                    With a total of <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.hits"></lml-text> hits
+                <small>
+                    Average of <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.ratio.pagepersession"></lml-text> pages per session
                 </small>
+            </div>
+            <div class="dashboard-ga-yesterday-rect">
+                <h3>Page views</h3>
+                <div class="dashboard-ga-total-unique">
+                    <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.views"></lml-text>
+                </div>
+            </div>
+        </div>
+        <div class="in-flex dashboard-card">
+            <div class="dashboard-ga-yesterday-rect dashboard-ga-publication-list">
+                <h3><lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.published.length"></lml-text> articles published</h3>
+                <lml-foreach var="publication" in="livevars.googleanalytics.dashboard.performance.yesterday.published">
+                    <lml-link href="{=config.default.server.url}/{publication.name}" target="_blank">
+                        <lml-text var="publication.title.0"></lml-text>
+                    </lml-link>
+                </lml-foreach>
+            </div>
+        </div>
+        <div class="in-flex dashboard-card">
+            <div class="dashboard-ga-yesterday-rect">
+                <h3>Top article</h3>
+                <div>
+                    <lml-link href="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.url}" target="_blank">
+                        <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.title.0" wrapper="h4" /></lml-text>
+                    </lml-link>
+                    <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.subtitle.0" wrapper="h5" /></lml-text>
+
+                    <div class="dashboard-ga-toppage-image-wrapper">
+                    <lml-image src="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.featuredimage.0.sizes.thumbnaillarge.url}" class="dashboard-ga-toppage-image"></lml-image>
+                    </div>
+
+                    <div class="dashboard-ga-toppage-author">
+                        <lml-image src="{livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.authors.0.avatarURL}"></lml-image> 
+                        <span>
+                            Written by 
+                            <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.article.authors.0.displayname"></lml-text>
+                        </span>
+                    </div>
+                    <small class="centered">
+                        With a total of <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.toppage.hits"></lml-text> hits
+                    </small>
+                </div>
             </div>
         </div>
     </div>
@@ -207,36 +209,38 @@ var generateRandomTopPost = function(ldContext) {
         </div>
     </div>
 
-    <div class="col-xs-4 col-md-4 dashboard-card">
-        <div class="dashboard-ga-yesterday-rect">
-            <h3>Last month sessions</h3>
-            <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.performance.lastmonth.lastmonth.sessions"></lml-text>
-            </div>
-            <small>
-                <lml-generate call="generateLastMonth"></lml-generate>
-            </small>
-        </div>
-    </div>
-
-    <div class="col-xs-4 col-md-4 dashboard-card">
-        <div class="dashboard-ga-yesterday-rect">
-            <h3>Last week sessions</h3>
-            <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.performance.lastweek.sessions"></lml-text>
+    <div class="flex">
+        <div class="dashboard-card in-flex">
+            <div class="dashboard-ga-yesterday-rect">
+                <h3>Last month sessions</h3>
+                <div class="dashboard-ga-total-unique">
+                    <lml-text var="livevars.googleanalytics.dashboard.performance.lastmonth.lastmonth.sessions"></lml-text>
+                </div>
+                <small>
+                    <lml-generate call="generateLastMonth"></lml-generate>
+                </small>
             </div>
         </div>
-    </div>
 
-    <div class="col-xs-4 col-md-4 dashboard-card">
-        <div class="dashboard-ga-yesterday-rect">
-            <h3>Yesterday session</h3>
-            <div class="dashboard-ga-total-unique">
-                <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions"></lml-text>
+        <div class="dashboard-card in-flex">
+            <div class="dashboard-ga-yesterday-rect">
+                <h3>Last week sessions</h3>
+                <div class="dashboard-ga-total-unique">
+                    <lml-text var="livevars.googleanalytics.dashboard.performance.lastweek.sessions"></lml-text>
+                </div>
             </div>
-            <small>
-                <lml-generate call="generateSameDayLastWeek"></lml-generate>
-            </small>
+        </div>
+
+        <div class="dashboard-card in-flex">
+            <div class="dashboard-ga-yesterday-rect">
+                <h3>Yesterday session</h3>
+                <div class="dashboard-ga-total-unique">
+                    <lml-text var="livevars.googleanalytics.dashboard.performance.yesterday.metrics.sessions"></lml-text>
+                </div>
+                <small>
+                    <lml-generate call="generateSameDayLastWeek"></lml-generate>
+                </small>
+            </div>
         </div>
     </div>
 
@@ -338,6 +342,16 @@ liliumcms.lmldom.bind(function() {
 
 #dashface img {
     opacity: 0.3;
+}
+
+.flex {
+    display: flex;
+    padding: 12px;
+    padding-top: 0px;
+}
+
+.in-flex {
+    width : 33.3333%;
 }
 
 #quote-of-the-day span {
@@ -442,7 +456,8 @@ liliumcms.lmldom.bind(function() {
 
 .dashboard-ga-toppage-image-wrapper img {
     object-fit: cover;
-    width: 100%;
+    width: 320px;
+    height: auto;
 }
 
 .dashboard-ga-toppage-author {
@@ -583,15 +598,16 @@ liliumcms.lmldom.bind(function() {
 
 .dashboard-top-source {
     display: inline-block;
-    font-size: 13px;
+    font-size: 12px;
     text-transform: uppercase;
-    padding: 1px 5px 0px;
     background-color: #333;
     color: #FFF;
     border-radius: 4px;
     font-weight: 600;
 
     margin-right: 4px;
+
+    padding: 2px 6px;
 }
 
 #dashboard-ga-rank {
