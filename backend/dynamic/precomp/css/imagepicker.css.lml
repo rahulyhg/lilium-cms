@@ -68,7 +68,7 @@
     border-bottom: 1px solid #CCC;
     box-shadow: 0px 0px 3px 0px rgba(0,0,0,0.2);
 
-    height: 60px;
+    height: 40px;
 }
 
 .lmlimagepicker-body {
@@ -150,6 +150,7 @@
     font-size: 60px;
     color: #BBB; 
     cursor: pointer;
+    box-sizing: border-box;
 }
 
 #lmlimagepicker .placeholder.placeholder-add:hover {
@@ -171,10 +172,11 @@
     color: #FFF;
     border-radius: 5px;
     font-size: 16px;
-    padding: 5px 11px;
+    padding: 7px 11px 5px;
     font-weight: 300;
     margin-top: 9px;
     cursor: pointer;
+    font-weight: bold;
 }
 
 .lmlimagepicker-actions button::before {
@@ -191,35 +193,33 @@
     background-color: #83ce71; 
 } 
 
-.lmlimagepicker-actions button.accept::before {
-    content: '\f00c';
-}
-
 .lmlimagepicker-actions button.refresh {
     
 }
 
+/*
 .lmlimagepicker-actions button.refresh::before {
     content: '\f021';
 }
+.lmlimagepicker-actions button.accept::before {
+    content: '\f00c';
+}
+.lmlimagepicker-actions button.remove::before,
+.lmlimagepicker-actions button.dismiss::before {
+    content: '\f00d';
+}
+.lmlimagepicker-actions button.upload::before {
+    content: '\f0ee';
+}
+*/
 
 .lmlimagepicker-actions button.dismiss,
 .lmlimagepicker-actions button.remove {
     background-color: #c15f5f;
 }
-
-.lmlimagepicker-actions button.remove::before,
-.lmlimagepicker-actions button.dismiss::before {
-    content: '\f00d';
-}
-
 .lmlimagepicker-actions button.upload {
     background-color: #5f74c1; 
 } 
-
-.lmlimagepicker-actions button.upload::before {
-    content: '\f0ee';
-}
 
 #lmlimagepicker-file {
     opacity: 0;
@@ -288,6 +288,7 @@
     width: 100%;
     border: 1px solid #DDD;
     padding: 10px;
+    box-sizing: border-box;
 }
 
 .image-details-line input.invalid {

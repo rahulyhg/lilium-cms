@@ -27,6 +27,7 @@
     left: 0px;
     right: 0px;
     height: 50px;
+    z-index: 10;
 
     border-bottom: 1px solid #CCC;
 }
@@ -78,7 +79,8 @@
 
     color: #999;  
     cursor: pointer;
-    border-left: 1px solid #DDD
+    border-left: 1px solid #DDD;
+    box-sizing: border-box;
 }
 
 .lmlpreview-tools-right i:hover {
