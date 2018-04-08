@@ -1,92 +1,62 @@
 {#config;vocab}
-{*notifications.mine}
-<header class="admin-bar">
-
-    <nav class="navbar navbar-default">
-        <div class="header-burger">
-            <i></i>
-            <i></i>
-            <i></i>
-        </div>
-        <div class="">
-            <div class="navbar-header">
-                <div class="lilium-logo-link">
-                    <a href="{=config.default.server.url}/admin">
-                        <img src="{=config.default.server.url}/static/media/lmllogo.png" id="lilium-logo" class="lilium-logo" />
-                        <span class="product-text">
-                            Lilium CMS
-                        </span>
-                    </a>
-                </div>
-            </div>
-            <div id="navbar" class="navbar-collapse collapse">
-                <ul class="nav navbar-nav navbar-right">
-                    <li id="topbar-cakepop" class="link">
-                        <img src="{=config.default.server.url}/static/media/chocopop.png" />
-                    </li>
-                    <li id="topbar-localclip" class="link">
-                        <span class="far fa-clipboard"></span>
-                    </li>
-                    <li id="topbar-search-icon" class="link">
-                        <span class="far fa-search"></span>
-                    </li>
-                    <li id="nav-conversations" class="link">
-                        <span class="far fa-comment" aria-hidden="true">
-                        </span>
-                        <b></b>
-                    </li>
-                    <li id="dropdown-notification" class="dropdown">
-                        <span class="far fa-bell link dropdown-toggle" data-toggle="dropdown" aria-hidden="true">
-                            <span class="badge">0</span>
-                        </span>
-                        <ul id="notification-dropdown" class="dropdown-menu">
-                            <div class="title">Notifications</div>
-                            <div id="notification_list">
-
-                            </div>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <div class="loggedin-user-box link dropdown-toggle" id="loggedinuserbox" data-toggle="dropdown" aria-hidden="true">
-                        </div>
-
-                        <div id="profile-dropdown" class="dropdown-menu">
-                            <span class="links">
-                                <div>
-                                    <a href="{=config.default.server.url}/admin/me">My profile</a>
-                                </div>
-                                <div>
-                                    <a href="{=config.default.server.url}/admin/preferences">My Lilium</a>
-                                </div>
-                                <div>
-                                    <a href="{=config.default.server.url}/logout" data-replace="true">Logout</a>
-                                </div>
-                            </span>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-            <!--/.nav-collapse -->
-        </div>
-        <!--/.container-fluid -->
-    </nav>
-</header>
-
-<lml-template id="adminquickactionbutton">
-    <lml-tobject data-hrefsource="topbuttonlink" data-nodetype="a" data-class="admin-publish-button" data-prependroot="true" >
-        <lml-tobject data-key="topbuttontext" data-nodetype="span"></lml-tobject>
-    </lml-tobject>
-</lml-template>
-
-<lml-template id="adminbaruserbox">
-    <lml-tobject data-absurl="avatarURL" data-nodetype="img" data-filter="hasAvatar"></lml-tobject>
-    <lml-tobject data-key="displayname" data-nodetype="span" data-class="lmladminbardisplayname"></lml-tobject>
-</lml-template>
 {*session(template:"adminbaruserbox",target:"loggedinuserbox")}
 {*preferences.mine(template:"adminquickactionbutton",target:"adminquickaction")}
+{*notifications.mine}
+
+<header class="admin-bar">
+    <div class="lilium-logo-link">
+        <a href="{=config.default.server.url}/admin">
+            <img src="{=config.default.server.url}/static/media/lmllogo.png" id="lilium-logo" class="lilium-logo" />
+            <span class="product-text">
+                Lilium CMS
+            </span>
+        </a>
+    </div>
+
+    <div id="header-quicklinks">
+
+    </div>
+
+    <div id="navbar" class="navbar-collapse collapse">
+        <ul>
+            <li id="topbar-cakepop">
+                <img src="{=config.default.server.url}/static/media/chocopop.png" />
+            </li>
+            <li id="topbar-localclip" class="top-jewel">
+                <span class="far fa-clipboard"></span>
+            </li>
+            <li id="topbar-search-icon" class="top-jewel">
+                <span class="far fa-search"></span>
+            </li>
+            <li id="dropdown-notification" class="top-jewel">
+                <span class="far fa-bell" data-toggle="dropdown" aria-hidden="true">
+                    <span class="badge"></span>
+                </span>
+                <ul id="notification-dropdown" class="dropdown-menu">
+                    <div class="title">Notifications</div>
+                    <div id="notification_list">
+
+                    </div>
+                </ul>
+            </li>
+            <li id="topbar-profile-name">
+                <div class="loggedin-user-box dropdown-toggle" id="loggedinuserbox">
+                    Loading...
+                </div>
+
+                <div id="profile-dropdown" class="dropdown-menu">
+                    <a href="{=config.default.server.url}/admin/me">My profile</a>
+                    <a href="{=config.default.server.url}/admin/preferences">My Lilium</a>
+                    <a href="{=config.default.server.url}/logout" data-replace="true">Logout</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</header>
+
 
 <script>
-window.hasAvatar = function(sesh) {
-    return sesh.avatarURL && sesh.avatarURL !== '';
-};
+liliumcms.initBind(function() {
+    d.id('loggedinuserbox').text(liliumcms.session.current.displayname);
+});
 </script>
