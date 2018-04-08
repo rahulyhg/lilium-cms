@@ -72,6 +72,7 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 
 .history-card span {
     padding-left: 10px;
+    flex-grow: 1;
 }
 
 .history-actor {
@@ -83,6 +84,7 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 
 .history-card {
     display: flex;
+    flex-wrap: nowrap;
     border: 1px solid #DDD;
     background: #FFF;
     padding: 10px;
@@ -141,10 +143,6 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 }
 
 .publishing-tab {
-}
-
-.liliumtext.theme-minim .liliumtext-topbar-command {
-    height: 34px;
 }
 
 .publishing-header {
