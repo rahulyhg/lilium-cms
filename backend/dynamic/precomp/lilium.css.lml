@@ -60,6 +60,10 @@ body {
 		transition: opacity 0.2s;
 }
 
+* {
+    box-sizing: border-box;
+}
+
 body.block-scroll {
     overflow: hidden;
 }
@@ -146,8 +150,8 @@ input[type="checkbox"], .lmlcheckbox {
 
 .lmlbeautifiedcheckbox {
 	display: inline-block;
-	width: 32px;
-	height:32px;
+	width: 34px;
+	height:34px;
 	vertical-align: middle;
 
     font-family: "Font Awesome 5 Pro";
@@ -161,7 +165,7 @@ input[type="checkbox"], .lmlcheckbox {
 
     font-size: 26px;
     text-align: center;
-    padding-top: 2px;
+    padding-top: 4px;
 
     border: 1px dashed #CCC;
     border-radius: 5px;
@@ -228,11 +232,6 @@ select {
 
 /* Lilium */
 /* Bootstrap */
-.container {
-    padding-left: {=sidebarwidth};
-    width: 100%;
-    padding-right: 0px;
-}
 .row{
     margin-right: 0px;
     margin-left: 0px;
@@ -382,6 +381,7 @@ select {
 
 .lmlform-fieldwrapper label {
 	margin-right: 10px;
+    margin-bottom: 5px;
     color: #333;
     font-size: 16px;
     font-weight: 500;
@@ -483,6 +483,11 @@ lml-bunch {
 
 .bunch-filters input {
     min-width: 100px;
+}
+
+.bunch-filters input, 
+.bunch-filters select {
+    padding: 3px;
 }
 
 .bunch-filters label {
@@ -778,6 +783,7 @@ input[type="submit"].green:active, .btn.green:active, button.green:active {
     padding-bottom: 5px;
     font-size: 24px;
     font-weight: 300;
+    color: #333;
 }
 
 .workbutton.working span {
@@ -825,10 +831,15 @@ input[type="submit"].green:active, .btn.green:active, button.green:active {
     margin-top: -10px;
 }
 
+#lilium .liliumtext.theme-minim .liliumtext-topbar-command {
+    height: 36px;
+}
 
 .lmladmincontentwrapper {
 	padding-left: {=sidebarwidth};
 	padding-top: {=topbarheight};
+
+    width: 100%;
 }
 
 .lmladminsidebardecowrapper {
@@ -933,6 +944,12 @@ h2.subtitlestrip, h2.subtitle {
         -ms-transition: all 0.3s;
          -o-transition: all 0.3s;
             transition: all 0.3s;
+
+    overflow-x : hidden;
+}
+
+.lmladminsidebar:hover {
+    width: 200px;
 }
 
 .lmladminsidebar.left {
@@ -961,19 +978,18 @@ h2.subtitlestrip, h2.subtitle {
 .lmladminsidebar .lmladminsidebaritems li {
     cursor: pointer;
     font-size: 14px;
-    text-align: center;
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
-    width: 29px;
-    border-radius: 40px;
-    margin-left: 5px;
+    border-radius: 0;
+    margin-left: 0px;
     -webkit-transition: all 0.2s;
     -moz-transition: all 0.2s;
     -ms-transition: all 0.2s;
     -o-transition: all 0.2s;
     transition: all 0.2s;
     background-color: #241f25;
-    display: inline-block;
+    display: block;
 }
 
 .lmladminsidebar .lmladminsidebaritems li ul li {
@@ -994,28 +1010,23 @@ h2.subtitlestrip, h2.subtitle {
 
 .lmladminsidebar .lmladminsidebaritems li a {
     display: block;
-    padding: 6px 0px 1px;
+    padding: 8px 7px 1px;
     color: #BBB;
     font-weight: 600;
     text-decoration: none;
     vertical-align: middle;
-    margin-left: 3px;
+    margin-left: 2px;
 }
 
 .lmladminsidebar .lmladminsidebaritems li span {
     vertical-align: middle;
     display: inline-block;
-    margin-left: 5px;
-    margin-bottom: 2px;
+    margin-left: 10px;
+    margin-bottom: 4px;
 }
 
 .lmladminsidebar .lmladminsidebaritems li:hover {
-	background-color: {=barcolorhover};
-    width: 200px;
-}
-
-.lmladminsidebar .lmladminsidebaritems li.parent:hover {
-    border-radius : 20px;
+	background-color: #111;
 }
 
 .lmladminsidebar .lmladminsidebaritems li:hover a {
@@ -1136,12 +1147,14 @@ h2.subtitlestrip, h2.subtitle {
 	padding: 0px;
 	max-height: 300px;
 	width: 300px;
-
-	overflow-x: hidden;
+    background: #111;
+    position: absolute;
+    right: 0;
 }
+
 #notification-dropdown li{
 	padding: 10px;
-	background-color: #F6F6F6;
+	background-color: #333;
 	width: 300px;
 	border-left: 5px;
 	border-color: {=infocolor};
@@ -1164,14 +1177,14 @@ h2.subtitlestrip, h2.subtitle {
 #notification-dropdown li > a .notif-title {
 	font-size: 14px;
 	font-weight: bold;
-	color: #333;
+	color: #FFF;
 }
 
 #notification-dropdown li:hover{
-	background-color: #ccc;
+	background-color: #222;
 }
 #notification-dropdown li.new:hover{
-	background-color: #ccc;
+	background-color: #222;
 }
 #notification-dropdown li:hover .date{
 	color: #fff;
@@ -1185,11 +1198,12 @@ h2.subtitlestrip, h2.subtitle {
 	font-size: 12px;
 }
 #notification-dropdown li.new{
-	background-color: #FFF;
+	background-color: #111;
 }
 #notification-dropdown > .title{
-	font-size: 16px;
-	padding: 10px;
+    font-size: 22px;
+    padding: 10px 15px;
+    text-align: left;
 }
 
 .navbar-right #notification-dropdown.dropdown-menu {
@@ -1287,6 +1301,14 @@ header.admin-bar {
 	height: {=topbarheight};
 
 	box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.5);
+    background-color: #222;
+    color: #FFF;
+    display: flex;
+}
+
+#header-quicklinks {
+    flex-grow : 1;
+    height: 100%;
 }
 
 .navbar-default {
@@ -1305,14 +1327,62 @@ header.admin-bar {
 	z-index: 10000;
 }
 
-.navbar{
+#navbar{
 	border-radius: 0px;
 	border: none;
 	color: #FFF;
-
+    height: 100%;
 }
+
+#navbar ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+#navbar ul li {
+    display: inline-block;
+    vertical-align: top;
+    cursor: pointer;
+}
+
+#navbar ul li.top-jewel:hover {
+    background: #111;
+}
+
+#navbar ul li.top-jewel {
+    height: 50px;
+    width: 60px;
+    text-align: center;
+    position: relative;
+}
+
+#navbar ul li.top-jewel span.badge {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    color: #ffffff;
+    padding: 4px 7px 2px 6px;
+    background: #cd7bff;
+    border-radius: 12px;
+    font-weight: bold;
+    font-family: "Open Sans", sans-serif;
+}
+
+#navbar ul li.top-jewel span.badge:empty {
+    display: none;
+}
+
+#navbar ul li.top-jewel span {
+    margin: 17px 0
+}
+
 .navbar .dropdown-menu {
 	color: {=fontcolor};
+}
+
+#topbar-profile-name:hover {
+    background: #111;
 }
 
 .container-fluid {
@@ -1332,7 +1402,7 @@ header.admin-bar .lilium-logo-link {
     width: 200px;
     height: 50px;
     display: inline-block;
-    padding: 2px 6px 3px 5px;
+    padding: 0px;
 
     cursor: pointer;
 
@@ -1366,17 +1436,13 @@ header.admin-bar .lilium-logo-link span.product-text {
     font-weight: 500;
     font-size: 24px;
     vertical-align: middle;
-    padding-top: 5px;
+    padding-top: 9px;
     display: inline-block;
-    margin-left: 55px;
+    margin-left: 62px;
 }
 
 header.admin-bar .navbar-default .navbar-header {
 	position: absolute;
-}
-
-#navbar.navbar-collapse {
-	padding-left: 190px;
 }
 
 
@@ -1388,11 +1454,37 @@ header.admin-bar .navbar-default .navbar-header {
 	overflow: hidden;
 	text-align: center;
     position: relative;
+    padding: 15px 0px;    
+}
+
+#profile-dropdown a {
+    display: block;
+    background: #111;
+    font-size: 14px;
+    padding: 12px 12px;
+    font-weight: bold;
+}
+
+#topbar-profile-name {
+    border-left: 1px solid #333;
+}
+
+#dropdown-notification,
+#topbar-profile-name {
+    height: 50px;
+    overflow: hidden;
+}
+
+#dropdown-notification.dropped,
+#topbar-profile-name.dropped {
+    overflow : visible;
+    background-color: #111;
 }
 
 #profile-dropdown {
     width: 200px;
     padding: 0px;
+    margin-top: 1px;
 }
 
 #profile-dropdown #avatar{
@@ -1414,10 +1506,6 @@ header.admin-bar .navbar-default .navbar-header {
     display: block;
     padding-top: 5px;
     padding-bottom: 5px;
-}
-#profile-dropdown .links a:hover {
- background: {=hovercolor};
- color: #fff;
 }
 
 #upload_profile_picture.lmlform {
@@ -1517,39 +1605,14 @@ header.admin-bar .navbar-default .navbar-nav .admin-publish-button:active {
 
 header.admin-bar .navbar-default .navbar-nav  .loggedin-user-box {
 	text-transform: uppercase;
-    border-left: 2px solid #333;
+    border-left: 2px solid #444;
 	font-size: 14px;
-}
-
-header.admin-bar .loggedin-user-box > img {
-    height: 80px;
-    border-radius: 60px;
-    margin-right: 5px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
-
-    position: absolute;
-    left: -20px;
-    bottom: -22px;
-
-    box-shadow: 0px 0px 30px 10px rgba(0, 0, 0, 0.5);
-    opacity: 0.4;
-}
-
-header.admin-bar .loggedin-user-box > * {
-    vertical-align: middle;
-    display: inline-block;
 }
 
 header.admin-bar .lmladminbardisplayname {
     position: relative;
     z-index: 5;
     text-shadow: 0px 0px 10px rgb(0,0,0);
-}
-
-header.admin-bar .loggedin-user-box:hover {
-	background-color: rgba(255, 255, 255, 0.1);
-	color: #EEE;
-    position: relative;
 }
 
 header.admin-bar .navbar-default .navbar-nav  .user-actions > div {
