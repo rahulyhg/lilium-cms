@@ -133,7 +133,7 @@ var Cakepop = function() {
     };
 
     this.showIcon = function() {
-        document.getElementById('topbar-cakepop').style.display = "block";
+        document.getElementById('topbar-cakepop').style.display = "inline-block";
     };
 
     this.hideIcon = function() {

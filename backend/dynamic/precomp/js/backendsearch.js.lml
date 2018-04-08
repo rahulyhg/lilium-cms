@@ -83,7 +83,7 @@ var BackendSearch = function() {
                 }, status : function(status) {
                     return status[0].toUpperCase() + status.substring(1);
                 }, author : function(userid) {
-                    var maybeuser = liliumcms.conversations.getCachedUsers()[userid]
+                    var maybeuser = liliumcms.session.getCachedUsers()[userid]
                     return maybeuser ? maybeuser.displayname : "Inactive user";
                 }, date : function(date) {
                     date = new Date(date);

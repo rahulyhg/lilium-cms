@@ -195,7 +195,7 @@ var LMLImagePicker = function() {
         ePicker.querySelector(".image-details-fullurl a").href = "{=config.default.server.url}/" + imginfo.fullurl;
         ePicker.querySelector(".image-details-fullurl a").textContent = "{=config.default.server.url}/" + imginfo.fullurl;
 
-        var allusers = liliumcms.conversations.getCachedUsers();
+        var allusers = liliumcms.session.getCachedUsers();
         var uploader = "Unknown";
         if (imginfo.uploader) {
             upuser = allusers[imginfo.uploader];
