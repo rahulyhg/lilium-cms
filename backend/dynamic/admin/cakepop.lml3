@@ -38,6 +38,7 @@ const style = `<style>
 .cakepop-strip a {
     font-size: 12px;
     color: #333;
+    text-decoration: none;
 }
 
 </style>`;
@@ -108,7 +109,7 @@ const preload = (context, done) => {
             if (ldContext.ckp.status == "creation") {
                 elem.className = "fal fa-pencil-square";
             } else if (ldContext.ckp.expiry > window.ckp_now) {
-                elem.className = "fal fa-circle-o-notch fa-spin fa-fw"
+                elem.className = "fal fa-circle-notch fa-spin fa-fw"
             } else if (ldContext.ckp.status == "live") {
                 elem.className = "fal fa-calendar-check";
             }

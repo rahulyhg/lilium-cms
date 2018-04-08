@@ -414,13 +414,15 @@ window.generateCard = function(entity, ldContext) {
 
 .entity-picture {
     height : 250px;
-    width : 100%;
+    width : 250px;
     object-fit : cover;
 }
 
 .entity-photo-wrap {
     position: relative;
     overflow : hidden;
+    height : 250px;
+    width : 250px;
 }
 
 .admin-mention {
@@ -430,15 +432,15 @@ window.generateCard = function(entity, ldContext) {
     background: #af57e4;
     color: #FFF;
     text-transform: uppercase;
-    padding: 6px 46px;
+    padding: 6px 6px;
     font-weight: bold;
     border-radius: 3px;
     font-size: 16px;
     transform: rotateZ(45deg);
-    width: 150px;
-
+    width: 143px;
     border-bottom: 3px solid #871faf;
     border-top: 1px solid #871faf;
+    text-align: center;
 }
 
 .entity-name {
@@ -514,10 +516,9 @@ lml-emptytemplate {
 }
 
 .lml-modal-body h3 {
-    font-weight: bold;
     margin-top: 10px;
-    margin-bottom: 4px;
-    color: #BBB;
+    margin-bottom: 10px;
+    color: #1f0523;
 }
 
 .lml-modal-body span {

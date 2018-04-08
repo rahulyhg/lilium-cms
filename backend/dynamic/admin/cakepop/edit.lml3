@@ -28,7 +28,7 @@ const preload = (context, done) => {
             var cp = liliumcms.livevars.livevars()["cakepop.single." + liliumcms.pageloader.lastLevel];
             if (cp) {
                 var history = cp.history;
-                var users = liliumcms.conversations.getCachedUsers();
+                var users = liliumcms.session.getCachedUsers();
                 d.table(d.id('cakepop-report-body'), history, ["by", "action", "at"], {
                     by : function(userid) {
                         if (users[userid]) {
