@@ -132,6 +132,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             <a id="pub-url-link" href="" target="_blank"></a>
         </div>
         <div class="pub-detail-field">
+            <span>Total words</span>
+            <b id="pub-words">-</b>
+        </div>
+        <div class="pub-detail-field">
             <span>Registered shares</span>
             <b id="pub-shares">-</b>
         </div>
@@ -408,8 +412,16 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         });
 
         d.id('publishing-tabs').born(tab).born(d.id('publishing-tab-add'));
+        textEditor.contentel.addEventListener('blur', contentBlur);
+        contentBlur();
 
         return totalpage++;
+    };
+
+    var contentBlur = function() {
+        document.getElementById("pub-words").textContent = allEditors.reduce(function(current, that) {
+            return current + that.contentel.textContent.split(' ').filter(function(str) { return str.trim(); }).length;
+        }, 0);
     };
 
     var selectFinalTopic = function(topicid) {
