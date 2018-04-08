@@ -347,7 +347,7 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
         }
     
         var displayOwner = function(ldContext) {
-            var creator = liliumcms.conversations.getCachedUsers()[ldContext.link.creatorid];
+            var creator = liliumcms.session.getCachedUsers()[ldContext.link.creatorid];
             return document.createTextNode(creator ? creator.displayname : "an inactive user");
         }
 

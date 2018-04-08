@@ -36,7 +36,7 @@ liliumcms.lmldom.bind(function() {
 
 window.historyCardGenerator = function(ldContext) {
     var obj = ldContext.histo;
-    var cUsers = liliumcms.conversations.getCachedUsers();
+    var cUsers = liliumcms.session.getCachedUsers();
     var actorobj = cUsers[obj.modifiedBy];
 
     curHistoryStack.push(obj);
@@ -129,7 +129,7 @@ window.historyCreatedGenerator = function(ldContext) {
     }
 
     if (obj.createdBy) {
-        var actorobj = liliumcms.conversations.getCachedUsers()[obj.createdBy];
+        var actorobj = liliumcms.session.getCachedUsers()[obj.createdBy];
         createString += actorobj ? (" by " + actorobj.displayname) : "";
     }
 

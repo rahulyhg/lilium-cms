@@ -319,7 +319,7 @@ const compile = (o, context, v) => { o(context.header, css, `
 
         window.generateCard = function(post) {
             var isAuthor = post.author == liliumcms.session.current._id;
-            var fullAuthor = liliumcms.conversations.getCachedUsers()[post.author];
+            var fullAuthor = liliumcms.session.getCachedUsers()[post.author];
 
             var authorName = isAuthor ? "you" : fullAuthor ? fullAuthor.displayname : "[Inactive author]";
             
@@ -355,7 +355,7 @@ const compile = (o, context, v) => { o(context.header, css, `
         }
 
         liliumcms.lmldom.bind(function() {
-            var users = liliumcms.conversations.getCachedUsers();
+            var users = liliumcms.session.getCachedUsers();
             var ids = Object.keys(users);
             var arr = [];
 
