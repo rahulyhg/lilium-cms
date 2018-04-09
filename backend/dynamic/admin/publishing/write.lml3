@@ -544,6 +544,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         var creator = users.find(function(user) { return user._id == history.actor }) || { displayname : "An Unknown Author", avatarURL : "/static/media/lmllogo.png" };
         
         var creatorAvatar = document.createElement('img');
+        creatorAvatar.onload = function() { setTimeout(function() { creatorAvatar.style.flexGrow = 1; }, 10); };
         creatorAvatar.className = "history-actor";
         creatorAvatar.src = creator.avatarURL;
         card.appendChild(creatorAvatar);

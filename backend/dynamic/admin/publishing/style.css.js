@@ -72,7 +72,6 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 
 .history-card span {
     padding-left: 10px;
-    flex-grow: 1;
 }
 
 .history-actor {
@@ -80,6 +79,8 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     height: 32px;
     object-fit : cover;
     border-radius: 5px;
+    display: block;
+    flex-grow: 1;
 }
 
 .history-card {
