@@ -378,7 +378,8 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                     new LiliumTextWebCommand("block", "h3", "far fa-h3"),
                     new LiliumTextWebCommand("block", "blockquote", "far fa-quote-right"),
                 ], [
-                    new LiliumTextWebCommand('insert', 'hr', 'far fa-minus')
+                    new LiliumTextWebCommand('insert', 'hr', 'far fa-minus'),
+                    new LiliumTextWebCommand('insert', 'ad', 'far fa-usd-square')
                 ], [
                     new LiliumTextWebCommand('exec', "insertOrderedList",   "far fa-list-ol"),  
                     new LiliumTextWebCommand('exec', "insertUnorderedList", "far fa-list-ul"), 
