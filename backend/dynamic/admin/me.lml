@@ -3,11 +3,15 @@
 {*decorations.mine}
 <lml-dom v="0.8" />
 
-<div>
-    <form data-context="noctx" class="lmlform" name="upload_profile_picture" id="upload_profile_picture" method="POST" enctype="multipart/form-data">
-        <div class="profile-photo-form">
-            <h1 class="data-livevar" data-livevar='"html":"session.displayname"'></h1>
-            <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="square" />
+<div id="upload_profile_picture">
+    <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="square" />
+
+    <div id="me-edit-section">
+        <div id="me-displayname">
+            <lml-text var="session.current.displayname"></lml-text>
+        </div>
+        <div id="me-username">
+            @<lml-text var="session.current.username"></lml-text>
         </div>
 
         <div class="me-decoration-wrapper">
@@ -17,16 +21,74 @@
                 </lml-foreach>
             </div>
         </div>
-    </form>
+
+        <textarea id="me-bio" placeholder="Write a small introduction paragraph"></textarea>
+    </div>
 </div> 
 
-{=forms.render('update_profile','edit','me/0')}
-{=forms.render('update_password')}
+
 
 <style>
-.me-decorations {
+#upload_profile_picture {
+    background-color: #351043;
+    background-image: url("data:image/svg+xml,%3Csvg width='84' height='48' viewBox='0 0 84 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z' fill='%235d3772' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E");
+
+    padding: 40px;
+    display: flex;
+    flex-wrap : nowrap;
+
+    animation: meback 5s infinite 0s linear;
+}
+
+@keyframes meback {
+    from { background-position: 0px 0px; }
+    to   { background-position: 84px 0px;}
+}
+
+#profile_photo {
+    border-radius: 200px;
+    border-width: 6px;
+    width: 250px;
+    height: 250px;
+}
+
+#me-displayname {
+    color: #f3ddfb;
+    font-size: 42px;
+}
+
+#me-username {
+    color: #b08cbb;
+    margin-top: -6px;
+}
+
+#me-edit-section {
+    margin-left: 40px;
+    flex-grow : 1;
+}
+
+#me-bio {
     display: block;
-    text-align: center;
+    color: #d4b3dc;
+    padding-right: 40px;
+    margin-top: 20px;
+    background: none;
+    resize: none;
+    font-size: 14px;
+    padding: 0;
+    width: 100%;
+    height: 100px;
+    padding-left: 12px;
+    border-left: 1px solid #c47dd4;
+}
+
+#me-bio::placeholder {
+    color: #9c63a9;
+    font-weight: bold;
+}
+
+.me-decorations span {
+    margin-right: -12px;
 }
 
 .me-decoration {
@@ -77,6 +139,10 @@
 </style>
 
 <script>
+    liliumcms.lmldom.bind(function() {
+        document.getElementById('me-bio').value = liliumcms.session.current.description;
+    });
+
     window.generatedeco = function(ctx) {
         var badge = ctx.deco;
 
@@ -117,7 +183,6 @@
 
         $.post("{=config.default.server.url}/admin/me", dat, function() {
             liliumcms.notify({type : "success", title : "You look amazing!", message : "Profile picture was successfully updated."});
-            document.querySelector('.loggedin-user-box img').setAttribute("src", imgurl);
         });
     };
 
