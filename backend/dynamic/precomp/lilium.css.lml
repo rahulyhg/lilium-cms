@@ -1513,43 +1513,6 @@ header.admin-bar .navbar-default .navbar-header {
     padding-bottom: 5px;
 }
 
-#upload_profile_picture.lmlform {
-    border: none;
-}
-
-#upload_profile_picture {
-    padding: 20px;
-    text-align: center;
-
-    background: -webkit-repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
-    background: repeating-linear-gradient(45deg, #2f2f2f, #2f2f2f 10px, #272627 10px, #272627 20px);
-}
-
-#upload_profile_picture h1 {
-    background: none;
-    border: none;
-    color: #DDD;
-    font-size: 38px;
-    margin-bottom: 10px;
-    font-weight: 300;
-}
-
-#upload_profile_picture #profile_photo {
-    width: 250px;
-    height: 250px;
-    border-radius: 250px;
-    border-width: 5px;
-
-    box-shadow: 0px 0px 100px 10px rgba(255, 255, 255, 0.08);
-}
-
-#upload_profile_picture h2 {
-    color: #777;
-    font-weight: 500;
-    margin-top: 20px;
-    font-size: 26px;
-}
-
 header.admin-bar .navbar-default .navbar-nav .admin-publish-button {
 	-webkit-border-radius: 3px;
    	   -moz-border-radius: 3px;

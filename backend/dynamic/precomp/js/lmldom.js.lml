@@ -1116,6 +1116,7 @@ var LMLDom = function() {
 
         lmldom.emptyStage();
         ldContext.livevars = liliumcms.livevars.deepLivevars(true);
+        ldContext.session = liliumcms.session;
         this.valuegroups = [];
 
         log('LMLDOM', 'Parsing Lilium Document Object Model v' + domv);
