@@ -6055,9 +6055,9 @@
       }
     },
     "lilium-text": {
-      "version": "0.2.0",
-      "resolved": "https://registry.npmjs.org/lilium-text/-/lilium-text-0.2.0.tgz",
-      "integrity": "sha512-N97MiVWptCaML34WMlBr2bncIiT6adGv+wvDIDAWFMgZT5+NdLIW3cQJ/snfD3O+HioBfEf+tFJN/r8ykz4zNQ=="
+      "version": "0.2.6",
+      "resolved": "https://registry.npmjs.org/lilium-text/-/lilium-text-0.2.6.tgz",
+      "integrity": "sha512-WXe68kJjryqOG4/TZg+CCxMxAzPShOyxh5wlAOdvsGPGcUd3CmdPSR8wVemhmjs160TXFv2QTEt1aZ+AFVNOlw=="
     },
     "linkify-it": {
       "version": "2.0.3",
