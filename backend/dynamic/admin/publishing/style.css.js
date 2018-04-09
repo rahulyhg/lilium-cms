@@ -256,8 +256,7 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 }
 
 .publishing-category-single:nth-child(3):hover i {
-    -webkit-animation: handshakeanim 0.5s ease-in-out 0s infinite; 
-    animation: handshakeanim 0.5s ease-in-out 0s infinite; 
+    animation: handshakeanim 1s ease-in-out 0s infinite; 
 }
 
 .topic-card {
@@ -327,16 +326,10 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     color: #333;
 }
 
-@-webkit-keyframes handshakeanim {
-    0%   : { transform: translate3d(0, 0, 0); }
-    50%  : { transform: translate3d(0, -20px, 0); }
-    100% : { transform: translate3d(0, 0, 0); }
-}
-
 @keyframes handshakeanim {
-    0%   : { transform: translate3d(0, 0, 0); }
-    50%  : { transform: translate3d(0, -20px, 0); }
-    100% : { transform: translate3d(0, 0, 0); }
+    0%   { transform: translate3d(0, 0, 0); }
+    50%  { transform: translate3d(0, -12px, 0); }
+    100% { transform: translate3d(0, 0, 0); }
 }
 
 #publishing-media {

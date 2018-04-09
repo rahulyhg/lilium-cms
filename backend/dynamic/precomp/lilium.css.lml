@@ -219,6 +219,7 @@ form input, form label{
 select {
     color: #666;
     background: #fff;
+    font-size: 14px;
 }
 .lilium {
 	padding:0;
