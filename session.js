@@ -166,31 +166,32 @@ var Sessions = function () {
     };
 
     this.livevar = function(cli, levels, params, callback) {
-        var dat = cli.session.data;
-        var rights = [];
-        var roles = dat.roles || [];
-    
-        db.findToArray(require('./config.js').default(), "roles", {name : {$in : roles}}, function(err, arr) {
-            for (var i = 0; i < arr.length; i++) {
-                rights.push(...arr[i].rights);
-            }
+        const _id = db.mongoID(cli.userinfo.userid);
+        if (_id) {
+            db.findUnique(require('./config').default(), 'entities', { _id }, (err, dat) => {
+                db.findToArray(require('./config.js').default(), "roles", {name : {$in : dat.roles}}, function(err, arr) {
+                    const rights = [];
+                    arr.forEach(role => rights.push( ...role.rights ));
 
-            dat = {
-                _id: dat._id,
-                admin: dat.admin,
-                avatarURL: dat.avatarURL,
-                displayname: dat.displayname,
-                roles: dat.roles,
-                rights : rights,
-                username: dat.username,
-                site : dat.site,
-                preferences : dat.preferences || preferences.getDefault(cli._c),
-                newNotifications: dat.newNotifications || 0,
-                data : (params.withdata ? dat.data : undefined)
-            }
-
-            callback(dat);
-        });
+                    callback({
+                        rights, 
+                        _id: dat._id,
+                        admin: dat.admin,
+                        avatarURL: dat.avatarURL,
+                        displayname: dat.displayname,
+                        roles: dat.roles,
+                        username: dat.username,
+                        description : dat.description,
+                        site : dat.site,
+                        preferences : dat.preferences || preferences.getDefault(cli._c),
+                        newNotifications: dat.newNotifications || 0,
+                        data : (params.withdata ? dat.data : undefined)
+                    });
+                });
+            });
+        } else {
+            cli.refuse();
+        }
     };
 
     this.initSessionsFromDatabase = function (conf, cb) {
