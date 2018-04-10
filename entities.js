@@ -47,6 +47,14 @@ const SOCIAL_NETWORKS = {
     googleplus : { icon : "fa fa-google",    color : "#df4a32", border : "#bf2a12", url : "https://plus.google.com/u/1/+" }
 };
 
+const ALLOWED_ME_FIELDS = [ 
+    // Basic information
+    "displayname", "description", "email", "phone", "personality",
+
+    // Social profiles
+    "socialnetworks.facebook", "socialnetworks.twitter", "socialnetworks.instagram", "socialnetworks.googleplus"
+];
+
 class Entity {
     constructor() {
         this._id;
@@ -211,22 +219,38 @@ class Entities {
     adminPOST  (cli) {
         cli.touch('entities.handlePOST');
         if (cli.routeinfo.path[1] == 'me') {
-            switch (cli.postdata.data.form_name) {
-            case "update_profile":
-                this.updateProfile(cli);
-                break;
-            case "upload_profile_picture":
-                this.updateProfilePictureID(cli, true);
-                break;
-            case "update_password":
-                this.changePassword(cli, true);
-                break;
-            case "commitfbauth":
-                this.commitfbauth(cli);
-                break;
-            default:
-                cli.throwHTTP(401);
-                break;
+            if (cli.routeinfo.path[2] == "updateOneField") {
+                if (ALLOWED_ME_FIELDS.includes(cli.postdata.data.field)) {
+                    db.update(require('./config').default(), 'entities', { _id : db.mongoID(cli.userinfo.userid) }, {
+                        [cli.postdata.data.field] : cli.postdata.data.value
+                    }, () => {
+                        cli.sendJSON({
+                            updated : {
+                                [cli.postdata.data.field] : cli.postdata.data.value
+                            }
+                        })
+                    });
+                } else {
+                    cli.refuse();
+                }
+            } else {
+                switch (cli.postdata.data.form_name) {
+                case "update_profile":
+                    this.updateProfile(cli);
+                    break;
+                case "upload_profile_picture":
+                    this.updateProfilePictureID(cli, true);
+                    break;
+                case "update_password":
+                    this.changePassword(cli, true);
+                    break;
+                case "commitfbauth":
+                    this.commitfbauth(cli);
+                    break;
+                default:
+                    cli.throwHTTP(401);
+                    break;
+                }
             }
         } else if (cli.routeinfo.path[2] == "revoke") {
             cli.hasRightOrRefuse('revoke-access') && this.revoke(db.mongoID(cli.routeinfo.path[3]), () => { cli.sendJSON({ ok : 1 }) });
@@ -1166,6 +1190,10 @@ class Entities {
         db.findToArray(_c.default(), 'roles', { name : { $in : roles } }, (err, arr) => {
             send([].concat(...arr.map(r => r.rights)));
         });
+    };
+
+    handleMePOST(cli) {
+        cli.sendJSON({ [cli.postdata.data.field] : cli.postdata.data.value });
     };
 
     setup () {
