@@ -7,7 +7,7 @@
     <img id="profile_photo" class="pickable data-livevar" data-livevar='"src":"session.avatarURL"' data-size="square" />
 
     <div id="me-edit-section">
-        <div id="me-displayname">
+        <div id="me-displayname" data-field="displayname" contenteditable>
             <lml-text var="session.current.displayname"></lml-text>
         </div>
         <div id="me-username">
@@ -139,8 +139,19 @@
 </style>
 
 <script>
+    var bindBlur = function(id) {
+        document.getElementById(id).addEventListener('blur', function(ev) {
+            var value = (ev.target.value || ev.target.textContent || "").trim();
+            var field = ev.target.dataset.field;
+
+            liliumcms.lmldom.post({ field : field, value : value }, '{=config.default.server.url}/admin/me/updateOneField', function(r) {
+            });
+        });
+    }
+
     liliumcms.lmldom.bind(function() {
         document.getElementById('me-bio').value = liliumcms.session.current.description;
+        bindBlur('me-displayname');
     });
 
     window.generatedeco = function(ctx) {
