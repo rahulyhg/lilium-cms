@@ -12,10 +12,20 @@ var createDivFromResponse = function(data) {
 }
 
 var createV3DivFromResponse = function(data, ourl) {
-    return '<p contenteditable="false"><img data-width="'+data.dimensions.width+'" data-height="'+data.dimensions.height+'" src="'+data.display_url+                  
-        '" class="lml-instagram-embed-3" /><a class="lml-instagram-op-3" href="'+
-        ourl +'" ><img src="'+data.owner.profile_pic_url+'" class="lml-instagram-avatar-3" /> @'+data.owner.username+
-        '<span class="lml-instagram-via-3">embedded via <i class="fab fa-instagram">&nbsp;</i> </span> </a> </p>';
+    return data.is_video ? 
+            '<p contenteditable="false">'+
+            '<video class="lml-instagram-video-3" data-width="'+data.dimensions.width+'" data-height="'+data.dimensions.height+'" controls>' +
+            ' <source src="'+data.video_url+ '"> This video is not available.' +
+            '</video><a class="lml-instagram-op-3" href="'+
+            ourl +'" ><img src="'+data.owner.profile_pic_url+'" class="lml-instagram-avatar-3" /> @'+data.owner.username+
+            '<span class="lml-instagram-via-3">embedded via <i class="fab fa-instagram">&nbsp;</i> </span> </a> </p>'
+        : (
+            '<p contenteditable="false">'+
+            '<img data-width="'+data.dimensions.width+'" data-height="'+data.dimensions.height+'" src="'+data.display_url+ 
+            '" class="lml-instagram-embed-3" /><a class="lml-instagram-op-3" href="'+
+            ourl +'" ><img src="'+data.owner.profile_pic_url+'" class="lml-instagram-avatar-3" /> @'+data.owner.username+
+            '<span class="lml-instagram-via-3">embedded via <i class="fab fa-instagram">&nbsp;</i> </span> </a> </p>'
+        );
 }
 
 var handleRequest = function(cli) {
@@ -24,6 +34,23 @@ var handleRequest = function(cli) {
     var as = cli.routeinfo.params.as;
 
     switch (type) {
+        case "igcarousel":
+            request.get({json : true, url : "https://api.instagram.com/oembed/?url=" + url}, (err, r, data) => {
+                if (data) {
+                    cli.sendJSON({
+                        instagram : data,
+                        markup : data.html
+                    });
+                } else {
+                    cli.sendJSON( { 
+                        instagram : "", 
+                        markup : '<p class="lml-instagram-embed-err">Oops. It appears <b>Instagram.com</b> responded with an error. Make sure the Instagram account is public, that the picture is still available and that Instagram is not down.</p>', 
+                        error : "Invalid Instagram Response" 
+                    });
+                }
+            });
+            break;
+
         case "instagram":
             url += (url.includes('?') ? '&' : '?') + "__a=1";
             request.get({url, json:true}, function(err, r, data) {
