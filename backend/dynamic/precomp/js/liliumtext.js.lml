@@ -151,6 +151,9 @@ var LiliumTextEmbedPlugin= function(editor) {
 LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
     var editor = this.editor;
     switch (type) {
+        case "igphoto":
+        case "igcarousel":
+        case "igvideo":
         case "instagram.c":
             var wrapid = "instatemp" + Math.random().toString().substring(2);
             var template = document.createElement('div');
@@ -159,7 +162,10 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
             editor.insertBlock(template);
             
             log('Instagram', "Handling Instagram embed");
-            liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type=instagram&as=json&url=' + text, { }, function(resp) {
+            var urltype = type == "igcarousel" ? type : "instagram";
+            liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type='+urltype+'&as=json&url=' + text, 
+                { }, 
+            function(resp) {
                 try {
                     resp = JSON.parse(resp);
                     if (!resp.instagram) {
@@ -202,14 +208,26 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
             });
             break;
 
+        case "fbpost":
+        case "fbphoto":
         case "facebook.c":
 
             break;
 
+        case "youtube":
         case "youtube.c":
 
             break;
 
+        case "vimeo":
+
+            break;
+
+        case "twitter":
+
+            break;
+
+        case "soundcloud":
         case "soundcloud.c":
 
             break;
@@ -237,8 +255,27 @@ LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, pasteArgs) {
     }
 };
 
+LiliumTextEmbedPlugin.prototype.handleCommandAccept = function(modal) {
+    var text = document.getElementById('embedlink-text').value;
+    var type = document.getElementById('embedlink-type').value;
+    var dt = new DataTransfer();
+    dt.setData('text', text);
+
+    modal.dismiss();
+    this.handleEmbed(type, dt, text);
+
+    document.getElementById('embedlink-text').value = "";
+    document.getElementById('embedlink-type').value = "link";
+}
+
+LiliumTextEmbedPlugin.prototype.commandClick = function() {
+    window["lml-insert-embedlink-modal_accept"] = this.handleCommandAccept.bind(this);
+    liliumcms.modals.get('lml-insert-embedlink-modal').cast();
+};
+
 LiliumTextEmbedPlugin.prototype.register = function() {
     this.editor.bind('paste', this.handlePaste.bind(this));
+    this.editor.addCommand(new LiliumTextCustomCommand("embedlink", this.commandClick.bind(this), "far fa-link"), 3);
 }
 
 LiliumTextEmbedPlugin.prototype.unregister = function() {
