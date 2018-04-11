@@ -67,4 +67,43 @@
     </div>
 </div></div>
 
+<div class="lml-modal-wrapper"><div id="lml-insert-embedlink-modal" class="lml-modal lml-modal-perma">
+    <div class="lml-modal-title">
+        Insert embed link
+    </div>
+    <div class="lml-modal-body">
+        <p>Please provide a destination URL or an embed code snippet.</p>
+        <input type="text" id="embedlink-text" placeholder="URL or code" />
+
+        <span>Type</span>
+        <select id="embedlink-type">
+            <optgroup label="Linking">
+                <option value="link">Insert link on selection</option>
+            </optgroup>
+    
+            <optgroup label="Embed Media">
+                <option value="igphoto">Instagram photo</option>
+                <option value="igvideo">Instagram video</option>
+                <option value="igcarousel">Instagram carousel</option>
+                <option value="fbpost">Facebook Post</option>
+                <option value="fbphoto">Facebook Photo</option>
+                <option value="fbvideo">Facebook Video</option>
+                <option value="youtube">Youtube video</option>
+                <option value="vimeo">Vimeo video</option>
+                <option value="twitter">Twitter tweet</option>
+                <option value="soundcloud">Soundcloud song</option>
+                <option value="imgur">Imgur image</option>
+            </optgroup>
+
+            <optgroup label="Embed Code">
+                <option value="html">HTML code</option>
+            </optgroup>
+        </select>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Insert</button>
+    </div>
+</div></div>
+
 
