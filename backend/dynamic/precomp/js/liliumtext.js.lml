@@ -208,6 +208,11 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
             });
             break;
 
+        case "link":
+            this.editor.restoreSelection();
+            document.execCommand("createLink", false, text);
+            break;
+
         case "fbpost":
         case "fbphoto":
         case "facebook.c":
