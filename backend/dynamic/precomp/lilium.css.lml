@@ -1710,6 +1710,34 @@ a.button-link:active {
 }
 
 /* Fab buttons */
+.lml3-tool-add {
+    width: 80px;
+    height: 80px;
+    background-color: #af56e4;
+    color: #FFF;
+    font-size: 46px;
+    padding: 12px 0px;
+    text-align: center;
+    border-radius: 50px;
+    font-weight: 100;
+    position: fixed;
+    z-index: 1000;
+    right: 20px;
+    bottom: 20px;
+    cursor: pointer;
+    box-shadow: 0px 0px 3px 3px rgba(175, 85, 228, 0.5);
+}
+
+.lml3-tool-add:hover {
+    color: #FFF;
+    background-color: #bf66f4;
+}
+
+.lml3-tool-add.up {
+    bottom: inherit;
+    top: 70px;
+}
+
 h1 > a.fab {
     float: right;
     background-color: {=actioncolor};
