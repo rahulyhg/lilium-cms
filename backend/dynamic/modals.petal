@@ -91,7 +91,6 @@
                 <option value="vimeo">Vimeo video</option>
                 <option value="twitter">Twitter tweet</option>
                 <option value="soundcloud">Soundcloud song</option>
-                <option value="imgur">Imgur image</option>
             </optgroup>
 
             <optgroup label="Embed Code">
