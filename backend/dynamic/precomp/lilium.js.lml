@@ -782,20 +782,22 @@ var LiliumCMS = function() {
         this.parseDocument = function(wrapper) {
             log('PageLoader', 'Seeking links, transform them into async links');
             var total = 0;
-            $(wrapper || 'main.lmladminmain a').each(function(index, a) {
-                a = $(a);
-                var href = a.attr('href') || "";
+            
+            Array.prototype.forEach.call(document.querySelectorAll(wrapper || 'main.lmladminmain a'), function(a) {
+                var href = a.href || "";
+
                 if (
-                    !a.data('async') &&
-                    !a.data("replace") && 
-                    !a.hasClass("direct-link") &&
-                    href.indexOf('#') === -1 && 
+                    !a.dataset.async && !a.dataset.replace && 
+                    !a.classList.contains("direct-link") &&
+                    href.indexOf('#') === -1 && href.indexOf('*') === -1 &&
                     href.indexOf("{=config.default.server.url}") !== -1 && 
-                    href.indexOf('*') === -1 &&
-                    a.attr('target') !== "_blank"
+                    a.target !== "_blank"
                 ) {
                     total++;
-                    a.data("async", true).data("parser", "pageloader").attr("href", href).bind('click', function(ev) {
+                    a.dataset.async = true;
+                    a.dataset.parser = "pageloader";
+                    a.href = href;
+                    a.addEventListener('click', function(ev) {
                         ev.preventDefault();
                         ev.stopPropagation();
                         that.load(href);
@@ -809,26 +811,7 @@ var LiliumCMS = function() {
 
         this.parseAdminPanel = function() {
             log('PageLoader', 'Binding links to load inside page async');
-            $('a').each(function(index, a) {
-                a = $(a);
-                var href = a.attr('href') || "";
-                if (
-                    !a.data('async') &&
-                    !a.data("replace") && 
-                    !a.hasClass("direct-link") &&
-                    href.indexOf('#') === -1 && 
-                    href.indexOf("{=config.default.server.url}") !== -1 && 
-                    href.indexOf('*') === -1 &&
-                    a.attr('target') !== "_blank"
-                ) {
-                    a.attr("href", href).data("parser", "admininit").on('click', function(ev) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        that.load(href);
-                        return false;
-                    });
-                }
-            });
+            this.parseDocument('a');
         };
     };
 
