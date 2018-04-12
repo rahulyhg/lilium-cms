@@ -91,6 +91,8 @@ class ContentLib {
             extra.language = deepArticle.topic.override.language;
         }
 
+        deepArticle.content = deepArticle.content.map(x => x.replace(/lml-fb-video/g, 'fb-video').replace(/lml-fb-post/g, 'fb-post'));
+
         hooks.fire('article_will_render', {
             _c : _c,
             article: deepArticle
