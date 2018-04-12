@@ -69,6 +69,28 @@ var handleRequest = function(cli) {
             });
             break;
 
+        case "fbvideo":
+            cli.sendJSON({
+                markup : `<div class="fb-video-wrap" contenteditable="false">
+                    <div class="lml-fb-video"
+                        data-href="${url}"
+                        data-width="640"
+                        data-allowfullscreen="true"
+                        data-autoplay="true"
+                        data-show-captions="true">
+                    </div>  
+                </div>`
+            });
+            break;
+
+        case "fbpost":
+            cli.sendJSON({
+                markup : `<div class="fb-post-wrap" contenteditable="false">
+                    <div class="lml-fb-post" data-width="640" data-href="${url}"></div>
+                </div>`
+            });
+            break;
+
         case "twitter":
             request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
                 cli.sendJSON(data);
