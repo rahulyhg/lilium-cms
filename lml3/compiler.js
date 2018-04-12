@@ -50,8 +50,14 @@ class LMLTool {
                 this.markup = `<a class="fab lml3-tool-add" ${tool.href&&'href="'+tool.href+'"'||''}>+</a>` +
                     (tool.call && (
                         `<script>
-                            document.querySelector('.lml3-tool-add').addEventListener("click", function() {
-                                ${tool.call}();
+                            document.querySelector('.lml3-tool-add').addEventListener("click", function(ev) {
+                                ev.which != 3 && ev.button != 2 && ${tool.call}();
+                            });
+
+                            document.querySelector('.lml3-tool-add').addEventListener("contextmenu", function(ev) {
+                                ev.target.classList.toggle('up');
+                                ev.preventDefault();
+                                return false;
                             });
                         </script>`
                     )
@@ -101,7 +107,8 @@ class LMLContext {
         }
 
         this.header += this.livevars || '';
-        this.header += this.title ? `<h1>${this.title} ${this.maybeCreateAddTool()}</h1>` : '';
+        this.header += this.title ? `<h1>${this.title}</h1>` : ""; 
+        this.header += this.maybeCreateAddTool();
 
         return this;
     }
