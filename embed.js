@@ -93,7 +93,25 @@ var handleRequest = function(cli) {
 
         case "twitter":
             request({url : "https://publish.twitter.com/oembed?omit_script=1&url=" + url, json:true}, (err, r, data) => {
-                cli.sendJSON(data);
+                data && data.html ? cli.sendJSON({
+                    data : data,
+                    markup : data.html
+                }) : cli.sendJSON({
+                    data : {},
+                    markup : ""
+                });
+            });
+            break;
+
+        case "vimeo":
+            request({url : "https://vimeo.com/api/oembed.json?url=" + url, json : true}, (err, r, data) => {
+                data && data.html ? cli.sendJSON({
+                    data : data,
+                    markup : data.html
+                }) : cli.sendJSON({
+                    data : {},
+                    markup : ""
+                });
             });
             break;
 

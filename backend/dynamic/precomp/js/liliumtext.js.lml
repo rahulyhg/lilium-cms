@@ -215,11 +215,13 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
 
         case "fbpost":
         case "fbvideo":
+        case "vimeo":
+        case "twitter":
         case "facebook.c":
             var template = document.createElement('div');
             editor.insertBlock(template);
 
-            log("Embed", "Sending request to server for Facebook embed");
+            log("Embed", "Sending request to server for " + type + " embed");
             liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type='+type+'&as=json&url=' + text, 
                 {  }, 
             function(resp) {
@@ -230,7 +232,7 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
                         template.parentElement.insertBefore(template.firstChild, template);
                     }
                 } catch(err) {
-                    liliumcms.modals.error("Facebook embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the Facebook embed feature of this post. Make sure the post is from a public account, and that it is correctly formatted.");
+                    liliumcms.modals.error("Embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the " + type + " embed feature of this post. Make sure the post is from a public account, and that it is correctly formatted.");
                     console.err(err);
                 }
 
@@ -256,17 +258,19 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
             editor.insert(iframe);
             break;
 
-        case "vimeo":
-
-            break;
-
-        case "twitter":
-
-            break;
-
         case "soundcloud":
         case "soundcloud.c":
+            var iframe = d.make({
+                node : "iframe",
+                attr : {
+                    width : "100%",
+                    height: "300",
+                    frameborder : "0",
+                    src : "https://w.soundcloud.com/player/?url=" + text
+                }
+            }).get();
 
+            editor.insert(iframe);
             break;
 
         case "imgur":

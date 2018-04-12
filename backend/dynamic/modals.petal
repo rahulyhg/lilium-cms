@@ -86,7 +86,6 @@
                 <option value="igvideo">Instagram video</option>
                 <option value="igcarousel">Instagram carousel</option>
                 <option value="fbpost">Facebook Post</option>
-                <option value="fbphoto">Facebook Photo</option>
                 <option value="fbvideo">Facebook Video</option>
                 <option value="youtube">Youtube video</option>
                 <option value="vimeo">Vimeo video</option>
