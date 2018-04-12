@@ -214,14 +214,46 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
             break;
 
         case "fbpost":
-        case "fbphoto":
+        case "fbvideo":
         case "facebook.c":
+            var template = document.createElement('div');
+            editor.insertBlock(template);
 
+            log("Embed", "Sending request to server for Facebook embed");
+            liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type='+type+'&as=json&url=' + text, 
+                {  }, 
+            function(resp) {
+                try {
+                    resp = JSON.parse(resp);
+                    template.innerHTML = resp.markup;
+                    while (template.firstChild) {
+                        template.parentElement.insertBefore(template.firstChild, template);
+                    }
+                } catch(err) {
+                    liliumcms.modals.error("Facebook embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the Facebook embed feature of this post. Make sure the post is from a public account, and that it is correctly formatted.");
+                    console.err(err);
+                }
+
+                template.remove();
+            });
             break;
 
         case "youtube":
         case "youtube.c":
+            var param = text.split('v=')[1].split('&')[0];
+            var iframe = d.make({
+                node : "iframe",
+                attr : {
+                    allow : "autoplay; encrypted-media",
+                    allowfullscreen : "",
+                    width : "640",
+                    height: "360",
+                    frameborder : "0",
+                    src : "https://www.youtube.com/embed/" + param
+                }
+            }).get();
 
+            editor.insert(iframe);
             break;
 
         case "vimeo":
