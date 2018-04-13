@@ -67,6 +67,20 @@
     </div>
 </div></div>
 
+<div class="lml-modal-wrapper"><div id="lml-edit-link-modal" class="lml-modal lml-modal-perma">
+    <div class="lml-modal-title">
+        Edit embed link
+    </div>
+    <div class="lml-modal-body">
+        <input type="text" id="edit-link-modal-url" placeholder="Provide a URL" />
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Cancel</button>
+        <button class="lml-modal-accept" type="button">Save</button>
+    </div>
+</div></div>
+
+
 <div class="lml-modal-wrapper"><div id="lml-insert-embedlink-modal" class="lml-modal lml-modal-perma">
     <div class="lml-modal-title">
         Insert embed link
