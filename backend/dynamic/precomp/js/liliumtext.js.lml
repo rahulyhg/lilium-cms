@@ -314,8 +314,30 @@ LiliumTextEmbedPlugin.prototype.handleCommandAccept = function(modal) {
 }
 
 LiliumTextEmbedPlugin.prototype.commandClick = function() {
-    window["lml-insert-embedlink-modal_accept"] = this.handleCommandAccept.bind(this);
-    liliumcms.modals.get('lml-insert-embedlink-modal').cast();
+    var context = this.editor.createSelectionContext(this.editor.restoreSelection().focusNode);
+    var maybeLink = context.find(function(el) { return el.nodeName == "A" });
+
+    if (maybeLink) {
+        window["lml-edit-link-modal_accept"] = function() {
+            var newurl = document.getElementById('edit-link-modal-url').value.toString().trim();
+            if (!newurl || (newurl.indexOf('http') == -1 && newurl.indexOf('#') != 0)) {
+                liliumcms.notify({
+                    type : "warning",
+                    title : "Edit link",
+                    message : "The provided URL is invalid. Make sure it begins with http or https."
+                });
+            } else {
+                maybeLink.href = newurl; 
+                liliumcms.modals.get('lml-edit-link-modal').dismiss();
+            }
+        };
+
+        document.getElementById('edit-link-modal-url').value = maybeLink.getAttribute('href');
+        liliumcms.modals.get('lml-edit-link-modal').cast();
+    } else {
+        window["lml-insert-embedlink-modal_accept"] = this.handleCommandAccept.bind(this);
+        liliumcms.modals.get('lml-insert-embedlink-modal').cast();
+    }
 };
 
 LiliumTextEmbedPlugin.prototype.register = function() {
