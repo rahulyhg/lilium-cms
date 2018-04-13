@@ -782,9 +782,16 @@ var LiliumCMS = function() {
         this.parseDocument = function(wrapper) {
             log('PageLoader', 'Seeking links, transform them into async links');
             var total = 0;
+            var liliumtexteditors = document.querySelectorAll('.liliumtext');
             
             Array.prototype.forEach.call(document.querySelectorAll(wrapper || 'main.lmladminmain a'), function(a) {
                 var href = a.href || "";
+
+                for (var i = 0; i < liliumtexteditors.length; i++) {
+                    if (liliumtexteditors[i].contains(a)) {
+                        return;
+                    }
+                }
 
                 if (
                     !a.dataset.async && !a.dataset.replace && 
