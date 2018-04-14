@@ -85,7 +85,7 @@ const compile = (o, context) => { o(context.header, css, `
         </div>
         <div id="ponglink-versions-table-wrapper" class="half-cell">
             <div id="ponglink-versions-table" class="half-flex">
-                <div class="half-table-cell half-cell-title">Version</div>
+                <div class="half-table-cell half-cell-title">Medium / Identifier</div>
                 <div class="half-table-cell half-cell-title">Clicks</div>
             </div>
         </div>
@@ -137,6 +137,11 @@ const compile = (o, context) => { o(context.header, css, `
                 }
             });
 
+            var versionsToString = {};
+            lv.link.versions.forEach(function(v) {
+                versionsToString[v.hash] = v.medium;
+            });
+
             graphel = document.getElementById('ponglink-pie');
             ctx = graphel.getContext('2d');
             labels = [];
@@ -145,7 +150,7 @@ const compile = (o, context) => { o(context.header, css, `
                 labels.unshift(x.version);
                 data.unshift(x.clicks);
 
-                d.make({ parent : versiontable, text : x.version, class : "half-table-cell" })
+                d.make({ parent : versiontable, text : versionsToString[x.version] || x.version, class : "half-table-cell" })
                 d.make({ parent : versiontable, text : x.clicks, class : "half-table-cell" })
             });
 
