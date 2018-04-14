@@ -10,7 +10,10 @@ const ALLOWED_EDIT_FIELDS = [
 
 class PongLinks {
     hashDestination(dest) {
-        return SHA1(dest);
+        return new Buffer(Date.now().toString()).toString('base64').slice(0, -2);
+
+        // Old logic
+        return new Buffer(SHA1(dest)).toString('base64').substring(10);
     }
 
     parseEditFields(keyval) {
@@ -41,27 +44,39 @@ class PongLinks {
     }   
 
     createLink(_c, creatorid, link, done) {
-        const hash = this.hashDestination(link.identifier + link.destination);
-        const destination = link.destination + (link.destination.includes("?") ? "&" : "?") +
-            "utm_campaign=" + link.campaign +
-            "&utm_source=" + link.source +
-            "&utm_medium=" + link.medium;
+        const hash = this.hashDestination(JSON.stringify(link));
+        const versions = link.versions.map((v, i) => {
+            v.identifier = v.identifier.trim().replace(/[\s\&]/g, '_');
+
+            return {
+                destination : v.destination.trim() + (v.destination.includes("?") ? "&" : "?") +
+                    "utm_campaign=" + link.defaults.campaign +
+                    "&utm_source=" + link.defaults.source +
+                    "&utm_medium=" + v.identifier,
+                hash : i + 1000,
+                medium : v.identifier
+            };
+        });
 
         db.insert(_c, 'ponglinks', {
-            creatorid, hash, destination,
+            creatorid, hash, versions,
+
             createdOn : new Date(),
             createdAt : Date.now(),
 
             status : "active", 
             identifier : link.identifier,
-            source : link.source,
-            campaign : link.campaign, 
-            medium : link.medium,
-            versions : link.versions.split(',').map(x => x.trim().replace(/[\s\&]/g, '_')), 
+            defaults : link.defaults,
             clicks : 0
         }, (err, r) => {
             done(err, r.insertedId);
-            sharedcache.set({ ["ponglinks_" + hash] : destination });
+
+            const set = {};
+            versions.forEach(x => {
+                set["ponglinks_" + hash + x.hash] = x.destination;
+            });
+
+            sharedcache.set(set);
         });
     }
 
