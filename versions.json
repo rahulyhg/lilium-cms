@@ -106,5 +106,10 @@
         "codename" : "Cerebus",
         "script" : "2.2.0.js",
         "features" : ["publishingv2"]
+    },
+    "3.0.0" : {
+        "codename": "Tyche",
+        "script" : "MAJOR_3.js",
+        "features" : ["V3"]
     }
 }
