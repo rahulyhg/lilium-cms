@@ -82,8 +82,8 @@ class PongLinks {
 
     GET(cli) {
         const hash = cli.routeinfo.path[1];
-        const version = cli.routeinfo.params.version || "forged";
-        sharedcache.get("ponglinks_" + hash, domain => domain ? cli.redirect(domain + "&version=" + version) : cli.throwHTTP(404, undefined, true));
+        const version = cli.routeinfo.params.version || cli.routeinfo.path[2];
+        sharedcache.get("ponglinks_" + hash + version, domain => domain ? cli.redirect(domain) : cli.throwHTTP(404, undefined, true));
 
         db.increment(cli._c, 'ponglinks', { hash, status : "active" }, { clicks : 1 }, (r) => {
             r.modifiedCount && db.insert(cli._c, 'pongclicks', { at : new Date(), ip : cli.ip, hash, version }, () => {});
@@ -144,10 +144,15 @@ class PongLinks {
             sites.forEach(site => {
                 db.createCollections(site, ['ponglinks', 'pongclicks'], () => {
                     db.findToArray(site, 'ponglinks', {}, (err, arr) => {
+                        const set = {};
                         log('Ponglinks', 'Storing ' + arr.length + " links in shared cache", 'success');
                         arr.forEach(x => {
-                            sharedcache.set({ ["ponglinks_" + x.hash] : x.destination });
+                            x.versions.forEach(v => {
+                                set["ponglinks_" + x.hash + (v.name || v.hash)] = v.destination;
+                            });
                         });
+
+                        sharedcache.set(set);
                     });
                 });
             });
