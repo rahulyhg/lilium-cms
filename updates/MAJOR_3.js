@@ -19,6 +19,7 @@ const remodalPonglinks = (_c, done) => {
                     return {
                         hash : 1000 + i,
                         use_default : true,
+                        medium : link.medium,
                         destination : link.defaults.destination,
                         name : v
                     };
