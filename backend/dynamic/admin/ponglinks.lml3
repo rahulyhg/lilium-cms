@@ -567,29 +567,6 @@ const compile = (o, context, v) => { o(context.header, css, sliders(context), `
                 dismissCreate();
             });
         }
-
-        var DEPRECATED_createNewPonglink = function() {
-            var payload = {};
-            payload.identifier = d.id('modal-identifier').value;
-            payload.destination = d.id('modal-destination').value;
-            payload.source = d.id('modal-source').value;
-            payload.campaign = d.id('modal-campaign').value;
-            payload.medium = d.id('modal-medium').value;
-            payload.versions = d.id('modal-versions').value;
-
-            if (!payload.versions.trim()) {
-                payload.versions = "Main";
-            }
-
-            if (payload.identifier && payload.destination) {
-                liliumcms.lmldom.post(payload, '${context._c.server.url}/admin/ponglinks/create', function(r) {
-                    liliumcms.lmldom.getBunches()["ponglinks-list"].render();
-                    liliumcms.modals.get('create-ponglink-modal').dismiss();
-                });
-            } else {
-                liliumcms.notify({ type : "warning", title : "Missing information", message : "You need to provide an identifier as well as a destination URL." })
-            } 
-        };
     </script>
 
 `)};
