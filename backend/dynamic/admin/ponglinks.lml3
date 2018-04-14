@@ -529,6 +529,45 @@ const compile = (o, context, v) => { o(context.header, css, sliders(context), `
             return document.createTextNode(creator ? creator.displayname : "an inactive user");
         }
 
+        var createPayload = function() {
+            var v = function(id) { return document.getElementById(id).value; }
+
+            return {
+                identifier : v("pl-identifier"),
+                defaults : {
+                    destination : v("pl-default-url"),
+                    source : v("pl-default-source"),
+                    campaign : v("pl-default-campaign")
+                },
+                versions : Array.prototype.map.call(document.querySelectorAll('.pl-version-item'), function(item) {
+                    return {
+                        destination : item.querySelector('.pl-version-destination').value || v("pl-default-url"),
+                        identifier : item.querySelector('.pl-version-identifier').value
+                    };
+                })
+            };
+        };
+
+        var createNewPonglink = function() {
+            var payload = createPayload();
+            if (!payload.identifier || !payload.defaults.destination || !payload.defaults.source || !payload.defaults.campaign || 
+                payload.versions.length == 0 ||
+                payload.versions.map(function(ver) { return ver.identifier.trim() }).includes("")
+            ) {
+                return liliumcms.modals.error("Ponglinks", "Seems like some fields are missing. Make sure the form is filled out properly!");
+            }
+
+            liliumcms.lmldom.post(payload, '${context._c.server.url}/admin/ponglinks/create', function(r) {
+                liliumcms.lmldom.getBunches()["ponglinks-list"].render();
+                liliumcms.notify({ 
+                    title : "Ponglinks",
+                    message : payload.identifier + " was successfully created",
+                    type : "success"
+                });
+                dismissCreate();
+            });
+        }
+
         var DEPRECATED_createNewPonglink = function() {
             var payload = {};
             payload.identifier = d.id('modal-identifier').value;
