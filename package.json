@@ -125,11 +125,12 @@
     "simple-oauth2": "latest",
     "slug": "latest",
     "slugify": "latest",
-    "socket.io": "latest",
+    "socket.io": "^2.1.0",
     "socket.io-redis": "latest",
     "stackpath": "0.0.5",
     "stream-browserify": "latest",
     "streamify": "latest",
+    "streamws": "^0.1.1",
     "stripe": "^5.4.0",
     "twitter": "latest",
     "uglify": "latest",
@@ -141,6 +142,6 @@
     "validator": "latest",
     "vanilla-js-calendar": "latest",
     "websocket": "latest",
-    "ws": "^3.2.0"
+    "ws": "^5.1.1"
   }
 }
