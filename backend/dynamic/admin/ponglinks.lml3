@@ -85,12 +85,12 @@ const css = `<style>
 .link-status span::before {
     display: inline-block;
     margin: 4px 0px;
-    padding: 1px 4px;
+    padding: 4px 10px;
     background-color: #333;
     color: #FFF;
     border-radius : 3px;
     text-transform: uppercase;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
 }
 
@@ -172,45 +172,199 @@ const css = `<style>
     cursor: default;
 }
 
+.publish-overlay {
+    position:fixed;
+    top:0; 
+    bottom:0;
+
+    z-index: 100000;
+    transition: all 0.5s;
+}
+
+#lilium .publish-overlay.shown {
+    transform: translate3d(0,0,0);
+}
+
+#pl-create-overlay-left {
+    width: 100%;
+    left : 0;
+    transform: translate3d(-100%, 0, 0);
+    color: rgb(244, 191, 255);
+
+    background-color: #332336;
+    background-image: url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%232c1d2f' fill-opacity='0.4' fill-rule='evenodd'%3E%3Ccircle cx='3' cy='3' r='3'/%3E%3Ccircle cx='13' cy='13' r='3'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+#pl-create-overlay-right {
+    width: 60%;
+    right : 0;
+    background-color: rgb(244, 191, 255);
+    color: #2c1d2f;
+    transform: translate3d(100%, 0, 0);
+    z-index: 100001;
+    padding: 0px 30px 20px;
+    font-family: "Lato", sans-serif;
+
+    overflow-y : auto;
+}
+
+#publish-input-section label {
+    display: block;
+    font-weight: bold;
+    font-size: 20px;
+    margin-bottom: 2px;
+    color: #754b7d;
+    font-family: "Lato", sans-serif;
+}
+
+#publish-input-section input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    background: transparent;
+    font-size: 14px;
+    margin-bottom: 25px;
+    border-bottom: 1px solid #ac7ab7;
+    margin-top: 4px;
+    color: #614367;
+    font-family: "Lato", sans-serif;
+    padding: 0px 0px 2px;
+}
+
+#publish-input-section input::placeholder {
+    color: #ac7ab7;
+}
+
+#publish-input-section h3 {
+    font-size: 32px;
+    margin: 30px 0px 10px;
+    display: block;
+    font-weight: bold;
+}
+
+.site-name {
+    font-family: "Oswald", sans-serif;
+    font-size: 72px;
+    text-transform: uppercase;
+    font-weight: normal;
+    display: block;
+
+    margin-bottom: -20px;
+    margin-left: -3px;
+}
+
+.publish-title {
+    font-family: "Muli", sans-serif;
+    font-size: 20px;
+    text-transform: uppercase;
+    display: block;
+    letter-spacing: -1px;
+}
+
+#publish-title-section {
+    height: 100px;
+    position: relative;
+    top: 40%;
+    left: 100px;
+    width: calc(100% - 200px);
+}
+
+#writeactions {
+    text-align: right;
+    margin-top: 10px;
+}
+
+#writeactions b {
+    margin-left: 20px;
+    color: #2c1d2f;
+    cursor: pointer;
+}
+
+#pl-create-details {
+    padding: 2px 15px;
+    background: #302033;
+    color: #f4bfff;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#pop-up-version-help {
+    font-size: 12px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    padding-top: 3px;
+    border-radius: 12px;
+    cursor: pointer;
+    background: #332336;
+    color: #f4bfff;
+}
+
+#pl-create-version {
+    padding: 10px;
+    background: #332336;
+    color: #f4bfff;
+    font-size: 21px;
+    text-transform: uppercase;
+    border-radius: 3px;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.pl-version-item {
+    padding: 20px 20px 2px;
+    border-left: 3px solid #b77dc1;
+    margin-bottom: 20px;
+}
+
 </style>`;
 
-const modal = `<div id="create-ponglink-modal" class="lml-modal">
+const sliders = context => `
 
-    <div class="lml-modal-title">Create new ponglink</div>
-
-    <div class="lml-modal-body">
-        <span>Unique identifier</span>
-        <input id="modal-identifier" placeholder="Campaign ID, client name, website name..." />
-
-        <span>Destination URL</span>
-        <input id="modal-destination" placeholder="https://www.liliumcms.com" />
-
-        <hr />
-        <span>Source</span>
-        <input id="modal-source" placeholder="utm_source" />
-
-        <span>Medium</span>
-        <input id="modal-medium" placeholder="utm_medium" />
-
-        <span>Campaign</span>
-        <input id="modal-campaign" placeholder="utm_campaign" />
-
-        <hr />
-        <span>Variations</span>
-        <p>
-            It is possible to define multiple versions of the same link and compare clicks between them. 
-            Simply fill the following field with a comma separated list of version names.
-        </p>
-        <input id="modal-versions" placeholder="Top, Middle, Bottom, Signature" />
+    <div id="pl-create-overlay-left" class="publish-overlay">
+        <div id="publish-title-section">
+            <b class="site-name">${context._c.website.sitetitle}</b>
+            <b class="publish-title">Create a new Ponglink</b>
+        </div>
     </div>
 
-    <div class="lml-modal-footer">
-        <button class="lml-modal-cancel" type="button">Cancel</button> 
-        <button class="lml-modal-accept" type="button">Create</button>
-    </div>
-</div>`;
+    <div id="pl-create-overlay-right" class="publish-overlay">
+        <div id="publish-input-section">
+            <h3>Ponglink campaign information</h3>
+            <label>Ponglink identifier</label>
+            <input placeholder="The readers will not see this anywhere" id="pl-identifier" />
 
-const compile = (o, context, v) => { o(context.header, css, modal, `
+            <label>Default destination URL</label>
+            <input placeholder="The URL used as a destination for versions which don't have one" id="pl-default-url" />
+
+            <label>Public campaign name</label>
+            <input placeholder="Will appear in the URL as the utm_campaign parameter" id="pl-default-campaign" />
+
+            <label>Public Source name</label>
+            <input placeholder="Will appear in the URL as the utm_source parameter" id="pl-default-source" />
+
+            <h3>Ponglink versions <i class="fas fa-question" id="pop-up-version-help" onclick="popupVersionHelp();"></i></h3>
+            <div id="pl-version-list">
+
+            </div>
+            <div id="pl-create-version" onclick="addPonglinkVersion();">
+                Add Ponglink version
+            </div>
+            
+            <div id="writeactions">
+                <b onclick="dismissCreate();">Dismiss</b>
+                <b onclick="createNewPonglink();">Create Ponglink</b>
+            </div>
+        </div>
+    </div>
+
+
+`;
+
+const compile = (o, context, v) => { o(context.header, css, sliders(context), `
   
     <lml-bunch>
         <lml-bunchfilters>
@@ -296,16 +450,46 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
             return actionwrap.get();
         }   
 
+        var popupVersionHelp = function() {
+            liliumcms.modals.alert('Ponglink versions', "You can specify multiple destinations for a single campaign. Each version of a Ponglink must have a destination, an identifier, and a medium. For convenience, it is possible to use the default values provided instead of copy-pasting the same link for each version. <br><br>At least one version must be provided in order to create a Ponglink campaign.<br><br>Click the 'Add Ponglink Version' button to add a new version.");
+        };
+
+        var addPonglinkVersion = function() {
+            var wrap = d.make({
+                class : "pl-version-item"
+            });
+
+            d.make({ node : "label", text : "Medium / Identifier", parent : wrap })
+            d.make({ node : "input", attr : { placeholder : "Will be used as the utm_medium URL parameter" }, class : "pl-version-identifier", parent : wrap });
+
+            d.make({ node : "label", text : "Destination URL", parent : wrap })
+            d.make({ node : "input", attr : { placeholder : "Leave empty to use the default destination" }, class : "pl-version-destination", parent : wrap });
+
+            d.id('pl-version-list').born(wrap);
+        };
+
+        var popupCreate = function() {
+            d.id('pl-create-overlay-left').cadd('shown');
+            d.id('pl-create-overlay-right').cadd('shown');
+
+            return false;
+        };
+
+        var dismissCreate = function() {
+            d.id('pl-create-overlay-left').crm('shown');
+            d.id('pl-create-overlay-right').crm('shown');
+        };
+
         var listLinksVersions = function(ldContext) {
             var link = ldContext.link;
-            var href = "${context._c.server.protocol}${context._c.server.url}/pong/" + link.hash + "?version=";
+            var href = "${context._c.server.protocol}${context._c.server.url}/pong/" + link.hash + "/";
 
             var wrap = d.make({ class : "ponglink-links" })
             for (var i = 0; i < link.versions.length; i++) {
                 var row = d.make({ class : "ponglink-linkrow", parent : wrap });
-                d.make({ text : link.versions[i], parent : row, class : "ponglink-linkcell" });
+                d.make({ text : link.versions[i].medium || "Default", parent : row, class : "ponglink-linkcell" });
 
-                var ccell = d.make({ text : href + link.versions[i], parent : row, class : "ponglink-linkcell" });
+                var ccell = d.make({ text : href + (link.versions[i].name || link.versions[i].hash), parent : row, class : "ponglink-linkcell" });
                 ccell.bind('click', function(ev) {
                     var t = ev.target;
                     var text = t.textContent.trim();
@@ -331,12 +515,6 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
                 });
             }
 
-            var row = d.make({ class : "ponglink-linkrow", parent : wrap });
-            d.make({ text : "Destination", parent : row, class : "ponglink-linkcell bold" });
-
-            var linkwrap = d.make({ parent : row, class : "ponglink-linkcell" });
-            d.make({ node : "a", attr : { href : link.destination, target : "_blank" }, text : link.destination, parent : linkwrap });
-
             return wrap.get();
         }
 
@@ -351,12 +529,7 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
             return document.createTextNode(creator ? creator.displayname : "an inactive user");
         }
 
-        var popupCreate = function() {
-            liliumcms.modals.get('create-ponglink-modal').show();
-            return void 0;
-        }
-
-        document.querySelector('#create-ponglink-modal .lml-modal-accept').addEventListener('click', function() {
+        var DEPRECATED_createNewPonglink = function() {
             var payload = {};
             payload.identifier = d.id('modal-identifier').value;
             payload.destination = d.id('modal-destination').value;
@@ -377,7 +550,7 @@ const compile = (o, context, v) => { o(context.header, css, modal, `
             } else {
                 liliumcms.notify({ type : "warning", title : "Missing information", message : "You need to provide an identifier as well as a destination URL." })
             } 
-        });
+        };
     </script>
 
 `)};
