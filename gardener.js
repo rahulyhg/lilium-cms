@@ -3,11 +3,12 @@ const fileserver = require('./fileserver.js');
 const cluster = require('cluster');
 const RedisServer = require('redis-server');
 const fs = require('fs');
-const SharedMemory = require('./network/sharedmemory.js');
 const log = require('./log.js');
+const { spawn } = require('child_process');
 
 const garden = {};
 
+let sharedMemoryProcess;
 let bootCount = 0;
 
 class Gardener {
@@ -22,12 +23,10 @@ class Gardener {
             log('Network', 'Spawning redis server', 'lilium');
             const redisserver = new RedisServer(6379);
 
+            this.spawnSharedMemory();
             redisserver.open(() => {
                 log('Network', 'Redis server spawned', 'success');
                 const lmlinstances = this.networkConfig.familysize || require('os').cpus().length;
-
-                log('Network', 'Starting up Shared Memory module', 'lilium');
-                SharedMemory.bind();
 
                 const server = require('http').createServer();
                 const io = require('socket.io').listen(server);
@@ -78,6 +77,14 @@ class Gardener {
             const lilium = new Lilium();
             garden[process.id] = lilium.cms();
         } 
+    }
+
+    spawnSharedMemory() {
+        log('Network', 'Spawning local cache server', 'lilium');
+        sharedMemoryProcess = spawn("node", [__dirname + "/network/spawn.js"]);
+        sharedMemoryProcess.on('error', err => {
+            log('Gardener', err, 'err');
+        })
     }
 
     updateAndRestart() {
