@@ -1127,23 +1127,28 @@ var LiliumCMS = function() {
     };
 
     var LMLSession = function() {
+        var that = this;
         this.current = {};
         this.allUsers = [];
         this.users = {};
 
         this.init = function() {
             log('Session', 'Recrieving session');
-            this.current = liliumcms.livevars.retrieveVar('session');
-            this.allUsers = liliumcms.livevars.livevars()["entities.cached"];
+            that.current = liliumcms.livevars.retrieveVar('session');
+            that.allUsers = liliumcms.livevars.livevars()["entities.cached"];
+            that.isAdmin = that.current.roles.includes('admin');
 
-            var that = this;
             this.allUsers.forEach(function(u) {
                 that.users[u._id] = u;
             });
         }
 
+        this.hasRight = function(right) {
+            return that.isAdmin || that.current.rights.includes(right);
+        }
+
         this.getCachedUsers = function() {
-            return this.users;
+            return that.users;
         }
     };
 
