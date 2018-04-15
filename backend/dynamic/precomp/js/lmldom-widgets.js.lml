@@ -1,3 +1,5 @@
+{#config}
+
 var LMLDOM_MultiSelect = function(elem) {
     var that = this;
     that.elem = elem;
