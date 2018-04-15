@@ -635,10 +635,9 @@ class Entities {
         newEnt.shhh = CryptoJS.SHA256(entData.password).toString(CryptoJS.enc.Hex);
         newEnt.email = entData.email;
         newEnt.description = entData.description || '';
-        newEnt.reportsto = entData.reportsto || [];
 
-        for (var i = 0; i < newEnt.reportsto.length; i++) {
-            newEnt.reportsto[i] = db.mongoID(newEnt.reportsto[i]); 
+        if (entData.reportsto) {
+            newEnt.reportsto = db.mongoID(entData.reportsto);
         }
 
         newEnt.roles = [];
