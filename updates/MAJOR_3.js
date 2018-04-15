@@ -48,7 +48,27 @@ const remodalPonglinks = (_c, done) => {
     });
 };
 
+const remodalEntities = done => {
+    const doOne = cur => {
+        cur.hasNext((err, hasnext) => {
+            hasnext ? cur.next((err, entity) => {
+                if (Array.isArray(entity.reportsto)) {
+                    db.update(require('../config').default(), 'entities', { _id : entity._id }, { reportsto : db.mongoID(entity.reportsto[0]) }, () => {
+                        setTimeout(() => doOne(cur), 0);
+                    });
+                } else {
+                    doOne(cur);
+                }
+            }) : done();
+        });
+    };
+
+    db.find(require('../config').default(), 'entities', { reportsto : { $exists : 1 } }, [], (err, cur) => {
+        doOne(cur);
+    });
+};
+
 // Exported update function
 module.exports = (_c, done) => {
-    remodalPonglinks(_c, done);
+    remodalPonglinks(_c, remodalEntities(done));
 };
