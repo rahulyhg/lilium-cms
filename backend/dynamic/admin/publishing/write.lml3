@@ -152,7 +152,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     var STATUS_VOCAB = {
         published   : { text : "Published",     color : "#2162b9" },
         draft       : { text : "Draft",         color : "#576c88" },
-        pending     : { text : "Pending review",color : "#701ab9" },
+        reviewing   : { text : "Pending review",color : "#701ab9" },
         deleted     : { text : "Unpublished",   color : "#9a471b" },
         destroyed   : { text : "Destroyed",     color : "#ff4405" },
     };
@@ -161,7 +161,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
          {
             id : "save",
             shouldShow : function() {
-                return window._poststate.status == "draft" || window._poststate.status == "deleted";
+                return window._poststate.status == "draft" || window._poststate.status == "deleted" || window._poststate.status == "reviewing";
             },
             render : function() {
                 var button = document.createElement('button');
@@ -173,7 +173,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         {
             id : "publish",
             shouldShow : function() {
-                return window._poststate.status == "draft" || window._poststate.status == "deleted";
+                return liliumcms.session.hasRight("publish-articles") && (window._poststate.status == "draft" || window._poststate.status == "deleted" || window._poststate.status == "reviewing");
             },
             render : function() {
                 var button = document.createElement('button');
@@ -182,6 +182,31 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 return button;
             }
         },
+        {
+            id : "submitreview",
+            shouldShow : function() {
+                return liliumcms.session.current.roles.includes("contractor") && (window._poststate.status == "draft" || window._poststate.status == "deleted");
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Submit for review";
+                button.addEventListener('click', submitCurrentPost);
+                return button;
+            }
+        },
+        {
+            id : "refuse",
+            shouldShow : function() {
+                return liliumcms.session.hasRight("editor") && (window._poststate.status == "reviewing");
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Refuse proposal";
+                button.addEventListener('click', refuseCurrentPost);
+                return button;
+            }
+        },
+
         {
             id : "preview",
             shouldShow : function() {
@@ -209,7 +234,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         {
             id : "unpublish",
             shouldShow : function() {
-                return window._poststate.status == "published";
+                return liliumcms.session.hasRight("publish-articles") && window._poststate.status == "published";
             },
             render : function() {
                 var button = document.createElement('button');
@@ -527,8 +552,14 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             case "unpublished":
                 return displayname + " removed this article from the website";
 
+            case "submitted":
+                return displayname + " submitted this article for review";
+
+            case "refused":
+                return displayname + " refused this submission";
+
             case "destroyed":
-                return displayname + " destroyed this article"
+                return displayname + " destroyed this article";
 
             default:
                 return displayname + " updated this post";
@@ -545,7 +576,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         var creator = users.find(function(user) { return user._id == history.actor }) || { displayname : "An Unknown Author", avatarURL : "/static/media/lmllogo.png" };
         
         var creatorAvatar = document.createElement('img');
-        creatorAvatar.onload = function() { setTimeout(function() { creatorAvatar.style.flexGrow = 1; }, 10); };
+        creatorAvatar.onload = function() { setTimeout(function() { creatorAvatar.style.flexGrow = 1; textspan.style.flexGrow = 1; }, 10); };
         creatorAvatar.className = "history-actor";
         creatorAvatar.src = creator.avatarURL;
         card.appendChild(creatorAvatar);
@@ -598,7 +629,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 if (resp.error) {
                     liliumcms.notify({ type : "danger", title : "Did not Destroy", message : "Could not destroy the article because of an error : " + resp.error});
                 } else {
-                    liliumcms.notify({ type : "success", title : "Unpublished", message : "This article was removed from the website, but is still editable and can be published later."});
+                    liliumcms.notify({ type : "success", title : "Article destroyed", message : "This article was destroyed, and is no longer accessible."});
                     liliumcms.pageloader.load("/admin/publishing/list");
                 }
             } else{
@@ -626,6 +657,43 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             }
         });
     }
+
+    var refuseCurrentPost = function() {
+        liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/refuse/" + liliumcms.pageloader.lastLevel, function(resp) {
+            if (resp) {
+                if (resp.error) {
+                    liliumcms.notify({ type : "danger", title : "Did not refuse", message : "Could not refuse the article."});
+                } else {
+                    resp.historyentry && pushHistoryCard(resp.historyentry);
+                    resp.newstate && (window._poststate = resp.newstate);
+
+                    refreshState();
+                    refreshActions();
+
+                    liliumcms.notify({ type : "success", title : "Submit article", message : "The article can now be edited by the author, and they will be able to submit it once again."});
+                }
+            } else {
+                liliumcms.notify({ type : "danger", title : "Did not refuse", message : "Could not refuse the article."});
+            }
+        });
+    }
+
+    var submitCurrentPost = function() {
+        saveCurrentPost(function(saveresp) {
+            liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/submit/" + liliumcms.pageloader.lastLevel, function(resp) {
+                if (resp) {
+                    if (resp.error) {
+                        liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article because some fields are missing."});
+                    } else {
+                        liliumcms.notify({ type : "success", title : "Submit article", message : "This article is now pending review."});
+                        liliumcms.pageloader.load('/admin/publishing/list');
+                    }
+                } else {
+                    liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article for an unknown reason."});
+                }
+            });
+        });
+    };
 
     var publishCurrentPost = function() {
         saveCurrentPost(function(saveresp) {
