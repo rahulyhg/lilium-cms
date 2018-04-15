@@ -62,6 +62,40 @@ class ContentController {
                 });
                 break;
 
+            case 'submit':
+                log('Content', 'Sending article for review from PUT under /submit', 'detail');
+                const cid = cli.routeinfo.path[3];
+                const conds = {
+                    _id : db.mongoID(cid),
+                    status : { $ne : "published" },
+                    author : db.mongoID(cli.userinfo.userid)
+                };
+
+                db.findUnique(cli._c, 'content', conds, (err, maybePost) => {
+                    if (cli.hasRight("contributor") && maybePost) {
+                        contentlib.sendForReview(cli._c, conds._id, conds.author, resp => cli.sendJSON(resp));
+                    } else {
+                        cli.sendJSON({ error : "Not allowed" });
+                    }
+                });
+                break;
+
+            case "refuse":
+                log('Content', 'Refusing submission from PUT under /refuse', 'detail');
+                if (cli.hasRight('editor')) {
+                    const postid = db.mongoID(cli.routeinfo.path[3]);
+                    db.findUnique(cli._c, 'content', {_id : postid}, (err, maybePost) => {
+                        if (maybePost) {
+                            contentlib.refuseSubmission(cli._c, postid, db.mongoID(cli.userinfo.userid), resp => cli.sendJSON(resp));
+                        } else {
+                            cli.sendJSON({ error : "Not allowed" })
+                        }
+                    });     
+                } else {
+                    cli.sendJSON({ error : "Not allowed" })
+                }
+                break;
+
             case 'refresh':
                 log('Content', 'Refreshing article from PUT under /refresh', 'detail');
                 db.findUnique(cli._c, 'content', { _id }, (err, article) => {
