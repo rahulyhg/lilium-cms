@@ -112,6 +112,11 @@ class ContentController {
     livevar(cli, levels, params, sendback) {
         // Get formatted data
         if (levels[0] == "bunch") {
+            if (!cli.hasRight('editor')) {
+                params.filters = params.filters || {};
+                params.filters.author = cli.userinfo.userid;
+            }
+
             contentlib.bunch(cli._c, params.filters, params.filters && params.filters.sort, params.max, (params.page - 1) * params.max, sendback);
         } else if (levels[0] == "write") {
             contentlib.getFull(cli._c, levels[1], post => sendback(post));
