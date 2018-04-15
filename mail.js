@@ -250,7 +250,7 @@ class LMLMail {
     triggerHook(_c, hookname, to, extra, cb) {
         const that = this;
 
-        log('Mail', 'Triggering email hook ' + hookname + ' for ' + to);
+        log('Mail', 'Triggering email hook ' + hookname + ' for ' + to, 'detail');
         db.findToArray(_c, 'mailtemplates', { hooks : hookname }, (err, templates) => {
             for (let i = 0; i < templates.length; i++) {
                 let template = templates[i];
@@ -263,7 +263,7 @@ class LMLMail {
                 extra.config = _c;
 
                 LML2.compileToString(_c.id, body, extra, (compiledPage) => {
-                    log('Mail', 'Preparing to send LML email to ' + to);
+                    log('Mail', 'Preparing to send LML email to ' + to, 'info');
                     const email = that.createEmail(_c, to, template.subject);
                     email.setHTML(compiledPage);
                     if (extra.cc) {
@@ -271,7 +271,7 @@ class LMLMail {
                     }
 
                     that.send(email, () => {
-                        log('Mail', 'Sent email to ' + to + ' from hook ' + hookname);
+                        log('Mail', 'Sent email to ' + to + ' from hook ' + hookname, 'detail');
                         cb && cb();
                     });
                 });
