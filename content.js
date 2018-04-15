@@ -360,8 +360,32 @@ class ContentLib {
         });
     }
 
-    sendForReview() {
-    
+    sendForReview(_c, postid, author, callback) {
+        db.update(_c, 'content', { _id : postid }, {status : "reviewing"}, ()  => {
+            this.pushHistoryEntryFromDiff(_c, postid, author, diff({}, { status : "published" }), 'submitted', historyentry => {
+                callback && callback({ historyentry });
+            });
+
+            const defaultConfig = require('./config.js').default();
+            db.findUnique(defaultConfig, 'entities', { _id : author }, (err, contractor) => {
+                db.findUnique(defaultConfig, 'entities', {_id : contractor.reportsto}, (err, reportee) => {
+                    reportee && db.findUnique(_c, 'content', { _id : postid }, (err, article) => {
+                        require('./mail.js').triggerHook(_c, 'article_sent_for_review', reportee.email, {
+                            to : reportee, 
+                            article, contractor
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    refuseSubmission(_c, postid, caller, callback) {
+        db.update(_c, 'content', { _id : postid }, { status : "draft" }, () => {
+            this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "draft" }), 'refused', historyentry => {
+                this.getFull(_c, postid, newstate => callback && callback({ historyentry, newstate }));
+            });
+        });
     }
 
     unpublish(_c, postid, caller, callback) {
