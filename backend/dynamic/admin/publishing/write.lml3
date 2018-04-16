@@ -22,6 +22,55 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
 <div id="anim-slide-fade">
     <div id="anim-title"></div>
+
+    <div id="anim-cards">
+        <div class="flex-col">
+            <div id="anim-article" class="flex-card">
+                <div id="anim-article-title"></div>
+                <div id="anim-article-subtitle"></div>
+                <img src="" id="anim-article-image" />
+                <div id="anim-author">
+                    <b>Published by </b> <span id="anim-article-authorname"></span>
+                </div>
+            </div>
+
+            <div id="anim-author" class="flex-card">
+                <b class="card-title" id="anim-article-authordisplayname">The author</b>
+                <div class="flex-author">
+                    <img id="anim-article-authorimage" src="" />
+                    <div class="author-flexgrow">
+                        <div id="anim-article-authorarticles"><i class="far fa-paper-plane"></i>Published <b><span></span></b> articles on ${context._c.website.sitetitle}</div>
+                        <div id="anim-article-authorarticlestoday"><i class="far fa-calendar-edit"></i>Published <b><span></span></b> articles today</div>
+                        <div id="anim-article-authordeco"><i class="far fa-certificate"></i><b><span></span></b> decorations</div>
+
+                        <a id="anim-article-authorpage" href="" target="_blank">View author page</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-col">
+            <div id="anim-details" class="flex-card">
+                <b class="card-title">About this post</b>
+                <div id="anim-article-parag"><i class="far fa-paragraph"></i><span></span><b>Paragraphs</b></div>
+                <div id="anim-article-img"><i class="far fa-image"></i><span></span><b>Images</b></div>
+                <div id="anim-article-ads"><i class="far fa-usd-square"></i><span></span><b>Content ads</b></div>
+                <div id="anim-article-paginated"><i class="fas fa-columns"></i><span></span></div>
+                <div id="anim-article-nsfw"><i class="far fa-exclamation-square"></i><span></span></div>
+                <div id="anim-article-sponsored"><i class="far fa-handshake"></i><span></span></div>
+            </div>
+
+            <div id="anim-url" class="flex-card">
+                <b class="card-title">Article URL</b>
+                <a id="anim-article-url" target="_blank"></a>
+            </div>
+
+            <div id="anim-today" class="flex-card">
+                <b class="card-title">Also published today</b>
+                <div id="anim-today-list"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div id="publishing-actions">
@@ -278,32 +327,95 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         }
     ];
 
+    var fillReport = function(r) {
+        var set = function(id, value) {
+            get(id).textContent = value;
+        }
+        var setSpan = function(id, value) {
+            get(id).querySelector('span').textContent = value;
+        }
+        var get = function(id) {
+            return document.getElementById('anim-article-' + id);
+        }
+
+        set('title', r.headline);
+        set('subtitle', r.subline);
+        get('image').src = r.media;
+        set('authorname', r.fullauthor.displayname);
+        setSpan('parag', r.p);
+        setSpan('img', r.img);
+        setSpan('ads', r.ads);
+        setSpan('paginated', r.paginated ? "Paginated" : "Not paginated");
+        setSpan('nsfw', r.nsfw ? "Not safe for work" : "Safe for work");
+        setSpan('sponsored', r.isSponsored ? "Sponsored" : "Not sponsored");
+
+        set('url', r.url);
+        get('url').href = r.url;
+
+        get('authorimage').src = r.fullauthor.avatarURL;
+        set('authordisplayname', r.fullauthor.displayname);
+        setSpan('authorarticles', r.authortotal);
+        setSpan('authorarticlestoday', r.authortotaltoday);
+        setSpan('authordeco', r.decorations);
+        get('authorpage').href = "${context._c.server.url}/author/" + r.fullauthor.slug;
+
+        if (r.today.length != 0) {
+            var list = d.id('anim-today-list');
+            r.today.forEach(function(art) {
+                var wrap = d.make({ class : "anim-today-post", parent : list });
+                d.make({ class : "anim-today-post-date", text : dateFormat(art.date, "HH:MM"), parent : wrap });
+                d.make({ class : "anim-today-post-link", node : "a", text : art.headline.trim(), attr : { href : "${context._c.server.url}/" + art.name, "target" : "_blank" }, parent : wrap });
+            });
+            document.getElementById('anim-today').style.display = "block";
+        } else {
+            document.getElementById('anim-today').style.display = "none";
+        }
+    }
+
     var displayConfirmationAnimation = function() {
-        document.querySelectorAll('.anim-slide').forEach((s, i) => setTimeout(() => s.classList.add("slid"), i * i * 20));
-        setTimeout(() => {
-            var wrap = document.getElementById("anim-slide-fade");
-            var tle = document.getElementById('anim-title');
-            var textarr = "Article published".split('');
+        liliumcms.lmldom.get('${context._c.server.url}/admin/publishing/report/' + liliumcms.pageloader.lastLevel, {
+            json:true,
+            params : { async : true }
+        }, function(resp) {
+            fillReport(resp);
 
-            wrap.style.display = "block";
-
-            while (tle.firstChild) { tle.firstChild.remove(); };
-            textarr.forEach(function(char, i) {
-                var span = document.createElement('span');
-                span.innerHTML = char.trim() || "&nbsp;";
-                tle.appendChild(span);
-            
-                setTimeout(function() {
-                    span.classList.add('shown');
-                }, i*30 + 500);   
+            Array.prototype.forEach.call(document.querySelectorAll('.anim-slide'), function(s, i) { 
+                setTimeout(function() { 
+                    s.classList.add("slid") 
+                }, i * i * 20);
             });
 
             setTimeout(function() {
-                document.getElementById('anim-title').classList.add('slid');
-                document.getElementById('anim-slide-fade').classList.add('full');
-            }, textarr.length * 30 + 1200);
-            
-        }, 500);
+                var wrap = document.getElementById("anim-slide-fade");
+                var tle = document.getElementById('anim-title');
+                var textarr = "Article published".split('');
+
+                wrap.style.display = "block";
+
+                while (tle.firstChild) { tle.firstChild.remove(); };
+                textarr.forEach(function(char, i) {
+                    var span = document.createElement('span');
+                    span.innerHTML = char.trim() || "&nbsp;";
+                    tle.appendChild(span);
+                
+                    setTimeout(function() {
+                        span.classList.add('shown');
+                    }, i*30 + 500);   
+                });
+
+                setTimeout(function() {
+                    document.getElementById('anim-title').classList.add('slid');
+                    document.getElementById('anim-slide-fade').classList.add('full');
+
+                    Array.prototype.forEach.call(document.querySelectorAll('.flex-card'), function(c, i) {
+                        setTimeout(function() {
+                            c.classList.add('shown');
+                        }, i * 200);
+                    });
+                }, textarr.length * 30 + 1200);
+                
+            }, 300);
+        });
     };
 
     var createPayload = function() {
