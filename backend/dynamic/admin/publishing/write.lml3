@@ -234,12 +234,25 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             }
         },
         {
+            id : "preview",
+            shouldShow : function() {
+                return true;
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Preview";
+                button.addEventListener('click', previewCurrentPost);
+                return button;
+            }
+        },
+        {
             id : "publish",
             shouldShow : function() {
                 return liliumcms.session.hasRight("publish-articles") && (window._poststate.status == "draft" || window._poststate.status == "deleted" || window._poststate.status == "reviewing");
             },
             render : function() {
                 var button = document.createElement('button');
+                button.className = "blue";
                 button.textContent = "Publish article";
                 button.addEventListener('click', publishCurrentPost);
                 return button;
@@ -266,19 +279,6 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 var button = document.createElement('button');
                 button.textContent = "Refuse proposal";
                 button.addEventListener('click', refuseCurrentPost);
-                return button;
-            }
-        },
-
-        {
-            id : "preview",
-            shouldShow : function() {
-                return true;
-            },
-            render : function() {
-                var button = document.createElement('button');
-                button.textContent = "Preview";
-                button.addEventListener('click', previewCurrentPost);
                 return button;
             }
         },

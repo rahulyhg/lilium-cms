@@ -42,6 +42,11 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     padding-top: 0px;
 }
 
+#sticky-actions button.red,
+#sticky-actions button.blue {
+    box-shadow : none;
+}
+
 .history-card.history-card-published {
     background-color: #d7e8d9;
     background-image: url("data:image/svg+xml,<svg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'><g fill='%23a8c3af' fill-opacity='0.4' fill-rule='evenodd'><circle cx='3' cy='3' r='3'/><circle cx='13' cy='13' r='3'/></g></svg>");
