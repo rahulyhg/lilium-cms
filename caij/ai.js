@@ -166,10 +166,9 @@ class AI {
         log('CAIJ', 'Received task from module ' + extra.module, 'lilium');
 
         executor.registerJob(taskname, (done) => {
-            const callee = require(extra._c.server.base + "/" + extra.module);
-            callee[extra.call](this, () => {
-                done();
-            });
+            const callee = require(liliumroot + "/" + extra.module);
+            callee[extra.call].apply(callee);
+            done && done();
         });
 
         extra._c = Knowledge.janitorSites[extra.siteid || "default"];
@@ -186,7 +185,7 @@ class AI {
         if (extra.runAt) {
             ai["module_" + extra.call] = require('../scheduler').schedule("module_" + extra.call, {
                 runat : extra.runAt
-            }, createModuleTask).start();
+            }, () => createModuleTask()).start();
         }
 
         !extra.notImmediate && createModuleTask();
