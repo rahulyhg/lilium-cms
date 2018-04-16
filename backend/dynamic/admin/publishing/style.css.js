@@ -650,5 +650,14 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     font-weight: bold;
 }
 
+#anim-dismiss.flex-card {
+    padding: 30px;
+    text-align: center;
+    font-size: 27px;
+    background: #792796;
+    color: #fff;
+    cursor: pointer;
+}
+
 </style>
 `;

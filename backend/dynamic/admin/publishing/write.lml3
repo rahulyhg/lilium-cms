@@ -47,6 +47,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                     </div>
                 </div>
             </div>
+
+            <div id="anim-dismiss" class="flex-card">
+                <b>Dismiss publication report</b>
+            </div>
         </div>
 
         <div class="flex-col">
@@ -217,15 +221,6 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     };
 
     var STICKY_ACTIONS = [
-        {
-           id : "text", shouldShow : function() { return true } , render : function() {
-                var button = document.createElement('button');
-                button.textContent = "Test animation";
-                button.addEventListener('click', displayConfirmationAnimation);
-                return button;
-           } 
-        },
-
          {
             id : "save",
             shouldShow : function() {
@@ -390,7 +385,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 var tle = document.getElementById('anim-title');
                 var textarr = "Article published".split('');
 
-                wrap.style.display = "block";
+                setTimeout(function() {
+                    wrap.style.display = "block";
+                    wrap.scrollTo(0,0);
+                }, 150);
 
                 while (tle.firstChild) { tle.firstChild.remove(); };
                 textarr.forEach(function(char, i) {
@@ -416,6 +414,24 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 
             }, 300);
         });
+    };
+
+    var dismissReport = function() {
+        document.getElementById('anim-title').classList.remove('slid');
+        document.getElementById('anim-slide-fade').classList.remove('full');
+        Array.prototype.forEach.call(document.querySelectorAll('.flex-card'), function(c, i) {
+            c.classList.remove('shown');
+        });
+
+        Array.prototype.forEach.call(document.querySelectorAll('.anim-slide'), function(s, i) { 
+            setTimeout(function() { 
+                s.classList.remove("slid") 
+            }, i * i * 20);
+        });
+
+        setTimeout(function() {
+            document.getElementById("anim-slide-fade").style.display = "";
+        }, 400);
     };
 
     var createPayload = function() {
@@ -867,6 +883,8 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                         refreshActions();
     
                         liliumcms.notify({ type : "success", title : "Published", message : "This article was published live on the website."});
+
+                        displayConfirmationAnimation();
                     }
                 } else {
                     liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article for an unknown reason."});
@@ -930,6 +948,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             });
         }
 
+        d.id('anim-dismiss').bind('click', dismissReport);
         refreshState();
         refreshActions();
 
