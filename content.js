@@ -16,6 +16,10 @@ const LOOKUPS = {
     topic : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" }
 };
 
+const PUBLICATION_REPORT_TODAY_PROJECTION = {
+    headline : { $arrayElemAt : ["$title", 0] }, "date" : 1, "name" : 1 
+};
+
 class ContentLib {
     create(_c, title, author, done) {
         db.findUnique(config.default(), 'entities', { _id : author }, (err, authorentity) => {
@@ -206,16 +210,41 @@ class ContentLib {
 
     generatePublicationReport(_c, _id, sendback) {
         this.getFull(_c, _id, article => {
+            const doc = new (require('jsdom')).JSDOM(article.content.join(' ')).window.document;
+            const start = new Date();
+            start.setHours(0,0,0,0);
+
+            const end = new Date();
+            end.setHours(23,59,59,999);
+
+            const date = {$gte: start, $lt: end};
+
             db.count(_c, 'content', { author : article.author }, (err, authortotal) => {
-                sendback({
-                    authortotal,
-                    headline : article.headline,
-                    fullauthor : article.fullauthor,
-                    fulltopic : article.fulltopic,
-                    fullmedia : article.deepmedia,
-                    nsfw : article.nsfw,
-                    isSponsored : article.isSponsored,
-                    ads : new (require('jsdom')).JSDOM(article.content.join(' ')).window.document.querySelectorAll('ad').length
+                db.count(_c, 'content', { author : article.author, date }, (err, authortotaltoday) => {
+                    db.count(require('./config').default(), 'decorations', { entity : article.author }, (err, decorations) => {
+                        db.join(_c, 'content', [
+                            { $match : { date } },
+                            { $limit : 200 },
+                            { $project : PUBLICATION_REPORT_TODAY_PROJECTION },
+                            { $sort : { date : -1 } }
+                        ], today => {
+                            sendback({
+                                authortotal, authortotaltoday, decorations, today,
+                                url : article.url,
+                                headline : article.headline,
+                                subline : article.subtitle[0],
+                                fullauthor : article.fullauthor,
+                                fulltopic : article.fulltopic,
+                                media : article.deepmedia.sizes.facebook.url,
+                                nsfw : article.nsfw,
+                                isSponsored : article.isSponsored,
+                                ads : doc.querySelectorAll('ad').length,
+                                p : doc.querySelectorAll('p').length,
+                                img : doc.querySelectorAll('img').length,
+                                paginated : article.content.length < 1
+                            });
+                        });
+                    });
                 });
             });
         });
