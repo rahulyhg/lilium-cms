@@ -9,10 +9,20 @@ const settings = {
     lmldom : { v : 1.0 }
 };                    
          
-         
+delete require.cache[require.resolve('./style.css.js')];   
 const css = require('./style.css');
 
 const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
+
+<div class="anim-slide" id="anim-slide-1"></div>
+<div class="anim-slide" id="anim-slide-2"></div>
+<div class="anim-slide" id="anim-slide-3"></div>
+<div class="anim-slide" id="anim-slide-4"></div>
+<div class="anim-slide" id="anim-slide-5"></div>
+
+<div id="anim-slide-fade">
+    <div id="anim-title"></div>
+</div>
 
 <div id="publishing-actions">
     <h3>Manage</h3>
@@ -158,6 +168,15 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     };
 
     var STICKY_ACTIONS = [
+        {
+           id : "text", shouldShow : function() { return true } , render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Test animation";
+                button.addEventListener('click', displayConfirmationAnimation);
+                return button;
+           } 
+        },
+
          {
             id : "save",
             shouldShow : function() {
@@ -259,6 +278,33 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         }
     ];
 
+    var displayConfirmationAnimation = function() {
+        document.querySelectorAll('.anim-slide').forEach((s, i) => setTimeout(() => s.classList.add("slid"), i * i * 20));
+        setTimeout(() => {
+            var wrap = document.getElementById("anim-slide-fade");
+            var tle = document.getElementById('anim-title');
+            var textarr = "Article published".split('');
+
+            wrap.style.display = "block";
+
+            while (tle.firstChild) { tle.firstChild.remove(); };
+            textarr.forEach(function(char, i) {
+                var span = document.createElement('span');
+                span.innerHTML = char.trim() || "&nbsp;";
+                tle.appendChild(span);
+            
+                setTimeout(function() {
+                    span.classList.add('shown');
+                }, i*30 + 500);   
+            });
+
+            setTimeout(function() {
+                document.getElementById('anim-title').classList.add('slid');
+                document.getElementById('anim-slide-fade').classList.add('full');
+            }, textarr.length * 30 + 1200);
+            
+        }, 500);
+    };
 
     var createPayload = function() {
         var s = updateState();
