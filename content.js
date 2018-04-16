@@ -471,15 +471,15 @@ class ContentLib {
     }
 
     getPreview(_c, postid, payload, sendback) {
-        payload = this.parseSpecialValues(payload);
+        this.parseSpecialValues(payload);
 
         db.findUnique(_c, 'content', { _id : postid }, (err, post) => {
             const previewpost = {};
             Object.assign(previewpost, post, payload);
 
-            db.findUnique(_c, 'topics', { _id : db.mongoID(previewpost.topic) }, (err, fulltopic) => {
-                db.findUnique(_c, 'uploads', { _id : db.mongoID(previewpost.media) }, (err, deepmedia) => {
-                    db.findUnique(config.default(), 'entities', { _id : db.mongoID(previewpost.author) }, (err, fullauthor) => {
+            db.findUnique(_c, 'topics', { _id : previewpost.topic }, (err, fulltopic) => {
+                db.findUnique(_c, 'uploads', { _id : previewpost.media }, (err, deepmedia) => {
+                    db.findUnique(config.default(), 'entities', { _id : previewpost.author }, (err, fullauthor) => {
                         previewpost.fulltopic = fulltopic;
                         previewpost.deepmedia = deepmedia;
                         previewpost.fullauthor = fullauthor;
@@ -511,9 +511,7 @@ class ContentLib {
                             Math.random().toString().slice(2) + 
                             ".tmp";
 
-                        filelogic.renderThemeLML3(_c, ctx, abspath, extra, (markup) => {
-                            sendback(markup);
-                        });
+                        filelogic.renderThemeLML3(_c, ctx, abspath, extra, markup => sendback(markup));
                     });
                 });
             });
