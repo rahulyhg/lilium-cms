@@ -8,6 +8,7 @@ class ContentController {
         switch (cli.routeinfo.path[2]) {
             case "list" : cli.hasRightOrRefuse('list-articles') && filelogic.serveAdminLML3(cli); break;
             case "write" : cli.hasRightOrRefuse('create-articles') && filelogic.serveAdminLML3(cli, true); break;
+            case "report": contentlib.generatePublicationReport(cli._c, db.mongoID(cli.routeinfo.path[3]), report => cli.sendJSON(report)); break;
             default : cli.refuse();
         }
     }

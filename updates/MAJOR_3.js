@@ -70,5 +70,5 @@ const remodalEntities = done => {
 
 // Exported update function
 module.exports = (_c, done) => {
-    remodalPonglinks(_c, remodalEntities(done));
+    remodalPonglinks(_c, () => remodalEntities(done));
 };

@@ -204,6 +204,23 @@ class ContentLib {
         nextHook();
     }
 
+    generatePublicationReport(_c, _id, sendback) {
+        this.getFull(_c, _id, article => {
+            db.count(_c, 'content', { author : article.author }, (err, authortotal) => {
+                sendback({
+                    authortotal,
+                    headline : article.headline,
+                    fullauthor : article.fullauthor,
+                    fulltopic : article.fulltopic,
+                    fullmedia : article.deepmedia,
+                    nsfw : article.nsfw,
+                    isSponsored : article.isSponsored,
+                    ads : new (require('jsdom')).JSDOM(article.content.join(' ')).window.document.querySelectorAll('ad').length
+                });
+            });
+        });
+    }
+
     bunch(_c, filters = {}, sort, max = 50, skip = 0, sendback) {
         const $match = { status : { $ne : "destroyed" } };
         const $sort = { [sort || "_id"] : -1 };
