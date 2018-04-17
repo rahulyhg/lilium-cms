@@ -448,7 +448,9 @@ class GoogleAnalytics {
     }
 
     addSite(_c, cb) {
-        if (_c.analytics) {
+        if (GASites[_c.id]) {
+            cb && cb();
+        } else if (_c.analytics) {
             GASites[_c.id] = new GoogleAnalyticsInfo(_c.analytics.serviceaccount, _c.analytics.jsonkeypath);
             that.loadClient(_c);
             that.authorize(_c, cb);
@@ -550,6 +552,32 @@ class GoogleAnalytics {
         }, () => {
             response.pages = response.pages.sort((a, b) => b.count - a.count);
             sendback(response)
+        });
+    }
+
+    generateYesterdayReport(_c, send) {
+        if (!GASites[_c.id] || !GASites[_c.id].AUTH_CLIENT) {
+            return send(new Error("No GA"));
+        }
+
+        this.getData(_c, {
+            "start-date" : "yesterday",
+            "end-date" : "yesterday",
+            "metrics" : defaultMetrics,
+            "dimensions" : defaultDimensions,
+            "max-results" : 1,
+            "sort" : "-ga:pageviews"
+        }, (err, traffic) => {
+            this.getData(_c, {
+                "start-date" : "yesterday",
+                "end-date" : "yesterday",
+                "metrics" : "ga:users",
+                "dimensions" : "ga:operatingSystem",
+                "max-results" : 3,
+                "sort" : "-ga:users"
+            }, (err, os) => {
+                send({ traffic, os });                 
+            });
         });
     }
 
