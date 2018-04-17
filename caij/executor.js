@@ -277,6 +277,11 @@ class RunningTask {
         });
     }
 
+    generateTheDailyLilium(sendback) {
+        const now = new Date();
+        require('../thedailylilium').storeEntry(this._c, new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0), () => sendback());
+    }
+
     statsEmail(sendback) {
         analyticsLib.addSite(_c, (err) => {
             if (err) {
