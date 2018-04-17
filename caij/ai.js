@@ -25,7 +25,8 @@ const Knowledge = {
     hotDelai : oneMinute * 10,
     filler3days : oneDay,
     facebookDelai : oneMinute * 3,
-    sendEmailAt : "00:15:00"
+    sendEmailAt : "00:15:00",
+    theDailyLiliumAt : "06:05:00"
 };
 
 class AI {
@@ -134,6 +135,15 @@ class AI {
             });
         };
 
+        let generateTheDailyLilium = () => {
+            Knowledge.janitorSites.forEach(_c => {
+                taskscheduler.push({
+                    taskname : "generateTheDailyLilium",
+                    extra : { origin : "AI", action : "init", _c }
+                });
+            });
+        };
+
         ai.filler3days = setInterval(createFiller3daysTask, Knowledge.filler3days);
         ai.gaRealtimeInterval = setInterval(createAnalyticsTask, Knowledge.gaRealtimeDelai);
         ai.homepageInterval = setInterval(createHomepageTask, Knowledge.homepageDelai);
@@ -150,6 +160,10 @@ class AI {
         createAnalyticsTask();
         createFiller3daysTask();
         createHotTask();
+
+        ai.thedailyliliumInterval = require('../scheduler.js').schedule("CAIJ_The_Daily_Lilium", {
+            runat : Knowledge.theDailyLiliumAt
+        }, generateTheDailyLilium).start();
     }
 
     error(err) {
