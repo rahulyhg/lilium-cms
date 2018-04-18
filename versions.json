@@ -111,5 +111,10 @@
         "codename": "Tyche",
         "script" : "MAJOR_3.js",
         "features" : ["V3"]
+    },
+    "3.0.1" : {
+        "codename" : "Tyche",
+        "script" : "3.0.1.js",
+        "features" : ["Facebook"]
     }
 }
