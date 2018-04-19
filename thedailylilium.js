@@ -43,7 +43,6 @@ class TheDailyLilium {
             }
 
             Analytics.generateYesterdayReport(_c, yesterday => {
-                console.log(yesterday);
                 log('DailyLilium', "Got stats from Analytics", 'detail');
                 report.os = yesterday.os.rows.map(x => { return { os : x[0], users : x[1] } });
                 report.stats = yesterday.traffic.totalsForAllResults;
@@ -60,6 +59,7 @@ class TheDailyLilium {
                     log('DailyLilium', "Fetch top article from database", 'detail');
                     report.toparticle = toparticle.pop();
                     report.toparticle.fullmedia = report.toparticle.fullmedia[0].sizes.facebook.url;
+                    report.toparticle.pageviews = yesterday.traffic.rows[0][2];
 
                     db.findUnique(_d, 'entities', { _id : report.toparticle.author }, (err, author) => {
                         log('DailyLilium', "Fetched author of top article", 'detail');
@@ -74,17 +74,33 @@ class TheDailyLilium {
                             } }
                         ], decorations => {
                             log('DailyLilium', "Fetched all new decorations with full author", 'detail');
+                            const { DEFAULT_BADGES_ASSOC, BADGE_LEVEL_TEXT } = require('./badges').getDecorationSettings();
                             report.decorations = decorations;
+                            decorations.forEach(x => {
+                                x.reason = DEFAULT_BADGES_ASSOC[x.slug].reason.replace('<n>', DEFAULT_BADGES_ASSOC[x.slug].levels[x.level]);
+                                x.displayname = DEFAULT_BADGES_ASSOC[x.slug].displayname;
+                                x.title = BADGE_LEVEL_TEXT[x.level];
+                                x.icon = DEFAULT_BADGES_ASSOC[x.slug].icon;
+                                x.fullentity = x.fullentity.pop();
+                            });
                             
                             db.join(_c, 'content', [
                                 { $match : { $and : [ { date : { $gte : datestart } }, { date : { $lte : dateend } } ] } },
+                                { $lookup : { from : "uploads", as : "fullmedia", localField : "media", foreignField : "_id" } },
+                                { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" } },
                                 { $project : {
                                     headline : { $arrayElemAt : ["$title", 0] },
-                                    author : 1, isSponsored : 1, topic : 1
+                                    author : 1, isSponsored : 1, topic : 1,
+                                    "fullmedia.sizes.square.url": 1,
+                                    "fulltopic.displayname" : 1
                                 } }
                             ], articles => {   
                                 log('DailyLilium', "Fetched all published articles from provided date", 'detail');
                                 report.articles = articles;
+                                articles.forEach(x => {
+                                    x.fullmedia = x.fullmedia[0].sizes.square.url;
+                                    x.fulltopic = x.fulltopic[0].displayname;
+                                });     
 
                                 dashboard.getQuote(quote => {
                                     log('DailyLilium', "Got daily quote", 'detail');
@@ -94,7 +110,7 @@ class TheDailyLilium {
                                         { $match : { $and : [ { at : { $gte : datestart.getTime() } }, { at : { $lte : dateend.getTime() } } ] } }, 
                                         { $group : { _id : "$terms", total : { $sum : 1 }} }, 
                                         { $sort : { total : -1 }}, 
-                                        { $limit : 5 }, 
+                                        { $limit : 10 }, 
                                         { $project : { total : 1, terms : "$_id", _id : 0 } }
                                     ], topsearches => {
                                         log('DailyLilium', "Fetched top searches from database", 'detail');
@@ -102,7 +118,7 @@ class TheDailyLilium {
                                         report._id = dateformat(datestart, "ddmmyyyy");
 
                                         db.rawCollection(_c, 'thedailylilium', {}, (err, col) => {
-                                            col.updateOne({ _id : report._id }, report, {
+                                            col.replaceOne({ _id : report._id }, report, {
                                                 upsert : 1
                                             }, (err, r) => {
                                                 log('DailyLilium', "Inserted report inside database", "success");
@@ -117,6 +133,26 @@ class TheDailyLilium {
                 });
             });       
         });       
+    }
+
+    adminGET(cli) {
+        require('./filelogic').serveAdminLML3(cli);
+    }
+
+    livevar(cli, levels, params, sendback) {
+        const temp = new Date();
+        const datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, 0, 0);
+        const _id = dateformat(datestart, "ddmmyyyy");
+
+        db.findUnique(cli._c, 'thedailylilium', { _id }, (err, report) => {
+            if (!report) {
+                this.storeEntry(cli._c, datestart, report => {
+                    sendback(report);
+                });
+            } else {
+                sendback(report);
+            }
+        });
     }
 }
 
