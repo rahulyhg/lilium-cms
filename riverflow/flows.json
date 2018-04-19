@@ -71,6 +71,19 @@
             "endpoint" : "livevars",
             "support" : ["api_get"]
         }, {
+            "module" : "thedailylilium.js",
+            "endpoint" : "thedailylilium",
+            "support" : ["admin_get", "livevar"],
+            "admin_menu" : {
+                "id": "thedailylilium",
+                "faicon": "fa-newspaper",
+                "displayname": "The Daily Lilium",
+                "priority": 80,
+                "rights": ["dash"],
+                "absURL": "admin/thedailylilium",
+                "children": []
+            }
+        }, {
             "module" : "passwordrecovery.js",
             "endpoint" : "accesscheckpoint",
             "support" : ["get", "post", "admin_get"]
@@ -78,6 +91,10 @@
             "module" : "lys.js",
             "endpoint" : "lys",
             "support" : ["livevar"]
+        }, {
+            "module" : "darksky.js",
+            "endpoint" : "darksky",
+            "support" : ["livevar", "setup"]
         }, {
             "module" : "reporting.js",
             "endpoint" : "r",
@@ -191,16 +208,7 @@
         }, {
             "module" : "feed.js",
             "endpoint" : "feed",
-            "support" : ["setup", "admin_get", "livevar"],
-            "admin_menu" : {
-                "id": "feed",
-                "faicon": "fa-newspaper",
-                "displayname": "What's up",
-                "priority": 80,
-                "rights": ["dash"],
-                "absURL": "admin/feed",
-                "children": []
-            }
+            "support" : ["setup", "admin_get", "livevar"]
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
