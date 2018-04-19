@@ -573,7 +573,7 @@ class GoogleAnalytics {
                 "end-date" : "yesterday",
                 "metrics" : "ga:users",
                 "dimensions" : "ga:operatingSystem",
-                "max-results" : 3,
+                "max-results" : 5,
                 "sort" : "-ga:users"
             }, (err, os) => {
                 send({ traffic, os });                 
