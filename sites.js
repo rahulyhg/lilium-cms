@@ -212,6 +212,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(base + "backend/static/leaflet/leaflet.css", 1010, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/animate.css", 1050, 'admin', conf.id);
         Frontend.registerCSSFile(base + "backend/static/hightlight.agate.css", 1120, 'admin', conf.id);
+        Frontend.registerCSSFile(base + "backend/static/weather-icons.min.css", 1150, 'admin', conf.id);
         Frontend.registerCSSFile(base + "node_modules/lilium-text/build/minim.min.css", 1180, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/lilium.css", 2000, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/mobile.css", 2005, 'admin', conf.id);
