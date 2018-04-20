@@ -233,6 +233,17 @@ class Entities {
                 } else {
                     cli.refuse();
                 }
+            } else if (cli.routeinfo.path[2] == 'updatePassword') {
+                const old = CryptoJS.SHA256(cli.postdata.data.old).toString(CryptoJS.enc.Hex);
+                const shhh = CryptoJS.SHA256(cli.postdata.data.new).toString(CryptoJS.enc.Hex);
+                const _id = db.mongoID(cli.userinfo.userid);
+
+                db.update(require('./config').default(), 'entities', { _id, shhh : old }, { shhh }, (err, r) => {
+                    log('Entities', 'Updated entity ' + _id + ' : ' + !!r.matchedCount, 'info');
+                    cli.sendJSON({
+                        updated : !!r.matchedCount
+                    });
+                });
             } else {
                 switch (cli.postdata.data.form_name) {
                 case "update_profile":
