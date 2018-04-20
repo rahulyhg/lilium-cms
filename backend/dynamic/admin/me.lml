@@ -22,10 +22,35 @@
             </div>
         </div>
 
-        <textarea id="me-bio" placeholder="Write a small introduction paragraph"></textarea>
+        <textarea id="me-bio" data-field="description" placeholder="Write a small introduction paragraph"></textarea>
     </div>
 </div> 
 
+<div id="profile-contact">
+    <h3>Contact information</h3>
+    <label>Email</label>
+    <input data-field="email" id="me-email" />
+
+    <label>Phone number</label>
+    <input data-field="phone" id="me-phone" />
+
+</div>
+
+<div id="profile-social">
+    <h3>Social network</h3>
+    <label>Facebook profile URL</label>
+    <input data-field="socialnetworks.facebook" id="me-facebook" />
+
+    <label>Twitter account name, without the @</label>
+    <input data-field="socialnetworks.twitter" id="me-twitter" />
+
+    <label>Google Plus username</label>
+    <input data-field="socialnetworks.googleplus" id="me-googleplus" />
+
+    <label>Instagram username, without the @</label>
+    <input data-field="socialnetworks.instagram" id="me-instagram" />
+
+</div>
 
 
 <style>
@@ -43,6 +68,26 @@
 @keyframes meback {
     from { background-position: 0px 0px; }
     to   { background-position: 84px 0px;}
+}
+
+main {
+    background: #F6F6F6;
+}
+
+label {
+    display: block;
+    padding: 10px 10px 5px;
+    font-weight: bold;
+}
+
+input {
+    border: 1px solid #DDD;
+    border-bottom-width: 3px;
+    margin: 0px 10px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom : 12px;
 }
 
 #profile_photo {
@@ -74,12 +119,13 @@
     margin-top: 20px;
     background: none;
     resize: none;
-    font-size: 14px;
+    font-size: 16px;
     padding: 0;
     width: 100%;
     height: 100px;
     padding-left: 12px;
     border-left: 1px solid #c47dd4;
+    font-family: "Lato", sans-serif;
 }
 
 #me-bio::placeholder {
@@ -136,6 +182,19 @@
     margin-top: 1px;
     text-shadow: 0px 0px 10px rgba(255,255,255,0.7);
 }
+
+h3 {
+    display: block;
+    font-size: 26px;
+    font-family: "Oswald", sans-serif;
+    padding: 6px 14px;
+    border-bottom: 1px solid #a735d6;
+    border-top: 1px solid #a735d6;
+    background: #be78d0;
+    color: #f2d1ff;
+    text-transform: uppercase;
+}
+
 </style>
 
 <script>
@@ -150,8 +209,28 @@
     }
 
     liliumcms.lmldom.bind(function() {
+        var me = liliumcms.livevars.livevars()["me"][0];
         document.getElementById('me-bio').value = liliumcms.session.current.description;
+        document.getElementById('me-email').value = me.email;
+        document.getElementById('me-phone').value = me.phone;
+
         bindBlur('me-displayname');
+        bindBlur('me-bio');
+        bindBlur('me-email');
+        bindBlur('me-phone');
+        bindBlur('me-facebook');
+        bindBlur('me-twitter');
+        bindBlur('me-googleplus');
+        bindBlur('me-instagram');
+
+        if (me.socialnetworks) {
+            Object.keys(me.socialnetworks).forEach(function(key) {
+                var input = document.getElementById('me-' + key);
+                if (input) {
+                    input.value = me.socialnetworks[key];
+                }
+            });
+        }
     });
 
     window.generatedeco = function(ctx) {
