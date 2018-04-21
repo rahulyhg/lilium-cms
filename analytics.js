@@ -672,6 +672,16 @@ class GoogleAnalytics {
         }
     }
 
+    GET(cli) {
+        if (cli.userinfo.loggedin) {
+            require('./lml3/compiler').compile(cli._c, liliumroot + '/backend/dynamic/analytics.lml3', {}, markup => {
+                cli.sendHTML(markup);
+            });
+        } else {
+            cli.redirect("/login");
+        }
+    }
+
     settingsSaved(cli) {
         that.addSite(cli._c);
     }

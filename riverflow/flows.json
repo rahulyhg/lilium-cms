@@ -144,7 +144,7 @@
         }, {
             "module" : "analytics.js",
             "endpoint" : "googleanalytics",
-            "support" : ["livevar", "setup"],
+            "support" : ["livevar", "setup", "get"],
             "hooks" : [
                 {"name" : "settings_saved", "priority" : 1000, "callback" : "settingsSaved"}
             ]
