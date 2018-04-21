@@ -196,7 +196,6 @@ class ContentLib {
                 }, 'article_async_render_' + _c.uid)
             } else {
                 // Generate LML page
-                console.log(filename);
                 filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
                     allDone({
                         success: true,
