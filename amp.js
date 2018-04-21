@@ -132,24 +132,14 @@ class Amp {
                 }
 
                 ampimg.setAttribute('src', cdn.parseOne(cli._c, source));
+            } else if (x.src && x.src.startsWith('http:')) {
+                ampimg.setAttribute('src', "https" + x.src.substring(4));
             }
 
             ampimg.setAttribute('width', x.dataset.width || 640);
             ampimg.setAttribute('height', x.dataset.height || 640);
             ampimg.setAttribute('layout', "responsive");
-
-            if (ampimg.getAttribute('src')) {
-                x.parentElement.insertBefore(ampimg, x);
-            }
-            /*
-            try {
-                dom.window.document.body.insertBefore(ampimg, x.parentElement);
-            } catch (ex) {
-                try {
-                    dom.window.document.body.insertBefore(ampimg, x.parentElement.parentElement);
-                } catch (ex) {}
-            }
-            */
+            ampimg.getAttribute('src') && x.parentElement.insertBefore(ampimg, x);
 
             x.remove();
         }
@@ -175,7 +165,7 @@ class Amp {
                 youtube.setAttribute('layout', 'responsive');
 
                 try {
-                    dom.window.document.body.insertBefore(youtube, x);
+                    x.parentElement.insertBefore(youtube, x);
                     x.remove();
                 } catch (ex) { log('AMP', 'Could not remove iframe : ' + ex.stack || ex, 'warn');}
             }
@@ -183,8 +173,30 @@ class Amp {
 
         // Slow
         const styled = dom.window.document.querySelectorAll("[style]");
-        for (let i = 0; i < styled.length; i++) {
-            styled[i].removeAttribute('style');
+        for (let i = styled.length - 1; i >= 0; i--) { styled[i].removeAttribute('style'); }
+
+        const mousedown = dom.window.document.querySelectorAll("[onmousedown]");
+        for (let i = mousedown.length - 1; i >= 0; i--) { mousedown[i].removeAttribute('onmousedown'); }
+
+        const clicked = dom.window.document.querySelectorAll("[onclick]");
+        for (let i = clicked.length - 1; i >= 0; i--) { clicked[i].removeAttribute('onclick'); }
+
+        const parags = dom.window.document.querySelectorAll('p');
+        for (let i = parags.length - 1; i >= 0; i--) { parags[i].removeAttribute('contenteditable'); }
+
+        const iframes = dom.window.document.querySelectorAll('iframe');
+        for (let i = iframes.length - 1; i >= 0; i--) { 
+            const iframe = iframes[i];
+            const ampframe = dom.window.document.createElement('amp-iframe');
+            ampframe.setAttribute('width', iframe.width);
+            ampframe.setAttribute('height', iframe.height);
+            ampframe.setAttribute('src', iframe.src);
+            ampframe.setAttribute('layout', "responsive");
+            ampframe.setAttribute('frameborder', 0);
+            ampframe.setAttribute('sandbox', "allow-script");
+
+            iframe.parentElement.insertBefore(ampframe, iframe);
+            iframe.remove();
         }
 
         cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
