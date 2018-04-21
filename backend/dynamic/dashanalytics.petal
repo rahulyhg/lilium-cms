@@ -139,7 +139,7 @@ var generateRandomTopPost = function(ldContext) {
 
 <div id="dashboard-ga-yesterday" style="background-color: #f9efff;">
 
-    <div class="dashboard-ga-title" id="dashboard-ga-yesterday-title" style="border-top: 3px solid #AF57E4;">
+    <!--div class="dashboard-ga-title" id="dashboard-ga-yesterday-title" style="border-top: 3px solid #AF57E4;">
         <div class="dashboard-ga-title-text">
             Yesterday insights
         </div>
@@ -201,7 +201,7 @@ var generateRandomTopPost = function(ldContext) {
         </div>
     </div>
 
-    <div style="float: none; clear: both; height: 1px;"></div>
+    <div style="float: none; clear: both; height: 1px;"></div-->
 
     <div class="dashboard-ga-title" id="dashboard-ga-performance-title" style="border-top: 3px solid #AF57E4;">
         <div class="dashboard-ga-title-text">
@@ -251,7 +251,7 @@ var generateRandomTopPost = function(ldContext) {
         <lml-generate call="createPerfCanvas"></lml-generate>
     </div>
 
-    <h3 class="performance-title">Random success story</h3>
+    <!--h3 class="performance-title">Random success story</h3>
 
     <lml-generate call="generateRandomTopPost"></lml-generate>
     <div style="float: none; clear: both; height: 1px;"></div>
@@ -265,7 +265,7 @@ var generateRandomTopPost = function(ldContext) {
 
     <div id="dashface">
         <img src="{=config.default.server.url}/static/media/dashface.png" />
-    </div>
+    </div-->
 </div>
 
 <script>
