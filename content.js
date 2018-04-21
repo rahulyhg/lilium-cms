@@ -94,6 +94,9 @@ class ContentLib {
         if (deepArticle.topic && deepArticle.topic.override && deepArticle.topic.override.language) {
             extra.language = deepArticle.topic.override.language;
         }
+        if (deepArticle.topicslug.startsWith('/')) {
+            deepArticle.topicslug = deepArticle.topicslug.slice(1, -1);
+        }
 
         deepArticle.content = deepArticle.content.map(x => x.replace(/lml-fb-video/g, 'fb-video').replace(/lml-fb-post/g, 'fb-post'));
 
