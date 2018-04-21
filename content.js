@@ -103,7 +103,7 @@ class ContentLib {
         });
 
         let ctx = deepArticle.templatename || (deepArticle.topic && deepArticle.topic.articletemplate) || "article";
-        let filename = deepArticle.topicslug.substring(1) + deepArticle.name;
+        let filename = deepArticle.topicslug + "/" + deepArticle.name;
 
         deepArticle.headline = deepArticle.title[0];
         deepArticle.headsub = deepArticle.subtitle[0]
@@ -196,6 +196,7 @@ class ContentLib {
                 }, 'article_async_render_' + _c.uid)
             } else {
                 // Generate LML page
+                console.log(filename);
                 filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
                     allDone({
                         success: true,
