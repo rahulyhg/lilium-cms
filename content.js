@@ -269,6 +269,9 @@ class ContentLib {
         if (filters.status) { $match.status = filters.status };
         if (filters.author) { $match.author = db.mongoID(filters.author) };
         if (filters.isSponsored) { $match.isSponsored = filters.isSponsored.toString() == "true" ? true : { $ne : true } };
+        if (filters.search && filters.search.trim()) { 
+            $match.$text = { $search : filters.search.trim().split(' ').map(x => "\"" + x + "\"").join(' ') };
+        }
 
         const pipeline = [
             { $match }, 
