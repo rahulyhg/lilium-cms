@@ -471,9 +471,21 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
     // Update local object sent to the server
     var updateState = function() {
-        var titles    = Array.prototype.map.call(document.querySelectorAll('.big-title'),    function(x) { return x.value; });
-        var subtitles = Array.prototype.map.call(document.querySelectorAll('.big-subtitle'), function(x) { return x.value; });
-        var contents  = allEditors.map(function(x) { return x.content; });
+        var tabs = document.querySelectorAll('.publishing-tab');
+        var titleel = document.querySelectorAll('.big-title');
+        var subel = document.querySelectorAll('.big-subtitle');
+
+        var titles = [];
+        var subtitles = [];
+        var contents = [];
+
+        for (var i = 0; i < tabs.length - 1; i++) {
+            if (!tabs[i].classList.contains("to-be-removed")) {
+                titles.push( titleel[i].value );
+                subtitles.push( subel[i].value );
+                contents.push( allEditors[i].content );
+            }
+        }
 
         window._poststate.title = titles;
         window._poststate.subtitle = subtitles;
@@ -602,9 +614,34 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
         var tab = d.make({ 
             class : "publishing-tab", 
-            id : "publishing-tab-" + totalpage, 
-            text : totalpage == 0 ? "Landing" : "Page " + totalpage 
+            id : "publishing-tab-" + totalpage 
         });
+        d.make({ text : totalpage == 0 ? "Landing" : "Page " + totalpage, node : "span", class : "publishing-tab-text", parent : tab })
+
+        if ( totalpage != 0 ) {
+            d.make({ node : "i", class : "far fa-times-circle publishing-tab-close", parent : tab }).bind('click', function() {
+                wrap.cadd("to-be-removed");
+                tab.cadd("to-be-removed");
+
+                liliumcms.notify({
+                    type : "success",
+                    title : "Tab",
+                    message : "This tab will be removed completely next time you save."
+                });
+            });
+
+            d.make({ node : "i", class : "far fa-check-circle publishing-tab-restore", parent : tab }).bind('click', function() {
+                wrap.crm("to-be-removed");
+                tab.crm("to-be-removed");
+
+                liliumcms.notify({
+                    type : "success",
+                    title : "Tab",
+                    message : "This tab was restored and will be saved."
+                });
+               
+            });
+        }
 
         var currentpage = totalpage;
         tab.bind('click', function() {

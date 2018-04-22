@@ -170,6 +170,37 @@ body #lilium .liliumtext.theme-minim.fullscreen {
 
 .publishing-header {
     display: none;
+    position: relative;
+}
+
+.publishing-header.to-be-removed.selected::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    bottom: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.publishing-tab.to-be-removed .publishing-tab-close {
+    display: none;
+}
+
+.publishing-tab-restore {
+    display: none;
+}
+
+.publishing-tab i {
+    margin-left: 5px;
+    color: #333;
+    cursor: pointer;
+}
+
+.publishing-tab.to-be-removed .publishing-tab-restore {
+    display: inline-block;
 }
 
 .publishing-header.selected {
@@ -192,6 +223,10 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     border-bottom: none;
     border-top: 3px solid #af57e4;
     font-weight: 700;
+}
+
+.publishing-tab.to-be-removed {
+    text-decoration: line-through;
 }
 
 #publishing-tab-add {
