@@ -16,12 +16,19 @@ var LiveVars = function() {
     var livevars = {};
     var that = this;
 
+    var getExtraDetails = function() {
+        return JSON.stringify({
+            tzoffset : new Date().getTimezoneOffset()
+        });
+    };
+
     this.getSingleLivevar = function(endpoint, params, cb) {
         $.get("{=config.default.server.url}/livevars", {
             vars :JSON.stringify([{
                 varname: endpoint,
                 params: params
-            }])
+            }]),
+            details : getExtraDetails()
         }, cb);
     }
 
@@ -52,11 +59,11 @@ var LiveVars = function() {
         if (!local) {
             endpoints.push({
                 'varname': 'session',
-                'params': new Object()
+                'params': {}
             });
             endpoints.push({
                 'varname' : 'lys',
-                'params': new Object()
+                'params': {}
             });
         } else {
             pageendpoints = [];
@@ -90,7 +97,8 @@ var LiveVars = function() {
 
         log('Livevars', "Sending request for " + Object.keys(local ? pageendpoints : endpoints).length + " live variables");
         $.get("{=config.default.server.url}/livevars", {
-            vars: JSON.stringify(local ? pageendpoints : endpoints)
+            vars: JSON.stringify(local ? pageendpoints : endpoints),
+            details : getExtraDetails() 
         }, function(data) {
             tLivevars = deepUnescape(data.livevars);
             for (var l in tLivevars) {
