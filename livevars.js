@@ -130,6 +130,7 @@ var LiveVariables = function() {
         try {
             var liveVars = JSON.parse(cli.routeinfo.params.vars);
             cli.livevars = {};
+            cli.details = JSON.parse(cli.routeinfo.params.details || {});
 
             var callback = function(response) {
                 cli.sendJSON({
@@ -144,6 +145,7 @@ var LiveVariables = function() {
                 callback();
             }
         } catch (e) {
+            console.log(e);
             cli.throwHTTP(400, 'Bad request');
         }
 
