@@ -79,7 +79,7 @@ var BackendSearch = function() {
                 imageurl : function(url) {
                     return '<img src="'+url+'" class="lml-search-image" />';
                 }, title : function(title, row) {
-                    return '<a href="{=config.default.server.url}/admin/article/edit/'+row._id+'">'+title+'</a>';
+                    return '<a href="{=config.default.server.url}/admin/publishing/write/'+row._id+'">'+title+'</a>';
                 }, status : function(status) {
                     return status[0].toUpperCase() + status.substring(1);
                 }, author : function(userid) {
