@@ -141,7 +141,11 @@ class TheDailyLilium {
 
     livevar(cli, levels, params, sendback) {
         const temp = new Date();
-        const datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, 0, 0);
+        let datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, 0, 0);
+        if (cli.details.tzoffset) {
+            datestart = new Date(datestart.getTime() - (1000 * cli.details.tzoffset) + (1000 * new Date().getTimezoneOffset()));
+        }
+
         const _id = dateformat(datestart, "ddmmyyyy");
 
         db.findUnique(cli._c, 'thedailylilium', { _id }, (err, report) => {
