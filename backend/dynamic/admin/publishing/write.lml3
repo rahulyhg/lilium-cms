@@ -20,12 +20,14 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         Recent autosave
     </div>
     <div class="lml-modal-body">
+        <i class="fal fa-paste"></i>
         <p>There is an auto-saved version of this article from <b id="recent-autosave-date"></b>.</p>
+        <p>It is possible to restore the auto-saved version of this post. Choosing to do so <b>will not</b> overwrite the post until you hit "save" or "update".</p>
         <p>Would you like to use the auto-saved version instead of the current one?</p>
     </div>
     <div class="lml-modal-footer">
-        <button class="lml-modal-cancel" type="button">No</button>
-        <button class="lml-modal-accept" type="button">Yes</button>
+        <button class="lml-modal-cancel" type="button">Dismiss</button>
+        <button class="lml-modal-accept" type="button">Use auto-saved version</button>
     </div>
 
 </div>
@@ -693,7 +695,8 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         for (var i = tabs.length - 1; i >= 0; i--) {
             tabs[i].remove();
             headers[i].remove();
-            allEditors[i].destroy()
+            clearInterval(allEditors[i].snapshotTimerID);
+            allEditors[i].destroy();
         }        
 
         allEditors = [];

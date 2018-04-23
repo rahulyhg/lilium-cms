@@ -3,6 +3,14 @@ main {
     background: #F3F3F3;
 }
 
+#restore-recent-autosave .fal {
+    text-align: center;
+    display: block;
+    font-size: 72px;
+    padding: 20px 0px;
+    color: #5f2782;
+}
+
 #sticky-actions button {
     display: block;
     padding: 8px 14px;
