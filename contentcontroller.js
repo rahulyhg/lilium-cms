@@ -73,7 +73,7 @@ class ContentController {
                 };
 
                 db.findUnique(cli._c, 'content', conds, (err, maybePost) => {
-                    if (cli.hasRight("contributor") && maybePost) {
+                    if ((cli.hasRight("contributor") || cli.hasRight('contractor')) && maybePost) {
                         contentlib.sendForReview(cli._c, conds._id, conds.author, resp => cli.sendJSON(resp));
                     } else {
                         cli.sendJSON({ error : "Not allowed" });
