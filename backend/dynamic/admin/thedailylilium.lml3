@@ -620,8 +620,9 @@ var generateContentNews = function(ldContext) {
     
     var report = ldContext.livevars.thedailylilium;
     var forecast = ldContext.livevars.darksky && ldContext.livevars.darksky.forecast;
-    var now = new Date();
-    var yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+
+    var splitdate = report._id;
+    var yesterday = new Date(splitdate.substring(4), parseInt(splitdate.substring(2, 4)) - 1, splitdate.substring(0, 2), 0, 0, 0);
 
     cols[0].born(gen_toppost(report, yesterday));
     cols[0].born(gen_badges(report, yesterday));
