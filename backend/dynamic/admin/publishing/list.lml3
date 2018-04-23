@@ -287,7 +287,7 @@ const compile = (o, context, v) => { o(context.header, css, `
         var STATUS_VOCAB = {
             published   : { text : "Published",     color : "#2162b9" },
             draft       : { text : "Draft",         color : "#576c88" },
-            pending     : { text : "Pending review",color : "#701ab9" },
+            reviewing   : { text : "Pending review",color : "#701ab9" },
             deleted     : { text : "Unpublished",   color : "#9a471b" },
             destroyed   : { text : "Destroyed",     color : "#ff4405" },
         };
