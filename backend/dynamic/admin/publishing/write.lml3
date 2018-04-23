@@ -1,6 +1,7 @@
 const settings = {     
     livevars : [
         "publishing.write.{?1}", 
+        "publishing.auto.{?1}",
         "topics.simple", 
         "entities.simple", 
         "themes.templates.article", 
@@ -13,6 +14,21 @@ delete require.cache[require.resolve('./style.css.js')];
 const css = require('./style.css');
 
 const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
+
+<div id="restore-recent-autosave" class="lml-modal">
+    <div class="lml-modal-title">
+        Recent autosave
+    </div>
+    <div class="lml-modal-body">
+        <p>There is an auto-saved version of this article from <b id="recent-autosave-date"></b>.</p>
+        <p>Would you like to use the auto-saved version instead of the current one?</p>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">No</button>
+        <button class="lml-modal-accept" type="button">Yes</button>
+    </div>
+
+</div>
 
 <div class="anim-slide" id="anim-slide-1"></div>
 <div class="anim-slide" id="anim-slide-2"></div>
@@ -212,6 +228,8 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 <script>
     window._poststate = {};
 
+    var AUTOSAVE_INTERVAL = undefined;
+    var LAST_AUTOSAVE = undefined;
     var STATUS_VOCAB = {
         published   : { text : "Published",     color : "#2162b9" },
         draft       : { text : "Draft",         color : "#576c88" },
@@ -663,6 +681,33 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         return totalpage++;
     };
 
+    var alertRecentAutosave = function() {
+        d.id('recent-autosave-date').get().textContent = dateFormat(new Date(LAST_AUTOSAVE.at), "mmmm dd, 'at' HH:MM:ss");
+        liliumcms.modals.get('restore-recent-autosave').cast();
+    };
+
+    window["restore-recent-autosave_accept"] = function(modal) {
+        var tabs = document.querySelectorAll('.publishing-tab:not(#publishing-tab-add)');
+        var headers = document.querySelectorAll('.publishing-header');
+
+        for (var i = tabs.length - 1; i >= 0; i--) {
+            tabs[i].remove();
+            headers[i].remove();
+            allEditors[i].destroy()
+        }        
+
+        allEditors = [];
+        totalpage = 0;
+        var total = LAST_AUTOSAVE.data.title.length;
+        for (var i = 0; i < total; i++) {
+            createHeaderSlide(LAST_AUTOSAVE.data.title[i], LAST_AUTOSAVE.data.subtitle[i], LAST_AUTOSAVE.data.content[i]);
+        }
+
+        updateState();
+        switchToTab(0);
+        modal.dismiss();
+    };
+
     var contentBlur = function() {
         document.getElementById("pub-words").textContent = allEditors.reduce(function(current, that) {
             return current + that.contentel.textContent.split(' ').filter(function(str) { return str.trim(); }).length;
@@ -842,6 +887,17 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         });
     };
 
+    var autosaveCurrentPost = function() {
+        var payload = createPayload();
+        liliumcms.lmldom.post({
+            title : payload.title, 
+            subtitle : payload.subtitle,
+            content : payload.content
+        }, "${context._c.server.url}/admin/publishing/auto/" + liliumcms.pageloader.lastLevel, function(resp) {
+            
+        });
+    };
+
     var destroyCurrentPost = function() {
         liliumcms.lmldom.del({}, "${context._c.server.url}/admin/publishing/destroy/" + liliumcms.pageloader.lastLevel, function(resp) {
             if (resp) {
@@ -1006,6 +1062,20 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         refreshActions();
 
         createHistory();
+
+        AUTOSAVE_INTERVAL = setInterval(function() {
+            shouldAutosave() && autosaveCurrentPost();
+        }, 1000 * 60);
+
+        liliumcms.pageloader.bindUnload(function() {
+            clearInterval(AUTOSAVE_INTERVAL);
+        });
+
+        LAST_AUTOSAVE = liliumcms.livevars.livevars()["publishing.auto." + liliumcms.pageloader.lastLevel];
+
+        if (LAST_AUTOSAVE && LAST_AUTOSAVE.at && new Date(LAST_AUTOSAVE.at).getTime() > new Date(post.updated).getTime() && post.status != "published") {
+            alertRecentAutosave();
+        }
     });
 </script>
 
