@@ -350,7 +350,9 @@ class ContentLib {
         v.author && (v.author = db.mongoID(v.author));
         v.topic && (v.topic = db.mongoID(v.topic));
         v.media && (v.media = db.mongoID(v.media));
-        v.sponsoredBoxLogo && (v.sponsoredBoxLogo = db.mongoID(v.sponsoredBoxLogo))
+        v.sponsoredBoxLogo && (v.sponsoredBoxLogo = db.mongoID(v.sponsoredBoxLogo));
+
+        return v;
     }
 
     update(_c, postid, caller, values, callback) {
@@ -369,6 +371,7 @@ class ContentLib {
                 } else {
                     this.pushHistoryEntryFromDiff(_c, postid, caller, deepdiff, 'update', entry => {
                         if (entry) {
+                            newpost.updated = new Date();
                             col.replaceOne({_id : postid}, newpost, {}, () => {
                                 log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
                                 callback(undefined, entry);
@@ -382,6 +385,38 @@ class ContentLib {
             });
         });
     }
+
+    shallowCompare(a, b) {
+        return !(
+            a.title.map((x, i) => x == b.title[i]).includes(false) ||
+            a.subtitle.map((x, i) => x == b.subtitle[i]).includes(false) ||
+            a.content.map((x, i) => x == b.content[i]).includes(false)
+        );
+    }
+
+    autosave(_c, contentid, data, done) {
+        data = this.parseSpecialValues(data);
+        this.getLatestAutosave(_c, contentid, last => {
+            if (!last || !this.shallowCompare(last.data, data)) {
+                db.insert(_c, 'autosave', {
+                    data, contentid,
+                    at : new Date()
+                }, () => {
+                    done && done({ok : 1, inserted : true });
+                });
+            } else {
+                done && done({ ok : 1, inserted : false, reason : "nodiff" });
+            }
+        });
+    };
+
+    getLatestAutosave(_c, contentid, send) {
+        db.find(_c, 'autosave', { contentid }, [], (err, cur) => {
+            cur.sort({_id : -1}).limit(1).next((err, entry) => {
+                send(entry);
+            });
+        });
+    };
 
     publish(_c, post, caller, callback) {
         const payload = { status : "published" };
@@ -402,11 +437,13 @@ class ContentLib {
         }
 
         db.update(_c, 'content', { _id : post._id }, payload, () => {
-            this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
-                this.getFull(_c, post._id, fullpost => {
-                    this.generate(_c, fullpost, () => {
-                        callback({ historyentry, newstate : fullpost });
-                    }, 'all');
+            db.remove(_c, 'autosave', { contentid : post._id }, () => {
+                this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
+                    this.getFull(_c, post._id, fullpost => {
+                        this.generate(_c, fullpost, () => {
+                            callback({ historyentry, newstate : fullpost });
+                        }, 'all');
+                    });
                 });
             });
         });
