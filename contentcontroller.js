@@ -22,6 +22,17 @@ class ContentController {
                     cli.sendJSON(err ? { error : err } : { _id : art._id });
                 }); 
                 break;
+            case "auto":
+                cli.hasRightOrRefuse('create-articles') && db.findUnique(cli._c, 'content', { _id : db.mongoID(cli.routeinfo.path[3]) }, (err, article) => {
+                    if (article && (cli.hasRight('editor') || article.author.toString() == cli.userinfo.userid)) {
+                        contentlib.autosave(cli._c, db.mongoID(cli.routeinfo.path[3]),  cli.postdata.data, resp => {
+                            cli.sendJSON(resp)
+                        });
+                    } else {
+                        cli.throwHTTP(400, undefined, true);
+                    }
+                }, { author : 1 });
+                break;
             case "preview" : 
                 contentlib.getPreview(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, markup => cli.sendHTML(markup));
                 break;
@@ -155,6 +166,8 @@ class ContentController {
             contentlib.bunch(cli._c, params.filters, params.filters && params.filters.sort, params.max, (params.page - 1) * params.max, sendback);
         } else if (levels[0] == "write") {
             contentlib.getFull(cli._c, levels[1], post => sendback(post));
+        } else if (levels[0] == "auto") {
+            contentlib.getLatestAutosave(cli._c, db.mongoID(levels[1]), entry => sendback(entry || { none : true })); 
         } else if (levels[0] == "history") {
             contentlib.getHistoryList(cli._c, levels[1], list => sendback(list));
         } else {
