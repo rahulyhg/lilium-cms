@@ -242,6 +242,7 @@ const compile = (o, context, v) => { o(context.header, css, `
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
                     <option value="deleted">Unpublished</option>
+                    <option value="reviewing">Pending review</option>
                 </select>
 
                 <label>Author</label>
