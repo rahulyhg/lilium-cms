@@ -353,6 +353,10 @@ class ContentLib {
         v.media && (v.media = db.mongoID(v.media));
         v.sponsoredBoxLogo && (v.sponsoredBoxLogo = db.mongoID(v.sponsoredBoxLogo));
 
+        if (v.topic == null || typeof v.topic == "undefined") {
+            delete v.topic;
+        }
+
         return v;
     }
 

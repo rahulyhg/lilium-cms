@@ -1,5 +1,6 @@
 const filelogic = require('./filelogic');
 const contentlib = require('./content');
+const hooks = require('./hooks');
 const db = require('./includes/db');
 
 class ContentController {
@@ -73,6 +74,12 @@ class ContentController {
                     if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
                         contentlib.publish(cli._c, article, db.mongoID(cli.userinfo.userid), resp => cli.sendJSON(resp));
                         contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
+
+                        hooks.fire('article_published', {
+                            cli: cli,
+                            article: article,
+                            _c : cli._c
+                        });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
                         cli.throwHTTP(404, undefined, true);
@@ -122,13 +129,19 @@ class ContentController {
                             contentlib.generate(cli._c, fullpost, () => {
                                 contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
                                 cli.sendJSON({ ok : 1 });
+
+                                hooks.fire('article_updated', {
+                                    cli: cli,
+                                    article: article,
+                                    _c : cli._c
+                                });
                             }, 'all');
                         });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
                         cli.throwHTTP(404, undefined, true);
                     }
-                }, { author : 1 });
+                });
                 break;
             default:
                 cli.throwHTTP(404, undefined, true);
@@ -149,11 +162,16 @@ class ContentController {
                 db.findUnique(cli._c, 'content', { _id }, (err, article) => {
                     if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
                         contentlib[cli.routeinfo.path[2]](cli._c, _id, db.mongoID(cli.userinfo.userid), payload => cli.sendJSON(payload));
+                        hooks.fire('article_unpublished', {
+                            cli: cli,
+                            article: article,
+                            _c : cli._c
+                        });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
                         cli.throwHTTP(404, undefined, true);
                     }
-                }, { author : 1 });
+                });
                 break;
 
             default:
