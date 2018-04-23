@@ -430,7 +430,7 @@ var gen_stats = function(report, date) {
 var gen_postlist = function(report, date) {
     var wrap = d.make({ id : "tdlposts" });
 
-    if (report.articles) {
+    if (report.articles && report.articles.length != 0) {
         var articles = report.articles;
         var startIndex = Math.round(Math.random() * (report.articles.length - 3));
 
