@@ -130,7 +130,12 @@ var LiveVariables = function() {
         try {
             var liveVars = JSON.parse(cli.routeinfo.params.vars);
             cli.livevars = {};
-            cli.details = JSON.parse(cli.routeinfo.params.details || {});
+
+            try {
+                cli.details = JSON.parse(cli.routeinfo.params.details || {});
+            } catch (err) {
+                cli.details = {};
+            }
 
             var callback = function(response) {
                 cli.sendJSON({
