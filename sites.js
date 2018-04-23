@@ -158,6 +158,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/mousetrap.js", 250, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/highlight.js", 290, "admin", conf.id);
+        Frontend.registerJSFile(base + "backend/static/formathtml.js", 320, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/socket.io.js", 400, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/leaflet/leaflet.js", 410, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/dateformat.js", 600, 'admin', conf.id);

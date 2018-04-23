@@ -75,6 +75,7 @@
     "image-size": "latest",
     "instagram-node": "latest",
     "js-base64": "latest",
+    "js-beautify": "^1.7.5",
     "jsdiff": "latest",
     "jsdom": "latest",
     "kerberos": "latest",
