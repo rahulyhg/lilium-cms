@@ -322,6 +322,14 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         }
     ];
 
+    var shouldAutosave = function() {
+        return window._poststate.status != "published";
+    };
+
+    var hasAds = function() {
+        return !allEditors.map(x => x.content.includes('<ad')).includes(false);
+    };
+
     var fillReport = function(r) {
         var set = function(id, value) {
             get(id).textContent = value;
@@ -891,42 +899,50 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
     var submitCurrentPost = function() {
         saveCurrentPost(function(saveresp) {
-            liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/submit/" + liliumcms.pageloader.lastLevel, function(resp) {
-                if (resp) {
-                    if (resp.error) {
-                        liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article because some fields are missing."});
+            if (hasAds() || d.id('psponsored').get().checked) {
+                liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/submit/" + liliumcms.pageloader.lastLevel, function(resp) {
+                    if (resp) {
+                        if (resp.error) {
+                            liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article because some fields are missing."});
+                        } else {
+                            liliumcms.notify({ type : "success", title : "Submit article", message : "This article is now pending review."});
+                            liliumcms.pageloader.load('/admin/publishing/list');
+                        }
                     } else {
-                        liliumcms.notify({ type : "success", title : "Submit article", message : "This article is now pending review."});
-                        liliumcms.pageloader.load('/admin/publishing/list');
+                        liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article for an unknown reason."});
                     }
-                } else {
-                    liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article for an unknown reason."});
-                }
-            });
+                });
+            } else {
+                liliumcms.notify({ type : "warning", title : "No ads", message : "Oops! It appears you forgot to insert ads. Please insert a few and try again." });
+            }
         });
     };
 
     var publishCurrentPost = function() {
         saveCurrentPost(function(saveresp) {
-            liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/publish/" + liliumcms.pageloader.lastLevel, function(resp) {
-                if (resp) {
-                    if (resp.error) {
-                        liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article because some fields are missing."});
-                    } else {
-                        resp.historyentry && pushHistoryCard(resp.historyentry);
-                        resp.newstate && (window._poststate = resp.newstate);
-    
-                        refreshState();
-                        refreshActions();
-    
-                        liliumcms.notify({ type : "success", title : "Published", message : "This article was published live on the website."});
+            if (hasAds() || d.id('psponsored').get().checked) {
+                liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/publish/" + liliumcms.pageloader.lastLevel, function(resp) {
+                    if (resp) {
+                        if (resp.error) {
+                            liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article because some fields are missing."});
+                        } else {
+                            resp.historyentry && pushHistoryCard(resp.historyentry);
+                            resp.newstate && (window._poststate = resp.newstate);
+        
+                            refreshState();
+                            refreshActions();
+        
+                            liliumcms.notify({ type : "success", title : "Published", message : "This article was published live on the website."});
 
-                        displayConfirmationAnimation();
+                            displayConfirmationAnimation();
+                        }
+                    } else {
+                        liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article for an unknown reason."});
                     }
-                } else {
-                    liliumcms.notify({ type : "danger", title : "Did not publish", message : "Could not publish the article for an unknown reason."});
-                }
-            });
+                });
+            } else {
+                liliumcms.notify({ type : "warning", title : "No ads", message : "Oops! It appears you forgot to insert ads. Please insert a few and try again." });
+            }
         });
     };
 
@@ -936,7 +952,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 pushHistoryCard(resp.historyentry);
                 liliumcms.notify({ type : "success", title : "Post updated", message : "This article was successfully updated."});
             } else {
-                liliumcms.notify({ type : "info", title : "Did not save", message : "Article was not updated due to lack of motifications."});
+                // liliumcms.notify({ type : "info", title : "Did not save", message : "Article was not updated due to lack of motifications."});
             }
 
             typeof done == "function" && done(resp);
