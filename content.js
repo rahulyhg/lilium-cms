@@ -36,6 +36,7 @@ class ContentLib {
                 type : "post",
                 status : "draft",
                 shares : 0,
+                hidden : false,
                 updated : new Date(),
                 createdOn : new Date()
             };
