@@ -248,7 +248,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         {
             id : "publish",
             shouldShow : function() {
-                return liliumcms.session.hasRight("publish-articles") && (window._poststate.status == "draft" || window._poststate.status == "deleted" || window._poststate.status == "reviewing");
+                return (!liliumcms.session.current.roles.includes('contractor') || liliumcms.session.hasRight('editor')) && (window._poststate.status == "draft" || window._poststate.status == "deleted" || window._poststate.status == "reviewing");
             },
             render : function() {
                 var button = document.createElement('button');
