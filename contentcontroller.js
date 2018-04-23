@@ -33,6 +33,11 @@ class ContentController {
                     }
                 }, { author : 1 });
                 break;
+            case "debug":
+                contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), db.mongoID(cli.routeinfo.path[3]), () => {
+                    cli.sendJSON({ debug : 1 });
+                });
+                break;
             case "preview" : 
                 contentlib.getPreview(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, markup => cli.sendHTML(markup));
                 break;
@@ -67,6 +72,7 @@ class ContentController {
                 db.findUnique(cli._c, 'content', { _id }, (err, article) => {
                     if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
                         contentlib.publish(cli._c, article, db.mongoID(cli.userinfo.userid), resp => cli.sendJSON(resp));
+                        contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
                         cli.throwHTTP(404, undefined, true);
@@ -114,6 +120,7 @@ class ContentController {
                     if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
                         contentlib.getFull(cli._c, _id, fullpost => {
                             contentlib.generate(cli._c, fullpost, () => {
+                                contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
                                 cli.sendJSON({ ok : 1 });
                             }, 'all');
                         });

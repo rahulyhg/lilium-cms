@@ -3,6 +3,7 @@ const config = require('./config');
 const filelogic = require('./filelogic');
 const log = require('./log');
 const hooks = require('./hooks');
+const notifications = require('./notifications');
 const DeepDiff = require('deep-diff');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
@@ -512,6 +513,44 @@ class ContentLib {
             });
         });
     }
+
+    facebookDebug(_c, userid, postid, done) {
+        db.findUnique(_c, 'content', {_id : postid}, (err, article) => {
+            if (_c.social.facebook.appid && _c.social.facebook.token) {
+                log('Facebook', 'Sending request to debug link');
+                require('request')({
+                    url : 'https://graph.facebook.com/v' + _c.social.facebook.apiversion || "2.8",
+                    body : {
+                        scrape : true,
+                        access_token : _c.social.facebook.token,
+                        id : _c.server.protocol + _c.server.url + "/" + article.name
+                    },
+                    json : true,
+                    method : "POST"
+                }, (a, b, c)  => {
+                    if (c && c.title) {
+                        log('Facebook', 'Debugger responded with title', "success");
+                        notifications.notifyUser(userid, _c.id, {
+                            title: "Facebook Graph",
+                            msg: '<i>'+article.title[0]+'</i> has been debugged on Facebook Graph.',
+                            type: 'log'
+                        });
+                    } else {
+                        log('Facebook', 'Debugger responded with error', "warn");
+                        notifications.notifyUser(userid, _c.id, {
+                            title: "Facebook Graph",
+                            url : "https://developers.facebook.com/tools/debug/og/object/",
+                            msg: '<i>'+article.title[0]+'</i> was not debugged on Facebook Graph.',
+                            type: 'warning'
+                        });
+                    }
+                });
+            }
+        });
+
+        done && done();
+    }
+
 
     getPreview(_c, postid, payload, sendback) {
         this.parseSpecialValues(payload);
