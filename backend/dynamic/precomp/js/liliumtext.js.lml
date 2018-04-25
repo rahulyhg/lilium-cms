@@ -159,7 +159,14 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
             var template = document.createElement('div');
             template.className = "instatemp";
             template.id = wrapid;
+
+            var sel = window.getSelection();
+            var range = sel.getRangeAt(0).cloneRange();
+
             editor.insertBlock(template);
+
+            sel.removeAllRanges();
+            sel.addRange(range);
             
             log('Instagram', "Handling Instagram embed");
             var urltype = type == "igcarousel" ? type : "instagram";
@@ -189,16 +196,8 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
                         maybeNext.innerHTML = "<br>";
                     }
 
-                    var range = document.createRange();
-                    range.setStart(maybeNext, 0);
-                    range.collapse(true);
-
-                    var sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-
                     var scrolltop = maybeNext.getClientRects()[0].top;
-                    editor.contentel.scrollTop = scrolltop + 30;
+                    // editor.contentel.scrollTop = scrolltop + 30;
                 } catch (err) {
                     liliumcms.modals.error("Instagram embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the Instagram embed feature of this post. Make sure the picture is from a public account, and that it is correctly formatted.");
                     console.err(err);
