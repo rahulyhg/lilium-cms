@@ -135,6 +135,7 @@ const compile = (o, context) => { o(`
 	<head>
         <style>${css}</style>
         <link href="https://fonts.googleapis.com/css?family=Leckerli+One|Lato" rel="stylesheet">
+        <title>Lilium Login - ${context._c.website.sitetitle}</title>
 	</head>
 	<body class="lml-login" id="lml-login">
         <div id="left">
