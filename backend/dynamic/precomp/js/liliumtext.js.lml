@@ -213,6 +213,16 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
             document.execCommand("createLink", false, text);
             break;
 
+        case "reddit":
+            var bq = document.createElement('blockquote');
+            bq.className = "reddit-card";
+            
+            var a = document.createElement('a');
+            a.href = text;
+            bq.appendChild(a);
+            editor.insertBlock(bq);
+            break;
+
         case "fbpost":
         case "fbvideo":
         case "vimeo":
