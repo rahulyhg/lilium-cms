@@ -1,4 +1,5 @@
 {#config}
+
 ////////////////////////////////////////////////////////////////////////////
 //                                                                        //
 // Image Insertion                                                        //
@@ -295,6 +296,7 @@ LiliumTextEmbedPlugin.prototype.handleEmbed = function(type, transfer, text) {
 LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, pasteArgs) {
     var transfer = pasteArgs.dataTransfer;
     var textdata = transfer.getData("text");
+
     if (textdata) {
         var isURL = /^(https?\:\/\/)?[a-zA-Z0-9\.]+[a-zA-Z0-9\-\=\?\&\/]*$/.test(textdata);
         if (isURL) {
@@ -305,8 +307,28 @@ LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, pasteArgs) {
                     return false;
                 }
             }   
+        } else if (textdata == '<!--LML-->' && window.LML_GLOBAL_SELECTION) {
+            window.getSelection().getRangeAt(0).insertNode(window.LML_GLOBAL_SELECTION.cloneNode(true));
+
+            pasteArgs.event.preventDefault();
+            return false;
+        } else {
+            var textdata = (pasteArgs.event.originalEvent || pasteArgs.event).clipboardData.getData('text/plain');
+            document.execCommand('insertHtml', false, textdata);
+
+            pasteArgs.event.preventDefault();
+            return false;
         }
     }
+};
+
+LiliumTextEmbedPlugin.prototype.handleCopy = function(ev) {
+    ev.clipboardData.setData('text/html', '<!--LML-->');
+    ev.clipboardData.setData('text', '<!--LML-->');
+    window.LML_GLOBAL_SELECTION = window.getSelection().getRangeAt(0).cloneContents();
+
+    ev.preventDefault();
+    return false;
 };
 
 LiliumTextEmbedPlugin.prototype.handleCommandAccept = function(modal) {
@@ -351,6 +373,7 @@ LiliumTextEmbedPlugin.prototype.commandClick = function() {
 
 LiliumTextEmbedPlugin.prototype.register = function() {
     this.editor.bind('paste', this.handlePaste.bind(this));
+    this.editor.contentel.addEventListener('copy', this.handleCopy.bind(this));
     this.editor.addCommand(new LiliumTextCustomCommand("embedlink", this.commandClick.bind(this), "far fa-link"), 3);
 }
 
