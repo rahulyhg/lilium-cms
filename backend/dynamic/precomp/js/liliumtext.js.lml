@@ -307,14 +307,8 @@ LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, pasteArgs) {
                     return false;
                 }
             }   
-        } else if (false && transfer.getData('text/html') == '<!--LML-->' && window.LML_GLOBAL_SELECTION) {
-            window.getSelection().getRangeAt(0).insertNode(window.LML_GLOBAL_SELECTION.cloneNode(true));
-
-            pasteArgs.event.preventDefault();
-            return false;
-        } else {
-            var textdata = (pasteArgs.event.originalEvent || pasteArgs.event).clipboardData.getData('text/plain');
-            document.execCommand('insertHtml', false, textdata);
+        } else if (transfer.getData('text/html')) {
+            document.execCommand('insertHtml', false, transfer.getData('text/html'));
 
             pasteArgs.event.preventDefault();
             return false;
