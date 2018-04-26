@@ -134,7 +134,7 @@ const BADGE_VALIDATORS = {
         BadgeValidator.check(data._c, data.article.author, "use-n-images", data.score.img, done);
     }, "n-shares-48h" : (data, done) => {
         done(false);
-    }, "user_loggedin" : (data, done) => {
+    }, "latelogin-n-times" : (data, done) => {
         done(false);
     }, "top-article-n-times" : (data, done) => {
         if (data.data && data.data.toppage) {
