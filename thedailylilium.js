@@ -136,27 +136,108 @@ class TheDailyLilium {
     }
 
     adminGET(cli) {
-        require('./filelogic').serveAdminLML3(cli);
+        const page = cli.routeinfo.path[2];
+
+        switch (page) {
+            case undefined:
+            case "articles":
+                require('./filelogic').serveAdminLML3(cli);
+                break;
+
+            case "edit":
+                require('./filelogic').serveAdminLML3(cli, true);
+                break;
+
+            default:
+                cli.throwHTTP(404);
+        }
+    }
+
+    adminPOST(cli) {
+        const action = cli.routeinfo.path[2];
+        const _id = db.mongoID(cli.routeinfo.path[3]);
+
+        switch (action) {
+            case "make":
+                const headline = cli.postdata.data.headline;
+                const author = db.mongoID(cli.userinfo.userid);
+                const article = {
+                    headline, author, 
+
+                    createdOn : new Date(),
+                    content : "<p>Write something amazing.</p>",
+                    editionOf : require('dateformat')(new Date(Date.now() + 1000 * 60 * 60 * 24), "ddmmyyyy"),
+                    mediasrc : "",
+                    status : "draft"
+                }
+
+                db.insert(require('./config').default(), 'tdlposts', article, (err, r) => {
+                    cli.sendJSON({ articleid : article._id, error : err });
+                });
+                break;
+
+            case "save":
+                const updated = cli.postdata.data;
+                db.update(require('./config').default(), 'tdlposts', {_id}, updated, (err) => cli.sendJSON({ok:!err}));
+                break;
+
+            default:
+                cli.throwHTTP(404, undefined, true);
+        }
     }
 
     livevar(cli, levels, params, sendback) {
-        const temp = new Date();
-        let datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, 0, 0);
-        if (cli.details.tzoffset) {
-            datestart = new Date(datestart.getTime() + (1000 * 60 * cli.details.tzoffset) - (1000 * 60 * new Date().getTimezoneOffset()));
+        const action = levels[0];
+
+        if (!cli.hasRight('write-thedailylilium')) {
+            return sendback(new Error("Not Authorized"));
         }
 
-        const _id = dateformat(datestart, "ddmmyyyy");
+        if (action == "bunch") {
+            const $match = {
+                status : params.filters.status || {$ne : "destroyed"}
+            };
 
-        db.findUnique(cli._c, 'thedailylilium', { _id }, (err, report) => {
-            if (!report) {
-                this.storeEntry(cli._c, datestart, report => {
-                    sendback(report);
-                });
-            } else {
-                sendback(report);
+            if (params.filters.search) {
+                $match.headline = new RegExp(params.filters.search, 'i');
             }
-        });
+
+            db.join(require('./config').default(), 'tdlposts', [
+                { $match },
+                { $sort : { _id : -1 } },
+                { $limit : 50 }
+            ], items => {
+                sendback({ items, total : items.length });
+            });
+        } else if (action == "single") {
+            db.join(require('./config').default(), 'tdlposts', [
+                { $match : { _id : db.mongoID(levels[1]) } }
+            ], arr => {
+                sendback(arr[0]);
+            });
+        } else {
+            const temp = new Date();
+            let datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, 0, 0);
+            if (cli.details.tzoffset) {
+                datestart = new Date(datestart.getTime() + (1000 * 60 * cli.details.tzoffset) - (1000 * 60 * new Date().getTimezoneOffset()));
+            }
+
+            const _id = dateformat(datestart, "ddmmyyyy");
+
+            db.findUnique(cli._c, 'thedailylilium', { _id }, (err, report) => {
+                db.findToArray(require('./config').default(), 'tdlposts', { editionOf : _id }, (err, customposts) => {
+                    if (!report) {
+                        this.storeEntry(cli._c, datestart, report => {
+                            report.customposts = customposts;
+                            sendback(report);
+                        });
+                    } else {
+                        report.customposts = customposts;
+                        sendback(report);
+                    }
+                }
+            });
+        }
     }
 }
 
