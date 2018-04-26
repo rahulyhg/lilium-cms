@@ -307,7 +307,7 @@ LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, pasteArgs) {
                     return false;
                 }
             }   
-        } else if (textdata == '<!--LML-->' && window.LML_GLOBAL_SELECTION) {
+        } else if (false && transfer.getData('text/html') == '<!--LML-->' && window.LML_GLOBAL_SELECTION) {
             window.getSelection().getRangeAt(0).insertNode(window.LML_GLOBAL_SELECTION.cloneNode(true));
 
             pasteArgs.event.preventDefault();
@@ -323,10 +323,10 @@ LiliumTextEmbedPlugin.prototype.handlePaste = function(editor, pasteArgs) {
 };
 
 LiliumTextEmbedPlugin.prototype.handleCopy = function(ev) {
-    ev.clipboardData.setData('text/html', '<!--LML-->');
-    ev.clipboardData.setData('text', '<!--LML-->');
     window.LML_GLOBAL_SELECTION = window.getSelection().getRangeAt(0).cloneContents();
 
+    ev.clipboardData.setData('text', window.LML_GLOBAL_SELECTION.textContent);
+    ev.clipboardData.setData('text/html', '<!--LML-->');
     ev.preventDefault();
     return false;
 };
@@ -373,7 +373,7 @@ LiliumTextEmbedPlugin.prototype.commandClick = function() {
 
 LiliumTextEmbedPlugin.prototype.register = function() {
     this.editor.bind('paste', this.handlePaste.bind(this));
-    this.editor.contentel.addEventListener('copy', this.handleCopy.bind(this));
+    // this.editor.contentel.addEventListener('copy', this.handleCopy.bind(this));
     this.editor.addCommand(new LiliumTextCustomCommand("embedlink", this.commandClick.bind(this), "far fa-link"), 3);
 }
 
