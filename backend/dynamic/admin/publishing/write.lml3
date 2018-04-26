@@ -347,7 +347,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     };
 
     var hasAds = function() {
-        return !allEditors.map(x => x.content.includes('<ad')).includes(false);
+        return !allEditors.map(x => !!x.contentel.querySelector('ad')).includes(false);
     };
 
     var fillReport = function(r) {
