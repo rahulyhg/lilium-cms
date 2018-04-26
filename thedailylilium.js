@@ -235,7 +235,7 @@ class TheDailyLilium {
                         report.customposts = customposts;
                         sendback(report);
                     }
-                }
+                });
             });
         }
     }
