@@ -20,7 +20,7 @@ var Dispatcher = function () {
                 Admin.serveDashboard(cli);
             } else {
                 if (cli._c.usability.admin.loginIfNotAuth) {
-                    cli.redirect(cli._c.server.url + "/login?cause=401", false);
+                    cli.redirect(cli._c.server.url + "/login?to=" + cli._c.server.protocol + cli._c.server.url + cli.routeinfo.fullpath, false);
                 } else {
                     cli.throwHTTP(401, "Unauthorized", true);
                 }

@@ -8,8 +8,8 @@ const AdminEndpoints = {
 const AdminMenus = [];
 
 const filelogic = require('../filelogic.js');
-const formBuilder = require('../formBuilder');
 const LML2 = require('../lml/compiler.js');
+const LML3 = require('../lml3/compiler');
 const hooks = require('../hooks.js');
 
 class AdminMenu {
@@ -41,7 +41,9 @@ class Admin {
 
 	serveLogin (cli) {
 		cli.touch('admin.serverLogin');
-		filelogic.runLogic(cli);
+        LML3.compile(cli._c, liliumroot + "/backend/dynamic/login.lml3", {}, markup => {
+            cli.sendHTML(markup);
+        });
 	};
 
     welcome (cli, method) {

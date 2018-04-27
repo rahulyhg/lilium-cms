@@ -73,7 +73,7 @@
         }, {
             "module" : "thedailylilium.js",
             "endpoint" : "thedailylilium",
-            "support" : ["admin_get", "livevar"],
+            "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "thedailylilium",
                 "faicon": "fa-newspaper",

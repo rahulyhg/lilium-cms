@@ -90,7 +90,7 @@ var DB = function() {
 
 	this.initDatabase = function(conf, callback) {
 		MongoClient.connect(formatMongoString(conf), function(err, client) {
-			client.db(conf.data.use).collection('lilium', {strict:true}, function(err, c) {
+			client.db(conf.data.use).collection('lilium', {}, function(err, c) {
 				if (err) {
 					require('./dbinit.js')(conf, client.db(conf.data.use), callback);
 				} else {
@@ -127,7 +127,7 @@ var DB = function() {
 		cb : End callback with format function(err, cursor)
 	*/
 	this.find = this.query = function(conf, coln, conds, stack, cb, proj) {
-		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
                 log('Database', 'Error querying collection ' + coln + ' : ' + err, 'err');
 				cb("[Database - Error : "+err+"]");
@@ -190,7 +190,7 @@ var DB = function() {
     }
 
     this.count = this.length = function(conf, coln, conds, cb) {
-        _conns[conf.id || conf].collection(coln, {strict:true}, function(err, col) {
+        _conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -212,7 +212,7 @@ var DB = function() {
 	};
 
 	this.findToArray = function(conf, coln, conds, cb, projection, skip, max, fromLastToFirst) {
-		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -276,7 +276,7 @@ var DB = function() {
 	};
 
     this.save = function(conf, coln, doc, cb) {
-        _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+        _conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
             } else if (!doc || !doc._id) {
@@ -291,7 +291,7 @@ var DB = function() {
 	// Modify all all entries for newVal,
 	// And call the cb callback with format function(err, result)
 	this.modify = this.update = function(conf, coln, conds, newVal, cb, upsert, one, operators, getDoc) {
-        _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+        _conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -328,7 +328,7 @@ var DB = function() {
 
 	this.createIndex = function(conf, coln, fields, cb) {
         log("Database", "Creating index for collection " + coln + "@" + (conf.id || conf));
-		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			col.createIndex(fields, {}, function(err, results) {
 				cb(err, results);
 			});
@@ -336,7 +336,7 @@ var DB = function() {
 	}
 
 	this.findAndModify = function(conf, coln, conds, newVal, cb, upsert, one) {
-		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -363,7 +363,7 @@ var DB = function() {
 	}
 
 	this.insert = function(conf, coln, docs, cb) {
-		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof docs !== "object") {
@@ -375,7 +375,7 @@ var DB = function() {
 	};
 
 	this.remove = this.delete = function(conf, coln, conds, cb, one) {
-		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {
@@ -393,7 +393,7 @@ var DB = function() {
 	};
 
 	this.aggregate = this.join = function(conf, coln, aggregation, cb, unique) {
-		_conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else {
@@ -433,7 +433,7 @@ var DB = function() {
 
 	// Will callback cb with a boolean representing the existance of a document
 	this.match = this.exists = function(conf, coln, conds, cb) {
-        _conns[conf.id || conf].collection(coln, {"strict":true}, function(err, col) {
+        _conns[conf.id || conf].collection(coln, {}, function(err, col) {
             col.find(conds).limit(1).hasNext(function(err, hasnext) {
                 cb(hasnext);
             });
@@ -447,7 +447,7 @@ var DB = function() {
     // iterator :   function called on each object with (object, next, cursor)
     //              Calling next(false) will break the loop
     this.paramQuery = function(conf, params, cb) {
-		_conns[conf.id || conf].collection(coln, params.colparam || {"strict":true}, function(err, col) {
+		_conns[conf.id || conf].collection(coln, params.colparam || {}, function(err, col) {
 			if (err) {
 				cb("[Database - Error : "+err+"]");
 			} else if (typeof conds != "object") {

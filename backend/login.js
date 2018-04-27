@@ -1,4 +1,3 @@
-const fileserver = require('../fileserver.js');
 const db = require('../includes/db.js');
 const CryptoJS = require('crypto-js');
 const _c = require('../config.js');
@@ -30,7 +29,10 @@ const loginSuccess = (cli, userObj, cb) => {
                     const entity = userObj._id;
                     db.update(_c.default(), 'actionstats', {entity, type : "system"}, {$inc : {login : 1}}, (err, r) => {
                         hooks.fire('user_loggedin', { _c : cli._c, userObj, score : r.value ? r.value.login : 1 });
-                        cli.redirect(cli._c.server.url + "/admin", false);
+                        cli.sendJSON({
+                            success : true,
+                            to : cli.routeinfo.params.to || (cli._c.server.url + "/admin")
+                        })
                     }, true, true, true, true);
                 }
             });
@@ -144,7 +146,7 @@ class Login {
 			    } else {
 	    		    hooks.fire('user_login_failed', cli);
                     log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
-    			    cli.redirect(cli._c.server.url + "/" + cli._c.paths.login + "?failed", false);
+                    cli.sendJSON({ error : "credentials", success : false })
                 }
             });
 		} else {

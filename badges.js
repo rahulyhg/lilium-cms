@@ -81,6 +81,10 @@ const DEFAULT_BADGES = [
         displayname : "Influencer",
         levels : [2, 4, 8, 12, 20, 50, 80, 200],
         reason : "For publishing <n> sponsored articles", icon : "fa-handshake", hook : "article_published_from_draft"},
+    {slug : "latelogin-n-times", 
+        displayname : "Sleepless",
+        levels : [2, 10, 50, 100, 1000, 2000, 5000, 10000],
+        reason : "For logging in between 1AM and 5 AM <n> times", icon : "fas fa-coffee", hook : "user_loggedin"},
     {slug : "preview-n-times", 
         displayname : "Perfectionist",
         levels : [2, 10, 50, 100, 1000, 2000, 5000, 10000],
@@ -129,6 +133,8 @@ const BADGE_VALIDATORS = {
     }, "use-n-images" : (data, done) => {
         BadgeValidator.check(data._c, data.article.author, "use-n-images", data.score.img, done);
     }, "n-shares-48h" : (data, done) => {
+        done(false);
+    }, "latelogin-n-times" : (data, done) => {
         done(false);
     }, "top-article-n-times" : (data, done) => {
         if (data.data && data.data.toppage) {

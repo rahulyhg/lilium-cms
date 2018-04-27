@@ -274,6 +274,9 @@ class ContentLib {
         if (filters.search && filters.search.trim()) { 
             $match.$text = { $search : filters.search.trim().split(' ').map(x => "\"" + x + "\"").join(' ') };
         }
+        if (sort == "updated") {
+            $match.updated = { $exists : 1 };
+        }
 
         const pipeline = [
             { $match }, 

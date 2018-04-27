@@ -259,6 +259,7 @@ const compile = (o, context, v) => { o(context.header, css, `
 
                 <label>Sort by</label>
                 <select name="sort">
+                    <option value="updated">Last edited</option>
                     <option value="">Lilium Blend</option>
                     <option value="date">Publication date</option>
                     <option value="shares">Most shares</option>
