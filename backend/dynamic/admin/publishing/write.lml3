@@ -209,6 +209,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             <input type="checkbox" id="pnsfw" name="nsfw" />
         </div>
         <div class="pub-detail-field">
+            <span>Only accessible via URL</span>
+            <input type="checkbox" id="phidden" name="hidden" />
+        </div>
+        <div class="pub-detail-field">
             <span>URL</span>
             <a id="pub-url-link" href="" target="_blank"></a>
         </div>
@@ -482,6 +486,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             sponsoredBoxLogo    : s.sponsoredBoxLogo,
             sponsoredBoxTitle   : s.sponsoredBoxTitle,
             sponsoredBoxURL     : s.sponsoredBoxURL,
+            hidden              : s.hidden,
 
             customfacebooktitle : s.customfacebooktitle,
             facebooktitle       : s.facebooktitle,
@@ -523,6 +528,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         window._poststate.media = document.getElementById('mediapicker').value;
         window._poststate.author = document.getElementById('pauthor').value;
         window._poststate.nsfw = !!document.getElementById('pnsfw').checked;
+        window._poststate.hidden = !!document.getElementById('phidden').checked;
 
         window._poststate.isSponsored = document.getElementById('psponsored').checked;
         window._poststate.sponsoredCampaignID = document.getElementById('pcampid').value;
@@ -561,6 +567,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         document.getElementById('pcampid').value = window._poststate.sponsoredCampaignID || "";
 
         document.getElementById('psponsbox').checked = window._poststate.useSponsoredBox;
+        document.getElementById('phidden').checked = window._poststate.hidden;
         onChangeToggleSponsoredBoxBoxes(undefined, document.getElementById('psponsbox').checked);
 
         document.getElementById('psponsboxtitle').value = window._poststate.sponsoredBoxTitle;
