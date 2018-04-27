@@ -1,0 +1,91 @@
+{#config}
+
+window.BASE_URL = "{=config.default.server.protocol}{=config.default.server.url}";
+
+window.ELEMLIST = {
+    P : {
+        node : "P",
+        description : "A text paragraph"
+    },
+    IMG : {
+        node : "IMG",
+        description : "An image"
+    },
+    BLOCKQUOTE : {
+        node : "BLOCKQUOTE",
+        description : "An indented quote"
+    },
+    UL : {
+        node : "UL",
+        description : "An unordered list"
+    },
+    OL : {
+        node : "OL",
+        description : "An ordered list"
+    },
+    TABLE : {
+        node : "TABLE",
+        description : "Tabulated data"
+    },
+    DIV : {
+        node : "DIV",
+        description : "A container"
+    },
+    IFRAME : {
+        node : "IFRAME",
+        description : "Embedded website / content"
+    },
+    AD : {
+        node : "AD",
+        description : "Advertiser banner"
+    }
+};
+
+window.SPECIALELEMS = {
+    "INSTA" : {
+        node : "IMG",
+        description : "Instagram embed",
+        selector : "p .lml-instagram-embed-3"
+    },
+    "TWITTER" : {
+        node : "BLOCKQUOTE",
+        description : "Twitter embed",
+        selector : "blockquote.twitter-tweet"
+    },
+    "UPLOAD" : {
+        node : "IMG",
+        description : "Uploaded image",
+        selector : ".parag-image-wrapper img"
+    },
+    "YOUTUBE" : {
+        node : "IFRAME",
+        description : "A YouTube video",
+        selector : 'iframe[src~="youtube"]'
+    },
+    "REDDIT" : {
+        node : "BLOCKQUOTE",
+        description : "Reddit embed",
+        selector : "blockquote.reddit-card"
+    },
+    "SOUNDCLOUD" : {
+        node : "IFRAME",
+        description : "Soundcloud embed",
+        selector : 'iframe[src~="soundcloud"]'
+    },
+    "VIMEO" : {
+        node : "IFRAME",
+        description : "Vimeo embed",
+        selector : 'iframe[src~="player.vimeo"]'
+    },
+    "FACEBOOK" : {
+        node : "DIV",
+        description : "Facebook embed",
+        selector : '.fb-post-wrap, .fb-video-wrap'
+    }
+
+}
+
+window.UNKNOWNELEM = {
+    node : "?",
+    description : "An element"
+}
