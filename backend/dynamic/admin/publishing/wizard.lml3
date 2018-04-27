@@ -7,21 +7,102 @@ const settings = {
 const compile = (o, context) => { o(context.header, `
 
 <div id="lml-wizard">
+    <div class="liliumtext theme-minim liliumtext-spoof">
+        <div id="post-template" class="liliumtext-editor">
 
+        </div>
+    </div>
+
+    <div id="post-actions">
+        <div id="post-action-text">
+            Click on any element in the preview panel
+        </div>
+
+        <div id="elem-info">
+            <div class="card">
+                <b>Paragraph block</b>
+            </div>
+        </div>
+    </div>
 </div>
 
+<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
 <style>
+
+#post-actions {
+    background: #f6f6f6;
+    width: calc(100% - 680px);
+    overflow-y: auto;
+    position: fixed;
+    top: 128px;
+    right: 0px;
+    bottom: 0;
+}
+
+#post-action-text {
+    display: block;
+    margin-top: 100px;
+    text-align: center;
+    font-size: 36px;
+    padding: 0px 40px;
+    color: #a699b1;
+    font-weight: bold;
+}
+
+#lml-wizard {
+    position: relative;
+}
+
+#lilium .liliumtext.theme-minim #post-template {
+    width: 640px;
+    overflow-y: auto;
+    position: fixed;
+    top: 128px;
+    left: 40px;
+    bottom: 0;
+    box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.2);
+    background: #fff;
+    padding: 0;
+    z-index: 10;
+}
+
+#post-template img {
+    width: 100%;
+    height: auto;
+}
+
+#post-template > * {
+    padding: 10px;
+    margin: 10px;
+    border: 1px solid #FFF;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+#post-template > *:hover {
+    border-color: #CCC;
+    background-color: #F6F6F6;
+}
 
 </style>
 
 <script>
 
 liliumcms.lmldom.bind(function() {
+    var parser = document.createElement('div');
+    parser.innerHTML = liliumcms.livevars.livevars()["publishing.write." + liliumcms.pageloader.lastLevel].content;
 
+    var template = document.getElementById('post-template');
+    while (parser.firstChild) {
+        template.appendChild(parser.firstChild);
+    }
+
+    var links = template.querySelectorAll('a');
+    Array.prototype.forEach.call(links, function(a) { a.target = "_blank"; })
 });
 
 </script>
-
+    
 `); }
 
 module.exports = { settings, compile };
