@@ -32,6 +32,21 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
 </div>
 
+<div id="no-ads-modal" class="lml-modal">
+    <div class="lml-modal-title">
+        No ads found in content
+    </div>
+    <div class="lml-modal-body">
+        <p>Before submitting an article for publication, advertising banners must be inserted inside the content between paragraphs.</p>
+        <p>To make it easier for you, an ad insertion wizard is available.</p>
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Insert ads manually</button>
+        <button class="lml-modal-accept" type="button">Use the wizard</button>
+    </div>
+
+</div>
+
 <div class="anim-slide" id="anim-slide-1"></div>
 <div class="anim-slide" id="anim-slide-2"></div>
 <div class="anim-slide" id="anim-slide-3"></div>
@@ -957,6 +972,15 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         });
     }
 
+    var displayNoAds = function() {
+        liliumcms.modals.get('no-ads-modal').cast();
+    };
+
+    window["no-ads-modal_accept"] = function(modal) {
+        modal.dismiss();
+        liliumcms.pageloader.load("/admin/publishing/wizard/" + liliumcms.pageloader.lastLevel);
+    };
+
     var submitCurrentPost = function() {
         saveCurrentPost(function(saveresp) {
             if (hasAds() || d.id('psponsored').get().checked) {
@@ -973,7 +997,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                     }
                 });
             } else {
-                liliumcms.notify({ type : "warning", title : "No ads", message : "Oops! It appears you forgot to insert ads. Please insert a few and try again." });
+                displayNoAds();
             }
         });
     };
@@ -1001,7 +1025,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                     }
                 });
             } else {
-                liliumcms.notify({ type : "warning", title : "No ads", message : "Oops! It appears you forgot to insert ads. Please insert a few and try again." });
+                displayNoAds();
             }
         });
     };
