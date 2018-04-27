@@ -1,0 +1,27 @@
+const settings = {
+    title : "Publishing wizard",
+    lmldom : { v : 1.0 },
+    livevars : ["publishing.write.{?1}"]
+};
+
+const compile = (o, context) => { o(context.header, `
+
+<div id="lml-wizard">
+
+</div>
+
+<style>
+
+</style>
+
+<script>
+
+liliumcms.lmldom.bind(function() {
+
+});
+
+</script>
+
+`); }
+
+module.exports = { settings, compile };
