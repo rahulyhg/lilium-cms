@@ -224,6 +224,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             <input type="checkbox" id="pnsfw" name="nsfw" />
         </div>
         <div class="pub-detail-field">
+            <span>Only accessible via URL</span>
+            <input type="checkbox" id="phidden" name="hidden" />
+        </div>
+        <div class="pub-detail-field">
             <span>URL</span>
             <a id="pub-url-link" href="" target="_blank"></a>
         </div>
@@ -362,7 +366,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     };
 
     var hasAds = function() {
-        return !allEditors.map(x => !!x.contentel.querySelector('ad')).includes(false);
+        return !allEditors.map(x => !!x.contentel.querySelector('.lml-adplaceholder')).includes(false);
     };
 
     var fillReport = function(r) {
@@ -497,6 +501,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             sponsoredBoxLogo    : s.sponsoredBoxLogo,
             sponsoredBoxTitle   : s.sponsoredBoxTitle,
             sponsoredBoxURL     : s.sponsoredBoxURL,
+            hidden              : s.hidden,
 
             customfacebooktitle : s.customfacebooktitle,
             facebooktitle       : s.facebooktitle,
@@ -538,6 +543,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         window._poststate.media = document.getElementById('mediapicker').value;
         window._poststate.author = document.getElementById('pauthor').value;
         window._poststate.nsfw = !!document.getElementById('pnsfw').checked;
+        window._poststate.hidden = !!document.getElementById('phidden').checked;
 
         window._poststate.isSponsored = document.getElementById('psponsored').checked;
         window._poststate.sponsoredCampaignID = document.getElementById('pcampid').value;
@@ -576,6 +582,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         document.getElementById('pcampid').value = window._poststate.sponsoredCampaignID || "";
 
         document.getElementById('psponsbox').checked = window._poststate.useSponsoredBox;
+        document.getElementById('phidden').checked = window._poststate.hidden;
         onChangeToggleSponsoredBoxBoxes(undefined, document.getElementById('psponsbox').checked);
 
         document.getElementById('psponsboxtitle').value = window._poststate.sponsoredBoxTitle;
@@ -632,8 +639,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                     new LiliumTextWebCommand("block", "h3", "far fa-h3"),
                     new LiliumTextWebCommand("block", "blockquote", "far fa-quote-right"),
                 ], [
-                    new LiliumTextWebCommand('insert', 'hr', 'far fa-minus'),
-                    new LiliumTextWebCommand('insert', 'ad', 'far fa-usd-square')
+                    new LiliumTextWebCommand('insert', 'hr', 'far fa-minus')
                 ], [
                     new LiliumTextWebCommand('exec', "insertOrderedList",   "far fa-list-ol"),  
                     new LiliumTextWebCommand('exec', "insertUnorderedList", "far fa-list-ul"), 
@@ -645,6 +651,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             ],
             plugins : [
                 LiliumCodeFormatPlugin,
+                LiliumTextInsertAds,
                 LiliumTextImageSelectionPlugin,
                 LiliumTextImageInsertionPlugin,
                 LiliumTextEmbedPlugin

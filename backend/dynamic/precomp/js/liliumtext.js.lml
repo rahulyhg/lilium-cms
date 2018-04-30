@@ -55,8 +55,27 @@ LiliumTextImageInsertionPlugin.prototype.register = function() {
     this.editor.addCommand(this.insertCommand, 3);
 };
 
-LiliumTextImageInsertionPlugin.prototype.unregister = function() {
+////////////////////////////////////////////////////////////////////////////
+//                                                                        //
+// Ad Insertion                                                           //
+//                                                                        //
+////////////////////////////////////////////////////////////////////////////
+var LiliumTextInsertAds = function(editor) {
+    this.identifier = "LiliumTextInsertAdsPlugin";
+    this.editor = editor;
+};
 
+LiliumTextInsertAds.prototype.insertAd = function() {
+    var elem = document.createElement('div');
+    elem.className = "lml-adplaceholder";
+    elem.setAttribute('contenteditable', false);
+
+    this.editor.insertBlock(elem);
+};
+
+LiliumTextInsertAds.prototype.register = function() {
+    this.cmd = new LiliumTextCustomCommand("LiliumTextInsertAds", this.insertAd.bind(this), "far fa-usd-square");
+    this.editor.addCommand(this.cmd, 3);
 };
 
 ////////////////////////////////////////////////////////////////////////////
