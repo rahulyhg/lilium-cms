@@ -155,7 +155,7 @@ var SiteInitializer = function (conf, siteobj) {
         var htmlbase = conf.server.html;
 
         log('SiteInitializer', "Registering admin default frontend JS and CSS", 'info');
-        Frontend.registerJSFile(base + "/compiled/admin/js/const.js", 100, "admin", conf.id);
+        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/const.js", 100, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/jq.js", 150, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/mousetrap.js", 250, "admin", conf.id);
         Frontend.registerJSFile(base + "backend/static/highlight.js", 290, "admin", conf.id);
