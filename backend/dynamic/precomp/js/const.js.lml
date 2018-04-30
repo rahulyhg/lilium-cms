@@ -2,6 +2,15 @@
 
 window.BASE_URL = "{=config.default.server.protocol}{=config.default.server.url}";
 
+window.getElementDetails = function(el) {
+    var template = document.createElement('div');
+    template.appendChild(el.cloneNode(true));
+
+    return window.SPECIALELEMS.find(function(special) {
+        return template.querySelector(special.selector);
+    }) || window.ELEMLIST[el.nodeName] || window.UNKNOWNELEM;
+}
+
 window.ELEMLIST = {
     P : {
         node : "P",
@@ -37,53 +46,52 @@ window.ELEMLIST = {
     },
     AD : {
         node : "AD",
-        description : "Advertiser banner"
+        description : "Advertising banner"
     }
 };
 
-window.SPECIALELEMS = {
-    "INSTA" : {
+window.SPECIALELEMS = [
+    {
         node : "IMG",
         description : "Instagram embed",
         selector : "p .lml-instagram-embed-3"
     },
-    "TWITTER" : {
+    {
         node : "BLOCKQUOTE",
         description : "Twitter embed",
         selector : "blockquote.twitter-tweet"
     },
-    "UPLOAD" : {
+    {
         node : "IMG",
         description : "Uploaded image",
         selector : ".parag-image-wrapper img"
     },
-    "YOUTUBE" : {
+    {
         node : "IFRAME",
         description : "A YouTube video",
         selector : 'iframe[src~="youtube"]'
     },
-    "REDDIT" : {
+    {
         node : "BLOCKQUOTE",
         description : "Reddit embed",
         selector : "blockquote.reddit-card"
     },
-    "SOUNDCLOUD" : {
+    {
         node : "IFRAME",
         description : "Soundcloud embed",
         selector : 'iframe[src~="soundcloud"]'
     },
-    "VIMEO" : {
+    {
         node : "IFRAME",
         description : "Vimeo embed",
         selector : 'iframe[src~="player.vimeo"]'
     },
-    "FACEBOOK" : {
+    {
         node : "DIV",
         description : "Facebook embed",
         selector : '.fb-post-wrap, .fb-video-wrap'
     }
-
-}
+];
 
 window.UNKNOWNELEM = {
     node : "?",
