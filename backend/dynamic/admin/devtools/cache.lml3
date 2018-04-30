@@ -51,9 +51,28 @@ const preload = (context, done) => {
                 done();
             });
         };
+
+        window.gencache = function(done, btn) {
+            lml.post({}, '${context._c.server.url}/admin/devtools/gencache/' + (btn.dataset.total || ""), function() {
+                liliumcms.notify({ title : "Cache", message : "Generating " + (btn.dataset.total || "all") + " posts", type : "info" });
+                done();
+            }); 
+        };
     </script>`;
 
     context.homebutton = `
+        <div id="gegen-cache-button" class="workbutton big" data-call="gencache" data-total="50">
+            <span>Rebuild 50 latests</span>
+        </div>
+        <div id="gegen-cache-button" class="workbutton big" data-call="gencache" data-total="200">
+            <span>Rebuild 200 latests</span>
+        </div>
+        <div id="gegen-cache-button" class="workbutton big" data-call="gencache" data-total="1000">
+            <span>Rebuild 1000 latests</span>
+        </div>
+        <div id="gegen-cache-button" class="workbutton big" data-call="gencache">
+            <span>Rebuild entire cache base</span>
+        </div>
         <div id="clear-homepage-button" class="workbutton big" data-call="generateHomepage">
             <span>Rebuild homepage markup</span>
         </div>

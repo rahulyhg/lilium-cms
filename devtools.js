@@ -64,6 +64,9 @@ class DevTools {
             case 'cache':
                 handleCacheClear(cli);
                 break;
+            case 'gencache':
+                maybeRegenCache(cli);
+                break;
             case 'scripts':
                 maybeExecuteScript(cli);
                 break;
@@ -402,7 +405,44 @@ var dispatchMagicLink = function(cli) {
     require('./entities.js').sendMagicLinkToEveryone(cli, function() {
         cli.sendJSON({success : true});
     });
-}
+};
+
+var maybeRegenCache = function(cli) {
+    if (cli.hasRightOrRefuse('admin')) {
+        cli.sendJSON({ok : 1});
+
+        const now = Date.now();
+        const total = isNaN(cli.routeinfo.path[3]) ? 1000000 : parseInt(cli.routeinfo.path[3]);
+        db.join(cli._c, 'content', [
+            { $match : { status : "published" } },
+            { $sort : { _id : -1 } },
+            { $limit : total }
+        ], arr => {
+            const ids = arr.map(x => x._id);
+            const contentlib = require('./content');
+            
+            let i = -1;
+            const doOne = () => {
+                const _id = ids[++i];
+                if (_id) {
+                    setTimeout(() => {
+                        contentlib.getFull(cli._c, _id, fullarticle => {
+                            contentlib.generate(cli._c, fullarticle, () => doOne());
+                        });
+                    }, 0);
+                } else {
+                    notif.notifyUser(cli.userinfo.userid, cli._c.id, {
+                        title: "HTML Cache",
+                        msg : ids.length + " articles were regenerated in " + (Date.now() - now) + "ms",
+                        type: "success"
+                    });
+                }
+            };
+
+            doOne();
+        });
+    }
+};
 
 var maybeSendMail = function(cli) {
     var mailer = require('./mail.js');
