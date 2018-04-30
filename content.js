@@ -274,7 +274,7 @@ class ContentLib {
                                 media : article.deepmedia.sizes.facebook.url,
                                 nsfw : article.nsfw,
                                 isSponsored : article.isSponsored,
-                                ads : doc.querySelectorAll('ad').length,
+                                ads : doc.querySelectorAll('.lml-adplaceholder').length,
                                 p : doc.querySelectorAll('p').length,
                                 img : doc.querySelectorAll('img').length,
                                 paginated : article.content.length < 1

@@ -429,7 +429,7 @@ var maybeRegenCache = function(cli) {
                         contentlib.getFull(cli._c, _id, fullarticle => {
                             contentlib.generate(cli._c, fullarticle, () => doOne());
                         });
-                    }, 0);
+                    }, 1);
                 } else {
                     notif.notifyUser(cli.userinfo.userid, cli._c.id, {
                         title: "HTML Cache",
