@@ -21,6 +21,21 @@ const PUBLICATION_REPORT_TODAY_PROJECTION = {
     headline : { $arrayElemAt : ["$title", 0] }, "date" : 1, "name" : 1 
 };
 
+const countOcc = (article, occ) => {
+    var content = article.content || article || [""];
+    var total = 0;
+
+    content.forEach(x => {
+        var i = 0;
+        do {
+            total++;
+            i = x.indexOf(occ, i) + 1;
+        } while (i != 0)
+    });
+
+    return total;
+};
+
 class ContentLib {
     create(_c, title, author, done) {
         db.findUnique(config.default(), 'entities', { _id : author }, (err, authorentity) => {
@@ -212,6 +227,22 @@ class ContentLib {
 
         nextHook();
     }
+
+    updateActionStats(_c, deepArticle, callback, reduce) {
+        var stats = {
+            $inc : {
+                p   : countOcc(deepArticle, '</p>') * (reduce ? -1 : 1),
+                img : countOcc(deepArticle, '<img') * (reduce ? -1 : 1),
+                ad  : countOcc(deepArticle, '<ad>') * (reduce ? -1 : 1)
+            }
+        };
+        var entity = db.mongoID(deepArticle.author);
+
+        db.update(require('./config').default(), 'actionstats', {entity, type : "article_content"}, stats, (err, r)  => {
+            err && log('Article', 'Error during action stats : ' + err, 'err');
+            callback && callback(err ? err : r && r.value);
+        }, true, true, true, true);
+    };
 
     generatePublicationReport(_c, _id, sendback) {
         this.getFull(_c, _id, article => {
@@ -449,9 +480,13 @@ class ContentLib {
             db.remove(_c, 'autosave', { contentid : post._id }, () => {
                 this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
                     this.getFull(_c, post._id, fullpost => {
-                        this.generate(_c, fullpost, () => {
-                            callback({ historyentry, newstate : fullpost });
-                        }, 'all');
+
+                        this.updateActionStats(_c, fullpost, score => {
+                            hooks.fire('article_published_from_draft', { article : fullpost, score, _c });
+                            this.generate(_c, fullpost, () => {
+                                callback({ historyentry, newstate : fullpost });
+                            }, 'all');
+                        });
                     });
                 });
             });
@@ -489,17 +524,19 @@ class ContentLib {
     unpublish(_c, postid, caller, callback) {
         db.update(_c, 'content', { _id : postid }, { status : "deleted" }, () => {
             this.getFull(_c, postid, fullpost => {
-                this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "deleted" }), 'unpublished', historyentry => {
-                    callback({ historyentry, newstate : fullpost });
-                });
-
-                if (fullpost.fulltopic && fullpost.title && fullpost.title.length > 1) {
-                    fullpost.title.forEach((x, i) => {
-                        fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + "/" + (i+1) + ".html", () => {});
-                    })
-                } else if (fullpost.fulltopic) {
-                    fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
-                }
+                this.updateActionStats(_c, fullpost, () => {
+                    this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "deleted" }), 'unpublished', historyentry => {
+                        callback({ historyentry, newstate : fullpost });
+                    });
+    
+                    if (fullpost.fulltopic && fullpost.title && fullpost.title.length > 1) {
+                        fullpost.title.forEach((x, i) => {
+                            fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + "/" + (i+1) + ".html", () => {});
+                        })
+                    } else if (fullpost.fulltopic) {
+                        fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
+                    }
+                }, true);
             });
         });
     }
