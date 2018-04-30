@@ -233,7 +233,7 @@ class ContentLib {
             $inc : {
                 p   : countOcc(deepArticle, '</p>') * (reduce ? -1 : 1),
                 img : countOcc(deepArticle, '<img') * (reduce ? -1 : 1),
-                ad  : countOcc(deepArticle, '<ad>') * (reduce ? -1 : 1)
+                ad  : countOcc(deepArticle, 'lml-adplaceholder') * (reduce ? -1 : 1)
             }
         };
         var entity = db.mongoID(deepArticle.author);

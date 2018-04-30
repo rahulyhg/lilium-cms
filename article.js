@@ -755,7 +755,7 @@ class Article {
                 $inc : {
                     p   : countOcc(article, '</p>') * (reduce ? -1 : 1),
                     img : countOcc(article, '<img') * (reduce ? -1 : 1),
-                    ad  : countOcc(article, '<ad>') * (reduce ? -1 : 1)
+                    ad  : countOcc(article, 'lml-adplaceholder') * (reduce ? -1 : 1)
                 }
             };
             var entity = db.mongoID(deepArticle.author);
@@ -1541,7 +1541,7 @@ class Article {
                             topic,
                             featuredimage : featuredimage.sizes.content.url,
                             score : {
-                                ads : countOcc(art, "<ad"),
+                                ads : countOcc(art, "lml-adplaceholder"),
                                 pages : pageCount,
                                 paragraphs : countOcc(art, '<p'),
                                 images : countOcc(art, '<img')

@@ -49,7 +49,7 @@ class AdsLib {
     }
 
     pageContainsAds(page) {
-        return page.includes('<ad>');
+        return page.includes('lml-adplaceholder');
     }
 
     detectPatternType(siteid, plist) {

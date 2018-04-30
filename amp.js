@@ -213,7 +213,7 @@ class Amp {
                     cur.sort({_id : 1}).toArray((err, ads) => {
                         hooks.fire("amp_replace_ads_" + cli._c.uid, { article : articlewrap, theme : cTheme, lang, ads });
                         articleContent = articlewrap.content;
-                        articleContent = articleContent.replace(/<ad><\/ad>/g, "").replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
+                        articleContent = articleContent.replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
 
                         cb(undefined, articleContent);
                     });
