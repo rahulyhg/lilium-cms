@@ -116,5 +116,10 @@
         "codename" : "Tyche",
         "script" : "3.0.1.js",
         "features" : ["Facebook"]
+    },
+    "3.0.2" : {
+        "codename" : "Tyche",
+        "script" : "3.0.2.js",
+        "features" : ["Ads"]
     }
 }
