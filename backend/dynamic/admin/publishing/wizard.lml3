@@ -71,7 +71,7 @@ const compile = (o, context) => { o(context.header, `
     height: auto;
 }
 
-#post-template > * {
+#post-template .post-template-page > * {
     padding: 10px;
     margin: 10px;
     border: 1px solid #FFF;
@@ -79,9 +79,14 @@ const compile = (o, context) => { o(context.header, `
     border-radius: 10px;
 }
 
-#post-template > *:hover {
+#post-template .post-template-page > *:hover {
     border-color: #CCC;
     background-color: #F6F6F6;
+}
+
+#post-template .post-template-page:not(:first-child):before {
+    content : attr(data-textheader);
+
 }
 
 </style>
@@ -89,16 +94,26 @@ const compile = (o, context) => { o(context.header, `
 <script>
 
 liliumcms.lmldom.bind(function() {
-    var parser = document.createElement('div');
-    parser.innerHTML = liliumcms.livevars.livevars()["publishing.write." + liliumcms.pageloader.lastLevel].content;
-
+    var content = liliumcms.livevars.livevars()["publishing.write." + liliumcms.pageloader.lastLevel].content;
     var template = document.getElementById('post-template');
-    while (parser.firstChild) {
-        template.appendChild(parser.firstChild);
-    }
 
-    var links = template.querySelectorAll('a');
-    Array.prototype.forEach.call(links, function(a) { a.target = "_blank"; })
+    for (var i = 0; i < content.length; i++) {
+        var parser = document.createElement('div');
+        parser.innerHTML = content[i];
+
+        var newwrap = document.createElement('div');
+        newwrap.dataset.index = i;
+        newwrap.dataset.textheader = "Page " + (i+1);
+        newwrap.className = "post-template-page";
+        while (parser.firstChild) {
+            newwrap.appendChild(parser.firstChild);
+        }
+
+        var links = newwrap.querySelectorAll('a');
+        Array.prototype.forEach.call(links, function(a) { a.target = "_blank"; })
+
+        template.appendChild(newwrap);
+    }
 });
 
 </script>
