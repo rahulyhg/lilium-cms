@@ -8,6 +8,7 @@ const DeepDiff = require('deep-diff');
 const mkdirp = require('mkdirp');
 const fs = require('fs');
 const diff = DeepDiff.diff;
+const { JSDOM } = require('jsdom');
 
 const CONTENT_COLLECTION = 'content';
 const ENTITY_COLLECTION = 'entities';
@@ -212,6 +213,7 @@ class ContentLib {
                     _c : _c,
                     done : nextHook,
                     article : deepArticle,
+                    dom : new JSDOM(deepArticle.content),
                     extra : extra
                 }, 'article_async_render_' + _c.uid)
             } else {
