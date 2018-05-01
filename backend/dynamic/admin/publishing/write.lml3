@@ -334,6 +334,18 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             }
         },
         {
+            id : "wizard",
+            shouldShow : function() {
+                return window._poststate.status != "destroyed";
+            },
+            render : function() {
+                var button = document.createElement('button');
+                button.textContent = "Launch Wizard";
+                button.addEventListener('click', launchWizard);
+                return button;
+            }
+        },
+        {
             id : "unpublish",
             shouldShow : function() {
                 return liliumcms.session.hasRight("publish-articles") && window._poststate.status == "published";
@@ -986,6 +998,12 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     window["no-ads-modal_accept"] = function(modal) {
         modal.dismiss();
         liliumcms.pageloader.load("/admin/publishing/wizard/" + liliumcms.pageloader.lastLevel);
+    };
+
+    var launchWizard = function() {
+        saveCurrentPost(function() {
+            liliumcms.pageloader.load("/admin/publishing/wizard/" + liliumcms.pageloader.lastLevel);
+        });
     };
 
     var submitCurrentPost = function() {
