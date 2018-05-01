@@ -17,7 +17,7 @@ const Knowledge = {
     janitorJobs : executor.getJanitorJobs(),
     janitorSites : executor.getJanitorSites(),
     cpuCap : 80,
-    cooldown : 1000,
+    cooldown : 100,
 
     homepageDelai : oneMinute * 5,
     sitemapDelai : oneHour,
@@ -53,11 +53,12 @@ class AI {
             };
         }
 
+
         executor.execute(task, oneTime ? callback : ai.createInterval);
     }
 
     createInterval() {
-        setTimeout(ai.decide, Knowledge.cooldown);
+        setTimeout(() => ai.decide(), 0);
     }
 
     createTaskInserter() {
