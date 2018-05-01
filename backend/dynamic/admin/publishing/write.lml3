@@ -713,6 +713,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
         d.id('publishing-tabs').born(tab).born(d.id('publishing-tab-add'));
         textEditor.contentel.addEventListener('blur', contentBlur);
+        textEditor.bind('focus', function() { document.execCommand('styleWithCSS', false); });
         contentBlur();
 
         return totalpage++;
