@@ -211,7 +211,7 @@ class Amp {
 
                 db.find(cli._c, 'ads', { type : "amp", lang }, [], (err, cur) => {
                     cur.sort({_id : 1}).toArray((err, ads) => {
-                        hooks.fire("amp_replace_ads_" + cli._c.uid, { article : articlewrap, theme : cTheme, lang, ads });
+                        hooks.fire("amp_replace_ads_" + cli._c.uid, { article : articlewrap, dom : dom, theme : cTheme, lang, ads });
                         articleContent = articlewrap.content;
                         articleContent = articleContent.replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
 
