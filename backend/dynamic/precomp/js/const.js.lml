@@ -14,39 +14,62 @@ window.getElementDetails = function(el) {
 window.ELEMLIST = {
     P : {
         node : "P",
-        description : "A text paragraph"
+        description : "A text paragraph",
+        details : "Paragraphs can contain links, images, and various inline media. They usually have a bottom margin, and will take the entire available width."
     },
     IMG : {
         node : "IMG",
-        description : "An image"
+        description : "An image",
+        movable : true,
+        details : "Images fill the entire width while maintaining the aspect ratio. They are always followed by a credit. The credit is a link pointing to the artist's website."
     },
     BLOCKQUOTE : {
         node : "BLOCKQUOTE",
-        description : "An indented quote"
+        description : "An indented quote",
+        details : "Blockquotes are an indented block of text representing content taken from a different source. They will take the available width."
     },
     UL : {
         node : "UL",
-        description : "An unordered list"
+        description : "An unordered list",
+        details : "A list of items prefixed by a bullet point. Lists can have as many items as needed, and will indented to the right."
     },
     OL : {
         node : "OL",
-        description : "An ordered list"
+        description : "An ordered list",
+        details : "A list of items ordered from 1 to n, where n is the number of items in the list. Numbers will prefix each list item."
     },
     TABLE : {
         node : "TABLE",
-        description : "Tabulated data"
+        description : "Tabulated data",
+        movable : true,
+        details : "Data formatted as rows and cells. Tabulated data will usually take the available width, and cells will resize depending on the content."
     },
     DIV : {
         node : "DIV",
-        description : "A container"
+        description : "A container",
+        movable : true,
+        details : "A generic container. Those can contain any other element including paragraphs, images, and links. DIVs are used to group together multiple elements."
     },
     IFRAME : {
         node : "IFRAME",
-        description : "Embedded website / content"
+        description : "Embedded website / content",
+        movable : true,
+        details : "An embedded browser window inside the content. Most social networks and media will offer an iFrame version of a piece of content to be embedded somewhere else."
     },
-    AD : {
-        node : "AD",
-        description : "Advertising banner"
+    H3 : {
+        node : "H3",
+        description : "Heading, level 3",
+        details : "A subtitle. Those can be set as link, or normal text. They are blocks, meaning they will take as much space as possible, and nothing can appear on the same line."
+    },
+    A : {
+        node : "A",
+        description : "An outbound link",
+        details : "A hyperlink pointing to a different location. Those can point to somewhere else on the website, or to any other site. They will open in a new window or tab."
+    },
+    HR : {
+        node : "HR",
+        description : "A horizontal ruler", 
+        details : "Horizontal rulers will fill the entire width. They are thin, pale lines used to split content into distinct sections."
     }
 };
 
@@ -54,46 +77,77 @@ window.SPECIALELEMS = [
     {
         node : "IMG",
         description : "Instagram embed",
+        movable : true,
+        details : "Lilium uses its own version of the Instagram embed for a blazing fast load time. Instagram embeds come with a credit link pointing to the original poster's Instagram page.",
         selector : "p .lml-instagram-embed-3"
     },
     {
         node : "BLOCKQUOTE",
+        description : "Instagram embed",
+        movable : true,
+        details : "An Instagram embedded using their embed script. It is somewhat slow, but will display a native Instagram widget with their styling as well as the post's stats.",
+        selector : "blockquote.instagram-media"
+    },
+    {
+        node : "DIV",
+        description : "Advertising banner",
+        movable : true,
+        details : "The banner placeholders will be replaced with real in-content ads during the publication phase. Those will later be transformed, but can still be moved around.",
+        selector : ".lml-adplaceholder"
+    },
+    {
+        node : "BLOCKQUOTE",
         description : "Twitter embed",
+        movable : true,
+        details : "A Twitter Tweet embedded using their embed script. It is somewhat slow, but will display a native Twitter widget with their styling as well as the Tweet's stats.",
         selector : "blockquote.twitter-tweet"
     },
     {
         node : "IMG",
         description : "Uploaded image",
+        movable : true,
+        details : "Images fill the entire width while maintaining the aspect ratio. They are always followed by a credit. The credit is a link pointing to the artist's website. This image is hosted on our server.",
         selector : ".parag-image-wrapper img"
     },
     {
         node : "IFRAME",
         description : "A YouTube video",
-        selector : 'iframe[src~="youtube"]'
+        movable : true,
+        details : "An embedded browser window inside the content. It contains a YouTube player widget which includes features as fullscreen, preload, thumbnail, and more.",
+        selector : 'iframe[src*="youtube"]'
     },
     {
         node : "BLOCKQUOTE",
         description : "Reddit embed",
+        movable : true,
+        details : "Reddit embedded content using their embed script. It is somewhat slow, but will display a native Reddit widget using their styling as well as the post's stats.",
         selector : "blockquote.reddit-card"
     },
     {
         node : "IFRAME",
         description : "Soundcloud embed",
-        selector : 'iframe[src~="soundcloud"]'
+        movable : true,
+        details : "A Soundcloud song or playlist embedded using an iFrame. Those will use Soundcloud's style, and can play music directly on the website without having to leave the page.",
+        selector : 'iframe[src*="soundcloud"]'
     },
     {
         node : "IFRAME",
         description : "Vimeo embed",
-        selector : 'iframe[src~="player.vimeo"]'
+        movable : true,
+        details : "An embedded browser window inside the content. It contains a Vimeo player widget which includes features as fullscreen, preload, thumbnail, and more.",
+        selector : 'iframe[src*="player.vimeo"]'
     },
     {
         node : "DIV",
         description : "Facebook embed",
+        movable : true,
+        details : "A Facebook post embedded using their embed script. The post will render on the website, and will appear with the Facebook style. Facebook embeds can be videos, photos, or text posts.",
         selector : '.fb-post-wrap, .fb-video-wrap'
     }
 ];
 
 window.UNKNOWNELEM = {
-    node : "?",
-    description : "An element"
+    node : "",
+    details : "This is an unknown element. It will be treated as a DIV.",
+    description : "An unknown element"
 }
