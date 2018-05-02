@@ -105,7 +105,7 @@ class ReportGenerator {
     generate(send) {
         db.rawCollection(this.report.site, this.report.maincollection, {}, (err, col) => {
             col.count({}, (err, total) => {
-                col.aggregate(this.join, (err, arr) => send(arr, total));
+                col.aggregate(this.join, (err, cur) => cur.toArray((err, arr) => send(arr, total)));
             });
         });
     }
