@@ -135,10 +135,12 @@ const compile = (o, context) => { o(css, context.header, `
         d.id('save-ads-button').bind('click', saveAds);
 
         liliumcms.lmldom.bind(function() {
-            var ads = liliumcms.livevars.livevars()["ads.list"];
-            for (var i = 0; i < ads.length; i++) {
-                addContentAd(ads[i].lang, ads[i].type, ads[i].markup);
-            }
+            var adsets = liliumcms.livevars.livevars()["ads.list"];
+            adsets.forEach(function(adset) {
+                adset.ads.forEach(function(ad) {
+                    addContentAd(adset.lang, adset.type, ad.markup);
+                });
+            });
         });
     </script>
 `);};

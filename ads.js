@@ -80,8 +80,22 @@ class AdsLib {
         }   
 
         const ads = cli.postdata.data.ads;
+        const langs = {
+            en : { content : [], amp : [] },
+            fr : { content : [], amp : [] }
+        };  
+
+        ads.forEach(x => {
+            langs[x.lang][x.type].push({markup : x.markup});
+        });
+
         db.remove(cli._c, 'ads', {}, () => {
-            db.insert(cli._c, 'ads', ads, () => {
+            db.insert(cli._c, 'ads', [
+                { format : "adset", lang : "en", type : "content", ads : langs.en.content },
+                { format : "adset", lang : "fr", type : "content", ads : langs.fr.content },
+                { format : "adset", lang : "en", type : "amp", ads : langs.en.amp },
+                { format : "adset", lang : "fr", type : "amp", ads : langs.fr.amp }
+            ], () => {
                 cli.sendJSON({ total : ads.length });
             });
         });
