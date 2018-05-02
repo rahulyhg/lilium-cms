@@ -1,14 +1,14 @@
-var url = require('url');
-var pathlib = require('path');
-var session = require('./session.js');
-var _c = require('./config.js');
-var clerk = require('./clerk.js');
+const url = require('url');
+const pathlib = require('path');
+const session = require('./session');
+const _c = require('./config');
+const clerk = require('./clerk');
 
-var Router = function () {
-    this.parseClientObject = function (cli, cb) {
+class Router {
+    parseClientObject(cli, cb) {
         cli.touch('router.parseClientObject');
 
-        pObj = url.parse(cli.request.url, true);
+        const pObj = url.parse(cli.request.url, true);
         cli.routeinfo.fileExt = pathlib.extname(pObj.pathname);
         cli.routeinfo.isStatic = cli.routeinfo.fileExt !== '';
         cli.routeinfo.paramtrail = pObj.search;
@@ -67,12 +67,6 @@ var Router = function () {
             cb(false);
         };
     };
-
-    var init = function () {
-
-    };
-
-    init();
 };
 
 module.exports = new Router();
