@@ -13,7 +13,7 @@ const settings = {
 delete require.cache[require.resolve('./style.css.js')];   
 const css = require('./style.css');
 
-const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
+const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css?at=${Date.now()}">
 
 <div id="restore-recent-autosave" class="lml-modal">
     <div class="lml-modal-title">
