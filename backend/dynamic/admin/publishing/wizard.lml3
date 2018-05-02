@@ -88,7 +88,7 @@ const compile = (o, context) => { o(context.header, `
     </div>
 </div>
 
-<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css">
+<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css?at=${Date.now()}">
 <style>
 
 #post-actions {
