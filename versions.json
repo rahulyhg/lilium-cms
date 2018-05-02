@@ -121,5 +121,10 @@
         "codename" : "Tyche",
         "script" : "3.0.2.js",
         "features" : ["Ads"]
+    },
+    "3.0.3" : {
+        "codename" : "Tyche",
+        "script" : "3.0.3.js",
+        "features" : ["Adsets"]
     }
 }
