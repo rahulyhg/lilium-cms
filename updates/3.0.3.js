@@ -2,7 +2,7 @@ const db = require('../includes/db');
 
 module.exports = (_c, done) => {
     db.find(_c, 'ads', {}, [], (err, cur) => {
-        cur.sort({ _id : -1 }).toArray((err, allads) => {
+        cur.sort({ _id : 1 }).toArray((err, allads) => {
             const langs = {
                 en : { content : [], amp : [] },
                 fr : { content : [], amp : [] }
