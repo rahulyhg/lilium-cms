@@ -67,6 +67,9 @@ class DevTools {
             case 'gencache':
                 maybeRegenCache(cli);
                 break;
+            case 'initbuild':
+                maybeInitBuild(cli);
+                break;
             case 'scripts':
                 maybeExecuteScript(cli);
                 break;
@@ -396,6 +399,12 @@ var restartPM2 = function(cli) {
         require('child_process').exec('pm2 restart lilium');
     }
 };
+
+var maybeInitBuild = function(cli) {
+    if (cli.hasRightOrRefuse('admin')) {
+        require('./build').initialBuild(() => { cli.sendJSON({ done : 1 }); });
+    }
+}
 
 var preloadCache = function(cli) {
     require('./cacheInvalidator.js').preloadLatests(cli._c);

@@ -58,6 +58,13 @@ const preload = (context, done) => {
                 done();
             }); 
         };
+
+        window.initbuild = function(done, btn) {
+            lml.post({}, '${context._c.server.url}/admin/devtools/initbuild', function() {
+                liliumcms.notify({ title : "Cache", message : "Apps were compileds under /apps", type : "info" });
+                done();
+            });
+        };
     </script>`;
 
     context.homebutton = `
@@ -75,6 +82,9 @@ const preload = (context, done) => {
         </div>
         <div id="clear-homepage-button" class="workbutton big" data-call="generateHomepage">
             <span>Rebuild homepage markup</span>
+        </div>
+        <div id="rebuild-cache" class="workbutton big" data-call="initbuild">
+            <span>Compile frontend apps</span>
         </div>
         <div id="clear-lml3-button" class="workbutton big" data-call="clearlml3">
             <span>Clear LML3 require cache</span>
