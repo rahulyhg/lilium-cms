@@ -5,6 +5,7 @@
   "main": "index.prod.js",
   "scripts": {
     "test": "node gardener.js crash-on-error",
+    "build": "",
     "dev": "node gardener.js dev",
     "start": "node index.prod.js",
     "setup": "npm install && sudo npm install bower -g && bower install"
@@ -41,6 +42,7 @@
   "dependencies": {
     "JSONStream": "latest",
     "admin-mongo": "latest",
+    "babel-preset-preact": "^1.1.0",
     "binaryjs": "latest",
     "bower": "latest",
     "buffertools": "latest",
@@ -144,5 +146,15 @@
     "vanilla-js-calendar": "latest",
     "websocket": "latest",
     "ws": "^5.1.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-loader": "^7.1.4",
+    "babel-plugin-transform-react-jsx": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
+    "preact": "^8.2.9",
+    "preact-compat": "^3.18.0",
+    "preact-dom": "^1.0.1",
+    "webpack": "^4.7.0"
   }
 }
