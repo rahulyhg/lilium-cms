@@ -5,6 +5,7 @@ const livevars = require('./livevars.js');
 const sharedcache = require('./sharedcache.js');
 const hooks = require('./hooks.js');
 const notifications = require('./notifications.js');
+const builder = require('./build');
 
 // Google API
 const {google} = require('googleapis');
@@ -698,6 +699,17 @@ class GoogleAnalytics {
     setup() {
         log('Analytics', "Analytics controller setup");
         that.prepareDashboard();
+
+        require('./config').eachSync(_c => {
+            builder.pushToBuildTree(_c, "networkboard", 'networkboard', {
+                babel : {
+                    "plugins": [
+                        ["transform-react-jsx", { "pragma":"preact.h" }]
+                    ],
+                    "presets" : ["es2015"]
+                }
+            });
+        });
     }
 }
 
