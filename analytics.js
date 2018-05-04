@@ -582,6 +582,30 @@ class GoogleAnalytics {
         });
     }
 
+    getAllSitesRealtime(send) {
+        const sites = require('./config').getAllSites();
+        const sitesdata = [];
+        let index = -1;
+        let nextsite = () => {
+            const _c = sites[++index];
+
+            if (_c) {
+                sharedcache.get('analytics_realtime_' + _c.id, data => {
+                    data && sitesdata.push({
+                        data,
+                        sitename : _c.website.sitetitle
+                    });
+
+                    nextsite();
+                });
+            } else {
+                send(sitesdata);
+            }
+        };
+
+        nextsite();
+    }
+
     livevar(cli, levels, params, send) {
         var topLevel = levels[0] || "lastmonth";
 
@@ -675,9 +699,22 @@ class GoogleAnalytics {
 
     GET(cli) {
         if (cli.userinfo.loggedin) {
-            require('./lml3/compiler').compile(cli._c, liliumroot + '/backend/dynamic/analytics.lml3', {}, markup => {
-                cli.sendHTML(markup);
-            });
+            const action = cli.routeinfo.path[1];
+            switch (action) {
+                case undefined:
+                case "":
+                    require('./lml3/compiler').compile(cli._c, liliumroot + '/backend/dynamic/analytics.lml3', {}, markup => {
+                        cli.sendHTML(markup);
+                    });
+                    break;
+
+                case "network": 
+                    this.getAllSitesRealtime(data => cli.sendJSON({data}));
+                    break;
+
+                default:
+                    cli.throwHTTP(404, undefined, true);
+            }
         } else {
             cli.redirect("/login");
         }
