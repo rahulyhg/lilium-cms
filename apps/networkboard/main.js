@@ -6,11 +6,15 @@ import fetch from 'unfetch'
 class App extends Component {
     constructor() {
         super();
+        this.state = {
+            title : "Loading",
+            posts : []
+        };
     }
 
     componentDidMount() {
         this.fetchData();
-        setInterval(this.fetchData.bind(this), 10000);
+        setInterval(this.fetchData.bind(this), 8000);
     }
 
     fetchData() {
@@ -19,7 +23,13 @@ class App extends Component {
         }).then(r => r.json()).then(resp => {
             this.setState({ 
                 total : resp.data.reduce((acc, cur) => acc + parseInt(cur.data.total), 0),
-                pages : resp.data.reduce((acc, cur) => [...acc, ...cur.data.pages], [])
+                pages : resp.data.reduce((acc, cur) => [...acc, ...cur.data.pages.map(x => {
+                    x.url = cur.siteurl + x.url;
+                    x.sitename = cur.sitename;
+                    x.home = x.url == "/";
+
+                    return x;
+                })], []).sort((a, b) => b.count - a.count)
             });
         });
     }

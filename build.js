@@ -57,8 +57,14 @@ class Builder {
         };
 
         webpack(buildconfig, (err, result) => {
-            if (err) { throw err; }
-            log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
+            err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
+                log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
+
+            if (result && result.compilation && result.compilation.errors.length != 0) {
+                log('Builder', 'Errors were found in the code for ' + outputkey, 'err');
+                result.compilation.errors.forEach(console.log);
+            }
+
             done && done();
         });
     }

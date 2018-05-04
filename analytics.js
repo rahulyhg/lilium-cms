@@ -593,7 +593,8 @@ class GoogleAnalytics {
                 sharedcache.get('analytics_realtime_' + _c.id, data => {
                     data && sitesdata.push({
                         data,
-                        sitename : _c.website.sitetitle
+                        sitename : _c.website.sitetitle,
+                        siteurl : _c.server.url
                     });
 
                     nextsite();
