@@ -39,25 +39,25 @@ class Builder {
         const now = Date.now();
         options = options || Builder.defaultOptions;
 
-        webpack({
+        const buildconfig = {
             module : {
                 rules : [
-                    { test : /.jsx?$/, loader : "babel-loader", options : options.babel },
+                    { 
+                        test : /.jsx?$/, 
+                        loader : "babel-loader", 
+                        options : options.babel 
+                    },
                 ]
             },
-            resolve: {
-                alias: {
-                    'react': 'preact-compat',
-                    'react-dom': 'preact-compat',
-                    'create-react-class': 'preact-compat/lib/create-react-class'
-                }
-            },
-            entry  : path.join(liliumroot, "apps", input, 'main.js'),
+            entry : path.join(liliumroot, "apps", input, 'main.js'),
             output : {
                 path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
                 filename : options.bundlename || "app.bundle.js"
             }
-        }, (err, result) => {
+        };
+
+        webpack(buildconfig, (err, result) => {
+            if (err) { throw err; }
             log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
             done && done();
         });

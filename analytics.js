@@ -704,7 +704,7 @@ class GoogleAnalytics {
             builder.pushToBuildTree(_c, "networkboard", 'networkboard', {
                 babel : {
                     "plugins": [
-                        ["transform-react-jsx", { "pragma":"preact.h" }]
+                        ["transform-react-jsx", { "pragma":"h" }]
                     ],
                     "presets" : ["es2015"]
                 }

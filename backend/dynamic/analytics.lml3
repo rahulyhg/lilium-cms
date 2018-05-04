@@ -2,8 +2,21 @@ const settings = {
 
 };
 
-const compile = (o, context) => {
+const compile = (o, context) => { o(`
 
-};
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Network real-time traffic</title>
+    </head>
+    <body>
+        <div id="root">
+
+        </div>
+        <script src="${context._c.server.url}/apps/networkboard/app.bundle.js?at=${Date.now()}"></script>
+    </body>
+</html>
+
+`);};
 
 module.exports = { settings, compile };
