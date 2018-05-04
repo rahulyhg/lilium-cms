@@ -74,21 +74,23 @@ class Core {
                                 redirectIfInit(resp, () => {
                                     loadFrontend();
                                     bindLocalCast();
-            
                                     require('./riverflow/riverflow.js').loadFlows();
-                                    inbound.handleQueue();
-            
-                                    loadCacheInvalidator();
-                                    scheduleGC();
-            
-                                    log('Lilium', 'Starting inbound server', 'info');
-                                    loadNotifications();
-                                    notifyAdminsViaEmail();
-                                    executeRunScript();
-                                    initSchedulingTasks();
-            
-                                    log('Core', 'Firing initialized signal', 'info');
-                                    hooks.fire('init');
+
+                                    makeBuild(() => {
+                                        inbound.handleQueue();
+                
+                                        loadCacheInvalidator();
+                                        scheduleGC();
+                
+                                        log('Lilium', 'Starting inbound server', 'info');
+                                        loadNotifications();
+                                        notifyAdminsViaEmail();
+                                        executeRunScript();
+                                        initSchedulingTasks();
+                
+                                        log('Core', 'Firing initialized signal', 'info');
+                                        hooks.fire('init');
+                                    });
                                 });
                             });
                         });
@@ -204,6 +206,12 @@ const loadPlugins = function (cb) {
         hooks.fire('plugins_loaded');
         cb && cb();
     });
+};
+
+const makeBuild = function(cb) {
+    if (!isElder) { return cb(); }
+
+    require('./build').initialBuild(cb);
 };
 
 const loadRoles = function (cb) {
