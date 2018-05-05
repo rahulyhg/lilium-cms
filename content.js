@@ -416,7 +416,7 @@ class ContentLib {
                                     _c.server.protocol + _c.server.url + "/" + article[0].fulltopic[0].completeSlug + "/" + name
                                 );
                             } else {
-                                callback(name);
+                                callback(undefined, name);
                             }
                         });
                     });
