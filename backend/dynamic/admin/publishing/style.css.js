@@ -473,6 +473,16 @@ body #lilium .liliumtext.theme-minim.fullscreen {
     min-height: 30px;
 }
 
+#edit-slug-icon {
+    margin-left: 6px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+#pub-url-wrap {
+    padding-top: 6px;
+}
+
 .pub-detail-field span {
     width: 200px;
     display: block;
