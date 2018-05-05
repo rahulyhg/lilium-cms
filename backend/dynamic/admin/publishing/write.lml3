@@ -32,6 +32,21 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
 </div>
 
+<div id="edit-slug-publishing" class="lml-modal">
+    <div class="lml-modal-title">
+        Edit article slug
+    </div>
+    <div class="lml-modal-body">
+        <b>Article slug</b>
+        <input id="edit-slug-input" placeholder="Provide an article slug" />
+    </div>
+    <div class="lml-modal-footer">
+        <button class="lml-modal-cancel" type="button">Dismiss</button>
+        <button class="lml-modal-accept" type="button">Save</button>
+    </div>
+
+</div>
+
 <div id="no-ads-modal" class="lml-modal">
     <div class="lml-modal-title">
         No ads found in content
@@ -229,7 +244,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         </div>
         <div class="pub-detail-field">
             <span>URL</span>
-            <a id="pub-url-link" href="" target="_blank"></a>
+            <div id="pub-url-wrap">
+                <a id="pub-url-link" href="" target="_blank"></a>
+                <i class="fal fa-pencil-alt" id="edit-slug-icon"></i>
+            </div>
         </div>
         <div class="pub-detail-field">
             <span>Total words</span>
@@ -573,6 +591,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         // Url, Date, author, status
         document.getElementById('pub-url-link').text = window._poststate.url || "This article does not have a URL";
         document.getElementById('pub-url-link').href = window._poststate.url || "";
+        document.getElementById('edit-slug-icon').style.display = window._poststate.url ? "" : "none";
 
         document.getElementById('pauthor').value = window._poststate.author;
         if (window._poststate.date) {
@@ -972,6 +991,48 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         });
     }
 
+    var popupSlugEdit = function() {
+        document.getElementById('edit-slug-input').value = window._poststate.name;
+        liliumcms.modals.get('edit-slug-publishing').cast();
+    };
+
+    var slugRegexp = /[^a-zA-Z0-9\-]/;
+    window["edit-slug-publishing_accept"] = function(modal) {
+        var slug = document.getElementById('edit-slug-input').value.trim();
+        if (!slug || slugRegexp.test(slug)) {
+            liliumcms.notify({
+                type : "warning",
+                title : "Invalid slug",
+                message : "Slugs can only contain letters, numbers, and hyphens."
+            })
+        } else {
+            modal.dismiss();
+            liliumcms.lmldom.put({ slug }, "${context._c.server.url}/admin/publishing/slug/" + liliumcms.pageloader.lastLevel, function(resp) {
+                if (resp) {
+                    if (resp.err) {
+                        liliumcms.notify({
+                            type : "warning",
+                            title : "Edit slug",
+                            message : resp.err.message
+                        })
+                    } else {
+                        liliumcms.notify({
+                            type : "success",
+                            title : "Edit slug",
+                            message : "Slug successfully edited."
+                        })
+                    }
+                } else {
+                    liliumcms.notify({
+                        type : "error",
+                        title : "Edit slug",
+                        message : "You do not seem to have the rights to edit this slug."
+                    });
+                }
+            });
+        }
+    };
+
     var refuseCurrentPost = function() {
         liliumcms.lmldom.put({}, "${context._c.server.url}/admin/publishing/refuse/" + liliumcms.pageloader.lastLevel, function(resp) {
             if (resp) {
@@ -1110,6 +1171,8 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 }
             });
         }
+
+        document.getElementById('edit-slug-icon').addEventListener('click', popupSlugEdit);
 
         d.id('anim-dismiss').bind('click', dismissReport);
         refreshState();
