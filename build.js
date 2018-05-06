@@ -69,6 +69,21 @@ class Builder {
         });
     }
 
+    getAppScript(key) {
+        return `<div id="${key}-app"></div>
+        <script>
+            log('Preact', 'Waiting for LMLDom to be ready before requesting bundle ${key}');
+            liliumcms.lmldom.bind(function() {
+                log('Preact', 'Getting Preact script with key ${key}');
+                liliumcms.lmldom.get('/apps/${key}/app.bundle.js', {}, function(preactscript) {
+                    log('Preact', 'Evaluating bundle for app ${key}');
+                    eval(preactscript);
+                    log('Preact', 'Evaluated bundle for app ${key}');
+                });
+            });
+        </script>`;
+    }
+
     getBundle(siteid, outputkey, sendback) {
         sharedcache.get('_babel_' + siteid + "_" + outputkey, markup => {
             sendback(markup);
