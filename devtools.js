@@ -34,6 +34,7 @@ class DevTools {
 
             case 'lml3':
             case 'api':
+            case 'preact':
             case 'cache':
             case 'decorations':
                 filelogic.serveAdminLML3(cli);
@@ -172,6 +173,18 @@ class DevTools {
         }
     };
     
+    setup() {
+        require('./config').eachSync(_c => {
+            require('./build').pushToBuildTree(_c, 'devtools', 'devtools', {
+                babel : {
+                    "plugins": [
+                        ["transform-react-jsx", { "pragma":"h" }]
+                    ],
+                    "presets" : ["es2015"]
+                }
+            });
+        });
+    }
     
     form () {
         formBuilder.createForm('devtools_livevar', {
