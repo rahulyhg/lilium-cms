@@ -877,6 +877,9 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             case "submitted":
                 return displayname + " submitted this article for review";
 
+            case "slug":
+                return displayname + " updated the article slug";
+
             case "refused":
                 return displayname + " refused this submission";
 
