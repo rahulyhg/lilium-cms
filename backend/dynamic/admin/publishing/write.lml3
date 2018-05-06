@@ -1007,7 +1007,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             })
         } else {
             modal.dismiss();
-            liliumcms.lmldom.put({ slug }, "${context._c.server.url}/admin/publishing/slug/" + liliumcms.pageloader.lastLevel, function(resp) {
+            liliumcms.lmldom.put({ slug : slug }, "${context._c.server.url}/admin/publishing/slug/" + liliumcms.pageloader.lastLevel, function(resp) {
                 if (resp) {
                     if (resp.err) {
                         liliumcms.notify({
@@ -1016,6 +1016,11 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                             message : resp.err.message
                         })
                     } else {
+                        window._poststate.name = slug;
+                        var bottomlink = document.getElementById('pub-url-link');
+                        bottomlink.textContent = resp.url;
+                        bottomlink.href = resp.url;
+
                         liliumcms.notify({
                             type : "success",
                             title : "Edit slug",
