@@ -54,6 +54,7 @@ class ContentLib {
                 shares : 0,
                 hidden : false,
                 updated : new Date(),
+                aliases : [],
                 createdOn : new Date()
             };
 
@@ -404,12 +405,23 @@ class ContentLib {
                 db.join(_c, 'content', [
                     { $match : { _id : postid } },
                     { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" } },
-                    { $project : { fulltopic : 1, name : 1 } }
+                    { $project : { fulltopic : 1, name : 1, title : 1 } }
                 ], article => {
-                    db.update(_c, 'content', { _id : postid }, { name }, () => {
+                    db.update(_c, 'content', { _id : postid }, { 
+                        $set : { name },
+                        $addToSet : { aliases : article[0].name }
+                    }, () => {
                         this.pushHistoryEntryFromDiff(_c, postid, caller, diff(
                             { name : article[0].name }, { name }
                         ), 'slug', entry => {
+                            hooks.fire('slug_edited', {
+                                _c : _c,
+                                oldslug : article[0].name,
+                                newslug : name,
+                                oldurl : "/" + article[0].fulltopic[0].completeSlug + "/" + article[0].name,
+                                paginated : article[0].title.length > 1
+                            });
+
                             if (article[0] && article[0].fulltopic[0]) {
                                 callback(
                                     undefined, 
@@ -419,7 +431,7 @@ class ContentLib {
                                 callback(undefined, name);
                             }
                         });
-                    });
+                    }, false, true, true);
                 });
             } else {
                 callback({message : "Slug already used by another article", type : "exists"});
