@@ -717,7 +717,7 @@ class GoogleAnalytics {
                     cli.throwHTTP(404, undefined, true);
             }
         } else {
-            cli.redirect("/login");
+            cli.redirect("/login?to=" + cli._c.server.protocol + cli._c.server.url + "/googleanalytics");
         }
     }
 
