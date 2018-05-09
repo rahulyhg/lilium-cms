@@ -439,6 +439,47 @@ class ContentLib {
         });
     }
 
+    fetchDeepFieldsFromDiff(_c, post, deepdiff, done) {        
+        const fields = deepdiff.diffs.map( x => x.field );
+
+        let doTopic = next => {
+            if (fields.includes('topic') && post.topic) {
+                require('./topics').deepFetch(_c, post.topic, topic => {
+                    if (topic) {
+                        post.topicslug = topic.completeSlug;
+                        post.topicdisplay = topic.displayname;
+                        post.topicfamily = topic.family;
+                        post.lang = topic.override.language || _c.website.language || "en-ca";
+                    } 
+
+                    next();
+                });
+            } else {
+                next();
+            }
+        };
+
+        let doMedia = next => {
+            if (fields.includes('media') && post.media) {
+                db.findUnique(_c, 'uploads', { _id : post.media }, (err, media) => {
+                    if (media) {
+                        post.facebookmedia = _c.server.protocol + media.sizes.facebook.url;
+                    } 
+
+                    next();
+                });
+            } else {
+                next();
+            }
+        };
+
+        doTopic(() => {
+            doMedia(() => {
+                done();
+            })
+        })
+    }
+
     update(_c, postid, caller, values, callback) {
         this.parseSpecialValues(values);
 
@@ -455,10 +496,12 @@ class ContentLib {
                 } else {
                     this.pushHistoryEntryFromDiff(_c, postid, caller, deepdiff, 'update', entry => {
                         if (entry) {
-                            newpost.updated = new Date();
-                            col.replaceOne({_id : postid}, newpost, {}, () => {
-                                log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
-                                callback(undefined, entry);
+                            this.fetchDeepFieldsFromDiff(_c, newpost, entry, () => {
+                                newpost.updated = new Date();
+                                col.replaceOne({_id : postid}, newpost, {}, (err, r) => {
+                                    log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
+                                    callback(undefined, entry);
+                                });
                             });
                         } else {
                             log('Content', 'Did not update article (no diff) with headline ' + newpost.title[0], 'info');
