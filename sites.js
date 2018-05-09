@@ -332,7 +332,9 @@ var SiteInitializer = function (conf, siteobj) {
         var compileKey = "lml" + Math.random().toString().substring(2) + Math.random().toString().substring(2);
         conf.compilekey = compileKey;
 
-        if (conf.env == "prod") {
+        if (global.liliumenv.caij) {
+            log.setLevels(["err", "warn", "lilium"]);
+        } else if (conf.env == "prod") {
             log.setLevels(["err", "warn", "lilium"]);
         } else if (conf.env == "dev") {
             log.setLevels(["success", "detail", "live", "err", "warn", "info", "lilium"]);
