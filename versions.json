@@ -126,5 +126,10 @@
         "codename" : "Tyche",
         "script" : "3.0.3.js",
         "features" : ["Adsets"]
+    },
+    "3.0.4" : {
+        "codename" : "Tyche",
+        "script" : "3.0.4.js",
+        "features" : ["Content Cache"]
     }
 }
