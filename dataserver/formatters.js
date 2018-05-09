@@ -15,3 +15,23 @@ module.exports.presentableFacebookUser = (u,picture,lmltk) => {
 module.exports.makeToken = token => {
     return "lmldstk-" + require('crypto').createHash('sha256').update(token + Date.now()).digest("hex");
 };
+
+module.exports.readPostData = (cli, sendback) => {
+    let dat = "";
+    cli.request.on('data', c => {
+        dat += c.toString();
+    });
+
+    cli.request.on('end', () => {
+        sendback(dat);
+    });
+}
+
+const ObjectID = require('mongodb').ObjectID;
+module.exports.mongoID = _id => {
+    try {
+        return new ObjectID(_id);
+    } catch(err) {
+        return new ObjectID();
+    }
+};
