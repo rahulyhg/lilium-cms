@@ -11,7 +11,7 @@ const themes = require('./themes.js');
 const JSDOM = require('jsdom'); 
 
 class Amp {
-    // Called from Riverflow
+    // Called from Riverflow 
     GET(cli) {
         // Contains the article name from the URL
         let articleName = cli.routeinfo.path[cli.routeinfo.path.length - 1];
