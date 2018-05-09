@@ -68,10 +68,13 @@ const endpoints = {
 
     "DELETE/me" : cli => {
         const sesh = sessions[cli.request.headers.lmltk];
-        cli._c.db.collection('fbusers').removeOne({_id : sesh._id});
-
-        const deleted = delete sessions[cli.request.headers.lmltk];
-        cli.sendJSON({deleted});
+        if (!sesh) {
+            cli.throwHTTP(404);
+        } else {
+            cli._c.db.collection('fbusers').removeOne({_id : sesh._id});
+            const deleted = delete sessions[cli.request.headers.lmltk];
+            cli.sendJSON({deleted});
+        }
     },
 
     "PUT/pref" : cli => {
