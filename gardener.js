@@ -24,6 +24,7 @@ class Gardener {
             const redisserver = new RedisServer(6379);
 
             this.spawnSharedMemory();
+            this.spawnDataServer();
             redisserver.open(() => {
                 log('Network', 'Redis server spawned', 'success');
                 const lmlinstances = this.networkConfig.familysize || require('os').cpus().length;
@@ -85,6 +86,11 @@ class Gardener {
         sharedMemoryProcess.on('error', err => {
             log('Gardener', err, 'err');
         })
+    }
+
+    spawnDataServer() {
+        log('Network', 'Spawning dataserver', 'lilium');
+        spawn('node', [__dirname + "/dataserver/spawn.js"]);
     }
 
     updateAndRestart() {
