@@ -1,0 +1,16 @@
+{
+    "favouriteList" : {
+        "article.title" : 1,
+        "article.subtitle" : 1,
+        "article.date" : 1,
+        "article.media.sizes.facebook.url" : 1,
+
+        "at" : 1
+    },
+
+    "searchResults" : {
+        "title" : 1,
+        "media.sizes.facebook.url" : 1,
+        "date" : 1
+    }
+}
