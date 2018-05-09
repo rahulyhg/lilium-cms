@@ -27,7 +27,6 @@ const endpoints = {
                 const fbid = r.data.user_id;
                 const _id = require('crypto').createHash('sha256').update(fbid).digest("hex");
 
-
                 cli._c.db.collection('fbusers').find({ _id }).next((err, maybeuser) => {  
                     if (maybeuser) {
                         sessions[maybeuser.lmltk] = maybeuser;
@@ -41,6 +40,7 @@ const endpoints = {
                             cli._c.db.collection('fbusers').insertOne(user, (err, r) => {
                                 user.lmltk = lmltk;
                                 sessions[lmltk] = user;
+                                user.firstLogin = true;
                                 cli.sendJSON(user);
                             });
                         })
