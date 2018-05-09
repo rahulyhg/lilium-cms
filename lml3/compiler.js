@@ -117,6 +117,7 @@ class LMLContext {
         this.libs = {
             formbuilder : require('../formBuilder.js'),
             encodec : require('entities'),
+            app : require('../build').getAppScript,
             cdn : require('../cdn'),
             slugify : require('slugify'),
             fileio : require('../fileserver.js'),

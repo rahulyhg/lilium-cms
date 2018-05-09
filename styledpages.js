@@ -222,12 +222,14 @@ class StyledPages {
         switch (level) {
             case "new":
                 db.insert(cli._c, 'styledpages', that.createNewObject(), (err, r) => {
-                    cli.redirect(cli._c.server.url + "/admin/styledpages/edit/" + r.insertedId.toString(), false, 'rewrite');
+                    cli.sendJSON({
+                        _id : r.insertedId.toString()
+                    });
                 });
                 break;
 
             case "list":
-                require('./filelogic.js').serveAdminLML(cli);
+                require('./filelogic.js').serveAdminLML3(cli);
                 break;
 
             case "edit":
@@ -291,10 +293,30 @@ class StyledPages {
         });
     }
 
+    sendBunch(cli, levels, params, send) {
+        const filters = params.filters;
+        const $match = {};
+        if (filters.visibility) {
+            $match.status = filters.visibility;
+        }
+
+        if (filters.search) {
+            $match.title = new RegExp(filters.search, 'gi');
+        }
+
+        db.join(cli._c, 'styledpages', [
+            { $match },
+            { $sort : {_id: -1} }
+        ], arr => {
+            send({ items : arr, total : arr.length })
+        });
+    }
+
     livevar(cli, levels, params, send) {
         if (!cli.hasRight("styledpages")) { return send(); }
 
         switch (levels[0]) {
+            case 'bunch': that.sendBunch(cli, levels, params, send); break;
             case 'table': that.sendTable(cli, levels, params, send); break;
             case 'get'  : that.getSingle(cli._c, levels[1], send); break;
             default: send([]);

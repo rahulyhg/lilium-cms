@@ -1,0 +1,97 @@
+const settings = {
+    title : "Styled Pages",
+    lmldom : { v : 1.0 },
+    tools : {
+        add : { call : "addStyledPage" }
+    }
+};
+
+const compile = (o, context) => { o(context.header, `
+
+    <lml-bunch>
+        <lml-bunchfilters>
+            <div class="bunch-filters">
+                <div class="bunch-filters-title">FILTERS</div>
+                <label>Search</label>
+                <input type="text" name="search" placeholder="Title keywords" />
+
+                <label>Visibility</label>
+                <select name="visibility">
+                    <option value="">All</option>
+                    <option value="public">Public</option>
+                    <option value="magiclink">Magic Link</option>
+                    <option value="invisible">Invisible</option>
+                </select>
+            </div>
+        </lml-bunchfilters>
+
+        <lml-bunchitem>
+            <div class="sp-strip-wrapper">
+                <div class="sp-strip">
+                    <lml-link href="${context._c.server.url}/admin/styledpages/edit/{sp._id}">
+                        <h4>
+                            <lml-text var="sp.title"></lml-text>
+                        </h4>
+                    </lml-link>
+                    <div>
+                        <lml-link href="${context._c.server.url}/{sp.slug}?accesskey={sp.magiclink}" target="_blank">
+                            View on website
+                        </lml-link>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <div class="sp-status">
+                            <lml-text var="sp.status"></lml-text>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </lml-bunchitem>
+
+        <script type="lmljson" name="eakepopbunch">
+            {
+                "datasource" : "styledpages.bunch",
+                "loopvar" : "sp"
+            }
+        </script>
+    </lml-bunch>
+
+
+    <script>
+        window.addStyledPage = function() {
+            liliumcms.lmldom.get('/admin/styledpages/new?async=*', {json:true}, function(resp) {
+                liliumcms.pageloader.load("/admin/styledpages/edit/" + resp._id);
+            });
+        };
+    </script>
+
+    <style>
+.sp-strip-wrapper {
+    margin: 10px;
+    padding: 10px;
+    background: #FFF;
+    box-shadow: 0px 1px 2px rgba(0,0,0,0.2);
+}
+
+.sp-status {
+    background: #333;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #DDD;
+    text-transform: uppercase;
+    font-size: 12px;
+}
+
+main {
+    background : #F6F6F6;
+}
+
+.sp-strip h4 {
+    color: #000;
+    font-size: 24px;
+    font-family: "Oswald", sans-serif;
+}
+    </style>
+`); };
+
+module.exports = { settings, compile };

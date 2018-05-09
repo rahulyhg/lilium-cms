@@ -32,6 +32,17 @@ var CacheInvalidator = function () {
     };
 
     this.init = function (cb) {
+        hooks.bind("slug_edited", 1, pkg => {
+            const oldpath = pkg._c.server.html + pkg.oldurl;
+            if (pkg.paginated) {
+                log('Cache', 'Clearing directory ' + oldpath, 'info');
+                fileserver.emptyDirectory(oldpath, { fileFilter : "*.html" }, () => {});
+            } else {
+                log('Cache', 'Clearing cached file ' + oldpath + ".html", 'info');
+                fileserver.deleteFile(oldpath + ".html", () => {});
+            }
+        });
+
         hooks.bind(['article_published', 'article_updated', 'article_deleted', 'article_unpublished'], 1, function(data) {
             // Update profile page
             hooks.fire('homepage_needs_refresh_' + (data._c && data._c.uid), data);

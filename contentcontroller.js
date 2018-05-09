@@ -88,6 +88,26 @@ class ContentController {
                 });
                 break;
 
+            case "slug":
+                log('Content', 'Updating slug from PUT under /slug', 'detail');
+                db.findUnique(cli._c, 'content', { _id }, (err, article) => {
+                    if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
+                        cli.readPostData(data => {
+                            if (data && data.slug) {
+                                contentlib.editSlug(cli._c, _id, db.mongoID(cli.userinfo.userid), data.slug, (err, url) => 
+                                    cli.sendJSON({ url, err })
+                                );
+                            } else {
+                                cli.sendJSON({ err : { message : "Missing information in PUT request", type : "request" } })
+                            }
+                        });
+                    } else {
+                        log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
+                        cli.throwHTTP(404, undefined, true);
+                    }
+                });
+                break;
+
             case 'submit':
                 log('Content', 'Sending article for review from PUT under /submit', 'detail');
                 const cid = cli.routeinfo.path[3];

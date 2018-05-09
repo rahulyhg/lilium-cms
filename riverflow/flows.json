@@ -179,7 +179,7 @@
         }, {
             "module" : "devtools.js",
             "endpoint" : "devtools",
-            "support" : ["admin_get", "admin_post", "livevar", "form"]
+            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"]
         }, {
             "module" : "embed.js",
             "endpoint" : "embed",
