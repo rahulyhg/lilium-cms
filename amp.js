@@ -211,7 +211,7 @@ class Amp {
 
                 db.findUnique(cli._c, 'ads', { type : "amp", lang }, (err, adset) => {
                     const ads = adset.ads;
-                    hooks.fire("amp_replace_ads_" + cli._c.uid, { article : articlewrap, dom : dom, theme : cTheme, lang, ads });
+                    hooks.fireSite(cli._c, "amp_replace_ads", { article : articlewrap, dom : dom, theme : cTheme, lang, ads });
                     articleContent = articlewrap.content;
                     articleContent = articleContent.replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
 
