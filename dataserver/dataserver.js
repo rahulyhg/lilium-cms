@@ -18,6 +18,12 @@ class DataServer {
                 this.createServer(_c);
             }
         });
+
+        process.on('uncaughtException', this.crash.bind(this))
+    }
+
+    crash(err) {
+        console.err(err);
     }
 
     handle(cli) {
