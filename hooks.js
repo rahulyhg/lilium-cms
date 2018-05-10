@@ -2,21 +2,8 @@ const log = require('./log.js');
 const _c = require('./config.js');
 const isElder = require('./network/info.js').isElderChild();
 
-const events = {
-    "load": {},
-    "request": {},
-    "clientobject": {},
-    "dispatch": {},
-    "redirect": {},
-    "postdata": {},
-    "login": {},
-    "logout": {},
-    "lmlstart": {},
-    "lmlinclude": {},
-    "endpoints": {},
-    "time_is_hour" : {},
-    "time_is_midnight" : {}
-};
+const events = {};
+const siteevents = {};
 
 class Hooks {
     init() {
@@ -44,8 +31,15 @@ class Hooks {
         return events[eventName] || {};
     }
 
+    getSiteHooksFor(_c, name) {
+        return siteevents[_c.id] && siteevents[_c.id][name];
+    }
+
     debug() {
-        return events;
+        return {
+            globalevents : events,
+            siteevents : siteevents
+        };
     }
 
     register() {return this.bind(...arguments);}
@@ -90,6 +84,17 @@ class Hooks {
         }
         events[eventName] = tempObj;
     };
+
+    bindSite(_c, name, cb) {
+        siteevents[_c.id] = siteevents[_c.id] || {};
+        siteevents[_c.id][name] = siteevents[_c.id][name] || [];
+        siteevents[_c.id][name].push(cb);
+    }
+
+    fireSite(_c, name, payload = {}) {
+        siteevents[_c.id] && siteevents[_c.id][name] && siteevents[_c.id][name].forEach(ftc => ftc && ftc(payload, _c));
+        this.fire(name, payload);
+    }
 
     fire() {this.trigger(...arguments)}
     trigger(eventName, params) {
