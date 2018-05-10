@@ -119,7 +119,7 @@ class ContentLib {
 
         deepArticle.content = deepArticle.content.map(x => x.replace(/lml-fb-video/g, 'fb-video').replace(/lml-fb-post/g, 'fb-post'));
 
-        hooks.fire('article_will_render', {
+        hooks.fireSite(_c, 'article_will_render', {
             _c : _c,
             article: deepArticle
         });
@@ -184,7 +184,7 @@ class ContentLib {
                 deepArticle.similartitle = true;
             }
 
-            hooks.fire('paginated_article_generated_' + _c.uid, { article : deepArticle, page : pageIndex });
+            hooks.fireSite(_c, 'paginated_article_generated_' + _c.uid, { article : deepArticle, page : pageIndex });
 
             deepArticle.url += "/" + pageIndex;
 
@@ -203,20 +203,19 @@ class ContentLib {
             deepArticle.numberOfPages = 1;
         }
  
-        const asyncHooks = hooks.getHooksFor('article_async_render_' + _c.uid);
-        const aKeys = Object.keys(asyncHooks);
+        const asyncHooks = hooks.getSiteHooksFor(_c, 'article_async_render');
     
         let hookIndex = -1;
         const nextHook = ()  => {
-            if (++hookIndex != aKeys.length) {
-                let hk = asyncHooks[aKeys[hookIndex]];
-                hk.cb({
+            if (++hookIndex != asyncHooks.length) {
+                let hk = asyncHooks[hookIndex];
+                hk({
                     _c : _c,
                     done : nextHook,
                     article : deepArticle,
                     dom : new JSDOM(deepArticle.content),
                     extra : extra
-                }, 'article_async_render_' + _c.uid)
+                }, 'article_async_render')
             } else {
                 // Generate LML page
                 filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
@@ -414,13 +413,15 @@ class ContentLib {
                         this.pushHistoryEntryFromDiff(_c, postid, caller, diff(
                             { name : article[0].name }, { name }
                         ), 'slug', entry => {
-                            hooks.fire('slug_edited', {
+                            hooks.fireSite(_c, 'slug_edited', {
                                 _c : _c,
                                 oldslug : article[0].name,
                                 newslug : name,
                                 oldurl : "/" + article[0].fulltopic[0].completeSlug + "/" + article[0].name,
                                 paginated : article[0].title.length > 1
                             });
+
+                            hooks.fireSite(_c, 'article_updated', { article, _c });
 
                             if (article[0] && article[0].fulltopic[0]) {
                                 callback(
@@ -501,6 +502,8 @@ class ContentLib {
                                 col.replaceOne({_id : postid}, newpost, {}, (err, r) => {
                                     log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
                                     callback(undefined, entry);
+
+                                    hooks.fireSite(_c, 'article_updated', { article : newpost, _c, full : false });
                                 });
                             });
                         } else {
@@ -569,7 +572,9 @@ class ContentLib {
                     this.getFull(_c, post._id, fullpost => {
 
                         this.updateActionStats(_c, fullpost, score => {
-                            hooks.fire('article_published_from_draft', { article : fullpost, score, _c });
+                            hooks.fireSite(_c, 'article_published_from_draft', { article : fullpost, score, _c });
+                            hooks.fireSite(_c, 'article_updated', { article : fullpost, _c });
+
                             this.generate(_c, fullpost, () => {
                                 callback({ historyentry, newstate : fullpost });
                             }, 'all');
@@ -615,6 +620,9 @@ class ContentLib {
                     this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "deleted" }), 'unpublished', historyentry => {
                         callback({ historyentry, newstate : fullpost });
                     });
+
+                    hooks.fireSite(_c, 'article_unpublished', { article : fullpost, _c });
+                    hooks.fireSite(_c, 'article_updated', { article : fullpost, _c });
     
                     if (fullpost.fulltopic && fullpost.title && fullpost.title.length > 1) {
                         fullpost.title.forEach((x, i) => {
@@ -634,6 +642,8 @@ class ContentLib {
                 this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "destroyed" }), 'destroyed', historyentry => {
                     callback({ historyentry, newstate : fullpost });
                 });
+
+                hooks.fireSite(_c, 'article_updated', { article : fullpost, _c });
 
                 if (fullpost.fulltopic && fullpost.title && fullpost.title.length > 1) {
                     fullpost.title.forEach((x, i) => {
