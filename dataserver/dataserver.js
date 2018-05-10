@@ -23,7 +23,8 @@ class DataServer {
     }
 
     crash(err) {
-        console.err(err);
+        console.error(err);
+        return false;
     }
 
     handle(cli) {

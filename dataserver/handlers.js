@@ -5,6 +5,7 @@ const FACEBOOK_API = "https://graph.facebook.com/v";
 const request = require('request');
 const { presentableFacebookUser, makeToken, mongoID, readPostData } = require('./formatters');
 const Projections = require('./projection');
+const fs = require('fs');
 
 const sessions = {};
 
@@ -170,7 +171,8 @@ const endpoints = {
                 { $sort : { _id : -1 } },
                 { $limit : 30 },
                 { $lookup : { from : "uploads", as : "media", localField : "media", foreignField : "_id" }},
-                { $project : Projections.searchResults }
+                { $project : Projections.searchResults },
+                { $unwind : "$facebookmedia" }
             ]).toArray((err, arr) => {
                 cli.sendJSON({ posts : arr });
             });
@@ -178,6 +180,41 @@ const endpoints = {
             cli.throwHTTP(404);
         }   
     },
+
+    "GET/all" : cli => {
+        cli.response.writeHead(200, { "Content-Type" : "application/json"});
+        const st = fs.createReadStream(cli._c.server.html + "/all.json", {encoding : "utf8"});
+        st.on('end', () => { st.destroy(); });
+        st.pipe(cli.response);
+    },
+
+    "GET/content" : cli => {
+        console.log(cli._c.server.html + "/content/" + cli.path[1] + ".json")
+        cli.response.writeHead(200, { "Content-Type" : "application/json"});
+        const st = fs.createReadStream(cli._c.server.html + "/content/" + cli.path[1] + ".json", {encoding : "utf8"});
+        st.on('end', () => { st.destroy(); });
+        st.pipe(cli.response);       
+    },
+
+    "GET/author" : cli => {
+        const sesh = sessions[cli.request.headers.lmltk];
+        const author = cli.request.headers.author;
+
+        if (sesh && author) {
+            cli._c.db.collection('content').aggregate([
+                { $match : { status : "published", author : mongoID(author) } },
+                { $sort : { _id : -1 } },
+                { $limit : 30 },
+                { $lookup : { from : "uploads", as : "media", localField : "media", foreignField : "_id" }},
+                { $project : Projections.searchResults },
+                { $unwind : "$facebookmedia" }
+            ]).toArray((err, arr) => {
+                cli.sendJSON({ posts : arr, author });
+            });
+        } else {
+            cli.throwHTTP(404);
+        }           
+    }
 };
 
 // Handler wrappers

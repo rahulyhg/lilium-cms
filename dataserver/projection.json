@@ -10,7 +10,7 @@
 
     "searchResults" : {
         "title" : 1,
-        "media.sizes.facebook.url" : 1,
+        "facebookmedia" : "$media.sizes.facebook.url",
         "date" : 1
     }
 }
