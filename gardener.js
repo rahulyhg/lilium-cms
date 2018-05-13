@@ -135,4 +135,4 @@ class Gardener {
 
 };
 
-const lmlnetwork = new Gardener();
+global.__LILIUMNETWORK = new Gardener();
