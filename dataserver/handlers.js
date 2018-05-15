@@ -87,8 +87,9 @@ const endpoints = {
             const index = Math.abs(cli.request.headers.index || 0);
             cli._c.db.collection('fbusersfav').aggregate([
                 { $match : { userid : sesh._id } },
-                { $skip : (index * 30) },
-                { $limit : 30 },
+                { $sort : { at : -1 } },
+                { $skip : (index * 100) },
+                { $limit : 100 },
                 { $lookup : { from : "content", as : "article", localField : "_id", foreignField : "_id" } },
                 { $unwind : "$article" },
                 { $match : { "article.status" : "published" } },
@@ -96,7 +97,7 @@ const endpoints = {
                 { $unwind : "$article.media" },
                 { $project : Projections.favouriteList }
             ]).toArray((err, arr) => {
-                cli.sendJSON({posts : arr, index, payloadsize : 30, err});
+                cli.sendJSON({posts : arr, index, payloadsize : 100, err});
             })
         } else {
             cli.throwHTTP(404);
