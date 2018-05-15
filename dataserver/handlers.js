@@ -166,7 +166,7 @@ const endpoints = {
         const sesh = sessions[cli.request.headers.lmltk];
         const terms = cli.request.headers.terms;
 
-        if (sesh && terms) {
+        if (!sesh && terms) {
             cli._c.db.collection('content').aggregate([
                 { $match : { status : "published", $text : { $search : terms.trim() } } },
                 { $sort : { score: { $meta: "textScore" } } },
