@@ -79,12 +79,6 @@ class ContentLib {
     }
 
     generate(_c, deepArticle, cb, pageIndex) {
-        const allDone = response => {
-            this.generateJSON(_c, deepArticle, () => {
-                cb && cb(response);
-            });
-        };
-
         let extra = {};
         extra.ctx = "article";
         extra.article = deepArticle;
@@ -204,22 +198,22 @@ class ContentLib {
         }
  
         const asyncHooks = hooks.getSiteHooksFor(_c, 'article_async_render');
+        const dom = new JSDOM(deepArticle.content);
     
         let hookIndex = -1;
         const nextHook = ()  => {
             if (++hookIndex != asyncHooks.length) {
                 let hk = asyncHooks[hookIndex];
                 hk({
-                    _c : _c,
                     done : nextHook,
                     article : deepArticle,
-                    dom : new JSDOM(deepArticle.content),
-                    extra : extra
+
+                    _c, dom, extra
                 }, 'article_async_render')
             } else {
                 // Generate LML page
                 filelogic.renderThemeLML(_c, ctx, filename + '.html', extra , (name)  => {
-                    allDone({
+                    cb && cb({
                         success: true,
                         deepArticle : deepArticle
                     });
@@ -227,7 +221,9 @@ class ContentLib {
             }
         };
 
-        nextHook();
+        this.generateJSON(_c, deepArticle, () => {
+            nextHook();
+        });
     }
 
     updateActionStats(_c, deepArticle, callback, reduce) {
