@@ -174,8 +174,8 @@ const endpoints = {
                 { $lookup : { from : "uploads", as : "media", localField : "media", foreignField : "_id" }},
                 { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" }},
                 { $unwind : "$fulltopic" },
-                { $unwind : "$facebookmedia" },
-                { $project : Projections.searchResults }
+                { $project : Projections.searchResults },
+                { $unwind : "$facebookmedia" }
             ]).toArray((err, arr) => {
                 cli.sendJSON({ posts : arr });
             });
