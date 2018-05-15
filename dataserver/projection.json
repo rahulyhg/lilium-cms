@@ -9,7 +9,7 @@
     },
 
     "searchResults" : {
-        "title" : 1,
+        "title" : { "$arrayElemAt" : ["$title", 0] },
         "facebookmedia" : "$media.sizes.facebook.url",
         "fulltopic.displayname" : 1,
         "fulltopic.completeSlug" : 1,
