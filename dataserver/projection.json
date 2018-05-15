@@ -11,6 +11,8 @@
     "searchResults" : {
         "title" : 1,
         "facebookmedia" : "$media.sizes.facebook.url",
+        "fulltopic.displayname" : 1,
+        "fulltopic.completeSlug" : 1,
         "date" : 1
     }
 }

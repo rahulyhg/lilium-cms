@@ -168,12 +168,14 @@ const endpoints = {
 
         if (sesh && terms) {
             cli._c.db.collection('content').aggregate([
-                { $match : { status : "published", $text : { $search : terms.split(' ').map(x => "\"" + x + "\"").join(' ') } } },
-                { $sort : { _id : -1 } },
+                { $match : { status : "published", $text : { $search : terms.trim() } } },
+                { $sort : { score: { $meta: "textScore" } } },
                 { $limit : 30 },
                 { $lookup : { from : "uploads", as : "media", localField : "media", foreignField : "_id" }},
-                { $project : Projections.searchResults },
-                { $unwind : "$facebookmedia" }
+                { $lookup : { from : "topics", as : "fulltopic", localField : "topic", foreignField : "_id" }},
+                { $unwind : "$fulltopic" },
+                { $unwind : "$facebookmedia" },
+                { $project : Projections.searchResults }
             ]).toArray((err, arr) => {
                 cli.sendJSON({ posts : arr });
             });
