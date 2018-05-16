@@ -168,7 +168,7 @@ const endpoints = {
 
         if (sesh && terms) {
             cli._c.db.collection('content').aggregate([
-                { $match : { status : "published", $text : { $search : '"' + terms.trim().split(' ').join('" "') + '"' } } },
+                { $match : { status : "published", $text : { $search : '"' + decodeURI(terms).trim().split(' ').join('" "') + '"' } } },
                 { $sort : { score: { $meta: "textScore" } } },
                 { $limit : 30 },
                 { $lookup : { from : "uploads", as : "media", localField : "media", foreignField : "_id" }},
