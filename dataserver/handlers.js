@@ -3,7 +3,7 @@ const FACEBOOK_API = "https://graph.facebook.com/v";
 
 // Libraries
 const request = require('request');
-const { presentableFacebookUser, makeToken, mongoID, readPostData } = require('./formatters');
+const { presentableFacebookUser, presentableGoogleUser, makeToken, mongoID, readPostData } = require('./formatters');
 const Projections = require('./projection');
 const fs = require('fs');
 
@@ -18,6 +18,19 @@ const endpoints = {
         request(gurl, {json : true}, (err, resp, r) => {
             cli.sendJSON(r);
         });
+    },
+
+    "POST/DEBUG_GOOGLE_TEST_HERE" : cli => {
+        const token = cli.request.headers.t;
+        const gurl = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + token;
+        readPostData(cli, data => {
+            request(gurl, {json : true}, (err, resp, r) => {
+                cli.sendJSON({
+                    googleresponse : r,
+                    sentpostdata : data
+                });
+            })
+        })
     },
 
     "POST/introduce" : cli => {
@@ -42,7 +55,6 @@ const endpoints = {
                             cli._c.db.collection('fbusers').insertOne(user, (err, r) => {
                                 user.lmltk = lmltk;
                                 sessions[lmltk] = user;
-                                user.firstLogin = true;
                                 cli.sendJSON(user);
                             });
                         })
@@ -52,6 +64,51 @@ const endpoints = {
                 cli.throwHTTP(403);
             }
         });
+    },
+
+    "POST/gintroduce" : cli => {
+        const token = cli.request.headers.t;
+        const gurl = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=" + token;
+
+        request(gurl, {json : true}, (err, resp, r) => {
+            if (r && r.user_id) {        
+                const gid = r.user_id;
+                const _id = require('crypto').createHash('sha256').update(gid).digest("hex"); 
+                
+                cli._c.db.collection('fbusers').find({ _id }).next((err, maybeuser) => {  
+                    if (maybeuser) {
+                        sessions[maybeuser.lmltk] = maybeuser;
+                        cli.sendJSON(maybeuser);
+                    } else {
+                        const lmltk = makeToken(_id);
+                        cli._c.db.collection('fbsessions').insertOne({ _id : lmltk, userid : _id, at : Date.now() });
+
+                        readPostData(cli, u => {
+                            try {
+                                u = JSON.parse(u);
+                                const user = presentableGoogleUser(u, lmltk);
+
+                                if (u.accessToken && u.id) {
+                                    cli._c.db.collection('fbusers').insertOne(user, (err, r) => {
+                                        user.lmltk = lmltk;
+                                        sessions[lmltk] = user;
+                                        cli.sendJSON(user);
+                                    });
+                                } else {
+                                    console.log(u);
+                                    cli.throwHTTP(401);
+                                }
+                            } catch (err) {
+                                cli.throwHTTP(500);
+                            }
+                        });
+                    }
+                })                
+            } else {
+                console.log(r);
+                cli.throwHTTP(404);
+            }
+        })
     },
 
     "DELETE/introduce" : cli => {

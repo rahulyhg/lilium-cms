@@ -6,8 +6,23 @@ module.exports.presentableFacebookUser = (u,picture,lmltk) => {
         createdAt : Date.now(),
         feedtype : "full",
         language : "all",
+        type : "facebook",
 
         picture,
+        lmltk
+    }
+}
+
+module.exports.presentableGoogleUser = (u,lmltk) => {
+    return {
+        _id : require('crypto').createHash('sha256').update(u.id).digest('hex'),
+        displayname : u.name,
+        createdAt : Date.now(),
+        feedtype : "full",
+        language : "all",
+        type : "google",
+        picture : u.photo,
+        
         lmltk
     }
 }
