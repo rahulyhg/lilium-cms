@@ -127,7 +127,7 @@ class ContentSearch {
                 conditions.topic = {$in : topics.map(x => x._id)};
             }
 
-            hooks.fireSire(_c, 'search_willFind', {conditions, terms});
+            hooks.fireSite(_c, 'search_willFind', {conditions, terms});
             db.join(_c, 'content', [
                 {$match : conditions},
                 options.scoresort ? {$sort: { score: { $meta: "textScore" }, _id : -1} } : {$sort : {_id : -1}},
