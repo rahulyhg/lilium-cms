@@ -342,7 +342,7 @@ var SiteInitializer = function (conf, siteobj) {
             log.setLevels(["none", "info", "success", "detail", "live", "err", "warn", "lilium"]);
         }
 
-        hooks.fire('site_will_initialize', conf);
+        hooks.fireSite(conf, 'site_will_initialize', {});
         endpoints.addSite(conf.id);
         analytics.addSite(conf);
         adslib.registerSite(conf.id);

@@ -359,6 +359,8 @@ class Entities {
                         success : true
                     });
                 });
+
+                hooks.fire('profileUpdated', { entity });
             } else {
                 log('[Database] error while updating entity : ' + err);
                 cli.throwHTTP(500);
@@ -414,6 +416,7 @@ class Entities {
                     avatarID: db.mongoID(avatarID)
                 }, function(err, result) {
                     images.success = true;
+                    hooks.fire('profilePicUpdated', { _id : db.mongoID(userid), images });
                     cb(err, images);
                 });
             });
@@ -457,6 +460,7 @@ class Entities {
                             avatarID: db.mongoID(avatarID)
                         }, function (err, result) {
                             cli.did("entity", "picupload");
+                            hooks.fire('profilePicUpdated', { _id : db.mongoID(id), images });
 
                             // Update session
                             if (isProfile) {
@@ -707,6 +711,7 @@ class Entities {
                     entity : entity
                 });
 
+                hooks.fire("entityInvited", { entity });
                 done(true);
             });
         });

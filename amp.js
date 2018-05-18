@@ -98,7 +98,9 @@ class Amp {
                 cli.response.writeHead(200);
                 cli.response.end(filecontent);
 
-                fileserver.dumpToFile(cli._c.server.html + "/amp/" + article.name + ".html", filecontent, () => {
+                const filepath = cli._c.server.html + "/amp/" + article.name + ".html";
+                fileserver.dumpToFile(filepath, filecontent, () => {
+                    hooks.fireSite(cli._c, "ampGenerated", { article, filepath });
                     log("AMP", "Cached file written");
                 }, 'utf8');
             }, true);

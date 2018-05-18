@@ -26,6 +26,7 @@ const Analytics = require('./analytics');
 const db = require('./includes/db');
 const dashboard = require('./dashboard');
 const dateformat = require('dateformat');
+const hooks = require('./hooks')
 
 class TheDailyLilium {
     storeEntry(_c, datetime, done) {
@@ -118,6 +119,7 @@ class TheDailyLilium {
                                         report._id = dateformat(datestart, "ddmmyyyy");
 
                                         db.rawCollection(_c, 'thedailylilium', {}, (err, col) => {
+                                            hooks.fireSite(_c, 'dailyLiliumGenerate', {report})
                                             col.replaceOne({ _id : report._id }, report, {
                                                 upsert : 1
                                             }, (err, r) => {

@@ -1,6 +1,7 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
 const config = require('./config.js');
+const hooks = require('./hooks');
 
 const PROJECTION = {
     title : 1, subtitle : 1, media : 1, topic : 1, status : 1, date : 1, author : 1, _id : 1 
@@ -126,6 +127,7 @@ class ContentSearch {
                 conditions.topic = {$in : topics.map(x => x._id)};
             }
 
+            hooks.fireSire(_c, 'search_willFind', {conditions, terms});
             db.join(_c, 'content', [
                 {$match : conditions},
                 options.scoresort ? {$sort: { score: { $meta: "textScore" }, _id : -1} } : {$sort : {_id : -1}},

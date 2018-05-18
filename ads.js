@@ -2,6 +2,7 @@ const log = require('./log');
 const db = require('./includes/db');
 const config = require('./config');
 const filelogic = require('./filelogic');
+const hooks = require('./hooks');
 const _patterns = {};
 
 class AdPatterns {

@@ -32,6 +32,7 @@ const db = require('./includes/db.js');
 const formbuilder = require('./formBuilder.js');
 const filelogic = require('./filelogic.js');
 const config = require('./config.js');
+const hooks = require('./hooks');
 const LML3 = require('./lml3/compiler.js');
 
 const CAKEPOP_COLLECTION = "cakepops";
@@ -67,6 +68,7 @@ class Cakepop {
                 };
 
                 db.insert(config.default(), CAKEPOP_COLLECTION, newDocument, () => {
+                    hooks.fire('createdCakepop', {cakepop : newDocument, by : db.mongoID(cli.userinfo.userid)});
                     cli.sendJSON({
                         success : true,
                         id : newDocument._id,
@@ -79,6 +81,7 @@ class Cakepop {
         } else if (action == "save" && cli.hasRight('cakepop')) {
             const d = cli.postdata.data;
             db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.routeinfo.path[3])}, d, () => {
+                hooks.fire('editedCakepop', {diff : d, by : db.mongoID(cli.userinfo.userid)});
                 cli.sendJSON({
                     success : true,
                     type : "success",
@@ -98,7 +101,8 @@ class Cakepop {
                             at : new Date().getTime()
                         }
                     }
-                }, () => {
+                }, () => {                
+                    hooks.fire('cakepopOpen', { _id : db.mongoID(cli.postdata.data.id), by : cli.me(), response : cli.postdata.data.response });
                     cli.sendJSON({delicious : true, userid : cli.userinfo.userid, cakepop : cli.postdata.data.id});
                 }, false, true, true);
             } else {

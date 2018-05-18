@@ -124,6 +124,8 @@ class LMLTopics {
                 db.insert(cli._c, 'topics', newTopic, (err, r) => {
                     this.updateFamily(cli._c, newTopic._id, newTopic.slug, () => {
                         this.generateFamilyEntry(cli._c, newTopic._id, () => {
+
+                            hooks.fireSite(cli._c, 'topicCreated', {topic : newTopic})
                             cli.sendJSON({
                                 created : true,
                                 reason : "Valid form"
@@ -144,6 +146,8 @@ class LMLTopics {
             if (updatedTopic && updatedTopic.displayname && updatedTopic.slug && topicID) {
                 db.update(cli._c, 'topics', {_id : topicID}, updatedTopic, (() => {
                     this.updateFamily(cli._c, topicID, updatedTopic.slug, () => {
+                        hooks.fireSite(cli._c, 'topicUpdated', {topic : updatedTopic})
+
                         cli.sendJSON({
                             updated : true,
                             reason : "Valid form"
@@ -166,7 +170,9 @@ class LMLTopics {
             }
 
             if (topicID) {
-                db.update(cli._c, 'topics', {_id : topicID}, {override : realdata}, (() => {
+                db.update(cli._c, 'topics', {_id : topicID}, {override : realdata}, (() => {                        
+                    hooks.fireSite(cli._c, 'topicOverrideUpdated', {override : realdata, _id : topicID})
+
                     cli.sendJSON({
                         updated : true,
                         reason : "Valid form",
@@ -297,6 +303,7 @@ class LMLTopics {
                 }
             }
         ], (articles) => {
+
             db.findUnique(conf, 'topics', {_id}, (err, topic) => {
                 articles.forEach(a => {
                     if (a.featuredimage[0]) {
@@ -423,6 +430,7 @@ class LMLTopics {
                 }
             }
 
+            hooks.fireSite(conf, 'topicDeepFetch', {topic : finalTopic, parents})
             send(finalTopic, parents.reverse());
         });
     }

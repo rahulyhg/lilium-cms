@@ -3,6 +3,7 @@ const path = require('path');
 const Babel = require("babel-core");
 const sharedcache = require('./sharedcache');
 const webpack = require('webpack');
+const hooks = require('./hooks');
 
 const init_build_tree = [];
 
@@ -16,7 +17,10 @@ class Builder {
 
     pushToBuildTree(_c, input, outputkey, options) {
         log('Builder', 'Added file ' + input + ' to build tree', 'detail');
-        init_build_tree.push({ _c, input, outputkey, options });
+        const entry = { _c, input, outputkey, options }
+        init_build_tree.push(entry);
+
+        hooks.fireSite(_c, 'addedFileToBuildTree', entry)
     }
 
     initialBuild(done) {
@@ -56,6 +60,7 @@ class Builder {
             }
         };
 
+        hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig})
         webpack(buildconfig, (err, result) => {
             err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
                 log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');

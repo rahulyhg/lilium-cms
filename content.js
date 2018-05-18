@@ -61,7 +61,8 @@ class ContentLib {
             authorentity.reportsto && authorentity.reportsto.length > 0 && art.subscribers.push(...authorentity.reportsto)
 
             db.insert(_c, CONTENT_COLLECTION, art, (err, result) => {
-               done && done(err, art);
+                hooks.fireSite(_c, 'contentCreated', {title, article : art})
+                done && done(err, art);
             });
         }, {reportsto : 1, displayname : 1});
     }
@@ -178,7 +179,7 @@ class ContentLib {
                 deepArticle.similartitle = true;
             }
 
-            hooks.fireSite(_c, 'paginated_article_generated_' + _c.uid, { article : deepArticle, page : pageIndex });
+            hooks.fireSite(_c, 'paginated_article_generated', { article : deepArticle, page : pageIndex });
 
             deepArticle.url += "/" + pageIndex;
 
@@ -344,6 +345,7 @@ class ContentLib {
                 post.headline = post.title[0];
                 post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
 
+                hooks.fireSite(_c, 'contentGetFull', {article : post});
                 sendback(post);
             }, { displayname : 1, username : 1, avatarURL : 1, avatarMini : 1, slug : 1, revoked : 1 });
         });
@@ -365,6 +367,7 @@ class ContentLib {
                 at : new Date(),
             }
     
+            hooks.fireSite(_c, 'pushingContentDiff', {postid, actor, diffres, type});
             db.insert(_c, 'contenthistory', entry, (err, r) => done(entry));
         } else {
             done();
@@ -590,11 +593,14 @@ class ContentLib {
             const defaultConfig = require('./config.js').default();
             db.findUnique(defaultConfig, 'entities', { _id : author }, (err, contractor) => {
                 db.findUnique(defaultConfig, 'entities', {_id : contractor.reportsto}, (err, reportee) => {
-                    reportee && db.findUnique(_c, 'content', { _id : postid }, (err, article) => {
-                        require('./mail.js').triggerHook(_c, 'article_sent_for_review', reportee.email, {
+                    db.findUnique(_c, 'content', { _id : postid }, (err, article) => {
+                        reportee && require('./mail.js').triggerHook(_c, 'article_sent_for_review', reportee.email, {
                             to : reportee, 
                             article, contractor
                         });
+
+
+                        hooks.fireSite(_c, 'article_sentForReview', { article, contractor });
                     });
                 });
             });
@@ -604,7 +610,11 @@ class ContentLib {
     refuseSubmission(_c, postid, caller, callback) {
         db.update(_c, 'content', { _id : postid }, { status : "draft" }, () => {
             this.pushHistoryEntryFromDiff(_c, postid, caller, diff({}, { status : "draft" }), 'refused', historyentry => {
-                this.getFull(_c, postid, newstate => callback && callback({ historyentry, newstate }));
+                this.getFull(_c, postid, newstate => {
+                    hooks.fireSite(_c, 'article_refusedSubmission', { article : newstate, by : caller });
+
+                    callback && callback({ historyentry, newstate });
+                });
             });
         });
     }
@@ -673,6 +683,8 @@ class ContentLib {
                             msg: '<i>'+article.title[0]+'</i> has been debugged on Facebook Graph.',
                             type: 'log'
                         });
+
+                        hooks.fireSite(_c, 'contentFacebookDebug', {article});
                     } else {
                         log('Facebook', 'Debugger responded with error', "warn");
                         notifications.notifyUser(userid, _c.id, {
@@ -731,6 +743,7 @@ class ContentLib {
                             Math.random().toString().slice(2) + 
                             ".tmp";
 
+                        hooks.fireSite(_c, 'contentWillPreview', {article : previewpost, extra});
                         filelogic.renderThemeLML3(_c, ctx, abspath, extra, markup => sendback(markup));
                     });
                 });

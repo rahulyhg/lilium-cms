@@ -8,6 +8,7 @@ const filelogic = require('./filelogic.js');
 const livevars = require('./livevars.js');
 const themes = require('./themes.js');
 const networkinfo = require('./network/info.js');
+const hooks = require('./hooks');
 
 class StyledPages {
     constructor() {
@@ -195,6 +196,7 @@ class StyledPages {
             fileserver.deleteFile(cachedFile, () => {
                 db.update(conf, 'styledpages', {_id : db.mongoID(pageID)}, newData, () => {
                     db.findUnique(conf, 'styledpages', {_id : db.mongoID(pageID)}, (err, newpage) => {
+                        hooks.fireSite(conf, 'styledpageSaved', {page : newpage});
                         this.generatePage(conf, newpage, () => {
                             done && done(undefined, true);
                         });
@@ -222,6 +224,7 @@ class StyledPages {
         switch (level) {
             case "new":
                 db.insert(cli._c, 'styledpages', that.createNewObject(), (err, r) => {
+                    hooks.fireSite(cli._c, 'styledpageCreated', {_id : r.insertedId});
                     cli.sendJSON({
                         _id : r.insertedId.toString()
                     });

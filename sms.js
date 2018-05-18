@@ -1,5 +1,6 @@
 const request = require('request');
 const log = require('./log');
+const hooks = require('./hooks')
 
 class SMS {
     getConfig() {
@@ -19,6 +20,8 @@ class SMS {
         if (!conf.error) {
             const url = this.formatURL(conf);
             log('SMS', 'Sending SMS to ' + to);
+
+            hooks.fire("sendingSMS", {to, message});
             request.post(url, { form : {
                 To : to, From : conf.from, Body : message
             } }, (err, resp, body) => {
