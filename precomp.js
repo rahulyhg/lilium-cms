@@ -36,9 +36,9 @@ var Precomp = function () {
     };
 
     var compileQueue = function(conf, cb, extra) {
-        hooks.fire('queue_will_compile', {config : conf});
+        hooks.fireSite(conf, 'queue_will_compile', {config : conf});
         that.compileMultipleFiles(conf, precompQueue, function() {
-            hooks.fire('queue_compiled', {config : conf});
+            hooks.fireSite(conf, 'queue_compiled', {config : conf});
             cb();
         }, extra);
     };

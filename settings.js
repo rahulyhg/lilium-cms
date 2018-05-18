@@ -28,10 +28,9 @@ var Settings = function () {
             }
 
             var saveSetts = function() {
-                hooks.fire('settings_will_save', cli);
+                hooks.fireSite(cli._c, 'settings_will_save', {settings : data});
 
                 _c.saveConfigs(cli._c, function () {
-                    hooks.fire('settings_saved', cli);
                     cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?updated=true", false);
                 });
             };

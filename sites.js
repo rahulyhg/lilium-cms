@@ -238,12 +238,12 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/modals.css", 2660, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/welcome.css", 2800, 'admin', conf.id);
 
-        hooks.fire('frontend_will_precompile', {
+        hooks.fireSite(conf, 'frontend_will_precompile', {
             config: conf,
             Frontend: Frontend
         });
         Precompiler.precompile(conf, function () {
-            hooks.fire('frontend_precompiled', {
+            hooks.fireSite(conf, 'frontend_precompiled', {
                 config: conf,
                 Frontend
             });
