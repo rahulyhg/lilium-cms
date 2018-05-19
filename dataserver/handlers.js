@@ -8,6 +8,7 @@ const Projections = require('./projection');
 const fs = require('fs');
 
 const sessions = {};
+const SLUGTOID_CACHE = [];
 
 // Endpoints
 const endpoints = {
@@ -123,6 +124,27 @@ const endpoints = {
 
     "PUT/me" : cli => {
         cli.throwHTTP(501);
+    },
+
+    "GET/urltoid" : cli => {
+        const url = cli.request.headers.urltoid;
+        const split = url.split('/');
+        let slug = split[split.length - 1];
+        
+        if (!slug) {
+            cli.throwHTTP(404);
+        } else if (SLUGTOID_CACHE[slug]) {
+            cli.sendJSON({_id : SLUGTOID_CACHE[slug]});
+        } else {
+            cli._c.db.collection('content').findOne({name : slug}, {projection : {_id : 1}}, (err, art) => {
+                if (art) {
+                    SLUGTOID_CACHE[slug] = art._id;
+                    cli.sendJSON(art);
+                } else {
+                    cli.throwHTTP(404);
+                }
+            });
+        }
     },
 
     "DELETE/me" : cli => {
