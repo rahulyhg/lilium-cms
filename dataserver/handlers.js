@@ -8,7 +8,8 @@ const Projections = require('./projection');
 const fs = require('fs');
 
 const sessions = {};
-const SLUGTOID_CACHE = [];
+const SLUGTOID_CACHE = {};
+const STATICPAGES = {};
 
 // Endpoints
 const endpoints = {
@@ -32,6 +33,26 @@ const endpoints = {
                 });
             })
         })
+    },
+
+    "GET/staticpage" : cli => {
+        const slug = cli.path[1];
+        if (!slug) {
+            cli.throwHTTP(404);
+        } else if (STATICPAGES[slug]) {
+            cli.response.writeHead(200, {"Content-Type" : "text/html"});
+            cli.response.end(STATICPAGES[slug]);
+        } else {
+            cli._c.db.collection('styledpages').findOne({ slug }, (err, page) => {
+                if (page) {
+                    STATICPAGES[slug] = page.content;
+                    cli.response.writeHead(200, {"Content-Type" : "text/html"});
+                    cli.response.end(page.content); 
+                } else {
+                    cli.throwHTTP(404);
+                }
+            });
+        }
     },
 
     "POST/introduce" : cli => {
