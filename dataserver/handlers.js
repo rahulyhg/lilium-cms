@@ -172,9 +172,11 @@ const endpoints = {
         const sesh = sessions[cli.request.headers.lmltk];
 
         if (sesh) {
-            cli._c.db.collection('fbusers').removeOne({_id : sesh._id});
+            cli._c.db.collection('fbusers').deleteOne({_id : sesh._id});
+            cli._c.db.collection('fbusersfav').deleteMany({ userid : sesh._id });
 
             const deleted = delete sessions[cli.request.headers.lmltk];
+
             cli.sendJSON({deleted});
         } else {
             cli.throwHTTP(404);
