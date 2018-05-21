@@ -398,6 +398,10 @@ const precompile = function (done) {
         return done();
     }
 
+    if (!isElder) {
+        return done();
+    }
+
     log('Core', 'Staring precompilation', 'info');
     hooks.fire("will_precompile");
     sites.loopPrecomp(function() {

@@ -666,15 +666,16 @@ var Sites = function () {
     };
 
     this.loopPrecomp = function (done) {
-        if (!isElder) { return done(); }
-
         var s = _cachedSites;
         var len = s.length;
         var index = 0;
 
         log("Sites", "Precompiling static files", 'info');
+        var now = Date.now();
         var execPreComp = function () {
             if (index === len) {
+                var later = Date.now() - now;
+                log('Sites', 'Precompiled static files in ' + later + "ms", "info");
                 done();
             } else {
                 (new SiteInitializer(s[index])).precompile(function () {
