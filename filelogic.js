@@ -160,14 +160,14 @@ class FileLogic {
         let savePath = cli._c.server.html + name + '/index.html';
         FileServer.fileExists(savePath, isPresent => {
             let readPath = cli._c.server.base + (dynamicroot || "backend/dynamic") + name + ".lml";
-            if (!isPresent) {
+            if (cli._c.env == "dev" || !isPresent) {
                 FileServer.readFile(readPath, content => {
                     if (!content) {
                         cli.throwHTTP(404);
                     } else {
                         FileServer.createDirIfNotExists(savePath, () => {
                             require("./themes").fetchCurrentTheme(cli._c, cTheme => {
-                                let output = FileServer.getOutputFileHandle(savePath);
+                                let output = FileServer.getOutputFileHandle(savePath, "w+");
                                 extra = extra || {};
                                 extra.rootDir = readPath.substring(0, readPath.lastIndexOf('/'));
                                 extra.config = cli._c;
