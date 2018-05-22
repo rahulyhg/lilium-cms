@@ -139,6 +139,9 @@ class Article {
             for (var size in article.featuredimage[0].sizes) {
                 featuredimages[size] = CDN.parseOne(_c, article.featuredimage[0].sizes[size].url);
             }
+
+            article.featuredimageartist = article.featuredimage[0].artistname;
+            article.featuredimagelink = article.featuredimage[0].artisturl;
         }
 
         var topic;
