@@ -17,7 +17,7 @@ const Knowledge = {
     janitorJobs : executor.getJanitorJobs(),
     janitorSites : executor.getJanitorSites(),
     cpuCap : 80,
-    cooldown : 100,
+    cooldown : 3000,
 
     homepageDelai : oneMinute * 5,
     sitemapDelai : oneHour,
@@ -42,6 +42,7 @@ class AI {
         let task = taskscheduler.next();
 
         if (!task) {
+            /*
             let jobindex = ++ai.indices.cursor % Knowledge.janitorJobs.length;
             !jobindex && ai.indices.sitecursor++;
             task = {
@@ -51,14 +52,16 @@ class AI {
                     _c : Knowledge.janitorSites[ai.indices.sitecursor % Knowledge.janitorSites.length]
                 }
             };
+            */
+
+            ai.createInterval();
+        } else {
+            executor.execute(task, oneTime ? callback : ai.createInterval);
         }
-
-
-        executor.execute(task, oneTime ? callback : ai.createInterval);
     }
 
     createInterval() {
-        setTimeout(() => ai.decide(), 0);
+        setTimeout(() => ai.decide(), Knowledge.cooldown);
     }
 
     createTaskInserter() {
