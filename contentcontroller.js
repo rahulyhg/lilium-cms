@@ -75,12 +75,6 @@ class ContentController {
                     if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
                         contentlib.publish(cli._c, article, db.mongoID(cli.userinfo.userid), resp => cli.sendJSON(resp));
                         contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
-
-                        hooks.fire('article_published', {
-                            cli: cli,
-                            article: article,
-                            _c : cli._c
-                        });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
                         cli.throwHTTP(404, undefined, true);

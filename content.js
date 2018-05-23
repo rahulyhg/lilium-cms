@@ -573,6 +573,9 @@ class ContentLib {
                         this.updateActionStats(_c, fullpost, score => {
                             hooks.fireSite(_c, 'article_published_from_draft', { article : fullpost, score, _c });
                             hooks.fireSite(_c, 'article_updated', { article : fullpost, _c });
+                            hooks.fire('article_published', {
+                                article: fullpost, _c
+                            });
 
                             this.generate(_c, fullpost, () => {
                                 callback({ historyentry, newstate : fullpost });
