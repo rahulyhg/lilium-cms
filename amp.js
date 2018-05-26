@@ -195,6 +195,28 @@ class Amp {
             }
         }
 
+        const tweetblocks = dom.window.document.querySelectorAll('.twitter-tweet');
+        for (let i = tweetblocks.length - 1; i >= 0; i--) {
+            let id;
+            let maybea = tweetblocks[i].lastElementChild;
+            if (maybea.nodeName == "A") {
+                id = maybea.href && maybea.href.toString().split("/").pop().split('?')[0]
+            }
+
+            if (id) {
+                const amptweet = dom.window.document.createElement('amp-twitter');
+                amptweet.setAttribute('width', '375')
+                amptweet.setAttribute('height', '472')
+                amptweet.setAttribute('layout', 'responsive')
+                amptweet.dataset.tweetid = id;
+
+                tweetblocks[i].parentElement.insertBefore(amptweet, tweetblocks[i]);
+                amptweet.appendChild(tweetblocks[i]);
+                tweetblocks[i].removeAttribute('class');
+                tweetblocks[i].setAttribute('placeholder', "");
+            }
+        }
+
         // Slow
         const styled = dom.window.document.querySelectorAll("[style]");
         for (let i = styled.length - 1; i >= 0; i--) { styled[i].removeAttribute('style'); }
