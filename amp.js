@@ -173,6 +173,28 @@ class Amp {
             }
         }
 
+        const styledspans = dom.window.document.querySelectorAll('span');
+        for (let i = styledspans.length - 1; i >= 0; i--) {
+            let nodeName;
+            const styles = styledspans[i].style;
+
+            if (styles.fontWeight == "bold" || styles.fontWeight >= 600) {
+                nodeName = "strong";
+            } else if (styles.fontStyle == "italic") {
+                nodeName = "em"
+            }
+
+            if (nodeName) {
+                const node = dom.window.document.createElement(nodeName);
+                while (styledspans[i].firstChild) {
+                    node.appendChild(styledspans[i].firstChild);
+                }
+
+                styledspans[i].parentElement.insertBefore(node, styledspans[i]);
+                styledspans[i].remove();
+            }
+        }
+
         // Slow
         const styled = dom.window.document.querySelectorAll("[style]");
         for (let i = styled.length - 1; i >= 0; i--) { styled[i].removeAttribute('style'); }
