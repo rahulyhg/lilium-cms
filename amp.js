@@ -195,6 +195,12 @@ class Amp {
             }
         }
 
+        const fabig = dom.window.document.querySelectorAll('.fab.fa-instagram');
+        for (let i = fabig.length - 1; i >= 0; i--) {
+            fabig[i].className = "fa fa-instagram";
+        }
+
+
         const tweetblocks = dom.window.document.querySelectorAll('.twitter-tweet');
         for (let i = tweetblocks.length - 1; i >= 0; i--) {
             let id;
@@ -234,8 +240,8 @@ class Amp {
         for (let i = iframes.length - 1; i >= 0; i--) { 
             const iframe = iframes[i];
             const ampframe = dom.window.document.createElement('amp-iframe');
-            ampframe.setAttribute('width', iframe.width);
-            ampframe.setAttribute('height', iframe.height);
+            ampframe.setAttribute('width', !iframe.width || isNaN(iframe.width) ? "340" : iframe.width);
+            ampframe.setAttribute('height', !iframe.height || isNaN(iframe.height) ? "340" : iframe.height);
             ampframe.setAttribute('src', iframe.src);
             ampframe.setAttribute('layout', "responsive");
             ampframe.setAttribute('frameborder', 0);
