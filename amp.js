@@ -151,10 +151,10 @@ class Amp {
             scripts[i].remove();
         }
 
-        const videos = dom.window.document.querySelectorAll('.ck-embed-video');
+        const videos = dom.window.document.querySelectorAll('.ck-embed-video, iframe');
         for (let i = videos.length - 1; i >= 0; i--) {
             const x = videos[i];
-            if (x.src.includes('youtube.com')) {
+            if (x.src && x.src.includes('youtube.com')) {
                 let vid = x.src.substring(x.src.indexOf('/embed/') + 7);
                 if (vid.includes('/')) { vid = vid.substring(0, vid.indexOf('/')); }
                 if (vid.includes('?')) { vid = vid.substring(0, vid.indexOf('?')); }
