@@ -146,7 +146,7 @@ class Amp {
             x.remove();
         }
 
-        const scripts = dom.window.document.querySelectorAll('script');
+        const scripts = dom.window.document.querySelectorAll('script, ad, lml-related, lml-ad');
         for (let i = scripts.length - 1; i >= 0; i--) {
             scripts[i].remove();
         }
@@ -251,6 +251,15 @@ class Amp {
             iframe.remove();
         }
 
+        const links = dom.window.document.querySelectorAll('a');
+        for (let i = links.length - 1; i >= 0; i--) {
+            Array.prototype.forEach.call(links[i].attributes, attr => {
+                if (attr != "href") {
+                    links[i].removeAttribute(attr);
+                }
+            });
+        }
+
         cdn.parse(dom.window.document.body.innerHTML, cli, (articleContent) => {
             themes.fetchCurrentTheme(cli._c, cTheme => {
                 let articlewrap = { content : articleContent };
@@ -264,8 +273,7 @@ class Amp {
                 db.findUnique(cli._c, 'ads', { type : "amp", lang }, (err, adset) => {
                     const ads = adset.ads;
                     hooks.fireSite(cli._c, "amp_replace_ads", { article : articlewrap, dom : dom, theme : cTheme, lang, ads });
-                    articleContent = articlewrap.content;
-                    articleContent = articleContent.replace('<lml-related></lml-related>', '').replace(/style=/g, "amp-style=");
+                    articleContent = articlewrap.content.replace(/style=/g, "amp-style=");
 
                     cb(undefined, articleContent);
                 });
