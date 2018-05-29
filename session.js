@@ -176,6 +176,7 @@ var Sessions = function () {
                     callback({
                         rights, 
                         _id: dat._id,
+                        mustupdatepassword : dat.mustupdatepassword || false,
                         admin: dat.admin,
                         avatarURL: dat.avatarURL,
                         displayname: dat.displayname,

@@ -9,7 +9,7 @@
             {*conversations.list}
             {*entities.chat}
             {*online.list}
-            {%adminlivevars;adminfacebook;backendsearch;adminwelcome;adminbadges;imagepicker;previewer;modals;imagestudio;localclip;adminbar;adminsidebar;adminmain;cakepops;notifications}
+            {%adminlivevars;adminfacebook;mustupdatepassword;backendsearch;adminwelcome;adminbadges;imagepicker;previewer;modals;imagestudio;localclip;adminbar;adminsidebar;adminmain;cakepops;notifications}
         </div>
 	</body>
 </html>

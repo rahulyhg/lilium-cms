@@ -238,7 +238,7 @@ class Entities {
                 const shhh = CryptoJS.SHA256(cli.postdata.data.new).toString(CryptoJS.enc.Hex);
                 const _id = db.mongoID(cli.userinfo.userid);
 
-                db.update(require('./config').default(), 'entities', { _id, shhh : old }, { shhh }, (err, r) => {
+                db.update(require('./config').default(), 'entities', { _id, shhh : {$ne : shhh}, $or : [{shhh : old}, {mustupdatepassword : true}] }, { shhh, mustupdatepassword : false }, (err, r) => {
                     log('Entities', 'Updated entity ' + _id + ' : ' + !!r.matchedCount, 'info');
                     cli.sendJSON({
                         updated : !!r.matchedCount

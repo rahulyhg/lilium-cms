@@ -1132,6 +1132,31 @@ var LiliumCMS = function() {
         this.allUsers = [];
         this.users = {};
 
+        var checkForPasswordMustChange = function(session) {
+            if (session.mustupdatepassword) {
+                liliumcms.modals.get('lml-modal-mustupdatepassword').cast();
+            }
+        }
+
+        window["lml-modal-mustupdatepassword_accept"] = function(modal) {
+            var p = document.getElementById('mustupdatepassword-text').value;
+
+            if (p.length < 6) {
+                return liliumcms.modals.alert("Invalid password", "The new password must contain at least 8 characters.");
+            } else if (!p.match(/[^a-z0-9]/)) {
+                return liliumcms.modals.alert("Invalid password", "The new password must contain at least one capital letter or symbol.");
+            }
+
+            liliumcms.lmldom.post({ "new" : p }, "{=config.default.server.url}/admin/me/updatePassword", function(resp) {
+                if (resp.updated) {
+                    modal.dismiss();
+                    liliumcms.notify({ type : "success", title : "Password update", message : "Your password was successfully updated." });
+                } else {
+                    liliumcms.modals.alert("Password update", "Your password must be different.");
+                }
+            });
+        };
+
         this.init = function() {
             log('Session', 'Recrieving session');
             that.current = liliumcms.livevars.retrieveVar('session');
@@ -1141,6 +1166,8 @@ var LiliumCMS = function() {
             this.allUsers.forEach(function(u) {
                 that.users[u._id] = u;
             });
+
+            checkForPasswordMustChange(that.current);
         }
 
         this.hasRight = function(right) {
@@ -1340,11 +1367,11 @@ document.addEventListener('livevarsRendered', function(e) {
         log('Lilium', 'Awesomestrapping some amazingness', 'lilium');
 
         liliumcms.queryparams.parseURL();
+        liliumcms.modals.find();
         liliumcms.session.init();
         liliumcms.initjewels();
         liliumcms.ckeditor && liliumcms.ckeditor.initEditor();
         liliumcms.adminmenu.init();
-        liliumcms.modals.find();
         liliumcms.pageloader.parseAdminPanel();
         liliumcms.pageloader.loadCurrentURL();
         liliumcms.pageloader.bindHistory();
