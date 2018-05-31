@@ -84,10 +84,6 @@ var SiteInitializer = function (conf, siteobj) {
         rootDir = conf.server.base + 'backend/static/webfonts/';
         fileserver.createSymlinkSync(rootDir, to);
 
-        to = conf.server.html + '/plugins';
-        rootDir = conf.server.base + 'plugins/';
-        fileserver.createSymlinkSync(rootDir, to);
-
         done();
     };
 

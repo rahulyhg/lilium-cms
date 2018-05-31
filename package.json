@@ -145,7 +145,8 @@
     "validator": "latest",
     "vanilla-js-calendar": "latest",
     "websocket": "latest",
-    "ws": "^5.1.1"
+    "ws": "^5.1.1",
+    "xxhashjs": "^0.2.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
