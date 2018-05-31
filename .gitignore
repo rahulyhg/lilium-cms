@@ -50,4 +50,8 @@ backend/static/lib
 # Optional REPL history
 .node_repl_history
 
+# React / Preact builds
+backend/static/js/main.*
+backend/static/css/main.*
+
 dictionary
