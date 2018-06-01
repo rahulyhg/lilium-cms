@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const Babel = require("babel-core");
-const sharedcache = require('./sharedcache');
 const webpack = require('webpack');
 const hooks = require('./hooks');
 
@@ -53,7 +52,7 @@ class Builder {
                     },
                 ]
             },
-            entry : path.join(liliumroot, "apps", input, 'main.js'),
+            entry : path.join(liliumroot, "apps", input, options.entryfile || 'main.js'),
             output : {
                 path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
                 filename : options.bundlename || "app.bundle.js"
@@ -90,7 +89,7 @@ class Builder {
     }
 
     getBundle(siteid, outputkey, sendback) {
-        sharedcache.get('_babel_' + siteid + "_" + outputkey, markup => {
+        require('./sharedcache').get('_babel_' + siteid + "_" + outputkey, markup => {
             sendback(markup);
         });
     }

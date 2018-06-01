@@ -1,5 +1,5 @@
 // Libraries
-const log = require('../log');
+global.log = require('../log');
 const buildLib = require('../build');
 const http = require('http');
 const path = require('path');
@@ -14,7 +14,13 @@ buildLib.build(
     "initialserver",
     "initialserver",
     {
-        
+        outputpath : path.join(__dirname, '..', 'tmp'),
+        babel : {
+            "plugins": [
+                ["transform-react-jsx", { "pragma":"h" }]
+            ],
+            "presets" : ["es2015"]
+        }
     }, 
 () => {
     // Server

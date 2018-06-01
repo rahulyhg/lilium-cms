@@ -35,4 +35,5 @@
  *********************************************************************************************************/
 
 global.__STARTUPSTAMP = Date.now();
+global.liliumroot = __dirname;
 require('./gardener.js');
