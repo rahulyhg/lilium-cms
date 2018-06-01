@@ -10,4 +10,4 @@ class LiliumInitialServer extends Component {
     }
 }
 
-render(<LiliumInitialServer />, document.body);
+render(<LiliumInitialServer />, document.getElementById('app'));
