@@ -960,17 +960,25 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     };
 
     var destroyCurrentPost = function() {
-        liliumcms.lmldom.del({}, "${context._c.server.url}/admin/publishing/destroy/" + liliumcms.pageloader.lastLevel, function(resp) {
-            if (resp) {
-                if (resp.error) {
-                    liliumcms.notify({ type : "danger", title : "Did not Destroy", message : "Could not destroy the article because of an error : " + resp.error});
-                } else {
-                    liliumcms.notify({ type : "success", title : "Article destroyed", message : "This article was destroyed, and is no longer accessible."});
-                    liliumcms.pageloader.load("/admin/publishing/list");
+        liliumcms.modals.ask({ 
+            title : "Destroy article", 
+            message : "Once the article is destroyed, it will not appear in the list of articles, and will become immutable. This operation is irreversible.",
+            accepttext : "Destroy", 
+            canceltext : "Cancel" 
+        }, function(modal) {
+            modal.dismiss();
+            liliumcms.lmldom.del({}, "${context._c.server.url}/admin/publishing/destroy/" + liliumcms.pageloader.lastLevel, function(resp) {
+                if (resp) {
+                    if (resp.error) {
+                        liliumcms.notify({ type : "danger", title : "Did not Destroy", message : "Could not destroy the article because of an error : " + resp.error});
+                    } else {
+                        liliumcms.notify({ type : "success", title : "Article destroyed", message : "This article was destroyed, and is no longer accessible."});
+                        liliumcms.pageloader.load("/admin/publishing/list");
+                    }
+                } else{
+                    liliumcms.notify({ type : "danger", title : "Did not destroy", message : "Could not destroy the article for an unknown reason."});
                 }
-            } else{
-                liliumcms.notify({ type : "danger", title : "Did not destroy", message : "Could not destroy the article for an unknown reason."});
-            }
+            });
         });
     }
 
