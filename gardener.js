@@ -17,9 +17,9 @@ class Gardener {
             require('./masthead.js');
 
             log('Network', 'Loading network config', 'lilium');
-	    try {
+	        try {
                 this.networkConfig = require('./sites/default.json').network;
-	    } catch (err) {
+	        } catch (err) {
                 return this.fireupInitialServer();
             }
 
@@ -85,7 +85,8 @@ class Gardener {
     }
 
     fireupInitialServer() {
-
+        log('Network', 'Firing up initial server', 'lilium');
+        require("./includes/initialserver");
     }
 
     spawnSharedMemory() {
