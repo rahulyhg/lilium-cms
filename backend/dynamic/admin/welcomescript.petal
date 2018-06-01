@@ -141,10 +141,10 @@ function uploadPicture(ev) {
             addMessage(300, "Nice shot!");
             addMessage(1000, "We're all set.");
             addMessage(1500, "Let me compile the information you provided, and let's get started.");
-            addMessage(2000, "You will be redirected to the login page in about 10 seconds. Sit tight!");
+            addMessage(2000, "You will be redirected to the dashboard page in about 10 seconds. Sit tight!");
 
             setTimeout(function() {
-                document.location = "{=config.default.server.url}/login#" + USER.username;
+                document.location = "{=config.default.server.url}/admin/dashboard";
             }, 10000);
         } else {
             addMessage(0, "It would appear this image file is not valid.");
