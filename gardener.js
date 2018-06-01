@@ -12,12 +12,16 @@ let sharedMemoryProcess;
 let bootCount = 0;
 
 class Gardener {
-    constructor() {
+    start() {
         if (cluster.isMaster) {
             require('./masthead.js');
 
             log('Network', 'Loading network config', 'lilium');
-            this.networkConfig = require('./sites/default.json').network;
+	    try {
+                this.networkConfig = require('./sites/default.json').network;
+	    } catch (err) {
+                return this.fireupInitialServer();
+            }
 
             log('Network', 'Network configuration loaded', 'success');
             log('Network', 'Spawning redis server', 'lilium');
@@ -80,6 +84,10 @@ class Gardener {
         } 
     }
 
+    fireupInitialServer() {
+
+    }
+
     spawnSharedMemory() {
         log('Network', 'Spawning local cache server', 'lilium');
         sharedMemoryProcess = spawn("node", [__dirname + "/network/spawn.js"]);
@@ -136,3 +144,4 @@ class Gardener {
 };
 
 global.__LILIUMNETWORK = new Gardener();
+global.__LILIUMNETWORK.start();
