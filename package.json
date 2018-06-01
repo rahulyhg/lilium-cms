@@ -14,6 +14,16 @@
     "type": "git",
     "url": "git+https://RykDesjardins@bitbucket.org/RykDesjardins/lilium-cms.git"
   },
+  "liliumthemes": [
+    { "displayname" : "Narcity", "repo" : "https://github.com/narcitymedia/narcity-theme-lilium" }
+  ],
+  "liliumplugins" : [
+    { "displayname" : "Firebase", "repo" : "https://github.com/narcitymedia/lilium-firebase-plugin" },
+    { "displayname" : "Stackpath", "repo" : "https://github.com/narcitymedia/lilium-plugin-stackpath" },
+    { "displayname" : "Contactors", "repo" : "https://github.com/narcitymedia/lilium-contractors-plugin" },
+    { "displayname" : "DFP", "repo" : "https://github.com/narcitymedia/lilium-dfp" },
+    { "displayname" : "Apple News", "repo" : "https://github.com/narcitymedia/lilium-apple-news" }
+  ],
   "keywords": [
     "cms",
     "nodejs",
