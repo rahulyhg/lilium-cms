@@ -2,6 +2,10 @@ import { h, render, Component } from 'preact';
 import BigForm from './bigform';
 
 class LiliumInitialServer extends Component {
+    submit(values) {
+        console.log(values);
+    }
+
     render() {
         return (
             <div id="lilium-initial-server">
@@ -24,8 +28,8 @@ class LiliumInitialServer extends Component {
 
                     </div>
                 </div>
-                
-                <BigForm />
+
+                <BigForm submit={this.submit.bind(this)} />
             </div>
         );
     }
