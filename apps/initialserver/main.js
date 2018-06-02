@@ -1,4 +1,5 @@
 import { h, render, Component } from 'preact';
+import BigForm from './bigform';
 
 class LiliumInitialServer extends Component {
     render() {
@@ -14,18 +15,21 @@ class LiliumInitialServer extends Component {
                         <div id="masthead-text">
                             <h1>Lilium Stack</h1>
                             <h2>Installer</h2>
-                            <div>
-                                
-                            </div>
+                            <h3>
+                                This installer will walk you through the creation of a Lilium Stack.
+                            </h3>
                         </div>
                     </div>
                     <div id="masthead-right">
 
                     </div>
                 </div>
+                
+                <BigForm />
             </div>
         );
     }
 }
 
 render(<LiliumInitialServer />, document.getElementById('app'));
+ 
