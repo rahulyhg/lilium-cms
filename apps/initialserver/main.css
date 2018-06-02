@@ -10,6 +10,12 @@ html, body {
     height: 50px;
     color: #af57e4;
     display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    z-index: 29;
+    box-shadow: 0px 2px 3px rgba(0,0,0,0.2);
 }
 
 #title-wrap {
@@ -47,11 +53,25 @@ h3 {
     color: #56385f;
 }
 
+.bigform {
+    display: block;
+    position: relative;
+    margin-top: 400px;
+    background: #eee;
+    z-index: 10;
+    padding-top: 20px;
+    box-shadow: 0px -2px 3px rgba(0,0,0,0.2);
+}
+
 #masthead {
     display: flex;
     font-family: 'Quicksand', sans-serif;
-    box-shadow: 0px 2px 3px 0px rgba(0,0,0,0.2);
     margin-bottom: 40px;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 50px;
+    height: 400px;
 }
 
 #masthead-left {
@@ -92,7 +112,8 @@ label {
     color: #333;
 }
 
-input[type="text"] {
+input[type="text"], input[type="password"], input[type="number"],
+select, textarea {
     display: block;
     margin: 5px 0px;
     font-size: 20px;
@@ -100,6 +121,14 @@ input[type="text"] {
     box-sizing: border-box;
     padding: 6px 10px;
     font-family: 'Quicksand', sans-serif;
+    background: #fff;
+    resize: none;
+}
+
+textarea {
+    height: 200px;
+    font-family: monospace;
+    font-size: 14px;
 }
 
 #masthead-right {
