@@ -36,6 +36,7 @@ bower_components
 
 # Temp files
 backend/static/tmp
+tmp/*
 
 # Uploads
 backend/static/uploads/*

@@ -73,7 +73,6 @@ class Core {
                             loadDocs(() => {
                                 redirectIfInit(resp, () => {
                                     loadFrontend();
-                                    bindLocalCast();
                                     require('./riverflow/riverflow.js').loadFlows();
 
                                     makeBuild(() => {
@@ -427,18 +426,6 @@ const redirectIfInit = function (resp, cb) {
     } else {
         cb();
     }
-};
-
-const bindLocalCast = function() {
-    const localcast = require('./localcast.js');
-    localcast.init();
-    localcast.bind('lilium', function(payload) {
-        log('Core', 'New process spawned with pid : ' + payload.from, 'info');
-    });
-
-    localcast.broadcast('lilium', {
-        initialized : true
-    });
 };
 
 const loadDocs = function(cb) {

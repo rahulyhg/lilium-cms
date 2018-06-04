@@ -200,8 +200,6 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/lmltable.js", 1360, 'admin', conf.id);
         Frontend.registerJSFile(base + "/backend/static/dropzone.js", 1370, 'admin', conf.id);    
         Frontend.registerJSFile(base + "/backend/static/chart.js", 1375, 'admin', conf.id);    
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/quiz.js", 1380, 'admin', conf.id);
-        Frontend.registerJSFile(htmlbase + "/compiled/admin/js/album.js", 1390, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/alert.js", 1400, 'admin', conf.id);
 
         Frontend.registerCSSFile(base + "bower_components/flatpickr/dist/flatpickr.min.css", 500, 'admin', conf.id);

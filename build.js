@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const Babel = require("babel-core");
-const sharedcache = require('./sharedcache');
 const webpack = require('webpack');
 const hooks = require('./hooks');
 
@@ -53,14 +52,14 @@ class Builder {
                     },
                 ]
             },
-            entry : path.join(liliumroot, "apps", input, 'main.js'),
+            entry : path.join(liliumroot, "apps", input, options.entryfile || 'main.js'),
             output : {
                 path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
                 filename : options.bundlename || "app.bundle.js"
             }
         };
 
-        hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig});
+        _c && hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig});
         webpack(buildconfig, (err, result) => {
             err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
                 log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
@@ -90,7 +89,7 @@ class Builder {
     }
 
     getBundle(siteid, outputkey, sendback) {
-        sharedcache.get('_babel_' + siteid + "_" + outputkey, markup => {
+        require('./sharedcache').get('_babel_' + siteid + "_" + outputkey, markup => {
             sendback(markup);
         });
     }
