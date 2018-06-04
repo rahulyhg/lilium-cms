@@ -225,13 +225,6 @@
                 { "name" : "themeLML_compiled", "priority" : 100, "callback" : "themeLMLCompiled" }
             ]
         }, {
-            "module" : "postleaf.js",
-            "endpoint" : "postleaf",
-            "support" : ["livevar"],
-            "hooks" : [
-                { "name" : "post_create_postleaf", "priority" : 10, "callback" : "postCreatePostleaf" }
-            ]
-        }, {
             "module" : "contentcontroller.js",
             "endpoint" : "publishing",
             "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "livevar"],
