@@ -53,14 +53,56 @@ h3 {
     color: #56385f;
 }
 
-.bigform {
+#error-strip {
+    position: relative;
+    top: 430px;
+    z-index: 28;
+    text-align: center;
+    color: #ec3a2e;
+}
+
+#bigloader {
+    font-size: 72px;
+    position: relative;
+    top: 550px;
+    text-align: center;
+    color: #b58ecc;
     display: block;
+}
+
+#success-wrapper {
+    text-align: center;
+}
+
+#success-text-wrapper {
+    position: relative;
+    top: 520px;
+    text-align: center;
+    font-size: 72px;
+    font-weight: 100;
+    font-family: 'Quicksand', sans-serif;
+    z-index: 25;
+}
+
+.success-cog {
+    position: relative;
+    top: 400px;
+    font-size: 180px;
+    color: #ddd;
+}
+
+.bigform {
+    display: none;
     position: relative;
     margin-top: 400px;
     background: #eee;
     z-index: 10;
     padding-top: 20px;
     box-shadow: 0px -2px 3px rgba(0,0,0,0.2);
+}
+
+.bigform.visible {
+    display: block;
 }
 
 #masthead {

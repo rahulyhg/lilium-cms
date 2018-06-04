@@ -21,13 +21,14 @@ export class TextField extends Component {
     }
 
     render() {
+        let value = this.props.values[this.props.id];
         return (
             <div class="field-wrapper">
                 <label>{this.props.displayname}</label>
                 {
                     this.props.multiline ? 
-                    <textarea onChange={this.changed.bind(this)} id={this.props.id} value={this.props.default || ""}></textarea> :
-                    <input    onChange={this.changed.bind(this)} type={this.props.type || "text"} id={this.props.id} value={this.props.default || ""} />
+                    <textarea onChange={this.changed.bind(this)} id={this.props.id} value={value || this.props.default || ""}></textarea> :
+                    <input    onChange={this.changed.bind(this)} type={this.props.type || "text"} id={this.props.id} value={value || this.props.default || ""} />
                 }
             </div>
         )
@@ -51,7 +52,7 @@ export class SingleSelect extends Component {
         return (
             <div class="field-wrapper">
                 <label>{this.props.displayname}</label>
-                <select onChange={this.changed.bind(this)} id={this.props.id}>
+                <select onChange={this.changed.bind(this)} id={this.props.id} value={this.props.values[this.props.id] || ""}>
                     {
                         this.props.options.map(opt => <option value={opt.value} key={opt.value}>{opt.displayname}</option>)
                     }
