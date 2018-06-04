@@ -140,7 +140,7 @@ class ContentLib {
                             log('Article', "Cleared non-paginated version of article from file system");
                         });
 
-                        allDone({
+                        cb && cb({
                             success : true, 
                             deepArticle : deepArticle,
                             pages : pages.length
