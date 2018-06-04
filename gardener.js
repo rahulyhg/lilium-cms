@@ -86,7 +86,11 @@ class Gardener {
 
     fireupInitialServer() {
         log('Network', 'Firing up initial server', 'lilium');
-        require("./includes/initialserver");
+        require("./includes/initialserver").init(this.followupInitServer.bind(this));
+    }
+
+    followupInitServer() {
+        this.start();
     }
 
     spawnSharedMemory() {
