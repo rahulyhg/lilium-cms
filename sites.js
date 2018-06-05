@@ -84,6 +84,10 @@ var SiteInitializer = function (conf, siteobj) {
         rootDir = conf.server.base + 'backend/static/webfonts/';
         fileserver.createSymlinkSync(rootDir, to);
 
+        to = conf.server.html + '/tinymce';
+        rootDir = conf.server.base + "node_modules/tinymce/";
+        fileserver.createSymlinkSync(rootDir, to);
+
         done();
     };
 
