@@ -396,7 +396,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     };
 
     var hasAds = function() {
-        return !allEditors.map(x => !!x.contentel.querySelector('.lml-adplaceholder')).includes(false);
+        return !allEditors.map(x => !!x.dom.doc.querySelector('.lml-adplaceholder')).includes(false);
     };
 
     var fillReport = function(r) {
@@ -561,7 +561,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             if (!tabs[i].classList.contains("to-be-removed")) {
                 titles.push( titleel[i].value );
                 subtitles.push( subel[i].value );
-                contents.push( allEditors[i].content );
+                contents.push( allEditors[i].getContent() );
             }
         }
 
@@ -645,13 +645,21 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
     var totalpage = 0;
     var allEditors = [];
-    var createHeaderSlide = function(title = "", subtitle = "", content = "<p></p>") {
+    var createHeaderSlide = function(title, subtitle, content, callback) {
         log('Publishing', 'Creating new header slide with index ' + totalpage);
+
+        title = title || "";
+        subtitle = subtitle || "";
+        content = content || "<p></p>";
 
         var wrap = d.make({ class : "publishing-header", id : "publishing-header-" + totalpage });        
         var btitle = d.make({ node : "input", attr : { placeholder : totalpage ? "(Reuse headline)" : "Headline" }, class : "big-title", parent : wrap }).get();
         var bsubtitle = d.make({ node : "input", attr : { placeholder : totalpage ? "(Reuse subtitle)" : "Subtitle" }, class : "big-subtitle", parent : wrap }).get();
-        var beditor = d.make({ class : "big-content", id : "publishing-" + totalpage, parent : wrap }).get();
+        var beditor = d.make({ class : "big-content", id : "publishing-" + totalpage, parent : wrap, node : "textarea" }).get();
+
+        d.id('publishing-headers').born(wrap);
+
+        /*
         var textEditor = new LiliumText(beditor, {
             content : content,
             boldnode : "b",
@@ -688,54 +696,79 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
                 LiliumTextEmbedPlugin
             ]
         });
+        */
 
-        btitle.value = title.trim();
-        bsubtitle.value = subtitle.trim();
-        allEditors.push(textEditor);
-        d.id('publishing-headers').born(wrap);
+        tinyMCE.baseURL = "${context._c.server.url}/tinymce";
+        tinyMCE.init({
+            target: beditor,
+            height: 500,
+            menubar: false,
+            plugins: [
+                'advlist autolink lists link image charmap print preview anchor textcolor',
+                'searchreplace visualblocks code fullscreen',
+                'insertdatetime media table paste code wordcount'
+            ],
+            toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            content_css: [
+                '${context._c.server.url}/compiled/theme/tinymce.css'
+            ]
+        }).then(function(textEditor) {
+            textEditor = textEditor[0];
 
-        var tab = d.make({ 
-            class : "publishing-tab", 
-            id : "publishing-tab-" + totalpage 
-        });
-        d.make({ text : totalpage == 0 ? "Landing" : "Page " + totalpage, node : "span", class : "publishing-tab-text", parent : tab })
+            log('TinyMCE', 'Text editor created successfully', 'success');
+            allEditors.push(textEditor);
+            textEditor.setContent(content || "");
 
-        if ( totalpage != 0 ) {
-            d.make({ node : "i", class : "far fa-times-circle publishing-tab-close", parent : tab }).bind('click', function() {
-                wrap.cadd("to-be-removed");
-                tab.cadd("to-be-removed");
+            btitle.value = title.trim();
+            bsubtitle.value = subtitle.trim();
+            allEditors.push(textEditor);
 
-                liliumcms.notify({
-                    type : "success",
-                    title : "Tab",
-                    message : "This tab will be removed completely next time you save."
+            var tab = d.make({ 
+                class : "publishing-tab", 
+                id : "publishing-tab-" + totalpage 
+            });
+            d.make({ text : totalpage == 0 ? "Landing" : "Page " + totalpage, node : "span", class : "publishing-tab-text", parent : tab })
+
+            if ( totalpage != 0 ) {
+                d.make({ node : "i", class : "far fa-times-circle publishing-tab-close", parent : tab }).bind('click', function() {
+                    wrap.cadd("to-be-removed");
+                    tab.cadd("to-be-removed");
+
+                    liliumcms.notify({
+                        type : "success",
+                        title : "Tab",
+                        message : "This tab will be removed completely next time you save."
+                    });
                 });
+
+                d.make({ node : "i", class : "far fa-check-circle publishing-tab-restore", parent : tab }).bind('click', function() {
+                    wrap.crm("to-be-removed");
+                    tab.crm("to-be-removed");
+
+                    liliumcms.notify({
+                        type : "success",
+                        title : "Tab",
+                        message : "This tab was restored and will be saved."
+                    });
+                
+                });
+            }
+
+            var currentpage = totalpage;
+            tab.bind('click', function() {
+                switchToTab(currentpage);
             });
 
-            d.make({ node : "i", class : "far fa-check-circle publishing-tab-restore", parent : tab }).bind('click', function() {
-                wrap.crm("to-be-removed");
-                tab.crm("to-be-removed");
+            d.id('publishing-tabs').born(tab).born(d.id('publishing-tab-add'));
+            // textEditor.contentel.addEventListener('blur', contentBlur);
+            // textEditor.bind('focus', function() { document.execCommand('styleWithCSS', false); });
+            contentBlur();
 
-                liliumcms.notify({
-                    type : "success",
-                    title : "Tab",
-                    message : "This tab was restored and will be saved."
-                });
-               
-            });
-        }
-
-        var currentpage = totalpage;
-        tab.bind('click', function() {
-            switchToTab(currentpage);
+            totalpage++;
+            callback && callback(totalpage);
+        }).catch(function(err) {
+            log('TinyMCE', err.toString(), 'err')  
         });
-
-        d.id('publishing-tabs').born(tab).born(d.id('publishing-tab-add'));
-        textEditor.contentel.addEventListener('blur', contentBlur);
-        textEditor.bind('focus', function() { document.execCommand('styleWithCSS', false); });
-        contentBlur();
-
-        return totalpage++;
     };
 
     var alertRecentAutosave = function() {
@@ -750,25 +783,27 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         for (var i = tabs.length - 1; i >= 0; i--) {
             tabs[i].remove();
             headers[i].remove();
-            clearInterval(allEditors[i].snapshotTimerID);
-            allEditors[i].destroy();
+            // clearInterval(allEditors[i].snapshotTimerID);
+            // allEditors[i].destroy();
         }        
 
         allEditors = [];
         totalpage = 0;
         var total = LAST_AUTOSAVE.data.title.length;
         for (var i = 0; i < total; i++) {
-            createHeaderSlide(LAST_AUTOSAVE.data.title[i], LAST_AUTOSAVE.data.subtitle[i], LAST_AUTOSAVE.data.content[i]);
+            createHeaderSlide(LAST_AUTOSAVE.data.title[i], LAST_AUTOSAVE.data.subtitle[i], LAST_AUTOSAVE.data.content[i], function() {
+                updateState();
+                switchToTab(0);
+            });
         }
 
-        updateState();
-        switchToTab(0);
+
         modal.dismiss();
     };
 
     var contentBlur = function() {
         document.getElementById("pub-words").textContent = allEditors.reduce(function(current, that) {
-            return current + that.contentel.textContent.split(' ').filter(function(str) { return str.trim(); }).length;
+            return current + that.dom.doc.body.textContent.split(' ').filter(function(str) { return str.trim(); }).length;
         }, 0);
     };
 
@@ -1155,14 +1190,16 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         window._poststate = post;
         window._posthistory = liliumcms.livevars.livevars()["publishing.history." + liliumcms.pageloader.lastLevel]
         for (var i = 0; i < post.title.length; i++) {
-            createHeaderSlide(post.title[i], post.subtitle[i], post.content[i]);
+            createHeaderSlide(post.title[i], post.subtitle[i], post.content[i], function() {
+                switchToTab(0);
+            });
         }
 
         d.id('publishing-tab-add').bind('click', function() {
-            switchToTab(createHeaderSlide());
+            createHeaderSlide(null, null, null, function(index) {
+                switchToTab(index);
+            })
         });
-
-        switchToTab(0);
 
         initTopics();
         post.topic && selectFinalTopic(post.topic);
