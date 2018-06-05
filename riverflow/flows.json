@@ -274,35 +274,6 @@
             "endpoint" : "content",
             "support" : ["livevar"]
         }, {
-            "module" : "album.js",
-            "endpoint" : "album",
-            "support" : ["admin_post", "livevar"],
-            "post_leaf" : {
-                "name" : "album", 
-                "displayname" : "Album",
-                "script" : {
-                    "add" : "addAlbumToPost",
-                    "edit" : "editAlbumToPost",
-                    "show" : "renderAlbum"
-                }
-            },
-            "hooks" : [
-                { "name" : "article_deepfetch", "priority" : 50, "callback" : "articleDeepFetch" }
-            ]
-        }, {
-            "module" : "quiz.js",
-            "endpoint" : "quiz",
-            "support" : ["admin_post"],
-            "post_leaf" : {
-                "name" : "quiz", 
-                "displayname" : "Quiz",
-                "script" : {
-                    "add" : "addQuizToPost",
-                    "edit" : "editQuizToPost",
-                    "show" : "renderQuiz"
-                }
-            }
-        }, {
             "module" : "crew.js",
             "endpoint" : "crew",
             "support" : ["admin_get", "admin_post", "livevar", "setup", "form"],

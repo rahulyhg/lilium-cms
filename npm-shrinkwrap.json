@@ -1,6 +1,6 @@
 {
   "name": "LiliumCMS",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "lockfileVersion": 1,
   "requires": true,
   "dependencies": {
@@ -6029,6 +6029,20 @@
           "version": "1.1.1",
           "resolved": "https://registry.npmjs.org/he/-/he-1.1.1.tgz",
           "integrity": "sha1-k0EP0hsAlzUVH4howvJx80J+I/0="
+        },
+        "source-map": {
+          "version": "0.6.1",
+          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
+          "integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="
+        },
+        "uglify-js": {
+          "version": "3.3.28",
+          "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.3.28.tgz",
+          "integrity": "sha512-68Rc/aA6cswiaQ5SrE979UJcXX+ADA1z33/ZsPd+fbAiVdjZ16OXdbtGO+rJUUBgK6qdf3SOPhQf3K/ybF5Miw==",
+          "requires": {
+            "commander": "~2.15.0",
+            "source-map": "~0.6.1"
+          }
         }
       }
     },
@@ -7631,17 +7645,17 @@
       "integrity": "sha1-FzrwFAMzkALgq9C01nWYfTzc+Z4="
     },
     "mongodb": {
-      "version": "3.0.9",
-      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-3.0.9.tgz",
-      "integrity": "sha512-2NJzruJu15/1YF6+H55f1wfLQb1M6/+hU96+L5sPv07PDZDPvZEDJBtCjFQorpbW9D2aqsem7mFVUKPhVwwRog==",
+      "version": "3.0.10",
+      "resolved": "https://registry.npmjs.org/mongodb/-/mongodb-3.0.10.tgz",
+      "integrity": "sha512-jy9s4FgcM4rl8sHNETYHGeWcuRh9AlwQCUuMiTj041t/HD02HwyFgmm2VZdd9/mA9YNHaUJLqj0tzBx2QFivtg==",
       "requires": {
-        "mongodb-core": "3.0.8"
+        "mongodb-core": "3.0.9"
       },
       "dependencies": {
         "mongodb-core": {
-          "version": "3.0.8",
-          "resolved": "https://registry.npmjs.org/mongodb-core/-/mongodb-core-3.0.8.tgz",
-          "integrity": "sha512-dFxfhH9N7ohuQnINyIl6dqEF8sYOE0WKuymrFf3L3cipJNrx+S8rAbNOTwa00/fuJCjBMJNFsaA+R2N16//UIw==",
+          "version": "3.0.9",
+          "resolved": "https://registry.npmjs.org/mongodb-core/-/mongodb-core-3.0.9.tgz",
+          "integrity": "sha512-buOWjdLLBlEqjHDeHYSXqXx173wHMVp7bafhdHxSjxWdB9V6Ri4myTqxjYZwL/eGFZxvd8oRQSuhwuIDbaaB+g==",
           "requires": {
             "bson": "~1.0.4",
             "require_optional": "^1.0.1"
@@ -11718,6 +11732,11 @@
       "resolved": "https://registry.npmjs.org/tinycolor/-/tinycolor-0.0.1.tgz",
       "integrity": "sha1-MgtaUtg6u1l42Bo+iH1K77FaYWQ="
     },
+    "tinymce": {
+      "version": "4.7.13",
+      "resolved": "https://registry.npmjs.org/tinymce/-/tinymce-4.7.13.tgz",
+      "integrity": "sha512-6QbNYGV4VExH+p7+o/5km6jOnVSD5mO7aw0s+eKByKnpyG8gZfajxXPhwBM57r7SIravrCI6LFj8DARNe31qPw=="
+    },
     "to-array": {
       "version": "0.1.4",
       "resolved": "https://registry.npmjs.org/to-array/-/to-array-0.1.4.tgz",
@@ -11957,9 +11976,9 @@
       }
     },
     "uglify-js": {
-      "version": "3.3.28",
-      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.3.28.tgz",
-      "integrity": "sha512-68Rc/aA6cswiaQ5SrE979UJcXX+ADA1z33/ZsPd+fbAiVdjZ16OXdbtGO+rJUUBgK6qdf3SOPhQf3K/ybF5Miw==",
+      "version": "3.4.0",
+      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.4.0.tgz",
+      "integrity": "sha512-Jcf5naPkX3rVPSQpRn9Vm6Rr572I1gTtR9LnqKgXjmOgfYQ/QS0V2WRStFR53Bdj520M66aCZqt9uzYXgtGrJQ==",
       "requires": {
         "commander": "~2.15.0",
         "source-map": "~0.6.1"
