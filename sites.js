@@ -170,6 +170,7 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerJSFile(base + "bower_components/linkifyjs/linkify-html.min.js", 1510, "admin", conf.id);
         Frontend.registerJSFile(base + "bower_components/Sortable/Sortable.min.js", 1800, "admin", conf.id);
         Frontend.registerJSFile(base + "node_modules/lilium-text/build/liliumtext.js", 1850, "admin", conf.id);
+        Frontend.registerJSFile(base + "node_modules/tinymce/tinymce.js", 1880, "admin", conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/dom.js", 1900, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/lilium.js", 2000, 'admin', conf.id);
         Frontend.registerJSFile(htmlbase + "/compiled/admin/js/facebook.js", 2025, 'admin', conf.id);
