@@ -1,0 +1,51 @@
+var ConfigureLiliumTinyMCE = function(editor) {
+    editor.addButton('insertUpload', {
+        icon : 'image',
+        onclick : function() {
+            liliumcms.imagepicker.cast(function(images) {
+                if (images == -1) {
+                    
+                } else if (images) {
+                    Object.keys(images).forEach(imageid => {
+                        var image = images[imageid];
+                        var parag = document.createElement('p');
+                        parag.className = "parag-image-wrapper";
+                        parag.contentEditable = false;
+                        
+                        var imgel = document.createElement('img');
+                        imgel.className = "lml-content-image lml-instagram-embed-2";
+                        imgel.dataset.height = image.size.height;
+                        imgel.dataset.width = image.size.width;
+                        imgel.dataset.iid = imageid;
+                        imgel.src = image.sizes.content.url;
+                        parag.appendChild(imgel);
+                        
+                        if (image.artistname) {
+                            var cred = document.createElement('a');
+                            cred.target = "_blank";
+                            cred.href = image.artisturl;
+                            cred.textContent = "Via " + image.artistname;
+                            parag.appendChild(cred);
+                        }
+
+                        editor.insertContent(parag.outerHTML);
+                    });
+                }
+            }, undefined, {
+                multiple : true,
+                withcredit : true
+            });
+        }
+    });
+
+    editor.addButton('insertAd', {
+        icon : "coin-dollar",
+        onclick : function() {
+            var elem = document.createElement('div');
+            elem.className = "lml-adplaceholder";
+            elem.setAttribute('contenteditable', false);
+
+            editor.insertContent(elem.outerHTML);
+        }
+    });
+};
