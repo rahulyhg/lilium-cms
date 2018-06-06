@@ -702,6 +702,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         tinyMCE.init({
             target: beditor,
             height: 500,
+            convert_urls : false,
             menubar: false,
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor textcolor',
