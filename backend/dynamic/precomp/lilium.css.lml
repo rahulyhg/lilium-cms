@@ -221,7 +221,7 @@ select {
     color: #FF2634;
 }
 
-.float-right {
+.float-right { 
     float : right;
 }
 
@@ -230,6 +230,10 @@ select {
 .row{
     margin-right: 0px;
     margin-left: 0px;
+}
+
+#lilium .mce-tinymce.mce-container.mce-panel {
+    margin-top: 20px;
 }
 
 /* Normalized Forms */
@@ -677,15 +681,15 @@ input[type="submit"]::before, .btn::before, button::before {
     line-height: 1;
 }
 
-input[type="submit"]:hover, .btn:hover, button:hover, 
-input[type="submit"]:focus, .btn:focus, button:focus {
+input[type="submit"]:hover, .btn:hover, button:not([type=button]):hover, 
+input[type="submit"]:focus, .btn:focus, button:not([type=button]):focus {
     background-color: #Bf67F4;
     text-decoration: none;
     box-shadow : 0px 0px 10px rgba(255, 255, 255, 0.3) inset;
     color: #FFF;
 }
 
-input[type="submit"]:active, .btn:active, button:active {
+input[type="submit"]:active, .btn:active, button:not([type=button]):active {
     border-bottom-width: 1px;
     background-color: #995bBe;
     box-shadow : 0px 0px 10px rgba(0, 0, 0, 0.2) inset;
@@ -1440,6 +1444,18 @@ header.admin-bar .navbar-default .navbar-header {
 	position: absolute;
 }
 
+#lilium div.mce-fullscreen {
+    position: fixed;
+    top: 50px;
+    left: 40px;
+    z-index: 1000;
+    right: 260px;
+    width: auto;
+}
+
+#lilium div.mce-fullscreen .mce-container-body.mce-flow-layout {
+    text-align: center;
+}
 
 /* Profile dropdown */
 #loggedinuserbox {
@@ -2629,3 +2645,17 @@ button.bigger {
 @-ms-keyframes      slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
 @-o-keyframes       slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
 @keyframes          slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
+
+.mce-i-coin-dollar:before {
+    display: inline-block;
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    
+    content: "\f2e9";
+    font-size: 17px;
+}

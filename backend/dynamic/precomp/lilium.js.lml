@@ -711,6 +711,10 @@ var LiliumCMS = function() {
                 that.unloadHooks[i]();
             }
 
+            for (var i = tinyMCE.editors.length - 1; i >= 0; i--) {
+                tinyMCE.editors[i].destroy()
+            }
+
             that.unloadHooks = [];
 
             this.levels = document.location.href.split('/');

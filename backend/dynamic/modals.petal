@@ -91,10 +91,6 @@
 
         <span>Type</span>
         <select id="embedlink-type">
-            <optgroup label="Linking">
-                <option value="link">Insert link on selection</option>
-            </optgroup>
-    
             <optgroup label="Embed Media">
                 <option value="igphoto">Instagram photo</option>
                 <option value="igvideo">Instagram video</option>
