@@ -1,3 +1,5 @@
+{#config}
+
 var ConfigureLiliumTinyMCE = function(editor) {
     editor.addButton('insertUpload', {
         icon : 'image',
@@ -48,4 +50,116 @@ var ConfigureLiliumTinyMCE = function(editor) {
             editor.insertContent(elem.outerHTML);
         }
     });
+
+    var handleEmbedAcceptTinyMCE = function(type, text) {
+        switch (type) {
+            case "igphoto":
+            case "igcarousel":
+            case "igvideo":
+            case "instagram.c":
+                log('Instagram', "Handling Instagram embed");
+                var urltype = type == "igcarousel" ? type : "instagram";
+                liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type='+urltype+'&as=json&url=' + text, 
+                    { }, 
+                function(resp) {
+                    try {
+                        resp = JSON.parse(resp);
+                        if (!resp.instagram) {
+                            throw new Error("No markup");
+                        }
+
+                        editor.insertContent(resp.markup);
+                    } catch (err) {
+                        liliumcms.modals.error("Instagram embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the Instagram embed feature of this post. Make sure the picture is from a public account, and that it is correctly formatted.");
+                        console.err(err);
+                    }
+                });
+                break;
+
+            case "reddit":
+                var bq = document.createElement('blockquote');
+                bq.className = "reddit-card";
+                
+                var a = document.createElement('a');
+                a.href = text;
+                bq.appendChild(a);
+                editor.insertContent(bq.outerHTML);
+                break;
+
+            case "fbpost":
+            case "fbvideo":
+            case "vimeo":
+            case "twitter":
+            case "facebook.c":
+
+                log("Embed", "Sending request to server for " + type + " embed");
+                liliumcms.lmldom.get('{=config.default.server.url}/admin/embed?async=*&type='+type+'&as=json&url=' + text, 
+                    {  }, 
+                function(resp) {
+                    try {
+                        editor.insertContent(resp.markup);
+                    } catch(err) {
+                        liliumcms.modals.error("Embed", "There was an error embeding the following url : " + text + ". It would seem there is a problem with the " + type + " embed feature of this post. Make sure the post is from a public account, and that it is correctly formatted.");
+                        console.err(err);
+                    }
+                });
+                break;
+
+            case "youtube":
+            case "youtube.c":
+                var param = text.split('v=')[1].split('&')[0];
+                var iframe = d.make({
+                    node : "iframe",
+                    attr : {
+                        allow : "autoplay; encrypted-media",
+                        allowfullscreen : "",
+                        width : "640",
+                        height: "360",
+                        frameborder : "0",
+                        src : "https://www.youtube.com/embed/" + param
+                    }
+                }).get();
+
+                editor.insertContent(iframe.outerHTML);
+                break;
+
+            case "soundcloud":
+            case "soundcloud.c":
+                var iframe = d.make({
+                    node : "iframe",
+                    attr : {
+                        width : "100%",
+                        height: "170",
+                        frameborder : "0",
+                        src : "https://w.soundcloud.com/player/?url=" + text
+                    }
+                }).get();
+
+                editor.insertContent(iframe.outerHTML);
+                break;
+
+            case "html":
+                editor.insertContent(text);
+                break;
+        }
+    }
+
+    editor.addButton('insertEmbed', {
+        icon : "media",
+        onclick : function() {
+            window["lml-insert-embedlink-modal_accept"] = function(modal) {
+                var text = document.getElementById('embedlink-text').value;
+                var type = document.getElementById('embedlink-type').value;
+
+                modal.dismiss();
+                handleEmbedAcceptTinyMCE(type, text);
+
+                document.getElementById('embedlink-text').value = "";
+                document.getElementById('embedlink-type').value = "igphoto";   
+            };
+
+            liliumcms.modals.get('lml-insert-embedlink-modal').cast();
+        }
+    })
 };
+
