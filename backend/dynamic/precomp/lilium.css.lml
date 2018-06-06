@@ -1440,6 +1440,18 @@ header.admin-bar .navbar-default .navbar-header {
 	position: absolute;
 }
 
+#lilium div.mce-fullscreen {
+    position: fixed;
+    top: 50px;
+    left: 40px;
+    z-index: 1000;
+    right: 260px;
+    width: auto;
+}
+
+#lilium div.mce-fullscreen .mce-container-body.mce-flow-layout {
+    text-align: center;
+}
 
 /* Profile dropdown */
 #loggedinuserbox {
@@ -2629,3 +2641,17 @@ button.bigger {
 @-ms-keyframes      slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
 @-o-keyframes       slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
 @keyframes          slowrotate { 0% { transform : rotateZ(0deg) } 100% { transform : rotateZ(360deg) }}
+
+.mce-i-coin-dollar:before {
+    display: inline-block;
+
+    font-family: "Font Awesome 5 Pro";
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    
+    content: "\f2e9";
+    font-size: 17px;
+}
