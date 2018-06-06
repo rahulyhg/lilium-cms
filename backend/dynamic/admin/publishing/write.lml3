@@ -705,13 +705,14 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             menubar: false,
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor textcolor',
-                'searchreplace visualblocks code fullscreen',
-                'insertdatetime media table paste code wordcount'
+                'searchreplace visualblocks code codesample fullscreen hr',
+                'insertdatetime media table paste wordcount'
             ],
-            toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | help',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insertUpload | bullist numlist | fullscreen | code',
             content_css: [
                 '${context._c.server.url}/compiled/theme/tinymce.css'
-            ]
+            ],
+            setup : ConfigureLiliumTinyMCE
         }).then(function(textEditor) {
             textEditor = textEditor[0];
 
@@ -784,7 +785,10 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             tabs[i].remove();
             headers[i].remove();
             // clearInterval(allEditors[i].snapshotTimerID);
-            // allEditors[i].destroy();
+            
+            allEditors.forEach(function(editor) {
+                editor.destroy();
+            })
         }        
 
         allEditors = [];
