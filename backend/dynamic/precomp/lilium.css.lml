@@ -232,6 +232,10 @@ select {
     margin-left: 0px;
 }
 
+.mce-tinymce {
+    margin-top: 20px;
+}
+
 /* Normalized Forms */
 .lmlform {
 	background-color: #F6F6F6;
