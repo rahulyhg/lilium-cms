@@ -72,7 +72,7 @@
     "admin-mongo": "latest",
     "babel-preset-preact": "^1.1.0",
     "binaryjs": "latest",
-    "bower": "latest",
+    "bower": "^1.8.4",
     "buffertools": "latest",
     "busboy": "latest",
     "canvas": "^2.0.0-alpha.12",

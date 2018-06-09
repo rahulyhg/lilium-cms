@@ -283,12 +283,12 @@ class RunningTask {
     }
 
     statsEmail(sendback) {
-        analyticsLib.addSite(_c, (err) => {
+        analyticsLib.addSite(this._c, (err) => {
             if (err) {
                 log("RunningTask", "Error sending emails : " + err, "err");
                 sendback();
             } else {
-                analyticsLib.getData(_c, {
+                analyticsLib.getData(this._c, {
                     "start-date" : "yesterday",
                     "end-date" : "yesterday",
                     "metrics" : "ga:users,ga:pageviews,ga:sessions",
@@ -334,7 +334,7 @@ class RunningTask {
                         }
                     }
 
-                    articleLib.batchFetch(_c, orderedSlugs, deepArticles => {
+                    articleLib.batchFetch(this._c, orderedSlugs, deepArticles => {
                         let finalArray = [];
                         deepArticles.forEach(art => {
                             if (art) {
