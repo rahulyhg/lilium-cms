@@ -312,6 +312,21 @@ const css = `<style>
     margin-bottom: 20px;
 }
 
+.pl-remove-version {
+    display: inline-block;
+    padding: 7px 11px;
+    background: #332336;
+    color: #f4bfff;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.pl-action-wrapper {
+    text-align: right;
+}
+
 </style>`;
 
 const sliders = context => `
@@ -456,6 +471,11 @@ const compile = (o, context, v) => { o(context.header, css, sliders(context), `
 
             d.make({ node : "label", text : "Destination URL", parent : wrap })
             d.make({ node : "input", attr : { placeholder : "Leave empty to use the default destination" }, class : "pl-version-destination", parent : wrap });
+
+            var actionwrap = d.make({ parent : wrap, class : "pl-action-wrapper" });
+            d.make({ text : "Remove version", class : "pl-remove-version", parent : actionwrap }).bind('click', function() {
+                wrap.get().remove();
+            });
 
             d.id('pl-version-list').born(wrap);
         };
