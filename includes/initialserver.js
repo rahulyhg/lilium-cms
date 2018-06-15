@@ -5,7 +5,14 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const CryptoJS = require('crypto-js');
-const manifest = require('../../manifest');
+let manifest;
+
+try {
+    manifest = require('../../manifest');
+} catch(err) {
+    log('Init', 'FATAL : No manifest file found.', 'err');
+    process.exit(1);
+}
 
 // Constants
 const INITIAL_SERVER_PORT = 14370;
