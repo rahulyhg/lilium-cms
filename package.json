@@ -132,6 +132,7 @@
     "pmx": "latest",
     "process": "latest",
     "quill": "latest",
+    "read-xml": "^3.0.0",
     "readability-checker": "latest",
     "readability-meter": "latest",
     "readdirp": "latest",
@@ -176,6 +177,7 @@
     "vanilla-js-calendar": "latest",
     "websocket": "latest",
     "ws": "^5.1.1",
+    "xml2js": "^0.4.19",
     "xxhashjs": "^0.2.2"
   },
   "devDependencies": {
