@@ -202,7 +202,8 @@ class RunningTask {
                     status : "published", 
                     name : { 
                         $in : slugs 
-                    } 
+                    },
+                    nsfw : { $ne : true }
                 }}, { 
                     $limit : slugs.length
                 }, { $lookup : {
