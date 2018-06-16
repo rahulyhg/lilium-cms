@@ -1,5 +1,6 @@
 // Libraries
 global.log = require('../log');
+
 const buildLib = require('../build');
 const http = require('http');
 const path = require('path');
@@ -57,29 +58,39 @@ const handleInitialPOST = (resp, dat, done) => {
         log('Init', 'Found missing fields in POST data', 'warn');
         resp.writeHead(412);
         return resp.end();
-    }
+    }fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'dfp.json'), dat.dfpkey, {flag : "w+"});
 
     currentStatus = "working";
     resp.writeHead(200);
     resp.end();
 
     const config = mapPostDataToLiliumConfig(dat);
-    
+
+    log('Init', 'Creating default.json site config', 'info');
     fs.writeFileSync(path.join(__dirname, '..', 'sites', 'default.json'), JSON.stringify(config, null, 4), {flag : "w+"});
+
+    log('Init', 'Creating Analytics key', 'info');
     fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'analytics.json'), dat.googlekey, {flag : "w+"});
+
+    log('Init', 'Creating Darksky key', 'info');
     fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'darksky.json'), JSON.stringify({
         secretkey : dat.darkskykey,
         cachettl : dat.darkskyttl
     }), {flag : "w+"});
 
+    log('Init', 'Creating DFP key', 'info');
     dat.dfpkey && fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'dfp.json'), dat.dfpkey, {flag : "w+"});
+
+    log('Init', 'Creating Twilio key', 'info');
     dat.twiliosid && fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'twilio.json'), JSON.stringify({
         sid : dat.twiliosid,
         token : dat.twiliotoken,
         from : dat.twiliofrom
     }), {flag : "w+"});
 
-    require('./createstack').createStack(config, () => {
+    log('Init', 'Done creating key files', 'success');
+    log('Init', 'Stack creation ongoing', 'info');
+    require('./createstack').createStack(dat, () => {
         currentStatus = "done";
 
         setTimeout(() => {
@@ -101,6 +112,7 @@ const mapPostDataToLiliumConfig = dat => {
     let urldetails = require('url').parse(dat.websiteurl);
     let analyticsDetails = JSON.parse(dat.googlekey);
 
+    log('Init', 'Mapping POST data to Lilium config', 'detail');
     return {
         env : "prod",
         caij : true,
