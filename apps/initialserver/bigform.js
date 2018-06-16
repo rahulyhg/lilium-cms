@@ -1,5 +1,5 @@
 import { h, render, Component } from 'preact';
-import { SingleSelect, FieldSection, TextField, ActionButton } from './fields';
+import { SingleSelect, FieldSection, TextField, ActionButton, FileField } from './fields';
 
 function maybeParseInt(value) {
     return isNaN(value) ? value : parseInt(value);
@@ -39,7 +39,9 @@ export default class BigForm extends Component {
             }
         });
 
-        this.setState({ valid })
+        this.setState({ valid });
+
+        console.log(this.values);
     }
 
     finishup() {
@@ -52,7 +54,16 @@ export default class BigForm extends Component {
         });
 
         if (valid) {
-            this.props.submit(this.values);
+            if (this.values.wordpressdb) {
+                const fs = new FileReader();
+                fs.onload = () => {
+                    this.values.wordpressdb = fs.result;
+                    this.props.submit(this.values);
+                }
+                fs.readAsText(this.values.wordpressdb);
+            } else {
+                this.props.submit(this.values);
+            }
         }
     }
 
@@ -129,7 +140,11 @@ export default class BigForm extends Component {
                 <FieldSection displayname="Darksky">
                     <TextField onchange={this.fieldUpdated.bind(this)}  values={this.values}  id="darkskykey" displayname="Secret key *" />
                     <TextField onchange={this.fieldUpdated.bind(this)}  values={this.values}  id="darkskyttl" displayname="Cache time-to-live (TTL) *" default="3600000" />
-                </FieldSection>    
+                </FieldSection>   
+
+                <FieldSection displayname="Wordpress Database">
+                    <FileField onchange={this.fieldUpdated.bind(this)}  values={this.values}  id="wordpressdb" displayname="Database XML file" />
+                </FieldSection> 
 
                 { this.state.valid ? 
                 <FieldSection displayname="Finish up">

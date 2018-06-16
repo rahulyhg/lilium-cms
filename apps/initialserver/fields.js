@@ -11,6 +11,21 @@ export class FieldSection extends Component {
     }
 }
 
+export class FileField extends Component {
+    changed(ev) {
+        this.props.onchange(this.props.id, ev.target.files[0]);
+    }
+
+    render() {
+        return (
+            <div class="field-wrapper">
+                <label>{this.props.displayname}</label>
+                <input onChange={this.changed.bind(this)} type="file" id={this.props.id} />
+            </div>
+        );
+    }
+}
+
 export class TextField extends Component {
     changed(ev) {
         this.props.onchange(this.props.id, ev.target.value);
