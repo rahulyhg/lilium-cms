@@ -20,7 +20,7 @@ function parseWordpressXML(dataref, next) {
 
         log('Init', 'Dumping Wordpress database parsed XML in json file', 'info')
         fs.writeFileSync(path.join(__dirname, '..', '..', 'wpdb.json'), JSON.stringify(wpdata), {flag : "w+"});        
-        fs.writeFileSync(path.join(__dirname, '..', '..', 'wpdb.json'), JSON.stringify(channel), {flag : "w+"});
+        fs.writeFileSync(path.join(__dirname, '..', '..', 'wpchannel.json'), JSON.stringify(channel), {flag : "w+"});
 
         log('Init', 'Wordpress data dump successful', 'success');
         next();
