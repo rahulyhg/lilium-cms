@@ -141,7 +141,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     <h1>Publishing</h1>
 
     <div id="publishing-tabs">
-        <div class="publishing-tab" id="publishing-tab-add">Add</div>
+        <div class="publishing-tab" id="publishing-tab-add" style="display: none;">Add</div>
     </div>
 
     <div id="publishing-headers">
