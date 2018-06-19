@@ -146,6 +146,21 @@ module.exports = function(config, data, done) {
         return up;
     });
 
+    const styledpages = data.item.filter(x => x["wp:post_type"] == "page").map(p => {
+        return {
+            _id : new ObjectId(),
+            title : p.title[0],
+            description : p["excerpt:encoded"] ? p["excerpt:encoded"][0] : "",
+            content : p["content:encoded"][0],
+            slug : p["wp:post_name"][0],
+            status : p["wp:status"][0] == "publish" ? "visible" : "invisible",
+            customcss : "",
+            customjs : "console.log('Loaded styled page.');",
+            magiclink : "215868736849605939257208369611",
+            skiplayout : false,
+            staticfile : false
+        };
+    });
 
 
     done({
