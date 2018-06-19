@@ -163,6 +163,69 @@ module.exports = function(config, data, done) {
     });
 
 
+    const restofcontent = data.item.filter(x =>
+        x["wp:post_type"] != "post" && x["wp:post_type"] != "page" && x["wp:post_type"] != "blog"
+    ).map(r => {
+        return { ...r, _id : new ObjectId() };
+    });
+
+    const parseStatus = function(status) {
+        switch (status) {
+            case "publish" : return "published";
+            case "draft" : return status;
+            default : return "destroyed";
+        }
+    };
+
+    const content = data.item.filter(x => x["wp:post_type"] == "post" || x["wp:post_type"] == "blog" ).map(art => {
+        const author = entities.find(x => x.username == art["dc:creator"] && art["dc:creator"][0]);
+        const wpmedia = art["wp:postmeta"].find(x => x["wp:meta_key"] == "_thumbnail_id");
+        const media = wpmedia && uploads.find(x => x.wpid == wpmedia["wp:meta_value"][0]);
+        const topic = art.category && art.category.find(x => x.$ && x.$.domain == "category");
+        const fulltopic = topic && topics.find(x => topic.$.nicename == x.slug);
+
+        return {
+            _id : new ObjectId(),
+            title : art.title,
+            subtitle : art["excerpt:encoded"] ? art["excerpt:encoded"][0] : "",
+            content : art["content:encoded"],
+            author : author && author._id,
+            createdBy : author && author._id,
+            subscribers : [],
+            type : "post",
+            shares : 0,
+            status : parseStatus(art["wp:status"][0]),
+            hidden : false,
+            updated : new Date(),
+            aliases : [],
+            createdOn : new Date(),
+            media : media && media._id,
+            nsfw : false,
+            date : new Date(art["pubDate"] && art["pubDate"][0]),
+            isSponsored : false,
+            sponsoredCampaignID : "",
+            useSponsoredBox : false,
+            sponsoredBoxContent : "",
+            sponsoredBoxLogo : "",
+            sponsoredBoxTitle : "",
+            sponsoredBoxURL : "",
+            paymentstatus : "paid",
+            worth : 20,
+            topic : fulltopic && fulltopic._id,
+            topicslug : fulltopic && fulltopic.completeSlug,
+            topicdisplay : fulltopic && fulltopic.displayname,
+            topicfamily : fulltopic ? [
+                fulltopic._id
+            ] : [],
+            lang : "en-ca",
+            facebookmedia : media && (config.server.protocol + media.sizes.facebook.url),
+            name : art["wp:post_name"] && art["wp:post_name"][0],
+            comments : 0,
+            facebooklastupdate : new Date()
+        };
+    });
+
+
     done({
         topics, uploads, entities, styledpages, restofcontent, content
     });
