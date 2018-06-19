@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Parse Wordpress mySQL database from exported XML to mongo
-function parseWordpressXML(dataref, next) {
+function parseWordpressXML(config, dataref, next) {
     const parser = new XML2JS.Parser();
     log('Init', 'Parsing XML Wordpress data into JSON', 'info');
     parser.parseString(dataref.wordpressdb, (err, wpdata) => {
@@ -27,13 +27,13 @@ function parseWordpressXML(dataref, next) {
     });
 };
 
-function transformWordpressData(dataref, next) {
+function transformWordpressData(config, dataref, next) {
     const channel = dataref.wordpresschannel;
 
     next();
 };
 
-function createStack(data, done) {
+function createStack(config, data, done) {
     const tasks = [];
 
     log('Init', 'Checking for Wordpress db', 'info');
@@ -45,7 +45,7 @@ function createStack(data, done) {
     let i = -1;
     const nextTask = () => {
         const task = tasks[++i];
-        task ? task(data, () => nextTask()) : done();
+        task ? task(config, data, () => nextTask()) : done();
     };
 
     nextTask();
