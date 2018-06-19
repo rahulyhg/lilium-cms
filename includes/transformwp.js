@@ -56,6 +56,7 @@
 const { ObjectId } = require('mongodb');
 const { unserialize } = require("php-serialization");
 const mkdirp = require('mkdirp').sync;
+const crypto = require('crypto-js');
 
 module.exports = function(config, data, done) {
     const topics = data["wp:category"].map(c => {
@@ -74,8 +75,29 @@ module.exports = function(config, data, done) {
             _id : new ObjectId(),
             wpid : e["wp:author_id"][0],
             username : e["wp:author_login"][0],
+            jobtitle : "",
             email : e["wp:author_email"][0],
-            displayname : e["wp:author_display_name"][0]
+            displayname : e["wp:author_display_name"][0],
+            avatarURL : "https://secure.gravatar.com/avatar/" + crypto.MD5(e["wp:author_email"][0]).toString() + "?s=256",
+            avatarMini : "https://secure.gravatar.com/avatar/" + crypto.MD5(e["wp:author_email"][0]).toString() + "?s=150",
+            socialnetworks : {
+                facebook : "", twitter : "", googleplus : "", instagram : ""
+            },
+            personality : null,
+            welcomed : false, 
+            slug : e["wp:author_login"][0],
+            wpdata : e,
+            description : "",
+            sites : [config.id],
+            firstname : e["wp:author_display_name"][0].split(' ')[0],
+            lastname : e["wp:author_display_name"][0].split(' ').splice(1),
+            phone : "",
+            createdOn : new Date(),
+            magiclink : "",
+            totalLogin : 0,
+            geo : {},
+            mustupdatepassword : true,
+            revoked : true
         };
     });
 
@@ -224,7 +246,6 @@ module.exports = function(config, data, done) {
             facebooklastupdate : new Date()
         };
     });
-
 
     done({
         topics, uploads, entities, styledpages, restofcontent, content
