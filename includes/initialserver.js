@@ -90,7 +90,7 @@ const handleInitialPOST = (resp, dat, done) => {
 
     log('Init', 'Done creating key files', 'success');
     log('Init', 'Stack creation ongoing', 'info');
-    require('./createstack').createStack(dat, () => {
+    require('./createstack').createStack(config, dat, () => {
         currentStatus = "done";
 
         setTimeout(() => {
