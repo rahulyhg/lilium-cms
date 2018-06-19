@@ -85,6 +85,7 @@ module.exports = function(config, data, done) {
         
         const up = {
             _id : new ObjectId(),
+            wpid : a["wp:post_id"][0],
             artistname : "",
             artisturl : "",
             name : "Full Size",
@@ -93,25 +94,63 @@ module.exports = function(config, data, done) {
         };
 
         if (metadata) {
+            const base = config.server.base + "backend/static/u/";
+            const sizes = metadata.sizes;
+            const uploadrelpath = "backend/static/u/";
+            const filename =  metadata.file.split('/').pop();
+            const reldirpath = metadata.file.split('/').slice(0, -1).join('/') + "/";
+
             up.size = {
                 width : metadata.width,
                 height : metadata.height
             };
             up.fullurl = "u/" + metadata.file;
+            up.path = base + uploadrelpath + reldirpath + filename;
             up.artistname = metadata.image_meta.caption;
             up.articleurl = metadata.image_meta.credit;
-            up.filename = metadata.file.split('/').pop();
-            up.sizes = {
+            up.filename = filename;
 
+            up.sizes = {};
+            up.sizes.facebook =  {
+                path : base + uploadrelpath + reldirpath + filename,
+                url : config.server.url + "/u/" + reldirpath + filename,
+                width : metadata.width,
+                height : metadata.height
             };
+
+            const large = sizes.large || sizes.medium_large || { file : filename, width : metadata.width, height : metadata.height };
+            up.sizes.content = {
+                path : base + uploadrelpath + reldirpath + large.file,
+                url :  config.server.url + "/u/" + reldirpath + large.file,
+                width : large.width,
+                height : large.height
+            }; up.sizes.thumbnaillarge = up.sizes.content;
+
+            const thumbnail = sizes.thumbnail || { file : filename, width : metadata.width, height : metadata.height };
+            up.sizes.thumbnail = {
+                path : base + uploadrelpath + reldirpath + thumbnail.file,
+                url :  config.server.url + "/u/" + reldirpath + thumbnail.file,
+                width : thumbnail.width,
+                height : thumbnail.height                
+            }; up.sizes.mini = up.sizes.thumbnail;
+           
+            const medium = sizes.medium || { file : filename, width : metadata.width, height : metadata.height };
+            up.sizes.thumbnailarchive = {
+                path : base + uploadrelpath + reldirpath + medium.file,
+                url :  config.server.url + "/u/" + reldirpath + medium.file,
+                width : medium.width,
+                height : medium.height   
+            }; up.sizes.square = up.sizes.thumbnailarchive;
         }
 
         return up;
     });
 
-    console.log(uploads);
 
-    done();
+
+    done({
+        topics, uploads, entities, styledpages, restofcontent, content
+    });
 };
 
 if (!global.liliumroot) {
@@ -119,10 +158,13 @@ if (!global.liliumroot) {
     global.log = require('../log');
     module.exports({
         server : {
-            url : "localhost:8080",
+            url : "//localhost:8080",
+            base : "/usr/share/lilium/lilium-cms/",
+            protocol : "http:",
             html : "/usr/share/lilium/html/default_html"
         }
-    }, data, () => {
+    }, data, dat => {
         log('TransformWP', 'Done', 'success');
+        console.log(dat);
     })
 }
