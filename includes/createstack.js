@@ -29,8 +29,11 @@ function parseWordpressXML(config, dataref, next) {
 
 function transformWordpressData(config, dataref, next) {
     const channel = dataref.wordpresschannel;
+    require('./transformwp')(config, dataref, dbdata => {
+        console.log(dbdata);
 
-    next();
+        next();
+    });
 };
 
 function createStack(config, data, done) {

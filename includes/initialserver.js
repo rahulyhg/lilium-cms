@@ -192,7 +192,7 @@ module.exports.init = done => {
             outputpath : path.join(__dirname, '..', 'tmp'),
             babel : {
                 "plugins": [
-                    ["transform-react-jsx", { "pragma":"h" }]
+                    ["transform-react-jsx", { "pragma":"h" }]b053e97a5f48ed532429fc52cea664f46e2c55c8
                 ],
                 "presets" : ["es2015"]
             }
