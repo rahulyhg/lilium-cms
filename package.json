@@ -129,6 +129,7 @@
     "nodemailer": "latest",
     "parchment": "latest",
     "path": "latest",
+    "php-serialization": "0.0.4",
     "pmx": "latest",
     "process": "latest",
     "quill": "latest",

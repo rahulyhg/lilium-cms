@@ -1794,6 +1794,11 @@
       "integrity": "sha512-+hN/Zh2D08Mx65pZ/4g5bsmNiZUuChDiQfTUQ7qJr4/kuopCr88xZsAXv6mBoZEsUI4OuGHlX59qE94K2mMW8Q==",
       "dev": true
     },
+    "bigdecimal": {
+      "version": "0.6.1",
+      "resolved": "https://registry.npmjs.org/bigdecimal/-/bigdecimal-0.6.1.tgz",
+      "integrity": "sha1-GFiNS08ia3cxDtBFdIWMA2pUSFs="
+    },
     "bignumber.js": {
       "version": "4.0.4",
       "resolved": "https://registry.npmjs.org/bignumber.js/-/bignumber.js-4.0.4.tgz",
@@ -4736,13 +4741,11 @@
         },
         "balanced-match": {
           "version": "1.0.0",
-          "bundled": true,
-          "optional": true
+          "bundled": true
         },
         "brace-expansion": {
           "version": "1.1.11",
           "bundled": true,
-          "optional": true,
           "requires": {
             "balanced-match": "^1.0.0",
             "concat-map": "0.0.1"
@@ -4759,8 +4762,7 @@
         },
         "concat-map": {
           "version": "0.0.1",
-          "bundled": true,
-          "optional": true
+          "bundled": true
         },
         "console-control-strings": {
           "version": "1.1.0",
@@ -4889,7 +4891,6 @@
         "minimatch": {
           "version": "3.0.4",
           "bundled": true,
-          "optional": true,
           "requires": {
             "brace-expansion": "^1.1.7"
           }
@@ -9816,6 +9817,25 @@
       "version": "2.1.0",
       "resolved": "https://registry.npmjs.org/performance-now/-/performance-now-2.1.0.tgz",
       "integrity": "sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns="
+    },
+    "php-serialization": {
+      "version": "0.0.4",
+      "resolved": "https://registry.npmjs.org/php-serialization/-/php-serialization-0.0.4.tgz",
+      "integrity": "sha1-n3miYJKHs5qqHPwxiWPmnUSJi5A=",
+      "requires": {
+        "bigdecimal": "~0.6.1",
+        "util": "~0.10.3"
+      },
+      "dependencies": {
+        "util": {
+          "version": "0.10.4",
+          "resolved": "https://registry.npmjs.org/util/-/util-0.10.4.tgz",
+          "integrity": "sha512-0Pm9hTQ3se5ll1XihRic3FDIku70C+iHUdT/W926rSgHV5QgXsYbKZN8MSC3tJtSkhuROzvsQjAaFENRXr+19A==",
+          "requires": {
+            "inherits": "2.0.3"
+          }
+        }
+      }
     },
     "pify": {
       "version": "3.0.0",
