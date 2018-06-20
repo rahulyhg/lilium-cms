@@ -4741,11 +4741,13 @@
         },
         "balanced-match": {
           "version": "1.0.0",
-          "bundled": true
+          "bundled": true,
+          "optional": true
         },
         "brace-expansion": {
           "version": "1.1.11",
           "bundled": true,
+          "optional": true,
           "requires": {
             "balanced-match": "^1.0.0",
             "concat-map": "0.0.1"
@@ -4762,7 +4764,8 @@
         },
         "concat-map": {
           "version": "0.0.1",
-          "bundled": true
+          "bundled": true,
+          "optional": true
         },
         "console-control-strings": {
           "version": "1.1.0",
@@ -4891,6 +4894,7 @@
         "minimatch": {
           "version": "3.0.4",
           "bundled": true,
+          "optional": true,
           "requires": {
             "brace-expansion": "^1.1.7"
           }
@@ -6614,9 +6618,9 @@
       }
     },
     "is-arrayish": {
-      "version": "0.3.1",
-      "resolved": "https://registry.npmjs.org/is-arrayish/-/is-arrayish-0.3.1.tgz",
-      "integrity": "sha1-wt/DhquqDD4zxI2z/ocFnmkGXv0="
+      "version": "0.3.2",
+      "resolved": "https://registry.npmjs.org/is-arrayish/-/is-arrayish-0.3.2.tgz",
+      "integrity": "sha512-eVRqCvVlZbuw3GrM63ovNSNAeA1K16kaR/LRY/92w0zxQ5/1YzwblUX652i4Xs9RwAGjW9d9y6X88t8OaAJfWQ=="
     },
     "is-binary-path": {
       "version": "1.0.1",
@@ -7393,9 +7397,9 @@
       }
     },
     "localforage": {
-      "version": "1.7.1",
-      "resolved": "https://registry.npmjs.org/localforage/-/localforage-1.7.1.tgz",
-      "integrity": "sha1-5JJ+BCMCuGTbMPMhHxO1xvDell0=",
+      "version": "1.7.2",
+      "resolved": "https://registry.npmjs.org/localforage/-/localforage-1.7.2.tgz",
+      "integrity": "sha1-+kRCYC+Abt0rympUq05lbwMfEhw=",
       "requires": {
         "lie": "3.1.1"
       }
@@ -8049,9 +8053,9 @@
       "integrity": "sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y="
     },
     "moment-timezone": {
-      "version": "0.5.17",
-      "resolved": "https://registry.npmjs.org/moment-timezone/-/moment-timezone-0.5.17.tgz",
-      "integrity": "sha512-Y/JpVEWIOA9Gho4vO15MTnW1FCmHi3ypprrkUaxsZ1TKg3uqC8q/qMBjTddkHoiwwZN3qvZSr4zJP7x9V3LpXA==",
+      "version": "0.5.20",
+      "resolved": "https://registry.npmjs.org/moment-timezone/-/moment-timezone-0.5.20.tgz",
+      "integrity": "sha512-uJXgstE4ddmJpLFIyihm7VsLJsViDxO88lx+GmIbSnyAAHHbSdpwBhpE2N3KFOmDa/9BxYDykQUzH796CHga2w==",
       "requires": {
         "moment": ">= 2.9.0"
       }
@@ -8785,6 +8789,22 @@
           "requires": {
             "has-flag": "^3.0.0"
           }
+        },
+        "uglify-js": {
+          "version": "3.4.0",
+          "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.4.0.tgz",
+          "integrity": "sha512-Jcf5naPkX3rVPSQpRn9Vm6Rr572I1gTtR9LnqKgXjmOgfYQ/QS0V2WRStFR53Bdj520M66aCZqt9uzYXgtGrJQ==",
+          "requires": {
+            "commander": "~2.15.0",
+            "source-map": "~0.6.1"
+          },
+          "dependencies": {
+            "source-map": {
+              "version": "0.6.1",
+              "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.6.1.tgz",
+              "integrity": "sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g=="
+            }
+          }
         }
       }
     },
@@ -9317,9 +9337,9 @@
       "integrity": "sha512-3iuY4N5dhgMpCUrOVnuAdGrgxVqV2cJpM+XNccjR2DKOB1RUP0aA+wGXEiNziG/UKboFyGBIoKOaNlJxx8bciQ=="
     },
     "nwsapi": {
-      "version": "2.0.3",
-      "resolved": "https://registry.npmjs.org/nwsapi/-/nwsapi-2.0.3.tgz",
-      "integrity": "sha512-zFJF9lOpg2+uicP0BQKOAfIOqeTp/p8PC669mewxgRkR1hGjne8BMUHk4wpRS9o5Z0icA5Nv04HmGkW31KfMKw=="
+      "version": "2.0.4",
+      "resolved": "https://registry.npmjs.org/nwsapi/-/nwsapi-2.0.4.tgz",
+      "integrity": "sha512-Zt6HRR6RcJkuj5/N9zeE7FN6YitRW//hK2wTOwX274IBphbY3Zf5+yn5mZ9v/SzAOTMjQNxZf9KkmPLWn0cV4g=="
     },
     "oauth": {
       "version": "0.9.15",
@@ -11265,9 +11285,9 @@
       }
     },
     "sharp": {
-      "version": "0.20.3",
-      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.20.3.tgz",
-      "integrity": "sha512-9P6WclSW4GZg3I2ej3p/Xphsa2kl4b5pZaKMZXaFA5CRN91zzeJoZxLmXFUsjOY7ppIaMLXDOMs0zR2LYzjE/w==",
+      "version": "0.20.4",
+      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.20.4.tgz",
+      "integrity": "sha512-+cT49MjwkQDMRw1AvSXDMb8X7RMlsKQK567oNWM5s8FH3Xgo6CshPY7iFqRisCNDV4zFILo9n6G6j9037+RaVg==",
       "requires": {
         "color": "^3.0.0",
         "detect-libc": "^1.0.3",
@@ -12260,9 +12280,9 @@
       }
     },
     "tar-fs": {
-      "version": "1.16.2",
-      "resolved": "https://registry.npmjs.org/tar-fs/-/tar-fs-1.16.2.tgz",
-      "integrity": "sha512-LdknWjPEiZC1nOBwhv0JBzfJBGPJar08dZg2rwZe0ZTLQoRGEzgrl7vF3qUEkCHpI/wN9e7RyCuDhMsJUCLPPQ==",
+      "version": "1.16.3",
+      "resolved": "https://registry.npmjs.org/tar-fs/-/tar-fs-1.16.3.tgz",
+      "integrity": "sha512-NvCeXpYx7OsmOh8zIOP/ebG55zZmxLE0etfWRbWok+q2Qo8x/vOR/IJT1taADXPe+jsiu9axDb3X4B+iIgNlKw==",
       "requires": {
         "chownr": "^1.0.1",
         "mkdirp": "^0.5.1",
@@ -12639,9 +12659,9 @@
       }
     },
     "uglify-js": {
-      "version": "3.4.0",
-      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.4.0.tgz",
-      "integrity": "sha512-Jcf5naPkX3rVPSQpRn9Vm6Rr572I1gTtR9LnqKgXjmOgfYQ/QS0V2WRStFR53Bdj520M66aCZqt9uzYXgtGrJQ==",
+      "version": "3.4.1",
+      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.4.1.tgz",
+      "integrity": "sha512-ITeCo3bk/cBaK5zD3RKdCtRoxaQQJMfZke4mikJfpkXOEioqQewcJ/3K9WCqQ+WcfWjP8pkstsfFQNNOVSqnoA==",
       "requires": {
         "commander": "~2.15.0",
         "source-map": "~0.6.1"
@@ -13109,9 +13129,9 @@
       }
     },
     "validator": {
-      "version": "10.3.0",
-      "resolved": "https://registry.npmjs.org/validator/-/validator-10.3.0.tgz",
-      "integrity": "sha512-bn7dcJcdkpSjcujYlf8lrY9VL660h5njEkFzQzQOFMQgJ3Id1C4+MkazHKgHE45NoGsyQYEPmo4dCIbDQ7eTdw=="
+      "version": "10.4.0",
+      "resolved": "https://registry.npmjs.org/validator/-/validator-10.4.0.tgz",
+      "integrity": "sha512-Q/wBy3LB1uOyssgNlXSRmaf22NxjvDNZM2MtIQ4jaEOAB61xsh1TQxsq1CgzUMBV1lDrVMogIh8GjG1DYW0zLg=="
     },
     "vanilla-js-calendar": {
       "version": "1.0.10",
