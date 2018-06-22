@@ -160,6 +160,10 @@ const mapPostDataToLiliumConfig = dat => {
             accountid : dat.googleaccountid,
             siteviewid : dat.googleview
         },
+        signature : {
+            privatehash : CryptoJS.SHA256(Date.now().toString()).toString(CryptoJS.enc.Hex),
+            publichash : CryptoJS.SHA256(Math.random().toString()).toString(CryptoJS.enc.Hex)
+        },
         usability : { admin: { loginIfNotAuth: true }, home: { keepInRAM: false } },
         website : {
             sitetitle : dat.websitetitle,
