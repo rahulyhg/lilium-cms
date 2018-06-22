@@ -138,7 +138,7 @@ const mapPostDataToLiliumConfig = dat => {
                 appid : dat.facebookappid,
                 token : dat.facebookapppubtoken,
                 privtoken : dat.facebookappprivtoken,
-                apiversion : dat.facebookappogversion
+                apiversion : vbapi
             }
         },
         data : manifest,
