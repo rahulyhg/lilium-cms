@@ -67,6 +67,8 @@ module.exports = function(config, data, done) {
             completeSlug : c["wp:category_nicename"][0],
             slug : c["wp:category_nicename"][0],
             displayname : c["wp:cat_name"][0],
+            active : true, 
+            category : "interest",
             wpparent : c["wp:category_parent"][0]
         };
     });
