@@ -133,7 +133,7 @@ const mapPostDataToLiliumConfig = dat => {
             senderpass : dat.emailpassword,
             senderfrom : dat.emailfrom
         },
-        data : manifest.database,
+        data : manifest,
         paths: { 
             admin: 'admin',
             login: 'login',
