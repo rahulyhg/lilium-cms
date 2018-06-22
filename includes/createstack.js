@@ -11,14 +11,7 @@ function parseWordpressXML(config, dataref, next) {
     log('Init', 'Parsing XML Wordpress data into JSON', 'info');
     parser.parseString(dataref.wordpressdb, (err, wpdata) => {
         const channel = wpdata.rss.channel[0];
-
-        const dataset = {
-            authors : channel["wp:author"],
-            categories : channel["wp:category"],
-            posts : channel.item
-        };
-
-        dataref.wordpresschannel = dataset;
+        dataref.wordpresschannel = channel;
 
         log('Init', 'Dumping Wordpress database parsed XML in json file', 'info')
         fs.writeFileSync(path.join(__dirname, '..', '..', 'wpdb.json'), JSON.stringify(wpdata), {flag : "w+"});        
@@ -78,11 +71,7 @@ function createAdminEntity(config, dataref, next) {
     next();
 };
 
-var formatMongoString = function(conf) {
-    return 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" +
-        conf.data.host + ":" + conf.data.port + "/" + conf.data.use;
-}
-
+const formatMongoString = conf => 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" + conf.data.host + ":" + conf.data.port + "/" + conf.data.use;
 function createDatabase(config, dataref, next) {
     MongoClient.connect(formatMongoString(config), (err, conn) => {
         const db = conn.db(config.data.use);
@@ -99,13 +88,17 @@ function createDatabase(config, dataref, next) {
                         log('Init', 'Error inserting entries in ' + colls[index], 'err') :
                         log('Init', 'Successfully inserted ' + dataref.dbdata[colls[index]].length + ' entries in collection ' + colls[index], 'success');
 
-                    createNextCollection();    
+                    createNextCollection();
                 })
             }
         };
 
         createNextCollection();
     });
+};
+
+function transferWPImages(config, data, done) {
+    done();
 };
 
 function createStack(config, data, done) {
@@ -118,6 +111,7 @@ function createStack(config, data, done) {
     if (data.wordpressdb) {
         tasks.push(parseWordpressXML);
         tasks.push(transformWordpressData);
+        tasks.push(transferWPImages);
     }
 
     tasks.push(createAdminEntity);
