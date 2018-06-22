@@ -211,7 +211,7 @@ module.exports = function(config, data, done) {
         return {
             _id : new ObjectId(),
             title : art.title,
-            subtitle : art["excerpt:encoded"] ? art["excerpt:encoded"][0] : "",
+            subtitle : [art["excerpt:encoded"] ? art["excerpt:encoded"][0] : ""],
             content : art["content:encoded"],
             author : author && author._id,
             createdBy : author && author._id,
