@@ -166,7 +166,7 @@ const mapPostDataToLiliumConfig = dat => {
             catchline : '',
             language : dat.websitelang
         },
-        id : urldetails.host,
+        id : urldetails.host || "default",
         uid : CryptoJS.SHA256(urldetails.host).toString(CryptoJS.enc.Hex),
         network: { 
             proxy: { listento: 9090, speakto: 8080 },
