@@ -145,6 +145,28 @@ const mapPostDataToLiliumConfig = dat => {
             pluginsInfo: 'info.json',
             uploads: 'uploads' 
         },
+        MIMES : {
+			"" : "text/html; charset=utf-8",
+			".html" : "text/html; charset=utf-8",
+			".htm" : "text/html",
+			".xml" : "text/xml; charset=utf-8",
+			".css" : "text/css",
+			".js" : "text/javascript",
+			".png" : "image/png",
+			".jpg" : "image/jpeg",
+			".jpeg" : "image/jpeg",
+			".bmp" : "image/bmp",
+			".gif" : "image/gif",
+			".swf" : "application/x-shockwave-flash",
+			".lml" : "application/x-lilium-markup"
+		},
+		supported_pictures : [
+			".jpg",
+			".jpeg",
+			".bmp",
+			".png",
+			".gif"
+		],
         server : {
             base : path.join(__dirname, "..") + "/",
             html : path.join(__dirname, '..', '..', 'default_html'),
