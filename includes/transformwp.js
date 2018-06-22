@@ -77,6 +77,7 @@ module.exports = function(config, data, done) {
             wpid : e["wp:author_id"][0],
             username : e["wp:author_login"][0],
             jobtitle : "",
+            preferences : [],
             email : e["wp:author_email"][0],
             displayname : e["wp:author_display_name"][0],
             avatarURL : "https://secure.gravatar.com/avatar/" + crypto.MD5(e["wp:author_email"][0]).toString() + "?s=256",

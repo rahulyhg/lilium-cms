@@ -52,6 +52,7 @@ function createAdminEntity(config, dataref, next) {
         socialnetworks : {
             facebook : "", twitter : "", googleplus : "", instagram : ""
         },
+        preferences : [],
         roles : ["admin", "lilium"],
         personality : null,
         welcomed : true, 
