@@ -133,6 +133,14 @@ const mapPostDataToLiliumConfig = dat => {
             senderpass : dat.emailpassword,
             senderfrom : dat.emailfrom
         },
+        social : {
+            facebook : {
+                appid : dat.facebookappid,
+                token : dat.facebookapppubtoken,
+                privtoken : dat.facebookappprivtoken,
+                apiversion : dat.facebookappogversion
+            }
+        },
         data : manifest,
         paths: { 
             admin: 'admin',
