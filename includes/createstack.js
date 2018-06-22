@@ -80,7 +80,19 @@ function createDatabase(config, dataref, next) {
     
         const createNextCollection = () => {
             if (++index == colls.length) {
-                next();
+                const versions = require('../versions');
+                const verarray = Object.keys(versions).map(v => {
+                    return {
+                        codename : v.codename, 
+                        script : v.script, 
+                        features : v.features, 
+                        v
+                    };
+                })
+
+                db.collection('lilium').insertMany(verarray, () => {
+                    next();
+                });
             } else {
                 const col = db.collection(colls[index]);
                 col.insertMany(dataref.dbdata[colls[index]], (err) => {
