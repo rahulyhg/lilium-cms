@@ -20,18 +20,18 @@ const INITIAL_SERVER_PORT = 14370;
 
 // Required fields
 const REQUIRED_FIELDS = [
-  "websiteurl", "websitelang",
-  "networkproc", "networkport",
-  "maxpostsize",
-  "facebookappid", "facebookapppubtoken", "facebookappprivtoken", "facebookappogversion",
-  "cdnurl",
-  "darkskyttl",
-  "websitetitle",
-  "adminemail",
-  "adminuser", "adminpass",
-  "emailaddress", "emailpassword", "emailfrom",
-  "googlekey", "googleaccountid", "googleview",
-  "darkskykey"
+    "websiteurl", "websitelang",
+    "networkproc", "networkport",
+    "maxpostsize",
+    "facebookappid", "facebookapppubtoken", "facebookappprivtoken", "facebookappogversion",
+    "cdnurl",
+    "darkskyttl",
+    "websitetitle",
+    "adminemail",
+    "adminuser", "adminpass",
+    "emailaddress", "emailpassword", "emailfrom",
+    "googlekey", "googleaccountid", "googleview",
+    "darkskykey"
 ];
 
 // POST handler
