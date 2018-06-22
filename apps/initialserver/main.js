@@ -31,7 +31,9 @@ class LiliumInitialServer extends Component {
         setTimeout(() => {
             fetch("/status").then(r => {
                 if (r.status == 200) {
-                    document.location = this.state.values.websiteurl + (this.state.values.websiteurl.endsWith('/') ? "" : "/") + "login";
+                    setTimeout(() => {
+                        document.location = this.state.values.websiteurl + (this.state.values.websiteurl.endsWith('/') ? "" : "/") + "login";
+                    }, 3000);
                 } else if (r.status == 204) {
                     this.pollStatus();
                 } else if (r.status == 500) {
