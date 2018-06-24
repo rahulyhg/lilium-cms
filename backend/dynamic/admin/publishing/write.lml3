@@ -658,45 +658,6 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
         d.id('publishing-headers').born(wrap);
 
-        /*
-        var textEditor = new LiliumText(beditor, {
-            content : content,
-            boldnode : "b",
-            commandsets : [
-                [
-                    new LiliumTextWebCommand('text', "b", "far fa-bold"), 
-                    new LiliumTextWebCommand('text', "i", "far fa-italic"), 
-                    new LiliumTextWebCommand('text', "u", "far fa-underline"),  
-                    new LiliumTextWebCommand('text', "strike", "far fa-strikethrough"),
-                    new LiliumTextWebCommand('remove', undefined, "far fa-eraser")
-                ], [
-                    new LiliumTextCustomCommand('undo', LiliumTextCustomUndo, 'far fa-undo'),
-                    new LiliumTextCustomCommand('redo', LiliumTextCustomRedo, 'far fa-redo')
-                ], [
-                    new LiliumTextWebCommand('block', 'p', 'far fa-paragraph'), 
-                    new LiliumTextWebCommand("block", "h3", "far fa-h3"),
-                    new LiliumTextWebCommand("block", "blockquote", "far fa-quote-right"),
-                ], [
-                    new LiliumTextWebCommand('insert', 'hr', 'far fa-minus')
-                ], [
-                    new LiliumTextWebCommand('exec', "insertOrderedList",   "far fa-list-ol"),  
-                    new LiliumTextWebCommand('exec', "insertUnorderedList", "far fa-list-ul"), 
-                    new LiliumTextWebCommand('remove', 'a', 'far fa-unlink')
-                ], [
-                    new LiliumTextCustomCommand("full", LiliumTextCustomCommandFullscreen, "far fa-window-maximize"),
-                    new LiliumTextCustomCommand("code", LiliumTextCustomCommandCode, "far fa-code")
-                ]
-            ],
-            plugins : [
-                LiliumCodeFormatPlugin,
-                LiliumTextInsertAds,
-                LiliumTextImageSelectionPlugin,
-                LiliumTextImageInsertionPlugin,
-                LiliumTextEmbedPlugin
-            ]
-        });
-        */
-
         tinyMCE.baseURL = "${context._c.server.url}/tinymce";
         tinyMCE.init({
             target: beditor,
@@ -714,7 +675,6 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
             ],
             setup : ConfigureLiliumTinyMCE
         }).then(function(textEditor) {
-            console.log(textEditor);
             textEditor = textEditor[0];
 
             log('TinyMCE', 'Text editor created successfully', 'success');
