@@ -683,7 +683,6 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
             btitle.value = title.trim();
             bsubtitle.value = subtitle.trim();
-            allEditors.push(textEditor);
 
             var tab = d.make({ 
                 class : "publishing-tab", 
