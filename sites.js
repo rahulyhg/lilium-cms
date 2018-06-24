@@ -26,6 +26,7 @@ var adslib = require('./ads');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
+var mkdirp = require('mkdirp');
 
 var _cachedSites = new Array();
 
@@ -74,18 +75,22 @@ var SiteInitializer = function (conf, siteobj) {
 
         to = conf.server.html + '/uploads';
         rootDir = conf.server.base + 'backend/static/uploads/';
+        mkdirp.sync(rootDir);
         fileserver.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/u';
         rootDir = conf.server.base + 'backend/static/u/';
+        mkdirp.sync(rootDir);
         fileserver.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/webfonts';
         rootDir = conf.server.base + 'backend/static/webfonts/';
+        mkdirp.sync(rootDir);
         fileserver.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/tinymce';
         rootDir = conf.server.base + "node_modules/tinymce/";
+        mkdirp.sync(rootDir);
         fileserver.createSymlinkSync(rootDir, to);
 
         done();

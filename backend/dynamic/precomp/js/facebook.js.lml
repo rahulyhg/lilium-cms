@@ -13,7 +13,7 @@ LMLFacebook.prototype.loadfbscript = function() {
     FB.init({
       appId      : '{=config.default.social.facebook.appid}',
       xfbml      : true,
-      version    : 'v{=config.default.social.facebook.apiversion}'
+      version    : 'v2.12'
     });
     FB.getLoginStatus(function(response) {
       lmlcheckfbstatus && lmlcheckfbstatus(response);

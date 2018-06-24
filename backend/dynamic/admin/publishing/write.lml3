@@ -10,7 +10,6 @@ const settings = {
     lmldom : { v : 1.0 }
 };                    
          
-delete require.cache[require.resolve('./style.css.js')];   
 const css = require('./style.css');
 
 const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet" type="text/css" href="/compiled/theme/liliumtext.css?at=${Date.now()}">
@@ -141,7 +140,7 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     <h1>Publishing</h1>
 
     <div id="publishing-tabs">
-        <div class="publishing-tab" id="publishing-tab-add">Add</div>
+        <div class="publishing-tab" id="publishing-tab-add" style="display: none;">Add</div>
     </div>
 
     <div id="publishing-headers">
@@ -659,45 +658,6 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
         d.id('publishing-headers').born(wrap);
 
-        /*
-        var textEditor = new LiliumText(beditor, {
-            content : content,
-            boldnode : "b",
-            commandsets : [
-                [
-                    new LiliumTextWebCommand('text', "b", "far fa-bold"), 
-                    new LiliumTextWebCommand('text', "i", "far fa-italic"), 
-                    new LiliumTextWebCommand('text', "u", "far fa-underline"),  
-                    new LiliumTextWebCommand('text', "strike", "far fa-strikethrough"),
-                    new LiliumTextWebCommand('remove', undefined, "far fa-eraser")
-                ], [
-                    new LiliumTextCustomCommand('undo', LiliumTextCustomUndo, 'far fa-undo'),
-                    new LiliumTextCustomCommand('redo', LiliumTextCustomRedo, 'far fa-redo')
-                ], [
-                    new LiliumTextWebCommand('block', 'p', 'far fa-paragraph'), 
-                    new LiliumTextWebCommand("block", "h3", "far fa-h3"),
-                    new LiliumTextWebCommand("block", "blockquote", "far fa-quote-right"),
-                ], [
-                    new LiliumTextWebCommand('insert', 'hr', 'far fa-minus')
-                ], [
-                    new LiliumTextWebCommand('exec', "insertOrderedList",   "far fa-list-ol"),  
-                    new LiliumTextWebCommand('exec', "insertUnorderedList", "far fa-list-ul"), 
-                    new LiliumTextWebCommand('remove', 'a', 'far fa-unlink')
-                ], [
-                    new LiliumTextCustomCommand("full", LiliumTextCustomCommandFullscreen, "far fa-window-maximize"),
-                    new LiliumTextCustomCommand("code", LiliumTextCustomCommandCode, "far fa-code")
-                ]
-            ],
-            plugins : [
-                LiliumCodeFormatPlugin,
-                LiliumTextInsertAds,
-                LiliumTextImageSelectionPlugin,
-                LiliumTextImageInsertionPlugin,
-                LiliumTextEmbedPlugin
-            ]
-        });
-        */
-
         tinyMCE.baseURL = "${context._c.server.url}/tinymce";
         tinyMCE.init({
             target: beditor,
@@ -723,7 +683,6 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
 
             btitle.value = title.trim();
             bsubtitle.value = subtitle.trim();
-            allEditors.push(textEditor);
 
             var tab = d.make({ 
                 class : "publishing-tab", 
@@ -1193,64 +1152,70 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
         }
 
         window._poststate = post;
-        window._posthistory = liliumcms.livevars.livevars()["publishing.history." + liliumcms.pageloader.lastLevel]
-        for (var i = 0; i < post.title.length; i++) {
-            createHeaderSlide(post.title[i], post.subtitle[i], post.content[i], function() {
-                switchToTab(0);
+        window._posthistory = liliumcms.livevars.livevars()["publishing.history." + liliumcms.pageloader.lastLevel];
+
+        var finishLMLDomBind = function() {                
+            switchToTab(0);
+
+            initTopics();
+            post.topic && selectFinalTopic(post.topic);
+
+            initAuthor();
+
+            if (post.media) {
+                d.id('mediapicker').get().value = post.media;
+                liliumcms.livevars.getSingleLivevar("uploads.single." + post.media, {}, function(r) { 
+                    var fullmedia = r.livevars["uploads.single." + post.media];
+                    if (fullmedia) {
+                        d.id('featured-image-tag').get().src = fullmedia.sizes.facebook && fullmedia.sizes.facebook.url;
+                    }
+                });
+            }
+
+            if (post.sponsoredBoxLogo) {
+                liliumcms.livevars.getSingleLivevar("uploads.single." + post.sponsoredBoxLogo, {}, function(r) { 
+                    var fullmedia = r.livevars["uploads.single." + post.sponsoredBoxLogo];
+                    if (fullmedia) {
+                        d.id('sponsored-box-image').get().src = fullmedia.sizes.square && fullmedia.sizes.square.url;
+                    }
+                });
+            }
+
+            document.getElementById('edit-slug-icon').addEventListener('click', popupSlugEdit);
+
+            d.id('anim-dismiss').bind('click', dismissReport);
+            refreshState();
+            refreshActions();
+
+            createHistory();
+
+            AUTOSAVE_INTERVAL = setInterval(function() {
+                shouldAutosave() && autosaveCurrentPost();
+            }, 1000 * 60);
+
+            liliumcms.pageloader.bindUnload(function() {
+                clearInterval(AUTOSAVE_INTERVAL);
             });
-        }
 
-        d.id('publishing-tab-add').bind('click', function() {
-            createHeaderSlide(null, null, null, function(index) {
-                switchToTab(index);
-            })
-        });
+            LAST_AUTOSAVE = liliumcms.livevars.livevars()["publishing.auto." + liliumcms.pageloader.lastLevel];
 
-        initTopics();
-        post.topic && selectFinalTopic(post.topic);
+            if (LAST_AUTOSAVE && LAST_AUTOSAVE.at && new Date(LAST_AUTOSAVE.at).getTime() > new Date(post.updated).getTime() && post.status != "published") {
+                alertRecentAutosave();
+            }
+        };
 
-        initAuthor();
+        var i = -1;
+        var nextSlide = function() {
+            if (post.title[++i]) {
+                createHeaderSlide(post.title[i], post.subtitle[i], post.content[i], function() {
+                    nextSlide();
+                });
+            } else {
+                finishLMLDomBind();
+            }
+        };
 
-        if (post.media) {
-            d.id('mediapicker').get().value = post.media;
-            liliumcms.livevars.getSingleLivevar("uploads.single." + post.media, {}, function(r) { 
-                var fullmedia = r.livevars["uploads.single." + post.media];
-                if (fullmedia) {
-                    d.id('featured-image-tag').get().src = fullmedia.sizes.facebook && fullmedia.sizes.facebook.url;
-                }
-            });
-        }
-
-        if (post.sponsoredBoxLogo) {
-            liliumcms.livevars.getSingleLivevar("uploads.single." + post.sponsoredBoxLogo, {}, function(r) { 
-                var fullmedia = r.livevars["uploads.single." + post.sponsoredBoxLogo];
-                if (fullmedia) {
-                    d.id('sponsored-box-image').get().src = fullmedia.sizes.square && fullmedia.sizes.square.url;
-                }
-            });
-        }
-
-        document.getElementById('edit-slug-icon').addEventListener('click', popupSlugEdit);
-
-        d.id('anim-dismiss').bind('click', dismissReport);
-        refreshState();
-        refreshActions();
-
-        createHistory();
-
-        AUTOSAVE_INTERVAL = setInterval(function() {
-            shouldAutosave() && autosaveCurrentPost();
-        }, 1000 * 60);
-
-        liliumcms.pageloader.bindUnload(function() {
-            clearInterval(AUTOSAVE_INTERVAL);
-        });
-
-        LAST_AUTOSAVE = liliumcms.livevars.livevars()["publishing.auto." + liliumcms.pageloader.lastLevel];
-
-        if (LAST_AUTOSAVE && LAST_AUTOSAVE.at && new Date(LAST_AUTOSAVE.at).getTime() > new Date(post.updated).getTime() && post.status != "published") {
-            alertRecentAutosave();
-        }
+        nextSlide();
     });
 </script>
 

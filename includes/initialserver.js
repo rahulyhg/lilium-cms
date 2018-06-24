@@ -1,29 +1,37 @@
 // Libraries
 global.log = require('../log');
+
 const buildLib = require('../build');
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
 const CryptoJS = require('crypto-js');
-const manifest = require('../../manifest');
+let manifest;
+
+try {
+    manifest = require('../../manifest');
+} catch(err) {
+    log('Init', 'FATAL : No manifest file found.', 'err');
+    process.exit(1);
+}
 
 // Constants
 const INITIAL_SERVER_PORT = 14370;
 
 // Required fields
 const REQUIRED_FIELDS = [
-  "websiteurl", "websitelang",
-  "networkproc", "networkport",
-  "maxpostsize",
-  "facebookappid", "facebookapppubtoken", "facebookappprivtoken", "facebookappogversion",
-  "cdnurl",
-  "darkskyttl",
-  "websitetitle",
-  "adminemail",
-  "adminuser", "adminpass",
-  "emailaddress", "emailpassword", "emailfrom",
-  "googlekey", "googleaccountid", "googleview",
-  "darkskykey"
+    "websiteurl", "websitelang",
+    "networkproc", "networkport",
+    "maxpostsize",
+    "facebookappid", "facebookapppubtoken", "facebookappprivtoken", "facebookappogversion",
+    "cdnurl",
+    "darkskyttl",
+    "websitetitle",
+    "adminemail",
+    "adminuser", "adminpass",
+    "emailaddress", "emailpassword", "emailfrom",
+    "googlekey", "googleaccountid", "googleview",
+    "darkskykey"
 ];
 
 // POST handler
@@ -50,29 +58,39 @@ const handleInitialPOST = (resp, dat, done) => {
         log('Init', 'Found missing fields in POST data', 'warn');
         resp.writeHead(412);
         return resp.end();
-    }
+    }fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'dfp.json'), dat.dfpkey, {flag : "w+"});
 
     currentStatus = "working";
     resp.writeHead(200);
     resp.end();
 
     const config = mapPostDataToLiliumConfig(dat);
-    
+
+    log('Init', 'Creating default.json site config', 'info');
     fs.writeFileSync(path.join(__dirname, '..', 'sites', 'default.json'), JSON.stringify(config, null, 4), {flag : "w+"});
+
+    log('Init', 'Creating Analytics key', 'info');
     fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'analytics.json'), dat.googlekey, {flag : "w+"});
+
+    log('Init', 'Creating Darksky key', 'info');
     fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'darksky.json'), JSON.stringify({
         secretkey : dat.darkskykey,
         cachettl : dat.darkskyttl
     }), {flag : "w+"});
 
+    log('Init', 'Creating DFP key', 'info');
     dat.dfpkey && fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'dfp.json'), dat.dfpkey, {flag : "w+"});
+
+    log('Init', 'Creating Twilio key', 'info');
     dat.twiliosid && fs.writeFileSync(path.join(__dirname, '..', '..', 'keys', 'twilio.json'), JSON.stringify({
         sid : dat.twiliosid,
         token : dat.twiliotoken,
         from : dat.twiliofrom
     }), {flag : "w+"});
 
-    require('./createstack').createStack(config, () => {
+    log('Init', 'Done creating key files', 'success');
+    log('Init', 'Stack creation ongoing', 'info');
+    require('./createstack').createStack(config, dat, () => {
         currentStatus = "done";
 
         setTimeout(() => {
@@ -94,6 +112,7 @@ const mapPostDataToLiliumConfig = dat => {
     let urldetails = require('url').parse(dat.websiteurl);
     let analyticsDetails = JSON.parse(dat.googlekey);
 
+    log('Init', 'Mapping POST data to Lilium config', 'detail');
     return {
         env : "prod",
         caij : true,
@@ -114,7 +133,15 @@ const mapPostDataToLiliumConfig = dat => {
             senderpass : dat.emailpassword,
             senderfrom : dat.emailfrom
         },
-        data : manifest.database,
+        social : {
+            facebook : {
+                appid : dat.facebookappid,
+                token : dat.facebookapppubtoken,
+                privtoken : dat.facebookappprivtoken,
+                apiversion : vbapi
+            }
+        },
+        data : manifest,
         paths: { 
             admin: 'admin',
             login: 'login',
@@ -126,6 +153,28 @@ const mapPostDataToLiliumConfig = dat => {
             pluginsInfo: 'info.json',
             uploads: 'uploads' 
         },
+        MIMES : {
+			"" : "text/html; charset=utf-8",
+			".html" : "text/html; charset=utf-8",
+			".htm" : "text/html",
+			".xml" : "text/xml; charset=utf-8",
+			".css" : "text/css",
+			".js" : "text/javascript",
+			".png" : "image/png",
+			".jpg" : "image/jpeg",
+			".jpeg" : "image/jpeg",
+			".bmp" : "image/bmp",
+			".gif" : "image/gif",
+			".swf" : "application/x-shockwave-flash",
+			".lml" : "application/x-lilium-markup"
+		},
+		supported_pictures : [
+			".jpg",
+			".jpeg",
+			".bmp",
+			".png",
+			".gif"
+		],
         server : {
             base : path.join(__dirname, "..") + "/",
             html : path.join(__dirname, '..', '..', 'default_html'),
@@ -141,13 +190,17 @@ const mapPostDataToLiliumConfig = dat => {
             accountid : dat.googleaccountid,
             siteviewid : dat.googleview
         },
+        signature : {
+            privatehash : CryptoJS.SHA256(Date.now().toString()).toString(CryptoJS.enc.Hex),
+            publichash : CryptoJS.SHA256(Math.random().toString()).toString(CryptoJS.enc.Hex)
+        },
         usability : { admin: { loginIfNotAuth: true }, home: { keepInRAM: false } },
         website : {
             sitetitle : dat.websitetitle,
             catchline : '',
             language : dat.websitelang
         },
-        id : urldetails.host,
+        id : urldetails.host || "default",
         uid : CryptoJS.SHA256(urldetails.host).toString(CryptoJS.enc.Hex),
         network: { 
             proxy: { listento: 9090, speakto: 8080 },

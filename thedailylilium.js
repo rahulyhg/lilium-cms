@@ -191,10 +191,6 @@ class TheDailyLilium {
     livevar(cli, levels, params, sendback) {
         const action = levels[0];
 
-        if (!cli.hasRight('write-thedailylilium')) {
-            return sendback(new Error("Not Authorized"));
-        }
-
         if (action == "bunch") {
             const $match = {
                 status : params.filters.status || {$ne : "destroyed"}
