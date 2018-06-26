@@ -315,9 +315,8 @@ class FileLogic {
         const ctxName = contextname || "home";
 
         themeLib.fetchCurrentTheme(_c, cTheme => {
-            if (!extra.language) {
-                extra.language = _c.website.language;
-            }
+            extra.language = extra.language || _c.website.language;
+            cTheme.settings = cTheme.settings || {};
 
             extra.theme = cTheme;
             extra.minify = true;
