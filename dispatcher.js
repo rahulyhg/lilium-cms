@@ -11,9 +11,7 @@ var clerk = require('./clerk.js');
 var Dispatcher = function () {
     this.dispatch = function (cli) {
         cli.touch('dispatcher.dispatch');
-        if (cli.routeinfo.isStatic) {
-            HTMLServer.serveStatic(cli);
-        } else if (cli.routeinfo.front) {
+        if (cli.routeinfo.front) {
             clerk.serve(cli);
         } else if (cli.routeinfo.admin) {
             if (cli.userinfo.loggedin && entities.isAllowed(cli.userinfo, 'dash')) {
@@ -37,6 +35,8 @@ var Dispatcher = function () {
 
         } else if (Endpoints.isRegistered(cli.routeinfo.configname, cli.routeinfo.path[0], 'GET')) {
             Endpoints.execute(cli.routeinfo.path[0], 'GET', cli);
+        } else if (cli.routeinfo.isStatic) {
+            HTMLServer.serveStatic(cli);
         } else {
             HTMLServer.serveClient(cli);
         }
