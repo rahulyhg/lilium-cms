@@ -596,7 +596,7 @@ class ContentLib {
     regenerate(_c, _id, done) {
         this.getFull(_c, _id, fullpost => {
             fullpost ? this.generate(_c, fullpost, () => {
-                done(true);
+                done(fullpost);
             }) : done(false);
         });
     }

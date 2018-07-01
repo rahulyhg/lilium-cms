@@ -4741,13 +4741,11 @@
         },
         "balanced-match": {
           "version": "1.0.0",
-          "bundled": true,
-          "optional": true
+          "bundled": true
         },
         "brace-expansion": {
           "version": "1.1.11",
           "bundled": true,
-          "optional": true,
           "requires": {
             "balanced-match": "^1.0.0",
             "concat-map": "0.0.1"
@@ -4764,8 +4762,7 @@
         },
         "concat-map": {
           "version": "0.0.1",
-          "bundled": true,
-          "optional": true
+          "bundled": true
         },
         "console-control-strings": {
           "version": "1.1.0",
@@ -4894,7 +4891,6 @@
         "minimatch": {
           "version": "3.0.4",
           "bundled": true,
-          "optional": true,
           "requires": {
             "brace-expansion": "^1.1.7"
           }
@@ -8053,9 +8049,9 @@
       "integrity": "sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y="
     },
     "moment-timezone": {
-      "version": "0.5.20",
-      "resolved": "https://registry.npmjs.org/moment-timezone/-/moment-timezone-0.5.20.tgz",
-      "integrity": "sha512-uJXgstE4ddmJpLFIyihm7VsLJsViDxO88lx+GmIbSnyAAHHbSdpwBhpE2N3KFOmDa/9BxYDykQUzH796CHga2w==",
+      "version": "0.5.21",
+      "resolved": "https://registry.npmjs.org/moment-timezone/-/moment-timezone-0.5.21.tgz",
+      "integrity": "sha512-j96bAh4otsgj3lKydm3K7kdtA3iKf2m6MY2iSYCzCm5a1zmHo1g+aK3068dDEeocLZQIS9kU8bsdQHLqEvgW0A==",
       "requires": {
         "moment": ">= 2.9.0"
       }
@@ -8488,9 +8484,9 @@
       }
     },
     "node-abi": {
-      "version": "2.4.1",
-      "resolved": "https://registry.npmjs.org/node-abi/-/node-abi-2.4.1.tgz",
-      "integrity": "sha512-pUlswqpHQ7zGPI9lGjZ4XDNIEUDbHxsltfIRb7dTnYdhgHWHOcB0MLZKLoCz6UMcGzSPG5wGl1HODZVQAUsH6w==",
+      "version": "2.4.3",
+      "resolved": "https://registry.npmjs.org/node-abi/-/node-abi-2.4.3.tgz",
+      "integrity": "sha512-b656V5C0628gOOA2kwcpNA/bxdlqYF9FvxJ+qqVX0ctdXNVZpS8J6xEUYir3WAKc7U0BH/NRlSpNbGsy+azjeg==",
       "requires": {
         "semver": "^5.4.1"
       }
@@ -11285,9 +11281,9 @@
       }
     },
     "sharp": {
-      "version": "0.20.4",
-      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.20.4.tgz",
-      "integrity": "sha512-+cT49MjwkQDMRw1AvSXDMb8X7RMlsKQK567oNWM5s8FH3Xgo6CshPY7iFqRisCNDV4zFILo9n6G6j9037+RaVg==",
+      "version": "0.20.5",
+      "resolved": "https://registry.npmjs.org/sharp/-/sharp-0.20.5.tgz",
+      "integrity": "sha512-ZgSX4EAmJzqcykEGZZtth1YHeb21LH4IRnFYtqvvx49ix3R7jxBbXJSrjXrCsVfyE1woaZR/JdsQCLLGs3cF6w==",
       "requires": {
         "color": "^3.0.0",
         "detect-libc": "^1.0.3",
@@ -12659,9 +12655,9 @@
       }
     },
     "uglify-js": {
-      "version": "3.4.1",
-      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.4.1.tgz",
-      "integrity": "sha512-ITeCo3bk/cBaK5zD3RKdCtRoxaQQJMfZke4mikJfpkXOEioqQewcJ/3K9WCqQ+WcfWjP8pkstsfFQNNOVSqnoA==",
+      "version": "3.4.2",
+      "resolved": "https://registry.npmjs.org/uglify-js/-/uglify-js-3.4.2.tgz",
+      "integrity": "sha512-/kVQDzwiE9Vy7Y63eMkMozF4jIt0C2+xHctF9YpqNWdE/NLOuMurshkpoYGUlAbeYhACPv0HJPIHJul0Ak4/uw==",
       "requires": {
         "commander": "~2.15.0",
         "source-map": "~0.6.1"
