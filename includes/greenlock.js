@@ -8,6 +8,10 @@ class GreenlockWrapper {
         const levels = curedURL.split('.');
         const urlVariation = levels.length > 2 ? levels.splice(1).join('.') : ("www." + levels.join('.'));
 
+        if (levels.length > 2 && levels[0] != "www") {
+            skipVariation = true;
+        }
+
         const options = {
             domains : skipVariation ? [curedURL] : [curedURL, urlVariation],
             email : _c.emails.senderemail,
