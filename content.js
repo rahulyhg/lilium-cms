@@ -587,6 +587,20 @@ class ContentLib {
         });
     }
 
+    regenerateFromSlug(_c, slug, done) {
+        db.findUnique(_c, 'content', { name : slug, status : "published" }, (err, article) => {
+            article ? this.regenerate(_c, article._id, done) : done(false);
+        }, {_id : 1});
+    }
+
+    regenerate(_c, _id, done) {
+        this.getFull(_c, _id, fullpost => {
+            fullpost ? this.generate(_c, fullpost, () => {
+                done(fullpost);
+            }) : done(false);
+        });
+    }
+
     sendForReview(_c, postid, author, callback) {
         db.update(_c, 'content', { _id : postid }, {status : "reviewing"}, ()  => {
             this.pushHistoryEntryFromDiff(_c, postid, author, diff({}, { status : "published" }), 'submitted', historyentry => {

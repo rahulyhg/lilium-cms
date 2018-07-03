@@ -6,7 +6,7 @@
 <header class="admin-bar">
     <div class="lilium-logo-link">
         <a href="{=config.default.server.url}/admin">
-            <img src="{=config.default.server.url}/static/media/lmllogo.png" id="lilium-logo" class="lilium-logo" />
+            <img src="{=config.default.server.url}/static/media/lmllogo.svg" id="lilium-logo" class="lilium-logo" />
             <span class="product-text">
                 Lilium CMS
             </span>
