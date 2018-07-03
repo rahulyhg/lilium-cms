@@ -213,8 +213,13 @@ module.exports.initializeNginx = (_c, done) => {
 
     log('Nginx', 'Writing default http files', 'info');
     fs.writeFileSync("/etc/nginx/sites-available/default", createNginxConfig(_c));
-    execSync("sudo service nginx reload");
-    log('Nginx', 'Reloaded nginx with new config files', 'success');
+    try {
+        execSync("sudo service nginx reload");
+        log('Nginx', 'Reloaded nginx with new config files', 'success');
+    } catch (err) {
+        log('Nginx', 'Nginx failed to reload new configs. Exiting.', 'err');
+        process.exit(1);   
+    }
 
     greenlock.generateCert(_c, success => {
         if (!success) {
