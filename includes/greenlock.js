@@ -7,7 +7,6 @@ class GreenlockWrapper {
         log('Greenlock', 'Generating HTTPS cert', 'info');
         const curedURL = _c.server.url.substring(2);
         const levels = curedURL.split('.');
-        let urlVariation;
 
         if (levels.length > 2 && levels[0] != "www") {
             skipVariation = true;

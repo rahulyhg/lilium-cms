@@ -221,6 +221,7 @@ module.exports.initializeNginx = (_c, done) => {
         process.exit(1);   
     }
 
+    log ('Greenlock', 'Calling generateCert from init method', 'info');
     greenlock.generateCert(_c, success => {
         if (!success) {
             log('Init', 'Failed to generate HTTPS cert', 'err');
