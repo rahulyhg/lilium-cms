@@ -115,6 +115,7 @@ function transferWPImages(config, data, done) {
 };
 
 function initializeHTTPS(config, data, done) {
+    log('Init', 'Initializing nginx and HTTPS', 'info');
     const { initializeNginx } = require('./nginxconfig');
     initializeNginx(config, success => {
         success ? 

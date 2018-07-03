@@ -216,10 +216,14 @@ server {
 module.exports.initializeNginx = (_c, done) => {
     const greenlock = new Greenlock();
 
+    log('Nginx', 'Writing default http files', 'info');
     fs.writeFileSync("/etc/nginx/sites-available/default", createNginxConfig(_c));
     execSync("sudo service nginx reload");
+    log('Nginx', 'Reloaded nginx with new config files', 'success');
+
     greenlock.generateCert(_c, success => {
         if (!success) {
+            log('Init', 'Failed to generate HTTPS cert', 'err');
             _c.server.protocol = "http:";
             done();
         } else {

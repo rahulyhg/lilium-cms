@@ -4,6 +4,7 @@ const path = require('path');
 
 class GreenlockWrapper {
     generateCert(_c, done, skipVariation) {
+        log('Greenlock', 'Generating HTTPS cert', 'info');
         const curedURL = _c.server.url.substring(2);
         const levels = curedURL.split('.');
         const urlVariation = levels.length > 2 ? levels.splice(1).join('.') : ("www." + levels.join('.'));
@@ -26,7 +27,6 @@ class GreenlockWrapper {
             skipChallengeTest : true
         });
         
-        console.log(options);
         greenlock.register(options).then(certs => {
             log('Greenlock', 'Generated cert successfully', 'success');
             log('Greenlock', 'Will expire at ' + certs.expiredAt, 'info');
