@@ -7,11 +7,13 @@ class GreenlockWrapper {
         log('Greenlock', 'Generating HTTPS cert', 'info');
         const curedURL = _c.server.url.substring(2);
         const levels = curedURL.split('.');
-        const urlVariation = levels.length > 2 ? levels.splice(1).join('.') : ("www." + levels.join('.'));
+        let urlVariation;
 
         if (levels.length > 2 && levels[0] != "www") {
             skipVariation = true;
         }
+
+        const urlVariation = levels.length > 2 ? levels.splice(1).join('.') : ("www." + levels.join('.'));
 
         const options = {
             domains : skipVariation ? [curedURL] : [curedURL, urlVariation],
@@ -27,6 +29,7 @@ class GreenlockWrapper {
             skipChallengeTest : true
         });
         
+        log('Greenlock', options.domains, 'info');
         greenlock.register(options).then(certs => {
             log('Greenlock', 'Generated cert successfully', 'success');
             log('Greenlock', 'Will expire at ' + certs.expiredAt, 'info');
