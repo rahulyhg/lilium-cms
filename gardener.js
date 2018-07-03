@@ -9,6 +9,8 @@ const { spawn } = require('child_process');
 const garden = {};
 
 let sharedMemoryProcess;
+let dataServerProcess;
+let redisserver;
 let bootCount = 0;
 
 class Gardener {
@@ -25,7 +27,7 @@ class Gardener {
 
             log('Network', 'Network configuration loaded', 'success');
             log('Network', 'Spawning redis server', 'lilium');
-            const redisserver = new RedisServer(6379);
+            redisserver = new RedisServer(6379);
 
             this.spawnSharedMemory();
             this.spawnDataServer();
@@ -95,6 +97,9 @@ class Gardener {
 
     spawnSharedMemory() {
         log('Network', 'Spawning local cache server', 'lilium');
+        if (sharedMemoryProcess) {
+            sharedMemoryProcess.kill("SIGHUP");
+        }
         sharedMemoryProcess = spawn("node", [__dirname + "/network/spawn.js"]);
         sharedMemoryProcess.on('error', err => {
             log('Gardener', err, 'err');
@@ -103,28 +108,22 @@ class Gardener {
 
     spawnDataServer() {
         log('Network', 'Spawning dataserver', 'lilium');
-        spawn('node', [__dirname + "/dataserver/spawn.js"]);
+        if (dataServerProcess) {
+            dataServerProcess.kill("SIGHUP");
+        }
+        dataServerProcess = spawn('node', [__dirname + "/dataserver/spawn.js"]);
     }
 
     updateAndRestart() {
-        log('Gardener', 'Pulling from git', 'Lilium');
-
-        const { spawn } = require('child_process');
-        const gitcommand = spawn('git', 'pull origin master'.split(' '));
-        gitcommand.on('close', code => {
-            log('Gardener', 'Clearing require cache', 'Lilium');
-            const cachedFiles = Object.keys(require.cache);
-            for (let file in cachedFiles) {
-                delete require.cache[file];
-            }
-
-            // this.caijProc.kill();
-
-            log('Gardener', 'Killing children processes', 'Lilium');
-            for (let pid in garden) {
-                garden[pid].kill();
-            }
+        log('Gardener', 'Restarting instances...', 'Lilium');
+        const pids = Object.keys(garden);
+        this.caijProc.kill("SIGHUP")
+        Object.keys(pids).forEach(pid => {
+            garden[pids].kill("SIGHUP")
         });
+        
+        this.spawnSharedMemory();
+        this.spawnDataServer();
     }
 
     broadcast(m) {

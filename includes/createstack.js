@@ -114,6 +114,17 @@ function transferWPImages(config, data, done) {
     done();
 };
 
+function initializeHTTPS(config, data, done) {
+    const { initializeNginx } = require('./nginxconfig');
+    initializeNginx(config, success => {
+        success ? 
+            log('Nginx', 'Successfully created HTTPS certs', 'success') :
+            log('Nginx', 'Failed to create HTTPS certs', 'err');
+            
+        done();
+    })
+}
+
 function createStack(config, data, done) {
     const tasks = [];
     data.dbdata = {
@@ -129,6 +140,7 @@ function createStack(config, data, done) {
 
     tasks.push(createAdminEntity);
     tasks.push(createDatabase);
+    tasks.push(initializeHTTPS);
 
     let i = -1;
     const nextTask = () => {
