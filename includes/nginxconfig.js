@@ -1,4 +1,18 @@
-module.exports.createNginxConfig = _c => `
+module.exports.createNginxConfig = _c => `# Lilium CMS
+
+server {
+    listen 80;
+    server_name ${_c.server.url.replace(/\//g, "")};
+    root ${_c.server.html}/;
+
+    location /.well-known {
+        try_files $uri =404;
+    }
+}
+
+`;
+
+module.exports.createNginxExtendedConfig = _c =>`# Lilium CMS
 
 upstream lilium_proxy  {
     server 127.0.0.1:8080;
@@ -18,27 +32,9 @@ map $http_sec_websocket_key $conn {
 proxy_cache_path ${_c.server.html}/liliumcache levels=1:2 keys_zone=my_cache_lilium:10m max_size=10g inactive=60m use_temp_path=off;
 
 server {
-    listen 80;
-    server_name ${_c.server.url.replace(/\/|www/g, '')} www.${_c.server.url.replace(/\/|www/g, '')};
-    root ${_c.server.html}/;
-
-    location /.well-known {
-        try_files $uri =404;
-    }
-
-    location / {
-        return 301 https://www.${_c.server.url.replace(/\/|www/g, '')}$request_uri;
-    }
-}
-
-`;
-
-module.exports.createNginxExtendedConfig = _c =>`
-
-server {
     listen 443 ssl; 
-    ssl_certificate /etc/letsencrypt/live/www.${_c.server.url.replace(/\/|www/g, '')}/fullchain.pem; 
-    ssl_certificate_key /etc/letsencrypt/live/www.${_c.server.url.replace(/\/|www/g, '')}/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/${_c.server.url.replace(/\//g, "")}/fullchain.pem; 
+    ssl_certificate_key /etc/letsencrypt/live/${_c.server.url.replace(/\//g, "")}/privkey.pem;
     ssl_session_cache shared:le_nginx_SSL:1m;
     ssl_session_timeout 1440m; 
 
@@ -47,11 +43,12 @@ server {
 
     ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256 ECDHE-ECDSA-AES256-GCM-SHA384 ECDHE-ECDSA-AES128-SHA ECDHE-ECDSA-AES256-SHA ECDHE-ECDSA-AES128-SHA256 ECDHE-ECDSA-AES256-SHA384 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES128-SHA ECDHE-RSA-AES128-SHA256 ECDHE-RSA-AES256-SHA384 DHE-RSA-AES128-GCM-SHA256 DHE-RSA-AES256-GCM-SHA384 DHE-RSA-AES128-SHA DHE-RSA-AES256-SHA DHE-RSA-AES128-SHA256 DHE-RSA-AES256-SHA256 EDH-RSA-DES-CBC3-SHA"; # managed by Certbot
 
-    server_name ${_c.server.url.replace(/\/|www/g, '')} www.${_c.server.url.replace(/\/|www/g, '')};
+    server_name ${_c.server.url.replace(/\//g, "")} ${_c.server.url.replace(/\//g, "")};
     # port_in_redirect off;
 
     large_client_header_buffers 8 32k;
     index index.html;
+
 
     if ($http_host = "${_c.server.url.replace(/\/|www/g, '')}") {
         rewrite ^ https://www.${_c.server.url.replace(/\/|www/g, '')}$request_uri permanent;
