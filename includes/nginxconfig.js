@@ -1,11 +1,32 @@
-module.exports.createNginxConfig = _c => {
-    
-    const curedURL = _c.server.url.replace(/\//g, "");
+const { execSync } = require('child_process');
+const fs = require('fs');
+
+module.exports.updateNginxConfig = _c => {
+    const curedURL = _c.server.url.substring(2);
     let urlVariation;
 
     const levels = curedURL.split('.');
     if (levels.length > 2) {
         urlVariation = levels.splice(1).join('.')
+    } else {
+        urlVariation = "www." + levels.join('.');
+    }
+
+    fs.writeFileSync("/etc/nginx/sites-available/default", createNginxConfig(_c));
+    execSync("sudo service nginx reload");
+    execSync(`sudo letsencrypt certonly -a webroot --webroot-path=${_c.server.html} -d ${curedURL} -d ${urlVariation}`);
+    fs.writeFileSync("/etc/nginx/sites-available/default", createNginxExtendedConfig(_c));
+    execSync("sudo service nginx reload");
+};
+
+const createNginxConfig = _c => {
+    
+    const curedURL = _c.server.url.substring(2);
+    let urlVariation;
+
+    const levels = curedURL.split('.');
+    if (levels.length > 2) {
+        urlVariation = levels.splice(1).join('.');
     } else {
         urlVariation = "www." + levels.join('.');
     }
@@ -24,9 +45,9 @@ server {
 
 `;
 
-module.exports.createNginxExtendedConfig = _c => {
+const createNginxExtendedConfig = _c => {
     
-    const curedURL = _c.server.url.replace(/\//g, "");
+    const curedURL = _c.server.url.substring(2);
     let urlVariation;
 
     const levels = curedURL.split('.');
