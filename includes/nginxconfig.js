@@ -225,13 +225,15 @@ module.exports.initializeNginx = (_c, done) => {
     greenlock.generateCert(_c, success => {
         if (!success) {
             log('Init', 'Failed to generate HTTPS cert', 'err');
-            _c.server.protocol = "http:";
             done();
         } else {
+            log('Nginx', 'Writing new nginx config', 'info');
             fs.writeFileSync("/etc/nginx/sites-available/default", createNginxExtendedConfig(_c));
-            execSync("sudo service nginx reload");
-            _c.server.protocol = "https:";
 
+            log('Nginx', 'Reloading nginx with https config file', 'info');
+            execSync("sudo service nginx reload");
+
+            log('Nginx', 'All done!', 'success');
             done();
         }
     });
