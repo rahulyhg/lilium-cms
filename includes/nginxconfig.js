@@ -231,7 +231,13 @@ module.exports.initializeNginx = (_c, done) => {
             fs.writeFileSync("/etc/nginx/sites-available/default", createNginxExtendedConfig(_c));
 
             log('Nginx', 'Reloading nginx with https config file', 'info');
-            execSync("sudo service nginx reload");
+            try {
+                execSync("sudo service nginx reload");
+                log('Nginx', 'Reloaded nginx with new config files', 'success');
+            } catch (err) {
+                log('Nginx', 'Nginx failed to reload new configs. Exiting.', 'err');
+                process.exit(1);   
+            }
 
             log('Nginx', 'All done!', 'success');
             done();
