@@ -100,7 +100,7 @@ server {
     }
 
     location / {
-        return 301 https://${curedURL}$request_uri
+        return 301 https://${curedURL}$request_uri;
     }
 }
 
