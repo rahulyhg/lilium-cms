@@ -17,6 +17,11 @@ const createNginxConfig = _c => {
 
     return `# Lilium CMS
 
+upstream lilium_proxy  {
+    server 127.0.0.1:8080;
+    keepalive 64;
+}
+
 server {
     listen 80;
     server_name ${curedURL} ${urlVariation};
@@ -27,11 +32,6 @@ server {
     }
 
     location / {
-        proxy_cache my_cache_lilium;
-        proxy_cache_revalidate on;
-        proxy_cache_min_uses 3;
-        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
-        proxy_cache_lock on;
         add_header 'lml-country-code' "$http_cf_ipcountry";
 
         alias ${_c.server.html}/;
@@ -51,11 +51,6 @@ server {
 
         proxy_pass http://lilium_proxy;
         proxy_redirect off;
-
-        # enables WS support
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $upgr;
-        proxy_set_header Connection $conn;
     }
 }
 
