@@ -251,7 +251,7 @@ module.exports = function(config, data, done) {
                 fulltopic._id
             ] : [],
             lang : "en-ca",
-            facebookmedia : media && media.sizes.facebook && (config.server.protocol + media.sizes.facebook.url),
+            facebookmedia : media && media.sizes && media.sizes.facebook && (config.server.protocol + media.sizes.facebook.url),
             name : art["wp:post_name"] && art["wp:post_name"][0],
             comments : 0,
             facebooklastupdate : new Date()
