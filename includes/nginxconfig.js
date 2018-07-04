@@ -240,7 +240,7 @@ module.exports.initializeNginx = (_c, done) => {
             }
 
             log('Nginx', 'All done!', 'success');
-            done();
+            done(true);
         }
     });
 };
