@@ -107,8 +107,15 @@ module.exports = function(config, data, done) {
 
     const uploads = data.item.filter(x => x["wp:post_type"] == "attachment").map(a => {
         const smeta = a["wp:postmeta"].find(x => x["wp:meta_key"][0] == "_wp_attachment_metadata");
-        const metadata = smeta && smeta["wp:meta_value"] && unserialize(smeta["wp:meta_value"][0]);
-        
+        let metadata;
+
+        try {
+            metadata = smeta && smeta["wp:meta_value"] && unserialize(smeta["wp:meta_value"][0]);
+        } catch (err) {
+            log('TransformWP', 'Could not parse meta data of an image entry', 'warn');
+            log('TransformWP', err.toString(), 'warn');
+        }
+
         const up = {
             _id : new ObjectId(),
             wpid : a["wp:post_id"][0],
