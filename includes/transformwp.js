@@ -132,7 +132,9 @@ module.exports = function(config, data, done) {
             const uploadrelpath = "backend/static/u/";
             const filename =  metadata.file.split('/').pop();
             const reldirpath = metadata.file.split('/').slice(0, -1).join('/') + "/";
-
+            
+            up.wptransferred = true;
+            up.wppath = "/wp-content/uploads/" + metadata.file;
             up.size = {
                 width : metadata.width,
                 height : metadata.height
