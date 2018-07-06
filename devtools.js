@@ -56,6 +56,9 @@ class DevTools {
                     interpretLMLToCli(cli);
                 }
                 break;
+            case 'wptransfer':
+                transferWPFromOrigin(cli);
+                break;
             case 'clearlml3':
                 clearLML3Cache(cli);
                 break;
@@ -536,6 +539,71 @@ var clearLML3Cache = function(cli) {
     });
     
     cli.sendJSON({ok : 1})
+};
+
+var transferWPFromOrigin = function(cli) {
+    const path = require('path');
+    const mkdirp = require('mkdirp');
+    const request = require('request');
+    const fs = require('fs');
+
+    const files = [];
+
+    let index = -1;
+    const startTransfer = () => {
+        const nextImage = () => {
+            const file = files[++index];
+
+            if (file) {
+                request({ url : file.url, encoding : 'binary' }, (err, res) => {
+                    if (res.statusCode == 200) {
+                        mkdirp(file.dir, () => {
+                            fs.writeFile(path.join(file.dir, file.filename), res.body, {encoding : 'binary'}, () => {
+                                nextImage();
+                            });
+                        });
+                    } else {
+                        nextImage();
+                    }
+                });
+            } else {
+                log('Devtools', '--------------------------------', 'success');
+                log('Devtools', 'Done handling WP images transfer', 'success');                
+                log('Devtools', '--------------------------------', 'success');
+            }
+        };
+
+        nextImage();
+    };
+
+    db.find(cli._c, "uploads", { wptransferred : true, wpfiletransferred : false }, [], (err, cur) => {
+        log('Devtools', 'Listing images to download', 'info');
+        const nextImage = () => {
+            cur.next((err, image) => {
+                if (image) {
+                    files.push[{
+                        url : cli._c.server.protocol + cli._c.server.url + image.wppath,
+                        dir : image.dirpath,
+                        filename : image.filename
+                    }];
+                    Object.keys(image.sizes).forEach(size => {
+                        image.sizes[size].wpurl && files.push({
+                            url : cli._c.server.protocol + cli._c.server.url + image.sizes[size].wpurl,
+                            dir : image.dirpath,
+                            filename : image.sizes[size].wpfile
+                        });
+                    })
+
+                    nextImage();
+                } else {
+                    log('Devtools', 'Done listing images for WP transfer. Total : ' + files.length, 'info');
+                    startTransfer();
+                }
+            });
+        }
+
+        nextImage();
+    });
 };
 
 var maybeInsertFeed = function(cli) {

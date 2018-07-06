@@ -134,13 +134,15 @@ module.exports = function(config, data, done) {
             const reldirpath = metadata.file.split('/').slice(0, -1).join('/') + "/";
             
             up.wptransferred = true;
-            up.wppath = "/wp-content/uploads/" + metadata.file;
+            up.wpfiletransferred = false;
+            up.wppath = "/wp-content/uploads/" + reldirpath;
             up.size = {
                 width : metadata.width,
                 height : metadata.height
             };
             up.fullurl = "u/" + metadata.file;
             up.path = base + uploadrelpath + reldirpath + filename;
+            up.dirpath = base + uploadrelpath + reldirpath;
             up.artistname = metadata.image_meta.caption;
             up.articleurl = metadata.image_meta.credit;
             up.filename = filename;
@@ -157,6 +159,8 @@ module.exports = function(config, data, done) {
             up.sizes.content = {
                 path : base + uploadrelpath + reldirpath + large.file,
                 url :  config.server.url + "/u/" + reldirpath + large.file,
+                wpurl : "/wp-content/uploads/" + reldirpath + large.file,
+                wpfile : large.file.split('/').pop(),
                 width : large.width,
                 height : large.height
             }; up.sizes.thumbnaillarge = up.sizes.content;
@@ -165,6 +169,8 @@ module.exports = function(config, data, done) {
             up.sizes.thumbnail = {
                 path : base + uploadrelpath + reldirpath + thumbnail.file,
                 url :  config.server.url + "/u/" + reldirpath + thumbnail.file,
+                wpurl : "/wp-content/uploads/" + reldirpath + thumbnail.file,
+                wpfile : thumbnail.file.split('/').pop(),
                 width : thumbnail.width,
                 height : thumbnail.height                
             }; up.sizes.mini = up.sizes.thumbnail;
@@ -173,6 +179,8 @@ module.exports = function(config, data, done) {
             up.sizes.thumbnailarchive = {
                 path : base + uploadrelpath + reldirpath + medium.file,
                 url :  config.server.url + "/u/" + reldirpath + medium.file,
+                wpurl : "/wp-content/uploads/" + reldirpath + medium.file,
+                wpfile : medium.file.split('/').pop(),
                 width : medium.width,
                 height : medium.height   
             }; up.sizes.square = up.sizes.thumbnailarchive;

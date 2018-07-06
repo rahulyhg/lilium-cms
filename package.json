@@ -97,7 +97,7 @@
     "gmail-sender": "latest",
     "google-trends-api": "^4.3.0",
     "googleapis": "latest",
-    "greenlock": "^2.3.2",
+    "greenlock": "^2.3.5",
     "html-entities": "latest",
     "html-minifier": "latest",
     "html-to-amp": "^2.0.2",
