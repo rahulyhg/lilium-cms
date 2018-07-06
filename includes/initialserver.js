@@ -169,6 +169,10 @@ const mapPostDataToLiliumConfig = dat => {
             postMaxLength : 1024,
             fileMaxSize : dat.maxpostsize
         },
+        wp : {
+            iswp : !!dat.wordpressdb,
+            url : dat.wordpressurl
+        },
         analytics : {
             serviceaccount : analyticsDetails.client_email,
             jsonkeypath : path.join(__dirname, '..', '..', 'keys', 'analytics.json'),

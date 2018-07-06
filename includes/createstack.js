@@ -156,15 +156,15 @@ function transferWPImages(_c, data, done) {
     log('WPInit', 'Listing images to download', 'info');
 
     data.dbdata.uploads.filter(x => x.wppath).forEach(image => {
-        const dir = path.join(_c.server.html, image.wppath);
+        const dir = path.join(_c.wp.url, image.wppath);
         files.push[{
-            url : _c.server.protocol + _c.server.url + image.wppath,
+            url : _c.wp.url + image.wppath,
             filename : image.filename,
             dir
         }];
         Object.keys(image.sizes).forEach(size => {
             image.sizes[size].wpurl && files.push({
-                url : _c.server.protocol + _c.server.url + image.sizes[size].wpurl,
+                url : _c.wp.url + image.sizes[size].wpurl,
                 filename : image.sizes[size].wpfile,
                 dir
             });
