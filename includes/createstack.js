@@ -74,7 +74,9 @@ function createAdminEntity(config, dataref, next) {
 
 const formatMongoString = conf => 'mongodb://' + conf.data.user + ":" + conf.data.pass + "@" + conf.data.host + ":" + conf.data.port + "/" + conf.data.use;
 function createDatabase(config, dataref, next) {
+    log('Stack', "Mongo string : " + formatMongoString(config), 'info');
     MongoClient.connect(formatMongoString(config), (err, conn) => {
+        err && log('Stack', err, 'err');
         const db = conn.db(config.data.use);
         const colls = Object.keys(dataref.dbdata);
         let index = -1;
@@ -110,7 +112,67 @@ function createDatabase(config, dataref, next) {
     });
 };
 
-function transferWPImages(config, data, done) {
+function transferWPImages(_c, data, done) {
+    const path = require('path');
+    const mkdirp = require('mkdirp');
+    const request = require('request');
+    const fs = require('fs');
+
+    const files = [];
+
+    let index = -1;
+    const startTransfer = () => {
+        const nextImage = () => {
+            const file = files[++index];
+
+            if (file) {
+                log('WPInit', 'Downloading image file : ' + file.url, 'info');
+                request({ url : file.url, encoding : 'binary' }, (err, res) => {
+                    if (res.statusCode == 200) {
+                        mkdirp(file.dir, () => {
+                            const ffpath = path.join(file.dir, file.filename);
+                            log('WPInit', 'Writing file to ' + ffpath, 'info');
+                            fs.writeFile(ffpath, res.body, {encoding : 'binary'}, (err) => {
+                                err && log('WPInit', err, 'err');
+                                return nextImage();
+                            });
+                        });
+                    } else {
+                        return nextImage();
+                    }
+                });
+            } else {
+                log('WPInit', '--------------------------------', 'success');
+                log('WPInit', 'Done handling WP images transfer', 'success');                
+                log('WPInit', '--------------------------------', 'success');
+
+                return;
+            }
+        };
+
+        setTimeout(nextImage, 0);
+    };
+
+    log('WPInit', 'Listing images to download', 'info');
+
+    data.dbdata.uploads.filter(x => x.wppath).forEach(image => {
+        const dir = path.join(_c.server.html, image.wppath);
+        files.push[{
+            url : _c.server.protocol + _c.server.url + image.wppath,
+            filename : image.filename,
+            dir
+        }];
+        Object.keys(image.sizes).forEach(size => {
+            image.sizes[size].wpurl && files.push({
+                url : _c.server.protocol + _c.server.url + image.sizes[size].wpurl,
+                filename : image.sizes[size].wpfile,
+                dir
+            });
+        })
+    });
+    
+    log('WPInit', 'Done listing images for WP transfer. Total : ' + files.length, 'info');
+    startTransfer();
     done();
 };
 
