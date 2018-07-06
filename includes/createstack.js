@@ -156,7 +156,7 @@ function transferWPImages(_c, data, done) {
     log('WPInit', 'Listing images to download', 'info');
 
     data.dbdata.uploads.filter(x => x.wppath).forEach(image => {
-        const dir = path.join(_c.wp.url, image.wppath);
+        const dir = path.join(_c.server.html, image.wppath);
         files.push[{
             url : _c.wp.url + image.wppath,
             filename : image.filename,
