@@ -9,9 +9,11 @@ export class Header extends Component {
     render() {
         return (
             <header>
-                <Link display="inline" href="/">
-                    <img id="lilium-logo" src="/static/media/lmllogo.svg" />
-                    <span id="lilium-brandname">Lilium CMS</span>
+                <Link display="inline" href="/dashboard">
+                    <div id="lilium-logo-wrapper">
+                        <img id="lilium-logo" src="/static/media/lmllogo.svg" />
+                        <span id="lilium-brandname" class="ptext">Lilium CMS</span>
+                    </div>
                 </Link>
             </header>
         )
