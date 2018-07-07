@@ -127,9 +127,9 @@ module.exports = function(config, data, done) {
         };
 
         if (metadata) {
-            const base = config.server.base + "backend/static/u/";
+            const base = config.server.html;
             const sizes = metadata.sizes;
-            const uploadrelpath = "backend/static/u/";
+            const uploadrelpath = "/wp-content/uploads/";
             const filename =  metadata.file.split('/').pop();
             const reldirpath = metadata.file.split('/').slice(0, -1).join('/') + "/";
             
@@ -140,7 +140,7 @@ module.exports = function(config, data, done) {
                 width : metadata.width,
                 height : metadata.height
             };
-            up.fullurl = "u/" + metadata.file;
+            up.fullurl = "wp-content/uploads/" + metadata.file;
             up.path = base + uploadrelpath + reldirpath + filename;
             up.dirpath = base + uploadrelpath + reldirpath;
             up.artistname = metadata.image_meta.caption;
@@ -158,7 +158,7 @@ module.exports = function(config, data, done) {
             const large = sizes.large || sizes.medium_large || { file : filename, width : metadata.width, height : metadata.height };
             up.sizes.content = {
                 path : base + uploadrelpath + reldirpath + large.file,
-                url :  config.server.url + "/u/" + reldirpath + large.file,
+                url :  config.server.url + "/wp-content/uploads/" + reldirpath + large.file,
                 wpurl : "/wp-content/uploads/" + reldirpath + large.file,
                 wpfile : large.file.split('/').pop(),
                 width : large.width,
@@ -168,7 +168,7 @@ module.exports = function(config, data, done) {
             const thumbnail = sizes.thumbnail || { file : filename, width : metadata.width, height : metadata.height };
             up.sizes.thumbnail = {
                 path : base + uploadrelpath + reldirpath + thumbnail.file,
-                url :  config.server.url + "/u/" + reldirpath + thumbnail.file,
+                url :  config.server.url + "/wp-content/uploads/" + reldirpath + thumbnail.file,
                 wpurl : "/wp-content/uploads/" + reldirpath + thumbnail.file,
                 wpfile : thumbnail.file.split('/').pop(),
                 width : thumbnail.width,
@@ -178,7 +178,7 @@ module.exports = function(config, data, done) {
             const medium = sizes.medium || { file : filename, width : metadata.width, height : metadata.height };
             up.sizes.thumbnailarchive = {
                 path : base + uploadrelpath + reldirpath + medium.file,
-                url :  config.server.url + "/u/" + reldirpath + medium.file,
+                url :  config.server.url + "/wp-content/uploads/" + reldirpath + medium.file,
                 wpurl : "/wp-content/uploads/" + reldirpath + medium.file,
                 wpfile : medium.file.split('/').pop(),
                 width : medium.width,
