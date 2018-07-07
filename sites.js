@@ -244,8 +244,9 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/modals.css", 2660, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/welcome.css", 2800, 'admin', conf.id);
 
+        const pathLib = require('path');
         buildLib.pushToBuildTree(conf, 'lilium', 'lilium', {
-            outputpath : require("path").join(conf.server.html, 'lmlbackend'),
+            outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
             babel : {
                 "plugins": [
                     ["transform-react-jsx", { "pragma":"h" }]
@@ -253,6 +254,11 @@ var SiteInitializer = function (conf, siteobj) {
                 "presets" : ["es2015"]
             }
         });
+
+        fs.copyFileSync(
+            pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
+            pathLib.join(conf.server.html, 'lilium.css')
+        );
 
         hooks.fireSite(conf, 'frontend_will_precompile', {
             config: conf,
