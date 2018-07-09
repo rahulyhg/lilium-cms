@@ -129,7 +129,15 @@ var LiveVariables = function() {
     this.handleRequest = function(cli) {
         if (cli.routeinfo.path[1] == "v4") {
             // LIVE VARIABLE V4
-            RegisteredLiveVariables[cli.routeinfo.path[2]] ? RegisteredLiveVariables[cli.routeinfo.path[2]].callback(cli, cli.routeinfo.path.splice(2), cli.routeinfo.params, resp => {
+            let params = cli.routeinfo.params.p;
+            try {
+                params = JSON.parse(params);
+            } catch (err) { }
+
+            console.log(params);
+            RegisteredLiveVariables[cli.routeinfo.path[2]] ? RegisteredLiveVariables[cli.routeinfo.path[2]].callback(
+                cli, cli.routeinfo.path.splice(3), params, 
+            resp => {
                 cli.sendJSON(resp);
             }) : cli.throwHTTP(404, undefined, true);
         } else {
