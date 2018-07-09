@@ -127,33 +127,40 @@ var LiveVariables = function() {
     };
 
     this.handleRequest = function(cli) {
-        try {
-            var liveVars = JSON.parse(cli.routeinfo.params.vars);
-            cli.livevars = {};
-
+        if (cli.routeinfo.path[1] == "v4") {
+            // LIVE VARIABLE V4
+            RegisteredLiveVariables[cli.routeinfo.path[2]] ? RegisteredLiveVariables[cli.routeinfo.path[2]].callback(cli, cli.routeinfo.path.splice(2), cli.routeinfo.params, resp => {
+                cli.sendJSON(resp);
+            }) : cli.throwHTTP(404, undefined, true);
+        } else {
+            // LEGACY LIVE VARIABLE HANDLING LOGIC
             try {
-                cli.details = JSON.parse(cli.routeinfo.params.details || {});
-            } catch (err) {
-                cli.details = {};
-            }
+                var liveVars = JSON.parse(cli.routeinfo.params.vars);
+                cli.livevars = {};
 
-            var callback = function(response) {
-                cli.sendJSON({
-                    livevars: cli.livevars,
-                    response: response
-                });
-            };
+                try {
+                    cli.details = JSON.parse(cli.routeinfo.params.details || {});
+                } catch (err) {
+                    cli.details = {};
+                }
 
-            if (typeof liveVars === 'object') {
-                startLoop(cli, liveVars, cli.livevars, callback);
-            } else {
-                callback();
+                var callback = function(response) {
+                    cli.sendJSON({
+                        livevars: cli.livevars,
+                        response: response
+                    });
+                };
+
+                if (typeof liveVars === 'object') {
+                    startLoop(cli, liveVars, cli.livevars, callback);
+                } else {
+                    callback();
+                }
+            } catch (e) {
+                console.log(e);
+                cli.throwHTTP(400, 'Bad request');
             }
-        } catch (e) {
-            console.log(e);
-            cli.throwHTTP(400, 'Bad request');
         }
-
     };
 
     this.registerDebugEndpoint = function() {
