@@ -3,6 +3,7 @@ import { h, Component } from 'preact'
 // Import default pages from route
 import InitPage     from '../pages/default';
 import Dashboard    from '../pages/dashboard/index';
+import Publishing   from '../pages/publishing/index';
 import e404         from '../pages/errors/404';
 
 // Default endpoints are provided here
@@ -36,6 +37,7 @@ EndpointStore.ENDPOINT_STORE = {};
 EndpointStore.registerEndpoint("_init", InitPage);
 EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
+EndpointStore.registerEndpoint('publishing', Publishing);
 
 export class URLRenderer extends Component {
     constructor(props) {
