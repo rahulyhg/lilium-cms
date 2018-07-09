@@ -131,6 +131,7 @@
     "parchment": "latest",
     "path": "latest",
     "php-serialization": "0.0.4",
+    "pidusage": "^2.0.11",
     "pmx": "latest",
     "process": "latest",
     "quill": "latest",
