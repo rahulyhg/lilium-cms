@@ -7,6 +7,8 @@ const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 const log = require('../log.js');
 const api = require('../api.js');
+// const otplib = require('otplib.js');
+
 
 const loginSuccess = (cli, userObj, cb) => {
 	cli.touch('login.loginsuccess');
@@ -41,6 +43,8 @@ const loginSuccess = (cli, userObj, cb) => {
 };
 
 class Login {
+
+    // Deprecated
     fbAuth (cli) {
         require('request').get('https://graph.facebook.com/debug_token/?input_token=' + cli.postdata.data.accessToken +
             '&access_token=' + cli._c.social.facebook.token, {}, (err, resp) => {
@@ -137,10 +141,10 @@ class Login {
             ];
 
             cli.touch("login.authUser@networkcheck");
-            db.match(_c.default(), 'entities', conds, found => {
-    			if (found) {
-            		entities.fetchFromDB(cli._c, usr, userObj => {
-                        log("Auth", "Login success with user " + usr, "lilium");
+            db.findUnique(_c.default(), 'entities', conds, (err, user) => {
+    			if (!err, user) {
+            		entities.fetchFromDB(cli._c, user.usr, userObj => {
+                        log("Auth", "Login success with user " + user.usr, "lilium");
 	        			loginSuccess(cli, userObj);
 		        	});
 			    } else {
