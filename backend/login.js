@@ -126,7 +126,9 @@ class Login {
         }
 
 		const usr = cli.postdata.data.usr;
-		const psw = cli.postdata.data.psw;
+        const psw = cli.postdata.data.psw;
+        const token2fa = cli.postdata.data.token2fa;
+        console.log(token2fa);
 
 		if (usr && psw) {
             const conds = {
