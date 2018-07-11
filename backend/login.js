@@ -142,9 +142,10 @@ class Login {
 
             cli.touch("login.authUser@networkcheck");
             db.findUnique(_c.default(), 'entities', conds, (err, user) => {
-    			if (!err, user) {
-            		entities.fetchFromDB(cli._c, user.usr, userObj => {
-                        log("Auth", "Login success with user " + user.usr, "lilium");
+                if (!err && user) {
+                    entities.fetchFromDB(cli._c, user.username, userObj => {
+                        console.log(userObj);
+                        log("Auth", "Login success with user " + user.username, "lilium");
 	        			loginSuccess(cli, userObj);
 		        	});
 			    } else {
