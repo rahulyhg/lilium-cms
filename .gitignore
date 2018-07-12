@@ -56,3 +56,6 @@ backend/static/js/main.*
 backend/static/css/main.*
 
 dictionary
+
+# VS Code workspace directory
+.vscode/

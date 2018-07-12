@@ -71,6 +71,7 @@
     "JSONStream": "latest",
     "admin-mongo": "latest",
     "babel-preset-preact": "^1.1.0",
+    "base32-encode": "^1.1.0",
     "binaryjs": "latest",
     "bower": "^1.8.4",
     "buffertools": "latest",

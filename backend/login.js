@@ -7,8 +7,8 @@ const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 const log = require('../log.js');
 const api = require('../api.js');
-// const otplib = require('otplib.js');
-
+const otplib = require('otplib');
+const base32Encode = require('base32-encode');
 
 const loginSuccess = (cli, userObj, cb) => {
 	cli.touch('login.loginsuccess');
@@ -115,7 +115,7 @@ class Login {
                 }
             });
         } else {
-            cli.throwHTTP(403)
+            cli.throwHTTP(403);
         }
     }
 
@@ -128,7 +128,6 @@ class Login {
 		const usr = cli.postdata.data.usr;
         const psw = cli.postdata.data.psw;
         const token2fa = cli.postdata.data.token2fa;
-        console.log(token2fa);
 
 		if (usr && psw) {
             const conds = {
@@ -144,14 +143,33 @@ class Login {
 
             cli.touch("login.authUser@networkcheck");
             db.findUnique(_c.default(), 'entities', conds, (err, user) => {
+                // console.log(err, user);
                 if (!err && user) {
-                    entities.fetchFromDB(cli._c, user.username, userObj => {
-                        console.log(userObj);
-                        log("Auth", "Login success with user " + user.username, "lilium");
-	        			loginSuccess(cli, userObj);
-		        	});
-			    } else {
-	    		    hooks.fire('user_login_failed', cli);
+                    console.log(err, user);
+                    if (user.enforce2fa) {
+                        const secret = base32Encode(Buffer.from(usr + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
+                        console.log(secret, secret.length);
+                        console.log(token2fa, otplib.authenticator.generate(secret));
+                        console.log(otplib.authenticator.check(token2fa, secret));
+                        console.log((token2fa && otplib.authenticator.check(token2fa, secret)));
+                        if (token2fa && otplib.authenticator.check(token2fa, secret)) {
+                            entities.fetchFromDB(cli._c, user.username, userObj => {
+                                log("Auth", "Login with credentials and 2FA success with user " + user.username, "lilium");
+                                loginSuccess(cli, userObj);
+                            });
+                        } else {
+                            hooks.fire('user_login_failed', cli);
+                            log("Auth", "Login attempt failed with user " + usr + " due to invalid 2FA token", "warn");
+                            cli.sendJSON({ error : "2fa", success : false })
+                        }
+                    } else {
+                        entities.fetchFromDB(cli._c, user.username, userObj => {
+                            log("Auth", "Login with credentials success with user " + user.username, "lilium");
+                            loginSuccess(cli, userObj);
+                        });
+                    }
+                } else {
+                    hooks.fire('user_login_failed', cli);
                     log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
                     cli.sendJSON({ error : "credentials", success : false })
                 }
