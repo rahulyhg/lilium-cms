@@ -61,6 +61,11 @@ export class URLRenderer extends Component {
             window.history.pushState("/lilium/dashboard", undefined, "/lilium/dashboard");
         }
 
+        window.onpopstate = () => {
+            log("URLRenderer", 'Handling popstate event', 'url');
+            this.refreshPath();
+        };
+
         this.refreshPath();
     }
 

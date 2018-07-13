@@ -20,3 +20,9 @@ export class Link extends Component {
         );
     }
 }
+
+export function navigateTo(href) {
+    log('Link', 'Hard navigation from code to href : ' + href, 'detail');
+    const ev = new CustomEvent("navigate", { detail : { href } });
+    document.dispatchEvent(ev);    
+}
