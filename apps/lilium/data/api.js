@@ -6,7 +6,8 @@ class API {
                 r.json().then(resp => {
                     sendback(undefined, resp);
                 }).catch(err => {
-                    r.text().then(txt => sendback(undefined, txt));
+                    log('API', 'JSON failed to parse', 'warn');
+                    sendback(err);
                 });
             } else {               
                 log('API', '['+r.status+'] API call to ' + endpoint, 'warn');
