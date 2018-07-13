@@ -19,7 +19,7 @@ export default class EditView extends Component {
         API.getMany(Object.keys(endpoints).map(key => endpoints[key]), resp => {
             const post = resp[endpoints.post.endpoint];
             post ?
-                log('Publishing', 'Loaded : ' + post.headline, 'detail') :
+                log('Publishing', 'About to display : ' + post.headline, 'detail') :
                 log('Publishing', 'Article not found : ' + this.props.postid, 'warn');
             
             this.setState(post ? { post } : { error : "Article not Found" });
