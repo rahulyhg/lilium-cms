@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import API from "../../data/api";
 
+
+
 export default class EditView extends Component {
     constructor(props) {
         super(props);
@@ -10,14 +12,17 @@ export default class EditView extends Component {
     }
 
     componentDidMount() {
-        API.get("/publishing/write/" + this.props.postid, {}, (err, post) => {
-            if (!post) {
-                log('Publishing', 'Article not found : ' + this.props.postid, 'warn');
-            } else {
-                log('Publishing', 'Loaded : ' + post.headline, 'detail');
-            }
+        const endpoints = {
+            post : { endpoint : "/publishing/write/" + this.props.postid, params : {} }
+        };
 
-            this.setState(post ? { post } : { error : "Article not Found" })
+        API.getMany(Object.keys(endpoints).map(key => endpoints[key]), resp => {
+            const post = resp[endpoints.post.endpoint];
+            post ?
+                log('Publishing', 'Loaded : ' + post.headline, 'detail') :
+                log('Publishing', 'Article not found : ' + this.props.postid, 'warn');
+            
+            this.setState(post ? { post } : { error : "Article not Found" });
         });
     }
 
@@ -25,7 +30,7 @@ export default class EditView extends Component {
         if (this.state.error) {
             return (
                 <div>
-                    Article not found
+                    {this.state.error}
                 </div>
             )
         }
