@@ -7,6 +7,7 @@ export class Link extends Component {
     }
 
     navigate() {
+        log('Link', 'Link was clicked with href : ' + this.props.href, 'detail');
         const ev = new CustomEvent("navigate", { detail : { href : this.props.href } });
         document.dispatchEvent(ev);
     }
