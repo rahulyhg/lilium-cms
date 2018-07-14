@@ -21,9 +21,9 @@
             "endpoint" : "login",
             "support" : ["api_get", "api_post"]
         }, {
-            "module" : "proofreader.js",
-            "endpoint" : "proofread",
-            "support" : ["setup"]
+            "module": "twoFactor.js",
+            "endpoint": "2fa",
+            "support": ["livevar", "admin_post"]
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
@@ -435,5 +435,5 @@
                 }]
             }
         }       
-    ]   
+    ]
 }

@@ -149,6 +149,7 @@ const compile = (o, context) => { o(`
                 <img src="/static/media/lmllogo.png" id="logo" />
                 <input type="text" placeholder="Username" id="txtusername" />
                 <input type="password" placeholder="Password" id="txtpassword" />
+                <input type="text" placeholder="2FA Token (leave blank if you don't have 2FA enabled)" id="txt2fa" />
 
                 <div id="loginmsg"></div>
 
@@ -183,6 +184,9 @@ const compile = (o, context) => { o(`
                 pwd.value = "";
                 pwd.focus();
 
+                var token2fa = document.getElementById('txt2fa');
+                token2fa.value = "";
+
                 document.getElementById('loginbutton').style.display = "";
                 document.getElementById('loginmsg').style.display = "block";
                 document.getElementById('loginmsg').textContent = "Login failed."
@@ -208,6 +212,7 @@ const compile = (o, context) => { o(`
 
                 var username = document.getElementById('txtusername').value;
                 var password = document.getElementById('txtpassword').value;
+                var txt2fa = document.getElementById('txt2fa').value;
 
                 if (!username.trim() || !password.trim()) {
                     failed();
@@ -216,7 +221,7 @@ const compile = (o, context) => { o(`
                     oReq.addEventListener("load", gotLoginResp);
                     oReq.open("POST", "/login" + document.location.search);
                     oReq.setRequestHeader('Content-Type', 'application/json');
-                    oReq.send(JSON.stringify({ usr : username, psw : password, payloadid : "${Math.random().toString().substring(2)}" }));
+                    oReq.send(JSON.stringify({ usr : username, psw : password, token2fa : txt2fa, payloadid : "${Math.random().toString().substring(2)}" }));
                 }
             }
 
