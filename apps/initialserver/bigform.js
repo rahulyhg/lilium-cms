@@ -142,7 +142,8 @@ export default class BigForm extends Component {
                     <TextField onchange={this.fieldUpdated.bind(this)}  values={this.values}  id="darkskyttl" displayname="Cache time-to-live (TTL) *" default="3600000" />
                 </FieldSection>   
 
-                <FieldSection displayname="Wordpress Database">
+                <FieldSection displayname="Wordpress Database">                    
+                    <TextField onchange={this.fieldUpdated.bind(this)}  values={this.values}  id="wordpressurl" displayname="Wordpress full URL" />
                     <FileField onchange={this.fieldUpdated.bind(this)}  values={this.values}  id="wordpressdb" displayname="Database XML file" />
                 </FieldSection> 
 

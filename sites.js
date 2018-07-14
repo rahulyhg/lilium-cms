@@ -14,6 +14,7 @@ var themes = require('./themes.js');
 var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
 var templateBuilder = require('./templateBuilder.js');
+var buildLib = require('./build');
 var category = require('./category.js');
 var badges = require('./badges.js');
 var events = require('./events.js');
@@ -242,6 +243,34 @@ var SiteInitializer = function (conf, siteobj) {
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/lmltable.css", 2640, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/modals.css", 2660, 'admin', conf.id);
         Frontend.registerCSSFile(htmlbase + "/compiled/admin/css/welcome.css", 2800, 'admin', conf.id);
+
+        const pathLib = require('path');
+        buildLib.pushToBuildTree(conf, 'lilium', 'lilium', {
+            outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
+            babel : {
+                "plugins": [
+                    ["transform-react-jsx", { "pragma":"h" }]
+                ],
+                "presets" : ["es2015"]
+            }
+        });
+
+        hooks.bindSite(conf, 'preactAppInjectionPhase', pkg => {
+            if (pkg.appname == "lilium") {
+                pkg.code += `// Lilium config
+                    global.liliumcms = {
+                        env : "${conf.env}",
+                        uid : "${conf.uid}",
+                        url : "${conf.server.url}"
+                    };
+                `;
+            }
+        });
+
+        fs.copyFileSync(
+            pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
+            pathLib.join(conf.server.html, 'lilium.css')
+        );
 
         hooks.fireSite(conf, 'frontend_will_precompile', {
             config: conf,

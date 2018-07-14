@@ -17,6 +17,11 @@ const createNginxConfig = _c => {
 
     return `# Lilium CMS
 
+upstream lilium_proxy  {
+    server 127.0.0.1:8080;
+    keepalive 64;
+}
+
 server {
     listen 80;
     server_name ${curedURL} ${urlVariation};
@@ -27,11 +32,6 @@ server {
     }
 
     location / {
-        proxy_cache my_cache_lilium;
-        proxy_cache_revalidate on;
-        proxy_cache_min_uses 3;
-        proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
-        proxy_cache_lock on;
         add_header 'lml-country-code' "$http_cf_ipcountry";
 
         alias ${_c.server.html}/;
@@ -51,11 +51,6 @@ server {
 
         proxy_pass http://lilium_proxy;
         proxy_redirect off;
-
-        # enables WS support
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $upgr;
-        proxy_set_header Connection $conn;
     }
 }
 
@@ -105,7 +100,7 @@ server {
     }
 
     location / {
-        return 301 https://${curedURL}$request_uri
+        return 301 https://${curedURL}$request_uri;
     }
 }
 
@@ -121,7 +116,7 @@ server {
 
     ssl_ciphers "ECDHE-ECDSA-AES128-GCM-SHA256 ECDHE-ECDSA-AES256-GCM-SHA384 ECDHE-ECDSA-AES128-SHA ECDHE-ECDSA-AES256-SHA ECDHE-ECDSA-AES128-SHA256 ECDHE-ECDSA-AES256-SHA384 ECDHE-RSA-AES128-GCM-SHA256 ECDHE-RSA-AES256-GCM-SHA384 ECDHE-RSA-AES128-SHA ECDHE-RSA-AES128-SHA256 ECDHE-RSA-AES256-SHA384 DHE-RSA-AES128-GCM-SHA256 DHE-RSA-AES256-GCM-SHA384 DHE-RSA-AES128-SHA DHE-RSA-AES256-SHA DHE-RSA-AES128-SHA256 DHE-RSA-AES256-SHA256 EDH-RSA-DES-CBC3-SHA"; # managed by Certbot
 
-    server_name ${curedURL} ${urlVariaion};
+    server_name ${curedURL} ${urlVariation};
     # port_in_redirect off;
 
     large_client_header_buffers 8 32k;
@@ -216,18 +211,36 @@ server {
 module.exports.initializeNginx = (_c, done) => {
     const greenlock = new Greenlock();
 
+    log('Nginx', 'Writing default http files', 'info');
     fs.writeFileSync("/etc/nginx/sites-available/default", createNginxConfig(_c));
-    execSync("sudo service nginx reload");
+    try {
+        execSync("sudo service nginx reload");
+        log('Nginx', 'Reloaded nginx with new config files', 'success');
+    } catch (err) {
+        log('Nginx', 'Nginx failed to reload new configs. Exiting.', 'err');
+        process.exit(1);   
+    }
+
+    log ('Greenlock', 'Calling generateCert from init method', 'info');
     greenlock.generateCert(_c, success => {
         if (!success) {
-            _c.server.protocol = "http:";
+            log('Init', 'Failed to generate HTTPS cert', 'err');
             done();
         } else {
+            log('Nginx', 'Writing new nginx config', 'info');
             fs.writeFileSync("/etc/nginx/sites-available/default", createNginxExtendedConfig(_c));
-            execSync("sudo service nginx reload");
-            _c.server.protocol = "https:";
 
-            done();
+            log('Nginx', 'Reloading nginx with https config file', 'info');
+            try {
+                execSync("sudo service nginx reload");
+                log('Nginx', 'Reloaded nginx with new config files', 'success');
+            } catch (err) {
+                log('Nginx', 'Nginx failed to reload new configs. Exiting.', 'err');
+                process.exit(1);   
+            }
+
+            log('Nginx', 'All done!', 'success');
+            done(true);
         }
     });
 };

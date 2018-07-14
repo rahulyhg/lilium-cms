@@ -107,8 +107,15 @@ module.exports = function(config, data, done) {
 
     const uploads = data.item.filter(x => x["wp:post_type"] == "attachment").map(a => {
         const smeta = a["wp:postmeta"].find(x => x["wp:meta_key"][0] == "_wp_attachment_metadata");
-        const metadata = smeta && smeta["wp:meta_value"] && unserialize(smeta["wp:meta_value"][0]);
-        
+        let metadata;
+
+        try {
+            metadata = smeta && smeta["wp:meta_value"] && unserialize(smeta["wp:meta_value"][0]);
+        } catch (err) {
+            log('TransformWP', 'Could not parse meta data of an image entry', 'warn');
+            log('TransformWP', err.toString(), 'warn');
+        }
+
         const up = {
             _id : new ObjectId(),
             wpid : a["wp:post_id"][0],
@@ -120,18 +127,22 @@ module.exports = function(config, data, done) {
         };
 
         if (metadata) {
-            const base = config.server.base + "backend/static/u/";
+            const base = config.server.html;
             const sizes = metadata.sizes;
-            const uploadrelpath = "backend/static/u/";
+            const uploadrelpath = "/wp-content/uploads/";
             const filename =  metadata.file.split('/').pop();
             const reldirpath = metadata.file.split('/').slice(0, -1).join('/') + "/";
-
+            
+            up.wptransferred = true;
+            up.wpfiletransferred = false;
+            up.wppath = "/wp-content/uploads/" + reldirpath;
             up.size = {
                 width : metadata.width,
                 height : metadata.height
             };
-            up.fullurl = "u/" + metadata.file;
+            up.fullurl = "wp-content/uploads/" + metadata.file;
             up.path = base + uploadrelpath + reldirpath + filename;
+            up.dirpath = base + uploadrelpath + reldirpath;
             up.artistname = metadata.image_meta.caption;
             up.articleurl = metadata.image_meta.credit;
             up.filename = filename;
@@ -147,7 +158,9 @@ module.exports = function(config, data, done) {
             const large = sizes.large || sizes.medium_large || { file : filename, width : metadata.width, height : metadata.height };
             up.sizes.content = {
                 path : base + uploadrelpath + reldirpath + large.file,
-                url :  config.server.url + "/u/" + reldirpath + large.file,
+                url :  config.server.url + "/wp-content/uploads/" + reldirpath + large.file,
+                wpurl : "/wp-content/uploads/" + reldirpath + large.file,
+                wpfile : large.file.split('/').pop(),
                 width : large.width,
                 height : large.height
             }; up.sizes.thumbnaillarge = up.sizes.content;
@@ -155,7 +168,9 @@ module.exports = function(config, data, done) {
             const thumbnail = sizes.thumbnail || { file : filename, width : metadata.width, height : metadata.height };
             up.sizes.thumbnail = {
                 path : base + uploadrelpath + reldirpath + thumbnail.file,
-                url :  config.server.url + "/u/" + reldirpath + thumbnail.file,
+                url :  config.server.url + "/wp-content/uploads/" + reldirpath + thumbnail.file,
+                wpurl : "/wp-content/uploads/" + reldirpath + thumbnail.file,
+                wpfile : thumbnail.file.split('/').pop(),
                 width : thumbnail.width,
                 height : thumbnail.height                
             }; up.sizes.mini = up.sizes.thumbnail;
@@ -163,7 +178,9 @@ module.exports = function(config, data, done) {
             const medium = sizes.medium || { file : filename, width : metadata.width, height : metadata.height };
             up.sizes.thumbnailarchive = {
                 path : base + uploadrelpath + reldirpath + medium.file,
-                url :  config.server.url + "/u/" + reldirpath + medium.file,
+                url :  config.server.url + "/wp-content/uploads/" + reldirpath + medium.file,
+                wpurl : "/wp-content/uploads/" + reldirpath + medium.file,
+                wpfile : medium.file.split('/').pop(),
                 width : medium.width,
                 height : medium.height   
             }; up.sizes.square = up.sizes.thumbnailarchive;
@@ -244,7 +261,7 @@ module.exports = function(config, data, done) {
                 fulltopic._id
             ] : [],
             lang : "en-ca",
-            facebookmedia : media && (config.server.protocol + media.sizes.facebook.url),
+            facebookmedia : media && media.sizes && media.sizes.facebook && (config.server.protocol + media.sizes.facebook.url),
             name : art["wp:post_name"] && art["wp:post_name"][0],
             comments : 0,
             facebooklastupdate : new Date()

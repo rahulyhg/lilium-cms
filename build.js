@@ -37,40 +37,76 @@ class Builder {
         next();
     }
 
+    adminPOST(cli) {
+        if (cli.hasRightOrRefuse('lilium')) {
+            if (cli.routeinfo.path[2] == "lilium") {
+                const b = init_build_tree.find(x => x.input == "lilium" && x._c.id == cli._c.id);
+                if (b) {
+                    this.build(b._c, b.input, b.outputkey, b.options, () => {
+                        cli.sendJSON({done : 1})
+                    })
+                } else {
+                    cli.sendJSON({ error : "nobuildinfo" });
+                }
+            }
+        }
+    }
+
     build(_c, input, outputkey, options, done) {
         log('Builder', 'Compiling ES6 project from dir ' + input, 'info');
         const now = Date.now();
         options = options || Builder.defaultOptions;
 
-        const buildconfig = {
-            module : {
-                rules : [
-                    { 
-                        test : /.jsx?$/, 
-                        loader : "babel-loader", 
-                        options : options.babel 
+        const entryfile = path.join(liliumroot, "apps", input, options.entryfile || 'main.js');        
+        const precompfile = path.join(liliumroot, "apps", input, 'main.lilium.js');
+
+        fs.readFile(entryfile, { encoding : "utf8" }, (err, maincontent) => {
+            if (err || !maincontent) {
+                log('Build', 'Missing main.js file in app ' + input, 'err');
+                return done();
+            }
+
+            const preactInjectedCode = {
+                code : "",
+                appname : input
+            };
+
+            _c && hooks.fireSite(_c, 'preactAppInjectionPhase', preactInjectedCode)
+            maincontent = maincontent.replace("// LILIUM_IMPORT_TEMPLATE", preactInjectedCode.code);
+
+            fs.writeFile(precompfile, maincontent, { encoding : "utf8" }, err => {
+                const buildconfig = {
+                    module : {
+                        rules : [
+                            { 
+                                test : /.jsx?$/, 
+                                loader : "babel-loader", 
+                                options : options.babel 
+                            },
+                        ]
                     },
-                ]
-            },
-            entry : path.join(liliumroot, "apps", input, options.entryfile || 'main.js'),
-            output : {
-                path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
-                filename : options.bundlename || "app.bundle.js"
-            }
-        };
+                    entry : precompfile,
+                    output : {
+                        path : options.outputpath || (_c.server.html + "/apps/" + outputkey),
+                        filename : options.bundlename || "app.bundle.js"
+                    }
+                };
 
-        _c && hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig});
-        webpack(buildconfig, (err, result) => {
-            err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
-                log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
+                _c && hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig});
+                webpack(buildconfig, (err, result) => {
+                    err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
+                        log('Builder', 'Compiled ES6 file with key ' + outputkey + " in " + (Date.now() - now) + "ms", 'success');
 
-            if (result && result.compilation && result.compilation.errors.length != 0) {
-                log('Builder', 'Errors were found in the code for ' + outputkey, 'err');
-                result.compilation.errors.forEach(console.log);
-            }
+                    if (result && result.compilation && result.compilation.errors.length != 0) {
+                        log('Builder', 'Errors were found in the code for ' + outputkey, 'err');
+                        result.compilation.errors.forEach(console.log);
+                    }
 
-            done && done();
-        });
+                    fs.unlink(precompfile, () => done && done());
+                });
+
+            });
+        })
     }
 
     getAppScript(key) {

@@ -2,6 +2,7 @@ const log = require('./log.js');
 const hooks = require('./hooks.js');
 const db = require('./includes/db.js');
 const isElder = require('./network/info.js').isElderChild();
+const V4 = require('./v4');
 
 class Core {
     constructor() {
@@ -121,6 +122,12 @@ const loadEndpoints = () => {
     const LoginLib = require('./backend/login.js');
 
     endpoints.init();
+    endpoints.register('*', 'lilium', 'GET', function(cli) {
+        cli.userinfo && cli.userinfo.loggedin ? 
+            V4.serveV4Index(cli) :
+            cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
+    });
+
     endpoints.register('*', 'login', 'POST', function (cli) {
         cli.touch("endpoints.POST.login");
         LoginLib.authUser(cli);
@@ -210,7 +217,8 @@ const loadPlugins = function (cb) {
 const makeBuild = function(cb) {
     if (!isElder) { return cb(); }
 
-    require('./build').initialBuild(cb);
+    const buildLib = require('./build');    
+    buildLib.initialBuild(cb);
 };
 
 const loadRoles = function (cb) {

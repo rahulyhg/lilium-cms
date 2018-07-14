@@ -103,6 +103,11 @@ const compile = (o, context) => { o(context.header, `
 
         <span>Roles</span>
         <div id="e-roles"></div>
+
+        <span>2-Factor Authentication</span>
+        <div id="e-2fa-wrap">
+            <b>Enforce 2FA </b><input type="checkbox" id="enforce2fa" name="enforce2fa" />
+        </div> 
     </div>
 
     <div class="lml-modal-footer">
@@ -244,8 +249,9 @@ window["restore-entity-modal_accept"] = function(modal) {
 window["access-entity-modal_accept"] = function(modal) {
     var sites = _contextWidgets["e-sites"].getValue();
     var roles = _contextWidgets["e-roles"].getValue();
+    var enforce2fa = d.id("enforce2fa").get().checked;
 
-    liliumcms.lmldom.post({ sites : sites, roles : roles }, '${context._c.server.url}/admin/entities/edit/' + _contextEntity._id, function() {
+    liliumcms.lmldom.post({ sites : sites, roles : roles, enforce2fa : enforce2fa }, '${context._c.server.url}/admin/entities/edit/' + _contextEntity._id, function() {
         liliumcms.notify({ type : "success", title : "Edit entity", message : _contextEntity.displayname + "'s access was updated successfully" });
         liliumcms.lmldom.updatedBunches();
         modal.dismiss();
@@ -324,6 +330,10 @@ var popupEntityPassword = function(entity) {
     _contextEntity = entity;
     _contextWidgets["e-sites"].setValues(entity.sites);
     _contextWidgets["e-roles"].setValues(entity.roles);
+    var checkb = d.id("enforce2fa").get();
+    checkb.checked = (entity.enforce2fa || false);
+    checkb.previousElementSibling.classList[(entity.enforce2fa || false) ? "add" : "remove"]("checked");
+
     liliumcms.modals.get('access-entity-modal').cast();
 }
 
