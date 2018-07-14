@@ -1,5 +1,6 @@
 import { Component, h } from 'preact';
 import { Link } from '../routing/link';
+import { LILIUM } from '../data/const';
 
 export class Header extends Component {
     constructor(props) {
@@ -26,7 +27,7 @@ export class Header extends Component {
                 <Link display="inline" href="/dashboard">
                     <div id="lilium-logo-wrapper">
                         <img id="lilium-logo" src="/static/media/lmllogo.png" />
-                        <span id="lilium-brandname" class="ptext">Lilium CMS</span>
+                        <span id="lilium-brandname" class="ptext">{LILIUM.vendor}</span>
                     </div>
                 </Link>
             </header>
