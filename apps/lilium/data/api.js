@@ -1,7 +1,7 @@
 class API {
-    static get(endpoint, params = {}, sendback) {
-        log('API', 'Requesting to endpoint : ' + endpoint, 'detail');
-        fetch(`/livevars/v4${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include" }).then(r => {
+    static request(method = "GET", endpoint, params = {}, data = {}, sendback) {
+        log('API', 'Requesting ' + method + ' to endpoint : ' + endpoint, 'detail');
+        fetch(`${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include", method, data : JSON.stringify(data) }).then(r => {
             if (Math.floor(r.status / 200) == 1) {
                 log('API', '['+ r.status +'] API call to ' + endpoint, 'success');
                 r.json().then(resp => {
@@ -19,6 +19,22 @@ class API {
                     response : r
                 });
             }
+        });
+    }
+
+    static get(endpoint, params, sendback) {
+        API.request('GET', "/livevars/v4" + endpoint, params, {}, sendback);
+    }
+
+    static post(endpoint, data, sendback) {
+        API.request('POST', "/admin" + endpoint, {}, data, sendback);
+    }
+
+    static rebuild() {
+        log('Lilium', 'Rebuilding Lilium V4 Preact app', 'detail');
+        API.post('/build/lilium', {}, () => { 
+            log('Lilium', 'Finish building Lilium V4', 'success'); 
+            document.location.reload();
         });
     }
 
