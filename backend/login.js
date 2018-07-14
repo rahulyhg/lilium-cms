@@ -155,7 +155,7 @@ class Login {
                         } else {
                             hooks.fire('user_login_failed', cli);
                             log("Auth", "Login attempt failed with user " + usr + " due to invalid 2FA token", "warn");
-                            cli.sendJSON({ error: 'credentials', message: (_c.eefault().env == 'prod') ? 'Login failed' : 'Invalid 2FA Token', success : false })
+                            cli.sendJSON({ error: 'credentials', message: (_c.default().env == 'prod') ? 'Login failed' : 'Invalid 2FA Token', success : false })
                         }
                     } else {
                         entities.fetchFromDB(cli._c, user.username, userObj => {
