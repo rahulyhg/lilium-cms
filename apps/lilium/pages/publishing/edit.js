@@ -2,8 +2,6 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import API from "../../data/api";
 
-
-
 export default class EditView extends Component {
     constructor(props) {
         super(props);
