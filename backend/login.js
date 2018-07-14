@@ -145,13 +145,8 @@ class Login {
             db.findUnique(_c.default(), 'entities', conds, (err, user) => {
                 // console.log(err, user);
                 if (!err && user) {
-                    console.log(err, user);
-                    if (user.enforce2fa) {
+                    if (user.enforce2fa && user.confirmed2fa) {
                         const secret = base32Encode(Buffer.from(usr + _c.default().signature.privatehash), 'RFC4648').substring(0, 32);
-                        console.log(secret, secret.length);
-                        console.log(token2fa, otplib.authenticator.generate(secret));
-                        console.log(otplib.authenticator.check(token2fa, secret));
-                        console.log((token2fa && otplib.authenticator.check(token2fa, secret)));
                         if (token2fa && otplib.authenticator.check(token2fa, secret)) {
                             entities.fetchFromDB(cli._c, user.username, userObj => {
                                 log("Auth", "Login with credentials and 2FA success with user " + user.username, "lilium");
@@ -160,7 +155,7 @@ class Login {
                         } else {
                             hooks.fire('user_login_failed', cli);
                             log("Auth", "Login attempt failed with user " + usr + " due to invalid 2FA token", "warn");
-                            cli.sendJSON({ error : "2fa", success : false })
+                            cli.sendJSON({ error: 'credentials', message: (_c.eefault().env == 'prod') ? 'Login failed' : 'Invalid 2FA Token', success : false })
                         }
                     } else {
                         entities.fetchFromDB(cli._c, user.username, userObj => {
@@ -171,7 +166,7 @@ class Login {
                 } else {
                     hooks.fire('user_login_failed', cli);
                     log("Auth", "Login attempt failed with user " + usr + " and non-hash " + psw, "warn");
-                    cli.sendJSON({ error : "credentials", success : false })
+                    cli.sendJSON({ error : "credentials", message: 'Login Failed', success : false })
                 }
             });
 		} else {

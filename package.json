@@ -136,6 +136,7 @@
     "pidusage": "^2.0.11",
     "pmx": "latest",
     "process": "latest",
+    "qrcode": "^1.2.0",
     "quill": "latest",
     "read-xml": "^3.0.0",
     "readability-checker": "latest",
