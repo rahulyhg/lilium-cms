@@ -259,6 +259,7 @@ var SiteInitializer = function (conf, siteobj) {
             if (pkg.appname == "lilium") {
                 pkg.code += `// Lilium config
                     global.liliumcms = {
+                        env : "${conf.env}",
                         uid : "${conf.uid}",
                         url : "${conf.server.url}"
                     };

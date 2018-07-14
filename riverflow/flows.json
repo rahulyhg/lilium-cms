@@ -149,6 +149,10 @@
                 {"name" : "settings_saved", "priority" : 1000, "callback" : "settingsSaved"}
             ]
         }, {
+            "module" : "build.js",
+            "endpoint" : "build",
+            "support" : ["admin_post"]
+        }, {
             "module" : "communications.js",
             "endpoint" : "communications",
             "support" : ["admin_post", "livevar"]
