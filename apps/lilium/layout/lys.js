@@ -1,6 +1,12 @@
 import { h, Component } from 'preact';
 import { TIMING } from '../data/const';
+import { navigateTo, Link } from '../routing/link';
 import API from '../data/api';
+
+let pageCommands = [];
+
+export function resetPageCommands()   { pageCommands = [];   }
+export function setPageCommands(cmds) { pageCommands = cmds; }
 
 export class Lys extends Component {
     constructor(props) {
@@ -8,6 +14,7 @@ export class Lys extends Component {
         this.state = {
             visible : false,
             choices : [],
+            pageChoices : [],
             posts : []
         };
 
@@ -48,7 +55,12 @@ export class Lys extends Component {
     display() {
         log('Lys', 'Making Lys visible', 'detail');            
         this.shiftDown = false;
-        this.setState({ visible : true }, () => {
+        this.setState({ 
+            visible : true, 
+            choices : this.commands,
+            pageChoices : pageCommands,
+            posts : []
+        }, () => {
             const box = document.getElementById('lys-input');
             box.value = "";
             box.focus();
@@ -60,12 +72,36 @@ export class Lys extends Component {
         this.shiftDown = false;
     }
 
+    goAndHide(url) {
+        navigateTo(url);
+        this.hide();
+    }
+
+    showHelp() {
+        log('Lys', 'Showing help panel', 'detail');
+        this.setState({ help : true });
+    }
+
     executeCommand(cmd) {
         log('Lys', 'Executing command : ' + cmd, 'detail');
-        if (cmd != "?") {
+        let willHide = true;
 
-            this.hide();
+        if (this.state.pageChoices.length != 0) {
+            this.state.pageChoices[0].execute();
+            log('Lys', 'Executed page command : ' + cmd, 'success');
+        } else if (this.state.choices.length != 0) {
+            navigateTo(this.state.choices[0].url);
+            log('Lys', 'Executed Lilium command : ' + cmd, 'success');
+        } else if (this.state.posts.length != 0) {
+            navigateTo("/publishing/write/" + this.state.posts[0]._id);
+            log('Lys', 'Navigated to post from Lys', 'success');
+        } else {
+            log('Lys', 'No command found, showing help', 'detail');
+            this.showHelp();
+            willHide = false;
         }
+
+        willHide && this.hide();
     }
 
     boxKeyUp(ev) {
@@ -89,25 +125,29 @@ export class Lys extends Component {
 
     fillSearch(text) {
         log('Lys', 'Filling search from timeout', 'detail');
-        API.get('/search', {
-            q : text,
-            scoresort : true
-        }, (err, results) => {
-            if (!err && results && results.length != 0) {
-                this.setState({
-                    posts : results
-                });
-            }
-        })
+        if (text.length < 3) {
+            this.setState({ posts : [] });
+        } else {
+            API.get('/search/lys', {
+                text
+            }, (err, results) => {
+                if (!err && results && results.length != 0) {
+                    this.setState({
+                        posts : results, help : false
+                    });
+                }
+            });
+        }
     }
 
     refreshSearchTimeout(text) {
         this.searchTimeout && clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(this.fillSearch.bind(this, text), TIMING.LYS_QUICK_SEARCH);
 
-        const choices = this.commands.filter(x => x.command.includes(text))
+        const choices = this.commands.filter(x => x.command.includes(text));
+        const pageChoices = pageCommands.filter(x => x.command.includes(text));
         this.setState({
-            choices     
+            choices, pageChoices
         });
     }
 
@@ -129,9 +169,15 @@ export class Lys extends Component {
                     <input type="text" id="lys-input" placeholder="What are you looking for?" onKeyUp={this.keyUpBoxBinding} />
                     <div id="lys-sugg-cmds">
                         {
-                            this.state.choices.map(text => (
-                                <div>
-                                    <b>{text.displayname}</b>
+                            this.state.pageChoices.map(cmd => (
+                                <div class="lys-sugg lys-sugg-cmd lys-sugg-page-cmd" onClick={cmd.execute}>
+                                    <b>{cmd.displayname}</b>
+                                </div>
+                            ))
+                        } {
+                            this.state.choices.map(cmd => (
+                                <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
+                                    <b>{cmd.displayname}</b>
                                 </div>
                             ))
                         }
@@ -139,14 +185,38 @@ export class Lys extends Component {
                     <div id="lys-sugg-posts">
                         {
                             this.state.posts.map(post => (
-                                <div>
-                                    <b>{post.title}</b>
+                                <div class="lys-sugg lys-sugg-post" onClick={() => this.goAndHide("/publishing/write/" + post._id)}>
+                                    <b>{post.headline}</b>
                                 </div>
                             ))
                         }
                     </div>
+
+                    { (
+                        this.state.pageChoices.length == 0 &&
+                        this.state.choices.length == 0 &&
+                        this.state.posts.length == 0
+                    ) ? this.renderHelp() : null }
                 </div>
             </div>
         )
+    }
+
+    renderHelp() {
+        return (
+            <div id="lys-help">
+                <img src="/static/media/lmllogo.png" class="lys-help-logo" />
+                <p>
+                    The <b>Lys</b> box can be used to quickly search for commands or posts to edit. 
+                </p>
+                <p>
+                    <ul>
+                        <li>Write a search query, then click on an article / command</li>
+                        <li>Press enter to select the first search result</li>
+                        <li>Press the <b>Escape</b> key to close the <b>Lys</b> box.</li>
+                    </ul> 
+                </p>
+            </div>
+        );
     }
 }

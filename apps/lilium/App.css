@@ -107,6 +107,24 @@ header {
     width: 100%;
 }
 
+.lys-sugg {
+    cursor: pointer;
+}
+
+#lys-help {
+    text-align: center;
+    padding: 20px 0px;
+}
+
+.lys-help-logo {
+    width: 100px;
+    filter: grayscale(1);
+}
+
+#lys-help ul {
+    text-align: left;
+}
+
 @keyframes anim {
     0% { transform: rotateZ(0deg); }
     100% { transform: rotateZ(360deg); }
