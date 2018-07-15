@@ -1,4 +1,5 @@
 import { h, Component } from 'preact'
+import { resetPageCommands } from '../layout/lys';
 
 // Import default pages from route
 import InitPage     from '../pages/default';
@@ -77,6 +78,7 @@ export class URLRenderer extends Component {
         const levels = paths;
 
         log('URLRenderer', 'Refreshing URL state with endpoint : ' + endpoint, 'url');
+        resetPageCommands();
         this.setState({ endpoint, levels });
     }
 

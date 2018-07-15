@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
+import { setPageCommands } from '../../layout/lys';
 import API from "../../data/api";
 
 export default class EditView extends Component {
@@ -10,18 +11,38 @@ export default class EditView extends Component {
     }
 
     componentDidMount() {
+        this.requestArticle(this.props.postid);
+    }
+
+    save() {
+        log('Publishing', 'Saving current post with id ' + this.props.postid, 'detail');
+    }
+
+    requestArticle(postid) {
+        setPageCommands([{
+            command : "save",
+            displayname : "Save Article",
+            execute : this.save.bind(this)
+        }]);
+
         const endpoints = {
-            post : { endpoint : "/publishing/write/" + this.props.postid, params : {} }
+            post : { endpoint : "/publishing/write/" + postid, params : {} }
         };
 
         API.getMany(Object.keys(endpoints).map(key => endpoints[key]), resp => {
             const post = resp[endpoints.post.endpoint];
             post ?
                 log('Publishing', 'About to display : ' + post.headline, 'detail') :
-                log('Publishing', 'Article not found : ' + this.props.postid, 'warn');
+                log('Publishing', 'Article not found : ' + postid, 'warn');
             
             this.setState(post ? { post } : { error : "Article not Found" });
         });
+    }
+
+    componentWillReceiveProps(props) {
+        if (props.postid) {
+            this.requestArticle(props.postid);
+        }
     }
 
     render() {
