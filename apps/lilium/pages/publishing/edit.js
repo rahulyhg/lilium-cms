@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
+import { TextEditor } from '../../widgets/texteditor';
 import API from "../../data/api";
 
 export default class EditView extends Component {
@@ -14,31 +15,6 @@ export default class EditView extends Component {
 
     componentDidMount() {
         this.requestArticle(this.props.postid);
-    }
-
-    createTinyMCEInstance() {
-        log('Publishing', 'Creating a new TinyMCE instance', 'detail');
-
-        tinymce.init({
-            selector : "#content-editor",
-            height: 500,
-            convert_urls : false,
-            menubar: false,
-            plugins: [
-                'advlist autolink lists link image charmap print preview anchor textcolor',
-                'searchreplace visualblocks code fullscreen hr',
-                'media paste wordcount'
-            ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insertUpload insertEmbed link | bullist numlist | fullscreen | code',
-            content_css: [
-                '/compiled/theme/tinymce.css'
-            ],
-        }).then(editors => {
-            if (editors && editors[0]) {
-                log('Publishing', 'Injecting content into TinyMCE instance', 'detail');
-                editors[0].setContent(this.state.post.content[0]);
-            }
-        })
     }
 
     save() {
@@ -64,7 +40,7 @@ export default class EditView extends Component {
                 log('Publishing', 'Article not found : ' + postid, 'warn');
             
             this.setState(post ? { post, loading: false } : { error : "Article not Found", loading : false }, () => {
-                post && this.createTinyMCEInstance();
+                
             });
         });
     }
@@ -94,7 +70,7 @@ export default class EditView extends Component {
             <div>
                 <h1>{this.state.post.title}</h1>
                 <h2>{this.state.post.subtitle}</h2>
-                <textarea id="content-editor"></textarea>
+                <TextEditor content={this.state.post.content[0]}></TextEditor>
             </div>
         )
     }
