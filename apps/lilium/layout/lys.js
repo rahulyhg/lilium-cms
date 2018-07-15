@@ -1,12 +1,14 @@
 import { h, Component } from 'preact';
 import { TIMING } from '../data/const';
+import API from '../data/api';
 
 export class Lys extends Component {
     constructor(props) {
         super(props);
         this.state = {
             visible : false,
-            choices : []
+            choices : [],
+            posts : []
         };
 
         this.shiftDown = false;
@@ -87,7 +89,16 @@ export class Lys extends Component {
 
     fillSearch(text) {
         log('Lys', 'Filling search from timeout', 'detail');
-
+        API.get('/search', {
+            q : text,
+            scoresort : true
+        }, (err, results) => {
+            if (!err && results && results.length != 0) {
+                this.setState({
+                    posts : results
+                });
+            }
+        })
     }
 
     refreshSearchTimeout(text) {
@@ -116,11 +127,20 @@ export class Lys extends Component {
             <div id="lys-wrap">
                 <div id="lys">
                     <input type="text" id="lys-input" placeholder="What are you looking for?" onKeyUp={this.keyUpBoxBinding} />
-                    <div id="lys-sugg">
+                    <div id="lys-sugg-cmds">
                         {
                             this.state.choices.map(text => (
                                 <div>
                                     <b>{text.displayname}</b>
+                                </div>
+                            ))
+                        }
+                    </div>
+                    <div id="lys-sugg-posts">
+                        {
+                            this.state.posts.map(post => (
+                                <div>
+                                    <b>{post.title}</b>
                                 </div>
                             ))
                         }
