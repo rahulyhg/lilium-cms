@@ -6,6 +6,7 @@ export class TextEditor extends Component {
         this.state = {
 
         }
+        this.textarea;
 
         this.rID = "txt-" + Math.random().toString().substring(2) + Date.now().toString()
     }
@@ -13,8 +14,8 @@ export class TextEditor extends Component {
     createEditor() {                
         log('TextEditor', 'Creating a new TinyMCE instance with ID ' + this.rID, 'detail');
 
-        tinymce.init({
-            selector : "#" + this.rID,
+        this.textarea ? tinymce.init({
+            target : this.textarea,
             height: 500,
             convert_urls : false,
             menubar: false,
@@ -29,11 +30,12 @@ export class TextEditor extends Component {
             ],
         }).then(editors => {
             if (editors && editors[0]) {
-                this.texteditor = editors[0];
-                log('TextEditor', 'Injecting content into TinyMCE instance', 'detail');
-                editors[0].setContent(this.props.content || "<p></p>");
+                this.texteditor = editors && editors[0];
+                this.texteditor.show();
+            } else { 
+                log('TextEditor', 'No editor were created at that point', 'warn');
             }
-        })
+        }) : log("TextEditor", "Could not create text editor due to missing element", "warn");
     }
 
     componentDidMount() {
@@ -56,10 +58,12 @@ export class TextEditor extends Component {
     }
 
     render() {
+        log('TextEditor', 'Rendering text editor with random ID ' + this.rID, 'detail');
+        
         return (
-            <textarea id={this.rID}>
-                
-            </textarea>
+            <div>
+                <textarea ref={el => (this.textarea = el)} id={this.rID}>{this.props.content}</textarea>
+            </div>
         )
     }
 }
