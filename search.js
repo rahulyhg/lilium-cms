@@ -7,6 +7,10 @@ const PROJECTION = {
     title : 1, subtitle : 1, media : 1, topic : 1, status : 1, date : 1, author : 1, _id : 1 
 };
 
+const LYS_PROJECTION = {
+    headline : { $arrayElemAt : ["$title", 0] }
+}
+
 const IMAGE_LOOKUP = {
     from         : "uploads",
     localField   : "media",
@@ -156,6 +160,26 @@ class ContentSearch {
         }, {_id : 1});
     }
 
+    lysSearch(cli, text, send) {
+        const conditions = {
+            $and : [
+                { $text : { $search : text } },
+                { title : { $regex : new RegExp(text, 'i') } }
+            ]
+        };
+
+        if (!cli.hasRight('editor')) {
+            conditions.$and.shift({ author : db.mongoID(cli.userinfo.userid) });
+        }
+
+        db.join(cli._c, 'content', [
+            {$match : conditions},
+            {$sort : {_id : -1}},
+            {$limit : 20},
+            {$project : LYS_PROJECTION}
+        ], arr => send(arr));
+    }
+
     livevar(cli, levels, params, send) {
         if (levels[0] == "dashboard") {
             this.generateReport({
@@ -167,6 +191,8 @@ class ContentSearch {
             }, (arr) => {
                 send(arr.reverse());                  
             });
+        } else if (levels[0] == "lys") {
+            this.lysSearch(cli, params.text, res => send(res));
         } else {
             const conditions = {};
             if (!cli.hasRight('editor')) {
