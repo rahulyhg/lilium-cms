@@ -3,6 +3,7 @@ import { makeGlobalLogger } from './data/logger';
 import { Header } from './layout/header'
 import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
+import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv } from './dev/env';
 import API from './data/api';
@@ -58,6 +59,7 @@ class Lilium extends Component {
                 <Header session={this.state.session} />
                 <LiliumMenu menus={this.state.menus} />
                 <URLRenderer session={this.state.session} />
+                <Lys menus={this.state.menus} session={this.state.session} />
             </div>
         );
     }
