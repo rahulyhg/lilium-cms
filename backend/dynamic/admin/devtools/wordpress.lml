@@ -1,0 +1,67 @@
+{#config}
+<h1>Wordpress management</h1>
+
+<script>
+    var wpFILE = undefined;
+    var wpDATA = "";
+    var updateGlobWPFile = function(ev) {
+        wpFILE = ev.target.files[0];
+        var wpoutput = document.getElementById('wp-output');
+        wpoutput.textContent += "\nUpdated file in glob WP file var";
+
+        var fs = new FileReader();
+        fs.onload = function() {
+            wpDATA = fs.result;        
+            wpoutput.textContent += "\nStored file content in variable";
+        }
+        fs.readAsText(wpFILE);
+    }
+
+    var uploadXMLFile = function(ev) {
+        var wpoutput = document.getElementById('wp-output');
+        wpoutput.textContent += "\nPreparing to upload";
+
+        if (!wpFILE) {
+            return wpoutput.textContent += "\nNo file found.";
+        }
+
+        wpoutput.textContent += "\nCreating payload";
+        var wpurl = document.getElementById('wordpress-url').value;
+
+        fetch('{=config.default.server.url}/admin/devtools/wordpressupdate', {
+            method : "POST",
+            credentials : 'include',
+            headers : {
+                "content-type" : "application/json"
+            },
+            body : JSON.stringify({ xml : wpDATA, wpurl : wpurl })
+        }).then(resp => {
+            if (resp.status == 200) {
+                resp.json().then(json => {
+                    wpoutput.textContent += "\nAll done!";
+                    wpoutput.textContent += "\n" + JSON.stringify(json);
+                })
+            } else {
+                wpoutput.textContent += "\nGot error " + resp.status;
+            }
+        })
+    }
+</script>
+
+<div style="padding: 0px 15px;">
+    <p>It is possible to update / transfer the website using an exported XML file. If the website already has Wordpress data, the existing one won't be touched, and the new one will be added.</p>
+</div>
+
+<div style="padding: 0px 10px;">
+    <input type="file" id="wordpress-xml" />
+    <input type="text" id="wordpress-url" placeholder="Wordpress URL" />
+    <button id="upload-wordpress-xml-file" onclick="uploadXMLFile();">Upload Wordpress XML file</button>
+</div>
+
+<div style="padding: 50px 10px;">
+    <pre id="wp-output">Waiting for file...</pre>
+</div>
+
+<script>
+    document.getElementById('wordpress-xml').addEventListener('change', updateGlobWPFile);
+</script>

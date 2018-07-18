@@ -20,7 +20,7 @@ WPDump.prototype.dump = function(cli, mysqldb, done) {
 
         var connection = mysql.createConnection({
             host: mysqldb.host,
-            port: mysqldb.port;
+            port: mysqldb.port,
             user: mysqldb.user,
             password: mysqldb.password
         });
