@@ -14,8 +14,6 @@ const styles = {
         position: "fixed",
         bottom: 0,
         left: 0,
-        width: "100%",
-        backgroundColor : "rgba(0,0,0,0.8)",
         borderTop : "3px solid #af57e4",
         transition: "all 0.3s"
     },
@@ -57,7 +55,7 @@ export class DevTools extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            hidden : false
+            hidden : true
         }
     }
 
@@ -73,7 +71,7 @@ export class DevTools extends Component {
     render() {
         log('Dev', 'Displaying dev tools bar', 'lilium');
         return (
-            <div style={styles.devtools}>
+            <div style={styles.devtools} class={"devtool-strip " + (this.state.hidden ? "hidden" : "")}>
                 <b onClick={this.toggle.bind(this)} style={styles.title}>Dev Tools</b>
 
                 { this.state.hidden ? null : (
