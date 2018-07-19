@@ -1,9 +1,11 @@
 import { h, Component } from 'preact'
+import { resetPageCommands } from '../layout/lys';
 
 // Import default pages from route
 import InitPage     from '../pages/default';
 import Dashboard    from '../pages/dashboard/index';
 import Publishing   from '../pages/publishing/index';
+import ProfilePage  from '../pages/me/index.js';
 import e404         from '../pages/errors/404';
 
 // Default endpoints are provided here
@@ -35,9 +37,10 @@ EndpointStore.ENDPOINT_STORE = {};
 
 // Define default Lilium's endpoints
 EndpointStore.registerEndpoint("_init", InitPage);
-EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
+EndpointStore.registerEndpoint('me', ProfilePage);
+EndpointStore.registerEndpoint('_e404', e404);
 
 export class URLRenderer extends Component {
     constructor(props) {
@@ -77,6 +80,7 @@ export class URLRenderer extends Component {
         const levels = paths;
 
         log('URLRenderer', 'Refreshing URL state with endpoint : ' + endpoint, 'url');
+        resetPageCommands();
         this.setState({ endpoint, levels });
     }
 

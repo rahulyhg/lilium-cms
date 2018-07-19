@@ -1043,6 +1043,13 @@ class Entities {
             }, function(err, arr) { 
                 callback(arr); 
             });
+        } else if (levels[0] == "me") {
+            require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => callback(data ? {
+                badges : data.badges,
+                huespin : data.huespin, 
+                levels : data.levels, 
+                user : data.items[0]
+            } : { error : "Not found" }));              
         } else if (levels[0] == "bunch") {
             const filters = params.filters;
             const $match = { };

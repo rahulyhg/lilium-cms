@@ -19,10 +19,21 @@ export class LiliumMenu extends Component {
 
     render() {
         return (
-            <menu id="lilium-menu" style={{ marginTop : 100 }}>
+            <menu id="lilium-menu">
                 {
                     this.state.menus.map(menu => (
-                        <Link linkStyle="block" href={menu.absURL.replace('admin', '')}><i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span></Link>
+                        <div>
+                            <Link display="block" href={menu.absURL.replace('admin', '')}>
+                                <i className={"fa " + menu.faicon}></i> <span>{menu.displayname}</span>
+                            </Link>
+                            <div>
+                                {menu.children.map(child => (
+                                    <Link display="block" href={child.absURL.replace('admin', '')}>
+                                        <i className={"fa " + child.faicon}></i> <span>{child.displayname}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
                     ))
                 }
             </menu>

@@ -25,6 +25,20 @@ body, html {
 #urlrenderer {
     position: relative;
     top: 50px;
+    left: 200px;
+    width: calc(100% - 200px);
+}
+
+#lilium-menu {
+    position: fixed;
+    left: 0;
+    top: 50px;
+    background: #333;
+    padding: 0;
+    margin: 0;
+    bottom: 0px;
+    width: 200px;
+    color: white;
 }
 
 header {
@@ -63,6 +77,52 @@ header {
 
 #lilium-logo.spin {
     animation: anim 2s infinite 0s ease-in-out;
+}
+
+#lys-wrap {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+}
+
+#lys {
+    width: 600px;
+    position: relative;
+    margin: 150px auto 0px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+}
+
+#lys-input {
+    box-sizing: border-box;
+    border-radius: 5px;
+    font-size: 24px;
+    border: none;
+    padding: 18px 18px 14px;
+    width: 100%;
+}
+
+.lys-sugg {
+    cursor: pointer;
+}
+
+#lys-help {
+    text-align: center;
+    padding: 20px 0px;
+}
+
+.lys-help-logo {
+    width: 100px;
+    filter: grayscale(1);
+}
+
+#lys-help ul {
+    text-align: left;
 }
 
 @keyframes anim {
