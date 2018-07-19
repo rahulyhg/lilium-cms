@@ -69,7 +69,13 @@ const style = {
 
     },
 
-    
+    infoGroupTitle: {
+        backgroundColor: '#9c5ab7',
+        color: 'white',
+        textTransform: 'uppercase',
+        marginTop: '24px',
+        padding: '6px'
+    }
 };
 
 export default class ProfilePage extends Component {
@@ -95,34 +101,102 @@ export default class ProfilePage extends Component {
     render() {
         if (this.state.user) {
             return (
-                <div id="profile-header" style={style.header}>
-                    <div id="core-info" style={style.coreInfo}>
-                        <div id="profile-picture-wrapper" style={style.coreInfo} >
-                            <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} />
+                <div id="profile">
+                    <div id="profile-header" style={style.header}>
+                        <div id="core-info" style={style.coreInfo}>
+                            <div id="profile-picture-wrapper" style={style.coreInfo} >
+                                <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} />
+                            </div>
+                            <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.username}`}</h3>
                         </div>
-                        <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.username}`}</h3>
+                        <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
+                            <input type="text" style={style.inputField} value={this.state.user.displayname} />
+                            <input type="text" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'/>
+                            <textarea name="description" className='change-placeholder' id="descriptichange-placeholderon" cols="30" rows="8" 
+                                    placeholder='Write a small introduction paragraph'
+                                    style={style.textarea}></textarea>
+                        </div>
+                        <div id="badges">
+                            {
+                                this.state.user.badges.map(badge => {
+                                    return (
+                                        <span className="badge">
+                                            {badge.displayname}
+                                            <i className="badge-symbol"></i>
+                                        </span>
+                                    );
+                                })
+                            }
+                        </div>
                     </div>
-                    <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
-                        <input type="text" style={style.inputField} value={this.state.user.displayname} />
-                        <input type="text" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'/>
-                        <textarea name="description" className='change-placeholder' id="descriptichange-placeholderon" cols="30" rows="8" 
-                                placeholder='Write a small introduction paragraph'
-                                style={style.textarea}></textarea>
-                    </div>
-                    <div id="badges">
-                        {
-                            this.state.user.badges.map(badge => {
-                                return (
-                                    <span className="badge">
-                                        {badge.displayname}
-                                        <i className="badge-symbol"></i>
-                                    </span>
-                                );
-                            })
-                        }
-                    </div>
-                    <div id="other-info">
-                        
+                    <div id="other-info" style={{margin: '14px'}}>
+                        <div id="contact-info">
+                            <h2 style={style.infoGroupTitle}>Contact Information</h2>
+
+                            <label htmlFor="phone-number">Phone number</label>
+                            <input type="text" id="phone-number" name="phone-number"/>
+                            
+                            <label htmlFor="email">Email address</label>
+                            <input type="email" id="email" name="email"/>
+                        </div>
+                        <div id="social-media">
+                            <h2  style={style.infoGroupTitle}>Social Network</h2>
+
+                            <label htmlFor="facebook-profile-url">Facebook profile URL</label>
+                            <input type="url" id="facebook-profile-url" name="facebook-profile-url"/>
+
+                            <label htmlFor="twitter-account-name">Twitter account name, without the '@'</label>
+                            <input type="text" id="twitter-account-name" name="twitter-account-name"/>
+
+                            <label htmlFor="google-plus-username">Google Plus username</label>
+                            <input type="text" id="google-plus-username" name="google-plus-username"/>
+                            
+                            <label htmlFor="instagram-account-name">Instagram account name, without the '@'</label>
+                            <input type="text" id="instagram-account-name" name="instagram-account-name"/>
+                        </div>
+                        <div id="login-info">
+                            <h2 style={style.infoGroupTitle}>Login Information</h2>
+
+                            <h2>Password</h2>
+                            <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
+                            <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
+                            
+                            <label htmlFor="old-password">Current password</label>
+                            <input type="password" id="old-password"/>
+
+                            <label htmlFor="new-password">New password</label>
+                            <input type="password" id="new-password"/>
+
+                            <label htmlFor="new-password-confirm">Confirm new password</label>
+                            <input type="password" id="new-password-confirm"/>
+
+                            <hr/>
+
+                            <h2>Two Factor Authentication</h2>
+                            <p>
+                                Two Factor Authentication, '2FA' for short, is an extra layer of security you can apply on your Lilium account.
+                                 It works by requiring that you provide a 6 digits code displayed by your smartphone in addition to your password when you login.
+                            </p>
+                            <p>To get started, follow these few steps :</p>
+                            <ol>
+                                <li>I
+                                    nstall the Google Authenticator application on your smartphone, the application is available on 
+                                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en">Android</a>
+                                    and on <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8">iOS</a>.
+                                </li>
+                                <li>Inside Google Authenticator, tap the '+' icon to add an account.</li>
+                                <li>Choose the 'Scan a barcode' option.</li>
+                                <li>Center the QR Code displayed below in the designate area on your phone's screen, it will be detected automatically.</li>
+                                <li>You should now see an account named 'Lilium CMS &gt;company name&lt; (&gt;username&lt;). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
+                            </ol>
+
+                            <img src="" id="qr-code-2fa" alt=""/>
+
+                            <label htmlFor="token-2fa">2FA Token</label>
+                            <input type="text" id='token-2fa' placeholder='123456' />
+
+                            <button>Enable 2fa for my account</button>
+                        </div>
                     </div>
                 </div>
             );
