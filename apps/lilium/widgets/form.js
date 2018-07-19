@@ -95,7 +95,7 @@ export class TextField extends FormField {
                 {
                     this.props.multiline ? 
                         ( <textarea style={Object.assign({}, styles.textfield, styles.textarea)} onChange={this.changed.bind(this)}>{this.value || ""}</textarea>) :
-                        ( <input style={styles.textfield} type="text" value={this.value} onChange={this.changed.bind(this)} />)
+                        ( <input style={styles.textfield} type={this.props.type || 'text'} value={this.value} onChange={this.changed.bind(this)} />)
                 }
             </div>
         )
