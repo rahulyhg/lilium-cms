@@ -5,7 +5,7 @@ import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
-import { initializeDevEnv } from './dev/env';
+import { initializeDevEnv, DevTools } from './dev/env';
 import API from './data/api';
 
 // LILIUM_IMPORT_TEMPLATE
@@ -60,6 +60,7 @@ class Lilium extends Component {
                 <LiliumMenu menus={this.state.menus} />
                 <URLRenderer session={this.state.session} />
                 <Lys menus={this.state.menus} session={this.state.session} />
+                { liliumcms.env == "dev" ? <DevTools /> : null }
             </div>
         );
     }
