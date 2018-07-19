@@ -111,5 +111,11 @@
                 <b class="devtools-list-item-title">Preact integration</b>
             </a>
         </li>
+        <li class="devtools-list-item">
+            <a class="devtools-list-item-link" href="{=config.default.server.url}/admin/devtools/wordpress" >
+                <i class="devtools-list-item-icon fab fa-wordpress"></i>
+                <b class="devtools-list-item-title">Wordpress</b>
+            </a>
+        </li>
     </ul>
 </div>

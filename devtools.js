@@ -27,6 +27,7 @@ class DevTools {
             case 'hits':
             case 'mail':
             case 'unlink':
+            case 'wordpress':
             case 'where':
             case undefined:
                 filelogic.serveAdminLML(cli);
@@ -51,43 +52,21 @@ class DevTools {
         }
 
         switch (cli.routeinfo.path[2]) {
-            case 'lml':
-                if (cli.routeinfo.path[3] === 'interpret') {
-                    interpretLMLToCli(cli);
-                }
-                break;
-            case 'wptransfer':
-                transferWPFromOrigin(cli);
-                break;
-            case 'clearlml3':
-                clearLML3Cache(cli);
-                break;
-            case 'unlink':
-                unlinkUpload(cli);
-                break;
-            case 'cache':
-                handleCacheClear(cli);
-                break;
-            case 'gencache':
-                maybeRegenCache(cli);
-                break;
-            case 'initbuild':
-                maybeInitBuild(cli);
-                break;
-            case 'scripts':
-                maybeExecuteScript(cli);
-                break;
-            case 'feed':
-                maybeInsertFeed(cli);
-                break;
-            case 'restart':
-                maybeRestart(cli);
-                break;
-            case 'mail':
-                maybeSendMail(cli);
-                break;
-            default:
-                cli.refresh();
+            case 'lml': if (cli.routeinfo.path[3] === 'interpret') { interpretLMLToCli(cli); } break;
+
+            case 'wordpressupdate':     updateWordpress(cli); break;
+            case 'wptransfer':          transferWPFromOrigin(cli); break;
+            case 'clearlml3':           clearLML3Cache(cli); break;
+            case 'unlink':              unlinkUpload(cli); break;
+            case 'cache':               handleCacheClear(cli); break;
+            case 'gencache':            maybeRegenCache(cli); break;
+            case 'initbuild':           maybeInitBuild(cli); break;
+            case 'scripts':             maybeExecuteScript(cli); break;
+            case 'feed':                maybeInsertFeed(cli); break;
+            case 'restart':             maybeRestart(cli); break;
+            case 'mail':                maybeSendMail(cli); break;
+
+            default:                    cli.refresh();
         }
     };
 
@@ -531,6 +510,36 @@ var clearCache = function(cli, ctx) {
         default:
             cli.response.end("");
     }
+};
+
+var updateWordpress = function(cli) {
+    const XML2JS = require('xml2js');
+    const { transferWPImages  } = require('./includes/createstack')
+    cli._c.wp = cli._c.wp || {
+        url : cli.postdata.data.wpurl
+    };
+
+    const parser = new XML2JS.Parser();
+    parser.parseString(cli.postdata.data.xml, (err, wpdata) => {
+        const channel = wpdata.rss.channel[0];
+
+        require('./includes/transformwp')(cli._c, channel, data => {
+            
+            transferWPImages(cli._c, {
+                dbdata : {
+                    uploads : data.uploads
+                }
+            }, () => {});
+
+            handleWordpressUploads(cli._c, data.uploads);            
+
+            cli.sendJSON({ articles : data.content.length });
+        });
+    });
+};
+
+var handleWordpressUploads = function(_c, uploads) {
+      
 };
 
 var clearLML3Cache = function(cli) {
