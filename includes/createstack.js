@@ -122,28 +122,47 @@ function transferWPImages(_c, data, done) {
 
     let index = -1;
     const startTransfer = () => {
+        let retrying = false;
         const nextImage = () => {
             const file = files[++index];
 
             if (file) {
-                log('WPInit', '['+index+'/'+files.length+'] Downloading image file : ' + file.url, 'info');
-                request({ url : file.url, encoding : 'binary' }, (err, res) => {
-                    if (res.statusCode == 200) {
-                        mkdirp(file.dir, () => {
-                            const ffpath = path.join(file.dir, file.filename);
-                            log('WPInit', 'Writing file to ' + ffpath, 'info');
-                            fs.writeFile(ffpath, res.body, {encoding : 'binary'}, (err) => {
-                                err && log('WPInit', err, 'err');
-                                return nextImage();
+                const ffpath = path.join(file.dir, file.filename);
+
+                fs.stat(ffpath, err => {
+                    if (!err) { return setTimeout(() => nextImage(), 0); }
+
+                    log('WPInit', '['+index+'/'+files.length+'] Downloading image file : ' + file.url, 'info');
+                    request({ url : file.url, encoding : 'binary', headers : { "user-agent" : `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36` } }, (err, res) => {
+                        if (err) {
+                            log('Wordpress', 'Error fetching image : ' + err, 'err');
+                            return nextImage();
+                        }
+                        else if (res.statusCode == 200) {
+                            retrying = false;
+                            mkdirp(file.dir, () => {
+                                log('WPInit', 'Writing file to ' + ffpath, 'info');
+                                fs.writeFile(ffpath, res.body, {encoding : 'binary'}, (err) => {
+                                    err && log('WPInit', err, 'err');
+                                    return nextImage();
+                                });
                             });
-                        });
-                    } else {
-                        return nextImage();
-                    }
+                        } else {
+                            log('Wordpress', 'Non-200 HTTP code : ' + res.statusCode, 'warn');
+                            if (retrying) {
+                                    return nextImage();
+                            }
+
+                            --index;
+                            retrying = true;
+
+                            return setTimeout(() => nextImage(), 8000);
+                        }
+                    });
                 });
             } else {
                 log('WPInit', '--------------------------------', 'success');
-                log('WPInit', 'Done handling WP images transfer', 'success');                
+                log('WPInit', 'Done handling WP images transfer', 'success');
                 log('WPInit', '--------------------------------', 'success');
 
                 return;
@@ -170,7 +189,7 @@ function transferWPImages(_c, data, done) {
             });
         })
     });
-    
+
     log('WPInit', 'Done listing images for WP transfer. Total : ' + files.length, 'info');
     startTransfer();
     done();
