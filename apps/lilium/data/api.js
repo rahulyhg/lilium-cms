@@ -6,18 +6,17 @@ class API {
                 log('API', '['+ r.status +'] API call to ' + endpoint, 'success');
                 r.json().then(resp => {
                     log('API', 'JSON parsed successfully', 'detail');
-                    sendback(undefined, resp);
+                    sendback(undefined, resp, r);
                 }).catch(err => {
-                    console.log(err);
                     log('API', 'JSON failed to parse', 'warn');
-                    sendback(err);
+                    sendback(err, undefined, r);
                 });
             } else {               
                 log('API', '['+r.status+'] API call to ' + endpoint, 'warn');
                 sendback(undefined, {
                     code : r.status,
                     response : r
-                });
+                }, r);
             }
         });
     }
