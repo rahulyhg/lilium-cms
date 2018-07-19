@@ -93,6 +93,8 @@ class Crew {
         }, (user) => {
             user = user.items.pop();
 
+            return finish(user);
+            
             this.injectMemberFeaturedPosts(user, () => {
                 if (user.socialnetworks && user.socialnetworks.find(x => x.network == "instagram")) {
                     instagram.getSingleAccountStats(user.socialnetworks.find(x => x.network == "instagram").link, (data) => {

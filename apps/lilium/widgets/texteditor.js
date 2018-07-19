@@ -32,6 +32,7 @@ export class TextEditor extends Component {
             if (editors && editors[0]) {
                 this.texteditor = editors && editors[0];
                 this.texteditor.show();
+                this.texteditor.setContent(this.props.content);
             } else { 
                 log('TextEditor', 'No editor were created at that point', 'warn');
             }
@@ -49,6 +50,7 @@ export class TextEditor extends Component {
 
     componentWillReceiveProps(props) {
         if (props.content && this.texteditor) {
+            log('TextEditor', 'Content set via new props', 'detail');
             this.texteditor.setContent(props.content);
         }
     }
