@@ -126,7 +126,7 @@ function transferWPImages(_c, data, done) {
             const file = files[++index];
 
             if (file) {
-                log('WPInit', 'Downloading image file : ' + file.url, 'info');
+                log('WPInit', '['+index+'/'+files.length+'] Downloading image file : ' + file.url, 'info');
                 request({ url : file.url, encoding : 'binary' }, (err, res) => {
                     if (res.statusCode == 200) {
                         mkdirp(file.dir, () => {
@@ -155,7 +155,7 @@ function transferWPImages(_c, data, done) {
 
     log('WPInit', 'Listing images to download', 'info');
 
-    data.dbdata.uploads.filter(x => x.wppath).forEach(image => {
+    data.dbdata.uploads.reverse().filter(x => x.wppath).forEach(image => {
         const dir = path.join(_c.server.html, image.wppath);
         files.push[{
             url : _c.wp.url + image.wppath,
@@ -214,4 +214,7 @@ function createStack(config, data, done) {
     nextTask();
 };
 
-module.exports = { createStack };
+module.exports = { 
+    createStack, parseWordpressXML, transformWordpressData, transferWPImages,
+    createAdminEntity, createDatabase, initializeHTTPS
+};
