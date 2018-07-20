@@ -71,7 +71,18 @@ export class URLRenderer extends Component {
             this.refreshPath();
         };
 
+        this.menuslid_bound = this.menuslid.bind(this);
+        document.addEventListener('menuslid', this.menuslid_bound)
+
         this.refreshPath();
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('menuslid', this.menuslid_bound)
+    }
+
+    menuslid(ev) {
+        this.renderer.classList[ev.detail.slid ? "add" : "remove"]("slid");
     }
 
     refreshPath() {
@@ -91,7 +102,7 @@ export class URLRenderer extends Component {
         
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
-            <div id="urlrenderer">
+            <div id="urlrenderer" ref={x => (this.renderer = x)}>
                 <Container endpoint={this.state.endpoint} levels={this.state.levels} />
             </div>
         )
