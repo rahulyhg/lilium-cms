@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
+import { TextField } from '../../widgets/form';
 import API from "../../data/api";
 
 export default class EditView extends Component {
@@ -68,9 +69,13 @@ export default class EditView extends Component {
 
         return (
             <div>
-                <h1>{this.state.post.title}</h1>
-                <h2>{this.state.post.subtitle}</h2>
-                <TextEditor content={this.state.post.content[0]}></TextEditor>
+                <h1>Publishing</h1>
+
+                <div style={{ padding : 10 }}>
+                    <TextField initialValue={this.state.post.title[0]} placeholder="Title" placeholderType="inside" wrapstyle={{ marginBottom: 10 }} style={{ fontFamily : '"Oswald", sans-serif', fontSize : 32 }} />
+                    <TextField initialValue={this.state.post.subtitle[0]} placeholder="Subtitle" placeholderType="inside" />
+                    <TextEditor content={this.state.post.content[0]}></TextEditor>
+                </div>
             </div>
         )
     }
