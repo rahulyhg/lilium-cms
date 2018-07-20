@@ -1,5 +1,6 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
+import { TextField, ButtonWorker } from '../../widgets/form';
 
 const style = {
     header: {
@@ -29,8 +30,6 @@ const style = {
         display: 'flex',
         flexDirection: 'column',
         margin: '0px 40px',
-        // borderLeft: '1px solid #9c5ab7',
-        // borderRight: '1px solid #9c5ab7',
         padding: '0px 30px'
     },
 
@@ -83,19 +82,57 @@ export default class ProfilePage extends Component {
     constructor(props) {
         super(props);
 
+        this.passwordFields = {};
         this.state = { user: undefined, username: 'gabrielcardinal', err: undefined };
     }
 
     componentWillMount() {
-        API.get('/entities/me', {}, (err, user) => {
-            if (!err && user) {
-                console.log(user);
-                this.setState({ user: user.user, err: undefined });
+        API.get('/entities/me', {}, (err, data) => {
+            if (!err && data) {
+                /// Remap social network for convenience
+                let socialNetworks = data.user.socialnetworks;
+                data.user.socialnetworks = {};
+                for (let i = 0; i < socialNetworks.length; i++) {
+                    data.user.socialnetworks[socialNetworks[i].network] = socialNetworks[i].username;
+                }
+
+                this.setState({ user: data.user, err: undefined });
+                console.log(this.state);
             } else {
                 console.log(err);
                 this.setState({ err });x
             }
         });
+    }
+
+    asyncFieldUpdate(name, value) {
+        console.log({ field: name, value: value });
+        API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
+            if (!err)
+                console.log('Updated field ' + name);
+            else
+                console.log('Error updating field ' + name);
+        });
+    }
+
+    asyncUpdateHeaderField(e) {
+        this.asyncFieldUpdate(e.target.name, e.target.value);
+    }
+
+    updatePasswordField(name, value) {
+        console.log(name, value);
+        this.passwordFields[name] = value;
+        console.log(this.passwordFields);
+    }
+
+    changePassword(done) {
+        console.log(this.passwordFields);
+        if (this.passwordFields.oldpassword && this.passwordFields.newpassword
+                && this.passwordFields.newpassword == this.passwordFields.confirmnewpassword) {
+            API.post('/me/updatePassword', { old: this.passwordFields.oldpassword, new: this.passwordFields.newpassword }, (err, data) => {
+                done && done();
+            });
+        }
     }
 
     render() {
@@ -110,11 +147,13 @@ export default class ProfilePage extends Component {
                             <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.username}`}</h3>
                         </div>
                         <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
-                            <input type="text" style={style.inputField} value={this.state.user.displayname} />
-                            <input type="text" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'/>
+                            <input type="text" name="displayname" style={style.inputField} value={this.state.user.displayname}
+                                         onChange={this.asyncUpdateHeaderField.bind(this)} />
+                            <input type="text" name="jobtitle" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'
+                                         onChange={this.asyncUpdateHeaderField.bind(this)} />
                             <textarea name="description" className='change-placeholder' id="descriptichange-placeholderon" cols="30" rows="8" 
                                     placeholder='Write a small introduction paragraph'
-                                    style={style.textarea}></textarea>
+                                    style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.state.user.description}</textarea>
                         </div>
                         <div id="badges">
                             {
@@ -133,42 +172,42 @@ export default class ProfilePage extends Component {
                         <div id="contact-info">
                             <h2 style={style.infoGroupTitle}>Contact Information</h2>
 
-                            <label htmlFor="phone-number">Phone number</label>
-                            <input type="text" id="phone-number" name="phone-number"/>
-                            
-                            <label htmlFor="email">Email address</label>
-                            <input type="email" id="email" name="email"/>
+                            <TextField type="tel" name="phone" placeholder="Phone number" initialValue={this.state.user.phone}
+                                            onChange={this.asyncFieldUpdate.bind(this)} />
+                            <TextField type="email" name="email" placeholder="Email address" initialValue={this.state.user.email}
+                                            onChange={this.asyncFieldUpdate.bind(this)} />
                         </div>
                         <div id="social-media">
                             <h2  style={style.infoGroupTitle}>Social Network</h2>
 
-                            <label htmlFor="facebook-profile-url">Facebook profile URL</label>
-                            <input type="url" id="facebook-profile-url" name="facebook-profile-url"/>
+                            <TextField type='url' name='socialnetworks.facebook' placeholder='Facebook profile URL'
+                                initialValue={this.state.user.socialnetworks.facebook} onChange={this.asyncFieldUpdate.bind(this)} />
 
-                            <label htmlFor="twitter-account-name">Twitter account name, without the '@'</label>
-                            <input type="text" id="twitter-account-name" name="twitter-account-name"/>
+                            <TextField name='socialnetworks.twitter' placeholder="Twitter account name, without the '@'"
+                                initialValue={this.state.user.socialnetworks.twitter} onChange={this.asyncFieldUpdate.bind(this)} />
 
-                            <label htmlFor="google-plus-username">Google Plus username</label>
-                            <input type="text" id="google-plus-username" name="google-plus-username"/>
-                            
-                            <label htmlFor="instagram-account-name">Instagram account name, without the '@'</label>
-                            <input type="text" id="instagram-account-name" name="instagram-account-name"/>
+                            <TextField name='socialnetworks.googleplus' placeholder='Google Plus username'
+                                initialValue={this.state.user.socialnetworks.googleplus} onChange={this.asyncFieldUpdate.bind(this)} />
+
+                            <TextField name='socialnetworks.instagram' placeholder="Instagram account name, without the '@'"
+                                initialValue={this.state.user.socialnetworks.instagram} onChange={this.asyncFieldUpdate.bind(this)} />
                         </div>
                         <div id="login-info">
                             <h2 style={style.infoGroupTitle}>Login Information</h2>
 
                             <h2>Password</h2>
+
                             <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
                             <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
                             
-                            <label htmlFor="old-password">Current password</label>
-                            <input type="password" id="old-password"/>
+                            <TextField type='password' name='oldpassword' placeholder='Current password'
+                                    onChange={this.updatePasswordField.bind(this)} />
+                            <TextField type='password' name='newpassword' placeholder='New password'
+                                    onChange={this.updatePasswordField.bind(this)} />
+                            <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
+                                    onChange={this.updatePasswordField.bind(this)} />
 
-                            <label htmlFor="new-password">New password</label>
-                            <input type="password" id="new-password"/>
-
-                            <label htmlFor="new-password-confirm">Confirm new password</label>
-                            <input type="password" id="new-password-confirm"/>
+                            <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} />
 
                             <hr/>
 
@@ -181,8 +220,8 @@ export default class ProfilePage extends Component {
                             <ol>
                                 <li>I
                                     nstall the Google Authenticator application on your smartphone, the application is available on 
-                                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en">Android</a>
-                                    and on <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8">iOS</a>.
+                                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" target='_blank'> Android </a>
+                                    and on <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8" target='_blank'>iOS</a>.
                                 </li>
                                 <li>Inside Google Authenticator, tap the '+' icon to add an account.</li>
                                 <li>Choose the 'Scan a barcode' option.</li>
@@ -190,12 +229,11 @@ export default class ProfilePage extends Component {
                                 <li>You should now see an account named 'Lilium CMS &gt;company name&lt; (&gt;username&lt;). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
                             </ol>
 
-                            <img src="" id="qr-code-2fa" alt=""/>
+                            <img src={this.state.qrCode} id="qr-code-2fa" alt=""/>
 
-                            <label htmlFor="token-2fa">2FA Token</label>
-                            <input type="text" id='token-2fa' placeholder='123456' />
+                            <TextField name='token-2fa' placeholder='2FA Token' />
 
-                            <button>Enable 2fa for my account</button>
+                            <ButtonWorker text='Activate 2FA for my account' />
                         </div>
                     </div>
                 </div>
