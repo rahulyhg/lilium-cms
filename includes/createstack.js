@@ -128,7 +128,11 @@ function transferWPImages(_c, data, done) {
             if (file) {
                 log('WPInit', '['+index+'/'+files.length+'] Downloading image file : ' + file.url, 'info');
                 request({ url : file.url, encoding : 'binary' }, (err, res) => {
-                    if (res.statusCode == 200) {
+                    if (err) {
+                        log('Wordpress', 'Error fetching image : ' + err, 'err');
+                        return nextImage();
+                    }
+                    else if (res.statusCode == 200) {
                         mkdirp(file.dir, () => {
                             const ffpath = path.join(file.dir, file.filename);
                             log('WPInit', 'Writing file to ' + ffpath, 'info');

@@ -524,22 +524,81 @@ var updateWordpress = function(cli) {
         const channel = wpdata.rss.channel[0];
 
         require('./includes/transformwp')(cli._c, channel, data => {
-            
-            transferWPImages(cli._c, {
-                dbdata : {
-                    uploads : data.uploads
-                }
-            }, () => {});
+            handleWordpressContent(cli._c, data.content, () => {
+                handleWordpressUploads(cli._c, data.uploads, () => {
+                    cli.sendJSON({ articles : data.content.length });
 
-            handleWordpressUploads(cli._c, data.uploads);            
-
-            cli.sendJSON({ articles : data.content.length });
+                    transferWPImages(cli._c, {
+                        dbdata : {
+                            uploads : data.uploads
+                        }
+                    }, () => {});
+                }); 
+            });  
         });
     });
 };
 
-var handleWordpressUploads = function(_c, uploads) {
-      
+var handleWordpressUploads = function(_c, uploads, done) {
+    const nextUpload = () => {
+        setTimeout(() => {
+            let upload = uploads[--i];
+            if (upload) {
+                db.findUnique(_c, 'uploads', { wpid : upload.wpid }, (err, existing) => {
+                    if (existing) {
+                        return nextUpload();
+                    }
+
+                    log('Wordress', 'Inserted new upload with WPID : ' + upload.wpid + ' and mongo ID ' + upload._id, 'success')
+                    db.insert(_c, 'uploads', upload, () => nextUpload());
+                });
+            } else {
+                log('Wordpress', 'Updated all uploads', 'success');
+                done();
+            }
+        }, 0);
+    };
+    let i = uploads.length;
+    nextUpload();
+};
+
+var handleWordpressContent = function(_c, articles, done) {
+    const nextPost = () => {
+        setTimeout(() => {
+            let article = articles[--i];
+            if (article) {
+                db.findUnique(_c, 'content', {
+                    title : article.title[0]
+                }, (err, existing) => {
+                    if (existing) {
+                        return nextPost();
+                    }
+
+                    article.author = undefined;
+                    db.findUnique(require('./config').default(), 'entities', {}, (err, author) => {
+                        db.findUnique(_c, 'topics', { completeSlug : article.topicslug }, (err, topic) => {
+                            if (topic) {
+                                article.topic = topic._id;
+                            }
+        
+                            if (author) {
+                                article.author = author._id;
+                                article.createdBy = author._id;
+                            }
+        
+                            log('Wordpress', 'Inserted new article with title : ' + article.title[0], 'detail');
+                            db.insert(_c, 'content', article, () => nextPost());
+                        }, {_id : -1});           
+                    }, {_id : -1})          
+                })
+            } else {
+                log('Wordpress', 'Updated all articles', 'success');
+                done();
+            }
+        }, 0);
+    };
+    let i = articles.length;
+    nextPost();
 };
 
 var clearLML3Cache = function(cli) {

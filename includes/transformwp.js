@@ -59,7 +59,6 @@ const mkdirp = require('mkdirp').sync;
 const crypto = require('crypto-js');
 
 module.exports = function(config, data, done) {
-    console.log(data);
     const topics = data["wp:category"].map(c => {
         return {
             _id : new ObjectId(),
