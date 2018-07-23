@@ -15,7 +15,8 @@ const styles = {
         bottom: 0,
         left: 0,
         borderTop : "3px solid #af57e4",
-        transition: "all 0.3s"
+        transition: "all 0.3s",
+        zIndex : 100
     },
     btn : {
         padding: 12,
@@ -32,6 +33,15 @@ const styles = {
         fontWeight: "bold",
         display: "inline-block",
         cursor: "pointer"
+    },
+    errorscreen : {
+        position: "fixed",
+        top : 0,
+        left : 0,
+        width: "100%",
+        height : "100%",
+        backgroundColor : "rgba(105, 12, 12, 0.97)",
+        color : "white"
     }
 }
 
@@ -59,6 +69,14 @@ export class DevTools extends Component {
         }
     }
 
+    componentDidMount() {
+        window.onerror = this.onerror.bind(this);
+    }
+
+    onerror(error) {
+        this.setState({ error })
+    }
+
     bundleJS() {
         log('Dev', 'Sent request to bundle V4... The browser will refresh shortly', 'lilium');
         API.rebuild();
@@ -69,6 +87,19 @@ export class DevTools extends Component {
     }
 
     render() {
+        if (this.state.error) {
+            log('Dev', 'Displaying fullscreen error report', 'detail');
+            console.error(this.state.error);
+            
+            return (
+                <div style={styles.errorscreen}>
+                    <h1>Crash handler</h1>
+                    <h2>{this.state.error.toString()}</h2>
+                    <pre>{this.state.error.stack}</pre>
+                </div>
+            )
+        }
+
         log('Dev', 'Displaying dev tools bar', 'lilium');
         return (
             <div style={styles.devtools} class={"devtool-strip " + (this.state.hidden ? "hidden" : "")}>
