@@ -72,7 +72,10 @@ export class URLRenderer extends Component {
         };
 
         this.menuslid_bound = this.menuslid.bind(this);
-        document.addEventListener('menuslid', this.menuslid_bound)
+        this.menusnapped_bound = this.menusnapped.bind(this);
+        document.addEventListener('menuslid', this.menuslid_bound);
+        document.addEventListener('menusnap', this.menusnapped_bound);
+
 
         this.refreshPath();
     }
@@ -83,6 +86,10 @@ export class URLRenderer extends Component {
 
     menuslid(ev) {
         this.renderer.classList[ev.detail.slid ? "add" : "remove"]("slid");
+    }
+
+    menusnapped(ev) {
+        this.renderer.classList[ev.detail.snapped ? "add" : "remove"]("snap")
     }
 
     refreshPath() {
@@ -98,12 +105,15 @@ export class URLRenderer extends Component {
     }
 
     render() {
-        const Container = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
+        // if (this.lastRenderedPath != document.location.pathname) {
+            this.CurrentContainer = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
+        // }
+        this.lastRenderedPath = document.location.pathname;
         
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
             <div id="urlrenderer" ref={x => (this.renderer = x)}>
-                <Container endpoint={this.state.endpoint} levels={this.state.levels} />
+                <this.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
             </div>
         )
     }
