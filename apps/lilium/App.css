@@ -31,13 +31,13 @@ body, html {
     z-index: 2;
 }
 
-#urlrenderer.slid {
-    transform: translate3d(100px, 0px, 0px);
+#OLD_urlrenderer.slid {
+    transform: translate3d(120px, 0px, 0px);
 }
 
 #urlrenderer.snap {
-    transform: translate3d(250px, 0px, 0px);
-    width: calc(100% - 280px);
+    transform: translate3d(210px, 0px, 0px);
+    width: calc(100% - 240px);
 }
 
 #lilium-menu {
@@ -45,14 +45,13 @@ body, html {
     left: 0;
     top: 50px;
     background: #333;
-    padding: 30px 30px 0px 0px;
+    padding: 30px 10px 0px 0px;
     margin: 0;
     bottom: 0px;
-    width: 250px;
+    width: 230px;
     color: white;
-
     transition: 0.2s;
-    transform: translate3d(-250px, 0px, 0px);
+    transform: translate3d(-210px, 0px, 0px);
     z-index: 5;
 }
 
@@ -62,6 +61,7 @@ body, html {
 
 #lilium-menu.snap {
     transform: translate3d(0px,0px,0px);
+    background : #262626;
 }
 
 header {
