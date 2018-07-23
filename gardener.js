@@ -118,9 +118,7 @@ class Gardener {
         log('Gardener', 'Restarting instances...', 'Lilium');
         const pids = Object.keys(garden);
         this.caijProc.kill("SIGHUP")
-        Object.keys(pids).forEach(pid => {
-            garden[pids].kill("SIGHUP")
-        });
+        pids.forEach(pid => garden[pid].kill("SIGHUP"));
         
         this.spawnSharedMemory();
         this.spawnDataServer();
