@@ -150,6 +150,8 @@ module.exports = function(config, data, done) {
             up.sizes.facebook =  {
                 path : base + uploadrelpath + reldirpath + filename,
                 url : config.server.url + "/u/" + reldirpath + filename,
+                wpurl : "/" + up.fullurl,
+                wpfile : up.filename,
                 width : metadata.width,
                 height : metadata.height
             };

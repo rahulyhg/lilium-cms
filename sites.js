@@ -259,17 +259,18 @@ var SiteInitializer = function (conf, siteobj) {
             if (pkg.appname == "lilium") {
                 pkg.code += `// Lilium config
                     global.liliumcms = {
+                        env : "${conf.env}",
                         uid : "${conf.uid}",
                         url : "${conf.server.url}"
                     };
                 `;
             }
+            
+            fs.copyFileSync(
+                pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
+                pathLib.join(conf.server.html, 'lilium.css')
+            );
         });
-
-        fs.copyFileSync(
-            pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
-            pathLib.join(conf.server.html, 'lilium.css')
-        );
 
         hooks.fireSite(conf, 'frontend_will_precompile', {
             config: conf,

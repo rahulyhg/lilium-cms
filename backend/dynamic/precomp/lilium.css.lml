@@ -834,9 +834,26 @@ input[type="submit"].green:active, .btn.green:active, button.green:active {
     height: 36px;
 }
 
+#lmldeprec {
+    position: fixed;
+    top: 50px;
+    left: 40px;
+    background: #ff2634;
+    color: white;
+    padding: 13px;
+    width: 100%;
+    z-index: 100000;
+}
+
+#lmldeprec a {
+    color: white;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
 .lmladmincontentwrapper {
 	padding-left: {=sidebarwidth};
-	padding-top: {=topbarheight};
+	padding-top: 95px;
 
     width: 100%;
 }

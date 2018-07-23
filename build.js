@@ -37,6 +37,21 @@ class Builder {
         next();
     }
 
+    adminPOST(cli) {
+        if (cli.hasRightOrRefuse('lilium')) {
+            if (cli.routeinfo.path[2] == "lilium") {
+                const b = init_build_tree.find(x => x.input == "lilium" && x._c.id == cli._c.id);
+                if (b) {
+                    this.build(b._c, b.input, b.outputkey, b.options, () => {
+                        cli.sendJSON({done : 1})
+                    })
+                } else {
+                    cli.sendJSON({ error : "nobuildinfo" });
+                }
+            }
+        }
+    }
+
     build(_c, input, outputkey, options, done) {
         log('Builder', 'Compiling ES6 project from dir ' + input, 'info');
         const now = Date.now();

@@ -1,9 +1,12 @@
 import { h, Component } from 'preact'
+import { resetPageCommands } from '../layout/lys';
 
 // Import default pages from route
 import InitPage     from '../pages/default';
 import Dashboard    from '../pages/dashboard/index';
 import Publishing   from '../pages/publishing/index';
+import ProfilePage  from '../pages/me/index.js';
+import DevTools     from '../pages/devtools/index.js';
 import e404         from '../pages/errors/404';
 
 // Default endpoints are provided here
@@ -35,9 +38,11 @@ EndpointStore.ENDPOINT_STORE = {};
 
 // Define default Lilium's endpoints
 EndpointStore.registerEndpoint("_init", InitPage);
-EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
+EndpointStore.registerEndpoint('me', ProfilePage);
+EndpointStore.registerEndpoint('devtools', DevTools);
+EndpointStore.registerEndpoint('_e404', e404);
 
 export class URLRenderer extends Component {
     constructor(props) {
@@ -66,7 +71,25 @@ export class URLRenderer extends Component {
             this.refreshPath();
         };
 
+        this.menuslid_bound = this.menuslid.bind(this);
+        this.menusnapped_bound = this.menusnapped.bind(this);
+        document.addEventListener('menuslid', this.menuslid_bound);
+        document.addEventListener('menusnap', this.menusnapped_bound);
+
+
         this.refreshPath();
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('menuslid', this.menuslid_bound)
+    }
+
+    menuslid(ev) {
+        this.renderer.classList[ev.detail.slid ? "add" : "remove"]("slid");
+    }
+
+    menusnapped(ev) {
+        this.renderer.classList[ev.detail.snapped ? "add" : "remove"]("snap")
     }
 
     refreshPath() {
@@ -77,16 +100,20 @@ export class URLRenderer extends Component {
         const levels = paths;
 
         log('URLRenderer', 'Refreshing URL state with endpoint : ' + endpoint, 'url');
+        resetPageCommands();
         this.setState({ endpoint, levels });
     }
 
     render() {
-        const Container = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
+        // if (this.lastRenderedPath != document.location.pathname) {
+            this.CurrentContainer = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
+        // }
+        this.lastRenderedPath = document.location.pathname;
         
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
-            <div id="urlrenderer">
-                <Container endpoint={this.state.endpoint} levels={this.state.levels} />
+            <div id="urlrenderer" ref={x => (this.renderer = x)}>
+                <this.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
             </div>
         )
     }

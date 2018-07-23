@@ -122,6 +122,7 @@ function transferWPImages(_c, data, done) {
 
     let index = -1;
     const startTransfer = () => {
+        let retrying = false;
         const nextImage = () => {
             const file = files[++index];
 
@@ -140,14 +141,22 @@ function transferWPImages(_c, data, done) {
                                 err && log('WPInit', err, 'err');
                                 return nextImage();
                             });
-                        });
-                    } else {
-                        return nextImage();
-                    }
+                        } else {
+                            log('Wordpress', 'Non-200 HTTP code : ' + res.statusCode, 'warn');
+                            if (retrying) {
+                                    return nextImage();
+                            }
+
+                            --index;
+                            retrying = true;
+
+                            return setTimeout(() => nextImage(), 8000);
+                        }
+                    });
                 });
             } else {
                 log('WPInit', '--------------------------------', 'success');
-                log('WPInit', 'Done handling WP images transfer', 'success');                
+                log('WPInit', 'Done handling WP images transfer', 'success');
                 log('WPInit', '--------------------------------', 'success');
 
                 return;
@@ -174,7 +183,7 @@ function transferWPImages(_c, data, done) {
             });
         })
     });
-    
+
     log('WPInit', 'Done listing images for WP transfer. Total : ' + files.length, 'info');
     startTransfer();
     done();
