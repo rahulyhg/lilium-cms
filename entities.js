@@ -216,7 +216,7 @@ class Entities {
         }
     };
 
-    adminPOST  (cli) {
+    adminPOST(cli) {
         cli.touch('entities.handlePOST');
         if (cli.routeinfo.path[1] == 'me') {
             if (cli.routeinfo.path[2] == "updateOneField") {

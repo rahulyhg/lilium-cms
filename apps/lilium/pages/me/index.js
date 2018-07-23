@@ -82,8 +82,13 @@ export default class ProfilePage extends Component {
     constructor(props) {
         super(props);
 
-        this.passwordFields = {};
-        this.state = { user: undefined, username: 'gabrielcardinal', err: undefined };
+        this.inputValues = {};
+        this.state = {
+            user: undefined,
+            qrCode: '',
+            token2fa: '',
+            err: undefined
+        };
     }
 
     componentWillMount() {
@@ -98,6 +103,15 @@ export default class ProfilePage extends Component {
 
                 this.setState({ user: data.user, err: undefined });
                 console.log(this.state);
+
+                API.get('/2fa', {}, (err, data) => {
+                    if (!err && data) {
+                        this.setState({ qrCode: data.qrCode });
+                        log('ProfilePage', 'Got 2FA QRCode', 'success');
+                    } else {
+                        log('ProfilePage', 'Error fetching 2FA QRCode for Google Authnticator', 'error');
+                    }
+                });
             } else {
                 console.log(err);
                 this.setState({ err });x
@@ -106,12 +120,11 @@ export default class ProfilePage extends Component {
     }
 
     asyncFieldUpdate(name, value) {
-        console.log({ field: name, value: value });
         API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
             if (!err)
-                console.log('Updated field ' + name);
+                log('ProfilePage', 'Updated field ' + name, 'success');
             else
-                console.log('Error updating field ' + name);
+                log('ProfilePage', 'Error updating field ' + name, 'error');
         });
     }
 
@@ -120,19 +133,40 @@ export default class ProfilePage extends Component {
     }
 
     updatePasswordField(name, value) {
-        console.log(name, value);
-        this.passwordFields[name] = value;
-        console.log(this.passwordFields);
+        this.inputValues[name] = value;
     }
 
     changePassword(done) {
-        console.log(this.passwordFields);
-        if (this.passwordFields.oldpassword && this.passwordFields.newpassword
-                && this.passwordFields.newpassword == this.passwordFields.confirmnewpassword) {
-            API.post('/me/updatePassword', { old: this.passwordFields.oldpassword, new: this.passwordFields.newpassword }, (err, data) => {
-                done && done();
-            });
+        if (this.inputValues.oldpassword && this.inputValues.newpassword
+            && this.inputValues.newpassword == this.inputValues.confirmnewpassword) {
+                API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
+                    done && done();
+                });
         }
+    }
+
+    activate2fa(done) {
+        API.post('/2fa/activate', {token2fa: this.state.token2fa}, (err, data) => {
+            if (!err) {
+                const user = this.state.user;
+                user.confirmed2fa = true;
+                this.setState({ user });
+                log('ProfilePage', 'Activated 2FA', 'success');
+                done && done();
+            }
+        });
+    }
+
+    deactivate2fa(done) {
+        API.post('/2fa/deactivate', {token2fa: this.state.token2fa}, (err, data) => {
+            if (!err) {
+                const user = this.state.user;
+                user.confirmed2fa = false;
+                this.setState({ user });
+                log('ProfilePage', 'Deactivated 2FA', 'success');
+                done && done();
+            }
+        });
     }
 
     render() {
@@ -144,7 +178,7 @@ export default class ProfilePage extends Component {
                             <div id="profile-picture-wrapper" style={style.coreInfo} >
                                 <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} />
                             </div>
-                            <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.username}`}</h3>
+                            <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.user.username}`}</h3>
                         </div>
                         <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
                             <input type="text" name="displayname" style={style.inputField} value={this.state.user.displayname}
@@ -229,11 +263,13 @@ export default class ProfilePage extends Component {
                                 <li>You should now see an account named 'Lilium CMS &gt;company name&lt; (&gt;username&lt;). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
                             </ol>
 
-                            <img src={this.state.qrCode} id="qr-code-2fa" alt=""/>
+                            <img src={this.state.qrCode} id="qr-code-2fa" alt="" />
 
-                            <TextField name='token-2fa' placeholder='2FA Token' />
+                            <TextField name='token2fa' placeholder='2FA Token' onChange={(name, value) => this.setState({ token2fa: value })} />
 
-                            <ButtonWorker text='Activate 2FA for my account' />
+                            <ButtonWorker text={`${(this.state.user.confirmed2fa) ? 'Deactivate' : 'Activate'} 2FA for my account`}
+                                            theme={(this.state.user.confirmed2fa) ? 'danger' : ''}
+                                            work={(this.state.user.confirmed2fa) ? this.deactivate2fa.bind(this) : this.activate2fa.bind(this)} />
                         </div>
                     </div>
                 </div>

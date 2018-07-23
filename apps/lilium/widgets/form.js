@@ -41,12 +41,20 @@ class FormField extends Component {
     get isField() { return true; }
 }
 
+
+const buttonThemes = {
+    'success': { backgroundColor: "green" },
+    'danger': { backgroundColor: "red" },
+    'info': { backgroundColor: "white" },
+};
+
 export class ButtonWorker extends Component {
     constructor(props) {
         super(props);
+
         this.state = {
             working : false
-        }
+        };
     }
 
     work() {
@@ -63,7 +71,7 @@ export class ButtonWorker extends Component {
 
     render() {
         return (
-            <div class="button-worker" style={styles.buttonworker} onClick={this.work.bind(this)}>
+            <div class="button-worker" style={Object.assign({}, styles.buttonworker, buttonThemes[this.props.theme] || {})} onClick={this.work.bind(this)}>
                 <span class={this.state.working ? "hidden" : ""}>{this.props.text}</span>
                 <div class={"working-spinner " + (this.state.working ? "shown" : "")}><i class="fa fa-spin fa-cog"></i></div>
             </div>
@@ -101,3 +109,10 @@ export class TextField extends FormField {
         )
     }
 }
+
+
+
+
+
+
+
