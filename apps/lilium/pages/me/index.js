@@ -64,8 +64,15 @@ const style = {
         justifyContent: 'center'
     },
 
-    badges: {
+    badgesContainer: {
+        display: 'flex',
+        flexFlow: 'row wrap',
+        justifyContent: 'space-around'
+    },
 
+    badgeImage: {
+        maxHeight: '70px',
+        maxWidth:'70px'
     },
 
     infoGroupTitle: {
@@ -169,6 +176,23 @@ export default class ProfilePage extends Component {
         });
     }
 
+    /**
+     * Returns the appropriate image name fot e given badge level
+     * @param {number} level the level of the badge for which to return the image name
+     */
+    getBadgeImageName(level) {
+        // All badges from level 6 and on have the '4.png' image
+        return Math.min((Math.floor(level / 2) + 1), 4).toString() + ".png";
+    }
+
+    /**
+     * Returns a font awesome class in the form of 'fa-icon' from the classlist of a badge
+     * @param {string} classes string classes list returned from the server
+     */
+    getFonwAwesomeClass(classes) {
+
+    }
+
     render() {
         if (this.state.user) {
             return (
@@ -180,6 +204,7 @@ export default class ProfilePage extends Component {
                             </div>
                             <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.user.username}`}</h3>
                         </div>
+
                         <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
                             <input type="text" name="displayname" style={style.inputField} value={this.state.user.displayname}
                                          onChange={this.asyncUpdateHeaderField.bind(this)} />
@@ -189,13 +214,17 @@ export default class ProfilePage extends Component {
                                     placeholder='Write a small introduction paragraph'
                                     style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.state.user.description}</textarea>
                         </div>
-                        <div id="badges">
+
+                        <div style={style.badgesContainer}>
                             {
                                 this.state.user.badges.map(badge => {
+                                    console.log(badge);
                                     return (
-                                        <span className="badge">
-                                            {badge.displayname}
-                                            <i className="badge-symbol"></i>
+                                        <span>
+                                            <div class="me-decoration level-1" style="filter: hue-rotate(70deg);">
+                                                <img src={`//narcity.localhost:8080/static/badges/${this.getBadgeImageName(badge.level)}`} style={style.badgeImage} />
+                                                <i class="fa fa fa-key"></i>
+                                            </div>
                                         </span>
                                     );
                                 })

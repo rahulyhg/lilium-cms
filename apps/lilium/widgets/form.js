@@ -29,8 +29,6 @@ class FormField extends Component {
     constructor(props) {
         super(props);
         this.value = props.initialValue;
-
-        // this.value && props.onChange && props.onChange(props.name, this.value);
     }
 
     changed(ev) {

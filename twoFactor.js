@@ -60,7 +60,7 @@ class twoFactor {
 
         qrcode.toDataURL(uri, (err, data) => {
             if (!err && data) {
-                log("2FA", "Generated Google Authenticator QR Coduserinfoe for user " + cli.userinfo.user, "lilium");
+                log("2FA", "Generated Google Authenticator QR Codu for user " + cli.userinfo.user, "lilium");
                 sendback({ success: true, qrCode: data });
             } else {
                 log("2FA", "Error generating Google Authenticator QR Code for user " + cli.userinfo.user, "warn");
