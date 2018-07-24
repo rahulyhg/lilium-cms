@@ -121,7 +121,7 @@ export default class ProfilePage extends Component {
                 });
             } else {
                 console.log(err);
-                this.setState({ err });x
+                this.setState({ err });
             }
         });
     }
