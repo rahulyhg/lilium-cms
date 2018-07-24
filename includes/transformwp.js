@@ -59,7 +59,6 @@ const mkdirp = require('mkdirp').sync;
 const crypto = require('crypto-js');
 
 module.exports = function(config, data, done) {
-    console.log(data);
     const topics = data["wp:category"].map(c => {
         return {
             _id : new ObjectId(),
@@ -151,6 +150,8 @@ module.exports = function(config, data, done) {
             up.sizes.facebook =  {
                 path : base + uploadrelpath + reldirpath + filename,
                 url : config.server.url + "/u/" + reldirpath + filename,
+                wpurl : "/" + up.fullurl,
+                wpfile : up.filename,
                 width : metadata.width,
                 height : metadata.height
             };

@@ -1,5 +1,6 @@
 import { h, Component } from 'preact'
 import { resetPageCommands } from '../layout/lys';
+import { CACHEKEYS, getLocal } from '../data/cache';
 
 // Import default pages from route
 import InitPage     from '../pages/default';
@@ -49,8 +50,11 @@ export class URLRenderer extends Component {
         super(props);
         this.state = {
             endpoint : "_init",
-            levels : []
+            levels : [],
+            classes : []
         }
+
+        getLocal(CACHEKEYS.SIDEBARSNAP) && this.state.classes.push("snap");
     }
 
     componentDidMount() {
@@ -71,7 +75,25 @@ export class URLRenderer extends Component {
             this.refreshPath();
         };
 
+        this.menuslid_bound = this.menuslid.bind(this);
+        this.menusnapped_bound = this.menusnapped.bind(this);
+        document.addEventListener('menuslid', this.menuslid_bound);
+        document.addEventListener('menusnap', this.menusnapped_bound);
+
         this.refreshPath();
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('menuslid', this.menuslid_bound)
+    }
+
+    menuslid(ev) {
+        this.renderer.classList[ev.detail.slid ? "add" : "remove"]("slid");
+    }
+
+    menusnapped(ev) {
+        this.renderer.classList[ev.detail.snapped ? "add" : "remove"]("snap");
+        this.state.classes = ev.detail.snapped ? ["snap"] : [];
     }
 
     refreshPath() {
@@ -87,12 +109,15 @@ export class URLRenderer extends Component {
     }
 
     render() {
-        const Container = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
+        // if (this.lastRenderedPath != document.location.pathname) {
+            this.CurrentContainer = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
+        // }
+        this.lastRenderedPath = document.location.pathname;
         
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
-            <div id="urlrenderer">
-                <Container endpoint={this.state.endpoint} levels={this.state.levels} />
+            <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
+                <this.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
             </div>
         )
     }

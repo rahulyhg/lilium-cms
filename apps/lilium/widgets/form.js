@@ -95,13 +95,13 @@ export class SelectField extends FormField {
 export class TextField extends FormField {
     render() {
         return (
-            <div style={styles.fieldwrap}>
-                { this.props.placeholder ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
+            <div style={Object.assign(styles.fieldwrap, this.props.wrapstyle || {})}>
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
 
                 {
                     this.props.multiline ? 
-                        ( <textarea style={Object.assign({}, styles.textfield, styles.textarea)} onChange={this.changed.bind(this)}>{this.value || ""}</textarea>) :
-                        ( <input style={styles.textfield} type={this.props.type || 'text'} value={this.value} onChange={this.changed.bind(this)} />)
+                        ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} onChange={this.changed.bind(this)}>{this.value || ""}</textarea>) :
+                        ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type="text" value={this.value} onChange={this.changed.bind(this)} />)
                 }
             </div>
         )

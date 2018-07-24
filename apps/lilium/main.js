@@ -6,6 +6,7 @@ import { URLRenderer } from './routing/urlrenderer';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
+import { initLocal } from './data/cache'
 import API from './data/api';
 
 // LILIUM_IMPORT_TEMPLATE
@@ -22,6 +23,13 @@ class Lilium extends Component {
         this.state = {
             /* session, menus */
         };
+
+        // Initialize cache
+        initLocal();
+
+        // Realtime socket
+        initiateConnection();
+
         log('Lilium', 'Created Main app component', 'lilium');
     }
 
@@ -41,7 +49,6 @@ class Lilium extends Component {
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
                 this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"] });            
-                initiateConnection();
             }
         });
     }
