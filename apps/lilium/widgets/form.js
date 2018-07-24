@@ -30,7 +30,7 @@ class FormField extends Component {
         super(props);
         this.value = props.initialValue;
 
-        this.value && props.onChange && props.onChange(props.name, this.value);
+        // this.value && props.onChange && props.onChange(props.name, this.value);
     }
 
     changed(ev) {
@@ -109,10 +109,3 @@ export class TextField extends FormField {
         )
     }
 }
-
-
-
-
-
-
-
