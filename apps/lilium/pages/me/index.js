@@ -149,6 +149,8 @@ export default class ProfilePage extends Component {
                 API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
                     done && done();
                 });
+        } else {
+            done && done();
         }
     }
 
