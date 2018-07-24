@@ -246,3 +246,13 @@ h1, h2 {
     0% { transform: rotateZ(0deg); }
     100% { transform: rotateZ(360deg); }
 }
+
+
+/* 
+    Pseudo Eleents and Selector
+    This section is useful to apply style to pseudo elements that React can't have access to
+*/
+
+.change-placeholder::-webkit-input-placeholder {
+    color: #ddd;
+}
