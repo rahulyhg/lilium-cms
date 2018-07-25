@@ -31,7 +31,7 @@ class twoFactor {
     }
 
     activate2fa(cli) {
-        db.update(_c.default(), 'entities', { username: cli.userinfo.user }, { confirmed2fa: true }, err => {
+        db.update(_c.default(), 'entities', { username: cli.userinfo.user }, { confirmed2fa: true, enforce2fa : true }, err => {
             if (!err) {
                 log('2FA', 'Activated 2FA for user ' + cli.userinfo.user, 'lilium');
                 cli.sendJSON({ success: true });
@@ -43,7 +43,7 @@ class twoFactor {
     }
 
     deactivate2fa(cli) {
-        db.update(_c.default(), 'entities', { username: cli.userinfo.user }, { confirmed2fa: false }, err => {
+        db.update(_c.default(), 'entities', { username: cli.userinfo.user }, { confirmed2fa: false, enforce2fa : false }, err => {
             if (!err) {
                 log('2FA', 'Deactivated 2FA for user ' + cli.userinfo.user, 'warn');
                 cli.sendJSON({ success: true });
