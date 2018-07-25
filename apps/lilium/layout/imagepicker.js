@@ -35,6 +35,7 @@ class SelectedImage extends Component {
 
     componentWillReceiveProps(props) {
         log('ImagePicker', 'Selected image received image as prop, about to set state', 'detail');
+        this.imgtag && this.imgtag.removeAttribute('src');
         this.setState({
             selected : props.image
         })
@@ -52,7 +53,7 @@ class SelectedImage extends Component {
 
         return (
             <div>
-                <img src={this.state.selected.sizes.facebook.url} class="image-picker-selected-full" />
+                <img ref={img => this.imgtag = img} src={document.location.protocol + ("//www.narcity.com" || liliumcms.url) + "/" + this.state.selected.fullurl} class="image-picker-selected-full" />
                 <b>{this.state.selected.fullurl}</b>
             </div>
         )
@@ -79,7 +80,7 @@ class ImageThumbnail extends Component {
         return (
             <img onClick={this.clicked.bind(this)} 
                 class={"image-picker-thumb " + (this.state.selected ? "selected" : "")} 
-                src={this.props.image.sizes.square.url} 
+                src={this.props.image.sizes.thumbnail.url} 
             />
         )
     }

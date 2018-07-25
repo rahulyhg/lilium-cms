@@ -306,6 +306,12 @@ h1, h2 {
     background-color: #DDD;
     width: 100%;
     height: auto;
+    max-height: 280px;
+    object-fit: contain;
+}
+
+.image-picker-selected-full[src=""] {
+    height: 280px;
 }
 
 @keyframes anim {
