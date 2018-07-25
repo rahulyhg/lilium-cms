@@ -255,6 +255,17 @@ var SiteInitializer = function (conf, siteobj) {
             }
         });
 
+        hooks.bindSite(conf, 'preactAppInjectionPhase', pkg => {
+            if (pkg.appname == "lilium") {
+                pkg.code += `// Lilium config
+                    global.liliumcms = {
+                        uid : "${conf.uid}",
+                        url : "${conf.server.url}"
+                    };
+                `;
+            }
+        });
+
         fs.copyFileSync(
             pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
             pathLib.join(conf.server.html, 'lilium.css')

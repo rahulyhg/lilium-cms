@@ -28,10 +28,14 @@ var Settings = function () {
             }
 
             var saveSetts = function() {
-                hooks.fireSite(cli._c, 'settings_will_save', {settings : data});
+                hooks.fireSite(cli._c, 'settings_will_save', {settings : dat, _c : cli._c});
 
                 _c.saveConfigs(cli._c, function () {
-                    cli.redirect(cli._c.server.url + cli.routeinfo.relsitepath + "?updated=true", false);
+                    cli.sendJSON({ settings : dat, ok : 1 });
+
+                    setTimeout(() =>{
+                        process.send("updateAndRestart", () => {});
+                    }, 100);
                 });
             };
 
@@ -158,22 +162,7 @@ var Settings = function () {
             .add('google.apikey', 'text', {
                 displayname: "API Key"
             })
- /*           .add('google.clientid', 'text', {
-                displayname: "Client ID"
-            })
-            .add('google.clientsecret', 'text', {
-                displayname: "Client Secret"
-            })
-            .add('google.redirecturl', 'text', {
-                displayname: "Redirect URL"
-            })
-            .add('google.accesstoken', 'text', {
-                displayname : "Access Token"
-            })
-            .add('google.refreshtoken', 'text', {
-                displayname : "Refresh Token"
-            })
-*/            .add('google.jsonfilepath', 'text', {
+            .add('google.jsonfilepath', 'text', {
                 displayname : "Backend JSON key file full path"
             })
 
@@ -192,111 +181,6 @@ var Settings = function () {
             .add('analytics.siteviewid', 'text', {
                 displayname: "Site view ID"
             })
-/*
-*       .add('lickstats_title', 'title', {
-            displayname : "Lickstats Combos"
-        })
-        .add('lickstatscombos', 'stack', {
-            displayname : "Lickstats ID / Secret combo",
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "websiteurl",
-                        dataType : "text",
-                        displayname : "Website URL"
-                    }, {
-                        fieldName : "id",
-                        dataType : "text",
-                        displayname : "Account ID"
-                    }, {
-                        fieldName : "secret",
-                        dataType : "text",
-                        displayname : "Access Secret"
-                    }
-                ]
-            }
-        })
-        .add('dfp_title', 'title', {
-                displayname: "DFP"
-            })
-            .add('dfp.client_id', 'text', {
-                displayname: "Client ID"
-            }, {
-                required: false
-            })
-            .add('dfp.client_secret', 'text', {
-                displayname: "Client Secret"
-            }, {
-                required: false
-            })
-            .add('dfp.redirect_url', 'text', {
-                displayname: "Redirect URL"
-            }, {
-                required: false
-            })
-            .add('dfp.scope', 'text', {
-                displayname: "Scope"
-            }, {
-                required: false
-            })
-            .add('dfp.code', 'text', {
-                displayname: "Code"
-            }, {
-                required: false
-            })
-            .add('dfp.access_token', 'text', {
-                displayname: "Access Token"
-            }, {
-                required: false
-            })
-            .add('dfp.refresh_token', 'text', {
-                displayname: "Refresh Token"
-            }, {
-                required: false
-            })
-            .add('dfp.version', 'text', {
-                displayname: "API Version"
-            }, {
-                required: false
-            })
-            .add('dfp.network_code', 'text', {
-                displayname: "Network Code"
-            }, {
-                required: false
-            })
-            .add('dfp.app_name', 'text', {
-                displayname: "DFP App Name"
-            }, {
-                required: false
-            })
-            .add('dfp.fan', 'text', {
-                displayname: "In-content Facebook Audiance Network Placement ID"
-            }, {
-                required: false
-            })
-            .add('dfp-incontentprop', 'stack', {
-                displayname : "In-content DFP tags",
-                scheme : {
-                    columns : [
-                        {
-                            fieldName : "tagid",
-                            dataType : "text",
-                            displayname : "DFP Tag ID"
-                        }, {
-                            fieldName : "sizes",
-                            dataType : "text",
-                            displayname : "Sizes (2D array)"
-                        }, {
-                            fieldName : "htmlid",
-                            dataType : "text",
-                            displayname : "HTML ID"
-                        }
-                    ]
-                }
-            }, {
-                required: false
-            })
-*/
         .add('social-facebook-sep', 'title', {
                 displayname: "Facebook API"
             })
@@ -318,21 +202,6 @@ var Settings = function () {
             .add('social.instagram.accounts', 'text', {
                 displayname : "Instagram accounts"
             })
-/*
-        .add('stripe-sep', "title", {
-                displayname: "Stripe"
-            })
-            .add('stripe.publickey', 'text', {
-                displayname: "Public Key"
-            }, {
-                required: false
-            })
-            .add('stripe.secretkey', 'text', {
-                displayname: "Secret Key"
-            }, {
-                required: false
-            })
-*/
         .add('email-sep', 'title', {
                 displayname: "Email System"
             })
@@ -375,13 +244,6 @@ var Settings = function () {
                 notitle: true,
                 format : "array"
             })
-/*
-            .add('posts.frontend.dateformat', 'text', {
-                displayname: "Presented date format"
-            }, {
-                required: false
-            })
-*/
 
             .trg('bottom')
 
@@ -405,9 +267,16 @@ var Settings = function () {
         .add('action-sep', 'title', {
                 displayname: "Actions"
             })
-            .add('submit', 'submit', {
-                displayname: "Save (WIP)"
-            });
+        .add("actions", 'buttonset', {
+            buttons : [
+                {
+                    name : "save",
+                    displayname : "Save and Restart Lilium",
+                    type : "button",
+                    classes : ["btn-save"]
+                }
+            ]
+        })
     };
 
     this.livevar = function(cli, levels, params, callback) {

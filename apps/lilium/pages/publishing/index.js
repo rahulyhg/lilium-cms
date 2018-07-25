@@ -1,45 +1,21 @@
 import { h, Component } from "preact";
-import API from "../../data/api";
+import ListView from './list';
+import EditView from './edit';
+import { navigateTo } from '../../routing/link';
 
 export default class PublishingTab extends Component {
     constructor(props) {
         super(props);
-
-        this.state = { 
-            filters : {
-                search : "",
-                status : "",
-                author : "",
-                isSponsored : "",
-                sort : "updated"
-            },
-            page : 1,
-            max : 25,
-            items : []
-        };
-    }
-
-    componentDidMount() {
-        API.get("/publishing/bunch", {
-            filters : this.state.filters,
-            page : this.state.page,
-            max : this.state.max
-        }, (err, data) => {
-            this.setState({
-                items : data.items
-            });
-        });
     }
 
     render() {
-        return (
-            <div id="publishing-tab">
-                {this.state.items.map(post => (
-                    <div key={post._id}>
-                        {post.headline}
-                    </div>
-                ))}
-            </div>
-        );
+        log('Publishing', 'Rendering publishing pane with ' + this.props.levels.length + ' levels', 'detail');
+        if (this.props.levels.length == 0) {
+            return (<ListView />);
+        } else if (this.props.levels[0] == "write") {
+            return (<EditView postid={this.props.levels[1]} />)
+        } else {
+            navigateTo("/publishing");
+        }
     }
 }

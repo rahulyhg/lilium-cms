@@ -51,7 +51,6 @@ class Builder {
                 return done();
             }
 
-            // TODO hook to inject v4 code
             const preactInjectedCode = {
                 code : "",
                 appname : input

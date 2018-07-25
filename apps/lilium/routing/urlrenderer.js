@@ -49,6 +49,7 @@ export class URLRenderer extends Component {
     }
 
     componentDidMount() {
+        log('URLRenderer', 'Finished mounting a URL Renderer', 'url');
         document.addEventListener('navigate', ev => {
             const path = "/lilium" + ev.detail.href;
             window.history.pushState(path, undefined, path);
@@ -56,8 +57,14 @@ export class URLRenderer extends Component {
         });
 
         if (document.location.pathname.substring(1).split('/').length == 1) {
+            log('URLRenderer', 'Pushing a URL state to window history', 'url');
             window.history.pushState("/lilium/dashboard", undefined, "/lilium/dashboard");
         }
+
+        window.onpopstate = () => {
+            log("URLRenderer", 'Handling popstate event', 'url');
+            this.refreshPath();
+        };
 
         this.refreshPath();
     }
@@ -69,12 +76,14 @@ export class URLRenderer extends Component {
         const endpoint = paths.shift();
         const levels = paths;
 
+        log('URLRenderer', 'Refreshing URL state with endpoint : ' + endpoint, 'url');
         this.setState({ endpoint, levels });
     }
 
     render() {
         const Container = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
         
+        log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
             <div id="urlrenderer">
                 <Container endpoint={this.state.endpoint} levels={this.state.levels} />

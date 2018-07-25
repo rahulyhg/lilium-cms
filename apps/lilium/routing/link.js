@@ -7,6 +7,7 @@ export class Link extends Component {
     }
 
     navigate() {
+        log('Link', 'Link was clicked with href : ' + this.props.href, 'detail');
         const ev = new CustomEvent("navigate", { detail : { href : this.props.href } });
         document.dispatchEvent(ev);
     }
@@ -18,4 +19,10 @@ export class Link extends Component {
             <div  class="link block-link"  onClick={this.navigate.bind(this)}>{this.props.children}</div>
         );
     }
+}
+
+export function navigateTo(href) {
+    log('Link', 'Hard navigation from code to href : ' + href, 'detail');
+    const ev = new CustomEvent("navigate", { detail : { href } });
+    document.dispatchEvent(ev);    
 }
