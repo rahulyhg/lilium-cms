@@ -282,19 +282,30 @@ h1, h2 {
     margin: 2px;
     border: 2px solid #CCC;
     cursor: pointer;
+    transition: transform 0.2s;
 }
 
 .image-picker-thumb:hover {
     border: 2px solid rgb(175, 87, 228);
 }
 
+.image-picker-thumb.selected {
+    border: 2px solid #73358f;
+    transform: rotateZ(5deg) scale(1.1);
+}
+
 #image-gallery-detail {
     position: absolute;
-    top: 66px;
-    right: 20px;
-    width: 360px;
+    top: 60px;
+    right: 2px;
+    width: 398px;
     bottom: 0;
-    overflow: hidden;
+}
+
+.image-picker-selected-full {
+    background-color: #DDD;
+    width: 100%;
+    height: auto;
 }
 
 @keyframes anim {
