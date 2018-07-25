@@ -11,6 +11,26 @@ const styles = {
     }
 }
 
+class ImageThumbnail extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            selected : false
+        };
+    }
+
+    clicked(ev) {
+        this.setState({ selected : true });
+        this.props.clicked(this.props.image, this);
+    }
+
+    render() {
+        return (
+            <img onClick={this.clicked.bind(this)} class="image-picker-thumb" src={this.props.image.sizes.square.url} />
+        )
+    }
+}
+
 let _singleton;
 export class ImagePicker extends Component {
     constructor(props) {
@@ -23,14 +43,25 @@ export class ImagePicker extends Component {
         };
 
         _singleton = this;
+        this.keydown_bound = this.keydown.bind(this);
     }
 
     static cast(params, done) {
+        log('ImagePicker', 'Casting image picker singleton', 'detail');
         _singleton.setState({ params, visible : true });
+        window.addEventListener('keydown', _singleton.keydown_bound);
     }
 
     static dismiss() {
+        log('ImagePicker', 'Dismissing image picker singlethon', 'detail');
         _singleton.setState({ visible : false });
+        window.removeEventListener('keydown', _singleton.keydown_bound);
+
+        this.state.callback && this.state.callback(this.state.selected);
+    }
+
+    keydown(ev) {
+        ev.keyCode == "27" && ImagePicker.dismiss();
     }
 
     fetchLatest() {
@@ -41,6 +72,12 @@ export class ImagePicker extends Component {
 
     componentDidMount() {
         this.fetchLatest();
+    }
+
+    imageClicked(selected, comp) {
+        this.setState({
+            selected
+        });
     }
 
     render() {
@@ -55,12 +92,12 @@ export class ImagePicker extends Component {
 
                     <div id="image-gallery">
                     {
-                        this.state.images.map(x => (<img class="image-picker-thumb" src={x.sizes.square.url} />))
+                        this.state.images.map(x => (<ImageThumbnail image={x} clicked={this.imageClicked.bind(this)} />))
                     }
                     </div>
 
                     <div id="image-gallery-detail">
-
+                        
                     </div>
                 </div>
             </div>
