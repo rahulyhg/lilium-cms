@@ -766,9 +766,9 @@ const compile = (o, context) => { o(context.header, css, `<link rel="stylesheet"
     };
 
     var contentBlur = function() {
-        document.getElementById("pub-words").textContent = allEditors.reduce(function(current, that) {
+        document.getElementById("pub-words").textContent = "~" + allEditors.reduce(function(current, that) {
             return current + that.dom.doc.body.textContent.split(' ').filter(function(str) { return str.trim(); }).length;
-        }, 0);
+        }, 0) + " words including embeded text.";
     };
 
     var selectFinalTopic = function(topicid) {
