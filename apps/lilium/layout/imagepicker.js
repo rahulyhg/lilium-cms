@@ -8,6 +8,20 @@ const styles = {
         display: "block",
         margin: "10px 20px",
         borderBottom: "1px solid #CCC"
+    },
+    noimagetitle : {
+        display: "block",
+        textAlign: "center",
+        marginTop: 100,
+        fontSize: 32,
+        color: "#CCC"
+    },
+    noimageicon : {
+        display : "block",
+        textAlign : "center",
+        fontSize : 72,
+        marginTop : 30,
+        color : "#CCC"
     }
 }
 
@@ -59,8 +73,19 @@ export class ImagePicker extends Component {
                     }
                     </div>
 
-                    <div id="image-gallery-detail">
+                    <div id="image-gallery-detail">        
+                    {
+                        this.state.selected ? (
+                            <div>
 
+                            </div>
+                        ) : (
+                            <div>
+                                <b style={ styles.noimagetitle }>No image selected</b>
+                                <i style={ styles.noimageicon } class="fal fa-image"></i>
+                            </div>
+                        )
+                    }
                     </div>
                 </div>
             </div>
