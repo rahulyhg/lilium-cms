@@ -3,10 +3,11 @@ import { makeGlobalLogger } from './data/logger';
 import { Header } from './layout/header'
 import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
+import { ImagePicker } from './layout/imagepicker';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
-import { initLocal } from './data/cache'
+import { initLocal } from './data/cache';
 import API from './data/api';
 
 // LILIUM_IMPORT_TEMPLATE
@@ -49,7 +50,7 @@ class Lilium extends Component {
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
                 this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"] });            
-            }
+            }   
         });
     }
 
@@ -67,6 +68,8 @@ class Lilium extends Component {
                 <LiliumMenu menus={this.state.menus} />
                 <URLRenderer session={this.state.session} />
                 <Lys menus={this.state.menus} session={this.state.session} />
+                <ImagePicker />
+
                 { liliumcms.env == "dev" ? <DevTools /> : null }
             </div>
         );
