@@ -98,6 +98,17 @@ class SharedCache {
         this.socket(uid, 'get', false, done);
     }
 
+    setRole(role, done) {
+        let sock = getUDS();
+        sock.on('end', done || noop);
+        sock.write(JSON.stringify({
+            roles: {
+                action: 'set',
+                role
+            }
+        }) + "\0");
+    }
+
     socket(uid, state, sid, done) {
         let sock = getUDS();
         let json = "";

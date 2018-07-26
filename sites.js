@@ -24,6 +24,7 @@ var sharedcache = require('./sharedcache.js');
 var sitemap = require('./sitemap.js');
 var analytics = require('./analytics.js');
 var adslib = require('./ads');
+var roles = require('./role');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -331,8 +332,11 @@ var SiteInitializer = function (conf, siteobj) {
         });
     };
 
+
+
     var loadSessions = function(cb) {
         if (!isElder) { return cb(); }
+        roles.loadRolesInCache();
         sessions.initSessionsFromDatabase(conf, () => {
             require('./api.js').loadSessionsInCache(cb);
         });
