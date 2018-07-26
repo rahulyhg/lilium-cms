@@ -336,9 +336,10 @@ var SiteInitializer = function (conf, siteobj) {
 
     var loadSessions = function(cb) {
         if (!isElder) { return cb(); }
-        roles.loadRolesInCache();
-        sessions.initSessionsFromDatabase(conf, () => {
-            require('./api.js').loadSessionsInCache(cb);
+        roles.loadRolesInCache(() => {
+            sessions.initSessionsFromDatabase(conf, () => {
+                require('./api.js').loadSessionsInCache(cb);
+            });
         });
     };
 
