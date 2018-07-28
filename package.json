@@ -70,6 +70,7 @@
   "dependencies": {
     "JSONStream": "latest",
     "admin-mongo": "latest",
+    "animejs": "^2.2.0",
     "babel-preset-preact": "^1.1.0",
     "base32-encode": "^1.1.0",
     "binaryjs": "latest",
