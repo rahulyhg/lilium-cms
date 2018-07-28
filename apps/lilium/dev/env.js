@@ -17,7 +17,8 @@ const styles = {
         left: 0,
         borderTop : "3px solid #af57e4",
         transition: "all 0.3s",
-        zIndex : 100
+        zIndex : 100,
+        display: "flex"
     },
     btn : {
         padding: 12,
