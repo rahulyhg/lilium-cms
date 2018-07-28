@@ -21,12 +21,13 @@ export const styles = {
         fontSize : 120,
         display: "block",
         fontFamily : "Oswald", 
-        fontShadow : "0px 2px 0px #8f37c4"
+        textShadow : "0px 2px 0px #5c1475"
     },
 
     totalReadersTitle : {
         fontSize : 20,
-        fontWeight : "bold"
+        fontWeight : "bold",
+        textShadow : "0px 2px 0px #5c1475"
     },
 
     realtimeListWrapper : {
