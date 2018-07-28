@@ -3,7 +3,8 @@ export const styles = {
     realtimeTicker : {
         margin: 20,
         background: "white",
-        display: "flex"
+        display: "flex",
+        boxShadow: "0px 1px 2px rgba(0,0,0,0.2)"
     },
 
     activeReadersCounter : {
