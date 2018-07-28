@@ -261,7 +261,8 @@ var SiteInitializer = function (conf, siteobj) {
                     global.liliumcms = {
                         env : "${conf.env}",
                         uid : "${conf.uid}",
-                        url : "${conf.server.url}"
+                        url : "${conf.server.url}",
+                        sitename : "${conf.website.sitetitle}"
                     };
                 `;
             }
