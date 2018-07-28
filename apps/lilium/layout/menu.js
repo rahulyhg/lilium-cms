@@ -1,5 +1,6 @@
 import {h, Component} from 'preact';
 import { Link } from '../routing/link';
+import { CACHEKEYS, storeLocal, getLocal } from '../data/cache'
 
 const styles = {
     handle : {
@@ -22,8 +23,14 @@ export class LiliumMenu extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            menus : []
+            menus : [],
+            snapped : getLocal(CACHEKEYS.SIDEBARSNAP)
         }
+    }
+
+    componentDidMount() {
+        const ev = new CustomEvent("menusnap", { detail : { snapped : this.state.snapped } });
+        document.dispatchEvent(ev);
     }
 
     componentWillReceiveProps(props) {
@@ -51,6 +58,8 @@ export class LiliumMenu extends Component {
         log('Menu', 'Handle snap was clicked', 'detail');
         const ev = new CustomEvent("menusnap", { detail : { snapped : !this.state.snapped } });
         document.dispatchEvent(ev);
+
+        storeLocal(CACHEKEYS.SIDEBARSNAP, !this.state.snapped);
         this.setState({ snapped : !this.state.snapped })
     }
 

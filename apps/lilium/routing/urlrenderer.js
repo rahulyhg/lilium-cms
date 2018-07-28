@@ -1,5 +1,6 @@
 import { h, Component } from 'preact'
 import { resetPageCommands } from '../layout/lys';
+import { CACHEKEYS, getLocal } from '../data/cache';
 
 // Import default pages from route
 import InitPage     from '../pages/default';
@@ -49,8 +50,11 @@ export class URLRenderer extends Component {
         super(props);
         this.state = {
             endpoint : "_init",
-            levels : []
+            levels : [],
+            classes : []
         }
+
+        getLocal(CACHEKEYS.SIDEBARSNAP) && this.state.classes.push("snap");
     }
 
     componentDidMount() {
@@ -76,7 +80,6 @@ export class URLRenderer extends Component {
         document.addEventListener('menuslid', this.menuslid_bound);
         document.addEventListener('menusnap', this.menusnapped_bound);
 
-
         this.refreshPath();
     }
 
@@ -89,7 +92,8 @@ export class URLRenderer extends Component {
     }
 
     menusnapped(ev) {
-        this.renderer.classList[ev.detail.snapped ? "add" : "remove"]("snap")
+        this.renderer.classList[ev.detail.snapped ? "add" : "remove"]("snap");
+        this.state.classes = ev.detail.snapped ? ["snap"] : [];
     }
 
     refreshPath() {
@@ -112,7 +116,7 @@ export class URLRenderer extends Component {
         
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
-            <div id="urlrenderer" ref={x => (this.renderer = x)}>
+            <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
                 <this.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
             </div>
         )

@@ -12,7 +12,8 @@ const LIST_PROJECTION = {
     personality : 1, socialnetworks : 1,
     badgecount : { "$size": "$badges" },
     firstname : 1, lastname : 1,
-    jobtitle : 1, phone : 1, email : 1
+    jobtitle : 1, phone : 1, email : 1,
+    enforce2fa: 1, confirmed2fa: 1
 };
 
 class Crew {
@@ -168,6 +169,7 @@ class Crew {
                         networks.push({
                             network : n,
 
+                            username: items[i].socialnetworks[n],
                             link : (SOCIAL_NETWORKS[n].url + items[i].socialnetworks[n]),
                             color : (SOCIAL_NETWORKS[n].color),
                             border : (SOCIAL_NETWORKS[n].border),

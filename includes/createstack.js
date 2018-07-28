@@ -127,6 +127,27 @@ function transferWPImages(_c, data, done) {
             const file = files[++index];
 
             if (file) {
+<<<<<<< HEAD
+                const ffpath = path.join(file.dir, file.filename);
+
+                fs.stat(ffpath, err => {
+                    if (!err) { return setTimeout(() => nextImage(), 0); }
+
+                    log('WPInit', '['+index+'/'+files.length+'] Downloading image file : ' + file.url, 'info');
+                    request({ url : file.url, encoding : 'binary', headers : { "user-agent" : `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36` } }, (err, res) => {
+                        if (err) {
+                            log('Wordpress', 'Error fetching image : ' + err, 'err');
+                            return nextImage();
+                        }
+                        else if (res.statusCode == 200) {
+                            retrying = false;
+                            mkdirp(file.dir, () => {
+                                log('WPInit', 'Writing file to ' + ffpath, 'info');
+                                fs.writeFile(ffpath, res.body, {encoding : 'binary'}, (err) => {
+                                    err && log('WPInit', err, 'err');
+                                    return nextImage();
+                                });
+=======
                 log('WPInit', '['+index+'/'+files.length+'] Downloading image file : ' + file.url, 'info');
                 request({ url : file.url, encoding : 'binary' }, (err, res) => {
                     if (err) {
@@ -140,6 +161,7 @@ function transferWPImages(_c, data, done) {
                             fs.writeFile(ffpath, res.body, {encoding : 'binary'}, (err) => {
                                 err && log('WPInit', err, 'err');
                                 return nextImage();
+>>>>>>> 1505c3f98098b6d915cb7a482209c49c25ee29fb
                             });
                         } else {
                             log('Wordpress', 'Non-200 HTTP code : ' + res.statusCode, 'warn');

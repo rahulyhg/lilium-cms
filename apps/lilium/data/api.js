@@ -1,7 +1,7 @@
 class API {
-    static request(method = "GET", endpoint, params = {}, data = {}, sendback) {
+    static request(method = "GET", endpoint, params = {}, data, sendback) {
         log('API', 'Requesting ' + method + ' to endpoint : ' + endpoint, 'detail');
-        fetch(`${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include", method, data : JSON.stringify(data) }).then(r => {
+        fetch(`${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include", method, body : data && JSON.stringify(data), headers: data && { "Content-Type": "application/json" } }).then(r => {
             if (Math.floor(r.status / 200) == 1) {
                 log('API', '['+ r.status +'] API call to ' + endpoint, 'success');
                 r.json().then(resp => {
@@ -22,7 +22,7 @@ class API {
     }
 
     static get(endpoint, params, sendback) {
-        API.request('GET', "/livevars/v4" + endpoint, params, {}, sendback);
+        API.request('GET', "/livevars/v4" + endpoint, params, undefined, sendback);
     }
 
     static post(endpoint, data, sendback) {
