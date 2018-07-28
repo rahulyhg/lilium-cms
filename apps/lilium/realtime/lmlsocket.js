@@ -38,12 +38,12 @@ export class LMLSocket {
     }
 
     unbind(ev, evid) {
-        log('LMLSocket', 'Unbinding a realtime event with id : ' + id, 'socket');
+        log('LMLSocket', 'Unbinding a realtime event with id : ' + evid, 'socket');
         const entryIndex = SOCKET_EVENTS[ev].findIndex(x => x.id == evid);
         if (entryIndex != -1) {
-            SOCKET_EVENTS.splice(entryIndex, 1);
+            SOCKET_EVENTS[ev].splice(entryIndex, 1);
         }       
         
-        log('LMLSocket', 'Unbound a realtime event with id : ' + id, 'socket');
+        log('LMLSocket', 'Unbound a realtime event with id : ' + evid, 'socket');
     }
 }

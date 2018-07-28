@@ -302,9 +302,12 @@ class StatsBeautifier {
 
         dat.rows.forEach(x => { 
             let path = x[1];
+            let query = "";
             let maybeParam = path.indexOf('?');
             if (maybeParam != -1) {
-                path = path.substring(0, maybeParam);
+                const split = path.split('?');
+                query = split[1];
+                path = split[0];
             }
 
             let lastSlash = path.lastIndexOf('/');
@@ -333,6 +336,8 @@ class StatsBeautifier {
                     pages[path] = page;
                 }
             }
+
+            pages[path].query = query;
         });
 
         return {
