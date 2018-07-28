@@ -2,20 +2,26 @@ import { Component, h } from 'preact';
 import { Link } from '../routing/link';
 import { LILIUM } from '../data/const';
 import { bindRealtimeEvent } from '../realtime/connection';
+import { AnimeNumber } from '../widgets/animenumber';
+import API from '../data/api';
 
 export class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            session : undefined
+            session : undefined,
+            totalRT : 0,
+            ready : false
         }
     }
 
     componentDidMount() {
         bindRealtimeEvent("analytics_realtime", data => {
-            if (data && data.total) {
-                this.realtimeCounter.textContent = data.total;
-            }
+            data && data.total && this.setState({ totalRT : data.total });
+        });
+
+        API.get('/googleanalytics/realtime', {}, (err, data) => {
+            data && data.total && this.setState({ totalRT : data.total });
         });
     }
 
@@ -26,8 +32,8 @@ export class Header extends Component {
     }
 
     render() {
-        log('Header', 'Rendering header component', 'layout');
-        if (!this.state.session) {
+        if (!this.state.session) {        
+            log('Header', 'Rendering header component without a session', 'layout');
             return (<header></header>);
         }
 
@@ -40,8 +46,8 @@ export class Header extends Component {
                     </div>
                 </Link>
                 <div id="headerRtCounter">
-                    <b ref={rt => (this.realtimeCounter = rt)}>Loading realtime</b>
-                    <span> readers</span>
+                    <b><AnimeNumber number={this.state.totalRT} /></b>
+                    <span> active readers</span>
                 </div>
             </header>
         )
