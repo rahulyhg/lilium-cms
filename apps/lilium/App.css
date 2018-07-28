@@ -314,6 +314,29 @@ h1, h2 {
     height: 280px;
 }
 
+.realtime-listitem {
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.realtime-listitem-count {
+    display: block;
+    font-size : 24px;
+    font-family: "Oswald", sans-serif;
+    width: 60px;
+    padding-left: 10px;
+    flex : 0 0 60px;
+}
+
+.realtime-listitem-title {
+    display: block;
+    font-size: 18px;
+    color: #333;
+    text-decoration: none;
+    flex-grow : 1;
+}
+
 @keyframes anim {
     0% { transform: rotateZ(0deg); }
     100% { transform: rotateZ(360deg); }
