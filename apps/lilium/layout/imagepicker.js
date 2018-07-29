@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { TextField } from '../widgets/form';
 import API from '../data/api';
 
 const styles = {
@@ -42,7 +43,7 @@ class SelectedImage extends Component {
     }
 
     makeSrc(image) {
-        return document.location.protocol + ("//www.narcity.com" || liliumcms.url) + "/" + image.fullurl;
+        return image.sizes.content.url;
     }
 
     render() {
@@ -58,6 +59,8 @@ class SelectedImage extends Component {
         return (
             <div>
                 <img ref={img => this.imgtag = img} src={this.makeSrc(this.state.selected)} class="image-picker-selected-full" />
+                <TextField name="uploadArtistName" initialValue={this.state.selected.artistname} placeholder="Artist name" />
+                <TextField name="uploadArtistURL" initialValue={this.state.selected.artisturl} placeholder="Source URL" />
                 <b>{this.state.selected.fullurl}</b>
             </div>
         )
