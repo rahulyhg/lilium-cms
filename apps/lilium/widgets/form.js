@@ -31,6 +31,13 @@ class FormField extends Component {
         this.value = props.initialValue;
     }
 
+    componentWillReceiveProps(props) {
+        if (typeof props.initialValue != "undefined") {
+            this.value = props.initialValue;
+            this.setState({ initialValue : props.initialValue });
+        }
+    }
+
     changed(ev) {
         this.value = ev.target.value;
         this.props.onChange && this.props.onChange(this.props.name, ev.target.value);
