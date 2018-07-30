@@ -126,32 +126,8 @@ export default class ProfilePage extends Component {
         });
     }
 
-    asyncFieldUpdate(name, value) {
-        API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
-            if (!err)
-                log('ProfilePage', 'Updated field ' + name, 'success');
-            else
-                log('ProfilePage', 'Error updating field ' + name, 'error');
-        });
-    }
-
     asyncUpdateHeaderField(e) {
         this.asyncFieldUpdate(e.target.name, e.target.value);
-    }
-
-    updatePasswordField(name, value) {
-        this.inputValues[name] = value;
-    }
-
-    changePassword(done) {
-        if (this.inputValues.oldpassword && this.inputValues.newpassword
-            && this.inputValues.newpassword == this.inputValues.confirmnewpassword) {
-                API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
-                    done && done();
-                });
-        } else {
-            done && done();
-        }
     }
 
     activate2fa(done) {
@@ -178,6 +154,18 @@ export default class ProfilePage extends Component {
         });
     }
 
+
+
+    asyncFieldUpdate(name, value) {
+        API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
+            if (!err)
+                log('ProfilePage', 'Updated field ' + name, 'success');
+            else
+                log('ProfilePage', 'Error updating field ' + name, 'error');
+        });
+    }
+
+
     /**
      * Returns the appropriate image name fot e given badge level
      * @param {number} level the level of the badge for which to return the image name
@@ -185,14 +173,6 @@ export default class ProfilePage extends Component {
     getBadgeImageName(level) {
         // All badges from level 6 and on have the '4.png' image
         return Math.min((Math.floor(level / 2) + 1), 4).toString() + ".png";
-    }
-
-    /**
-     * Returns a font awesome class in the form of 'fa-icon' from the classlist of a badge
-     * @param {string} classes string classes list returned from the server
-     */
-    getFonwAwesomeClass(classes) {
-
     }
 
     render() {
@@ -209,18 +189,17 @@ export default class ProfilePage extends Component {
 
                         <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
                             <input type="text" name="displayname" style={style.inputField} value={this.state.user.displayname}
-                                         onChange={this.asyncUpdateHeaderField.bind(this)} />
+                                        onChange={this.asyncUpdateHeaderField.bind(this)} />
                             <input type="text" name="jobtitle" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'
-                                         onChange={this.asyncUpdateHeaderField.bind(this)} />
+                                        onChange={this.asyncUpdateHeaderField.bind(this)} />
                             <textarea name="description" className='change-placeholder' id="descriptichange-placeholderon" cols="30" rows="8" 
-                                    placeholder='Write a small introduction paragraph'
-                                    style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.state.user.description}</textarea>
+                                        placeholder='Write a small introduction paragraph'
+                                        style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.state.user.description}</textarea>
                         </div>
 
                         <div style={style.badgesContainer}>
                             {
                                 this.state.user.badges.map(badge => {
-                                    console.log(badge);
                                     return (
                                         <span>
                                             <div class="me-decoration level-1" style="filter: hue-rotate(70deg);">
@@ -242,37 +221,11 @@ export default class ProfilePage extends Component {
                             <TextField type="email" name="email" placeholder="Email address" initialValue={this.state.user.email}
                                             onChange={this.asyncFieldUpdate.bind(this)} />
                         </div>
-                        <div id="social-media">
-                            <h2  style={style.infoGroupTitle}>Social Network</h2>
 
-                            <TextField type='url' name='socialnetworks.facebook' placeholder='Facebook profile URL'
-                                initialValue={this.state.user.socialnetworks.facebook} onChange={this.asyncFieldUpdate.bind(this)} />
+                        <SocialMedia user={this.state.user} />
 
-                            <TextField name='socialnetworks.twitter' placeholder="Twitter account name, without the '@'"
-                                initialValue={this.state.user.socialnetworks.twitter} onChange={this.asyncFieldUpdate.bind(this)} />
-
-                            <TextField name='socialnetworks.googleplus' placeholder='Google Plus username'
-                                initialValue={this.state.user.socialnetworks.googleplus} onChange={this.asyncFieldUpdate.bind(this)} />
-
-                            <TextField name='socialnetworks.instagram' placeholder="Instagram account name, without the '@'"
-                                initialValue={this.state.user.socialnetworks.instagram} onChange={this.asyncFieldUpdate.bind(this)} />
-                        </div>
                         <div id="login-info">
-                            <h2 style={style.infoGroupTitle}>Login Information</h2>
-
-                            <h2>Password</h2>
-
-                            <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
-                            <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
-                            
-                            <TextField type='password' name='oldpassword' placeholder='Current password'
-                                    onChange={this.updatePasswordField.bind(this)} />
-                            <TextField type='password' name='newpassword' placeholder='New password'
-                                    onChange={this.updatePasswordField.bind(this)} />
-                            <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
-                                    onChange={this.updatePasswordField.bind(this)} />
-
-                            <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} />
+                            <PasswordResetForm aasyncFieldUpdate={this.asyncFieldUpdate.bind(this)} />
 
                             <hr/>
 
@@ -313,4 +266,103 @@ export default class ProfilePage extends Component {
             );
         }
     }
+}
+
+
+class AsyncFieldUpdate extends Component {
+    constructor(props) {
+        super(props);
+    }    
+
+    asyncFieldUpdate(name, value) {
+        API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
+            if (!err)
+                log('ProfilePage', 'Updated field ' + name, 'success');
+            else
+                log('ProfilePage', 'Error updating field ' + name, 'error');
+        });
+    }
+}
+
+class ProfieHeader extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    
+}
+
+class SocialMedia extends AsyncFieldUpdate {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div id="social-media">
+                <h2  style={style.infoGroupTitle}>Social Network</h2>
+
+                <TextField type='url' name='socialnetworks.facebook' placeholder='Facebook profile URL'
+                    initialValue={this.props.user.socialnetworks.facebook} onChange={this.asyncFieldUpdate.bind(this)} />
+
+                <TextField name='socialnetworks.twitter' placeholder="Twitter account name, without the '@'"
+                    initialValue={this.props.user.socialnetworks.twitter} onChange={this.asyncFieldUpdate.bind(this)} />
+
+                <TextField name='socialnetworks.googleplus' placeholder='Google Plus username'
+                    initialValue={this.props.user.socialnetworks.googleplus} onChange={this.asyncFieldUpdate.bind(this)} />
+
+                <TextField name='socialnetworks.instagram' placeholder="Instagram account name, without the '@'"
+                    initialValue={this.props.user.socialnetworks.instagram} onChange={this.asyncFieldUpdate.bind(this)} />
+            </div>
+        );
+    }
+}
+
+class PasswordResetForm extends Component {
+    constructor(props) {
+        super(props);
+
+        this.inputValues = {};
+    }
+
+    updatePasswordField(name, value) {
+        this.inputValues[name] = value;
+    }
+
+    changePassword(done) {
+        if (this.inputValues.oldpassword && this.inputValues.newpassword
+            && this.inputValues.newpassword == this.inputValues.confirmnewpassword) {
+                API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
+                    done && done();
+                });
+        } else {
+            done && done();
+        }
+    }
+
+    render() {
+        return (
+            <div id="password-reset-form">
+                <h2 style={style.infoGroupTitle}>Login Information</h2>
+
+                <h2>Password</h2>
+
+                <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
+                <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
+                
+                <TextField type='password' name='oldpassword' placeholder='Current password'
+                        onChange={this.updatePasswordField.bind(this)} />
+                <TextField type='password' name='newpassword' placeholder='New password'
+                        onChange={this.updatePasswordField.bind(this)} />
+                <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
+                        onChange={this.updatePasswordField.bind(this)} />
+
+                <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} />
+            </div>
+        );
+    }
+}
+
+class Activate2FAForm extends Component {
+
 }
