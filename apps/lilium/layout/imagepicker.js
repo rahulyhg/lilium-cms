@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import { TextField, ButtonWorker } from '../widgets/form';
 import API from '../data/api';
-import { fusiontables } from 'googleapis/build/src/apis/fusiontables';
 
 const styles = {
     bigtitle : {
@@ -170,18 +169,18 @@ export class ImagePicker extends Component {
     }
 
     prepareUpload(ev) {
-        const files = ev.target.files
+        const files = ev.target.files;
         if (files && files.length > 0) {
             Array.from(files).forEach(file => {
-                const fr = new FileReader();
-                fr.onload = () => {
-                    const data = fr.result;
-                    API.upload(data, (err, resp) => {
+                const freader = new FileReader();
+                freader.onload = () => {
+                    const data = freader.result;
+                    API.upload(data, file.name, (err, resp) => {
                         console.log(resp);
                     });
                 };
 
-                fr.readAsArrayBuffer(file);
+                freader.readAsArrayBuffer(file);
             })
         } else {
             // NoOP

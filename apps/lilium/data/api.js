@@ -37,9 +37,11 @@ class API {
         });
     }
 
-    static upload(blob, sendback) {
+    static upload(blob, name, sendback) {
         log('API', 'Uploading file to V4 quick upload endpoint', 'detail');
-        fetch(`/admin/mediaUpload`, { credentials : "include", method : "POST", body : blob}).then(r => {
+
+        const ext = name.split('.').pop();
+        fetch(`/admin/mediaUpload/${ext}`, { credentials : "include", method : "POST", body : blob}).then(r => {
             if (r.status == 200) {
                 log('API', '[200] Uploaded file successfully', 'success');
                 r.json().then(json => {
