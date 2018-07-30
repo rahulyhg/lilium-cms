@@ -37,21 +37,29 @@ class API {
         });
     }
 
-    static upload(blob, name, sendback) {
+    static upload(file, name, progress, sendback) {
         log('API', 'Uploading file to V4 quick upload endpoint', 'detail');
 
-        const ext = name.split('.').pop();
-        fetch(`/admin/mediaUpload/${ext}`, { credentials : "include", method : "POST", body : blob}).then(r => {
-            if (r.status == 200) {
-                log('API', '[200] Uploaded file successfully', 'success');
-                r.json().then(json => {
+        const freader = new FileReader();
+        freader.onload = () => {
+            const ext = name.split('.').pop();
+            const oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", ev => {
+                if (oReq.status == 200) {
+                    log('API', '[200] Uploaded file successfully', 'success');
+                    const resp = oReq.responseText;
+                    const json = JSON.parse(resp);
                     sendback(undefined, json);
-                })
-            } else {               
-                log('API', '['+r.status+'] File upload failed', 'warn');
-                sendback(r.status);
-            }
-        });        
+                } else {               
+                    log('API', '['+oReq.status+'] File upload failed', 'warn');
+                    sendback(oReq.status);
+                }
+            });
+            oReq.open("POST", `/admin/mediaUpload/${ext}`, true);
+            oReq.upload.onprogress = ev => progress(ev);
+            oReq.send(freader.result);
+        };
+        freader.readAsArrayBuffer(file);
     }
 
     /**
