@@ -91,23 +91,66 @@ class ImageThumbnail extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selected : props.selected
+            selected : props.selected,
+            uploading : !!props.file,
+            progress : 0,
+            image : props.image
         };
     }
 
-    componentWillReceiveProps(props) {
-        this.setState({ selected : props.selected })
+    componentDidMount() {
+        if (this.props.file) {
+            log('ImagePicker', 'Starting POST XHR', 'detail');
+            this.upload();
+        }
     }
 
-    clicked(ev) {
-        this.props.clicked(this.props.image, this);
+    upload() {
+        API.upload(this.props.file, this.props.file.name, oEvent => {
+            const ratio = oEvent.loaded / oEvent.total * 100;
+            ratio != 100 ? this.setState({ progress : ratio }) : this.setState({ loading : true, progress : ratio, uploading : false });
+        }, (err, image) => {
+            if (!err) {
+                this.setState({ uploading : false, loading : false, progress : 100, image }, () => {
+                    this.clicked();
+                });
+            } else {
+                log('ImagePicker', 'Upload failed : ' + err, 'err');
+                this.setState({ uploading : false, loading : false, error : err });
+            }
+        });
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState({ selected : props.selected });
+    }
+
+    clicked() {
+        this.props.clicked(this.state.image, this);
     }
 
     render() {
+        if (this.state.uploading) {
+            return (
+                <div class={"image-picker-thumb"}>
+                    <div class="image-picker-progress-width" style={{ width : this.state.progress + "%" }}></div>
+                </div>
+            );
+        }
+
+        if (this.state.loading) {
+            log('ImagePicker', 'Waiting for response from upload endpoint', 'detail');
+            return (
+                <div class="image-picker-thumb image-upload-loading">
+                    <i class="far fa-spinner-third fa-spin"></i>
+                </div>
+            );
+        }
+
         return (
             <img onClick={this.clicked.bind(this)} 
                 class={"image-picker-thumb " + (this.state.selected ? "selected" : "")} 
-                src={this.props.image.sizes.thumbnail.url} 
+                src={this.state.image.sizes.thumbnail.url} 
             />
         )
     }
@@ -152,13 +195,14 @@ export class ImagePicker extends Component {
     }
 
     static dismiss() {
-        log('ImagePicker', 'Dismissing image picker singlethon', 'detail');
+        log('ImagePicker', 'Dismissing image picker singleton', 'detail');
         _singleton.setState({ visible : false });
         window.removeEventListener('keydown', _singleton.keydown_bound);
     }
 
     static accept() {        
         if (_singleton.state.selected) {
+            log('ImagePicker', 'Selected image and calling back', 'detail');
             _singleton.state.callback && _singleton.state.callback(_singleton.state.selected);        
             ImagePicker.dismiss();
         }
@@ -171,17 +215,14 @@ export class ImagePicker extends Component {
     prepareUpload(ev) {
         const files = ev.target.files;
         if (files && files.length > 0) {
-            Array.from(files).forEach(file => {
-                const freader = new FileReader();
-                freader.onload = () => {
-                    const data = freader.result;
-                    API.upload(data, file.name, (err, resp) => {
-                        console.log(resp);
-                    });
-                };
+            log("ImagePicker", "Initiating upload sequence", "detail");
 
-                freader.readAsArrayBuffer(file);
-            })
+            const ffs = Array.from(files).map(f => { return { uploading : true, file : f }; });
+            const images = this.state.images;
+            images.unshift(...ffs);
+
+            log('ImagePicker', 'Prepared ' + ffs.length + ' files for upload', 'detail');
+            this.setState({ images });
         } else {
             // NoOP
         }
@@ -221,9 +262,12 @@ export class ImagePicker extends Component {
                     </div>
 
                     <div id="image-gallery">
-                        <div id="image-upload-button" onClick={this.castUpload.bind(this)}><i class="far fa-plus-circle"></i></div>
+                        <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
+                            <i class="far fa-plus-circle"></i>
+                        </div>
+
                         {
-                            this.state.images.map(x => (<ImageThumbnail image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
+                            this.state.images.map(x => (<ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
                         }
                     </div>
 

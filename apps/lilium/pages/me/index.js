@@ -110,7 +110,6 @@ export default class ProfilePage extends Component {
                 }
 
                 this.setState({ user: data.user, err: undefined });
-                console.log(this.state);
 
                 API.get('/2fa', {}, (err, data) => {
                     if (!err && data) {
@@ -121,7 +120,6 @@ export default class ProfilePage extends Component {
                     }
                 });
             } else {
-                console.log(err);
                 this.setState({ err });
             }
         });
@@ -240,7 +238,6 @@ export default class ProfilePage extends Component {
                         <div style={style.badgesContainer}>
                             {
                                 this.state.user.badges.map(badge => {
-                                    console.log(badge);
                                     return (
                                         <span>
                                             <div class="me-decoration level-1" style="filter: hue-rotate(70deg);">
