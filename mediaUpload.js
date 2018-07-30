@@ -49,10 +49,6 @@ class File {
         return `${basename}.${extension}`;
     }
 
-    getURLPath() {
-        return '';
-    }
-
     toJSON() {
         return JSON.stringify({
             name: this.name,
@@ -69,7 +65,6 @@ class ImageFile extends File {
 
     generateResizedVersions(cli, done) {
         imageResizer.resizev4(this, cli._c, (err, images, oSize) => {
-            console.log(images, oSize);
             const upload = {
                 filename: this.name,
                 uploader: db.mongoID(cli.userinfo.userid),
