@@ -37,6 +37,21 @@ class API {
         });
     }
 
+    static upload(blob, sendback) {
+        log('API', 'Uploading file to V4 quick upload endpoint', 'detail');
+        fetch(`/admin/mediaUpload`, { credentials : "include", method : "POST", body : blob}).then(r => {
+            if (r.status == 200) {
+                log('API', '[200] Uploaded file successfully', 'success');
+                r.json().then(json => {
+                    sendback(undefined, json);
+                })
+            } else {               
+                log('API', '['+r.status+'] File upload failed', 'warn');
+                sendback(r.status);
+            }
+        });        
+    }
+
     /**
      * 
      * @param {array} payload 
