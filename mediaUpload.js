@@ -69,7 +69,6 @@ class ImageFile extends File {
 
     generateResizedVersions(cli, done) {
         imageResizer.resizev4(this, cli._c, (err, images, oSize) => {
-            console.log(images, oSize);
             const upload = {
                 filename: this.name,
                 uploader: db.mongoID(cli.userinfo.userid),
@@ -98,7 +97,7 @@ class MediaUpload {
                     if (!err) {
                         cli.sendJSON(upload);
                     } else {
-                        console.log(err);
+                        log('Upload', err, 'err');
                         cli.throwHTTP(500, "An error occured while trying to resize the image file", true);
                     }
                 });

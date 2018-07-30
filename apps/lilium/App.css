@@ -288,15 +288,16 @@ h1, h2 {
     box-sizing: border-box;
 }
 
+.image-upload-loading,
 #image-upload-button {
-    color: #9355af;
     background-color: #DDD;
     font-size: 68px;
     text-align: center;
     transition: none;
 }
 
-#image-upload-button i {
+#image-upload-button i,
+.image-upload-loading i {
     margin-top: 40px;
     color: white;
 }
@@ -332,6 +333,14 @@ h1, h2 {
 
 .image-picker-selected-full[src=""] {
     height: 280px;
+}
+
+.image-picker-progress-width {
+    transition: all 0.2s;
+    width: 0px;
+    height: 100%;
+    display: block;
+    background: #CCC;
 }
 
 .realtime-listitem {
