@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
-import { TextField } from '../widgets/form';
+import { TextField, ButtonWorker } from '../widgets/form';
 import API from '../data/api';
+import { fusiontables } from 'googleapis/build/src/apis/fusiontables';
 
 const styles = {
     bigtitle : {
@@ -23,6 +24,15 @@ const styles = {
         fontSize : 72,
         marginTop : 30,
         color : "#CCC"
+    },
+    selectedFields : {
+        padding : "5px 15px",
+        wordBreak: "break-all"
+    },
+    textboxes : {
+        padding : 8,
+        fontSize : 15,
+        backgroundColor : "white"
     }
 }
 
@@ -59,10 +69,21 @@ class SelectedImage extends Component {
         return (
             <div>
                 <img ref={img => this.imgtag = img} src={this.makeSrc(this.state.selected)} class="image-picker-selected-full" />
-                <TextField name="uploadArtistName" initialValue={this.state.selected.artistname} placeholder="Artist name" />
-                <TextField name="uploadArtistURL" initialValue={this.state.selected.artisturl} placeholder="Source URL" />
-                <b>{this.state.selected.fullurl}</b>
+                <div style={styles.selectedFields}>
+                    <TextField style={styles.textboxes} name="uploadArtistName" initialValue={this.state.selected.artistname} placeholder="Artist name" />
+                    <TextField style={styles.textboxes} name="uploadArtistURL" initialValue={this.state.selected.artisturl} placeholder="Source URL" />
+                    <div>
+                        <b>Full URL : </b>
+                        <a href={document.location.protocol + liliumcms.url + "/" + this.state.selected.fullurl} target="_blank">
+                            {document.location.protocol}{liliumcms.url}/{this.state.selected.fullurl}
+                        </a>
+                    </div>
+                    <div style={{ padding: 20, textAlign: 'center' }}>
+                        <ButtonWorker theme="" text="Select image" work={done => this.props.selectFromWorker()} sync={true} />
+                    </div>
+                </div>
             </div>
+
         )
     }
 }
@@ -110,7 +131,7 @@ export class ImagePicker extends Component {
 
     static cast(params, done) {
         log('ImagePicker', 'Casting image picker singleton', 'detail');
-        const initState = { params, visible : true, selected : undefined };
+        const initState = { params, visible : true, selected : undefined, callback : done };
         if (params && params.selected) {
             initState.loading = true;
             _singleton.setState(initState);
@@ -135,12 +156,41 @@ export class ImagePicker extends Component {
         log('ImagePicker', 'Dismissing image picker singlethon', 'detail');
         _singleton.setState({ visible : false });
         window.removeEventListener('keydown', _singleton.keydown_bound);
+    }
 
-        _singleton.state.callback && _singleton.state.callback(_singleton.state.selected);
+    static accept() {        
+        if (_singleton.state.selected) {
+            _singleton.state.callback && _singleton.state.callback(_singleton.state.selected);        
+            ImagePicker.dismiss();
+        }
+    }
+
+    castUpload() {
+        this.fileElem.click();
+    }
+
+    prepareUpload(ev) {
+        const files = ev.target.files
+        if (files && files.length > 0) {
+            Array.from(files).forEach(file => {
+                const fr = new FileReader();
+                fr.onload = () => {
+                    const data = fr.result;
+                    API.upload(data, (err, resp) => {
+                        console.log(resp);
+                    });
+                };
+
+                fr.readAsArrayBuffer(file);
+            })
+        } else {
+            // NoOP
+        }
     }
 
     keydown(ev) {
         ev.keyCode == "27" && ImagePicker.dismiss();
+        ev.keyCode == "13" && ImagePicker.accept();
     }
 
     fetchLatest(sendback) {
@@ -168,16 +218,18 @@ export class ImagePicker extends Component {
                 <div id="image-picker">
                     <div>
                         <b style={ styles.bigtitle }>Lilium gallery</b>
+                        <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
                     </div>
 
                     <div id="image-gallery">
-                    {
-                        this.state.images.map(x => (<ImageThumbnail image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
-                    }
+                        <div id="image-upload-button" onClick={this.castUpload.bind(this)}><i class="far fa-plus-circle"></i></div>
+                        {
+                            this.state.images.map(x => (<ImageThumbnail image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
+                        }
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={ImagePicker.accept.bind(ImagePicker)} />       
                     </div>
                 </div>
             </div>
