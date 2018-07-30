@@ -49,7 +49,7 @@ const SOCIAL_NETWORKS = {
 
 const ALLOWED_ME_FIELDS = [ 
     // Basic information
-    "displayname", "description", "email", "phone", "personality", 'jobtitle',
+    "displayname", "description", "email", "phone", "personality", 'jobtitle', 'avatarURL',
 
     // Social profiles
     "socialnetworks.facebook", "socialnetworks.twitter", "socialnetworks.instagram", "socialnetworks.googleplus"
