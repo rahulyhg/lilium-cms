@@ -49,10 +49,6 @@ class File {
         return `${basename}.${extension}`;
     }
 
-    getURLPath() {
-        return '';
-    }
-
     toJSON() {
         return JSON.stringify({
             name: this.name,
