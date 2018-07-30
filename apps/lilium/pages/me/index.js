@@ -1,6 +1,7 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
 import { TextField, ButtonWorker } from '../../widgets/form';
+import { ImagePicker } from '../../layout/imagepicker';
 
 const style = {
     header: {
@@ -109,7 +110,6 @@ export default class ProfilePage extends Component {
                 }
 
                 this.setState({ user: data.user, err: undefined });
-                console.log(this.state);
 
                 API.get('/2fa', {}, (err, data) => {
                     if (!err && data) {
@@ -120,7 +120,6 @@ export default class ProfilePage extends Component {
                     }
                 });
             } else {
-                console.log(err);
                 this.setState({ err });
             }
         });
@@ -152,6 +151,25 @@ export default class ProfilePage extends Component {
         } else {
             done && done();
         }
+    }
+
+    selectNewProfilePicture() {
+        ImagePicker.cast({}, image => {
+            if (image) {
+                const avatarURL = image.sizes.square.url;
+                API.post('/me/updateOneField', { field: "avatarURL", value: avatarURL }, (err, data) => {
+                    if (!err) {
+                        log('ProfilePage', 'Updated profile picture', 'success');
+
+                        const user = this.state.user;
+                        user.avatarURL = image.sizes.square.url;
+                        this.setState({ user })
+                    } else {
+                        log('ProfilePage', 'Error updating profile picture', 'error');
+                    }
+                });
+            }
+        });
     }
 
     activate2fa(done) {
@@ -202,7 +220,7 @@ export default class ProfilePage extends Component {
                     <div id="profile-header" style={style.header}>
                         <div id="core-info" style={style.coreInfo}>
                             <div id="profile-picture-wrapper" style={style.coreInfo} >
-                                <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} />
+                                <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} onClick={this.selectNewProfilePicture.bind(this)} />
                             </div>
                             <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.user.username}`}</h3>
                         </div>
@@ -220,7 +238,6 @@ export default class ProfilePage extends Component {
                         <div style={style.badgesContainer}>
                             {
                                 this.state.user.badges.map(badge => {
-                                    console.log(badge);
                                     return (
                                         <span>
                                             <div class="me-decoration level-1" style="filter: hue-rotate(70deg);">

@@ -37,6 +37,31 @@ class API {
         });
     }
 
+    static upload(file, name, progress, sendback) {
+        log('API', 'Uploading file to V4 quick upload endpoint', 'detail');
+
+        const freader = new FileReader();
+        freader.onload = () => {
+            const ext = name.split('.').pop();
+            const oReq = new XMLHttpRequest();
+            oReq.addEventListener("load", ev => {
+                if (oReq.status == 200) {
+                    log('API', '[200] Uploaded file successfully', 'success');
+                    const resp = oReq.responseText;
+                    const json = JSON.parse(resp);
+                    sendback(undefined, json);
+                } else {               
+                    log('API', '['+oReq.status+'] File upload failed', 'warn');
+                    sendback(oReq.status);
+                }
+            });
+            oReq.open("POST", `/admin/mediaUpload/${ext}`, true);
+            oReq.upload.onprogress = ev => progress(ev);
+            oReq.send(freader.result);
+        };
+        freader.readAsArrayBuffer(file);
+    }
+
     /**
      * 
      * @param {array} payload 

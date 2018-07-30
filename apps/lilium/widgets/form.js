@@ -31,6 +31,13 @@ class FormField extends Component {
         this.value = props.initialValue;
     }
 
+    componentWillReceiveProps(props) {
+        if (typeof props.initialValue != "undefined") {
+            this.value = props.initialValue;
+            this.setState({ initialValue : props.initialValue });
+        }
+    }
+
     changed(ev) {
         this.value = ev.target.value;
         this.props.onChange && this.props.onChange(this.props.name, ev.target.value);
@@ -41,9 +48,9 @@ class FormField extends Component {
 
 
 const buttonThemes = {
-    'success': { backgroundColor: "green" },
-    'danger': { backgroundColor: "red" },
-    'info': { backgroundColor: "white" },
+    'success': { backgroundColor: "green", borderColor : "#0c3c0c" },
+    'danger':  { backgroundColor: "red"  , borderColor : "#3c0c0c" },
+    'info':    { backgroundColor: "white", borderColor : "#DDDDDD" },
 };
 
 export class ButtonWorker extends Component {
@@ -56,7 +63,7 @@ export class ButtonWorker extends Component {
     }
 
     work() {
-        this.setState({ working : true });
+        !this.props.sync && this.setState({ working : true });
         this.props.work && this.props.work(status => {
             this.done(...arguments);
         });

@@ -1,5 +1,6 @@
 import API from '../data/api';
 import { h, Component } from 'preact';
+import { ImagePicker } from '../layout/imagepicker';
 
 export function initializeDevEnv() {
     log('Dev', 'Initialize development environment', 'detail');
@@ -16,7 +17,8 @@ const styles = {
         left: 0,
         borderTop : "3px solid #af57e4",
         transition: "all 0.3s",
-        zIndex : 100
+        zIndex : 100,
+        display: "flex"
     },
     btn : {
         padding: 12,
@@ -41,14 +43,17 @@ const styles = {
         width: "100%",
         height : "100%",
         backgroundColor : "rgba(105, 12, 12, 0.97)",
-        color : "white"
+        color : "white",
+        zIndex : 1000
     }
 }
 
 class DevTool extends Component {
     clicked(ev) {
         this.setState({loading : true});
-        this.props.click();
+        this.props.click(() => {
+            this.setState({loading : false});
+        });
     }
 
     render() {
@@ -82,6 +87,18 @@ export class DevTools extends Component {
         API.rebuild();
     }
 
+    pickimage(done) {
+        log('Dev', 'Casting image picker from dev tool', 'lilium');
+        ImagePicker.cast({
+
+        }, result => {
+            
+        });
+
+        done();
+        this.setState({ hidden : true });
+    }
+
     toggle() {
         this.setState({ hidden : !this.state.hidden });
     }
@@ -106,7 +123,10 @@ export class DevTools extends Component {
                 <b onClick={this.toggle.bind(this)} style={styles.title}>Dev Tools</b>
 
                 { this.state.hidden ? null : (
-                    <DevTool click={this.bundleJS.bind(this)}>Bundle JS</DevTool>
+                    <div>
+                        <DevTool click={this.bundleJS.bind(this)}>Bundle JS</DevTool>
+                        <DevTool click={this.pickimage.bind(this)}>Image picker</DevTool>
+                    </div>
                 ) }
             </div>
         );
