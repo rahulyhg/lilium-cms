@@ -276,22 +276,41 @@ h1, h2 {
     overflow: auto;
 }
 
-.image-picker-thumb {
+.image-picker-thumb,
+#image-upload-button {
     width: 150px;
     height: 150px;
     object-fit: cover;
     margin: 2px;
     border: 2px solid #CCC;
     cursor: pointer;
-    transition: transform 0.2s;
+    transition: transform 0.2s, border 0.2s;
+    box-sizing: border-box;
+}
+
+#image-upload-button {
+    color: #9355af;
+    background-color: #DDD;
+    font-size: 68px;
+    text-align: center;
+    transition: none;
+}
+
+#image-upload-button i {
+    margin-top: 40px;
+    color: white;
+}
+
+#image-upload-button:hover {
+    background-color: #AAA;
 }
 
 .image-picker-thumb:hover {
-    border: 2px solid rgb(175, 87, 228);
+    border: 10px solid rgb(175, 87, 228);
 }
 
 .image-picker-thumb.selected {
-    border: 2px solid #73358f;
+    border: 5px solid #73358f;
     transform: rotateZ(5deg) scale(1.1);
 }
 
@@ -377,6 +396,10 @@ h1, h2 {
     text-transform: uppercase;
     font-size: 12px;
     letter-spacing: 1px;
+}
+
+a {
+    color : #af57e4;
 }
 
 @keyframes anim {
