@@ -1,6 +1,7 @@
 import API from '../data/api';
 import { h, Component } from 'preact';
 import { ImagePicker } from '../layout/imagepicker';
+import { castNotification } from '../layout/notifications';
 
 export function initializeDevEnv() {
     log('Dev', 'Initialize development environment', 'detail');
@@ -99,6 +100,17 @@ export class DevTools extends Component {
         this.setState({ hidden : true });
     }
 
+    testNotification(done) {
+        castNotification({
+            title : "Dev tools",
+            message : "This is a lot of fun! Here's a random number : " + Math.random().toString().substring(2),
+            type : "success",
+            timeout : 10000
+        });
+
+        done();
+    }
+
     toggle() {
         this.setState({ hidden : !this.state.hidden });
     }
@@ -126,6 +138,7 @@ export class DevTools extends Component {
                     <div>
                         <DevTool click={this.bundleJS.bind(this)}>Bundle JS</DevTool>
                         <DevTool click={this.pickimage.bind(this)}>Image picker</DevTool>
+                        <DevTool click={this.testNotification.bind(this)}>Cast notification</DevTool>
                     </div>
                 ) }
             </div>
