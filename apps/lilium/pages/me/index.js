@@ -1,6 +1,7 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
 import { TextField, ButtonWorker } from '../../widgets/form';
+import { ImagePicker } from '../../layout/imagepicker';
 
 const style = {
     header: {
@@ -118,7 +119,6 @@ export default class ProfilePage extends Component {
 
                 this.setState({ user: data.user, err: undefined });
             } else {
-                console.log(err);
                 this.setState({ err });
             }
         });
@@ -169,6 +169,25 @@ class ProfileHeader extends Component {
         return Math.min((Math.floor(level / 2) + 1), 4).toString() + ".png";
     }
 
+  selectNewProfilePicture() {
+        ImagePicker.cast({}, image => {
+            if (image) {
+                const avatarURL = image.sizes.square.url;
+                API.post('/me/updateOneField', { field: "avatarURL", value: avatarURL }, (err, data) => {
+                    if (!err) {
+                        log('ProfilePage', 'Updated profile picture', 'success');
+
+                        const user = this.state.user;
+                        user.avatarURL = image.sizes.square.url;
+                        this.setState({ user })
+                    } else {
+                        log('ProfilePage', 'Error updating profile picture', 'error');
+                    }
+                });
+            }
+        });
+    }
+  
     render() {
         return (
             <div id="profile-header" style={style.header}>
@@ -318,6 +337,7 @@ class Manage2FAForm extends Component {
             }
         });
     }
+    
 
     activate2fa(done) {
         API.post('/2fa/activate', {token2fa: this.state.token2fa}, (err, data) => {

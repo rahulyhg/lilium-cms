@@ -93,7 +93,7 @@ class MediaUpload {
                     if (!err) {
                         cli.sendJSON(upload);
                     } else {
-                        console.log(err);
+                        log('Upload', err, 'err');
                         cli.throwHTTP(500, "An error occured while trying to resize the image file", true);
                     }
                 });
