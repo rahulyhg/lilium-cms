@@ -13,7 +13,7 @@ const styles = {
 class LiliumNotification {
     static get defaultOptions() {
         return {
-            type : "info",
+            type : "white",
             timeout : 6500,
             title : "Head's up!",
             message : "",
@@ -49,7 +49,9 @@ export class NotificationStrip extends Component {
             this.tm = setTimeout(this.dismiss.bind(this), this.notification.timeout);
         }
 
-        this.setState({ slidout : false })
+        setTimeout(() => {
+            this.setState({ slidout : false });
+        }, 20);
     }
 
     dismiss() {
@@ -68,7 +70,7 @@ export class NotificationStrip extends Component {
 
     render() {
         return (
-            <div class="notification-strip" onClick={this.clicked.bind(this)}>
+            <div class={"notification-strip notif-style-" + this.notification.type + " " + (this.state.slidout ? "hidden" : "")} onClick={this.clicked.bind(this)}>
                 <b>{this.notification.title}</b>
                 <span>{this.notification.message}</span>
             </div>

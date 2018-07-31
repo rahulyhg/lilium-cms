@@ -101,11 +101,14 @@ export class DevTools extends Component {
     }
 
     testNotification(done) {
+        const hasTimeout = Math.random() > 0.5;
+        const type = ["success", "info", "warning", "error", "system"][Math.floor(Math.random() * 5)];
+
         castNotification({
-            title : "Dev tools",
-            message : "This is a lot of fun! Here's a random number : " + Math.random().toString().substring(2),
-            type : "success",
-            timeout : 10000
+            title : "Dev tools - " + (hasTimeout ? "With 5s timeout" : "Without timeout"),
+            message : "["+type+"] This is a lot of fun! Here's a random number : " + Math.random().toString().substring(2),
+            type : type,
+            timeout : hasTimeout ? 5000 : 0
         });
 
         done();
