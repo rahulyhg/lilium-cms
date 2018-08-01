@@ -2,6 +2,7 @@ import { h, Component } from "preact";
 import API from '../../data/api';
 import { TextField, ButtonWorker } from '../../widgets/form';
 import { ImagePicker } from '../../layout/imagepicker';
+import { castNotification } from '../../layout/notifications';
 
 const style = {
     header: {
@@ -291,9 +292,20 @@ class PasswordResetForm extends Component {
         if (this.inputValues.oldpassword && this.inputValues.newpassword
             && this.inputValues.newpassword == this.inputValues.confirmnewpassword) {
                 API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
+                    if (!err) {
+                        castNotification({ title: 'Password updated', message: 'Successfully updated your password!', type: 'success' });
+                    } else {
+                        castNotification({ title: 'Error updating password', message: 'Error updating password!', type: 'success' });                        
+                    }
+
                     done && done();
                 });
         } else {
+            castNotification({
+                title: 'Error updating password',
+                message: "The 'current password', 'new password', and 'confirm new password' fields are mandatory and the 'new password' and 'confirm new password' fields must match",
+                type: 'success'
+            });
             done && done();
         }
     }
