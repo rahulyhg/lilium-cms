@@ -154,6 +154,9 @@ export default class ProfilePage extends Component {
 class ProfileHeader extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            user: this.props.user
+        }
     }
 
     asyncUpdateHeaderField(e) {
@@ -169,7 +172,7 @@ class ProfileHeader extends Component {
         return Math.min((Math.floor(level / 2) + 1), 4).toString() + ".png";
     }
 
-  selectNewProfilePicture() {
+    selectNewProfilePicture() {
         ImagePicker.cast({}, image => {
             if (image) {
                 const avatarURL = image.sizes.square.url;
@@ -181,6 +184,7 @@ class ProfileHeader extends Component {
                         user.avatarURL = image.sizes.square.url;
                         this.setState({ user })
                     } else {
+                        console.log(err);
                         log('ProfilePage', 'Error updating profile picture', 'error');
                     }
                 });
@@ -193,19 +197,19 @@ class ProfileHeader extends Component {
             <div id="profile-header" style={style.header}>
                 <div id="core-info" style={style.coreInfo}>
                     <div id="profile-picture-wrapper" style={style.coreInfo} >
-                        <img src={this.props.user.avatarURL} id="profile-picture" style={style.profilePicture} />
+                        <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} onClick={this.selectNewProfilePicture.bind(this)} />
                     </div>
-                    <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.props.user.username}`}</h3>
+                    <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.user.username}`}</h3>
                 </div>
 
                 <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
-                    <input type="text" name="displayname" style={style.inputField} value={this.props.user.displayname}
+                    <input type="text" name="displayname" style={style.inputField} value={this.state.user.displayname}
                                 onChange={this.asyncUpdateHeaderField.bind(this)} />
-                    <input type="text" name="jobtitle" style={style.inputField} value={this.props.user.jobtitle || ''} placeholder='Job Title'
+                    <input type="text" name="jobtitle" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'
                                 onChange={this.asyncUpdateHeaderField.bind(this)} />
                     <textarea name="description" className='change-placeholder' id="descriptichange-placeholderon" cols="30" rows="8" 
                                 placeholder='Write a small introduction paragraph'
-                                style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.props.user.description}</textarea>
+                                style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.state.user.description}</textarea>
                 </div>
 
                 <div style={style.badgesContainer}>
