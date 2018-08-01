@@ -174,7 +174,7 @@ export class Lys extends Component {
         return (
             <div id="lys-wrap">
                 <div id="lys">
-                    <input type="text" id="lys-input" placeholder="What are you looking for?" onKeyUp={this.keyUpBoxBinding} />
+                    <input type="text" id="lys-input" placeholder="What are you looking for?" onKeyUp={this.keyUpBoxBinding} autocomplete="off" />
                     <div id="lys-sugg-cmds">
                         {
                             this.state.pageChoices.map(cmd => (
