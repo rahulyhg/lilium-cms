@@ -4,9 +4,12 @@ import { navigateTo, Link } from '../routing/link';
 import API from '../data/api';
 
 let pageCommands = [];
+let commands = [];
+let customCommands = [];
 
 export function resetPageCommands()   { pageCommands = [];   }
 export function setPageCommands(cmds) { pageCommands = cmds; }
+export function addCommand(cmd) { customCommands.push(cmd); }
 
 export class Lys extends Component {
     constructor(props) {
@@ -20,7 +23,6 @@ export class Lys extends Component {
 
         this.shiftDown = false;
         this.keyUpBoxBinding = this.boxKeyUp.bind(this);
-        this.commands = [];
     }
 
     componentDidMount() {
@@ -31,7 +33,7 @@ export class Lys extends Component {
 
     componentWillReceiveProps(props) {
         if (props.menus) {
-            this.commands = [];
+            commands = [];
             props.menus.map(x => {
                 return [{
                     command : x.displayname.toLowerCase(),
@@ -46,9 +48,9 @@ export class Lys extends Component {
                         url : y.absURL.replace('admin', '')
                     }
                 })];
-            }).forEach(x => this.commands.push(...x));
+            }).forEach(x => commands.push(...x));
 
-            log('Lys', 'Handling now ' + this.commands.length + ' built-in commands', 'success');
+            log('Lys', 'Handling now ' + commands.length + ' built-in commands', 'success');
         }
     }
 
@@ -57,8 +59,9 @@ export class Lys extends Component {
         this.shiftDown = false;
         this.setState({ 
             visible : true, 
-            choices : this.commands,
+            choices : commands,
             pageChoices : pageCommands,
+            customChoices: customCommands,
             posts : []
         }, () => {
             const box = document.getElementById('lys-input');
@@ -89,6 +92,9 @@ export class Lys extends Component {
         if (this.state.pageChoices.length != 0) {
             this.state.pageChoices[0].execute();
             log('Lys', 'Executed page command : ' + cmd, 'success');
+        } else if (this.state.customChoices.length != 0) {
+            this.state.customChoices[0].execute();
+            log('Lys', 'Executed Custom Command : ' + cmd, 'success');
         } else if (this.state.choices.length != 0) {
             navigateTo(this.state.choices[0].url);
             log('Lys', 'Executed Lilium command : ' + cmd, 'success');
@@ -144,10 +150,12 @@ export class Lys extends Component {
         this.searchTimeout && clearTimeout(this.searchTimeout);
         this.searchTimeout = setTimeout(this.fillSearch.bind(this, text), TIMING.LYS_QUICK_SEARCH);
 
-        const choices = this.commands.filter(x => x.command.includes(text));
+        const choices = commands.filter(x => x.command.includes(text));
         const pageChoices = pageCommands.filter(x => x.command.includes(text));
+        const customChoices = customCommands.filter(x => x.command.includes(text));
+
         this.setState({
-            choices, pageChoices
+            choices, pageChoices, customChoices
         });
     }
 
@@ -176,6 +184,12 @@ export class Lys extends Component {
                             ))
                         } {
                             this.state.choices.map(cmd => (
+                                <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
+                                    <b>{cmd.displayname}</b>
+                                </div>
+                            ))
+                        } {
+                            this.state.customChoices.map(cmd => (
                                 <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
                                     <b>{cmd.displayname}</b>
                                 </div>

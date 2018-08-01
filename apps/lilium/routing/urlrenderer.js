@@ -8,6 +8,7 @@ import Dashboard    from '../pages/dashboard/index';
 import Publishing   from '../pages/publishing/index';
 import ProfilePage  from '../pages/me/index.js';
 import DevTools     from '../pages/devtools/index.js';
+import translations from '../pages/translations/index.js';
 import e404         from '../pages/errors/404';
 
 // Default endpoints are provided here
@@ -43,6 +44,7 @@ EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
 EndpointStore.registerEndpoint('me', ProfilePage);
 EndpointStore.registerEndpoint('devtools', DevTools);
+EndpointStore.registerEndpoint('translations', translations);
 EndpointStore.registerEndpoint('_e404', e404);
 
 export class URLRenderer extends Component {

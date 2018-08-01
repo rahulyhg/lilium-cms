@@ -24,7 +24,7 @@ export default class EditView extends Component {
 
     requestArticle(postid) {
         this.setState({ loading : true });
-        setPageCommands([{
+        setPageCommands([ {
             command : "save",
             displayname : "Save Article",
             execute : this.save.bind(this)

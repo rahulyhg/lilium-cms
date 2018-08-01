@@ -2,6 +2,7 @@ import API from '../data/api';
 import { h, Component } from 'preact';
 import { ImagePicker } from '../layout/imagepicker';
 import { castNotification } from '../layout/notifications';
+import { addCommand } from '../layout/lys.js';
 
 export function initializeDevEnv() {
     log('Dev', 'Initialize development environment', 'detail');
@@ -77,6 +78,11 @@ export class DevTools extends Component {
 
     componentDidMount() {
         window.onerror = this.onerror.bind(this);
+        addCommand({
+            command : "bundle-js",
+            displayname : "Bundle JS",
+            execute : this.bundleJS.bind(this)
+        });
     }
 
     onerror(error) {
