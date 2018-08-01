@@ -1,6 +1,19 @@
 import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import API from "../../data/api";
+import { BigList } from '../../widgets/biglist'
+
+class PostListItem extends Component {
+    render() {
+        return (
+            <div>
+                <Link href={"/publishing/write/" + this.props.item._id}>
+                    { this.props.item.status } : {this.props.item.headline}
+                </Link>
+            </div>
+        )
+    }
+}
 
 export default class ListView extends Component {
     constructor(props) {
@@ -13,36 +26,22 @@ export default class ListView extends Component {
                 author : "",
                 isSponsored : "",
                 sort : "updated"
-            },
-            page : 1,
-            max : 25,
-            posts : []
+            }
         };
     }
 
-    componentDidMount() {
-        log('Publishing', 'Fetching list of posts using the API', 'detail');
-        API.get("/publishing/bunch", {
-            filters : this.state.filters,
-            page : this.state.page,
-            max : this.state.max
-        }, (err, data) => {
-            this.setState({
-                posts : data.items
-            });
-        });
+    showdrafts() {
+        const filters = this.state.filters;
+        filters.status = "draft";
+
+        this.setState({ filters })
     }
 
     render() {
         return (
             <div>
-                {this.state.posts.map(post => (
-                    <div key={post._id}>
-                        <Link href={"/publishing/write/" + post._id}>
-                            {post.headline}
-                        </Link>
-                    </div>
-                ))}
+                <button onClick={this.showdrafts.bind(this)}>Only show drafts</button>
+                <BigList listitem={PostListItem} endpoint="/publishing/biglist" filters={this.state.filters} />
             </div>
         )
     }
