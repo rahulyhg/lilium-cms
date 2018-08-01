@@ -395,16 +395,39 @@ var Notification = function () {
         }
     };
 
+    this.adminPOST = function(cli) {
+        switch (levels[0]) {
+            case "seeall" : {
+                db.update(cli._c, 'notifications', { userID : db.mongoID(cli.userinfo.userid), interacted : false }, { interacted : true }, (err, r) => {
+                    err ? cli.throwHTTP(500, err, true) : cli.sendJSON({ updated : !!r.result.modifiedCount, total : r.result.modifiedCount });
+                })
+            } break;
+
+            case "seeone" : {
+                db.update(cli._c, 'notifications', { userID : db.mongoID(cli.userinfo.userid), _id : db.mongoID(levels[1]) }, { interacted : true }, (err, r) => {
+                    err ? cli.throwHTTP(500, err, true) : cli.sendJSON({ updated : !!r.result.modifiedCount });
+                })
+            } break;
+
+            default : cli.throwHTTP(404, undefined, true);
+        }
+    }
+
     this.registerLiveVar = function() {
         livevars.registerLiveVariable('notifications', function(cli, levels, params, cb) {
+            const $skip = params.skip || 0;
+            const $limit = params.limit || 10;
             db.join(cli._c, 'notifications', [
-                {$match : {userID : db.mongoID(cli.userinfo.userid)}},
+                {$match : {
+                    userID : db.mongoID(cli.userinfo.userid),
+                    interacted : true
+                }},
                 {$sort : {_id : -1}},
-                {$limit : 10},
+                {$skip}, {$limit},
                 {$sort : {_id : 1}}
-            ], function(result) {
-                cb(result);
-            });
+            ], seen => db.findToArray(cli._c, 'notifications', { userID : db.mongoID(cli.userinfo.userid), interacted : false }, (err, unseen) => {
+                cb({ seen, unseen });
+            }));
         });
 
         livevars.registerLiveVariable('online', function(cli, levels, params, cb) {
