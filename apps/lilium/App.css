@@ -70,7 +70,7 @@ body, html {
 
 #lilium-menu.snap {
     transform: translate3d(0px,0px,0px);
-    background : #262626;
+    background : #2d2d2d;
 }
 
 header {
@@ -84,10 +84,31 @@ header {
     display: flex;
 }
 
+.header-section {
+    width: 50%;
+    display: flex;
+}
+
+.header-section.header-section-right {
+    flex-direction: row-reverse;
+}
+
+.dropdown-menu {
+
+}
+
+.dropdown-menu .link {
+    display: block;
+    height : 50px;
+    padding-top : 16px;
+    box-sizing: border-box;
+    background : #2d2d2d;
+}
+
 #lilium-logo-wrapper {
     display: block;
     height: 50px;
-    background: #262626;
+    background: #2d2d2d;
     width: 240px;
     cursor: pointer;
 }
