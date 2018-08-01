@@ -7,6 +7,7 @@ import InitPage     from '../pages/default';
 import Dashboard    from '../pages/dashboard/index';
 import Publishing   from '../pages/publishing/index';
 import ProfilePage  from '../pages/me/index.js';
+import Logout       from '../pages/logout/index';
 import DevTools     from '../pages/devtools/index.js';
 import e404         from '../pages/errors/404';
 
@@ -42,6 +43,7 @@ EndpointStore.registerEndpoint("_init", InitPage);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
 EndpointStore.registerEndpoint('me', ProfilePage);
+EndpointStore.registerEndpoint('logout', Logout);
 EndpointStore.registerEndpoint('devtools', DevTools);
 EndpointStore.registerEndpoint('_e404', e404);
 
