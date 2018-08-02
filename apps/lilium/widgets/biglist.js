@@ -26,71 +26,201 @@ export class BigList extends Component {
         super(props);
         this.state = {
             items : props.items || [],
+            ready : false
+        };
+
+        this.coldState = {
             endpoint : props.endpoint,
             component : props.listitem,
             index : 0,
             batchsize : props.batchsize || 30,
             livevarkey : typeof props.livevarkey == "undefined" ? "items" : props.livevarkey,
             prepend : props.prepend || false,
-            filters : props.filters || {}
-        };
+            filters : {},
+            toolbarConfig : props.toolbar || undefined
+        }
     }
 
-    loadMore(callback) {
-        API.get(this.state.endpoint, {
-            limit : this.state.batchsize,
-            skip : this.state.index * this.state.batchsize,
-            filters : this.state.filters
+    loadMore(overwrite) {
+        API.get(this.coldState.endpoint, {
+            limit : this.coldState.batchsize,
+            skip : this.coldState.index * this.coldState.batchsize,
+            filters : this.coldState.filters
         }, (err, list) => {
             if (err) {
                 log('BigList', "Could not add items in big list because of response error : " + err, "warning")
             } else {
-                log("BigList", "Added values in a big list from live variable endpoint", "success");
-                if (callback) {
-                    callback(this.state.livevarkey ? list[this.state.livevarkey] : list);
-                } else {
+                if (overwrite) {                
+                    log("BigList", "Overwritten items of a big list from live variable endpoint", "success");
+                    const items = [...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list)];
+                    this.setState({ items, ready : true });
+                } else {                
+                    log("BigList", "Added values in a big list from live variable endpoint", "success");
                     const items = [...this.state.items];
-                    items[this.state.prepend ? "unshift" : "push"](...(this.state.livevarkey ? list[this.state.livevarkey] : list));
+                    items[this.coldState.prepend ? "unshift" : "push"](...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list));
 
-                    this.setState({ items, index : ++this.state.index });
+                    this.coldState.index++;
+                    this.setState({ items, ready : true });
                 }
             }
         });
     }
 
+    toolbarFieldChanged(name, value) {
+        this.coldState.filters = Object.assign(this.coldState.filters || {}, { [name] : value });
+        this.loadMore(true);
+    }
+
     componentDidMount() {
-        this.loadMore();        
+        this.loadMore(true);        
     }
 
     componentWillReceiveProps(props) {
         const newState = {
-            endpoint  : props.endpoint  || this.state.endpoint,
-            component : props.listitem  || this.state.component,
-            batchsize : props.batchsize || this.state.batchsize,
-            filters   : props.filters   || this.state.filters,
+            endpoint  : props.endpoint  || this.coldState.endpoint,
+            component : props.listitem  || this.coldState.component,
+            batchsize : props.batchsize || this.coldState.batchsize,
             index : 0
         };
 
-        if (props.items) {
-            newState.items = [...props.items];
-        } 
+        Object.assign(this.coldState, newState);
 
-        this.setState(newState, () => {
-            this.loadMore(items => {
-                this.setState({ items });
-            });
-        })
+        log('BigList', 'Received props, about to reload list content', 'detail');
+        if (props.items) {
+            const items = [...props.items];
+            this.setState({ items });
+        } else {
+            this.loadMore(true);
+        }
     }
 
     render() {
+        if (!this.state.ready) {
+            return null;
+        }
+
         log('BigList', 'Rendering a big list with ' + this.state.items.length + ' items', 'detail');
         return (
             <div class="big-list">
                 {
+                    this.coldState.toolbarConfig ? (
+                        <BigListToolBar 
+                            fields={this.coldState.toolbarConfig.fields} 
+                            title={this.coldState.toolbarConfig.title} 
+                            id={this.coldState.toolbarConfig.id} 
+                            fieldChanged={this.toolbarFieldChanged.bind(this)} />
+                    ) : null
+                }
+
+                <div class="big-list-items">
+                {
                     this.state.items.map(x => (
-                        <this.state.component item={x} key={x[this.props.keyid || "_id"]} />
+                        <this.coldState.component item={x} key={x[this.props.keyid || "_id"]} />
                     ))
                 }
+                </div>
+            </div>
+        );
+    }
+}
+
+/**
+ * BigListToolBarBuilder
+ * 
+ * 
+ * Fields anatomy => { type : "text | select | checkbox", title : "Display name", name : "nameSentToServer", options? : [] }
+ *   - type defaults to "text"
+ *   - title detaults to empty string
+ *   - name is mandatory
+ * 
+ *   - options defaults to empty array, is only used with type "select", is represented as an array object : [{ text : "Display text", value : "optionValue" }, {...}]
+ */
+export class BigListToolBarBuilder {
+    get defaultOptions() {
+        return {
+            fields : [],
+            title : "Filters"
+        };
+    }
+
+    /**
+     * make(params)
+     * 
+     * @param {object Toolbar settings including the fields to display, it, and title} params 
+     */
+    make(params = {}) {
+        const settings = Object.assign(this.defaultOptions, params);
+
+        return {
+            fields : settings.fields,
+            title : settings.title,
+            id : settings.id
+        }
+    }
+}
+
+class BigListToolBar extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            fields : props.fields,
+            title : props.title,
+            id : props.id
+        };
+    }
+
+    fieldChanged(ev) {
+        this.props.fieldChanged && this.props.fieldChanged(ev.target.name, ev.target.value);
+    }
+
+    makeField(field) {
+        switch (field.type) {
+            case "select": {
+                return (
+                    <div class="big-list-tool-wrap">
+                        <b>{field.title}</b>
+                        <select onChange={this.fieldChanged.bind(this)} name={field.name}>
+                            {
+                                field.options.map(opt => (<option value={opt.value}>{opt.text}</option>))
+                            }
+                        </select>
+                    </div>
+                );
+            } break;
+
+            case "checkbox": {
+                return (
+                    <div class="big-list-tool-wrap">
+                        <b>{field.title}</b>
+                        <input type="checkbox" onChange={this.fieldChanged.bind(this)} name={field.name} />
+                    </div>
+                );
+            } break;
+
+            case "text":
+            default: {
+                return (
+                    <div class="big-list-tool-wrap">
+                        <b>{field.title}</b>
+                        <input type="text" onKeyUp={this.fieldChanged.bind(this)} name={field.name} />
+                    </div>
+                );
+            }
+        }
+    }
+
+    componentDidMount() {
+
+    }
+
+    render() {
+        log('BigList', 'Rendering toolbar with ' + this.state.fields.length + ' fields', 'detail');
+        return (
+            <div class="big-list-tool-bar">
+                <div class="big-list-tool-bar-title">{this.state.title}</div>
+                <div class="big-list-tools">
+                    { this.state.fields.map(x => this.makeField(x)) }
+                </div>
             </div>
         );
     }
