@@ -107,19 +107,20 @@ export class URLRenderer extends Component {
 
         log('URLRenderer', 'Refreshing URL state with endpoint : ' + endpoint, 'url');
         resetPageCommands();
-        this.setState({ endpoint, levels });
+
+        const CurrentContainer = EndpointStore.getComponentFromEndpoint(endpoint);
+        this.setState({ endpoint, levels, CurrentContainer }, () => {
+            const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
+            document.dispatchEvent(ev);
+        });
     }
 
     render() {
-        // if (this.lastRenderedPath != document.location.pathname) {
-            this.CurrentContainer = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
-        // }
         this.lastRenderedPath = document.location.pathname;
-        
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
             <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
-                <this.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
+                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
             </div>
         )
     }

@@ -23,7 +23,7 @@ class Lilium extends Component {
     constructor(props) {
         super(props);        
         this.state = {
-            /* session, menus */
+            /* session, menus, headerTitle */
         };
 
         // Initialize cache
