@@ -434,7 +434,7 @@
                     "children": []
                 }, {    
                     "id": "translations",
-                    "faicon": "fa-usd-square",
+                    "faicon": "fa-globe",
                     "displayname": "Translations",
                     "priority": 3000,
                     "rights": ["admin"],
