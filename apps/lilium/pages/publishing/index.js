@@ -8,6 +8,12 @@ export default class PublishingTab extends Component {
         super(props);
     }
 
+    static get pagesettings()  {
+        return {
+            title : "Publishing"
+        }
+    }
+
     render() {
         log('Publishing', 'Rendering publishing pane with ' + this.props.levels.length + ' levels', 'detail');
         if (this.props.levels.length == 0) {
