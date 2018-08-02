@@ -1,3 +1,5 @@
+import { getAPI, storeAPI } from './cache';
+
 class API {
     static request(method = "GET", endpoint, params = {}, data, sendback) {
         log('API', 'Requesting ' + method + ' to endpoint : ' + endpoint, 'detail');
@@ -21,8 +23,24 @@ class API {
         });
     }
 
-    static get(endpoint, params, sendback) {
-        API.request('GET', "/livevars/v4" + endpoint, params, undefined, sendback);
+    static get(endpoint, params, sendback, usecache) {
+        if (usecache) {
+            log('API', 'Requesting endpoint data from cache at : ' + endpoint, 'detail');
+            const val = getAPI(endpoint);
+            if (val) {
+                log('API', 'Served data from cache at : ' + endpoint, 'success');
+                sendback(undefined, val, undefined);
+            } else {
+                API.get(endpoint, params, (err, json) => {
+                    storeAPI(endpoint, json);                    
+                    log('API', 'Stored data in cache at : ' + endpoint, 'success');
+
+                    sendback(err, json);
+                });
+            }
+        } else {
+            API.request('GET', "/livevars/v4" + endpoint, params, undefined, sendback);
+        }
     }
 
     static post(endpoint, data, sendback) {
