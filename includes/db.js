@@ -11,7 +11,7 @@ var DB = function() {
 	// Will return undefined if everything went well, or an err if it crashes
 	this.testConnection = function(conf, callback) {
 		log('Database', 'Testing connection to mongo database');
-		MongoClient.connect(formatMongoString(conf), function(err, db) {
+		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, db) {
 			log('Database', 'Test at ' + conf.data.host + ":" + conf.data.port);
 			if (!err) {
 				log('Database', 'Firing successful test signal');
@@ -31,7 +31,7 @@ var DB = function() {
         if (!dbtype || dbtype === 'mongo') {
 		    var mongoString = "mongodb://" + user + ":" + pass + "@" + host + ":" + port + "/" + name;
 	    	log('Database', 'Testing : ' + mongoString);
-    		MongoClient.connect(mongoString, function(err, tempConn) {
+    		MongoClient.connect(mongoString, { useNewUrlParser: true }, function(err, tempConn) {
 			    if (err) {
 		    		cb(false, err);
 	    		} else {
@@ -47,7 +47,7 @@ var DB = function() {
 
 	this.createDatabase = function(conf, callback) {
 		log('Database', 'Initializing database');
-		MongoClient.connect(formatMongoString(conf), function(err, db) {
+		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, db) {
 			if (err) {
 				log('Database', 'Error accessing database : ' + err);
 				callback(false);
@@ -89,7 +89,7 @@ var DB = function() {
 	};
 
 	this.initDatabase = function(conf, callback) {
-		MongoClient.connect(formatMongoString(conf), function(err, client) {
+		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, client) {
 			client.db(conf.data.use).collection('lilium', {}, function(err, c) {
 				if (err) {
 					require('./dbinit.js')(conf, client.db(conf.data.use), callback);
@@ -102,7 +102,7 @@ var DB = function() {
 
 	this.createPool = function(conf, callback) {
 		log('Database', 'Creating database global connection object');
-		MongoClient.connect(formatMongoString(conf), function(err, conn) {
+		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, conn) {
 			_conns[conf.id || conf] = conn.db(conf.data.use);
 			callback(!err);
 		});

@@ -6,7 +6,6 @@ const log = require('./log.js');
 const Admin = require('./backend/admin.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
-const tableBuilder = require('./tableBuilder.js');
 const cli = require('./cli.js');
 const hooks = require('./hooks.js');
 const RegisteredPlugins = new Object();
@@ -222,31 +221,6 @@ class Plugins {
             callback([]);
         }
     };
-
-    table() {
-        tableBuilder.createTable({
-            name: 'plugin',
-            endpoint: 'plugins.table',
-            paginate: true,
-            searchable: true,
-            max_results: 10,
-            fields: [{
-                key: 'identifier',
-                displayname: 'Name',
-                sortable: true
-            }, {
-                key: '',
-                displayname: 'Actions',
-                template: 'table-plugins-actions',
-                sortable: true,
-                sortkey: 'active'
-            }, {
-                key: 'entry',
-                displayname: 'Entry Script',
-                sortable: true
-            }, ]
-        });
-    }
 
     init(cb) {
         db.findToArray(_c.default(), 'plugins', {
