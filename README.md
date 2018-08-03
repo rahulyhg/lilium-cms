@@ -1,7 +1,6 @@
 ![LML masthead](https://www.narcitymedia.com/wp-content/uploads/2017/08/422959623-LML-masthead-copy.png)
 
-# Lilium CMS #
-
+# Lilium CMS V4 #
 Lilium is a lightning-fast, web based content management system built with Node.JS. Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and database access.
 
 Interpreting its own simple language, Lilium uses LML (Lilium Markup Language) to create the templates and generate the served files. LML is user friendly, ressemble HTML and makes it easy for new developers or web designers to customize their very own themes.
