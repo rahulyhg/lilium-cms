@@ -66,11 +66,11 @@ class Core {
             
             loadVocab(() => {
                 loadPlugins(() => {
-                    makeBuild(() => {
-                        loadRoles(() => {
-                            precompile(() => {
-                                loadDocs(() => {
-                                    redirectIfInit(resp, () => {
+                    loadRoles(() => {
+                        precompile(() => {
+                            loadDocs(() => {
+                                redirectIfInit(resp, () => {
+                                    makeBuild(() => {
                                         loadFrontend();
                                         require('./riverflow/riverflow.js').loadFlows();
 
