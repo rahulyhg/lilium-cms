@@ -207,39 +207,7 @@ var Themes = function () {
 
     var createOrUpdateThemeForm = function (config) {
         var defaults = {};
-        var formName = 'theme_settings_' + config.uid;
 
-        log('Themes', 'Recreating form ' + formName);
-        if (formBuilder.isAlreadyCreated(formName)) {
-            formBuilder.deleteForm(formName);
-        }
-
-        var form = formBuilder.createForm(formName, {
-            fieldWrapper: {
-                tag: 'div',
-                cssPrefix: 'theme-setting-field-'
-            },
-            cssClass: 'theme-settings-form'
-        });
-        form.add('formsetting-sep', 'title', {
-            displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'
-        });
-
-        for (var name in ActiveTheme[config.id].info.settingForm) {
-            var property = ActiveTheme[config.id].info.settingForm[name];
-            if (property.type == 'submit') {
-                throw new Error('[Themes] - ILLEGAL form type "submit" for theme settings form.')
-            }
-
-            if (!property.default) {
-                throw new Error('[Themes] - The field "' + name + '" has no default value.');
-            }
-            defaults[name] = property.default;
-            form.add(name, property.type, property.attr || {}, property.validations || {required : false} );
-        }
-
-        form.add('Submit', 'submit', {displayname : 'Update Settings'} );
-            
         log("Themes", "Updated setting form")
         return defaults;
     };
