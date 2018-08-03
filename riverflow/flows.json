@@ -42,6 +42,10 @@
             "endpoint" : "pong",
             "support" : ["get"]
         }, {
+            "module" : "notifications.js",
+            "endpoint" : "notifications",
+            "support" : ["admin_post"]
+        }, {
             "module" : "search.js",
             "endpoint" : "search",
             "support" : ["livevar", "setup"]

@@ -139,6 +139,12 @@ h1, h2 {
     margin: 0;
 }
 
+h1 {
+    border-bottom: 1px solid #DDD;
+    background: #333;
+    color: #c47ed4;
+}
+
 #lilium div.mce-fullscreen {
     position: fixed;
     top: 50px;
@@ -300,6 +306,57 @@ h1, h2 {
 .notification-strip.notif-style-warning { background: #fbecca; color: #735a1f; border-color : #735a1f; } .notification-strip.notif-style-warning > span { color: #735a1f; }
 .notification-strip.notif-style-system { background: #cd61e0; color: #fac7ff; border-color: #8a209c; } .notification-strip.notif-style-system > span { color: #fac7ff;  }
 
+.big-list-items {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 12px;
+}
+
+.article-list-thumbnail img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+}
+
+.article-list-no-image {
+    box-sizing: border-box;
+    width: 300px;
+    height: 200px;
+    text-align: center;
+    padding-top: 80px;
+    font-size: 28px;
+    background: #E9E9E9;
+    color: #777;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.article-list-status {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 3px;
+    text-transform: uppercase;
+    font-weight: bold;
+}
+
+.article-list-item {
+    width: 300px;
+    background: white;
+    margin: 12px;
+    box-shadow: 0px 0px 3px rgba(0,0,0,0.2);
+}
+
+.article-list-text {
+    padding: 8px 12px;
+}
+
+.article-list-headline {
+    font-size: 16px;
+    line-height: 22px;
+}
+
 #image-picker-overlay {
     position: fixed;
     top:0;
@@ -398,6 +455,37 @@ h1, h2 {
     height: 100%;
     display: block;
     background: #CCC;
+}
+
+.big-list-tool-bar {
+    display: flex;
+    background: #F6F6F6;
+    border-bottom: 1px solid #DDD;
+}
+
+.big-list-tools {
+    display: flex;
+}
+
+.big-list-tool-bar-title {
+    padding: 10px 14px;
+    font-size: 18px;
+    text-transform: uppercase;
+    background: #E6E6E6;
+    border-right: 1px solid #DDD;
+    font-weight: bold;
+    color: #BBB;
+}
+
+.big-list-tools .big-list-tool-wrap {
+    padding: 10px 15px;
+    border-right: 1px solid #DDD;
+}
+
+.big-list-tools .big-list-tool-wrap b {
+    margin-right: 10px;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .realtime-listitem {

@@ -23,7 +23,7 @@ class Lilium extends Component {
     constructor(props) {
         super(props);        
         this.state = {
-            /* session, menus */
+            /* session, menus, headerTitle */
         };
 
         // Initialize cache
@@ -44,12 +44,14 @@ class Lilium extends Component {
         log('Lilium', 'Requesting current session information', 'lilium');
         API.getMany([
             { endpoint : '/me', params : {} },
-            { endpoint : "/adminmenus", params : {} }
+            { endpoint : "/adminmenus", params : {} },
+            { endpoint : "/notifications", params : {} }
         ], (resp) => {
             if (!resp["/me"] || !resp["/me"][0]) {
                 this.setState({ error : "session" });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
+                resp["/me"].notifications = resp["/notifications"];
                 this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"] });            
             }   
         });

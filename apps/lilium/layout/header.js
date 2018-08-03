@@ -125,6 +125,45 @@ class HeaderRealtimeCounter extends Component {
     }
 }
 
+class HeaderPageTitle extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            title : "",
+            webtitle : document.title
+        }
+
+        this.originalWebTitle = document.title;
+    }
+
+    componentDidMount() {
+        document.addEventListener('renderedURL', ev => {
+            log('PageTitle', 'Received renderedURL event, about to update page title', 'detail');
+            const { CurrentContainer } = ev.detail;
+
+            if (CurrentContainer.pagesettings && CurrentContainer.pagesettings.title) {            
+                log('PageTitle', 'Setting new page title : ' + CurrentContainer.pagesettings.title, 'detail');
+                this.setState({ title : CurrentContainer.pagesettings.title });
+            } else {
+                log('PageTitle', 'No page title found, defaulting to empty string', 'detail');
+                this.setState({ title : "" });
+            }
+        });
+    }
+
+    render() {
+        document.title = this.originalWebTitle + (this.state.title ? (" | " + this.state.title) : "");
+
+        if (true || !this.state.title) {
+            return null;
+        }
+
+        return (
+            <div>{this.state.title}<span> | </span></div>   
+        );
+    }
+}
+
 export class Header extends Component {
     constructor(props) {
         super(props);
@@ -156,6 +195,7 @@ export class Header extends Component {
                             <span id="lilium-brandname" class="ptext">{LILIUM.vendor}</span>
                         </div>
                     </Link>
+                    <HeaderPageTitle />
                     <HeaderRealtimeCounter />
                 </div>
                 <div class="header-section header-section-right">
