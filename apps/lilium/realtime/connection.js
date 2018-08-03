@@ -1,11 +1,9 @@
 import { LMLSocket } from './lmlsocket';
-let LMLSOCKET;
+
+const LMLSOCKET = new LMLSocket();;
 
 export function initiateConnection() {
-    if (!LMLSOCKET) {
-        LMLSOCKET = new LMLSocket();
-        LMLSOCKET.connect();
-    }
+    LMLSOCKET.connect();
 }
 
 export function bindRealtimeEvent(ev, callback) {

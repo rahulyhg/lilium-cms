@@ -10,6 +10,7 @@ var db = require('./includes/db.js');
 var imageSize = require('image-size');
 var eventEmitter = new require('events').EventEmitter();
 var log = require('./log.js');
+const mediaUpload = require('./mediaUpload');
 
 var Handler = function () {
     var GET = function (cli) {
@@ -240,12 +241,20 @@ var Handler = function () {
         Router.parseClientObject(cli, (loggedin) => {
             require('./api.js').serveApi(cli);
         });
-    }
+    };
+
+    const handleMediaUpload = (cli) => {
+        Router.parseClientObject(cli, (loggedin) => {
+            mediaUpload.handleImageUpload(cli);
+        });
+    };
 
     this.handle = function (cli) {
         cli.touch('handler.handle');
 
-        if (cli.request.url.startsWith('/api') /*&& cli.method == "OPTIONS"*/) {
+        if (cli.request.url.startsWith('/admin/mediaUpload') && cli.method == 'POST') {
+            handleMediaUpload(cli);
+        } else if (cli.request.url.startsWith('/api') /*&& cli.method == "OPTIONS"*/) {
             handleAPI(cli);
         } else {
             parseMethod(cli);

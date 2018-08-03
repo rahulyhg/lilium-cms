@@ -54,6 +54,9 @@ var Role = function () {
         const _id = db.mongoID(cli.routeinfo.path[3]);
 
         db.update(config.default(), 'roles', { _id }, cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
+        db.findUnique(config.default(), 'roles', { _id }, (err, role) => {
+            role && sharedcache.setRole(role);
+        });
     };
 
     this.list = function (cli) {
@@ -218,6 +221,28 @@ var Role = function () {
 
     this.setup = function() {
 
+    }
+
+    this.loadRolesInCache = (done) => {
+        db.findToArray(conf.default(), 'roles', {}, (err, arr) => {
+            if (!err) {
+                let i = -1;
+                const pushRoleToCache = () => {
+                    if (arr[++i]) {
+                        sharedcache.setRole(arr[i]);
+                        pushRoleToCache();
+                    } else {
+                        log('Role', 'Loaded roles in cache server', 'info');
+                        done && done();
+                    }
+                };
+    
+                pushRoleToCache();
+            } else {
+                log('Role', "Could't get roles from database", 'error');
+                done && done();
+            }
+        });
     }
 };
 

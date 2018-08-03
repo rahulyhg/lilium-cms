@@ -1,9 +1,14 @@
 import { h, Component } from 'preact'
+import { resetPageCommands } from '../layout/lys';
+import { CACHEKEYS, getLocal } from '../data/cache';
 
 // Import default pages from route
 import InitPage     from '../pages/default';
 import Dashboard    from '../pages/dashboard/index';
 import Publishing   from '../pages/publishing/index';
+import ProfilePage  from '../pages/me/index.js';
+import Logout       from '../pages/logout/index';
+import DevTools     from '../pages/devtools/index.js';
 import e404         from '../pages/errors/404';
 
 // Default endpoints are provided here
@@ -35,17 +40,23 @@ EndpointStore.ENDPOINT_STORE = {};
 
 // Define default Lilium's endpoints
 EndpointStore.registerEndpoint("_init", InitPage);
-EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
+EndpointStore.registerEndpoint('me', ProfilePage);
+EndpointStore.registerEndpoint('logout', Logout);
+EndpointStore.registerEndpoint('devtools', DevTools);
+EndpointStore.registerEndpoint('_e404', e404);
 
 export class URLRenderer extends Component {
     constructor(props) {
         super(props);
         this.state = {
             endpoint : "_init",
-            levels : []
+            levels : [],
+            classes : []
         }
+
+        getLocal(CACHEKEYS.SIDEBARSNAP) && this.state.classes.push("snap");
     }
 
     componentDidMount() {
@@ -66,7 +77,25 @@ export class URLRenderer extends Component {
             this.refreshPath();
         };
 
+        this.menuslid_bound = this.menuslid.bind(this);
+        this.menusnapped_bound = this.menusnapped.bind(this);
+        document.addEventListener('menuslid', this.menuslid_bound);
+        document.addEventListener('menusnap', this.menusnapped_bound);
+
         this.refreshPath();
+    }
+
+    componentWillUnmount() {
+        document.removeEventListener('menuslid', this.menuslid_bound)
+    }
+
+    menuslid(ev) {
+        this.renderer.classList[ev.detail.slid ? "add" : "remove"]("slid");
+    }
+
+    menusnapped(ev) {
+        this.renderer.classList[ev.detail.snapped ? "add" : "remove"]("snap");
+        this.state.classes = ev.detail.snapped ? ["snap"] : [];
     }
 
     refreshPath() {
@@ -77,16 +106,21 @@ export class URLRenderer extends Component {
         const levels = paths;
 
         log('URLRenderer', 'Refreshing URL state with endpoint : ' + endpoint, 'url');
-        this.setState({ endpoint, levels });
+        resetPageCommands();
+
+        const CurrentContainer = EndpointStore.getComponentFromEndpoint(endpoint);
+        this.setState({ endpoint, levels, CurrentContainer }, () => {
+            const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
+            document.dispatchEvent(ev);
+        });
     }
 
     render() {
-        const Container = EndpointStore.getComponentFromEndpoint(this.state.endpoint); 
-        
+        this.lastRenderedPath = document.location.pathname;
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
-            <div id="urlrenderer">
-                <Container endpoint={this.state.endpoint} levels={this.state.levels} />
+            <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
+                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
             </div>
         )
     }

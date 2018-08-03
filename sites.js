@@ -24,6 +24,7 @@ var sharedcache = require('./sharedcache.js');
 var sitemap = require('./sitemap.js');
 var analytics = require('./analytics.js');
 var adslib = require('./ads');
+var roles = require('./role');
 
 var networkInfo = require('./network/info.js');
 var isElder = networkInfo.isElderChild();
@@ -259,17 +260,19 @@ var SiteInitializer = function (conf, siteobj) {
             if (pkg.appname == "lilium") {
                 pkg.code += `// Lilium config
                     global.liliumcms = {
+                        env : "${conf.env}",
                         uid : "${conf.uid}",
-                        url : "${conf.server.url}"
+                        url : "${conf.server.url}",
+                        sitename : "${conf.website.sitetitle}"
                     };
                 `;
             }
+            
+            fs.copyFileSync(
+                pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
+                pathLib.join(conf.server.html, 'lilium.css')
+            );
         });
-
-        fs.copyFileSync(
-            pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
-            pathLib.join(conf.server.html, 'lilium.css')
-        );
 
         hooks.fireSite(conf, 'frontend_will_precompile', {
             config: conf,
@@ -330,10 +333,14 @@ var SiteInitializer = function (conf, siteobj) {
         });
     };
 
+
+
     var loadSessions = function(cb) {
         if (!isElder) { return cb(); }
-        sessions.initSessionsFromDatabase(conf, () => {
-            require('./api.js').loadSessionsInCache(cb);
+        roles.loadRolesInCache(() => {
+            sessions.initSessionsFromDatabase(conf, () => {
+                require('./api.js').loadSessionsInCache(cb);
+            });
         });
     };
 
