@@ -115,3 +115,21 @@ export class TextField extends FormField {
         )
     }
 }
+
+
+class EditableText extends TextField {
+
+    onBlur() {
+        this.props.onBlur && this.props.onBlur();
+    }
+
+    render() {
+        return (
+            <div style={Object.assign(styles.fieldwrap, this.props.wrapstyle || {})}>
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
+
+                <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value} onChange={this.changed.bind(this)} onBlure={this.onBlur.bind(this)} />
+            </div>
+        )
+    }
+}
