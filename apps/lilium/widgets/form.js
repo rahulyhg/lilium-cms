@@ -39,8 +39,9 @@ class FormField extends Component {
     }
 
     changed(ev) {
+        const oldValue = this.value;
         this.value = ev.target.value;
-        this.props.onChange && this.props.onChange(this.props.name, ev.target.value);
+        this.props.onChange && this.props.onChange(this.props.name, ev.target.value, oldValue);
     }
 
     get isField() { return true; }
