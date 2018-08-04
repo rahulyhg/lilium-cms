@@ -33,6 +33,7 @@ export class BigList extends Component {
         this.coldState = {
             endpoint : props.endpoint,
             component : props.listitem,
+            emptyComponent : props.emptyComponent || BigListEmptyTemplate,
             index : 0,
             batchsize : props.batchsize || 30,
             livevarkey : typeof props.livevarkey == "undefined" ? "items" : props.livevarkey,
@@ -119,13 +120,23 @@ export class BigList extends Component {
 
                 <div class="big-list-items">
                 {
-                    this.state.items.map(x => (
+                    this.state.items.length == 0 ? (
+                        <this.coldState.emptyComponent />
+                    ) : this.state.items.map(x => (
                         <this.coldState.component item={x} key={x[this.props.keyid || "_id"]} />
                     ))
                 }
                 </div>
             </div>
         );
+    }
+}
+
+class BigListEmptyTemplate {
+    render() {
+        return (<div class="big-list-empty-template">
+            <b>Nothing was found using the current filters.</b>
+        </div>);
     }
 }
 
