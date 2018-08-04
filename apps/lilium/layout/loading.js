@@ -17,6 +17,11 @@ const styles = {
         fontSize : "48px",
         color : "rgb(170, 153, 185)",
         textShadow : "rgb(163, 133, 189) 0px 2px 0px"
+    },
+    devmention : {
+        display : "block",
+        fontSize : "20px",
+        color : "rgb(170, 153, 185)"    
     }
 };
 
@@ -25,6 +30,9 @@ export class LoadingView extends Component {
         return (
             <div style={styles.screen}>
                 <b style={styles.message}>Loading awesomeness</b>
+                {
+                    liliumcms.env == "dev" ? (<b style={styles.devmention}>Development build</b>) : null
+                }
             </div>
         );
     }
