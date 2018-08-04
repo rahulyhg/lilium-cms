@@ -3,9 +3,10 @@ import { getAPI, storeAPI } from './cache';
 class API {
     static request(method = "GET", endpoint, params = {}, data, sendback) {
         log('API', 'Requesting ' + method + ' to endpoint : ' + endpoint, 'detail');
+        const now = Date.now();
         fetch(`${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include", method, body : data && JSON.stringify(data), headers: data && { "Content-Type": "application/json" } }).then(r => {
             if (Math.floor(r.status / 200) == 1) {
-                log('API', '['+ r.status +'] API call to ' + endpoint, 'success');
+                log('API', '['+ r.status +'] API call to ' + endpoint + ' replied in ' + (Date.now() - now) + "ms", 'success');
                 r.json().then(resp => {
                     log('API', 'JSON parsed successfully', 'detail');
                     sendback(undefined, resp, r);
@@ -14,7 +15,7 @@ class API {
                     sendback(err, undefined, r);
                 });
             } else {               
-                log('API', '['+r.status+'] API call to ' + endpoint, 'warn');
+                log('API', '['+r.status+'] API call to ' + endpoint + ' replied in ' + (Date.now() - now) + "ms", 'warn');
                 sendback(undefined, {
                     code : r.status,
                     response : r
