@@ -23,7 +23,7 @@ export class LiliumMenu extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            menus : [],
+            menus : props.menus || [],
             snapped : getLocal(CACHEKEYS.SIDEBARSNAP)
         }
     }

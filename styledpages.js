@@ -1,7 +1,5 @@
 const log = require('./log.js');
 const db = require('./includes/db.js');
-const formBuilder = require('./formBuilder.js');
-const tableBuilder = require('./tableBuilder.js');
 const Admin = require('./backend/admin.js');
 const fileserver = require('./fileserver.js');
 const filelogic = require('./filelogic.js');
@@ -70,111 +68,7 @@ class StyledPages {
             }
         });
     }
-
-    form() {
-        formBuilder.createForm('styledpage_edit', {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                'id': 'article_new',
-                'inner': true
-            },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add('title', 'text', {
-            placeholder : true, 
-            displayname : "Styled Page Title",
-            classes : ["article_base_title"]
-        })
-        .add('content', 'ckeditor', {
-            nolabel : true
-        })
-        .add('title-accessing', 'title', {
-            displayname : "Accessing"
-        })
-        .add('slug', 'text', {
-            displayname : "URL slug"
-        })
-        .add('status', 'select', {
-            displayname : "Visibility",
-            datasource : [
-                {name : "invisible", displayName : "Invisible"},
-                {name : "magiclink", displayName : "Private with magic link"},
-                {name : "public", displayName : "Public"}
-            ]
-        })
-        .add('description', 'text', {
-            displayname : "Public description"
-        })
-        .add('title-custom-integration', 'title', {
-            displayname : "Custom integration"
-        })
-        .add('customcss', 'textarea', {
-            displayname : "Custom CSS"
-        })
-        .add('customjs', 'textarea', {
-            displayname : "Custom Javascript"
-        })
-        .add('skiplayout', 'checkbox', {
-            displayname : "Do not use theme layout"
-        })
-        .add('staticfile', 'checkbox', {
-            displayname : "Save as static file"
-        })
-        .add('title-action', 'title', {
-            displayname: "Actions"
-        })
-        .add('publish-set', 'buttonset', { buttons : [{
-                'name' : 'save',
-                'displayname': 'Save',
-                'type' : 'button',
-                'classes': ['btn-save']
-            }, {
-                'name' : 'view',
-                'displayname': 'View page',
-                'type' : 'button',
-                'classes': ['btn-preview']
-            }        
-        ]})
-        ;
-    }
-
-    table() {
-        tableBuilder.createTable({
-            name: 'styledpages',
-            endpoint: 'styledpages.table',    
-            paginate: true,     
-            searchable: true, 
-            filters : {
-                status : {
-                    displayname : "Visibility",
-                    datasource : [{
-                        value : "invisible",
-                        displayname : "Invisible"
-                    }, {
-                        value : "magiclink",
-                        displayname : "Magic Link"
-                    }, {
-                        value : "Public",
-                        displayname : "Public"
-                    }]
-                }
-            },
-            fields : [{
-                key: 'title',
-                displayname: 'Title'
-            }, {
-                key: 'status',
-                displayname: 'Visibility',
-            }, {
-                key: '',
-                displayname : "Actions",
-                template: 'table-ss-actions',
-                sortable : false
-            }]
-        });
-    }
-
+        
     createNewObject() {
         return {
             title : "New Styled Page",

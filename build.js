@@ -42,7 +42,7 @@ class Builder {
             if (cli.routeinfo.path[2] == "lilium") {
                 const b = init_build_tree.find(x => x.input == "lilium" && x._c.id == cli._c.id);
                 if (b) {
-                    this.build(b._c, b.input, b.outputkey, b.options, () => {
+                    this.build(b._c, b.input, b.outputkey, Object.assign({}, b.options, {dontOverwite : false}), () => {
                         cli.sendJSON({done : 1})
                     })
                 } else {
@@ -59,6 +59,14 @@ class Builder {
 
         const entryfile = path.join(liliumroot, "apps", input, options.entryfile || 'main.js');        
         const precompfile = path.join(liliumroot, "apps", input, 'main.lilium.js');
+
+        if (options.dontOverwite) {
+            try {
+                fs.statSync(path.join(options.outputpath || (_c.server.html + "/apps/" + outputkey), options.bundlename || "app.bundle.js"));
+                log('Build', 'Will not build Preact project ' + input + ' because it already exists', 'info');
+                return done && done();
+            } catch (err) { }
+        }
 
         fs.readFile(entryfile, { encoding : "utf8" }, (err, maincontent) => {
             if (err || !maincontent) {

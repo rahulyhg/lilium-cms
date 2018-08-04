@@ -1,5 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../data/api'
+import { storeLocal, getLocal } from '../data/cache';
 
 /**
  * BigList 
@@ -38,6 +39,10 @@ export class BigList extends Component {
             prepend : props.prepend || false,
             filters : {},
             toolbarConfig : props.toolbar || undefined
+        }
+
+        if (props.toolbar && props.toolbar.id) {
+            this.coldState.filters = getLocal("LML_LIST_FILTERS_" + props.toolbar.id) || {};
         }
     }
 
@@ -167,9 +172,14 @@ class BigListToolBar extends Component {
             title : props.title,
             id : props.id
         };
+
+        this.coldValues = getLocal("LML_LIST_FILTERS_" + props.id) || {};
     }
 
     fieldChanged(ev) {
+        this.coldValues[ev.target.name] = ev.target.value;
+        storeLocal("LML_LIST_FILTERS_" + this.props.id, this.coldValues);
+
         this.props.fieldChanged && this.props.fieldChanged(ev.target.name, ev.target.value);
     }
 
@@ -179,7 +189,7 @@ class BigListToolBar extends Component {
                 return (
                     <div class="big-list-tool-wrap">
                         <b>{field.title}</b>
-                        <select onChange={this.fieldChanged.bind(this)} name={field.name}>
+                        <select onChange={this.fieldChanged.bind(this)} name={field.name} value={this.coldValues[field.name] || ""}>
                             {
                                 field.options.map(opt => (<option value={opt.value}>{opt.text}</option>))
                             }
@@ -192,7 +202,7 @@ class BigListToolBar extends Component {
                 return (
                     <div class="big-list-tool-wrap">
                         <b>{field.title}</b>
-                        <input type="checkbox" onChange={this.fieldChanged.bind(this)} name={field.name} />
+                        <input checked={this.coldValues[field.name] || false} type="checkbox" onChange={this.fieldChanged.bind(this)} name={field.name} />
                     </div>
                 );
             } break;
@@ -202,15 +212,11 @@ class BigListToolBar extends Component {
                 return (
                     <div class="big-list-tool-wrap">
                         <b>{field.title}</b>
-                        <input type="text" onKeyUp={this.fieldChanged.bind(this)} name={field.name} />
+                        <input value={this.coldValues[field.name] || ""} type="text" onKeyUp={this.fieldChanged.bind(this)} name={field.name} />
                     </div>
                 );
             }
         }
-    }
-
-    componentDidMount() {
-
     }
 
     render() {

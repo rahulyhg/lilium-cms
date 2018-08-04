@@ -6,8 +6,6 @@ var log = require('./log.js');
 var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
-var tableBuilder = require('./tableBuilder.js');
-var formBuilder = require('./formBuilder.js');
 var cli = require('./cli.js');
 
 var ActiveTheme = new Object();
@@ -77,13 +75,10 @@ var Themes = function () {
     };
 
     this.updateThemeSettings = function (cli) {
-        var form = formBuilder.handleRequest(cli);
-        var formData = formBuilder.serializeForm(form);
-
-        if (formData) {
-            db.update(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, {settings : formData}, function(err, res) {
+        if (cli.postdata.data) {
+            db.update(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, {settings : cli.postdata.data}, function(err, res) {
                 if (err) throw new Error("[ThemeException] Error while updating theme settings " + err);
-                ActiveTheme[cli._c.id].settings = formData;
+                ActiveTheme[cli._c.id].settings = cli.postdata.data;
                 cli.refresh();
             });
         } else {
@@ -212,39 +207,7 @@ var Themes = function () {
 
     var createOrUpdateThemeForm = function (config) {
         var defaults = {};
-        var formName = 'theme_settings_' + config.uid;
 
-        log('Themes', 'Recreating form ' + formName);
-        if (formBuilder.isAlreadyCreated(formName)) {
-            formBuilder.deleteForm(formName);
-        }
-
-        var form = formBuilder.createForm(formName, {
-            fieldWrapper: {
-                tag: 'div',
-                cssPrefix: 'theme-setting-field-'
-            },
-            cssClass: 'theme-settings-form'
-        });
-        form.add('formsetting-sep', 'title', {
-            displayname : 'Theme Settings (' + ActiveTheme[config.id].info.uName + ')'
-        });
-
-        for (var name in ActiveTheme[config.id].info.settingForm) {
-            var property = ActiveTheme[config.id].info.settingForm[name];
-            if (property.type == 'submit') {
-                throw new Error('[Themes] - ILLEGAL form type "submit" for theme settings form.')
-            }
-
-            if (!property.default) {
-                throw new Error('[Themes] - The field "' + name + '" has no default value.');
-            }
-            defaults[name] = property.default;
-            form.add(name, property.type, property.attr || {}, property.validations || {required : false} );
-        }
-
-        form.add('Submit', 'submit', {displayname : 'Update Settings'} );
-            
         log("Themes", "Updated setting form")
         return defaults;
     };
@@ -338,31 +301,6 @@ var Themes = function () {
                 limit: [1]
             }, callback);
         }
-    };
-
-    this.table = function () {
-        tableBuilder.createTable({
-            name: 'theme',
-            endpoint: 'themes.table',
-            paginate: true,
-            searchable: true,
-            max_results: 10,
-            fields: [{
-                key: 'dName',
-                displayname: 'Name',
-                sortable: true
-            }, {
-                key: '',
-                displayname: 'Actions',
-                template: 'table-themes-actions',
-                sortable: true,
-                sortkey: 'active'
-            }, {
-                key: 'entry',
-                displayname: 'Entry Script',
-                sortable: true
-            }, ]
-        });
     };
 
     this.initializeSite = function (conf, cb) {

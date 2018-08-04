@@ -17,9 +17,9 @@ export default class PublishingTab extends Component {
     render() {
         log('Publishing', 'Rendering publishing pane with ' + this.props.levels.length + ' levels', 'detail');
         if (this.props.levels.length == 0) {
-            return (<ListView />);
+            return (<ListView session={this.props.session} />);
         } else if (this.props.levels[0] == "write") {
-            return (<EditView postid={this.props.levels[1]} />)
+            return (<EditView session={this.props.session} postid={this.props.levels[1]} />)
         } else {
             navigateTo("/publishing");
         }

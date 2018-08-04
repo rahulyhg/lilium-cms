@@ -3,7 +3,6 @@
  * @return {[FormBuilder]} [The FormBuilder as a node module]
  */
 
-var htmlParser = require('./htmlParser');
 var validator = require('validator');
 var hooks = require('./hooks.js');
 var log = require('./log.js');
@@ -107,7 +106,6 @@ var FormBuilder = function() {
     };
 
     this.registerFieldType = function(name, fct) {
-        htmlParser.registerType(name, fct);
     };
 
     this.beginSection = function(sectionName, conditions) {
@@ -258,8 +256,6 @@ var FormBuilder = function() {
                 required: false
             }, forms[formName]);
         }
-
-        return htmlParser.parseForm(forms[formName], formContext || "noctx", filledBy);
     };
 
     /**
