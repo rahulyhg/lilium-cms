@@ -168,7 +168,7 @@ export class Header extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            session : undefined,
+            session : props.session,
             totalRT : 0,
             ready : false
         }
