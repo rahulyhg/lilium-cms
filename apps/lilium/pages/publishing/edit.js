@@ -69,8 +69,6 @@ export default class EditView extends Component {
 
         return (
             <div>
-                <h1>Publishing</h1>
-
                 <div style={{ padding : 10 }}>
                     <TextField initialValue={this.state.post.title[0]} placeholder="Title" placeholderType="inside" wrapstyle={{ marginBottom: 10 }} style={{ fontFamily : '"Oswald", sans-serif', fontSize : 32 }} />
                     <TextField initialValue={this.state.post.subtitle[0]} placeholder="Subtitle" placeholderType="inside" />

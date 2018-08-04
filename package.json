@@ -7,8 +7,7 @@
     "test": "node gardener.js crash-on-error",
     "build": "",
     "dev": "node gardener.js dev",
-    "start": "node index.prod.js",
-    "setup": "npm install && sudo npm install bower -g && bower install"
+    "start": "node index.prod.js"
   },
   "repository": {
     "type": "git",
@@ -74,7 +73,6 @@
     "babel-preset-preact": "^1.1.0",
     "base32-encode": "^1.1.0",
     "binaryjs": "latest",
-    "bower": "^1.8.4",
     "buffertools": "latest",
     "busboy": "latest",
     "canvas": "^2.0.0-alpha.12",

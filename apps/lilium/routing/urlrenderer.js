@@ -85,6 +85,10 @@ export class URLRenderer extends Component {
         this.refreshPath();
     }
 
+    componentWillReceiveProps(props) {
+
+    }
+
     componentWillUnmount() {
         document.removeEventListener('menuslid', this.menuslid_bound)
     }
@@ -120,7 +124,7 @@ export class URLRenderer extends Component {
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
             <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
-                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} />
+                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} session={this.props.session} />
             </div>
         )
     }
