@@ -67,7 +67,11 @@ export default class ListView extends Component {
                 type : "select",
                 name : "author",
                 title : "Author",
-                options : users.map(u => { return { value : u._id, text : u.displayname } })
+                options : [
+                    { value : "", text : "Anyone" }, 
+                    { value : this.props.session._id, text : "Me" }, 
+                    ...users.map(u => { return { value : u._id, text : u.displayname } })
+                ]
             });
 
             const toolbarbuilder = new BigListToolBarBuilder();
