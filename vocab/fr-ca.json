@@ -1,3 +1,11 @@
 {
-
+    "dashboard": {},
+    "devtools": {},
+    "errors": {},
+    "me": {
+        "title": "Page de Profil",
+        "subtitle": "Gérez votre profil"
+    },
+    "publishing": {},
+    "translations": {}
 }

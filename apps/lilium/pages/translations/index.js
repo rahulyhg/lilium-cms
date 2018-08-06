@@ -1,7 +1,7 @@
 import { h, Component } from "preact";
 import  { setPageCommands } from '../../layout/lys.js';
 import { getSupportedLanguages } from '../../vocab/vocab.js';
-import{ TextField } from '../../widgets/form.js';
+import{ TextField, EditableText } from '../../widgets/form.js';
 import API from '../../data/api';
 
 const style = {
@@ -22,7 +22,7 @@ const style = {
     },
     langInputWrapper: {
         alignSelf: 'center',
-        flex: '1',
+        flexGrow: '1',
         margin: '2px 8px'
     }
 };
@@ -32,7 +32,7 @@ class Field extends Component {
         super(props);
 
         this.state = {
-            field: this.props.field
+            field: this.props.field,
         }
     }
 
@@ -42,16 +42,21 @@ class Field extends Component {
         this.props.onUpdate(this.state.field.slug, lang, val);
     }
 
+    updateSlugName(name, val) {
+        alert('Changing slug name' + name + ' ' + val);
+    }
+
     render() {
         return (
             <div className="field" style={style.field}>
-                <p className="slug" style={style.fieldSlug} title={this.state.field.slug}>{this.state.field.slug}</p>
+                
+                <TextField name={this.state.field.slug} initialValue={this.state.field.slug} onChange={this.updateSlugName.bind(this)} wrapstyle={style.fieldSlug} />
                 {
-                    getSupportedLanguages().map(lang => {
-                        return (
-                            <TextField type="text" name={`${this.state.field.slug}-${lang}`} initialValue={this.state.field[lang]}
+                    Object.keys(this.state.field).map(lang => {
+                        return lang != 'slug' && (
+                            <TextField name={`${this.state.field.slug}-${lang}`} initialValue={this.state.field[lang]}
                                         wrapstyle={style.langInputWrapper} placeholderType='inside' placeholder={lang}
-                                        onChange={this.prepSlugUpdate.bind(this)} />
+                                        onChange={this.prepSlugUpdate.bind(this)} onEnter={this.props.insertAfter.bind(this)} />
                         )
                     })
                 }
@@ -78,14 +83,31 @@ class PageTranslation extends Component {
         this.props.onUpdate(this.state.page.name, slug, lang, newValue);
     }
 
+    insertAfter(slug) {
+        alert('insert after');
+        let index = this.state.page.fields.findIndex(f => f.slug == slug);
+        if (index != -1) {
+            const newVal = { slug:'' };
+            this.props.supportedLanguages.forEach(lang => {
+                newVal[lang] = '';
+            });
+            const fields = [...this.state.page.fields.splice(0, index + 1), newVal, ...this.state.page.fields];
+
+            const old = this.state.page;
+            old.fields = fields;
+
+            this.setState({ page: old });
+        }
+    }
+
     render() {
         return (
             <div className="page-translation" style={style.page}>
-                <h2>{this.state.page.name}</h2>
+                <h2>{this.props.pageName}</h2>
                 {
                     this.state.page.fields.map(field => {
                         return (
-                            <Field field={field} onUpdate={this.proxySlugUpdate.bind(this)} />
+                            <Field field={field} onUpdate={this.proxySlugUpdate.bind(this)} insertAfter={this.insertAfter.bind(this)} />
                         );
                     })
                 }
@@ -98,8 +120,9 @@ export default class Translations extends Component {
     constructor(props) {
         super(props);
 
+        this.supportedLanguages = [];
         this.state = {
-            pagesTranslations: []
+            pagesTranslations: {}
         };
     }
 
@@ -111,42 +134,88 @@ export default class Translations extends Component {
      * @param {string} newValue THe new value
      */
     updateSlug(pageName, slug, lang, newValue) {
-        alert('Updating slug ' + pageName + slug + lang + newValue);
-        // API.post('/updateLanguageSlug', { pageName, slug, lang, newValue }, (err, data) => {
-        //     if (!err) {
-        //         alert('updated slug!');
-        //     }
-        // });
+        API.post('/translations/updateLanguageSlug', { pageName, slug, lang, newValue }, (err, data) => {
+            if (!err) {
+                alert('updated slug!');
+            }
+        });
     }
 
-    rebuildTranslations() {
-        log('Vocab','Rebuilding translations', 'info');
+    getSupportedLanguages(done) {
+        API.get('/translations/getSupportedLanguages', {}, (err, data) => {
+            if (!err) {
+                done && done(data);
+            } else {
+                log('Translations', 'Failed to get supported languages', 'err');
+                console.log(err);
+            }
+        });
+    }
+
+    getPages(done) {
+        API.get('/translations/getPages', {}, (err, data) => {
+            if (!err) {
+                done && done(data);
+            }
+        });
+    }
+    
+    getLangResources(done) {
+        API.get('/translations/getAllLanguageResources', {}, (err, languageResources) => {
+            if (!err) {
+                console.log(languageResources);
+                done && done(languageResources);
+            } else {
+                console.log(err);
+            }
+        });        
     }
 
     componentDidMount() {
-        setPageCommands([
-            {
-                command : "translation-rebuild",
-                displayname : "Rebuild Translations",
-                execute : this.rebuildTranslations.bind(this)
-            }
-        ]);
+        this.getSupportedLanguages(supportedLanguages => {
+            this.supportedLanguages = supportedLanguages;
+        });
 
-        this.setState({
-            pagesTranslations: [
-                {
-                    name: 'me',
-                    fields: [
-                        { slug: 'loginInfoTitle', en: 'Login Information', fr: 'Informations de connexion' },
-                        { slug: 'passwordResetTitle', en: 'Reset Password', fr: 'Réinitialiser mon mot de passe' },
-                    ]
-                }, {
-                    name: 'dashboard',
-                    fields: [
-                        { slug: 'welcomeMessage', en: 'Welcome!', fr: 'Bienvenue!' }
-                    ]
-                },
-            ]
+        this.getMappedLangData(mapped => {
+            this.setState({ pagesTranslations: mapped });
+            console.log('state', this.state);
+        });
+    }
+
+    /**
+     * Gets the multilingual data and remaps it for it to be edited
+     * @param {callback} done 
+     */
+    getMappedLangData(done) {
+        // What will be returned 
+        const mapped = {};
+        this.getPages(pages => {
+            this.getLangResources(vocab => {
+                console.log('Vocab', vocab);
+                // For each page keys, we will assign a single field named "fields" which is an array 
+                try {
+                    pages.forEach(page => {
+                        mapped[page] = {
+                            fields : Object.keys(vocab.enca[page]).map(slug => {
+                                // We map on the current page slugs (i.e. title, subtitle, profileHeader)
+                                const perLang = {slug};
+        
+                                // For each language we support, find the translation per slug
+                                Object.keys(vocab).forEach(lang => {
+                                    perLang[lang] = vocab[lang][page][slug];
+                                });
+        
+                                // Set slug, spread all languages into one final object to be added in "fields" array or current page
+                                return perLang;
+                            })
+                        };
+                    });
+        
+                    done && done(mapped);
+                } catch (e) {
+                    log('Translations', 'Error mapping language data : ' + e, 'err');
+                }
+            });
         });
     }
 
@@ -155,10 +224,20 @@ export default class Translations extends Component {
             <div id="translations">
                 <h1>Translations</h1>
                 <div id="pages">
+                    <div id="headers" style={Object.assign({}, style.field, { marginLeft: '50px' })}>
+                        <h4 style={style.fieldSlug}>Slug</h4>
+                        {
+                            this.supportedLanguages.map(language => {
+                                return (<h4 style={style.langInputWrapper}>{language}</h4>)
+                            })
+                        }
+                    </div>
                     {
-                        this.state.pagesTranslations.map(page => {
+                        Object.keys(this.state.pagesTranslations).map(pageName => {
+                            console.log(pageName);
                             return (
-                                <PageTranslation page={page} onUpdate={this.updateSlug} />
+                                <PageTranslation pageName={pageName} page={this.state.pagesTranslations[pageName]}
+                                                supportedLanguages={this.supportedLanguages} onUpdate={this.updateSlug} />
                             );
                         })
                     }

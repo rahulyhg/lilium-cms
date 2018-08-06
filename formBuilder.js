@@ -72,6 +72,7 @@ var FormBuilder = function() {
         }
         if (!auto) {
             if (typeof forms[name] !== 'undefined') {
+                console.log(forms[name]);
                 var err = new Error("[FormBuilderException] - Form already created : " + name);
                 log('FormBuilder', err, 'warn');
                 return;

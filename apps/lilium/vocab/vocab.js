@@ -1,5 +1,5 @@
 const SUPPORTED_LANGUAGES = [
-    'en', 'fr', 'sp'
+    'en', 'fr'
 ];
 
 exports.getSupportedLanguages = () => {
@@ -19,5 +19,3 @@ exports.setLanguage = (langCode, done) => {
         console.log(myJson);
     });    
 }
-
-

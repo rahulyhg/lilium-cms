@@ -1,9 +1,12 @@
 {
-	"logintitle" : "Login",
-	"username" : "Username",
-	"password" : "Password",
-	"loginaction" : "Login",
-	"admintitle" : "Admin",
-	"plugins" : "Plugins",
-	"themes" : "Themes"
+    "dashboard": {
+        "title": "Dashboard"
+    },
+    "devtools": {},
+    "errors": {},
+    "me": {
+        "title": "Profile Page"
+    },
+    "publishing": {},
+    "translations": {}
 }
