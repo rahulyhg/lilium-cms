@@ -654,6 +654,8 @@ class ContentLib {
                     } else if (fullpost.fulltopic) {
                         fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
                     }
+
+                    fileserver.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html");
                 }, true);
             });
         });
