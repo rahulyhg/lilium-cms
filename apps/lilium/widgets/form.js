@@ -101,15 +101,24 @@ export class SelectField extends FormField {
 }
 
 export class TextField extends FormField {
+    handleKeyPress(ev) {
+        if (ev.key == 'Enter') {
+            alert('enter');
+            this.props.onEnter && this.props.onEnter();
+        }
+    }
+
     render() {
         return (
-            <div style={Object.assign(styles.fieldwrap, this.props.wrapstyle || {})}>
+            <div style={Object.assign({}, styles.fieldwrap, this.props.wrapstyle || {})}>
                 { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
 
                 {
                     this.props.multiline ? 
-                        ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} onChange={this.changed.bind(this)}>{this.value || ""}</textarea>) :
-                        ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value} onChange={this.changed.bind(this)} />)
+                        ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} 
+                                    onChange={this.changed.bind(this)}>{this.value || ""} onKeyPress={this.handleKeyPress.bind(this)} </textarea>) :
+                        ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
+                                    onChange={this.changed.bind(this)} onKeyPress={this.handleKeyPress.bind(this)} />)
                 }
             </div>
         )
@@ -117,18 +126,39 @@ export class TextField extends FormField {
 }
 
 
-class EditableText extends TextField {
+export class EditableText extends FormField {
 
-    onBlur() {
-        this.props.onBlur && this.props.onBlur();
+    constructor(props) {
+        super(props);
+
+        this.state.editing = false;
+    }
+
+    handleBlur(ev) {
+        log('EditableText', 'BLUR', 'success');
+        const oldValue = this.value;
+        
+        if (this.value != oldValue) {
+            this.value = ev.target.value;
+            this.props.onChange && this.props.onChange(this.props.name, ev.target.value, oldValue);
+        }
+  
+        this.setState({ editing: false });
     }
 
     render() {
+        log('EditableText', 'RENDER', 'success');
         return (
-            <div style={Object.assign(styles.fieldwrap, this.props.wrapstyle || {})}>
+            <div style={Object.assign({}, styles.fieldwrap, this.props.wrapstyle || {})}>
                 { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
 
-                <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value} onChange={this.changed.bind(this)} onBlure={this.onBlur.bind(this)} />
+                {
+                    this.state.editing ?
+                        (this.props.multiline ? 
+                            ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} onBlur={this.handleBlur.bind(this)}>{this.value || ""}</textarea>) :
+                            ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value} onBlur={this.handleBlur.bind(this)} />))
+                        : ( <p onClick={() => { this.setState({ editing: true }) }}>{this.value}</p> )
+                }
             </div>
         )
     }
