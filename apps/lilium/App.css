@@ -312,6 +312,18 @@ h1 {
     padding: 12px;
 }
 
+.big-list-empty-template {
+    padding: 20px;
+    background: white;
+    border-radius: 6px;
+    display: block;
+    margin: 100px auto 0;
+    box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
+    font-size: 20px;
+    color: #999;
+    font-weight: 100;
+}
+
 .article-list-thumbnail img {
     width: 300px;
     height: 200px;

@@ -20,7 +20,8 @@ export class Lys extends Component {
 
         this.shiftDown = false;
         this.keyUpBoxBinding = this.boxKeyUp.bind(this);
-        this.commands = [];
+
+        this.createCommandFromProp(props.menus);
     }
 
     componentDidMount() {
@@ -29,26 +30,30 @@ export class Lys extends Component {
         window.addEventListener('keyup', this.keyUp.bind(this));
     }
 
+    createCommandFromProp(menus) {
+        this.commands = [];
+        menus.map(x => {
+            return [{
+                command : x.displayname.toLowerCase(),
+                displayname : x.displayname,
+                icon : "fa " + x.faicon,
+                url : x.absURL.replace('admin', '')
+            }, ...x.children.map( y => {
+                return {
+                    command : y.displayname.toLowerCase(),
+                    displayname : y.displayname,
+                    icon : "fa " + y.faicon,
+                    url : y.absURL.replace('admin', '')
+                }
+            })];
+        }).forEach(x => this.commands.push(...x));
+
+        log('Lys', 'Handling now ' + this.commands.length + ' built-in commands', 'success');
+    }
+
     componentWillReceiveProps(props) {
         if (props.menus) {
-            this.commands = [];
-            props.menus.map(x => {
-                return [{
-                    command : x.displayname.toLowerCase(),
-                    displayname : x.displayname,
-                    icon : "fa " + x.faicon,
-                    url : x.absURL.replace('admin', '')
-                }, ...x.children.map( y => {
-                    return {
-                        command : y.displayname.toLowerCase(),
-                        displayname : y.displayname,
-                        icon : "fa " + y.faicon,
-                        url : y.absURL.replace('admin', '')
-                    }
-                })];
-            }).forEach(x => this.commands.push(...x));
-
-            log('Lys', 'Handling now ' + this.commands.length + ' built-in commands', 'success');
+            this.createCommandFromProp(props.menus);
         }
     }
 

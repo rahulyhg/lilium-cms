@@ -4,6 +4,7 @@ import { Header } from './layout/header'
 import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
 import { ImagePicker } from './layout/imagepicker';
+import { LoadingView } from './layout/loading';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
@@ -23,6 +24,7 @@ class Lilium extends Component {
     constructor(props) {
         super(props);        
         this.state = {
+            loading : true
             /* session, menus, headerTitle */
         };
 
@@ -48,17 +50,21 @@ class Lilium extends Component {
             { endpoint : "/notifications", params : {} }
         ], (resp) => {
             if (!resp["/me"] || !resp["/me"][0]) {
-                this.setState({ error : "session" });
+                this.setState({ error : "session", loading : false });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
                 resp["/me"].notifications = resp["/notifications"];
-                this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"] });            
+                this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false });            
             }   
         });
     }
 
     render() {
-        log('Lilium', 'Rendering Lilium application into DOM', 'layout');
+        log('Lilium', 'Rendering Lilium application into DOM', 'lilium');
+        if (this.state.loading) {
+            return (<LoadingView />);
+        }
+
         if (this.state.error) {
             return (
                 <div>Error loading Lilium : {this.state.error}</div>
