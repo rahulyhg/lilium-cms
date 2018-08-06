@@ -70,7 +70,8 @@
     "JSONStream": "latest",
     "admin-mongo": "latest",
     "animejs": "^2.2.0",
-    "babel-preset-preact": "^1.1.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-preact": "latest",
     "base32-encode": "^1.1.0",
     "binaryjs": "latest",
     "buffertools": "latest",
@@ -187,13 +188,13 @@
     "xxhashjs": "^0.2.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "unfetch": "^3.0.0",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
+    "babel-cli": "latest",
+    "babel-loader": "latest",
+    "babel-plugin-transform-react-jsx": "latest",
+    "babel-preset-env": "latest",
     "preact": "^8.2.9",
     "preact-dom": "^1.0.1",
+    "unfetch": "^3.0.0",
     "webpack": "^4.7.0"
   }
 }
