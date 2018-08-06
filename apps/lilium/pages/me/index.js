@@ -2,6 +2,7 @@ import { h, Component } from "preact";
 import API from '../../data/api';
 import { TextField, ButtonWorker } from '../../widgets/form';
 import { ImagePicker } from '../../layout/imagepicker';
+import { castNotification } from '../../layout/notifications';
 
 const style = {
     header: {
@@ -85,6 +86,16 @@ const style = {
     }
 };
 
+
+const asyncFieldUpdate = (name, value) => {
+    API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
+        if (!err)
+            log('ProfilePage', 'Updated field ' + name, 'success');
+        else
+            log('ProfilePage', 'Error updating field ' + name, 'error');
+    });
+}
+
 export default class ProfilePage extends Component {
 
     constructor(props) {
@@ -93,8 +104,6 @@ export default class ProfilePage extends Component {
         this.inputValues = {};
         this.state = {
             user: undefined,
-            qrCode: '',
-            token2fa: '',
             err: undefined
         };
     }
@@ -110,47 +119,58 @@ export default class ProfilePage extends Component {
                 }
 
                 this.setState({ user: data.user, err: undefined });
-
-                API.get('/2fa', {}, (err, data) => {
-                    if (!err && data) {
-                        this.setState({ qrCode: data.qrCode });
-                        log('ProfilePage', 'Got 2FA QRCode', 'success');
-                    } else {
-                        log('ProfilePage', 'Error fetching 2FA QRCode for Google Authnticator', 'error');
-                    }
-                });
             } else {
                 this.setState({ err });
             }
         });
     }
 
-    asyncFieldUpdate(name, value) {
-        API.post('/me/updateOneField', { field: name, value: value }, (err, data) => {
-            if (!err)
-                log('ProfilePage', 'Updated field ' + name, 'success');
-            else
-                log('ProfilePage', 'Error updating field ' + name, 'error');
-        });
+    render() {
+        if (this.state.user) {
+            return (
+                <div id="profile">
+                    <ProfileHeader user={this.state.user} />
+                    <div id="other-info" style={{margin: '14px'}}>
+                        <ContactInfo user={this.state.user} />
+                        <SocialMedia user={this.state.user} />
+
+                        <div id="login-info">
+                            <PasswordResetForm />
+                            <hr/>
+                            <Manage2FAForm user={this.state.user} />
+                        </div>
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div id="profile-error">
+                    <h3>There was an error when trying to retrieve your user info, are you loggedchange-placeholder in?</h3>
+                </div>
+            );
+        }
+    }
+}
+
+class ProfileHeader extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            user: this.props.user
+        }
     }
 
     asyncUpdateHeaderField(e) {
-        this.asyncFieldUpdate(e.target.name, e.target.value);
+        asyncFieldUpdate(e.target.name, e.target.value);
     }
 
-    updatePasswordField(name, value) {
-        this.inputValues[name] = value;
-    }
-
-    changePassword(done) {
-        if (this.inputValues.oldpassword && this.inputValues.newpassword
-            && this.inputValues.newpassword == this.inputValues.confirmnewpassword) {
-                API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
-                    done && done();
-                });
-        } else {
-            done && done();
-        }
+    /**
+     * Returns the appropriate image name fot e given badge level
+     * @param {number} level the level of the badge for which to return the image name
+     */
+    getBadgeImageName(level) {
+        // All badges from level 6 and on have the '4.png' image
+        return Math.min((Math.floor(level / 2) + 1), 4).toString() + ".png";
     }
 
     selectNewProfilePicture() {
@@ -165,21 +185,185 @@ export default class ProfilePage extends Component {
                         user.avatarURL = image.sizes.square.url;
                         this.setState({ user })
                     } else {
+                        console.log(err);
                         log('ProfilePage', 'Error updating profile picture', 'error');
                     }
                 });
             }
         });
     }
+  
+    render() {
+        return (
+            <div id="profile-header" style={style.header}>
+                <div id="core-info" style={style.coreInfo}>
+                    <div id="profile-picture-wrapper" style={style.coreInfo} >
+                        <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} onClick={this.selectNewProfilePicture.bind(this)} />
+                    </div>
+                    <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.user.username}`}</h3>
+                </div>
+
+                <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
+                    <input type="text" name="displayname" style={style.inputField} value={this.state.user.displayname}
+                                onChange={this.asyncUpdateHeaderField.bind(this)} />
+                    <input type="text" name="jobtitle" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'
+                                onChange={this.asyncUpdateHeaderField.bind(this)} />
+                    <textarea name="description" className='change-placeholder' id="descriptichange-placeholderon" cols="30" rows="8" 
+                                placeholder='Write a small introduction paragraph'
+                                style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.state.user.description}</textarea>
+                </div>
+
+                <div style={style.badgesContainer}>
+                    {
+                        this.props.user.badges.map(badge => {
+                            return (
+                                <span>
+                                    <div class="me-decoration level-1" style="filter: hue-rotate(70deg);">
+                                        <img src={`//narcity.localhost:8080/static/badges/${this.getBadgeImageName(badge.level)}`} style={style.badgeImage} />
+                                        <i class="fa fa fa-key"></i>
+                                    </div>
+                                </span>
+                            );
+                        })
+                    }
+                </div>
+            </div>
+        );
+    }
+}
+
+class ContactInfo extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div id="contact-info">
+                <h2 style={style.infoGroupTitle}>Contact Information</h2>
+
+                <TextField type="tel" name="phone" placeholder="Phone number" initialValue={this.props.user.phone}
+                        onChange={asyncFieldUpdate.bind(this)} />
+                <TextField type="email" name="email" placeholder="Email address" initialValue={this.props.user.email}
+                        onChange={asyncFieldUpdate.bind(this)} />
+            </div>
+        );
+    }
+}
+
+class SocialMedia extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div id="social-media">
+                <h2  style={style.infoGroupTitle}>Social Network</h2>
+
+                <TextField type='url' name='socialnetworks.facebook' placeholder='Facebook profile URL'
+                    initialValue={this.props.user.socialnetworks.facebook} onChange={asyncFieldUpdate.bind(this)} />
+
+                <TextField name='socialnetworks.twitter' placeholder="Twitter account name, without the '@'"
+                    initialValue={this.props.user.socialnetworks.twitter} onChange={asyncFieldUpdate.bind(this)} />
+
+                <TextField name='socialnetworks.googleplus' placeholder='Google Plus username'
+                    initialValue={this.props.user.socialnetworks.googleplus} onChange={asyncFieldUpdate.bind(this)} />
+
+                <TextField name='socialnetworks.instagram' placeholder="Instagram account name, without the '@'"
+                    initialValue={this.props.user.socialnetworks.instagram} onChange={asyncFieldUpdate.bind(this)} />
+            </div>
+        );
+    }
+}
+
+class PasswordResetForm extends Component {
+    constructor(props) {
+        super(props);
+
+        this.inputValues = {};
+    }
+
+    updatePasswordField(name, value) {
+        this.inputValues[name] = value;
+    }
+
+    changePassword(done) {
+        if (this.inputValues.oldpassword && this.inputValues.newpassword
+            && this.inputValues.newpassword == this.inputValues.confirmnewpassword) {
+                API.post('/me/updatePassword', { old: this.inputValues.oldpassword, new: this.inputValues.newpassword }, (err, data) => {
+                    if (!err) {
+                        castNotification({ title: 'Password updated', message: 'Successfully updated your password!', type: 'success' });
+                    } else {
+                        castNotification({ title: 'Error updating password', message: 'Error updating password!', type: 'success' });                        
+                    }
+
+                    done && done();
+                });
+        } else {
+            castNotification({
+                title: 'Error updating password',
+                message: "The 'current password', 'new password', and 'confirm new password' fields are mandatory and the 'new password' and 'confirm new password' fields must match",
+                type: 'success'
+            });
+            done && done();
+        }
+    }
+
+    render() {
+        return (
+            <div id="password-reset-form">
+                <h2 style={style.infoGroupTitle}>Login Information</h2>
+
+                <h2>Password</h2>
+
+                <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
+                <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
+                
+                <TextField type='password' name='oldpassword' placeholder='Current password'
+                        onChange={this.updatePasswordField.bind(this)} />
+                <TextField type='password' name='newpassword' placeholder='New password'
+                        onChange={this.updatePasswordField.bind(this)} />
+                <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
+                        onChange={this.updatePasswordField.bind(this)} />
+
+                <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} />
+            </div>
+        );
+    }
+}
+
+class Manage2FAForm extends Component {
+    constructor(props) {
+        super(props);
+        this.staate = {
+            confirmed2fa: this.props.user.confirmed2fa,
+            qrCode: '',
+            token2fa: ''
+        };
+    }
+
+    componentDidMount() {
+        API.get('/2fa', {}, (err, data) => {
+            if (!err && data) {
+                this.setState({ qrCode: data.qrCode });
+                log('ProfilePage', 'Got 2FA QRCode', 'success');
+            } else {
+                log('ProfilePage', 'Error fetching 2FA QRCode for Google Authnticator', 'error');
+            }
+        });
+    }
+    
 
     activate2fa(done) {
         API.post('/2fa/activate', {token2fa: this.state.token2fa}, (err, data) => {
             if (!err) {
-                const user = this.state.user;
-                user.confirmed2fa = true;
-                this.setState({ user });
+                this.setState({ confirmed2fa: true });
                 log('ProfilePage', 'Activated 2FA', 'success');
                 done && done();
+            } else {
+                console.log(err);
+                log('ProfilePage', 'Error activating 2FA', 'error');
             }
         });
     }
@@ -187,147 +371,45 @@ export default class ProfilePage extends Component {
     deactivate2fa(done) {
         API.post('/2fa/deactivate', {token2fa: this.state.token2fa}, (err, data) => {
             if (!err) {
-                const user = this.state.user;
-                user.confirmed2fa = false;
-                this.setState({ user });
+                this.setState({ confirmed2fa: false });
                 log('ProfilePage', 'Deactivated 2FA', 'success');
                 done && done();
+            } else {
+                console.log(err);
+                log('ProfilePage', 'Error Deactivating 2FA', 'error');
             }
         });
     }
 
-    /**
-     * Returns the appropriate image name fot e given badge level
-     * @param {number} level the level of the badge for which to return the image name
-     */
-    getBadgeImageName(level) {
-        // All badges from level 6 and on have the '4.png' image
-        return Math.min((Math.floor(level / 2) + 1), 4).toString() + ".png";
-    }
-
-    /**
-     * Returns a font awesome class in the form of 'fa-icon' from the classlist of a badge
-     * @param {string} classes string classes list returned from the server
-     */
-    getFonwAwesomeClass(classes) {
-
-    }
-
     render() {
-        if (this.state.user) {
-            return (
-                <div id="profile">
-                    <div id="profile-header" style={style.header}>
-                        <div id="core-info" style={style.coreInfo}>
-                            <div id="profile-picture-wrapper" style={style.coreInfo} >
-                                <img src={this.state.user.avatarURL} id="profile-picture" style={style.profilePicture} onClick={this.selectNewProfilePicture.bind(this)} />
-                            </div>
-                            <h3 id="username" style={{ alignSelf: 'center' }}>{`@${this.state.user.username}`}</h3>
-                        </div>
+        return (
+            <div id="2fa-f">
+                <h2>Two Factor Authentication</h2>
+                <p>
+                    Two Factor Authentication, '2FA' for short, is an extra layer of security you can apply on your Lilium account.
+                    It works by requiring that you provide a 6 digits code displayed by your smartphone in addition to your password when you login.
+                </p>
+                <p>To get started, follow these few steps :</p>
+                <ol>
+                    <li>
+                        Install the Google Authenticator application on your smartphone, the application is available on 
+                        <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" target='_blank'> Android </a>
+                        and on <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8" target='_blank'>iOS</a>.
+                    </li>
+                    <li>Inside Google Authenticator, tap the '+' icon to add an account.</li>
+                    <li>Choose the 'Scan a barcode' option.</li>
+                    <li>Center the QR Code displayed below in the designate area on your phone's screen, it will be detected automatically.</li>
+                    <li>You should now see an account named 'Lilium CMS &gt;company name&lt; (&gt;username&lt;). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
+                </ol>
 
-                        <div id="profile-info-wrapper" style={style.profileInfoWrapper}>
-                            <input type="text" name="displayname" style={style.inputField} value={this.state.user.displayname}
-                                         onChange={this.asyncUpdateHeaderField.bind(this)} />
-                            <input type="text" name="jobtitle" style={style.inputField} value={this.state.user.jobtitle || ''} placeholder='Job Title'
-                                         onChange={this.asyncUpdateHeaderField.bind(this)} />
-                            <textarea name="description" className='change-placeholder' id="descriptichange-placeholderon" cols="30" rows="8" 
-                                    placeholder='Write a small introduction paragraph'
-                                    style={style.textarea}  onChange={this.asyncUpdateHeaderField.bind(this)}>{this.state.user.description}</textarea>
-                        </div>
+                <img src={this.state.qrCode} id="qr-code-2fa" alt="" />
 
-                        <div style={style.badgesContainer}>
-                            {
-                                this.state.user.badges.map(badge => {
-                                    return (
-                                        <span>
-                                            <div class="me-decoration level-1" style="filter: hue-rotate(70deg);">
-                                                <img src={`//narcity.localhost:8080/static/badges/${this.getBadgeImageName(badge.level)}`} style={style.badgeImage} />
-                                                <i class="fa fa fa-key"></i>
-                                            </div>
-                                        </span>
-                                    );
-                                })
-                            }
-                        </div>
-                    </div>
-                    <div id="other-info" style={{margin: '14px'}}>
-                        <div id="contact-info">
-                            <h2 style={style.infoGroupTitle}>Contact Information</h2>
+                <TextField name='token2fa' placeholder='2FA Token' onChange={(name, value) => this.setState({ token2fa: value })} />
 
-                            <TextField type="tel" name="phone" placeholder="Phone number" initialValue={this.state.user.phone}
-                                            onChange={this.asyncFieldUpdate.bind(this)} />
-                            <TextField type="email" name="email" placeholder="Email address" initialValue={this.state.user.email}
-                                            onChange={this.asyncFieldUpdate.bind(this)} />
-                        </div>
-                        <div id="social-media">
-                            <h2  style={style.infoGroupTitle}>Social Network</h2>
-
-                            <TextField type='url' name='socialnetworks.facebook' placeholder='Facebook profile URL'
-                                initialValue={this.state.user.socialnetworks.facebook} onChange={this.asyncFieldUpdate.bind(this)} />
-
-                            <TextField name='socialnetworks.twitter' placeholder="Twitter account name, without the '@'"
-                                initialValue={this.state.user.socialnetworks.twitter} onChange={this.asyncFieldUpdate.bind(this)} />
-
-                            <TextField name='socialnetworks.googleplus' placeholder='Google Plus username'
-                                initialValue={this.state.user.socialnetworks.googleplus} onChange={this.asyncFieldUpdate.bind(this)} />
-
-                            <TextField name='socialnetworks.instagram' placeholder="Instagram account name, without the '@'"
-                                initialValue={this.state.user.socialnetworks.instagram} onChange={this.asyncFieldUpdate.bind(this)} />
-                        </div>
-                        <div id="login-info">
-                            <h2 style={style.infoGroupTitle}>Login Information</h2>
-
-                            <h2>Password</h2>
-
-                            <p>If you ever forget your password, you can always click on "I have no idea what my password is" on the login page, and request a reset code via SMS. In order to receive the SMS, make sure you provided your phone number</p>
-                            <p>For <b>security</b> reasons, it's always a good practice to change your password on a regular basis.</p>
-                            
-                            <TextField type='password' name='oldpassword' placeholder='Current password'
-                                    onChange={this.updatePasswordField.bind(this)} />
-                            <TextField type='password' name='newpassword' placeholder='New password'
-                                    onChange={this.updatePasswordField.bind(this)} />
-                            <TextField type='password' name='confirmnewpassword' placeholder='Confirm new password'
-                                    onChange={this.updatePasswordField.bind(this)} />
-
-                            <ButtonWorker text='Change my password' work={this.changePassword.bind(this)} />
-
-                            <hr/>
-
-                            <h2>Two Factor Authentication</h2>
-                            <p>
-                                Two Factor Authentication, '2FA' for short, is an extra layer of security you can apply on your Lilium account.
-                                 It works by requiring that you provide a 6 digits code displayed by your smartphone in addition to your password when you login.
-                            </p>
-                            <p>To get started, follow these few steps :</p>
-                            <ol>
-                                <li>I
-                                    nstall the Google Authenticator application on your smartphone, the application is available on 
-                                    <a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" target='_blank'> Android </a>
-                                    and on <a href="https://itunes.apple.com/ca/app/google-authenticator/id388497605?mt=8" target='_blank'>iOS</a>.
-                                </li>
-                                <li>Inside Google Authenticator, tap the '+' icon to add an account.</li>
-                                <li>Choose the 'Scan a barcode' option.</li>
-                                <li>Center the QR Code displayed below in the designate area on your phone's screen, it will be detected automatically.</li>
-                                <li>You should now see an account named 'Lilium CMS &gt;company name&lt; (&gt;username&lt;). with a correspponding string of 6 digits that refreshes every 30 seconds.</li>
-                            </ol>
-
-                            <img src={this.state.qrCode} id="qr-code-2fa" alt="" />
-
-                            <TextField name='token2fa' placeholder='2FA Token' onChange={(name, value) => this.setState({ token2fa: value })} />
-
-                            <ButtonWorker text={`${(this.state.user.confirmed2fa) ? 'Deactivate' : 'Activate'} 2FA for my account`}
-                                            theme={(this.state.user.confirmed2fa) ? 'danger' : ''}
-                                            work={(this.state.user.confirmed2fa) ? this.deactivate2fa.bind(this) : this.activate2fa.bind(this)} />
-                        </div>
-                    </div>
-                </div>
-            );
-        } else {
-            return (
-                <div id="profile-error">
-                    <h3>There was an error when trying to retrieve your user info, are you loggedchange-placeholder in?</h3>
-                </div>
-            );
-        }
+                <ButtonWorker text={`${(this.state.confirmed2fa) ? 'Deactivate' : 'Activate'} 2FA for my account`}
+                        theme={(this.state.confirmed2fa) ? 'danger' : ''}
+                        work={(this.state.confirmed2fa) ? this.deactivate2fa.bind(this) : this.activate2fa.bind(this)} />
+            </div>
+        );
     }
 }

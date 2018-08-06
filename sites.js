@@ -168,7 +168,8 @@ var SiteInitializer = function (conf, siteobj) {
                     ["transform-react-jsx", { "pragma":"h" }]
                 ],
                 "presets" : ["es2015"]
-            }
+            },
+            dontOverwite : true
         });
 
         hooks.bindSite(conf, 'preactAppInjectionPhase', pkg => {

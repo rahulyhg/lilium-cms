@@ -836,7 +836,7 @@ class Entities {
             }
 
             db.find(_c.default(), 'entities', match, [], function(err, cur) {
-                cur.sort({displayname : 1}).toArray(function(err, arr) {
+                cur.project(simpProj).sort({displayname : 1}).toArray(function(err, arr) {
                     let revoked = [];
                     let active = [];
                     arr.forEach(x => {

@@ -8,9 +8,9 @@ export const TIMING = {
 }
 
 export const POST_STATUS = {
-    published : { w : "Published" },
-    deleted   : { w : "Back to draft" },
-    reviewing : { w : "Pending review" },
-    draft     : { w : "Draft" },
-    destroyed : { w : "Destroyed" }
+    published : { color : "#0d6aad", w : "Published" },
+    deleted   : { color : "#b7834e", w : "Back to draft" },
+    reviewing : { color : "#496540", w : "Pending review" },
+    draft     : { color : "#3f5463", w : "Draft" },
+    destroyed : { color : "#333333", w : "Destroyed" }
 };

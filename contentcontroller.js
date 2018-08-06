@@ -204,6 +204,13 @@ class ContentController {
             }
 
             contentlib.bunch(cli._c, params.filters, params.filters && params.filters.sort, params.max, (params.page - 1) * params.max, sendback);
+        } else if (levels[0] == "biglist") {
+            if (!cli.hasRight('editor')) {
+                params.filters = params.filters || {};
+                params.filters.author = db.mongoID(cli.userinfo.userid);
+            }
+
+            contentlib.bunch(cli._c, params.filters, params.filters && params.filters.sort, params.limit, params.skip, sendback);
         } else if (levels[0] == "write") {
             contentlib.getFull(cli._c, levels[1], post => sendback(post));
         } else if (levels[0] == "auto") {

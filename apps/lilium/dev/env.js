@@ -1,6 +1,8 @@
 import API from '../data/api';
 import { h, Component } from 'preact';
 import { ImagePicker } from '../layout/imagepicker';
+import { castNotification } from '../layout/notifications';
+import { dumpCache } from '../data/cache';
 
 export function initializeDevEnv() {
     log('Dev', 'Initialize development environment', 'detail');
@@ -99,8 +101,29 @@ export class DevTools extends Component {
         this.setState({ hidden : true });
     }
 
+    testNotification(done) {
+        const hasTimeout = Math.random() > 0.5;
+        const type = ["success", "info", "warning", "error", "system"][Math.floor(Math.random() * 5)];
+
+        castNotification({
+            title : "Dev tools - " + (hasTimeout ? "With 5s timeout" : "Without timeout"),
+            message : "["+type+"] This is a lot of fun! Here's a random number : " + Math.random().toString().substring(2),
+            type : type,
+            timeout : hasTimeout ? 5000 : 0
+        });
+
+        done();
+    }
+
     toggle() {
         this.setState({ hidden : !this.state.hidden });
+    }
+
+    dumpApplicationCache(done) {
+        log('Dev', 'Application cache dumped : ', 'lilium');
+        console.log(dumpCache());
+        
+        done();
     }
 
     render() {
@@ -126,6 +149,8 @@ export class DevTools extends Component {
                     <div>
                         <DevTool click={this.bundleJS.bind(this)}>Bundle JS</DevTool>
                         <DevTool click={this.pickimage.bind(this)}>Image picker</DevTool>
+                        <DevTool click={this.testNotification.bind(this)}>Cast notification</DevTool>
+                        <DevTool click={this.dumpApplicationCache.bind(this)}>Dump cache in console</DevTool>
                     </div>
                 ) }
             </div>
