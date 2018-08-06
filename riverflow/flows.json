@@ -20,9 +20,9 @@
             "endpoint" : "login",
             "support" : ["api_get", "api_post"]
         }, {
-            "module" : "proofreader.js",
-            "endpoint" : "proofread",
-            "support" : ["setup"]
+            "module": "twoFactor.js",
+            "endpoint": "2fa",
+            "support": ["livevar", "admin_post"]
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
@@ -147,6 +147,10 @@
             "hooks" : [
                 {"name" : "settings_saved", "priority" : 1000, "callback" : "settingsSaved"}
             ]
+        }, {
+            "module" : "build.js",
+            "endpoint" : "build",
+            "support" : ["admin_post"]
         }, {
             "module" : "communications.js",
             "endpoint" : "communications",
@@ -430,5 +434,5 @@
                 }]
             }
         }       
-    ]   
+    ]
 }

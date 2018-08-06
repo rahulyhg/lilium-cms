@@ -2,6 +2,7 @@ const log = require('../log.js');
 const net = require('net');
 
 const mem = {
+    roles: {},
     cache : {},
     sockets : {},
     sessions : {},
@@ -60,7 +61,7 @@ const remCache = (kv) => {
     return JSON.stringify(resp);
 };
 
-const getCache = (keys) => {
+const getCache = keys => {
     if (typeof keys == "object") {
         let resp = {};
 
@@ -72,7 +73,20 @@ const getCache = (keys) => {
     } else {
         return mem.cache[keys];
     }
-}
+};
+
+const updateRightsInCachedSessions = name => {
+    Object.keys(mem.sessions).forEach(token => {
+        const sesh = mem.sessions[token];
+        if (sesh &&sesh.data.roles.includes(name)) {
+            sesh.data.rights = [];
+            sesh.data.roles.reduce((s, role) => {
+                mem.roles[name] && s.data.rights.push(...mem.roles[role].rights);
+                return s;
+            }, sesh);
+        };
+    });
+};
 
 class SharedMemory {
     onConnect(connection) {
@@ -97,6 +111,17 @@ class SharedMemory {
                             resp = JSON.stringify({session : mem.clerk[key]});
                             delete mem.clerk[key];
                         }
+                    } else if (object.roles) {
+                        let key = object.roles.role.name;
+                        if (object.roles.action == "set") {
+                            mem.roles[key] = object.roles.role;
+                            resp = '{"set" : true}';
+                        } else if (object.roles.action == "unset") {
+                            resp = JSON.stringify({session : mem.roles[key]});
+                            delete mem.roles[key];
+                        }
+
+                        updateRightsInCachedSessions(key);
                     } else if (object.session) {
                         let token = object.session.token;
 
@@ -176,6 +201,7 @@ class SharedMemory {
                     connection.end(resp);
                 } catch (ex) {
                     log('SharedMem', ex + " : " + json, 'err');
+                    log('SharedMem', ex.stack, 'warn');
                 }
             }
         });
@@ -187,6 +213,7 @@ class SharedMemory {
 
     onError(err) {
         log('SharedMem', err, 'err');
+        log('SharedMem', err.stack, 'warn');
     }
 
     bind() {
@@ -200,8 +227,8 @@ class SharedMemory {
             }
         }
 
-        this.server = net.createServer(this.onConnect);
-        this.server.on('error', this.onError);
+        this.server = net.createServer(this.onConnect); 
+        process.on('uncaughtException', this.onError);
         this.server.listen(!this.gdconf.useUDS ? {
             port : this.gdconf.cacheport,
             host : "localhost",

@@ -48,7 +48,7 @@ const SOCIAL_NETWORKS = {
 
 const ALLOWED_ME_FIELDS = [ 
     // Basic information
-    "displayname", "description", "email", "phone", "personality",
+    "displayname", "description", "email", "phone", "personality", 'jobtitle', 'avatarURL',
 
     // Social profiles
     "socialnetworks.facebook", "socialnetworks.twitter", "socialnetworks.instagram", "socialnetworks.googleplus"
@@ -215,7 +215,7 @@ class Entities {
         }
     };
 
-    adminPOST  (cli) {
+    adminPOST(cli) {
         cli.touch('entities.handlePOST');
         if (cli.routeinfo.path[1] == 'me') {
             if (cli.routeinfo.path[2] == "updateOneField") {
@@ -763,6 +763,13 @@ class Entities {
             }, function(err, arr) { 
                 callback(arr); 
             });
+        } else if (levels[0] == "me") {
+            require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => callback(data ? {
+                badges : data.badges,
+                huespin : data.huespin, 
+                levels : data.levels, 
+                user : data.items[0]
+            } : { error : "Not found" }));              
         } else if (levels[0] == "bunch") {
             const filters = params.filters;
             const $match = { };
