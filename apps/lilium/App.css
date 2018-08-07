@@ -310,6 +310,7 @@ h1 {
     display: flex;
     flex-wrap: wrap;
     padding: 12px;
+    justify-content : center;
 }
 
 .big-list-empty-template {
@@ -367,6 +368,57 @@ h1 {
 .article-list-headline {
     font-size: 16px;
     line-height: 22px;
+}
+
+.history-entry {
+    display: flex;
+    margin: 5px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.history-entry-avatar-wrap {
+    width: 40px;
+}
+
+.history-entry-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius : 4px;
+    object-fit: cover;
+}
+
+.history-entry-text {
+    width: 220px;
+    position: relative;
+    padding-bottom: 26px;
+}
+
+.history-entry-date {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    font-size: 12px;
+    color: #333;
+}
+
+.history-entry.history-entry-published {
+    border-top: 1px solid #367d2f;
+    border-bottom: 1px solid #367d2f;
+    background-color: #6ea967;
+    color: white;
+    margin: 10px 0px;
+    padding: 10px;
+}
+
+
+.history-entry.history-entry-created {
+    border-top: 1px solid #2f647d;
+    border-bottom: 1px solid #2f647d;
+    background-color: #58a4b5;
+    color: white;
+    margin: 10px 0px;
+    padding: 10px;
 }
 
 #image-picker-overlay {

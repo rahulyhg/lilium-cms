@@ -17,7 +17,8 @@ const styles = {
         background : "#F9F9F9",
         border : "1px solid #CCC",
         borderBottomWidth : 2,
-        color: "#333"
+        color: "#333",
+        outlineColor: "#c47ed4"
     },
     textarea : {
         resize : "none",
