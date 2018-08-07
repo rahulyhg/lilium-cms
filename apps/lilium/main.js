@@ -8,7 +8,7 @@ import { LoadingView } from './layout/loading';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
-import { initLocal } from './data/cache';
+import { initLocal, setSession } from './data/cache';
 import { NotificationWrapper } from './layout/notifications';
 import API from './data/api';
 
@@ -47,12 +47,14 @@ class Lilium extends Component {
         API.getMany([
             { endpoint : '/me', params : {} },
             { endpoint : "/adminmenus", params : {} },
-            { endpoint : "/notifications", params : {} }
+            { endpoint : "/notifications", params : {} },
+            { endpoint : "/entities/simple", params : {} }
         ], (resp) => {
             if (!resp["/me"] || !resp["/me"][0]) {
                 this.setState({ error : "session", loading : false });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
+                setSession("entities", resp["/entities/simple"]);
                 resp["/me"].notifications = resp["/notifications"];
                 this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false });            
             }   
