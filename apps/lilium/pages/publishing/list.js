@@ -2,6 +2,7 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import API from "../../data/api";
 import { BigList, BigListToolBarBuilder } from '../../widgets/biglist'
+import { getSession } from '../../data/cache';
 import { POST_STATUS } from '../../data/const'
 
 class PostListItem extends Component {
@@ -61,22 +62,21 @@ export default class ListView extends Component {
     }
 
     componentDidMount() {
-        API.get("/entities/simple/active", {}, (err, users) => {
-            const toolbarconfigs = ListView.TOOLBAR_CONFIG;
-            toolbarconfigs.fields.push({
-                type : "select",
-                name : "author",
-                title : "Author",
-                options : [
-                    { value : "", text : "Anyone" }, 
-                    { value : this.props.session._id, text : "Me" }, 
-                    ...users.map(u => { return { value : u._id, text : u.displayname } })
-                ]
-            });
+        const users = getSession("entities");
+        const toolbarconfigs = ListView.TOOLBAR_CONFIG;
+        toolbarconfigs.fields.push({
+            type : "select",
+            name : "author",
+            title : "Author",
+            options : [
+                { value : "", text : "Anyone" }, 
+                { value : this.props.session._id, text : "Me" }, 
+                ...users.map(u => { return { value : u._id, text : u.displayname } })
+            ]
+        });
 
-            const toolbarbuilder = new BigListToolBarBuilder();
-            this.setState({ toolbarConfig : toolbarbuilder.make(toolbarconfigs), ready : true })
-        }, true);
+        const toolbarbuilder = new BigListToolBarBuilder();
+        this.setState({ toolbarConfig : toolbarbuilder.make(toolbarconfigs), ready : true })
     }
 
     render() {
