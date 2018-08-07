@@ -826,6 +826,7 @@ class Entities {
             var simpProj = {
                 displayname : 1,
                 revoked : 1,
+                avatarURL : 1,
                 _id : 1
             };
         
