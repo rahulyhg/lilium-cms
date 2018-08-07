@@ -1,4 +1,0 @@
-{#config;forms}
-
-<h1>Create Campaign</h1>
-{=forms.render('campaign_create','new')}

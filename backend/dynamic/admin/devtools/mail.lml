@@ -1,4 +1,0 @@
-{#config;forms}
-<h1>Lilium Mailing system</h1>
-
-{=forms.render("devmail")}
