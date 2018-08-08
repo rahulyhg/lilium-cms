@@ -125,6 +125,15 @@ class HeaderRealtimeCounter extends Component {
     }
 }
 
+class HeaderJewels extends Component { 
+    constructor(props) {
+        super(props);
+        this.state.session = props.session;
+    }
+}
+
+
+
 class HeaderPageTitle extends Component {
     constructor(props) {
         super(props);
@@ -199,6 +208,7 @@ export class Header extends Component {
                     <HeaderRealtimeCounter />
                 </div>
                 <div class="header-section header-section-right">
+                    <HeaderJewels session={this.state.session} />
                     <HeaderUserDropdown session={this.state.session} />
                 </div>
             </header>
