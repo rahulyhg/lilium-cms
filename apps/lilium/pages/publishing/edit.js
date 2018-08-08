@@ -201,7 +201,9 @@ export default class EditView extends Component {
     }
 
     publish(done) {
-
+        this.save(() => {
+            
+        });
     }
 
     preview(done) {
