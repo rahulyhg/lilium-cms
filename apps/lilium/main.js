@@ -9,15 +9,17 @@ import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
 import { initLocal } from './data/cache';
 import { NotificationWrapper } from './layout/notifications';
+import { makeGLobalLang, setLanguage } from './data/vocab';
 import API from './data/api';
 
 // LILIUM_IMPORT_TEMPLATE
 
 makeGlobalLogger();
+makeGLobalLang();
 
 if (liliumcms.env == "dev") {
     initializeDevEnv();
-}
+}makeGLobalLang
 
 class Lilium extends Component {
     constructor(props) {
@@ -50,7 +52,10 @@ class Lilium extends Component {
                 this.setState({ error : "session" });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
-                this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"] });            
+                const currentLanguage = resp['/me'][0].language || 'en-ca';
+                setLanguage(currentLanguage, () => {
+                    this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], currentLanguage });
+                });
             }   
         });
     }

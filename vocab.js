@@ -34,7 +34,7 @@ class Vocab {
 
                     this.languagesData[langName] = langData;
 
-                    writeFileSync(path.join(liliumroot, 'vocab', langDirItem), JSON.stringify(langData, null, 4));
+                    writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem), JSON.stringify(langData));
                 } catch (e) {
                     log('Vocab', `Error opening language file ` + e.message, 'err');
                 }
@@ -54,9 +54,7 @@ class Vocab {
      * Returns an object containing the translation data for a language code
      * @param {string} langcode THe langcode of which to get the translations
      */
-    getLangData(langcode) {
-        return this.languagesData[langcode];replace
-    }
+    getLangData(langcode) { return this.languagesData[langcode]; }
 
     /**
      * Writes the language data held in RAM to the disk to ensure consistency after a restart

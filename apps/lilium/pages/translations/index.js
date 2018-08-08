@@ -223,7 +223,7 @@ export default class Translations extends Component {
             } else {
                 log('Translations', 'Failed to get language resource file', 'err');
             }
-        });        
+        });
     }
 
     componentDidMount() {
@@ -275,7 +275,7 @@ export default class Translations extends Component {
     render() {
         return (
             <div id="translations">
-                <h1>Translations</h1>
+                <h1>{_v('translations.title')}</h1>
                 <div id="pages">
                     <div id="headers" style={Object.assign({}, style.field, { marginLeft: '50px' })}>
                         <h4 style={style.fieldSlug}>Slug</h4>
