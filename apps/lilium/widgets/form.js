@@ -40,8 +40,8 @@ class FormField extends Component {
     }
 
     changed(ev) {
-        this.value = ev.target.value;
-        this.props.onChange && this.props.onChange(this.props.name, ev.target.value);
+        this.value = this.props.format ? this.props.format(ev.target.value) : ev.target.value;
+        this.props.onChange && this.props.onChange(this.props.name, this.value);
     }
 
     get isField() { return true; }
