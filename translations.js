@@ -22,25 +22,18 @@ class Translations {
         cli.touch("translations.adminPOST");
         if (cli.routeinfo.path[2] == 'updateLanguageSlug') {
             vocab.updateSlug(cli.postdata.data.lang, cli.postdata.data.pageName, cli.postdata.data.slug, cli.postdata.data.newValue, err => {
-                if (!err) {
-                    cli.sendJSON({ success: true })
-                } else {
-                    cli.sendJSON({ success: false });
-                }
+                cli.sendJSON({ success: !err })
             });
         } else if (cli.routeinfo.path[2] == 'updateSlugName') {
             vocab.updateSlugName(cli.postdata.data.pageName, cli.postdata.data.slug, cli.postdata.data.newName, err => {
-                if (!err)
-                    cli.sendJSON({ success: true })
-                else
-                    cli.sendJSON({ success: false });
+                cli.sendJSON({ success: !err })
             });
         } else if (cli.routeinfo.path[2] == 'removeField') {
             vocab.removeField(cli.postdata.data.pageName, cli.postdata.data.slug, err => {
-                cli.sendJSON({ success: true });
+                cli.sendJSON({ success: !err })
             });
         } else if (cli.routeinfo.path[2] == 'deleteSlug') {
-            cli.sendJSON({ success: true })
+            cli.sendJSON({ success: !err })
         } else {
             cli.throwHTTP(404, '', true);
         }
