@@ -1,4 +1,0 @@
-{#config;forms}
-<h1>Edit persona</h1>
-{=forms.render("persona_create")}
-{*persona.get.{?1}(sourceof:"persona_create")} 

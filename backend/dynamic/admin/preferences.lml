@@ -1,8 +1,0 @@
-{#config;forms}
-
-{*preferences.mine(template:"preferences_template",sourceof:"preferences")}
-{=forms.render("preferences")}
-
-<lml-template id="preferences_template">
-    <h1>My Lilium</h1>
-</lml-template>

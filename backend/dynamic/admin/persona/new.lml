@@ -1,7 +1,0 @@
-{#config;forms}
-<h1>Create new persona</h1>
-<span class="pad10">
-    <i class="fa fa-info-circle" aria-hidden="true"></i>
-    All fields are mandatory. Multiple persona examples are available <a target="_blank" href="https://docs.google.com/a/mtlblog.com/presentation/d/12bLqFuZW1zXv3zLZ7RYCiDWTpRwXlFUwCtim9p7UusA/edit?usp=sharing">here</a>. 
-</span>
-{=forms.render("persona_create")}

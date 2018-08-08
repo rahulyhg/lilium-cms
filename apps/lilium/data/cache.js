@@ -1,4 +1,5 @@
 const quickCache = {};
+const sessionCache = {};
 
 const LILIUM_CACHE_KEY = "LiliumV4";
 export const CACHEKEYS = {
@@ -24,6 +25,14 @@ export function storeLocal(key, value) {
 export function getLocal(key) {
     log('Cache', 'Accessing local cache at : ' + key, 'detail');
     return quickCache[key];
+}
+
+export function setSession(key, value) {
+    sessionCache[key] = value;
+}
+
+export function getSession(key) {
+    return sessionCache[key]
 }
 
 export function initLocal() {

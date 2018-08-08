@@ -376,7 +376,7 @@ class ContentLib {
 
     getHistoryList(_c, postid, sendback) {
         db.find(_c, 'contenthistory', { postid : db.mongoID(postid) }, [], (err, cur) => {
-            cur.sort({ _id : 1 }).project({ 
+            cur.sort({ _id : -1 }).project({ 
                 actor : 1, at : 1, type : 1, diffs : 1
             }).toArray((err, arr) => sendback(arr));
         });
@@ -654,6 +654,8 @@ class ContentLib {
                     } else if (fullpost.fulltopic) {
                         fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
                     }
+
+                    fileserver.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html");
                 }, true);
             });
         });

@@ -95,27 +95,9 @@ var Precomp = function () {
                     compileFiles(conf, themeFiles, histo, undefined, absWritePath, readycb, true, force, extra);
                 });
             });
-
         } else {
-            var absReadPath = conf.server.base + "backend/dynamic/precomp/";
-            var absWritePath = conf.server.html + "/compiled/admin/";
-
-            log('Precompiler', 'Precompiling static files', 'info');
-            fileserver.listDirContentRecursive(absReadPath, function (fileArr) {
-                // Read files registered
-                var files = [];
-                fileArr.forEach(function (file) {
-                    files.push(file.replace(absReadPath, ''));
-                });
-                fileArr = files;
-                db.findToArray(conf, 'compiledfiles', {style : null}, function (err, histo) {
-                    db.remove(conf, 'compiledfiles', {style : null}, function (remErr, res) {
-                        compileFiles(conf, fileArr, histo, absReadPath, absWritePath, readycb, false, force, extra)
-                    });
-                });
-            });
+            readycb();
         }
-
     };
 
     this.compileMultipleFiles = function(conf, lmlfiles, callback, extra) {

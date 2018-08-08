@@ -48,6 +48,10 @@ class API {
         API.request('POST', "/admin" + endpoint, {}, data, sendback);
     }
 
+    static put(endpoint, data, sendback) {
+        API.request('PUT', '/admin' + endpoint, {}, data, sendback);
+    }
+
     static rebuild() {
         log('Lilium', 'Rebuilding Lilium V4 Preact app', 'detail');
         API.post('/build/lilium', {}, () => { 
