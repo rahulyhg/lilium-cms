@@ -56,6 +56,10 @@ export class TextEditor extends Component {
         }
     }
 
+    shouldComponentUpdate() {
+        return false;
+    }
+
     changed() {
         this.props.onChange && this.props.onChange(this.props.name || this.rID, this.props.format ? this.props.format(this.getContent()) : this.getContent());
     }
