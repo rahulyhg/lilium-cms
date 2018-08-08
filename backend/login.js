@@ -19,7 +19,7 @@ const loginSuccess = (cli, userObj, cb) => {
             log('Login', 'Logged in user ' + userObj.username + " for the first time");
 
             entities.firstLogin(cli, userObj, () => {
-                cli.redirect(cli._c.server.url + '/admin/welcome', false);
+                cli.redirect(cli._c.server.url + '/lilium/welcome', false);
             });
         } else {
             entities.registerLogin(cli, userObj, () => {
@@ -33,7 +33,7 @@ const loginSuccess = (cli, userObj, cb) => {
                         hooks.fire('user_loggedin', { _c : cli._c, userObj, score : r.value ? r.value.login : 1 });
                         cli.sendJSON({
                             success : true,
-                            to : cli.routeinfo.params.to || (cli._c.server.url + "/admin")
+                            to : cli.routeinfo.params.to || (cli._c.server.url + "/lilium")
                         })
                     }, true, true, true, true);
                 }

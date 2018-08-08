@@ -1,6 +1,0 @@
-{#config}
-<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
-
-<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/bower/bootstrap/dist/css/bootstrap.min.css"/>
-<link type="text/css" rel="stylesheet" href="{=config.default.server.url}/compiled/lilium.css" />
-<script src="{=config.default.server.url}/compiled/admin.js?v=1.0.3"></script>
