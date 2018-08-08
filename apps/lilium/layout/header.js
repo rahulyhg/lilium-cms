@@ -125,14 +125,54 @@ class HeaderRealtimeCounter extends Component {
     }
 }
 
+class NotificationItem extends Component {
+
+}
+
+class NotificationJewel extends Component {
+    constructor(props) {
+        super(props);
+        this.state.notifications = props.session.notifications;
+        console.log(this.state);
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState({ notifications : props.session.notifications });
+    }
+
+    render() {
+        return (
+            <div class="header-jewel">
+                <div class="header-jewel-icon notification-dropdown-icon">
+                    <i class="far fa-inbox"></i>
+                </div>
+                <div class="notification-dropdown-list">
+                    <div>
+                        {this.state.notifications.unread.map(x => <NotificationItem unread={true} notification={x} />)}
+                    </div>
+                    <div>
+                        {this.state.notifications.read.map(x => <NotificationItem unread={false} notification={x} />)}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+}
+
 class HeaderJewels extends Component { 
     constructor(props) {
         super(props);
         this.state.session = props.session;
     }
+
+    render() {
+        return (
+            <div id="header-jewels">
+                <NotificationJewel session={this.state.session} />
+            </div>
+        );
+    }
 }
-
-
 
 class HeaderPageTitle extends Component {
     constructor(props) {
@@ -208,8 +248,8 @@ export class Header extends Component {
                     <HeaderRealtimeCounter />
                 </div>
                 <div class="header-section header-section-right">
-                    <HeaderJewels session={this.state.session} />
                     <HeaderUserDropdown session={this.state.session} />
+                    <HeaderJewels session={this.state.session} />
                 </div>
             </header>
         )

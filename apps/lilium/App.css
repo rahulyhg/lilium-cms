@@ -93,6 +93,22 @@ header {
     flex-direction: row-reverse;
 }
 
+.header-jewel {
+    height : 100%;
+}
+
+.header-jewel-icon {
+    width: 60px;
+    height: 100%;
+    display: block;
+    color: #CCC;
+    font-size: 18px;
+    text-align: center;
+    box-sizing: border-box;
+    padding-top: 12px;
+    cursor: pointer;
+}
+
 .dropdown-menu {
 
 }
@@ -241,6 +257,7 @@ h1 {
     transition: all 0.2s;        
     transform: translate3d(0px, 0px, 0px);
     opacity : 1;
+    display: block;
 
 }
 
