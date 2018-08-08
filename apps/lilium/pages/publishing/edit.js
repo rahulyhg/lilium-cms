@@ -189,7 +189,7 @@ export default class EditView extends Component {
                     });
                 } else {
                     castNotification({
-                        type : "warn",
+                        type : "warning",
                         title : "Article did not save",
                         message : `[${r.status}] Error message from Lilium.`
                     })
