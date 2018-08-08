@@ -48,7 +48,7 @@ class Vocab {
     /**
      * Returns an array containing the language codes of the supported languages
      */
-    getSUpportedLanguages() { ; console.log('get supported lang', this.supportedLanguages); return this.supportedLanguages; };
+    getSUpportedLanguages() { return this.supportedLanguages; };
 
     /**
      * Returns an object containing the translation data for a language code
@@ -115,12 +115,8 @@ class Vocab {
     }
 
     removeField(pageName, slug, done) {
-        console.log('allo', this.languagesData);
         this.supportedLanguages.forEach(lang => {   
             delete this.languagesData[lang][pageName][slug];
-            // const index = this.languagesData[lang][pageName].findIndex(x => x[slug]);
-            // console.log(index);
-            // this.languagesData[lang][pageName].splice(index, 1);
         });
 
         this.writeLangDataToDisk(done);

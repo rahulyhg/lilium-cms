@@ -19,7 +19,6 @@ class Translations {
     }
 
     adminPOST(cli) {
-        console.log('remove!');
         cli.touch("translations.adminPOST");
         if (cli.routeinfo.path[2] == 'updateLanguageSlug') {
             vocab.updateSlug(cli.postdata.data.lang, cli.postdata.data.pageName, cli.postdata.data.slug, cli.postdata.data.newValue, err => {

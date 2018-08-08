@@ -22,6 +22,17 @@ const style = {
         alignSelf: 'center',
         flexGrow: '1',
         margin: '2px 8px'
+    },
+    button: {
+        backgroundColor: 'red',
+        color: 'white',
+        display: 'flex',
+        alignContent: 'center',
+        justifyContent: 'center',
+        padding: '8px',
+        marginTop: '8px',
+        height: '100%',
+        cursor: 'pointer'
     }
 };
 
@@ -46,7 +57,7 @@ class Field extends Component {
     render() {
         return (
             <div className="field" style={style.field}>
-                <div className="remove-button" onClick={this.props.removeField.bind(this, this.state.field.slug)}>
+                <div className="remove-button" onClick={this.props.removeField.bind(this, this.state.field.slug)} style={style.button} >
                     <i className="fa fa-minus"></i>
                 </div>
                 <TextField name={this.state.field.slug} initialValue={this.state.field.slug} wrapstyle={style.fieldSlug}
@@ -107,7 +118,6 @@ class PageTranslation extends Component {
      * @param {string} newValue THe new value
      */
     updateSlug(slug, lang, newValue) {
-        alert(lang);
         API.post('/translations/updateLanguageSlug', { pageName: this.props.pageName, slug, lang, newValue }, err => {
             if (!err) {
                 log('Translations', `Updated slug ${slug} - ${lang}- ${this.props.pageName} with value ${newValue}`, 'success');
@@ -128,7 +138,6 @@ class PageTranslation extends Component {
      * @param {string} newName 
      */
     updateSlugName(slug, newName) {
-        alert('updateSLugName');
         API.post('/translations/updateSlugName', { pageName: this.props.pageName, slug, newName }, err => {
             if (!err) {
                 log('Translations', 'Updated slug name', 'success');
@@ -143,18 +152,22 @@ class PageTranslation extends Component {
     }
 
     removeField(slug) {
-        API.post('/translations/removeField', { pageName: this.props.pageName, slug }, err => {
-            if (!err) {
-                log('Translations', `Removed slug ${this.props.pageName}.${slug}`, 'success');
-                const index = this.state.page.fields.findIndex(x => x.slug == slug);
-                if (index != -1) {
-                    this.state.page.fields.splice(index, 1);
-                    this.setState(this.state);
+        if (this.state.page.fields.length > 1) {
+            API.post('/translations/removeField', { pageName: this.props.pageName, slug }, err => {
+                if (!err) {
+                    log('Translations', `Removed slug ${this.props.pageName}.${slug}`, 'success');
+                    const index = this.state.page.fields.findIndex(x => x.slug == slug);
+                    if (index != -1) {
+                        this.state.page.fields.splice(index, 1);
+                        this.setState(this.state);
+                    }
+                } else {
+                    log('Translations', 'Error while deleting language field', 'err');
                 }
-            } else {
-                console.log(err);
-            }
-        });
+            });
+        } else {
+            log('Translations', "Won't delete the last field of a page", 'warn');
+        }
     }
 
     render() {
@@ -191,7 +204,6 @@ export default class Translations extends Component {
                 done && done(data);
             } else {
                 log('Translations', 'Failed to get supported languages', 'err');
-                console.log(err);
             }
         });
     }
@@ -203,14 +215,13 @@ export default class Translations extends Component {
             }
         });
     }
-    
+
     getLangResources(done) {
         API.get('/translations/getAllLanguageResources', {}, (err, languageResources) => {
             if (!err) {
-                console.log(languageResources);
                 done && done(languageResources);
             } else {
-                console.log(err);
+                log('Translations', 'Failed to get language resource file', 'err');
             }
         });        
     }
@@ -222,7 +233,6 @@ export default class Translations extends Component {
 
         this.getMappedLangData(mapped => {
             this.setState({ pagesTranslations: mapped });
-            console.log('state', this.state);
         });
     }
 
@@ -235,7 +245,6 @@ export default class Translations extends Component {
         const mapped = {};
         this.getPages(pages => {
             this.getLangResources(vocab => {
-                console.log('Vocab', vocab);
                 // For each page keys, we will assign a single field named "fields" which is an array 
                 try {
                     pages.forEach(page => {
@@ -243,12 +252,12 @@ export default class Translations extends Component {
                             fields : Object.keys(vocab['en-ca'][page]).map(slug => {
                                 // We map on the current page slugs (i.e. title, subtitle, profileHeader)
                                 const perLang = {slug};
-        
+
                                 // For each language we support, find the translation per slug
                                 Object.keys(vocab).forEach(lang => {
                                     perLang[lang] = vocab[lang][page][slug];
                                 });
-        
+
                                 // Set slug, spread all languages into one final object to be added in "fields" array or current page
                                 return perLang;
                             })
@@ -278,7 +287,6 @@ export default class Translations extends Component {
                     </div>
                     {
                         Object.keys(this.state.pagesTranslations).map(pageName => {
-                            console.log(pageName);
                             return (
                                 <PageTranslation pageName={pageName} page={this.state.pagesTranslations[pageName]}
                                                 supportedLanguages={this.supportedLanguages} />
@@ -290,5 +298,3 @@ export default class Translations extends Component {
         );
     }
 }
-
-

@@ -1,11 +1,20 @@
 {
     "dashboard": {
-        "title": "Dashboard",
-        "ppopopopopo": "qweqweq"
+        "subtitle": ""
     },
-    "devtools": {},
-    "errors": {},
-    "me": {},
-    "publishing": {},
-    "translations": {}
+    "devtools": {
+        "subtitle": ""
+    },
+    "errors": {
+        "subtitle": ""
+    },
+    "me": {
+        "subtitle": ""
+    },
+    "publishing": {
+        "subtitle": ""
+    },
+    "translations": {
+        "subtitle": ""
+    }
 }

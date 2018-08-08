@@ -1,11 +1,20 @@
 {
     "dashboard": {
-        "title": "Dashboard",
-        "ppopopopopo": "asdas"
+        "subtitle": "Dashboard"
     },
-    "devtools": {},
-    "errors": {},
-    "me": {},
-    "publishing": {},
-    "translations": {}
+    "devtools": {
+        "subtitle": "Dev Tools"
+    },
+    "errors": {
+        "subtitle": "Errors"
+    },
+    "me": {
+        "subtitle": "Profile Page"
+    },
+    "publishing": {
+        "subtitle": "Publishing"
+    },
+    "translations": {
+        "subtitle": "Translations"
+    }
 }
