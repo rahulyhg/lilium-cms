@@ -17,7 +17,8 @@ const styles = {
         background : "#F9F9F9",
         border : "1px solid #CCC",
         borderBottomWidth : 2,
-        color: "#333"
+        color: "#333",
+        outlineColor: "#c47ed4"
     },
     textarea : {
         resize : "none",
@@ -40,7 +41,7 @@ class FormField extends Component {
 
     changed(ev) {
         const oldValue = this.value;
-        this.value = ev.target.value;
+        this.value = this.props.format ? this.props.format(ev.target.value) : ev.target.value;
         this.props.onChange && this.props.onChange(this.props.name, ev.target.value, oldValue);
     }
 

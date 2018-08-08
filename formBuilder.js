@@ -3,7 +3,6 @@
  * @return {[FormBuilder]} [The FormBuilder as a node module]
  */
 
-var htmlParser = require('./htmlParser');
 var validator = require('validator');
 var hooks = require('./hooks.js');
 var log = require('./log.js');
@@ -108,7 +107,6 @@ var FormBuilder = function() {
     };
 
     this.registerFieldType = function(name, fct) {
-        htmlParser.registerType(name, fct);
     };
 
     this.beginSection = function(sectionName, conditions) {
@@ -126,25 +124,6 @@ var FormBuilder = function() {
     };
 
     this.add = function(name, type, attr, requirements, contextForm, auto) {
-        if (typeof type === 'object') {
-            attr = type;
-            type = 'text';
-        }
-
-        // Check if it is a tempalte
-        currentForm = contextForm || currentForm;
-        if (typeof currentForm == 'undefined') {
-            throw new Error("[FormBuilderException] - Form not created. Please call createForm() first.");
-        }
-        if (typeof currentForm.fields == 'undefined') {
-            currentForm.fields = {};
-        }
-        if (typeof currentForm.fields[name] !== 'undefined') {
-            // throw new Error("[FormBuilderException - Field already added : " + name + " with value " + JSON.stringify(currentForm.fields[name]));
-            return this;
-        }
-
-        currentForm.fields[name] = createField(name, type, attr, currentForm.attr ? Object.assign(currentForm.attr.requirements || {}, requirements) : requirements);
         return this;
     };
 
@@ -244,6 +223,10 @@ var FormBuilder = function() {
     };
 
     this.render = function(formName, formContext, filledBy) {
+        log('FormBuilder', 'DEPRECATED call to .render', 'warn');
+        return;
+
+        /*
         log('FormBuilder', 'Rendering form with name : ' + formName, 'info');
         if (typeof forms[formName] === 'undefined') {
             log('FormBuilder', 'Tried to render undefined form with name : ' + formName, 'err');
@@ -259,8 +242,7 @@ var FormBuilder = function() {
                 required: false
             }, forms[formName]);
         }
-
-        return htmlParser.parseForm(forms[formName], formContext || "noctx", filledBy);
+        */
     };
 
     /**
@@ -270,6 +252,9 @@ var FormBuilder = function() {
      * @return {Array}err A stack of all the errors.
      */
     this.validate = function(form, callStack, cli) {
+        log('FormBuilder', 'DEPRECATED call to .validate', 'warn');
+        return true;
+
         var valid = false;
         // Return an error stack by default
         if (typeof callStack == 'undefined') {
@@ -376,6 +361,9 @@ var FormBuilder = function() {
      * @return {[type]}     [description]
      */
     this.handleRequest = function(cli) {
+        log('FormBuilder', 'DEPRECATED call to .handleRequest', 'warn');
+        return cli.postdata.data;
+
         if (typeof cli.postdata !== 'undefined') {
             if (typeof cli.postdata.data !== 'undefined' &&
                 typeof cli.postdata.data.form_name !== 'undefined' &&

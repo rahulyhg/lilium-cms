@@ -57,12 +57,14 @@ class Vocab {
     getLangData(langcode) { return this.languagesData[langcode]; }
 
     /**
-     * Writes the language data held in RAM to the disk to ensure consistency after a restart
+     * Writes the language data held in RAM to the disk to ensure consistency after a restart.
+     * Also writes the modifications to the /backend/static/compiled directory
      * @param {callback} done 
      */
     writeLangDataToDisk(done) {
         this.supportedLanguages.forEach(lang => {
-           writeFileSync(this.getLanguageFilePath(lang), JSON.stringify(this.languagesData[lang], null, 4));
+            writeFileSync(this.getLanguageFilePath(lang), JSON.stringify(this.languagesData[lang], null, 4));
+            writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', lang + '.json'), JSON.stringify(this.languagesData[lang]));
         });
 
         done && done();

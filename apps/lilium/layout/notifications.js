@@ -4,7 +4,7 @@ const styles = {
     wrapper : {
         position: "fixed",
         right: 0,
-        top: 50,
+        bottom: 0,
         padding: 10,
         zIndex: 20
     }

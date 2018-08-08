@@ -4,10 +4,11 @@ import { Header } from './layout/header'
 import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
 import { ImagePicker } from './layout/imagepicker';
+import { LoadingView } from './layout/loading';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
-import { initLocal } from './data/cache';
+import { initLocal, setSession } from './data/cache';
 import { NotificationWrapper } from './layout/notifications';
 import { makeGLobalLang, setLanguage } from './data/vocab';
 import API from './data/api';
@@ -25,7 +26,8 @@ class Lilium extends Component {
     constructor(props) {
         super(props);        
         this.state = {
-            /* session, menus */
+            loading : true
+            /* session, menus, headerTitle */
         };
 
         // Initialize cache
@@ -46,22 +48,30 @@ class Lilium extends Component {
         log('Lilium', 'Requesting current session information', 'lilium');
         API.getMany([
             { endpoint : '/me', params : {} },
-            { endpoint : "/adminmenus", params : {} }
+            { endpoint : "/adminmenus", params : {} },
+            { endpoint : "/notifications", params : {} },
+            { endpoint : "/entities/simple", params : {} }
         ], (resp) => {
             if (!resp["/me"] || !resp["/me"][0]) {
-                this.setState({ error : "session" });
+                this.setState({ error : "session", loading : false });
             } else {
                 log('Lilium', 'Hello, ' + resp["/me"][0].displayname + '!', 'success');
                 const currentLanguage = resp['/me'][0].language || 'en-ca';
                 setLanguage(currentLanguage, () => {
-                    this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], currentLanguage });
+                    setSession("entities", resp["/entities/simple"]);
+                    resp["/me"].notifications = resp["/notifications"];
+                    this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false, currentLanguage });            
                 });
             }   
         });
     }
 
     render() {
-        log('Lilium', 'Rendering Lilium application into DOM', 'layout');
+        log('Lilium', 'Rendering Lilium application into DOM', 'lilium');
+        if (this.state.loading) {
+            return (<LoadingView />);
+        }
+
         if (this.state.error) {
             return (
                 <div>Error loading Lilium : {this.state.error}</div>

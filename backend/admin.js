@@ -18,21 +18,16 @@ class AdminMenu {
         this.faicon = "";
         this.displayname = "";
         this.priority = -1;
-        this.rights = new Array();
+        this.rights = [];
         this.absURL = "";
-        this.children = new Array();
+        this.children = [];
     }
 };
 
 class Admin {
 	serveDashboard (cli) {
 		cli.touch('admin.serverDashboard');
-
-		if (cli.routeinfo.path.length == 1) {
-			cli.redirect(cli._c.server.url + "/admin/dashboard", false);
-		} else {
-			this.handleAdminEndpoint(cli);
-		}
+		this.handleAdminEndpoint(cli);
 	};
 
 	handleGETDashboard (cli) {
@@ -76,9 +71,7 @@ class Admin {
 	handleAdminEndpoint (cli) {
 		cli.touch('admin.handleAdminEndpoint');
     
-        if (cli.method === "GET" && !cli.routeinfo.params.async && cli.routeinfo.path[1] != "welcome") {
-            filelogic.serveAdminTemplate(cli);
-		} else if (this.adminEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
+        if (this.adminEndpointRegistered(cli.routeinfo.path[1], cli.method)) {
 			this.executeEndpoint(cli);
 		} else {
             cli.did('request', '404', {url : cli.routeinfo.fullpath});
@@ -168,16 +161,6 @@ class Admin {
 		let that = this;
 
 		require('../livevars.js').registerLiveVariable('adminmenus', (cli, levels, params, callback) => {
-            const sharedkey = "adminmenus_" + cli.userinfo.userid;
-            const sharedcache = require('../sharedcache.js');
-
-            /*
-            sharedcache.get(sharedkey, cachedmenus => {
-                if (cachedmenus) {
-                    return callback(cachedmenus);
-                }
-            */
-
             const sortedMenus = [];
             const menus = that.getAdminMenus();
 
@@ -198,13 +181,7 @@ class Admin {
                 }
             }
             
-            /*
-                sharedcache.set({
-                    [sharedkey] : sortedMenus
-                }, () => {*/
-                    callback(sortedMenus);
-            //    });
-            //});
+            callback(sortedMenus);
 		});
 	};
 

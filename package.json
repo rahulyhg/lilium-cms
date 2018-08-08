@@ -7,8 +7,7 @@
     "test": "node gardener.js crash-on-error",
     "build": "",
     "dev": "node gardener.js dev",
-    "start": "node index.prod.js",
-    "setup": "npm install && sudo npm install bower -g && bower install"
+    "start": "node index.prod.js"
   },
   "repository": {
     "type": "git",
@@ -71,10 +70,10 @@
     "JSONStream": "latest",
     "admin-mongo": "latest",
     "animejs": "^2.2.0",
-    "babel-preset-preact": "^1.1.0",
+    "babel-plugin-transform-object-rest-spread": "^6.26.0",
+    "babel-preset-preact": "latest",
     "base32-encode": "^1.1.0",
     "binaryjs": "latest",
-    "bower": "^1.8.4",
     "buffertools": "latest",
     "busboy": "latest",
     "canvas": "^2.0.0-alpha.12",
@@ -189,13 +188,13 @@
     "xxhashjs": "^0.2.2"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "unfetch": "^3.0.0",
-    "babel-loader": "^7.1.4",
-    "babel-plugin-transform-react-jsx": "^6.24.1",
-    "babel-preset-env": "^1.6.1",
+    "babel-cli": "latest",
+    "babel-loader": "latest",
+    "babel-plugin-transform-react-jsx": "latest",
+    "babel-preset-env": "latest",
     "preact": "^8.2.9",
     "preact-dom": "^1.0.1",
+    "unfetch": "^3.0.0",
     "webpack": "^4.7.0"
   }
 }

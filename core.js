@@ -46,7 +46,6 @@ class Core {
                 search : require('./search'),
                 sharedcache : require('./sharedcache'),
                 socialdispatch : require('./socialdispatch'),
-                tableBuilder : require('./tableBuilder'),
                 themes : require('./themes'),
                 topics : require('./topics'),
                 utils : require('./utils'),
@@ -57,8 +56,6 @@ class Core {
 
             maybeRunCAIJ();
             loadHooks(readyToRock);
-            loadForms();
-            loadTables();
             loadEndpoints();
             loadStandardInput();
             loadImageSizes();
@@ -73,10 +70,10 @@ class Core {
                         precompile(() => {
                             loadDocs(() => {
                                 redirectIfInit(resp, () => {
-                                    loadFrontend();
-                                    require('./riverflow/riverflow.js').loadFlows();
-
                                     makeBuild(() => {
+                                        loadFrontend();
+                                        require('./riverflow/riverflow.js').loadFlows();
+
                                         inbound.handleQueue();
                 
                                         loadCacheInvalidator();
@@ -122,56 +119,56 @@ const loadEndpoints = () => {
     const LoginLib = require('./backend/login.js');
 
     endpoints.init();
-    endpoints.register('*', 'lilium', 'GET', function(cli) {
+    endpoints.register('*', 'lilium', 'GET', (cli) => {
         cli.userinfo && cli.userinfo.loggedin ? 
             V4.serveV4Index(cli) :
             cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
     });
 
-    endpoints.register('*', 'login', 'POST', function (cli) {
+    endpoints.register('*', 'login', 'POST', (cli) => {
         cli.touch("endpoints.POST.login");
         LoginLib.authUser(cli);
     });
 
-    endpoints.register('*', 'magiclink', 'GET', function (cli) {
+    endpoints.register('*', 'magiclink', 'GET', (cli) => {
         cli.touch("endpoints.POST.login");
         LoginLib.magiclink(cli);
     });
 
-    endpoints.register('*', 'admin', 'POST', function (cli) {
+    endpoints.register('*', 'admin', 'POST', (cli) => {
         cli.touch("endpoints.POST.admin");
         admin.handleAdminEndpoint(cli);
     });
 
-    endpoints.register('*', 'logout', 'GET', function (cli) {
+    endpoints.register('*', 'logout', 'GET', (cli) => {
         cli.touch("endpoints.POST.logout");
         const sessions = require('./session.js');
         sessions.logout(cli);
     });
 
-    admin.registerAdminEndpoint('welcome', 'GET', function(cli) {
+    admin.registerAdminEndpoint('welcome', 'GET', (cli) => {
         cli.touch('admin.GET.welcome');
         admin.welcome(cli, 'GET');
     });
 
-    admin.registerAdminEndpoint('welcome', 'POST', function(cli) {
+    admin.registerAdminEndpoint('welcome', 'POST', (cli) => {
         cli.touch('admin.POST.welcome');
         admin.welcome(cli, 'POST');
     });
 
-    admin.registerAdminEndpoint('activities', 'GET', function (cli) {
+    admin.registerAdminEndpoint('activities', 'GET', (cli) => {
         cli.touch('admin.GET.activities');
         if (cli.hasRightOrRefuse("entities-act")) {
             filelogic.serveAdminLML(cli, false);
         }
     });
 
-    admin.registerAdminEndpoint('me', 'POST', function (cli) {
+    admin.registerAdminEndpoint('me', 'POST', (cli) => {
         cli.touch('admin.POST.me');
         entities.adminPOST(cli);
     });
 
-    admin.registerAdminEndpoint('me', 'GET', function (cli) {
+    admin.registerAdminEndpoint('me', 'GET', (cli) => {
         cli.touch('admin.GET.me');
         filelogic.serveAdminLML(cli, false);
     });
@@ -180,7 +177,7 @@ const loadEndpoints = () => {
     log('Endpoints', 'Loaded endpoints', 'success');
 };
 
-const loadGlobalPetals = function () {
+const loadGlobalPetals = () => {
     const Petals = require('./petal.js');
     const _c = require('./config.js');
     Petals.register('adminbar',         _c.default().server.base + 'backend/dynamic/admin/adminbar.petal');
@@ -189,7 +186,7 @@ const loadGlobalPetals = function () {
     Petals.register('backendsearch',    _c.default().server.base + 'backend/dynamic/admin/backendsearch.petal');
 };
 
-const loadImageSizes = function () {
+const loadImageSizes = () => {
     const imageSize = require('./imageSize.js');
 
     imageSize.add("mini", 48, 48);
@@ -202,7 +199,7 @@ const loadImageSizes = function () {
     hooks.fire('image_sized_loaded');
 };
 
-const loadPlugins = function (cb) {
+const loadPlugins = (cb) => {
     const plugins = require('./plugins.js');
 
     log('Plugins', 'Loading plugins');
@@ -214,33 +211,33 @@ const loadPlugins = function (cb) {
     });
 };
 
-const makeBuild = function(cb) {
+const makeBuild = (cb) => {
     if (!isElder) { return cb(); }
 
     const buildLib = require('./build');    
     buildLib.initialBuild(cb);
 };
 
-const loadRoles = function (cb) {
+const loadRoles = (cb) => {
     const entities = require('./entities.js');
     entities.registerRole({
         name: 'admin',
         displayname: 'admin',
-    }, ['dash', 'admin'], function () {
+    }, ['dash', 'admin'], () => {
         return;
     }, true, true);
 
     entities.registerRole({
         name: 'lilium',
         displayname: 'lilium',
-    }, ['dash', 'admin'], function () {
+    }, ['dash', 'admin'], () => {
         return;
     }, true, true);
 
     cb();
 };
 
-const gracefullyCrash = function(err) {
+const gracefullyCrash = (err) => {
     const stack = err.stack.split('\n');
 
     log('Core', '------------------------------------------------', 'detail');
@@ -257,17 +254,17 @@ const gracefullyCrash = function(err) {
     log('Core', 'Contacting handler to request a crash to all handles', 'info');
 };
 
-const bindCrash = function() {
+const bindCrash = () => {
     if ( process.env.handleError != "crash" ) {
         process.on('uncaughtException', gracefullyCrash);
     }
 };
 
-const loadStandardInput = function () {
+const loadStandardInput = () => {
     const stdin = process.openStdin();
     stdin.liliumBuffer = "";
-    stdin.on('data', function (chunk) {
-        setTimeout(function () {
+    stdin.on('data', (chunk) => {
+        setTimeout(() => {
             chunk = chunk.toString().trim();
             stdin.liliumBuffer += chunk;
 
@@ -290,30 +287,30 @@ const loadStandardInput = function () {
     log("STDin", 'Listening to standard input', 'info');
 };
 
-const loadCacheInvalidator = function () {
+const loadCacheInvalidator = () => {
     log("CacheInvalidator", 'Initializing cacheInvalidator', 'info');
     const cacheInvalidator = require('./cacheInvalidator.js');
-    cacheInvalidator.init(function () {
+    cacheInvalidator.init(() => {
         log("CacheInvalidator", 'Ready to invalidate cached files', 'success');
     });
 };
 
-const scheduleGC = function () {
+const scheduleGC = () => {
     log('GC', 'Scheduling temporary file collection', 'info');
     const scheduler = require('./scheduler.js');
     scheduler.schedule('GCcollecttmp', {
         every: {
             secondCount: 1000 * 60 * 60
         }
-    }, function () {
+    }, () => {
         const GC = require('./gc.js');
-        GC.clearTempFiles(function () {
+        GC.clearTempFiles(() => {
             log("GC", "Scheduled temporary files collection done", 'success');
         });
     });
 };
 
-const loadLiveVars = function () {
+const loadLiveVars = () => {
     require('./backend/admin.js').registerLiveVar();
     require('./notifications.js').registerLiveVar();
     require('./backend/search.js').registerLiveVar();
@@ -323,32 +320,16 @@ const loadLiveVars = function () {
     log('Core', 'Loaded live variables', 'success');
 };
 
-const loadTables = function () {
-    require('./tableBuilder.js').init();
-}
-
-const loadForms = function () {
-    const Forms = require('./forms');
-    const formBuilder = require('./formBuilder.js');
-    const LoginLib = require('./backend/login.js');
-
-    formBuilder.init();
-    Forms.init();
-    LoginLib.registerLoginForm();
-
-    hooks.fire('forms_init');
-};
-
-const loadNotifications = function () {
+const loadNotifications = () => {
     require('./notifications.js').init();
 }
 
-const notifyAdminsViaEmail = function() {
+const notifyAdminsViaEmail = () => {
     if (!isElder) { return; }
 
     const _c = require('./config');
-    db.findToArray(_c.default(), "entities", {roles : "lilium"}, function(err, users) {
-        users.forEach(function(user) {
+    db.findToArray(_c.default(), "entities", {roles : "lilium"}, (err, users) => {
+        users.forEach((user) => {
             if (user.email) {
                 require('./mail.js').triggerHook(_c.default(), 'lilium_restarted', user.email, {
                     sigsha : require("crypto-js").SHA256(new Date()).toString(require("crypto-js").enc.Hex),
@@ -360,27 +341,27 @@ const notifyAdminsViaEmail = function() {
     });
 };
 
-const loadFrontend = function () {
+const loadFrontend = () => {
     log('Frontend', 'Registering default values from core', 'info');
     const Frontend = require('./frontend.js');
     Frontend.registerFromCore();
     hooks.fire('frontend_registered');
 };
 
-const prepareDefaultSiteCreation = function (cb) {
+const prepareDefaultSiteCreation = (cb) => {
     require('./init.js')(cb);
 };
 
-const loadWebsites = function (loadEverything) {
+const loadWebsites = (loadEverything) => {
     sites = require('./sites.js');
 
     const currentRoot = __dirname;
     const fss = require('./fileserver.js');
 
     log('Core', 'Reading sites directory', 'info');
-    fss.dirExists(currentRoot + "/sites", function (exists) {
+    fss.dirExists(currentRoot + "/sites", (exists) => {
         if (exists) {
-            fss.fileExists(currentRoot + "/sites/default.json", function (exists) {
+            fss.fileExists(currentRoot + "/sites/default.json", (exists) => {
                 if (exists) {
                     sites.loadSites(loadEverything);
                 } else {
@@ -393,14 +374,14 @@ const loadWebsites = function (loadEverything) {
     });
 };
 
-const loadLMLLibs = function () {
+const loadLMLLibs = () => {
     hooks.trigger('will_load_core_lml_libs');
     const dashboard = require('./dashboard.js');
     dashboard.registerLMLLib();
     hooks.trigger('loaded_core_lml_libs');
 };
 
-const precompile = function (done) {
+const precompile = (done) => {
     if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
         return done();
     }
@@ -411,13 +392,13 @@ const precompile = function (done) {
 
     log('Core', 'Staring precompilation', 'info');
     hooks.fire("will_precompile");
-    sites.loopPrecomp(function() {
+    sites.loopPrecomp(() => {
         hooks.fire("did_precompile");
         done();
     });
 };
 
-const redirectIfInit = function (resp, cb) {
+const redirectIfInit = (resp, cb) => {
     if (resp) {
         resp.writeHead(200, {
             "Content-Type": "text/html"
@@ -425,7 +406,7 @@ const redirectIfInit = function (resp, cb) {
         resp.end(
             '<i>Please wait a moment...</i><script>setTimeout(function() {window.location = "' + resp.redirectTo + '"}, 1000);</script>',
             'utf8',
-            function () {
+            () => {
                 resp.req.connection.unref();
                 resp.req.connection.destroy();
                 resp.server.close(cb);
@@ -436,23 +417,23 @@ const redirectIfInit = function (resp, cb) {
     }
 };
 
-const loadDocs = function(cb) {
+const loadDocs = (cb) => {
     if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
         return cb();
     }
 
     const docs = require('./docs.js');
-    docs.compileDirectory(function() {
+    docs.compileDirectory(() => {
         docs.compileIndex(cb);
     });
 };
 
-const loadVocab = function(done) {
+const loadVocab = (done) => {
     const vocab = require('./vocab.js');
     vocab.preloadDicos(done);
 };
 
-const loadScriptMode = function() {
+const loadScriptMode = () => {
     if (global.liliumenv.mode == "script") {
         const scriptpath = global.liliumenv.script;
         if (scriptpath) {
@@ -463,7 +444,7 @@ const loadScriptMode = function() {
     }
 };
 
-const loadEnv = function() {
+const loadEnv = () => {
     log("Core", "Loading Lilium environment variables", "info");
     global.liliumenv = global.liliumenv || {};
     let total = 0;
@@ -487,13 +468,13 @@ const loadEnv = function() {
     log('Core', `Loaded ${total} env variables.`);
 };
 
-const executeRunScript = function() {
+const executeRunScript = () => {
     if (global.liliumenv.mode == "script" || global.liliumenv.caij) {
         global.liliumenv.run && global.liliumenv.run.apply(require('./config.js'), [__dirname]);
     }
 }
 
-const loadBackendSearch = function() {
+const loadBackendSearch = () => {
     const backendSearch = require('./backend/search.js');
     backendSearch.registerSearchFormat({
         collection : "content",
@@ -521,7 +502,7 @@ const loadBackendSearch = function() {
 
 const initSchedulingTasks = () => {
     if (isElder) {
-        require('./config.js').eachSync(function(_c) {
+        require('./config.js').eachSync((_c) => {
             require('./caij/caij.js').scheduleTask("refreshTopicLatests", {
                 siteid : _c.id,
                 origin : "Elder"

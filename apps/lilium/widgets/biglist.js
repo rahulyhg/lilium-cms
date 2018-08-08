@@ -1,0 +1,244 @@
+import { h, Component } from 'preact';
+import API from '../data/api'
+import { storeLocal, getLocal } from '../data/cache';
+
+/**
+ * BigList 
+ * 
+ * Will make async calls to Live Variable endpoints. The list will expect an endpoint, and a Component which will be used as a list item. 
+ * The Livevar endpoint can, but doesn't have to, handle the "limit" and "skip" params so that the list can lazy load on scroll. Those params
+ * are typically handled by the livevar as a $limit : max and $skip : max * page mongo query param.
+ * 
+ * Props : {
+ *      // Basic props
+ *      endpoint : "/someEndpoint/with/levels/or/not",
+ *      listitem : ComponentClass (the actual class, not a JSX element),
+ *      batchsize : Number, representing the "max" param, defaults to 30,
+ * 
+ *      // More custom stuff
+ *      livevarkey : Key of the server response, defaults to "item". If the server response is : { posts : [...] }, then livevarkey should be "posts",
+ *      prepend : Wether the additional items will be added at the start or end of list. Setting this to "true" will add items at start of list,
+ *      items : Array of initial items. Can be set later. If passed after mount, will replace the entire array with the new one.
+ *      keyid : List item key for Preact mapping. Defaults to : _id 
+ * }
+ */
+export class BigList extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            items : props.items || [],
+            ready : false
+        };
+
+        this.coldState = {
+            endpoint : props.endpoint,
+            component : props.listitem,
+            emptyComponent : props.emptyComponent || BigListEmptyTemplate,
+            index : 0,
+            batchsize : props.batchsize || 30,
+            livevarkey : typeof props.livevarkey == "undefined" ? "items" : props.livevarkey,
+            prepend : props.prepend || false,
+            filters : {},
+            toolbarConfig : props.toolbar || undefined
+        }
+
+        if (props.toolbar && props.toolbar.id) {
+            this.coldState.filters = getLocal("LML_LIST_FILTERS_" + props.toolbar.id) || {};
+        }
+    }
+
+    loadMore(overwrite) {
+        API.get(this.coldState.endpoint, {
+            limit : this.coldState.batchsize,
+            skip : this.coldState.index * this.coldState.batchsize,
+            filters : this.coldState.filters
+        }, (err, list) => {
+            if (err) {
+                log('BigList', "Could not add items in big list because of response error : " + err, "warning")
+            } else {
+                if (overwrite) {                
+                    log("BigList", "Overwritten items of a big list from live variable endpoint", "success");
+                    const items = [...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list)];
+                    this.setState({ items, ready : true });
+                } else {                
+                    log("BigList", "Added values in a big list from live variable endpoint", "success");
+                    const items = [...this.state.items];
+                    items[this.coldState.prepend ? "unshift" : "push"](...(this.coldState.livevarkey ? list[this.coldState.livevarkey] : list));
+
+                    this.coldState.index++;
+                    this.setState({ items, ready : true });
+                }
+            }
+        });
+    }
+
+    toolbarFieldChanged(name, value) {
+        this.coldState.filters = Object.assign(this.coldState.filters || {}, { [name] : value });
+        this.loadMore(true);
+    }
+
+    componentDidMount() {
+        this.loadMore(true);        
+    }
+
+    componentWillReceiveProps(props) {
+        const newState = {
+            endpoint  : props.endpoint  || this.coldState.endpoint,
+            component : props.listitem  || this.coldState.component,
+            batchsize : props.batchsize || this.coldState.batchsize,
+            index : 0
+        };
+
+        Object.assign(this.coldState, newState);
+
+        log('BigList', 'Received props, about to reload list content', 'detail');
+        if (props.items) {
+            const items = [...props.items];
+            this.setState({ items });
+        } else {
+            this.loadMore(true);
+        }
+    }
+
+    render() {
+        if (!this.state.ready) {
+            return null;
+        }
+
+        log('BigList', 'Rendering a big list with ' + this.state.items.length + ' items', 'detail');
+        return (
+            <div class="big-list">
+                {
+                    this.coldState.toolbarConfig ? (
+                        <BigListToolBar 
+                            fields={this.coldState.toolbarConfig.fields} 
+                            title={this.coldState.toolbarConfig.title} 
+                            id={this.coldState.toolbarConfig.id} 
+                            fieldChanged={this.toolbarFieldChanged.bind(this)} />
+                    ) : null
+                }
+
+                <div class="big-list-items">
+                {
+                    this.state.items.length == 0 ? (
+                        <this.coldState.emptyComponent />
+                    ) : this.state.items.map(x => (
+                        <this.coldState.component item={x} key={x[this.props.keyid || "_id"]} />
+                    ))
+                }
+                </div>
+            </div>
+        );
+    }
+}
+
+class BigListEmptyTemplate {
+    render() {
+        return (<div class="big-list-empty-template">
+            <b>Nothing was found using the current filters.</b>
+        </div>);
+    }
+}
+
+/**
+ * BigListToolBarBuilder
+ * 
+ * 
+ * Fields anatomy => { type : "text | select | checkbox", title : "Display name", name : "nameSentToServer", options? : [] }
+ *   - type defaults to "text"
+ *   - title detaults to empty string
+ *   - name is mandatory
+ * 
+ *   - options defaults to empty array, is only used with type "select", is represented as an array object : [{ text : "Display text", value : "optionValue" }, {...}]
+ */
+export class BigListToolBarBuilder {
+    get defaultOptions() {
+        return {
+            fields : [],
+            title : "Filters"
+        };
+    }
+
+    /**
+     * make(params)
+     * 
+     * @param {object Toolbar settings including the fields to display, it, and title} params 
+     */
+    make(params = {}) {
+        const settings = Object.assign(this.defaultOptions, params);
+
+        return {
+            fields : settings.fields,
+            title : settings.title,
+            id : settings.id
+        }
+    }
+}
+
+class BigListToolBar extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            fields : props.fields,
+            title : props.title,
+            id : props.id
+        };
+
+        this.coldValues = getLocal("LML_LIST_FILTERS_" + props.id) || {};
+    }
+
+    fieldChanged(ev) {
+        this.coldValues[ev.target.name] = ev.target.value;
+        storeLocal("LML_LIST_FILTERS_" + this.props.id, this.coldValues);
+
+        this.props.fieldChanged && this.props.fieldChanged(ev.target.name, ev.target.value);
+    }
+
+    makeField(field) {
+        switch (field.type) {
+            case "select": {
+                return (
+                    <div class="big-list-tool-wrap">
+                        <b>{field.title}</b>
+                        <select onChange={this.fieldChanged.bind(this)} name={field.name} value={this.coldValues[field.name] || ""}>
+                            {
+                                field.options.map(opt => (<option value={opt.value}>{opt.text}</option>))
+                            }
+                        </select>
+                    </div>
+                );
+            } break;
+
+            case "checkbox": {
+                return (
+                    <div class="big-list-tool-wrap">
+                        <b>{field.title}</b>
+                        <input checked={this.coldValues[field.name] || false} type="checkbox" onChange={this.fieldChanged.bind(this)} name={field.name} />
+                    </div>
+                );
+            } break;
+
+            case "text":
+            default: {
+                return (
+                    <div class="big-list-tool-wrap">
+                        <b>{field.title}</b>
+                        <input value={this.coldValues[field.name] || ""} type="text" onKeyUp={this.fieldChanged.bind(this)} name={field.name} />
+                    </div>
+                );
+            }
+        }
+    }
+
+    render() {
+        log('BigList', 'Rendering toolbar with ' + this.state.fields.length + ' fields', 'detail');
+        return (
+            <div class="big-list-tool-bar">
+                <div class="big-list-tool-bar-title">{this.state.title}</div>
+                <div class="big-list-tools">
+                    { this.state.fields.map(x => this.makeField(x)) }
+                </div>
+            </div>
+        );
+    }
+}

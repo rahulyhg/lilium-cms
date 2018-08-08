@@ -31,6 +31,7 @@ export class TextEditor extends Component {
         }).then(editors => {
             if (editors && editors[0]) {
                 this.texteditor = editors && editors[0];
+                this.texteditor.on('change', this.changed.bind(this));
                 this.texteditor.show();
                 this.texteditor.setContent(this.props.content);
             } else { 
@@ -53,6 +54,14 @@ export class TextEditor extends Component {
             log('TextEditor', 'Content set via new props', 'detail');
             this.texteditor.setContent(props.content);
         }
+    }
+
+    shouldComponentUpdate() {
+        return false;
+    }
+
+    changed() {
+        this.props.onChange && this.props.onChange(this.props.name || this.rID, this.props.format ? this.props.format(this.getContent()) : this.getContent());
     }
 
     getContent() {

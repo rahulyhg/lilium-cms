@@ -1,9 +1,19 @@
 const quickCache = {};
+const sessionCache = {};
 
 const LILIUM_CACHE_KEY = "LiliumV4";
 export const CACHEKEYS = {
-    SIDEBARSNAP : "sb1"
+    SIDEBARSNAP : "sb1",
+    API : "api"
 };
+
+export function getAPI(key) {
+    return quickCache[CACHEKEYS.API + key];
+}
+
+export function storeAPI(key, value) {
+    quickCache[CACHEKEYS.API + key] = value;
+}
 
 export function storeLocal(key, value) {
     log('Cache', 'Storing local cache value at key : ' + key, 'detail');
@@ -17,6 +27,14 @@ export function getLocal(key) {
     return quickCache[key];
 }
 
+export function setSession(key, value) {
+    sessionCache[key] = value;
+}
+
+export function getSession(key) {
+    return sessionCache[key]
+}
+
 export function initLocal() {
     log('Cache', 'Initializing local storage dump into RAM', 'success');
     if (!window.localStorage) {
@@ -28,4 +46,8 @@ export function initLocal() {
 
     const loadedCache = JSON.parse(window.localStorage.getItem(LILIUM_CACHE_KEY) || "{}");
     Object.keys(loadedCache).forEach(k => { quickCache[k] = loadedCache[k]; });
+}
+
+export function dumpCache() {
+    return { application : quickCache };
 }

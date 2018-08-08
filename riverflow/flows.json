@@ -4,7 +4,6 @@
     "supported" : [
         "admin_get", "admin_post",
         "get", "post",
-        "form", "table",
         "livevar", "setup"
     ],
 
@@ -42,6 +41,10 @@
             "endpoint" : "pong",
             "support" : ["get"]
         }, {
+            "module" : "notifications.js",
+            "endpoint" : "notifications",
+            "support" : ["admin_post"]
+        }, {
             "module" : "search.js",
             "endpoint" : "search",
             "support" : ["livevar", "setup"]
@@ -56,7 +59,7 @@
         }, {
             "module" : "datareader.js",
             "endpoint" : "datareader",
-            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "datareader",
                 "faicon": "fa-chart-pie",
@@ -106,7 +109,7 @@
         }, {
             "module" : "fix.js",
             "endpoint" : "fix",
-            "support" : ["livevar", "admin_get", "admin_post", "form"],
+            "support" : ["livevar", "admin_get", "admin_post"],
             "admin_menu" : {
                 "id": "support",
                 "faicon": "fa-life-ring",
@@ -119,15 +122,15 @@
         }, {
             "module" : "topics.js",
             "endpoint" : "topics",
-            "support" : ["admin_get", "admin_post", "livevar", "form"]
+            "support" : ["admin_get", "admin_post", "livevar"]
         }, {
             "module" : "plugins.js",
             "endpoint" : "plugins",
-            "support" : ["admin_get", "admin_post", "livevar", "table"]
+            "support" : ["admin_get", "admin_post", "livevar"]
         }, {
             "module" : "themes.js",
             "endpoint" : "themes",
-            "support" : ["admin_get", "admin_post", "table", "livevar"]
+            "support" : ["admin_get", "admin_post", "livevar"]
         }, {
             "module" : "dashboard.js",
             "endpoint" : "dashboard",
@@ -183,7 +186,7 @@
         }, {
             "module" : "devtools.js",
             "endpoint" : "devtools",
-            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"]
+            "support" : ["admin_get", "admin_post", "livevar", "setup"]
         }, {
             "module" : "embed.js",
             "endpoint" : "embed",
@@ -216,7 +219,7 @@
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
-            "support" : ["admin_get", "admin_post", "form", "table", "livevar", "setup", "api_get"]
+            "support" : ["admin_get", "admin_post", "livevar", "setup", "api_get"]
         }, {
             "module" : "docs.js",
             "endpoint" : "docs",
@@ -268,11 +271,11 @@
         }, {
             "module" : "article.js",
             "endpoint" : "article",
-            "support" : ["admin_get", "admin_post", "form", "table", "api_get", "api_post"]
+            "support" : ["admin_get", "admin_post", "api_get", "api_post"]
         }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
-            "support" : ["livevar", "admin_get", "admin_post", "form"]
+            "support" : ["livevar", "admin_get", "admin_post"]
         }, {
             "module" : "article.js",
             "endpoint" : "content",
@@ -280,7 +283,7 @@
         }, {
             "module" : "crew.js",
             "endpoint" : "crew",
-            "support" : ["admin_get", "admin_post", "livevar", "setup", "form"],
+            "support" : ["admin_get", "admin_post", "livevar", "setup"],
             "admin_menu" : {
                 "id": "crew",
                 "faicon": "fa-beer",
@@ -293,7 +296,7 @@
         }, {
             "module" : "entities.js",
             "endpoint" : "entities",
-            "support" : ["admin_get", "admin_post", "livevar", "setup", "table", "form", "api_get", "api_post"],
+            "support" : ["admin_get", "admin_post", "livevar", "setup", "api_get", "api_post"],
             "admin_menu" : {
                 "id": "entities",
                 "faicon": "fa-users",
@@ -318,18 +321,18 @@
         }, {
             "module" : "personas.js",
             "endpoint" : "persona",
-            "support" : ["admin_get", "admin_post", "form", "livevar"],
+            "support" : ["admin_get", "admin_post", "livevar"],
             "hooks" : [
                 { "name" : "post_create_persona", "priority" : 15, "callback" : "postCreatePersona" }
             ]
         }, {
             "module" : "role.js",
             "endpoint" : "role",
-            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"]
+            "support" : ["admin_get", "admin_post", "livevar", "setup"]
         }, {
             "module" : "preferences.js",
             "endpoint" : "preferences",
-            "support" : ["admin_get", "admin_post", "livevar", "form"]
+            "support" : ["admin_get", "admin_post", "livevar"]
         }, {
             "module" : "media.js",
             "endpoint" : "media",
@@ -345,7 +348,7 @@
         }, {
             "module" : "socialdispatch.js",
             "endpoint" : "socialdispatch",
-            "support" : ["admin_get", "admin_post", "livevar", "form", "setup"],
+            "support" : ["admin_get", "admin_post", "livevar", "setup"],
             "admin_menu" : {
                 "id": "socialdispatch",
                 "faicon": "fa-share-alt",
@@ -362,7 +365,7 @@
         }, {
             "module" : "cakepop.js",
             "endpoint" : "cakepop",
-            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "cakepop",
                 "faicon": "fa-window-maximize",
@@ -379,7 +382,7 @@
         }, {
             "module" : "sites.js",
             "endpoint" : "sites",
-            "support" : ["admin_get", "admin_post", "livevar", "form"],
+            "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "sites",
                 "faicon": "fa-globe",
@@ -396,7 +399,7 @@
         }, {
             "module" : "settings.js",
             "endpoint" : "settings",
-            "support" : ["admin_get", "admin_post", "form", "livevar"],
+            "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "settings",
                 "faicon": "fa-cogs",

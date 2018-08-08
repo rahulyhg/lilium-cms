@@ -3,6 +3,7 @@ import { h, Component } from 'preact';
 import { ImagePicker } from '../layout/imagepicker';
 import { castNotification } from '../layout/notifications';
 import { addCommand } from '../layout/lys.js';
+import { dumpCache } from '../data/cache';
 
 export function initializeDevEnv() {
     log('Dev', 'Initialize development environment', 'detail');
@@ -124,6 +125,13 @@ export class DevTools extends Component {
         this.setState({ hidden : !this.state.hidden });
     }
 
+    dumpApplicationCache(done) {
+        log('Dev', 'Application cache dumped : ', 'lilium');
+        console.log(dumpCache());
+        
+        done();
+    }
+
     render() {
         if (this.state.error) {
             log('Dev', 'Displaying fullscreen error report', 'detail');
@@ -148,6 +156,7 @@ export class DevTools extends Component {
                         <DevTool click={this.bundleJS.bind(this)}>Bundle JS</DevTool>
                         <DevTool click={this.pickimage.bind(this)}>Image picker</DevTool>
                         <DevTool click={this.testNotification.bind(this)}>Cast notification</DevTool>
+                        <DevTool click={this.dumpApplicationCache.bind(this)}>Dump cache in console</DevTool>
                     </div>
                 ) }
             </div>

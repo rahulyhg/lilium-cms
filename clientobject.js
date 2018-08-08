@@ -102,7 +102,7 @@ class ClientObject {
         }
     };
 
-    readPostData(done, max = 65536) {
+    readPostData(done, max = 2e+7) {
         if (this.postdata && this.postdata.data) {
             return done(this.postdata.data);
         }
