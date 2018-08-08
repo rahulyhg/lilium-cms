@@ -102,9 +102,10 @@ export class SelectField extends FormField {
 
 export class TextField extends FormField {
     handleKeyPress(ev) {
+        this.props.onKeyPress && this.props.onKeyPress(ev);
+
         if (ev.key == 'Enter') {
-            alert('enter');
-            this.props.onEnter && this.props.onEnter();
+            this.props.onEnter && this.props.onEnter(ev.target.value, ev.target);
         }
     }
 

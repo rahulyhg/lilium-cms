@@ -1,12 +1,11 @@
 {
     "dashboard": {
-        "title": "Dashboard"
+        "title": "Dashboard",
+        "ppopopopopo": "asdas"
     },
     "devtools": {},
     "errors": {},
-    "me": {
-        "title": "Profile Page"
-    },
+    "me": {},
     "publishing": {},
     "translations": {}
 }

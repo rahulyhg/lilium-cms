@@ -3,19 +3,15 @@ const vocab = require('./vocab');
 class Translations {
 
     livevar(cli, levels, params, sendback) {
-        console.log(levels);
         if (levels[0] == 'getSupportedLanguages') {
-            console.log(vocab.getSUpportedLanguages());
             sendback(vocab.getSUpportedLanguages());
         } else if (levels[0] == 'getLanguageResource') {
             if (levels[1]) {
-                console.log(vocab.getLangData(levels[1].replace('-', '')));
-                sendback(vocab.getLangData(levels[1].replace('-', '')));
+                sendback(vocab.getLangData(levels[1]));
             } else {
                 cli.throwHTTP(400, 'No language was provided', true);
             }
         } else if (levels[0] == 'getAllLanguageResources') {7
-            console.log(vocab.getAllLanguageResources());
             sendback(vocab.getAllLanguageResources());
         } else if (levels[0] == 'getPages') {
             sendback(vocab.getPages());
@@ -23,18 +19,29 @@ class Translations {
     }
 
     adminPOST(cli) {
+        console.log('remove!');
         cli.touch("translations.adminPOST");
         if (cli.routeinfo.path[2] == 'updateLanguageSlug') {
-            vocab.updateSlug(cli.postdata.data.lang, cli.postdata.data.pageName, cli.postdata.data.slug, cli.postdata.data.value, err => {
-                if (!err)
-                    cli.throwHTTP(200, '', true);
-                else
-                    cli.throwHTTP(500, 'Error writing language file', true);
+            vocab.updateSlug(cli.postdata.data.lang, cli.postdata.data.pageName, cli.postdata.data.slug, cli.postdata.data.newValue, err => {
+                if (!err) {
+                    cli.sendJSON({ success: true })
+                } else {
+                    cli.sendJSON({ success: false });
+                }
             });
-        } else if (cli.routeinfo.path[2] == 'createSlug') {
-            cli.throwHTTP(200, '', true);
+        } else if (cli.routeinfo.path[2] == 'updateSlugName') {
+            vocab.updateSlugName(cli.postdata.data.pageName, cli.postdata.data.slug, cli.postdata.data.newName, err => {
+                if (!err)
+                    cli.sendJSON({ success: true })
+                else
+                    cli.sendJSON({ success: false });
+            });
+        } else if (cli.routeinfo.path[2] == 'removeField') {
+            vocab.removeField(cli.postdata.data.pageName, cli.postdata.data.slug, err => {
+                cli.sendJSON({ success: true });
+            });
         } else if (cli.routeinfo.path[2] == 'deleteSlug') {
-            cli.throwHTTP(200, '', true);
+            cli.sendJSON({ success: true })
         } else {
             cli.throwHTTP(404, '', true);
         }

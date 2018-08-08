@@ -1,11 +1,11 @@
 {
-    "dashboard": {},
+    "dashboard": {
+        "title": "qweqwe",
+        "ppopopopopo": "tyutt"
+    },
     "devtools": {},
     "errors": {},
-    "me": {
-        "title": "Page de Profil",
-        "subtitle": "Gérez votre profil"
-    },
+    "me": {},
     "publishing": {},
     "translations": {}
 }

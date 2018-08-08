@@ -1,8 +1,6 @@
-const _c = require('./config.js');
-const dicos = {};
 const path = require('path');
 const log = require('./log.js');
-const {lstatSync, readdirSync, writeFile, writeFileSync} = require('fs');
+const {lstatSync, readdirSync, writeFileSync} = require('fs');
 
 class Vocab {
 
@@ -25,22 +23,16 @@ class Vocab {
             if (langDirItem.endsWith('.json')) {
                 const langName = langDirItem.split('.json')[0];
                 this.supportedLanguages.push(langName);
-
                 try {
                     const langData = require(path.join(liliumroot, 'vocab', langDirItem)) || {};
 
-                    console.log(pages);
                     pages.forEach(page => {
                         if (!langData[page]) {
                             langData[page] = {}
                         }
                     });
 
-                    this.languagesData[langName.replace('-', '')] = langData;
-
-                    console.log(langData);
-                    console.log(this.languagesData);
-                    console.log(this.supportedLanguages);
+                    this.languagesData[langName] = langData;
 
                     writeFileSync(path.join(liliumroot, 'vocab', langDirItem), JSON.stringify(langData, null, 4));
                 } catch (e) {
@@ -49,21 +41,33 @@ class Vocab {
             }
         });
         
-        done && done();
         log('Vocab', `Detected supported languages ${this.supportedLanguages}`, 'success');
+        done && done();
     }
 
     /**
      * Returns an array containing the language codes of the supported languages
      */
-    getSUpportedLanguages() { return this.supportedLanguages; }
+    getSUpportedLanguages() { ; console.log('get supported lang', this.supportedLanguages); return this.supportedLanguages; };
 
     /**
      * Returns an object containing the translation data for a language code
      * @param {string} langcode THe langcode of which to get the translations
      */
     getLangData(langcode) {
-        return this.languagesData[langcode.replace('-', '')];
+        return this.languagesData[langcode];replace
+    }
+
+    /**
+     * Writes the language data held in RAM to the disk to ensure consistency after a restart
+     * @param {callback} done 
+     */
+    writeLangDataToDisk(done) {
+        this.supportedLanguages.forEach(lang => {
+           writeFileSync(this.getLanguageFilePath(lang), JSON.stringify(this.languagesData[lang], null, 4));
+        });
+
+        done && done();
     }
 
     /**
@@ -77,12 +81,49 @@ class Vocab {
     updateSlug(lang, pageName, slug, value, done) {
         try {
             this.languagesData[lang][pageName][slug] = value;
-            writeFile(getLanguageFilePath(lang), JSON.stringify(this.languagesData[lang], null, 4), err => {
-                done && done(err);
-            });
+            this.writeLangDataToDisk(done);
         } catch (e) {
-            throw new Error('Tried to update a slug for an invalid language or page');
+            log('Vocab', e, 'err');
+            done(e);
         }
+    }
+    
+    /**
+     * Updates the name of a slug in a page for each language in the language data
+     * and writes it to the disk
+     * @param {string} pageName 
+     * @param {string} slug 
+     * @param {string} newValue 
+     * @param {callback} done 
+     */
+    updateSlugName(pageName, slug, newValue, done) {
+        if (slug != newValue) {
+            this.supportedLanguages.forEach(lang => {
+                const slugValue = this.languagesData[lang][pageName][slug];
+                if (slugValue) {
+                    this.languagesData[lang][pageName][newValue] = slugValue;
+                    delete this.languagesData[lang][pageName][slug];
+                } else {
+                    this.languagesData[lang][pageName][newValue] = '';                    
+                }
+            });
+
+            this.writeLangDataToDisk(done);
+        } else {
+            done && done();
+        }
+    }
+
+    removeField(pageName, slug, done) {
+        console.log('allo', this.languagesData);
+        this.supportedLanguages.forEach(lang => {   
+            delete this.languagesData[lang][pageName][slug];
+            // const index = this.languagesData[lang][pageName].findIndex(x => x[slug]);
+            // console.log(index);
+            // this.languagesData[lang][pageName].splice(index, 1);
+        });
+
+        this.writeLangDataToDisk(done);
     }
 
     getPages() {
@@ -90,21 +131,21 @@ class Vocab {
             return lstatSync(path.join(liliumroot, 'apps','lilium', 'pages', dirItem)).isDirectory();
         });
     }
-
-    getDico() {
-        return {};
-    }
-
+    
     getAllLanguageResources() {
         return this.languagesData;
     }
-
+    
     /**
      * Returns the absolute path of a language file
      * @param {string} langcode Language code of the language file to get
      */
     getLanguageFilePath(langcode) {
         return path.join(liliumroot, 'vocab', langcode+ '.json');
+    }
+
+    getDico() {
+        return {};
     }
 };
 
