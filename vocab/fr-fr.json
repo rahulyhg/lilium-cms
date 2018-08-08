@@ -1,9 +1,9 @@
 {
     "dashboard": {
-        "subtitle": "Tableau de bord"
+        "title": "Tableau de bord"
     },
     "devtools": {
-        "subtitle": "Outils de développement"
+        "title": "Outils de développement"
     },
     "errors": {
         "subtitle": "Erreurs"

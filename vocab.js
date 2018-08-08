@@ -67,6 +67,7 @@ class Vocab {
             writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', lang + '.json'), JSON.stringify(this.languagesData[lang]));
         });
 
+        log('Vocab', 'Writing language translations to disk', 'info');
         done && done();
     }
 
@@ -82,6 +83,7 @@ class Vocab {
         try {
             this.languagesData[lang][pageName][slug] = value;
             this.writeLangDataToDisk(done);
+            log('Vocab', `Set language slug ${slug} in page ${pageName} for language ${lang} to '${value}'`, 'success');
         } catch (e) {
             log('Vocab', e, 'err');
             done(e);
@@ -108,6 +110,7 @@ class Vocab {
                 }
             });
 
+            log('Vocab', `Updated language slug name in page ${pageName} from '${slug}' to '${newValue}'`, 'success');
             this.writeLangDataToDisk(done);
         } else {
             done && done();
