@@ -20,6 +20,8 @@ const styles = {
     }
 }
 
+
+
 class HistoryEntry extends Component {
     makeBackgroundStyle() {
 
@@ -88,7 +90,7 @@ class PublishingHistory extends Component {
     
     render() {
         return (
-            <div style={{ overflow : "auto" }}>
+            <div>
                 {
                     this.state.history.map(entry => (<HistoryEntry entry={entry} actor={this.cachedUsers[entry.actor]} />))
                 }
@@ -138,8 +140,11 @@ export default class EditView extends Component {
         super(props);
 
         this.state = {
-            loading : true
+            loading : true,
+            actions : []
         };
+
+        this.coldState = {};
     }
 
     componentDidMount() {
@@ -168,6 +173,7 @@ export default class EditView extends Component {
                 log('Publishing', 'About to display : ' + post.headline, 'detail') :
                 log('Publishing', 'Article not found : ' + postid, 'warn');
             
+            this.coldState.post = post;
             this.setState(post ? { post, loading: false } : { error : "Article not Found", loading : false }, () => {
                 
             });
@@ -206,8 +212,8 @@ export default class EditView extends Component {
                     </div>
                 </div>
 
-                <div style={{ position : "fixed", right : 0, top : 50, bottom : 0, width : 280, background : "rgb(238, 226, 241)", boxShadow : "1px 0px 2px 2px rgba(154, 145, 156, 0.46)" }}>
-                    <PublishingSidebar post={this.state.post}  />
+                <div style={{ position : "fixed", right : 0, top : 50, bottom : 0, width : 280, overflow : "auto", background : "rgb(238, 226, 241)", boxShadow : "1px 0px 2px 2px rgba(154, 145, 156, 0.46)" }}>
+                    <PublishingSidebar post={this.state.post} actions={this.state.actions}  />
                 </div>
             </div>
         )
