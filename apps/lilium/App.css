@@ -411,11 +411,46 @@ h1 {
     padding: 10px;
 }
 
-
 .history-entry.history-entry-created {
     border-top: 1px solid #2f647d;
     border-bottom: 1px solid #2f647d;
     background-color: #58a4b5;
+    color: white;
+    margin: 10px 0px;
+    padding: 10px;
+}
+
+.history-entry.history-entry-submitted {
+    border-top: 1px solid #674a82;
+    border-bottom: 1px solid #674a82;
+    background-color: #5e58b5;
+    color: white;
+    margin: 10px 0px;
+    padding: 10px;
+}
+
+.history-entry.history-entry-unpublished {
+    border-top: 1px solid #423a32;
+    border-bottom: 1px solid #423a32;
+    background-color: #c7925a;
+    color: white;
+    margin: 10px 0px;
+    padding: 10px;
+}
+
+.history-entry.history-entry-refused {
+    border-top: 1px solid #6d6b24;
+    border-bottom: 1px solid #6d6b24;
+    background-color: #c7b05a;
+    color: white;
+    margin: 10px 0px;
+    padding: 10px;
+}
+
+.history-entry.history-entry-destroyed {
+    border-top: 1px solid #502a2a;
+    border-bottom: 1px solid #502a2a;
+    background-color: #c75a5a;
     color: white;
     margin: 10px 0px;
     padding: 10px;
