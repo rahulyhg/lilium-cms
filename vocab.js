@@ -66,8 +66,7 @@ class Vocab {
     writeLangDataToDisk(done) {
         this.supportedLanguages.forEach(lang => {
             writeFileSync(this.getLanguageFilePath(lang), JSON.stringify(this.languagesData[lang], null, 4));
-            this.compileLanguageData(lang);
-            writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', lang + '.json'), JSON.stringify(this.languagesData[lang]));
+            writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', lang + '.json'), JSON.stringify(this.compileLanguageData(lang)));
         });
 
         done && done();
@@ -84,10 +83,8 @@ class Vocab {
      */
     compileLanguageData(lang) {
         const compiled = this.languagesData[this.defaultLanguage];
-        console.log(compiled);
         const fallbackLangData = this.languagesData[this.languagesData[lang].__.fallback] || this.languagesData[lang];
         this.getPages().forEach(page => {
-            console.log(page);
             Object.keys(fallbackLangData[page]).filter(slug => fallbackLangData[page][slug]).forEach(slug => {
                 compiled[page][slug] = fallbackLangData[page][slug];
             });
@@ -95,10 +92,9 @@ class Vocab {
                 compiled[page][slug] = this.languagesData[lang][page][slug];
             });
         });
-        
+
         log('Vocab', 'Compiled language resource file for language ' + lang, 'info');
         compiled.__ = this.languagesData[lang].__;
-        console.log('compiled',lang, compiled);
         return compiled;
     }
 
@@ -172,10 +168,6 @@ class Vocab {
      */
     getLanguageFilePath(langcode) {
         return path.join(liliumroot, 'vocab', langcode+ '.json');
-    }
-
-    getDico() {
-        return {};
     }
 };
 
