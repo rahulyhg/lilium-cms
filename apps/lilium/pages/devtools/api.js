@@ -21,7 +21,7 @@ const styles = {
 export default class DevToolAPI extends Component {
     constructor(props) {
         super(props);
-        this.values = { method: HTTP_METHODS[0].value };
+        this.values = {};
         this.state = { output : "Waiting for request information." };
     }
 
@@ -30,7 +30,6 @@ export default class DevToolAPI extends Component {
     }
 
     sendRequest(done) {
-        console.log(this.values);
         const send = API[this.values.method.toLowerCase()];
         this.setState({ output : "Waiting for response..." });
         const now = performance.now();
