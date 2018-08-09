@@ -21,7 +21,7 @@ const styles = {
 export default class DevToolAPI extends Component {
     constructor(props) {
         super(props);
-        this.values = {};
+        this.values = {method: HTTP_METHODS[0].value};
         this.state = { output : "Waiting for request information." };
     }
 
