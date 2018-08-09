@@ -110,7 +110,7 @@ class Vocab {
                 }
             });
 
-            log('Vocab', `Updated language slug name in page ${pageName} from '${slug}' to '${newValue}'`, 'success');
+            log('Vocab', `Updated language slug name Lowein page ${pageName} from '${slug}' to '${newValue}'`, 'success');
             this.writeLangDataToDisk(done);
         } else {
             done && done();

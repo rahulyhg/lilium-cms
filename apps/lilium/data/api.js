@@ -52,6 +52,10 @@ class API {
         API.request('PUT', '/admin' + endpoint, {}, data, sendback);
     }
 
+    static delete(endpoint, data, sendback) {
+        API.request('DELETE', '/admin' + endpoint, {}, data, sendback);
+    }
+
     static rebuild() {
         log('Lilium', 'Rebuilding Lilium V4 Preact app', 'detail');
         API.post('/build/lilium', {}, () => { 

@@ -118,7 +118,7 @@ export class TextField extends FormField {
                 {
                     this.props.multiline ? 
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} 
-                                    onChange={this.changed.bind(this)}>{this.value || ""} onKeyPress={this.handleKeyPress.bind(this)} </textarea>) :
+                                    onChange={this.changed.bind(this)} onKeyPress={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
                                     onChange={this.changed.bind(this)} onKeyPress={this.handleKeyPress.bind(this)} />)
                 }
