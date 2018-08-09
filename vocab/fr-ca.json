@@ -17,5 +17,7 @@
     "translations": {
         "title": "Traductions"
     },
-    "logout": {}
+    "logout": {
+        "title": "Déconnexion"
+    }
 }

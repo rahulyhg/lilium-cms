@@ -15,20 +15,20 @@ class Vocab {
      * @param {callback} done 
      */
     preloadDicos(done) {
-        const pages = readdirSync(path.join(liliumroot, 'apps', 'lilium', 'pages')).filter(dirItem => {
-            return lstatSync(path.join(liliumroot, 'apps','lilium', 'pages', dirItem)).isDirectory();
-        });
+        const pages = this.getPages();
 
         readdirSync(path.join(liliumroot, 'vocab')).forEach(langDirItem => {
             if (langDirItem.endsWith('.json')) {
                 const langName = langDirItem.split('.json')[0];
                 this.supportedLanguages.push(langName);
+
                 try {
                     const langData = require(path.join(liliumroot, 'vocab', langDirItem)) || {};
 
                     pages.forEach(page => {
                         if (!langData[page]) {
-                            langData[page] = {}
+                            langData[page] = { title: page };
+                            log('Vocab', 'Added new page to translations ' + page, 'info');
                         }
                     });
 

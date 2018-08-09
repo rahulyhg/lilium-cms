@@ -17,5 +17,7 @@
     "translations": {
         "title": "Translations"
     },
-    "logout": {}
+    "logout": {
+        "title": "Log Out"
+    }
 }

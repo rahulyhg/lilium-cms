@@ -183,6 +183,7 @@ class PageTranslation extends Component {
                         );
                     })
                 }
+                
             </div>
         );
     }
