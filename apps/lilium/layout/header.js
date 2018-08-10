@@ -258,37 +258,41 @@ class NotificationJewel extends Component {
         this.state = {
             unreadCount : 0
         }
+
+        this.receivedNotification_bound = this.receivedNotification.bind(this);        
+        this.maybeClose_bound = this.maybeClose.bind(this);
     }
 
     componentDidMount() {
         API.get('/notifications/unreadcount', {}, (err, resp, r) => {
             this.setState({ unreadCount : resp.unreadCount });
         });
+
+        bindRealtimeEvent('notification', this.receivedNotification_bound);
     }
 
-    sawOne() {
-        this.setState({ unreadCount : this.state.unreadCount - 1 });
+    componentWillUnmount() {
+        unbindRealtimeEvent('notification', this.receivedNotification_bound);
     }
 
-    sawAll() {
-        this.setState({ unreadCount : 0 });
+    receivedNotification() {
+        this.setState({ unreadCount : this.state.unreadCount + 1 });
     }
 
-    toggle() {
-        this.state.open ? this.close() : this.open();
+    maybeClose(ev) {
+        !this.el.contains(ev.target) && this.el != ev.target && this.close();
     }
 
-    open() {
-        this.setState({ open : true });
-    }
+    sawOne() { this.setState({ unreadCount : this.state.unreadCount - 1 }); }
+    sawAll() { this.setState({ unreadCount : 0 }); }
+    open()   { this.setState({ open : true }); document.addEventListener('click', this.maybeClose_bound); }
+    close()  { this.setState({ open : false }); document.removeEventListener('click', this.maybeClose_bound); }
 
-    close() {
-        this.setState({ open : false });
-    }
+    toggle() { this.state.open ? this.close() : this.open(); }
 
     render() {
         return (
-            <div class="header-jewel">
+            <div class="header-jewel" ref={ el => (this.el = el) }>
                 <div class="header-jewel-icon notification-dropdown-icon" onClick={this.toggle.bind(this)}>
                     <i class="far fa-inbox"></i>
                     <b class={"header-notification-number " + (this.state.unreadCount == 0 ? "hidden" : "")}>{this.state.unreadCount}</b>
