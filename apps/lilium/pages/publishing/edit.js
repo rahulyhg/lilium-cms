@@ -207,11 +207,11 @@ export default class EditView extends Component {
     }
 
     preview(done) {
-
+        
     }
 
     commitchanges(done) {
-
+        
     }
 
     requestArticle(postid, done) {
