@@ -16,6 +16,9 @@ class LMLInstagram {
     }
 
     setup() {
+        log('Instagram', 'Deprecated method setup', 'warn');
+        return;
+
         if (isElder) {
             let store = this.storeStats.bind(this);
             let storeAllWebsites = () => {

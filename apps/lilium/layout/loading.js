@@ -22,6 +22,11 @@ const styles = {
         display : "block",
         fontSize : "20px",
         color : "rgb(170, 153, 185)"    
+    },
+    spinner : {
+        fontSize : 60,
+        color : "rgb(170, 153, 185)",
+        marginTop : 20
     }
 };
 
@@ -33,6 +38,7 @@ export class LoadingView extends Component {
                 {
                     liliumcms.env == "dev" ? (<b style={styles.devmention}>Development build</b>) : null
                 }
+                <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
             </div>
         );
     }

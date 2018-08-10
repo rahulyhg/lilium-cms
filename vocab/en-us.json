@@ -1,3 +1,32 @@
 {
+    "__": {
+        "languageName": "en-us",
+        "fallback": "en-ca",
+        "displayName": "English United States"
+    },
 
+    
+    "dashboard": {
+        "subtitle": "",
+        "title": ""
+    },
+    "devtools": {
+        "subtitle": "",
+        "title": ""
+    },
+    "errors": {
+        "subtitle": ""
+    },
+    "me": {
+        "subtitle": ""
+    },
+    "publishing": {
+        "subtitle": ""
+    },
+    "translations": {
+        "title": ""
+    },
+    "logout": {
+        "title": ""
+    }
 }

@@ -123,5 +123,8 @@ export function castNotification(param) {
     log('Notif', 'Casting Lilium notification with type : ' + n.type, 'detail');
     _singleton.push(n);
 
+    const event = new CustomEvent('notification', {detail : { notification : n }});
+    document.dispatchEvent(event);
+
     return n.id;
 }

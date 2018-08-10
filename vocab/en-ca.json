@@ -1,9 +1,30 @@
 {
-	"logintitle" : "Login",
-	"username" : "Username",
-	"password" : "Password",
-	"loginaction" : "Login",
-	"admintitle" : "Admin",
-	"plugins" : "Plugins",
-	"themes" : "Themes"
+    "__": {
+        "languageName": "en-ca",
+        "fallback": "",
+        "displayName": "Canadian English"
+    },
+
+    
+    "dashboard": {
+        "title": "Dashboard"
+    },
+    "devtools": {
+        "title": "Dev Tools"
+    },
+    "errors": {
+        "subtitle": "Errors"
+    },
+    "me": {
+        "subtitle": "Profile Page"
+    },
+    "publishing": {
+        "subtitle": "Publishing"
+    },
+    "translations": {
+        "title": "Translations"
+    },
+    "logout": {
+        "title": "Log Out"
+    }
 }

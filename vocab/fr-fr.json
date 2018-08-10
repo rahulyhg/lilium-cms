@@ -1,3 +1,30 @@
 {
+    "__": {
+        "languageName": "fr-fr",
+        "fallback": "fr-ca",
+        "displayName": "Français France"
+    },
 
+
+    "dashboard": {
+        "subtitle": "Accueil"
+    },
+    "devtools": {
+        "subtitle": ""
+    },
+    "errors": {
+        "subtitle": ""
+    },
+    "me": {
+        "subtitle": ""
+    },
+    "publishing": {
+        "subtitle": ""
+    },
+    "translations": {
+        "title": ""
+    },
+    "logout": {
+        "title": ""
+    }
 }
