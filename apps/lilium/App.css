@@ -379,6 +379,7 @@ h1 {
 
 .header-notification-success { border-left: 3px solid #20bd1d; }
 .header-notification-warning { border-left: 3px solid #ceab5d; }
+.header-notification-info,
 .header-notification-log     { border-left: 3px solid #607ada; }
 .header-notification-danger,
 .header-notification-error   { border-left: 3px solid #da6060; }
