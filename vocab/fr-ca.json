@@ -1,9 +1,16 @@
 {
+    "__": {
+        "languageName": "fr-ca",
+        "fallback": "en-ca",
+        "displayName": "Français Canadien"
+    },
+
+    
     "dashboard": {
         "title": "Tableau de bord"
     },
     "devtools": {
-        "title": "Outils de développement"
+        "subtitle": ""
     },
     "errors": {
         "subtitle": "Erreurs"

@@ -1,12 +1,14 @@
 const path = require('path');
 const log = require('./log.js');
 const {lstatSync, readdirSync, writeFileSync} = require('fs');
+const _c = require('./config');
 
 class Vocab {
 
     constructor() {
         this.supportedLanguages = [];
         this.languagesData = {};
+        this.defaultLanguage = 'en-ca';
     }
 
     /**
@@ -15,32 +17,32 @@ class Vocab {
      * @param {callback} done 
      */
     preloadDicos(done) {
-        const pages = readdirSync(path.join(liliumroot, 'apps', 'lilium', 'pages')).filter(dirItem => {
-            return lstatSync(path.join(liliumroot, 'apps','lilium', 'pages', dirItem)).isDirectory();
-        });
+        const pages = this.getPages();
 
         readdirSync(path.join(liliumroot, 'vocab')).forEach(langDirItem => {
             if (langDirItem.endsWith('.json')) {
                 const langName = langDirItem.split('.json')[0];
                 this.supportedLanguages.push(langName);
+
                 try {
                     const langData = require(path.join(liliumroot, 'vocab', langDirItem)) || {};
 
                     pages.forEach(page => {
                         if (!langData[page]) {
-                            langData[page] = {}
+                            langData[page] = { title: page };
+                            log('Vocab', 'Added new page to translations ' + page, 'info');
                         }
                     });
 
                     this.languagesData[langName] = langData;
 
-                    writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem), JSON.stringify(langData));
+                    writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem), JSON.stringify(this.compileLanguageData(langName)));
                 } catch (e) {
                     log('Vocab', `Error opening language file ` + e.message, 'err');
                 }
             }
         });
-        
+
         log('Vocab', `Detected supported languages ${this.supportedLanguages}`, 'success');
         done && done();
     }
@@ -50,7 +52,7 @@ class Vocab {
      */
     getSUpportedLanguages() { return this.supportedLanguages; };
 
-    /**
+    /**jsvas
      * Returns an object containing the translation data for a language code
      * @param {string} langcode THe langcode of which to get the translations
      */
@@ -64,12 +66,40 @@ class Vocab {
     writeLangDataToDisk(done) {
         this.supportedLanguages.forEach(lang => {
             writeFileSync(this.getLanguageFilePath(lang), JSON.stringify(this.languagesData[lang], null, 4));
-            writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', lang + '.json'), JSON.stringify(this.languagesData[lang]));
+            writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', lang + '.json'), JSON.stringify(this.compileLanguageData(lang)));
         });
 
         log('Vocab', 'Writing language translations to disk', 'info');
         done && done();
     }
+
+    /**
+     * Returned a compiled version of the language data that will be served as a static asset.
+     * This compilation logic handles the following fallback mechanisms:
+     *  - If a culture specific language e.g. 'fr-fr'does not have text associated to it, it will fallback to
+     *    any same language culture e.g. 'fr-ca' that has text associated to it.
+     *  - If no suitable language could be found in the previous step, fallback to 'en-ca'
+     * It's necessary to compile the language data as such to avoid having to fetch multiple language resource files from the client side
+     * @param {string} lang The language code of the language file to compile
+     */
+    compileLanguageData(lang) {
+        const compiled = this.languagesData[this.defaultLanguage];
+        const fallbackLangData = this.languagesData[this.languagesData[lang].__.fallback] || this.languagesData[lang];
+        this.getPages().forEach(page => {
+            Object.keys(fallbackLangData[page]).filter(slug => fallbackLangData[page][slug]).forEach(slug => {
+                compiled[page][slug] = fallbackLangData[page][slug];
+            });
+            Object.keys(this.languagesData[lang][page]).filter(slug => this.languagesData[lang][page][slug]).forEach(slug => {
+                compiled[page][slug] = this.languagesData[lang][page][slug];
+            });
+        });
+
+        log('Vocab', 'Compiled language resource file for language ' + lang, 'info');
+        compiled.__ = this.languagesData[lang].__;
+        return compiled;
+    }
+
+    
 
     /**
      * Updates a page translation slug for a specific language
@@ -130,21 +160,17 @@ class Vocab {
             return lstatSync(path.join(liliumroot, 'apps','lilium', 'pages', dirItem)).isDirectory();
         });
     }
-    
+
     getAllLanguageResources() {
         return this.languagesData;
     }
-    
+
     /**
      * Returns the absolute path of a language file
      * @param {string} langcode Language code of the language file to get
      */
     getLanguageFilePath(langcode) {
         return path.join(liliumroot, 'vocab', langcode+ '.json');
-    }
-
-    getDico() {
-        return {};
     }
 };
 

@@ -1,4 +1,11 @@
 {
+    "__": {
+        "languageName": "en-us",
+        "fallback": "en-ca",
+        "displayName": "English United States"
+    },
+
+    
     "dashboard": {
         "subtitle": "",
         "title": ""
@@ -17,8 +24,9 @@
         "subtitle": ""
     },
     "translations": {
-        "subtitle": "",
         "title": ""
     },
-    "logout": {}
+    "logout": {
+        "title": ""
+    }
 }

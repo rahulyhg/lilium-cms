@@ -1,21 +1,30 @@
 {
+    "__": {
+        "languageName": "fr-fr",
+        "fallback": "fr-ca",
+        "displayName": "Français France"
+    },
+
+
     "dashboard": {
-        "title": "Tableau de bord"
+        "subtitle": "Accueil"
     },
     "devtools": {
-        "title": "Outils de développement"
+        "subtitle": ""
     },
     "errors": {
-        "subtitle": "Erreurs"
+        "subtitle": ""
     },
     "me": {
-        "subtitle": "Profil"
+        "subtitle": ""
     },
     "publishing": {
-        "subtitle": "Publication"
+        "subtitle": ""
     },
     "translations": {
-        "title": "Traductions"
+        "title": ""
     },
-    "logout": {}
+    "logout": {
+        "title": ""
+    }
 }
