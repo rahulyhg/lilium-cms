@@ -18,6 +18,11 @@ const styles = {
         borderTop: "1px solid #d6ace8",
         color: "#4d2161",
         backgroundColor: "#e3c6ea"
+    },
+    spinner : {
+        fontSize : 60,
+        color : "rgb(170, 153, 185)",
+        marginTop : 20
     }
 }
 
@@ -274,7 +279,9 @@ export default class EditView extends Component {
 
         if (this.state.loading) {
             return (
-                <div>Loading...</div>
+                <div style={{ textAlign : 'center', paddingTop : 150 }}>
+                    <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
+                </div>
             )
         }
 
