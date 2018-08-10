@@ -2,6 +2,7 @@ import { h, Component } from "preact";
 import { navigateTo } from '../../routing/link';
 
 import DevToolAPI from './api';
+import DevToolNotifications from './notifications'
 
 const styles = {
     page : {
@@ -21,7 +22,8 @@ const styles = {
         background: "rgb(231, 226, 232)",
         border: "2px solid #f5eef7",
         textAlign : 'center',
-        cursor: "pointer"
+        cursor: "pointer",
+        marginRight : 20
     },
 
     linkIcon : {
@@ -33,12 +35,13 @@ const styles = {
 }
 
 const DEVTOOLS = {
-    api : DevToolAPI
+    api : DevToolAPI,
+    notifications : DevToolNotifications
 }
 
 class DevToolLink extends Component {
     clicked(ev) {
-        navigateTo("/devtools/api")
+        navigateTo("/devtools/" + this.props.name);
     }
 
     render() {
@@ -74,6 +77,7 @@ export default class DevTools extends Component {
 
                     <div style={{ padding: 15 }}>
                         <DevToolLink name="api" displayname="API" icon="fal fa-project-diagram" />
+                        <DevToolLink name="notifications" displayname="Notifications" icon="far fa-inbox" />
                     </div>
                 </div>
             )
