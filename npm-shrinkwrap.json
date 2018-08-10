@@ -605,9 +605,9 @@
       },
       "dependencies": {
         "commander": {
-          "version": "2.17.0",
-          "resolved": "https://registry.npmjs.org/commander/-/commander-2.17.0.tgz",
-          "integrity": "sha512-477o1hdVORiFlZxw8wgsXYCef3lh0zl/OV0FTftqiDxJSWw6dPQ2ipS4k20J2qBcsmsmLKSyr2iFrf9e3JGi4w==",
+          "version": "2.17.1",
+          "resolved": "https://registry.npmjs.org/commander/-/commander-2.17.1.tgz",
+          "integrity": "sha512-wPMUt6FnH2yzG95SA6mzjQOEKUU3aLaDEmzs1ti+1E9h+CsrZghRlqEM/EJ4KscsQVG8uNN4uVreUeT8+drlgg==",
           "dev": true
         },
         "source-map": {
@@ -1275,7 +1275,6 @@
       "version": "6.24.1",
       "resolved": "https://registry.npmjs.org/babel-plugin-transform-react-jsx/-/babel-plugin-transform-react-jsx-6.24.1.tgz",
       "integrity": "sha1-hAoCjn30YN/DotKfDA2R9jduZqM=",
-      "dev": true,
       "requires": {
         "babel-helper-builder-react-jsx": "^6.24.1",
         "babel-plugin-syntax-jsx": "^6.8.0",
@@ -1615,18 +1614,6 @@
       "requires": {
         "babel-plugin-syntax-jsx": "^6.0.2",
         "babel-plugin-transform-react-jsx": "^6.0.2"
-      },
-      "dependencies": {
-        "babel-plugin-transform-react-jsx": {
-          "version": "6.24.1",
-          "resolved": "https://registry.npmjs.org/babel-plugin-transform-react-jsx/-/babel-plugin-transform-react-jsx-6.24.1.tgz",
-          "integrity": "sha1-hAoCjn30YN/DotKfDA2R9jduZqM=",
-          "requires": {
-            "babel-helper-builder-react-jsx": "^6.24.1",
-            "babel-plugin-syntax-jsx": "^6.8.0",
-            "babel-runtime": "^6.22.0"
-          }
-        }
       }
     },
     "babel-register": {

@@ -30,7 +30,7 @@
             "admin_menu" : {
                 "id": "ponglinks",
                 "faicon": "fa-external-link",
-                "displayname": "Ponglinks",
+                "displayname": "Pong links",
                 "priority": 330,
                 "rights": ["ponglinks"],
                 "absURL": "admin/ponglinks",
@@ -338,6 +338,10 @@
             "endpoint" : "media",
             "support" : ["admin_get", "admin_post", "setup"]
         }, {
+            "module" : "translations.js",
+            "endpoint" : "translations",
+            "support" : ["admin_post", "livevar"]
+        }, {
             "module" : "badges.js",
             "endpoint" : "decorations",
             "support" : ["setup", "livevar", "admin_post", "admin_get"]
@@ -434,6 +438,14 @@
                     "priority": 700,
                     "rights": ["manage-plugins"],
                     "absURL": "admin/plugins",
+                    "children": []
+                }, {    
+                    "id": "translations",
+                    "faicon": "fa-globe",
+                    "displayname": "Translations",
+                    "priority": 3000,
+                    "rights": ["admin"],
+                    "absURL": "admin/translations",
                     "children": []
                 }]
             }

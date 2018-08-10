@@ -1,3 +1,21 @@
 {
-
+    "dashboard": {
+        "title": "Tableau de bord"
+    },
+    "devtools": {
+        "title": "Outils de développement"
+    },
+    "errors": {
+        "subtitle": "Erreurs"
+    },
+    "me": {
+        "subtitle": "Profil"
+    },
+    "publishing": {
+        "subtitle": "Publication"
+    },
+    "translations": {
+        "title": "Traductions"
+    },
+    "logout": {}
 }
