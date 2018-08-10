@@ -7,7 +7,7 @@
 
     
     "dashboard": {
-        "subtitle": "Tableau de bord"
+        "title": "Tableau de bord"
     },
     "devtools": {
         "subtitle": ""

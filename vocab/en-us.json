@@ -7,10 +7,12 @@
 
     
     "dashboard": {
-        "subtitle": ""
+        "subtitle": "",
+        "title": ""
     },
     "devtools": {
-        "subtitle": ""
+        "subtitle": "",
+        "title": ""
     },
     "errors": {
         "subtitle": ""

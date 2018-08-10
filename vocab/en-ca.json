@@ -7,10 +7,10 @@
 
     
     "dashboard": {
-        "subtitle": "Dashboard"
+        "title": "Dashboard"
     },
     "devtools": {
-        "subtitle": "Dev Tools"
+        "title": "Dev Tools"
     },
     "errors": {
         "subtitle": "Errors"
