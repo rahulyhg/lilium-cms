@@ -1,6 +1,0 @@
-<script>
-    var isArticle = function() {
-        var articleTypes = ["seditbasic", "seditstand", "seditprem"];
-        return articleTypes.indexOf(this.toString()) !== -1;
-    }
-</script>

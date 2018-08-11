@@ -11,7 +11,7 @@ class API {
                     log('API', 'JSON parsed successfully', 'detail');
                     sendback(undefined, resp, r);
                 }).catch(err => {
-                    log('API', 'JSON failed to parse', 'warn');
+                    log('API', 'JSON failed to parse for endpoint ' + endpoint, 'warn');
                     sendback(err, undefined, r);
                 });
             } else {               
@@ -46,6 +46,14 @@ class API {
 
     static post(endpoint, data, sendback) {
         API.request('POST', "/admin" + endpoint, {}, data, sendback);
+    }
+
+    static put(endpoint, data, sendback) {
+        API.request('PUT', '/admin' + endpoint, {}, data, sendback);
+    }
+
+    static delete(endpoint, data, sendback) {
+        API.request('DELETE', '/admin' + endpoint, {}, data, sendback);
     }
 
     static rebuild() {
