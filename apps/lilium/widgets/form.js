@@ -23,6 +23,34 @@ const styles = {
     textarea : {
         resize : "none",
         height : 150
+    },
+    checkboxWrapper: {
+        cursor: 'pointer',
+        border: '1px solid #2d2d2d',
+        borderRadius: '4px',
+        backgroundColor: 'transparent',
+        height: '25px',
+        width: '25px',
+        margin: '12px 12px 12px 20px',
+        flex: '0 0 25px',
+        flexWrap: 'nowrap',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white'
+    },
+    checkboxChecked: {
+        backgroundColor: '#af57e4',
+        borderStyle: 'dashed'
+    },
+    checkboxFieldWrapper: {
+        display: 'flex',
+        alignItems: 'center',
+    },
+    checkboxCheckmark: {
+        color: 'white',
+        padding: '0px',
+        margin: '0px'
     }
 }
 
@@ -54,6 +82,22 @@ const buttonThemes = {
     'danger':  { backgroundColor: "red"  , borderColor : "#3c0c0c" },
     'info':    { backgroundColor: "white", borderColor : "#DDDDDD" },
 };
+
+/**
+ * Returns the Class of a form component appropriate to the specified type
+ * @param {string} type The type of the value that needs to be represented by a form element
+ */
+export function fieldFromType(type) {
+    switch(type) {
+        case 'boolean':
+            alert('Checkbox!');
+            return CheckboxField;
+        case 'object':
+            return SelectField;
+        default:
+            return TextField;
+    }
+}
 
 export class ButtonWorker extends Component {
     constructor(props) {
@@ -163,5 +207,35 @@ export class EditableText extends FormField {
                 }
             </div>
         )
+    }
+}
+
+export class CheckboxField extends FormField {
+    constructor(props) {
+        super(props);
+
+        console.log(props);
+        this.state = { checked: this.props.initialValue || false };
+        console.log('initial value : ', this.state);
+    }
+
+    changed(ev) {
+        console.log(ev);
+        this.value = !this.value;
+        this.setState({ checked: this.value }, () => {
+            this.props.onChange && this.props.onChange(this.props.name, this.state.checked);
+        });
+    }
+
+    render() {
+        return (
+            <div className="checkbow-field-wrapper" style={styles.checkboxFieldWrapper}>
+                <p className="checkbox-text" style={{ margin: '0px' }}>{this.props.placeholder}</p>
+                <div className="checkbox-wrapper" onClick={this.changed.bind(this)}
+                        style={Object.assign({}, styles.checkboxWrapper, (this.state.checked) ? styles.checkboxChecked : {})}>
+                    <span className="checkmark">{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
+                </div>
+            </div>
+        );
     }
 }
