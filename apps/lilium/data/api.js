@@ -11,6 +11,7 @@ class API {
                     log('API', 'JSON parsed successfully', 'detail');
                     sendback(undefined, resp, r);
                 }).catch(err => {
+                    console.log(err);
                     log('API', 'JSON failed to parse for endpoint ' + endpoint, 'warn');
                     sendback(err, undefined, r);
                 });
