@@ -1,93 +1,45 @@
 var log = require('./log.js');
-var Admin = require('./backend/admin.js');
-var filelogic = require('./filelogic.js');
-var livevars = require('./livevars.js');
 var db = require('./includes/db.js');
-var formBuilder = require('./formBuilder.js');
-var config = require('./config.js');
+const _c = require('./config');
 
-var Preferences = function() {
+class Preferences {
 
-};
 
-var getDefault = function(conf) {
-    return {
-        topbuttontext : "Publish", 
-        topbuttonlink : "admin/article/new"
-    }
-};
 
-Preferences.prototype.getDefault = function(conf) {
-    return getDefault(conf);
-};
-
-Preferences.prototype.adminGET = function(cli) {
-    if (cli.routeinfo.path.length == 2) {
-        filelogic.serveAdminLML(cli, false);
-    } else {
-        switch (cli.routeinfo.path[2]) {
-            
+    adminPOST(cli) {
+        cli.touch('Preferences.adminPOST');
+        if (cli.routeinfo.path[2] == 'updatePreference') {
+            if (cli.postdata.data.preferenceName && typeof cli.postdata.data.value != 'undefined') {
+                console.log('passed!');
+                db.update(_c.default(), 'entities', {_id: db.mongoID(cli.userinfo.userid)},
+                    {[`preferences.${cli.postdata.data.preferenceName}`]: cli.postdata.data.value}, (err, result) => {
+                    if (!err) {
+                        cli.sendJSON({ success: true });
+                        log('Preferences', `Changed preference ${cli.postdata.data.preferenceName} to ${cli.postdata.data.value} for user ${cli.userinfo.user}`, 'success');
+                    } else {
+                        cli.sendJSON({ success: false });
+                        log('Preferences', `Error changing preference ${cli.postdata.data.preferenceName} to ${cli.postdata.data.value} for user ${cli.userinfo.user}`, 'err');
+                    }
+                });
+            } else {
+                cli.throwHTTP(400, 'Missing post data', true);
+            }
         }
-
-        cli.debug();
     }
-};
 
-Preferences.prototype.adminPOST = function(cli) {
-    savePreferences(cli, cli.postdata.data, function() {
-        cli.refresh();
-    });
-};
-
-var serveMyPreferences = function(cli, callback) {
-    db.find(config.default(), 'entities', {_id : db.mongoID(cli.userinfo.userid)}, [], function(err, cur) {
-        cur.next(function(err, obj) {
-            callback(err || obj && obj.preferences ? (obj.preferences.form_name ? obj.preferences : getDefault(cli._c)) : {});
+    livevar(cli, levels, params, sendback) {
+        cli.touch('Preferences.livevar');
+        db.findUnique(_c.default(), 'entities', { _id: db.mongoID(cli.userinfo.userid) }, (err, user) => {
+            if (!err) {
+                log('Preferences', 'fetched user preferences of user ' + cli.userinfo.user, 'success');
+                sendback(user.preferences);
+            } else {
+                log('Preferences', 'Error getting user preferences for user' + cli.userinfo.user, 'err');
+            }
         });
-    });
-};
-
-var savePreferences = function(cli, prefs, callback) {
-    cli.session.data.preferences = prefs;
-
-    cli.did('preferences', 'save', prefs);
-    db.update(config.default(), 'entities', { _id : db.mongoID(cli.session.data._id) }, {
-        preferences : prefs
-    }, callback, false, true);
-};
-
-Preferences.prototype.livevar = function(cli, levels, params, callback) {
-    if (levels.length == 0) {
-        callback(new Error("Cannot access Preferences Live Variable root level."));
+        console.log(this.state);
     }
 
-    switch (levels[0]) {
-        case "mine" : 
-            serveMyPreferences(cli, callback);             
-            break;
-        default :
-            callback(new Error("Undefined first-level " + levels[0] + " for Live Variable Preferences"));
-            break;
-    }
-};
-
-Preferences.prototype.form = function() {
-    formBuilder.createForm('preferences', {
-        fieldWrapper : "lmlform-fieldwrapper"
-    })
-    .add('title-admininterface', 'title', {
-        displayname : "Admin Interface"
-    })
-    .add('topbuttontext', 'text', {
-        displayname : "Top Button Text"
-    })
-    .add('topbuttonlink', 'text', {
-        displayname : "Top Button Link"
-    })
-    .add('save', 'submit', {
-        displayname : "Save Preferences",
-        value : "Save Preferences"
-    })
-};
+}
 
 module.exports = new Preferences();

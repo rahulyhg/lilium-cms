@@ -332,7 +332,7 @@
         }, {
             "module" : "preferences.js",
             "endpoint" : "preferences",
-            "support" : ["admin_get", "admin_post", "livevar"]
+            "support" : ["admin_post", "livevar"]
         }, {
             "module" : "media.js",
             "endpoint" : "media",
