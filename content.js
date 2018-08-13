@@ -585,6 +585,12 @@ class ContentLib {
 
                             this.generate(_c, fullpost, () => {
                                 callback({ historyentry, newstate : fullpost });
+
+                                notifications.emitToWebsite(_c.id, {
+                                    articleid : post._id,
+                                    at : Date.now(),
+                                    by : caller
+                                }, "articlePublished");
                             }, 'all');
                         });
                     });
