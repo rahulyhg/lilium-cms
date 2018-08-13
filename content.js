@@ -500,9 +500,15 @@ class ContentLib {
                                 newpost.updated = new Date();
                                 col.replaceOne({_id : postid}, newpost, {}, (err, r) => {
                                     log('Content', 'Updated article with headline ' + newpost.title[0], 'success');
-                                    callback(undefined, entry);
 
                                     hooks.fireSite(_c, 'article_updated', { article : newpost, _c, full : false });
+                                    notifications.emitToWebsite(_c.id, {
+                                        articleid : postid,
+                                        at : Date.now(),
+                                        by : caller
+                                    }, "articleUpdate");
+
+                                    callback(undefined, entry);
                                 });
                             });
                         } else {
