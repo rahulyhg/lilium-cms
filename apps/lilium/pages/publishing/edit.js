@@ -9,6 +9,7 @@ import { castNotification } from '../../layout/notifications';
 import dateFormat from 'dateformat';
 
 import API from "../../data/api";
+import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
     sidebarTitle : {
@@ -153,10 +154,28 @@ export default class EditView extends Component {
 
         this.coldState = {};
         this.edits = {};
+
+        this.socketArticleUpdateEvent_bound = this.socketArticleUpdateEvent.bind(this);
     }
 
     componentDidMount() {
         this.requestArticle(this.props.postid);
+        bindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound)
+    }
+
+    componentWillUnmount() {
+        unbindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound);
+    }
+
+    socketArticleUpdateEvent(ev) {
+        if (ev.by != liliumcms.session._id) {
+            this.setState({ history : [ev.historyentry, ...this.state.history] });
+            castNotification({
+                type : "info",
+                title : "Article was edited",
+                message : "This article has just been edited by another user."
+            })
+        }
     }
 
     save(done) {

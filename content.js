@@ -505,7 +505,8 @@ class ContentLib {
                                     notifications.emitToWebsite(_c.id, {
                                         articleid : postid,
                                         at : Date.now(),
-                                        by : caller
+                                        by : caller,
+                                        historyentry : entry
                                     }, "articleUpdate");
 
                                     callback(undefined, entry);

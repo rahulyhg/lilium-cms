@@ -58,6 +58,7 @@ class Lilium extends Component {
                 const currentLanguage = resp['/me'][0].language || 'en-ca';
                 setLanguage(currentLanguage, () => {
                     setSession("entities", resp["/entities/simple"]);
+                    liliumcms.session = resp["/me"][0];
                     this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false, currentLanguage });            
                 });
             }   
