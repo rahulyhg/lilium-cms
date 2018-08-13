@@ -419,6 +419,18 @@ var Notification = function () {
                 db.count(cli._c, 'notifications', { userID : db.mongoID(cli.userinfo.userid), interacted : false }, (err, unreadCount) => {
                     cb({unreadCount});
                 })
+            } else if (levels[0] == "all") {
+                const $skip = params.skip || 0;
+                const $limit = params.limit || 10;
+                db.join(cli._c, 'notifications', [
+                    {$match : {
+                        userID : db.mongoID(cli.userinfo.userid)
+                    }},
+                    {$sort : {_id : -1}},
+                    {$skip}, {$limit}
+                ], all => {
+                    cb(all);
+                });
             } else {
                 const $skip = params.skip || 0;
                 const $limit = params.limit || 10;
