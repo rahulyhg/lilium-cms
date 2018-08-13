@@ -11,6 +11,7 @@ import Logout       from '../pages/logout/index';
 import DevTools     from '../pages/devtools/index.js';
 import translations from '../pages/translations/index.js';
 import SettingsPage from '../pages/settings/index.js';
+import Notifs       from '../pages/notifications/index';
 import e404         from '../pages/errors/404';
 
 // Default endpoints are provided here
@@ -49,6 +50,7 @@ EndpointStore.registerEndpoint('logout', Logout);
 EndpointStore.registerEndpoint('devtools', DevTools);
 EndpointStore.registerEndpoint('translations', translations);
 EndpointStore.registerEndpoint('settings', SettingsPage);
+EndpointStore.registerEndpoint('notifications', Notifs);
 EndpointStore.registerEndpoint('_e404', e404);
 
 export class URLRenderer extends Component {

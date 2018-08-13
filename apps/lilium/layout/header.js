@@ -243,8 +243,16 @@ class NotificationLists extends Component {
                 )}
 
                 { this.state.section == "seen" && (
-                    <div class="notification-dropdown-section">
-                        {this.state.notifications.seen.map(x => <NotificationItem key={x._id} unseen={false} notification={x} />)}
+                    <div>
+                        <div class="notification-dropdown-section">
+                            {this.state.notifications.seen.map(x => <NotificationItem key={x._id} unseen={false} notification={x} />)}
+                        </div>
+
+                        <div class="notification-dropdown-seeall">
+                            <Link linkStyle="block" href="/notifications">
+                                <b>See all notifications</b>
+                            </Link>
+                        </div>
                     </div>
                 )}
             </div>
