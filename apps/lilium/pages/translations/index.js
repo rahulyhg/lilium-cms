@@ -245,7 +245,6 @@ export default class Translations extends Component {
         const mapped = {};
         this.getPages(pages => {
             this.getLangResources(vocab => {
-                console.log('VOCAB', vocab);
                 // For each page keys, we will assign a single field named "fields" which is an array 
                 try {
                     pages.forEach(page => {
@@ -253,10 +252,8 @@ export default class Translations extends Component {
                             fields : Object.keys(vocab['en-ca'][page]).map(slug => {
                                 // We map on the current page slugs (i.e. title, subtitle, profileHeader)
                                 const perLang = {slug};
-                                console.log(perLang);
                                 // For each language we support, find the translation per slug
                                 Object.keys(vocab).forEach(lang => {
-                                    console.log(lang);
                                     perLang[lang] = vocab[lang][page][slug];
                                 });
 
