@@ -50,7 +50,7 @@ class Lilium extends Component {
             { endpoint : '/me', params : {} },
             { endpoint : "/adminmenus", params : {} },
             { endpoint : "/entities/simple", params : {} }
-        ], (resp) => {
+        ], (err, resp) => {
             if (!resp["/me"] || !resp["/me"][0]) {
                 this.setState({ error : "session", loading : false });
             } else {

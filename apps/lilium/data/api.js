@@ -102,11 +102,13 @@ class API {
      */
     static getMany(payload, sendback) {
         const responses = {};
+        const errors = {};
         let doneIndex = 0;
 
         const requestDone = (req, err, resp) => {
-            responses[req.endpoint] = err || resp;
-            ++doneIndex == payload.length && sendback(responses);
+            responses[req.endpoint] = resp;
+            errors[req.endpoint] = err;
+            ++doneIndex == payload.length && sendback(errors, responses);
         }
 
         log('API', 'Requesting to multiple endpoints. Total : ' + payload.length, 'detail');

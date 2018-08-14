@@ -251,7 +251,7 @@ export default class EditView extends Component {
             history : { endpoint : "/publishing/history/" + postid, params : {} }
         };
 
-        API.getMany(Object.keys(endpoints).map(key => endpoints[key]), resp => {
+        API.getMany(Object.keys(endpoints).map(key => endpoints[key]), (err, resp) => {
             const post = resp[endpoints.post.endpoint];
             post ?
                 log('Publishing', 'About to display : ' + post.headline, 'detail') :
