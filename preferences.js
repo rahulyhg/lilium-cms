@@ -8,7 +8,6 @@ class Preferences {
         cli.touch('Preferences.adminPOST');
         if (cli.routeinfo.path[2] == 'updatePreference') {
             if (cli.postdata.data.preferenceName && typeof cli.postdata.data.value != 'undefined') {
-                console.log('passed!');
                 db.update(_c.default(), 'entities', {_id: db.mongoID(cli.userinfo.userid)},
                     {[`preferences.${cli.postdata.data.preferenceName}`]: cli.postdata.data.value}, (err, result) => {
                     if (!err) {
@@ -35,9 +34,7 @@ class Preferences {
                 log('Preferences', 'Error getting user preferences for user' + cli.userinfo.user, 'err');
             }
         });
-        console.log(this.state);
     }
-
 }
 
 module.exports = new Preferences();
