@@ -215,13 +215,10 @@ export class CheckboxField extends FormField {
     constructor(props) {
         super(props);
 
-        console.log(props);
         this.state = { checked: !!this.props.initialValue };
-        console.log('initial value : ', this.state);
     }
 
     changed(ev) {
-        console.log(ev);
         this.value = !this.value;
         this.setState({ checked: this.value }, () => {
             this.props.onChange && this.props.onChange(this.props.name, this.state.checked);
