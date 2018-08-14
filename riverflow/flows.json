@@ -59,16 +59,7 @@
         }, {
             "module" : "datareader.js",
             "endpoint" : "datareader",
-            "support" : ["admin_get", "admin_post", "livevar"],
-            "admin_menu" : {
-                "id": "datareader",
-                "faicon": "fa-chart-pie",
-                "displayname": "Data Reader",
-                "priority": 530,
-                "rights": ["analyst"],
-                "absURL": "admin/datareader",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "livevar"]
         }, {
             "module" : "livevars.js",
             "endpoint" : "livevars",
@@ -195,19 +186,6 @@
             "module" : "sharedcache.js",
             "endpoint" : "sharedcache",
             "support" : ["livevar"]
-        }, {
-            "module" : "tools.js",
-            "endpoint" : "tools",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"],
-            "admin_menu" : {
-                "id": "tools",
-                "faicon": "fa-wrench",
-                "displayname": "Tools",
-                "priority": 800,
-                "rights": ["develop"],
-                "absURL": "admin/tools",
-                "children": []
-            }
         }, {
             "module" : "conversations.js",
             "endpoint" : "conversations",
@@ -382,16 +360,7 @@
         }, {
             "module" : "sites.js",
             "endpoint" : "sites",
-            "support" : ["admin_get", "admin_post", "livevar"],
-            "admin_menu" : {
-                "id": "sites",
-                "faicon": "fa-globe",
-                "displayname": "Network",
-                "priority": 50,
-                "rights": ["manage-sites"],
-                "absURL": "admin/sites",
-                "children": []
-            }
+            "support" : ["admin_get", "admin_post", "livevar"]
         }, {
             "module" : "session.js",
             "endpoint" : "session",
