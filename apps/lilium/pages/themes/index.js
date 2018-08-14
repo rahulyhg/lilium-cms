@@ -1,6 +1,31 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
 
+class ThemeCard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            selected : props.active || false
+        }
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState({ selected : props.active || false });
+    }
+
+    componentDidMount() {
+
+    }
+
+    render() {
+        return (
+            <div class={"theme-card" + (this.state.selected ? " selected" : "")}>
+                {this.props.theme.dName}
+            </div>
+        )
+    }
+}
+
 export default class ThemeSettings extends Component {
     constructor(props) {
         super(props);
@@ -26,11 +51,9 @@ export default class ThemeSettings extends Component {
         return (
             <div id="theme-settings-page">
                 <h1>Themes</h1>
-                <div>
+                <div class="theme-card-list">
                     {this.state.themes.map(x => (
-                        <div>
-                            {x.dName}
-                        </div>
+                        <ThemeCard theme={x} active={x.uName == this.state.current.uName} />
                     ))}
                 </div>
             </div>
