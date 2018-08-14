@@ -137,7 +137,7 @@ export class SelectField extends FormField {
                 { this.props.placeholder ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
                 <select style={styles.textfield} value={this.value} onChange={this.changed.bind(this)}>
                     { this.props.options.map(opt => (
-                        <option value={opt.value}>{opt.displayname}</option>
+                        <option value={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname}</option>
                     )) }
                 </select>
             </div> 
