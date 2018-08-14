@@ -229,10 +229,10 @@ export default class Translations extends Component {
     componentDidMount() {
         this.getSupportedLanguageCodes(supportedLanguages => {
             this.supportedLanguages = supportedLanguages;
-        });
 
-        this.getMappedLangData(mapped => {
-            this.setState({ pagesTranslations: mapped });
+            this.getMappedLangData(mapped => {
+                this.setState({ pagesTranslations: mapped });
+            });
         });
     }
 
