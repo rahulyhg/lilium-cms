@@ -1,7 +1,7 @@
 import { Component, h } from 'preact';
 import API from '../../data/api';
 import { castNotification } from '../../layout/notifications';
-import { SelectField, CheckboxField } from '../../widgets/form.js';
+import { MultitagBox, SelectField, CheckboxField } from '../../widgets/form.js';
 
 const styles ={
     preferencesEdit: {
@@ -72,6 +72,7 @@ export default class Preferences extends Component {
                                         onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='badgesNotifications' placeholder='Enable badges popup notifications' initialValue={this.values['badgesNotifications']}
                                         onChange={this.valueChanged.bind(this)} />
+                        <MultitagBox initialValue={['a', 'b']} placeholder='Enter some tags!' />
                     </div>
                 </div>
             );
