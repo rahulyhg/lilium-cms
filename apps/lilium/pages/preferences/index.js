@@ -29,9 +29,11 @@ export default class Preferences extends Component {
     }
 
     componentDidMount() {
-        this.values = liliumcms.session.preferences;
-        API.get('/preferences', {}, (err, pref) => {
-            if(!err) {
+        API.getMany([
+            { endpoint: '/preferences', params: {} },
+            { endpoint: '/translations/getSupportedLanguages', params: {} }
+        ], (err, data) => {
+            if (data['/preferences']) {
                 this.setState({
                     ready: true
                 });
