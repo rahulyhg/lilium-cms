@@ -1,19 +1,11 @@
 import { Component, h } from 'preact';
-import { fieldFromType, CheckboxField } from '../../widgets/form.js';
 import API from '../../data/api';
+import { castNotification } from '../../layout/notifications';
+import { SelectField, CheckboxField } from '../../widgets/form.js';
 
-class PreferenceEdit extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
-    render() {
-        // const fieldClass = fieldFromType(this.props.type);
-        return (
-            <div className="preference">
-            </div>
-        );
+const styles ={
+    preferencesEdit: {
+        margin: '15px 350px'
     }
 }
 
@@ -50,6 +42,11 @@ export default class Preferences extends Component {
         API.post('/preferences/updatePreference', {preferenceName: name, value: value }, err => {
             if (!err) {
                 log('Preferences', `Set preference ${name} to ${value}`, 'success');
+                castNotification({
+                    type: 'success',
+                    title: 'Preferences saved',
+                    message: 'Your changes to your preferences were saved!'
+                });
             } else {
                 log('Preferences', `Error updating preferenc ${name}`, 'err');
             }
@@ -63,15 +60,23 @@ export default class Preferences extends Component {
             return (
                 <div id="preferences">
                     <h1>Preferences</h1>
-                    <div id="preferences-edit">
+                    <div id="preferences-edit" style={styles.preferencesEdit}>
+                        <SelectField name='uiLanguage' placeholder='User Interface Language' initialValue={liliumcms.session.uiLanguage || 'en-ca'}
+                                        options={this.supportedLanguages.map(l => { return { displayname: l.displayName, value: l.languageName } })}
+                                        onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='menuLocked' placeholder='Lock Left Menu' initialValue={this.values['menuLocked']}
                                         onChange={this.valueChanged.bind(this)} />
-                        <SelectField name='uiLanguage' placeholder='User Interface Language' />
+                        <CheckboxField name='publishAnimations' placeholder='Enable publishing animations' initialValue={this.values['publishAnimations']}
+                                        onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='fullscreenArticleEdit' placeholder='Enable fullscreen article editing' initialValue={this.values['fullscreenArticleEdit']}
+                                        onChange={this.valueChanged.bind(this)} />
+                        <CheckboxField name='badgesNotifications' placeholder='Enable badges popup notifications' initialValue={this.values['badgesNotifications']}
+                                        onChange={this.valueChanged.bind(this)} />
                     </div>
                 </div>
             );
         } else {
-            return (<p>Loading preferences</p>);
+            return (<p>Loading preferences</p>)
         }
     }
 }

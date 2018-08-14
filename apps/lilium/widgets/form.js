@@ -37,7 +37,8 @@ const styles = {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        color: 'white'
+        color: 'white',
+        marginLeft: 'auto'
     },
     checkboxChecked: {
         backgroundColor: '#af57e4',
@@ -215,7 +216,7 @@ export class CheckboxField extends FormField {
         super(props);
 
         console.log(props);
-        this.state = { checked: this.props.initialValue || false };
+        this.state = { checked: !!this.props.initialValue };
         console.log('initial value : ', this.state);
     }
 
@@ -233,7 +234,7 @@ export class CheckboxField extends FormField {
                 <p className="checkbox-text" style={{ margin: '0px' }}>{this.props.placeholder}</p>
                 <div className="checkbox-wrapper" onClick={this.changed.bind(this)}
                         style={Object.assign({}, styles.checkboxWrapper, (this.state.checked) ? styles.checkboxChecked : {})}>
-                    <span className="checkmark">{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
+                    <span className="checkmark" style={styles.checkbox}>{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
                 </div>
             </div>
         );
