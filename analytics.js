@@ -512,7 +512,6 @@ class GoogleAnalytics {
                     ['analytics_realtime_' + _c.id] : beautifulData
                 }, done) : done();
             } else {
-                log('Analytics', 'Error while fetching realtime data : ' + err, 'err');
                 done(err);
             }
         });
