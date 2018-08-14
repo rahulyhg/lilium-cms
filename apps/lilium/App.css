@@ -158,6 +158,36 @@ header {
     margin: 0;
 }
 
+.notification-page-strip {
+    display: block;
+    width: 100%;
+    border: 1px solid #CCC;
+    border-left: 3px solid #333;
+    background : #fefaff;
+    color : #333;
+    padding: 5px 8px;
+    margin-bottom: 10px;
+}
+
+.notification-page-strip.unread {
+    background: #fdf1ff;
+    color: #934da5;
+    border: 1px solid #efbffb;
+    border-left-width: 3px;
+    box-shadow : 0px 0px 1px 1px rgba(177, 117, 191, 0.2);
+}
+
+.notification-page-strip .title {
+    font-size: 12px;
+}
+
+.notification-page-strip p {
+    display: block;
+    margin: 0;
+    padding: 0;
+    font-size: 20px;
+}
+
 h1 {
     border-bottom: 1px solid #DDD;
     color: #333;
@@ -387,12 +417,12 @@ h2 {
     cursor : pointer;
 }
 
-.header-notification-success { border-left: 3px solid #20bd1d; }
-.header-notification-warning { border-left: 3px solid #ceab5d; }
-.header-notification-info,
-.header-notification-log     { border-left: 3px solid #607ada; }
-.header-notification-danger,
-.header-notification-error   { border-left: 3px solid #da6060; }
+.notification-page-strip-success, .header-notification-success { border-left: 3px solid #20bd1d; }
+.notification-page-strip-warning, .header-notification-warning { border-left: 3px solid #ceab5d; }
+.notification-page-strip-info,    .header-notification-info,
+.notification-page-strip-log,     .header-notification-log     { border-left: 3px solid #607ada; }
+.notification-page-strip-danger,  .header-notification-danger,
+.notification-page-strip-error,   .header-notification-error   { border-left: 3px solid #da6060; }
 
 .header-notification-title {
     font-size: 14px;
