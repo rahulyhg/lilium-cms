@@ -56,7 +56,6 @@ export default class Preferences extends Component {
     render() {
         // this.values['menuLocked']
         if (this.state.ready) {
-            console.log(this.values['menuLocked']);
             return (
                 <div id="preferences">
                     <h1>Preferences</h1>
