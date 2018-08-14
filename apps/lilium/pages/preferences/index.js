@@ -22,6 +22,7 @@ export default class Preferences extends Component {
         super(props);
 
         this.values = {};
+        this.supportedLanguages = [];
         this.state = {
             ready: false,
             preferences: {}
@@ -33,10 +34,10 @@ export default class Preferences extends Component {
             { endpoint: '/preferences', params: {} },
             { endpoint: '/translations/getSupportedLanguages', params: {} }
         ], (err, data) => {
-            if (data['/preferences']) {
-                this.setState({
-                    ready: true
-                });
+            if (data['/preferences'] && data['/translations/getSupportedLanguages']) {
+                this.values = data['/preferences'];
+                this.supportedLanguages = data['/translations/getSupportedLanguages'];
+                this.setState({ ready: true });
 
                 log('Preferences', 'Fetched user preferences', 'success');
             } else {
