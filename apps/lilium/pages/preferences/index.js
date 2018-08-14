@@ -29,9 +29,9 @@ export default class Preferences extends Component {
     }
 
     componentDidMount() {
+        this.values = liliumcms.session.preferences;
         API.get('/preferences', {}, (err, pref) => {
             if(!err) {
-                this.values = pref;
                 this.setState({
                     ready: true
                 });
@@ -63,6 +63,7 @@ export default class Preferences extends Component {
                     <div id="preferences-edit">
                         <CheckboxField name='menuLocked' placeholder='Lock Left Menu' initialValue={this.values['menuLocked']}
                                         onChange={this.valueChanged.bind(this)} />
+                        <SelectField name='uiLanguage' placeholder='User Interface Language' />
                     </div>
                 </div>
             );

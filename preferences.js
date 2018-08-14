@@ -4,8 +4,6 @@ const _c = require('./config');
 
 class Preferences {
 
-
-
     adminPOST(cli) {
         cli.touch('Preferences.adminPOST');
         if (cli.routeinfo.path[2] == 'updatePreference') {
