@@ -41,6 +41,7 @@ tmp/*
 # Uploads
 backend/static/uploads/*
 backend/static/u/*
+backend/static/compiled/*
 
 # Generated files
 backend/static/gen/*
