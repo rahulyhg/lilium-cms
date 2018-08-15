@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
-import { TextField, ButtonWorker } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultitagBox } from '../../widgets/form';
 import { getSession } from '../../data/cache';
 import { castNotification } from '../../layout/notifications';
 
@@ -149,7 +149,8 @@ export default class EditView extends Component {
         this.state = {
             loading : true,
             actions : [],
-            lastEdit : undefined
+            lastEdit : undefined,
+
         };
 
         this.coldState = {};
@@ -312,6 +313,11 @@ export default class EditView extends Component {
                     
                     <div style={{ maxWidth: 800, margin: "auto" }}>
                         <TextEditor onChange={this.fieldChanged.bind(this)} format={x => [x]} name="content" content={this.state.post.content[0]} />
+                    </div>
+
+                    <div style={{ maxWidth: 800, margin: "auto" }}>
+                        <MultitagBox onChange={this.fieldChanged.bind(this)} name='tags' placeholder='Tags' initialValue={this.state.post.tags} />
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='sticky' placeholder='Make this article sticky' initialValue={this.state.post.sticky} />
                     </div>
                 </div>
 

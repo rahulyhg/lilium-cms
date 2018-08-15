@@ -86,6 +86,7 @@ class HeaderUserDropdown extends Component {
                 {
                     this.state.open ? (<div class="dropdown-menu">
                         <Link href="/me" linkStyle="block">Profile</Link>
+                        <Link href="/preferences" linkStyle="block">Preferences</Link>
                         <Link href="/logout" linkStyle="block">Logout</Link>
                     </div>) : null
                 }
