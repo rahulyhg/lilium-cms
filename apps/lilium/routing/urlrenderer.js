@@ -16,6 +16,8 @@ import Notifs       from '../pages/notifications/index';
 import ThemesPage   from '../pages/themes/index';
 import CommentsMan  from '../pages/comments/index';
 import e404         from '../pages/errors/404';
+import e403         from '../pages/errors/403';
+
 
 // Default endpoints are provided here
 export class EndpointStore {
@@ -36,8 +38,9 @@ export class EndpointStore {
     }
 
     static getComponentFromEndpoint(endpointname) {
-        return EndpointStore.ENDPOINT_STORE[endpointname] || 
-            EndpointStore.ENDPOINT_STORE._e404;
+        return liliumcms.session.allowedEndpoints.includes(endpointname) ? 
+            EndpointStore.ENDPOINT_STORE[endpointname] || EndpointStore.ENDPOINT_STORE._e404 : 
+            EndpointStore.ENDPOINT_STORE._e403;
     }
 }
 
@@ -58,6 +61,7 @@ EndpointStore.registerEndpoint('notifications', Notifs);
 EndpointStore.registerEndpoint('themes', ThemesPage);
 EndpointStore.registerEndpoint('comments', CommentsMan);
 EndpointStore.registerEndpoint('_e404', e404);
+EndpointStore.registerEndpoint('_e403', e403);
 
 export class URLRenderer extends Component {
     constructor(props) {
