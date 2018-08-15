@@ -51,7 +51,37 @@ const styles = {
     checkboxCheckmark: {
         color: 'white',
         padding: '0px',
-        margin: '0px'
+        margin: '0px',
+    },
+    fauxTextField: {
+        cursor: 'text',
+        height: '40px',
+        display: 'flex',
+        padding: '2px'
+    },
+    tag: {
+        closeButton: {
+            margin: '2px 2px 2px 6px',
+            cursor: 'pointer',
+            hover: {
+                fontWeight: 'bolder',
+            }
+        },
+        cursor: 'default',
+        backgroundColor: '#af57e4',
+        color: 'white',
+        margin: '4px 8px',
+        padding: '2px 6px',
+        display: 'flex',
+        alignContent: 'center',
+        fontWeight: 'bold'
+    },
+    invisibleInput: {
+        border: '0',
+        backgroundColor: 'transparent',
+        outline: 'none',
+        margin: '4px 8px',
+        lineHeight: '20px'
     }
 }
 
@@ -163,9 +193,9 @@ export class TextField extends FormField {
                 {
                     this.props.multiline ? 
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} 
-                                    onChange={this.changed.bind(this)} onKeyPress={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
+                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
-                                    onChange={this.changed.bind(this)} onKeyPress={this.handleKeyPress.bind(this)} />)
+                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} />)
                 }
             </div>
         )
@@ -174,7 +204,6 @@ export class TextField extends FormField {
 
 
 export class EditableText extends FormField {
-
     constructor(props) {
         super(props);
 
@@ -232,6 +261,96 @@ export class CheckboxField extends FormField {
                 <div className="checkbox-wrapper" onClick={this.changed.bind(this)}
                         style={Object.assign({}, styles.checkboxWrapper, (this.state.checked) ? styles.checkboxChecked : {})}>
                     <span className="checkmark" style={styles.checkbox}>{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
+                </div>
+            </div>
+        );
+    }
+}
+
+class Tag extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className="tags" style={styles.tag}>
+                <span className="tag-text">{this.props.text}</span>
+                <i className="fal fa-times" style={styles.tag.closeButton} onClick={this.props.remove.bind(this, this.props.text)}></i>
+            </div>
+        );
+    }
+}
+
+export class MultitagBox extends FormField {
+    constructor(props) {
+        super(props);
+
+        this.state = { tags: this.value || [] }
+    }
+
+    pushTag(text) {
+        const tags = this.state.tags;
+        if (!tags.includes(text)) {
+            tags.push(text);
+            this.setState({ tags });
+            
+            this.changed();
+        } else {
+            log('MultitagBox', 'MultitagBox will not add a duplicate tag', 'warn');
+        }
+    }
+
+    removeTag(key) {
+        const tags = this.state.tags.filter(tag => tag != key);
+        this.setState({ tags });
+
+        this.changed();
+    }
+
+    popTag() {
+        const tags = this.state.tags;
+        tags.pop();
+        this.setState({ tags });
+
+        this.changed();
+    }
+
+    changed() {
+        this.props.onChange && this.props.onChange(this.props.name, this.state.tags);
+    }
+
+    onKeyDown(ev) {
+        this.isEmpty = !ev.target.value;
+
+        if (ev.which == 13 || ev.keyCode == 13) {
+            this.pushTag(ev.target.value);
+            ev.target.value = '';
+            this.isEmpty = true;
+        } else if (ev.which == 8 || ev.keyCode == 8) {
+            this.isEmpty && this.popTag();
+        }
+    }
+
+    focusInput() {
+        this.textInput.focus();
+    }
+
+    render() {
+        return (
+            <div className="multilang-box-wrapper">
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
+                <div className="textfield" style={Object.assign({}, styles.textfield, styles.fauxTextField)} onClick={this.focusInput.bind(this)}>
+                    {
+                        this.state.tags.map(tag => {
+                            return (
+                                <Tag text={tag} key={tag} remove={this.removeTag.bind(this)} />
+                            );
+                        })
+                    }
+
+                    <input type="text" ref={x => (this.textInput = x)} style={styles.invisibleInput} onKeyDown={this.onKeyDown.bind(this)}
+                            placeholder={(this.props.placeholderType == 'inside' ) ? this.props.placeholder : ''} />
                 </div>
             </div>
         );

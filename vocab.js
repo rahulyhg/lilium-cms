@@ -23,7 +23,6 @@ class Vocab {
             if (langDirItem.endsWith('.json')) {
                 try {
                     const langData = require(path.join(liliumroot, 'vocab', langDirItem)) || {};
-                    console.log('LANG DATA : ', langData);
                     this.supportedLanguages.push(langData.__);
 
                     pages.forEach(page => {
@@ -33,10 +32,7 @@ class Vocab {
                         }
                     });
 
-                    console.log(langData.__.languageName);
-                    console.log('BEFORE : ', this.languagesData);
                     this.languagesData[langData.__.languageName] = langData;
-                    console.log('AFTER : ', this.languagesData);
                     writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem),
                                     JSON.stringify(this.compileLanguageData(langData.__.languageName)));
                 } catch (e) {
@@ -45,8 +41,6 @@ class Vocab {
             }
         });
 
-        // console.log('SUPPORTED LANGUAGES : ', this.supportedLanguages);
-        // console.log('LOADED LANGUAGE DATA : ', this.languagesData);
         log('Vocab', `Detected supported languages ${this.supportedLanguages}`, 'success');
         done && done();
     }
@@ -179,7 +173,6 @@ class Vocab {
      * @param {string} langcode Language code of the language file to get
      */
     getLanguageFilePath(langcode) {
-        console.log('PATH : ', path.join(liliumroot, 'vocab', langcode+ '.json'));
         return path.join(liliumroot, 'vocab', langcode+ '.json');
     }
 };

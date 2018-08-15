@@ -1,7 +1,7 @@
 import { Component, h } from 'preact';
 import API from '../../data/api';
 import { castNotification } from '../../layout/notifications';
-import { SelectField, CheckboxField } from '../../widgets/form.js';
+import { MultitagBox, SelectField, CheckboxField } from '../../widgets/form.js';
 
 const styles ={
     preferencesEdit: {
