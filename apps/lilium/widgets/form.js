@@ -20,6 +20,9 @@ const styles = {
         color: "#333",
         outlineColor: "#c47ed4"
     },
+    stackboxsingles : {
+        marginBottom : 0
+    },
     textarea : {
         resize : "none",
         height : 150
@@ -127,6 +130,77 @@ export class TextField extends FormField {
     }
 }
 
+export class StackBox extends FormField {
+    constructor(props) {
+        super(props);
+        this.state = {
+            values : Array.from(this.value || [])
+        };
+    }
+
+    onChange() {
+        console.log(this.state.values);
+        this.changed({
+            target : {
+                value : this.state.values
+            }
+        });
+    }
+
+    appendFromBox(text) {
+        this.setState({ values : [...this.state.values, text] }, () => {
+            this.onChange();
+        });
+    }
+
+    textEdited(index, value) {
+        const newValues = [...this.state.values];
+        newValues[index] = value;
+        this.setState({ values : newValues }, () => {
+            this.onChange();
+        });
+    }
+
+    handleInputBoxKeyPress(ev) {
+        if (ev.key == 'Enter' && ev.target.value.trim()) {
+            const value = ev.target.value.trim();
+            ev.target.value = "";
+            this.appendFromBox(value);
+        }
+    }
+
+    render() {
+        return (
+            <div class="stack-box">
+                <b style={styles.placeholder}>{this.props.placeholder || ""}</b>
+                <div class="stack-box-list">
+                    {
+                        this.state.values.map((value, i) => (<StackBox.StackField onChange={this.textEdited.bind(this)} index={i} initialValue={value} />))
+                    }
+                </div>
+                <div>
+                    <TextField onKeyPress={this.handleInputBoxKeyPress.bind(this)} placeholderType="inside" placeholder="Provide a value and press Enter (return)" />
+                </div>
+            </div>
+        )
+    }
+}
+
+StackBox.StackField = class StackField extends Component {
+    constructor(props) {
+        super(props);
+    }
+
+    onChange(name, value) {
+        this.props.onChange(this.props.index, value);
+    }
+
+    render() {
+        return (
+            <TextField onChange={this.onChange.bind(this)} wrapstyle={styles.stackboxsingles} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+        )
+    }
+}
 
 export class EditableText extends FormField {
 

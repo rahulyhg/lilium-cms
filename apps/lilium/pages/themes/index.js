@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
-import { TextField, SelectField } from '../../widgets/form';
+import { TextField, SelectField, StackBox } from '../../widgets/form';
 
 class ThemeSettingsForm extends Component {
     constructor(props) {
@@ -26,6 +26,11 @@ class ThemeSettingsForm extends Component {
                 placeholder={entry.attr.displayname} 
                 initialValue={this.coldState[name]} 
                 options={entry.attr.datasource.map(s => { return { displayname : s.displayName, value : s.name } })}
+            />);
+
+            case "stack": return (<StackBox 
+                placeholder={entry.attr.displayname}
+                initialValue={this.coldState[name] || []}
             />);
 
             case "text": default: return (<TextField 
