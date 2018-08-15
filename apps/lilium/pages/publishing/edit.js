@@ -2,13 +2,14 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
-import { TextField, ButtonWorker } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultitagBox } from '../../widgets/form';
 import { getSession } from '../../data/cache';
 import { castNotification } from '../../layout/notifications';
 
 import dateFormat from 'dateformat';
 
 import API from "../../data/api";
+import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
 
 const styles = {
     sidebarTitle : {
@@ -18,6 +19,11 @@ const styles = {
         borderTop: "1px solid #d6ace8",
         color: "#4d2161",
         backgroundColor: "#e3c6ea"
+    },
+    spinner : {
+        fontSize : 60,
+        color : "rgb(170, 153, 185)",
+        marginTop : 20
     }
 }
 
@@ -143,15 +149,34 @@ export default class EditView extends Component {
         this.state = {
             loading : true,
             actions : [],
-            lastEdit : undefined
+            lastEdit : undefined,
+
         };
 
         this.coldState = {};
         this.edits = {};
+
+        this.socketArticleUpdateEvent_bound = this.socketArticleUpdateEvent.bind(this);
     }
 
     componentDidMount() {
         this.requestArticle(this.props.postid);
+        bindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound)
+    }
+
+    componentWillUnmount() {
+        unbindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound);
+    }
+
+    socketArticleUpdateEvent(ev) {
+        if (ev.by != liliumcms.session._id) {
+            this.setState({ history : [ev.historyentry, ...this.state.history] });
+            castNotification({
+                type : "info",
+                title : "Article was edited",
+                message : "This article has just been edited by another user."
+            })
+        }
     }
 
     save(done) {
@@ -227,7 +252,7 @@ export default class EditView extends Component {
             history : { endpoint : "/publishing/history/" + postid, params : {} }
         };
 
-        API.getMany(Object.keys(endpoints).map(key => endpoints[key]), resp => {
+        API.getMany(Object.keys(endpoints).map(key => endpoints[key]), (err, resp) => {
             const post = resp[endpoints.post.endpoint];
             post ?
                 log('Publishing', 'About to display : ' + post.headline, 'detail') :
@@ -274,7 +299,9 @@ export default class EditView extends Component {
 
         if (this.state.loading) {
             return (
-                <div>Loading...</div>
+                <div style={{ textAlign : 'center', paddingTop : 150 }}>
+                    <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
+                </div>
             )
         }
 
@@ -286,6 +313,11 @@ export default class EditView extends Component {
                     
                     <div style={{ maxWidth: 800, margin: "auto" }}>
                         <TextEditor onChange={this.fieldChanged.bind(this)} format={x => [x]} name="content" content={this.state.post.content[0]} />
+                    </div>
+
+                    <div style={{ maxWidth: 800, margin: "auto" }}>
+                        <MultitagBox onChange={this.fieldChanged.bind(this)} name='tags' placeholder='Tags' initialValue={this.state.post.tags} />
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='sticky' placeholder='Make this article sticky' initialValue={this.state.post.sticky} />
                     </div>
                 </div>
 

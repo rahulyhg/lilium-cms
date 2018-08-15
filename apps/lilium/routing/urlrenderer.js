@@ -7,9 +7,13 @@ import InitPage     from '../pages/default';
 import Dashboard    from '../pages/dashboard/index';
 import Publishing   from '../pages/publishing/index';
 import ProfilePage  from '../pages/me/index.js';
+import Preferences  from '../pages/preferences/index.js';
 import Logout       from '../pages/logout/index';
 import DevTools     from '../pages/devtools/index.js';
 import translations from '../pages/translations/index.js';
+import SettingsPage from '../pages/settings/index.js';
+import Notifs       from '../pages/notifications/index';
+import ThemesPage   from '../pages/themes/index';
 import e404         from '../pages/errors/404';
 
 // Default endpoints are provided here
@@ -44,9 +48,13 @@ EndpointStore.registerEndpoint("_init", InitPage);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
 EndpointStore.registerEndpoint('me', ProfilePage);
+EndpointStore.registerEndpoint('preferences', Preferences);
 EndpointStore.registerEndpoint('logout', Logout);
 EndpointStore.registerEndpoint('devtools', DevTools);
 EndpointStore.registerEndpoint('translations', translations);
+EndpointStore.registerEndpoint('settings', SettingsPage);
+EndpointStore.registerEndpoint('notifications', Notifs);
+EndpointStore.registerEndpoint('themes', ThemesPage);
 EndpointStore.registerEndpoint('_e404', e404);
 
 export class URLRenderer extends Component {

@@ -183,7 +183,6 @@ class PageTranslation extends Component {
                         );
                     })
                 }
-                
             </div>
         );
     }
@@ -199,8 +198,8 @@ export default class Translations extends Component {
         };
     }
 
-    getSupportedLanguages(done) {
-        API.get('/translations/getSupportedLanguages', {}, (err, data) => {
+    getSupportedLanguageCodes(done) {
+        API.get('/translations/getSupportedLanguageCodes', {}, (err, data) => {
             if (!err) {
                 done && done(data);
             } else {
@@ -228,12 +227,12 @@ export default class Translations extends Component {
     }
 
     componentDidMount() {
-        this.getSupportedLanguages(supportedLanguages => {
+        this.getSupportedLanguageCodes(supportedLanguages => {
             this.supportedLanguages = supportedLanguages;
-        });
 
-        this.getMappedLangData(mapped => {
-            this.setState({ pagesTranslations: mapped });
+            this.getMappedLangData(mapped => {
+                this.setState({ pagesTranslations: mapped });
+            });
         });
     }
 
@@ -253,7 +252,6 @@ export default class Translations extends Component {
                             fields : Object.keys(vocab['en-ca'][page]).map(slug => {
                                 // We map on the current page slugs (i.e. title, subtitle, profileHeader)
                                 const perLang = {slug};
-
                                 // For each language we support, find the translation per slug
                                 Object.keys(vocab).forEach(lang => {
                                     perLang[lang] = vocab[lang][page][slug];
