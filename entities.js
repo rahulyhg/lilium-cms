@@ -771,7 +771,7 @@ class Entities {
                 user : data.items[0]
             } : { error : "Not found" }));              
         } else if (levels[0] == "bunch") {
-            const filters = params.filters;
+            const filters = params.filters || {};
             const $match = { };
             const $sort = { };
 
@@ -787,6 +787,7 @@ class Entities {
                 case "latest-logged" : $sort.lastLogin = -1; break;
                 case "newest" : $sort._id = -1; break;
                 case "oldest" : $sort._id = 1; break;
+                default: $sort._id = -1;
             }
 
             if (filters.search && filters.search.trim()) {
