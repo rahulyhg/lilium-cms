@@ -41,6 +41,19 @@
             "endpoint" : "pong",
             "support" : ["get"]
         }, {
+            "module" : "comments.js",
+            "endpoint" : "comments",
+            "support" : ["admin_post", "livevar", "get", "post"],
+            "admin_menu" : {
+                "id": "comments",
+                "faicon": "fa-comments",
+                "displayname": "Comment threads",
+                "priority": 228,
+                "rights": ["editor"],
+                "absURL": "admin/comments",
+                "children": []
+            }
+        }, {
             "module" : "notifications.js",
             "endpoint" : "notifications",
             "support" : ["admin_post"]
