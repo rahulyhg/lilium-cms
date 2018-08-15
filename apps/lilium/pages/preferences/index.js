@@ -72,7 +72,7 @@ export default class Preferences extends Component {
                                         onChange={this.valueChanged.bind(this)} />
                         <CheckboxField name='badgesNotifications' placeholder='Enable badges popup notifications' initialValue={this.values['badgesNotifications']}
                                         onChange={this.valueChanged.bind(this)} />
-                        <MultitagBox initialValue={['a', 'b']} placeholder='Enter some tags!' />
+                        <MultitagBox name='tagstestname' initialValue={['a', 'b']} placeholder='Enter some tags!' onChange={(name, val) => { console.log(name, val) }} />
                     </div>
                 </div>
             );

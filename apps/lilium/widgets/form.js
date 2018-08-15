@@ -297,6 +297,8 @@ export class MultitagBox extends FormField {
         if (!tags.includes(text)) {
             tags.push(text);
             this.setState({ tags });
+            
+            this.changed();
         } else {
             log('MultitagBox', 'MultitagBox will not add a duplicate tag', 'warn');
         }
@@ -305,12 +307,20 @@ export class MultitagBox extends FormField {
     removeTag(key) {
         const tags = this.state.tags.filter(tag => tag != key);
         this.setState({ tags });
+
+        this.changed();
     }
 
     popTag() {
         const tags = this.state.tags;
         tags.pop();
         this.setState({ tags });
+
+        this.changed();
+    }
+
+    changed() {
+        this.props.onChange && this.props.onChange(this.props.name, this.state.tags);
     }
 
     onKeyDown(ev) {
