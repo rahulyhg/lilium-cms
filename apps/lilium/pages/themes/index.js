@@ -16,6 +16,11 @@ class ThemeSettingsForm extends Component {
         this.setState({ theme : props.theme });
     }
 
+    valueChanged(name, value) {
+        this.coldState[name] = value;
+        
+    }
+
     componentDidMount() {
 
     }
@@ -25,16 +30,19 @@ class ThemeSettingsForm extends Component {
             case "select": return (<SelectField 
                 placeholder={entry.attr.displayname} 
                 initialValue={this.coldState[name]} 
+                onChange={this.valueChanged.bind(this)}
                 options={entry.attr.datasource.map(s => { return { displayname : s.displayName, value : s.name } })}
             />);
 
             case "stack": return (<StackBox 
                 placeholder={entry.attr.displayname}
+                onChange={this.valueChanged.bind(this)}
                 initialValue={this.coldState[name] || []}
             />);
 
             case "text": default: return (<TextField 
                 placeholder={entry.attr.displayname} 
+                onChange={this.valueChanged.bind(this)}
                 initialValue={this.coldState[name]} 
             />);
         }

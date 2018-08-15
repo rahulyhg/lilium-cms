@@ -21,7 +21,17 @@ const styles = {
         outlineColor: "#c47ed4"
     },
     stackboxsingles : {
-        marginBottom : 0
+        marginBottom : 0,
+        flexGrow : 1
+    },
+    stackboxex : {
+        width: 40, height : 40,    
+        background: "#f5b1b1",
+        color: "white",
+        boxSizing: "border-box",
+        fontSize: 32,
+        textAlign: "center",
+        cursor: "pointer"
     },
     textarea : {
         resize : "none",
@@ -214,7 +224,6 @@ export class StackBox extends FormField {
     }
 
     onChange() {
-        console.log(this.state.values);
         this.changed({
             target : {
                 value : this.state.values
@@ -244,17 +253,30 @@ export class StackBox extends FormField {
         }
     }
 
+    removeOne(index) {
+        let values = [...this.state.values];
+        if (index == 0) {
+            values.shift();
+        } else if (index == values.length - 1) {
+            values.pop();
+        } else {
+            values = [...values.splice(0, index), ...values.splice(1)];
+        }
+
+        this.setState({ values });
+    }
+
     render() {
         return (
             <div class="stack-box">
                 <b style={styles.placeholder}>{this.props.placeholder || ""}</b>
                 <div class="stack-box-list">
                     {
-                        this.state.values.map((value, i) => (<StackBox.StackField onChange={this.textEdited.bind(this)} index={i} initialValue={value} />))
+                        this.state.values.map((value, i) => (<StackBox.StackField onDelete={this.removeOne.bind(this, i)} onChange={this.textEdited.bind(this)} index={i} initialValue={value} />))
                     }
                 </div>
                 <div>
-                    <TextField onKeyPress={this.handleInputBoxKeyPress.bind(this)} placeholderType="inside" placeholder="Provide a value and press Enter (return)" />
+                    <TextField onKeyPress={this.handleInputBoxKeyPress.bind(this)} placeholderType="inside" placeholder="Provide a value and press Enter" />
                 </div>
             </div>
         )
@@ -270,9 +292,16 @@ StackBox.StackField = class StackField extends Component {
         this.props.onChange(this.props.index, value);
     }
 
+    selfdestruct() {
+        this.props.onDelete(this.props.index);
+    }
+
     render() {
         return (
-            <TextField onChange={this.onChange.bind(this)} wrapstyle={styles.stackboxsingles} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+            <div style={{ display : "flex" }}>
+                <div onClick={this.selfdestruct.bind(this)} style={styles.stackboxex}><i class="far fa-times"></i></div>
+                <TextField onChange={this.onChange.bind(this)} wrapstyle={styles.stackboxsingles} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+            </div>
         )
     }
 }
