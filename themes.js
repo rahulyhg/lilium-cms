@@ -49,8 +49,12 @@ var Themes = function () {
                         success: true
                     });
                 });
+            } else if (cli.routeinfo.path[2] == "updateOneField") {
+                this.updateOneField(cli._c, cli.postdata.data.field, cli.postdata.data.value, () => {
+
+                });
             } else {
-                this.updateThemeSettings(cli);
+                cli.throwHTTP(403, undefined, true);
             }
         } 
     };
@@ -85,6 +89,12 @@ var Themes = function () {
         } else {
             cli.refresh();
         }
+    }
+
+    this.updateOneField = function(_c, field, value, done) {
+        db.update(_c, 'themes', { active : true }, { ["settings." + field] : value }, (err, res) => {
+            done();
+        });
     }
 
     this.searchDirForThemes = function (uName, callback) {

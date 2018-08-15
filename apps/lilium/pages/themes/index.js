@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
-import { TextField, SelectField, StackBox } from '../../widgets/form';
+import { TextField, SelectField, StackBox, CheckboxField } from '../../widgets/form';
 
 class ThemeSettingsForm extends Component {
     constructor(props) {
@@ -16,9 +16,13 @@ class ThemeSettingsForm extends Component {
         this.setState({ theme : props.theme });
     }
 
-    valueChanged(name, value) {
-        this.coldState[name] = value;
-        
+    valueChanged(field, value) {
+        this.coldState[field] = value;
+        API.post('/themes/updateOneField', {
+            field, value
+        }, () => {
+            log('Themes', 'Updated theme field : ' + field, 'success');
+        });
     }
 
     componentDidMount() {
@@ -28,6 +32,7 @@ class ThemeSettingsForm extends Component {
     fieldFromInfoEntry(name, entry) {
         switch (entry.type) {
             case "select": return (<SelectField 
+                name={name}
                 placeholder={entry.attr.displayname} 
                 initialValue={this.coldState[name]} 
                 onChange={this.valueChanged.bind(this)}
@@ -35,12 +40,31 @@ class ThemeSettingsForm extends Component {
             />);
 
             case "stack": return (<StackBox 
+                name={name}
                 placeholder={entry.attr.displayname}
                 onChange={this.valueChanged.bind(this)}
                 initialValue={this.coldState[name] || []}
             />);
 
+            case "checkbox": return (<CheckboxField 
+                name={name}
+                placeholder={entry.attr.displayname}
+                onChange={this.valueChanged.bind(this)}
+                initialValue={this.coldState[name]}
+            />);
+
+            case "textarea": return (<TextField 
+                name={name}
+                multiline={true}
+                placeholder={entry.attr.displayname} 
+                onChange={this.valueChanged.bind(this)}
+                initialValue={this.coldState[name]} 
+            />)
+
+            case "title": return (<h2>{entry.attr.displayname}</h2>);
+
             case "text": default: return (<TextField 
+                name={name}
                 placeholder={entry.attr.displayname} 
                 onChange={this.valueChanged.bind(this)}
                 initialValue={this.coldState[name]} 
@@ -116,9 +140,11 @@ export default class ThemeSettings extends Component {
                         <ThemeCard theme={x} active={x.uName == this.state.current.uName} />
                     ))}
                 </div>
-                <h1>Settings</h1>
-                <div class="theme-settings">
-                    <ThemeSettingsForm theme={this.state.current} />
+                <div style={{ maxWidth : 780, margin : "auto" }}>
+                    <h1>Settings</h1>
+                    <div class="theme-settings">
+                        <ThemeSettingsForm theme={this.state.current} />
+                    </div>
                 </div>
             </div>
         );
