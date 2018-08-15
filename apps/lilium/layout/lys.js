@@ -51,6 +51,7 @@ export class Lys extends Component {
             })];
         }).forEach(x => this.commands.push(...x));
 
+        commands = this.commands;
         log('Lys', 'Handling now ' + this.commands.length + ' built-in commands', 'success');
     }
 
@@ -216,6 +217,7 @@ export class Lys extends Component {
                     { (
                         this.state.pageChoices.length == 0 &&
                         this.state.choices.length == 0 &&
+                        this.state.customChoices.length == 0 &&
                         this.state.posts.length == 0
                     ) ? this.renderHelp() : null }
                 </div>

@@ -71,6 +71,7 @@ class Core {
                             loadDocs(() => {
                                 redirectIfInit(resp, () => {
                                     makeBuild(() => {
+                                        loadGitHub();
                                         loadFrontend();
                                         require('./riverflow/riverflow.js').loadFlows();
 
@@ -88,6 +89,7 @@ class Core {
                                         log('Core', 'Firing initialized signal', 'info');
                                         hooks.fire('init');
                                     });
+                                
                                 });
                             });
                         });
@@ -236,6 +238,12 @@ const loadRoles = (cb) => {
 
     cb();
 };
+
+const loadGitHub = () => {
+    if (!isElder) return;
+
+    require('./github').initialize();
+}
 
 const gracefullyCrash = (err) => {
     const stack = err.stack.split('\n');

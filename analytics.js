@@ -468,7 +468,10 @@ class GoogleAnalytics {
 
     getData(_c, params, cb, realtime) {
         if (!GASites[_c.id].AUTH_CLIENT) {
-            log("Analytics", "Tried to request Google Analytics data without an authenticated client", 'warn');
+            if (!this.didWarnNoAuthClient) {
+                log("Analytics", "Tried to request Google Analytics data without an authenticated client", 'warn');
+                this.didWarnNoAuthClient = true;
+            }
             cb & cb(new Error("No auth client defined"));
             return false;
         }
@@ -509,7 +512,6 @@ class GoogleAnalytics {
                     ['analytics_realtime_' + _c.id] : beautifulData
                 }, done) : done();
             } else {
-                log('Analytics', 'Error while fetching realtime data : ' + err, 'err');
                 done(err);
             }
         });

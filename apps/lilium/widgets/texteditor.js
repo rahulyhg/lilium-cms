@@ -34,6 +34,7 @@ export class TextEditor extends Component {
                 this.texteditor.on('change', this.changed.bind(this));
                 this.texteditor.show();
                 this.texteditor.setContent(this.props.content);
+                this.texteditor.undoManager.clear();
             } else { 
                 log('TextEditor', 'No editor were created at that point', 'warn');
             }

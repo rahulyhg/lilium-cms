@@ -90,6 +90,10 @@ var DB = function() {
 
 	this.initDatabase = function(conf, callback) {
 		MongoClient.connect(formatMongoString(conf), { useNewUrlParser: true }, function(err, client) {
+            if (!client || err) {
+                log('Database', '[FATAL] Could not connect to database.', 'err');
+                return;
+            }
 			client.db(conf.data.use).collection('lilium', {}, function(err, c) {
 				if (err) {
 					require('./dbinit.js')(conf, client.db(conf.data.use), callback);
