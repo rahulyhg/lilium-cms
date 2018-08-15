@@ -216,6 +216,8 @@ h2 {
 
 .theme-card-list {
     display: flex;
+    justify-items: center;
+    justify-content: center;
     padding: 15px;
 }  
 

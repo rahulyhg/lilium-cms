@@ -263,7 +263,9 @@ export class StackBox extends FormField {
             values = [...values.splice(0, index), ...values.splice(1)];
         }
 
-        this.setState({ values });
+        this.setState({ values }, () => {
+            this.onChange();
+        });
     }
 
     render() {
@@ -360,7 +362,7 @@ export class CheckboxField extends FormField {
     render() {
         return (
             <div className="checkbow-field-wrapper" style={styles.checkboxFieldWrapper}>
-                <p className="checkbox-text" style={{ margin: '0px' }}>{this.props.placeholder}</p>
+                <b className="checkbox-text" style={styles.placeholder}>{this.props.placeholder}</b>
                 <div className="checkbox-wrapper" onClick={this.changed.bind(this)}
                         style={Object.assign({}, styles.checkboxWrapper, (this.state.checked) ? styles.checkboxChecked : {})}>
                     <span className="checkmark" style={styles.checkbox}>{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
