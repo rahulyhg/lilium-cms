@@ -20,7 +20,7 @@ makeGLobalLang();
 
 if (liliumcms.env == "dev") {
     initializeDevEnv();
-}makeGLobalLang
+}
 
 class Lilium extends Component {
     constructor(props) {
@@ -59,6 +59,9 @@ class Lilium extends Component {
                 setLanguage(currentLanguage, () => {
                     setSession("entities", resp["/entities/simple"]);
                     liliumcms.session = resp["/me"][0];
+                    liliumcms.session.allowedEndpoints = [
+                        "profile", "preferences", "logout", "notifications", ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
+                    ];
                     this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false, currentLanguage });            
                 });
             }   
