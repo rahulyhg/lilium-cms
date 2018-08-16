@@ -8,8 +8,19 @@ const COMMENT_TO_ARTICLE_LOOKUP = {
     foreignField : "_id"
 };
 
+const COMMENT_TO_USER_LOOKUP = {
+    from : 'fbusers',
+    as : 'commenter',
+    localField : 'author',
+    foreignField : '_id'
+};
+
 const COMMENT_LATEST_LIST_PROJECTION = {
-    date : 1, text : 1, replies : 1, "post.title" : 1, 
+    date : 1, text : 1, replies : 1, 
+    headline : { "$arrayElemAt" : ["$post.title", 0] }, 
+    articleid : "$post._id",
+    "commenter._id" : 1,
+    "commenter.displayname" : 1
 };
 
 class LiliumComments {
@@ -34,7 +45,9 @@ class LiliumComments {
                 { $skip },
                 { $limit : LIVEVAR_COMMENT_BATCHSIZE },
                 { $lookup : COMMENT_TO_ARTICLE_LOOKUP },
+                { $lookup : COMMENT_TO_USER_LOOKUP },
                 { $unwind : "$post" },
+                { $unwind : "$commenter" },
                 { $project : COMMENT_LATEST_LIST_PROJECTION }
             ], arr => {
                 sendback({ items : arr });
