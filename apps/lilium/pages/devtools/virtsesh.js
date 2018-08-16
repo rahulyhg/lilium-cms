@@ -12,7 +12,7 @@ export default class VirtualSession extends Component {
     render() {
         return (
             <div id="virtual-session">
-                
+                <h1>TO DO</h1>
             </div>
         )
     }

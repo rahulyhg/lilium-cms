@@ -2,8 +2,9 @@ import { h, Component } from "preact";
 import { navigateTo } from '../../routing/link';
 
 import DevToolAPI from './api';
-import DevToolNotifications from './notifications'
-import VirtualSession from './virtsesh'
+import DevToolNotifications from './notifications';
+import VirtualSession from './virtsesh';
+import DevToolComments from './comments';
 
 const styles = {
     page : {
@@ -38,7 +39,8 @@ const styles = {
 const DEVTOOLS = {
     api : DevToolAPI,
     notifications : DevToolNotifications,
-    virtsesh : VirtualSession
+    virtsesh : VirtualSession,
+    comments : DevToolComments
 }
 
 class DevToolLink extends Component {
@@ -81,6 +83,7 @@ export default class DevTools extends Component {
                         <DevToolLink name="api" displayname="API" icon="fal fa-project-diagram" />
                         <DevToolLink name="notifications" displayname="Notifications" icon="far fa-inbox" />
                         <DevToolLink name="virtsesh" displayname="Virtual Session" icon="far fa-sign-in" />
+                        <DevToolLink name="comments" displayname="Comments" icon="far fa-comments" />
                     </div>
                 </div>
             )

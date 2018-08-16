@@ -60,6 +60,7 @@ class DevTools {
             case 'unlink':              unlinkUpload(cli); break;
             case 'cache':               handleCacheClear(cli); break;
             case 'gencache':            maybeRegenCache(cli); break;
+            case 'createcomment':       maybeCreateComment(cli); break;
             case 'initbuild':           maybeInitBuild(cli); break;
             case 'scripts':             maybeExecuteScript(cli); break;
             case 'feed':                maybeInsertFeed(cli); break;
@@ -250,6 +251,41 @@ var dispatchMagicLink = function(cli) {
     require('./entities.js').sendMagicLinkToEveryone(cli, function() {
         cli.sendJSON({success : true});
     });
+};
+
+var maybeCreateComment = function(cli) {
+    const text = cli.postdata.data.text;
+    const _id = db.mongoID(cli.postdata.data._id);
+    const isThread = cli.postdata.data.isThread || false;
+    const author = cli.postdata.data.userid;
+
+    if (isThread) {
+        db.insert(cli._c, 'fbreplies', {
+            author, text,
+            threadid : _id,
+            date : Date.now()
+        }, (err, r) => {
+            db.update(cli._c, 'fbcomments', { _id }, {
+                $inc : { replies : 1 }
+            }, () => {
+                cli.sendJSON({ replyid : r.insertedId });
+            }, false, true, true);
+        });
+    } else {
+        db.insert(cli._c, 'fbcomments', {
+            author, text,
+            postid : _id,
+            date : Date.now(), 
+            thread : true,
+            edited : false
+        }, () => {
+            db.update(cli._c, 'content', { _id }, {
+                $inc : { comments : 1 }
+            }, (err, r) => {
+                cli.sendJSON({ threadid : r.insertedId });
+            }, false, true, true);
+        })
+    }
 };
 
 var maybeRegenCache = function(cli) {
