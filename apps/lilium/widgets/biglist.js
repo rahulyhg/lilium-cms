@@ -18,6 +18,7 @@ import { storeLocal, getLocal } from '../data/cache';
  *      // More custom stuff
  *      livevarkey : Key of the server response, defaults to "item". If the server response is : { posts : [...] }, then livevarkey should be "posts",
  *      prepend : Wether the additional items will be added at the start or end of list. Setting this to "true" will add items at start of list,
+ *      action : A function passed to every list item to link the BigList parent with the items through a callback,
  *      items : Array of initial items. Can be set later. If passed after mount, will replace the entire array with the new one.
  *      loadmoreButton : A component representing the load more button inside the list,
  *      keyid : List item key for Preact mapping. Defaults to : _id 
@@ -40,6 +41,7 @@ export class BigList extends Component {
             livevarkey : typeof props.livevarkey == "undefined" ? "items" : props.livevarkey,
             prepend : props.prepend || false,
             filters : {},
+            action : props.action || function() {},
             loadmoreButton : props.loadmoreButton || undefined,
             toolbarConfig : props.toolbar || undefined
         }
@@ -126,7 +128,7 @@ export class BigList extends Component {
                     this.state.items.length == 0 ? (
                         <this.coldState.emptyComponent />
                     ) : this.state.items.map(x => (
-                        <this.coldState.component item={x} key={x[this.props.keyid || "_id"]} />
+                        <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
                     ))
                 }
                 </div>
