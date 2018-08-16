@@ -262,6 +262,33 @@ h2 {
     margin: 10px auto;
 }
 
+.thread-view {
+    display: flex;
+}
+
+.thread-view-col {
+    width: 50%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.thread-reply {
+    background: white;
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 2px 1px;
+}
+
+.thread-view h2 {
+    text-align: center;
+    padding: 20px 0px 10px;
+}
+
+.thread-view-actions .button-worker {
+    margin-right: 15px;
+}
+
 .comments-man-listitem {
     width : 100%;
     margin: 5px;
