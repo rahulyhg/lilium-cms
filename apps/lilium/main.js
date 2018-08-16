@@ -60,7 +60,7 @@ class Lilium extends Component {
                     setSession("entities", resp["/entities/simple"]);
                     liliumcms.session = resp["/me"][0];
                     liliumcms.session.allowedEndpoints = [
-                        "profile", "preferences", "logout", "notifications", 
+                        "me", "preferences", "logout", "notifications", 
                         ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
                     ];
 
