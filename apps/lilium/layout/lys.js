@@ -18,6 +18,7 @@ export class Lys extends Component {
             visible : false,
             choices : [],
             pageChoices : [],
+            entities : [],
             posts : []
         };
 
@@ -70,7 +71,8 @@ export class Lys extends Component {
             choices : commands,
             pageChoices : pageCommands,
             customChoices: customCommands,
-            posts : []
+            posts : [],
+            entities : []
         }, () => {
             const box = document.getElementById('lys-input');
             box.value = "";
@@ -109,6 +111,9 @@ export class Lys extends Component {
         } else if (this.state.posts.length != 0) {
             navigateTo("/publishing/write/" + this.state.posts[0]._id);
             log('Lys', 'Navigated to post from Lys', 'success');
+        } else if (this.state.entities.length != 0) {
+            navigateTo("/entities/edit/" + this.state.entities[0]._id);
+            log('Lys', 'Navigated to entity from Lys', 'success');
         } else {
             log('Lys', 'No command found, showing help', 'detail');
             this.showHelp();
@@ -140,14 +145,14 @@ export class Lys extends Component {
     fillSearch(text) {
         log('Lys', 'Filling search from timeout', 'detail');
         if (text.length < 3) {
-            this.setState({ posts : [] });
+            this.setState({ posts : [], entities : [] });
         } else {
             API.get('/search/lys', {
                 text
             }, (err, results) => {
-                if (!err && results && results.length != 0) {
+                if (!err && results) {
                     this.setState({
-                        posts : results, help : false
+                        posts : results.articles, entities : results.entities, help : false
                     });
                 }
             });
@@ -213,12 +218,22 @@ export class Lys extends Component {
                             ))
                         }
                     </div>
+                    <div id="lys-sugg-entities">
+                        {
+                            this.state.entities.map(entity => (
+                                <div class="lys-sugg lys-sugg-entity" onClick={() => this.goAndHide("/entities/edit/" + entity._id)}>
+                                    <b>{entity.displayname}</b>
+                                </div>
+                            ))
+                        }
+                    </div>
 
                     { (
                         this.state.pageChoices.length == 0 &&
                         this.state.choices.length == 0 &&
                         this.state.customChoices.length == 0 &&
-                        this.state.posts.length == 0
+                        this.state.posts.length == 0 &&
+                        this.state.entities.length == 0
                     ) ? this.renderHelp() : null }
                 </div>
             </div>

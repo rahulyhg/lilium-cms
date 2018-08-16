@@ -7,8 +7,14 @@ const PROJECTION = {
     title : 1, subtitle : 1, media : 1, topic : 1, status : 1, date : 1, author : 1, _id : 1 
 };
 
-const LYS_PROJECTION = {
-    headline : { $arrayElemAt : ["$title", 0] }
+const LYS_PROJECTION_CONTENT = {
+    headline : { $arrayElemAt : ["$title", 0] },
+    type : "article"
+}
+
+const LYS_PROJECTION_ENTITY = {
+    displayname : 1,
+    type : "entity"
 }
 
 const IMAGE_LOOKUP = {
@@ -173,11 +179,23 @@ class ContentSearch {
         }
 
         db.join(cli._c, 'content', [
-            {$match : conditions},
-            {$sort : {_id : -1}},
-            {$limit : 20},
-            {$project : LYS_PROJECTION}
-        ], arr => send(arr));
+            { $match : conditions },
+            { $sort : {_id : -1} },
+            { $limit : 20 },
+            { $project : LYS_PROJECTION_CONTENT }
+        ], articles => {
+            if (cli.hasRight('manage-entities')) {
+                db.join(config.default(), 'entities', [
+                    { $match : { displayname : { $regex : new RegExp(text, 'i') }, revoked : { $ne : true } } },
+                    { $limit : 20 },
+                    { $project : LYS_PROJECTION_ENTITY }
+                ], entities => {
+                    send({ articles, entities })
+                });
+            } else {
+                send({ articles, entities : [] });
+            }
+        });
     }
 
     livevar(cli, levels, params, send) {
