@@ -861,3 +861,66 @@ a {
 .change-placeholder::-webkit-input-placeholder {
     color: #ddd;
 }
+
+/* Entities */
+.entity-card {
+    background-color: #8a6ea3;
+    margin: 20px;
+    width: 300px;
+    box-shadow: #aaa 4px 4px 15px;
+    color: white;
+}
+
+.entity-card > img.profile-picture {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
+    display: block;
+    background-color: white;
+    color: #333;
+}
+
+.entity-card > .displayname {
+    padding: 6px 0px;
+    margin: 0px;
+    text-align: center;
+    background-color: #674a82;
+}
+
+.entity-card .action-separator {
+    margin-bottom: 0px;
+}
+
+.entity-card > .info {
+    padding: 10px;
+    margin: 0px;
+}
+
+.entity-card > .info > * {
+    margin: 0px;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    flex-flow: nowrap;
+}
+
+.action {
+    cursor: pointer;
+    text-align: center;
+    padding: 2px;
+    flex-grow: 1;
+}
+.action.danger {
+    color: #ec0b40;
+}
+.action.success {
+    color: #9dfb46;
+}
+.action:hover {
+    background-color: #9c80b4;
+}
+.action span {
+    font-weight: bold;
+}
