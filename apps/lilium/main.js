@@ -60,8 +60,20 @@ class Lilium extends Component {
                     setSession("entities", resp["/entities/simple"]);
                     liliumcms.session = resp["/me"][0];
                     liliumcms.session.allowedEndpoints = [
-                        "profile", "preferences", "logout", "notifications", ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
+                        "profile", "preferences", "logout", "notifications", 
+                        ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
                     ];
+
+                    resp["/adminmenus"]
+                        .filter(x => x.children && x.children.length != 0)
+                        .map(x => x.children)
+                        .forEach(x => 
+                            x.forEach(y => 
+                                liliumcms.session.allowedEndpoints.push(y.absURL.split('/')[1]
+                            )
+                        )
+                    );
+
                     this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false, currentLanguage });            
                 });
             }   
