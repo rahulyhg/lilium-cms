@@ -15,6 +15,20 @@ const COMMENT_TO_USER_LOOKUP = {
     foreignField : '_id'
 };
 
+const COMMENT_TO_REPLIES = {
+    from : 'fbreplies', 
+    as : "replies",
+    localField : "_id",
+    foreignField : "threadid"
+};
+
+const COMMENT_REPLY_TO_AUTHOR = {
+    from : "fbusers",
+    as : "commenters",
+    localField : "replies.author",
+    foreignField : "_id"
+};
+
 const COMMENT_LATEST_LIST_PROJECTION = {
     date : 1, text : 1, replies : 1, 
     headline : { "$arrayElemAt" : ["$post.title", 0] }, 
@@ -23,10 +37,39 @@ const COMMENT_LATEST_LIST_PROJECTION = {
     "commenter.displayname" : 1
 };
 
+const THREAD_WITH_REPLIES_PROJECTION = {
+    date : 1, text : 1,
+    headline : { "$arrayElemAt" : ["$post.title", 0] }, 
+    articleid : "$post._id",
+    featuredimage : "$post.facebookmedia",
+    replies : 1,
+    commenter : 1,
+    commenters : 1
+}
+
 class LiliumComments {
     adminPOST(cli) {
         
     }  
+
+    adminDELETE(cli) {
+        if (cli.hasRightOrRefuse("editor")) {
+            const _id = db.mongoID(cli.routeinfo.path[2]);
+            db.findUnique(cli._c, 'fbcomments', { _id, active : true }, (err, comment) => {
+                if (comment) {
+                    db.update(cli._c, 'fbcomments', { _id }, {
+                        active : false,
+                        text : "---",
+                        deletedText : comment.text
+                    }, (err, r) => {
+                        cli.sendJSON(r);
+                    })
+                } else {
+                    cli.throwHTTP(404, undefined, true);
+                }
+            });
+        }
+    }
 
     livevar(cli, levels, params, sendback) {
         if (!cli.hasRight("editor")) {
@@ -37,7 +80,7 @@ class LiliumComments {
             const filters = params.filters || {};
             const $skip = filters.skip || 0;
             const $sort = { _id : -1 };
-            const $match = {};
+            const $match = { active : true };
             
             db.aggregate(cli._c, 'fbcomments', [
                 { $match },
@@ -52,8 +95,21 @@ class LiliumComments {
             ], arr => {
                 sendback({ items : arr });
             })
-        } else if (levels[0] == "posts") {
-            cli.throwHTTP(503);
+        } else if (levels[0] == "thread") {
+            const _id = db.mongoID(levels[1]);
+            db.join(cli._c, 'fbcomments', [
+                { $match : { _id } },
+                { $limit : 1 },
+                { $lookup : COMMENT_TO_USER_LOOKUP },
+                { $lookup : COMMENT_TO_ARTICLE_LOOKUP },
+                { $unwind : "$commenter" },
+                { $unwind : "$post" },
+                { $lookup : COMMENT_TO_REPLIES },
+                { $lookup : COMMENT_REPLY_TO_AUTHOR },
+                { $project : THREAD_WITH_REPLIES_PROJECTION }
+            ], thread => {
+                sendback(thread && thread[0]);
+            });
         } else {
             sendback("[LiveVariableException] Cannot use top level livevar");
         }
