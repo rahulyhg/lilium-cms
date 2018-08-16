@@ -1,40 +1,26 @@
-import { h, Component } from 'preact';
-import API from '../../data/api';
-import { BigList } from '../../widgets/biglist';
-import dateformat from 'dateformat';
+import { h, Component } from "preact";
+import ListView from './list';
+import ThreadView from './thread';
+import { navigateTo } from '../../routing/link';
 
-class CommentEntry extends Component {
+export default class CommentsView extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-
-        };
     }
-    
-    render() {
-        return (
-            <div>
-                
-                <p>{this.props.item.text}</p>
-                <div>{dateformat(this.props.item.date, 'MMMM DD, YYYY - hh:mm:ss')}</div>
-            </div>
-        )
-    }
-}
 
-export default class CommentsManager extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-
-        };
+    static get pagesettings()  {
+        return {
+            title : "Comments"
+        }
     }
 
     render() {
-        return (
-            <div class="comments-manager">
-                <BigList endpoint="/comments/latest" listitem={CommentEntry} />
-            </div>
-        )
+        if (this.props.levels.length == 0) {
+            return (<ListView />);
+        } else if (this.props.levels[0] == "thread") {
+            return (<ThreadView threadid={this.props.levels[1]} />)
+        } else {
+            navigateTo("/comments");
+        }
     }
 }
