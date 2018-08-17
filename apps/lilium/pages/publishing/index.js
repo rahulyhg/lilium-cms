@@ -3,6 +3,8 @@ import ListView from './list';
 import EditView from './edit';
 import { navigateTo } from '../../routing/link';
 import { addAction } from '../../layout/lys'
+import { registerOverlay, castOverlay } from '../../overlay/overlaywrap';
+import { CreateOverlay } from './createoverlay';
 
 export default class PublishingTab extends Component {
     constructor(props) {
@@ -22,9 +24,11 @@ export default class PublishingTab extends Component {
             command : "article,post",
             displayname : "Article",
             execute : () => {
-                
+                castOverlay('create-article');
             }
         });
+
+        registerOverlay('create-article', CreateOverlay);
     }
 
     render() {
