@@ -30,7 +30,7 @@ const COMMENT_REPLY_TO_AUTHOR = {
 };
 
 const COMMENT_LATEST_LIST_PROJECTION = {
-    date : 1, text : 1, replies : 1, 
+    date : 1, text : 1, replies : 1, deletedText : 1, active : 1,
     headline : { "$arrayElemAt" : ["$post.title", 0] }, 
     articleid : "$post._id",
     "commenter._id" : 1,
@@ -38,7 +38,7 @@ const COMMENT_LATEST_LIST_PROJECTION = {
 };
 
 const THREAD_WITH_REPLIES_PROJECTION = {
-    date : 1, text : 1,
+    date : 1, text : 1, deletedText : 1, active : 1,
     headline : { "$arrayElemAt" : ["$post.title", 0] }, 
     articleid : "$post._id",
     featuredimage : "$post.facebookmedia",
@@ -54,20 +54,37 @@ class LiliumComments {
 
     adminDELETE(cli) {
         if (cli.hasRightOrRefuse("editor")) {
-            const _id = db.mongoID(cli.routeinfo.path[2]);
-            db.findUnique(cli._c, 'fbcomments', { _id, active : true }, (err, comment) => {
-                if (comment) {
-                    db.update(cli._c, 'fbcomments', { _id }, {
-                        active : false,
-                        text : "---",
-                        deletedText : comment.text
-                    }, (err, r) => {
-                        cli.sendJSON(r);
-                    })
-                } else {
-                    cli.throwHTTP(404, undefined, true);
-                }
-            });
+            if (cli.routeinfo.path[2] == "thread") {
+                const _id = db.mongoID(cli.routeinfo.path[3]);
+                db.findUnique(cli._c, 'fbcomments', { _id, active : true }, (err, comment) => {
+                    if (comment) {
+                        db.update(cli._c, 'fbcomments', { _id }, {
+                            active : false,
+                            text : "---",
+                            deletedText : comment.text
+                        }, (err, r) => {
+                            cli.sendJSON(r);
+                        })
+                    } else {
+                        cli.throwHTTP(404, undefined, true);
+                    }
+                });
+            } else if (cli.routeinfo.path[2] == "reply") {
+                const _id = db.mongoID(cli.routeinfo.path[3]);
+                db.findUnique(cli._c, 'fbreplies', { _id, active : true }, (err, comment) => {
+                    if (comment) {
+                        db.update(cli._c, 'fbreplies', { _id }, {
+                            active : false,
+                            text : "---",
+                            deletedText : comment.text
+                        }, (err, r) => {
+                            cli.sendJSON(r);
+                        })
+                    } else {
+                        cli.throwHTTP(404, undefined, true);
+                    }
+                });
+            }
         }
     }
 
@@ -81,6 +98,14 @@ class LiliumComments {
             const $skip = filters.skip || 0;
             const $sort = { _id : -1 };
             const $match = { active : true };
+
+            if (filters.status == "deleted") {
+                $match.active = false;
+            }
+
+            if (filters.search && filters.search.trim().length > 2) {
+                $match.text = new RegExp(filters.search, 'i');
+            }
             
             db.aggregate(cli._c, 'fbcomments', [
                 { $match },
