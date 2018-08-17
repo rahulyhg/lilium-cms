@@ -1,4 +1,5 @@
 import { h, Component, cloneElement } from "preact";
+import { cpus } from "os";
 
 const styles = {
     placeholder : {
@@ -95,6 +96,27 @@ const styles = {
         outline: 'none',
         margin: '4px 8px',
         lineHeight: '20px'
+    },
+    multiSelectBoxWrapper: {
+        margin: '20px 0px',
+    },
+    multiSelectBoxOptionsList: {
+        maxHeight: '200px',
+        overflowX: 'auto',
+        backgroundColor: 'white',
+        padding: '8px',
+        borderWidth: '1px 1px 1px 2px',
+        borderStyle: 'solid',
+        borderColor: 'rgb(204, 204, 204)'
+    },
+    selectedOptionsWrapper: {
+        display: 'flex',
+        backgroundColor: 'white',
+    },
+    listItem: {
+        cursor: 'pointer',
+        padding: '2px 20px',
+        margin: "2px",
     }
 }
 
@@ -134,7 +156,6 @@ const buttonThemes = {
 export function fieldFromType(type) {
     switch(type) {
         case 'boolean':
-            alert('Checkbox!');
             return CheckboxField;
         case 'object':
             return SelectField;
@@ -381,7 +402,11 @@ class Tag extends Component {
         return (
             <div className="tags" style={styles.tag}>
                 <span className="tag-text">{this.props.text}</span>
-                <i className="fal fa-times" style={styles.tag.closeButton} onClick={this.props.remove.bind(this, this.props.text)}></i>
+                {
+                    (this.props.readOnly) ? (
+                        <i className="fal fa-times" style={styles.tag.closeButton} onClick={this.props.remove && this.props.remove.bind(this, this.props.text)}></i>
+                    ) : null
+                }
             </div>
         );
     }
@@ -456,6 +481,101 @@ export class MultitagBox extends FormField {
 
                     <input type="text" ref={x => (this.textInput = x)} style={styles.invisibleInput} onKeyDown={this.onKeyDown.bind(this)}
                             placeholder={(this.props.placeholderType == 'inside' ) ? this.props.placeholder : ''} />
+                </div>
+            </div>
+        );
+    }
+}
+
+class ListItem extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = { selected: this.props.selected || false };
+    }
+
+    componentWillReceiveProps(props) {
+        this.setState({ selected: props.selected });
+    }
+
+    render() {
+        if (this.state.selected) {
+            return (
+                <div className="list-item" onClick={this.props.unselectOption.bind(this, this.props.option.value)}
+                    style={Object.assign({}, styles.listItem, { backgroundColor: 'rgba(251, 244, 244, 0.75)', color: '#af57e4' })}>
+                    <span>{this.props.option.displayName}</span>
+                </div>
+            );
+        } else {
+            return (
+                <div className="list-item" onClick={this.props.selectOption.bind(this, this.props.option.value)} style={styles.listItem}>
+                    <span>{this.props.option.displayName}</span>
+                </div>
+            );
+        }
+    }
+}
+
+export class MultiSelectBox extends FormField {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            options: this.formatOptions() || [],
+            selectedValues: this.props.initialValue || []
+        };
+    }
+
+    /**
+     * If options provided via the 'options' prop consist of a string array e.g. ['option1', ...]
+     * this function returns an object array formatted like e.g. [{ displayName: 'option1 , value: 'option1'}]
+     */
+    formatOptions() {
+        return this.props.options.map(opt => { return (typeof opt == 'object') ? opt : { displayName: opt, value: opt } });
+    }
+
+    selectOption(val) {
+        const selectedValues = [...this.state.selectedValues];
+        selectedValues.push(val);
+        this.setState({ selectedValues });
+        this.changed();
+    }
+
+    unselectOption(val) {
+        const selectedValues = this.state.selectedValues;
+        this.setState({ selectedValues: selectedValues.filter(v => v != val) });
+        this.changed();
+    }
+
+    changed() {
+        this.props.onChange && this.props.onChange(this.props.name, this.state.selectedValues);
+    }
+
+    render() {
+        return (
+            <div className="multiselectbox-wrapper" style={styles.multiSelectBoxWrapper}>
+                <b style={styles.placeholder}>{this.props.placeholder}</b>
+                <div className="selectedoptions-container" style={styles.selectedOptionsWrapper}>
+                    {
+                        (this.state.selectedValues.length > 0) ? (
+                            this.state.selectedValues.map(value => {
+                                const option = this.state.options.find(o => o.value == value) || {};
+                                return (<Tag text={option.displayName} key={value} readonly={true} />)
+                            })
+                        ) : (
+                            <p style={{margin: 8, color: '#555'}}>No values selected</p>
+                        )
+                    }
+                </div>
+                <div className="options-list"  style={styles.multiSelectBoxOptionsList}>
+                    {
+                        this.state.options.map(option => {
+                            return (
+                                <ListItem option={option} selected={this.state.selectedValues.includes(option.value)} key={option.value}
+                                        unselectOption={this.unselectOption.bind(this)} selectOption={this.selectOption.bind(this)} />
+                            )
+                        })
+                    }
                 </div>
             </div>
         );
