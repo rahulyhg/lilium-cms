@@ -42,6 +42,10 @@ class Lilium extends Component {
     componentDidMount() {
         log('Lilium', 'Main component finished mounting', 'lilium');
         this.fetchUserData();
+
+        document.addEventListener('castexitscreen', () => {
+            this.setState({ loading : true });
+        });
     }
 
     fetchUserData() {        

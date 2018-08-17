@@ -92,6 +92,9 @@ export class DevTools extends Component {
 
     bundleJS() {
         log('Dev', 'Sent request to bundle V4... The browser will refresh shortly', 'lilium');
+        const event = new CustomEvent("castexitscreen");
+        document.dispatchEvent(event);
+        
         API.rebuild();
     }
 

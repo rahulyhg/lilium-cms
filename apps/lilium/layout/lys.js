@@ -188,45 +188,6 @@ export class Lys extends Component {
             <div id="lys-wrap">
                 <div id="lys">
                     <input type="text" id="lys-input" placeholder="What are you looking for?" onKeyUp={this.keyUpBoxBinding} autocomplete="off" />
-                    <div id="lys-sugg-cmds">
-                        {
-                            this.state.pageChoices.map(cmd => (
-                                <div class="lys-sugg lys-sugg-cmd lys-sugg-page-cmd" onClick={cmd.execute}>
-                                    <b>{cmd.displayname}</b>
-                                </div>
-                            ))
-                        } {
-                            this.state.choices.map(cmd => (
-                                <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
-                                    <b>{cmd.displayname}</b>
-                                </div>
-                            ))
-                        } {
-                            this.state.customChoices.map(cmd => (
-                                <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
-                                    <b>{cmd.displayname}</b>
-                                </div>
-                            ))
-                        }
-                    </div>
-                    <div id="lys-sugg-posts">
-                        {
-                            this.state.posts.map(post => (
-                                <div class="lys-sugg lys-sugg-post" onClick={() => this.goAndHide("/publishing/write/" + post._id)}>
-                                    <b>{post.headline}</b>
-                                </div>
-                            ))
-                        }
-                    </div>
-                    <div id="lys-sugg-entities">
-                        {
-                            this.state.entities.map(entity => (
-                                <div class="lys-sugg lys-sugg-entity" onClick={() => this.goAndHide("/entities/edit/" + entity._id)}>
-                                    <b>{entity.displayname}</b>
-                                </div>
-                            ))
-                        }
-                    </div>
 
                     { (
                         this.state.pageChoices.length == 0 &&
@@ -234,7 +195,54 @@ export class Lys extends Component {
                         this.state.customChoices.length == 0 &&
                         this.state.posts.length == 0 &&
                         this.state.entities.length == 0
-                    ) ? this.renderHelp() : null }
+                    ) ? this.renderHelp() : (
+                        <div>
+                            <div id="lys-sugg-cmds">
+                            {
+                                this.state.pageChoices.map(cmd => (
+                                    <div class="lys-sugg lys-sugg-cmd lys-sugg-page-cmd" onClick={cmd.execute}>
+                                        <i class="far fa-bolt" style={{ background : "#fffae0" }}></i>
+                                        <b>{cmd.displayname}</b>
+                                    </div>
+                                ))
+                            } {
+                                this.state.choices.map(cmd => (
+                                    <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
+                                        <i class={"fal " + cmd.icon} style={{ background : "#daf5ff" }}></i>
+                                        <b>{cmd.displayname}</b>
+                                    </div>
+                                ))
+                            } {
+                                this.state.customChoices.map(cmd => (
+                                    <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
+                                        <i class="far fa-bolt" style={{ background : "#fffae0" }}></i>
+                                        <b>{cmd.displayname}</b>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                        <div id="lys-sugg-posts">
+                            {
+                                this.state.posts.map(post => (
+                                    <div class="lys-sugg lys-sugg-post" onClick={() => this.goAndHide("/publishing/write/" + post._id)}>
+                                        <i class="far fa-pencil" style={{ background : "#ffdffe" }}></i>
+                                        <b>{post.headline}</b>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                        <div id="lys-sugg-entities">
+                            {
+                                this.state.entities.map(entity => (
+                                    <div class="lys-sugg lys-sugg-entity" onClick={() => this.goAndHide("/entities/edit/" + entity._id)}>
+                                        <i class="far fa-user" style={{ background : "#e1ffdf" }}></i>
+                                        <b>{entity.displayname}</b>
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    </div>
+                    ) }
                 </div>
             </div>
         )
