@@ -197,6 +197,7 @@
     "preact": "^8.2.9",
     "preact-dom": "^1.0.1",
     "unfetch": "^3.0.0",
-    "webpack": "^4.7.0"
+    "webpack": "^4.7.0",
+    "webpack-cli": "^3.1.0"
   }
 }
