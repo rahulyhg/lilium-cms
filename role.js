@@ -21,10 +21,9 @@ var Role = function () {
         switch (cli.routeinfo.path[2]) {
             case "quickedit":
                 this.quickEdit(cli);
-        default:
-            return cli.throwHTTP(404, 'Not Found');
-            break;
-
+                break;
+            default:
+                return cli.throwHTTP(404, 'Not Found');
         }
     };
 
@@ -44,15 +43,12 @@ var Role = function () {
                 break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
-                break;
-
             }
         }
     };
 
     this.quickEdit = function(cli) {
         const _id = db.mongoID(cli.routeinfo.path[3]);
-
         db.update(config.default(), 'roles', { _id }, cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
         db.findUnique(config.default(), 'roles', { _id }, (err, role) => {
             role && sharedcache.setRole(role);

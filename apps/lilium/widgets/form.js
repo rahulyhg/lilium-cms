@@ -69,9 +69,10 @@ const styles = {
     },
     fauxTextField: {
         cursor: 'text',
-        height: '40px',
+        minHeight: '40px',
         display: 'flex',
-        padding: '2px'
+        padding: '2px',
+        flexWrap: 'wrap'
     },
     tag: {
         closeButton: {
@@ -337,10 +338,9 @@ export class EditableText extends FormField {
     }
 
     handleBlur(ev) {
-        log('EditableText', 'BLUR', 'success');
         const oldValue = this.value;
-        
-        if (this.value != oldValue) {
+
+        if (this.value != ev.target.value) {
             this.value = ev.target.value;
             this.props.onChange && this.props.onChange(this.props.name, ev.target.value, oldValue);
         }
@@ -349,17 +349,20 @@ export class EditableText extends FormField {
     }
 
     render() {
-        log('EditableText', 'RENDER', 'success');
         return (
             <div style={Object.assign({}, styles.fieldwrap, this.props.wrapstyle || {})}>
                 { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
-
                 {
                     this.state.editing ?
                         (this.props.multiline ? 
-                            ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} onBlur={this.handleBlur.bind(this)}>{this.value || ""}</textarea>) :
-                            ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value} onBlur={this.handleBlur.bind(this)} />))
-                        : ( <p onClick={() => { this.setState({ editing: true }) }}>{this.value}</p> )
+                            ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""}
+                                    style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})}
+                                    onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)}>{this.value || ""}</textarea>) :
+                            ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""}
+                                    style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
+                                    onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)} />))
+                        : ( <p onClick={() => { this.setState({ editing: true }, () => { this.textInput.focus(); }); }}
+                                title='Click to edit' style={{ cursor: 'text', hover: { border:'1px solid #333' } }}>{this.value}</p> )
                 }
             </div>
         )
@@ -403,7 +406,7 @@ class Tag extends Component {
             <div className="tags" style={styles.tag}>
                 <span className="tag-text">{this.props.text}</span>
                 {
-                    (this.props.readOnly) ? (
+                    (!this.props.readOnly) ? (
                         <i className="fal fa-times" style={styles.tag.closeButton} onClick={this.props.remove && this.props.remove.bind(this, this.props.text)}></i>
                     ) : null
                 }
