@@ -2,6 +2,7 @@ import { h, Component } from "preact";
 import ListView from './list';
 import EditView from './edit';
 import { navigateTo } from '../../routing/link';
+import { addAction } from '../../layout/lys'
 
 export default class PublishingTab extends Component {
     constructor(props) {
@@ -12,6 +13,18 @@ export default class PublishingTab extends Component {
         return {
             title : "Publishing"
         }
+    }
+
+    static componentDidRegister() {
+        log('Publishing', 'Called register static method from URL Renderer', 'success');
+        addAction({
+            action : "#create",
+            command : "article,post",
+            displayname : "Article",
+            execute : () => {
+                
+            }
+        });
     }
 
     render() {

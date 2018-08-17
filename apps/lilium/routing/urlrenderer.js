@@ -98,7 +98,17 @@ export class URLRenderer extends Component {
         document.addEventListener('menuslid', this.menuslid_bound);
         document.addEventListener('menusnap', this.menusnapped_bound);
 
+        this.callStaticRegisterMethods();
         this.refreshPath();
+    }
+
+    callStaticRegisterMethods() {
+        log('URLRenderer', 'Calling static componentDidRegister methods of all endpoints', 'url');
+        Object.keys(EndpointStore.ENDPOINT_STORE).forEach(endpoint => 
+            liliumcms.session.allowedEndpoints.includes(endpoint) &&
+            EndpointStore.ENDPOINT_STORE[endpoint].componentDidRegister &&
+            EndpointStore.ENDPOINT_STORE[endpoint].componentDidRegister()
+        );
     }
 
     componentWillReceiveProps(props) {
