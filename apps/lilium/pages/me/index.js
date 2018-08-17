@@ -375,7 +375,6 @@ class Manage2FAForm extends Component {
                 log('ProfilePage', 'Deactivated 2FA', 'success');
                 done && done();
             } else {
-                console.log(err);
                 log('ProfilePage', 'Error Deactivating 2FA', 'error');
             }
         });

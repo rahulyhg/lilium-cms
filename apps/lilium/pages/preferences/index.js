@@ -55,7 +55,6 @@ export default class Preferences extends Component {
     }
 
     render() {
-        // this.values['menuLocked']
         if (this.state.ready) {
             return (
                 <div id="preferences" style={ styles.preferencesEdit }>
