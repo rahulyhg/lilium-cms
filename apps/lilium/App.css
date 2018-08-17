@@ -257,9 +257,10 @@ h2 {
     border: none;
 }
 
-.comments-manager {
+.comments-manager .big-list-items {
     max-width: 780px;
     margin: 10px auto;
+    padding: 0px;
 }
 
 .thread-view {

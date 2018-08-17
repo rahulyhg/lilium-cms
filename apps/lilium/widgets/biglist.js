@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import API from '../data/api'
 import { storeLocal, getLocal } from '../data/cache';
 
+const LOCALSTORAGE_PREFIX = "LF_";
+
 /**
  * BigList 
  * 
@@ -47,7 +49,7 @@ export class BigList extends Component {
         }
 
         if (props.toolbar && props.toolbar.id) {
-            this.coldState.filters = getLocal("LML_LIST_FILTERS_" + props.toolbar.id) || {};
+            this.coldState.filters = getLocal(LOCALSTORAGE_PREFIX + props.toolbar.id) || {};
         }
     }
 
@@ -134,7 +136,7 @@ export class BigList extends Component {
                 </div>
 
                 {
-                    this.coldState.loadmoreButton ? (
+                    this.coldState.loadmoreButton && this.state.items.length > this.coldState.batchsize ? (
                         <this.coldState.loadmoreButton onClick={this.loadMore.bind(this, false)} />
                     ) : null
                 }
@@ -195,12 +197,16 @@ class BigListToolBar extends Component {
             id : props.id
         };
 
-        this.coldValues = getLocal("LML_LIST_FILTERS_" + props.id) || {};
+        this.coldValues = getLocal(LOCALSTORAGE_PREFIX + props.id) || {};
+    }
+
+    shouldComponentUpdate() {
+        return false;
     }
 
     fieldChanged(ev) {
         this.coldValues[ev.target.name] = ev.target.value;
-        storeLocal("LML_LIST_FILTERS_" + this.props.id, this.coldValues);
+        storeLocal(LOCALSTORAGE_PREFIX + this.props.id, this.coldValues);
 
         this.props.fieldChanged && this.props.fieldChanged(ev.target.name, ev.target.value);
     }
