@@ -122,9 +122,9 @@ class FormField extends Component {
 
 
 const buttonThemes = {
-    'success': { backgroundColor: "green", borderColor : "#0c3c0c" },
-    'danger':  { backgroundColor: "red"  , borderColor : "#3c0c0c" },
-    'info':    { backgroundColor: "white", borderColor : "#DDDDDD" },
+    'success': { backgroundColor: "green",   borderColor : "#0c3c0c" },
+    'danger':  { backgroundColor: "#fb3e3b", borderColor : "rgb(187, 65, 65)" },
+    'white':   { backgroundColor: "white",   borderColor : "#DDD", color : "#333" },
 };
 
 /**
@@ -166,7 +166,7 @@ export class ButtonWorker extends Component {
 
     render() {
         return (
-            <div class="button-worker" style={Object.assign({}, styles.buttonworker, buttonThemes[this.props.theme] || {})} onClick={this.work.bind(this)}>
+            <div class="button-worker" style={Object.assign({}, styles.buttonworker, buttonThemes[this.props.theme] || {}, this.props.style || {})} onClick={this.work.bind(this)}>
                 <span class={this.state.working ? "hidden" : ""}>{this.props.text}</span>
                 <div class={"working-spinner " + (this.state.working ? "shown" : "")}><i class="fa fa-spin fa-cog"></i></div>
             </div>

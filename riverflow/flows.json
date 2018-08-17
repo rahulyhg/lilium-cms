@@ -43,7 +43,7 @@
         }, {
             "module" : "comments.js",
             "endpoint" : "comments",
-            "support" : ["admin_post", "livevar", "get"],
+            "support" : ["admin_post", "admin_delete", "livevar", "get"],
             "admin_menu" : {
                 "id": "comments",
                 "faicon": "fa-comments",
