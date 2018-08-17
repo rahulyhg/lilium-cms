@@ -29,6 +29,7 @@
             "support" : ["livevar", "admin_get", "admin_post", "setup"],
             "admin_menu" : {
                 "id": "ponglinks",
+                "lys" : "ponglinks",
                 "faicon": "fa-external-link",
                 "displayname": "Ponglinks",
                 "priority": 330,
@@ -46,6 +47,7 @@
             "support" : ["admin_post", "admin_delete", "livevar", "get"],
             "admin_menu" : {
                 "id": "comments",
+                "lys" : "comments,threads",
                 "faicon": "fa-comments",
                 "displayname": "Comment threads",
                 "priority": 228,
@@ -83,6 +85,7 @@
             "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "thedailylilium",
+                "lys" : "daily,lilium",
                 "faicon": "fa-newspaper",
                 "displayname": "The Daily Lilium",
                 "priority": 80,
@@ -116,6 +119,7 @@
             "support" : ["livevar", "admin_get", "admin_post"],
             "admin_menu" : {
                 "id": "support",
+                "lys" : "support,help,github",
                 "faicon": "fa-life-ring",
                 "displayname": "Support",
                 "priority": 2500,
@@ -141,6 +145,7 @@
             "support" : ["admin_get", "livevar"],
             "admin_menu" : {
                 "id": "dashboard",
+                "lys": "dashboard,home,traffic,trafic,realtime",
                 "faicon": "fa-tachometer",
                 "displayname": "Dashboard",
                 "priority": 100,
@@ -172,6 +177,7 @@
             ],
             "admin_menu" : {
                 "id": "mailtemplates",
+                "lys" : "mail,templates,email",
                 "faicon": "fa-envelope",
                 "displayname": "Email Templates",
                 "priority": 250,
@@ -228,6 +234,7 @@
             "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "livevar"],
             "admin_menu" : {
                 "id" : "publishing",
+                "lys" : "articles,publishing,content",
                 "faicon": "fa-pencil",
                 "displayname": "Publishing",
                 "priority": 225,
@@ -235,6 +242,7 @@
                 "absURL": "admin/publishing/list",
                 "children": [{
                     "id": "articles-topics",
+                    "lys" : "topics,categories,category",
                     "faicon": "fa-tags",
                     "displayname": "Topics",
                     "priority": 210,
@@ -243,6 +251,7 @@
                     "children": []
                 }, {
                     "id": "contentchains",
+                    "lys" : "chains,content,series",
                     "faicon": "fa-link",
                     "displayname": "Content Chains",
                     "priority": 235,
@@ -251,6 +260,7 @@
                     "children": []
                 }, {
                     "id": "styledpages",
+                    "lys" : "styledpages,static,pages",
                     "faicon": "fa-paragraph",
                     "displayname": "Styled Pages",
                     "priority": 250,
@@ -277,6 +287,7 @@
             "support" : ["admin_get", "admin_post", "livevar", "setup"],
             "admin_menu" : {
                 "id": "crew",
+                "lys" : "crew,people,users",
                 "faicon": "fa-beer",
                 "displayname": "Crew",
                 "priority": 500,
@@ -290,6 +301,7 @@
             "support" : ["admin_get", "admin_post", "livevar", "setup", "api_get", "api_post"],
             "admin_menu" : {
                 "id": "entities",
+                "lys" : "entities,users,people",
                 "faicon": "fa-users",
                 "displayname": "Entities",
                 "priority": 500,
@@ -297,6 +309,7 @@
                 "absURL": "admin/entities",
                 "children": [{
                     "id": "entities-rights",
+                    "lys" : "roles,rights",
                     "faicon": "fa-minus-circle",
                     "displayname": "Roles",
                     "priority": 510,
@@ -342,6 +355,7 @@
             "support" : ["admin_get", "admin_post", "livevar", "setup"],
             "admin_menu" : {
                 "id": "socialdispatch",
+                "lys" : "social,dispatch,facebook,twitter",
                 "faicon": "fa-share-alt",
                 "displayname": "Social Dispatch",
                 "priority": 410,
@@ -359,6 +373,7 @@
             "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "cakepop",
+                "lys" : "cakepop,popups",
                 "faicon": "fa-window-maximize",
                 "displayname": "Cakepops",
                 "priority": 415,
@@ -384,6 +399,7 @@
             "support" : ["admin_get", "admin_post", "livevar"],
             "admin_menu" : {
                 "id": "settings",
+                "lys" : "settings,configurations,",
                 "faicon": "fa-cogs",
                 "displayname": "Settings",
                 "priority": 1000,
@@ -391,6 +407,7 @@
                 "absURL": "admin/settings",
                 "children": [{    
                     "id": "ads",
+                    "lys" : "advertising,banners,ads",
                     "faicon": "fa-usd-square",
                     "displayname": "Ads management",
                     "priority": 400,
@@ -399,6 +416,7 @@
                     "children": []
                 }, {
                     "id": "themes",
+                    "lys" : "themes,website,appearance",
                     "faicon": "fa-paint-brush",
                     "displayname": "Themes",
                     "priority": 600,
@@ -407,6 +425,7 @@
                     "children": []
                 }, {
                     "id": "devtools",
+                    "lys" : "dev,tools,programming",
                     "faicon": "fa-hashtag",
                     "displayname": "Dev Tools",
                     "priority": 2000,
@@ -415,6 +434,7 @@
                     "children": []
                 }, {
                     "id": "plugins",
+                    "lys" : "plugins",
                     "faicon": "fa-plug",
                     "displayname": "Plugins",
                     "priority": 700,
@@ -423,6 +443,7 @@
                     "children": []
                 }, {    
                     "id": "translations",
+                    "lys" : "translations,languages",
                     "faicon": "fa-globe",
                     "displayname": "Translations",
                     "priority": 3000,
