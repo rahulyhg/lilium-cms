@@ -45,6 +45,11 @@ class CommentEntry extends Component {
         return (
             <div class="comments-man-listitem" style={{ opacity : this.state.deleting ? 0.5 : 1 }}>
                 <div class="comments-man-post-details">
+                    {
+                        !this.props.item.active ? (
+                            <span><b>Deleted</b> | </span>
+                        ) : null
+                    }
                     <span>{dateformat(this.props.item.date, 'mmmm dd, yyyy - HH:MM:ss')}</span>
                     <span> | </span>
                     <span>{this.props.item.replies} replies</span>
@@ -53,14 +58,16 @@ class CommentEntry extends Component {
                 </div>
                 <div class="comments-man-post-headline"><Link href={"/publishing/write/" + this.props.item.articleid}>{this.props.item.headline}</Link></div>
 
-                <p>{this.props.item.text}</p>
+                <p>{this.props.item.active ? this.props.item.text : this.props.item.deletedText}</p>
 
                 <div class="comments-man-actions">
                     <Link href={"/comments/thread/" + this.props.item._id}>
                         View Thread
                     </Link>
-                    <span class="clickable" onClick={this.banUser.bind(this)}>Ban User</span>                  
-                    <span class="delete-color clickable"><b onClick={this.deleteComment.bind(this)}>Delete comment</b></span>
+                    <span class="clickable" onClick={this.banUser.bind(this)}>Ban User</span>
+                    {                  
+                        this.props.item.active && (<span class="delete-color clickable"><b onClick={this.deleteComment.bind(this)}>Delete comment</b></span>)
+                    }
                 </div>
             </div>
         )
@@ -94,8 +101,22 @@ export default class CommentsManager extends Component {
         };
     }
 
+    static get TOOLBAR_CONFIG() {
+        return {
+            id : "commentsListTb",
+            title : "Filters",
+            fields : [
+                { type : "text", name : "search", title : "Search by word" },
+                { type : "select", name : "status", title : "Status", options : [
+                    { value : "active", text : "Visible on site" },
+                    { value : "deleted", text : "Hidden from site" }
+                ] }
+            ]
+        };
+    }
+
     deleteOne(_id) {
-        API.delete("/comments/" + _id, {}, () => {
+        API.delete("/comments/thread/" + _id, {}, () => {
             this.biglist.loadMore(true);
             castNotification({
                 type : "success",
@@ -115,7 +136,7 @@ export default class CommentsManager extends Component {
     render() {
         return (
             <div class="comments-manager">
-                <BigList ref={bl => (this.biglist = bl)} action={this.gotMessageFromItem.bind(this)} endpoint="/comments/latest" listitem={CommentEntry} loadmoreButton={CommentLoadMore} />
+                <BigList ref={bl => (this.biglist = bl)} toolbar={CommentsManager.TOOLBAR_CONFIG} action={this.gotMessageFromItem.bind(this)} endpoint="/comments/latest" listitem={CommentEntry} loadmoreButton={CommentLoadMore} />
             </div>
         )
     }

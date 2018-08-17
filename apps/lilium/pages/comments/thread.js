@@ -82,15 +82,42 @@ class ThreadHeader extends Component {
 }
 
 class SingleReply extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            reply : props.reply,
+            commenter : props.commenter
+        };
+    }
+
+    deleteThis() {
+        API.delete("/comments/reply/" + this.state.reply._id, {}, () => {
+            castNotification({
+                type : "success",
+                title : "Reply deleted",
+                message : "The reply has been successfully marked as deleted."
+            });
+
+            const reply = this.state.reply;
+            reply.active = false;
+            reply.deletedText = reply.text;
+            this.setState({ reply });
+        });
+    }
+
     render() {
         return (
-            <div class="thread-reply">
-                <div><b>{this.props.commenter.displayname}</b></div>
-                <p>{this.props.reply.text}</p>
+            <div class="thread-reply" style={{ opacity : this.state.reply.active ? 1 : 0.5 }}>
+                <div><b>{this.state.commenter.displayname}</b></div>
+                <p>{this.state.reply.active ? this.state.reply.text : this.state.reply.deletedText}</p>
                 <div style={styles.originaldate}>
-                    <span>{dateformat(this.props.reply.date, 'mmmm dd, yyyy - HH:MM:ss')}</span>
-                    <span style={{ margin: "0px 6px" }}>|</span>
-                    <b class="delete-color clickable">Delete Reply</b>
+                    <span>{dateformat(this.state.reply.date, 'mmmm dd, yyyy - HH:MM:ss')}</span>
+                    {
+                        this.state.reply.active ? (<span>
+                            <span style={{ margin: "0px 6px" }}>|</span>
+                            <b onClick={this.deleteThis.bind(this)} class="delete-color clickable">Delete Reply</b>
+                        </span>) : null
+                    }
                 </div>
             </div>
         )
@@ -133,7 +160,7 @@ export default class ThreadView extends Component {
     }
 
     deleteThread(_id) {
-        API.delete("/comments/" + this.props.threadid, {}, () => {
+        API.delete("/comments/thread/" + this.props.threadid, {}, () => {
             castNotification({
                 type : "success",
                 title : "Thread deleted",
