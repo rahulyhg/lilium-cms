@@ -143,7 +143,6 @@ const buttonThemes = {
 export function fieldFromType(type) {
     switch(type) {
         case 'boolean':
-            alert('Checkbox!');
             return CheckboxField;
         case 'object':
             return SelectField;
@@ -420,8 +419,6 @@ export class MultiSelectBox extends FormField {
             options: this.formatOptions() || [],
             selectedValues: this.props.initialValue || []
         };
-
-        console.log('State', this.state, this.props.options);
     }
 
     /**

@@ -23,10 +23,8 @@ export default class Entity extends Component {
                         roles: data['/role'].map(r => { return { displayName: r.displayname, value: r.name } }),
                         sites: data['/sites/all/simple'].map(s => { return { displayName: s.displayName, value: s.name } })
                     });
-                    console.log('Edit State:', this.state);
                 } else {
                     log('Entities.edit', 'Error fetching the requested entity', 'err');
-                    console.log(err);
                 }
             }
         );
