@@ -110,10 +110,6 @@ header {
     cursor: pointer;
 }
 
-.dropdown-menu {
-
-}
-
 .dropdown-menu .link {
     display: block;
     height : 50px;
@@ -904,6 +900,7 @@ a {
     display: flex;
     flex-direction: row;
     flex-flow: nowrap;
+    color: white;
 }
 
 .action {

@@ -13,6 +13,28 @@ class EntityListItem extends Component {
         this.state = { user: this.props.item };
     }
 
+    static get TOOLBAR_CONFIG() {
+        return {
+            id : "entities",
+            title : "Filters",
+            fields : [
+                { type : "text", name : "search", title : "Search by name" },
+                { type : "select", name : "status", title : "Status", options : [
+                    { value : "not-revoked", text : "Active" },
+                    { value : "revoked", text : "Revoked" },
+                    { value : "All", text : "All statuses" },
+                ] },
+                { type : "select", name : "sort", title : "Sort", options : [
+                    { value : "displayname-az", text : "Alphabetical" },
+                    { value : "displayname-za", text : "Alphabetical Reversed" },
+                    { value : "latest-logged", text : "Login Time" },
+                    { value : "newest", text : "Newest" },
+                    { value : "oldest", text : "Oldest" },
+                ] }
+            ]
+        };
+    }
+
     revokeAccess() {
         entityLib.revokeAccess(this.state.user, success => {
             if (success) {
@@ -131,30 +153,30 @@ class EntityListItem extends Component {
                 </div>
                 <hr className="action-separator" />
                 <div className="actions">
-                    <div className="action" title="Edit User Information and manage accesses" onClick={() => { navigateTo('/entities/edit/' + this.state.user._id) }}>
+                    <div className="action light" title="Edit User Information and manage accesses" onClick={() => { navigateTo('/entities/edit/' + this.state.user._id) }}>
                         <i className="fal fa-pencil"></i>
                     </div>
-                    <div className={"action " + ((this.state.user.mustupdatepassword) ? 'success' : '')} title="Force password reset on next login" onClick={this.forcePasswordReset.bind(this)}>
+                    <div className={"action light" + ((this.state.user.mustupdatepassword) ? 'success' : '')} title="Force password reset on next login" onClick={this.forcePasswordReset.bind(this)}>
                         <i className="fal fa-sync"></i>
                     </div>
                     {
                         (this.state.user.enforce2fa) ? (
-                            <div className="action danger" title="DIsable 2FA" onClick={this.deactivate2FA.bind(this)}>
+                            <div className="action danger light" title="DIsable 2FA" onClick={this.deactivate2FA.bind(this)}>
                                 <span>2FA</span>
                             </div>
                         ) : (
-                            <div className="action success" title="Enforce 2FA" onClick={this.enforce2FA.bind(this)}>
+                            <div className="action success light" title="Enforce 2FA" onClick={this.enforce2FA.bind(this)}>
                                 <span>2FA</span>
                             </div>
                         )
                     }
                     {
                         (this.state.user.revoked) ? (
-                            <div className={"action success"} title="Reinstate User" onClick={this.enableAccess.bind(this)}>
+                            <div className={"action success light"} title="Reinstate User" onClick={this.enableAccess.bind(this)}>
                                 <i className="fal fa-lock"></i>
                             </div>
                         ) : (
-                            <div className={"action danger"} title="Revoke User" onClick={this.revokeAccess.bind(this)}>
+                            <div className={"action danger light"} title="Revoke User" onClick={this.revokeAccess.bind(this)}>
                                 <i className="fal fa-lock"></i>
                             </div>
                         )
@@ -176,7 +198,7 @@ export default class Entities extends Component {
         return (
             <div id="entities">
                 <h1>Entities</h1>
-                <BigList listitem={EntityListItem} endpoint='/entities/bunch' />
+                <BigList listitem={EntityListItem} endpoint='/entities/bunch' toolbar={EntityListItem.TOOLBAR_CONFIG} />
             </div>
         )
     }
