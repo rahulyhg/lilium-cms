@@ -5,6 +5,7 @@ import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
 import { ImagePicker } from './layout/imagepicker';
 import { LoadingView } from './layout/loading';
+import { OverlayWrap } from './overlay/overlaywrap';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
@@ -104,6 +105,7 @@ class Lilium extends Component {
                 <Lys menus={this.state.menus} session={this.state.session} />
                 <NotificationWrapper />
                 <ImagePicker />
+                <OverlayWrap />
 
                 { liliumcms.env == "dev" ? <DevTools /> : null }
             </div>

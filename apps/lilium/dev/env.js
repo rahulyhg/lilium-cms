@@ -80,7 +80,7 @@ export class DevTools extends Component {
     componentDidMount() {
         window.onerror = this.onerror.bind(this);
         addCommand({
-            command : "bundle-js",
+            command : "bundlejs,compile,build",
             displayname : "Bundle JS",
             execute : this.bundleJS.bind(this)
         });
