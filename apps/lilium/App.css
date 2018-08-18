@@ -27,8 +27,16 @@ body, html {
     vertical-align: middle;
 }
 
+.pink-placeholder::placeholder {
+    color : rgb(165, 117, 177);
+}
+
 .delete-color {
     color: #fb3e3b;
+}
+
+.delete-color.pale {
+    color : #e07b7b
 }
 
 .clickable {
@@ -443,7 +451,7 @@ h2 {
     width: 100%;
     height: 100%;
 
-    z-index: 50;
+    z-index: 12;
 }
 
 @keyframes createarticleoverlayanim {

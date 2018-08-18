@@ -1,5 +1,4 @@
 import { h, Component, cloneElement } from "preact";
-import { cpus } from "os";
 
 const styles = {
     placeholder : {
