@@ -54,6 +54,10 @@ export class BigList extends Component {
     }
 
     loadMore(overwrite) {
+        if (overwrite) {
+            this.coldState.index = 0;
+        }
+
         API.get(this.coldState.endpoint, {
             limit : this.coldState.batchsize,
             skip : this.coldState.index * this.coldState.batchsize,

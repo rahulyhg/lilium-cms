@@ -70,7 +70,7 @@ export default class ListView extends Component {
             title : "Author",
             options : [
                 { value : "", text : "Anyone" }, 
-                { value : this.props.session._id, text : "Me" }, 
+                { value : liliumcms.session._id, text : "Me" }, 
                 ...users.map(u => { return { value : u._id, text : u.displayname } })
             ]
         });
