@@ -76,6 +76,12 @@ class Cakepop {
             } else {
                 cli.sendJSON({success : false, reason : "No displayname provided"})
             }
+        } else if (action == "updateOneField" && cli.hasRight('cakepop')) {
+            db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.routeinfo.path[3])}, {
+                [cli.postdata.data.field] : cli.postdata.data.value   
+            }, () => {
+                cli.sendJSON({ ok : 1 });
+            });
         } else if (action == "save" && cli.hasRight('cakepop')) {
             const d = cli.postdata.data;
             db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.routeinfo.path[3])}, d, () => {
