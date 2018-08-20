@@ -63,7 +63,6 @@ export class RolesList extends Component {
         API.get('/role', {}, (err, data, r) => {
             if (r.status == 200) {
                 this.setState({ roles: data });
-                console.log(this.state);
             } else {
                 log('Roles', 'Error fetching roles', 'err');
             }
