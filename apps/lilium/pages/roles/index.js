@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import { RolesList } from './list';
 import { addAction } from '../../layout/lys'
-import { registerOverlay, castOverlay } from '../../overlay/overlaywrap';
+import { castOverlay } from '../../overlay/overlaywrap';
 
 export default class Roles extends Component {
     constructor(props) {
