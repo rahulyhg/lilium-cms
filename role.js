@@ -22,6 +22,9 @@ var Role = function () {
             case "quickedit":
                 this.quickEdit(cli);
                 break;
+            case 'create':
+                this.new(cli);
+                break;
             default:
                 return cli.throwHTTP(404, 'Not Found');
         }
@@ -49,9 +52,11 @@ var Role = function () {
 
     this.quickEdit = function(cli) {
         const _id = db.mongoID(cli.routeinfo.path[3]);
-        db.update(config.default(), 'roles', { _id }, cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
-        db.findUnique(config.default(), 'roles', { _id }, (err, role) => {
-            role && sharedcache.setRole(role);
+        db.update(config.default(), 'roles', { _id }, cli.postdata.data, () => {
+            cli.sendJSON({ ok : 1 })
+            db.findUnique(config.default(), 'roles', { _id }, (err, role) => {
+                role && sharedcache.setRole(role);
+            });
         });
     };
 
@@ -68,9 +73,12 @@ var Role = function () {
             // Check if current user has sufficient role power
             if (cli.hasRight('admin')) {
                 // Create post
-                db.insert(conf.default(), 'roles', prepareRoleForDB(cli), function (err, result) {
-                    // Generate LML page
-                    cli.refresh();
+                db.insert(conf.default(), 'roles', cli.postdata.data, (err, result) => {
+                    if (!err) {
+                        cli.sendJSON({ success: true });
+                    } else {
+                        cli.sendJSON({ success: false, msg: 'Internal error' });
+                    }
                 });
             } else {
                 cli.sendJSON({
@@ -140,21 +148,6 @@ var Role = function () {
                 success: false
             });
         }
-    }
-
-    var prepareRoleForDB = function (cli) {
-        var postdata = cli.postdata.data;
-        var rights = new Array();
-
-        for (var key in postdata.rights) {
-            rights.push(postdata.rights[key].rights);
-        }
-
-        return {
-            "name": postdata.name,
-            "displayname": postdata.displayname,
-            "rights": rights
-        };
     }
 
     this.livevar = function (cli, levels, params, callback) {
