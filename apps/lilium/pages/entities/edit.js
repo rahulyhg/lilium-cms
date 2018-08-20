@@ -1,7 +1,7 @@
 import { Component, h } from 'preact';
 import API from '../../data/api';
 import { Spinner } from '../../layout/loading'
-import { TextField, MultitagBox, MultiSelectBox } from '../../widgets/form'
+import { TextField, MultiSelectBox } from '../../widgets/form'
 import { castNotification } from '../../layout/notifications';
 import * as entityLib from './lib'
 
