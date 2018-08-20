@@ -83,7 +83,7 @@ const styles = {
             }
         },
         cursor: 'default',
-        backgroundColor: '#af57e4',
+        backgroundColor: '#b769c9',
         color: 'white',
         margin: '4px 8px',
         padding: '2px 6px',
