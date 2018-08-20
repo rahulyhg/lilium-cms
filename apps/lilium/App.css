@@ -10,6 +10,10 @@ body, html {
     font-family: 'Nunito Sans', sans-serif;
 }
 
+.font2 {
+    font-family : 'Yanone Kaffeesatz', sans-serif;
+}
+
 .ptext {
     color: #af57e4;
 }
