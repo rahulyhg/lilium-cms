@@ -1,4 +1,5 @@
 import { h, Component, cloneElement } from "preact";
+import flatpickr from 'flatpickr';
 
 const styles = {
     placeholder : {
@@ -360,6 +361,38 @@ export class EditableText extends FormField {
                             ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value} onBlur={this.handleBlur.bind(this)} />))
                         : ( <p onClick={() => { this.setState({ editing: true }) }}>{this.value}</p> )
                 }
+            </div>
+        )
+    }
+}
+
+export class DatePicker extends FormField {
+    constructor(props) {
+        super(props);
+    }
+
+    shouldComponentUpdate() { return false; }
+    componentWillUnmount() { this.picker && this.picker.destroy(); }
+
+    componentDidMount() {
+        this.picker = flatpickr(this.input, this.props.flatpickr || {
+            enableTime : typeof this.props.enabletime == "undefined" ? true : this.props.enabletime,
+            dateFormat : this.props.dateformat || "Y-m-d H:i",
+            defaultDate : new Date(this.value) || new Date(),
+            onChange : date => {
+                const oldValue = this.value;
+                this.value = this.props.format ? this.props.format(date) : date;
+                this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue);        
+            }
+        });
+    }
+
+    render() {
+        return (
+            <div style={Object.assign({}, styles.fieldwrap, this.props.wrapstyle || {})}>
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
+                
+                <input ref={i => (this.input = i)} placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} />
             </div>
         )
     }
