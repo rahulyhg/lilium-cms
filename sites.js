@@ -91,6 +91,11 @@ var SiteInitializer = function (conf, siteobj) {
         mkdirp.sync(rootDir);
         fileserver.createSymlinkSync(rootDir, to);
 
+        to = conf.server.html + '/flatpickr';
+        rootDir = conf.server.base + "node_modules/flatpickr/dist";
+        mkdirp.sync(rootDir);
+        fileserver.createSymlinkSync(rootDir, to);
+
         done();
     };
 
