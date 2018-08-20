@@ -73,7 +73,7 @@ export class TextEditor extends Component {
         log('TextEditor', 'Rendering text editor with random ID ' + this.rID, 'detail');
         
         return (
-            <div>
+            <div style={this.props.style || { display: "block" }}>
                 <textarea ref={el => (this.textarea = el)} id={this.rID}>{this.props.content}</textarea>
             </div>
         )

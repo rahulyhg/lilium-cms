@@ -379,7 +379,9 @@ export class DatePicker extends FormField {
             enableTime : typeof this.props.enabletime == "undefined" ? true : this.props.enabletime,
             dateFormat : this.props.dateformat || "Y-m-d H:i",
             defaultDate : new Date(this.value) || new Date(),
-            onChange : date => {
+            onChange : dateArr => {
+                const [date] = dateArr;
+                
                 const oldValue = this.value;
                 this.value = this.props.format ? this.props.format(date) : date;
                 this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue);        
