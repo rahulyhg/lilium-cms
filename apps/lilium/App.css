@@ -424,6 +424,50 @@ h2 {
     text-align: left;
 }
 
+.plugin-strip {
+    width: 100%;
+    padding: 10px 15px;
+    background: white;
+    border-radius: 3px;
+    box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.plugin-action-wrap {
+    width: 120px;
+    text-align: center;
+}
+
+.plugin-details {
+    flex-grow : 1;
+}
+
+.plugin-title-strip {
+    margin-bottom: 12px;
+}
+
+.plugin-title-strip b {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.plugin-title-strip .plugin-status {
+    font-size: 14px;
+    text-transform: uppercase;
+    padding: 3px 5px;
+    background: #333;
+    color: white;
+    border-radius: 3px;
+    margin-left: 8px;
+}
+
+.plugin-title-strip .plugin-status.active {
+    background: #16b966;
+}
+
+
 .modal-bg {
     position: fixed;
     top: 0;
