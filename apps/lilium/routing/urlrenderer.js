@@ -19,6 +19,8 @@ import SettingsPage from '../pages/settings/index.js';
 import Notifs       from '../pages/notifications/index';
 import ThemesPage   from '../pages/themes/index';
 import CommentsMan  from '../pages/comments/index';
+import PluginsMan   from '../pages/plugins/index';
+import CakepopsMan  from '../pages/cakepops/index';
 import e404         from '../pages/errors/404';
 import e403         from '../pages/errors/403';
 
@@ -67,6 +69,8 @@ EndpointStore.registerEndpoint('settings', SettingsPage);
 EndpointStore.registerEndpoint('notifications', Notifs);
 EndpointStore.registerEndpoint('themes', ThemesPage);
 EndpointStore.registerEndpoint('comments', CommentsMan);
+EndpointStore.registerEndpoint('plugins', PluginsMan);
+EndpointStore.registerEndpoint('cakepop', CakepopsMan); 
 EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('_e403', e403);
 
