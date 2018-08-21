@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { getSession } from '../../data/cache';
-
+import { castNotification } from '../../layout/notifications';
 
 const STATUS_COLORS = {
     active: '#6da55e',
@@ -13,7 +13,8 @@ const styles = {
     statusIndicator: {
         color: 'white',
         display: 'inline-block',
-        padding: '4px'
+        padding: '4px',
+        borderRadius: '4px'
     },
     ponglink: {
         width: '100%',
@@ -30,6 +31,21 @@ const styles = {
         display: 'inline-block',
         marginRight: '14px',
         marginBottom: '0'
+    },
+    versions: {
+        width: '100%',
+        borderCollapse: 'collapse',
+        border: '0'
+    },
+    mediumHeader: {
+        width: '120px'
+    },
+    copyColumn: {
+        textAlign: 'center',
+        width: '80px'
+    },
+    copyIcon: {
+        cursor: 'pointer'
     }
 }
 
@@ -39,33 +55,22 @@ const StatusIndicator = props => (
     </div>
 );
 
-class PonglinkVersion extends Component {
-    constructor(props) {
-        super(props);
-    }
+const copy = txt => {
+    navigator.clipboard.writeText(txt);
+    castNotification({
+        title: 'Copied PongLink destination to clipboard',
+        message: txt,
+        type: 'success'
+    });
+};
 
-    render() {
-        return (
-            <div className="version">
-
-            </div>
-        );
-    }
-}
-
-class Version extends Component {
-    constructor(props) {
-        super(props);
-    }
-
-    render() {
-        return (
-            <div className="version">
-            
-            </div>
-        );
-    }
-}
+const Version = props => (
+    <tr style={styles.versionRow}>
+        <td title={props.medium}>{props.medium}</td>
+        <td><a href={props.dest} target='_blank'>{props.dest}</a></td>
+        <td style={styles.copyColumn}><i className="fal fa-copy" onClick={copy.bind(this, props.dest)} style={styles.copyIcon}></i></td>
+    </tr>
+)
 
 class PonglinkListItem extends Component {
     constructor(props) {
@@ -83,15 +88,26 @@ class PonglinkListItem extends Component {
                 <div className="clickCounter" style={{ display: 'inline-block', float: 'right' }}>
                     <span>{`${this.state.clicks} clicks`}</span>
                 </div>
-                <h3 style={styles.creatorName}>{mappedUsers[this.state.creatorid].displayname}</h3>
+                <h3 style={styles.creatorName}>{`Created by ${mappedUsers[this.state.creatorid].displayname}`}</h3>
                 <hr />
-                {
-                    this.state.versions.map(version => {
-                        return (
-                            <Version />
-                        );
-                    })
-                }
+                <table id="versions" style={styles.versions}>
+                    <thead>
+                        <tr>
+                            <th align='left' className='medium-header' style={styles.mediumHeader}>Medium</th>
+                            <th align='left'>Destination</th>
+                            <th style={{maxWidth: '80px'}}>Copy</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {
+                            this.state.versions.map(version => {
+                                return (
+                                    <Version medium={version.medium} dest={`https://www.narcity.com/pong/${this.state.hash}/${version.hash}`} />
+                                );
+                            })
+                        }
+                    </tbody>
+                </table>
             </div>
         );
     }
