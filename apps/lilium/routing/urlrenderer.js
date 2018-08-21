@@ -87,7 +87,7 @@ export class URLRenderer extends Component {
         document.addEventListener('navigate', ev => {
             const path = "/lilium" + ev.detail.href;
             window.history.pushState(path, undefined, path);
-            this.refreshPath();
+            this.refreshPath(ev.detail.extras);
         });
 
         if (document.location.pathname.substring(1).split('/').length == 1) {
@@ -135,7 +135,7 @@ export class URLRenderer extends Component {
         this.state.classes = ev.detail.snapped ? ["snap"] : [];
     }
 
-    refreshPath() {
+    refreshPath(extras= {}) {
         const paths = document.location.pathname.substring(1).split('/');
         paths.shift();
 
@@ -146,7 +146,7 @@ export class URLRenderer extends Component {
         resetPageCommands();
 
         const CurrentContainer = EndpointStore.getComponentFromEndpoint(endpoint);
-        this.setState({ endpoint, levels, CurrentContainer }, () => {
+        this.setState({ endpoint, levels, CurrentContainer, extras }, () => {
             const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
             document.dispatchEvent(ev);
 
@@ -159,7 +159,7 @@ export class URLRenderer extends Component {
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
             <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
-                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} session={this.props.session} />
+                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} session={this.props.session} extras={this.state.extras || {}} />
             </div>
         )
     }
