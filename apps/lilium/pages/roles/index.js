@@ -15,7 +15,6 @@ export default class Roles extends Component {
     }
 
     static componentDidRegister() {
-        log('Role', 'Registering overlay for CreateRole', 'success');
         addAction({
             action : "#create",
             command : "role",
@@ -27,7 +26,7 @@ export default class Roles extends Component {
     }
 
     render() {
-        log('Entities', 'Rendering roles pane with ' + this.props.levels.length + ' levels', 'detail');
+        log('Roles', 'Rendering roles pane with ' + this.props.levels.length + ' levels', 'detail');
         return (<RolesList />)
     }
 }

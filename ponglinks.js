@@ -8,6 +8,8 @@ const ALLOWED_EDIT_FIELDS = [
     "destination", "identifier", "status"
 ];
 
+const PONGLINK_BTACH_SIZE = 30;
+
 class PongLinks {
     hashDestination(dest) {
         return new Buffer(Date.now().toString()).toString('base64').slice(0, -2);
@@ -41,7 +43,7 @@ class PongLinks {
 
     editLink(_c, _id, keyval, done) {
         db.update(_c, 'ponglinks', { _id }, this.parseEditFields(keyval), (err, r) => done(err, !!r.modifiedCount));
-    }   
+    }
 
     createLink(_c, creatorid, link, done) {
         const hash = this.hashDestination(JSON.stringify(link));
@@ -106,8 +108,6 @@ class PongLinks {
     }
 
     livevar(cli, levels, params, sendback) {
-        const $match = { };
-
         if (levels[0] == "insights") {
             db.findUnique(cli._c, 'ponglinks', { _id : db.mongoID(levels[1]) }, (err, link) => {
                 db.join(cli._c, 'pongclicks', [
@@ -138,17 +138,27 @@ class PongLinks {
                 });
             });
         } else {
-            if (params.filters.search) {
-                $match.identifier = new RegExp(params.filters.search, 'i');
+            const filters = params.filters || {};
+            const $skip = filters.skip || 0;
+            const $sort = { _id : -1 };
+            const $match = {};
+
+            if (filters.status) {
+                $match.status = filters.status;
             }
 
-            if (params.filters.status) {
-                $match.status = params.filters.status;
+            if (filters.search && filters.search.trim().length > 2) {
+                $match.identifier = new RegExp(filters.search, 'i');
             }
-
-            db.join(cli._c, 'ponglinks', [ {$match}, {$sort : {_id : -1}} ], (items) => {
-                sendback({ items });
-            });
+            
+            db.aggregate(cli._c, 'ponglinks', [
+                { $match },
+                { $sort },
+                { $skip },
+                { $limit : PONGLINK_BTACH_SIZE }
+            ], arr => {
+                sendback({ items : arr });
+            })
         }
     }
 
