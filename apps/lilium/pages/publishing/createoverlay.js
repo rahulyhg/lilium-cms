@@ -8,27 +8,23 @@ import { dismissOverlay } from '../../overlay/overlaywrap';
 
 const styles = {
     overlay : {
-        position: "fixed",
-        top: "calc(50% - 100px)",
-        width : "calc(100% - 300px)",
-        left: 180,
+        position: "relative",
+        top: "calc(50% - 60px)",
+        width : "calc(100% - 240px)",
+        boxSizing : "border-box",
+        left: 120,
         zIndex : 20,
     },
-    title : {
-        color: "#ba8ac3",
-        fontFamily: "'Oswald', sans-serif",
-        textTransform: "uppercase",
-        fontWeight: 100,
-        fontSize: 72,
-        letterSpacing : -2,
-        marginBottom : -10
-    },
     textbox : {
-        background: "transparent",
-        color : "#f5cbff",
-        fontSize : 30,
-        border : "none",
+        background: "white",
+        color: "rgb(166, 35, 179)",
+        fontSize : 24,
+        padding: "16px 17px 12px",
+        border : "1px solid #DDD",
+        borderBottomWidth : 3,
         outline : "none",
+        boxSizing : "border-box",
+        borderRadius : 3,
         width : "100%"
     },
     button : {
@@ -94,26 +90,20 @@ export class CreateOverlay extends Component {
 
     render() {
         return (
-            <div id="create-article-overlay">
-                <div style={ styles.overlay }>
-                    {
-                        this.state.loading ? (
-                            <Spinner />
-                        ) : (
-                            <div>
-                                <div style={ styles.title }>Create a new post</div>
-                                <input onKeyDown={this.keydown.bind(this)} class="pink-placeholder" ref={x => (this.textbox = x)} style={ styles.textbox } placeholder="Provide a title, and press Enter"  />
-                                <div style={{ marginTop : 50 }}>
-                                    <b style={styles.button} class="" onClick={this.submitText.bind(this)}>Create article</b>
-                                    <b style={styles.button} onClick={this.dismiss.bind(this)}>Dismiss</b>
-                                </div>
+            <div style={ styles.overlay }>
+                {
+                    this.state.loading ? (
+                        <Spinner />
+                    ) : (
+                        <div>
+                            <input onKeyDown={this.keydown.bind(this)} ref={x => (this.textbox = x)} style={ styles.textbox } placeholder="Provide a title, and press Enter"  />
+                            <div style={{ marginTop : 10 }}>
+                                <b style={styles.button} class="" onClick={this.submitText.bind(this)}>Create article</b>
+                                <b style={styles.button} onClick={this.dismiss.bind(this)}>Dismiss</b>
                             </div>
-                        )
-                    }
-                </div>
-                <div class="create-article-bg"></div>
-                <div class="create-article-left-strip"></div>
-                <div class="create-article-right-strip"></div>
+                        </div>
+                    )
+                }
             </div>
         )
     }
