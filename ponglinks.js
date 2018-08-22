@@ -146,7 +146,12 @@ class PongLinks {
                 $match.status = params.filters.status;
             }
 
-            db.join(cli._c, 'ponglinks', [ {$match}, {$sort : {_id : -1}} ], (items) => {
+            db.join(cli._c, 'ponglinks', [
+                {$match},
+                {$sort : {_id : -1}},
+                {$skip : params.filters.skip || 0},
+                {$limit : params.filters.limit || 30}
+            ], (items) => {
                 sendback({ items });
             });
         }

@@ -1,21 +1,10 @@
 import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { getSession } from '../../data/cache';
-import { castNotification } from '../../layout/notifications';
-
-const STATUS_COLORS = {
-    active: '#6da55e',
-    paused: '#735a1f',
-    archived: '#731f1f'
-};
+import { ButtonWorker } from '../../widgets/form';
+import { StatusIndicator, Version } from './lib';
 
 const styles = {
-    statusIndicator: {
-        color: 'white',
-        display: 'inline-block',
-        padding: '4px',
-        borderRadius: '4px'
-    },
     ponglink: {
         width: '100%',
         backgroundColor: 'white',
@@ -40,44 +29,18 @@ const styles = {
     mediumHeader: {
         width: '120px'
     },
-    copyColumn: {
-        textAlign: 'center',
-        width: '80px'
-    },
-    copyIcon: {
-        cursor: 'pointer'
+    fullWidthBtn: {
+        display: 'block',
+        margin: '10px 100px',
+        textAlign:'center'
     }
 }
 
-const StatusIndicator = props => (
-    <div className="status-indicator" style={Object.assign({}, styles.statusIndicator, { backgroundColor: STATUS_COLORS[props.status] })}>
-        <span>{props.status.toUpperCase()}</span>
-    </div>
-);
-
-const copy = txt => {
-    navigator.clipboard.writeText(txt);
-    castNotification({
-        title: 'Copied PongLink destination to clipboard',
-        message: txt,
-        type: 'success'
-    });
-};
-
-const Version = props => (
-    <tr style={styles.versionRow}>
-        <td title={props.medium}>{props.medium}</td>
-        <td><a href={props.dest} target='_blank'>{props.dest}</a></td>
-        <td style={styles.copyColumn}><i className="fal fa-copy" onClick={copy.bind(this, props.dest)} style={styles.copyIcon}></i></td>
-    </tr>
-)
-
-class PonglinkListItem extends Component {
+class Ponglink extends Component {
     constructor(props) {
         super(props);
 
         this.state = {...this.props.item};
-        console.log(this.state);
     }
 
     render() {
@@ -88,7 +51,7 @@ class PonglinkListItem extends Component {
                 <div className="clickCounter" style={{ display: 'inline-block', float: 'right' }}>
                     <span>{`${this.state.clicks} clicks`}</span>
                 </div>
-                <h3 style={styles.creatorName}>{`Created by ${mappedUsers[this.state.creatorid].displayname}`}</h3>
+                <h3 style={styles.creatorName}>{`Created by ${getSession('mappedEntities')[this.state.creatorid].displayname}`}</h3>
                 <hr />
                 <table id="versions" style={styles.versions}>
                     <thead>
@@ -113,22 +76,16 @@ class PonglinkListItem extends Component {
     }
 }
 
-// Object containing all active users keyed by id, returned from cache
-let mappedUsers;
+const LoadMore = props => (
+    <ButtonWorker text='Load More' sync={true} work={done => props.onClick()} style={styles.fullWidthBtn} />
+);
 
 export class PonglinksList extends Component {
     constructor(props) {
         super(props);
 
         this.state = {};
-        this.bigListToolbar = {
-
-        };
-
-        mappedUsers = {};
-        getSession('entities').forEach(entity => {
-            mappedUsers[entity._id] = entity;
-        });
+        this.bigListToolbar = {};
     }
 
     static get TOOLBAR_CONFIG() {
@@ -154,7 +111,7 @@ export class PonglinksList extends Component {
     render() {
         return (
             <div id="ponglinks-list" style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <BigList listitem={PonglinkListItem} endpoint='/ponglinks/bunch' toolbar={PonglinksList.TOOLBAR_CONFIG} />                
+                <BigList listitem={Ponglink} batchsize={15} endpoint='/ponglinks/bunch' toolbar={PonglinksList.TOOLBAR_CONFIG} loadmoreButton={LoadMore} />                
             </div>
         );
     }
