@@ -76,7 +76,6 @@ export default class PonglinkInsight extends Component {
     }
 
     componentDidMount() {
-        getSession('mappedEntities');
         if (this.props.id) {
             API.get('/ponglinks/insights/' + this.props.id, {}, (err, data, r) => {
                 if (r.status == 200) {
@@ -121,6 +120,25 @@ export default class PonglinkInsight extends Component {
         return dataSet;
     }
 
+    changeStatus(status) {
+        API.post('/ponglinks/edit/' + this.props.id, { status }, (err, data, r) => {
+            if (r.status == 200) {
+                const link = this.state.link;
+                link.status = status;
+                this.setState({ link });
+                castNotification({
+                    title: `Campaign status set to ${status}`,
+                    type: 'success'
+                })
+            } else {
+                castNotification({
+                    title: 'Error updating ponglink status',
+                    type: 'error'
+                })
+            }
+        });
+    }
+
     render() {
         if (!this.state.loading) {
             const { lineLabels, lineClicks } = this.buildDailyClicksDataSet();
@@ -156,7 +174,7 @@ export default class PonglinkInsight extends Component {
 
                         <hr/>
 
-                        <PonglinkActions status={this.state.link.status} />
+                        <PonglinkActions status={this.state.link.status} changeStatus={this.changeStatus.bind(this)} />
                     </div>
 
                     <div className="diagrams" style={styles.diagrams}>

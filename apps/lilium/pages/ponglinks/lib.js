@@ -1,5 +1,6 @@
 import { castNotification } from '../../layout/notifications'
 import { Component, h } from "preact";
+import API from '../../data/api';
 
 const STATUS_COLORS = {
     active: '#6da55e',
@@ -66,13 +67,13 @@ export function copy(txt) {
 };
 
 const ActionArchive = props => (
-    <span style={styles.actionText}>Archive (this action is irreversible)</span>
+    <span style={styles.actionText} onClick={props.changeStatus}>Archive (this action is irreversible)</span>
 )
 const ActionPause = props => (
-    <span style={styles.actionText}>Pause)</span>
+    <span style={styles.actionText} onClick={props.changeStatus}>Pause)</span>
 )
 const ActionResume = props => (
-    <span style={styles.actionText}>Resume</span>    
+    <span style={styles.actionText} onClick={props.changeStatus}>Resume</span>
 )
 
 export class PonglinkActions extends Component {
@@ -91,21 +92,21 @@ export class PonglinkActions extends Component {
             return (
                 <div className="ponglink-actions" style={styles.actions}>
                     <div className="ponglink-action warning" style={{...styles.ponglinkAction, color: 'yellow'}}>
-                        <ActionPause />
+                        <ActionPause changeStatus={this.props.changeStatus.bind(this, 'paused')} />
                     </div>
                     <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
-                        <ActionArchive />
+                        <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />
                     </div>
                 </div>
             );
         } else if (this.state.status == 'paused') {
             return (
-                <div className="ponglink-actions">
-                    <div className="ponglink-action success" style={{...styles.succeponglinkActionss, color: 'green'}}>
-                        <ActionResume />
+                <div className="ponglink-actions" style={styles.actions}>
+                    <div className="ponglink-action success" style={{...styles.ponglinkAction, color: 'green'}}>
+                        <ActionResume changeStatus={this.props.changeStatus.bind(this, 'active')} />
                     </div>
                     <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
-                        <ActionArchive />                        
+                        <ActionArchive changeStatus={this.props.changeStatus.bind(this, 'archived')} />                        
                     </div>
                 </div>
             );
