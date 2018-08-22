@@ -66,7 +66,10 @@ export default class SettingsPage extends Component {
                         <TextField onChange={this.fieldChanged.bind(this)} name="analytics.jsonkeypath" placeholder="Analytics key path" initialValue={this.values.analytics.jsonkeypath} />
                         <TextField onChange={this.fieldChanged.bind(this)} name="analytics.accountid" placeholder="Analytics account ID" initialValue={this.values.analytics.accountid} />
                         <TextField onChange={this.fieldChanged.bind(this)} name="analytics.siteviewid" placeholder="Analytics Site View ID" initialValue={this.values.analytics.siteviewid} />
+                        <TextField onChange={this.fieldChanged.bind(this)} name="analytics.userDimension" placeholder="Custom dimension for author" initialValue={this.values.analytics.userDimension || "2"} />
                     </div>
+
+
 
                     <h2 style={styles.h2}>Facebook</h2>
                     <div style={{ padding : 15 }}>

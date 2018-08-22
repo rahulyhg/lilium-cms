@@ -28,7 +28,9 @@ export default class PublishingTab extends Component {
             }
         });
 
-        registerOverlay('create-article', CreateOverlay);
+        registerOverlay('create-article', CreateOverlay, {
+            title : "Create a new post"
+        });
     }
 
     render() {
