@@ -88,12 +88,14 @@ var SiteInitializer = function (conf, siteobj) {
 
         to = conf.server.html + '/tinymce';
         rootDir = conf.server.base + "node_modules/tinymce/";
-        mkdirp.sync(rootDir);
         fileserver.createSymlinkSync(rootDir, to);
 
         to = conf.server.html + '/flatpickr';
         rootDir = conf.server.base + "node_modules/flatpickr/dist";
-        mkdirp.sync(rootDir);
+        fileserver.createSymlinkSync(rootDir, to);
+
+        to = conf.server.html + '/chartjs';
+        rootDir = conf.server.base + "node_modules/chart.js/dist";
         fileserver.createSymlinkSync(rootDir, to);
 
         done();
