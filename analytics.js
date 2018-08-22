@@ -242,6 +242,7 @@ class GoogleAnalyticsRequest {
                         article : article ? {
                             title : article.title[0],
                             subtitle : article.subtitle[0],
+                            date : article.date,
                             author : author ? {
                                 displayname : author.displayname,
                                 _id : author._id,
