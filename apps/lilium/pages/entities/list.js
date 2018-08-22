@@ -1,8 +1,6 @@
 import { Component, h } from 'preact';
-import API from '../../data/api';
 import { castNotification } from '../../layout/notifications';
-import { MultitagBox, SelectField, CheckboxField } from '../../widgets/form.js';
-import { BigList, BigListToolBarBuilder } from '../../widgets/biglist'
+import { BigList } from '../../widgets/biglist'
 import { navigateTo } from '../../routing/link'
 import * as entityLib from './lib'
 
@@ -11,28 +9,6 @@ class EntityListItem extends Component {
         super(props);
 
         this.state = { user: this.props.item };
-    }
-
-    static get TOOLBAR_CONFIG() {
-        return {
-            id : "entities",
-            title : "Filters",
-            fields : [
-                { type : "text", name : "search", title : "Search by name" },
-                { type : "select", name : "status", title : "Status", options : [
-                    { value : "not-revoked", text : "Active" },
-                    { value : "revoked", text : "Revoked" },
-                    { value : "All", text : "All statuses" },
-                ] },
-                { type : "select", name : "sort", title : "Sort", options : [
-                    { value : "displayname-az", text : "Alphabetical" },
-                    { value : "displayname-za", text : "Alphabetical Reversed" },
-                    { value : "latest-logged", text : "Login Time" },
-                    { value : "newest", text : "Newest" },
-                    { value : "oldest", text : "Oldest" },
-                ] }
-            ]
-        };
     }
 
     revokeAccess() {
@@ -194,11 +170,33 @@ export default class Entities extends Component {
         this.state = { entities: [] };
     }
 
+    static get TOOLBAR_CONFIG() {
+        return {
+            id : "entities",
+            title : "Filters",
+            fields : [
+                { type : "text", name : "search", title : "Search by name" },
+                { type : "select", name : "status", title : "Status", options : [
+                    { value : "not-revoked", text : "Active" },
+                    { value : "revoked", text : "Revoked" },
+                    { value : "All", text : "All statuses" },
+                ] },
+                { type : "select", name : "sort", title : "Sort", options : [
+                    { value : "displayname-az", text : "Alphabetical" },
+                    { value : "displayname-za", text : "Alphabetical Reversed" },
+                    { value : "latest-logged", text : "Login Time" },
+                    { value : "newest", text : "Newest" },
+                    { value : "oldest", text : "Oldest" },
+                ] }
+            ]
+        };
+    }
+
     render() {
         return (
             <div id="entities">
                 <h1>Entities</h1>
-                <BigList listitem={EntityListItem} endpoint='/entities/bunch' toolbar={EntityListItem.TOOLBAR_CONFIG} />
+                <BigList listitem={EntityListItem} endpoint='/entities/bunch' toolbar={Entities.TOOLBAR_CONFIG} />
             </div>
         )
     }

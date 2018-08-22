@@ -1,7 +1,7 @@
 import { Component, h } from "preact";
 import { RolesList } from './list';
-import { addAction } from '../../layout/lys'
-import { registerOverlay, castOverlay } from '../../overlay/overlaywrap';
+import { addAction } from '../../layout/lys';
+import { navigateTo } from '../../routing/link';
 
 export default class Roles extends Component {
     constructor(props) {
@@ -15,19 +15,18 @@ export default class Roles extends Component {
     }
 
     static componentDidRegister() {
-        log('Role', 'Registering overlay for CreateRole', 'success');
         addAction({
             action : "#create",
             command : "role",
             displayname : "Role",
             execute : () => {
-                castOverlay('create-role');
+                navigateTo('/role', { modalShown: true })
             }
         });
     }
 
     render() {
-        log('Entities', 'Rendering roles pane with ' + this.props.levels.length + ' levels', 'detail');
-        return (<RolesList />)
+        log('Roles', 'Rendering roles pane with ' + this.props.levels.length + ' levels', 'detail');
+        return (<RolesList modalShown={this.props.extras.modalShown} />)
     }
 }

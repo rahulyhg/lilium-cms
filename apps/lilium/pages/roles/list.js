@@ -56,7 +56,7 @@ export class RolesList extends Component {
         super(props);
 
         this.values = {};
-        this.state = { roles: [], createModalVisible: false };
+        this.state = { roles: [], createModalVisible: props.modalShown || false};
     }
 
     componentDidMount() {

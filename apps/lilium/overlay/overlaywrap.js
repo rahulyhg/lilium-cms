@@ -1,9 +1,12 @@
-import { h, Component } from 'preact'
+import { h, Component } from 'preact';
+import { OverlaySlides } from './overlayslides';
 
 const OVERLAY_COLLECTION = {};
 
-export function registerOverlay(id, component) {
-    OVERLAY_COLLECTION[id] = component;
+export function registerOverlay(id, component, options = {}) {
+    OVERLAY_COLLECTION[id] = {
+        component, options
+    };
 }
 
 export function castOverlay(id, extra) {
@@ -29,8 +32,8 @@ export class OverlayWrap extends Component {
     cast(id, extra) {
         this.setState({
             visible : true,
-            component : OVERLAY_COLLECTION[id],
-            extra
+            extra,
+            ...OVERLAY_COLLECTION[id],
         });
     }
 
@@ -53,7 +56,7 @@ export class OverlayWrap extends Component {
 
         return (
             <div id="fullscreen-overlay">
-                <this.state.component extra={this.state.extra} />
+                <OverlaySlides options={this.state.options} extra={this.state.extra} component={this.state.component} />
             </div>
         )
     }

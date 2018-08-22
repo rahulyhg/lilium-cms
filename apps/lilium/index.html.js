@@ -11,6 +11,7 @@ module.exports = cli => `<!DOCTYPE html>
     <body>
         <div id="app"></div>
         <script src="/tinymce/tinymce.js"></script>
+        <script src="/chartjs/Chart.min.js"></script>
         <script src="/lmlbackend/app.bundle.js"></script>
     </body>
 </html>`;

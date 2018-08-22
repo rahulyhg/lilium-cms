@@ -9,7 +9,7 @@ import { OverlayWrap } from './overlay/overlaywrap';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
-import { initLocal, setSession } from './data/cache';
+import { initLocal, setSession, mapUsers } from './data/cache';
 import { NotificationWrapper } from './layout/notifications';
 import { makeGLobalLang, setLanguage } from './data/vocab';
 import API from './data/api';
@@ -63,6 +63,7 @@ class Lilium extends Component {
                 const currentLanguage = resp['/me'][0].language || 'en-ca';
                 setLanguage(currentLanguage, () => {
                     setSession("entities", resp["/entities/simple"]);
+                    setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
                     liliumcms.session = resp["/me"][0];
                     liliumcms.session.allowedEndpoints = [
                         "me", "preferences", "logout", "notifications", 
