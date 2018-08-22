@@ -58,5 +58,5 @@ export function initLocal() {
 }
 
 export function dumpCache() {
-    return { application : quickCache };
+    return { application : quickCache, session : sessionCache };
 }
