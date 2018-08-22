@@ -2,7 +2,7 @@ import { Component, h } from "preact";
 import { castNotification } from '../../layout/notifications'
 import API from '../../data/api';
 import { ChartGraph } from  '../../widgets/chart';
-import { StatusIndicator, Version } from './lib';
+import { StatusIndicator, Version, PonglinkActions } from './lib';
 import { getSession } from '../../data/cache';
 import dateFormat from 'dateformat';
 
@@ -153,6 +153,10 @@ export default class PonglinkInsight extends Component {
                                 }
                             </tbody>
                         </table>
+
+                        <hr/>
+
+                        <PonglinkActions status={this.state.status} />
                     </div>
 
                     <div className="diagrams" style={styles.diagrams}>
@@ -164,6 +168,8 @@ export default class PonglinkInsight extends Component {
                             <ChartGraph data={pieClicks} labels={pieLabels} title='Number of clicks per medium' lineStyle='#ccc' type='pie' />                        
                         </div>
                     </div>
+
+                    <hr/>
                 </div>
             );
         } else {

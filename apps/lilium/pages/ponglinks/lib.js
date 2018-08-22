@@ -21,6 +21,23 @@ const styles = {
         padding: '4px',
         borderRadius: '4px'
     },
+    actions: {
+        display: 'flex',
+    },
+    danger: {
+        color: 'red'
+    },
+    warning: {
+        color: 'yellow'
+    },
+    success: {
+        color: 'green'
+    },
+    archivedMessage: {
+        color: 'red',
+        margin: '6px',
+        textAlign: 'center'
+    }
 }
 
 export function StatusIndicator(props) {
@@ -50,7 +67,46 @@ export function copy(txt) {
     });
 };
 
+export class PonglinkActions extends Component {
+    constructor(props) {
+        super(props);
 
-export function getMappedUsers() {
+        this.state = { status: props.status || 'archived' };
+    }
 
+    componentWillReceiveProps(props) {
+        this.setState({ status: props.status });
+    }
+
+    render() {
+        if (this.state.status == 'active') {
+            return (
+                <div className="actions">
+                    <div className="action warning" style={styles.warning}>
+                        <span>Pause</span>
+                    </div>
+                    <div className="action danger" style={styles.danger}>
+                        <span>Archive</span>
+                    </div>
+                </div>
+            );
+        } else if (this.state.status == 'paused') {
+            return (
+                <div className="actions">
+                    <div className="action success" style={styles.success}>
+                        <span>Resume</span>
+                    </div>
+                    <div className="action danger" style={styles.danger}>
+                        <span>Archive</span>
+                    </div>
+                </div>
+            );
+        } else {
+            return (
+                <div className="actions">
+                    <p className="ponglink-archived" style={styles.archivedMessage}>This campaign is archived and cannot be activated again</p>
+                </div>
+            );
+        }
+    }
 }
