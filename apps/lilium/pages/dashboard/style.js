@@ -43,5 +43,19 @@ export const styles = {
         boxSizing : "border-box",
         flexWrap : "wrap",
         height: 350
+    },
+
+    boxtitle : {
+        padding: "10px 14px", 
+        fontSize : 16,
+        margin: 0, 
+        background : "#333", 
+        color : "white"
+    },
+
+    graphbg : {
+        padding: 10, 
+        background : "white", 
+        boxShadow : "0px 2px 1px rgba(0,0,0,0.2)"
     }
 };
