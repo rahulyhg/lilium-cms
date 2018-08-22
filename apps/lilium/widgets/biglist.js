@@ -140,7 +140,7 @@ export class BigList extends Component {
                 </div>
 
                 {
-                    this.coldState.loadmoreButton && this.state.items.length > this.coldState.batchsize ? (
+                    this.coldState.loadmoreButton && this.state.items.length >= this.coldState.batchsize ? (
                         <this.coldState.loadmoreButton onClick={this.loadMore.bind(this, false)} />
                     ) : null
                 }

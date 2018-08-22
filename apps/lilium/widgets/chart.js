@@ -1,5 +1,12 @@
 import { h, Component } from 'preact';
 
+const minPastel = 150;
+const maxPastel = 255;
+
+const getRandPastelRGBA = () => {
+    return minPastel + Math.random() *(maxPastel - minPastel);
+};
+
 export class ChartGraph extends Component {
     constructor(props) {
         super(props);
@@ -7,10 +14,15 @@ export class ChartGraph extends Component {
             datasets : props.datasets,
             data : props.data,
             labels : props.labels || ["Data"],
-            options : props.options || {}
+            options : Object.assign({}, props.options || {}),
+            title: props.title
         }
 
         this.resize_bound = this.resize.bind(this);
+    }
+
+    getDefaultBackgroundColors() {
+        return this.props.labels.map(() => `rgba(${getRandPastelRGBA()}, ${getRandPastelRGBA()}, ${getRandPastelRGBA()})`)
     }
 
     resize() {
@@ -33,7 +45,7 @@ export class ChartGraph extends Component {
                     label : this.state.title || "Data",
                     data : this.state.data,
                     ...(Object.assign({
-                        backgroundColor : "rgba(193, 123, 210, 0.7)",
+                        backgroundColor : this.getDefaultBackgroundColors(),
                         borderColor : "rgb(202, 80, 258)"
                     }, this.props.lineStyle))
                 }]
