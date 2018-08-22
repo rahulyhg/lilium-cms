@@ -116,7 +116,6 @@ export default class PonglinkInsight extends Component {
             (version) ? dataSet.pieLabels.push(version.medium) :dataSet.pieLabels.push('Unknown');
         });
 
-        console.log(dataSet);
         return dataSet;
     }
 

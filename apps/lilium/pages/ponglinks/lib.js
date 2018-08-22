@@ -1,6 +1,5 @@
 import { castNotification } from '../../layout/notifications'
 import { Component, h } from "preact";
-import API from '../../data/api';
 
 const STATUS_COLORS = {
     active: '#6da55e',

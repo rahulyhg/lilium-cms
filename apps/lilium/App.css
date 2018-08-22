@@ -397,7 +397,7 @@ h2 {
     top: 0;
     bottom: 0;
     width: 60%;
-
+    overflow-y: auto;
     background: #EEE;
     color: #333
 }

@@ -54,7 +54,6 @@ export class ChartGraph extends Component {
             options : this.state.options
         };
 
-        console.log(opt);
         this.chart = new Chart(this.ctx, opt);
         log('Chart', 'Created chart object using a canvas\' 2d context', 'success');
 
