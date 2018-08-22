@@ -24,14 +24,12 @@ const styles = {
     actions: {
         display: 'flex',
     },
-    danger: {
-        color: 'red'
+    ponglinkAction: {
+        textAlign: 'center',
+        flexGrow: '1'
     },
-    warning: {
-        color: 'yellow'
-    },
-    success: {
-        color: 'green'
+    actionText: {
+        cursor: 'pointer'
     },
     archivedMessage: {
         color: 'red',
@@ -67,6 +65,16 @@ export function copy(txt) {
     });
 };
 
+const ActionArchive = props => (
+    <span style={styles.actionText}>Archive (this action is irreversible)</span>
+)
+const ActionPause = props => (
+    <span style={styles.actionText}>Pause)</span>
+)
+const ActionResume = props => (
+    <span style={styles.actionText}>Resume</span>    
+)
+
 export class PonglinkActions extends Component {
     constructor(props) {
         super(props);
@@ -81,29 +89,29 @@ export class PonglinkActions extends Component {
     render() {
         if (this.state.status == 'active') {
             return (
-                <div className="actions">
-                    <div className="action warning" style={styles.warning}>
-                        <span>Pause</span>
+                <div className="ponglink-actions" style={styles.actions}>
+                    <div className="ponglink-action warning" style={{...styles.ponglinkAction, color: 'yellow'}}>
+                        <ActionPause />
                     </div>
-                    <div className="action danger" style={styles.danger}>
-                        <span>Archive</span>
+                    <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
+                        <ActionArchive />
                     </div>
                 </div>
             );
         } else if (this.state.status == 'paused') {
             return (
-                <div className="actions">
-                    <div className="action success" style={styles.success}>
-                        <span>Resume</span>
+                <div className="ponglink-actions">
+                    <div className="ponglink-action success" style={{...styles.succeponglinkActionss, color: 'green'}}>
+                        <ActionResume />
                     </div>
-                    <div className="action danger" style={styles.danger}>
-                        <span>Archive</span>
+                    <div className="ponglink-action danger" style={{...styles.ponglinkAction, color: 'red'}}>
+                        <ActionArchive />                        
                     </div>
                 </div>
             );
         } else {
             return (
-                <div className="actions">
+                <div className="ponglink-actions">
                     <p className="ponglink-archived" style={styles.archivedMessage}>This campaign is archived and cannot be activated again</p>
                 </div>
             );

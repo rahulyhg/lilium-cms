@@ -156,11 +156,11 @@ export default class PonglinkInsight extends Component {
 
                         <hr/>
 
-                        <PonglinkActions status={this.state.status} />
+                        <PonglinkActions status={this.state.link.status} />
                     </div>
 
                     <div className="diagrams" style={styles.diagrams}>
-                        <h2>Detailed statistics for the campaignk</h2>
+                        <h2>Detailed statistics for the campaign</h2>
                         <div id="clicks-per-day" style={styles.diagram}>
                             <ChartGraph data={lineClicks} labels={lineLabels} title='Number of clicks per day of the campaign' options={lineDiragramOptions} type='bar' />
                         </div>

@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 
-const minPastel = 150;
+const minPastel = 100;
 const maxPastel = 255;
 
 const getRandPastelRGBA = () => {
