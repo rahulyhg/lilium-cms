@@ -4,25 +4,26 @@ import { CACHEKEYS, getLocal } from '../data/cache';
 import { dismissOverlay } from '../overlay/overlaywrap';
 
 // Import default pages from route
-import InitPage     from '../pages/default';
-import Dashboard    from '../pages/dashboard/index';
-import Publishing   from '../pages/publishing/index';
-import ProfilePage  from '../pages/me/index.js';
-import Preferences  from '../pages/preferences/index.js';
-import Entities     from '../pages/entities/index.js';
-import Roles        from '../pages/roles/index.js';
-import Ponglinks    from '../pages/ponglinks/index.js';
-import Logout       from '../pages/logout/index';
-import DevTools     from '../pages/devtools/index.js';
-import translations from '../pages/translations/index.js';
-import SettingsPage from '../pages/settings/index.js';
-import Notifs       from '../pages/notifications/index';
-import ThemesPage   from '../pages/themes/index';
-import CommentsMan  from '../pages/comments/index';
-import PluginsMan   from '../pages/plugins/index';
-import CakepopsMan  from '../pages/cakepops/index';
-import e404         from '../pages/errors/404';
-import e403         from '../pages/errors/403';
+import InitPage         from '../pages/default';
+import Dashboard        from '../pages/dashboard/index';
+import Publishing       from '../pages/publishing/index';
+import ProfilePage      from '../pages/me/index.js';
+import Preferences      from '../pages/preferences/index.js';
+import Entities         from '../pages/entities/index.js';
+import Roles            from '../pages/roles/index.js';
+import Ponglinks        from '../pages/ponglinks/index.js';
+import ContentChains    from '../pages/contentchains/index.js';
+import Logout           from '../pages/logout/index';
+import DevTools         from '../pages/devtools/index.js';
+import translations     from '../pages/translations/index.js';
+import SettingsPage     from '../pages/settings/index.js';
+import Notifs           from '../pages/notifications/index';
+import ThemesPage       from '../pages/themes/index';
+import CommentsMan      from '../pages/comments/index';
+import PluginsMan       from '../pages/plugins/index';
+import CakepopsMan      from '../pages/cakepops/index';
+import e404             from '../pages/errors/404';
+import e403             from '../pages/errors/403';
 
 
 // Default endpoints are provided here
@@ -62,6 +63,7 @@ EndpointStore.registerEndpoint('preferences', Preferences);
 EndpointStore.registerEndpoint('entities', Entities);
 EndpointStore.registerEndpoint('role', Roles);
 EndpointStore.registerEndpoint('ponglinks', Ponglinks);
+EndpointStore.registerEndpoint('contentchains', ContentChains);
 EndpointStore.registerEndpoint('logout', Logout);
 EndpointStore.registerEndpoint('devtools', DevTools);
 EndpointStore.registerEndpoint('translations', translations);

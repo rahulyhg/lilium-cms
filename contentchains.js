@@ -47,9 +47,7 @@ class ContentChains {
             delete chainData.date;
         }
 
-        let that = this;
-        id = db.mongoID(id);
-        db.update(_c, 'contentchains', {_id : id}, chainData, () => {
+        db.update(_c, 'contentchains', {_id : db.mongoID(id)}, chainData, () => {
             callback && callback();
         });
     }
@@ -156,7 +154,7 @@ class ContentChains {
             return cli.refuse();
         }
 
-        var path = cli.routeinfo.path[2];   
+        let path = cli.routeinfo.path[2];   
 
         if (path == "new") {
             this.insertNewChain(cli._c, {
@@ -303,4 +301,5 @@ class ContentChains {
 }
 
 const cc = new ContentChains();
+
 module.exports = cc;
