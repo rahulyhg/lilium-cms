@@ -1,5 +1,6 @@
 import { h, Component, cloneElement } from "preact";
 import flatpickr from 'flatpickr';
+import API from "../data/api";
 
 const styles = {
     placeholder : {
@@ -611,6 +612,64 @@ export class MultiSelectBox extends FormField {
                                 <ListItem option={option} selected={this.state.selectedValues.includes(option.value)} key={option.value}
                                         unselectOption={this.unselectOption.bind(this)} selectOption={this.selectOption.bind(this)} />
                             )
+                        })
+                    }
+                </div>
+            </div>
+        );
+    }
+}
+
+export class DebouncedField extends FormField {
+    constructor(props) {
+        super(props);
+        // Debounce delay in ms
+        this.debounceDelay = this.props.debounceDelay || 300;
+        this.timeoutId;
+    }
+
+    shouldComponentUpdate() { return false; }
+
+    debounceInput(ev) {
+        this.timeoutId && clearTimeout(this.timeoutId);
+        this.timeoutId = setTimeout(this.props.onDebounce.bind(this, ev.target.value), this.debounceDelay);
+    }
+
+    render() {
+        return (
+            <TextField placeholder={this.props.placeholder} onKeyPress={this.debounceInput.bind(this)} />
+        );
+    }
+}
+
+export class AutocompleteField extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { items: [] };
+    }
+
+    searchEndpoint(searchString) {
+        if (!this.props.endpoint) throw new Error('Must specify an endpoint for AutocompleteField')
+
+        // The endpoint is expected to return an array
+        API.get(this.props.endpoint, { query: searchString }, (err, data, r) => {
+            if (r.status == 200) {
+                this.setState({ items: data })
+            } else {
+                log('AutocompleteField', `Failes fetching the specified endpoint ${this.props.endpoint}`, 'error');
+            }
+        });
+    }
+
+    render() {
+        return (
+            <div className="autocomplete-field">
+                <DebouncedField placeholder={this.props.placeholder} placeholderType='inside'
+                                onDebounce={this.searchEndpoint.bind(this)} />
+                <div className="autocomplete-choices">
+                    {
+                        this.state.items.map((item, index) => {
+                            return (<h4 className="autocomplete-choice" key={index}>{item[this.props.autocompleteField]}</h4>);
                         })
                     }
                 </div>

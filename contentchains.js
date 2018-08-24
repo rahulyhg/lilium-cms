@@ -4,6 +4,21 @@ const filelogic = require('./filelogic.js');
 const articleLib = require('./article.js');
 const noop = () => {};
 
+const CONTENTCHAIN_LIVEVAR_PROJECTION = {
+    title : 1,
+    subtitle : 1,
+    slug : 1,
+    presentation : 1,
+    status : 1,
+    createdBy : 1,
+    createdOn : 1,
+    lastModified : 1,
+    featuredMedia: 1,
+    'articles._id': 1,
+    'articles.title': 1,
+    'articles.date': 1
+}
+
 class ContentChains {
     constructor() {
         
@@ -15,12 +30,12 @@ class ContentChains {
             subtitle : "",
             slug : "",
             presentation : "",
-            status : "backstage",
+            status : "draft",
             createdBy : undefined,
             createdOn : new Date(),
             lastModified : new Date(),
-            media : undefined,
-            serie : []
+            featuredMedia: undefined,
+            articles : []
         }, data);
     }
 
@@ -36,18 +51,17 @@ class ContentChains {
     }
 
     editChain(_c, id, data, callback) {
-        let chainData = data;
-        if (chainData.media) {
-            chainData.media = db.mongoID(chainData.media);
+        if (data.featuredMedia) {
+            data.featuredMedia = db.mongoID(data.featuredMedia);
         }
 
-        if (chainData.date) {
-            chainData.date = new Date(chainData.date);
+        if (data.date) {
+            data.date = new Date(data.date);
         } else {
-            delete chainData.date;
+            delete data.date;
         }
 
-        db.update(_c, 'contentchains', {_id : db.mongoID(id)}, chainData, () => {
+        db.update(_c, 'contentchains', {_id : db.mongoID(id)}, data, () => {
             callback && callback();
         });
     }
@@ -110,7 +124,7 @@ class ContentChains {
                 }
 
                 item.featuredimage = undefined;
-                item.media = undefined;
+                item.featuredMedia = undefined;
             });
 
             db.count(cli._c, 'contentchains', query, (err, total) => {
@@ -129,6 +143,33 @@ class ContentChains {
         } else if (levels[0] == "deep") {
             this.deepFetch(cli._c, levels[1], (item) => {
                 send(item);
+            });
+        } else if (levels[0] == "search") {
+            db.join(cli._c, 'content', [
+                { $match: { title: { $regex: new RegExp(params.query, 'i') }}},
+                { $limit: 30 },
+                { $project: { title: { $arrayElemAt: ['$title', 0] }, date: 1 }},
+            ], items => {
+                send(items);
+            });
+        } else {
+            db.join(cli._c, 'contentchains', [
+                { $match : { _id: db.mongoID(levels[0]) } },
+                {
+                    $lookup : {
+                        from : "content",
+                        localField : "articles",
+                        foreignField : "_id",
+                        as : "articles" }
+                },
+                { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
+            ], items => {
+                if (items) {
+                    items[0].articles.forEach(article => { article.title = article.title[0] } );
+                    send(items[0]);
+                } else {
+                    send();
+                }
             });
         }
     }
@@ -159,12 +200,12 @@ class ContentChains {
         if (path == "new") {
             this.insertNewChain(cli._c, {
                 title : cli.postdata.data.title,
-                slug : require('slug')(cli.postdata.data.title).toLowerCase(),
+                subtitle : cli.postdata.data.subtitle,                
                 createdBy : db.mongoID(cli.userinfo.userid)
             }, (err, r) => {
                 cli.sendJSON({
-                    editurl : cli._c.server.url + "/admin/chains/edit/" + r.insertedId,
-                    valid : true
+                    created: r.ops[0],
+                    valid: !err
                 });
             });
         } else if (path == "edit") {
@@ -197,8 +238,8 @@ class ContentChains {
 
     generateChain(_c, strID, callback) {
         this.deepFetch(_c, strID, df => {
-            console.log(df.serie);
-            articleLib.batchFetch(_c, df.serie.map(x => db.mongoID(x)), articles => {
+            console.log(df.articles);
+            articleLib.batchFetch(_c, df.articles.map(x => db.mongoID(x)), articles => {
                 let id = df._id;
                 let extra = {
                     config : _c,
@@ -209,93 +250,6 @@ class ContentChains {
                 let landingPath = _c.server.html + "/" + df.slug + ".html";
                 filelogic.renderThemeLML(_c, 'chain', landingPath, extra, callback);
             });
-        });
-    }
-
-    form(cli) {
-        require('./formBuilder.js').createForm("contentchains", {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                'id': 'contentchainwrapper',
-                'inner': true
-            },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add('title', 'text', {
-            displayname : "Headline",
-            placeholder : true,
-            classes : ["bigtitle"]
-        })
-        .add('subtitle', 'text', {
-            placeholder: true,
-            displayname: 'Subtitle'
-        })
-        .add('title-content', 'title', {
-            displayname : "Serie"
-        })
-        .add('contentlist', 'snip', {
-            snip : "contentlist",
-            livevars : ["content.simple"]
-        })
-        .add('title-presentation', 'title', {
-            displayname : "Presentation"
-        })
-        .add('presentation', 'ckeditor', {
-            nolabel : true
-        })
-        .add('media', 'media-explorer', {
-            displayname : "Featured image",
-            classes : "content-chain-media-picker"
-        })
-        .add('title-complete', 'title', {
-            displayname : "Chain completion"
-        })
-        .add('finished', 'checkbox', {
-            displayname : "This chain is complete"
-        })
-        .add('pendingtext', 'text', {
-            displayname : "Display text for upcoming article if not complete"
-        }, {
-            required : false
-        })
-        .add('title-details', 'title', {
-            displayname : "Details"
-        })
-        .add('date', 'date', {
-            displayname : "Live date",
-            datetime : true,
-            context : 'edit'
-        }, {
-            required : false
-        })
-        .add('slug', 'text', {
-            displayname : "URL slug"
-        }, {
-            required : false   
-        })
-        .add('title-actions', 'title', {
-            displayname : "Actions"
-        })
-        .add('publish-set', 'buttonset', { 
-            buttons : [
-                {
-                    name : 'save',
-                    displayname: 'Save changes',
-                    type : 'button',
-                    classes: ['btn-save']
-                }, {
-                    name : "golive",
-                    displayname : "Save and go Live",
-                    type : "button",
-                    classes : ["btn-publish", "green"]
-                }, {
-                    name : "backstage",
-                    displayname : "Backstage",
-                    type : "button",
-                    classes : ["btn-remove"]
-                }
-            ]
         });
     }
 }

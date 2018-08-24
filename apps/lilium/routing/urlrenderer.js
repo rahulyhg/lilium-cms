@@ -63,7 +63,7 @@ EndpointStore.registerEndpoint('preferences', Preferences);
 EndpointStore.registerEndpoint('entities', Entities);
 EndpointStore.registerEndpoint('role', Roles);
 EndpointStore.registerEndpoint('ponglinks', Ponglinks);
-EndpointStore.registerEndpoint('contentchains', ContentChains);
+EndpointStore.registerEndpoint('chains', ContentChains);
 EndpointStore.registerEndpoint('logout', Logout);
 EndpointStore.registerEndpoint('devtools', DevTools);
 EndpointStore.registerEndpoint('translations', translations);
