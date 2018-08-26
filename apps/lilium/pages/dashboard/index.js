@@ -3,6 +3,9 @@ import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connectio
 import { styles } from './style';
 import API from '../../data/api';
 import { AnimeNumber } from '../../widgets/animenumber';
+import { Spinner } from '../../layout/loading';
+import { ChartGraph } from '../../widgets/chart';
+import { getSession } from '../../data/cache';
 
 class RealtimeTicker extends Component {
     constructor(props) {
@@ -85,6 +88,84 @@ class RealtimeTicker extends Component {
     }
 }
 
+class Last30Days extends Component {
+    constructor(props) {
+        super(props);
+
+        this.data   = props.stats.daily.map(x => x.views);
+        this.labels = props.stats.daily.map((x, i) => "");
+
+        log('Dashboard', 'Displaying Last 30 Days component', 'detail');
+    }
+
+    render() {
+        return (
+            <div style={{ width : "50%", margin: 10 }}>
+                <h2 style={styles.boxtitle}>Latest 30 days</h2>
+                <div style={styles.graphbg}>
+                    <ChartGraph type="line" data={this.data} labels={this.labels} />
+                </div>                
+            </div>                
+        )
+    }
+}
+
+class TopPost extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            toppost : props.toppost
+        };
+    }
+
+    render() {
+        return (
+            <div style={{ width : "50%", margin: 10, background : "white", boxShadow : "0px 2px 1px rgba(0,0,0,0.2)" }}>
+                <h2 style={styles.boxtitle}>Yesterday top post</h2>
+                <div style={{ position: "relative" }}>
+                    <div style={{ fontSize : 18, padding: 10 }}>{this.state.toppost.article.title}</div>
+                    <img src={this.state.toppost.article.facebookmedia} style={{ display: "block", width : "100%", height : "auto"}} />
+                </div>
+            </div>
+        )
+    }
+}
+
+class HistoricalDashboard extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            loading : true
+        }
+    }
+
+    componentDidMount() {
+        API.get('/googleanalytics/dashboard', {}, (err, data) => {
+            this.setState({
+                loading: false,
+                ...data.performance
+            });
+        });
+    }
+    
+    render() {
+        if (this.state.loading) {
+            return (
+                <div>
+                    <Spinner />
+                </div>
+            )
+        }
+
+        return (
+            <div style={{ display : "flex", padding : "0px 10px" }}>
+                <Last30Days stats={this.state.last30days} />
+                <TopPost toppost={this.state.yesterday.toppage} />
+            </div>
+        )
+    }
+}
+
 export default class Dashboard extends Component {
     constructor(props) {
         super(props);
@@ -94,6 +175,7 @@ export default class Dashboard extends Component {
         return (
             <div id="dashboard">
                 <RealtimeTicker />
+                <HistoricalDashboard />
             </div>
         );
     }

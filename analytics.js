@@ -76,6 +76,15 @@ class GoogleAnalyticsRequest {
         }, send);
     }
 
+    static yesterdayAuthor(_c, gAnalytics, send) {
+        gAnalytics.getData(_c, {
+            "metrics" : "ga:pageviews", 
+            "dimensions" : "ga:dimentions" + (_c.analytics && _c.analytics.userDimension ? _c.analytics.userDimension : "2"), 
+            "sort" : "-ga:pageviews", 
+            "max-results" : 20
+        }, send, true);
+    }
+
     static realtime(_c, gAnalytics, send) {
         gAnalytics.getData(_c, {
             "metrics" : "rt:activeUsers", 
@@ -168,6 +177,23 @@ class GoogleAnalyticsRequest {
         });
     }
 
+    static yesterdayAuthor(_c, gAnalytics, send) {
+        GoogleAnalyticsRequest.yesterdayAuthor(_c, gAnalytics, (err, arr) => {
+            if (err) {
+                return send(err);
+            }
+
+            const rows = (data.data || data)["rows"].map(x => {
+                return {
+                    author : x[0],
+                    pageviews : x[1]
+                };
+            });
+            
+            send(err, rows);
+        });
+    }
+
     static dashboard(_c, gAnalytics, send) {
         GoogleAnalyticsRequest.yesterday(_c, gAnalytics, (err, data) => {
             if (err) {
@@ -210,31 +236,49 @@ class GoogleAnalyticsRequest {
                 slug = slug.substring(0, maybeParam);
             }
 
-            require('./article.js').deepFetch(_c, slug, (article) => {
-                total.toppage = {
-                    article : article || {title : slug},
-                    path : topPagePath,
-                    url : _c.server.url + total.ratio.pages[0].page,
-                    hits : total.ratio.pages[0].views
-                };
-
-                var today = new Date(); 
-                today.setHours(0,0,0,0);
+            db.findUnique(_c, 'content', { name : slug }, (err, article) => {
+                db.findUnique(require('./config').default(), 'entities', { _id : article ? article.author : undefined }, (err, author) => {
+                    total.toppage = {
+                        article : article ? {
+                            title : article.title[0],
+                            subtitle : article.subtitle[0],
+                            author : author ? {
+                                displayname : author.displayname,
+                                _id : author._id,
+                                avatarURL : author.avatarURL
+                            } : article.author,
+                            facebookmedia : article.facebookmedia
+                        } : {title : slug},
+                        path : topPagePath,
+                        url : _c.server.url + total.ratio.pages[0].page,
+                        hits : total.ratio.pages[0].views
+                    };
         
-                var yesterday = new Date(new Date() - 1000 * 60 * 60 * 24);
-                yesterday.setHours(0,0,0,0);
-
-                db.findToArray(_c, 'content', {
-                    date : {
-                        $gte : yesterday,
-                        $lt : today
-                    }
-                }, (err, arr) => {
-                    total.published = arr;
-                    GoogleAnalyticsRequest.extendedDashboard(_c, gAnalytics, total, (extendeddata) => {
-                        send(err, extendeddata);
-                    });
-                }, {title : 1, name : 1});
+                    var today = new Date(); 
+                    today.setHours(0,0,0,0);
+            
+                    var yesterday = new Date(new Date() - 1000 * 60 * 60 * 24);
+                    yesterday.setHours(0,0,0,0);
+        
+                    db.join(_c, 'content', [
+                        { 
+                            $match : {
+                                date : {
+                                    $gte : yesterday,
+                                    $lt : today
+                                }
+                            }
+                        }, { 
+                            $project : { headline : { $arrayElemAt : ["$title", 0] }, name : 1, author : 1, _id : 1 } 
+                        }
+                    ], arr => {
+                        err && log('Analytics', 'Error fetching yesterday pages : ' + err, 'err');
+                        total.published = arr;
+                        GoogleAnalyticsRequest.extendedDashboard(_c, gAnalytics, total, (extendeddata) => {
+                            send(err, extendeddata);
+                        });
+                    });    
+                })
             });
         });
     }
@@ -634,6 +678,26 @@ class GoogleAnalytics {
                     });
                 }
             });
+        } else if (topLevel == "author") {
+            const cachekey = 'analytics_dashboard_author_' + cli._c.id;
+
+            sharedcache.get(cachekey, (data) => {
+                if (data && new Date().getTime() - data.cachedAt < (1000 * 60 * 60 * 6)) {
+                    send(data);
+                } else {
+                    GoogleAnalyticsRequest.yesterdayAuthor(cli._c, this, (err, data) => {
+                        if (data) {
+                            send(data);
+
+                            data.cachedAt = Date.now();
+                            sharedcache.set({[cachekey] : data});
+                        } else {
+                            send({ error : err && err.toString(), valid : false, err_json : JSON.stringify(err || {})});
+                        }
+                    });
+                }
+            });
+            
         } else if (topLevel == "dashboard") {
             const cachekey = 'analytics_dashboard_' + cli._c.id;
             sharedcache.get(cachekey, (data) => {
