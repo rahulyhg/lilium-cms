@@ -74,7 +74,7 @@ export default class NotificationPage extends Component {
         }
 
         return (
-            <div>
+            <div style={{ maxWidth : 780, margin: "auto" }}>
                 <h1>Notifications</h1>
                 <BigList loadmoreButton={NotificationLoadMore} endpoint="/notifications/all" listitem={NotificationStrip} batchsize={50} livevarkey="" />
             </div>

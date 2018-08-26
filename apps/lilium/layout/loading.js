@@ -30,6 +30,14 @@ const styles = {
     }
 };
 
+export class Spinner extends Component {
+    render() {
+        return (
+            <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
+        );
+    }
+}
+
 export class LoadingView extends Component {
     render() {
         return (
@@ -38,7 +46,7 @@ export class LoadingView extends Component {
                 {
                     liliumcms.env == "dev" ? (<b style={styles.devmention}>Development build</b>) : null
                 }
-                <i class="far fa-spinner-third fa-spin-fast" style={styles.spinner}></i>
+                <Spinner />
             </div>
         );
     }

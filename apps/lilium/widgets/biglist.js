@@ -2,6 +2,8 @@ import { h, Component } from 'preact';
 import API from '../data/api'
 import { storeLocal, getLocal } from '../data/cache';
 
+const LOCALSTORAGE_PREFIX = "LF_";
+
 /**
  * BigList 
  * 
@@ -18,6 +20,7 @@ import { storeLocal, getLocal } from '../data/cache';
  *      // More custom stuff
  *      livevarkey : Key of the server response, defaults to "item". If the server response is : { posts : [...] }, then livevarkey should be "posts",
  *      prepend : Wether the additional items will be added at the start or end of list. Setting this to "true" will add items at start of list,
+ *      action : A function passed to every list item to link the BigList parent with the items through a callback,
  *      items : Array of initial items. Can be set later. If passed after mount, will replace the entire array with the new one.
  *      loadmoreButton : A component representing the load more button inside the list,
  *      keyid : List item key for Preact mapping. Defaults to : _id 
@@ -40,16 +43,21 @@ export class BigList extends Component {
             livevarkey : typeof props.livevarkey == "undefined" ? "items" : props.livevarkey,
             prepend : props.prepend || false,
             filters : {},
+            action : props.action || function() {},
             loadmoreButton : props.loadmoreButton || undefined,
             toolbarConfig : props.toolbar || undefined
         }
 
         if (props.toolbar && props.toolbar.id) {
-            this.coldState.filters = getLocal("LML_LIST_FILTERS_" + props.toolbar.id) || {};
+            this.coldState.filters = getLocal(LOCALSTORAGE_PREFIX + props.toolbar.id) || {};
         }
     }
 
     loadMore(overwrite) {
+        if (overwrite) {
+            this.coldState.index = 0;
+        }
+
         API.get(this.coldState.endpoint, {
             limit : this.coldState.batchsize,
             skip : this.coldState.index * this.coldState.batchsize,
@@ -126,13 +134,13 @@ export class BigList extends Component {
                     this.state.items.length == 0 ? (
                         <this.coldState.emptyComponent />
                     ) : this.state.items.map(x => (
-                        <this.coldState.component item={x} key={x[this.props.keyid || "_id"]} />
+                        <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
                     ))
                 }
                 </div>
 
                 {
-                    this.coldState.loadmoreButton ? (
+                    this.coldState.loadmoreButton && this.state.items.length >= this.coldState.batchsize ? (
                         <this.coldState.loadmoreButton onClick={this.loadMore.bind(this, false)} />
                     ) : null
                 }
@@ -193,12 +201,16 @@ class BigListToolBar extends Component {
             id : props.id
         };
 
-        this.coldValues = getLocal("LML_LIST_FILTERS_" + props.id) || {};
+        this.coldValues = getLocal(LOCALSTORAGE_PREFIX + props.id) || {};
+    }
+
+    shouldComponentUpdate() {
+        return false;
     }
 
     fieldChanged(ev) {
         this.coldValues[ev.target.name] = ev.target.value;
-        storeLocal("LML_LIST_FILTERS_" + this.props.id, this.coldValues);
+        storeLocal(LOCALSTORAGE_PREFIX + this.props.id, this.coldValues);
 
         this.props.fieldChanged && this.props.fieldChanged(ev.target.name, ev.target.value);
     }

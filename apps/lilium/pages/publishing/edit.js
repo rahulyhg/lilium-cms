@@ -30,6 +30,14 @@ const styles = {
 
 
 class HistoryEntry extends Component {
+    constructor(props) {
+        super(props);
+        this.actor = this.props.actor || {
+            avatarURL : "/static/media/lmllogo.png",
+            displayname : "Inactive author"
+        };
+    }
+
     createMessage() {
         switch (this.props.entry.type) {
             case "update":
@@ -55,10 +63,10 @@ class HistoryEntry extends Component {
         return (
             <div key={this.props.key} class={"history-entry history-entry-" + this.props.entry.type}>
                 <div class="history-entry-avatar-wrap">
-                    <img class="history-entry-avatar" src={this.props.actor.avatarURL} />
+                    <img class="history-entry-avatar" src={this.actor.avatarURL} />
                 </div>
                 <div class="history-entry-text">
-                    <b>{this.props.actor.displayname}</b>
+                    <b>{this.actor.displayname}</b>
                     <span> { this.createMessage() } </span>
                     <div class="history-entry-date">{ dateFormat(new Date(this.props.entry.at), 'HH:MM, dddd mmm yyyy') }</div>
                 </div>
@@ -96,7 +104,7 @@ class PublishingHistory extends Component {
 
                 <HistoryEntry entry={{
                     type : "created",
-                    at : this.props.post.createdOn
+                    at : this.props.post.createdOn || this.props.post.date || 0
                 }} actor={this.cachedUsers[this.props.post.createdBy]} />
             </div>
         );

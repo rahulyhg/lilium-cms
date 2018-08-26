@@ -1,11 +1,12 @@
 import { Component, h } from 'preact';
 import API from '../../data/api';
 import { castNotification } from '../../layout/notifications';
-import { MultitagBox, SelectField, CheckboxField } from '../../widgets/form.js';
+import { SelectField, CheckboxField } from '../../widgets/form.js';
 
 const styles ={
     preferencesEdit: {
-        margin: '15px 350px'
+        margin: 'auto',
+        maxWidth : 780
     }
 }
 
@@ -54,12 +55,11 @@ export default class Preferences extends Component {
     }
 
     render() {
-        // this.values['menuLocked']
         if (this.state.ready) {
             return (
-                <div id="preferences">
-                    <h1>Preferences</h1>
-                    <div id="preferences-edit" style={styles.preferencesEdit}>
+                <div id="preferences" style={ styles.preferencesEdit }>
+                    <h1 style={{ margin: "15px 0 20px" }}>Preferences</h1>
+                    <div id="preferences-edit">
                         <SelectField name='uiLanguage' placeholder='User Interface Language' initialValue={liliumcms.session.uiLanguage || 'en-ca'}
                                         options={this.supportedLanguages.map(l => { return { displayname: l.displayName, value: l.languageName } })}
                                         onChange={this.valueChanged.bind(this)} />

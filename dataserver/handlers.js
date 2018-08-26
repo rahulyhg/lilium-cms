@@ -264,6 +264,86 @@ const endpoints = {
         }           
     },
 
+    // POST /thread/$threadid
+    "POST/thread" : cli => {
+        const sesh = sessions[cli.request.headers.lmltk];
+        if (sesh) {
+            const threadid = db.mongoID(cli.request.headers.cid);
+
+            if (!threadid) {
+                return cli.throwHTTP(400);
+            }
+            
+            cli._c.db.collection('fbcomments').find({ _id : threadid }).limit(1).haxNext((err, exists) => {
+                if (exists) {
+                    cli.readPostData(text => {
+                        if (!text || !text.trim()) {
+                            return cli.throwHTTP(400);
+                        }
+
+                        cli._c.db.collection('fbreplies').insertOne({
+                            threadid, text, 
+                            
+                            author : sesh._id, text, edited : false    
+                        }, (err, r) => {
+                            if (r.insertedId) {
+                                cli._c.db.collection('fbcomments').updateOne({ _id : threadid }, {
+                                    $inc : { replies : 1 }
+                                }, () => {
+                                    cli.sendJSON({ threadid : r.insertedId });
+                                })
+                            } else {
+                                cli.throwHTTP(500, undefined, err);
+                            }
+                        });
+                    });
+                } else {
+                    cli.throwHTTP(404, undefined, 'thread');
+                }
+            });
+        } else {
+            cli.throwHTTP(404);
+        }        
+    },
+
+    // POST /comments/$postid
+    "POST/comments" : cli => {
+        const sesh = sessions[cli.request.headers.lmltk];
+        if (sesh) {
+            const postid = db.mongoID(cli.request.headers.cid);
+
+            if (!postid) {
+                return cli.throwHTTP(400);
+            }
+            
+            cli._c.db.collection('content').find({ _id : postid }).limit(1).haxNext((err, exists) => {
+                if (exists) {
+                    cli.readPostData(text => {
+                        if (!text || !text.trim()) {
+                            return cli.throwHTTP(400);
+                        }
+
+                        cli._c.db.collection('fbcomments').insertOne({
+                            postid, text, 
+                            
+                            author : sesh._id, text, score : 0, edited : false, thread : true, replies : 0    
+                        }, (err, r) => {
+                            cli._c.db.collection('content').updateOne({ _id : postid }, {
+                                $inc : { comments : 1 }
+                            }, () => {
+                                cli.sendJSON({ threadid : r.insertedId });
+                            });
+                        });
+                    });
+                } else {
+                    cli.throwHTTP(404, undefined, 'post');
+                }
+            });
+        } else {
+            cli.throwHTTP(404);
+        }
+    },
+
     "GET/search" : cli => {
         const sesh = sessions[cli.request.headers.lmltk];
         const terms = cli.request.headers.terms;

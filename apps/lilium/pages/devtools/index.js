@@ -2,7 +2,9 @@ import { h, Component } from "preact";
 import { navigateTo } from '../../routing/link';
 
 import DevToolAPI from './api';
-import DevToolNotifications from './notifications'
+import DevToolNotifications from './notifications';
+import VirtualSession from './virtsesh';
+import DevToolComments from './comments';
 
 const styles = {
     page : {
@@ -17,8 +19,8 @@ const styles = {
 
     link : {
         display: "inline-block",
-        width: 100,
-        height: 100,
+        width: 150,
+        height: 150,
         background: "rgb(231, 226, 232)",
         border: "2px solid #f5eef7",
         textAlign : 'center',
@@ -29,14 +31,16 @@ const styles = {
     linkIcon : {
         display: "block",
         fontSize: 40,
-        marginTop: 20,
+        marginTop: 38,
         marginBottom: 8
     }
 }
 
 const DEVTOOLS = {
     api : DevToolAPI,
-    notifications : DevToolNotifications
+    notifications : DevToolNotifications,
+    virtsesh : VirtualSession,
+    comments : DevToolComments
 }
 
 class DevToolLink extends Component {
@@ -78,6 +82,8 @@ export default class DevTools extends Component {
                     <div style={{ padding: 15 }}>
                         <DevToolLink name="api" displayname="API" icon="fal fa-project-diagram" />
                         <DevToolLink name="notifications" displayname="Notifications" icon="far fa-inbox" />
+                        <DevToolLink name="virtsesh" displayname="Virtual Session" icon="far fa-sign-in" />
+                        <DevToolLink name="comments" displayname="Comments" icon="far fa-comments" />
                     </div>
                 </div>
             )

@@ -232,6 +232,13 @@ class Entities {
                 } else {
                     cli.refuse();
                 }
+            } else if (cli.routeinfo.path[2] == 'mustUpdatePassword') {
+                if (cli.hasRightOrRefuse('manage-entities')) {
+                    const _id = db.mongoID(cli.routeinfo.path[3]);
+                    db.update(_c.default(), 'entities', { _id }, { mustupdatepassword: true }, (err, r) => {
+                        cli.sendJSON({ success: true });
+                    });
+                }
             } else if (cli.routeinfo.path[2] == 'updatePassword') {
                 const old = CryptoJS.SHA256(cli.postdata.data.old).toString(CryptoJS.enc.Hex);
                 const shhh = CryptoJS.SHA256(cli.postdata.data.new).toString(CryptoJS.enc.Hex);
@@ -265,6 +272,15 @@ class Entities {
             cli.hasRightOrRefuse('edit-entities') && this.editInformation(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, () => { cli.sendJSON({ ok : 1 }) });
         } else if (cli.routeinfo.path[2] == "invite") {
             cli.hasRightOrRefuse('create-entities') && this.invite(cli._c, cli.postdata.data, (ok, reason) => { cli.sendJSON({ ok, reason }) });
+        } else if (cli.routeinfo.path[2] == "changeUsername") {
+            db.exists(_c.default(), 'entities', { username: cli.postdata.data.username }, (err, exists) => {
+                if (!err) {
+                    cli.sendJSON({ success: !exists });
+                } else {
+                    cli.throwHTTP(500, '', true);
+                    log('Entities', 'DB error while checking for user existance');
+                }
+            })
         } else if (cli.routeinfo.path[2] == "restore") {
             cli.hasRightOrRefuse('create-entities') && this.restore(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data.address, () => { 
                 this.sendNewMagicEmail(cli, db.mongoID(cli.routeinfo.path[3]), () => { 
@@ -754,24 +770,24 @@ class Entities {
         return allowed;
     };
 
-    livevar  (cli, levels, params, callback) {
+    livevar  (cli, levels, params, sendback) {
         var allEntities = levels.length === 0;
 
         if (allEntities) {
             db.findToArray(_c.default(), 'entities', cli.hasRight('list-entities') ? {} : {
                 _id : db.mongoID(cli.session.data._id)
             }, function(err, arr) { 
-                callback(arr); 
+                sendback(arr); 
             });
         } else if (levels[0] == "me") {
-            require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => callback(data ? {
+            require('./crew').getCrewList({ _id : db.mongoID(cli.userinfo.userid) }, data => sendback(data ? {
                 badges : data.badges,
                 huespin : data.huespin, 
                 levels : data.levels, 
                 user : data.items[0]
             } : { error : "Not found" }));              
         } else if (levels[0] == "bunch") {
-            const filters = params.filters;
+            const filters = params.filters || {};
             const $match = { };
             const $sort = { };
 
@@ -787,6 +803,7 @@ class Entities {
                 case "latest-logged" : $sort.lastLogin = -1; break;
                 case "newest" : $sort._id = -1; break;
                 case "oldest" : $sort._id = 1; break;
+                default: $sort._id = -1;
             }
 
             if (filters.search && filters.search.trim()) {
@@ -805,23 +822,23 @@ class Entities {
                 { $match },
                 { $sort }
             ], users => {
-                callback({ items : users, length : users.length });
+                sendback({ items : users, length : users.length });
             });
         } else if (levels[0] == "exists") {
             db.findUnique(_c.default(), 'entities', { username : levels[1] }, (err, user) => {
-                callback({ exists : !!user, user });
+                sendback({ exists : !!user, user });
             }, {_id : 1, displayname : 1, username : 1, avatarURL : 1 });
         } else if (levels[0] == "chat") {
             db.find(_c.default(), 'entities', {revoked : {$ne : true}}, [], function(err, cur) {
                 cur.sort({fullname : 1}).toArray(function(err, arr) {
-                    callback(err || arr);
+                    sendback(err || arr);
                 });
             }, {
                 displayname : 1, 
                 avatarURL : 1
             });
         } else if (levels[0] == "cached") {
-            db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, function(e, a) {callback(a);}, {displayname : 1, avatarURL : 1});
+            db.findToArray(_c.default(), 'entities', {revoked : {$ne : true}}, function(e, a) {sendback(a);}, {displayname : 1, avatarURL : 1});
         } else if (levels[0] == "simple") {
             var simpProj = {
                 displayname : 1,
@@ -848,7 +865,7 @@ class Entities {
                             active.push(x);
                         }
                     });
-                    callback([...active, ...revoked]);
+                    sendback([...active, ...revoked]);
                 });
             }, simpProj);
         } else if (levels[0] == 'query') {
@@ -868,11 +885,11 @@ class Entities {
             }
 
             db.findToArray(_c.default(), 'entities', queryInfo, function (err, arr) {
-                callback(err || arr);
+                sendback(err || arr);
             });
         } else if (levels[0] == 'table') {
             if (!cli.hasRight('list-entities')) {
-                callback({size:0,data:[]});
+                sendback({size:0,data:[]});
                 return;
             }
 
@@ -901,8 +918,8 @@ class Entities {
                     }
                 }
 
-                db.count(_c.default(), 'entities', mtch, function(err, total) {
-                    callback({
+                db.count(_c.default(), 'entities', mtch, (err, total) => {
+                    sendback({
                         size : total,
                         data : data
                     });
@@ -910,21 +927,21 @@ class Entities {
             });
         } else if (levels[0] == 'single' && levels[1]) {
             if (!cli.hasRight('list-entities') && levels[1] !== cli.session.data._id) {
-                callback([]);
+                sendback([]);
             } else {
-                db.findToArray(_c.default(), 'entities', {_id: db.mongoID(levels[1])}, function(err, res) {
-                    callback(err || res)
+                db.findUnique(_c.default(), 'entities', {_id: db.mongoID(levels[1])}, (err, entity) => {
+                    sendback({err, entity});
                 });
             }
         } else {
             if (!cli.hasRight('list-entities') && levels[0] !== cli.session.data.username) {
-                callback([]);
+                sendback([]);
             } else {
                 db.multiLevelFind(_c.default(), 'entities', levels, {
                     username: levels[0]
                 }, {
                     limit: [1]
-                }, callback);
+                }, sendback);
             }
         }
     };

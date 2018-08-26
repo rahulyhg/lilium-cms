@@ -32,10 +32,12 @@ class Plugins {
                 });
                 break;
             case "unregisterPlugin":
-                this.unregisterPlugin(cli.postdata.data.identifier,  () =>{
-                    cli.sendJSON({
-                        success: true
-                    });
+                this.unregisterPlugin(cli.postdata.data.identifier, () => {
+
+                });
+
+                cli.sendJSON({
+                    success: true
                 });
                 break;
             default:
@@ -195,28 +197,23 @@ class Plugins {
     };
 
     livevar(cli, levels, params, callback) {
-        var allPlugins = levels.length === 0;
-        if (!cli.hasRightOrRefuse("admin")) {return callback([]);} 
+        if (!cli.hasRight("admin")) {return callback([]);} 
 
-        if (levels[0] == 'table') {
-            db.findToArray(cli._c, 'plugins', {active : true}, (err, activeplugins) =>{
-                const kvActive = {};
-                activeplugins.forEach(x => {
-                    kvActive[x.identifier] = x;
-                });
+        if (levels[0] == 'bunch') {
+            db.findToArray(_c.default(), 'plugins', {active : true}, (err, activeplugins) =>{
                 this.getPluginsDirList((list) => {
                     list.forEach(x => {
-                        x.active = !!kvActive[x.identifier];
+                        x.active = !!activeplugins.find(y => x.identifier == y.identifier);
                     });
 
                     const results = {
                         size: list.length,
-                        data: list
+                        items: list
                     }
 
                     callback(results);
                 });
-            });
+            }, {identifier : 1});
         } else {
             callback([]);
         }
