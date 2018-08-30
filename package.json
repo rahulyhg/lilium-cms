@@ -70,6 +70,7 @@
     "JSONStream": "latest",
     "admin-mongo": "latest",
     "animejs": "^2.2.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "babel-preset-preact": "latest",
     "base32-encode": "^1.1.0",
