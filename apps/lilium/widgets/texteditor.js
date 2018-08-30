@@ -3,6 +3,7 @@ import { h, Component } from 'preact';
 export class TextEditor extends Component {
     constructor(props) {
         super(props);
+        this.oldValue = '';
         this.state = {
 
         }
@@ -31,7 +32,7 @@ export class TextEditor extends Component {
         }).then(editors => {
             if (editors && editors[0]) {
                 this.texteditor = editors && editors[0];
-                this.texteditor.on('change', this.changed.bind(this));
+                this.texteditor.on('blur', this.handleBlur.bind(this));
                 this.texteditor.show();
                 this.texteditor.setContent(this.props.content);
                 this.texteditor.undoManager.clear();
@@ -54,6 +55,7 @@ export class TextEditor extends Component {
         if (props.content && this.texteditor) {
             log('TextEditor', 'Content set via new props', 'detail');
             this.texteditor.setContent(props.content);
+            this.oldValue = props.content;
         }
     }
 
@@ -61,8 +63,11 @@ export class TextEditor extends Component {
         return false;
     }
 
-    changed() {
-        this.props.onChange && this.props.onChange(this.props.name || this.rID, this.props.format ? this.props.format(this.getContent()) : this.getContent());
+    handleBlur() {
+        if (this.oldValue != this.getContent()) {
+            this.props.onChange && this.props.onChange(this.props.name || this.rID, this.props.format ? this.props.format(this.getContent()) : this.getContent());
+            this.oldValue = this.getContent();
+        }
     }
 
     getContent() {
