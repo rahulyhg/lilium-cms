@@ -33,7 +33,7 @@ export default class ContentChains extends Component {
     render() {
         log('ContentChains', 'Rendering content chains pane with ' + this.props.levels.length + ' levels', 'detail');
         if (this.props.levels[0] == 'edit') {
-            return (<EditContentChain id={this.props.levels[1]} chain={this.props.extras} />);
+            return (<EditContentChain id={this.props.levels[1]} chain={this.props.extras._id ? {...this.props.extras} : undefined} />);
         } else {
             return (<ListContentChains />);
         }

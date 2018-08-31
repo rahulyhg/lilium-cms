@@ -61,8 +61,8 @@ class ContentChains {
             delete data.date;
         }
 
-        db.update(_c, 'contentchains', {_id : db.mongoID(id)}, data, () => {
-            callback && callback();
+        db.update(_c, 'contentchains', {_id : db.mongoID(id)}, data, (err) => {
+            callback && callback(err);
         });
     }
 
@@ -174,22 +174,6 @@ class ContentChains {
         }
     }
 
-    adminGET(cli) {
-        if (!cli.hasRight('editor')) {
-            return cli.refuse();
-        }
-
-        var path = cli.routeinfo.path[2];
-
-        if (!path || path == "new") {
-            filelogic.serveAdminLML(cli);
-        } else if (path == "edit") {
-            filelogic.serveAdminLML(cli, true);
-        } else {
-            cli.throwHTTP(404);
-        }
-    }
-
     adminPOST(cli) {
         if (!cli.hasRight('editor')) {
             return cli.refuse();
@@ -209,18 +193,29 @@ class ContentChains {
                 });
             });
         } else if (path == "edit") {
-            this.editChain(cli._c, cli.routeinfo.path[3], cli.postdata.data, (error) => {
+            this.editChain(cli._c, cli.routeinfo.path[3], cli.postdata.data, error => {
                 cli.sendJSON({
                     message : "Content chain saved",
                     success : !error,
-                    error 
+                    error
+                });
+            });
+        } else if (path == "updateArticles") {
+            const mapped = cli.postdata.data.articles.map(article => {
+                return
+            })
+            this.editChain(cli._c, cli.routeinfo.path[3], cli.postdata.data, error => {
+                cli.sendJSON({
+                    message : "Content chain saved",
+                    success : !error,
+                    error
                 });
             });
         } else if (path == "live") {
             let updatedData = cli.postdata.data;
             updatedData.status = "live";
 
-            this.editChain(cli._c, cli.routeinfo.path[3], updatedData, (error) => {
+            this.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
                 cli.sendJSON({
                     title : "Sit tight!",
                     message : "Content chain was saved successfully, and Lilium is currently generating everything.",

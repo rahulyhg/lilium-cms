@@ -3,57 +3,64 @@ import API from "../../data/api";
 import { castNotification } from '../../layout/notifications'
 import { TextField } from "../../widgets/form";
 import { TextEditor } from '../../widgets/texteditor';
-
-class Article extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            
-        }
-    }
-    
-    componentDidMount() {
-        
-    }
-    
-    render() {
-        return (
-            <div className="article">
-            </div>
-        );
-    }
-}
+import { ArticlePicker } from "../../widgets/articlepicker";
 
 export class EditContentChain extends Component {
     constructor(props) {
         super(props);
-        this.values = {};
-        this.state = this.props.chain || {};
-        this.state.loading = true;
-        console.log(this.props);
-        console.log(this.state);
+        this.state.chain = this.props.chain || {};
+        this.state.loading = !this.state.chain._id;
     }
 
     componentDidMount() {
-        // If no chain was passed as an extra, make the request
-        if (!this.state._id) {
-            API.get(`/chains/${this.props.id}`, {}, (err, data, r) => {
-                console.log(data);
-                if (r.status == 200) {
-                    this.setState({...data, loading: false});
-                    console.log(this.state);
-                } else {
-                    castNotification({
-                        title: 'Error while fetching content chain data from the server',
-                        type: 'error'
-                    })
-                }
-            });
+        if (!this.state.chain._id) {
+            this.loadFromServer(this.props.id);
         }
     }
 
+    componentWillReceiveProps(newProps) {
+        if (newProps.chain._id != this.state.chain._id) {
+            this.loadFromServer(newProps.id);
+        }
+    }
+
+    loadFromServer(id) {
+        // If no chain was passed as an extra, make the request
+        API.get(`/chains/${this.props.id}`, {}, (err, data, r) => {
+            if (r.status == 200) {
+                this.setState({ chain: {...data}, loading: false });
+            } else {
+                castNotification({
+                    title: 'Error while fetching content chain data from the server',
+                    type: 'error'
+                });
+            }
+        });
+    }
+
+    articleSelected(article) {
+        this.updateValues('articles', {})
+    }
+
     updateValues(name, val) {
-        this.state[name] = val;
+        this.state.chain[name] = val;
+
+        const payload = {};
+        payload[name] = val;
+        API.post('/chains/edit/' + this.state.chain._id, payload, (err, data, r) => {
+            if (r.status == 200) {
+                castNotification({
+                    title: 'Modifications saved',
+                    message: 'Your modifications to the content chain were saved',
+                    type: 'success'
+                })
+            } else {
+                castNotification({
+                    title: 'Error while saving content chain data on the server',
+                    type: 'error'
+                });
+            }
+        });
     }
 
     render() {
@@ -61,17 +68,11 @@ export class EditContentChain extends Component {
             return (
                 <div id="content-chains-edit">
                     <h1>Edit Content Chain</h1>
-                    <TextField name='title' initialValue={this.state.title} onChange={this.updateValues.bind(this)} />
-                    <TextField name='subtitle' initialValue={this.state.subtitle} onChange={this.updateValues.bind(this)} />
-                    <TextEditor name='presentation' content={this.state.presentation} onChange={this.updateValues.bind(this)} />
-    
-                    <div id="articles">
-                        {
-                            this.state.articles.map(article => {
-                                return (<h3>{article._id}</h3>)
-                            })
-                        }
-                    </div>
+                    <TextField name='title' placeholder='title' initialValue={this.state.chain.title} onChange={this.updateValues.bind(this)} />
+                    <TextField name='subtitle' placeholder='subtitle' initialValue={this.state.chain.subtitle} onChange={this.updateValues.bind(this)} />
+                    <TextEditor name='presentation' placeholder='presentation' content={this.state.chain.presentation} onChange={this.updateValues.bind(this)} />
+
+                    <ArticlePicker onArticleSelected={this.articleSelected.bind(this)} initialValue={this.state.chain.articles} />
                 </div>
             );
         } else {
