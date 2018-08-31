@@ -38,8 +38,21 @@ export class EditContentChain extends Component {
         });
     }
 
-    articleSelected(article) {
-        this.updateValues('articles', {})
+    selectedArticlesChanged(articles) {
+        API.post('/chains/updateArticles/' + this.state.chain._id, articles, (err, data, r) => {
+            if (r.status == 200) {
+                castNotification({
+                    title: 'Modifications saved',
+                    message: 'Your modifications to the content chain were saved',
+                    type: 'success'
+                })
+            } else {
+                castNotification({
+                    title: 'Error while saving content chain data on the server',
+                    type: 'error'
+                });
+            }
+        });
     }
 
     updateValues(name, val) {
@@ -72,7 +85,7 @@ export class EditContentChain extends Component {
                     <TextField name='subtitle' placeholder='subtitle' initialValue={this.state.chain.subtitle} onChange={this.updateValues.bind(this)} />
                     <TextEditor name='presentation' placeholder='presentation' content={this.state.chain.presentation} onChange={this.updateValues.bind(this)} />
 
-                    <ArticlePicker onArticleSelected={this.articleSelected.bind(this)} initialValue={this.state.chain.articles} />
+                    <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
                 </div>
             );
         } else {

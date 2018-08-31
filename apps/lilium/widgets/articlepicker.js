@@ -33,16 +33,14 @@ export class ArticlePicker extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedArticlesTitles: []
+            selectedArticles: []
         }
     }
     
     articleSelected(article) {
-        if (!this.state.selectedArticlesTitles.includes(article.title)) {
-            const selectedArticlesTitles = [...this.state.selectedArticlesTitles, article.title];
-            this.setState({ selectedArticlesTitles });
-            this.props.onArticleSelected && this.props.onArticleSelected(article);
-        }
+        const selectedArticles = [...this.state.selectedArticles, article];
+        this.setState({ selectedArticles });
+        this.props.onChange && this.props.onChange(selectedArticles);
     }
 
     /**
@@ -50,10 +48,11 @@ export class ArticlePicker extends Component {
      * @param {number} startIndex 
      */
     moveArticleUp(startIndex) {
-        const selectedArticlesTitles = this.state.selectedArticlesTitles;
-        if (startIndex > 0 && startIndex <= this.state.selectedArticlesTitles.length - 1) {
-            selectedArticlesTitles.splice(startIndex - 1, 0, selectedArticlesTitles.splice(startIndex, 1)[0]);
-            this.setState({ selectedArticlesTitles });
+        const selectedArticles = this.state.selectedArticles;
+        if (startIndex > 0 && startIndex <= this.state.selectedArticles.length - 1) {
+            selectedArticles.splice(startIndex - 1, 0, selectedArticles.splice(startIndex, 1)[0]);
+            this.setState({ selectedArticles });
+            this.props.onChange && this.props.onChange(selectedArticles);
         }
     }
 
@@ -62,17 +61,19 @@ export class ArticlePicker extends Component {
      * @param {number} startIndex 
      */
     moveArticleDown(startIndex) {
-        const selectedArticlesTitles = this.state.selectedArticlesTitles;
-        if (startIndex >= 0 && startIndex <= this.state.selectedArticlesTitles.length - 2) {
-            selectedArticlesTitles.splice(startIndex + 1, 0, selectedArticlesTitles.splice(startIndex, 1)[0]);
-            this.setState({ selectedArticlesTitles });
+        const selectedArticles = this.state.selectedArticles;
+        if (startIndex >= 0 && startIndex <= this.state.selectedArticles.length - 2) {
+            selectedArticles.splice(startIndex + 1, 0, selectedArticles.splice(startIndex, 1)[0]);
+            this.setState({ selectedArticles });
+            this.props.onChange && this.props.onChange(selectedArticles);
         }
     }
 
     removeArticle(index) {
-        const selectedArticlesTitles = this.state.selectedArticlesTitles;
-        selectedArticlesTitles.splice(index, 1);
-        this.setState({ selectedArticlesTitles });
+        const selectedArticles = this.state.selectedArticles;
+        selectedArticles.splice(index, 1);
+        this.setState({ selectedArticles });
+        this.props.onChange && this.props.onChange(selectedArticles);
     }
 
     render() {
@@ -81,8 +82,8 @@ export class ArticlePicker extends Component {
                 <AutocompleteField endpoint='/chains/search' autocompleteField='title' valueSelected={this.articleSelected.bind(this)}  />
                 <div className="article-picker-list">
                     {
-                        this.state.selectedArticlesTitles.map((articleTitle, index) => (
-                            <ArticlePickerArticle key={slugify(articleTitle)} index={index} lastInList={index == this.state.selectedArticlesTitles.length - 1} title={articleTitle}
+                        this.state.selectedArticles.map((article, index) => (
+                            <ArticlePickerArticle key={slugify(article.title)} index={index} lastInList={index == this.state.selectedArticles.length - 1} title={article.title}
                                                     removeArticle={this.removeArticle.bind(this)} moveArticleDown={this.moveArticleDown.bind(this)}
                                                     moveArticleUp={this.moveArticleUp.bind(this)} />
                         ))
