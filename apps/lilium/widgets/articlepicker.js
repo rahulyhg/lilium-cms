@@ -10,6 +10,8 @@ class ArticlePickerArticle extends Component {
     render() {
         return (
             <div className="article-picker-article">
+                {/* Display position as one based */}
+                <h4 className="position">{this.props.index + 1}</h4>
                 <div className="actions">
                     <i className="fal fa-times remove-article" onClick={this.props.removeArticle.bind(this, this.props.index)}></i>
                     <div className="position-controls">
