@@ -201,10 +201,8 @@ class ContentChains {
                 });
             });
         } else if (path == "updateArticles") {
-            const mapped = cli.postdata.data.articles.map(article => {
-                return
-            })
-            this.editChain(cli._c, cli.routeinfo.path[3], cli.postdata.data, error => {
+            const mappedArticles = cli.postdata.data.map(article => db.mongoID(article._id));
+            this.editChain(cli._c, cli.routeinfo.path[3], { articles: mappedArticles }, error => {
                 cli.sendJSON({
                     message : "Content chain saved",
                     success : !error,

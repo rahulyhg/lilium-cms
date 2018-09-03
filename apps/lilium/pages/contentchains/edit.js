@@ -39,7 +39,7 @@ export class EditContentChain extends Component {
     }
 
     selectedArticlesChanged(articles) {
-        API.post('/chains/updateArticles/' + this.state.chain._id, articles, (err, data, r) => {
+        API.post('/chains/updateArticles/' + this.state.chain._id, articles.map(article => article._id), (err, data, r) => {
             if (r.status == 200) {
                 castNotification({
                     title: 'Modifications saved',
@@ -77,6 +77,8 @@ export class EditContentChain extends Component {
     }
 
     render() {
+        console.log(this.state);;
+        
         if (!this.state.loading) {
             return (
                 <div id="content-chains-edit">
