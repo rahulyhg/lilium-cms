@@ -162,7 +162,7 @@ class ContentChains {
                         foreignField : "_id",
                         as : "articles" }
                 },
-                { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
+                { ////$project: CONTENTCHAIN_LIVEVAR_PROJECTION }
             ], items => {
                 if (items) {
                     items[0].articles.forEach(article => { article.title = article.title[0] } );

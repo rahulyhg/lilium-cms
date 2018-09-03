@@ -33,7 +33,7 @@ export class ArticlePicker extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedArticles: []
+            selectedArticles: props.initialValue || []
         }
     }
     

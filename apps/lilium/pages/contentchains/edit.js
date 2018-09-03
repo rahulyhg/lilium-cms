@@ -77,7 +77,7 @@ export class EditContentChain extends Component {
     }
 
     render() {
-        console.log(this.state);;
+        console.log('ArticlePicker state: ', this.state);;
         
         if (!this.state.loading) {
             return (
