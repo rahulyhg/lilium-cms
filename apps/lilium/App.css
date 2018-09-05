@@ -1477,3 +1477,25 @@ a {
 .content-chain .chain-title {
     margin: 6px;
 }
+
+.content-chain-list-articles-list {
+    margin-left: 4px;
+    overflow-y: auto;
+    max-height: 120px;
+    border: 1px solid #aaa;
+}
+
+.content-chain-list-articles-list h4.content-chain-list-article-title {
+    margin: 4px;
+}
+
+.content-chain-extra-info {
+    flex-grow: 1;
+    padding: 25px;
+}
+
+.content-chain-extra-info p.content-chain-info {
+    text-align: right;
+    margin: 4px;
+    padding: 0px;
+}

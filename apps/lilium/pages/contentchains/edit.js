@@ -29,7 +29,7 @@ export class EditContentChain extends Component {
         // If no chain was passed as an extra, make the request
         API.get(`/chains/${this.props.id}`, {}, (err, data, r) => {
             if (r.status == 200) {
-                this.setState({ chain: {...data}, loading: false });
+                this.setState({ chain: { ...data }, loading: false });
             } else {
                 castNotification({
                     title: 'Error while fetching content chain data from the server',
@@ -137,16 +137,17 @@ export class EditContentChain extends Component {
                     <div className="content-chain-featured-image-picker" onClick={this.chooseFeaturedImage.bind(this)} title='Choose a featured image'>
                         {
                             (this.state.chain.media) ? (
-                                <img className='featured-image' src={this.state.chain.media.sizes.content.url} alt="Content chain featured image"/>
+                                <img className='featured-image' src={this.state.chain.media.sizes.content.url} alt="Content chain featured image" />
                             ) : (
-                                <p id="choose-features-image">Choose a featured image</p>
-                            )
+                                    <p id="choose-features-image">Choose a featured image</p>
+                                )
                         }
                     </div>
 
+                    <h4>Select articles for the content chain</h4>
                     <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
                     <hr />
-                    <ButtonWorker text={this.state.chain.status == 'draft' ? 'Publish' : 'Unpublish'} work={this.togglePublishState.bind(this)} / >
+                    <ButtonWorker text={this.state.chain.status == 'draft' ? 'Publish' : 'Unpublish'} work={this.togglePublishState.bind(this)} />
                 </div>
             );
         } else {

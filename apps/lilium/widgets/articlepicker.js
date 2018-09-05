@@ -5,6 +5,7 @@ import slugify from 'slugify';
 export class ArticlePickerArticle extends Component {
     constructor(props) {
         super(props);
+        this.state.selectedArticles = [];
     }
 
     render() {
@@ -69,7 +70,7 @@ export class ArticlePicker extends Component {
         }
     }
 
-    removeArticle(index) {article
+    removeArticle(index) {
         const selectedArticles = this.state.selectedArticles;
         selectedArticles.splice(index, 1);
         this.setState({ selectedArticles });

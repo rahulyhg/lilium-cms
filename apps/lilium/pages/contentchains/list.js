@@ -1,6 +1,7 @@
-import { Component, h, dangerouslySetInnerHTML } from "preact";
+import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
-import { ArticlePickerArticle } from '../../widgets/articlepicker';
+import dateformat from 'dateformat';
+import { Link } from '../../routing/link';
 
 class ContentChainListItem extends Component {
     constructor(props) {
@@ -9,8 +10,6 @@ class ContentChainListItem extends Component {
     }
 
     render() {
-        console.log(this.props.item);
-        
         return (
             <div className="content-chain">
                 {
@@ -23,22 +22,27 @@ class ContentChainListItem extends Component {
                     )
                 }
                 <div className="content-chain-info">
-                    <a href={`chains/edit/${this.props.item._id}`}>
+                    <Link href={`/chains/edit/${this.props.item._id}`}>
                         <h1 className='chain-title font2'>{this.props.item.title}</h1>
-                    </a>
+                    </Link>
                     <h2 className='chain-subtitle font2'>{this.props.item.subtitle}</h2>
-                    <h3>Articles</h3>
-                    <div className="content-chain-articles-list">
+                    <h3>{`${this.props.item.articles.length} articles`}</h3>
+                    <div className="content-chain-list-articles-list">
                         {
                             this.props.item.articles.map((article, index) => {
                                 return (
-                                    <div className="content-chain-article">
-                                        <ArticlePickerArticle key={slugify(article.title)} index={index} lastInList={index == this.state.selectedArticles.length - 1} title={article.title} />
+                                    <div className="content-chain-list-article">
+                                        <h4 className='content-chain-list-article-title'>{`${index + 1} - ${article.title}`}</h4>
                                     </div>
                                 )
                             })
                         }
                     </div>
+                </div>
+                <div className="content-chain-extra-info">
+                    <p className="content-chain-info">{`Status: ${this.props.item.status}`}</p>
+                    <p className="content-chain-info">{`Created on: ${dateformat(this.props.item.createdOn, 'mmmm dd, yyyy - HH:MM:ss')}}`}</p>
+                    <p className="content-chain-info">{`Created on: ${dateformat(this.props.item.lastModifiedOn, 'mmmm dd, yyyy - HH:MM:ss')}}`}</p>
                 </div>
             </div>
         );

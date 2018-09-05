@@ -60,6 +60,8 @@ class ContentChains {
             delete data.date;
         }
 
+        console.log(id, data);
+
         db.update(_c, 'contentchains', {_id : db.mongoID(id)}, data, (err) => {
             callback && callback(err);
         });
@@ -173,7 +175,14 @@ class ContentChains {
                         as : "media" }
                 }, { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
             ], (items) => {
-                sendback({ items });
+                if (items.length) {
+                    console.log('items length', items.length);
+                    items[0].articles.forEach(article => { article.title = article.title[0] } );
+                    sendback({ items });
+                } else {
+                    console.log('not found');
+                    cli.throwHTTP(404, 'Content chain not found', true);
+                }
             });
         } else if (levels[0] == "searchContent") {
             db.join(cli._c, 'content', [
@@ -184,7 +193,6 @@ class ContentChains {
                 sendback(items);
             });
         } else {
-            console.log(levels);
             db.join(cli._c, 'contentchains', [
                 { $match : { _id: db.mongoID(levels[0]) } },
                 {
@@ -201,8 +209,8 @@ class ContentChains {
                         as : "media" }
                 }, { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
             ], items => {
+                console.log(items);
                 if (items.length) {
-                    console.log(items);
                     items[0].articles.forEach(article => { article.title = article.title[0] } );
                     sendback(items[0]);
                 } else {
@@ -239,7 +247,7 @@ class ContentChains {
                 });
             });
         } else if (path == "updateArticles") {
-            const mappedArticles = cli.postdata.data.map(article => db.mongoID(article._id));
+            const mappedArticles = cli.postdata.data.map(article => db.mongoID(article));
             
             this.editChain(cli._c, cli.routeinfo.path[3], { articles: mappedArticles }, error => {
                 cli.sendJSON({
