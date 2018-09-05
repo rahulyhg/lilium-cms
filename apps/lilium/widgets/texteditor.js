@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import API from '../data/api';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -8,6 +9,15 @@ export class TextEditor extends Component {
 
         }
         this.textarea;
+
+        this.autosave = props.autosave;
+
+        if (this.autosave) {
+            this.endpoint = props.endpoint;
+            this.fieldkey = props.fieldkey || "field";
+            this.valuekey = props.valuekey || "value";
+            this.savemethod = props.savemethod || "post";
+        }
 
         this.rID = "txt-" + Math.random().toString().substring(2) + Date.now().toString()
     }
@@ -67,6 +77,20 @@ export class TextEditor extends Component {
         if (this.oldValue != this.getContent()) {
             this.props.onChange && this.props.onChange(this.props.name || this.rID, this.props.format ? this.props.format(this.getContent()) : this.getContent());
             this.oldValue = this.getContent();
+        }
+
+        if (this.autosave) {
+            this.setState({ saving : true });
+            API[this.savemethod](this.endpoint, { 
+                [this.fieldkey] : this.props.name || this.rID, 
+                [this.valuekey] : this.props.format ? this.props.format(this.getContent()) : this.getContent()
+            }, (err, resp, r) => {
+                if (err || r.status / 200 != 1) {
+                    this.setState({ saving : false });
+                } else {
+                    this.setState({ saving : false, saveerror : true });
+                }
+            })
         }
     }
 

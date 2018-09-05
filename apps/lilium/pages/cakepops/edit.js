@@ -60,16 +60,16 @@ export default class CakepopEditPage extends Component {
         
         return (
             <div class="cakepop-edit-page">
-                <TextField     onChange={this.changed.bind(this)} name="title"      initialValue={this.coldState.title} placeholderType="inside" style={styles.title} placeholder="Cakepop identifier" />
-                <TextEditor    onChange={this.changed.bind(this)} name="content"    content={this.coldState.content} style={{ marginBottom : 15 }} />
-                <TextField     onChange={this.changed.bind(this)} name="stylesheet" multiline={true} initialValue={this.coldState.stylesheet} placeholder="Custom Stylesheet" />
-                <DatePicker    onChange={this.changed.bind(this)} name="expiry"     initialValue={new Date(this.coldState.expiry)} format={x => x && x.getTime()} placeholder="Expiry" />
-                <SelectField   onChange={this.changed.bind(this)} name="status"     initialValue={this.coldState.status} placeholder="Status" options={[
+                <TextField     autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} initialValue={this.coldState.title} name="title" placeholderType="inside" style={styles.title} placeholder="Cakepop identifier" />
+                <TextEditor    autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} name="content"    content={this.coldState.content} style={{ marginBottom : 15 }} />
+                <TextField     autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} name="stylesheet" multiline={true} initialValue={this.coldState.stylesheet} placeholder="Custom Stylesheet" />
+                <DatePicker    autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} name="expiry"     initialValue={new Date(this.coldState.expiry)} format={x => x && x.getTime()} placeholder="Expiry" />
+                <SelectField   autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} name="status"     initialValue={this.coldState.status} placeholder="Status" options={[
                     { displayname : "Draft", value : "creation" },
                     { displayname : "Live", value : "live" }
                 ]} />
 
-                <CheckboxField onChange={this.changed.bind(this)} name="auto"       initialValue={this.coldState.auto} placeholder="Automatically popup on next reload" />
+                <CheckboxField autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} name="auto"       initialValue={this.coldState.auto} placeholder="Automatically popup on next reload" />
             </div>
         )
     }

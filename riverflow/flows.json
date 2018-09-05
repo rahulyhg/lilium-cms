@@ -136,6 +136,20 @@
             "endpoint" : "plugins",
             "support" : ["admin_get", "admin_post", "livevar"]
         }, {
+            "module" : "flagging.js",
+            "endpoint" : "flagging",
+            "support" : ["post", "admin_put", "admin_post", "admin_delete", "livevar"],
+            "admin_menu" : {
+                "id": "flagging",
+                "lys": "flagging,report,banning",
+                "faicon": "fa-flag",
+                "displayname": "Flagging",
+                "priority": 300,
+                "rights": ["manage-flagging"],
+                "absURL": "admin/flagging",
+                "children": []
+            }
+        }, {
             "module" : "themes.js",
             "endpoint" : "themes",
             "support" : ["admin_get", "admin_post", "livevar"]

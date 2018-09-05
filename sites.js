@@ -172,6 +172,7 @@ var SiteInitializer = function (conf, siteobj) {
             outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
             babel : {
                 "plugins": [
+                    ["transform-class-properties"],
                     ["transform-object-rest-spread", {
                         useBuildIns : true
                     }],
