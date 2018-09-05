@@ -205,7 +205,7 @@ class Amp {
         for (let i = tweetblocks.length - 1; i >= 0; i--) {
             let id;
             let maybea = tweetblocks[i].lastElementChild;
-            if (maybea.nodeName == "A") {
+            if (maybea && maybea.nodeName == "A") {
                 id = maybea.href && maybea.href.toString().split("/").pop().split('?')[0]
             }
 

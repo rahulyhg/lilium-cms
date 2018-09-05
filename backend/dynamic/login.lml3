@@ -16,33 +16,24 @@ body, html {
     -webkit-font-smoothing: antialiased;
 }
 
-#left {
+#fullbackground {
     position: fixed;
     top: 0;
     bottom: 0;
     left : 0;
-    width: 50%;
+    right: 0;
+    width: 100%;
     overflow: hidden;
+    background-color: #333;
 }
 
-#credit {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    background: #FFF;
-    color: #000;
-    padding: 5px 7px;
-    font-family: Arial;
-    font-size: 12px;
-}
-
-#right {
+#overlay {
     position: fixed;
     top: 0;
     bottom: 0;
     right : 0;
-    width: 50%;
-    background : #fff7eb;
+    left: 0;
+    width: 100%;
 }
 
 #featuredimage {
@@ -59,12 +50,14 @@ body, html {
 }
 
 h1 {
-    font-family: 'Leckerli One', cursive;
+    font-family: 'Lato', 'Leckerli One', cursive;
     font-size: 42px;
     text-align: center;
-    color: #e0c299;
+    color: #f7f7f7;
     position: relative;
-    z-index : 10;
+    z-index: 10;
+    margin: 0 0 12px;
+    text-shadow: 0px 2px 0px rgba(0,0,0,0.5);
 }
 
 #logo {
@@ -77,19 +70,34 @@ h1 {
 
 #loginform {
     position: relative;
-    height: 250px;
+}
+
+#loginformfields {
+    position: relative;
     text-align : center;
+    margin: auto;
+    width: 280px;
+    background: #f7f7f7;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    box-shadow: 0px 3px 3px rgba(0,0,0,0.5);
 }
 
 input {
     display: block;
-    margin: 12px auto;
+    margin: 12px auto 20px;
     width: 250px;
-    padding: 8px 10px;
-    font-size: 16px;
-    background: #fff;
-    border: 1px solid #DDD;
+    padding: 5px 0px;
+    font-size: 14px;
+    background: none;
+    border: none;
+    border-bottom: 1px solid #DDD;
     box-sizing: border-box;
+    outline : none;
+}
+
+input:focus {
+    border-color: #c898de;
 }
 
 #loginwrap {
@@ -100,10 +108,11 @@ input {
 
 #loginbutton {
     background: #fff;
-    border: 1px solid #DDD;
+    border: none;
     padding: 6px 11px;
     font-size: 14px;
     width: 100px;
+    box-shadow: 0px 1px 2px 0px rgba(0,0,0,0.2);
 }
 
 #pwdforgot {
@@ -111,7 +120,7 @@ input {
     font-size: 12px;
     text-align: right;
     margin-top: 20px;
-    color: #987e56;
+    color: #925698;
 }
 
 @media (max-width: 800px) {
@@ -128,41 +137,61 @@ input {
 
 `;
 
-const compile = (o, context) => { o(`
-
-<!DOCTYPE html>
+const compile = (o, context) => { o(`<!DOCTYPE html>
 <html class="lmllogin">
 	<head>
         <style>${css}</style>
         <link href="https://fonts.googleapis.com/css?family=Leckerli+One|Lato" rel="stylesheet">
+        <link rel="icon" type="image/png" href="//www.narcity.com/static/media/favicon.png">
         <title>Lilium Login - ${context._c.website.sitetitle}</title>
 	</head>
 	<body class="lml-login" id="lml-login">
-        <div id="left">
-            <img src="/static/media/defaultlogin.jpg" id="featuredimage">
-            <div id="credit">Photo by <a href="https://unsplash.com/photos/RFgO9B_OR4g" target="_blank">Myles Tan</a> on Unsplash</div>
+        <div id="fullbackground">
+            <img id="featuredimage">
         </div>
-        <div id="right">
+        <div id="overlay">
             <div id="loginform">
-                <h1>Lilium CMS</h1>
+                <div id="logintitlewrap">
+                    <h1>Lilium CMS</h1>
+                    <img src="/static/media/lmllogo.png" id="logo" />
+                </div>
+                <div id="loginformfields">
+                    <input type="text" placeholder="Username" id="txtusername" />
+                    <input type="password" placeholder="Password" id="txtpassword" />
+                    <input type="text" placeholder="2FA Token" id="txt2fa" />
 
-                <img src="/static/media/lmllogo.png" id="logo" />
-                <input type="text" placeholder="Username" id="txtusername" />
-                <input type="password" placeholder="Password" id="txtpassword" />
-                <input type="text" placeholder="2FA Token (leave blank if you don't have 2FA enabled)" id="txt2fa" />
+                    <div id="loginmsg"></div>
 
-                <div id="loginmsg"></div>
+                    <div id="loginwrap">
+                        <button id="loginbutton">Login</button>
 
-                <div id="loginwrap">
-                    <button id="loginbutton">Login</button>
-
-                    <a id="pwdforgot" href="/accesscheckpoint">
-                        I have no idea what my password is
-                    </a>
+                        <a id="pwdforgot" href="/accesscheckpoint">
+                            I have no idea what my password is
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>
         <script>
+            var BACKGROUNDS_IDS = [
+                "https://images.unsplash.com/photo-1526725078729-d6b4c2b2a8b7?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=152de99ab92e1becf5026c01b7bf8f3f&auto=format&fit=crop&w=1920&q=80", 
+                "https://images.unsplash.com/photo-1528979375023-c1e3916fe3c3?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=bc20ba6c43beda52e3d3f8d8fc5f068b&auto=format&fit=crop&h=1200&q=80",
+                "https://images.unsplash.com/photo-1519109798364-ba17c14731df?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=7d84aa14276a5ba55f8cca9cb4ed8907&auto=format&fit=crop&w=1920&q=80", 
+                "https://images.unsplash.com/photo-1531867758044-9a5ef1a7afef?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=7a0562cc7e508f7fdb27b0b9105c9d2d&auto=format&fit=crop&h=1080&q=80",
+                "https://images.unsplash.com/photo-1495430599242-57ed65dd17b2?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=efb3ebd52e89f45a382e9ff17fb48cc0&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1500150368783-cb8954285792?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=02d40d5e6537abf906b28e85b661fea2&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1484494789010-20fc1a011197?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=fd01ec1c00af1598b6b39356c9f7e1d4&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1524839454943-5ac121f65ccb?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=02c772a70a4e6e5d2a80b60f8fe2dfb0&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1424169292451-7c28a6053189?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=8734cd3e54d66ae97e53a1b3c7984265&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1526190462716-e604eab954b9?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=70ae7af8421aaa9bfe612e732d7c74c3&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1518992212871-beba326cfffd?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=cc7d49649845bba72b7513a79253dca0&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1497235332722-bc46e3a9d98a?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=b47ee6032febe6b4174b466f6c2a8376&auto=format&fit=crop&w=1920&q=80",
+                "https://images.unsplash.com/photo-1467843182948-36a9b559865e?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=eab1d559f8fe9d409e10a51a9fec6cf1&auto=format&fit=crop&w=1920&q=80"
+            ];
+
+            document.getElementById('featuredimage').src = BACKGROUNDS_IDS[Math.floor(Math.random() * BACKGROUNDS_IDS.length)];
+            document.getElementById('txtusername').focus();
+
             if (document.location.hash) {
                 document.querySelector('input[name="usr"]').value = document.location.hash.toString().substring(1);
                 history.pushState("", document.title, window.location.pathname + window.location.search);
@@ -176,7 +205,7 @@ const compile = (o, context) => { o(`
             }, 100);
 
             var resize = function() {
-                document.getElementById('loginform').style.top = (window.innerHeight / 2 - 125) + "px";
+                document.getElementById('loginform').style.top = (window.innerHeight / 2 - 145) + "px";
             }
 
             var failed = function() {

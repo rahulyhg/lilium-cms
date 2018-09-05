@@ -1,4 +1,5 @@
 import { h, Component, cloneElement } from "preact";
+import API from '../data/api';
 import flatpickr from 'flatpickr';
 
 const styles = {
@@ -8,7 +9,8 @@ const styles = {
         marginBottom: 8
     },
     fieldwrap : {
-        marginBottom: 20
+        marginBottom: 20,
+        position: 'relative'
     },
     textfield : {
         boxSizing : "border-box",
@@ -125,6 +127,15 @@ class FormField extends Component {
     constructor(props) {
         super(props);
         this.value = props.initialValue;
+
+        this.autosave = props.autosave;
+
+        if (this.autosave) {
+            this.endpoint = props.endpoint;
+            this.fieldkey = props.fieldkey || "field";
+            this.valuekey = props.valuekey || "value";
+            this.savemethod = props.savemethod || "post";
+        }
     }
 
     componentWillReceiveProps(props) {
@@ -138,6 +149,23 @@ class FormField extends Component {
         const oldValue = this.value;
         this.value = this.props.format ? this.props.format(ev.target.value) : ev.target.value;
         this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue);
+
+        if (this.autosave) {
+            this.setState({ saving : true });
+            API[this.savemethod](this.endpoint, { 
+                [this.fieldkey] : this.props.name, [this.valuekey] : this.value 
+            }, (err, resp, r) => {
+                if (err || r.status / 200 != 1) {
+                    this.setState({ saving : false, saved : true });
+                } else {
+                    this.setState({ saving : false, saveerror : true });
+                }
+
+                setTimeout(() => {
+                    this.setState({ saved : false, saveerror : false })
+                }, 3000);
+            })
+        }
     }
 
     get isField() { return true; }
@@ -383,11 +411,14 @@ export class DatePicker extends FormField {
             dateFormat : this.props.dateformat || "Y-m-d H:i",
             defaultDate : new Date(this.value) || new Date(),
             onChange : dateArr => {
-                const [date] = dateArr;
-                
+                const [value] = dateArr;
                 const oldValue = this.value;
-                this.value = this.props.format ? this.props.format(date) : date;
-                this.props.onChange && this.props.onChange(this.props.name, this.value, oldValue);        
+
+                this.changed({
+                    target : {
+                        name : this.props.name, value, oldValue
+                    }
+                });        
             }
         });
     }
@@ -410,10 +441,14 @@ export class CheckboxField extends FormField {
         this.state = { checked: !!this.props.initialValue };
     }
 
-    changed(ev) {
+    onChange() {
         this.value = !this.value;
         this.setState({ checked: this.value }, () => {
-            this.props.onChange && this.props.onChange(this.props.name, this.state.checked);
+            this.changed({
+                target : {
+                    name : this.props.name, value : this.state.checked
+                }
+            });
         });
     }
 
@@ -421,7 +456,7 @@ export class CheckboxField extends FormField {
         return (
             <div className="checkbow-field-wrapper" style={styles.checkboxFieldWrapper}>
                 <b className="checkbox-text" style={styles.placeholder}>{this.props.placeholder}</b>
-                <div className="checkbox-wrapper" onClick={this.changed.bind(this)}
+                <div className="checkbox-wrapper" onClick={this.onChange.bind(this)}
                         style={Object.assign({}, styles.checkboxWrapper, (this.state.checked) ? styles.checkboxChecked : {})}>
                     <span className="checkmark" style={styles.checkbox}>{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
                 </div>

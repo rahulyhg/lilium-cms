@@ -21,6 +21,7 @@ import ThemesPage   from '../pages/themes/index';
 import CommentsMan  from '../pages/comments/index';
 import PluginsMan   from '../pages/plugins/index';
 import CakepopsMan  from '../pages/cakepops/index';
+import FlaggingMan  from '../pages/flagging/index';
 import e404         from '../pages/errors/404';
 import e403         from '../pages/errors/403';
 
@@ -71,6 +72,7 @@ EndpointStore.registerEndpoint('themes', ThemesPage);
 EndpointStore.registerEndpoint('comments', CommentsMan);
 EndpointStore.registerEndpoint('plugins', PluginsMan);
 EndpointStore.registerEndpoint('cakepop', CakepopsMan); 
+EndpointStore.registerEndpoint('flagging', FlaggingMan);
 EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('_e403', e403);
 
