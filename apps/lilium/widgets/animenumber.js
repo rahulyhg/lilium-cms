@@ -2,9 +2,10 @@ import { h, Component } from "preact";
 import anime from 'animejs'
 
 export class AnimeNumber extends Component {
+    number = 0;
+
     constructor(props) {
         super(props);
-        this.number = 0;
     }
 
     componentDidMount() {

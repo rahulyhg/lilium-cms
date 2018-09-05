@@ -35,7 +35,8 @@ class Admin {
 	};
 
 	serveLogin (cli) {
-		cli.touch('admin.serverLogin');
+        cli.touch('admin.serverLogin');
+        log('Login', 'Compiling login page using LML3', 'info');
         LML3.compile(cli._c, liliumroot + "/backend/dynamic/login.lml3", {}, markup => {
             cli.sendHTML(markup);
         });
