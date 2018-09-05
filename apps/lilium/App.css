@@ -1272,6 +1272,89 @@ a {
     100% { transform: rotateZ(360deg); }
 }
 
+/* Flagging */
+.flag-list-item {
+    width: 100%;
+    box-sizing: border-box;
+    background: white;
+    border-radius: 3px;
+    box-shadow : 0px 2px 0px rgba(0,0,0,0.2);
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.flag-type-bubble {
+    display: inline-block;
+    vertical-align: middle;
+    color: white;
+
+    font-size: 14px;
+    padding: 2px 6px 2px;
+    border-radius: 3px;
+
+    text-transform: uppercase;
+    font-weight: bold;
+    box-shadow: 0px 1px 0px rgba(0, 0, 0, 0.2);
+}
+
+.flag-type-text {
+    color: #333;
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 12px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.flag-list-poster {
+    margin-top: 20px;
+}
+
+.flag-list-poster img {
+    width: 48px;
+    height: 48px;
+    border-radius: 48px;
+    object-fit: cover;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.flag-list-poster span {
+    margin-left: 12px;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+.flag-list-message {
+    padding: 10px 0px;
+    margin: 20px 0px 0px;
+    font-size: 20px;
+}
+
+.flag-list-details {
+    font-size: 14px;
+    border-bottom: 1px dashed #DDD;
+    border-top: 1px dashed #DDD;
+    margin: 10px 0px;
+    padding: 10px 0px;
+}
+
+.flag-list-actions {
+    text-align: right;
+}
+
+.flag-list-single-action {
+    margin-left: 12px;
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;
+    text-decoration: underline;
+}
+
+.flag-list-single-action.red {
+    color: #FF2634;
+    font-weight: bold;
+}
 
 /* 
     Pseudo Eleents and Selector
