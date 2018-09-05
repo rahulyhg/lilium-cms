@@ -18,16 +18,16 @@ const LIVEVAR_PROJECT = {
     _id : 1, poster : 1, message : 1,
     type : 1, at : 1, from : 1, flaggeetype : 1, status : 1,
 
-    "article._id" : 1, 
-    "article.title" : { $arrayElemAt : ["$article.title", 0] }, 
-    "article.subtitle" : { $arrayElemAt : ["$article.subtitle", 0] },
-    "article.isSponsored" : 1,
-    "article.nsfw" : 1,
-    "article.topicslug" : 1,
-    "article.name" : 1,
+    "article._id"           : 1, 
+    "article.title"         : { $arrayElemAt : ["$article.title", 0] }, 
+    "article.subtitle"      : { $arrayElemAt : ["$article.subtitle", 0] },
+    "article.isSponsored"   : 1,
+    "article.nsfw"          : 1,
+    "article.topicslug"     : 1,
+    "article.name"          : 1,
     "article.facebookmedia" : 1,
-    "article.author" : 1,
-    "article.date" : 1
+    "article.author"        : 1,
+    "article.date"          : 1
 }
 
 class Flagging {
