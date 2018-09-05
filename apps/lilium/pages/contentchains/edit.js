@@ -1,9 +1,10 @@
 import { Component, h } from "preact";
 import API from "../../data/api";
 import { castNotification } from '../../layout/notifications'
-import { TextField } from "../../widgets/form";
+import { TextField, ButtonWorker } from "../../widgets/form";
 import { TextEditor } from '../../widgets/texteditor';
 import { ArticlePicker } from "../../widgets/articlepicker";
+import { ImagePicker } from '../../layout/imagepicker';
 
 export class EditContentChain extends Component {
     constructor(props) {
@@ -76,18 +77,76 @@ export class EditContentChain extends Component {
         });
     }
 
+    chooseFeaturedImage() {
+        ImagePicker.cast({}, image => {
+            console.log('image picked: ', image);
+            const chain = this.state.chain;
+            chain.media = image;
+            this.setState({ chain });
+            API.post('/chains/edit/' + this.state.chain._id, { media: image._id }, (err, data, t) => {
+                if (r.status == 200) {
+                    castNotification({
+                        title: 'New Featured image saved',
+                        type: 'success'
+                    })
+                } else {
+                    castNotification({
+                        title: 'Error while saving content chain data on the server',
+                        type: 'error'
+                    });
+                }
+            })
+        });
+    }
+
+    togglePublishState(done) {
+        const action = this.state.chain.status == 'draft' ? 'live' : 'unpublish';
+        API.post(`/chains/${action}/${this.state.chain._id}`, {}, (err, data, r) => {
+            if (r.status == 200) {
+                const chain = this.state.chain;
+                chain.status = this.state.chain.status == 'draft' ? 'live' : 'draft';
+                this.setState({ chain }, () => {
+                    castNotification({
+                        title: `THe content chain was ${(this.state.chain.status == 'draft') ? 'unpublished' : 'published'}`,
+                        type: 'success'
+                    })
+                });
+
+                done();
+            } else {
+                castNotification({
+                    title: 'Error while saving content chain data on the server',
+                    type: 'error'
+                });
+
+                done();
+            }
+        });
+    }
+
     render() {
-        console.log('ArticlePicker state: ', this.state);;
-        
         if (!this.state.loading) {
             return (
-                <div id="content-chains-edit">
+                <div id="content-chain-edit">
                     <h1>Edit Content Chain</h1>
                     <TextField name='title' placeholder='title' initialValue={this.state.chain.title} onChange={this.updateValues.bind(this)} />
                     <TextField name='subtitle' placeholder='subtitle' initialValue={this.state.chain.subtitle} onChange={this.updateValues.bind(this)} />
                     <TextEditor name='presentation' placeholder='presentation' content={this.state.chain.presentation} onChange={this.updateValues.bind(this)} />
 
+                    <h4>Featured Image</h4>
+                    <div className="content-chain-featured-image-picker" onClick={this.chooseFeaturedImage.bind(this)} title='Choose a featured image'>
+                        {
+                            (this.state.chain.media) ? (
+                                <img className='featured-image' src={this.state.chain.media.sizes.content.url} alt="Content chain featured image"/>
+                            ) : (
+                                <p id="choose-features-image">Choose a featured image</p>
+                            )
+                        }
+                    </div>
+
                     <ArticlePicker onChange={this.selectedArticlesChanged.bind(this)} initialValue={this.state.chain.articles} />
+                    <hr />
+                    <ButtonWorker text={this.state.chain.status == 'draft' ? 'Publish' : 'Unpublish'} work={this.togglePublishState.bind(this)} / >
                 </div>
             );
         } else {

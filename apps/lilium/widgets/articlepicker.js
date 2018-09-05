@@ -2,7 +2,7 @@ import { AutocompleteField } from "./form";
 import { Component, h } from "preact";
 import slugify from 'slugify';
 
-class ArticlePickerArticle extends Component {
+export class ArticlePickerArticle extends Component {
     constructor(props) {
         super(props);
     }
@@ -69,7 +69,7 @@ export class ArticlePicker extends Component {
         }
     }
 
-    removeArticle(index) {
+    removeArticle(index) {article
         const selectedArticles = this.state.selectedArticles;
         selectedArticles.splice(index, 1);
         this.setState({ selectedArticles });
@@ -79,7 +79,7 @@ export class ArticlePicker extends Component {
     render() {
         return (
             <div className="article-pirkcer">
-                <AutocompleteField endpoint='/chains/search' autocompleteField='title' valueSelected={this.articleSelected.bind(this)}  />
+                <AutocompleteField endpoint='/chains/searchContent' autocompleteField='title' valueSelected={this.articleSelected.bind(this)}  />
                 <div className="article-picker-list">
                     {
                         this.state.selectedArticles.map((article, index) => (

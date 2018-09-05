@@ -2,7 +2,6 @@ const log = require('./log.js');
 const db = require('./includes/db.js');
 const filelogic = require('./filelogic.js');
 const articleLib = require('./article.js');
-const noop = () => {};
 
 const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     title : 1,
@@ -13,7 +12,7 @@ const CONTENTCHAIN_LIVEVAR_PROJECTION = {
     createdBy : 1,
     createdOn : 1,
     lastModified : 1,
-    featuredMedia: 1,
+    media: { $arrayElemAt: ['$media', 0] },
     'articles._id': 1,
     'articles.title': 1,
     'articles.date': 1
@@ -34,7 +33,7 @@ class ContentChains {
             createdBy : undefined,
             createdOn : new Date(),
             lastModified : new Date(),
-            featuredMedia: undefined,
+            media: undefined,
             articles : []
         }, data);
     }
@@ -51,8 +50,8 @@ class ContentChains {
     }
 
     editChain(_c, id, data, callback) {
-        if (data.featuredMedia) {
-            data.featuredMedia = db.mongoID(data.featuredMedia);
+        if (data.media) {
+            data.media = db.mongoID(data.media);
         }
 
         if (data.date) {
@@ -77,7 +76,7 @@ class ContentChains {
                     from : "uploads",
                     localField : "media",
                     foreignField : "_id",
-                    as : "featuredimage"
+                    as : "media"
                 }
             }
         ], (item) => {
@@ -114,7 +113,7 @@ class ContentChains {
                 from : "uploads",
                 localField : "media",
                 foreignField : "_id",
-                as : "featuredimage"
+                as : "media"
             }
         }], (items) => {
             items.forEach(item => {
@@ -133,26 +132,59 @@ class ContentChains {
         });
     }
 
-    livevar(cli, levels, params, send) {
+    livevar(cli, levels, params, sendback) {
         if (!cli.hasRight('editor')) {
-            return send();
+            return sendback();
         }
 
         if (levels[0] == "bunch") {
             this.bunchLivevar(...arguments);
         } else if (levels[0] == "deep") {
             this.deepFetch(cli._c, levels[1], (item) => {
-                send(item);
+                sendback(item);
             });
         } else if (levels[0] == "search") {
+            const $match = {};
+
+            if (params.filters.search) {
+                $match.title = new RegExp(params.filters.search, 'i');
+            }
+
+            if (params.filters.status) {
+                $match.status = params.filters.status;
+            }
+
+            db.join(cli._c, 'contentchains', [
+                { $match },
+                { $sort : {_id : -1} },
+                { $skip : params.filters.skip || 0 },
+                { $limit : params.filters.limit || 30 },
+                {
+                    $lookup : {
+                        from : "content",
+                        localField : "articles",
+                        foreignField : "_id",
+                        as : "articles" }
+                }, {
+                    $lookup : {
+                        from : "uploads",
+                        localField : "media",
+                        foreignField : "_id",
+                        as : "media" }
+                }, { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
+            ], (items) => {
+                sendback({ items });
+            });
+        } else if (levels[0] == "searchContent") {
             db.join(cli._c, 'content', [
                 { $match: { title: { $regex: new RegExp(params.query, 'i') }}},
                 { $limit: 30 },
                 { $project: { title: { $arrayElemAt: ['$title', 0] }, date: 1 }},
             ], items => {
-                send(items);
+                sendback(items);
             });
         } else {
+            console.log(levels);
             db.join(cli._c, 'contentchains', [
                 { $match : { _id: db.mongoID(levels[0]) } },
                 {
@@ -161,14 +193,20 @@ class ContentChains {
                         localField : "articles",
                         foreignField : "_id",
                         as : "articles" }
-                },
-                { ////$project: CONTENTCHAIN_LIVEVAR_PROJECTION }
+                }, {
+                    $lookup : {
+                        from : "uploads",
+                        localField : "media",
+                        foreignField : "_id",
+                        as : "media" }
+                }, { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
             ], items => {
-                if (items) {
+                if (items.length) {
+                    console.log(items);
                     items[0].articles.forEach(article => { article.title = article.title[0] } );
-                    send(items[0]);
+                    sendback(items[0]);
                 } else {
-                    send();
+                    cli.throwHTTP(404, 'Content chain not found', true);
                 }
             });
         }
@@ -202,6 +240,7 @@ class ContentChains {
             });
         } else if (path == "updateArticles") {
             const mappedArticles = cli.postdata.data.map(article => db.mongoID(article._id));
+            
             this.editChain(cli._c, cli.routeinfo.path[3], { articles: mappedArticles }, error => {
                 cli.sendJSON({
                     message : "Content chain saved",
@@ -214,12 +253,17 @@ class ContentChains {
             updatedData.status = "live";
 
             this.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
-                cli.sendJSON({
-                    title : "Sit tight!",
-                    message : "Content chain was saved successfully, and Lilium is currently generating everything.",
-                    success : !error,
-                    error 
+                cli.sendJSON({ success: true });
+
+                this.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
                 });
+            });
+        } else if (path == "unpublish") {
+            let updatedData = cli.postdata.data;
+            updatedData.status = "draft";
+
+            this.editChain(cli._c, cli.routeinfo.path[3], updatedData, error => {
+                cli.sendJSON({ success: true });
 
                 this.generateChain(cli._c, cli.routeinfo.path[3], (error) => {
                 });
