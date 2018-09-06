@@ -1586,3 +1586,34 @@ a {
     margin: 4px;
     padding: 0px;
 }
+
+.status-indicator {
+    color:  white;
+    display:  inline-block;
+    padding:  4px;
+    border-radius:  4px;
+    margin: 4px 10px;
+}
+
+.status-indicator.success {
+    background-color: #6da55e;
+}
+
+.status-indicator.warning {
+    background-color: #735a1f;
+}
+
+.status-indicator.danger {
+    background-color: #731f1f;
+}
+
+#styled-pages-list .styled-page {
+    background-color: white;
+    box-shadow: 0px 1px 1px 1px rgba(0,0,0,0.1);
+    padding: 20px;
+    width: 100%;
+}
+
+#styled-pages-list a.styled-page-visit-link {
+    display: block;
+}

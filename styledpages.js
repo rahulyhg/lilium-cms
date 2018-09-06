@@ -1,12 +1,9 @@
-const log = require('./log.js');
 const db = require('./includes/db.js');
-const Admin = require('./backend/admin.js');
 const fileserver = require('./fileserver.js');
 const filelogic = require('./filelogic.js');
-const livevars = require('./livevars.js');
-const themes = require('./themes.js');
 const networkinfo = require('./network/info.js');
 const hooks = require('./hooks');
+const log = require('./log.js');
 
 class StyledPages {
     constructor() {
@@ -60,7 +57,7 @@ class StyledPages {
 
     serveOrFallback(cli, fallback) {
         let slug = cli.routeinfo.path[cli.routeinfo.path.length-1];
-        db.findUnique(cli._c, 'styledpages', {slug : slug}, function(err, page) {
+        db.findUnique(cli._c, 'styledpages', {slug : slug}, function(err, page) { 
             if (err || !page) {
                 fallback();
             } else {
@@ -68,13 +65,13 @@ class StyledPages {
             }
         });
     }
-        
-    createNewObject() {
+
+    createNewObject(title, description, slug) {
         return {
-            title : "New Styled Page",
-            description : "",
+            title : title || "New Styled Page",
+            description : description || "",
             content : "",
-            slug : "page-" + Math.random().toString().substring(3),
+            slug : slug || "page-" + Math.random().toString().substring(3),
             status : "invisible",
             customcss : "body {}",
             customjs : "console.log('Loaded styled page.');",
@@ -111,34 +108,6 @@ class StyledPages {
         });
     }
 
-    adminGET(cli) {
-        if (!cli.hasRight("styledpages")) { return cli.refuse(); }
-
-        const level = cli.routeinfo.path[2];
-        switch (level) {
-            case "new":
-                db.insert(cli._c, 'styledpages', that.createNewObject(), (err, r) => {
-                    hooks.fireSite(cli._c, 'styledpageCreated', {_id : r.insertedId});
-                    cli.sendJSON({
-                        _id : r.insertedId.toString()
-                    });
-                });
-                break;
-
-            case "list":
-                require('./filelogic.js').serveAdminLML3(cli);
-                break;
-
-            case "edit":
-                require('./filelogic.js').serveAdminLML(cli, true);
-                break;
-
-            case undefined:
-            default :
-                cli.redirect(cli._c.server.url + "/admin/styledpages/list");
-        }
-    }
-
     adminPOST(cli) {
         if (!cli.hasRight("styledpages")) { return cli.refuse(); }
 
@@ -148,6 +117,28 @@ class StyledPages {
                 that.save(cli._c, cli.routeinfo.path[3], cli.postdata.data, (err, success) => {
                     cli.sendJSON({err : err, success : success});
                 });
+
+                break;
+            case "remove":
+                db.remove(cli._c, 'styledpages', { _id: db.mongoID(cli.routeinfo.path[3]) }, err => {
+                    if (!err) {
+                        log('StyledPages', 'Styledpage with id ' + cli.routeinfo.path[3] + ' removed by user ' + cli.userinfo.user, 'warn');
+                        cli.sendJSON({ success: true });
+                    } else {
+                        cli.throwHTTP(500, 'Could not remove styled page', true);
+                    }
+                }, true);
+
+                break;
+            case "new":
+                const newStyledPage = that.createNewObject(cli.postdata.data.title, cli.postdata.data.description, cli.postdata.data.slug);
+                db.insert(cli._c, 'styledpages', newStyledPage, (err, r) => {
+                        hooks.fireSite(cli._c, 'styledpageCreated', {_id : r.insertedId});
+                        cli.sendJSON({ created: newStyledPage });
+                        log('StyledPages', 'Created new styledpage', 'success');
+                    }
+                );
+
                 break;
             default:
                 cli.throwHTTP(501, 'Method not implemented', true);
@@ -190,11 +181,11 @@ class StyledPages {
         });
     }
 
-    sendBunch(cli, levels, params, send) {
+    search(cli, levels, params, send) {
         const filters = params.filters;
         const $match = {};
-        if (filters.visibility) {
-            $match.status = filters.visibility;
+        if (filters.status) {
+            $match.status = filters.status;
         }
 
         if (filters.search) {
@@ -213,7 +204,7 @@ class StyledPages {
         if (!cli.hasRight("styledpages")) { return send(); }
 
         switch (levels[0]) {
-            case 'bunch': that.sendBunch(cli, levels, params, send); break;
+            case 'search': that.search(cli, levels, params, send); break;
             case 'table': that.sendTable(cli, levels, params, send); break;
             case 'get'  : that.getSingle(cli._c, levels[1], send); break;
             default: send([]);
