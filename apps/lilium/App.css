@@ -1001,6 +1001,121 @@ h2 {
     padding: 10px;
 }
 
+/* The Daily Lilium */
+#tdl-lilium-logo {
+    position: absolute;
+    left: -150px;
+    top: -165px;
+    z-index: 1;
+    width: 360px;
+    opacity: 0.8;
+    filter: sepia(1);
+    mix-blend-mode: soft-light;
+}
+
+.tdl-col {
+    position: relative;
+    width: 50%;
+    z-index: 2;
+    max-width: 640px;
+}
+
+#the-daily-lilium {
+    padding : 40px; 
+    background-image : url('/static/media/tx_paper.jpg');
+    color : #333; 
+    text-align: center;
+}
+
+#the-daily-lilium-header {
+    width: 625px;
+    margin: auto;
+    position: relative;   
+}
+
+#the-daily-lilium-subheader {
+    margin-top: 5px;
+    z-index: 2;
+    position: relative;
+    width: 100%;
+}
+
+#the-daily-lilium-subheader h2 {
+    font-family: Courier, serif;
+    font-weight: normal;
+    font-size: 16px;
+}
+
+#the-daily-lilium-dateline {
+    position: relative;
+    z-index: 2;
+    padding: 10px 0px;
+    max-width: 1280px;
+    margin: 20px auto;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    font-family: Courier, serif;
+    font-size: 14px;
+}
+
+#the-daily-lilium-dateline b:first-child { float:left;  }
+#the-daily-lilium-dateline b:last-child  { float:right; }
+
+#the-daily-lilium-content {
+    display: flex; 
+    align-content: center;
+    justify-content: center;
+    mix-blend-mode: hard-light;
+}
+
+@media screen and (max-width: 1440px) {
+    #the-daily-lilium .tdl-col {
+        max-width: 780px;
+        width: 100%;
+        box-sizing: border-box;
+        margin: auto;
+    }
+
+    #the-daily-lilium {
+        display: block;
+        padding: 20px 0px;
+    }
+}
+
+.tdl-lilium-header-image {
+    position: relative;
+    z-index: 2;
+    opacity: 0.8;
+}
+
+.the-daily-lilium-content-wrap {
+    position: relative;
+    z-index : 2;
+}
+
+.tdl-toppost-image {
+    width: 100%;
+    height: auto;
+    filter: sepia(0.5);
+}
+
+.tdl-toppost h3 {
+    font-family: 'Lora', serif;
+    font-size: 32px;
+    text-align: left;
+    padding: 0;
+    margin: 10px 0px 0px;
+}
+.tdl-toppost h4 {
+    font-family: 'Lora', serif;
+    font-size: 18px;
+    text-align: left;
+    font-weight: normal;
+    padding: 0;
+    margin: 5px 0px 0px;
+}
+/* Not The Daily Lilium anymore */
+
 .cakepop-edit-page {
     max-width: 720px;
     margin: auto;
