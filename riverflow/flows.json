@@ -51,7 +51,7 @@
                 "faicon": "fa-comments",
                 "displayname": "Comment threads",
                 "priority": 228,
-                "rights": ["editor"],
+                "rights": ["moderate"],
                 "absURL": "admin/comments",
                 "children": []
             }
