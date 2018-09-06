@@ -107,7 +107,7 @@ export class PonglinksList extends Component {
     }
 
     componentWillUnmount() {
-        mappedUsers = undefined;
+
     }
 
     render() {
