@@ -124,7 +124,7 @@ const loadEndpoints = () => {
     endpoints.register('*', 'lilium', 'GET', (cli) => {
         cli.userinfo && cli.userinfo.loggedin ? 
             V4.serveV4Index(cli) :
-            cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
+            cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login?to=" + cli.routeinfo.fullpath);
     });
 
     endpoints.register('*', 'login', 'POST', (cli) => {
