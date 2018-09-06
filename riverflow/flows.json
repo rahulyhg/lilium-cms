@@ -290,7 +290,7 @@
         }, {
             "module" : "contentchains.js",
             "endpoint" : "chains",
-            "support" : ["livevar", "admin_get", "admin_post"]
+            "support" : ["livevar", "admin_post"]
         }, {
             "module" : "article.js",
             "endpoint" : "content",
