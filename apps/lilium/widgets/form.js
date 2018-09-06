@@ -240,12 +240,21 @@ export class SelectField extends FormField {
 }
 
 export class TextField extends FormField {
+    constructor(props) {
+        super(props);
+
+        this.keyEvents = this.props.keyEvents || {};
+    }
+
     handleKeyPress(ev) {
         this.props.onKeyPress && this.props.onKeyPress(ev);
-
+        
         if (ev.key == 'Enter') {
             this.props.onEnter && this.props.onEnter(ev.target.value, ev.target);
         }
+
+        const keyEventCb = this.keyEvents[ev.keyCode] || this.keyEvents[ev.key];
+        keyEventCb && keyEventCb(ev);
     }
 
     render() {
@@ -258,7 +267,8 @@ export class TextField extends FormField {
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} 
                                     onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
-                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} />)
+                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
+                                    onFocus={this.props.onFocus && this.props.onFocus.bind(this)} />)
                 }
             </div>
         )
@@ -476,7 +486,8 @@ class Tag extends Component {
                 <span className="tag-text">{this.props.text}</span>
                 {
                     (!this.props.readOnly) ? (
-                        <i className="fal fa-times" style={styles.tag.closeButton} onClick={this.props.remove && this.props.remove.bind(this, this.props.text)}></i>
+                        <i className="fal fa-times" style={styles.tag.closeButton}
+                            onClick={this.props.remove && this.props.removebind(this, this.props.text)}></i>
                     ) : null
                 }
             </div>
@@ -649,6 +660,103 @@ export class MultiSelectBox extends FormField {
                         })
                     }
                 </div>
+            </div>
+        );
+    }
+}
+
+export class DebouncedField extends FormField {
+    constructor(props) {
+        super(props);
+        // Debounce delay in ms
+        this.debounceDelay = this.props.debounceDelay || 300;
+        this.timeoutId;
+        this.oldValue = "";
+    }
+
+    shouldComponentUpdate() { return false; }
+
+    debounceInput(ev) {
+        this.timeoutId && clearTimeout(this.timeoutId);
+        this.timeoutId = setTimeout(() => {
+            if (this.oldValue != ev.target.value) {
+                this.props.onDebounce(ev.target.value)
+            }
+         
+            this.oldValue = ev.target.value;
+        }, this.debounceDelay);
+    }
+
+    render() {
+        return (
+            <TextField placeholder={this.props.placeholder} onKeyPress={this.debounceInput.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
+                        onFocus={this.props.onFocus.bind(this)} keyEvents={this.props.keyEvents} />
+        );
+    }
+}
+
+export class AutocompleteField extends Component {
+    constructor(props) {
+        super(props);
+        this.state = { items: [] };
+    }
+
+    searchEndpoint(searchString) {
+        if (!this.props.endpoint) throw new Error('Must specify an endpoint for AutocompleteField')
+
+        // The endpoint is expected to return an array
+        API.get(this.props.endpoint, { query: searchString }, (err, data, r) => {
+            if (r.status == 200) {
+                this.setState({ items: data, dropdownShown: !!data.length });
+            } else {
+                log('AutocompleteField', `Failes fetching the specified endpoint ${this.props.endpoint}`, 'error');
+            }
+        });
+    }
+
+    getKeyBindings() {
+        return {
+            "27": this.onEscapePressed.bind(this)
+        }
+    }
+
+    onEscapePressed(ev) {
+        this.closeDropdown();
+    }
+
+    closeDropdown() {
+        this.setState({ dropdownShown: false });
+    }
+
+    showDropdown() {
+        this.setState({ dropdownShown: !!this.state.items.length });
+    }
+
+    selectItem(item) {
+        this.setState({ selectedValue: item[this.props.autocompleteField] });
+        this.props.valueSelected && this.props.valueSelected(item);
+    }
+
+    render() {
+        return (
+            <div className="autocomplete-field">
+                <DebouncedField placeholder={this.props.placeholder} placeholderType='inside' onFocus={this.showDropdown.bind(this)}
+                                onDebounce={this.searchEndpoint.bind(this)} onBlur={this.closeDropdown.bind(this)} keyEvents={this.getKeyBindings()} />
+                {
+                    (this.state.dropdownShown) ? (
+                        <div className="autocomplete-choices">
+                            {
+                                this.state.items.map((item, index) => {
+                                    const displayField = item[this.props.autocompleteField];
+
+                                    // h4 uses onMouseDown because the onBlur event of the DebouncedField prevents onClick from firing
+                                    return (<h4 className={`autocomplete-choice ${displayField == this.state.selectedValue ? 'selected' : ''}`} key={index}
+                                            onMouseDown={this.selectItem.bind(this, item)}>{displayField}</h4>);
+                                })
+                            }
+                        </div>
+                    ) : (null)
+                }
             </div>
         );
     }

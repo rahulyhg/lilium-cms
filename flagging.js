@@ -22,6 +22,7 @@ const LIVEVAR_PROJECT = {
     "article.title"         : { $arrayElemAt : ["$article.title", 0] }, 
     "article.subtitle"      : { $arrayElemAt : ["$article.subtitle", 0] },
     "article.isSponsored"   : 1,
+    "article.status"        : 1,
     "article.nsfw"          : 1,
     "article.topicslug"     : 1,
     "article.name"          : 1,
@@ -36,7 +37,7 @@ class Flagging {
     }
 
     adminPOST(cli) {
-
+        
     }
 
     adminPUT(cli) {
