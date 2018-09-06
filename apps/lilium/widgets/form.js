@@ -243,7 +243,12 @@ export class TextField extends FormField {
     constructor(props) {
         super(props);
 
+        this.inputbox;
         this.keyEvents = this.props.keyEvents || {};
+    }
+
+    componentWillReceiveProps(props) {
+        props.value && (this.inputbox.value = props.value)
     }
 
     handleKeyPress(ev) {
@@ -268,7 +273,7 @@ export class TextField extends FormField {
                                     onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
                                     onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
-                                    onFocus={this.props.onFocus && this.props.onFocus.bind(this)} />)
+                                    onFocus={this.props.onFocus && this.props.onFocus.bind(this)} ref={el => {this.inputbox = el}} />)
                 }
             </div>
         )
@@ -448,7 +453,8 @@ export class CheckboxField extends FormField {
     constructor(props) {
         super(props);
 
-        this.state = { checked: !!this.props.initialValue };
+        this.value = !!props.initialValue;
+        this.state = { checked: this.value };
     }
 
     onChange() {
