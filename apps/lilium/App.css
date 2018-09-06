@@ -1283,6 +1283,10 @@ a {
     margin-bottom: 20px;
 }
 
+.flag-list-item.closed {
+    filter : grayscale(1);
+}
+
 .flag-type-bubble {
     display: inline-block;
     vertical-align: middle;
