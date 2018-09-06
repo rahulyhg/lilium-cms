@@ -17,7 +17,7 @@ export default class Ponglinks extends Component {
     }
 
     static componentDidRegister() {
-        log('Role', 'Registering overlay for CreateRole', 'success');
+        log('PongLinks', 'Registering overlay for CreatePonglink', 'success');
         addAction({
             action : "#create",
             command : "ponglink",

@@ -36,6 +36,10 @@ export const setLanguage = (lang, done) => {
     .then(r => r.json()).then(data => {
         currentLanguageData = data;
         done && done();
+    })
+    .catch(err => {
+        log('Vocab', 'Failed to load vocab file : ' + lang, 'err');
+        done && done();
     });
 }
 
