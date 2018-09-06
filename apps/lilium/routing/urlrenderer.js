@@ -86,7 +86,8 @@ export class URLRenderer extends Component {
         this.state = {
             endpoint : "_init",
             levels : [],
-            classes : []
+            classes : [],
+            rendererstyle : {}
         }
 
         getLocal(CACHEKEYS.SIDEBARSNAP) && this.state.classes.push("snap");
@@ -156,7 +157,7 @@ export class URLRenderer extends Component {
         resetPageCommands();
 
         const CurrentContainer = EndpointStore.getComponentFromEndpoint(endpoint);
-        this.setState({ endpoint, levels, CurrentContainer, extras }, () => {
+        this.setState({ endpoint, levels, CurrentContainer, extras, rendererstyle : CurrentContainer.rendererstyle || {} }, () => {
             const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
             document.dispatchEvent(ev);
 
@@ -168,7 +169,7 @@ export class URLRenderer extends Component {
         this.lastRenderedPath = document.location.pathname;
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
-            <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
+            <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')} style={this.state.rendererstyle}>
                 <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} session={this.props.session} extras={this.state.extras || {}} />
             </div>
         )
