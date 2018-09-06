@@ -1,12 +1,6 @@
 import { castNotification } from '../../layout/notifications'
 import { Component, h } from "preact";
 
-const STATUS_COLORS = {
-    active: '#6da55e',
-    paused: '#735a1f',
-    archived: '#731f1f'
-};
-
 const styles = {
     copyColumn: {
         textAlign: 'center',
@@ -14,12 +8,6 @@ const styles = {
     },
     copyIcon: {
         cursor: 'pointer'
-    },
-    statusIndicator: {
-        color: 'white',
-        display: 'inline-block',
-        padding: '4px',
-        borderRadius: '4px'
     },
     actions: {
         display: 'flex',
@@ -37,14 +25,6 @@ const styles = {
         textAlign: 'center'
     }
 }
-
-export function StatusIndicator(props) {
-    return (
-        <div className="status-indicator" style={Object.assign({}, styles.statusIndicator, { backgroundColor: STATUS_COLORS[props.status] })}>
-            <span>{props.status.toUpperCase()}</span>
-        </div>
-    )
-};
 
 export function Version(props) {
     return (       
