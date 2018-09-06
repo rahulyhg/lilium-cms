@@ -53,7 +53,7 @@ class LiliumComments {
     }  
 
     adminDELETE(cli) {
-        if (cli.hasRightOrRefuse("editor")) {
+        if (cli.hasRightOrRefuse("moderate")) {
             if (cli.routeinfo.path[2] == "thread") {
                 const _id = db.mongoID(cli.routeinfo.path[3]);
                 db.findUnique(cli._c, 'fbcomments', { _id, active : true }, (err, comment) => {
@@ -89,7 +89,7 @@ class LiliumComments {
     }
 
     livevar(cli, levels, params, sendback) {
-        if (!cli.hasRight("editor")) {
+        if (!cli.hasRight("moderate")) {
             return sendback([]);
         }
 
