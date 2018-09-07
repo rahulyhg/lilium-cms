@@ -179,6 +179,10 @@
             "endpoint" : "build",
             "support" : ["admin_post"]
         }, {
+            "module" : "cssbuilder.js",
+            "endpoint" : "buildcss",
+            "support" : ["admin_post"]
+        }, {
             "module" : "communications.js",
             "endpoint" : "communications",
             "support" : ["admin_post", "livevar"]
