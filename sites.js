@@ -196,11 +196,6 @@ var SiteInitializer = function (conf, siteobj) {
                     };
                 `;
             }
-            
-            fs.copyFileSync(
-                pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
-                pathLib.join(conf.server.html, 'lilium.css')
-            );
         });
 
         hooks.fireSite(conf, 'frontend_will_precompile', {
