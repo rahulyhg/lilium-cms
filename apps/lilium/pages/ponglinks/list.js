@@ -2,7 +2,8 @@ import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { getSession } from '../../data/cache';
 import { ButtonWorker } from '../../widgets/form';
-import { StatusIndicator, Version } from './lib';
+import { Version } from './lib';
+import { StatusIndicator } from "../../widgets/statusindicator";
 
 const styles = {
     ponglink: {
@@ -43,13 +44,20 @@ class Ponglink extends Component {
         this.state = {...this.props.item};
     }
 
+    static statusIndicatorStyle = {
+        archived: 'danger',
+        active: 'success',
+        paused: 'warning'
+    }
+
+
     render() {
         return (
             <div className="ponglink" style={styles.ponglink}>
                 <a href={"ponglinks/insights/" + this.props.item._id}>
                     <h2 style={styles.identifier}>{this.state.identifier}</h2>
                 </a>
-                <StatusIndicator status={this.state.status} />
+                <StatusIndicator status={this.state.status} style={Ponglink.statusIndicatorStyle[this.state.status]} />
                 <div className="clickCounter" style={{ display: 'inline-block', float: 'right' }}>
                     <span>{`${this.state.clicks} clicks`}</span>
                 </div>
