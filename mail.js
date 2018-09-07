@@ -130,10 +130,23 @@ class MailController {
 
     livevar(cli, levels, params, send) {
         if (cli.hasRight('edit-emails')) {
-            if (levels[0] == "all") {
-                db.findToArray(cli._c, 'mailtemplates', {active : true}, (err, arr) => {
-                    send(arr);
-                });
+            if (levels[0] == "search") {
+                if (params.filters.search) {
+                    $match.displayname = new RegExp(params.filters.search, 'i');
+                }
+    
+                if (params.filter.hook) {
+                    $match;hooks = params.filter.hook;
+                }
+
+                db.join(cli._c, 'mailtemplates', [
+                    {$match},
+                    {$sort : {_id : -1}},
+                    {$skip : params.filters.skip || 0},
+                    {$limit : params.filters.limit || 30}
+                ], (items) => {
+                    sendback({ items });
+                });StyledPagesStyledPages
             } else if (levels[0] == "hooks") {
                 let arr = [];
                 for (var name in mailHooks) {
@@ -156,32 +169,6 @@ class MailController {
             }
         } else {
             send(new Error("Get outta here"));
-        }
-    }
-
-    adminGET(cli) {
-        if (!cli.hasRight('edit-emails')) {
-            return cli.throwHTTP(403);
-        }
-
-        switch (cli.routeinfo.path[2]) {
-            case undefined:
-            case "list":
-                filelogic.serveAdminLML(cli);
-                break;
-
-            case "edit":
-                filelogic.serveAdminLML(cli, true);
-                break;
-
-            case 'new':
-                db.insert(cli._c, 'mailtemplates', new MailTemplate(), (err, r) => {
-                    cli.redirect(cli._c.server.url + "/admin/mailtemplates/edit/" + r.insertedId.toString(), false, 'rewrite');
-                });
-                break;
-
-            default:
-                cli.throwHTTP(404);
         }
     }
 
@@ -210,10 +197,6 @@ class LMLMail {
 
     adminPOST(cli) {
         this.controller.adminPOST(cli);
-    }
-
-    adminGET(cli) {
-        this.controller.adminGET(cli);
     }
 
     livevar(cli, levels, params, send) {

@@ -185,7 +185,7 @@
         }, {
             "module" : "mail.js",
             "endpoint" : "mailtemplates",
-            "support" : ["setup", "admin_post", "admin_get", "livevar"],
+            "support" : ["setup", "admin_post", "livevar"],
             "hooks" : [
                 {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
             ],
