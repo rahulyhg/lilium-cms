@@ -115,6 +115,7 @@
     "jsdom": "latest",
     "jws": "^3.1.5",
     "kerberos": "latest",
+    "less": "^3.8.1",
     "lilium-text": "^1.3.2",
     "lorem-ipsum": "^1.0.5",
     "markdown": "latest",
@@ -194,7 +195,7 @@
   },
   "devDependencies": {
     "babel-cli": "latest",
-    "babel-loader": "latest",
+    "babel-loader": "^7.1.5",
     "babel-plugin-transform-react-jsx": "latest",
     "babel-preset-env": "latest",
     "preact": "^8.2.9",
