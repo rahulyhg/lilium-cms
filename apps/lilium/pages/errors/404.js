@@ -7,7 +7,7 @@ export default class e404 extends Component {
     }
 
     static rendererstyle = {
-        position: "fixed", top: 0, left: 0, bottom: 0, right: 0
+        position: "fixed", top: 50, left: 20, bottom: 0, right: 0
     }
 
     render() {
