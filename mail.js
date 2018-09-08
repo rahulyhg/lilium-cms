@@ -128,48 +128,55 @@ class MailController {
         ]});
     }
 
-    livevar(cli, levels, params, send) {
+    livevar(cli, levels, params, sendback) {
         if (cli.hasRight('edit-emails')) {
             if (levels[0] == "search") {
+                let $match= { deleted: { $ne: true } };
                 if (params.filters.search) {
                     $match.displayname = new RegExp(params.filters.search, 'i');
                 }
-    
-                if (params.filter.hook) {
-                    $match;hooks = params.filter.hook;
+
+                if (params.filters.hook) {
+                    $match.hooks = params.filter.hook;
                 }
 
                 db.join(cli._c, 'mailtemplates', [
                     {$match},
                     {$sort : {_id : -1}},
-                    {$skip : params.filters.skip || 0},
-                    {$limit : params.filters.limit || 30}
+                    {$skip : params.skip || 0},
+                    {$limit : params.limit || 30}
                 ], (items) => {
                     sendback({ items });
-                });StyledPagesStyledPages
+                });
             } else if (levels[0] == "hooks") {
                 let arr = [];
                 for (var name in mailHooks) {
                     arr.push(Object.assign(mailHooks[name], {name : name}));
                 }
 
-                send(arr);
+                sendback(arr);
             } else if (levels[0] == "simple") {
                 db.find(cli.c, 'mailtemplates', {active : true}, [], (err, cur) => {
                     cur.project({_id : 1, displayname : 1}).toArray((err, arr) => {
-                        send(arr);
+                        sendback(arr);
                     });
                 });
             } else if (levels[0]) {
                 db.findUnique(cli._c, 'mailtemplates', {_id : db.mongoID(levels[0]), active : true}, (err, obj) => {
-                    send(obj);
+                    sendback(obj);
                 });
             } else {
-                send(new Error("Undefined level " + levels[0]));
+                sendback(new Error("Undefined level " + levels[0]));
             }
         } else {
-            send(new Error("Get outta here"));
+            sendback(new Error("Get outta here"));
         }
+    }
+
+    adminDELETE(cli) {
+        db.update(cli._c, 'mailtemplates', { _id: db.mongoID(cli.routeinfo.path[2]) }, { hooks: '', deleted: true }, (err, r) => {
+            cli.sendJSON({ updated: !!r.nModified });
+        });
     }
 
     adminPOST(cli) {
@@ -197,6 +204,10 @@ class LMLMail {
 
     adminPOST(cli) {
         this.controller.adminPOST(cli);
+    }
+
+    adminDELETE(cli) {
+        this.controller.adminDELETE(cli);
     }
 
     livevar(cli, levels, params, send) {
