@@ -33,15 +33,21 @@ class PluginItem extends Component {
 
     render() {
         return (
-            <div class="plugin-strip">
+            <div class="card plugin-strip">
                 <div class="plugin-details">
-                    <div class="plugin-title-strip">
-                        <b class="">{this.props.item.identifier}</b> 
-                        <b class={"plugin-status " + (this.state.active ? "active" : "")}>{this.state.active ? "Enabled" : "Disabled"}</b>
+                    <div class="detail-head">
+                        <div class="bubble-wrap">
+                            <b class="big">{this.props.item.identifier}</b> 
+                            <b class={"bubble " + (this.state.active ? "green" : "")}>{this.state.active ? "Enabled" : "Disabled"}</b>
+                        </div>
                     </div>   
-                    <p>{this.props.item.description || (<i>This plugin does not have a description.</i>)}</p>             
-                    <div class="plugin-entry-file">
-                        <span>Entry file : {this.props.item.entry}</span>
+                    <div class="detail-list">
+                        <div>
+                            {this.props.item.description || (<i>This plugin does not have a description.</i>)}
+                        </div>             
+                        <div>
+                            Entry file : <b>{this.props.item.entry}</b>
+                        </div>
                     </div>
                 </div>
                 <div class="plugin-action-wrap">
