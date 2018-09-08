@@ -493,7 +493,7 @@ class Tag extends Component {
                 {
                     (!this.props.readOnly) ? (
                         <i className="fal fa-times" style={styles.tag.closeButton}
-                            onClick={this.props.remove && this.props.removebind(this, this.props.text)}></i>
+                            onClick={this.props.remove && this.props.remove.bind(this, this.props.text)}></i>
                     ) : null
                 }
             </div>
