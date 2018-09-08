@@ -1,127 +1,6 @@
-import { h, Component, cloneElement } from "preact";
+import { h, Component } from "preact";
 import API from '../data/api';
 import flatpickr from 'flatpickr';
-
-const styles = {
-    placeholder : {
-        display: "block",
-        fontSize : 14,
-        marginBottom: 8
-    },
-    fieldwrap : {
-        marginBottom: 20,
-        position: 'relative'
-    },
-    textfield : {
-        boxSizing : "border-box",
-        width : "100%",
-        padding: 10,
-        fontSize : 18,
-        background : "#F9F9F9",
-        border : "1px solid #CCC",
-        borderBottomWidth : 2,
-        color: "#333",
-        outlineColor: "#c47ed4"
-    },
-    stackboxsingles : {
-        marginBottom : 0,
-        flexGrow : 1
-    },
-    stackboxex : {
-        width: 40, height : 40,    
-        background: "#f5b1b1",
-        color: "white",
-        boxSizing: "border-box",
-        fontSize: 32,
-        textAlign: "center",
-        cursor: "pointer"
-    },
-    textarea : {
-        resize : "none",
-        height : 150
-    },
-    checkboxWrapper: {
-        cursor: 'pointer',
-        border: '1px solid #2d2d2d',
-        borderRadius: '4px',
-        backgroundColor: 'transparent',
-        height: '25px',
-        width: '25px',
-        margin: '12px 12px 12px 20px',
-        flex: '0 0 25px',
-        flexWrap: 'nowrap',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        marginLeft: 'auto'
-    },
-    checkboxChecked: {
-        backgroundColor: '#af57e4',
-        borderStyle: 'dashed'
-    },
-    checkboxFieldWrapper: {
-        display: 'flex',
-        alignItems: 'center',
-    },
-    checkboxCheckmark: {
-        color: 'white',
-        padding: '0px',
-        margin: '0px',
-    },
-    fauxTextField: {
-        cursor: 'text',
-        minHeight: '40px',
-        display: 'flex',
-        padding: '2px',
-        flexWrap: 'wrap'
-    },
-    tag: {
-        closeButton: {
-            margin: '2px 2px 2px 6px',
-            cursor: 'pointer',
-            hover: {
-                fontWeight: 'bolder',
-            }
-        },
-        cursor: 'default',
-        backgroundColor: '#b769c9',
-        color: 'white',
-        margin: '4px 8px',
-        padding: '2px 6px',
-        display: 'flex',
-        alignContent: 'center',
-        fontWeight: 'bold'
-    },
-    invisibleInput: {
-        border: '0',
-        backgroundColor: 'transparent',
-        outline: 'none',
-        margin: '4px 8px',
-        lineHeight: '20px'
-    },
-    multiSelectBoxWrapper: {
-        margin: '20px 0px',
-    },
-    multiSelectBoxOptionsList: {
-        maxHeight: '200px',
-        overflowX: 'auto',
-        backgroundColor: 'white',
-        padding: '8px',
-        borderWidth: '1px 1px 1px 2px',
-        borderStyle: 'solid',
-        borderColor: 'rgb(204, 204, 204)'
-    },
-    selectedOptionsWrapper: {
-        display: 'flex',
-        backgroundColor: 'white',
-    },
-    listItem: {
-        cursor: 'pointer',
-        padding: '2px 20px',
-        margin: "2px",
-    }
-}
 
 class FormField extends Component {
     constructor(props) {
@@ -216,7 +95,7 @@ export class ButtonWorker extends Component {
 
     render() {
         return (
-            <div class="button-worker" style={Object.assign({}, styles.buttonworker, buttonThemes[this.props.theme] || {}, this.props.style || {})} onClick={this.work.bind(this)}>
+            <div class="button-worker" style={Object.assign({}, buttonThemes[this.props.theme] || {}, this.props.style || {})} onClick={this.work.bind(this)}>
                 <span class={this.state.working ? "hidden" : ""}>{this.props.text}</span>
                 <div class={"working-spinner " + (this.state.working ? "shown" : "")}><i class="fa fa-spin fa-cog"></i></div>
             </div>
@@ -227,9 +106,9 @@ export class ButtonWorker extends Component {
 export class SelectField extends FormField {
     render() {
         return (
-            <div style={styles.fieldwrap}>
-                { this.props.placeholder ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
-                <select style={styles.textfield} value={this.value} onChange={this.changed.bind(this)}>
+            <div class="field-wrap">
+                { this.props.placeholder ? <b class="placeholder">{this.props.placeholder}</b> : null }
+                <select class="classic-field" value={this.value} onChange={this.changed.bind(this)}>
                     { this.props.options.map(opt => (
                         <option value={opt.value} selected={opt.value == this.props.initialValue}>{opt.displayname}</option>
                     )) }
@@ -264,14 +143,14 @@ export class TextField extends FormField {
 
     render() {
         return (
-            <div style={Object.assign({}, styles.fieldwrap, this.props.wrapstyle || {})}>
-                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
+            <div class="field-wrap" style={this.props.wrapstyle || {}}>
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b class="placeholder">{this.props.placeholder}</b> : null }
 
                 {
                     this.props.multiline ? 
-                        ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})} 
+                        ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={this.props.style || {}} 
                                     onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
-                        ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
+                        ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
                                     onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
                                     onFocus={this.props.onFocus && this.props.onFocus.bind(this)} ref={el => {this.inputbox = el}} />)
                 }
@@ -336,7 +215,7 @@ export class StackBox extends FormField {
     render() {
         return (
             <div class="stack-box">
-                <b style={styles.placeholder}>{this.props.placeholder || ""}</b>
+                <b class="placeholder">{this.props.placeholder || ""}</b>
                 <div class="stack-box-list">
                     {
                         this.state.values.map((value, i) => (<StackBox.StackField onDelete={this.removeOne.bind(this, i)} onChange={this.textEdited.bind(this)} index={i} initialValue={value} />))
@@ -366,8 +245,8 @@ StackBox.StackField = class StackField extends Component {
     render() {
         return (
             <div style={{ display : "flex" }}>
-                <div onClick={this.selfdestruct.bind(this)} style={styles.stackboxex}><i class="far fa-times"></i></div>
-                <TextField onChange={this.onChange.bind(this)} wrapstyle={styles.stackboxsingles} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
+                <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
+                <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
             </div>
         )
     }
@@ -393,16 +272,16 @@ export class EditableText extends FormField {
 
     render() {
         return (
-            <div style={Object.assign({}, styles.fieldwrap, this.props.wrapstyle || {})}>
-                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
+            <div class="field-wrap" style={this.props.wrapstyle || {}}>
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b class="placeholder">{this.props.placeholder}</b> : null }
                 {
                     this.state.editing ?
                         (this.props.multiline ? 
                             ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""}
-                                    style={Object.assign({}, styles.textfield, styles.textarea, this.props.style || {})}
+                                    class="classic-field" style={this.props.style || {}}
                                     onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)}>{this.value || ""}</textarea>) :
                             ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""}
-                                    style={Object.assign({}, styles.textfield, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
+                                    class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
                                     onBlur={this.handleBlur.bind(this)} ref={x => (this.textInput = x)} />))
                         : ( <p onClick={() => { this.setState({ editing: true }, () => { this.textInput.focus(); }); }}
                                 title='Click to edit' style={{ cursor: 'text', hover: { border:'1px solid #333' } }}>{this.value}</p> )
@@ -440,10 +319,10 @@ export class DatePicker extends FormField {
 
     render() {
         return (
-            <div style={Object.assign({}, styles.fieldwrap, this.props.wrapstyle || {})}>
-                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
+            <div style={this.props.wrapstyle || {}}>
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b class="placeholder">{this.props.placeholder}</b> : null }
                 
-                <input ref={i => (this.input = i)} placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, styles.textfield, this.props.style || {})} />
+                <input ref={i => (this.input = i)} placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} style={Object.assign({}, this.props.style || {})} class="classic-field" />
             </div>
         )
     }
@@ -470,11 +349,10 @@ export class CheckboxField extends FormField {
 
     render() {
         return (
-            <div className="checkbow-field-wrapper" style={styles.checkboxFieldWrapper}>
-                <b className="checkbox-text" style={styles.placeholder}>{this.props.placeholder}</b>
-                <div className="checkbox-wrapper" onClick={this.onChange.bind(this)}
-                        style={Object.assign({}, styles.checkboxWrapper, (this.state.checked) ? styles.checkboxChecked : {})}>
-                    <span className="checkmark" style={styles.checkbox}>{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
+            <div className="checkbox-field-wrapper">
+                <b className="checkbox-text placeholder">{this.props.placeholder}</b>
+                <div className={"checkbox-wrapper " + (this.state.checked ? "checked" : "")} onClick={this.onChange.bind(this)} >
+                    <span className="checkmark">{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
                 </div>
             </div>
         );
@@ -488,12 +366,12 @@ class Tag extends Component {
 
     render() {
         return (
-            <div className="tags" style={styles.tag}>
+            <div className="tag">
                 <span className="tag-text">{this.props.text}</span>
                 {
                     (!this.props.readOnly) ? (
-                        <i className="fal fa-times" style={styles.tag.closeButton}
-                            onClick={this.props.remove && this.props.removebind(this, this.props.text)}></i>
+                        <i className="fal fa-times close-button"
+                            onClick={this.props.remove && this.props.remove.bind(this, this.props.text)}></i>
                     ) : null
                 }
             </div>
@@ -558,8 +436,8 @@ export class MultitagBox extends FormField {
     render() {
         return (
             <div className="multilang-box-wrapper">
-                { this.props.placeholder && this.props.placeholderType != "inside" ? <b style={styles.placeholder}>{this.props.placeholder}</b> : null }
-                <div className="textfield" style={Object.assign({}, styles.textfield, styles.fauxTextField)} onClick={this.focusInput.bind(this)}>
+                { this.props.placeholder && this.props.placeholderType != "inside" ? <b class="placeholder">{this.props.placeholder}</b> : null }
+                <div class="classic-field faux" onClick={this.focusInput.bind(this)}>
                     {
                         this.state.tags.map(tag => {
                             return (
@@ -568,7 +446,7 @@ export class MultitagBox extends FormField {
                         })
                     }
 
-                    <input type="text" ref={x => (this.textInput = x)} style={styles.invisibleInput} onKeyDown={this.onKeyDown.bind(this)}
+                    <input class="invisible-input" type="text" ref={x => (this.textInput = x)} onKeyDown={this.onKeyDown.bind(this)}
                             placeholder={(this.props.placeholderType == 'inside' ) ? this.props.placeholder : ''} />
                 </div>
             </div>
@@ -590,14 +468,13 @@ class ListItem extends Component {
     render() {
         if (this.state.selected) {
             return (
-                <div className="list-item" onClick={this.props.unselectOption.bind(this, this.props.option.value)}
-                    style={Object.assign({}, styles.listItem, { backgroundColor: 'rgba(251, 244, 244, 0.75)', color: '#af57e4' })}>
+                <div className="list-item selected" onClick={this.props.unselectOption.bind(this, this.props.option.value)}>
                     <span>{this.props.option.displayName}</span>
                 </div>
             );
         } else {
             return (
-                <div className="list-item" onClick={this.props.selectOption.bind(this, this.props.option.value)} style={styles.listItem}>
+                <div className="list-item" onClick={this.props.selectOption.bind(this, this.props.option.value)}>
                     <span>{this.props.option.displayName}</span>
                 </div>
             );
@@ -642,9 +519,9 @@ export class MultiSelectBox extends FormField {
 
     render() {
         return (
-            <div className="multiselectbox-wrapper" style={styles.multiSelectBoxWrapper}>
-                <b style={styles.placeholder}>{this.props.placeholder}</b>
-                <div className="selectedoptions-container" style={styles.selectedOptionsWrapper}>
+            <div className="multiselectbox-wrapper">
+                <b class="placeholder">{this.props.placeholder}</b>
+                <div className="selectedoptions-wrapper">
                     {
                         (this.state.selectedValues.length > 0) ? (
                             this.state.selectedValues.map(value => {
@@ -656,7 +533,7 @@ export class MultiSelectBox extends FormField {
                         )
                     }
                 </div>
-                <div className="options-list"  style={styles.multiSelectBoxOptionsList}>
+                <div className="multiselectbox-options-list">
                     {
                         this.state.options.map(option => {
                             return (
