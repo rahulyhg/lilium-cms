@@ -2,25 +2,13 @@ import { Component, h } from "preact";
 import API from '../../data/api';
 import { MultitagBox, EditableText, TextField, ButtonWorker } from '../../widgets/form';
 import Modal from '../../widgets/modal';
-
-const styles = {
-    roles: {
-        display: 'flex',
-        flexWrap: 'wrap',
-        justifyContent: 'space-around'
-    },
-    role: {
-        width: '25%',
-        margin: '25px',
-        color: '#333'
-    }
-};
+import { BigList } from '../../widgets/biglist';
 
 class Role extends Component {
     constructor(props) {
         super(props);
 
-        this.state = { role: this.props.role }
+        this.state = { role: this.props.item }
     }
 
     editField(name, value) {
@@ -39,7 +27,7 @@ class Role extends Component {
 
     render() {
         return (
-            <div>
+            <div class="card flex">
                 <div className="role" style={{ padding: '4px 12px' }}>
                     <EditableText initialValue={this.state.role.displayname} name='displayname'onChange={this.editField.bind(this)} />
                     <EditableText initialValue={this.state.role.name} name='name' onChange={this.editField.bind(this)} />
@@ -60,13 +48,7 @@ export class RolesList extends Component {
     }
 
     componentDidMount() {
-        API.get('/role', {}, (err, data, r) => {
-            if (r.status == 200) {
-                this.setState({ roles: data });
-            } else {
-                log('Roles', 'Error fetching roles', 'err');
-            }
-        });
+
     }
 
     createRole() {
@@ -94,18 +76,8 @@ export class RolesList extends Component {
                     <h1 style={{ display: 'inline-block' }}>Roles Management</h1>
                     <ButtonWorker text='Create Role' style={{ float: 'right', margin: '16px' }} work={done => { this.setState({ createModalVisible: true }); done && done(); } } />
                 </div>
-                <div id="roles" style={styles.roles}>
-                    {
-                        this.state.roles.map(role => {
-                            return (
-                                <div className="height-wrapper"  style={styles.role}>
-                                    <div className="role-wrapper" style={{ backgroundColor: 'white', boxShadow: '#aaa 2px 2px 15px' }}>
-                                        <Role role={role} />
-                                    </div>
-                                </div>
-                            )
-                        })
-                    }
+                <div id="roles">
+                    <BigList endpoint="/role/bunch" listitem={Role}  />
                 </div>
             </div>
         )

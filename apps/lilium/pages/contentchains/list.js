@@ -11,38 +11,31 @@ class ContentChainListItem extends Component {
 
     render() {
         return (
-            <div className="content-chain">
-                {
-                    (this.props.item.media) ? (
-                        <img className='featured-image' src={this.props.item.media.sizes.square.url} alt=""/>
-                    ) : (
-                        <div className="content-chain-no-image">
-                            <p>No Image</p>
-                        </div>
-                    )
-                }
-                <div className="content-chain-info">
+            <div class="card flex">
+                <div class="image-wrapper">
                     <Link href={`/chains/edit/${this.props.item._id}`}>
-                        <h1 className='chain-title font2'>{this.props.item.title}</h1>
+                    {
+                        (this.props.item.media) ? (
+                            <img src={this.props.item.media.sizes.square.url} alt=""/>
+                        ) : (
+                            <div className="no-image">
+                                No Image
+                            </div>
+                        )
+                    }
                     </Link>
-                    <h2 className='chain-subtitle font2'>{this.props.item.subtitle}</h2>
-                    <h3>{`${this.props.item.articles.length} articles`}</h3>
-                    <div className="content-chain-list-articles-list">
-                        {
-                            this.props.item.articles.map((article, index) => {
-                                return (
-                                    <div className="content-chain-list-article">
-                                        <h4 className='content-chain-list-article-title'>{`${index + 1} - ${article.title}`}</h4>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
                 </div>
-                <div className="content-chain-extra-info">
-                    <p className="content-chain-info">{`Status: ${this.props.item.status}`}</p>
-                    <p className="content-chain-info">{`Created on: ${dateformat(this.props.item.createdOn, 'mmmm dd, yyyy - HH:MM:ss')}}`}</p>
-                    <p className="content-chain-info">{`Created on: ${dateformat(this.props.item.lastModifiedOn, 'mmmm dd, yyyy - HH:MM:ss')}}`}</p>
+                <div class="detail-head">
+                    <Link display="block" href={`/chains/edit/${this.props.item._id}`}>
+                        <div class="big-title">{this.props.item.title}</div>
+                    </Link>
+                    <h2 className='subtitle'>{this.props.item.subtitle}</h2>
+                </div>
+                <div className="detail-list">
+                    <div>Articles : {this.props.item.articles.length}</div>
+                    <div>Status : <b>{this.props.item.status}</b></div>
+                    <div>Created On : <b>{dateformat(this.props.item.createdOn, 'mmmm dd, yyyy - HH:MM:ss')}</b></div>
+                    <div>Last Modified On : <b>{dateformat(this.props.item.lastModifiedOn, 'mmmm dd, yyyy - HH:MM:ss')}</b></div>
                 </div>
             </div>
         );
@@ -73,7 +66,6 @@ export class ListContentChains extends Component {
     render() {
         return (
             <div id="content-chains-list">
-                <h1>Content Chains</h1>
                 <BigList listitem={ContentChainListItem} endpoint='/chains/search' toolbar={ListContentChains.TOOLBAR_CONFIG} />
             </div>
         );

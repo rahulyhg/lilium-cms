@@ -43,32 +43,34 @@ class CommentEntry extends Component {
     
     render() {
         return (
-            <div class="comments-man-listitem" style={{ opacity : this.state.deleting ? 0.5 : 1 }}>
-                <div class="comments-man-post-details">
-                    {
-                        !this.props.item.active ? (
-                            <span><b>Deleted</b> | </span>
-                        ) : null
-                    }
-                    <span>{dateformat(this.props.item.date, 'mmmm dd, yyyy - HH:MM:ss')}</span>
-                    <span> | </span>
-                    <span>{this.props.item.replies} replies</span>
-                    <span> | </span>
-                    <span>{this.props.item.commenter.displayname}</span>
-                </div>
-                <div class="comments-man-post-headline"><Link href={"/publishing/write/" + this.props.item.articleid}>{this.props.item.headline}</Link></div>
+            <div class="card" style={{ opacity : this.state.deleting ? 0.5 : 1 }}>
+                <div class="detail-head">
+                    <div>
+                        {
+                            !this.props.item.active ? (
+                                <span><b>Deleted</b> | </span>
+                            ) : null
+                        }
+                        <span>{dateformat(this.props.item.date, 'mmmm dd, yyyy - HH:MM:ss')}</span>
+                        <span> | </span>
+                        <span>{this.props.item.replies} replies</span>
+                        <span> | </span>
+                        <span>{this.props.item.commenter.displayname}</span>
+                    </div>
+                    <div class="small"><Link href={"/publishing/write/" + this.props.item.articleid}>{this.props.item.headline}</Link></div>
+                </div>                
 
                 <p>{this.props.item.active ? this.props.item.text : this.props.item.deletedText}</p>
 
-                <div class="comments-man-actions">
+                <footer>
                     <Link href={"/comments/thread/" + this.props.item._id}>
                         View Thread
                     </Link>
                     <span class="clickable" onClick={this.banUser.bind(this)}>Ban User</span>
                     {                  
-                        this.props.item.active && (<span class="delete-color clickable"><b onClick={this.deleteComment.bind(this)}>Delete comment</b></span>)
+                        this.props.item.active && (<span class="red clickable"><b onClick={this.deleteComment.bind(this)}>Delete comment</b></span>)
                     }
-                </div>
+                </footer>
             </div>
         )
     }
@@ -136,7 +138,11 @@ export default class CommentsManager extends Component {
     render() {
         return (
             <div class="comments-manager">
-                <BigList ref={bl => (this.biglist = bl)} toolbar={CommentsManager.TOOLBAR_CONFIG} action={this.gotMessageFromItem.bind(this)} endpoint="/comments/latest" listitem={CommentEntry} loadmoreButton={CommentLoadMore} />
+                <BigList ref={bl => (this.biglist = bl)} toolbar={CommentsManager.TOOLBAR_CONFIG} action={this.gotMessageFromItem.bind(this)} endpoint="/comments/latest" listitem={CommentEntry} loadmoreButton={CommentLoadMore} liststyle={{
+                    maxWidth: 780,
+                    margin: "10px auto",
+                    padding: 0
+                }} />
             </div>
         )
     }

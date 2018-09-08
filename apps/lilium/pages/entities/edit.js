@@ -13,9 +13,10 @@ export default class Entity extends Component {
     }
 
     componentDidMount() {
-        API.getMany(
-            [{ endpoint:'/entities/single/' + this.props.entityId }, { endpoint: '/sites/all/simple' }, { endpoint: '/role' }],
-            (err, data) => {
+        API.getMany([
+            { endpoint:'/entities/single/' + this.props.entityId }, 
+            { endpoint: '/sites/all/simple' }, { endpoint: '/role' }
+        ], (err, data) => {
                 if (Object.values(err).filter(x => x).length == 0) {
                     this.setState({
                         loading: false,
@@ -123,8 +124,8 @@ export default class Entity extends Component {
                 this.setState({ user });
                 castNotification({
                     type: 'success',
-                    title: 'Forced password reset on next login for user' + this.state.entity.username,
-                    message: 'Forced password reset on next login for user' + this.state.entity.username
+                    title: 'Forced password reset on next login for user ' + this.state.entity.username,
+                    message: 'Forced password reset on next login for user ' + this.state.entity.username
                 });
             } else {
                 castNotification({
@@ -162,35 +163,37 @@ export default class Entity extends Component {
                 <div id="entities"> 
                     <h1>Edit</h1>
                     <div id="info" style={{ width: '75vw', margin: '0 auto', display: 'flex' }}>
-                        <div id="profile-card" style={{ flexGrow: '300px 0 0' }}>
-                            <img src={this.state.entity.avatarURL} alt={`${this.state.entity.displayname}'s profile picture`} className="profile-picture" style={{ display: 'block' }} />
-                            <div className="actions light" style={{ backgroundColor: '#674a82' }}>
-                                <div className={"action " + ((this.state.entity.mustupdatepassword) ? 'success' : '')} title="Force password reset on next login" onClick={this.forcePasswordReset.bind(this)}>
-                                    <i className="fal fa-sync"></i>
-                                </div>
+                        <div class="card flex" style={{ alignSelf: "flex-start" }}>
+                            <div class="image-wrapper">
+                                <img src={this.state.entity.avatarURL} alt={`${this.state.entity.displayname}'s profile picture`} className="profile-picture" style={{ display: 'block' }} />
+                            </div>
+                            <footer>
+                                <span className={"clickable " + ((this.state.entity.mustupdatepassword) ? 'success' : '')} title="Force password reset on next login" onClick={this.forcePasswordReset.bind(this)}>
+                                    Force password reset
+                                </span>
                                 {
                                     (this.state.entity.enforce2fa) ? (
-                                        <div className="action danger" title="DIsable 2FA" onClick={this.deactivate2FA.bind(this)}>
-                                            <span>2FA</span>
-                                        </div>
+                                        <span className="clickable red" title="Disable 2FA" onClick={this.deactivate2FA.bind(this)}>
+                                            2FA
+                                        </span>
                                     ) : (
-                                        <div className="action success" title="Enforce 2FA" onClick={this.enforce2FA.bind(this)}>
-                                            <span>2FA</span>
-                                        </div>
+                                        <span className="clickable" title="Enforce 2FA" onClick={this.enforce2FA.bind(this)}>
+                                            2FA
+                                        </span>
                                     )
                                 }
                                 {
                                     (this.state.entity.revoked) ? (
-                                        <div className={"action success"} title="Reinstate User" onClick={this.enableAccess.bind(this)}>
+                                        <span className={"clickable success"} title="Reinstate User" onClick={this.enableAccess.bind(this)}>
                                             <i className="fal fa-lock"></i>
-                                        </div>
+                                        </span>
                                     ) : (
-                                        <div className={"action danger"} title="Revoke User" onClick={this.revokeAccess.bind(this)}>
+                                        <span className={"clickable red"} title="Revoke User" onClick={this.revokeAccess.bind(this)}>
                                             <i className="fal fa-lock"></i>
-                                        </div>
+                                        </span>
                                     )
                                 }
-                            </div>
+                            </footer>
                         </div>
                         <div id="EditFields" style={{ flexGrow: '1', margin: '0px 40px' }}>
                             <TextField name='displayname' initialValue={this.state.entity.displayname} placeholder='Display Name' onChange={this.updateEntity.bind(this)} />

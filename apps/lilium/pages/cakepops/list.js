@@ -9,8 +9,14 @@ const STATUS_TO_TEXT = {
     creation : "Draft",
     default : "Unknown status"
 }
+
+const STATUS_TO_COLOR = {
+    expired : "",
+    live : "purple",
+    creation : "blue"
+}
 const CakepopSingleStatus = props => (
-    <span class={"cakepop-status cakepop-status-" + props.status}>
+    <span class={"bubble " + STATUS_TO_COLOR[props.status]}>
         {STATUS_TO_TEXT[props.status] || STATUS_TO_TEXT.default}
     </span>
 );
@@ -18,14 +24,18 @@ const CakepopSingleStatus = props => (
 class CakepopSingle extends Component {
     render(){
         return (
-            <div class="cakepop-list-item">
+            <div class="card">
                 <Link linkStyle="block" href={"/cakepop/edit/" + this.props.item._id}>
-                    <div class="cakepop-list-item-container">
-                        <b>
-                            <span>{this.props.item.title}</span>
-                            <CakepopSingleStatus expiry={this.props.item.expiry} status={this.props.item.status} />
-                        </b>
+                    <div class="detail-head">
+                        <div class="bubble-wrap">
+                            <b class="big">
+                                <span>{this.props.item.title}</span>
+                            </b>
 
+                            <CakepopSingleStatus expiry={this.props.item.expiry} status={this.props.item.status} />
+                        </div>
+                    </div>
+                    <div class="detail-list">
                         <div>Running until {dateformat(this.props.item.expiry, 'mmmm, dd yyyy - HH:MM')}</div>
                         <div>Open {this.props.item.read} times</div>
                     </div>
