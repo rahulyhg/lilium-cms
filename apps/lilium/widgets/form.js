@@ -350,8 +350,9 @@ export class CheckboxField extends FormField {
     render() {
         return (
             <div className="checkbox-field-wrapper">
-                <b className="checkbox-text placeholder">{this.props.placeholder}</b>
-                <div className={"checkbox-wrapper " + (this.state.checked ? "checked" : "")} onClick={this.onChange.bind(this)} >
+                <b className="checkbox-text placeholder" onClick={this.onChange.bind(this)}>{this.props.placeholder}</b>
+                <hr  />
+                <div className={"checkbox-wrapper " + (this.state.checked ? "checked" : "")} onClick={this.onChange.bind(this)}>
                     <span className="checkmark">{(this.state.checked) ? (<i className="fa fa-check"></i>) : null}</span>
                 </div>
             </div>

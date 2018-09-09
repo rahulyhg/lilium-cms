@@ -319,13 +319,18 @@ export default class EditView extends Component {
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} style={{ fontFamily : '"Oswald", sans-serif', background : "transparent", fontSize : 32, border : "none", borderBottom : "1px solid #DDD", padding : "3px 0px", textAlign : 'center' }} />
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" style={{ background : "transparent", border : "none", padding : "5px 0px", marginBottom : 10, textAlign : 'center' }} />
                     
-                    <div style={{ maxWidth: 800, margin: "auto" }}>
+                    <div style={{ margin: "auto" }}>
                         <TextEditor onChange={this.fieldChanged.bind(this)} format={x => [x]} name="content" content={this.state.post.content[0]} />
                     </div>
 
-                    <div style={{ maxWidth: 800, margin: "auto" }}>
+                    <div class="card publishing-card">
                         <MultitagBox onChange={this.fieldChanged.bind(this)} name='tags' placeholder='Tags' initialValue={this.state.post.tags} />
                         <CheckboxField onChange={this.fieldChanged.bind(this)} name='sticky' placeholder='Make this article sticky' initialValue={this.state.post.sticky} />
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='nsfw' placeholder='Not safe for work (NSFW)' initialValue={this.state.post.nsfw} />
+                    </div>
+
+                    <div class="card publishing-card">
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='isSponsored' placeholder='This is a sponsored post' initialValue={this.state.post.isSponsored} />
                     </div>
                 </div>
 
