@@ -54,6 +54,9 @@ class FormField extends Component {
 const buttonThemes = {
     'success': { backgroundColor: "green",   borderColor : "#0c3c0c" },
     'danger':  { backgroundColor: "#fb3e3b", borderColor : "rgb(187, 65, 65)" },
+
+    'blue':    { backgroundColor: "rgb(59, 134, 251)", borderColor: "rgb(65, 99, 187)" },
+    'red':     { backgroundColor: "#fb3e3b", borderColor : "rgb(187, 65, 65)" },
     'white':   { backgroundColor: "white",   borderColor : "#DDD", color : "#333" },
 };
 

@@ -1,6 +1,8 @@
 module.exports = cli => `<!DOCTYPE html>
 <html>
     <head>
+        <meta charset="UTF-8">
+
         <title>Lilium | ${cli._c.website.sitetitle}</title>
         <link rel="icon" type="image/png" href="${cli._c.server.protocol}${cli._c.server.url}/static/media/favicon.png">
         <link href="https://fonts.googleapis.com/css?family=Nunito+Sans|Oswald|Yanone+Kaffeesatz:700|Lora" rel="stylesheet">
