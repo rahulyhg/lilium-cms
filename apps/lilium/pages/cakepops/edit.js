@@ -38,13 +38,6 @@ export default class CakepopEditPage extends Component {
         });
     }
 
-    changed(field, value) {
-        this.coldState[field] = value;
-        API.post('/cakepop/updateOneField/' + this.props.id, { field, value }, () => {
-            log('Cakepop', 'Updated one field : ' + field, 'success');
-        });
-    }
-
     render() {
         if (this.state.error) {
             return (
