@@ -13,12 +13,26 @@ class MailTemplateListItem extends Component {
 
     render() {
         return (
-            <div className="mail-template card">
-                <Link href={'/mailtemplates/edit/' + this.props.item._id}>
-                    <h3 className="mail-template-title">{this.props.item.displayname}</h3>
-                </Link>
-
-                <p className="mail-template-description">{this.props.item.description}</p>
+            <div class="card">
+                <div class="detail-head">
+                    <div class="bubble-wrap">
+                        <h2 className="big-title">{this.props.item.displayname}</h2>
+                        {
+                            this.props.item.hooks ? (
+                                <h2 className="bubble purple">{this.props.item.hooks}</h2>
+                            ) : null
+                        }
+                        
+                    </div>
+                </div>
+                <div class="detail-list">
+                    <p>{this.props.item.description}</p>
+                </div>
+                <footer>
+                    <Link href={'/mailtemplates/edit/' + this.props.item._id}>
+                        <span className="mail-template-title">Edit</span>
+                    </Link>
+                </footer>
             </div>
         );
     }
@@ -48,9 +62,9 @@ export class ListMailTemplates extends Component {
     }
 
     componentDidMount() {
-        const toolbarConfig = ListMailTemplates.TOOLBAR_CONFIG;
         API.get('/mailtemplates/hooks', {}, (err, data, r) => {
             if (!err) {
+                const toolbarConfig = ListMailTemplates.TOOLBAR_CONFIG;
                 toolbarConfig.fields[1].options.push(data.map(hook => ({ value: hook.name, text: hook.displayname })));
                 this.toolbarConfig = toolbarConfig;
                 this.setState({ loading: false })

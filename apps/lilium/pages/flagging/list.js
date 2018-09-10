@@ -52,12 +52,14 @@ const LIST_INNER_STYLE = {
 };
 
 const FlagItemType = props => (
-    <div class="flag-type">
-        <div class="flag-type-bubble" style={{ backgroundColor : (FLAGGEE_TYPE_TO_VOCAB[props.flaggeetype] || FLAGGEE_TYPE_TO_VOCAB.other).color }}>
-            { (FLAGGEE_TYPE_TO_VOCAB[props.flaggeetype] || FLAGGEE_TYPE_TO_VOCAB.other).vocab } 
-        </div>
-        <div class="flag-type-text" style={{ color : (FLAGGEE_TYPE_TO_VOCAB[props.flaggeetype] || FLAGGEE_TYPE_TO_VOCAB.other).color }}>
-            { TYPES_TO_VOCAB[props.type] || TYPES_TO_VOCAB.other }
+    <div class="detail-head">
+        <div class="bubble-wrap">
+            <div class="bubble" style={{ backgroundColor : (FLAGGEE_TYPE_TO_VOCAB[props.flaggeetype] || FLAGGEE_TYPE_TO_VOCAB.other).color }}>
+                { (FLAGGEE_TYPE_TO_VOCAB[props.flaggeetype] || FLAGGEE_TYPE_TO_VOCAB.other).vocab } 
+            </div>
+            <div class="flag-type-text" style={{ color : (FLAGGEE_TYPE_TO_VOCAB[props.flaggeetype] || FLAGGEE_TYPE_TO_VOCAB.other).color }}>
+                { TYPES_TO_VOCAB[props.type] || TYPES_TO_VOCAB.other }
+            </div>
         </div>
     </div>
 );
@@ -123,22 +125,22 @@ class FlagListItem extends Component {
 
     render() {
         return (
-            <div class={"flag-list-item " + (this.state.item.status == "open" ? "open" : "closed")}>
+            <div class={"card " + (this.state.item.status == "open" ? "" : "inactive")}>
                 <div style={{ opacity : this.state.item.status == "open" ? 1 : 0.5 }}>
                     <div>
                         <FlagItemType flaggeetype={this.state.item.flaggeetype} type={this.state.item.type} />
                     </div>
-                    <div class="flag-list-poster">
-                        <img src={this.state.item.poster.picture} />
-                        <span>{this.state.item.poster.displayname}</span>
-                        <span>{dateformat(this.state.item.at, "HH:MM, dd mmmm yyyy")}</span>
+                    <div class="row">
+                        <img class="avatar" src={this.state.item.poster.picture} />
+                        <span class="avatar-name">{this.state.item.poster.displayname}</span>
+                        <span class="avatar-name">{dateformat(this.state.item.at, "HH:MM, dd mmmm yyyy")}</span>
                     </div>
-                    <div class="flag-list-message">
+                    <p>
                         {this.state.item.message}
-                    </div>
+                    </p>
                     {
                         this.state.item.article ? (
-                            <div class="flag-list-details">
+                            <div class="detail-list">
                                 <div>Article : <a target="_blank" href={this.state.item.from}>{this.state.item.article.title}</a></div>
                                 <div>Currently Live : <b>{this.state.item.article.status == "published" ? "Yes" : "No"}</b></div>
                                 <div>Published On : <b>{dateformat(new Date(this.state.item.article.date), "dd mmmm yy, HH:MM")}</b></div>
@@ -149,11 +151,11 @@ class FlagListItem extends Component {
                     }
                     {
                         this.state.item.status == "open" ? (
-                            <div class="flag-list-actions">
-                                <div class="flag-list-single-action"  onClick={this.closeItem.bind(this)}>Close flag</div>
-                                { this.state.item.article && this.state.item.article.status == "published" ? (<div class="flag-list-single-action red" onClick={this.unpublish.bind(this)}>Unpublish article</div> ) : null }
-                                <div class="flag-list-single-action red" onClick={this.banUser.bind(this)}>Ban user</div>
-                            </div>
+                            <footer>
+                                <span onClick={this.closeItem.bind(this)}>Close flag</span>
+                                { this.state.item.article && this.state.item.article.status == "published" ? (<span class="red" onClick={this.unpublish.bind(this)}>Unpublish article</span> ) : null }
+                                <span class="red" onClick={this.banUser.bind(this)}>Ban user</span>
+                            </footer>
                         ) : null
                     }
                 </div>

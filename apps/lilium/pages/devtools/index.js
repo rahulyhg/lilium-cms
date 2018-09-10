@@ -5,6 +5,7 @@ import DevToolAPI from './api';
 import DevToolNotifications from './notifications';
 import VirtualSession from './virtsesh';
 import DevToolComments from './comments';
+import DevToolDesign from './design';
 
 const styles = {
     page : {
@@ -40,7 +41,8 @@ const DEVTOOLS = {
     api : DevToolAPI,
     notifications : DevToolNotifications,
     virtsesh : VirtualSession,
-    comments : DevToolComments
+    comments : DevToolComments,
+    design : DevToolDesign
 }
 
 class DevToolLink extends Component {
@@ -84,6 +86,7 @@ export default class DevTools extends Component {
                         <DevToolLink name="notifications" displayname="Notifications" icon="far fa-inbox" />
                         <DevToolLink name="virtsesh" displayname="Virtual Session" icon="far fa-sign-in" />
                         <DevToolLink name="comments" displayname="Comments" icon="far fa-comments" />
+                        <DevToolLink name="design" displayname="Design" icon="far fa-brush" />
                     </div>
                 </div>
             )

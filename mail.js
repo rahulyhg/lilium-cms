@@ -55,8 +55,8 @@ class EMail {
 };
 
 class MailTemplate {
-    constructor() {
-        this.displayname = "New Email template";
+    constructor(initialName) {
+        this.displayname = initialName || "New Email template";
         this.subject = "";
         this.hooks = "";
         this.description = "";
@@ -78,54 +78,6 @@ class MailController {
         require('./config.js').eachSync((conf) => {
             db.createCollection(conf, 'mailtemplates');
         });
-
-        this.createForm();
-    }
-
-    createForm() {
-        require('./formBuilder.js').createForm('mailtemplate_edit', {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                'id': 'article_new',
-                'inner': true
-            },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add('displayname', 'text', {
-            displayname : "Template name"
-        })
-        .add('subject', 'text', {
-            displayname : "Subject"
-        })
-        .add('template', 'ckeditor', {
-            nolabel : true
-        })
-        .add('description', 'text', {
-            displayname : "Short description"
-        })
-        .add('stylesheet', 'textarea', {
-            displayname : "Stylesheet",
-            rows : 10
-        })
-        .add('hooks', 'liveselect', {
-            endpoint: 'mailtemplates.hooks',
-            select : {
-                value : 'name',
-                displayname : 'displayname'
-            },
-            empty : {
-                displayname : "No automation"
-            },
-            displayname: "Automatically send when"
-        })
-        .add('publish-set', 'buttonset', { buttons : [{
-                'name' : 'save',
-                'displayname': 'Save',
-                'type' : 'button',
-                'classes': ['btn-save']
-            }
-        ]});
     }
 
     livevar(cli, levels, params, sendback) {
@@ -190,7 +142,11 @@ class MailController {
                     cli.sendJSON({success : !err, error : err});
                 });
                 break;
-
+            case 'new':
+                db.insert(cli._c, 'mailtemplates', new MailTemplate(cli.postdata.data.displayname), (err, r) => {
+                    cli.sendJSON({ success: !err, err });
+                });
+                break;
             default:
                 cli.throwHTTP(404);
         }
