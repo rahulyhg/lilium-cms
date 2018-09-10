@@ -189,7 +189,7 @@
         }, {
             "module" : "mail.js",
             "endpoint" : "mailtemplates",
-            "support" : ["setup", "admin_post", "admin_get", "livevar"],
+            "support" : ["setup", "admin_post", "livevar", "admin_delete"],
             "hooks" : [
                 {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
             ],
@@ -234,7 +234,7 @@
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
-            "support" : [ "admin_post", "livevar", "setup", "api_get"]
+            "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
         }, {
             "module" : "docs.js",
             "endpoint" : "docs",
