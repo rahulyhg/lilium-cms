@@ -4,6 +4,7 @@ import { TextField, ButtonWorker, CheckboxField, MultiSelectBox, SelectField, St
 import { TextEditor } from '../../widgets/texteditor'
 import { castNotification } from '../../layout/notifications';
 import dateformat from 'dateformat';
+import { Tab, TabView } from '../../widgets/tabview';
 
 const styles = {
     page : {
@@ -113,6 +114,19 @@ export default class CommentDevTool extends Component {
                         }    
                     </div>
 
+                    <h2 style={{ marginTop : 30 }}>Tabs</h2>
+                    <TabView selectedIndex={1}>
+                        <Tab title='Tab 1'>
+                            <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English. Many desktop publishing packages and web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes by accident, sometimes on purpose (injected humour and the like).</p>
+                        </Tab>
+                        <Tab title='Tab 2'>
+                            <h3>Some form</h3>
+                            <TextField placeholder="Some important value needed" onChange={(name, value) => castNotification({ title : "Text field changed with new value", message : value })} />
+                        <CheckboxField placeholder="Would you like this?" onChange={(name, value) => castNotification({ title : "Checkbox changed", type : value ? "success" : "warning", message : value ? "Checked" : "Unchecked" })} />
+                        <MultiSelectBox options={MULTISELECTBOX_OPTIONS} placeholder='Select a few things' onChange={(name, value) => {}} />
+                        </Tab>
+                    </TabView>
+
                     <h2 style={{ marginTop : 30 }}>Fields</h2>
                     <div>
                         <TextField placeholder="Some important value needed" onChange={(name, value) => castNotification({ title : "Text field changed with new value", message : value })} />
@@ -124,7 +138,7 @@ export default class CommentDevTool extends Component {
                     </div>
 
                     <h2 style={{ marginTop : 30 }}>Text Editor</h2>
-                    <TextEditor />
+                    <TextEditor content='Content' />
 
                     <h2 style={{ marginTop : 30 }}>Button Workers</h2>
                     <div class="card">
