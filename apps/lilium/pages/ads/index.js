@@ -25,18 +25,13 @@ export default class AdsManagement extends Component {
     }
     
     updateAdSet(id, ads) {
-        console.log('updateAdSet id: ', id);
-        console.log('updateAdSet ads: ', ads);
-        
         const adSetIndex = this.state.adSets.findIndex(adSet => {
             return adSet._id == id;
         });
 
         if (adSetIndex >= 0) {
             const adSets = this.state.adSets;
-            console.log(this.state.adSets);
             adSets[adSetIndex].ads = ads.map(adMarkup => { return { markup: adMarkup } });
-            console.log(adSets);
             
             this.setState({ adSets });
             

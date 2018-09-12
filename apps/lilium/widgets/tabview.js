@@ -20,7 +20,6 @@ export class TabView extends Component {
     constructor(props) {
         super(props);
 
-        console.log(this.props);
         props.children.forEach(child => {
             if (child.nodeName.prototype.constructor != Tab) {
                 throw new TypeError('All direct children of Tab must be of type Tab');

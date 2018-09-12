@@ -133,7 +133,7 @@ export default class CommentDevTool extends Component {
                         <CheckboxField placeholder="Would you like this?" onChange={(name, value) => castNotification({ title : "Checkbox changed", type : value ? "success" : "warning", message : value ? "Checked" : "Unchecked" })} />
                         <MultiSelectBox options={MULTISELECTBOX_OPTIONS} placeholder='Select a few things' onChange={(name, value) => {}} />
                         <SelectField options={SELECTBOX_OPTIONS} placeholder="Select one thing" onChange={(name, value) => castNotification({ title : "New value selected", message : value })} />
-                        <StackBox placeholder="Create multiple things" onChange={(name, value) => {console.log('design: ', name, value); castNotification({ title : "Stack box values count : " + value.length })}} />
+                        <StackBox placeholder="Create multiple things" onChange={(name, value) => castNotification({ title : "Stack box values count : " + value.length })} />
                         <DatePicker placeholder="Select your birthday" onChange={(name, value) => castNotification({ title : "Your birthday", message : dateformat(new Date(value), 'mmmm dd') })} />
                     </div>
 
