@@ -165,6 +165,7 @@ export class TextField extends FormField {
 export class StackBox extends FormField {
     constructor(props) {
         super(props);
+
         this.state = {
             values : Array.from(this.value || [])
         };
