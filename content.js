@@ -48,6 +48,7 @@ class ContentLib {
                 content : ["<p><br></p>"],
                 author : author, 
                 createdBy : author, 
+                previewkey : Math.random().toString(32).substring(2),
                 subscribers : [author],
                 type : "post",
                 status : "draft",
@@ -751,12 +752,13 @@ class ContentLib {
     }
 
 
-    getPreview(_c, postid, payload, sendback) {
-        this.parseSpecialValues(payload);
+    getPreview(_c, postid, previewkey, sendback) {
+        // this.parseSpecialValues(payload);
 
-        db.findUnique(_c, 'content', { _id : postid }, (err, post) => {
-            const previewpost = {};
-            Object.assign(previewpost, post, payload);
+        db.findUnique(_c, 'content', { _id : postid, previewkey }, (err, previewpost) => {
+            if (!previewpost) {
+                return sendback(404);
+            }
 
             db.findUnique(_c, 'topics', { _id : previewpost.topic }, (err, fulltopic) => {
                 db.findUnique(_c, 'uploads', { _id : previewpost.media }, (err, deepmedia) => {
@@ -787,13 +789,10 @@ class ContentLib {
                             article : previewpost
                         };
 
-                        const abspath  = _c.server.html + "/static/tmp/preview" + 
-                            Math.random().toString().slice(2) + 
-                            Math.random().toString().slice(2) + 
-                            ".tmp";
+                        const abspath  = _c.server.html + "/static/tmp/preview" + Math.random().toString().slice(2) + Math.random().toString().slice(2) + ".tmp";
 
                         hooks.fireSite(_c, 'contentWillPreview', {article : previewpost, extra});
-                        filelogic.renderThemeLML3(_c, ctx, abspath, extra, markup => sendback(markup));
+                        filelogic.renderThemeLML3(_c, ctx, abspath, extra, markup => sendback(undefined, markup));
                     });
                 });
             });
