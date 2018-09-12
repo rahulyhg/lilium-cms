@@ -1,6 +1,7 @@
 import { h, Component } from "preact";
 import API from '../data/api';
 import flatpickr from 'flatpickr';
+import slugify from "slugify";
 
 class FormField extends Component {
     constructor(props) {
@@ -165,6 +166,7 @@ export class TextField extends FormField {
 export class StackBox extends FormField {
     constructor(props) {
         super(props);
+
         this.state = {
             values : Array.from(this.value || [])
         };
@@ -200,15 +202,35 @@ export class StackBox extends FormField {
         }
     }
 
+    /**
+     * Moves an item 'up' in the list, decreasing its index
+     * @param {number} startIndex 
+     */
+    moveItemUp(startIndex) {
+        const values = this.state.values;
+        if (startIndex > 0 && startIndex <= this.state.values.length - 1) {
+            values.splice(startIndex - 1, 0, values.splice(startIndex, 1)[0]);
+            this.setState({ values });
+            this.onChange();
+        }
+    }
+
+    /**
+     * Moves an item 'down' in the list, increasing its index
+     * @param {number} startIndex 
+     */
+    moveItemDown(startIndex) {
+        const values = this.state.values;
+        if (startIndex >= 0 && startIndex <= this.state.values.length - 2) {
+            values.splice(startIndex + 1, 0, values.splice(startIndex, 1)[0]);
+            this.setState({ values });
+            this.onChange();
+        }
+    }
+
     removeOne(index) {
         let values = [...this.state.values];
-        if (index == 0) {
-            values.shift();
-        } else if (index == values.length - 1) {
-            values.pop();
-        } else {
-            values = [...values.splice(0, index), ...values.splice(1)];
-        }
+        values.splice(index, 1);
 
         this.setState({ values }, () => {
             this.onChange();
@@ -221,7 +243,11 @@ export class StackBox extends FormField {
                 <b class="placeholder">{this.props.placeholder || ""}</b>
                 <div class="stack-box-list">
                     {
-                        this.state.values.map((value, i) => (<StackBox.StackField onDelete={this.removeOne.bind(this, i)} onChange={this.textEdited.bind(this)} index={i} initialValue={value} />))
+                        this.state.values.map((value, index) => (
+                            <StackBox.StackField onDelete={this.removeOne.bind(this, index)} onChange={this.textEdited.bind(this)} key={slugify(value)}
+                                                index={index} lastInList={index == this.state.values.length - 1} initialValue={value}
+                                                moveItemDown={this.moveItemDown.bind(this)} moveItemUp={this.moveItemUp.bind(this)} />
+                        ))
                     }
                 </div>
                 <div>
@@ -245,10 +271,26 @@ StackBox.StackField = class StackField extends Component {
         this.props.onDelete(this.props.index);
     }
 
+    moveUp() {
+        this.props.moveItemUp(this.props.index);
+    }
+
+    moveDown() {
+        this.props.moveItemDown(this.props.index);
+    }
+
     render() {
         return (
             <div style={{ display : "flex" }}>
                 <div onClick={this.selfdestruct.bind(this)} class="stackboxex"><i class="far fa-times"></i></div>
+                {
+                    (this.props.index != 0) ? (
+                        <div onClick={this.moveUp.bind(this)} class="stackboxex"><i className="fal fa-chevron-up"></i></div>) : ( null )
+                }
+                {
+                    (!this.props.lastInList) ? (
+                        <div onClick={this.moveDown.bind(this)} class="stackboxex"><i className="fal fa-chevron-down"></i></div>) : ( null )
+                }
                 <TextField onChange={this.onChange.bind(this)} wrapstyle={{ marginBottom: 0, flexGrow : 1 }} style={{borderBottom : 'none'}} initialValue={this.props.initialValue} />
             </div>
         )
