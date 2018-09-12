@@ -1,6 +1,8 @@
 import { h, Component } from "preact";
 import API from '../data/api';
 import flatpickr from 'flatpickr';
+import { Spinner } from '../layout/loading'
+import { ImagePicker } from '../layout/imagepicker';
 
 class FormField extends Component {
     constructor(props) {
@@ -291,6 +293,198 @@ export class EditableText extends FormField {
                 }
             </div>
         )
+    }
+}
+
+export class MediaPickerField extends FormField {
+    constructor(props) {
+        super(props);
+        this.state.mediaID = props.mediaID || props.initialValue;
+        this.state.mediaURL = props.mediaURL;
+        this.state.size = props.size || "full";
+    }
+
+    extractImageFromResponse(image) {
+        switch (this.state.size) {
+            case "small": return image.sizes.square.url;
+            default: return image.sizes.facebook.url;
+        }
+    }
+
+    componentDidMount() {
+        if (this.state.mediaID && !this.state.mediaURL) {
+            API.get("/uploads/single/" + this.state.mediaID, {}, (err, upload) => {
+                upload && this.setState({ mediaURL : this.extractImageFromResponse(upload) })
+            });
+        }
+    }
+
+    open() {
+        ImagePicker.cast({
+            selected : this.state.mediaID || undefined
+        }, image => {
+            if (image) {
+                this.changed({
+                    target : {
+                        name : this.props.name, 
+                        value : image,
+                        
+                        oldValue : this.state.mediaURL
+                    }
+                });
+
+                this.setState({ mediaURL : this.extractImageFromResponse(image), mediaID : image._id });
+            }
+        });
+    }
+
+    render() {
+        return (
+            <div class="image-field-wrap">
+                {
+                    <b>{this.props.placeholder || "Select an image"}</b>
+                }
+                {
+                    this.state.mediaURL ? (
+                        <div class={"media-picker-field-image-wrap " + this.state.size} onClick={this.open.bind(this)} style={this.props.style || {}}>
+                            <img src={this.state.mediaURL} style={this.props.imagestyle || {}} />
+                        </div>
+                    ) : (
+                        <div class={"media-picker-field-image-wrap " + this.state.size} onClick={this.open.bind(this)} style={this.props.style || {}}>
+                            <b>{this.props.textoverlay || "Click here to pick an image"}</b>
+                        </div>
+                    )
+                }
+            </div>
+        )
+    }
+}
+
+export class TopicPicker extends FormField {
+    static TopicSlide = class {
+        constructor(props) {
+            this.state = {
+                topics: props.topics
+            }
+        }
+
+        selectOne(topic) {
+            this.props.onSelect(topic, this.props.index);
+        }
+
+        render() {
+            return (
+                <div class="topic-children-slide">
+                    { this.state.topics.map(topic => (
+                        <div onClick={this.selectOne.bind(this, topic)}>
+                            {topic.displayname}
+                        </div>
+                    )) }
+                </div>
+            )
+        }
+    }
+
+    constructor(props) {
+        super(props);
+        this.state.loading = true;
+        this.topics = [];
+        this.state.phase = "loading"
+    }
+
+    refreshCategories() {
+        API.get('/topics/category', {}, (err, categories) => {
+            this.setState({
+                phase : "category", 
+                categories
+            })
+        });
+    }
+
+    lockTopicFromID(id) {
+        API.get('/topics/simple/' + this.props.initialValue, {}, (err, topic) => {
+            this.setState({
+                phase : "lock",
+                selectedTopic : topic
+            });
+        });
+    }
+
+    loadCategoryChildren(category) {
+        API.get('/topics/ofcategory/' + category, {}, (err, topics) => {
+            this.setState({
+                phase : "tree",
+                topics : [topics]
+            });
+        });        
+    }
+
+    loadChildrenTopicsFrom(topic, index) {
+        API.get('/topics/childof/' + topic._id, {}, (err, children) => {
+            const newArray = [...this.state.topics.splice(0, index + 1), children];
+            this.setState({
+                phase : "tree",
+                topics : newArray
+            })
+        });        
+    }
+
+    componentDidMount() {
+        if (this.props.initialValue) {
+            this.lockTopicFromID(this.props.initialValue);
+        } else {
+            this.refreshCategories();
+        }
+    }
+
+    reset() {
+        this.setState({
+            loading: true,
+            phase : "loading", 
+            topics : [],
+            selectedTopic : undefined
+        }, () => {
+            this.refreshCategories();
+        })
+    }
+
+    render() {
+        switch (this.state.phase) {
+            case "loading": return (
+                <div class="card phase-loading">
+                    <Spinner />
+                </div>
+            )
+
+            case "category": return (
+                <div class="card phase-category">
+                    <b>Choose a category</b>
+                    {
+                        this.state.categories.map(category => (
+                            <div onClick={this.loadCategoryChildren.bind(this, category)}>
+                                {category}
+                            </div>
+                        ))
+                    }
+                </div>
+            )
+
+            case "tree": return (
+                <div class="card phase-tree">
+                    {
+                        this.state.topics.map((topicchildren, index) => (
+                            <TopicPicker.TopicSlide topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} index={index} />
+                        ))
+                    }
+                </div>
+            )
+
+            default: return (
+                <div class="card phase-error">
+                    Error
+                </div>
+            )
+        }
     }
 }
 
