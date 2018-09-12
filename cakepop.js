@@ -140,14 +140,13 @@ class Cakepop {
         let action = levels[0];
         if (action == "latests") {
             let now = new Date().getTime();
-            db.findUnique(config.default(), CAKEPOP_COLLECTION, {
+            db.findToArray(config.default(), CAKEPOP_COLLECTION, {
                 read : {$ne : db.mongoID(cli.userinfo.userid)},
                 expiry : {$gt : now},
                 status : "live"
             }, (err, dbobj) => {
                 sendback({
-                    found : !!dbobj,
-                    cakepop : dbobj
+                    cakepops : dbobj
                 });
             }, {
                 content : 1, stylesheet : 1, html : 1, expiry : 1,

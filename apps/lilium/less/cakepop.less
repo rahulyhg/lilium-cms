@@ -1,3 +1,32 @@
+// Cakepops pop up
+.cakepop-wrapper {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 30;
+    overflow-y: scroll;
+
+    -ms-overflow-style: none;
+    overflow: -moz-scrollbars-none;
+    &::-webkit-scrollbar { width: 0 !important }
+
+    .cakepop-body {
+        position: static;
+        width: 800px;
+        margin: 100px auto;
+        background: white;
+        box-shadow: 0px 2px 1px rgba(0,0,0,0.2);
+        
+        p, h1, h2, h3, h4, h5, h6 {
+            margin: 12px;
+        }
+    }
+}
+
+// Cakepops page
 .cakepop-edit-page {
     max-width: 720px;
     margin: auto;
