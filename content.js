@@ -323,6 +323,21 @@ class ContentLib {
         db.join(_c, CONTENT_COLLECTION, pipeline, arr => sendback({ items : arr }));
     }
 
+    fetchSponsoredInformation(_c, post, done) {
+        if (post.isSponsored && post.useSponsoredBox && post.sponsoredBoxLogo) {
+            db.findUnique(_c, 'uploads', { _id : db.mongoID(post.sponsoredBoxLogo) }, (err, image) => {
+                if (image) {
+                    post.sponsoredBoxLogoURL = image.sizes.square.url;
+                    post.sponsoredBoxLogoImage = image;
+                }
+                
+                done();
+            });
+        } else {
+            done();
+        }
+    }
+
     getFull(_c, _id, sendback, match = {}, collection = CONTENT_COLLECTION) {
         const $match = match;
         $match._id = db.mongoID(_id);
@@ -346,7 +361,9 @@ class ContentLib {
                 post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
 
                 hooks.fireSite(_c, 'contentGetFull', {article : post});
-                sendback(post);
+                this.fetchSponsoredInformation(_c, post, () => {
+                    sendback(post);
+                })
             }, { displayname : 1, username : 1, avatarURL : 1, avatarMini : 1, slug : 1, revoked : 1 });
         });
     }
