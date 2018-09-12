@@ -4,6 +4,7 @@ import { StackBox } from '../../widgets/form';
 import API from '../../data/api';
 import { castNotification } from "../../layout/notifications";
 import { LoadingView } from "../../layout/loading";
+import slugify from "slugify";
 
 export default class AdsManagement extends Component {
     constructor(props) {
@@ -23,8 +24,9 @@ export default class AdsManagement extends Component {
         });
     }
     
-    updateAdSet(id, aads) {
-        console.log('updateAdSet: ', id, aads);
+    updateAdSet(id, ads) {
+        console.log('updateAdSet id: ', id);
+        console.log('updateAdSet ads: ', ads);
         
         const adSetIndex = this.state.adSets.findIndex(adSet => {
             return adSet._id == id;
@@ -32,7 +34,8 @@ export default class AdsManagement extends Component {
 
         if (adSetIndex >= 0) {
             const adSets = this.state.adSets;
-            adSets[adSetIndex].ads = aads.map(adMarkup => { return { markup: adMarkup } });
+            console.log(this.state.adSets);
+            adSets[adSetIndex].ads = ads.map(adMarkup => { return { markup: adMarkup } });
             console.log(adSets);
             
             this.setState({ adSets });
@@ -60,7 +63,8 @@ export default class AdsManagement extends Component {
                         <TabView>
                             {
                                 this.state.adSets.map(adSet => (
-                                    <Tab title={`${adSet.lang.toUpperCase()} / ${adSet.type}`}>
+                                    <Tab title={`${adSet.lang.toUpperCase()} / ${adSet.type}`} key={slugify(adSet._id)}>
+                                        <h1>{`${adSet.lang.toUpperCase()} / ${adSet.type}`}</h1>
                                         <StackBox name={adSet._id} initialValue={adSet.ads.map(ad => ad.markup)} onChange={this.updateAdSet.bind(this)} />
                                     </Tab>
                                 ))
