@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
-import { TextField, ButtonWorker, CheckboxField, MultiSelectBox, SelectField, StackBox, DatePicker } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultiSelectBox, SelectField, StackBox, DatePicker, TopicPicker } from '../../widgets/form';
 import { TextEditor } from '../../widgets/texteditor'
 import { castNotification } from '../../layout/notifications';
 import dateformat from 'dateformat';
@@ -56,7 +56,7 @@ const SELECTBOX_OPTIONS = MULTISELECTBOX_OPTIONS.map(x => ({ displayname : x.dis
 export default class CommentDevTool extends Component {
     render() {
         return (
-            <div class="graph-paper" style={{ paddingTop: 30 }}>
+            <div class="graph-paper" style={{ paddingTop: 30, paddingBottom: 80 }}>
                 <div style={styles.wrap800}>
                     <h2>Flex Cards</h2>
                     
@@ -120,11 +120,11 @@ export default class CommentDevTool extends Component {
                         <MultiSelectBox options={MULTISELECTBOX_OPTIONS} placeholder='Select a few things' onChange={(name, value) => {}} />
                         <SelectField options={SELECTBOX_OPTIONS} placeholder="Select one thing" onChange={(name, value) => castNotification({ title : "New value selected", message : value })} />
                         <StackBox placeholder="Create multiple things" onChange={(name, value) => castNotification({ title : "Stack box values count : " + value.length })} />
-                        <DatePicker placeholder="Select your birthday" onChange={(name, value) => castNotification({ title : "Your birthday", message : dateformat(new Date(value), 'mmmm dd') })} />
+                        <DatePicker placeholder="Select your birthday" initialValue={new Date()} onChange={(name, value) => castNotification({ title : "Your birthday", message : dateformat(new Date(value), 'mmmm dd') })} />
                     </div>
 
                     <h2 style={{ marginTop : 30 }}>Text Editor</h2>
-                    <TextEditor />
+                    <TextEditor content="<p>Hello, <b>World!</b></p>" />
 
                     <h2 style={{ marginTop : 30 }}>Button Workers</h2>
                     <div class="card">
@@ -166,6 +166,9 @@ export default class CommentDevTool extends Component {
                             ))
                         }
                     </div>
+
+                    <h2 style={{ marginTop : 30 }}>Topic selection</h2>
+                    <TopicPicker placeholder="Choose a topic" />
                 </div>
             </div>
         )
