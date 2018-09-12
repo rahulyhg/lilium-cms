@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
-import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker } from '../../widgets/form';
 import { getSession } from '../../data/cache';
 import { castNotification } from '../../layout/notifications';
 
@@ -15,10 +15,10 @@ const styles = {
     sidebarTitle : {
         padding: 10,
         display: "block",
-        borderBottom: "1px solid #d6ace8",        
-        borderTop: "1px solid #d6ace8",
-        color: "#4d2161",
-        backgroundColor: "#e3c6ea"
+        borderBottom: "1px solid #F6F6F6",        
+        borderTop: "1px solid #F6F6F6",
+        color: "#333",
+        backgroundColor: "#EEE"
     },
     spinner : {
         fontSize : 60,
@@ -342,12 +342,12 @@ export default class EditView extends Component {
 
     getActionFromColdState() {
         const status = this.coldState.post.status;
-        const actions = [<ButtonWorker text="Preview" work={this.preview.bind(this)} />];
+        const actions = [<ButtonWorker theme="white" text="Preview" work={this.preview.bind(this)} />];
 
         if (status == "draft" || status == "deleted") {
-            actions.push(<ButtonWorker text="Save" work={this.save.bind(this)} />, <ButtonWorker text="Publish" work={this.publish.bind(this)} />);
+            actions.push(<ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, <ButtonWorker type="fill" theme="blue" text="Publish" work={this.publish.bind(this)} />);
         } else if (status == "published") {
-            actions.push(<ButtonWorker text="Save" work={this.save.bind(this)} />, <ButtonWorker text="Commit changes" work={this.commitchanges.bind(this)} />);
+            actions.push(<ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />);
         } 
 
         return actions;
@@ -361,6 +361,12 @@ export default class EditView extends Component {
         if (image) {
             this.edits.media = image._id;
             this.edits.facebookmedia = image.sizes.facebook.url;
+        }
+    }
+
+    topicChanged(name, topic) {
+        if (topic) {
+            this.edits.topic = topic._id;
         }
     }
 
@@ -397,8 +403,8 @@ export default class EditView extends Component {
                         <TextEditor onChange={this.fieldChanged.bind(this)} format={x => [x]} name="content" content={this.state.post.content[0]} />
                     </div>
 
-                    <div class="card publishing-card">
-
+                    <div class="publishing-card nopad">
+                        <TopicPicker onChange={this.topicChanged.bind(this)} name="topic" initialValue={this.state.post.topic || undefined} placeholder="Select a topic" />
                     </div>
 
                     <div class="card publishing-card">
@@ -415,10 +421,9 @@ export default class EditView extends Component {
                     <div class="card publishing-card">
                         <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
-
                 </div>
 
-                <div style={{ position : "fixed", right : 0, top : 50, bottom : 0, width : 280, overflow : "auto", background : "rgb(238, 226, 241)", boxShadow : "1px 0px 2px 2px rgba(154, 145, 156, 0.46)" }}>
+                <div style={{ position : "fixed", right : 0, top : 50, bottom : 0, width : 280, overflow : "auto", background : "white", borderLeft: "1px solid #DDD" }}>
                     <PublishingSidebar post={this.state.post} actions={this.state.actions} history={this.state.history} />
                 </div>
             </div>
