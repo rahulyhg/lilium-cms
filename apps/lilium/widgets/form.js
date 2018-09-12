@@ -52,16 +52,6 @@ class FormField extends Component {
     get isField() { return true; }
 }
 
-
-const buttonThemes = {
-    'success': { backgroundColor: "green",   borderColor : "#0c3c0c" },
-    'danger':  { backgroundColor: "#fb3e3b", borderColor : "rgb(187, 65, 65)" },
-
-    'blue':    { backgroundColor: "rgb(59, 134, 251)", borderColor: "rgb(65, 99, 187)" },
-    'red':     { backgroundColor: "#fb3e3b", borderColor : "rgb(187, 65, 65)" },
-    'white':   { backgroundColor: "white",   borderColor : "#DDD", color : "#333" },
-};
-
 /**
  * Returns the Class of a form component appropriate to the specified type
  * @param {string} type The type of the value that needs to be represented by a form element
@@ -87,10 +77,12 @@ export class ButtonWorker extends Component {
     }
 
     work() {
-        !this.props.sync && this.setState({ working : true });
-        this.props.work && this.props.work(status => {
-            this.done(...arguments);
-        });
+        if (!this.state.working) {
+            !this.props.sync && this.setState({ working : true });
+            this.props.work && this.props.work(status => {
+                this.done(...arguments);
+            });
+        }
     }
 
     done() {
@@ -100,7 +92,7 @@ export class ButtonWorker extends Component {
 
     render() {
         return (
-            <div class="button-worker" style={Object.assign({}, buttonThemes[this.props.theme] || {}, this.props.style || {})} onClick={this.work.bind(this)}>
+            <div class={"button-worker " + (this.props.theme || "white") + " " + (this.props.type || "outline")} style={this.props.style || {}} onClick={this.work.bind(this)}>
                 <span class={this.state.working ? "hidden" : ""}>{this.props.text}</span>
                 <div class={"working-spinner " + (this.state.working ? "shown" : "")}><i class="fa fa-spin fa-cog"></i></div>
             </div>
@@ -361,22 +353,33 @@ export class MediaPickerField extends FormField {
 }
 
 export class TopicPicker extends FormField {
-    static TopicSlide = class {
+    static TopicSlide = class TopicSlide extends Component {
         constructor(props) {
+            super(props);
             this.state = {
-                topics: props.topics
+                topics: props.topics,
+                selectedIndex : -1
             }
         }
 
-        selectOne(topic) {
+        componentWillReceiveProps(props) {
+            this.setState({ 
+                topics : props.topics
+            });
+        }
+
+        selectOne(topic, index) {
             this.props.onSelect(topic, this.props.index);
+            this.setState({
+                selectedIndex : index
+            })
         }
 
         render() {
             return (
                 <div class="topic-children-slide">
-                    { this.state.topics.map(topic => (
-                        <div onClick={this.selectOne.bind(this, topic)}>
+                    { this.state.topics.map((topic, index) => (
+                        <div class={"topic-children-item " + (index == this.state.selectedIndex ? "selected" : "")} onClick={this.selectOne.bind(this, topic, index)}>
                             {topic.displayname}
                         </div>
                     )) }
@@ -388,11 +391,14 @@ export class TopicPicker extends FormField {
     constructor(props) {
         super(props);
         this.state.loading = true;
-        this.topics = [];
+        this.state.topics = [];
         this.state.phase = "loading"
+        this.state.stagedtopic;
     }
 
     refreshCategories() {
+        log('Topics', 'Getting categories from server', 'info');
+
         API.get('/topics/category', {}, (err, categories) => {
             this.setState({
                 phase : "category", 
@@ -402,15 +408,19 @@ export class TopicPicker extends FormField {
     }
 
     lockTopicFromID(id) {
-        API.get('/topics/simple/' + this.props.initialValue, {}, (err, topic) => {
+        log('Topics', 'Locked topic with ID ' + id, 'info');
+
+        API.get('/topics/get/' + this.props.initialValue, {}, (err, topic) => {
             this.setState({
                 phase : "lock",
-                selectedTopic : topic
+                selectedTopic : topic,
+                stagedtopic : topic
             });
         });
     }
 
     loadCategoryChildren(category) {
+        log('Topics', 'Loading children topic from category ' + category, 'info');
         API.get('/topics/ofcategory/' + category, {}, (err, topics) => {
             this.setState({
                 phase : "tree",
@@ -420,13 +430,22 @@ export class TopicPicker extends FormField {
     }
 
     loadChildrenTopicsFrom(topic, index) {
+        log('Topics', 'Loading children topic from topic ' + topic.displayname + ' at index ' + index, 'info');
         API.get('/topics/childof/' + topic._id, {}, (err, children) => {
             const newArray = [...this.state.topics.splice(0, index + 1), children];
             this.setState({
                 phase : "tree",
-                topics : newArray
-            })
-        });        
+                topics : newArray,
+                stagedtopic : topic
+            });
+
+            this.changed({
+                target : {
+                    name : this.props.name, 
+                    value : topic
+                }
+            });
+        });
     }
 
     componentDidMount() {
@@ -442,35 +461,54 @@ export class TopicPicker extends FormField {
             loading: true,
             phase : "loading", 
             topics : [],
-            selectedTopic : undefined
+            selectedTopic : undefined,
+            stagedtopic : undefined
         }, () => {
             this.refreshCategories();
         })
     }
 
-    render() {
+    lockin() {
+        this.setState({
+            phase : "lock"
+        })
+    }
+
+    getCurrentSelectedSlug() {
+        if (this.state.stagedtopic && this.state.phase != "lock") {
+            return (<div class="topic-picker-current">
+                <b>{this.state.stagedtopic.displayname}</b> <i>/{this.state.stagedtopic.completeSlug}</i>
+            </div>);
+        } else {
+            return null
+        }
+    }
+
+    renderPickerSection() {
         switch (this.state.phase) {
             case "loading": return (
-                <div class="card phase-loading">
+                <div class="phase-loading">
                     <Spinner />
                 </div>
             )
 
             case "category": return (
-                <div class="card phase-category">
+                <div class="phase-category">
                     <b>Choose a category</b>
+                    <div class="category-picker-wrap">
                     {
                         this.state.categories.map(category => (
-                            <div onClick={this.loadCategoryChildren.bind(this, category)}>
+                            <div class="category-bubble" onClick={this.loadCategoryChildren.bind(this, category)}>
                                 {category}
                             </div>
                         ))
                     }
+                    </div>
                 </div>
             )
 
             case "tree": return (
-                <div class="card phase-tree">
+                <div class="phase-tree">
                     {
                         this.state.topics.map((topicchildren, index) => (
                             <TopicPicker.TopicSlide topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} index={index} />
@@ -479,12 +517,44 @@ export class TopicPicker extends FormField {
                 </div>
             )
 
+            case "lock": return (
+                <div class="phase-lock">
+                    <b>Selected topic</b>
+                    <div class="selected-topic-displayname">{this.state.stagedtopic.displayname}</div>
+                    <i class="selected-topic-slug">/{this.state.stagedtopic.completeSlug}</i>
+                </div>
+            )
+
             default: return (
-                <div class="card phase-error">
+                <div class="phase-error">
                     Error
                 </div>
             )
         }
+    }
+
+    getFooter() {
+        return (
+            <footer>
+                <span class="red clickable" onClick={this.reset.bind(this)}>Reset</span>
+                { this.state.stagedtopic ? (
+                    <span class="clickable" onClick={this.lockin.bind(this)}><b>Lock in</b></span>
+                ) : null }
+            </footer>
+        );
+    }
+
+    render() {
+        return (
+            <div class="topic-picker card">
+                <div class="topic-picker-picking-section">
+                    {this.renderPickerSection()}
+                </div>
+
+                {this.getCurrentSelectedSlug()}
+                {this.getFooter()}
+            </div>
+        )
     }
 }
 
