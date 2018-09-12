@@ -406,7 +406,7 @@ class Manage2FAForm extends Component {
                 <TextField name='token2fa' placeholder='2FA Token' onChange={(name, value) => this.setState({ token2fa: value })} />
 
                 <ButtonWorker text={`${(this.state.confirmed2fa) ? 'Deactivate' : 'Activate'} 2FA for my account`}
-                        theme={(this.state.confirmed2fa) ? 'danger' : ''}
+                        theme={(this.state.confirmed2fa) ? 'red' : ''}
                         work={(this.state.confirmed2fa) ? this.deactivate2fa.bind(this) : this.activate2fa.bind(this)} />
             </div>
         );
