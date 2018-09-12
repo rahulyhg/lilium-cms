@@ -55,11 +55,10 @@ export default class AdsManagement extends Component {
                 <div id="ads-management">
                     <h1>Advertisement Management</h1>
                     <div id="ads-tabs" style={{ width: '800px', margin: 'auto' }}>
-                        <TabView>
+                        <TabView id='ads-management'>
                             {
                                 this.state.adSets.map(adSet => (
                                     <Tab title={`${adSet.lang.toUpperCase()} / ${adSet.type}`} key={slugify(adSet._id)}>
-                                        <h1>{`${adSet.lang.toUpperCase()} / ${adSet.type}`}</h1>
                                         <StackBox name={adSet._id} initialValue={adSet.ads.map(ad => ad.markup)} onChange={this.updateAdSet.bind(this)} />
                                     </Tab>
                                 ))
