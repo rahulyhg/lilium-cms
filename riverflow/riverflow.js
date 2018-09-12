@@ -20,7 +20,7 @@ class FlowHandle {
         this.type = type;
 
         switch (this.type) {
-            case "admin_get"   : Admin.registerAdminEndpoint(this.flow.endpoint, 'GET',  this.river.adminGET.bind(this.river));  break;
+            case "admin_get"   : log("Riverflow", "Used Riverflow admin_get method, but it's deprecated", "warn"); break; 
             case "admin_post"  : Admin.registerAdminEndpoint(this.flow.endpoint, 'POST', this.river.adminPOST.bind(this.river)); break;
             case "admin_put"   : Admin.registerAdminEndpoint(this.flow.endpoint, 'PUT',  this.river.adminPUT.bind(this.river));  break;
             case "admin_delete": Admin.registerAdminEndpoint(this.flow.endpoint, 'DELETE', this.river.adminDELETE.bind(this.river)); break;
