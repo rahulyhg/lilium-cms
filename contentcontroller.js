@@ -4,6 +4,13 @@ const hooks = require('./hooks');
 const db = require('./includes/db');
 
 class ContentController {
+    GET(cli) {
+        switch (cli.routeinfo.path[1]) {
+            case "preview" : cli.hasRightOrRefuse('create-articles') && contentlib.getPreview(cli._c, db.mongoID(cli.routeinfo.path[2]), {}, markup => cli.sendHTML(markup)); break;
+            default : cli.refuse();
+        }        
+    }
+
     adminGET(cli) {
         // Get LML3 markup
         switch (cli.routeinfo.path[2]) {
