@@ -60,8 +60,6 @@ class ContentChains {
             delete data.date;
         }
 
-        console.log(id, data);
-
         db.update(_c, 'contentchains', {_id : db.mongoID(id)}, data, (err) => {
             callback && callback(err);
         });
@@ -176,11 +174,9 @@ class ContentChains {
                 }, { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
             ], (items) => {
                 if (items.length) {
-                    console.log('items length', items.length);
                     items[0].articles.forEach(article => { article.title = article.title[0] } );
                     sendback({ items });
                 } else {
-                    console.log('not found');
                     cli.throwHTTP(404, 'Content chain not found', true);
                 }
             });
@@ -209,7 +205,6 @@ class ContentChains {
                         as : "media" }
                 }, { $project: CONTENTCHAIN_LIVEVAR_PROJECTION }
             ], items => {
-                console.log(items);
                 if (items.length) {
                     items[0].articles.forEach(article => { article.title = article.title[0] } );
                     sendback(items[0]);
@@ -283,7 +278,6 @@ class ContentChains {
 
     generateChain(_c, strID, callback) {
         this.deepFetch(_c, strID, df => {
-            console.log(df.articles);
             articleLib.batchFetch(_c, df.articles.map(x => db.mongoID(x)), articles => {
                 let id = df._id;
                 let extra = {

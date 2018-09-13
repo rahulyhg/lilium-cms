@@ -67,39 +67,18 @@ class AdsLib {
         return _patterns[siteid][index];
     }
 
-    adminGET(cli) {
-        if (!cli.hasRight('admin')) {
-            return cli.throwHTTP(403);
-        }   
-
-        filelogic.serveAdminLML3(cli);
-    }
-
     adminPOST(cli) {
         if (!cli.hasRight('admin')) {
             return cli.throwHTTP(403);
         }   
 
-        const ads = cli.postdata.data.ads;
-        const langs = {
-            en : { content : [], amp : [] },
-            fr : { content : [], amp : [] }
-        };  
-
-        ads.forEach(x => {
-            langs[x.lang][x.type].push({markup : x.markup});
-        });
-
-        db.remove(cli._c, 'ads', {}, () => {
-            db.insert(cli._c, 'ads', [
-                { format : "adset", lang : "en", type : "content", ads : langs.en.content },
-                { format : "adset", lang : "fr", type : "content", ads : langs.fr.content },
-                { format : "adset", lang : "en", type : "amp", ads : langs.en.amp },
-                { format : "adset", lang : "fr", type : "amp", ads : langs.fr.amp }
-            ], () => {
-                cli.sendJSON({ total : ads.length });
+        if (cli.routeinfo.path[2]) {
+            db.update(cli._c, 'ads', { _id: db.mongoID(cli.routeinfo.path[2]) }, { ads: cli.postdata.data.ads }, (err, r) => {
+                cli.sendJSON({ success: !err, err });
             });
-        });
+        } else {
+            cli.throwHTTP(404, 'Must specify an adSet ID', true);
+        }
     }
 
     livevar(cli, levels, params, sendback) {

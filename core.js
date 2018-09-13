@@ -124,7 +124,7 @@ const loadEndpoints = () => {
     endpoints.register('*', 'lilium', 'GET', (cli) => {
         cli.userinfo && cli.userinfo.loggedin ? 
             V4.serveV4Index(cli) :
-            cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login");
+            cli.redirect(cli._c.server.protocol + cli._c.server.url + "/login?to=" + cli.routeinfo.fullpath);
     });
 
     endpoints.register('*', 'login', 'POST', (cli) => {
@@ -216,8 +216,22 @@ const loadPlugins = (cb) => {
 const makeBuild = (cb) => {
     if (!isElder) { return cb(); }
 
-    const buildLib = require('./build');    
-    buildLib.initialBuild(cb);
+    const buildLib = require('./build');   
+    const cssBuildLib = require('./cssbuilder'); 
+    const pathLib = require('path');
+
+    buildLib.initialBuild(() => {
+        cssBuildLib.build(
+            pathLib.join(liliumroot, 'apps', 'lilium', 'less'), 
+            pathLib.join(liliumroot, 'backend', 'static', 'compiled', 'v4.css'), 
+            { 
+                compress : require('./config').default().env == "prod" 
+            }, 
+        err => {
+            err && log('Core', 'Error compiling V4 less files to CSS : ' + err, 'err');
+            cb();
+        });
+    });
 };
 
 const loadRoles = (cb) => {

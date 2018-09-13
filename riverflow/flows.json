@@ -66,7 +66,7 @@
         }, {
             "module" : "ads.js",
             "endpoint" : "ads",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "history.js",
             "endpoint" : "history",
@@ -179,13 +179,17 @@
             "endpoint" : "build",
             "support" : ["admin_post"]
         }, {
+            "module" : "cssbuilder.js",
+            "endpoint" : "buildcss",
+            "support" : ["admin_post"]
+        }, {
             "module" : "communications.js",
             "endpoint" : "communications",
             "support" : ["admin_post", "livevar"]
         }, {
             "module" : "mail.js",
             "endpoint" : "mailtemplates",
-            "support" : ["setup", "admin_post", "admin_get", "livevar"],
+            "support" : ["setup", "admin_post", "livevar", "admin_delete"],
             "hooks" : [
                 {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
             ],
@@ -230,7 +234,7 @@
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
-            "support" : ["admin_get", "admin_post", "livevar", "setup", "api_get"]
+            "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
         }, {
             "module" : "docs.js",
             "endpoint" : "docs",
@@ -384,7 +388,7 @@
         }, {
             "module" : "cakepop.js",
             "endpoint" : "cakepop",
-            "support" : ["admin_get", "admin_post", "livevar"],
+            "support" : ["admin_post", "livevar"],
             "admin_menu" : {
                 "id": "cakepop",
                 "lys" : "cakepop,popups",

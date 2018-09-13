@@ -3,7 +3,7 @@ import { Component, h } from 'preact';
 export class Link extends Component {
     constructor(props) {
         super(props);
-        this.linkStyle = props.display || "inline"
+        this.linkStyle = props.display || props.linkStyle || "inline"
     }
 
     navigate() {

@@ -1,0 +1,236 @@
+.button {
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    padding: 8px 12px;
+    background: @liliumPurple;
+    box-shadow: 0px 1px 2px rgba(175, 87, 228, 0.28);
+    color: white;
+    border: 1px solid #9355af;
+    margin-right: 12px;
+    cursor: pointer;
+
+    span {
+        transition: all 0.2s;        
+        transform: translate3d(0px, 0px, 0px);
+        opacity : 1;
+        display: block;
+    }
+}
+
+.button-worker {
+    .button();
+    
+    span.hidden {
+        transform: translate3d(0px, -32px, 0px);
+        opacity : 0;
+    }
+}
+
+.working-spinner {
+    position: absolute;
+    text-align: center;
+    right: 0;
+    left: 0;
+    bottom: -25px;
+    opacity: 0;
+
+    transition: all 0.2s;
+}
+
+.working-spinner.shown {
+    transform: translate3d(0px, -32px, 0px);
+    opacity : 1;
+}
+
+
+.autocomplete-field {
+    position: relative;
+    margin: 0px 20px;
+}
+
+.autocomplete-choices {
+    position: absolute;
+    top: 41px;
+    left: 0px;
+    right: 0px;
+    background-color: rgb(249, 249, 249);
+    border: 1px solid rgb(204, 204, 204);
+    border-bottom-width: 0px;
+    padding: 12px;
+    overflow-y: auto;
+    max-height: 30vh;
+}
+
+.autocomplete-choices > * {
+    margin: 4px 0px;
+    cursor: pointer;
+}
+.autocomplete-choices > *:hover {
+    background-color: #e7e2e2;
+}
+
+.autocomplete-choice.selected {
+    color: white;
+    background-color: #674a82;
+}
+
+#lilium div.mce-fullscreen {
+    position: fixed;
+    top: 50px;
+    left: 30px;
+    z-index: @z_fullScreeMce;
+}
+
+#lilium #urlrenderer.snap div.mce-fullscreen {
+    top: 0px;
+    left: 0px;
+}
+
+.tag {
+    cursor: default;
+    background-color: #DDD;
+    color: #333;
+    margin: 4px 2px 6px 2px;
+    padding: 2px 6px;
+    display: flex;
+    align-content: center;
+    font-weight: normal;
+    border-radius: 3px;
+    box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
+
+    .close-button {
+        cursor: pointer;
+        margin: 2px 2px 2px 6px;
+        display: inline-block;
+        vertical-align: middle;
+
+        &:hover {
+            color: #FF3333;
+        }
+    }
+}
+
+.list-item {
+    border-radius: 3px;
+    color: #333;
+    padding: 2px 4px;
+    cursor: pointer;
+
+    &:hover {
+        background: #FEF;
+    }
+
+    &.selected {
+        background: #FCF;
+        font-weight: bold;
+        color: #737;
+    }
+}
+
+.classic-field {
+    box-sizing : border-box;
+    width : 100%;
+    padding: 10px;
+    font-size : 18px;
+    background : #F9F9F9;
+    border : 1px solid #CCC;
+    border-bottom-width : 2;
+    color: #333;
+    outline-color: #c47ed4;
+
+    &.faux {
+        cursor: text;
+        min-height: 40px;
+        display: flex;
+        padding: 2px;
+        flex-wrap: wrap;
+    }
+}
+
+.invisible-input {
+    border: 0;
+    background-color: transparent;
+    outline: none;
+    margin: 4px 8px;
+    line-height: 20px;
+}
+
+.field-wrap {
+    margin-bottom: 20px;
+    position: relative;
+}
+
+textarea {
+    resize: none;
+    height: 150px;
+}
+
+.checkbox-field-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.checkbox-wrapper {
+    cursor: pointer;
+    border: 1px solid #2d2d2d;
+    border-radius: 4px;
+    background-color: transparent;
+    height: 25px;
+    width: 25px;
+    margin: 12px 12px 12px 20px;
+    flex: 0 0 25px;
+    flex-wrap: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-left: auto;
+
+    &.checked {
+        background-color: @liliumPurple;
+        border-style: dashed;
+    }
+}
+
+.checkmark {
+    color: white;
+    padding: 0;
+    margin: 0;
+}
+
+.multiselectbox-wrapper {
+    margin: 20px 0px;
+}
+
+.placeholder {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.stackboxex {
+    width: 40px;
+    height: 40px;
+    background: #f5b1b1;
+    color: white;
+    box-sizing: border-box;
+    font-size: 32px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.multiselectbox-options-list {
+    max-height: 200px;
+    overflow: auto;
+    background: white;
+    padding: 8px;
+    border-width: 1px 1px 1px 2px;
+    border-style: solid;
+    border-color: rgb(204, 204, 204);
+}
+
+.selectedoptions-wrapper {
+    display: flex;
+    background-color: white;
+}

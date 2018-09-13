@@ -70,6 +70,7 @@ export default class CakepopEditPage extends Component {
                 ]} />
 
                 <CheckboxField autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} name="auto"       initialValue={this.coldState.auto} placeholder="Automatically popup on next reload" />
+                <CheckboxField autosave={true} endpoint={'/cakepop/updateOneField/' + this.props.id} name="mendatory"  initialValue={this.coldState.mendatory} placeholder="Make this cakepop mandaroty" />
             </div>
         )
     }
