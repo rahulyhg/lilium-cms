@@ -24,6 +24,7 @@ const LOCALSTORAGE_PREFIX = "LF_";
  *      items : Array of initial items. Can be set later. If passed after mount, will replace the entire array with the new one.
  *      loadmoreButton : A component representing the load more button inside the list,
  *      keyid : List item key for Preact mapping. Defaults to : _id 
+ *      liststyle : Style of the inner container wrapping the list items
  * }
  */
 export class BigList extends Component {
@@ -129,14 +130,14 @@ export class BigList extends Component {
                     ) : null
                 }
 
-                <div class="big-list-items">
-                {
-                    this.state.items.length == 0 ? (
-                        <this.coldState.emptyComponent />
-                    ) : this.state.items.map(x => (
-                        <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
-                    ))
-                }
+                <div class="big-list-items" style={this.props.liststyle || {}}>
+                    {
+                        this.state.items.length == 0 ? (
+                            <this.coldState.emptyComponent />
+                        ) : this.state.items.map(x => (
+                            <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
+                        ))
+                    }
                 </div>
 
                 {

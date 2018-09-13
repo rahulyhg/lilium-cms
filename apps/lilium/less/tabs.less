@@ -1,0 +1,27 @@
+.tabview:extend(.card) {
+    .tabs-bar {
+        background: #F6F6F6;
+        display: flex;
+        
+        .tab-name {
+            margin: 0px;
+            padding: 6px 12px;
+            display: inline-block;
+            cursor: pointer;
+            border-top-left-radius: 8%;
+            border-top-right-radius: 8%;
+
+            &.active {
+                padding-top: 3px;
+                font-size: 19px;
+                background: #FCFCFC;
+                border-top: 2px solid #af57e4;
+                box-shadow: 0px -4px 0px 3px rgba(0, 0, 0, 0.1);
+            }
+        }
+    }
+
+    .tab-content {
+        padding: 14px;
+    }
+}

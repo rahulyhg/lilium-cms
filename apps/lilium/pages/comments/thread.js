@@ -6,36 +6,9 @@ import dateformat from 'dateformat';
 import { castNotification } from '../../layout/notifications'; 
 
 const styles = {
-    featuredimage : {
-        width: "100%",
-        height : "auto",
-        objectFit : "cover",
-        display: "block"
-    },
     articleheadline : {
         fontSize : 20,
         padding : 10
-    },
-    commenteravatar : {
-        display: "inline-block",
-        width: 48,
-        height: 48,
-        borderRadius: 48,
-        verticalAlign: "middle",
-        marginRight: 10
-    },
-    commentercard : {
-        background: "white",
-        borderRadius: 3,
-        boxShadow: "0px 2px 2px 1px rgba(0,0,0,0.1)",
-        padding: 15
-    },
-    originalpostcard : {
-        overflow : "hidden",
-        background: "white",
-        boxShadow: "0px 2px 2px 1px rgba(0,0,0,0.1)",
-        borderRadius : 3,
-        marginBottom : 20
     },
     originaldate : {
         textAlign: 'right',
@@ -55,21 +28,29 @@ class ThreadHeader extends Component {
     render() {
         return (
             <div class="thread-view-col">
-                <Link href={"/publishing/write/" + this.props.thread.articleid} linkStyle="block">
-                    <div style={styles.originalpostcard}>
-                        <img style={styles.featuredimage} src={this.props.thread.featuredimage} />
-                        <div style={styles.articleheadline}>{this.props.thread.headline}</div>
-                    </div>
-                </Link>
+                <div class="card">
+                    <Link href={"/publishing/write/" + this.props.thread.articleid} linkStyle="block">
+                        <div class="image-wrapper">
+                            <img src={this.props.thread.featuredimage} />
+                        </div>
+                            
+                        <div style={styles.articleheadline}>
+                            {this.props.thread.headline}
+                        </div>
+                    </Link>
+                </div>
 
-                <div style={styles.commentercard}>
-                    <div style={{ paddingBottom : 10, marginBottom : 10, borderBottom : "1px dashed #DDD" }}>
-                        <img style={styles.commenteravatar} src={this.props.thread.commenter.picture} />   
-                        <b>{this.props.thread.commenter.displayname}</b> 
+                <div class="card">
+                    <div class="detail-head">
+                        <img class="avatar" src={this.props.thread.commenter.picture} />   
+                        <b class="avatar-name">{this.props.thread.commenter.displayname}</b> 
                     </div>
+                    
                     <p>{this.props.thread.text}</p>
 
-                    <div style={styles.originaldate}>{dateformat(this.props.thread.date, 'mmmm dd, yyyy - HH:MM:ss')}</div>
+                    <footer>
+                        {dateformat(this.props.thread.date, 'mmmm dd, yyyy - HH:MM:ss')}
+                    </footer>
                 </div>
                 
                 <div style={{ marginTop : 15 }} class="thread-view-actions">
@@ -107,18 +88,18 @@ class SingleReply extends Component {
 
     render() {
         return (
-            <div class="thread-reply" style={{ opacity : this.state.reply.active ? 1 : 0.5 }}>
-                <div><b>{this.state.commenter.displayname}</b></div>
-                <p>{this.state.reply.active ? this.state.reply.text : this.state.reply.deletedText}</p>
-                <div style={styles.originaldate}>
+            <div class="card" style={{ opacity : this.state.reply.active ? 1 : 0.5 }}>
+                <div class="detail-head"><b>{this.state.commenter.displayname}</b></div>
+
+                <p class="small">{this.state.reply.active ? this.state.reply.text : this.state.reply.deletedText}</p>
+                <footer>
                     <span>{dateformat(this.state.reply.date, 'mmmm dd, yyyy - HH:MM:ss')}</span>
                     {
                         this.state.reply.active ? (<span>
-                            <span style={{ margin: "0px 6px" }}>|</span>
                             <b onClick={this.deleteThis.bind(this)} class="delete-color clickable">Delete Reply</b>
                         </span>) : null
                     }
-                </div>
+                </footer>
             </div>
         )
     }

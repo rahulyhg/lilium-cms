@@ -1,0 +1,14 @@
+
+#urlrenderer {
+    position: relative;
+    top: 50px;
+    left: 30px;
+    width: calc(100% - 30px);
+    transition: all 0.2s;
+    z-index: @z_urlRenderer;
+}
+
+#urlrenderer.snap {
+    transform: translate3d(210px, 0px, 0px);
+    width: calc(100% - 240px);
+}

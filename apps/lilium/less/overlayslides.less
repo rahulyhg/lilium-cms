@@ -1,0 +1,61 @@
+#fullscreen-overlay {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right : 0;
+
+    z-index: @z_fullscreenOverlay;
+}
+
+#overlay-slides {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    overflow: hidden;
+}
+
+#overlay-slide-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+
+    background: #333;
+    color: #EEE;
+}
+
+#overlay-slide-left-floater {
+    height: 120px;
+    position: relative;
+    top: calc(50% - 60px);
+    left: 50px;
+}
+
+#overlay-slide-title {
+    font-size: 72px;
+    color: #EEE;
+    margin-bottom: -12px;
+}
+
+#overlay-slide-subtitle {
+    font-size: 20px;
+    text-transform: uppercase;
+    color: #CCC;
+    font-weight: bold;
+}
+
+#overlay-slide-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 60%;
+    overflow-y: auto;
+    background: #EEE;
+    color: #333
+}

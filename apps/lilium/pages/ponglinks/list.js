@@ -2,29 +2,13 @@ import { Component, h } from "preact";
 import { BigList } from '../../widgets/biglist';
 import { getSession } from '../../data/cache';
 import { ButtonWorker } from '../../widgets/form';
-import { StatusIndicator, Version } from './lib';
+import { Version } from './lib';
+import { Link } from '../../routing/link';
 
 const styles = {
-    ponglink: {
-        width: '100%',
-        backgroundColor: 'white',
-        margin: '8px 0px',
-        padding: '16px',
-        boxShadow: '0px 2px 0px rgba(0, 0, 0, 0.2)'
-    },
     creatorName: {
         fontWeight: '100',
         margin: '0'
-    },
-    identifier: {
-        display: 'inline-block',
-        marginRight: '14px',
-        marginBottom: '0'
-    },
-    versions: {
-        width: '100%',
-        borderCollapse: 'collapse',
-        border: '0'
     },
     mediumHeader: {
         width: '120px'
@@ -36,6 +20,12 @@ const styles = {
     }
 }
 
+const STATUS_TO_COLOR = {
+    active : 'green',
+    paused : 'orange',
+    archived : ''
+}
+
 class Ponglink extends Component {
     constructor(props) {
         super(props);
@@ -45,17 +35,27 @@ class Ponglink extends Component {
 
     render() {
         return (
-            <div className="ponglink" style={styles.ponglink}>
-                <a href={"ponglinks/insights/" + this.props.item._id}>
-                    <h2 style={styles.identifier}>{this.state.identifier}</h2>
-                </a>
-                <StatusIndicator status={this.state.status} />
-                <div className="clickCounter" style={{ display: 'inline-block', float: 'right' }}>
-                    <span>{`${this.state.clicks} clicks`}</span>
+            <div class="card">
+                <div class="detail-head">
+                    <div class="bubble-wrap">
+                        <Link href={"/ponglinks/insights/" + this.props.item._id}>
+                            <b class="big">{this.state.identifier}</b>
+                        </Link>
+
+                        <div class={"bubble " + STATUS_TO_COLOR[this.state.status]}>
+                            {this.state.status}
+                        </div>
+
+                        <div class="right">
+                            <span>{this.state.clicks} <i class="far fa-share"></i></span>
+                        </div>
+                    </div>
+                    
+                    <div>Created by {getSession('mappedEntities')[this.state.creatorid].displayname}</div>
                 </div>
-                <h3 style={styles.creatorName}>{`Created by ${getSession('mappedEntities')[this.state.creatorid].displayname}`}</h3>
-                <hr />
-                <table id="versions" style={styles.versions}>
+
+
+                <table>
                     <thead>
                         <tr>
                             <th align='left' className='medium-header' style={styles.mediumHeader}>Medium</th>
@@ -73,6 +73,7 @@ class Ponglink extends Component {
                         }
                     </tbody>
                 </table>
+
             </div>
         );
     }
@@ -107,13 +108,13 @@ export class PonglinksList extends Component {
     }
 
     componentWillUnmount() {
-        mappedUsers = undefined;
+
     }
 
     render() {
         return (
-            <div id="ponglinks-list" style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <BigList listitem={Ponglink} batchsize={15} endpoint='/ponglinks/bunch' toolbar={PonglinksList.TOOLBAR_CONFIG} loadmoreButton={LoadMore} />                
+            <div id="ponglinks-list">
+                <BigList listitem={Ponglink} batchsize={15} endpoint='/ponglinks/bunch' liststyle={{ maxWidth: 800, margin: 'auto' }} toolbar={PonglinksList.TOOLBAR_CONFIG} loadmoreButton={LoadMore} />                
             </div>
         );
     }

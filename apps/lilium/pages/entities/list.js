@@ -119,45 +119,51 @@ class EntityListItem extends Component {
 
     render() {
         return (
-            <div className="entity-card">
-                <img src={this.state.user.avatarURL} alt={`${this.state.user.displayname}'s profile picture`} className="profile-picture"/>
-                <h3 className='displayname'>{this.state.user.displayname}</h3>
-                <div className="info">
-                    <h4 className="username">{`@${this.state.user.username}`}</h4>
-                    <h4 className="phone-number">{this.state.user.phone || 'No hpone number to show'}</h4>
-                    <h4 className="phone-number">{this.state.user.email || 'No email to show'}</h4>
+            <div class="card flex">
+                <div class="image-wrapper">
+                    <img src={this.state.user.avatarURL} alt={`${this.state.user.displayname}'s profile picture`} className="profile-picture"/>
                 </div>
-                <hr className="action-separator" />
-                <div className="actions">
-                    <div className="action light" title="Edit User Information and manage accesses" onClick={() => { navigateTo('/entities/edit/' + this.state.user._id) }}>
-                        <i className="fal fa-pencil"></i>
+
+                <div class="detail-head">
+                    <div class="big">
+                        {this.state.user.displayname}
                     </div>
-                    <div className={"action light" + ((this.state.user.mustupdatepassword) ? 'success' : '')} title="Force password reset on next login" onClick={this.forcePasswordReset.bind(this)}>
-                        <i className="fal fa-sync"></i>
-                    </div>
+                </div>
+                <div className="detail-list">
+                    <div>@{this.state.user.username}</div>
+                    <div>{this.state.user.phone || 'No hpone number to show'}</div>
+                    <div>{this.state.user.email || 'No email to show'}</div>
+                </div>
+                <footer>
+                    <span class="clickable" title="Edit User Information and manage accesses" onClick={() => { navigateTo('/entities/edit/' + this.state.user._id) }}>
+                        Edit
+                    </span>
+                    <span className={"clickable light" + ((this.state.user.mustupdatepassword) ? 'success' : '')} title="Force password reset on next login" onClick={this.forcePasswordReset.bind(this)}>
+                        Force password reset
+                    </span>
                     {
                         (this.state.user.enforce2fa) ? (
-                            <div className="action danger light" title="DIsable 2FA" onClick={this.deactivate2FA.bind(this)}>
-                                <span>2FA</span>
-                            </div>
+                            <span className="clickable red light" title="Disable 2FA" onClick={this.deactivate2FA.bind(this)}>
+                                2FA
+                            </span>
                         ) : (
-                            <div className="action success light" title="Enforce 2FA" onClick={this.enforce2FA.bind(this)}>
-                                <span>2FA</span>
-                            </div>
+                            <span className="clickable light" title="Enforce 2FA" onClick={this.enforce2FA.bind(this)}>
+                                2FA                                
+                            </span>
                         )
                     }
                     {
                         (this.state.user.revoked) ? (
-                            <div className={"action success light"} title="Reinstate User" onClick={this.enableAccess.bind(this)}>
+                            <span className={"clickable success light"} title="Reinstate User" onClick={this.enableAccess.bind(this)}>
                                 <i className="fal fa-lock"></i>
-                            </div>
+                            </span>
                         ) : (
-                            <div className={"action danger light"} title="Revoke User" onClick={this.revokeAccess.bind(this)}>
+                            <span className={"clickable red light"} title="Revoke User" onClick={this.revokeAccess.bind(this)}>
                                 <i className="fal fa-lock"></i>
-                            </div>
+                            </span>
                         )
                     }
-                </div>
+                </footer>
             </div>
         )
     }
@@ -195,7 +201,6 @@ export default class Entities extends Component {
     render() {
         return (
             <div id="entities">
-                <h1>Entities</h1>
                 <BigList listitem={EntityListItem} endpoint='/entities/bunch' toolbar={Entities.TOOLBAR_CONFIG} />
             </div>
         )

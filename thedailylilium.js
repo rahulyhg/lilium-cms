@@ -216,8 +216,8 @@ class TheDailyLilium {
         } else {
             const temp = new Date();
             let datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, 0, 0);
-            if (cli.details.tzoffset) {
-                datestart = new Date(datestart.getTime() + (1000 * 60 * cli.details.tzoffset) - (1000 * 60 * new Date().getTimezoneOffset()));
+            if (params && params.tzoffset) {
+                datestart = new Date(datestart.getTime() + (1000 * 60 * params.tzoffset) - (1000 * 60 * new Date().getTimezoneOffset()));
             }
 
             const _id = dateformat(datestart, "ddmmyyyy");

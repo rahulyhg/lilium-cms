@@ -55,8 +55,8 @@ class EMail {
 };
 
 class MailTemplate {
-    constructor() {
-        this.displayname = "New Email template";
+    constructor(initialName) {
+        this.displayname = initialName || "New Email template";
         this.subject = "";
         this.hooks = "";
         this.description = "";
@@ -78,61 +78,27 @@ class MailController {
         require('./config.js').eachSync((conf) => {
             db.createCollection(conf, 'mailtemplates');
         });
-
-        this.createForm();
     }
 
-    createForm() {
-        require('./formBuilder.js').createForm('mailtemplate_edit', {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                'id': 'article_new',
-                'inner': true
-            },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add('displayname', 'text', {
-            displayname : "Template name"
-        })
-        .add('subject', 'text', {
-            displayname : "Subject"
-        })
-        .add('template', 'ckeditor', {
-            nolabel : true
-        })
-        .add('description', 'text', {
-            displayname : "Short description"
-        })
-        .add('stylesheet', 'textarea', {
-            displayname : "Stylesheet",
-            rows : 10
-        })
-        .add('hooks', 'liveselect', {
-            endpoint: 'mailtemplates.hooks',
-            select : {
-                value : 'name',
-                displayname : 'displayname'
-            },
-            empty : {
-                displayname : "No automation"
-            },
-            displayname: "Automatically send when"
-        })
-        .add('publish-set', 'buttonset', { buttons : [{
-                'name' : 'save',
-                'displayname': 'Save',
-                'type' : 'button',
-                'classes': ['btn-save']
-            }
-        ]});
-    }
-
-    livevar(cli, levels, params, send) {
+    livevar(cli, levels, params, sendback) {
         if (cli.hasRight('edit-emails')) {
-            if (levels[0] == "all") {
-                db.findToArray(cli._c, 'mailtemplates', {active : true}, (err, arr) => {
-                    send(arr);
+            if (levels[0] == "search") {
+                let $match= { deleted: { $ne: true } };
+                if (params.filters.search) {
+                    $match.displayname = new RegExp(params.filters.search, 'i');
+                }
+
+                if (params.filters.hook) {
+                    $match.hooks = params.filter.hook;
+                }
+
+                db.join(cli._c, 'mailtemplates', [
+                    {$match},
+                    {$sort : {_id : -1}},
+                    {$skip : params.skip || 0},
+                    {$limit : params.limit || 30}
+                ], (items) => {
+                    sendback({ items });
                 });
             } else if (levels[0] == "hooks") {
                 let arr = [];
@@ -140,49 +106,29 @@ class MailController {
                     arr.push(Object.assign(mailHooks[name], {name : name}));
                 }
 
-                send(arr);
+                sendback(arr);
             } else if (levels[0] == "simple") {
                 db.find(cli.c, 'mailtemplates', {active : true}, [], (err, cur) => {
                     cur.project({_id : 1, displayname : 1}).toArray((err, arr) => {
-                        send(arr);
+                        sendback(arr);
                     });
                 });
             } else if (levels[0]) {
                 db.findUnique(cli._c, 'mailtemplates', {_id : db.mongoID(levels[0]), active : true}, (err, obj) => {
-                    send(obj);
+                    sendback(obj);
                 });
             } else {
-                send(new Error("Undefined level " + levels[0]));
+                sendback(new Error("Undefined level " + levels[0]));
             }
         } else {
-            send(new Error("Get outta here"));
+            sendback(new Error("Get outta here"));
         }
     }
 
-    adminGET(cli) {
-        if (!cli.hasRight('edit-emails')) {
-            return cli.throwHTTP(403);
-        }
-
-        switch (cli.routeinfo.path[2]) {
-            case undefined:
-            case "list":
-                filelogic.serveAdminLML(cli);
-                break;
-
-            case "edit":
-                filelogic.serveAdminLML(cli, true);
-                break;
-
-            case 'new':
-                db.insert(cli._c, 'mailtemplates', new MailTemplate(), (err, r) => {
-                    cli.redirect(cli._c.server.url + "/admin/mailtemplates/edit/" + r.insertedId.toString(), false, 'rewrite');
-                });
-                break;
-
-            default:
-                cli.throwHTTP(404);
-        }
+    adminDELETE(cli) {
+        db.update(cli._c, 'mailtemplates', { _id: db.mongoID(cli.routeinfo.path[2]) }, { hooks: '', deleted: true }, (err, r) => {
+            cli.sendJSON({ updated: !!r.nModified });
+        });
     }
 
     adminPOST(cli) {
@@ -196,7 +142,11 @@ class MailController {
                     cli.sendJSON({success : !err, error : err});
                 });
                 break;
-
+            case 'new':
+                db.insert(cli._c, 'mailtemplates', new MailTemplate(cli.postdata.data.displayname), (err, r) => {
+                    cli.sendJSON({ success: !err, err });
+                });
+                break;
             default:
                 cli.throwHTTP(404);
         }
@@ -212,8 +162,8 @@ class LMLMail {
         this.controller.adminPOST(cli);
     }
 
-    adminGET(cli) {
-        this.controller.adminGET(cli);
+    adminDELETE(cli) {
+        this.controller.adminDELETE(cli);
     }
 
     livevar(cli, levels, params, send) {
