@@ -31,7 +31,6 @@ const db = require('./includes/db.js');
 const filelogic = require('./filelogic.js');
 const config = require('./config.js');
 const hooks = require('./hooks');
-const LML3 = require('./lml3/compiler.js');
 
 const CAKEPOP_COLLECTION = "cakepops";
 
@@ -97,7 +96,7 @@ class Cakepop {
             if (cli.postdata.data.id) {
                 db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.postdata.data.id), mendatory : action == "respond"}, {
                     $addToSet : {
-                        read : cli.me(),
+                        read : cli.me(),    
                         history : {
                             action, 
                             by : cli.me(), 
@@ -149,7 +148,7 @@ class Cakepop {
                     cakepops : dbobj
                 });
             }, {
-                content : 1, stylesheet : 1, html : 1, expiry : 1,
+                content : 1, stylesheet : 1, html : 1, expiry : 1, title: 1,
                 nocontainer : 1, mendatory : 1, auto : 1, responses : 1
             });
         } else if (action == "single") {
