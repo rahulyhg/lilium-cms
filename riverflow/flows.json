@@ -382,6 +382,20 @@
                 "children": []
             }
         }, {
+            "module" : "pwmanager.js",
+            "endpoint" : "pwmanager",
+            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"],
+            "admin_menu" : {
+                "id": "pwmanager",
+                "lys" : "password,manager,pw,social,facebook,twitter,instagram",
+                "faicon": "fa-key",
+                "displayname": "Password Manager",
+                "priority": 440,
+                "rights": ["manage-passwords"],
+                "absURL": "admin/pwmanager",
+                "children": []
+            }
+        }, {
             "module" : "amp.js",
             "endpoint" : "amp",
             "support" : ["get"]
