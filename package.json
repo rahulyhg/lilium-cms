@@ -67,6 +67,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/RykDesjardins/lilium-cms#readme",
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "JSONStream": "latest",
     "admin-mongo": "latest",
     "animejs": "^2.2.0",
