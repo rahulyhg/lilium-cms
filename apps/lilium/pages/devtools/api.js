@@ -33,7 +33,7 @@ export default class DevToolAPI extends Component {
         const send = API[this.values.method.toLowerCase()];
         this.setState({ output : "Waiting for response..." });
         const now = performance.now();
-        send(this.values.endpoint, this.payload, (err, data, r) => {
+        send(this.values.endpoint, this.values.payload, (err, data, r) => {
             const outputHead = this.values.method + " " + this.values.endpoint + " [" + r.status + "]\n" + (performance.now() - now).toFixed(0).toString() + "ms performance\n";
             this.setState({ output : outputHead + "\n" + (err ? err : JSON.stringify(data, undefined, 4) ) }, () => done())
         });
