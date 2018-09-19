@@ -208,7 +208,7 @@ var DB = function() {
     };
 	
 	this.isValidMongoID = id => {
-		mongoObjectID.isValid(id);
+		return mongoObjectID.isValid(id);
 	}
 
 	this.mongoID = function(str) {
