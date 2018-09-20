@@ -402,7 +402,7 @@
         }, {
             "module" : "cakepop.js",
             "endpoint" : "cakepop",
-            "support" : ["admin_get", "admin_post", "livevar"],
+            "support" : ["admin_post", "livevar"],
             "admin_menu" : {
                 "id": "cakepop",
                 "lys" : "cakepop,popups",
