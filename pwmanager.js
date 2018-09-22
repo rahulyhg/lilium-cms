@@ -55,11 +55,20 @@ class PwManager {
                 name: 1,
                 right: 1,
                 "passwords.name": 1,
+                "passwords.iv": 1,
+                "passwords.encrypted": 1,
                 "passwords.plaintext": 1
             }}
         ];
 
-        db.join(_c.default(), 'pwmanagercategories', pipeline, done);
+        db.join(_c.default(), 'pwmanagercategories', pipeline, categories => {
+            const allCategories = categories.map(category => new Category(category.name, category.right, category.passwords, category._id));
+            allCategories.forEach(category => { 
+                category.passwords = category.passwords.map(password => new Password(password.name, null, this.settings, password.encrypted, password.iv));
+            });
+
+            done && done(allCategories);
+        });
     }
 
     /**
@@ -80,6 +89,7 @@ class PwManager {
         db.remove(_c.default(), 'pwmanagercategories', { _id: db.mongoID(id) }, done, true);
     }
 
+
     /* Passwords */
 
     getPassword(id, done) {
@@ -98,8 +108,16 @@ class PwManager {
         const newPassword = new Password(name, plaintext, this.settings);
         newPassword.categoryId = db.mongoID(categoryId);
         newPassword.encrypt();
+        newPassword.plaintext = null;
 
-        db.insert(_c.default(), 'pwmanagerpasswords', newPassword, (err, r) => {
+        // Clone the object to hide the plaintext version of the password from the database
+        // but still be able to return the plaintext to the client
+        const dbPrepped = {...newPassword};
+        dbPrepped.plaintext = null;
+
+        db.insert(_c.default(), 'pwmanagerpasswords', dbPrepped, (err, r) => {
+            // Get the _id property of the inserted document
+            newPassword._id = dbPrepped._id;
             done && done(err, newPassword);
         });
     }
@@ -118,10 +136,14 @@ class Category {
      * Instanciates a Category object
      * @param {string} name Name of the category to be created
      * @param {string} right name of the right requirenewCategoryd
+     * @param {array} passwords Passwords held within this category
+     * @param {mongoID} name Id of the category
      */
-    constructor(name, right) {
+    constructor(name, right, passwords, id) {
         this.name = name;
         this.right = right;
+        this.passwords = passwords || [];
+        this._id = id;
     }
 
     /**
@@ -143,16 +165,27 @@ class Password {
      * @param {string} settings.algorithm Encryption algorithm to use
      * @param {string} settings.inputEncoding Encoding of the plaintext
      * @param {string} settings.outputEncoding Encoding of the ciphered password} settings 
+     * @param {string} encrypted Encrypted version of the password, used when a password is retrieved from the db
+     * @param {string} iv Initialisation vector for the password, used when a password is retrieved from the db
      */
-    constructor(name, plaintext, settings) {
+    constructor(name, plaintext, settings, encrypted, iv) {
+        console.log(name, plaintext, settings, encrypted, iv);
+        
         // encrypted is set to undefined and is generated on demand to avoid doing it each time
         // a new instance is created
         this.name = name;
         this.plaintext = plaintext;
-        this.iv = undefined;
-        this.encrypted = undefined;
+        this.encrypted = encrypted;
         this.categoryId = undefined;
         this.settings = settings;
+
+        if (iv) {
+            this.iv = iv.buffer;
+        }
+
+        if (!this.plaintext) {
+            this.plaintext = this.decrypt();
+        }
     }
 
     /**
@@ -160,6 +193,8 @@ class Password {
      * if the password hadn't been encrypted before, else, returns a 'cached' version of the encrypted password
      */
     encrypt() {
+        if (this.encrypted) return this.encrypted;
+
         if (!this.iv) this.iv = new Buffer.from(crypto.randomBytes(16));
         const cipher = crypto.createCipheriv(this.settings.algorithm, this.settings.key, this.iv);
         let crypted = cipher.update(this.plaintext, this.settings.inputEncoding, this.settings.outputEncoding);
@@ -192,8 +227,6 @@ class Password {
     }
 
     toJSON() {
-        console.log('toJSON()', {...this, encrypted: this.encrypt(), settings: undefined });
-        
         return {...this, encrypted: this.encrypt(), settings: undefined };
     }
 }
