@@ -85,6 +85,11 @@ class PwManager {
         });
     }
 
+    updateCategory(id, val, done) {
+        // No need to instanciate a Category object to only update, avoiding the overhead
+        db.update(_c.default(), 'pwmanagercategories', { _id: db.mongoID(id) }, val, done);
+    }
+
     removeCategory(id, done) {
         db.remove(_c.default(), 'pwmanagercategories', { _id: db.mongoID(id) }, done, true);
     }
@@ -93,9 +98,7 @@ class PwManager {
     /* Passwords */
 
     getPassword(id, done) {
-        db.findUnique(_c.default(), 'pwnamagerpasswords', { _id: db.mongoID(id) }, (err, r) => {
-            done && done(err, r);
-        });
+        db.findUnique(_c.default(), 'pwnamagerpasswords', { _id: db.mongoID(id) }, done);
     }
 
     /**
@@ -120,6 +123,25 @@ class PwManager {
             newPassword._id = dbPrepped._id;
             done && done(err, newPassword);
         });
+    }
+
+    updatePassword(id, val, done) {
+        // prevent client from directly changing the encrypted version of the password
+        delete val.encrypted
+
+        // If plaintext is updated, instantiate a Password object to access the encryption methods
+        // else update directly
+        if (Object.keys(val).includes('plaintext')) {
+            this.getPassword(id, (err, r) => {
+                if (err)  {
+                    done && done(err, r);
+                } else {
+                    const password = new Password();
+                }
+            });
+        } else {
+            db.update(_c.default(), 'pwmanagerpasswords', { _id: db.mongoID(id) }, val, done);
+        }
     }
 
     removePassword(id, done) {
@@ -288,7 +310,21 @@ class PwManagerController {
     }
 
     adminPUT(cli) {
+        console.log(cli);
+        console.log(cli.postdata);
         if (db.isValidMongoID(cli.routeinfo.path[3])) {
+            if (cli.routeinfo.path[2] == 'passwords') {
+                this.PwManager.updatePassword(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
+                    cli.sendJSON({ success: !err });
+                });
+            } else if (cli.routeinfo.path[2] == 'categories') {
+                this.PwManager.updateCategory(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
+                    console.log(err, r);
+                    cli.sendJSON({ success: !err });
+                });
+            } else {
+                cli.throwHTTP(404, 'Endpoint not found', true);
+            }
         } else {
             cli.throwHTTP(401, 'This endpoint requires a valid categoryId as a url param', true);
         }

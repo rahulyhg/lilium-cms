@@ -87,6 +87,10 @@ class Category extends Component {
 
                 <div class="detail-head">
                     <h1 classNema='big-title'>{this.props.name}</h1>
+                    <h2 classNema='subtitle' title={`This category is not visible by people who don't have the '${this.props.right}' right`}>
+                        <i className="far fa-shield-alt"> </i>
+                        {this.props.right}
+                    </h2>
                     {
                         this.props.passwords && this.props.passwords.length ? (<h2>Passwords</h2>) : (<h3>There are no passwords in this category</h3>)
                     }
@@ -95,10 +99,11 @@ class Category extends Component {
                             <Password name={password.name} plaintext={password.plaintext} />    
                         ))
                     }
-                    <div className="button" onClick={() => {this.setState({ createPasswordModalVisible: true })}}>
-                        <span>Create a new password</span>
-                    </div>
                 </div>
+                <footer>
+                    <span onClick={() => {this.setState({ createPasswordModalVisible: true })}}>Create a new password</span>
+                    <span className='red' onClick={this.props.removeCategory.bind(this, this.props._id)}>Remove Category</span>
+                </footer>
             </div>
         );
     }
@@ -150,6 +155,25 @@ export default class PwManager extends Component {
         });
     }
 
+    removeCategory(id) {
+        API.delete('/pwmanager/categories/' + id, {}, (err, data, r) => {
+            if (r.status == 200) {
+                let categories = this.state.categories;
+                categories = categories.filter(category => category._id != id);
+                this.setState({ categories });
+                castNotification({
+                    title: 'Category removed',
+                    type: 'success'
+                });
+            } else {
+                castNotification({
+                    title: 'Error removing category',
+                    type: 'error'
+                });
+            }
+        })
+    }
+
     render() {
         log('PwManager', 'Rendering PwManager pane with ' + this.props.levels.length + ' levels', 'detail');
         return (
@@ -164,7 +188,7 @@ export default class PwManager extends Component {
                 <h1>Password Manager</h1>
                 {
                     this.state.categories.map(category => (
-                        <Category {...category} onCreatePassword={this.onCreatePassword.bind(this)} />
+                        <Category {...category} removeCategory={this.removeCategory.bind(this)} />
                     ))
                 }
                 <div className="button" onClick={() => { this.setState({ createCategoryModalVisible: true }) }}>
