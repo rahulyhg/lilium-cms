@@ -92,7 +92,13 @@ class PwManager {
     }
 
     removeCategory(id, done) {
-        db.remove(_c.default(), 'pwmanagercategories', { _id: db.mongoID(id) }, done, true);
+        db.remove(_c.default(), 'pwmanagercategories', { _id: db.mongoID(id) }, (err, r) => {
+            if (!err) {
+                db.remove(_c.default(), 'pwmanagerpasswords', { categoryId: db.mongoID(id) }, done);
+            }else {
+                done && done(err, r);
+            }
+        }, true);
     }
 
 
