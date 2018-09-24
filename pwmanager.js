@@ -111,12 +111,12 @@ class PwManager {
         const newPassword = new Password(name, plaintext, this.settings);
         newPassword.categoryId = db.mongoID(categoryId);
         newPassword.encrypt();
-        newPassword.plaintext = null;
-
+        
         // Clone the object to hide the plaintext version of the password from the database
         // but still be able to return the plaintext to the client
         const dbPrepped = {...newPassword};
-        dbPrepped.plaintext = null;
+        dbPrepped.plaintext = undefined;
+        dbPrepped.settings = undefined;
 
         db.insert(_c.default(), 'pwmanagerpasswords', dbPrepped, (err, r) => {
             // Get the _id property of the inserted document
@@ -191,8 +191,6 @@ class Password {
      * @param {string} iv Initialisation vector for the password, used when a password is retrieved from the db
      */
     constructor(name, plaintext, settings, encrypted, iv) {
-        console.log(name, plaintext, settings, encrypted, iv);
-        
         // encrypted is set to undefined and is generated on demand to avoid doing it each time
         // a new instance is created
         this.name = name;
@@ -280,6 +278,12 @@ class PwManagerController {
     livevar(cli, levels, params, sendback) {
         if (levels[0] == 'categories') {
             this.PwManager.getCategories(cli.userinfo.rights, categories => {
+                console.log('categories: ', categories);
+                
+                categories.forEach(category => {
+                    category.passwords = category.passwords.map(password => { return { name: password.name, plaintext: password.plaintext }; });
+                });
+
                 sendback({categories});
             });
         } else if (levels[0] == 'passwords') {
@@ -298,9 +302,16 @@ class PwManagerController {
             });
         } else if (cli.routeinfo.path[2] == 'passwords') {
             if (db.isValidMongoID(cli.routeinfo.path[3])) {
-                this.PwManager.createPassword(cli.postdata.data.name, cli.postdata.data.plaintext, cli.routeinfo.path[3], (err, r) => {
-                    cli.sendJSON({ success: !err, inserted: r });
-                });
+                if (cli.postdata.data.name && cli.postdata.data.plaintext) {
+                    this.PwManager.createPassword(cli.postdata.data.name, cli.postdata.data.plaintext, cli.routeinfo.path[3], (err, r) => {
+                        if (r) {
+                            r.iv, r.encrypted, r.inputEncoding, r.outputEncoding = undefined;
+                        }
+                        cli.sendJSON({ success: !err, inserted: r });
+                    });
+                } else {
+                    cli.throwHTTP(401, 'This endpoint requires both a name and a plaintext field to create a password', true);
+                }
             } else {
                 cli.throwHTTP(401, 'This endpoint requires a valid categoryId as a url param', true);
             }
@@ -310,8 +321,6 @@ class PwManagerController {
     }
 
     adminPUT(cli) {
-        console.log(cli);
-        console.log(cli.postdata);
         if (db.isValidMongoID(cli.routeinfo.path[3])) {
             if (cli.routeinfo.path[2] == 'passwords') {
                 this.PwManager.updatePassword(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
