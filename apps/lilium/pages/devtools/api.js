@@ -1,6 +1,7 @@
 import { h, Component } from "preact";
 import API from '../../data/api';
 import { TextField, SelectField, ButtonWorker } from '../../widgets/form';
+import { getLocal, storeLocal } from "../../data/cache";
 
 const HTTP_METHODS = [
     { displayname : "GET", value : "GET" },
@@ -21,12 +22,33 @@ const styles = {
 export default class DevToolAPI extends Component {
     constructor(props) {
         super(props);
-        this.values = {method: HTTP_METHODS[0].value};
-        this.state = { output : "Waiting for request information." };
+
+        log('DevTools.API', 'Loading request from local storage', 'detail');
+        const storedInfo = getLocal('devtoolsapirequest') || {};
+
+        this.state = Object.assign({}, {
+            endpoint: '/',
+            method: HTTP_METHODS[0].value,
+            payload: '{}',
+            output : "Waiting for request information."
+        }, storedInfo);
+        this.values = this.state;
     }
 
     updatedValue(name, value) {
         this.values[name] = value;
+        this.saveRequest();
+    }
+
+    componentWillUnmount() {
+        this.saveRequest();
+    }
+
+    saveRequest() {
+        log('DevTools.API', 'Storing request in local storage', 'detail');
+        // Don't save output
+        delete this.values.output;
+        storeLocal('devtoolsapirequest', this.values);
     }
 
     sendRequest(done) {
@@ -45,9 +67,10 @@ export default class DevToolAPI extends Component {
                 <h1>API development tool</h1>
 
                 <div class="pad" style={{ paddingTop : 0 }}>
-                    <TextField name="endpoint" placeholder="API Endpoint or Live Variable" initialValue="/" onChange={this.updatedValue.bind(this)} />
-                    <SelectField name="method" placeholder="HTTP Method" initialValue="GET" onChange={this.updatedValue.bind(this)} options={HTTP_METHODS} />                   
-                    <TextField name="payload" placeholder="POST data or payload" initialValue="{}" onChange={this.updatedValue.bind(this)} multiline={true} />
+                    <TextField name="endpoint" placeholder="API Endpoint or Live Variable" initialValue={this.state.endpoint} autofocus
+                                onChange={this.updatedValue.bind(this)} />
+                    <SelectField name="method" placeholder="HTTP Method" initialValue={this.state.method} onChange={this.updatedValue.bind(this)} options={HTTP_METHODS} />                   
+                    <TextField name="payload" placeholder="POST data or payload" initialValue={this.state.payload} onChange={this.updatedValue.bind(this)} multiline={true} />
 
                     <ButtonWorker text="Send request" work={this.sendRequest.bind(this)} />
 
