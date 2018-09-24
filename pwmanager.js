@@ -55,6 +55,7 @@ class PwManager {
                 name: 1,
                 right: 1,
                 "passwords.name": 1,
+                "passwords._id": 1,
                 "passwords.iv": 1,
                 "passwords.encrypted": 1,
                 "passwords.plaintext": 1
@@ -64,7 +65,7 @@ class PwManager {
         db.join(_c.default(), 'pwmanagercategories', pipeline, categories => {
             const allCategories = categories.map(category => new Category(category.name, category.right, category.passwords, category._id));
             allCategories.forEach(category => { 
-                category.passwords = category.passwords.map(password => new Password(password.name, null, this.settings, password.encrypted, password.iv));
+                category.passwords = category.passwords.map(password => new Password(password.name, password._id, null, this.settings, password.encrypted, password.iv));
             });
 
             done && done(allCategories);
@@ -108,7 +109,7 @@ class PwManager {
      * @returns {Password} A password created with the settings provided to PwManager
      */
     createPassword(name, plaintext, categoryId, done) {
-        const newPassword = new Password(name, plaintext, this.settings);
+        const newPassword = new Password(name, undefined, plaintext, this.settings);
         newPassword.categoryId = db.mongoID(categoryId);
         newPassword.encrypt();
         
@@ -190,10 +191,11 @@ class Password {
      * @param {string} encrypted Encrypted version of the password, used when a password is retrieved from the db
      * @param {string} iv Initialisation vector for the password, used when a password is retrieved from the db
      */
-    constructor(name, plaintext, settings, encrypted, iv) {
+    constructor(name, id, plaintext, settings, encrypted, iv) {
         // encrypted is set to undefined and is generated on demand to avoid doing it each time
         // a new instance is created
         this.name = name;
+        this._id = id;
         this.plaintext = plaintext;
         this.encrypted = encrypted;
         this.categoryId = undefined;
@@ -281,7 +283,7 @@ class PwManagerController {
                 console.log('categories: ', categories);
                 
                 categories.forEach(category => {
-                    category.passwords = category.passwords.map(password => { return { name: password.name, plaintext: password.plaintext }; });
+                    category.passwords = category.passwords.map(password => { return { name: password.name, plaintext: password.plaintext, _id: password._id }; });
                 });
 
                 sendback({categories});
@@ -321,6 +323,8 @@ class PwManagerController {
     }
 
     adminPUT(cli) {
+        console.log(cli.postdata);
+        
         if (db.isValidMongoID(cli.routeinfo.path[3])) {
             if (cli.routeinfo.path[2] == 'passwords') {
                 this.PwManager.updatePassword(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
