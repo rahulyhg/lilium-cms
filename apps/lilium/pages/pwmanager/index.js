@@ -178,17 +178,20 @@ export default class PwManager extends Component {
         })
     }
 
-    createCategory() {
+    createCategory(done) {
         API.post('/pwmanager/categories', this.createCategoriesValues, (err, data, r) => {
             if (r.status == 200) {
                 const categories = this.state.categories;
                 categories.push(data.inserted);
                 this.setState({ categories, createCategoryModalVisible: false });
+                done && done()
             } else {
                 castNotification({
                     title: 'Error creating the new password',
                     type: 'error'
                 })
+
+                done && done()
             }
         });
     }
