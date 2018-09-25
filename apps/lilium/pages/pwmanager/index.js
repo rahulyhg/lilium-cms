@@ -139,8 +139,8 @@ class Category extends Component {
                     }
                 </div>
                 <footer>
-                    <span onClick={() => {this.setState({ createPasswordModalVisible: true })}}>Create a new password</span>
-                    <span className='red' onClick={this.props.removeCategory.bind(this, this.props._id)}>Remove Category</span>
+                    <span onClick={() => {this.setState({ createPasswordModalVisible: true })}}><i className="fal fa-plus"></i> Create a new password</span>
+                    <span className='red' onClick={this.props.removeCategory.bind(this, this.props._id)}><i className="fal fa-trash"></i> Remove Category</span>
                 </footer>
             </div>
         );
