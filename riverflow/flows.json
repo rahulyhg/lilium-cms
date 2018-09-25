@@ -60,6 +60,10 @@
             "endpoint" : "notifications",
             "support" : ["admin_post"]
         }, {
+            "module" : "googlemaps.js",
+            "endpoint" : "googlemaps",
+            "support" : ["admin_post", "admin_get", "setup"]
+        }, {
             "module" : "search.js",
             "endpoint" : "search",
             "support" : ["livevar", "setup"]
