@@ -14,7 +14,6 @@ class Password extends Component {
      * upper case and lower case letters, numbers and symbols
      */
     static generateRandom() {
-        alert('generating random');
         let generated = '';
         if (window.crypto && window.crypto.getRandomValues) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#[]{}$%&?()';

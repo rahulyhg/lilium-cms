@@ -131,8 +131,6 @@ export class TextField extends FormField {
     }
 
     componentWillReceiveProps(props) {
-        console.log('will recieve props: ', props);
-        
         if (props.value) {
             this.inputbox.value = props.value;
         }
@@ -154,8 +152,6 @@ export class TextField extends FormField {
     }
 
     render() {
-        console.log('rendered');
-        
         return (
             <div class="field-wrap" style={this.props.wrapstyle || {}}>
                 { this.props.placeholder && this.props.placeholderType != "inside" ? <b class="placeholder">{this.props.placeholder}</b> : null }
