@@ -131,7 +131,14 @@ export class TextField extends FormField {
     }
 
     componentWillReceiveProps(props) {
-        props.value && (this.inputbox.value = props.value)
+        if (props.value) {
+            this.changed({ target : { value : props.value }});
+            this.inputbox.value = props.value;
+        }
+    }
+
+    shouldComponentUpdate(nextProps) {
+        return !nextProps.value;
     }
 
     handleKeyPress(ev) {
