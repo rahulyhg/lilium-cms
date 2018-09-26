@@ -7,6 +7,7 @@ import { TextField, ButtonWorker, EditableText } from "../../widgets/form";
 class Password extends Component {
     constructor(props) {
         super(props);
+        this.values = {};
     }
 
     /**
@@ -34,15 +35,30 @@ class Password extends Component {
         return generated;
     }
 
+    updateValue(name, val) {
+        this.values[name] = val;
+        API.put('/pwmanager/passwords/' + this.props.id, this.values, (err, data, r) => {
+            if (r.status == 200) {
+                castNotification({
+                    title: 'Password updated'
+                })
+            } else {
+                castNotification({
+                    title: 'Error updating the password'
+                })
+            }
+        });
+    }
+
     render() {
         return (
             <div className="password">
                 <div className="delete-password" onClick={this.props.deletePassword.bind(this, this.props.id)}><i className="fal fa-times"></i></div>
                 <div className="password-name">
-                    <EditableText initialValue={this.props.name} placeholder='Name' placeholderType='inside' />
+                    <EditableText initialValue={this.props.name} name='name' placeholder='Name' placeholderType='inside' onChange={this.updateValue.bind(this)} />
                 </div>
                 <div className="password-plaintext">
-                    <EditableText initialValue={this.props.plaintext} placeholder='plaintext'  placeholderType='inside' />
+                    <EditableText initialValue={this.props.plaintext} name='plaintext' placeholder='plaintext'  placeholderType='inside' onChange={this.updateValue.bind(this)} />
                 </div>
             </div>
         )
