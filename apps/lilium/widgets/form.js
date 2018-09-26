@@ -138,7 +138,7 @@ export class TextField extends FormField {
     }
 
     shouldComponentUpdate(nextProps) {
-        if (nextProps.value) return false;
+        return !nextProps.value;
     }
 
     handleKeyPress(ev) {
