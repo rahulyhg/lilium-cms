@@ -135,20 +135,16 @@ class PwManager {
     updatePassword(id, val, done) {
         // prevent client from directly changing the encrypted version of the password
         delete val.encrypted
-        console.log(id, val);
         
         // If plaintext is updated, instantiate a Password object to access the encryption methods
         // else update directly
         if (Object.keys(val).includes('plaintext')) {
             this.getPassword(id, (err, r) => {
-                console.log('getPassword callback : ', err, r);
                 
                 if (err)  {
                     done && done(err, r);
                 } else {
                     const password = new Password(val.name || r.name, r._id, val.plaintext, this.settings);
-                    console.log('new password', password);
-                    
                     
                     db.update(_c.default(), 'pwmanagerpasswords', { _id: db.mongoID(id) }, {
                             name: password.name,
@@ -227,12 +223,8 @@ class Password {
         }
 
         if (!this.encrypted) {
-            console.log('ENCRYPT');
-            
             this.encrypt();
         }
-
-        console.log('this: ', this);
     }
 
     /**
@@ -356,12 +348,10 @@ class PwManagerController {
             if (db.isValidMongoID(cli.routeinfo.path[3])) {
                 if (cli.routeinfo.path[2] == 'passwords') {
                     this.PwManager.updatePassword(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
-                        console.log(err);
                         cli.sendJSON({ success: !err, err });
                     });
                 } else if (cli.routeinfo.path[2] == 'categories') {
                     this.PwManager.updateCategory(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
-                        console.log(err, r);
                         cli.sendJSON({ success: !err });
                     });
                 } else {
