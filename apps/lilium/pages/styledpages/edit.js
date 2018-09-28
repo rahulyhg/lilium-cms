@@ -82,7 +82,7 @@ export class EditStyledPage extends Component {
     }
 
     remove(done) {
-        API.post('/styledpages/remove/' + this.state.styledPage._id, {}, (err, data, r) => {
+        API.delete('/styledpages/' + this.state.styledPage._id, {}, (err, data, r) => {
             if (r.status == 200) {
                 this.unsavedModifications = false;
                 done();

@@ -206,7 +206,11 @@ var DB = function() {
             }
         });
     };
-    
+	
+	this.isValidMongoID = id => {
+		return mongoObjectID.isValid(id);
+	}
+
 	this.mongoID = function(str) {
 		try {
 			return new mongoObjectID(str);

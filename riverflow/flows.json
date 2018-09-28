@@ -66,7 +66,7 @@
         }, {
             "module" : "ads.js",
             "endpoint" : "ads",
-            "support" : ["admin_get", "admin_post", "livevar", "setup"]
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "history.js",
             "endpoint" : "history",
@@ -189,7 +189,7 @@
         }, {
             "module" : "mail.js",
             "endpoint" : "mailtemplates",
-            "support" : ["setup", "admin_post", "admin_get", "livevar"],
+            "support" : ["setup", "admin_post", "livevar", "admin_delete"],
             "hooks" : [
                 {"name" : "settings_will_save", "priority" : 50, "callback" : "settingsWillSave" }
             ],
@@ -234,7 +234,7 @@
         }, {
             "module" : "styledpages.js",
             "endpoint" : "styledpages",
-            "support" : [ "admin_post", "livevar", "setup", "api_get"]
+            "support" : [ "admin_post", "livevar", "setup", "api_get", "admin_delete"]
         }, {
             "module" : "docs.js",
             "endpoint" : "docs",
@@ -382,13 +382,27 @@
                 "children": []
             }
         }, {
+            "module" : "pwmanager.js",
+            "endpoint" : "pwmanager",
+            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"],
+            "admin_menu" : {
+                "id": "pwmanager",
+                "lys" : "password,manager,pw,social,facebook,twitter,instagram",
+                "faicon": "fa-key",
+                "displayname": "Password Manager",
+                "priority": 440,
+                "rights": ["manage-passwords"],
+                "absURL": "admin/pwmanager",
+                "children": []
+            }
+        }, {
             "module" : "amp.js",
             "endpoint" : "amp",
             "support" : ["get"]
         }, {
             "module" : "cakepop.js",
             "endpoint" : "cakepop",
-            "support" : ["admin_get", "admin_post", "livevar"],
+            "support" : ["admin_post", "livevar"],
             "admin_menu" : {
                 "id": "cakepop",
                 "lys" : "cakepop,popups",

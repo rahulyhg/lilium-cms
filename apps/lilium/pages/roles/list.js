@@ -65,7 +65,7 @@ export class RolesList extends Component {
     render() {
         return (
             <div id="roles-management">
-                <Modal visible={this.state.createModalVisible} title='Create a role' onChange={(name, val) => { this.values[name] = val; }} >
+                <Modal visible={this.state.createModalVisible} title='Create a role'>
                     <TextField name='displayname' placeholder='Display Name' onChange={(name, val) => { this.values[name] = val; }} />
                     <TextField name='name' placeholder='Name' onChange={(name, val) => { this.values[name] = val; }} />
                     <MultitagBox name='rights' placeholder='Rights' onChange={(name, val) => { this.values[name] = val; }} />
