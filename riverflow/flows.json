@@ -62,7 +62,7 @@
         }, {
             "module" : "googlemaps.js",
             "endpoint" : "googlemaps",
-            "support" : ["admin_post", "admin_get", "setup"]
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "search.js",
             "endpoint" : "search",

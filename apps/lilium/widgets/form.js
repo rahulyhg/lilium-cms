@@ -610,7 +610,7 @@ export class DebouncedField extends FormField {
         this.timeoutId && clearTimeout(this.timeoutId);
         this.timeoutId = setTimeout(() => {
             if (this.oldValue != ev.target.value) {
-                this.props.onDebounce(ev.target.value)
+                this.props.onDebounce && this.props.onDebounce(ev.target.value)
             }
          
             this.oldValue = ev.target.value;
@@ -620,7 +620,7 @@ export class DebouncedField extends FormField {
     render() {
         return (
             <TextField placeholder={this.props.placeholder} onKeyPress={this.debounceInput.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
-                        onFocus={this.props.onFocus.bind(this)} keyEvents={this.props.keyEvents} />
+                        onFocus={this.props.onFocus && this.props.onFocus.bind(this)} keyEvents={this.props.keyEvents} />
         );
     }
 }
