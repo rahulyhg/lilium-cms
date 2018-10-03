@@ -131,8 +131,10 @@ export class TextField extends FormField {
     }
 
     componentWillReceiveProps(props) {
-        if (props.value) {
+        if (typeof props.value != 'undefined') {
             this.inputbox.value = props.value;
+        } else {
+            this.inputbox.value = '';
         }
     }
 
@@ -155,7 +157,7 @@ export class TextField extends FormField {
                 {
                     this.props.multiline ? 
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={this.props.style || {}} 
-                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
+                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}>{this.props.initialValue || this.props.value || this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
                                     onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
                                     onFocus={this.props.onFocus && this.props.onFocus.bind(this)} ref={el => {this.inputbox = el}} />)
