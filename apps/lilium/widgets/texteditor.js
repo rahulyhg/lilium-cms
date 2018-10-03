@@ -47,8 +47,14 @@ export class TextEditor extends Component {
                     icon: 'fa fa-map-marker-alt',
                     tooltip: 'Insert Place',
                     onclick: () => {
-                        PlacePicker.cast({}, placeId => {
-                            alert(placeId);
+                        PlacePicker.cast({}, place => {
+                            console.log(place);
+                            
+                            const dummyPlaceEl = document.createElement('div');
+                            dummyPlaceEl.className = 'lml-placeholder-google-maps';
+                            dummyPlaceEl.dataset.placeId = place._id;
+
+                            editor.insertContent(dummyPlaceEl.outerHTML);
                         });
                     }
                 });

@@ -36,53 +36,57 @@
 }
 
 #place-picker:extend(.picker) {
-    padding: 20px;
+    display: flex;
+    flex-direction: column;
 
     #place-picker-search-pane:extend(.place-picker-fullscreen-pane) {
         left: 0;
-        padding: 0px 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        
+        #search-content-wrapper {
+            margin: 0px 20px;
+            
+            #search-results {
+                height: 205px;
 
-        #search-bar {
-            display: flex;
-    
-            & > #query {
-                flex-grow: 1;
-            }
-            & > #search-google {
-                flex: 200px 0 0;
-                margin: 0px 20px;
-                text-align: center;
-                #search-google-cb {
-                    color: #777;
-                    font-size: 2.8em;
+                .place {
                     cursor: pointer;
-                    &[aria-checked='true'] {
-                        color: #4285F4;
+                    margin: 8px;
+                    box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
+                    
+                    &:hover {
+                        background-color: rgb(241, 241, 241);
+                    }
+                    
+                    h2.place-name {
+                        color: #777;
+                        font-weight: initial;
+                    }
+            
+                    &.selected h2.place-name {
+                        font-weight: bolder;
+                        color: #222
                     }
                 }
             }
+
+            #place-details {
+                width: initial;
+                margin-top: 20px;
+                padding: 12px;
+                flex-grow: 1;
+                overflow-y: auto;
+            }
         }
 
-        #search-results .place {
-            cursor: pointer;
-            margin: 8px;
-            box-shadow: 0px 2px 0px rgba(0,0,0,0.2);
-            
-            &:hover {
-                background-color: rgb(241, 241, 241);
-            }
-            
-            h2.place-name {
-                color: #777;
-                font-weight: initial;
-            }
-
-            &.selected h2.place-name {
-                font-weight: bolder;
-                color: #222
-            }
+        #place-picker-actions-bar {
+            background-color: #F6F6F6;
+            padding: 6px;
         }
     }
+
 
     #place-picker-map-pane:extend(.place-picker-fullscreen-pane) {
         right: 0;
