@@ -1,5 +1,7 @@
 import { h, Component } from 'preact';
 import API from '../data/api';
+import { ImagePicker } from '../layout/imagepicker';
+import { PlacePicker } from '../layout/placepicker';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -30,12 +32,39 @@ export class TextEditor extends Component {
             height: 500,
             convert_urls : false,
             menubar: false,
+            setup: editor => {
+                editor.addButton('insert-image', {
+                    icon: 'image',
+                    tooltip: 'Insert Image',
+                    onclick: () => {
+                        ImagePicker.cast({}, image => {
+                            alert('Yay, you chose an image');
+                        });
+                    }
+                });
+
+                editor.addButton('insert-place', {
+                    icon: 'fa fa-map-marker-alt',
+                    tooltip: 'Insert Place',
+                    onclick: () => {
+                        PlacePicker.cast({}, place => {
+                            console.log(place);
+                            
+                            const dummyPlaceEl = document.createElement('div');
+                            dummyPlaceEl.className = 'lml-placeholder-google-maps';
+                            dummyPlaceEl.dataset.placeId = place._id;
+
+                            editor.insertContent(dummyPlaceEl.outerHTML);
+                        });
+                    }
+                });
+            },
             plugins: [
                 'advlist autolink lists link image charmap print preview anchor textcolor',
                 'searchreplace visualblocks code fullscreen hr',
                 'media paste wordcount'
             ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insertUpload insertEmbed link | bullist numlist | fullscreen | code',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-image insert-place insertEmbed link | bullist numlist | fullscreen | code',
             content_css: [
                 '/compiled/theme/tinymce.css'
             ],
@@ -81,7 +110,7 @@ export class TextEditor extends Component {
 
         if (this.autosave) {
             this.setState({ saving : true });
-            API[this.savemethod](this.endpoint, { 
+            API[this.savemethod](this.endpoint, {
                 [this.fieldkey] : this.props.name || this.rID, 
                 [this.valuekey] : this.props.format ? this.props.format(this.getContent()) : this.getContent()
             }, (err, resp, r) => {
