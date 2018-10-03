@@ -123,7 +123,6 @@ export class PlacePicker extends Component {
 
     render() {
         if (!this.state.visible) return null;
-        console.log(JSON.stringify(this.state.selectedPlace));
         
         return (
             <div id="place-picker-overlay">
@@ -162,8 +161,8 @@ export class PlacePicker extends Component {
                             </div>
                         </div>
                         <div id="place-picker-actions-bar">
-                            <a role='button' className="button" onClick={PlacePicker.accept.bind(this)}>Add Selected Place</a>
-                            <a role='button' className="button" onClick={PlacePicker.dismiss.bind(this)}>Cancel</a>
+                            <a role='button' className="button fill purple" onClick={PlacePicker.accept.bind(this)}>Add Selected Place</a>
+                            <a role='button' className="button outline red" onClick={PlacePicker.dismiss.bind(this)}>Cancel</a>
                         </div>
                     </div>
                     <div id="place-picker-map-pane">

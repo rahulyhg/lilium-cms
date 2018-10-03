@@ -26,7 +26,7 @@
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
-            "support" : ["livevar", "admin_get", "admin_post", "setup"],
+            "support" : ["livevar", "admin_post", "setup"],
             "admin_menu" : {
                 "id": "ponglinks",
                 "lys" : "ponglinks",
@@ -253,7 +253,7 @@
         }, {
             "module" : "contentcontroller.js",
             "endpoint" : "publishing",
-            "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "livevar"],
+            "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "get", "livevar"],
             "admin_menu" : {
                 "id" : "publishing",
                 "lys" : "articles,publishing,content",

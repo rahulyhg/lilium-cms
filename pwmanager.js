@@ -105,7 +105,7 @@ class PwManager {
     /* Passwords */
 
     getPassword(id, done) {
-        db.findUnique(_c.default(), 'pwnamagerpasswords', { _id: db.mongoID(id) }, done);
+        db.findUnique(_c.default(), 'pwmanagerpasswords', { _id: db.mongoID(id) }, done);
     }
 
     /**
@@ -135,15 +135,17 @@ class PwManager {
     updatePassword(id, val, done) {
         // prevent client from directly changing the encrypted version of the password
         delete val.encrypted
-
+        
         // If plaintext is updated, instantiate a Password object to access the encryption methods
         // else update directly
         if (Object.keys(val).includes('plaintext')) {
             this.getPassword(id, (err, r) => {
+                
                 if (err)  {
                     done && done(err, r);
                 } else {
                     const password = new Password(val.name || r.name, r._id, val.plaintext, this.settings);
+                    
                     db.update(_c.default(), 'pwmanagerpasswords', { _id: db.mongoID(id) }, {
                             name: password.name,
                             encrypted: password.encrypted,
@@ -218,6 +220,10 @@ class Password {
 
         if (!this.plaintext) {
             this.plaintext = this.decrypt();
+        }
+
+        if (!this.encrypted) {
+            this.encrypt();
         }
     }
 
@@ -338,22 +344,23 @@ class PwManagerController {
     }
 
     adminPUT(cli) {
-        if (db.isValidMongoID(cli.routeinfo.path[3])) {
-            if (cli.routeinfo.path[2] == 'passwords') {
-                this.PwManager.updatePassword(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
-                    cli.sendJSON({ success: !err });
-                });
-            } else if (cli.routeinfo.path[2] == 'categories') {
-                this.PwManager.updateCategory(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
-                    console.log(err, r);
-                    cli.sendJSON({ success: !err });
-                });
+        cli.readPostData(postdata => {
+            if (db.isValidMongoID(cli.routeinfo.path[3])) {
+                if (cli.routeinfo.path[2] == 'passwords') {
+                    this.PwManager.updatePassword(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
+                        cli.sendJSON({ success: !err, err });
+                    });
+                } else if (cli.routeinfo.path[2] == 'categories') {
+                    this.PwManager.updateCategory(cli.routeinfo.path[3], cli.postdata.data, (err, r) => {
+                        cli.sendJSON({ success: !err });
+                    });
+                } else {
+                    cli.throwHTTP(404, 'Endpoint not found', true);
+                }
             } else {
-                cli.throwHTTP(404, 'Endpoint not found', true);
+                cli.throwHTTP(401, 'This endpoint requires a valid categoryId as a url param', true);
             }
-        } else {
-            cli.throwHTTP(401, 'This endpoint requires a valid categoryId as a url param', true);
-        }
+        });
     }
 
     adminDELETE(cli) {

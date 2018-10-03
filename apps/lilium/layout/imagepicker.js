@@ -178,7 +178,7 @@ export class ImagePicker extends Component {
             initState.loading = true;
             _singleton.setState(initState);
 
-            _single.fetchLatest(allImages => {
+            _singleton.fetchLatest(allImages => {
                 API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
                     allImages.unshift(upload);
                     initState.images = allImages;

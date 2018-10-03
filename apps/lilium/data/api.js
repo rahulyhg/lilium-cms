@@ -1,18 +1,17 @@
 import { getAPI, storeAPI } from './cache';
 
 class API {
-    static request(method = "GET", endpoint, params = {}, data, sendback) {
+    static request(method = "GET", endpoint, params = {}, data, sendback, resptype = "json") {
         log('API', 'Requesting ' + method + ' to endpoint : ' + endpoint, 'detail');
         const now = Date.now();
         fetch(`${endpoint}?p=${JSON.stringify(params)}`, { credentials : "include", method, body : data && JSON.stringify(data), headers: data && { "Content-Type": "application/json" } }).then(r => {
             if (Math.floor(r.status / 200) == 1) {
                 log('API', '['+ r.status +'] API call to ' + endpoint + ' replied in ' + (Date.now() - now) + "ms", 'success');
-                r.json().then(resp => {
-                    log('API', 'JSON parsed successfully', 'detail');
+                r[resptype]().then(resp => {
+                    log('API', resptype + ' parsed successfully', 'detail');
                     sendback(undefined, resp, r);
                 }).catch(err => {
-                    console.log(err);
-                    log('API', 'JSON failed to parse for endpoint ' + endpoint, 'warn');
+                    log('API', resptype + ' failed to parse for endpoint ' + endpoint, 'warn');
                     sendback(err, undefined, r);
                 });
             } else {               
@@ -45,16 +44,16 @@ class API {
         }
     }
 
-    static post(endpoint, data, sendback) {
-        API.request('POST', "/admin" + endpoint, {}, data, sendback);
+    static post(endpoint, data, sendback, resptype) {
+        API.request('POST', "/admin" + endpoint, {}, data, sendback, resptype);
     }
 
-    static put(endpoint, data, sendback) {
-        API.request('PUT', '/admin' + endpoint, {}, data, sendback);
+    static put(endpoint, data, sendback, resptype) {
+        API.request('PUT', '/admin' + endpoint, {}, data, sendback, resptype);
     }
 
-    static delete(endpoint, data, sendback) {
-        API.request('DELETE', '/admin' + endpoint, {}, data, sendback);
+    static delete(endpoint, data, sendback, resptype) {
+        API.request('DELETE', '/admin' + endpoint, {}, data, sendback, resptype);
     }
 
     static rebuild() {

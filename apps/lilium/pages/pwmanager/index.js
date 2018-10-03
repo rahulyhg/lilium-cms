@@ -7,6 +7,7 @@ import { TextField, ButtonWorker, EditableText } from "../../widgets/form";
 class Password extends Component {
     constructor(props) {
         super(props);
+        this.values = {};
     }
 
     /**
@@ -14,7 +15,6 @@ class Password extends Component {
      * upper case and lower case letters, numbers and symbols
      */
     static generateRandom() {
-        alert('generating random');
         let generated = '';
         if (window.crypto && window.crypto.getRandomValues) {
             const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!#[]{}$%&?()';
@@ -35,15 +35,30 @@ class Password extends Component {
         return generated;
     }
 
+    updateValue(name, val) {
+        this.values[name] = val;
+        API.put('/pwmanager/passwords/' + this.props.id, this.values, (err, data, r) => {
+            if (r.status == 200) {
+                castNotification({
+                    title: 'Password updated'
+                })
+            } else {
+                castNotification({
+                    title: 'Error updating the password'
+                })
+            }
+        });
+    }
+
     render() {
         return (
             <div className="password">
                 <div className="delete-password" onClick={this.props.deletePassword.bind(this, this.props.id)}><i className="fal fa-times"></i></div>
                 <div className="password-name">
-                    <EditableText initialValue={this.props.name} placeholder='Name' placeholderType='inside' />
+                    <EditableText initialValue={this.props.name} name='name' placeholder='Name' placeholderType='inside' onChange={this.updateValue.bind(this)} />
                 </div>
                 <div className="password-plaintext">
-                    <EditableText initialValue={this.props.plaintext} placeholder='plaintext'  placeholderType='inside' />
+                    <EditableText initialValue={this.props.plaintext} name='plaintext' placeholder='plaintext'  placeholderType='inside' onChange={this.updateValue.bind(this)} />
                 </div>
             </div>
         )
@@ -139,8 +154,8 @@ class Category extends Component {
                     }
                 </div>
                 <footer>
-                    <span onClick={() => {this.setState({ createPasswordModalVisible: true })}}>Create a new password</span>
-                    <span className='red' onClick={this.props.removeCategory.bind(this, this.props._id)}>Remove Category</span>
+                    <span onClick={() => {this.setState({ createPasswordModalVisible: true })}}><i className="fal fa-plus"></i> Create a new password</span>
+                    <span className='red' onClick={this.props.removeCategory.bind(this, this.props._id)}><i className="fal fa-trash"></i> Remove Category</span>
                 </footer>
             </div>
         );

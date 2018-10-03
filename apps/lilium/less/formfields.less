@@ -3,12 +3,124 @@
     position: relative;
     overflow: hidden;
     padding: 8px 12px;
-    background: @liliumPurple;
+    background: transparent;
     box-shadow: 0px 1px 2px rgba(175, 87, 228, 0.28);
     color: white;
-    border: 1px solid #9355af;
+    border: 1px solid #DDD;
     margin-right: 12px;
     cursor: pointer;
+    border-radius: 4px;
+
+    &.outline {
+        &.white {
+            background: white;
+            border-color: #DDD;
+            color: #333;
+
+            &:hover {
+                background-color: #F6F6F6;
+            }
+        }
+
+        &.blue {
+            border-color: @blue;
+            color: @blue;
+
+            &:hover {
+                background-color: @blue;
+                color: white;
+            }
+        }
+
+        &.red {
+            border-color: @red;
+            color: @red;
+
+            &:hover {
+                background-color: @red;
+                color: white;
+            }
+        }
+
+        &.green {
+            border-color: @green;
+            color: @green;
+
+            &:hover {
+                background-color: @green;
+                color: white;
+            }
+        }
+
+        &.purple {
+            border-color: @liliumPurple;
+            color: @liliumPurple;
+
+            &:hover {
+                background-color: @liliumPurple;
+                color: white;
+            }
+        }
+    }
+
+    &.fill {
+        &.white {
+            background: white;
+            border-color: #DDD;
+            color: #333;
+
+            &:hover {
+                background-color: #F6F6F6;
+            }
+        }
+
+        &.blue {
+            background-color: @blue;
+            border-color: darken(@blue, @buttonBorderDarken);
+
+            &:hover {
+                background-color: darken(@blue, @buttonDarken);
+                color: white;
+            }
+        }
+
+        &.red {
+            background-color: @red;
+            border-color: darken(@red, @buttonBorderDarken);
+
+            &:hover {
+                background-color: darken(@red, @buttonDarken);
+                color: white;
+            }
+        }
+
+        &.green {
+            background-color: @green;
+            border-color: darken(@green, @buttonBorderDarken);
+
+            &:hover {
+                background-color: darken(@green, @buttonDarken);
+                color: white;
+            }
+        }
+
+        &.purple {
+            background-color: @liliumPurple;
+            border-color: darken(@liliumPurple, @buttonBorderDarken);
+
+            &:hover {
+                background-color: darken(@liliumPurple, @buttonDarken);
+                color: white;
+            }
+        }
+    }
+}
+
+.button-worker span {
+    transition: transform 0.2s, opacity 0.2s;        
+    transform: translate3d(0px, 0px, 0px);
+    opacity : 1;
+    display: block;
 
     span {
         transition: all 0.2s;        
@@ -169,6 +281,15 @@ textarea {
 .checkbox-field-wrapper {
     display: flex;
     align-items: center;
+    cursor: pointer;
+
+    hr {
+        background: transparent;
+        border: none;
+        border-top: 1px dashed #BBB;
+        margin: 0px 20px 3px;
+        flex : 1;
+    }
 }
 
 .checkbox-wrapper {
@@ -178,7 +299,7 @@ textarea {
     background-color: transparent;
     height: 25px;
     width: 25px;
-    margin: 12px 12px 12px 20px;
+    margin: 12px 0px 12px 20px;
     flex: 0 0 25px;
     flex-wrap: nowrap;
     display: flex;
@@ -233,4 +354,134 @@ textarea {
 .selectedoptions-wrapper {
     display: flex;
     background-color: white;
+}
+
+.image-field-wrap {
+    >b {
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .media-picker-field-image-wrap {
+        width: auto;
+        min-height: 240px;
+        cursor: pointer;
+        box-sizing: border-box;
+        border: 5px dashed #DDD;
+        color: #AAA;
+        text-align: center;
+        margin-bottom: 0px;
+        font-size: 32px;
+
+        &.small {
+            min-height: 150px;
+            height: 150px;
+            width: 150px;
+            font-size: 16px;
+
+            b {
+                margin-top: 50px;
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+        }
+    
+        b {
+            margin-top: 100px;
+            display: block;
+        }
+    
+        img {
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+            display: block;
+        }
+    }
+}
+
+.topic-picker {
+    .phase-category {
+        >b {
+            display: block;
+            padding: 30px 0px;
+            font-size: 32px;
+            color: #999;
+            text-align: center;
+        }
+
+        .category-picker-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+
+            .category-bubble {
+                background-color: #EEE;
+                color: #333;
+                padding: 8px 12px;
+                border-radius: 4px;
+                text-transform: uppercase;
+                margin: 0px 10px;
+                cursor: pointer;
+                font-size: 22px;
+            }
+        }
+    }
+
+    .topic-picker-current {
+        padding: 4px 6px;
+        border-top: 1px dashed #DDD;
+
+        i {
+            color: #999;
+        }
+    }
+
+    .phase-tree {
+        display: flex;
+        height: 320px;
+
+        .topic-children-slide {
+            height: 100%;
+            overflow-y: auto;
+            min-width: 200px;
+            border-right: 1px solid #DDD;
+
+            .topic-children-item {
+                padding: 4px 6px;
+                cursor: pointer;
+                border-bottom: 1px solid #DDD;
+
+                &.selected {
+                    background-color: #F3F3F3;
+                }
+            }
+        }
+    }
+
+    .phase-lock {
+        height: 320px;
+        display: block;
+        text-align: center;
+        background: #F6F6F6;
+        box-sizing: border-box;
+        padding-top: 120px;
+
+        >b {
+            font-size: 18px;
+        }
+
+        .selected-topic-displayname {
+            font-size: 32px;
+        }
+
+        .selected-topic-slug {
+            font-size: 15px;
+            display: block;
+        }
+    }
 }

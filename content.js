@@ -48,6 +48,7 @@ class ContentLib {
                 content : ["<p><br></p>"],
                 author : author, 
                 createdBy : author, 
+                previewkey : Math.random().toString(32).substring(2),
                 subscribers : [author],
                 type : "post",
                 status : "draft",
@@ -323,6 +324,21 @@ class ContentLib {
         db.join(_c, CONTENT_COLLECTION, pipeline, arr => sendback({ items : arr }));
     }
 
+    fetchSponsoredInformation(_c, post, done) {
+        if (post.isSponsored && post.useSponsoredBox && post.sponsoredBoxLogo) {
+            db.findUnique(_c, 'uploads', { _id : db.mongoID(post.sponsoredBoxLogo) }, (err, image) => {
+                if (image) {
+                    post.sponsoredBoxLogoURL = image.sizes.square.url;
+                    post.sponsoredBoxLogoImage = image;
+                }
+                
+                done();
+            });
+        } else {
+            done();
+        }
+    }
+
     getFull(_c, _id, sendback, match = {}, collection = CONTENT_COLLECTION) {
         const $match = match;
         $match._id = db.mongoID(_id);
@@ -346,7 +362,9 @@ class ContentLib {
                 post.url = post.fulltopic && post.name && (_c.server.protocol + _c.server.url + "/" + post.fulltopic.completeSlug + "/" + post.name);
 
                 hooks.fireSite(_c, 'contentGetFull', {article : post});
-                sendback(post);
+                this.fetchSponsoredInformation(_c, post, () => {
+                    sendback(post);
+                })
             }, { displayname : 1, username : 1, avatarURL : 1, avatarMini : 1, slug : 1, revoked : 1 });
         });
     }
@@ -734,12 +752,13 @@ class ContentLib {
     }
 
 
-    getPreview(_c, postid, payload, sendback) {
-        this.parseSpecialValues(payload);
+    getPreview(_c, postid, previewkey, sendback) {
+        // this.parseSpecialValues(payload);
 
-        db.findUnique(_c, 'content', { _id : postid }, (err, post) => {
-            const previewpost = {};
-            Object.assign(previewpost, post, payload);
+        db.findUnique(_c, 'content', { _id : postid, previewkey }, (err, previewpost) => {
+            if (!previewpost) {
+                return sendback(404);
+            }
 
             db.findUnique(_c, 'topics', { _id : previewpost.topic }, (err, fulltopic) => {
                 db.findUnique(_c, 'uploads', { _id : previewpost.media }, (err, deepmedia) => {
@@ -770,13 +789,10 @@ class ContentLib {
                             article : previewpost
                         };
 
-                        const abspath  = _c.server.html + "/static/tmp/preview" + 
-                            Math.random().toString().slice(2) + 
-                            Math.random().toString().slice(2) + 
-                            ".tmp";
+                        const abspath  = _c.server.html + "/static/tmp/preview" + Math.random().toString().slice(2) + Math.random().toString().slice(2) + ".tmp";
 
                         hooks.fireSite(_c, 'contentWillPreview', {article : previewpost, extra});
-                        filelogic.renderThemeLML3(_c, ctx, abspath, extra, markup => sendback(markup));
+                        filelogic.renderThemeLML3(_c, ctx, abspath, extra, markup => sendback(undefined, markup));
                     });
                 });
             });
