@@ -40,9 +40,13 @@ body, html {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: right;
-    transition: all 60s;
-    transition-timing-function: ease-in-out;
+    transition: all .5s;
+
+    opacity : 0;
+}
+
+#featuredimage.shown {
+    opacity : 1;
 }
 
 #featuredimage.right {
@@ -189,7 +193,14 @@ const compile = (o, context) => { o(`<!DOCTYPE html>
                 "https://images.unsplash.com/photo-1467843182948-36a9b559865e?ixlib=rb-0.3.5&ixid=eyJhcHBfaWQiOjEyMDd9&s=eab1d559f8fe9d409e10a51a9fec6cf1&auto=format&fit=crop&w=1920&q=80"
             ];
 
-            document.getElementById('featuredimage').src = BACKGROUNDS_IDS[Math.floor(Math.random() * BACKGROUNDS_IDS.length)];
+            var backgroundurl = BACKGROUNDS_IDS[Math.floor(Math.random() * BACKGROUNDS_IDS.length)];
+            var bgimage = new Image();
+            bgimage.onload = function() {
+                document.getElementById('featuredimage').classList.add('shown');
+                document.getElementById('featuredimage').src = backgroundurl;
+            }
+            bgimage.src = backgroundurl;
+
             document.getElementById('txtusername').focus();
 
             if (document.location.hash) {

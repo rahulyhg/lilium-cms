@@ -1,6 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../../data/api';
-import { TextField, ButtonWorker, CheckboxField, MultiSelectBox, SelectField, StackBox, DatePicker } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultiSelectBox, SelectField, StackBox, DatePicker, TopicPicker } from '../../widgets/form';
 import { TextEditor } from '../../widgets/texteditor'
 import { castNotification } from '../../layout/notifications';
 import dateformat from 'dateformat';
@@ -57,7 +57,7 @@ const SELECTBOX_OPTIONS = MULTISELECTBOX_OPTIONS.map(x => ({ displayname : x.dis
 export default class CommentDevTool extends Component {
     render() {
         return (
-            <div class="graph-paper" style={{ paddingTop: 30 }}>
+            <div class="graph-paper" style={{ paddingTop: 30, paddingBottom: 80 }}>
                 <div style={styles.wrap800}>
                     <h2>Flex Cards</h2>
                     
@@ -134,11 +134,11 @@ export default class CommentDevTool extends Component {
                         <MultiSelectBox options={MULTISELECTBOX_OPTIONS} placeholder='Select a few things' onChange={(name, value) => {}} />
                         <SelectField options={SELECTBOX_OPTIONS} placeholder="Select one thing" onChange={(name, value) => castNotification({ title : "New value selected", message : value })} />
                         <StackBox placeholder="Create multiple things" onChange={(name, value) => castNotification({ title : "Stack box values count : " + value.length })} />
-                        <DatePicker placeholder="Select your birthday" onChange={(name, value) => castNotification({ title : "Your birthday", message : dateformat(new Date(value), 'mmmm dd') })} />
+                        <DatePicker placeholder="Select your birthday" initialValue={new Date()} onChange={(name, value) => castNotification({ title : "Your birthday", message : dateformat(new Date(value), 'mmmm dd') })} />
                     </div>
 
                     <h2 style={{ marginTop : 30 }}>Text Editor</h2>
-                    <TextEditor content='Content' />
+                    <TextEditor content="<p>Hello, <b>World!</b></p>" />
 
                     <h2 style={{ marginTop : 30 }}>Button Workers</h2>
                     <div class="card">
@@ -147,8 +147,17 @@ export default class CommentDevTool extends Component {
                         </div>
                         <div class="detail-list">
                             <ButtonWorker theme="white" text="Work for 3 seconds" work={done => setTimeout(() => { done(); castNotification({ title : "Finished", message : "Task has completed", type : "success" }) }, 3000)} />
-                            <ButtonWorker theme="danger" text="Delete something" work={done => setTimeout(() => { done(); castNotification({ title : "Did not delete", message : "Could not delete a single thing", type : "error" }) }, 1000)} />
+                            <ButtonWorker theme="red" text="Delete something" work={done => setTimeout(() => { done(); castNotification({ title : "Did not delete", message : "Could not delete a single thing", type : "error" }) }, 1000)} />
                             <ButtonWorker theme="blue" text="Save the world" sync={true} work={() => castNotification({ title : "Missing field", message : "Some imaginary fields are missing", type : "warning" }) } />
+                            <ButtonWorker theme="green" text="Save the world again" sync={true} work={() => castNotification({ title : "Missing field", message : "Some imaginary fields are missing", type : "error" }) } />
+                            <ButtonWorker theme="purple" text="Crash everything" sync={true} work={() => castNotification({ title : "Missing field", message : "Some imaginary fields are missing", type : "system" }) } />
+                        </div>
+                        <div class="detail-list">
+                            <ButtonWorker type="fill" theme="white" text="Work for 3 seconds" work={done => setTimeout(() => { done(); castNotification({ title : "Finished", message : "Task has completed", type : "success" }) }, 3000)} />
+                            <ButtonWorker type="fill" theme="red" text="Delete something" work={done => setTimeout(() => { done(); castNotification({ title : "Did not delete", message : "Could not delete a single thing", type : "error" }) }, 1000)} />
+                            <ButtonWorker type="fill" theme="blue" text="Save the world" sync={true} work={() => castNotification({ title : "Missing field", message : "Some imaginary fields are missing", type : "warning" }) } />
+                            <ButtonWorker type="fill" theme="green" text="Save the world again" sync={true} work={() => castNotification({ title : "Missing field", message : "Some imaginary fields are missing", type : "error" }) } />
+                            <ButtonWorker type="fill" theme="purple" text="Crash everything" sync={true} work={() => castNotification({ title : "Missing field", message : "Some imaginary fields are missing", type : "system" }) } />
                         </div>
                         <footer>
                             <i>{dateformat(new Date(), 'dddd mmmm dd, yyyy')}</i>
@@ -180,6 +189,9 @@ export default class CommentDevTool extends Component {
                             ))
                         }
                     </div>
+
+                    <h2 style={{ marginTop : 30 }}>Topic selection</h2>
+                    <TopicPicker name="topic" placeholder="Choose a topic" onChange={(name, value) => castNotification({ title : "["+name+"] Topic selected : " + value.displayname })} />
                 </div>
             </div>
         )

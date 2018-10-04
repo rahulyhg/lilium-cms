@@ -2,7 +2,7 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
-import { TextField, ButtonWorker, CheckboxField, MultitagBox } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker } from '../../widgets/form';
 import { getSession } from '../../data/cache';
 import { castNotification } from '../../layout/notifications';
 
@@ -15,10 +15,10 @@ const styles = {
     sidebarTitle : {
         padding: 10,
         display: "block",
-        borderBottom: "1px solid #d6ace8",        
-        borderTop: "1px solid #d6ace8",
-        color: "#4d2161",
-        backgroundColor: "#e3c6ea"
+        borderBottom: "1px solid #F6F6F6",        
+        borderTop: "1px solid #F6F6F6",
+        color: "#333",
+        backgroundColor: "#EEE"
     },
     spinner : {
         fontSize : 60,
@@ -150,6 +150,59 @@ class PublishingSidebar extends Component {
     }
 }
 
+class PublishingSponsoredSection extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            open : !!props.post.isSponsored,
+            openfurther : !!props.post.useSponsoredBox
+        }
+    }
+
+    fieldChanged(name, value) {
+        if (name == "isSponsored") {
+            this.setState({ open : value });
+        } else if (name == "useSponsoredBox") {
+            this.setState({ openfurther : value });
+        }
+
+        this.props.post[name] = value;
+        this.props.fieldChanged(name, value);
+    }
+
+    imageChanged(name, value) {
+        this.props.post.sponsoredBoxLogo = value._id;
+        this.props.fieldChanged(name, value._id);
+    }
+
+    render() {
+        return (
+            <div>
+                <CheckboxField onChange={this.fieldChanged.bind(this)} name='isSponsored' placeholder='This is a sponsored post' initialValue={!!this.props.post.isSponsored} />
+                
+                {
+                    this.state.open ? (
+                        <div>
+                            <TextField onChange={this.fieldChanged.bind(this)} name="sponsoredCampaignID" initialValue={this.props.post.sponsoredCampaignID} placeholder="Sponsored Campaign ID" />
+                            <CheckboxField onChange={this.fieldChanged.bind(this)} name='useSponsoredBox' placeholder='Use Sponsored Box' initialValue={!!this.props.post.useSponsoredBox} />
+                            {
+                                this.state.openfurther ? (
+                                    <div>
+                                        <TextField onChange={this.fieldChanged.bind(this)} name="sponsoredBoxTitle" initialValue={this.props.post.sponsoredBoxTitle} placeholder="Sponsored Box Title" />
+                                        <TextField onChange={this.fieldChanged.bind(this)} name="sponsoredBoxURL" initialValue={this.props.post.sponsoredBoxURL} placeholder="Sponsored Box URL" />
+                                        <TextField onChange={this.fieldChanged.bind(this)} name="sponsoredBoxContent" initialValue={this.props.post.sponsoredBoxContent} placeholder="Sponsored Box Content" multiline={true} />
+                                        <MediaPickerField name="sponsoredBoxLogo" placeholder="Select a logo" initialValue={this.props.post.sponsoredBoxLogo} onChange={this.imageChanged.bind(this)} size="small" />
+                                    </div>
+                                ) : null
+                            }
+                        </div>
+                    ) : null
+                }
+            </div>
+        )
+    }
+}
+
 export default class EditView extends Component {
     constructor(props) {
         super(props);
@@ -240,7 +293,21 @@ export default class EditView extends Component {
     }
 
     preview(done) {
-        
+        this.save(() => {
+            const loc = document.location.protocol + liliumcms.url + "/publishing/preview/" + this.props.postid + "/" + this.state.post.previewkey;
+            try {
+                if (this.previewWindow && !this.previewWindow.closed) {
+                    this.previewWindow.document.location = loc;
+                    this.previewWindow.focus();
+                } else  {
+                    this.previewWindow = window.open(loc);
+                }
+            } catch (err) {
+                this.previewWindow = window.open(loc);
+            }
+
+            done();
+        });        
     }
 
     commitchanges(done) {
@@ -275,12 +342,12 @@ export default class EditView extends Component {
 
     getActionFromColdState() {
         const status = this.coldState.post.status;
-        const actions = [<ButtonWorker text="Preview" work={this.preview.bind(this)} />];
+        const actions = [<ButtonWorker theme="white" text="Preview" work={this.preview.bind(this)} />];
 
         if (status == "draft" || status == "deleted") {
-            actions.push(<ButtonWorker text="Save" work={this.save.bind(this)} />, <ButtonWorker text="Publish" work={this.publish.bind(this)} />);
+            actions.push(<ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, <ButtonWorker type="fill" theme="blue" text="Publish" work={this.publish.bind(this)} />);
         } else if (status == "published") {
-            actions.push(<ButtonWorker text="Save" work={this.save.bind(this)} />, <ButtonWorker text="Commit changes" work={this.commitchanges.bind(this)} />);
+            actions.push(<ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />);
         } 
 
         return actions;
@@ -288,6 +355,19 @@ export default class EditView extends Component {
 
     fieldChanged(name, value) {
         this.edits[name] = value;
+    }
+
+    imageChanged(name, image) {
+        if (image) {
+            this.edits.media = image._id;
+            this.edits.facebookmedia = image.sizes.facebook.url;
+        }
+    }
+
+    topicChanged(name, topic) {
+        if (topic) {
+            this.edits.topic = topic._id;
+        }
     }
 
     componentWillReceiveProps(props) {
@@ -319,17 +399,31 @@ export default class EditView extends Component {
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} style={{ fontFamily : '"Oswald", sans-serif', background : "transparent", fontSize : 32, border : "none", borderBottom : "1px solid #DDD", padding : "3px 0px", textAlign : 'center' }} />
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" style={{ background : "transparent", border : "none", padding : "5px 0px", marginBottom : 10, textAlign : 'center' }} />
                     
-                    <div style={{ maxWidth: 800, margin: "auto" }}>
+                    <div style={{ margin: "auto" }}>
                         <TextEditor onChange={this.fieldChanged.bind(this)} format={x => [x]} name="content" content={this.state.post.content[0]} />
                     </div>
 
-                    <div style={{ maxWidth: 800, margin: "auto" }}>
+                    <div class="publishing-card nopad">
+                        <TopicPicker onChange={this.topicChanged.bind(this)} name="topic" initialValue={this.state.post.topic || undefined} placeholder="Select a topic" />
+                    </div>
+
+                    <div class="card publishing-card">
                         <MultitagBox onChange={this.fieldChanged.bind(this)} name='tags' placeholder='Tags' initialValue={this.state.post.tags} />
                         <CheckboxField onChange={this.fieldChanged.bind(this)} name='sticky' placeholder='Make this article sticky' initialValue={this.state.post.sticky} />
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='nsfw' placeholder='Not safe for work (NSFW)' initialValue={this.state.post.nsfw} />
+                        <CheckboxField onChange={this.fieldChanged.bind(this)} name='hidden' placeholder='Only available via URL' initialValue={this.state.post.hidden} />
+                    </div>
+
+                    <div class="card publishing-card">
+                        <PublishingSponsoredSection fieldChanged={this.fieldChanged.bind(this)} post={this.state.post} />
+                    </div>
+
+                    <div class="card publishing-card">
+                        <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
                 </div>
 
-                <div style={{ position : "fixed", right : 0, top : 50, bottom : 0, width : 280, overflow : "auto", background : "rgb(238, 226, 241)", boxShadow : "1px 0px 2px 2px rgba(154, 145, 156, 0.46)" }}>
+                <div style={{ position : "fixed", right : 0, top : 50, bottom : 0, width : 280, overflow : "auto", background : "white", borderLeft: "1px solid #DDD" }}>
                     <PublishingSidebar post={this.state.post} actions={this.state.actions} history={this.state.history} />
                 </div>
             </div>
