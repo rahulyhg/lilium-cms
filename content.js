@@ -369,6 +369,10 @@ class ContentLib {
         });
     }
 
+    validate(_c, _id, sendback) {
+        
+    }
+
     pushHistoryEntryFromDiff(_c, postid, actor, diffres, type, done) {
         const diffs = diffres.filter(d => typeof d.rhs != "undefined" || d.kind == "A").map(d => {
             return {
@@ -572,48 +576,61 @@ class ContentLib {
         });
     };
 
-    publish(_c, post, caller, callback) {
-        const payload = { status : "published" };
-        post.status = payload.status;
+    publish(_c, _id, caller, sendback) {
+        this.getFull(_c, _id, post => { 
+            if (!post) {
+                return sendback({ error : "Post not found", code : 404 });
+            }
 
-        if (!post.date) {
-            payload.date = new Date();
-            post.date = payload.date;
-        }
+            db.findUnique(config.default(), 'entities', { _id : caller }, (err, fullrequester) => {
+                if (fullrequester.roles.includes('editor') || !post.author || caller.toString() == post.author.toString()) {
+                    if (!post.date) {
+                        post.date = new Date();
+                        post.date = post.date;
+                    }
+                    
+                    if (!post.name) {
+                        post.name = require('slug')(post.title[0]).toLowerCase();
+                        post.name = post.name;
+                    }
+        
+                    if (
+                        !post.topic || !post.author || !post.media || 
+                        !post.title[0] || !post.subtitle[0] || !post.content[0]
+                    ) {
+                        return sendback({ error : "Missing fields", code : 401 });
+                    }
 
-        if (!post.name) {
-            payload.name = require('slug')(post.title[0]).toLowerCase();
-            post.name = payload.name;
-        }
-
-        if (!post.topic || !post.author || !post.media) {
-            return callback({ error : "Missing fields", type : "fields" });
-        }
-
-        db.update(_c, 'content', { _id : post._id }, payload, () => {
-            db.remove(_c, 'autosave', { contentid : post._id }, () => {
-                this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
-                    this.getFull(_c, post._id, fullpost => {
-
-                        this.updateActionStats(_c, fullpost, score => {
-                            hooks.fireSite(_c, 'article_published_from_draft', { article : fullpost, score, _c });
-                            hooks.fireSite(_c, 'article_updated', { article : fullpost, _c });
-                            hooks.fire('article_published', {
-                                article: fullpost, _c
+                    post.status = "published";
+                    post.publishedOn = new Date();
+                    post.publishedAt = Date.now();
+        
+                    db.update(_c, 'content', { _id : post._id }, post, () => {
+                        db.remove(_c, 'autosave', { contentid : post._id }, () => {
+                            this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
+                                this.updateActionStats(_c, post, score => {
+                                    hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
+                                    hooks.fireSite(_c, 'article_updated', { article : post, _c });
+                                    hooks.fire('article_published', {
+                                        article: post, _c
+                                    });
+        
+                                    this.generate(_c, post, () => {
+                                        sendback({ historyentry, newstate : post });
+        
+                                        notifications.emitToWebsite(_c.id, {
+                                            articleid : post._id,
+                                            at : Date.now(),
+                                            by : caller
+                                        }, "articlePublished");
+                                    }, 'all');
+                                });
                             });
-
-                            this.generate(_c, fullpost, () => {
-                                callback({ historyentry, newstate : fullpost });
-
-                                notifications.emitToWebsite(_c.id, {
-                                    articleid : post._id,
-                                    at : Date.now(),
-                                    by : caller
-                                }, "articlePublished");
-                            }, 'all');
                         });
                     });
-                });
+                } else {
+                    return sendback({ error : "Missing rights", code : 403 });
+                }
             });
         });
     }
