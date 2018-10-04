@@ -44,6 +44,7 @@ backend/static/u/*
 
 # Generated files
 backend/static/gen/*
+backend/static/compiled/*
 
 # Custom frontend libraries
 backend/static/lib
