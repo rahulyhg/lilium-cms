@@ -703,7 +703,7 @@ class ContentLib {
                         fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
                     }
 
-                    fileserver.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html");
+                    fileserver.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html", () => {});
                 }, true);
             });
         });
