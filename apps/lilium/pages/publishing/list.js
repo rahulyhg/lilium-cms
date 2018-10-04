@@ -8,22 +8,20 @@ import { POST_STATUS } from '../../data/const'
 class PostListItem extends Component {
     render() {
         return (
-            <div>
-                <div class="article-list-item">
-                    <Link href={"/publishing/write/" + this.props.item._id} linkStyle="block">  
-                        <div class="article-list-thumbnail">
-                            {
-                                this.props.item.thumbnail ? (<img src={ this.props.item.thumbnail } />) : (<div class="article-list-no-image">No image</div>)
-                            }
-                        </div>        
-                        <div class={"article-list-status article-list-status-" + this.props.item.status} style={{ backgroundColor : POST_STATUS[this.props.item.status].color }}>
-                            { POST_STATUS[this.props.item.status].w }
-                        </div>              
-                        <div class="article-list-text">
-                            <div class="article-list-headline">{this.props.item.headline}</div>
-                        </div>
-                    </Link>
-                </div>            
+            <div class="card flex">
+                <Link href={"/publishing/write/" + this.props.item._id} linkStyle="block">  
+                    <div class="image-wrapper article-list-thumbnail">
+                        {
+                            this.props.item.thumbnail ? (<img src={ this.props.item.thumbnail } />) : (<div class="article-list-no-image">No image</div>)
+                        }
+                    </div>        
+                    <div class={"article-list-status article-list-status-" + this.props.item.status} style={{ backgroundColor : POST_STATUS[this.props.item.status].color }}>
+                        { POST_STATUS[this.props.item.status].w }
+                    </div>              
+                    <p>
+                        {this.props.item.headline}
+                    </p>
+                </Link>
             </div>
         )
     }
@@ -70,7 +68,7 @@ export default class ListView extends Component {
             title : "Author",
             options : [
                 { value : "", text : "Anyone" }, 
-                { value : this.props.session._id, text : "Me" }, 
+                { value : liliumcms.session._id, text : "Me" }, 
                 ...users.map(u => { return { value : u._id, text : u.displayname } })
             ]
         });

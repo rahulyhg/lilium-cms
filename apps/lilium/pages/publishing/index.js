@@ -2,6 +2,9 @@ import { h, Component } from "preact";
 import ListView from './list';
 import EditView from './edit';
 import { navigateTo } from '../../routing/link';
+import { addAction } from '../../layout/lys'
+import { registerOverlay, castOverlay } from '../../overlay/overlaywrap';
+import { CreateOverlay } from './createoverlay';
 
 export default class PublishingTab extends Component {
     constructor(props) {
@@ -12,6 +15,22 @@ export default class PublishingTab extends Component {
         return {
             title : "Publishing"
         }
+    }
+
+    static componentDidRegister() {
+        log('Publishing', 'Called register static method from URL Renderer', 'success');
+        addAction({
+            action : "#create",
+            command : "article,post",
+            displayname : "Article",
+            execute : () => {
+                castOverlay('create-article');
+            }
+        });
+
+        registerOverlay('create-article', CreateOverlay, {
+            title : "Create a new post"
+        });
     }
 
     render() {

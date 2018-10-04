@@ -1,3 +1,5 @@
+import { castNotification } from '../layout/notifications';
+
 let currentLanguageData;
 
 /**
@@ -11,7 +13,13 @@ const _v = pageSlug => {
         return currentLanguageData[pageName][slug] || pageSlug;
     } else {
         if (liliumcms.env == 'dev') {
-            throw new Error('Invalid pageName or slug provided as argument. the pageSLug argument must be structured as <pageName>.<slug>');
+            castNotification({
+                type: 'err',
+                title: 'Invalid translations Slug or pageName',
+                message: 'Invalid translation Slug or pageName provided as argument to _v()'
+            });
+
+            return 'Invalid translations Slug or pageName ' + pageSlug;
         } else {
             log('Vocab', 'Invalid pageName or slug', 'err');
             return slug;
@@ -27,6 +35,10 @@ export const setLanguage = (lang, done) => {
     fetch('/static/compiled/' + lang + '.json')
     .then(r => r.json()).then(data => {
         currentLanguageData = data;
+        done && done();
+    })
+    .catch(err => {
+        log('Vocab', 'Failed to load vocab file : ' + lang, 'err');
         done && done();
     });
 }

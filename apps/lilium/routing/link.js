@@ -3,7 +3,7 @@ import { Component, h } from 'preact';
 export class Link extends Component {
     constructor(props) {
         super(props);
-        this.linkStyle = props.display || "inline"
+        this.linkStyle = props.display || props.linkStyle || "inline"
     }
 
     navigate() {
@@ -21,8 +21,8 @@ export class Link extends Component {
     }
 }
 
-export function navigateTo(href) {
+export function navigateTo(href, extras = {}) {
     log('Link', 'Hard navigation from code to href : ' + href, 'detail');
-    const ev = new CustomEvent("navigate", { detail : { href } });
+    const ev = new CustomEvent("navigate", { detail : { href, extras } });
     document.dispatchEvent(ev);    
 }

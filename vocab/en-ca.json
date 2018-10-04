@@ -4,27 +4,38 @@
         "fallback": "",
         "displayName": "Canadian English"
     },
-
-    
     "dashboard": {
-        "title": "Dashboard"
+        "subtitle": "",
+        "title": ""
     },
     "devtools": {
-        "title": "Dev Tools"
+        "subtitle": "",
+        "title": "",
+        "pageTItle": "Development Tools",
+        "otherSlug": "",
+        "newOtherSlug": "",
+        "Allo": "allo"
     },
     "errors": {
-        "subtitle": "Errors"
+        "subtitle": "",
+        "testSlug": ""
     },
     "me": {
-        "subtitle": "Profile Page"
+        "subtitle": ""
     },
     "publishing": {
-        "subtitle": "Publishing"
+        "subtitle": ""
     },
     "translations": {
-        "title": "Translations"
+        "title": ""
     },
     "logout": {
-        "title": "Log Out"
+        "title": ""
+    },
+    "preferences": {
+        "title": "preferences"
+    },
+    "testpage": {
+        "title": "testpage"
     }
 }

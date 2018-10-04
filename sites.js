@@ -88,7 +88,14 @@ var SiteInitializer = function (conf, siteobj) {
 
         to = conf.server.html + '/tinymce';
         rootDir = conf.server.base + "node_modules/tinymce/";
-        mkdirp.sync(rootDir);
+        fileserver.createSymlinkSync(rootDir, to);
+
+        to = conf.server.html + '/flatpickr';
+        rootDir = conf.server.base + "node_modules/flatpickr/dist";
+        fileserver.createSymlinkSync(rootDir, to);
+
+        to = conf.server.html + '/chartjs';
+        rootDir = conf.server.base + "node_modules/chart.js/dist";
         fileserver.createSymlinkSync(rootDir, to);
 
         done();
@@ -165,6 +172,7 @@ var SiteInitializer = function (conf, siteobj) {
             outputpath : pathLib.join(conf.server.html, 'lmlbackend'),
             babel : {
                 "plugins": [
+                    ["transform-class-properties"],
                     ["transform-object-rest-spread", {
                         useBuildIns : true
                     }],
@@ -188,11 +196,6 @@ var SiteInitializer = function (conf, siteobj) {
                     };
                 `;
             }
-            
-            fs.copyFileSync(
-                pathLib.join(conf.server.base, 'apps', 'lilium', 'App.css'),
-                pathLib.join(conf.server.html, 'lilium.css')
-            );
         });
 
         hooks.fireSite(conf, 'frontend_will_precompile', {

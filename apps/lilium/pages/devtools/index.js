@@ -2,6 +2,10 @@ import { h, Component } from "preact";
 import { navigateTo } from '../../routing/link';
 
 import DevToolAPI from './api';
+import DevToolNotifications from './notifications';
+import VirtualSession from './virtsesh';
+import DevToolComments from './comments';
+import DevToolDesign from './design';
 
 const styles = {
     page : {
@@ -16,29 +20,34 @@ const styles = {
 
     link : {
         display: "inline-block",
-        width: 100,
-        height: 100,
+        width: 150,
+        height: 150,
         background: "rgb(231, 226, 232)",
         border: "2px solid #f5eef7",
         textAlign : 'center',
-        cursor: "pointer"
+        cursor: "pointer",
+        marginRight : 20
     },
 
     linkIcon : {
         display: "block",
         fontSize: 40,
-        marginTop: 20,
+        marginTop: 38,
         marginBottom: 8
     }
 }
 
 const DEVTOOLS = {
-    api : DevToolAPI
+    api : DevToolAPI,
+    notifications : DevToolNotifications,
+    virtsesh : VirtualSession,
+    comments : DevToolComments,
+    design : DevToolDesign
 }
 
 class DevToolLink extends Component {
     clicked(ev) {
-        navigateTo("/devtools/api")
+        navigateTo("/devtools/" + this.props.name);
     }
 
     render() {
@@ -74,6 +83,10 @@ export default class DevTools extends Component {
 
                     <div style={{ padding: 15 }}>
                         <DevToolLink name="api" displayname="API" icon="fal fa-project-diagram" />
+                        <DevToolLink name="notifications" displayname="Notifications" icon="far fa-inbox" />
+                        <DevToolLink name="virtsesh" displayname="Virtual Session" icon="far fa-sign-in" />
+                        <DevToolLink name="comments" displayname="Comments" icon="far fa-comments" />
+                        <DevToolLink name="design" displayname="Design" icon="far fa-brush" />
                     </div>
                 </div>
             )

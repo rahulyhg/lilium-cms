@@ -5,10 +5,11 @@ import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
 import { ImagePicker } from './layout/imagepicker';
 import { LoadingView } from './layout/loading';
+import { OverlayWrap } from './overlay/overlaywrap';
 import { Lys } from './layout/lys';
 import { initiateConnection } from './realtime/connection';
 import { initializeDevEnv, DevTools } from './dev/env';
-import { initLocal, setSession } from './data/cache';
+import { initLocal, setSession, mapUsers } from './data/cache';
 import { NotificationWrapper } from './layout/notifications';
 import { makeGLobalLang, setLanguage } from './data/vocab';
 import API from './data/api';
@@ -20,7 +21,7 @@ makeGLobalLang();
 
 if (liliumcms.env == "dev") {
     initializeDevEnv();
-}makeGLobalLang
+}
 
 class Lilium extends Component {
     constructor(props) {
@@ -42,6 +43,10 @@ class Lilium extends Component {
     componentDidMount() {
         log('Lilium', 'Main component finished mounting', 'lilium');
         this.fetchUserData();
+
+        document.addEventListener('castexitscreen', () => {
+            this.setState({ loading : true });
+        });
     }
 
     fetchUserData() {        
@@ -49,9 +54,8 @@ class Lilium extends Component {
         API.getMany([
             { endpoint : '/me', params : {} },
             { endpoint : "/adminmenus", params : {} },
-            { endpoint : "/notifications", params : {} },
             { endpoint : "/entities/simple", params : {} }
-        ], (resp) => {
+        ], (err, resp) => {
             if (!resp["/me"] || !resp["/me"][0]) {
                 this.setState({ error : "session", loading : false });
             } else {
@@ -59,7 +63,23 @@ class Lilium extends Component {
                 const currentLanguage = resp['/me'][0].language || 'en-ca';
                 setLanguage(currentLanguage, () => {
                     setSession("entities", resp["/entities/simple"]);
-                    resp["/me"].notifications = resp["/notifications"];
+                    setSession("mappedEntities", mapUsers(resp["/entities/simple"]));
+                    liliumcms.session = resp["/me"][0];
+                    liliumcms.session.allowedEndpoints = [
+                        "me", "preferences", "logout", "notifications", 
+                        ...resp["/adminmenus"].map(x => x.absURL.split('/')[1])
+                    ];
+
+                    resp["/adminmenus"]
+                        .filter(x => x.children && x.children.length != 0)
+                        .map(x => x.children)
+                        .forEach(x => 
+                            x.forEach(y => 
+                                liliumcms.session.allowedEndpoints.push(y.absURL.split('/')[1]
+                            )
+                        )
+                    );
+
                     this.setState({ session : resp["/me"][0], menus : resp["/adminmenus"], loading : false, currentLanguage });            
                 });
             }   
@@ -86,6 +106,7 @@ class Lilium extends Component {
                 <Lys menus={this.state.menus} session={this.state.session} />
                 <NotificationWrapper />
                 <ImagePicker />
+                <OverlayWrap />
 
                 { liliumcms.env == "dev" ? <DevTools /> : null }
             </div>

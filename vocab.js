@@ -6,8 +6,8 @@ const _c = require('./config');
 class Vocab {
 
     constructor() {
-        this.supportedLanguages = [];
         this.languagesData = {};
+        this.supportedLanguages = [];
         this.defaultLanguage = 'en-ca';
     }
 
@@ -20,11 +20,9 @@ class Vocab {
 
         readdirSync(path.join(liliumroot, 'vocab')).forEach(langDirItem => {
             if (langDirItem.endsWith('.json')) {
-                const langName = langDirItem.split('.json')[0];
-                this.supportedLanguages.push(langName);
-
                 try {
                     const langData = require(path.join(liliumroot, 'vocab', langDirItem)) || {};
+                    this.supportedLanguages.push(langData.__);
 
                     pages.forEach(page => {
                         if (!langData[page]) {
@@ -33,9 +31,9 @@ class Vocab {
                         }
                     });
 
-                    this.languagesData[langName] = langData;
-
-                    writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem), JSON.stringify(this.compileLanguageData(langName)));
+                    this.languagesData[langData.__.languageName] = langData;
+                    writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', langDirItem),
+                                    JSON.stringify(this.compileLanguageData(langData.__.languageName)));
                 } catch (e) {
                     log('Vocab', `Error opening language file ` + e.message, 'err');
                 }
@@ -47,17 +45,29 @@ class Vocab {
     }
 
     /**
+<<<<<<< HEAD
      * R
         eturns an array containing the information for all supported languages
+=======
+     * Returns an array containing the information for all supported languages
+>>>>>>> v4
      */
     getSUpportedLanguages() { return this.supportedLanguages; };
 
     /**
      * Returns an array containing the language codes of the supported languages
      */
+<<<<<<< HEAD
     getSupportedLanguageCodes() { return this.supportedLanguages.map(l => l.languageName); }
 
     /**
+=======
+    getSupportedLanguageCodes() {
+        return this.supportedLanguages.map(l => l.languageName);
+    }
+
+    /**jsvas
+>>>>>>> v4
      * Returns an object containing the translation data for a language code
      * @param {string} langcode THe langcode of which to get the translations
      */
@@ -69,7 +79,7 @@ class Vocab {
      * @param {callback} done 
      */
     writeLangDataToDisk(done) {
-        this.supportedLanguages.forEach(lang => {
+        this.getSupportedLanguageCodes().forEach(lang => {
             writeFileSync(this.getLanguageFilePath(lang), JSON.stringify(this.languagesData[lang], null, 4));
             writeFileSync(path.join(liliumroot, 'backend', 'static', 'compiled', lang + '.json'), JSON.stringify(this.compileLanguageData(lang)));
         });
@@ -105,8 +115,6 @@ class Vocab {
         return compiled;
     }
 
-    
-
     /**
      * Updates a page translation slug for a specific language
      * @param {string} lang Language code
@@ -125,7 +133,7 @@ class Vocab {
             done(e);
         }
     }
-    
+
     /**
      * Updates the name of a slug in a page for each language in the language data
      * and writes it to the disk
@@ -136,7 +144,7 @@ class Vocab {
      */
     updateSlugName(pageName, slug, newValue, done) {
         if (slug != newValue) {
-            this.supportedLanguages.forEach(lang => {
+            this.supportedLanguages.map(l => l.languageName).forEach(lang => {
                 const slugValue = this.languagesData[lang][pageName][slug];
                 if (slugValue) {
                     this.languagesData[lang][pageName][newValue] = slugValue;

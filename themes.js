@@ -7,6 +7,7 @@ var Admin = require('./backend/admin.js');
 var db = require('./includes/db.js');
 var livevars = require('./livevars.js');
 var cli = require('./cli.js');
+var pathLib = require('path');
 
 var ActiveTheme = new Object();
 var CachedThemes = new Array();
@@ -48,8 +49,12 @@ var Themes = function () {
                         success: true
                     });
                 });
+            } else if (cli.routeinfo.path[2] == "updateOneField") {
+                this.updateOneField(cli._c, cli.postdata.data.field, cli.postdata.data.value, () => {
+
+                });
             } else {
-                this.updateThemeSettings(cli);
+                cli.throwHTTP(403, undefined, true);
             }
         } 
     };
@@ -84,6 +89,12 @@ var Themes = function () {
         } else {
             cli.refresh();
         }
+    }
+
+    this.updateOneField = function(_c, field, value, done) {
+        db.update(_c, 'themes', { active : true }, { ["settings." + field] : value }, (err, res) => {
+            done();
+        });
     }
 
     this.searchDirForThemes = function (uName, callback) {
@@ -241,65 +252,36 @@ var Themes = function () {
     };
 
     this.livevar = function (cli, levels, params, callback) {
-        var allThemes = levels.length === 0;
-        if (allThemes) {
-            db.singleLevelFind(cli._c, 'themes', callback);
-        } else if (levels[0] == 'current') {
-            var cTheme = that.getEnabledTheme(cli._c.id);
-            callback({
-                info : cTheme.info,
-                settings : cTheme.settings
-            }); 
-        } else if (levels[0] == 'templates') {
-            if (levels[1]) {
-                callback(that.getEnabledTheme(cli._c.id).info.templates[levels[1]]);
-            } else {
-                callback(that.getEnabledTheme(cli._c.id).info.templates);
-            }
-        } else if (levels[0] == "settings"){
-            db.findToArray(cli._c, 'themes', {uName : ActiveTheme[cli._c.id].uName}, function(err, arr) {
-                callback(err || arr[0].settings);
-            });
-        } else if (levels[0] == 'table') {
-            var sort = {};
-            sort[typeof params.sortby !== 'undefined' ? params.sortby : '_id'] = (params.order || 1);
-            db.aggregate(cli._c, 'themes', [{
-                $match:
-                    (params.search ? {
-                        $text: {
-                            $search: params.search
+        if (levels[0] == "all") {
+            fs.readdir(pathLib.join(liliumroot, 'flowers'), (err, dirs) => {
+                if (err || dirs.length == 0) {
+                    callback([]);
+                } else {
+                    let index = -1;
+                    const themes = [];
+
+                    const nextJSON = () => {
+                        const dir = dirs[++index];
+                        if (!dir) {
+                            callback(themes);
+                        } else {
+                            fs.readFile(pathLib.join(liliumroot, 'flowers', dir, "info.json"), (err, json) => {
+                                if (json) {
+                                    themes.push(JSON.parse(json));  
+                                } 
+
+                                nextJSON();
+                            });
                         }
-                    } : {})
+                    };
 
-            }, {
-                $sort: sort
-            }, {
-                $skip: (params.skip || 0)
-            }, {
-                $limit: (params.max || 20)
-            }], function (data) {
-                db.find(cli._c, 'themes', (params.search ? {
-                    $text: {
-                        $search: params.search
-                    }
-                } : {}), [], function (err, cursor) {
-
-                    cursor.count(function (err, size) {
-                        results = {
-                            size: size,
-                            data: data
-                        }
-                        callback(err || results);
-
-                    });
-                });
+                    nextJSON();
+                }
             });
+        } else if (levels[0] == "current") {
+            db.findUnique(cli._c, 'themes', { active : true }, (err, t) => callback(t));
         } else {
-            db.multiLevelFind(cli._c, 'themes', levels, {
-                uName: (levels[0])
-            }, {
-                limit: [1]
-            }, callback);
+            callback();
         }
     };
 

@@ -60,9 +60,11 @@ class DevTools {
             case 'unlink':              unlinkUpload(cli); break;
             case 'cache':               handleCacheClear(cli); break;
             case 'gencache':            maybeRegenCache(cli); break;
+            case 'createcomment':       maybeCreateComment(cli); break;
             case 'initbuild':           maybeInitBuild(cli); break;
             case 'scripts':             maybeExecuteScript(cli); break;
             case 'feed':                maybeInsertFeed(cli); break;
+            case 'notifications':       maybeDispatchNotification(cli); break;
             case 'restart':             maybeRestart(cli); break;
             case 'mail':                maybeSendMail(cli); break;
 
@@ -169,176 +171,7 @@ class DevTools {
     }
     
     form () {
-        formBuilder.createForm('devtools_livevar', {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                    'id': 'article_new',
-                    'inner': true
-                },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add('endvar', 'livevar', {
-            displayname : "End Variable",
-            title: 'name',
-            template: 'option', 
-            tag: 'select', 
-            endpoint: 'devtools.livevars.all',
-            attr : {
-                lmlselect : false
-            },
-            props: {
-                value: 'name',
-                html : 'name',
-                header : 'Select One'
-            }
-        })
-        .add('levels', 'stack', {
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "level",
-                        dataType : "text",
-                        displayname : "Level"
-                    }
-                ]
-            },
-            displayname : "Levels"
-        })
-        .add('params', 'stack', {
-            scheme : {
-                columns : [
-                    {
-                        fieldName : "paramname",
-                        dataType : "text",
-                        displayname : "Name"
-                    },
-                    {
-                        fieldName : "paramvalue",
-                        dataType : "text",
-                        displayname : "Value"
-                    }
-                ]
-            },
-            displayname : "Parameters"
-        })
-        .add('query-set', 'buttonset', { buttons: [{
-                name : 'query', 
-                displayname : 'Query', 
-                classes : ['btn-query']
-            }
-        ]});
-
-        formBuilder.createForm('devmail', {
-            async : true,
-            fieldWrapper : 'lmlform-fieldwrapper'
-        })
-        .add('to', 'text', {
-            displayname : "To"
-        })
-        .add('subject', 'text', {
-            displayname : "Subject"
-        })
-        .add('content', 'textarea', {
-            displayname : "Content"
-        })
-        .add('send-set', 'buttonset', { buttons: [{
-                name : 'sendmail', 
-                displayname : 'Send Mail', 
-                classes : ['btn-sendmail']
-            }
-        ]});
-
-
-        formBuilder.createForm('devfeedinsert', {
-            async : true,
-            fieldWrapper : 'lmlform-fieldwrapper'
-        })
-        .add('type', 'select', {
-            displayname : "Type",
-            datasource : [
-                {name : "quote", displayName : "Quote"},
-                {name : "published", displayName : "Published"},
-                {name : "badge", displayName : "Badge"},
-                {name : "welcomed", displayName : "Welcomed"}
-            ]
-        })
-        .add('extid', 'text', {
-            displayname : "External ID"
-        })
-        .add('actor', 'livevar', {
-            displayname : "Actor",
-            endpoint : "entities.chat",
-                tag : "select",
-                template: "option",
-                attr: {
-                    lmlselect : false,
-                    header : 'Select an entity'
-                },
-                props: {
-                    'value' : "_id",
-                    'html' : 'displayname'
-                }            
-        })
-        .add('site', 'livevar', {
-                displayname : "Site",
-                endpoint : "sites.all.complex",
-                tag : "select",
-                template: "option",
-                attr: {
-                    lmlselect : false,
-                    header : 'Select a website'
-                },
-                props: {
-                    'value' : "id",
-                    'html' : 'website.sitetitle'
-                }            
-        })
-        .add('extra', 'stack', {
-            displayname : "Extra data",
-            scheme : {
-                columns : [
-                    { fieldName : "key", dataType : "text", displayname : "Key" },
-                    { fieldName : "value", dataType : "text", displayname : "Value" }
-                ]
-            }
-        })
-        .add('Insert', 'submit', {
-            type: 'button', 
-            displayname : 'Insert',
-            async : true
-        });
-
-        formBuilder.createForm('devtools_api', {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                    'id': 'devtools_api',
-                    'inner': true
-                },
-            fieldWrapper : "lmlform-fieldwrapper",
-            async : true
-        })
-        .add('endpoint', 'text', {
-            displayname : 'API Endpoint'
-        })
-        .add('method', 'select', {
-            displayname : "Method",
-            datasource : [
-                {displayName : "GET",  name : "GET" },
-                {displayName : "POST", name : "POST"}
-            ]
-        })
-        .add('token', 'text', {
-            displayname : "User Token"
-        })
-        .add('hash', 'text', {
-            displayname : "Hash header"
-        })
-        .add('send', 'button', {
-            displayname : "Send request",
-            callback : "sendDevtoolsAPIRequest"
-        });
+        
     }
 }
 
@@ -369,6 +202,15 @@ var unlinkUpload = function(cli) {
     });
 }
 
+var maybeDispatchNotification = function(cli) {
+    const notifLib = require('./notifications');
+    const { entity, title, msg, type } = cli.postdata.data;
+    notifLib.notifyUser(entity, cli._c, {
+        title, msg, type
+    });
+
+    cli.sendJSON({ok : 1})
+};
 
 var handleCacheClear = function(cli) {
     const type = cli.routeinfo.path[3];
@@ -409,6 +251,41 @@ var dispatchMagicLink = function(cli) {
     require('./entities.js').sendMagicLinkToEveryone(cli, function() {
         cli.sendJSON({success : true});
     });
+};
+
+var maybeCreateComment = function(cli) {
+    const text = cli.postdata.data.text;
+    const _id = db.mongoID(cli.postdata.data._id);
+    const isThread = cli.postdata.data.isThread || false;
+    const author = cli.postdata.data.userid;
+
+    if (isThread) {
+        db.insert(cli._c, 'fbreplies', {
+            author, text,
+            threadid : _id,
+            date : Date.now()
+        }, (err, r) => {
+            db.update(cli._c, 'fbcomments', { _id }, {
+                $inc : { replies : 1 }
+            }, () => {
+                cli.sendJSON({ replyid : r.insertedId });
+            }, false, true, true);
+        });
+    } else {
+        db.insert(cli._c, 'fbcomments', {
+            author, text,
+            postid : _id,
+            date : Date.now(), 
+            thread : true,
+            edited : false
+        }, () => {
+            db.update(cli._c, 'content', { _id }, {
+                $inc : { comments : 1 }
+            }, (err, r) => {
+                cli.sendJSON({ threadid : r.insertedId });
+            }, false, true, true);
+        })
+    }
 };
 
 var maybeRegenCache = function(cli) {

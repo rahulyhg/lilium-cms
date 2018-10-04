@@ -1,16 +1,35 @@
 import { h, Component } from 'preact'
 import { resetPageCommands } from '../layout/lys';
 import { CACHEKEYS, getLocal } from '../data/cache';
+import { dismissOverlay } from '../overlay/overlaywrap';
 
 // Import default pages from route
-import InitPage     from '../pages/default';
-import Dashboard    from '../pages/dashboard/index';
-import Publishing   from '../pages/publishing/index';
-import ProfilePage  from '../pages/me/index.js';
-import Logout       from '../pages/logout/index';
-import DevTools     from '../pages/devtools/index.js';
-import translations from '../pages/translations/index.js';
-import e404         from '../pages/errors/404';
+import InitPage         from '../pages/default';
+import Dashboard        from '../pages/dashboard/index';
+import Publishing       from '../pages/publishing/index';
+import ProfilePage      from '../pages/me/index.js';
+import Preferences      from '../pages/preferences/index.js';
+import Entities         from '../pages/entities/index.js';
+import Roles            from '../pages/roles/index.js';
+import Ponglinks        from '../pages/ponglinks/index.js';
+import StyledPages      from '../pages/styledpages/index.js';
+import MailTemplates    from '../pages/mailtemplates/index.js';
+import ContentChains    from '../pages/contentchains/index.js';
+import Logout           from '../pages/logout/index';
+import TheDailyLilium   from '../pages/thedailylilium/index';
+import DevTools         from '../pages/devtools/index.js';
+import translations     from '../pages/translations/index.js';
+import SettingsPage     from '../pages/settings/index.js';
+import Notifs           from '../pages/notifications/index';
+import ThemesPage       from '../pages/themes/index';
+import AdsManagement    from '../pages/ads/index';
+import CommentsMan      from '../pages/comments/index';
+import PluginsMan       from '../pages/plugins/index';
+import CakepopsMan      from '../pages/cakepops/index';
+import FlaggingMan      from '../pages/flagging/index';
+import e404             from '../pages/errors/404';
+import e403             from '../pages/errors/403';
+
 
 // Default endpoints are provided here
 export class EndpointStore {
@@ -31,8 +50,9 @@ export class EndpointStore {
     }
 
     static getComponentFromEndpoint(endpointname) {
-        return EndpointStore.ENDPOINT_STORE[endpointname] || 
-            EndpointStore.ENDPOINT_STORE._e404;
+        return liliumcms.session.allowedEndpoints.includes(endpointname) ? 
+            EndpointStore.ENDPOINT_STORE[endpointname] || EndpointStore.ENDPOINT_STORE._e404 : 
+            EndpointStore.ENDPOINT_STORE._e403;
     }
 }
 
@@ -44,10 +64,27 @@ EndpointStore.registerEndpoint("_init", InitPage);
 EndpointStore.registerEndpoint('dashboard', Dashboard);
 EndpointStore.registerEndpoint('publishing', Publishing);
 EndpointStore.registerEndpoint('me', ProfilePage);
+EndpointStore.registerEndpoint('preferences', Preferences);
+EndpointStore.registerEndpoint('entities', Entities);
+EndpointStore.registerEndpoint('role', Roles);
+EndpointStore.registerEndpoint('ponglinks', Ponglinks);
+EndpointStore.registerEndpoint('styledpages', StyledPages);
+EndpointStore.registerEndpoint('mailtemplates', MailTemplates);
+EndpointStore.registerEndpoint('chains', ContentChains);
 EndpointStore.registerEndpoint('logout', Logout);
 EndpointStore.registerEndpoint('devtools', DevTools);
+EndpointStore.registerEndpoint('thedailylilium', TheDailyLilium);
 EndpointStore.registerEndpoint('translations', translations);
+EndpointStore.registerEndpoint('settings', SettingsPage);
+EndpointStore.registerEndpoint('notifications', Notifs);
+EndpointStore.registerEndpoint('themes', ThemesPage);
+EndpointStore.registerEndpoint('ads', AdsManagement);
+EndpointStore.registerEndpoint('comments', CommentsMan);
+EndpointStore.registerEndpoint('plugins', PluginsMan);
+EndpointStore.registerEndpoint('cakepop', CakepopsMan); 
+EndpointStore.registerEndpoint('flagging', FlaggingMan);
 EndpointStore.registerEndpoint('_e404', e404);
+EndpointStore.registerEndpoint('_e403', e403);
 
 export class URLRenderer extends Component {
     constructor(props) {
@@ -55,7 +92,8 @@ export class URLRenderer extends Component {
         this.state = {
             endpoint : "_init",
             levels : [],
-            classes : []
+            classes : [],
+            rendererstyle : {}
         }
 
         getLocal(CACHEKEYS.SIDEBARSNAP) && this.state.classes.push("snap");
@@ -66,7 +104,7 @@ export class URLRenderer extends Component {
         document.addEventListener('navigate', ev => {
             const path = "/lilium" + ev.detail.href;
             window.history.pushState(path, undefined, path);
-            this.refreshPath();
+            this.refreshPath(ev.detail.extras);
         });
 
         if (document.location.pathname.substring(1).split('/').length == 1) {
@@ -84,7 +122,17 @@ export class URLRenderer extends Component {
         document.addEventListener('menuslid', this.menuslid_bound);
         document.addEventListener('menusnap', this.menusnapped_bound);
 
+        this.callStaticRegisterMethods();
         this.refreshPath();
+    }
+
+    callStaticRegisterMethods() {
+        log('URLRenderer', 'Calling static componentDidRegister methods of all endpoints', 'url');
+        Object.keys(EndpointStore.ENDPOINT_STORE).forEach(endpoint => 
+            liliumcms.session.allowedEndpoints.includes(endpoint) &&
+            EndpointStore.ENDPOINT_STORE[endpoint].componentDidRegister &&
+            EndpointStore.ENDPOINT_STORE[endpoint].componentDidRegister()
+        );
     }
 
     componentWillReceiveProps(props) {
@@ -104,7 +152,7 @@ export class URLRenderer extends Component {
         this.state.classes = ev.detail.snapped ? ["snap"] : [];
     }
 
-    refreshPath() {
+    refreshPath(extras= {}) {
         const paths = document.location.pathname.substring(1).split('/');
         paths.shift();
 
@@ -115,9 +163,11 @@ export class URLRenderer extends Component {
         resetPageCommands();
 
         const CurrentContainer = EndpointStore.getComponentFromEndpoint(endpoint);
-        this.setState({ endpoint, levels, CurrentContainer }, () => {
+        this.setState({ endpoint, levels, CurrentContainer, extras, rendererstyle : CurrentContainer.rendererstyle || {} }, () => {
             const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
             document.dispatchEvent(ev);
+
+            dismissOverlay();
         });
     }
 
@@ -125,8 +175,8 @@ export class URLRenderer extends Component {
         this.lastRenderedPath = document.location.pathname;
         log('URLRenderer', 'Rendering component at endpoint : ' + this.state.endpoint, 'layout');
         return (
-            <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')}>
-                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} session={this.props.session} />
+            <div id="urlrenderer" ref={x => (this.renderer = x)} class={this.state.classes.join(' ')} style={this.state.rendererstyle}>
+                <this.state.CurrentContainer endpoint={this.state.endpoint} levels={this.state.levels} session={this.props.session} extras={this.state.extras || {}} />
             </div>
         )
     }

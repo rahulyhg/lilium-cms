@@ -41,10 +41,10 @@ tmp/*
 # Uploads
 backend/static/uploads/*
 backend/static/u/*
+backend/static/compiled/*
 
 # Generated files
 backend/static/gen/*
-backend/static/compiled/*.old
 
 # Custom frontend libraries
 backend/static/lib

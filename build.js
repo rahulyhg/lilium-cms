@@ -84,6 +84,7 @@ class Builder {
 
             fs.writeFile(precompfile, maincontent, { encoding : "utf8" }, err => {
                 const buildconfig = {
+                    mode : _c.env == "dev" ? "development" : "production",
                     module : {
                         rules : [
                             { 
@@ -100,6 +101,7 @@ class Builder {
                     }
                 };
 
+                log('Builder', 'Injection phase took ' + (Date.now() - now) + 'ms', 'info');
                 _c && hooks.fireSite(_c, 'buildingPreactApp', {input, outputkey, options, buildconfig});
                 webpack(buildconfig, (err, result) => {
                     err ? log('Builder', 'Error compiling project ' + outputkey + ' : ' + err, 'err') : 
@@ -110,7 +112,7 @@ class Builder {
                         result.compilation.errors.forEach(console.log);
                     }
 
-                    fs.unlink(precompfile, () => done && done());
+                    fs.unlink(precompfile, () => done && done(err, result));
                 });
 
             });

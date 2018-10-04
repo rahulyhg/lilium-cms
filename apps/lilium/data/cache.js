@@ -35,6 +35,15 @@ export function getSession(key) {
     return sessionCache[key]
 }
 
+export function mapUsers(users) {
+    const obj= {};
+    users.forEach(user => {
+        obj[user._id] = user;
+    });
+
+    return obj;
+}
+
 export function initLocal() {
     log('Cache', 'Initializing local storage dump into RAM', 'success');
     if (!window.localStorage) {

@@ -1,12 +1,23 @@
 import { h, Component } from 'preact';
+import API from '../data/api';
 
 export class TextEditor extends Component {
     constructor(props) {
         super(props);
+        this.oldValue = '';
         this.state = {
 
         }
         this.textarea;
+
+        this.autosave = props.autosave;
+
+        if (this.autosave) {
+            this.endpoint = props.endpoint;
+            this.fieldkey = props.fieldkey || "field";
+            this.valuekey = props.valuekey || "value";
+            this.savemethod = props.savemethod || "post";
+        }
 
         this.rID = "txt-" + Math.random().toString().substring(2) + Date.now().toString()
     }
@@ -31,9 +42,10 @@ export class TextEditor extends Component {
         }).then(editors => {
             if (editors && editors[0]) {
                 this.texteditor = editors && editors[0];
-                this.texteditor.on('change', this.changed.bind(this));
+                this.texteditor.on('blur', this.handleBlur.bind(this));
                 this.texteditor.show();
                 this.texteditor.setContent(this.props.content);
+                this.texteditor.undoManager.clear();
             } else { 
                 log('TextEditor', 'No editor were created at that point', 'warn');
             }
@@ -53,6 +65,7 @@ export class TextEditor extends Component {
         if (props.content && this.texteditor) {
             log('TextEditor', 'Content set via new props', 'detail');
             this.texteditor.setContent(props.content);
+            this.oldValue = props.content;
         }
     }
 
@@ -60,8 +73,25 @@ export class TextEditor extends Component {
         return false;
     }
 
-    changed() {
-        this.props.onChange && this.props.onChange(this.props.name || this.rID, this.props.format ? this.props.format(this.getContent()) : this.getContent());
+    handleBlur() {
+        if (this.oldValue != this.getContent()) {
+            this.props.onChange && this.props.onChange(this.props.name || this.rID, this.props.format ? this.props.format(this.getContent()) : this.getContent());
+            this.oldValue = this.getContent();
+        }
+
+        if (this.autosave) {
+            this.setState({ saving : true });
+            API[this.savemethod](this.endpoint, { 
+                [this.fieldkey] : this.props.name || this.rID, 
+                [this.valuekey] : this.props.format ? this.props.format(this.getContent()) : this.getContent()
+            }, (err, resp, r) => {
+                if (err || r.status / 200 != 1) {
+                    this.setState({ saving : false });
+                } else {
+                    this.setState({ saving : false, saveerror : true });
+                }
+            })
+        }
     }
 
     getContent() {
@@ -72,7 +102,7 @@ export class TextEditor extends Component {
         log('TextEditor', 'Rendering text editor with random ID ' + this.rID, 'detail');
         
         return (
-            <div>
+            <div style={this.props.style || { display: "block" }}>
                 <textarea ref={el => (this.textarea = el)} id={this.rID}>{this.props.content}</textarea>
             </div>
         )

@@ -91,7 +91,7 @@ class PongLinks {
         } else if (action == "edit") {
             this.editLink(cli._c, db.mongoID(cli.routeinfo.path[3]), cli.postdata.data, (err, mod) => cli.sendJSON(err ? { error : err.toString() } : { mod }));
         } else {
-            cli.throwHTTP(404, undefined, true);
+            cli.throwHTTP(404, undcefined, true);
         }
     }
 
@@ -146,7 +146,12 @@ class PongLinks {
                 $match.status = params.filters.status;
             }
 
-            db.join(cli._c, 'ponglinks', [ {$match}, {$sort : {_id : -1}} ], (items) => {
+            db.join(cli._c, 'ponglinks', [
+                {$match},
+                {$sort : {_id : -1}},
+                {$skip : params.filters.skip || 0},
+                {$limit : params.filters.limit || 30}
+            ], (items) => {
                 sendback({ items });
             });
         }

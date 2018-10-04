@@ -27,9 +27,7 @@
  *
  *************************************************************************************************************************/
 
-const log = require('./log.js');
 const db = require('./includes/db.js');
-const formbuilder = require('./formBuilder.js');
 const filelogic = require('./filelogic.js');
 const config = require('./config.js');
 const hooks = require('./hooks');
@@ -78,6 +76,12 @@ class Cakepop {
             } else {
                 cli.sendJSON({success : false, reason : "No displayname provided"})
             }
+        } else if (action == "updateOneField" && cli.hasRight('cakepop')) {
+            db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.routeinfo.path[3])}, {
+                [cli.postdata.data.field] : cli.postdata.data.value   
+            }, () => {
+                cli.sendJSON({ ok : 1 });
+            });
         } else if (action == "save" && cli.hasRight('cakepop')) {
             const d = cli.postdata.data;
             db.update(config.default(), CAKEPOP_COLLECTION, {_id : db.mongoID(cli.routeinfo.path[3])}, d, () => {
@@ -168,7 +172,11 @@ class Cakepop {
             }
 
             if (filters.search) {
-                query.title = new RegExp(filters.search);
+                try {
+                    query.title = new RegExp(filters.search.toLowerCase(), 'i');
+                } catch (ex) {
+                    query.title = filters.search.toLowerCase();
+                }
             }
 
             db.find(config.default(), CAKEPOP_COLLECTION, query, [], (err, cur) => {
@@ -180,6 +188,7 @@ class Cakepop {
                 }).toArray((err, arr) => {
                     arr.forEach(x => {
                         x.expired = x.expiry < t;
+                        x.status = x.expired ? "expired" : x.status;
                         x.read = x.read && x.read.length || 0;
                     });
                     sendback({
@@ -193,68 +202,7 @@ class Cakepop {
     }
 
     form() {
-        formbuilder.createForm('cakepop_edit', {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                'id': 'cakepop_edit',
-                'inner': true
-            },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add('title', 'text', { displayname : "Title" })
-        .add('content', 'ckeditor', {nolabel : true, classes : ["no-style"]})
-        .add('app-sep', 'title', {
-            displayname : "Appearance"
-        })
-        .add('stylesheet', 'textarea', {displayname : "Custom CSS", rows : 10})
-        .add('nocontainer', 'checkbox', {displayname : "Do not use the default container"})
-        .add('int-sep', 'title', {
-            displayname : "Interactions"
-        })
-        .add('responses', 'stack', {
-            displayname : "Responses",
-            scheme : {
-                columns : [
-                    { fieldName : "identifier",     dataType : "text", displayname : "Identifier"   }, 
-                    { fieldName : "displayname",    dataType : "text", displayname : "Display Name" }, 
-                    { fieldName : "color",          dataType : "text", displayname : "Color (HEX)"  }
-                ]
-            }
-        })
-        .add('mendatory', 'checkbox', {displayname : "The cakepop cannot be dismissed without a response"})
-        .add('auto', 'checkbox', {displayname : "Automatically popup on next request (can be annoying)"})
-        .add('status-sep', 'title', {
-            displayname : "Status"
-        })
-        .add('expiry', 'date', {
-            displayname : "Expiry",
-            datetime : true, 
-            context : 'edit',
-            classes : ["lml-date"]
-        })
-        .add('status', 'select', {
-            datasource: [
-                {displayName : "Creation", name : "creation"},
-                {displayName : "Live", name : "live"}
-            ],
-            displayname : "State"
-        })
-        .add('publish-set', 'buttonset', { 
-            buttons : [
-                {
-                    'name' : 'save',
-                    'displayname': 'Save',
-                    'type' : 'button',
-                    'classes': ['btn-save']
-                }, {
-                    'name' : 'view',
-                    'displayname': 'Test Cakepop',
-                    'type' : 'button',
-                    'classes': ['btn-preview']
-                }        
-            ]
-        });
+     
     }
 }
 

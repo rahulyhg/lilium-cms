@@ -17,6 +17,6 @@ const log = (sender, msg, level) => {
 };
 
 export function makeGlobalLogger() {
-    console.log("%c", "font-size: 1px; line-height: 100px; background-image: url(" + document.location.protocol + "//" + liliumcms.url + "/static/media/masthead.png); background-size: 340px 100px; padding: 50px 170px;");
+    console.log("%c ", "font-size: 1px; line-height: 0px; background-image: url(" + document.location.protocol + "//" + liliumcms.url + "/static/media/masthead.png); background-size: 340px 100px; padding: 50px 170px;");
     global.log = log;
 }

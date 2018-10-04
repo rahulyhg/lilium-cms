@@ -80,18 +80,37 @@ export class DevTools extends Component {
     componentDidMount() {
         window.onerror = this.onerror.bind(this);
         addCommand({
-            command : "bundle-js",
+            command : "bundlejs,compile,build",
             displayname : "Bundle JS",
             execute : this.bundleJS.bind(this)
         });
+
+        addCommand({
+            command : "css,buildcss,less",
+            displayname : "Build Less",
+            execute : this.bundleCSS.bind(this)
+        })
     }
 
     onerror(error) {
         this.setState({ error })
     }
 
+    bundleCSS() {
+        log('Dev', 'Sent request to bundle Less files... The browser will refresh shortly', 'lilium');
+        const event = new CustomEvent("castexitscreen");
+        document.dispatchEvent(event);
+
+        API.post('/buildcss/lilium', {}, () => {
+            document.location.reload();
+        });
+    }
+
     bundleJS() {
         log('Dev', 'Sent request to bundle V4... The browser will refresh shortly', 'lilium');
+        const event = new CustomEvent("castexitscreen");
+        document.dispatchEvent(event);
+        
         API.rebuild();
     }
 

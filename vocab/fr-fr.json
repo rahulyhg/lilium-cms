@@ -2,18 +2,21 @@
     "__": {
         "languageName": "fr-fr",
         "fallback": "fr-ca",
-        "displayName": "Français France"
+        "displayName": "Français de France"
     },
-
-
     "dashboard": {
         "subtitle": "Accueil"
     },
     "devtools": {
-        "subtitle": ""
+        "subtitle": "",
+        "pageTItle": "",
+        "otherSlug": "",
+        "newOtherSlug": "",
+        "Allo": ""
     },
     "errors": {
-        "subtitle": ""
+        "subtitle": "",
+        "testSlug": ""
     },
     "me": {
         "subtitle": ""
@@ -26,5 +29,11 @@
     },
     "logout": {
         "title": ""
+    },
+    "preferences": {
+        "title": "preferences"
+    },
+    "testpage": {
+        "title": "testpage"
     }
 }

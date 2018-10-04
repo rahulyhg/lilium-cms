@@ -1,4 +1,5 @@
 import { h, Component } from 'preact';
+import { bindRealtimeEvent, unbindRealtimeEvent } from '../realtime/connection'
 
 const styles = {
     wrapper : {
@@ -85,10 +86,27 @@ export class NotificationWrapper extends Component {
         this.state = {
             notifications : []
         };
+
+        this.receivedNotification_bound = this.receivedNotification.bind(this);
     }
 
     componentDidMount() {
         _singleton = this;
+        bindRealtimeEvent('notification', this.receivedNotification_bound);
+    }
+
+    componentWillUnmount() {
+        unbindRealtimeEvent('notification', this.receivedNotification_bound)
+    }
+
+    receivedNotification(n) {
+        this.push({
+            type : n.type,
+            timeout : n.timeout || 6500,
+            title : n.title,
+            message : n.msg,
+            link : n.link,
+        });
     }
 
     push(notification) {
@@ -122,6 +140,9 @@ export function castNotification(param) {
     const n = new LiliumNotification(param);    
     log('Notif', 'Casting Lilium notification with type : ' + n.type, 'detail');
     _singleton.push(n);
+
+    const event = new CustomEvent('notification', {detail : { notification : n }});
+    document.dispatchEvent(event);
 
     return n.id;
 }
