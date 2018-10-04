@@ -12,8 +12,7 @@ class Vocab {
     }
 
     /**
-     * Converts the multilingual data sotred in the 'masterVocab' file into language specific files
-     * that can then be fetched by a client accordfring to it's prefered language
+     * Initializes language JSON files that will be requested by clients
      * @param {callback} done 
      */
     preloadDicos(done) {
@@ -48,11 +47,17 @@ class Vocab {
     }
 
     /**
-     * Returns an array containing the language codes of the supported languages
+     * R
+        eturns an array containing the information for all supported languages
      */
     getSUpportedLanguages() { return this.supportedLanguages; };
 
-    /**jsvas
+    /**
+     * Returns an array containing the language codes of the supported languages
+     */
+    getSupportedLanguageCodes() { return this.supportedLanguages.map(l => l.languageName); }
+
+    /**
      * Returns an object containing the translation data for a language code
      * @param {string} langcode THe langcode of which to get the translations
      */
@@ -96,6 +101,7 @@ class Vocab {
 
         log('Vocab', 'Compiled language resource file for language ' + lang, 'info');
         compiled.__ = this.languagesData[lang].__;
+
         return compiled;
     }
 
@@ -148,7 +154,11 @@ class Vocab {
     }
 
     removeField(pageName, slug, done) {
-        this.supportedLanguages.forEach(lang => {   
+        console.log(pageName, slug);
+        
+        this.supportedLanguages.forEach(lang => {
+            console.log(lang);
+            
             delete this.languagesData[lang][pageName][slug];
         });
 
