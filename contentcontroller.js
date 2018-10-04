@@ -78,13 +78,11 @@ class ContentController {
                 break;
             case 'publish':
                 log('Content', 'Publishing from PUT under /publish', 'detail');
-                db.findUnique(cli._c, 'content', { _id }, (err, article) => {
-                    if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
-                        contentlib.publish(cli._c, article, db.mongoID(cli.userinfo.userid), resp => cli.sendJSON(resp));
-                        contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
+                contentlib.publish(cli._c, _id, db.mongoID(cli.userinfo.userid), resp => {
+                    if (resp.error) {
+                        cli.throwHTTP(resp.code, resp.error, true);
                     } else {
-                        log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
-                        cli.throwHTTP(404, undefined, true);
+                        cli.sendJSON(resp);
                     }
                 });
                 break;
@@ -191,7 +189,7 @@ class ContentController {
                         });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
-                        cli.throwHTTP(404, undefined, true);
+                        cli.throwHTTP(404, "Missing rights", true);
                     }
                 });
                 break;
