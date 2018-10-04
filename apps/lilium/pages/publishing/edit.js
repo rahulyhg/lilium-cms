@@ -288,7 +288,67 @@ export default class EditView extends Component {
 
     publish(done) {
         this.save(() => {
-            
+            API.put('/publishing/publish/' + this.coldState.post._id, {}, (err, json, r) => {
+                if (r.status == 200) {
+                    this.setState({
+                        history : [json.historyentry, ...this.state.history],
+                        post : {...this.state.post, ...{
+                            status : json.newstate.status,
+                            date : json.newstate.date,
+                            name : json.newstate.name,
+                            publishedAt : Date.now()
+                        }}
+                    }, () => {
+                        this.coldState.post = this.state.post; 
+
+                        this.setState({
+                            actions : this.getActionFromColdState()
+                        })   
+                    });
+                } else {
+                    r.text().then(message => {
+                        castNotification({
+                            type : "warning",
+                            title : "Could not publish article",
+                            message
+                        });
+                    })
+                }
+
+                done();
+            });
+        });
+    }
+
+    unpublish(done) {
+        API.delete('/publishing/unpublish/' + this.coldState.post._id, {}, (err, json, r) => {
+            if (r.status == 200) {
+                this.setState({
+                    history : [json.historyentry, ...this.state.history],
+                    post : {...this.state.post, ...{
+                        status : json.newstate.status,
+                        date : json.newstate.date,
+                        name : json.newstate.name,
+                        publishedAt : Date.now()
+                    }}
+                }, () => {
+                    this.coldState.post = this.state.post; 
+
+                    this.setState({
+                        actions : this.getActionFromColdState()
+                    })   
+                });
+            } else {
+                r.text().then(message => {
+                    castNotification({
+                        type : "warning",
+                        title : "Could not unpublish article",
+                        message
+                    });
+                })
+            }
+
+            done();
         });
     }
 
@@ -345,9 +405,15 @@ export default class EditView extends Component {
         const actions = [<ButtonWorker theme="white" text="Preview" work={this.preview.bind(this)} />];
 
         if (status == "draft" || status == "deleted") {
-            actions.push(<ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, <ButtonWorker type="fill" theme="blue" text="Publish" work={this.publish.bind(this)} />);
+            actions.push(
+                <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
+                <ButtonWorker type="fill" theme="blue" text="Publish" work={this.publish.bind(this)} />
+            );
         } else if (status == "published") {
-            actions.push(<ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />);
+            actions.push(
+                <ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />, 
+                <ButtonWorker theme="red"  type="outline" text="Unpublish" work={this.unpublish.bind(this)} />
+            );
         } 
 
         return actions;
