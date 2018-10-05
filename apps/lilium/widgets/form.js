@@ -125,7 +125,9 @@ export class TextField extends FormField {
     }
 
     componentWillReceiveProps(props) {
-        if (typeof props.value != 'undefined') {
+        console.log(props);
+        
+        if (typeof props.value != 'undefined' && props.value != this.inputbox.value) {
             this.changed({ target : { value : props.value }});
             this.inputbox.value = props.value;
         } else {
