@@ -2,7 +2,7 @@ import { h, Component } from "preact";
 import API from '../data/api';
 import flatpickr from 'flatpickr';
 import { Spinner } from '../layout/loading'
-import { ImagePicker } from '../layout/imagepicker';
+import { Picker } from '../layout/imagepicker';
 import slugify from "slugify";
 
 class FormField extends Component {
@@ -363,7 +363,7 @@ export class MediaPickerField extends FormField {
     }
 
     open() {
-        ImagePicker.cast({
+        Picker.cast({
             selected : this.state.mediaID || undefined
         }, image => {
             if (image) {

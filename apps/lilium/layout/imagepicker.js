@@ -82,6 +82,7 @@ class SelectedImage extends Component {
                     </div>
                 </div>
             </div>
+
         )
     }
 }
@@ -155,7 +156,6 @@ class ImageThumbnail extends Component {
     }
 }
 
-let _singleton;
 export class ImagePicker extends Component {
     constructor(props) {
         super(props);
@@ -165,50 +165,30 @@ export class ImagePicker extends Component {
             images : [],
             selected : undefined
         };
-
-        _singleton && log('ImagePicker', 'Overriding _singleton reference value because the ImagePicker class was instanciated multiple times', 'watning');
-        _singleton = this;
-        this.keydown_bound = this.keydown.bind(this);
     }
 
-    static cast(params, done) {
-        log('ImagePicker', 'Casting image picker singleton', 'detail');
-        const initState = { params, visible : true, selected : undefined, callback : done };
-        if (params && params.selected) {
-            initState.loading = true;
-            _singleton.setState(initState);
+    static tabTitle =  'uploads';
 
-            _singleton.fetchLatest(allImages => {
-                API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
-                    allImages.unshift(upload);
-                    initState.images = allImages;
-                    initState.selected = upload;
+    // static cast(params, done) {
+    //     log('ImagePicker', 'Casting image picker singleton', 'detail');
+    //     const initState = { params, visible : true, selected : undefined, callback : done };
+    //     if (params && params.selected) {
+    //         initState.loading = true;
+    //         _singleton.setState(initState);
 
-                    _singleton.setState(initState);
-                });
-            });
-        } else {
-            _singleton.setState(initState);
-        }          
-        
-        window.addEventListener('keydown', _singleton.keydown_bound);
-        document.addEventListener('navigate', ImagePicker.dismiss);
-    }
+    //         _single.fetchLatest(allImages => {
+    //             API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
+    //                 allImages.unshift(upload);
+    //                 initState.images = allImages;
+    //                 initState.selected = upload;
 
-    static dismiss() {
-        log('ImagePicker', 'Dismissing image picker singleton', 'detail');
-        _singleton.setState({ visible : false });
-        window.removeEventListener('keydown', _singleton.keydown_bound);
-        document.removeEventListener('navigate', ImagePicker.dismiss);
-    }
-
-    static accept() {        
-        if (_singleton.state.selected) {
-            log('ImagePicker', 'Selected image and calling back', 'detail');
-            _singleton.state.callback && _singleton.state.callback(_singleton.state.selected);        
-            ImagePicker.dismiss();
-        }
-    }
+    //                 _singleton.setState(initState);
+    //             });
+    //         });
+    //     } else {
+    //         _singleton.setState(initState);
+    //     }          
+    // }
 
     castUpload() {
         this.fileElem.click();
@@ -228,11 +208,6 @@ export class ImagePicker extends Component {
         } else {
             // NoOP
         }
-    }
-
-    keydown(ev) {
-        ev.keyCode == "27" && ImagePicker.dismiss();
-        ev.keyCode == "13" && ImagePicker.accept();
     }
 
     fetchLatest(sendback) {
@@ -274,7 +249,7 @@ export class ImagePicker extends Component {
                     </div>
 
                     <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={ImagePicker.accept.bind(ImagePicker)} />       
+                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker)} />       
                     </div>
                 </div>
             </div>

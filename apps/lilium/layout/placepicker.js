@@ -32,48 +32,46 @@ export class PlacePicker extends Component {
             selected: undefined,
             callback: undefined
         };
-
-        _singleton && log('PlacePicker', 'Overriding _singleton reference value because the PlacePicker class was instanciated multiple times', 'watning');
-        _singleton = this;
-        this.keydown_bound = this.keydown.bind(this);
     }    
 
     static sessionToken = undefined;
 
-    static cast(params, done) {
-        log('PlacePicker', 'Casting Place picker singleton', 'detail');
-        PlacePicker.sessionToken = Date.now().toString(16) + Math.random().toString(16) + Math.random().toString(16);
-        _singleton.setState({ params, visible: true, selected: undefined, callback: done });        
-        window.addEventListener('keydown', _singleton.keydown_bound);
-        document.addEventListener('navigate', PlacePicker.dismiss);
-    }
+    static tabTitle = 'Place';
 
-    static dismiss() {
-        log('PlacePicker', 'Dismissing Place picker singleton', 'detail');
-        _singleton.setState({ visible : false });
-        window.removeEventListener('keydown', _singleton.keydown_bound);
-        document.removeEventListener('navigate', PlacePicker.dismiss);
-    }
+    // static cast(params, done) {
+    //     log('PlacePicker', 'Casting Place picker singleton', 'detail');
+    //     Picker.sessionToken = Date.now().toString(16) + Math.random().toString(16) + Math.random().toString(16);
+    //     _singleton.setState({ params, visible: true, selected: undefined, callback: done });        
+    //     window.addEventListener('keydown', _singleton.keydown_bound);
+    //     document.addEventListener('navigate', Picker.dismiss);
+    // }
 
-    static accept() {
-        if (_singleton.state.selectedPlace) {
-            log('PlacePicker', 'Selected Place and calling back', 'detail');
-            _singleton.state.callback && _singleton.state.callback(_singleton.state.selectedPlace);        
-            PlacePicker.dismiss();
-        }
-    }
+    // static dismiss() {
+    //     log('PlacePicker', 'Dismissing Place picker singleton', 'detail');
+    //     _singleton.setState({ visible : false });
+    //     window.removeEventListener('keydown', _singleton.keydown_bound);
+    //     document.removeEventListener('navigate', Picker.dismiss);
+    // }
+
+    // static accept() {
+    //     if (_singleton.state.selectedPlace) {
+    //         log('PlacePicker', 'Selected Place and calling back', 'detail');
+    //         _singleton.state.callback && _singleton.state.callback(_singleton.state.selectedPlace);        
+    //         Picker.dismiss();
+    //     }
+    // }
 
     toggleSearchGoogle() {
         this.setState({ searchGoogle: !this.state.searchGoogle });
     }
 
     keydown(ev) {
-        ev.keyCode == "27" && PlacePicker.dismiss();
-        ev.keyCode == "13" && PlacePicker.accept();
+        ev.keyCode == "27" && Picker.dismiss();
+        ev.keyCode == "13" && Picker.accept();
     }
 
     search(input) {
-        API.get('/googlemaps/autocompletequery', { input, sessionToken: PlacePicker.sessionToken }, (err, data, r) => {
+        API.get('/googlemaps/autocompletequery', { input, sessionToken: Picker.sessionToken }, (err, data, r) => {
             if (r.status == 200) {
                 this.setState({ places: data.predictions });
             } else {
@@ -161,8 +159,8 @@ export class PlacePicker extends Component {
                             </div>
                         </div>
                         <div id="place-picker-actions-bar">
-                            <a role='button' className="button fill purple" onClick={PlacePicker.accept.bind(this)}>Add Selected Place</a>
-                            <a role='button' className="button outline red" onClick={PlacePicker.dismiss.bind(this)}>Cancel</a>
+                            <a role='button' className="button fill purple" onClick={Picker.accept.bind(this)}>Add Selected Place</a>
+                            <a role='button' className="button outline red" onClick={Picker.dismiss.bind(this)}>Cancel</a>
                         </div>
                     </div>
                     <div id="place-picker-map-pane">

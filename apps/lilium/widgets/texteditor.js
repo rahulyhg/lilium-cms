@@ -1,7 +1,6 @@
 import { h, Component } from 'preact';
 import API from '../data/api';
-import { ImagePicker } from '../layout/imagepicker';
-import { PlacePicker } from '../layout/placepicker';
+import { Picker } from '../layout/picker';
 
 export class TextEditor extends Component {
     constructor(props) {
@@ -33,23 +32,12 @@ export class TextEditor extends Component {
             convert_urls : false,
             menubar: false,
             setup: editor => {
-                editor.addButton('insert-image', {
-                    icon: 'image',
-                    tooltip: 'Insert Image',
-                    onclick: () => {
-                        ImagePicker.cast({}, image => {
-                            alert('Yay, you chose an image');
-                        });
-                    }
-                });
-
                 editor.addButton('insert-place', {
-                    icon: 'fa fa-map-marker-alt',
+                    icon: 'fa fa-plus-circle',
                     tooltip: 'Insert Place',
                     onclick: () => {
-                        PlacePicker.cast({}, place => {
-                            console.log(place);
-                            
+                        const session =  new Picker.Session({});
+                        Picker.cast(session, place => {
                             const dummyPlaceEl = document.createElement('div');
                             dummyPlaceEl.className = 'lml-placeholder-google-maps';
                             dummyPlaceEl.dataset.placeId = place._id;
