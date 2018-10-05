@@ -1,4 +1,5 @@
 import { Component, h } from 'preact';
+import { Picker } from './picker';
 
 export class EmbedPicker extends Component {
     constructor(props) {

@@ -1,6 +1,7 @@
 import { h, Component } from 'preact';
 import { TextField, ButtonWorker } from '../widgets/form';
 import API from '../data/api';
+import { Picker } from './picker';
 
 const styles = {
     bigtitle : {
@@ -82,7 +83,6 @@ class SelectedImage extends Component {
                     </div>
                 </div>
             </div>
-
         )
     }
 }
@@ -160,35 +160,33 @@ export class ImagePicker extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            visible : false,
-            params : {},
             images : [],
             selected : undefined
         };
     }
 
-    static tabTitle =  'uploads';
+    static tabTitle =  'Uploads';
 
-    // static cast(params, done) {
-    //     log('ImagePicker', 'Casting image picker singleton', 'detail');
-    //     const initState = { params, visible : true, selected : undefined, callback : done };
-    //     if (params && params.selected) {
-    //         initState.loading = true;
-    //         _singleton.setState(initState);
+    componentDidMount(params, done) {
+        log('ImagePicker', 'Displaying image picker singleton', 'detail');
+        const initState = { params, visible : true, selected : undefined, callback : done };
+        if (params && params.selected) {
+            initState.loading = true;
+            this.setState(initState);
 
-    //         _single.fetchLatest(allImages => {
-    //             API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
-    //                 allImages.unshift(upload);
-    //                 initState.images = allImages;
-    //                 initState.selected = upload;
+            this.fetchLatest(allImages => {
+                API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
+                    allImages.unshift(upload);
+                    initState.images = allImages;
+                    initState.selected = upload;
 
-    //                 _singleton.setState(initState);
-    //             });
-    //         });
-    //     } else {
-    //         _singleton.setState(initState);
-    //     }          
-    // }
+                    this.setState(initState);
+                });
+            });
+        } else {
+            this.setState(initState);
+        }          
+    }
 
     castUpload() {
         this.fileElem.click();
@@ -228,29 +226,25 @@ export class ImagePicker extends Component {
     }
 
     render() {
-        if (!this.state.visible) return null;
-
         return (
-            <div id="image-picker-overlay">
-                <div id="image-picker">
-                    <div>
-                        <b style={ styles.bigtitle }>Lilium gallery</b>
-                        <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
+            <div id="image-picker">
+                <div>
+                    <b style={ styles.bigtitle }>Lilium gallery</b>
+                    <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />
+                </div>
+
+                <div id="image-gallery">
+                    <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
+                        <i class="far fa-plus-circle"></i>
                     </div>
 
-                    <div id="image-gallery">
-                        <div id="image-upload-button" onClick={this.castUpload.bind(this)}>
-                            <i class="far fa-plus-circle"></i>
-                        </div>
+                    {
+                        this.state.images.map(x => (<ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
+                    }
+                </div>
 
-                        {
-                            this.state.images.map(x => (<ImageThumbnail key={x.file || x._id} file={x && x.file} image={x} selected={this.state.selected && this.state.selected == x} clicked={this.imageClicked.bind(this)} />))
-                        }
-                    </div>
-
-                    <div id="image-gallery-detail"> 
-                        <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker)} />       
-                    </div>
+                <div id="image-gallery-detail"> 
+                    <SelectedImage image={this.state.selected} selectFromWorker={Picker.accept.bind(Picker)} />       
                 </div>
             </div>
         )

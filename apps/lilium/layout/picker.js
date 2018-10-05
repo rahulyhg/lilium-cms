@@ -2,8 +2,8 @@ import { Component, h } from 'preact';
 import { getLocal } from '../data/cache';
 import { TabView, Tab } from '../widgets/tabview';
 import { EmbedPicker } from './embedpicker';
-import { ImagePicker } from './imagepicker';
 import { PlacePicker } from './placepicker';
+import { ImagePicker } from './imagepicker';
 
 const PickerMap = {
     images: ImagePicker,

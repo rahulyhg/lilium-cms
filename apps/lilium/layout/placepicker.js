@@ -2,6 +2,7 @@ import { Component, h } from "preact";
 import { castNotification } from './notifications';
 import { DebouncedField, TextField } from "../widgets/form";
 import API from "../data/api";
+import { Picker } from './picker';
 
 class Place extends Component {
     constructor(props) {
@@ -17,13 +18,13 @@ class Place extends Component {
     }
 }
 
-let _singleton;
 export class PlacePicker extends Component {
     constructor(props) {
         super(props);
 
         this.values = {};
         this.placeId = '';
+        this.sessionToken = Date.now().toString(16) + Math.random().toString(16) + Math.random().toString(16);
         this.state = {
             visible: false,
             params: {},
@@ -34,32 +35,7 @@ export class PlacePicker extends Component {
         };
     }    
 
-    static sessionToken = undefined;
-
     static tabTitle = 'Place';
-
-    // static cast(params, done) {
-    //     log('PlacePicker', 'Casting Place picker singleton', 'detail');
-    //     Picker.sessionToken = Date.now().toString(16) + Math.random().toString(16) + Math.random().toString(16);
-    //     _singleton.setState({ params, visible: true, selected: undefined, callback: done });        
-    //     window.addEventListener('keydown', _singleton.keydown_bound);
-    //     document.addEventListener('navigate', Picker.dismiss);
-    // }
-
-    // static dismiss() {
-    //     log('PlacePicker', 'Dismissing Place picker singleton', 'detail');
-    //     _singleton.setState({ visible : false });
-    //     window.removeEventListener('keydown', _singleton.keydown_bound);
-    //     document.removeEventListener('navigate', Picker.dismiss);
-    // }
-
-    // static accept() {
-    //     if (_singleton.state.selectedPlace) {
-    //         log('PlacePicker', 'Selected Place and calling back', 'detail');
-    //         _singleton.state.callback && _singleton.state.callback(_singleton.state.selectedPlace);        
-    //         Picker.dismiss();
-    //     }
-    // }
 
     toggleSearchGoogle() {
         this.setState({ searchGoogle: !this.state.searchGoogle });
@@ -71,7 +47,7 @@ export class PlacePicker extends Component {
     }
 
     search(input) {
-        API.get('/googlemaps/autocompletequery', { input, sessionToken: Picker.sessionToken }, (err, data, r) => {
+        API.get('/googlemaps/autocompletequery', { input, sessionToken: this.sessionToken }, (err, data, r) => {
             if (r.status == 200) {
                 this.setState({ places: data.predictions });
             } else {
@@ -88,7 +64,7 @@ export class PlacePicker extends Component {
         this.values = { displayname: selectedPlace.structured_formatting.main_text }
         this.placeId = selectedPlace.place_id;
         this.upsert((err, data, r) => {
-            if (data.value) {
+            if (data.value) {PlacePicker
                 this.setState({ selectedPlace: data.value });
             } else {
                 this.setState({ selectedPlace: { ...this.values, _id: this.placeId } });
@@ -114,61 +90,57 @@ export class PlacePicker extends Component {
                     type: 'error'
                 })
             }
-            
+
             done && done(err, data, r);
         });
     }
 
     render() {
-        if (!this.state.visible) return null;
-        
         return (
-            <div id="place-picker-overlay">
-                <div id="place-picker">
-                    <div id="place-picker-search-pane">
-                        <div id="search-content-wrapper">
-                            <h1 className="title">Pick a place</h1>
-                            <div id="search-bar">
-                                <div id="query">
-                                    <DebouncedField name='query' placeholder='Search Query' onDebounce={this.search.bind(this)} />
-                                </div>
-                            </div>
-                            <div id="search-results">
-                                {
-                                    this.state.places && this.state.places.length ? (
-                                        this.state.places.map(place => (
-                                            <Place {...place} onSelect={this.placeSelected.bind(this)} key={place.place_id} selected={place.place_id== this.state.selectedPlace.place_id} />
-                                        ))
-                                    ) : (
-                                        <p>No places to show</p>
-                                    )
-                                }
-                            </div>
-                            <div id="place-details" className='card'>
-                                {
-                                    this.state.selectedPlace ? (
-                                        <div id="place-details-form">
-                                            <h1 id="det-place-name">{this.state.selectedPlace.displayname}</h1>
-                                            <TextField name='description' placeholder='Description' multiline value={this.state.selectedPlace.description}
-                                                        onChange={this.updateValues.bind(this)} />
-                                        </div>
-                                    ) : (
-                                        <p>Select a place to see details</p>
-                                    )
-                                }
+            <div id="place-picker">
+                <div id="place-picker-search-pane">
+                    <div id="search-content-wrapper">
+                        <h1 className="title">Pick a place</h1>
+                        <div id="search-bar">
+                            <div id="query">
+                                <DebouncedField name='query' placeholder='Search Query' onDebounce={this.search.bind(this)} />
                             </div>
                         </div>
-                        <div id="place-picker-actions-bar">
-                            <a role='button' className="button fill purple" onClick={Picker.accept.bind(this)}>Add Selected Place</a>
-                            <a role='button' className="button outline red" onClick={Picker.dismiss.bind(this)}>Cancel</a>
+                        <div id="search-results">
+                            {
+                                this.state.places && this.state.places.length ? (
+                                    this.state.places.map(place => (
+                                        <Place {...place} onSelect={this.placeSelected.bind(this)} key={place.place_id} selected={place.place_id== this.state.selectedPlace.place_id} />
+                                    ))
+                                ) : (
+                                    <p>No places to show</p>
+                                )
+                            }
+                        </div>
+                        <div id="place-details" className='card'>
+                            {
+                                this.state.selectedPlace ? (
+                                    <div id="place-details-form">
+                                        <h1 id="det-place-name">{this.state.selectedPlace.displayname}</h1>
+                                        <TextField name='description' placeholder='Description' multiline value={this.state.selectedPlace.description}
+                                                    onChange={this.updateValues.bind(this)} />
+                                    </div>
+                                ) : (
+                                    <p>Select a place to see details</p>
+                                )
+                            }
                         </div>
                     </div>
-                    <div id="place-picker-map-pane">
-                        <iframe id='map-embed' frameborder="0" style="border:0"
-                                src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBD6KcmiUsbFgikRMHDXxSByUAu7A8GkQs&q=${this.state.selectedPlace && this.state.selectedPlace._id ? 'place_id:' + this.state.selectedPlace._id : 'Montreal'}`}
-                                allowfullscreen>
-                        </iframe>
+                    <div id="place-picker-actions-bar">
+                        <a role='button' className="button fill purple" onClick={Picker.accept.bind(this)}>Add Selected Place</a>
+                        <a role='button' className="button outline red" onClick={Picker.dismiss.bind(this)}>Cancel</a>
                     </div>
+                </div>
+                <div id="place-picker-map-pane">
+                    <iframe id='map-embed' frameborder="0" style="border:0"
+                            src={`https://www.google.com/maps/embed/v1/place?key=AIzaSyBD6KcmiUsbFgikRMHDXxSByUAu7A8GkQs&q=${this.state.selectedPlace && this.state.selectedPlace._id ? 'place_id:' + this.state.selectedPlace._id : 'Montreal'}`}
+                            allowfullscreen>
+                    </iframe>
                 </div>
             </div>
         );
