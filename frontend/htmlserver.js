@@ -56,6 +56,7 @@ class BotResponder {
                 log('BotResponder', 'Redirected to ' + permalink, 'info');
                 return cli.redirect(permalink, true);
             } else {
+                log('BotResponder', 'Could not redirect bot request from ' + cli.routeinfo.fullpath, 'warn');
                 cli.throwHTTP(404, undefined, true);
             }
         });
