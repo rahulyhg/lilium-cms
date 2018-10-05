@@ -28,18 +28,12 @@ export class PlacePicker extends Component {
         this.state = {
             visible: false,
             params: {},
-            selectedPlace: '',
-            searchGoogle: false,
-            selected: undefined,
-            callback: undefined
+            selectedPlace: undefined
         };
     }    
 
     static tabTitle = 'Place';
-
-    toggleSearchGoogle() {
-        this.setState({ searchGoogle: !this.state.searchGoogle });
-    }
+    static slug = 'place';
 
     keydown(ev) {
         ev.keyCode == "27" && Picker.dismiss();
@@ -97,7 +91,7 @@ export class PlacePicker extends Component {
 
     render() {
         return (
-            <div id="place-picker">
+            <div id="place-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
                 <div id="place-picker-search-pane">
                     <div id="search-content-wrapper">
                         <h1 className="title">Pick a place</h1>

@@ -166,6 +166,7 @@ export class ImagePicker extends Component {
     }
 
     static tabTitle =  'Uploads';
+    static slug =  'uploads';
 
     componentDidMount(params, done) {
         log('ImagePicker', 'Displaying image picker singleton', 'detail');
@@ -227,7 +228,7 @@ export class ImagePicker extends Component {
 
     render() {
         return (
-            <div id="image-picker">
+            <div id="image-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
                 <div>
                     <b style={ styles.bigtitle }>Lilium gallery</b>
                     <input type="file" ref={el => (this.fileElem = el)} onChange={this.prepareUpload.bind(this)} style={{opacity : 0}} />

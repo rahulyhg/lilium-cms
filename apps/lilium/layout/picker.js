@@ -1,14 +1,14 @@
 import { Component, h } from 'preact';
 import { getLocal } from '../data/cache';
 import { TabView, Tab } from '../widgets/tabview';
-import { EmbedPicker } from './embedpicker';
-import { PlacePicker } from './placepicker';
 import { ImagePicker } from './imagepicker';
+import { PlacePicker } from './placepicker';
+import { EmbedPicker } from './embedpicker';
 
 const PickerMap = {
-    images: ImagePicker,
-    places: PlacePicker,
-    embeds: EmbedPicker
+    [ImagePicker.slug]: ImagePicker,
+    [PlacePicker.slug]: PlacePicker,
+    [EmbedPicker.slug]: EmbedPicker
 }
 
 const LAST_OPENED_LOCAL_KEY = 'picker.lastopened';
@@ -30,6 +30,7 @@ class PickerSession {
         }
 
         this.tab = sessionOptions.tab || this.getLastOpened() || this.accept[0];
+        this.options = sessionOptions.options || {};
     }
 
     getLastOpened() {
@@ -53,24 +54,30 @@ export class Picker extends Component {
     static Session = PickerSession;
 
     static cast(session, done) {
-        log('Picker', 'Casting picker singleton', 'detail');
-        const tabs = session.accept.map(x => PickerMap[x]);
-        console.log(tabs);
-        _singleton.setState({ session, visible: true, tabs });
-        
-        window.addEventListener('keydown', _singleton.keydown_bound);
+        if (session) {
+            log('Picker', 'Casting picker singleton', 'detail');
+            const tabs = session.accept.map(x => PickerMap[x]);
+            _singleton.setState({ session: session, visible: true, tabs, callback: done });
+            window.addEventListener('keydown', _singleton.keydown_bound);
+        } else {
+            log('Picker', 'Cannot cast Picker without a Session object', 'error');
+        }
     }
-    
+
     static dismiss() {
         log('Picker', 'Dismissing image picker singleton', 'detail');
         _singleton.setState({ visible : false });
         window.removeEventListener('keydown', _singleton.keydown_bound);
     }
 
-    static accept() {        
-        if (_singleton.state.selected) {
+    /**
+     * Dismisses the Picker and returns the values selected by the user
+     * @param {object} selectedVal Values selected by the user
+     */
+    static accept(selectedVal) {
+        if (selectedVal) {
             log('Picker', 'Selected image and calling back', 'detail');
-            _singleton.state.callback && _singleton.state.callback(_singleton.state.selected);        
+            _singleton.state.callback && _singleton.state.callback(selectedVal);
             Picker.dismiss();
         }
     }
@@ -83,19 +90,26 @@ export class Picker extends Component {
     render() {
         if (this.state.visible) {
             return (
-                <div id="image-picker-overlay">
-                    <div id="image-picker">
+                <div id="picker-overlay">
+                    <div id="picker">
                         <TabView>
                             {
-                                this.state.tabs.map(SubPicker => {
+                                this.state.tabs.map((SubPicker) => {
                                     return (
                                         <Tab title={SubPicker.tabTitle}>
-                                            <SubPicker />
+                                            <SubPicker onKeyDown={this.keydown.bind(this)} options={this.state.session.options[SubPicker.slug]} />
                                         </Tab>
                                     )
                                 })
                             }
                         </TabView>
+                        {
+                            this.state.session.type == 'carousel' ? (
+                                <div id="carousel-preview">
+                                    <p>No items in the carousel</p>
+                                </div>
+                            ) : null
+                        }
                     </div>
                 </div>
             )

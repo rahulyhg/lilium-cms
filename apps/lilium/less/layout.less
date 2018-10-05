@@ -1,4 +1,4 @@
-.picker-overlay {
+#picker-overlay {
     position: fixed;
     top:0;
     left:0;
@@ -8,14 +8,7 @@
     background-color: rgba(0,0,0,0.7);
 }
 
-#image-picker-overlay {
-    &:extend(.picker-overlay);
-}
-#place-picker-overlay {
-    &:extend(.picker-overlay);
-}
-
-.picker {
+#picker {
     position: absolute;
     top: 40px;
     left: 20px;
@@ -24,23 +17,13 @@
     background: white;
 }
 
-#image-picker {
-    &:extend(.picker);
-}
-
-.place-picker-fullscreen-pane {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 50%;
-}
-
-#place-picker:extend(.picker) {
+#place-picker {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    height: 100%;
 
-    #place-picker-search-pane:extend(.place-picker-fullscreen-pane) {
-        left: 0;
+    #place-picker-search-pane {
+        flex-grow: 1;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -88,8 +71,8 @@
     }
 
 
-    #place-picker-map-pane:extend(.place-picker-fullscreen-pane) {
-        right: 0;
+    #place-picker-map-pane {
+        flex-grow: 1;
         iframe#map-embed {
             background-color: #E4E3DF;
             height: 100%;

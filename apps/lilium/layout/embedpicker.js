@@ -9,7 +9,8 @@ export class EmbedPicker extends Component {
         }
     }
 
-    static tabTitle = 'Embed';  
+    static tabTitle = 'Embed';
+    static slug = 'embed';
     
     componentDidMount() {
         
@@ -17,7 +18,9 @@ export class EmbedPicker extends Component {
     
     render() {
         return (
-            <div>Embed Picker</div>
+            <div id="embed-picker" onKeyDown={this.props.onKeyDown.bind(this)}>
+                <div>Embed Picker</div>
+            </div>
         );
     }
 }

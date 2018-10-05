@@ -34,12 +34,27 @@ export class TextEditor extends Component {
             setup: editor => {
                 editor.addButton('insert-place', {
                     icon: 'fa fa-plus-circle',
-                    tooltip: 'Insert Place',
+                    tooltip: 'Insert Images, Places or Embeds',
                     onclick: () => {
                         const session =  new Picker.Session({});
                         Picker.cast(session, place => {
                             const dummyPlaceEl = document.createElement('div');
                             dummyPlaceEl.className = 'lml-placeholder-google-maps';
+                            dummyPlaceEl.dataset.placeId = place._id;
+
+                            editor.insertContent(dummyPlaceEl.outerHTML);
+                        });
+                    }
+                });
+
+                editor.addButton('insert-carousel', {
+                    icon: 'fa fa-images',
+                    tooltip: 'Insert Carousel',
+                    onclick: () => {
+                        const session =  new Picker.Session({ type: 'carousel' });
+                        Picker.cast(session, place => {
+                            const dummyPlaceEl = document.createElement('div');
+                            dummyPlaceEl.className = 'lml-placeholder-carousel';
                             dummyPlaceEl.dataset.placeId = place._id;
 
                             editor.insertContent(dummyPlaceEl.outerHTML);
@@ -52,7 +67,7 @@ export class TextEditor extends Component {
                 'searchreplace visualblocks code fullscreen hr',
                 'media paste wordcount'
             ],
-            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-image insert-place insertEmbed link | bullist numlist | fullscreen | code',
+            toolbar: 'bold italic underline strike strikethrough forecolor | removeformat | undo redo | formatselect | hr insertAd insert-place insert-carousel insertEmbed link | bullist numlist | fullscreen | code',
             content_css: [
                 '/compiled/theme/tinymce.css'
             ],
