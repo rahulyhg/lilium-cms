@@ -12,6 +12,7 @@ import { initializeDevEnv, DevTools } from './dev/env';
 import { initLocal, setSession, mapUsers } from './data/cache';
 import { NotificationWrapper } from './layout/notifications';
 import { makeGLobalLang, setLanguage } from './data/vocab';
+import { CakepopWrapper } from './layout/cakepopsmanager';
 import API from './data/api';
 
 // LILIUM_IMPORT_TEMPLATE
@@ -105,6 +106,7 @@ class Lilium extends Component {
                 <URLRenderer session={this.state.session} />
                 <Lys menus={this.state.menus} session={this.state.session} />
                 <NotificationWrapper />
+                <CakepopWrapper />
                 <ImagePicker />
                 <OverlayWrap />
 

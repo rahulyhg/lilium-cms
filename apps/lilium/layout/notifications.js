@@ -1,15 +1,15 @@
 import { h, Component } from 'preact';
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../realtime/connection'
 
-const styles = {
-    wrapper : {
-        position: "fixed",
-        right: 0,
-        bottom: 0,
-        padding: 10,
-        zIndex: 20
-    }
-};
+// const styles = {
+//     wrapper : {
+//         position: "fixed",
+//         right: 0,
+//         bottom: 0,
+//         padding: 10,
+//         zIndex: 20
+//     }
+// };
 
 class LiliumNotification {
     static get defaultOptions() {
@@ -127,7 +127,7 @@ export class NotificationWrapper extends Component {
 
     render() {
         return (
-            <div id="notification-wrapper" style={styles.wrapper}>
+            <div id="notification-wrapper">
                 {
                     this.state.notifications.map(n => <NotificationStrip key={n.id} notification={n} dismiss={this.remove.bind(this)} />)
                 }

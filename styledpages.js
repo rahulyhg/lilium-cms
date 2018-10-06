@@ -119,17 +119,6 @@ class StyledPages {
                 });
 
                 break;
-            case "remove":
-                db.remove(cli._c, 'styledpages', { _id: db.mongoID(cli.routeinfo.path[3]) }, err => {
-                    if (!err) {
-                        log('StyledPages', 'Styledpage with id ' + cli.routeinfo.path[3] + ' removed by user ' + cli.userinfo.user, 'warn');
-                        cli.sendJSON({ success: true });
-                    } else {
-                        cli.throwHTTP(500, 'Could not remove styled page', true);
-                    }
-                }, true);
-
-                break;
             case "new":
                 const newStyledPage = that.createNewObject(cli.postdata.data.title, cli.postdata.data.description, cli.postdata.data.slug);
                 db.insert(cli._c, 'styledpages', newStyledPage, (err, r) => {
@@ -143,6 +132,19 @@ class StyledPages {
             default:
                 cli.throwHTTP(501, 'Method not implemented', true);
         }
+    }
+
+    adminDELETE(cli) {
+        if (!cli.hasRight("styledpages")) { return cli.refuse(); }
+        
+        db.update(cli._c, 'styledpages', { _id: db.mongoID(cli.routeinfo.path[2]) }, { deleted: true }, err => {
+            if (!err) {
+                log('StyledPages', 'Styledpage with id ' + cli.routeinfo.path[2] + ' removed by user ' + cli.userinfo.user, 'warn');
+                cli.sendJSON({ success: true });
+            } else {
+                cli.throwHTTP(500, 'Could not remove styled page', true);
+            }
+        }, true);
     }
 
     sendTable(cli, levels, params, send) {
@@ -183,7 +185,7 @@ class StyledPages {
 
     search(cli, levels, params, send) {
         const filters = params.filters;
-        const $match = {};
+        const $match = { deleted: { $ne: true } };
         if (filters.status) {
             $match.status = filters.status;
         }

@@ -1,4 +1,4 @@
-.button-worker {
+.button {
     display: inline-block;
     position: relative;
     overflow: hidden;
@@ -121,11 +121,22 @@
     transform: translate3d(0px, 0px, 0px);
     opacity : 1;
     display: block;
+
+    span {
+        transition: all 0.2s;        
+        transform: translate3d(0px, 0px, 0px);
+        opacity : 1;
+        display: block;
+    }
 }
 
-.button-worker span.hidden {
-    transform: translate3d(0px, -32px, 0px);
-    opacity : 0;
+.button-worker {
+    .button();
+    
+    span.hidden {
+        transform: translate3d(0px, -32px, 0px);
+        opacity : 0;
+    }
 }
 
 .working-spinner {
@@ -180,7 +191,7 @@
     position: fixed;
     top: 50px;
     left: 30px;
-    z-index: 10;
+    z-index: @z_fullScreeMce;
 }
 
 #lilium #urlrenderer.snap div.mce-fullscreen {

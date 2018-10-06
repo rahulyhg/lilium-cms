@@ -4,6 +4,8 @@ const db = require('./includes/db.js');
 const isElder = require('./network/info.js').isElderChild();
 const V4 = require('./v4');
 
+global.require_template = require('./templaterequire');
+
 class Core {
     constructor() {
         log('Core', 'Lilium core object was created', 'success');
@@ -374,6 +376,18 @@ const prepareDefaultSiteCreation = (cb) => {
     require('./init.js')(cb);
 };
 
+const validateNetworkSite = () => {
+    try {
+        const dconf = require('./sites/default');
+        // TODO : More network site validation
+    } catch (err) {
+        log('Core', "[FATAL] Error in network site config : " + err, 'err');
+        return false;
+    }
+    
+    return true;
+}
+
 const loadWebsites = (loadEverything) => {
     sites = require('./sites.js');
 
@@ -384,7 +398,7 @@ const loadWebsites = (loadEverything) => {
     fss.dirExists(currentRoot + "/sites", (exists) => {
         if (exists) {
             fss.fileExists(currentRoot + "/sites/default.json", (exists) => {
-                if (exists) {
+                if (exists && validateNetworkSite()) {
                     sites.loadSites(loadEverything);
                 } else {
                     prepareDefaultSiteCreation(loadEverything);

@@ -131,13 +131,13 @@ export class BigList extends Component {
                 }
 
                 <div class="big-list-items" style={this.props.liststyle || {}}>
-                {
-                    this.state.items.length == 0 ? (
-                        <this.coldState.emptyComponent />
-                    ) : this.state.items.map(x => (
-                        <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
-                    ))
-                }
+                    {
+                        this.state.items.length == 0 ? (
+                            <this.coldState.emptyComponent />
+                        ) : this.state.items.map(x => (
+                            <this.coldState.component action={this.props.action} item={x} key={x[this.props.keyid || "_id"]} />
+                        ))
+                    }
                 </div>
 
                 {
