@@ -26,19 +26,22 @@ export class OverlayWrap extends Component {
         _singleton = this;
     }
 
-    static cast(id, extra) { _singleton.cast(id, extra); }
-    static dismiss(id)     { _singleton.dismiss(id);     }
+    static cast(id, extra = {}) { _singleton.cast(id, extra); }
+    static dismiss(id)          { _singleton.dismiss(id);     }
 
-    cast(id, extra) {
+    cast(id, extra = {}) {
         this.setState({
             visible : true,
             extra,
             ...OVERLAY_COLLECTION[id],
         });
+
+        document.body.classList.add('scroll-lock');
     }
 
     dismiss() {
-        this.setState({ visible : false })
+        this.setState({ visible : false });
+        document.body.classList.remove('scroll-lock');
     }
 
     componentDidMount() {

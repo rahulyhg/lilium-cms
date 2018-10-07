@@ -5,6 +5,7 @@ import { navigateTo } from '../../routing/link';
 import { addAction } from '../../layout/lys'
 import { registerOverlay, castOverlay } from '../../overlay/overlaywrap';
 import { CreateOverlay } from './createoverlay';
+import { PublishingOverlay } from './publishoverlay'; 
 
 export default class PublishingTab extends Component {
     constructor(props) {
@@ -30,6 +31,11 @@ export default class PublishingTab extends Component {
 
         registerOverlay('create-article', CreateOverlay, {
             title : "Create a new post"
+        });
+
+        registerOverlay('publish-article', PublishingOverlay, {
+            title : "Publish article",
+            customlayout : true
         });
     }
 
