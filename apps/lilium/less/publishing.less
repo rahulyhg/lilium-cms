@@ -244,7 +244,7 @@
                     display: block;
                     text-align: left;
                     width: 790px;
-                    margin: auto;
+                    margin: 0px auto 20px;
                 }
 
                 &.floating {
@@ -263,7 +263,25 @@
                         color: #777;
                     }
                 }
+            }
 
+            .time-spent-on-post {
+                margin-bottom: 6px;
+
+                img {
+                    width: 32px;
+                    height: 32px;
+                    object-fit: cover;
+                    display: inline-block;
+                    vertical-align: middle;
+                    margin-right: 12px;
+                    border-radius: 32px;
+                }
+
+                &>span {
+                    vertical-align: middle;
+                    display: inline-block;
+                }
             }
         }
 
