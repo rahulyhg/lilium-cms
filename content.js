@@ -19,7 +19,8 @@ const LOOKUPS = {
 };
 
 const PUBLICATION_REPORT_TODAY_PROJECTION = {
-    headline : { $arrayElemAt : ["$title", 0] }, "date" : 1, "name" : 1 
+    headline : { $arrayElemAt : ["$title", 0] }, subline : { $arrayElemAt : ["$subtitle", 0] }, 
+    date : 1, name : 1, facebookmedia : 1, topicslug : 1, author : 1
 };
 
 const countOcc = (article, occ) => {
@@ -247,6 +248,7 @@ class ContentLib {
     generatePublicationReport(_c, _id, sendback) {
         this.getFull(_c, _id, article => {
             const doc = new (require('jsdom')).JSDOM(article.content.join(' ')).window.document;
+            
             const start = new Date();
             start.setHours(0,0,0,0);
 
@@ -257,27 +259,36 @@ class ContentLib {
 
             db.count(_c, 'content', { author : article.author }, (err, authortotal) => {
                 db.count(_c, 'content', { author : article.author, date }, (err, authortotaltoday) => {
-                    db.count(require('./config').default(), 'decorations', { entity : article.author }, (err, decorations) => {
-                        db.join(_c, 'content', [
-                            { $match : { date } },
-                            { $limit : 200 },
-                            { $project : PUBLICATION_REPORT_TODAY_PROJECTION },
-                            { $sort : { date : -1 } }
-                        ], today => {
-                            sendback({
-                                authortotal, authortotaltoday, decorations, today,
-                                url : article.url,
-                                headline : article.headline,
-                                subline : article.subtitle[0],
-                                fullauthor : article.fullauthor,
-                                fulltopic : article.fulltopic,
-                                media : article.deepmedia.sizes.facebook.url,
-                                nsfw : article.nsfw,
-                                isSponsored : article.isSponsored,
-                                ads : doc.querySelectorAll('.lml-adplaceholder').length,
-                                p : doc.querySelectorAll('p').length,
-                                img : doc.querySelectorAll('img').length,
-                                paginated : article.content.length < 1
+                    db.count(_c, 'content', { status : "published" }, (err, websitetotal) => {
+                        db.count(require('./config').default(), 'decorations', { entity : article.author }, (err, decorations) => {
+                            db.join(_c, 'content', [
+                                { $match : { date : {$lt : article.date }, status : "published" } },
+                                { $sort : { date : -1 } },
+                                { $limit : 20 },
+                                { $sort : { date : 1 } },
+                                { $project : PUBLICATION_REPORT_TODAY_PROJECTION },
+                            ], lastpublished => {
+                                lastpublished.push({
+                                    headline : article.title[0], subline : article.subtitle[0], 
+                                    date : article.date, name : article.name, facebookmedia : article.facebookmedia, 
+                                    topicslug : article.topicslug, author : article.author._id || article.author
+                                });
+
+                                sendback({
+                                    authortotal, authortotaltoday, decorations, websitetotal, lastpublished, 
+                                    url : article.url,
+                                    headline : article.headline,
+                                    subline : article.subtitle[0],
+                                    fullauthor : article.fullauthor,
+                                    fulltopic : article.fulltopic,
+                                    media : article.deepmedia.sizes.facebook.url,
+                                    nsfw : article.nsfw,
+                                    isSponsored : article.isSponsored,
+                                    ads : doc.querySelectorAll('.lml-adplaceholder').length,
+                                    p : doc.querySelectorAll('p').length,
+                                    img : doc.querySelectorAll('img').length,
+                                    paginated : article.content.length < 1
+                                });
                             });
                         });
                     });
@@ -367,10 +378,6 @@ class ContentLib {
                 })
             }, { displayname : 1, username : 1, avatarURL : 1, avatarMini : 1, slug : 1, revoked : 1 });
         });
-    }
-
-    validate(_c, _id, sendback) {
-        
     }
 
     pushHistoryEntryFromDiff(_c, postid, actor, diffres, type, done) {
@@ -576,7 +583,7 @@ class ContentLib {
         });
     };
 
-    publish(_c, _id, caller, sendback) {
+    validate(_c, _id, caller, sendback) {
         this.getFull(_c, _id, post => { 
             if (!post) {
                 return sendback({ error : "Post not found", code : 404 });
@@ -601,37 +608,49 @@ class ContentLib {
                         return sendback({ error : "Missing fields", code : 401 });
                     }
 
-                    post.status = "published";
-                    post.publishedOn = new Date();
-                    post.publishedAt = Date.now();
-        
-                    db.update(_c, 'content', { _id : post._id }, post, () => {
-                        db.remove(_c, 'autosave', { contentid : post._id }, () => {
-                            this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
-                                this.updateActionStats(_c, post, score => {
-                                    hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
-                                    hooks.fireSite(_c, 'article_updated', { article : post, _c });
-                                    hooks.fire('article_published', {
-                                        article: post, _c
-                                    });
-        
-                                    this.generate(_c, post, () => {
-                                        sendback({ historyentry, newstate : post });
-        
-                                        notifications.emitToWebsite(_c.id, {
-                                            articleid : post._id,
-                                            at : Date.now(),
-                                            by : caller
-                                        }, "articlePublished");
-                                    }, 'all');
-                                });
-                            });
-                        });
-                    });
+                    sendback(undefined, post);
                 } else {
                     return sendback({ error : "Missing rights", code : 403 });
                 }
             });
+        });
+    }
+
+    publish(_c, _id, caller, sendback) {
+        this.validate(_c, _id, caller, (err, post) => {
+            if (err) {
+                return sendback(err);
+            } 
+
+            post.status = "published";
+            post.publishedOn = new Date();
+            post.publishedAt = Date.now();
+            post.date = new Date();
+
+            db.update(_c, 'content', { _id : post._id }, post, () => {
+                db.remove(_c, 'autosave', { contentid : post._id }, () => {
+                    this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
+                        this.updateActionStats(_c, post, score => {
+                            hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
+                            hooks.fireSite(_c, 'article_updated', { article : post, _c });
+                            hooks.fire('article_published', {
+                                article: post, _c
+                            });
+
+                            this.generate(_c, post, () => {
+                                sendback({ historyentry, newstate : post });
+
+                                notifications.emitToWebsite(_c.id, {
+                                    articleid : post._id,
+                                    at : Date.now(),
+                                    by : caller
+                                }, "articlePublished");
+                            }, 'all');
+                        });
+                    });
+                });
+            });
+
         });
     }
 
