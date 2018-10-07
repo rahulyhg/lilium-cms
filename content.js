@@ -276,8 +276,9 @@ class ContentLib {
 
                                 db.join(_c, 'hits', [
                                     { $match : { path : "/lilium/publishing/write/" + _id.toString() }},
-                                    { $sort : { timespent : -1 } }
-                                ], (err, hits) => {
+                                    { $sort : { timespent : -1 } },
+                                    { $project : {timespent : 1, userid : 1, _id : 0} }
+                                ], hits => {
                                     sendback({
                                         authortotal, authortotaltoday, decorations, websitetotal, lastpublished, 
                                         totaltime : hits,
@@ -295,7 +296,7 @@ class ContentLib {
                                         img : doc.querySelectorAll('img').length,
                                         paginated : article.content.length < 1
                                     });
-                                }, {timespent : 1, userid : 1, _id : 0});
+                                });
                             });
                         });
                     });
