@@ -2,13 +2,15 @@ import { h, Component } from 'preact';
 import { Link } from '../../routing/link';
 import { setPageCommands } from '../../layout/lys';
 import { TextEditor } from '../../widgets/texteditor';
-import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker } from '../../widgets/form';
+import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker, SelectField } from '../../widgets/form';
 import { getSession } from '../../data/cache';
 import { castNotification } from '../../layout/notifications';
 import { castOverlay } from '../../overlay/overlaywrap';
 import { hit } from '../../realtime/connection';
+import Modal from '../../widgets/modal';
 
 import dateFormat from 'dateformat';
+import { getTimeAgo } from '../../widgets/timeago';
 
 import API from "../../data/api";
 import { bindRealtimeEvent, unbindRealtimeEvent } from '../../realtime/connection';
@@ -205,6 +207,123 @@ class PublishingSponsoredSection extends Component {
     }
 }
 
+class PostDetails extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state.post = props.post;
+        const cachedUsers = {};
+        getSession("entities").forEach(x => {
+            cachedUsers[x._id] = x;
+        });
+        this.cachedUsers = cachedUsers;
+
+        this.stage = {};
+    }
+
+    componentWillReceiveProps(props) {
+        if (props.post) {
+            this.setState({
+                post : props.post
+            })
+        }
+    }
+
+    triggerAuthorChange() {
+        this.setState({
+            updatingAuthor : true,
+            updatingSlug : false
+        });
+    }
+
+    triggerSlugChange() {
+        this.setState({
+            updatingSlug : true,
+            updatingAuthor : false
+        });        
+    }
+
+    triggerPreviewLinkInvalidation() {
+        this.props.onAction('previewkey');
+    }
+
+    updateAuthor() {
+        this.props.onAction("author", this.stage.author);
+        this.setState({
+            updatingSlug : false,
+            updatingAuthor : false
+        });
+    }
+
+    updateSlug() {
+        this.props.onAction("name", this.stage.name);
+        this.setState({
+            updatingSlug : false,
+            updatingAuthor : false
+        });
+    }
+
+    render() {
+        return (
+            <div class="publication-details-card">
+                <div class="detail-head">
+                    <b>About this article</b>
+                </div>
+
+                <div class="detail-list">
+                    <div>
+                        Created <b>{getTimeAgo(Date.now() - new Date(this.state.post.createdOn).getTime()).toString()}</b> by <b>{this.cachedUsers[this.state.post.createdBy] ? this.cachedUsers[this.state.post.createdBy].displayname : " an inactive user"}</b>.
+                    </div>
+                    { this.state.post.updated ? (
+                        <div>
+                            Updated <b>{getTimeAgo(Date.now() - new Date(this.state.post.updated).getTime()).toString()}</b>.
+                        </div>
+                    ) : null }
+                    { this.state.post.wordcount ? (
+                        <div>
+                            <b>{this.state.post.wordcount} words</b> piece.
+                        </div>
+                    ) : null}
+                    { this.state.post.date && this.state.post.status == "published" ? (
+                        <div>
+                            Published <b>{getTimeAgo(Date.now() - new Date(this.state.post.date).getTime()).toString()}</b> by <b>{this.cachedUsers[this.state.post.author] ? this.cachedUsers[this.state.post.author].displayname : " an inactive user"}</b>.
+                        </div>
+                    ) : null}
+                    { this.state.post.url && this.state.post.status == "published" ? (
+                        <div>
+                            URL : <a href={this.state.post.url} target="_blank">{this.state.post.url}</a>
+                        </div>
+                    ) : null}
+                    { this.state.post.aliases && this.state.post.aliases.length != 0 ? (
+                        <div>
+                            <div><b>Alias slugs :</b></div>
+                            {this.state.post.aliases.map(a => (<div>/{a}</div>))}
+                        </div>
+                    ) : null}
+                </div>
+
+                <footer>
+                    <span class="clickable" onClick={this.triggerAuthorChange.bind(this)}>Change author</span>
+                    { this.state.post.url ? (<span class="clickable" onClick={this.triggerSlugChange.bind(this)}>Change URL</span>) : null }
+                    <span class="red clickable" onClick={this.triggerPreviewLinkInvalidation.bind(this)}>Invalidate preview link</span>
+                </footer>
+
+                <Modal visible={this.state.updatingSlug} title='Update slug'>
+                    <TextField name='name' placeholder='URL Slug' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.name} />
+                    <ButtonWorker text='Update' work={this.updateSlug.bind(this)} />
+                </Modal>
+
+                <Modal visible={this.state.updatingAuthor} title='Update author'>
+                    <SelectField name='author' placeholder='Author' onChange={(name, val) => { this.stage[name] = val; }} initialValue={this.state.post.author} options={
+                        getSession("entities").map(user => ({ value : user._id, displayname : user.displayname }))
+                    } />
+                    <ButtonWorker text='Update' work={this.updateAuthor.bind(this)} />
+                </Modal>
+            </div>
+        )
+    }
+}
+
 export default class EditView extends Component {
     constructor(props) {
         super(props);
@@ -218,6 +337,7 @@ export default class EditView extends Component {
 
         this.coldState = {};
         this.edits = {};
+        this.modalStage = {};
 
         this.socketArticleUpdateEvent_bound = this.socketArticleUpdateEvent.bind(this);
     }
@@ -460,6 +580,22 @@ export default class EditView extends Component {
         this.edits[name] = value;
     }
 
+    contentChanged(name, value) {
+        this.edits[name] = [value];
+
+        const tempdiv = document.createElement('div');
+        tempdiv.innerHTML = value;
+
+        this.edits.wordcount = [
+            ...Array.from(tempdiv.querySelectorAll('p')).map(p => p.textContent.split(' ').length),
+            ...Array.from(tempdiv.querySelectorAll('h3')).map(p => p.textContent.split(' ').length),
+            ...Array.from(tempdiv.querySelectorAll('h2')).map(p => p.textContent.split(' ').length),
+            ...Array.from(tempdiv.querySelectorAll('h1')).map(p => p.textContent.split(' ').length),
+        ].reduce((prev, cur) => prev + cur, 0);
+
+        tempdiv.innerHTML = "";
+    }
+
     imageChanged(name, image) {
         if (image) {
             this.edits.media = image._id;
@@ -476,6 +612,61 @@ export default class EditView extends Component {
     componentWillReceiveProps(props) {
         if (props.postid) {
             this.requestArticle(props.postid);
+        }
+    }
+
+    handleDetailsAction(field, value) {
+        if (field == "name") {
+            API.put("/publishing/slug/" + this.state.post._id, { slug : value }, (err, json, r) => {
+                if (json.err) {
+                    castNotification({
+                        type : "warning",
+                        title : "Could not edit URL slug",
+                        message : json.err
+                    })
+                } else {
+                    castNotification({
+                        type : "success",
+                        title : "URL slug",
+                        message : "The URL slug was successfully modified."
+                    });
+
+                    const post = this.state.post;
+                    if (post.aliases) {
+                        post.aliases.push(post.name);
+                    }
+
+                    post.name = value;
+                    if (post.url) {
+                        post.url = document.location.protocol + liliumcms.url + "/" + post.topicslug + "/" + value;
+                    }
+
+                    this.setState({ post });
+                }
+            });
+        } else if (field == "author") {
+            this.edits.author = value;
+            this.save();
+        } else if (field == "previewkey") {
+            API.delete('/publishing/previewlink/' + this.state.post._id, {}, (err, json, r) => {
+                if (r.status == 200) {
+                    const post = this.state.post;
+                    post.previewkey = json.previewkey;
+
+                    this.setState({ post })
+
+                    castNotification({
+                        type : "success",
+                        title : "Preview link",
+                        message : "The old preview links are no longer available."
+                    });
+                } else {
+                    castNotification({
+                        type : "warning",
+                        title : "Could not invalidate preview link"
+                    })         
+                }
+            });
         }
     }
 
@@ -498,13 +689,12 @@ export default class EditView extends Component {
 
         return (
             <div>
-
-                <div style={{ padding : 20, marginRight: 280 }}>
+                <div class="publishing-edit-section">
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} style={{ fontFamily : '"Oswald", sans-serif', background : "transparent", fontSize : 32, border : "none", borderBottom : "1px solid #DDD", padding : "3px 0px", textAlign : 'center' }} />
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" style={{ background : "transparent", border : "none", padding : "5px 0px", marginBottom : 10, textAlign : 'center' }} />
                     
-                    <div style={{ margin: "auto" }}>
-                        <TextEditor onChange={this.fieldChanged.bind(this)} format={x => [x]} name="content" content={this.state.post.content[0]} />
+                    <div style={{ margin: "auto", maxWidth: 1200 }}>
+                        <TextEditor onChange={this.contentChanged.bind(this)} name="content" content={this.state.post.content[0]} />
                     </div>
 
                     <div class="publishing-card nopad">
@@ -525,9 +715,13 @@ export default class EditView extends Component {
                     <div class="card publishing-card">
                         <MediaPickerField name="media" placeholder="Featured image" initialValue={this.state.post.media} onChange={this.imageChanged.bind(this)} />
                     </div>
+
+                    <div class="card publishing-card nopad">
+                        <PostDetails post={this.state.post} onAction={this.handleDetailsAction.bind(this)} />
+                    </div>
                 </div>
 
-                <div style={{ position : "fixed", right : 0, top : 50, bottom : 0, width : 280, overflow : "auto", background : "white", borderLeft: "1px solid #DDD" }}>
+                <div class="publishing-sidebar">
                     <PublishingSidebar post={this.state.post} actions={this.state.actions} history={this.state.history} />
                 </div>
             </div>
