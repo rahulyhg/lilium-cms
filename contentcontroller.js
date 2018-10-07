@@ -206,6 +206,20 @@ class ContentController {
                 });
                 break;
 
+            case 'previewlink':
+                db.findUnique(cli._c, 'content', { _id }, (err, article) => {
+                    if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
+                        const previewkey = Math.random().toString(32).substring(2);
+                        db.update(cli._c, 'content', { _id}, { previewkey }, () => {
+                            cli.sendJSON({ previewkey });
+                        });
+                    } else {
+                        log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
+                        cli.throwHTTP(404, "Missing rights", true);
+                    }
+                });
+                break;
+
             default:
                 cli.throwHTTP(404, undefined, true);
 
