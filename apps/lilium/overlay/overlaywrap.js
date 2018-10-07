@@ -35,10 +35,13 @@ export class OverlayWrap extends Component {
             extra,
             ...OVERLAY_COLLECTION[id],
         });
+
+        document.body.classList.add('scroll-lock');
     }
 
     dismiss() {
-        this.setState({ visible : false })
+        this.setState({ visible : false });
+        document.body.classList.remove('scroll-lock');
     }
 
     componentDidMount() {
