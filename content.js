@@ -274,22 +274,28 @@ class ContentLib {
                                     topicslug : article.topicslug, author : article.author._id || article.author
                                 });
 
-                                sendback({
-                                    authortotal, authortotaltoday, decorations, websitetotal, lastpublished, 
-                                    url : article.url,
-                                    headline : article.headline,
-                                    subline : article.subtitle[0],
-                                    fullauthor : article.fullauthor,
-                                    timespent : article.date - article.createdOn,
-                                    fulltopic : article.fulltopic,
-                                    media : article.deepmedia.sizes.facebook.url,
-                                    nsfw : article.nsfw,
-                                    isSponsored : article.isSponsored,
-                                    ads : doc.querySelectorAll('.lml-adplaceholder').length,
-                                    p : doc.querySelectorAll('p').length,
-                                    img : doc.querySelectorAll('img').length,
-                                    paginated : article.content.length < 1
-                                });
+                                db.join(_c, 'hits', [
+                                    { $match : { path : "/lilium/publishing/write/" + _id.toString() }},
+                                    { $sort : { timespent : -1 } }
+                                ], (err, hits) => {
+                                    sendback({
+                                        authortotal, authortotaltoday, decorations, websitetotal, lastpublished, 
+                                        totaltime : hits,
+                                        url : article.url,
+                                        headline : article.headline,
+                                        subline : article.subtitle[0],
+                                        fullauthor : article.fullauthor,
+                                        timespent : article.date - article.createdOn,
+                                        fulltopic : article.fulltopic,
+                                        media : article.deepmedia.sizes.facebook.url,
+                                        nsfw : article.nsfw,
+                                        isSponsored : article.isSponsored,
+                                        ads : doc.querySelectorAll('.lml-adplaceholder').length,
+                                        p : doc.querySelectorAll('p').length,
+                                        img : doc.querySelectorAll('img').length,
+                                        paginated : article.content.length < 1
+                                    });
+                                }, {timespent : 1, userid : 1, _id : 0});
                             });
                         });
                     });
