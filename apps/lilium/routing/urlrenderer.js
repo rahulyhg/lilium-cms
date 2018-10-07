@@ -2,6 +2,7 @@ import { h, Component } from 'preact'
 import { resetPageCommands } from '../layout/lys';
 import { CACHEKEYS, getLocal } from '../data/cache';
 import { dismissOverlay } from '../overlay/overlaywrap';
+import { hit } from '../realtime/connection';
 
 // Import default pages from route
 import InitPage         from '../pages/default';
@@ -169,6 +170,7 @@ export class URLRenderer extends Component {
             const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
             document.dispatchEvent(ev);
 
+            hit();
             dismissOverlay();
         });
     }
