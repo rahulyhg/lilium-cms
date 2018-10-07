@@ -8,11 +8,39 @@ import dateformat from 'dateformat';
 import { AnimeNumber } from '../../widgets/animenumber';
 import { getTimeAgo } from '../../widgets/timeago';
 
+class TimeSpentOnArticle extends Component {
+    constructor(props) {
+        super(props);
+        this.user = props.user || {
+            displayname : "Inactive user",
+            avatarURL : "/static/media/lmllogo.png"
+        }
+
+        this.timeago = getTimeAgo(props.timespent);
+    }
+
+    render() {
+        return (
+            <div class="time-spent-on-post">
+                <img src={this.user.avatarURL} />
+                <span>
+                    <b>{this.user.displayname}</b> spent <AnimeNumber number={this.timeago.value} duration={1000} /> {this.timeago.unit}
+                </span>
+            </div>
+        )
+    }
+}
+
 class PublishedReportDetails extends Component {
     constructor(props) {
         super(props);
 
         this.timeToPublish = getTimeAgo(props.report.timespent);
+        const cachedUsers = {};
+        getSession("entities").forEach(x => {
+            cachedUsers[x._id] = x;
+        });
+        this.cachedUsers = cachedUsers;
     }
 
     componentDidMount() {
@@ -46,6 +74,17 @@ class PublishedReportDetails extends Component {
                 <div class="card full">
                     <div class="detail-head">
                         <div class="bubble-wrap">
+                            <b>Time spent working on this article</b>
+                        </div>
+                    </div>
+                    <div class="detail-list">
+                        { this.props.report.totaltime.map(t => (<TimeSpentOnArticle timespent={t.timespent} user={this.cachedUsers[t.userid]} />)) }
+                        
+                    </div>
+                </div>
+                <div class="card full">
+                    <div class="detail-head">
+                        <div class="bubble-wrap">
                             <b>More about this article</b>
                         </div>
                     </div>
@@ -75,7 +114,7 @@ class PublishedReportCard extends Component {
             last : props.last
         };
 
-        this.ago = getTimeAgo(new Date() - new Date(this.props.post.date));
+        this.ago = !props.placeholder && getTimeAgo(new Date() - new Date(this.props.post.date));
     }
 
     componentDidMount() {
@@ -93,6 +132,14 @@ class PublishedReportCard extends Component {
     }
 
     render() {
+        if (this.props.placeholder) {
+            return (
+                <div style={{ width : PUBLISHED_CARD_CONST_WIDTH }} class={ "card publish-report-card placeholder" }>
+
+                </div>
+            )
+        }
+
         return this.state.visible ? (
             <div style={{ width : PUBLISHED_CARD_CONST_WIDTH }} class={ "card publish-report-card " + (this.state.last ? "last " : " ") }>
                 <a class="image-wrapper" href={"/" + this.props.post.topicslug + "/" + this.props.post.name} target="_blank">

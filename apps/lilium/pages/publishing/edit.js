@@ -6,6 +6,7 @@ import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, 
 import { getSession } from '../../data/cache';
 import { castNotification } from '../../layout/notifications';
 import { castOverlay } from '../../overlay/overlaywrap';
+import { hit } from '../../realtime/connection';
 
 import dateFormat from 'dateformat';
 
@@ -319,6 +320,7 @@ export default class EditView extends Component {
     publish(done) {
         API.put('/publishing/publish/' + this.coldState.post._id, {}, (err, json, r) => {
             if (r.status == 200) {
+                hit();
                 this.setState({
                     history : [json.historyentry, ...this.state.history],
                     post : {...this.state.post, ...{
