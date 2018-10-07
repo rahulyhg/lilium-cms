@@ -76,6 +76,18 @@ class ContentController {
                     }
                 }, { author : 1 });
                 break;
+            case 'validate':
+                log('Content', 'Validating article from PUT under /validate', 'detail');
+                contentlib.validate(cli._c, _id, db.mongoID(cli.userinfo.userid), err => {
+                    if (err) {
+                        log('Content', 'Article failed validation', 'info');
+                        cli.throwHTTP(err.code, err.error, true);
+                    } else {
+                        log('Content', 'Article was validated successfully', 'success');
+                        cli.sendJSON({ valid : true });
+                    }
+                })
+                break;
             case 'publish':
                 log('Content', 'Publishing from PUT under /publish', 'detail');
                 contentlib.publish(cli._c, _id, db.mongoID(cli.userinfo.userid), resp => {
@@ -222,6 +234,8 @@ class ContentController {
             contentlib.getLatestAutosave(cli._c, db.mongoID(levels[1]), entry => sendback(entry || { none : true })); 
         } else if (levels[0] == "history") {
             contentlib.getHistoryList(cli._c, levels[1], list => sendback(list));
+        } else if (levels[0] == "report") {
+            contentlib.generatePublicationReport(cli._c, db.mongoID(levels[1]), report => sendback(report));
         } else {
             sendback([]);
         }
