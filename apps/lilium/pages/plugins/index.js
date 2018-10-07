@@ -51,7 +51,7 @@ class PluginItem extends Component {
                     </div>
                 </div>
                 <div class="plugin-action-wrap">
-                    <ButtonWorker theme={this.state.active ? "danger" : "white"} work={this.toggle.bind(this)} text={this.state.active ? "Disable" : "Enable"} />
+                    <ButtonWorker theme={this.state.active ? "red" : "white"} type={this.state.active ? "fill" : "outline"} work={this.toggle.bind(this)} text={this.state.active ? "Disable" : "Enable"} />
                 </div>
             </div>
         )

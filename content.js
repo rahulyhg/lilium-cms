@@ -19,7 +19,8 @@ const LOOKUPS = {
 };
 
 const PUBLICATION_REPORT_TODAY_PROJECTION = {
-    headline : { $arrayElemAt : ["$title", 0] }, "date" : 1, "name" : 1 
+    headline : { $arrayElemAt : ["$title", 0] }, subline : { $arrayElemAt : ["$subtitle", 0] }, 
+    date : 1, name : 1, facebookmedia : 1, topicslug : 1, author : 1
 };
 
 const countOcc = (article, occ) => {
@@ -247,6 +248,7 @@ class ContentLib {
     generatePublicationReport(_c, _id, sendback) {
         this.getFull(_c, _id, article => {
             const doc = new (require('jsdom')).JSDOM(article.content.join(' ')).window.document;
+            
             const start = new Date();
             start.setHours(0,0,0,0);
 
@@ -257,27 +259,44 @@ class ContentLib {
 
             db.count(_c, 'content', { author : article.author }, (err, authortotal) => {
                 db.count(_c, 'content', { author : article.author, date }, (err, authortotaltoday) => {
-                    db.count(require('./config').default(), 'decorations', { entity : article.author }, (err, decorations) => {
-                        db.join(_c, 'content', [
-                            { $match : { date } },
-                            { $limit : 200 },
-                            { $project : PUBLICATION_REPORT_TODAY_PROJECTION },
-                            { $sort : { date : -1 } }
-                        ], today => {
-                            sendback({
-                                authortotal, authortotaltoday, decorations, today,
-                                url : article.url,
-                                headline : article.headline,
-                                subline : article.subtitle[0],
-                                fullauthor : article.fullauthor,
-                                fulltopic : article.fulltopic,
-                                media : article.deepmedia.sizes.facebook.url,
-                                nsfw : article.nsfw,
-                                isSponsored : article.isSponsored,
-                                ads : doc.querySelectorAll('.lml-adplaceholder').length,
-                                p : doc.querySelectorAll('p').length,
-                                img : doc.querySelectorAll('img').length,
-                                paginated : article.content.length < 1
+                    db.count(_c, 'content', { status : "published" }, (err, websitetotal) => {
+                        db.count(require('./config').default(), 'decorations', { entity : article.author }, (err, decorations) => {
+                            db.join(_c, 'content', [
+                                { $match : { date : {$lt : article.date }, status : "published" } },
+                                { $sort : { date : -1 } },
+                                { $limit : 20 },
+                                { $sort : { date : 1 } },
+                                { $project : PUBLICATION_REPORT_TODAY_PROJECTION },
+                            ], lastpublished => {
+                                lastpublished.push({
+                                    headline : article.title[0], subline : article.subtitle[0], 
+                                    date : article.date, name : article.name, facebookmedia : article.facebookmedia, 
+                                    topicslug : article.topicslug, author : article.author._id || article.author
+                                });
+
+                                db.join(_c, 'hits', [
+                                    { $match : { path : "/lilium/publishing/write/" + _id.toString() }},
+                                    { $sort : { timespent : -1 } },
+                                    { $project : {timespent : 1, userid : 1, _id : 0} }
+                                ], hits => {
+                                    sendback({
+                                        authortotal, authortotaltoday, decorations, websitetotal, lastpublished, 
+                                        totaltime : hits,
+                                        url : article.url,
+                                        headline : article.headline,
+                                        subline : article.subtitle[0],
+                                        fullauthor : article.fullauthor,
+                                        timespent : article.date - article.createdOn,
+                                        fulltopic : article.fulltopic,
+                                        media : article.deepmedia.sizes.facebook.url,
+                                        nsfw : article.nsfw,
+                                        isSponsored : article.isSponsored,
+                                        ads : doc.querySelectorAll('.lml-adplaceholder').length,
+                                        p : doc.querySelectorAll('p').length,
+                                        img : doc.querySelectorAll('img').length,
+                                        paginated : article.content.length < 1
+                                    });
+                                });
                             });
                         });
                     });
@@ -572,38 +591,62 @@ class ContentLib {
         });
     };
 
-    publish(_c, post, caller, callback) {
-        const payload = { status : "published" };
-        post.status = payload.status;
+    validate(_c, _id, caller, sendback) {
+        this.getFull(_c, _id, post => { 
+            if (!post) {
+                return sendback({ error : "Post not found", code : 404 });
+            }
 
-        if (!post.date) {
-            payload.date = new Date();
-            post.date = payload.date;
-        }
+            db.findUnique(config.default(), 'entities', { _id : caller }, (err, fullrequester) => {
+                if (fullrequester.roles.includes('editor') || !post.author || caller.toString() == post.author.toString()) {
+                    if (!post.date) {
+                        post.date = new Date();
+                        post.date = post.date;
+                    }
+                    
+                    if (!post.name) {
+                        post.name = require('slug')(post.title[0]).toLowerCase();
+                        post.name = post.name;
+                    }
+        
+                    if (
+                        !post.topic || !post.author || !post.media || 
+                        !post.title[0] || !post.subtitle[0] || !post.content[0]
+                    ) {
+                        return sendback({ error : "Missing fields", code : 401 });
+                    }
 
-        if (!post.name) {
-            payload.name = require('slug')(post.title[0]).toLowerCase();
-            post.name = payload.name;
-        }
+                    sendback(undefined, post);
+                } else {
+                    return sendback({ error : "Missing rights", code : 403 });
+                }
+            });
+        });
+    }
 
-        if (!post.topic || !post.author || !post.media) {
-            return callback({ error : "Missing fields", type : "fields" });
-        }
+    publish(_c, _id, caller, sendback) {
+        this.validate(_c, _id, caller, (err, post) => {
+            if (err) {
+                return sendback(err);
+            } 
 
-        db.update(_c, 'content', { _id : post._id }, payload, () => {
-            db.remove(_c, 'autosave', { contentid : post._id }, () => {
-                this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
-                    this.getFull(_c, post._id, fullpost => {
+            post.status = "published";
+            post.publishedOn = new Date();
+            post.publishedAt = Date.now();
+            post.date = new Date();
 
-                        this.updateActionStats(_c, fullpost, score => {
-                            hooks.fireSite(_c, 'article_published_from_draft', { article : fullpost, score, _c });
-                            hooks.fireSite(_c, 'article_updated', { article : fullpost, _c });
+            db.update(_c, 'content', { _id : post._id }, post, () => {
+                db.remove(_c, 'autosave', { contentid : post._id }, () => {
+                    this.pushHistoryEntryFromDiff(_c, post._id, caller, diff({}, { status : "published" }), 'published', historyentry => {
+                        this.updateActionStats(_c, post, score => {
+                            hooks.fireSite(_c, 'article_published_from_draft', { article : post, score, _c });
+                            hooks.fireSite(_c, 'article_updated', { article : post, _c });
                             hooks.fire('article_published', {
-                                article: fullpost, _c
+                                article: post, _c
                             });
 
-                            this.generate(_c, fullpost, () => {
-                                callback({ historyentry, newstate : fullpost });
+                            this.generate(_c, post, () => {
+                                sendback({ historyentry, newstate : post });
 
                                 notifications.emitToWebsite(_c.id, {
                                     articleid : post._id,
@@ -615,6 +658,7 @@ class ContentLib {
                     });
                 });
             });
+
         });
     }
 
@@ -686,7 +730,7 @@ class ContentLib {
                         fileserver.deleteFile(_c.server.html + "/" + fullpost.fulltopic.completeSlug + "/" + fullpost.name + ".html", () => {});
                     }
 
-                    fileserver.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html");
+                    fileserver.deleteFile(_c.server.html + "/amp/" + fullpost.name + ".html", () => {});
                 }, true);
             });
         });

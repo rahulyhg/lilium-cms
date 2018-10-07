@@ -103,28 +103,44 @@ export class Lys extends Component {
         log('Lys', 'Executing command : ' + cmd, 'detail');
         let willHide = true;
 
-        if (this.state.pageChoices.length != 0) {
-            this.state.pageChoices[0].execute();
-            log('Lys', 'Executed page command : ' + cmd, 'success');
-        } else if (this.state.choices.length != 0) {
-            navigateTo(this.state.choices[0].url);
-            log('Lys', 'Executed Lilium command : ' + cmd, 'success');
-        } else if (this.state.customChoices.length != 0) {
-            this.state.customChoices[0].execute();
-            log('Lys', 'Executed Custom Command : ' + cmd, 'success');
-        } else if (this.state.hashactions.length != 0) {
-            this.state.hashactions[0].execute(cmd);
-            log('Lys', 'Executed Hash Command : ' + cmd, 'success');
-        } else if (this.state.posts.length != 0) {
-            navigateTo("/publishing/write/" + this.state.posts[0]._id);
-            log('Lys', 'Navigated to post from Lys', 'success');
-        } else if (this.state.entities.length != 0) {
-            navigateTo("/entities/edit/" + this.state.entities[0]._id);
-            log('Lys', 'Navigated to entity from Lys', 'success');
-        } else {
+        const act = this.enterAction;
+        if (!act || act.default) {
             log('Lys', 'No command found, showing help', 'detail');
             this.showHelp();
             willHide = false;
+        } else {
+            switch (act.type) {
+                case "pageChoices": 
+                    act.action.execute();
+                    log('Lys', 'Executed page command : ' + cmd, 'success');
+                    break;
+
+                case "choices":
+                    navigateTo(act.action.url);
+                    log('Lys', 'Executed Lilium command : ' + cmd, 'success');
+                    break;
+
+                case "customChoices":
+                    act.action.execute();
+                    log('Lys', 'Executed Custom Command : ' + cmd, 'success');
+                    break;
+
+                case "hashactions":
+                    act.action.execute(cmd);
+                    log('Lys', 'Executed Hash Command : ' + cmd, 'success');
+                    break;
+
+                case "posts":
+                    navigateTo("/publishing/write/" + act.action._id);
+                    log('Lys', 'Navigated to post from Lys', 'success');
+                    break;
+                
+                case "entities":
+                    navigateTo("/entities/edit/" + act.action._id);
+                    log('Lys', 'Navigated to entity from Lys', 'success');
+                    break;
+            } 
+            
         }
 
         willHide && this.hide();
@@ -223,7 +239,7 @@ export class Lys extends Component {
                     ))
                 } {
                     this.state.customChoices.map(cmd => (
-                        <div class="lys-sugg lys-sugg-cmd" onClick={() => this.goAndHide(cmd.url)}>
+                        <div class="lys-sugg lys-sugg-cmd" onClick={() => cmd.execute()}>
                             <i class="far fa-bolt" style={{ background : "#fffae0" }}></i>
                             <b>{cmd.displayname}</b>
                         </div>
@@ -268,26 +284,40 @@ export class Lys extends Component {
             return null;
         }
 
-        const bigicon = this.state.pageChoices[0] ? {
+        this.enterAction = this.state.pageChoices[0] ? {
             icon : "far fa-bolt",
+            action : this.state.pageChoices[0],
+            type : "pageChoices",
             color : "#fffae0"
         } : this.state.choices[0] ? {
             icon : "fal " + this.state.choices[0].icon,
+            action : this.state.choices[0],
+            type : "choices",
             color : "#daf5ff"
         } : this.state.customChoices[0] ? {
             icon : "far fa-bolt",
+            action : this.state.customChoices[0],
+            type : "customChoices",
             color : "#fffae0"
         } : this.state.hashactions[0] ? {
             icon : "far fa-hashtag",
+            action : this.state.hashactions[0],
+            type : "hashactions",
             color : "rgb(255, 135, 135)"
         } : this.state.posts[0] ? {
             icon : "far fa-pencil",
+            action : this.state.posts[0],
+            type : "posts",
             color : "#ffdffe"
         } : this.state.entities[0] ? {
             icon : "far fa-user",
+            action : this.state.entities[0],
+            type : "entities",
             color : "#e1ffdf"
         } : {
             icon : "fal fa-question",
+            action : undefined,
+            type : "default",
             color : "#AAA",
             default : true
         };
@@ -296,13 +326,13 @@ export class Lys extends Component {
             <div id="lys-wrap">
                 <div id="lys">
                     <div style={{ display: "flex" }}>
-                        <div id="lys-sugg-big-icon" style={{ background : bigicon.color }}>
-                            <i id="lys-sugg-big-icon-i" class={bigicon.icon}></i>
+                        <div id="lys-sugg-big-icon" style={{ background : this.enterAction.color }}>
+                            <i id="lys-sugg-big-icon-i" class={this.enterAction.icon}></i>
                         </div>
                         <input type="text" id="lys-input" placeholder="What are you looking for?" onKeyUp={this.keyUpBoxBinding} autocomplete="off" />
                     </div>
 
-                    { bigicon.default ? this.renderHelp() : this.renderSuggs() }
+                    { this.enterAction.default ? this.renderHelp() : this.renderSuggs() }
                 </div>
             </div>
         )
