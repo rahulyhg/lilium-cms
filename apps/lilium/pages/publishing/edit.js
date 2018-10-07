@@ -5,6 +5,7 @@ import { TextEditor } from '../../widgets/texteditor';
 import { TextField, ButtonWorker, CheckboxField, MultitagBox, MediaPickerField, TopicPicker } from '../../widgets/form';
 import { getSession } from '../../data/cache';
 import { castNotification } from '../../layout/notifications';
+import { castOverlay } from '../../overlay/overlaywrap';
 
 import dateFormat from 'dateformat';
 
@@ -222,7 +223,7 @@ export default class EditView extends Component {
 
     componentDidMount() {
         this.requestArticle(this.props.postid);
-        bindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound)
+        bindRealtimeEvent('articleUpdate', this.socketArticleUpdateEvent_bound);
     }
 
     componentWillUnmount() {
@@ -286,24 +287,13 @@ export default class EditView extends Component {
         }
     }
 
-    publish(done) {
+    validate(done) {
         this.save(() => {
-            API.put('/publishing/publish/' + this.coldState.post._id, {}, (err, json, r) => {
+            API.put('/publishing/validate/' + this.coldState.post._id, {}, (err, json, r) => {
                 if (r.status == 200) {
-                    this.setState({
-                        history : [json.historyentry, ...this.state.history],
-                        post : {...this.state.post, ...{
-                            status : json.newstate.status,
-                            date : json.newstate.date,
-                            name : json.newstate.name,
-                            publishedAt : Date.now()
-                        }}
-                    }, () => {
-                        this.coldState.post = this.state.post; 
-
-                        this.setState({
-                            actions : this.getActionFromColdState()
-                        })   
+                    castOverlay('publish-article', {
+                        publishFunction : this.publish.bind(this),
+                        getReportFunction : this.getReport.bind(this)
                     });
                 } else {
                     r.text().then(message => {
@@ -314,9 +304,49 @@ export default class EditView extends Component {
                         });
                     })
                 }
-
+    
                 done();
-            });
+            });            
+        });
+    }
+
+    getReport(sendback) {
+        API.get('/publishing/report/' + this.coldState.post._id, {}, (err, json, r) => {
+            sendback(err, json);
+        });
+    }
+
+    publish(done) {
+        API.put('/publishing/publish/' + this.coldState.post._id, {}, (err, json, r) => {
+            if (r.status == 200) {
+                this.setState({
+                    history : [json.historyentry, ...this.state.history],
+                    post : {...this.state.post, ...{
+                        status : json.newstate.status,
+                        date : json.newstate.date,
+                        name : json.newstate.name,
+                        publishedAt : Date.now()
+                    }}
+                }, () => {
+                    this.coldState.post = this.state.post; 
+
+                    this.setState({
+                        actions : this.getActionFromColdState()
+                    }, () => {
+                        done(r.status);
+                    });
+                });
+            } else {
+                r.text().then(message => {
+                    castNotification({
+                        type : "warning",
+                        title : "Could not publish article",
+                        message
+                    });
+
+                    done(r.status, message);
+                })
+            }
         });
     }
 
@@ -407,7 +437,7 @@ export default class EditView extends Component {
         if (status == "draft" || status == "deleted") {
             actions.push(
                 <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
-                <ButtonWorker type="fill" theme="blue" text="Publish" work={this.publish.bind(this)} />
+                <ButtonWorker type="fill" theme="blue" text="Publish" work={this.validate.bind(this)} />
             );
         } else if (status == "published") {
             actions.push(
@@ -461,6 +491,7 @@ export default class EditView extends Component {
 
         return (
             <div>
+
                 <div style={{ padding : 20, marginRight: 280 }}>
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="title" initialValue={this.state.post.title[0]} placeholder="Publication headline" placeholderType="inside" wrapstyle={{ marginBottom: 6 }} style={{ fontFamily : '"Oswald", sans-serif', background : "transparent", fontSize : 32, border : "none", borderBottom : "1px solid #DDD", padding : "3px 0px", textAlign : 'center' }} />
                     <TextField onChange={this.fieldChanged.bind(this)} format={x => [x]} name="subtitle" initialValue={this.state.post.subtitle[0]} placeholder="Subtitle or catchline" placeholderType="inside" style={{ background : "transparent", border : "none", padding : "5px 0px", marginBottom : 10, textAlign : 'center' }} />
