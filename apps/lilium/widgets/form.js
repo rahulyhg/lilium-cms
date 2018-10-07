@@ -125,9 +125,11 @@ export class TextField extends FormField {
     }
 
     componentWillReceiveProps(props) {
-        if (props.value) {
+        if (typeof props.value != 'undefined') {
             this.changed({ target : { value : props.value }});
             this.inputbox.value = props.value;
+        } else {
+            this.inputbox.value = '';
         }
     }
 
@@ -154,7 +156,7 @@ export class TextField extends FormField {
                 {
                     this.props.multiline ? 
                         ( <textarea placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={this.props.style || {}} 
-                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)}>{this.value || ""}</textarea>) :
+                                    onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} ref={el => {this.inputbox = el}}>{this.props.initialValue || this.props.value || this.value || ""}</textarea>) :
                         ( <input placeholder={this.props.placeholderType == "inside" ? this.props.placeholder : ""} class="classic-field" style={Object.assign({}, this.props.style || {})} type={this.props.type || 'text'} value={this.value}
                                     onChange={this.changed.bind(this)} onKeyDown={this.handleKeyPress.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
                                     onFocus={this.props.onFocus && this.props.onFocus.bind(this)} ref={el => {this.inputbox = el}} />)
@@ -880,7 +882,7 @@ export class DebouncedField extends FormField {
         this.timeoutId && clearTimeout(this.timeoutId);
         this.timeoutId = setTimeout(() => {
             if (this.oldValue != ev.target.value) {
-                this.props.onDebounce(ev.target.value)
+                this.props.onDebounce && this.props.onDebounce(ev.target.value)
             }
          
             this.oldValue = ev.target.value;
@@ -890,7 +892,7 @@ export class DebouncedField extends FormField {
     render() {
         return (
             <TextField placeholder={this.props.placeholder} onKeyPress={this.debounceInput.bind(this)} onBlur={this.props.onBlur && this.props.onBlur.bind(this)}
-                        onFocus={this.props.onFocus.bind(this)} keyEvents={this.props.keyEvents} />
+                        onFocus={this.props.onFocus && this.props.onFocus.bind(this)} keyEvents={this.props.keyEvents} />
         );
     }
 }
