@@ -6,33 +6,62 @@ import { getSession } from '../../data/cache';
 import { dismissOverlay } from '../../overlay/overlaywrap';
 import dateformat from 'dateformat';
 import { AnimeNumber } from '../../widgets/animenumber';
+import { getTimeAgo } from '../../widgets/timeago';
 
 class PublishedReportDetails extends Component {
     constructor(props) {
         super(props);
 
-        this.state = {
-            websitetotal : this.props.report.websitetotal - 1
-        }
+        this.timeToPublish = getTimeAgo(props.report.timespent);
     }
 
     componentDidMount() {
         setTimeout(() => {
-            this.setState({
-                websitetotal : this.state.websitetotal + 1
-            });
+            this.setState({ shown : true })
         }, 2000);
     }
 
+    popAnimeNumber(number, span, animenumber) {
+        span.style.transform = "scale(1.3)";
+        setTimeout(() => {
+            span.style.transform = "";
+        }, 800);
+    }
+
     render() {
-        return (
+        return this.state.shown ? (
             <div class="full-pub-report">
-                <div class="card">
-                    <AnimeNumber number={this.state.websitetotal} />
-                    <div class="pub-report-title">articles on the website</div>
+                <div class="card floating">
+                    <AnimeNumber number={this.props.report.websitetotal} duration={1000} onReady={this.popAnimeNumber.bind(this)} />
+                    <b class="pub-report-title">articles on the website</b>
+                </div>
+                <div class="card floating">
+                    <AnimeNumber number={this.props.report.authortotal} duration={1000} />
+                    <b class="pub-report-title">articles by {this.props.report.fullauthor.displayname}</b>
+                </div>
+                <div class="card floating">
+                    <AnimeNumber number={this.props.report.authortotaltoday} duration={1000} />
+                    <b class="pub-report-title">published today</b>
+                </div>
+                <div class="card full">
+                    <div class="detail-head">
+                        <div class="bubble-wrap">
+                            <b>More about this article</b>
+                        </div>
+                    </div>
+                    <div class="detail-list">
+                        <div>Created : <AnimeNumber number={this.timeToPublish.value} duration={1000} /> {this.timeToPublish.unit} ago</div>
+                        <div>Number of paragraphs : <b><AnimeNumber number={this.props.report.p} duration={1000} /></b></div>
+                        <div>Number of images : <b><AnimeNumber number={this.props.report.img} duration={1000} /></b></div>
+                        <div>Number of ads : <b><AnimeNumber number={this.props.report.ads} duration={1000} /></b></div>
+                        <div>Sponsored post : <b>{this.props.report.isSponsored ? "Yes" : "No"}</b></div>
+                        <div>Not safe for work : <b>{this.props.report.nsfw ? "Yes" : "No"}</b></div>
+                        <div>Paginated article : <b>{this.props.report.paginated ? "Yes" : "No"}</b></div>
+                        <div>Full URL : <a href={this.props.report.url} target="_blank">{this.props.report.url}</a></div>
+                    </div>
                 </div>
             </div>
-        )
+        ) : null;
     }
 }
 
@@ -45,6 +74,8 @@ class PublishedReportCard extends Component {
             visible : !props.last,
             last : props.last
         };
+
+        this.ago = getTimeAgo(new Date() - new Date(this.props.post.date));
     }
 
     componentDidMount() {
@@ -66,13 +97,12 @@ class PublishedReportCard extends Component {
             <div style={{ width : PUBLISHED_CARD_CONST_WIDTH }} class={ "card publish-report-card " + (this.state.last ? "last " : " ") }>
                 <a class="image-wrapper" href={"/" + this.props.post.topicslug + "/" + this.props.post.name} target="_blank">
                     <img class="pub-report-card-facebookmedia" src={this.props.post.facebookmedia} />
-
                 </a>
                 <div class="pub-report-card-headline">{this.props.post.headline}</div>
                 <div class="pub-report-card-subline">{this.props.post.subline}</div>
 
                 <footer>
-                    {dateformat(new Date(this.props.post.date), 'mmmm dd, HH:MM')} | {this.props.author.displayname}
+                    {this.ago.toString()} | {this.props.author.displayname}
                 </footer>
             </div>
         ) : null;

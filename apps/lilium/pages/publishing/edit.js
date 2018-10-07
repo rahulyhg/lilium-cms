@@ -444,7 +444,12 @@ export default class EditView extends Component {
                 <ButtonWorker theme="blue"  type="fill" text="Commit changes" work={this.commitchanges.bind(this)} />, 
                 <ButtonWorker theme="red"  type="outline" text="Unpublish" work={this.unpublish.bind(this)} />
             );
-        } 
+        } else if (status == "reviewing") {
+            actions.push(
+                <ButtonWorker theme="white" text="Save" work={this.save.bind(this)} />, 
+                <ButtonWorker type="fill" theme="blue" text="Approve and publish" work={this.validate.bind(this)} />
+            );
+        }
 
         return actions;
     }
