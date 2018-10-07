@@ -280,6 +280,7 @@ class ContentLib {
                                     headline : article.headline,
                                     subline : article.subtitle[0],
                                     fullauthor : article.fullauthor,
+                                    timespent : article.date - article.createdOn,
                                     fulltopic : article.fulltopic,
                                     media : article.deepmedia.sizes.facebook.url,
                                     nsfw : article.nsfw,
