@@ -27,6 +27,8 @@
 
     background: #333;
     color: #EEE;
+
+    animation: left-pane 0.3s ease-out;
 }
 
 #overlay-slide-left-floater {
@@ -57,5 +59,30 @@
     width: 60%;
     overflow-y: auto;
     background: #EEE;
-    color: #333
+    color: #333;
+
+    animation: right-pane 0.3s ease-out;
+
+}
+
+@keyframes left-pane {
+    0% {
+        opacity: 0;
+        transform: translate3d(-100%, 0, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0,0,0);
+    }
+}
+
+@keyframes right-pane {
+    0% {
+        opacity: 0;
+        transform: translate3d(100%, 0, 0);
+    }
+    100% {
+        opacity: 1;
+        transform: translate3d(0,0,0);
+    }
 }
