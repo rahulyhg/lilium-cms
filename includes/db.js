@@ -5,7 +5,7 @@ var mongoObjectID = require('mongodb').ObjectID;
 var noop = () => {};
 
 var _conn = undefined;
-var _conns = new Object();
+var _conns = {};
 
 var DB = function() {
 	// Will return undefined if everything went well, or an err if it crashes
@@ -207,11 +207,9 @@ var DB = function() {
         });
     };
 	
-	this.isValidMongoID = id => {
-		return mongoObjectID.isValid(id);
-	}
+	this.isValidMongoID = id =>  mongoObjectID.isValid(id);
 
-	this.mongoID = function(str) {
+	this.mongoID = str => {
 		try {
 			return new mongoObjectID(str);
 		} catch (err) {

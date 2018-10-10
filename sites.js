@@ -15,8 +15,6 @@ var endpoints = require('./endpoints.js');
 var sessions = require('./session.js');
 var templateBuilder = require('./templateBuilder.js');
 var buildLib = require('./build');
-var category = require('./category.js');
-var badges = require('./badges.js');
 var events = require('./events.js');
 var various = require('./various.js');
 var mail = require('./mail.js');
@@ -339,20 +337,18 @@ var SiteInitializer = function (conf, siteobj) {
                                     return done();
                                 }
 
-                                category.preload(conf, function() {
-                                    loadSessions(function() {
-                                        loadRobots(function() {
-                                            update(conf, function() {
-                                                sharedcache.hi();
+                                loadSessions(function() {
+                                    loadRobots(function() {
+                                        update(conf, function() {
+                                            sharedcache.hi();
 
-                                                checkForWP(conf);
-                                                hooks.fire('site_initialized', conf);
-                                                log('Sites', 'Initialized site with id ' + conf.id, 'success');
-                                                done();
-                                            });
+                                            checkForWP(conf);
+                                            hooks.fire('site_initialized', conf);
+                                            log('Sites', 'Initialized site with id ' + conf.id, 'success');
+                                            done();
                                         });
                                     });
-                                });
+                                });  
                             });
                         });
                     });
@@ -692,147 +688,8 @@ var Sites = function () {
     };
 
     this.form = function () {
-        formbuilder.registerFormTemplate('lilium_website_info')
-        .add('title-info', 'title', {
-                displayname: "Website information"
-            })
-            .add('websitename', 'text', {
-                displayname: "Public name"
-            })
-            .add('websiteemail', 'email', {
-                displayname: "Admin email"
-            })
-            .trg('websiteinfo')
-
-        .add('title-database', 'title', {
-                displayname: "Database"
-            })
-            .add('dbhost', 'text', {
-                displayname: "Host"
-            })
-            .add('dbport', 'text', {
-                displayname: "Port"
-            })
-            .add('dbuser', 'text', {
-                displayname: "Username"
-            })
-            .add('dbpass', 'password', {
-                displayname: "Password"
-            })
-            .add('dbname', 'text', {
-                displayname: "Database Name"
-            })
-            .trg('database')
-
-        .add('title-server', 'title', {
-                displayname: "Server"
-            })
-            .add('serverurl', 'text', {
-                displayname: "Base URL",
-                defaultValue: "//"
-            })
-            .add('serverport', 'number', {
-                displayname: "Port",
-                defaultValue: "80"
-            })
-            .add('serverhtml', 'text', {
-                displayname: "HTML File Path",
-                defaultValue: "/usr/local/lilium/html/"
-            })
-            .trg('server');
-
-
-        formbuilder.createForm('launch_lilium_website', {
-            fieldWrapper: {
-                tag: "div",
-                cssPrefix: "launchwebsite-field-"
-            },
-            cssClass: "form-launch-website",
-            dependencies: [],
-        })
-        .addTemplate('lilium_website_info')
-        .trg('beforesubmit')
-            .add('submit', 'submit', {
-                value: "Launch"
-            });
-
-        formbuilder.createForm('wptransfer_lilium_website', {
-            fieldWrapper: {
-                tag: "div",
-                cssPrefix: "launchwebsite-field-"
-            },
-            cssClass: "form-launch-website",
-            dependencies: ["sites.all.complex"],
-        })
-        .add('title-existing-site', 'title', {
-            displayname : "Existing Lilium Site"
-        })
-        .add('originalsite', 'livevar', {
-            displayname : "Lilium Site",
-            endpoint : "sites.all.complex",
-            tag : "select",
-            template: "option",
-            title : "originalsite",
-            readkey : "originalsite",
-            attr: {
-                lmlselect : false,
-                header : 'Create a new Lilium Site'
-            },
-            props: {
-                'value' : "uid",
-                'html' : 'website.sitetitle'
-            }            
-        })
-        .add('title-info', 'title', {
-                displayname: "Wordpress site information"
-            })
-            .add('originalurl', {
-                displayname: "Original URL without trailing slash"
-            })
-            .add('wpsitedataurl', {
-                displayname: "Database URL"
-            })
-            .add('wpsitedataport', {
-                displayname: "Database Port",
-                datatype : "number"
-            })
-            .add('wpsitedataname', {
-                displayname: "Database Name"
-            })
-            .add('wpsitedatauser', {
-                displayname: "Database User"
-            })
-            .add('wpsitedatapwd', 'password', {
-                displayname: "Database Password"
-            })
-        .add('title-info-uploads', 'title', {
-                displayname : "Uploads"
-            })
-            .add('wpuploadslocaldir', 'text', {
-                displayname : "Local directory"
-            }, {
-                required : false
-            })
-        .add('title-info-bridge', 'title', {
-                displayname: "Wordpress bridge"
-            })
-            .add('wpbridgedata', {
-                displayname: "Database Name"
-            })
-
-        .add('title-lml-site', 'title', {
-            displayname: "Lilium site information"
-        })
-        .beginSection('lilium_website_info_section', {
-
-        })
-        .addTemplate("lilium_website_info")
-        .closeSection('lilium_website_info_section')
-        .trg('beforesubmit')
-            .add('submit', 'submit', {
-                value: "Transfer"
-            });
-    };
+    
+    }
 };
 
 module.exports = new Sites();

@@ -204,10 +204,6 @@ class Entities {
                 this.serveNew(cli);
                 break;
 
-            case "impersonate":
-                require('./backend/login.js').impersonate(cli);
-                break;
-
             default:
                 return cli.throwHTTP(404, 'Not Found');
                 break;
@@ -281,6 +277,8 @@ class Entities {
                     log('Entities', 'DB error while checking for user existance');
                 }
             })
+        } else if (cli.routeinfo.path[2] == "impersonate") {
+            require('./backend/login.js').impersonate(cli);
         } else if (cli.routeinfo.path[2] == "restore") {
             cli.hasRightOrRefuse('create-entities') && this.restore(db.mongoID(cli.routeinfo.path[3]), cli.postdata.data.address, () => { 
                 this.sendNewMagicEmail(cli, db.mongoID(cli.routeinfo.path[3]), () => { 

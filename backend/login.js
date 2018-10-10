@@ -2,7 +2,6 @@ const db = require('../includes/db.js');
 const CryptoJS = require('crypto-js');
 const _c = require('../config.js');
 const entities = require('../entities.js');
-const formbuilder = require('../formBuilder.js');
 const hooks = require('../hooks.js');
 const sessions = require('../session.js');
 const log = require('../log.js');
@@ -43,46 +42,6 @@ const loginSuccess = (cli, userObj, cb) => {
 };
 
 class Login {
-
-    // Deprecated
-    fbAuth (cli) {
-        require('request').get('https://graph.facebook.com/debug_token/?input_token=' + cli.postdata.data.accessToken +
-            '&access_token=' + cli._c.social.facebook.token, {}, (err, resp) => {
-            if (resp.statusCode == 200) {
-                db.findToArray(_c.default(), 'entities', {
-                    fbid : cli.postdata.data.userID,
-                    revoked : {$ne : true}
-                }, (err, arr) => {    
-                    if (arr.length == 0) {
-                        cli.sendJSON({
-                            status : 200,
-                            success : false,
-                            invalidator : "lilium",
-                            reason : "entities"
-                        });
-                    } else {
-            			entities.fetchFromDB(cli._c, arr[0].username, function(userObj) {
-	            		    loginSuccess(cli, userObj, function() {
-                                cli.sendJSON({
-                                    status : 200,
-                                    success : true,
-                                    userid : userObj._id
-                                });
-                            });
-                        });
-                    }
-                });
-            } else {
-                cli.sendJSON({
-                    status : resp.statusCode,
-                    success : false,
-                    invalidator : "facebook",
-                    reason : "token"
-                });
-            }
-        });
-    };
-
     magiclink (cli) {
         db.findUnique(require('../config.js').default(), 
             'entities', 
@@ -93,7 +52,7 @@ class Login {
             } else {
                 entities.fetchFromDB(cli._c, user.username, userObj => {
                     loginSuccess(cli, userObj, () => {
-                        cli.redirect(cli._c.server.url + "/admin", false)   
+                        cli.redirect(cli._c.server.url + "/lilium", false)   
                     });
                 });
 
@@ -105,9 +64,10 @@ class Login {
     impersonate (cli) {
         const _id = db.mongoID(cli.routeinfo.path[3]);
         if (cli.hasRight("develop")) {
-            db.findUnique(_c.default(), 'entities', {_id}, function(err, user) {
+            db.findUnique(_c.default(), 'entities', {_id}, (err, user) => {
     			if (user) {
-            		entities.fetchFromDB(cli._c, user._id, function(userObj) {
+            		entities.fetchFromDB(cli._c, user._id, userObj => {
+                        log('Entities', cli.userinfo.displayname + " impersonates " + userObj.displayname, "lilium");
 	        			userObj ? loginSuccess(cli, userObj) : cli.throwHTTP(404);
                     }, true);
                 } else {
@@ -121,10 +81,6 @@ class Login {
 
 	authUser (cli) {
 		cli.touch('login.authUser');
-        if (cli.routeinfo.path[1] == "fb") {
-            return this.fbAuth(cli);
-        }
-
 		const usr = cli.postdata.data.usr;
         const psw = cli.postdata.data.psw;
         const token2fa = cli.postdata.data.token2fa;
@@ -175,29 +131,7 @@ class Login {
 	};
 
 	registerLoginForm () {
-		formbuilder.createForm('login_form', {
-			fieldWrapper : {
-				'tag' : 'div',
-				'cssPrefix' : "loginfield-"
-			},
-			cssClass : "dashboard-login-form"
-		})
-		.add('usr', 'text', {displayname:"Username", placeholder:true,wrapperCssSuffix:"username"})
-		.add('psw', 'password', {displayname:"Password", placeholder:true,wrapperCssSuffix:"password"})
-		.trg('userpass')
-        .add('loginbtnset', 'buttonset', {
-            buttons : [{
-                name : 'login', 
-                displayname : "Login",
-                classes : ["loginbutton"]
-            /*}, {
-                name : 'login-fb', 
-                displayname : '<i class="fa fa-facebook-official" aria-hidden="true"></i>',
-                classes : ["fbloginbutton"],
-                type : "button",
-                callback : "window.loginwithfacebook();"
-            */}]
-        });
+
 	};
 
     apiAuth(username, password, done) {
