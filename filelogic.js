@@ -266,9 +266,9 @@ class FileLogic {
             log('FileLogic', 'Compiling theme LML3 with context ' + contextname, 'info')
             LML3.compile(_c, readPath, extra, (ctn) => {
                 if (nolayout) {
-                    return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, cdned => {
-                        done(cdned);
-                    });
+                    // return require('./cdn.js').parse(fileserver.minifyString(ctn), _c, cdned => {
+                        return done(ctn);
+                    // });
                 }
 
                 log('FileLogic', 'Adding template to LML3 theme compilation', 'info')
