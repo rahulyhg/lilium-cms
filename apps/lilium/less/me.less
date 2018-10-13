@@ -1,0 +1,65 @@
+#profile-header {
+    display: block;
+    text-align: center;
+
+    padding-top: 20px;
+    color: #333;
+}
+
+#profile-picture-wrapper {
+    margin: auto;
+}
+
+#me-badge-wrapper {
+    text-align: center;
+}
+
+#profile {
+    max-width: 780px;
+    margin: auto;
+}
+
+#me-badge-wrapper {
+    margin: 20px auto;
+}
+
+#profile-picture {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    border: 6px solid #bb75cd;
+    border-radius: 50%;
+    background: #333;
+    overflow: hidden;
+    cursor: pointer;
+    
+    &:hover {
+        border-color: @liliumPurple;
+    }
+}
+
+.me-decoration {
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    margin: 0px 3px;
+
+    .badge-image {
+        height: 70px;
+        width: auto;
+    }
+
+    .fa {
+        display: block;
+        text-align: cemter;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 23px;
+        color: white;
+
+        &.level-7, &.level-6 {
+            top: 27px;
+        }
+    }
+}
