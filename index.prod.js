@@ -13,23 +13,29 @@
  * LILIUM CMS | Entry Point                                                                              *
  *                                                                                                       *
  * Lilium is a lightning-fast, online Content Management System built with node.js, without express.     *
- * Its power resides in the cache engine running behind Lilium, which reduces CPU usage, RAM and         *
+ * Its power resides in the cache engine and templating system, which reduces CPU usage, RAM and         *
  * database access.                                                                                      *
  *                                                                                                       *
  * Interpreting its own simple language, Lilium uses LML (Lilium Markup Language) to create the          *
- * templates and generate the served files. LML is user friendly, ressemble HTML and makes it easy for   *
+ * templates and generate the served files. LML is user friendly, ressembles HTML and makes it easy for  *
  * new developers or web designers to customize their very own themes                                    *
  *                                                                                                       *
  *----- Dependencies ----------------------------------------------------------------------------------- *
  *                                                                                                       *
- * Lilium needs bower installed, a Mongo database, and Node JS. That's it!                               *
+ * Lilium needs a Mongo database, and Node JS. That's it!                                                *
  * The user running node must have write access to the root directory of Lilium.                         *
- * We recommend the node package "pm2" for running Lilium.                                               *
+ * We recommend the node package "forever" for running Lilium.                                           *
  *                                                                                                       *
  *----- The people behind Lilium ----------------------------------------------------------------------- *
  *                                                                                                       *
  *    Author : Erik Desjardins                                                                           *
+ *                                                                                                       *
  *    Contributors : Samuel Rondeau-Millaire                                                             *
+ *                   Daniel McAuley                                                                      *
+ *                   Era Sinbandith                                                                      *
+ *                   Gabriel Cardinal                                                                    *
+ *                   Narcity Media inc.                                                                  *
+ *                                                                                                       *
  *    Documentation : http://liliumcms.com/docs                                                          *
  *                                                                                                       *
  *********************************************************************************************************/
