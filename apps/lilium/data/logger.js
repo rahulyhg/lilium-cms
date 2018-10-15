@@ -1,3 +1,5 @@
+window.LML_FULL_SESSION_LOG = [];
+
 const log = (sender, msg, level) => {    
     const output = ('[' + sender + "]").padEnd(14, ' ') + msg;
     switch (level) {
@@ -14,6 +16,8 @@ const log = (sender, msg, level) => {
         case "style"   :  console.log   ('%c' + output, style); break;
         default        :  console.log   (output);
     };
+
+    LML_FULL_SESSION_LOG.push({ sender, msg, level });
 };
 
 export function makeGlobalLogger() {
