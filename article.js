@@ -68,7 +68,6 @@ class Article {
             case 'haseditrights': if (cli.hasRightOrRefuse("create-articles")) this.haseditrights(cli); break;
             case 'liveedit': if (cli.hasRightOrRefuse("create-articles")) this.liveedit(cli); break;
             case 'package': if (cli.hasRightOrRefuse("create-articles")) this.packageArticle(cli); break;
-            case 'addwordtodico': if (cli.hasRightOrRefuse('create-articles')) this.addWordToDico(cli); break;
             case 'sendforreview': if (cli.hasRightOrRefuse("contributor")) this.sendForReview(cli); break;
             case 'refusereview': if (cli.hasRightOrRefuse("production")) this.refuseReview(cli); break;
             case 'preview': if (cli.hasRightOrRefuse("list-articles")) this.publish(cli, "preview"); break;
@@ -375,13 +374,6 @@ class Article {
         });
     };
 
-    addWordToDico(cli) {
-        const Proofreader = require('./proofreader');
-        Proofreader.addWord(cli.postdata.data.word, cli.postdata.data.lang || "en", () => {
-            cli.sendJSON({ok : true});
-        });
-    };
-
     packageArticle(cli) {
         const lang = cli.postdata.data.lang;
 
@@ -445,21 +437,6 @@ class Article {
 
             nextpage();
         }, {content : 1, title : 1, subtitle : 1, facebooktitle : 1, facebooksubtitle : 1, isSponsored : 1, nsfw : 1, hasads : 1});
-    }
-
-    proofread(paragraphs, lang, send) {
-        const Proofreader = require('./proofreader');
-
-        Proofreader.proofread(paragraphs.map(x => x.textContent), lang, (report, lang) => {
-            send(report && { 
-                corrections : report.map(r => r.messages.map(x => { 
-                    return { reason : x.message, at : x.column, suggestions : x.expected,  } })
-                ),
-                keywords : report.map(r => r.data.keywords),
-                paragraphs : paragraphs.map(x => x.innerHTML),
-                language : lang
-            });
-        });
     }
 
     infoStrip(cli) {
