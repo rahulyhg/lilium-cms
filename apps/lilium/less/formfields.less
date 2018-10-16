@@ -439,6 +439,7 @@ textarea {
     .phase-tree {
         display: flex;
         height: 320px;
+        overflow-x: auto;
 
         .topic-children-slide {
             height: 100%;
@@ -453,6 +454,22 @@ textarea {
 
                 &.selected {
                     background-color: #F3F3F3;
+                }
+
+                &.add-new {
+                    font-weight: bold;
+                    background: #c47ed4;
+                    color: #FFF;
+                    font-size: 24px;
+                    text-align: center;
+                    border-bottom: 0;
+                    margin: 10px auto;
+                    width: 40px;
+                    height: 40px;
+                    box-sizing: border-box;
+                    padding-top: 5px;
+                    border-radius: 50%;
+                    cursor: pointer;
                 }
             }
         }
