@@ -434,6 +434,14 @@ export class TopicPicker extends FormField {
                             {topic.displayname}
                         </div>
                     )) }
+
+                    {
+                        this.props.session == "manager" ? (
+                            <div class="topic-children-item add-new">
+                                <i class="far fa-plus"></i>
+                            </div>
+                        ) : null
+                    }
                 </div>
             )
         }
@@ -531,7 +539,7 @@ export class TopicPicker extends FormField {
                 <b>{this.state.stagedtopic.displayname}</b> <i>/{this.state.stagedtopic.completeSlug}</i>
             </div>);
         } else {
-            return null
+            return null;
         }
     }
 
@@ -562,7 +570,7 @@ export class TopicPicker extends FormField {
                 <div class="phase-tree">
                     {
                         this.state.topics.map((topicchildren, index) => (
-                            <TopicPicker.TopicSlide topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} index={index} />
+                            <TopicPicker.TopicSlide session={this.props.session} topics={topicchildren} onSelect={this.loadChildrenTopicsFrom.bind(this)} index={index} />
                         ))
                     }
                 </div>
