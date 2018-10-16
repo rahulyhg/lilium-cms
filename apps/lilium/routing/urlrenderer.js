@@ -2,6 +2,7 @@ import { h, Component } from 'preact'
 import { resetPageCommands } from '../layout/lys';
 import { CACHEKEYS, getLocal } from '../data/cache';
 import { dismissOverlay } from '../overlay/overlaywrap';
+import { hit } from '../realtime/connection';
 
 // Import default pages from route
 import InitPage         from '../pages/default';
@@ -27,6 +28,7 @@ import CommentsMan      from '../pages/comments/index';
 import PluginsMan       from '../pages/plugins/index';
 import CakepopsMan      from '../pages/cakepops/index';
 import FlaggingMan      from '../pages/flagging/index';
+import PwManager        from '../pages/pwmanager/index';
 import e404             from '../pages/errors/404';
 import e403             from '../pages/errors/403';
 
@@ -83,6 +85,7 @@ EndpointStore.registerEndpoint('comments', CommentsMan);
 EndpointStore.registerEndpoint('plugins', PluginsMan);
 EndpointStore.registerEndpoint('cakepop', CakepopsMan); 
 EndpointStore.registerEndpoint('flagging', FlaggingMan);
+EndpointStore.registerEndpoint('pwmanager', PwManager);
 EndpointStore.registerEndpoint('_e404', e404);
 EndpointStore.registerEndpoint('_e403', e403);
 
@@ -152,6 +155,11 @@ export class URLRenderer extends Component {
         this.state.classes = ev.detail.snapped ? ["snap"] : [];
     }
 
+    updateBodyClass(endpoint) {
+        document.body.classList.remove("endpoint-" + this.state.endpoint);
+        document.body.classList.add("endpoint-" + endpoint);
+    }
+
     refreshPath(extras= {}) {
         const paths = document.location.pathname.substring(1).split('/');
         paths.shift();
@@ -163,10 +171,12 @@ export class URLRenderer extends Component {
         resetPageCommands();
 
         const CurrentContainer = EndpointStore.getComponentFromEndpoint(endpoint);
+        this.updateBodyClass(endpoint);
         this.setState({ endpoint, levels, CurrentContainer, extras, rendererstyle : CurrentContainer.rendererstyle || {} }, () => {
             const ev = new CustomEvent("renderedURL", { detail : { endpoint, levels, CurrentContainer} });
             document.dispatchEvent(ev);
 
+            hit();
             dismissOverlay();
         });
     }

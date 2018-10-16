@@ -2,7 +2,6 @@ const log = require('./log.js');
 const hooks = require('./hooks.js');
 const db = require('./includes/db.js');
 const livevars = require('./livevars.js');
-const formBuilder = require('./formBuilder.js');
 const filelogic = require('./filelogic.js');
 const Admin = require('./backend/admin.js');
 
@@ -28,16 +27,24 @@ class LMLTopics {
 
                 send(respArray);
             });
+        } else if (levels[0] == "ofcategory") {
+            db.findToArray(cli._c, 'topics', { category : levels[1], active : true }, (err, arr) => {
+                send(arr);
+            }, { displayname : 1, slug : 1, description : 1, completeSlug : 1 });
+        } else if (levels[0] == "childof") {
+            db.findToArray(cli._c, 'topics', { parent : db.mongoID(levels[1]), active : true }, (err, arr) => {
+                send(arr);
+            }, { displayname : 1, slug : 1, description : 1, completeSlug : 1 });
         } else if (levels[0] == "simple") {
             db.findToArray(cli._c, 'topics', { active : true }, (err, topics) => {
                 send(topics);
             }, { _id : 1, displayname : 1, slug : 1, completeSlug : 1, parent : 1, category : 1 });
         } else if (levels[0] == "category") {
             db.join(cli._c, 'topics', [
-                { $match : { active : true } },
-                { $group : { _id : "$category", topics : { $push : "$$ROOT" } } }
-            ], (categories) => {
-                cli.sendJSON(categories);
+                { $match : { active : true, parent : { $exists : false }, category : { $exists : true } } },
+                { $project : { category : 1 } }
+            ], topics => {
+                cli.sendJSON(Array.from(new Set(topics.map(x => x.category))));
             });
         } else if (levels[0] == "tablepicker") {
             db.findToArray(cli._c, 'topics', { active : true }, (err, arr) => {
@@ -508,75 +515,6 @@ class LMLTopics {
                 });
             });
         });
-    }
-
-    form() {
-        require('./formBuilder.js').createForm('topicedit', {
-            formWrapper: {
-                'tag': 'div',
-                'class': 'row',
-                'id': 'article_new',
-                'inner': true
-            },
-            fieldWrapper : "lmlform-fieldwrapper"
-        })
-        .add('topic-details-title', 'title', {
-            displayname : "Topic details"
-        })
-        .add('displayname', 'text', {
-            displayname : "Display Name"
-        })
-        .add('slug', 'text', {
-            displayname : "URL slug"
-        })
-        .add('description', 'textarea', {
-            displayname : "Description"
-        })
-        .add('category', 'select', {
-            displayname : "Category", 
-            datasource : [
-                { name : "", displayName : "Other" },
-                { name : "local", displayName : "Local" },
-                { name : "interest", displayName : "Interest" },
-                { name : "partners", displayName : "Partners" }
-            ]
-        })
-        .trg('top')
-        .add('frontend-title', 'title', { displayname : "Templates" })
-        .add('articletemplate', 'liveselect', {
-            endpoint : "themes.templates.article",
-            select : {
-                value : 'file',
-                displayname : 'displayname'
-            },
-            empty : {
-                displayname : " - Default theme's article template - "
-            },
-            displayname : "Article template"
-        })
-        .add('archivetemplate', 'liveselect', {
-            endpoint : "themes.templates.archive",
-            select : {
-                value : 'file',
-                displayname : 'displayname'
-            },
-            empty : {
-                displayname : " - Default theme's archive template - "
-            },
-            displayname : "Archive template"
-        })
-        .trg('bottom')
-        .add('topic-action-title', 'title', { displayname : "Actions" })
-        .add('publish-set', 'buttonset', { buttons : [{
-                'name' : 'save',
-                'displayname': 'Save',
-                'type' : 'button',
-                'classes': ['btn-save']
-            }        
-        ]})
-        .add('children-title', 'title', {
-            displayname : "Children"
-        })
     }
 }
 

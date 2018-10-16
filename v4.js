@@ -1,5 +1,5 @@
 const path = require('path');
-const makeIndex = require(path.join(liliumroot, "apps", "lilium", "index.html"));
+const makeIndex = require(path.join(global.liliumroot || __dirname, "apps", "lilium", "index.html"));
 
 class V4 {
     static serveV4Index(cli) {

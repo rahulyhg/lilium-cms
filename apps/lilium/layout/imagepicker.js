@@ -82,7 +82,6 @@ class SelectedImage extends Component {
                     </div>
                 </div>
             </div>
-
         )
     }
 }
@@ -167,6 +166,7 @@ export class ImagePicker extends Component {
             selected : undefined
         };
 
+        _singleton && log('ImagePicker', 'Overriding _singleton reference value because the ImagePicker class was instanciated multiple times', 'watning');
         _singleton = this;
         this.keydown_bound = this.keydown.bind(this);
     }
@@ -178,7 +178,7 @@ export class ImagePicker extends Component {
             initState.loading = true;
             _singleton.setState(initState);
 
-            _single.fetchLatest(allImages => {
+            _singleton.fetchLatest(allImages => {
                 API.get("/uploads/single/" + params.selected, {}, (err, upload) => {
                     allImages.unshift(upload);
                     initState.images = allImages;
@@ -192,12 +192,14 @@ export class ImagePicker extends Component {
         }          
         
         window.addEventListener('keydown', _singleton.keydown_bound);
+        document.addEventListener('navigate', ImagePicker.dismiss);
     }
 
     static dismiss() {
         log('ImagePicker', 'Dismissing image picker singleton', 'detail');
         _singleton.setState({ visible : false });
         window.removeEventListener('keydown', _singleton.keydown_bound);
+        document.removeEventListener('navigate', ImagePicker.dismiss);
     }
 
     static accept() {        

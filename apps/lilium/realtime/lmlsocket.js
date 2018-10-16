@@ -17,6 +17,10 @@ export class LMLSocket {
         });
     }
 
+    send(ev, data) {
+        this.socket.emit(ev, data);
+    }
+
     bind(ev, callback) {
         log('LMLSocket', 'Binding a realtime event : ' + ev, 'socket');
         if (!SOCKET_EVENTS[ev]) {        

@@ -26,7 +26,7 @@
         }, {
             "module" : "ponglinks.js",
             "endpoint" : "ponglinks",
-            "support" : ["livevar", "admin_get", "admin_post", "setup"],
+            "support" : ["livevar", "admin_post", "setup"],
             "admin_menu" : {
                 "id": "ponglinks",
                 "lys" : "ponglinks",
@@ -59,6 +59,10 @@
             "module" : "notifications.js",
             "endpoint" : "notifications",
             "support" : ["admin_post"]
+        }, {
+            "module" : "googlemaps.js",
+            "endpoint" : "googlemaps",
+            "support" : ["admin_post", "livevar", "setup"]
         }, {
             "module" : "search.js",
             "endpoint" : "search",
@@ -249,7 +253,7 @@
         }, {
             "module" : "contentcontroller.js",
             "endpoint" : "publishing",
-            "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "livevar"],
+            "support" : ["admin_get", "admin_post", "admin_put", "admin_delete", "get", "livevar"],
             "admin_menu" : {
                 "id" : "publishing",
                 "lys" : "articles,publishing,content",
@@ -379,6 +383,20 @@
                 "priority": 410,
                 "rights": ["editor"],
                 "absURL": "admin/socialdispatch",
+                "children": []
+            }
+        }, {
+            "module" : "pwmanager.js",
+            "endpoint" : "pwmanager",
+            "support" : ["admin_post", "admin_put", "admin_delete", "livevar"],
+            "admin_menu" : {
+                "id": "pwmanager",
+                "lys" : "password,manager,pw,social,facebook,twitter,instagram",
+                "faicon": "fa-key",
+                "displayname": "Password Manager",
+                "priority": 440,
+                "rights": ["manage-passwords"],
+                "absURL": "admin/pwmanager",
                 "children": []
             }
         }, {

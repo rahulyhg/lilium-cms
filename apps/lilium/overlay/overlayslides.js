@@ -25,7 +25,7 @@ class OverlaySlideRight extends Component {
     render() {
         return (
             <div id="overlay-slide-right">
-                <this.props.component extras={ this.props.extras } />
+                <this.props.component extra={ this.props.extra } />
             </div>
         )
     }
@@ -37,11 +37,15 @@ export class OverlaySlides extends Component {
     }
 
     render() {
-        return (
-            <div id="overlay-slides">
-                <OverlaySlideLeft title={this.props.options.title} subtitle={this.props.options.subtitle} />
-                <OverlaySlideRight component={this.props.component}/>
-            </div>
-        )
+        if (this.props.options.customlayout) {
+            return (<this.props.component extra={this.props.extra} title={this.props.options.title} subtitle={this.props.options.subtitle} />)
+        } else {
+            return (
+                <div id="overlay-slides">
+                    <OverlaySlideLeft title={this.props.options.title} subtitle={this.props.options.subtitle} />
+                    <OverlaySlideRight component={this.props.component} extra={this.props.extra} />
+                </div>
+            )
+        }
     }
 }

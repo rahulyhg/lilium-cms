@@ -54,7 +54,7 @@ class ThreadHeader extends Component {
                 </div>
                 
                 <div style={{ marginTop : 15 }} class="thread-view-actions">
-                    <ButtonWorker work={this.props.deleteAction.bind(this)} text="Delete thread" theme="danger" />
+                    <ButtonWorker work={this.props.deleteAction.bind(this)} text="Delete thread" theme="red" />
                     <ButtonWorker text="Ban User [TO DO]" theme="white" />
                 </div>
             </div>

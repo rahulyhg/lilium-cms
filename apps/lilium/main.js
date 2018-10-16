@@ -4,6 +4,7 @@ import { Header } from './layout/header'
 import { LiliumMenu } from './layout/menu';
 import { URLRenderer } from './routing/urlrenderer';
 import { ImagePicker } from './layout/imagepicker';
+import { PlacePicker } from './layout/placepicker';
 import { LoadingView } from './layout/loading';
 import { OverlayWrap } from './overlay/overlaywrap';
 import { Lys } from './layout/lys';
@@ -108,6 +109,7 @@ class Lilium extends Component {
                 <NotificationWrapper />
                 <CakepopWrapper />
                 <ImagePicker />
+                <PlacePicker />
                 <OverlayWrap />
 
                 { liliumcms.env == "dev" ? <DevTools /> : null }

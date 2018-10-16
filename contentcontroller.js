@@ -4,6 +4,13 @@ const hooks = require('./hooks');
 const db = require('./includes/db');
 
 class ContentController {
+    GET(cli) {
+        switch (cli.routeinfo.path[1]) {
+            case "preview" : contentlib.getPreview(cli._c, db.mongoID(cli.routeinfo.path[2]), cli.routeinfo.path[3], (err, markup) => err ? cli.throwHTTP(err, undefined, true) : cli.sendHTML(markup)); break;
+            default : cli.refuse();
+        }        
+    }
+
     adminGET(cli) {
         // Get LML3 markup
         switch (cli.routeinfo.path[2]) {
@@ -69,15 +76,27 @@ class ContentController {
                     }
                 }, { author : 1 });
                 break;
+            case 'validate':
+                log('Content', 'Validating article from PUT under /validate', 'detail');
+                contentlib.validate(cli._c, _id, db.mongoID(cli.userinfo.userid), err => {
+                    if (err) {
+                        log('Content', 'Article failed validation', 'info');
+                        cli.throwHTTP(err.code, err.error, true);
+                    } else {
+                        log('Content', 'Article was validated successfully', 'success');
+                        cli.sendJSON({ valid : true });
+                    }
+                })
+                break;
             case 'publish':
                 log('Content', 'Publishing from PUT under /publish', 'detail');
-                db.findUnique(cli._c, 'content', { _id }, (err, article) => {
-                    if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
-                        contentlib.publish(cli._c, article, db.mongoID(cli.userinfo.userid), resp => cli.sendJSON(resp));
-                        contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
+                contentlib.publish(cli._c, _id, db.mongoID(cli.userinfo.userid), resp => {
+                    if (resp.error) {
+                        cli.throwHTTP(resp.code, resp.error, true);
                     } else {
-                        log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
-                        cli.throwHTTP(404, undefined, true);
+                        contentlib.facebookDebug(cli._c, db.mongoID(cli.userinfo.userid), _id, () => { });
+
+                        cli.sendJSON(resp);
                     }
                 });
                 break;
@@ -184,7 +203,21 @@ class ContentController {
                         });
                     } else {
                         log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
-                        cli.throwHTTP(404, undefined, true);
+                        cli.throwHTTP(404, "Missing rights", true);
+                    }
+                });
+                break;
+
+            case 'previewlink':
+                db.findUnique(cli._c, 'content', { _id }, (err, article) => {
+                    if (article && (cli.hasRight('editor') || !article.author || cli.userinfo.userid == article.author.toString())) {
+                        const previewkey = Math.random().toString(32).substring(2);
+                        db.update(cli._c, 'content', { _id}, { previewkey }, () => {
+                            cli.sendJSON({ previewkey });
+                        });
+                    } else {
+                        log('Content', 'User ' + cli.userinfo.displayname + ' was not authorized to edit article with id ' + _id, 'warn');
+                        cli.throwHTTP(404, "Missing rights", true);
                     }
                 });
                 break;
@@ -217,6 +250,8 @@ class ContentController {
             contentlib.getLatestAutosave(cli._c, db.mongoID(levels[1]), entry => sendback(entry || { none : true })); 
         } else if (levels[0] == "history") {
             contentlib.getHistoryList(cli._c, levels[1], list => sendback(list));
+        } else if (levels[0] == "report") {
+            contentlib.generatePublicationReport(cli._c, db.mongoID(levels[1]), report => sendback(report));
         } else {
             sendback([]);
         }

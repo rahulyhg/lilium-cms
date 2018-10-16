@@ -28,8 +28,10 @@ const dashboard = require('./dashboard');
 const dateformat = require('dateformat');
 const hooks = require('./hooks')
 
+const SERVER_TIMEZONE_OFFSET = new Date().getTimezoneOffset();
+
 class TheDailyLilium {
-    storeEntry(_c, datetime, done) {
+    storeYesterday(_c, datetime, _id, done) {
         log('DailyLilium', "Generating The Daily Lilium entry for date " + datetime, 'info');
         const _d = require('./config').default();
 
@@ -37,7 +39,7 @@ class TheDailyLilium {
         const datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 0, 0, 0);
         const dateend = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate(), 23,59,59);
 
-        const report = {};
+        const report = { _id };
         Analytics.addSite(_c, () => {
             if (!_c.analytics || !_c.analytics.jsonkeypath) {
                 return done && done();
@@ -116,11 +118,10 @@ class TheDailyLilium {
                                     ], topsearches => {
                                         log('DailyLilium', "Fetched top searches from database", 'detail');
                                         report.topsearches = topsearches;
-                                        report._id = dateformat(datestart, "ddmmyyyy");
 
                                         db.rawCollection(_c, 'thedailylilium', {}, (err, col) => {
                                             hooks.fireSite(_c, 'dailyLiliumGenerate', {report})
-                                            col.replaceOne({ _id : report._id }, report, {
+                                            col.replaceOne({ _id : report._id, tzoffset }, report, {
                                                 upsert : 1
                                             }, (err, r) => {
                                                 log('DailyLilium', "Inserted report inside database", "success");
@@ -136,25 +137,7 @@ class TheDailyLilium {
             });       
         });       
     }
-
-    adminGET(cli) {
-        const page = cli.routeinfo.path[2];
-
-        switch (page) {
-            case undefined:
-            case "articles":
-                require('./filelogic').serveAdminLML3(cli);
-                break;
-
-            case "edit":
-                require('./filelogic').serveAdminLML3(cli, true);
-                break;
-
-            default:
-                cli.throwHTTP(404);
-        }
-    }
-
+    
     adminPOST(cli) {
         const action = cli.routeinfo.path[2];
         const _id = db.mongoID(cli.routeinfo.path[3]);
@@ -213,28 +196,42 @@ class TheDailyLilium {
             ], arr => {
                 sendback(arr[0]);
             });
-        } else {
+        } else if (action == "yesterday") {
             const temp = new Date();
-            let datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, 0, 0);
-            if (params && params.tzoffset) {
-                datestart = new Date(datestart.getTime() + (1000 * 60 * params.tzoffset) - (1000 * 60 * new Date().getTimezoneOffset()));
-            }
-
-            const _id = dateformat(datestart, "ddmmyyyy");
+            let datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, temp.getTime() - ((1000 * 60 * params.tzoffset) - SERVER_TIMEZONE_OFFSET), 0); 
+            const _id = dateformat(datestart, "ddmmyyyy") + tzoffset + "-day";
 
             db.findUnique(cli._c, 'thedailylilium', { _id }, (err, report) => {
-                db.findToArray(require('./config').default(), 'tdlposts', { editionOf : _id }, (err, customposts) => {
+                // db.findToArray(require('./config').default(), 'tdlposts', { editionOf : _id }, (err, customposts) => {
                     if (!report) {
-                        this.storeEntry(cli._c, datestart, report => {
-                            report.customposts = customposts;
+                        this.storeYesterday(cli._c, datestart, _id, report => {
+                            // report.customposts = customposts;
                             sendback(report);
                         });
                     } else {
-                        report.customposts = customposts;
+                        // report.customposts = customposts;
                         sendback(report);
                     }
-                });
+                // });
             });
+        } else if (action == "lastweek") {
+            const temp = new Date();
+            let datestart = new Date(temp.getFullYear(), temp.getMonth(), temp.getDate() - 1, 0, temp.getTime() - ((1000 * 60 * params.tzoffset) - SERVER_TIMEZONE_OFFSET), 0);             
+            const _id = dateformat(datestart, "ddmmyyyy") + tzoffset + "-week";
+
+            db.findUnique(cli._c, 'thedailylilium', { _id }, (err, report) => {
+                if (!report) {
+                    this.storeYesterday(cli._c, datestart, _id, report => {
+                        sendback(report);
+                    });
+                } else {
+                    sendback(report);
+                }
+            });
+        } else if (action == "lastmonth") {
+
+        } else {
+            sendback({ ok : "nope" });
         }
     }
 }
